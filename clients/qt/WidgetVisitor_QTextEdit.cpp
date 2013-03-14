@@ -31,12 +31,13 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QTextEdit.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QTextEdit::WidgetVisitorState_QTextEdit( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
 	,m_textEdit(qobject_cast<QTextEdit*>(widget_)){}
 
-void WidgetVisitorState_QTextEdit::clearProperty()
+void WidgetVisitorState_QTextEdit::clear()
 {
 	m_textEdit->clear();
 }
@@ -64,5 +65,16 @@ const QList<QByteArray>& WidgetVisitorState_QTextEdit::dataelements() const
 {
 	static const DataElements ar( "", 0);
 	return ar;
+}
+
+void WidgetVisitorState_QTextEdit::setState( const QString& state)
+{
+	qDebug() << "Restoring tree state for text edit" << m_textEdit->objectName();
+	m_textEdit->setHtml( state);
+}
+
+QString WidgetVisitorState_QTextEdit::getState() const
+{
+	return m_textEdit->toHtml();
 }
 

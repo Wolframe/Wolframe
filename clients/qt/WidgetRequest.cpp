@@ -36,7 +36,7 @@
 #include <QXmlStreamWriter>
 #include <QVariant>
 
-static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& dataroot, bool debugmode)
+static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& dataobject, bool debugmode)
 {
 	QList<QByteArray> props = visitor.widget()->dynamicPropertyNames();
 	QString docType,rootElement;
@@ -72,11 +72,11 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 	QList<WidgetVisitor::Element> elements;
 	if (hasSelectedDataElements)
 	{
-		elements = dataroot.elements( selectedDataElements);
+		elements = dataobject.elements( selectedDataElements);
 	}
 	else
 	{
-		elements = dataroot.elements();
+		elements = dataobject.elements();
 	}
 	if (debugmode)
 	{
@@ -136,18 +136,17 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	QByteArray rt;
-	QVariant datarootname = visitor.property( "dataroot");
-	if (datarootname.isValid())
+	QVariant dataobjectname = visitor.property( "dataobject");
+	if (dataobjectname.isValid())
 	{
-		WidgetVisitor dataroot = visitor.getRootElement( datarootname.toByteArray());
-		if (!dataroot.widget())
+		WidgetVisitor dataobject = visitor.getRootElement( dataobjectname.toByteArray());
+		if (!dataobject.widget())
 		{
-			qCritical() << "action dataroot does not address a known widget:" << datarootname;
+			qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
 			return rt;
 		}
-		rt = getWigdetRequest_( visitor, dataroot, debugmode);
-		qDebug() << "widget request of " << dataroot.objectName() << "=" << rt;
-		visitor.leave();
+		rt = getWigdetRequest_( visitor, dataobject, debugmode);
+		qDebug() << "widget request of " << dataobject.objectName() << "=" << rt;
 	}
 	else
 	{
@@ -166,17 +165,20 @@ struct WidgetAnswerStackElement
 	QByteArray name;
 	QString tok;
 	bool istag;
+	bool ischild;
 
-	explicit WidgetAnswerStackElement( const QXmlStreamReader& xml, bool istag_)
+	explicit WidgetAnswerStackElement( const QXmlStreamReader& xml, bool istag_, bool ischild_)
 		:name(xml.name().toString().toAscii())
 		,tok()
 		,istag(istag_)
+		,ischild(ischild_)
 	{}
 
 	WidgetAnswerStackElement( const WidgetAnswerStackElement& o)
 		:name( o.name)
 		,tok( o.tok)
 		,istag(o.istag)
+		,ischild(o.ischild)
 	{}
 };
 
@@ -201,6 +203,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 	QList<WidgetAnswerStackElement> stk;
 	QXmlStreamReader xml( answer);
 	int taglevel = 0;
+	visitor.resetState();
 
 	qDebug( ) << "feeding widget " << visitor.objectName() << "with XML";
 
@@ -220,11 +223,15 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				XMLERROR( xml, stk, QString( "element not defined: '") + stk.last().name + "/" + tagname + "'");
 				return false;
 			}
+			QWidget* prev_widget = visitor.widget();
 			bool istag = visitor.enter( tagname, true);
-			stk.push_back( WidgetAnswerStackElement( xml, istag));
+			bool ischild = (prev_widget != visitor.widget());
+			stk.push_back( WidgetAnswerStackElement( xml, istag, ischild));
 			QXmlStreamAttributes attributes = xml.attributes();
 			if (istag)
 			{
+				if (ischild) visitor.resetState();
+
 				QXmlStreamAttributes::const_iterator ai = attributes.begin(), ae = attributes.end();
 				for (; ai != ae; ++ai)
 				{
@@ -264,7 +271,8 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				{
 					XMLERROR( xml, stk, "failed to set content element");
 				}
-				visitor.leave();
+				if (stk.last().ischild) visitor.restoreState();
+				visitor.leave( true);
 			}
 			else
 			{
@@ -290,6 +298,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			stk.last().tok.append( xml.text());
 		}
 	}
+	visitor.restoreState();
 	return true;
 }
 

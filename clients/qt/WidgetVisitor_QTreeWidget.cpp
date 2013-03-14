@@ -57,7 +57,7 @@ WidgetVisitorState_QTreeWidget::WidgetVisitorState_QTreeWidget( QWidget* widget_
 	m_dataelements_list.append( m_headers);
 }
 
-void WidgetVisitorState_QTreeWidget::clearProperty()
+void WidgetVisitorState_QTreeWidget::clear()
 {
 	m_treeWidget->clear();
 	m_mode = Init;
@@ -112,7 +112,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 	return false;
 }
 
-bool WidgetVisitorState_QTreeWidget::leave()
+bool WidgetVisitorState_QTreeWidget::leave( bool /*writemode*/)
 {
 	if (m_stk.isEmpty()) return false;
 	m_stk.pop_back();
@@ -191,4 +191,69 @@ const QList<QByteArray>& WidgetVisitorState_QTreeWidget::dataelements() const
 	}
 	return noDataElements;
 }
+
+
+typedef void (*UnfoldProc)( QTreeWidget* tree, QTreeWidgetItem* item);
+void unfoldProc_SetExpanded( QTreeWidget* /*tree*/, QTreeWidgetItem* item)
+{
+	item->setExpanded( true);
+}
+void unfoldProc_SetSelected( QTreeWidget* tree, QTreeWidgetItem* item)
+{
+	item->setSelected( true);
+	// better than nothing, scroll to the position of the last selection (usually one)
+	tree->scrollToItem( item);
+}
+
+static void unfoldNodes( QTreeWidget* tree, const QList<QString>& stateList, QChar marker, UnfoldProc unfoldProc)
+{
+	QSet<QString> states;
+	foreach (QString state, stateList)
+	{
+		if (state[0] == marker)
+		{
+			states.insert( state.mid( 1, state.length() - 1));
+		}
+	}
+	QTreeWidgetItemIterator it( tree);
+	while (*it)
+	{
+		QString id = (*it)->data( 0, Qt::UserRole).toString();
+		if (states.contains( id))
+		{
+			unfoldProc( tree, *it);
+		}
+		++it;
+	}
+}
+
+void WidgetVisitorState_QTreeWidget::setState( const QString& state)
+{
+	qDebug() << "Restoring tree state for tree" << m_elementname;
+	QList<QString> stateList = state.split( "|", QString::SkipEmptyParts);
+	// expand tree first, otherwise parents get selected if we select a non-expanded subtree!
+	unfoldNodes( m_treeWidget, stateList, 'E', unfoldProc_SetExpanded);
+	unfoldNodes( m_treeWidget, stateList, 'S', unfoldProc_SetSelected);
+}
+
+QString WidgetVisitorState_QTreeWidget::getState() const
+{
+	QTreeWidgetItemIterator it( m_treeWidget );
+	QString state = "";
+	while( *it ) {
+		if( (*it)->isExpanded( ) ) {
+			state.append( "E" );
+			state.append( (*it)->data( 0, Qt::UserRole ).toString( ) );
+			state.append( "|" );
+		}
+		if( (*it)->isSelected( ) ) {
+			state.append( "S" );
+			state.append( (*it)->data( 0, Qt::UserRole ).toString( ) );
+			state.append( "|" );
+		}
+		++it;
+	}
+	return state;
+}
+
 

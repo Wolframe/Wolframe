@@ -31,12 +31,13 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QListWidget.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QListWidget::WidgetVisitorState_QListWidget( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
 	,m_listWidget(qobject_cast<QListWidget*>(widget_)){}
 
-void WidgetVisitorState_QListWidget::clearProperty()
+void WidgetVisitorState_QListWidget::clear()
 {
 	m_listWidget->clear();
 }
@@ -78,4 +79,16 @@ const QList<QByteArray>& WidgetVisitorState_QListWidget::dataelements() const
 	static const DataElements ar( "select", 0);
 	return ar;
 }
+
+void WidgetVisitorState_QListWidget::setState( const QString& /*state*/)
+{
+	qDebug() << "Restoring tree state for list widget" << m_listWidget->objectName();
+}
+
+QString WidgetVisitorState_QListWidget::getState() const
+{
+	return QString();
+}
+
+
 

@@ -560,38 +560,6 @@ void DataHandler::resetFormData( QWidget *form )
 	}
 }
 
-void DataHandler::loadFormDomains( QString form_name, QWidget *form, QString name )
-{
-	QWidget *widget = form->findChild<QWidget *>( name );
-	
-	loadFormDomains( form_name, form, widget, name );
-}
-
-void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name )
-{
-	QString clazz = widget->metaObject( )->className( ); 
-	
-	// TODO: widgets can also have custom properties for the domain handling
-	QHash<QString, QString> *props = new QHash<QString, QString>( );
-	FormWidget::readDynamicStringProperties( props, widget );
-
-	QString window_name = QString::number( (int)m_formWidget->winId( ) );
-	if( clazz == "QComboBox" ) {
-		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
-	} else if( clazz == "QListWidget" ) {
-		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
-	} else if( clazz == "QTreeWidget" ) {
-		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
-	} else if( clazz == "QTableWidget" ) {
-		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
-	} else {
-		// all other classes don't load domains, but we want to keep
-		// the calling code generic..
-	}
-	
-	//[+]qDebug( ) << "Domain load in " << clazz << name;
-}
-
 void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 {
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );

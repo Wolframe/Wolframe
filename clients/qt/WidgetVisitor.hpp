@@ -65,7 +65,7 @@ class WidgetVisitor
 		WidgetVisitor getRootElement( const QByteArray& name);
 
 		///\brief Set the current node to the parent that called enter to this node.
-		void leave();
+		void leave( bool writemode);
 
 		/** Property name resolving process:
 		*	(A) Split name to SELECT.REST and try to enter SELECT from the current node and eveluate there REST
@@ -162,14 +162,16 @@ class WidgetVisitor
 				return m_widget;
 			}
 
-			virtual void clearProperty(){}
+			virtual void clear(){}
 			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
-			virtual bool leave()							{return false;}
+			virtual bool leave( bool /*writemode*/)					{return false;}
 			virtual QVariant property( const QByteArray&)				{return QVariant();}
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
 			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
 			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
 			const QByteArray& getSynonym( const QByteArray& name) const;
+			virtual void setState( const QString& /*state*/){}
+			virtual QString getState()						{return QByteArray();}
 
 			QVariant dynamicProperty( const QByteArray& name) const;
 			bool setDynamicProperty( const QByteArray&, const QVariant& value);
@@ -200,6 +202,11 @@ class WidgetVisitor
 		///\brief Resolve reference to a variable
 		///\param[in] value to resolve
 		QVariant resolve( const QVariant& value);
+
+		///\brief Backup state description in a dynamic property and reset widget state
+		void resetState();
+		///\brief Restore the state from its description backup (resetState)
+		void restoreState();
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

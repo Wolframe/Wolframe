@@ -92,7 +92,7 @@ bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode
 	return false;
 }
 
-bool WidgetVisitorState_QComboBox::leave()
+bool WidgetVisitorState_QComboBox::leave( bool /*writemode*/)
 {
 	switch (m_stateid)
 	{

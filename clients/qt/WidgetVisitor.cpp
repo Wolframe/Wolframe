@@ -196,17 +196,16 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 			return false;
 		}
 		if (children.isEmpty()) return false;
-
 		m_stk.push( widgetVisitorState( children[0]));
 		return true;
 	}
 	return false;
 }
 
-void WidgetVisitor::leave()
+void WidgetVisitor::leave( bool writemode)
 {
 	if (m_stk.empty()) return;
-	if (!m_stk.top()->leave())
+	if (!m_stk.top()->leave( writemode))
 	{
 		m_stk.pop();
 	}
@@ -328,6 +327,31 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
+void WidgetVisitor::resetState()
+{
+	if (!m_stk.isEmpty())
+	{
+		QString state = m_stk.top()->getState();
+		if (!state.isEmpty())
+		{
+			m_stk.top()->widget()->setProperty( "_w_state", state);
+		}
+		m_stk.top()->clear();
+	}
+}
+
+void WidgetVisitor::restoreState()
+{
+	if (!m_stk.isEmpty())
+	{
+		QVariant state = m_stk.top()->widget()->property( "_w_state");
+		if (state.isValid())
+		{
+			m_stk.top()->setState( state.toString());
+		}
+	}
+}
+
 WidgetVisitor WidgetVisitor::getRootElement( const QByteArray& name)
 {
 	if (m_stk.empty()) return WidgetVisitor();
@@ -365,7 +389,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 		if (enter( prefix, false))
 		{
 			rt = property( rest, level+1);
-			leave();
+			leave( false);
 			if (m_stk.top()->isRepeatingDataElement( prefix))
 			{
 				// ... handle array
@@ -375,7 +399,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 				while (enter( prefix, false))
 				{
 					rt = property( rest, level+1);
-					leave();
+					leave( false);
 					rtlist.push_back( rt);
 				}
 				return QVariant( rtlist);
@@ -443,7 +467,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 		if (enter( prefix, true))
 		{
 			bool rt = setProperty( rest, value, level+1);
-			leave();
+			leave( true);
 			if (m_stk.top()->isRepeatingDataElement( prefix))
 			{
 				qCritical() << "cannot set property addressing a set of properties:" << prefix;
@@ -535,14 +559,14 @@ static bool isReservedProperty( const QByteArray& key)
 	// ignore Wolframe elements:
 	if (key[0] == 'd')
 	{
-		if (key == "doctype" || key == "dataroot" || key == "dataelement")
+		if (key == "doctype" || key == "dataobject" || key == "dataelement")
 		{
 			return true;
 		}
 	}
 	else
 	{
-		if (key == "rootelement" || key == "form" || key == "state")
+		if (key == "rootelement" || key == "form")
 		{
 			return true;
 		}
@@ -779,7 +803,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 				{
 					rt.push_back( Element( Element::CloseTag, ""));
 				}
-				leave();
+				leave( false);
 			}
 		}
 	}

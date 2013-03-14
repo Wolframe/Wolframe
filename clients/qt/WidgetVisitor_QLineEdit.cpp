@@ -31,12 +31,13 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QLineEdit.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QLineEdit::WidgetVisitorState_QLineEdit( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
 	,m_lineEdit(qobject_cast<QLineEdit*>(widget_)){}
 
-void WidgetVisitorState_QLineEdit::clearProperty()
+void WidgetVisitorState_QLineEdit::clear()
 {
 	m_lineEdit->clear();
 }
@@ -64,5 +65,16 @@ const QList<QByteArray>& WidgetVisitorState_QLineEdit::dataelements() const
 {
 	static const DataElements ar( "", 0);
 	return ar;
+}
+
+void WidgetVisitorState_QLineEdit::setState( const QString& state)
+{
+	qDebug() << "Restoring tree state for line edit" << m_lineEdit->objectName();
+	m_lineEdit->setText( state);
+}
+
+QString WidgetVisitorState_QLineEdit::getState() const
+{
+	return m_lineEdit->text();
 }
 

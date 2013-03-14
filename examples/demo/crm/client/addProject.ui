@@ -92,7 +92,7 @@
        <property name="dataelement" stdset="0">
         <string>@customerid,name,description</string>
        </property>
-       <property name="dataroot" stdset="0">
+       <property name="dataobject" stdset="0">
         <string>addProject</string>
        </property>
       </widget>

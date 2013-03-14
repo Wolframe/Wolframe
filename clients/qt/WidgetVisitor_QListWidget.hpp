@@ -42,10 +42,12 @@ class WidgetVisitorState_QListWidget
 public:
 	WidgetVisitorState_QListWidget( QWidget* widget_);
 
-	virtual void clearProperty();
+	virtual void clear();
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
+	virtual void setState( const QString& state);
+	virtual QString getState() const;
 
 private:
 	QListWidget* m_listWidget;

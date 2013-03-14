@@ -43,12 +43,14 @@ public:
 	WidgetVisitorState_QTreeWidget( QWidget* widget_);
 
 	virtual bool enter( const QByteArray& name, bool writemode);
-	virtual bool leave();
-	virtual void clearProperty();
+	virtual bool leave( bool writemode);
+	virtual void clear();
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
 	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual void setState( const QString& state);
+	virtual QString getState() const;
 
 private:
 	struct StackElement

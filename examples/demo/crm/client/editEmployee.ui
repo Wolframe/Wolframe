@@ -160,7 +160,7 @@
        <property name="form" stdset="0">
         <string notr="true">listEmployee</string>
        </property>
-       <property name="dataroot" stdset="0">
+       <property name="dataobject" stdset="0">
         <string>employee</string>
        </property>
       </widget>

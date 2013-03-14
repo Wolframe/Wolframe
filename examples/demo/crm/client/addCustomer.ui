@@ -148,7 +148,7 @@
        <property name="form" stdset="0">
         <string notr="true">listCustomer</string>
        </property>
-       <property name="dataroot" stdset="0">
+       <property name="dataobject" stdset="0">
         <string>addCustomer</string>
        </property>
       </widget>

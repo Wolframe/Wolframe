@@ -101,7 +101,7 @@
        <property name="dataelement" stdset="0">
         <string>@id,@customerid,name,description</string>
        </property>
-       <property name="dataroot" stdset="0">
+       <property name="dataobject" stdset="0">
         <string>project</string>
        </property>
       </widget>

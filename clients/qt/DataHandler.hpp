@@ -61,13 +61,11 @@ class DataHandler : public QObject
 		void clearWidgetData( QWidget *widget, QString name );
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void loadFormDomains( QString name, QWidget *form );
-		void loadFormDomains( QString form_name, QWidget *form, QString name );
 		QString readFormVariable( QString variable, QWidget *form );
 
 	private:
 		void writeWidgets( QWidget *_parent, QStringList *dataElements, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
 		void resetWidgetData( QWidget *widget, QString name );
-		void loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name );
 	
 	private:
 		DataLoader *m_dataLoader;
