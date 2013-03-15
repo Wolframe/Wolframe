@@ -68,6 +68,7 @@ CPP_OBJS = \
 	WidgetVisitor_QLineEdit.o \
 	WidgetVisitor_QTextEdit.o \
 	WidgetVisitor_QTreeWidget.o \
+	WidgetVisitor_QTableWidget.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
 	FormCall.o \

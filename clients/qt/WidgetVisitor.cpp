@@ -341,11 +341,8 @@ void WidgetVisitor::resetState()
 
 void WidgetVisitor::restoreState()
 {
-	if (!m_stk.isEmpty())
-	{
-		QVariant state = m_stk.top()->widget()->property( "_w_state");
-		m_stk.top()->setState( state);
-	}
+	QVariant state = m_stk.top()->widget()->property( "_w_state");
+	m_stk.top()->setState( state);
 }
 
 WidgetVisitor WidgetVisitor::getRootElement( const QByteArray& name)

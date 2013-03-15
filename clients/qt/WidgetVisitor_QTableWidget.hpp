@@ -31,16 +31,16 @@
 
 ************************************************************************/
 
-#ifndef _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
-#define _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
+#ifndef _WIDGET_VISIOR_QTableWidget_HPP_INCLUDED
+#define _WIDGET_VISIOR_QTableWidget_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
-#include <QTreeWidget>
+#include <QTableWidget>
 
-class WidgetVisitorState_QTreeWidget
+class WidgetVisitorState_QTableWidget
 	:public WidgetVisitor::State
 {
 public:
-	WidgetVisitorState_QTreeWidget( QWidget* widget_);
+	WidgetVisitorState_QTableWidget( QWidget* widget_);
 
 	virtual bool enter( const QByteArray& name, bool writemode);
 	virtual bool leave( bool writemode);
@@ -56,26 +56,25 @@ private:
 	struct StackElement
 	{
 		int readpos;
-		QTreeWidgetItem* item;
+		QTableWidgetItem* item;
 		StackElement() :readpos(0),item(0){}
 		StackElement( const StackElement& o) :readpos(o.readpos),item(o.item){}
-		StackElement( QTreeWidgetItem* item_) :readpos(0),item(item_){}
+		StackElement( QTableWidgetItem* item_) :readpos(0),item(item_){}
 	};
 
-	QTreeWidget* m_treeWidget;
-	QStack<StackElement> m_stk;
-	QList<QByteArray> m_headers;
-	QByteArray m_elementname;
-	enum Mode {Init,Tree,List};
-	static const char* modeName( Mode i)
-	{
-		static const char* ar[] = {"Init","Tree","List"};
-		return ar[(int)i];
-	}
+	QTableWidget* m_tableWidget;
+	QHash<QByteArray,int> m_colheaders;
+	QHash<QByteArray,int> m_rowheaders;
+	enum Mode {Init,Row,Column};
 	Mode m_mode;
+	QList<QVariant> m_items;
+	int m_row;
+	int m_column;
+	int m_rowcount;
+	int m_columncount;
 	QList<QByteArray> m_dataelements_init;
-	QList<QByteArray> m_dataelements_tree;
-	QList<QByteArray> m_dataelements_list;
+	QList<QByteArray> m_dataelements_row;
+	QList<QByteArray> m_dataelements_col;
 };
 
 #endif

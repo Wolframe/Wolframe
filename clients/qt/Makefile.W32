@@ -81,6 +81,7 @@ OBJS = \
 	WidgetVisitor_QLineEdit.obj \
 	WidgetVisitor_QTextEdit.obj \
 	WidgetVisitor_QTreeWidget.obj \
+	WidgetVisitor_QTableWidget.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
 	FormCall.obj \

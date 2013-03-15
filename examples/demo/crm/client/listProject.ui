@@ -97,7 +97,7 @@
       <string>ListProject</string>
      </property>
      <property name="dataelement" stdset="0">
-      <string/>
+      <string> </string>
      </property>
      <column>
       <property name="text">

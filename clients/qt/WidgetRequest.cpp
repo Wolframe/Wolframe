@@ -35,6 +35,14 @@
 #include "DebugTerminal.hpp"
 #include <QXmlStreamWriter>
 #include <QVariant>
+#define WOLFRAME_LOWLEVEL_DEBUG
+#ifdef WOLFRAME_LOWLEVEL_DEBUG
+#define TRACE_VALUE( TITLE, VALUE)			qDebug() << "widget answer XML " << (TITLE) << (VALUE);
+#define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)		qDebug() << "widget answer XML " << (TITLE) << (NAME) << "=" << (VALUE);
+#else
+#define TRACE_VALUE( TITLE, VALUE)
+#define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
+#endif
 
 static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& dataobject, bool debugmode)
 {
@@ -46,7 +54,21 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 
 	if (props.contains("dataelement"))
 	{
-		selectedDataElements = visitor.property( "dataelement").toByteArray().split( ',');
+		foreach (const QByteArray& ee, visitor.property( "dataelement").toByteArray().trimmed().split( ','))
+		{
+			QByteArray elem = ee.trimmed();
+			if (!elem.isEmpty())
+			{
+				if (elem[0] == '_')
+				{
+					selectedDataElements.push_back( QByteArray());
+				}
+				else
+				{
+					selectedDataElements.push_back( elem);
+				}
+			}
+		}
 		hasSelectedDataElements = true;
 	}
 	if (props.contains("doctype"))
@@ -203,6 +225,7 @@ static void setAttributes( WidgetVisitor& visitor, const QList<WidgetAnswerStack
 	QXmlStreamAttributes::const_iterator ai = attributes.begin(), ae = attributes.end();
 	for (; ai != ae; ++ai)
 	{
+		TRACE_ASSIGNMENT( "ATTRIBUTE", ai->name().toString(), ai->value().toString());
 		if (!visitor.setProperty( ai->name().toString(), ai->value().toString()))
 		{
 			XMLERROR( xml, stk, QString( "failed to set property '") + ai->name().toString() + "'");
@@ -231,6 +254,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				continue;
 			}
 			QString tagname = xml.name().toString();
+			TRACE_VALUE( "OPEN TAG", tagname);
 			if (!stk.isEmpty() && !stk.last().istag)
 			{
 				XMLERROR( xml, stk, QString( "element not defined: '") + stk.last().name + "/" + tagname + "'");
@@ -263,6 +287,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				//... root element ignored. so is the end element belonging to root element.
 				continue;
 			}
+			TRACE_VALUE( "CLOSE TAG", "");
 			if (stk.isEmpty())
 			{
 				XMLERROR( xml, stk, QString( "unexpected end element: XML tags not balanced"));
@@ -273,6 +298,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			bool tokIsEmpty = (ti == te);
 			if (stk.last().istag)
 			{
+				TRACE_VALUE( "CONTENT", stk.last().tok);
 				if (!tokIsEmpty && !visitor.setProperty( QByteArray(""), stk.last().tok))
 				{
 					XMLERROR( xml, stk, "failed to set content element");
@@ -282,6 +308,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			}
 			else
 			{
+				TRACE_ASSIGNMENT( "PROPERTY", stk.last().name, stk.last().tok);
 				if (!tokIsEmpty && !visitor.setProperty( stk.last().name, stk.last().tok))
 				{
 					XMLERROR( xml, stk, QString( "failed to set property '") + stk.last().name + "'");

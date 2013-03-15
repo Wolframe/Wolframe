@@ -44,7 +44,7 @@ void WidgetVisitorState_QListWidget::clear()
 
 QVariant WidgetVisitorState_QListWidget::property( const QByteArray& name)
 {
-	if (strcmp( name,"select") == 0)
+	if (strcmp( name,"selected") == 0)
 	{
 		QList<QVariant> rt;
 		foreach( QListWidgetItem *item, m_listWidget->selectedItems())
@@ -63,7 +63,7 @@ bool WidgetVisitorState_QListWidget::setProperty( const QByteArray& name, const 
 		m_listWidget->addItem( data.toString());
 		return true;
 	}
-	if (strcmp( name,"select") == 0)
+	if (strcmp( name,"selected") == 0)
 	{
 		QList<QListWidgetItem *> items = m_listWidget->findItems( data.toString(), Qt::MatchExactly);
 		foreach( QListWidgetItem *item, items)
@@ -80,14 +80,34 @@ const QList<QByteArray>& WidgetVisitorState_QListWidget::dataelements() const
 	return ar;
 }
 
-void WidgetVisitorState_QListWidget::setState( const QVariant& /*state*/)
+void WidgetVisitorState_QListWidget::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for list widget" << m_listWidget->objectName();
+	for( int i = 0; i < m_listWidget->count( ); i++ )
+	{
+		QListWidgetItem *item = m_listWidget->item( i );
+		item->setSelected( false);
+	}
+	QList<QVariant> selected = state.toList();
+	foreach (const QVariant& elem, selected)
+	{
+		QList<QListWidgetItem*> itemlist = m_listWidget->findItems( elem.toString(), Qt::MatchExactly);
+		QList<QListWidgetItem*>::iterator ti = itemlist.begin(), te = itemlist.end();
+		for (; ti != te; ++ti)
+		{
+			(*ti)->setSelected( true);
+		}
+	}
 }
 
 QVariant WidgetVisitorState_QListWidget::getState() const
 {
-	return QVariant();
+	QList<QVariant> selected;
+	foreach (const QListWidgetItem* item, m_listWidget->selectedItems())
+	{
+		selected.push_back( QVariant( item->text()));
+	}
+	return QVariant(selected);
 }
 
 

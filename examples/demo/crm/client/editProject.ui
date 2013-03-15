@@ -93,7 +93,7 @@
         <string notr="true">project</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">UpdateProject.simpleform</string>
+        <string notr="true">UpdateProject</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
