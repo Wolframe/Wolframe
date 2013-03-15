@@ -1049,16 +1049,39 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 								item->setSelected( true );
 							}
 						} else if( clazz == "QTreeWidget" ) {
+							QXmlStreamAttributes attributes = xml.attributes( );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 							// TODO: select by name (text in first field), for backwards compatibility, should be done by id
 							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 0 );
-							foreach( QTreeWidgetItem *item, items ) {
-								item->setSelected( true );
-								QTreeWidgetItem *parent = item->parent( );
-								while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
-									parent->setExpanded( true );
-									parent = parent->parent( );
+							if( treeWidget->selectionMode( ) == QAbstractItemView::SingleSelection ) {
+								// problem: single selection, but more than one match, iterate over user data
+								// till we find the proper it
+								foreach( QTreeWidgetItem *item, items ) {
+									QString id = item->data( 0, Qt::UserRole ).toString( );
+									foreach( QXmlStreamAttribute attr, attributes ) {
+										if( attr.name( ) == "id" ) {
+											QString mustId = attr.value( ).toString( );
+											if( id == mustId ) {
+												item->setSelected( true );
+												QTreeWidgetItem *parent = item->parent( );
+												while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
+													parent->setExpanded( true );
+													parent = parent->parent( );
+												}
+												break;
+											}
+										}
+									}									
+								}
+							} else {
+								foreach( QTreeWidgetItem *item, items ) {
+									item->setSelected( true );
+									QTreeWidgetItem *parent = item->parent( );
+									while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
+										parent->setExpanded( true );
+										parent = parent->parent( );
+									}
 								}
 							}
 						} else if( clazz == "QTableWidget" ) {
