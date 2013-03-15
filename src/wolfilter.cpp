@@ -62,9 +62,9 @@ int main( int argc, char **argv )
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
 
 #if defined( DEFAULT_MODULE_LOAD_DIR)
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR));
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR), "");
 #else
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), execdir.string());
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), execdir.string(), "");
 #endif
 		if (cmdline.printversion())
 		{
