@@ -77,9 +77,6 @@ class WidgetVisitor
 		/** Used dynamic property prefixes:
 		*	'synonym:' Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is searched
 		*/
-		/** Rules:
-		*	Structured widget property names (customer.id) refer allways to the last accessed main property (customer)
-		*/
 		///\brief Get the property of the current node by 'name'
 		///\param[in] name name of the property
 		///\return Property variant (any type)
