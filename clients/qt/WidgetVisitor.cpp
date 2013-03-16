@@ -36,6 +36,7 @@
 #include "WidgetVisitor_QTreeWidget.hpp"
 #include "WidgetVisitor_QLineEdit.hpp"
 #include "WidgetVisitor_QTextEdit.hpp"
+#include "WidgetVisitorState_QTableWidget.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
 
@@ -77,7 +78,7 @@ static bool isConvertibleToInt( const QVariant& val)
 }
 
 WidgetVisitor::State::State( QWidget* widget_)
-	:m_widget(widget_)
+	:m_widget(widget_),m_entercnt(1)
 {
 	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
 	{
@@ -149,7 +150,7 @@ static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 	}
 	else if (clazz == "QTableWidget")
 	{
-		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
+		return WidgetVisitor::StateR( new WidgetVisitorState_QTableWidget( widget));
 	}
 	else if (clazz == "QTreeWidget")
 	{
@@ -183,6 +184,43 @@ bool WidgetVisitor::enter( const QString& name, bool writemode)
 bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 {
 	if (m_stk.empty()) return false;
+	QByteArray synonym = m_stk.top()->getSynonym( name);
+	if (!synonym.isEmpty())
+	{
+		int followidx = synonym.indexOf( '.');
+		if (followidx >= 0)
+		{
+			int entercnt = 0;
+			QByteArray prefix( synonym.mid( 0, followidx));
+			QByteArray rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
+			do
+			{
+				if (!enter( prefix, writemode))
+				{
+					for (; entercnt > 0; --entercnt) leave( writemode);
+					return false;
+				}
+				++entercnt;
+				followidx = rest.indexOf( '.');
+				if (followidx < 0)
+				{
+					if (!enter( rest, writemode))
+					{
+						for (; entercnt > 0; --entercnt) leave( writemode);
+						return false;
+					}
+					++entercnt;
+				}
+				prefix = rest.mid( 0, followidx);
+				rest = rest.mid( followidx+1, rest.size()-followidx-1);
+			} while (followidx >= 0);
+			m_stk.top()->entercnt( entercnt);
+		}
+		else
+		{
+			return enter( synonym, writemode);
+		}
+	}
 	if (m_stk.top()->enter( name, writemode))
 	{
 		return true;
@@ -205,9 +243,13 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 void WidgetVisitor::leave( bool writemode)
 {
 	if (m_stk.empty()) return;
-	if (!m_stk.top()->leave( writemode))
+	int cnt = m_stk.top()->entercnt();
+	while (cnt-- > 0)
 	{
-		m_stk.pop();
+		if (!m_stk.top()->leave( writemode))
+		{
+			m_stk.pop();
+		}
 	}
 }
 
@@ -336,6 +378,7 @@ void WidgetVisitor::resetState()
 		{
 			m_stk.top()->widget()->setProperty( "_w_state", state);
 		}
+		m_stk.top()->clear();
 	}
 }
 
@@ -343,6 +386,9 @@ void WidgetVisitor::restoreState()
 {
 	QVariant state = m_stk.top()->widget()->property( "_w_state");
 	m_stk.top()->setState( state);
+
+	QVariant initialFocus = m_stk.top()->dynamicProperty( "initialFocus");
+	if (initialFocus.toBool()) widget()->setFocus();
 }
 
 WidgetVisitor WidgetVisitor::getRootElement( const QByteArray& name)

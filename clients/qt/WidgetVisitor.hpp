@@ -153,7 +153,7 @@ class WidgetVisitor
 		{
 			explicit State( QWidget* widget_);
 			State( const State& o)
-				:m_widget(o.m_widget),m_synonyms(o.m_synonyms){}
+				:m_widget(o.m_widget),m_synonyms(o.m_synonyms),m_entercnt(o.m_entercnt){}
 
 			virtual ~State(){}
 
@@ -161,6 +161,8 @@ class WidgetVisitor
 			{
 				return m_widget;
 			}
+			int entercnt() const		{return m_entercnt;}
+			void entercnt( int entercnt_)	{m_entercnt = entercnt_;}
 
 			virtual void clear(){}
 			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
@@ -186,6 +188,7 @@ class WidgetVisitor
 			QWidget* m_widget;							//< widget reference
 			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
 			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
+			int m_entercnt;								//< counter for leaving multipart synonyms
 		};
 		typedef QSharedPointer<State> StateR;
 
