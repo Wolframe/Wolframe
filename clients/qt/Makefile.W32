@@ -58,6 +58,14 @@ MOC_FLAGS = \
 
 !ENDIF
 
+VISITOR_OBJS = \
+	visitors\WidgetVisitor_QComboBox.obj \
+	visitors\WidgetVisitor_QListWidget.obj \
+	visitors\WidgetVisitor_QLineEdit.obj \
+	visitors\WidgetVisitor_QTextEdit.obj \
+	visitors\WidgetVisitor_QTreeWidget.obj \
+	visitors\WidgetVisitor_QTableWidget.obj
+
 OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \
@@ -76,12 +84,7 @@ OBJS = \
 	WolframeClientProtocol.obj \
 	WolframeClientProtocolBase.obj \
 	WidgetVisitor.obj \
-	WidgetVisitor_QComboBox.obj \
-	WidgetVisitor_QListWidget.obj \
-	WidgetVisitor_QLineEdit.obj \
-	WidgetVisitor_QTextEdit.obj \
-	WidgetVisitor_QTreeWidget.obj \
-	WidgetVisitor_QTableWidget.obj \
+	$(VISITOR_OBJS) \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
 	FormCall.obj \

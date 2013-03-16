@@ -31,12 +31,12 @@
 
 ************************************************************************/
 #include "WidgetVisitor.hpp"
-#include "WidgetVisitor_QComboBox.hpp"
-#include "WidgetVisitor_QListWidget.hpp"
-#include "WidgetVisitor_QTreeWidget.hpp"
-#include "WidgetVisitor_QLineEdit.hpp"
-#include "WidgetVisitor_QTextEdit.hpp"
-#include "WidgetVisitorState_QTableWidget.hpp"
+#include "visitors/WidgetVisitor_QComboBox.hpp"
+#include "visitors/WidgetVisitor_QListWidget.hpp"
+#include "visitors/WidgetVisitor_QTreeWidget.hpp"
+#include "visitors/WidgetVisitor_QLineEdit.hpp"
+#include "visitors/WidgetVisitor_QTextEdit.hpp"
+#include "visitors/WidgetVisitor_QTableWidget.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
 
