@@ -18,84 +18,56 @@
 #include "visitors/WidgetVisitor_FileChooser.hpp"
 #include "visitors/WidgetVisitor_PictureChooser.hpp"
 
+typedef WidgetVisitor::StateR (*StateConstructor)( QWidget* widget);
+
+struct WidgetVisitorTypeMap :QHash<QString,StateConstructor>
+{
+	template <class VisitorStateClass>
+	static WidgetVisitor::StateR stateConstructor( QWidget* widget)
+	{
+		return WidgetVisitor::StateR( new VisitorStateClass( widget));
+	}
+	template <class VisitorStateClass>
+	void addClass( const char* name)
+	{
+		(*this)[ QString( name)] = &stateConstructor<VisitorStateClass>;
+	}
+	#define ADD_WidgetVisitorType( NAME ) { addClass<WidgetVisitorState_ ## NAME>( #NAME); }
+	WidgetVisitorTypeMap()
+	{
+		ADD_WidgetVisitorType( QComboBox)
+		ADD_WidgetVisitorType( QCheckBox)
+		ADD_WidgetVisitorType( QGroupBox)
+		ADD_WidgetVisitorType( QRadioButton)
+		ADD_WidgetVisitorType( QSpinBox)
+		ADD_WidgetVisitorType( QDoubleSpinBox)
+		ADD_WidgetVisitorType( QListWidget)
+		ADD_WidgetVisitorType( QTreeWidget)
+		ADD_WidgetVisitorType( QLineEdit)
+		ADD_WidgetVisitorType( QTextEdit)
+		ADD_WidgetVisitorType( QPlainTextEdit)
+		ADD_WidgetVisitorType( QDateEdit)
+		ADD_WidgetVisitorType( QTimeEdit)
+		ADD_WidgetVisitorType( QDateTimeEdit)
+		ADD_WidgetVisitorType( QTableWidget)
+		ADD_WidgetVisitorType( QSlider)
+		ADD_WidgetVisitorType( FileChooser)
+		ADD_WidgetVisitorType( PictureChooser)
+	}
+};
+
 WidgetVisitor::StateR createWidgetVisitorState( QWidget* widget)
 {
-	QString clazz = widget->metaObject()->className();
-	if (clazz == "QComboBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QComboBox( widget));
-	}
-	else if (clazz == "QCheckBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QCheckBox( widget));
-	}
-	else if (clazz == "QDoubleSpinBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QDoubleSpinBox( widget));
-	}
-	else if (clazz == "QSpinBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QSpinBox( widget));
-	}
-	else if (clazz == "QGroupBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QGroupBox( widget));
-	}
-	else if (clazz == "QRadioButton")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QRadioButton( widget));
-	}
-	else if (clazz == "QListWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QListWidget( widget));
-	}
-	else if (clazz == "QLineEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QLineEdit( widget));
-	}
-	else if (clazz == "QTextEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTextEdit( widget));
-	}
-	else if (clazz == "QPlainTextEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QPlainTextEdit( widget));
-	}
-	else if (clazz == "QDateEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QDateEdit( widget));
-	}
-	else if (clazz == "QTimeEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTimeEdit( widget));
-	}
-	else if (clazz == "QDateTimeEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QDateTimeEdit( widget));
-	}
-	else if (clazz == "QTableWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTableWidget( widget));
-	}
-	else if (clazz == "QTreeWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTreeWidget( widget));
-	}
-	else if (clazz == "QSlider")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QSlider( widget));
-	}
-	else if (clazz == "FileChooser")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_FileChooser( widget));
-	}
-	else if (clazz == "PictureChooser")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_PictureChooser( widget));
-	}
-	else
+	static WidgetVisitorTypeMap widgetVisitorTypeMap;
+	QHash<QString,StateConstructor>::const_iterator wi = widgetVisitorTypeMap.find( widget->metaObject()->className());
+	if (wi == widgetVisitorTypeMap.end())
 	{
 		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
 	}
+	else
+	{
+		return wi.value()( widget);
+	}
 }
+
 
