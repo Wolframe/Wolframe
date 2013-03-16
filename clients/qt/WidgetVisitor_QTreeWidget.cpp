@@ -76,7 +76,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 		}
 		else
 		{
-			if (m_stk.top().readpos < m_stk.top().item->childCount()) return false;
+			if (m_stk.top().readpos >= m_stk.top().item->childCount()) return false;
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 		}
 		return true;
@@ -95,7 +95,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 		}
 		else
 		{
-			if (m_stk.top().readpos < m_stk.top().item->childCount()) return false;
+			if (m_stk.top().readpos >= m_stk.top().item->childCount()) return false;
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 		}
 		return true;
@@ -180,45 +180,108 @@ const QList<QByteArray>& WidgetVisitorState_QTreeWidget::dataelements() const
 	return noDataElements;
 }
 
+enum StateTag {None,Open,Close,Expand,Select,ExpandSelect};
+static const char g_tagchr[] = "_ocES*";
+
+static QVariant getStateElementKey( StateTag tag, const QVariant& elem)
+{
+	QString rt;
+	rt.push_back( (QChar)g_tagchr[ (int)tag]);
+	rt.append( elem.toString());
+	return QVariant(rt);
+}
+
+static QString stateElementValue( const QVariant& elemkey)
+{
+	QString kk = elemkey.toString();
+	return kk.mid( 1, kk.size()-1);
+}
+
+static StateTag stateElementTag( const QVariant& elemkey)
+{
+	QString kk = elemkey.toString();
+	const char* pos = strchr( g_tagchr, kk.at( 0).toAscii());
+	return pos?(StateTag)(pos-g_tagchr):None;
+}
+
+static void skipTag( QList<QVariant>::const_iterator& itr, const QList<QVariant>::const_iterator end)
+{
+	++itr;
+	for (int taglevel=1; itr!=end && taglevel > 0; ++itr)
+	{
+		switch (stateElementTag(*itr))
+		{
+			case Open: ++taglevel; break;
+			case Close: --taglevel; break;
+			case None:
+			case Expand:
+			case Select:
+			case ExpandSelect: break;
+		}
+	}
+	--itr;
+}
+
+static QTreeWidgetItem* findchild( const QTreeWidgetItem* item, int keyidx, const QVariant& elemkey)
+{
+	int ii=0,chldcnt = item->childCount();
+	QString elemkeystr = stateElementValue( elemkey);
+	for (; ii<chldcnt; ++ii)
+	{
+		QTreeWidgetItem* chld = item->child( ii);
+		if (elemkeystr == chld->data( keyidx, Qt::UserRole).toString()) return chld;
+	}
+	return 0;
+}
 
 void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for tree" << m_elementname;
+	QStack<StackElement> stk;
+	int keyidx = m_headers.indexOf( "id");
+	if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined
+
+	stk.push_back( m_treeWidget->invisibleRootItem());
+
 	QList<QVariant> statelist = state.toList();
 	QList<QVariant>::const_iterator stateitr = statelist.begin();
-	if (stateitr != statelist.end())
+	QTreeWidgetItem* chld;
+
+	for (; !stk.isEmpty() && stateitr != statelist.end(); ++stateitr)
 	{
-		int nof_expanded = stateitr->toInt();
-		QList<QVariant> expanded;
-		QList<QVariant> selected;
-
-		for (++stateitr; nof_expanded > 0 && stateitr != statelist.end(); ++stateitr,--nof_expanded)
+		switch (stateElementTag(*stateitr))
 		{
-			expanded.push_back( *stateitr);
-		}
-		for (++stateitr; stateitr != statelist.end(); ++stateitr)
-		{
-			selected.push_back( *stateitr);
-		}
-
-		QTreeWidgetItemIterator ei( m_treeWidget);
-		for (; *ei; ++ei)
-		{
-			(*ei)->setExpanded( expanded.contains( (*ei)->data( 0, Qt::UserRole)));
-		}
-		QTreeWidgetItemIterator si( m_treeWidget);
-		for (; *si; ++si)
-		{
-			if (selected.contains( (*si)->data( 0, Qt::UserRole)))
-			{
-				(*si)->setSelected( true);
+			case Open:
+				chld = findchild( stk.top().item, keyidx, *stateitr);
+				if (chld)
+				{
+					stk.push_back( chld);
+				}
+				else
+				{
+					skipTag( stateitr, statelist.end());
+				}
+				break;
+			case Close:
+				stk.pop_back();
+				break;
+			case None:
+				break;
+			case Expand:
+				stk.top().item->setExpanded( true);
+				break;
+			case Select:
+				stk.top().item->setSelected( true);
 				// better than nothing, scroll to the position of the last selection (usually one)
-				m_treeWidget->scrollToItem( *si);
-			}
-			else
-			{
-				(*si)->setSelected( false);
-			}
+				m_treeWidget->scrollToItem( stk.top().item);
+				break;
+			case ExpandSelect:
+				stk.top().item->setExpanded( true);
+				stk.top().item->setSelected( true);
+				// better than nothing, scroll to the position of the last selection (usually one)
+				m_treeWidget->scrollToItem( stk.top().item);
+				stk.top().item->setExpanded( true);
+				break;
 		}
 	}
 	if (m_mode == List)
@@ -232,26 +295,41 @@ void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 
 QVariant WidgetVisitorState_QTreeWidget::getState() const
 {
-	// encoded state:
-	// 0: number of expanded elements
-	// 1..: expanded elements
-	// rest: selected elements
 	QList<QVariant> rt;
-	QTreeWidgetItemIterator xi( m_treeWidget);
-	for (; *xi; ++xi)
+	QStack<StackElement> stk;
+	int keyidx = m_headers.indexOf( "id");
+	if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined
+
+	stk.push_back( m_treeWidget->invisibleRootItem());
+	while (!stk.isEmpty())
 	{
-		if ((*xi)->isExpanded())
+		StateTag stateTag = None;
+		if (stk.top().item->isExpanded())
 		{
-			rt.push_back( (*xi)->data( 0, Qt::UserRole));
+			stateTag = stk.top().item->isSelected()?ExpandSelect:Expand;
 		}
-	}
-	rt.push_front( QVariant( rt.size()));
-	QTreeWidgetItemIterator si( m_treeWidget);
-	for (; *si; ++si)
-	{
-		if ((*si)->isSelected())
+		else if (stk.top().item->isSelected())
 		{
-			rt.push_back( (*xi)->data( 0, Qt::UserRole));
+			stateTag = Select;
+		}
+		if (stateTag != None)
+		{
+			rt.push_back( getStateElementKey( stateTag, stk.top().item->data( 0, Qt::UserRole)));
+		}
+		if (stk.top().readpos >= stk.top().item->childCount())
+		{
+			rt.push_back( getStateElementKey( Close, QVariant()));
+			stk.pop_back();
+			continue;
+		}
+		else if (stk.size() == 1 || stk.top().item->isExpanded())
+		{
+			rt.push_back( getStateElementKey( Open, stk.top().item->data( 0, Qt::UserRole)));
+			stk.push_back( stk.top().item->child( stk.top().readpos++));
+		}
+		else
+		{
+			stk.top().readpos++;
 		}
 	}
 	return QVariant(rt);

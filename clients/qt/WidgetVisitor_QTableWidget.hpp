@@ -41,6 +41,7 @@ class WidgetVisitorState_QTableWidget
 {
 public:
 	WidgetVisitorState_QTableWidget( QWidget* widget_);
+	~WidgetVisitorState_QTableWidget();
 
 	virtual bool enter( const QByteArray& name, bool writemode);
 	virtual bool leave( bool writemode);
@@ -51,6 +52,11 @@ public:
 	virtual bool isRepeatingDataElement( const QByteArray& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+
+private:
+	void fill_cell( int row, int col, int itemidx);
+	void set_thumbnail( int itemidx, const QVariant& data);
+	QVariant get_thumbnail( int row, int col) const;
 
 private:
 	struct StackElement
@@ -65,9 +71,15 @@ private:
 	QTableWidget* m_tableWidget;
 	QHash<QByteArray,int> m_colheaders;
 	QHash<QByteArray,int> m_rowheaders;
-	enum Mode {Init,Row,Column};
+	enum Mode {Init,Row,Column,RowData,ColumnData};
+	static const char* modeName( Mode i)
+	{
+		static const char* ar[] = {"Init","Row","Column","RowData","ColumnData"};
+		return ar[(int)i];
+	}
 	Mode m_mode;
 	QList<QVariant> m_items;
+	QList<QWidget*> m_cellwidgets;
 	int m_row;
 	int m_column;
 	int m_rowcount;

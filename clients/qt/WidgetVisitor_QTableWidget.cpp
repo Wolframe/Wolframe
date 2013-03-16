@@ -32,6 +32,8 @@
 ************************************************************************/
 #include "WidgetVisitor_QTableWidget.hpp"
 #include <QDebug>
+#include <QLabel>
+#include <QBuffer>
 
 WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -46,19 +48,30 @@ WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widge
 	for (int rr=0; rr<m_rowcount; ++rr)
 	{
 		QTableWidgetItem* item = m_tableWidget->verticalHeaderItem( rr);
-		m_dataelements_row.push_back( item->text().toAscii());
-		m_rowheaders[ m_dataelements_row.back()] = rr;
+		if (item)
+		{
+			m_dataelements_row.push_back( item->text().toAscii());
+			m_rowheaders[ m_dataelements_row.back()] = rr;
+		}
 	}
 	m_columncount = m_tableWidget->columnCount();
 	for (int cc=0; cc<m_columncount; ++cc)
 	{
 		QTableWidgetItem* item = m_tableWidget->horizontalHeaderItem( cc);
-		m_dataelements_col.push_back( item->text().toAscii());
-		m_colheaders[ m_dataelements_col.back()] = cc;
+		if (item)
+		{
+			m_dataelements_col.push_back( item->text().toAscii());
+			m_colheaders[ m_dataelements_col.back()] = cc;
+		}
 	}
 	m_dataelements_row.push_back( "id");
 	m_dataelements_col.push_back( "id");
 	m_dataelements_init = DataElements( "row", "column", 0);
+}
+
+WidgetVisitorState_QTableWidget::~WidgetVisitorState_QTableWidget()
+{
+	foreach (QWidget* wdg, m_cellwidgets) if (wdg) delete wdg;
 }
 
 void WidgetVisitorState_QTableWidget::clear()
@@ -71,73 +84,138 @@ void WidgetVisitorState_QTableWidget::clear()
 
 bool WidgetVisitorState_QTableWidget::enter( const QByteArray& name, bool writemode)
 {
-	if (writemode)
+	switch (m_mode)
 	{
-		if (m_mode == Init && strcmp( name, "row") == 0 && m_tableWidget->columnCount())
+		case Init:
 		{
-			m_mode = Row;
+			if (strcmp( name, "row") == 0)
+			{
+				if (writemode)
+				{
+					m_row = m_rowcount; //... default insertion at bottom of table
+				}
+				else
+				{
+					if (++m_row >= m_rowcount) return false;
+				}
+				m_mode = Row;
+				return true;
+			}
+			if (strcmp( name, "column") == 0)
+			{
+				if (writemode)
+				{
+					m_column = m_columncount; //... default insertion at end of table
+				}
+				else
+				{
+					if (++m_column >= m_columncount) return false;
+				}
+				m_mode = Column;
+				return true;
+			}
+			return false;
+		}
+		case Row:
+		{
+			QHash<QByteArray,int>::const_iterator itr = m_colheaders.find( name);
+			if (itr == m_colheaders.end()) return false;
+			m_column = itr.value();
+			if (writemode)
+			{
+				while (m_column >= m_items.size()) m_items.push_back( QVariant());
+				while (m_column >= m_cellwidgets.size()) m_cellwidgets.push_back( 0);
+			}
+			m_mode = RowData;
 			return true;
 		}
-		if (m_mode == Init && strcmp( name, "column") == 0 && m_tableWidget->rowCount())
+		case Column:
 		{
-			m_mode = Column;
+			QHash<QByteArray,int>::const_iterator itr = m_rowheaders.find( name);
+			if (itr == m_rowheaders.end()) return false;
+			m_row = itr.value();
+			if (writemode)
+			{
+				while (m_row >= m_items.size()) m_items.push_back( QVariant());
+				while (m_row >= m_cellwidgets.size()) m_cellwidgets.push_back( 0);
+			}
+			m_mode = ColumnData;
 			return true;
 		}
-	}
-	else
-	{
-		if (m_mode == Init && strcmp( name, "row") == 0)
-		{
-			if (m_row +1 >= m_rowcount) return false;
-			m_mode = Row;
-			++m_row;
-			return true;
-		}
-		if (m_mode == Init && strcmp( name, "column") == 0)
-		{
-			if (m_column +1 >= m_columncount) return false;
-			m_mode = Column;
-			++m_column;
-			return true;
-		}
+		case RowData:
+		case ColumnData:
+			return false;
 	}
 	return false;
 }
 
+void WidgetVisitorState_QTableWidget::fill_cell( int row, int col, int itemidx)
+{
+	if (m_cellwidgets.at( itemidx))
+	{
+		QTableWidgetItem *item = new QTableWidgetItem( m_items.at( itemidx).toString());
+		item->setFlags( item->flags() ^ Qt::ItemIsEditable);
+		m_tableWidget->setItem( row, col, item);
+		m_tableWidget->setCellWidget( row, col, m_cellwidgets.at( itemidx));
+		m_cellwidgets[ itemidx] = 0;
+	}
+	else
+	{
+		QTableWidgetItem* item = m_tableWidget->item( row, col);
+		if (m_items.at( itemidx).isValid()) item->setData( Qt::UserRole, m_items.at( itemidx));
+	}
+}
+
 bool WidgetVisitorState_QTableWidget::leave( bool writemode)
 {
-	if (m_mode == Init) return false;
-	if (writemode)
+	switch (m_mode)
 	{
-		if (m_mode == Row)
-		{
-			if (m_row < 0)
+		case Init:
+			return false;
+		case Row:
+			if (writemode)
 			{
-				m_tableWidget->insertRow( m_row = m_rowcount++);
+				if (m_row == m_rowcount)
+				{
+					m_tableWidget->insertRow( m_rowcount++);
+				}
+				for (int col=0; col<m_items.size(); ++col)
+				{
+					fill_cell( m_row, col, col);
+				}
+				m_items.clear();
+				m_cellwidgets.clear();
 			}
-			for (int col=0; col<m_items.size(); ++col)
+			m_row = -1;
+			m_column = -1;
+			m_mode = Init;
+			return true;
+		case Column:
+			if (writemode)
 			{
-				QTableWidgetItem* item = m_tableWidget->item( m_row, col);
-				item->setData( Qt::UserRole, m_items.at(col));
+				if (m_column == m_columncount)
+				{
+					m_tableWidget->insertColumn( m_columncount++);
+				}
+				for (int row=0; row<m_items.size(); ++row)
+				{
+					fill_cell( row, m_column, row);
+				}
+				m_items.clear();
+				m_cellwidgets.clear();
 			}
-		}
-		else
-		{
-			if (m_column < 0)
-			{
-				m_tableWidget->insertColumn( m_column = m_columncount++);
-			}
-			for (int row=0; row<m_items.size(); ++row)
-			{
-				QTableWidgetItem* item = m_tableWidget->item( row, m_column);
-				item->setData( Qt::UserRole, m_items.at( row));
-			}
-		}
+			m_row = -1;
+			m_column = -1;
+			m_mode = Init;
+			return true;
+		case RowData:
+			m_mode = Row;
+			return true;
+		case ColumnData:
+			m_mode = Column;
+			return true;
 	}
-	m_row = -1;
-	m_column = -1;
-	m_mode = Init;
-	return true;
+	return false;
 }
 
 bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QByteArray& name)
@@ -146,24 +224,71 @@ bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QByteArray& 
 	return false;
 }
 
+void WidgetVisitorState_QTableWidget::set_thumbnail( int itemidx, const QVariant& data)
+{
+	QByteArray decoded = QByteArray::fromBase64( data.toByteArray());
+	QPixmap pixmap;
+	pixmap.loadFromData( decoded);
+	QLabel *label = new QLabel();
+	label->setPixmap( pixmap);
+	label->setFixedSize( pixmap.size());
+	if (m_cellwidgets.at( itemidx)) delete m_cellwidgets[ itemidx];
+	m_cellwidgets[ itemidx] = label;
+}
+
+QVariant WidgetVisitorState_QTableWidget::get_thumbnail( int row, int col) const
+{
+	const QWidget* cellwidget = m_tableWidget->cellWidget( row, col);
+	if (!cellwidget) return QVariant();
+	const QLabel* label = qobject_cast<const QLabel*>( cellwidget);
+	if (!label) return QVariant();
+	const QPixmap* pixmap = label->pixmap();
+	if (!pixmap) return QVariant();
+	QByteArray bytes;
+	QBuffer buffer(&bytes);
+	buffer.open( QIODevice::WriteOnly);
+	pixmap->save( &buffer);
+	return QVariant( bytes.toBase64());
+}
+
 QVariant WidgetVisitorState_QTableWidget::property( const QByteArray& name)
 {
-	QHash<QByteArray,int>::const_iterator itr;
-	if (m_mode == Row)
+	QTableWidgetItem* item;
+	switch (m_mode)
 	{
-		itr = m_colheaders.find( name);
-		if (itr == m_colheaders.end()) return false;
-		int col = itr.value();
-		QTableWidgetItem* item = m_tableWidget->item( m_row, col);
-		return item->data( Qt::UserRole);
-	}
-	if (m_mode == Column)
-	{
-		itr = m_rowheaders.find( name);
-		if (itr == m_rowheaders.end()) return false;
-		int row = itr.value();
-		QTableWidgetItem* item = m_tableWidget->item( row, m_column);
-		return item->data( Qt::UserRole);
+		case Init:
+			break;
+		case Row:
+			if (name == "id")
+			{
+				item = m_tableWidget->verticalHeaderItem( m_row);
+				if (item)
+				{
+					return QVariant( item->text().toAscii());
+				}
+			}
+			break;
+		case Column:
+			if (name == "id")
+			{
+				item = m_tableWidget->horizontalHeaderItem( m_column);
+				if (item)
+				{
+					return QVariant( item->text().toAscii());
+				}
+			}
+			break;
+		case RowData:
+		case ColumnData:
+			if (name.isEmpty())
+			{
+				item = m_tableWidget->item( m_row, m_column);
+				if (item) return item->data( Qt::UserRole);
+			}
+			if (name == "thumbnail")
+			{
+				return get_thumbnail( m_row, m_column);
+			}
 	}
 	return QVariant();
 }
@@ -171,37 +296,52 @@ QVariant WidgetVisitorState_QTableWidget::property( const QByteArray& name)
 bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const QVariant& data)
 {
 	QHash<QByteArray,int>::const_iterator itr;
-	if (m_mode == Row)
+	switch (m_mode)
 	{
-		if (name == "id")
-		{
-			itr = m_rowheaders.find( name);
-			if (m_row >= 0 || itr == m_rowheaders.end()) return false;
-			m_row = itr.value();
-			return true;
-		}
-		itr = m_colheaders.find( name);
-		if (itr == m_colheaders.end()) return false;
-		int col = itr.value();
-		while (col <= m_items.size()) m_items.push_back( QVariant());
-		m_items[ col] = data;
-		return true;
-	}
-	if (m_mode == Column)
-	{
-		if (name == "id")
-		{
-			itr = m_colheaders.find( name);
-			if (m_column >= 0 || itr == m_colheaders.end()) return false;
-			m_column = itr.value();
-			return true;
-		}
-		itr = m_rowheaders.find( name);
-		if (itr == m_rowheaders.end()) return false;
-		int row = itr.value();
-		while (row <= m_items.size()) m_items.push_back( QVariant());
-		m_items[ row] = data;
-		return true;
+		case Init:
+			break;
+		case Row:
+			if (name == "id")
+			{
+				itr = m_rowheaders.find( data.toByteArray());
+				if (m_row >= 0 || itr == m_rowheaders.end()) return false;
+				m_row = itr.value();
+				return true;
+			}
+			break;
+		case Column:
+			if (name == "id")
+			{
+				itr = m_colheaders.find( data.toByteArray());
+				if (m_column >= 0 || itr == m_colheaders.end()) return false;
+				m_column = itr.value();
+				return true;
+			}
+			break;
+		case RowData:
+			if (name.isEmpty())
+			{
+				m_items[ m_column] = data;
+				return true;
+			}
+			if (name == "thumbnail")
+			{
+				set_thumbnail( m_column, data);
+				return true;
+			}
+			break;
+		case ColumnData:
+			if (name.isEmpty())
+			{
+				m_items[ m_row] = data;
+				return true;
+			}
+			if (name == "thumbnail")
+			{
+				set_thumbnail( m_row, data);
+				return true;
+			}
+			break;
 	}
 	return false;
 }
@@ -209,11 +349,14 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const
 const QList<QByteArray>& WidgetVisitorState_QTableWidget::dataelements() const
 {
 	static const QList<QByteArray> noDataElements;
+	static const DataElements dataelements_data( "", "thumbnail");
 	switch (m_mode)
 	{
 		case Init: return m_dataelements_init;
 		case Column: return m_dataelements_col;
 		case Row: return m_dataelements_row;
+		case ColumnData:  return dataelements_data;
+		case RowData: return dataelements_data;
 	}
 	return noDataElements;
 }
