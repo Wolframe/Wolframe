@@ -61,12 +61,23 @@ MOC_FLAGS = \
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.obj \
 	visitors\WidgetVisitor_QComboBox.obj \
+	visitors\WidgetVisitor_QCheckBox.obj \
+	visitors\WidgetVisitor_QRadioButton.obj \
+	visitors\WidgetVisitor_QGroupBox.obj \
+	visitors\WidgetVisitor_QSpinBox.obj \
+	visitors\WidgetVisitor_QDoubleSpinBox.obj \
 	visitors\WidgetVisitor_QListWidget.obj \
 	visitors\WidgetVisitor_QLineEdit.obj \
 	visitors\WidgetVisitor_QTextEdit.obj \
+	visitors\WidgetVisitor_QPlainTextEdit.obj \
+	visitors\WidgetVisitor_QDateEdit.obj \
+	visitors\WidgetVisitor_QTimeEdit.obj \
+	visitors\WidgetVisitor_QDateTimeEdit.obj \
 	visitors\WidgetVisitor_QTreeWidget.obj \
 	visitors\WidgetVisitor_QTableWidget.obj \
-	visitors/WidgetVisitor_FileChooser.obj
+	visitors\WidgetVisitor_QSlider.obj \
+	visitors\WidgetVisitor_FileChooser.obj \
+	visitors\WidgetVisitor_PictureChooser.obj
 
 OBJS = \
 	moc_MainWindow.obj \

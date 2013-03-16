@@ -48,12 +48,23 @@ endif
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.o \
 	visitors/WidgetVisitor_QComboBox.o \
+	visitors/WidgetVisitor_QCheckBox.o \
+	visitors/WidgetVisitor_QGroupBox.o \
+	visitors/WidgetVisitor_QRadioButton.o \
+	visitors/WidgetVisitor_QSpinBox.o \
+	visitors/WidgetVisitor_QDoubleSpinBox.o \
 	visitors/WidgetVisitor_QListWidget.o \
 	visitors/WidgetVisitor_QLineEdit.o \
 	visitors/WidgetVisitor_QTextEdit.o \
+	visitors/WidgetVisitor_QPlainTextEdit.o \
+	visitors/WidgetVisitor_QDateEdit.o \
+	visitors/WidgetVisitor_QTimeEdit.o \
+	visitors/WidgetVisitor_QDateTimeEdit.o \
 	visitors/WidgetVisitor_QTreeWidget.o \
 	visitors/WidgetVisitor_QTableWidget.o \
-	visitors/WidgetVisitor_FileChooser.o
+	visitors/WidgetVisitor_QSlider.o \
+	visitors/WidgetVisitor_FileChooser.o \
+	visitors/WidgetVisitor_PictureChooser.o
 
 CPP_OBJS = \
 	moc_MainWindow.o \
