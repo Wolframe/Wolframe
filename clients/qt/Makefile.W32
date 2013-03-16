@@ -11,7 +11,7 @@ INCLUDE_CXXFLAGS = \
 	/DQCOMMANDLINE_STATIC
 
 INCLUDE_DIRS = \
-	/I. \
+	/I. /I$(TOPDIR)\clients\qt \
 	/I"$(QT_DIR)\include" \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
@@ -59,12 +59,14 @@ MOC_FLAGS = \
 !ENDIF
 
 VISITOR_OBJS = \
+	WidgetVisitorStateConstructor.obj \
 	visitors\WidgetVisitor_QComboBox.obj \
 	visitors\WidgetVisitor_QListWidget.obj \
 	visitors\WidgetVisitor_QLineEdit.obj \
 	visitors\WidgetVisitor_QTextEdit.obj \
 	visitors\WidgetVisitor_QTreeWidget.obj \
-	visitors\WidgetVisitor_QTableWidget.obj
+	visitors\WidgetVisitor_QTableWidget.obj \
+	visitors/WidgetVisitor_FileChooser.obj
 
 OBJS = \
 	moc_MainWindow.obj \

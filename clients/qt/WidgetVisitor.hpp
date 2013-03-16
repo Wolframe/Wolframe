@@ -171,10 +171,10 @@ class WidgetVisitor
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
 			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
 			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
-			const QByteArray& getSynonym( const QByteArray& name) const;
 			virtual void setState( const QVariant& /*state*/){}
 			virtual QVariant getState()						{return QVariant();}
 
+			const QByteArray& getSynonym( const QByteArray& name) const;
 			QVariant dynamicProperty( const QByteArray& name) const;
 			bool setDynamicProperty( const QByteArray&, const QVariant& value);
 

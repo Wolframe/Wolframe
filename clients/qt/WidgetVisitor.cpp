@@ -31,12 +31,7 @@
 
 ************************************************************************/
 #include "WidgetVisitor.hpp"
-#include "visitors/WidgetVisitor_QComboBox.hpp"
-#include "visitors/WidgetVisitor_QListWidget.hpp"
-#include "visitors/WidgetVisitor_QTreeWidget.hpp"
-#include "visitors/WidgetVisitor_QLineEdit.hpp"
-#include "visitors/WidgetVisitor_QTextEdit.hpp"
-#include "visitors/WidgetVisitor_QTableWidget.hpp"
+#include "WidgetVisitorStateConstructor.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
 
@@ -129,42 +124,9 @@ WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
 	}
 }
 
-static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
-{
-	QString clazz = widget->metaObject()->className();
-	if (clazz == "QComboBox")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QComboBox( widget));
-	}
-	else if (clazz == "QListWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QListWidget( widget));
-	}
-	else if (clazz == "QLineEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QLineEdit( widget));
-	}
-	else if (clazz == "QTextEdit")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTextEdit( widget));
-	}
-	else if (clazz == "QTableWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTableWidget( widget));
-	}
-	else if (clazz == "QTreeWidget")
-	{
-		return WidgetVisitor::StateR( new WidgetVisitorState_QTreeWidget( widget));
-	}
-	else
-	{
-		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
-	}
-}
-
 WidgetVisitor::WidgetVisitor( QWidget* root)
 {
-	m_stk.push( widgetVisitorState( root));
+	m_stk.push( createWidgetVisitorState( root));
 }
 
 WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state)
@@ -234,7 +196,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 			return false;
 		}
 		if (children.isEmpty()) return false;
-		m_stk.push( widgetVisitorState( children[0]));
+		m_stk.push( createWidgetVisitorState( children[0]));
 		return true;
 	}
 	return false;
@@ -546,7 +508,7 @@ QList<WidgetVisitor> WidgetVisitor::findNodes( NodeProperty prop, const QByteArr
 			stk = ar[idx].m_stk;
 			foreach( QWidget* ww, ar[idx].widget()->findChildren<QWidget*>())
 			{
-				stk.push_back( widgetVisitorState( ww));
+				stk.push_back( createWidgetVisitorState( ww));
 				ar.push_back( WidgetVisitor( stk));
 				if (prop( ww, cond))
 				{
@@ -567,7 +529,7 @@ WidgetVisitor WidgetVisitor::getSubWidgetVisitor( const QWidget* subwidget) cons
 	WidgetVisitor rt( *this);
 	foreach (QWidget* ww, widget()->findChildren<QWidget*>())
 	{
-		rt.m_stk.push_back( widgetVisitorState( ww));
+		rt.m_stk.push_back( createWidgetVisitorState( ww));
 		if (ww == subwidget) return rt;
 		WidgetVisitor follow( rt.getSubWidgetVisitor( subwidget));
 		if (follow.widget()) return follow;

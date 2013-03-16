@@ -9,7 +9,7 @@ SUBDIRS = plugins apps
 INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
-	-I. \
+	-I. -I$(TOPDIR)/clients/qt \
 	-I$(QT_INCLUDE_DIR) \
 	-I$(QT_INCLUDE_DIR)/QtCore \
 	-I$(QT_INCLUDE_DIR)/QtNetwork \
@@ -46,12 +46,14 @@ MOC_FLAGS += \
 endif
 
 VISITOR_OBJS = \
+	WidgetVisitorStateConstructor.o \
 	visitors/WidgetVisitor_QComboBox.o \
 	visitors/WidgetVisitor_QListWidget.o \
 	visitors/WidgetVisitor_QLineEdit.o \
 	visitors/WidgetVisitor_QTextEdit.o \
 	visitors/WidgetVisitor_QTreeWidget.o \
-	visitors/WidgetVisitor_QTableWidget.o
+	visitors/WidgetVisitor_QTableWidget.o \
+	visitors/WidgetVisitor_FileChooser.o
 
 CPP_OBJS = \
 	moc_MainWindow.o \
