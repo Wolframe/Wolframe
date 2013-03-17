@@ -714,7 +714,31 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 				}
 				continue;
 			}
-			else if (enter( dataelem, false))
+			int pntidx;
+			QByteArray prefix;
+			if ((pntidx=dataelem.indexOf('.')) >= 0)
+			{
+				prefix = dataelem.mid( 0, pntidx);
+				if (enter( prefix, false))
+				{
+					elemstk.top().isContent = true;
+					if (stksize == m_stk.size())
+					{
+						///... if enter is internal in widget then we accumulate data
+						//     element references for comparison with selected data elements
+						QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
+						++elemstk.top().dataelementidx;
+						elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
+						rt.push_back( Element( Element::OpenTag, prefix));
+						continue;
+					}
+					else
+					{
+						leave( false);
+					}
+				}
+			}
+			if (enter( dataelem, false))
 			{
 				elemstk.top().isContent = true;
 				if (stksize == m_stk.size())
@@ -731,65 +755,63 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
 				}
 				rt.push_back( Element( Element::OpenTag, dataelem));
+				continue;
 			}
-			else
+			QVariant val = property( dataelem);
+			if (val.isValid())
 			{
-				QVariant val = property( dataelem);
-				if (val.isValid())
+				if (dataelem.isEmpty() || val.type() == QVariant::List)
 				{
-					if (dataelem.isEmpty() || val.type() == QVariant::List)
+					elemstk.top().isContent = true;
+				}
+				if (!elemstk.top().isContent)
+				{
+					if (elemstk.top().hasSelectedDataelements)
 					{
-						elemstk.top().isContent = true;
-					}
-					if (!elemstk.top().isContent)
-					{
-						if (elemstk.top().hasSelectedDataelements)
+						if (elemstk.top().dataelementidx >= elemstk.top().nof_attributes)
 						{
-							if (elemstk.top().dataelementidx >= elemstk.top().nof_attributes)
-							{
-								elemstk.top().isContent = true;
-							}
-						}
-						else
-						{
-							if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
-						}
-					}
-					if (elemstk.top().isContent)
-					{
-						if (val.type() == QVariant::List)
-						{
-							QList<QVariant> vlist = val.toList();
-							foreach (const QVariant& velem, vlist)
-							{
-								rt.push_back( Element( Element::OpenTag, dataelem));
-								rt.push_back( Element( Element::Value, velem));
-								rt.push_back( Element( Element::CloseTag, ""));
-							}
-						}
-						else if (dataelem.isEmpty())
-						{
-							rt.push_back( Element( Element::Value, val));
-						}
-						else
-						{
-							rt.push_back( Element( Element::OpenTag, dataelem));
-							rt.push_back( Element( Element::Value, val));
-							rt.push_back( Element( Element::CloseTag, ""));
+							elemstk.top().isContent = true;
 						}
 					}
 					else
 					{
-						rt.push_back( Element( Element::Attribute, dataelem));
-						rt.push_back( Element( Element::Value, val));
+						if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
 					}
 				}
-				else if (elemstk.top().hasSelectedDataelements)
+				if (elemstk.top().isContent)
 				{
-					qCritical() << "not found element:" << dataelem << "(elements defined with dataelement are mandatory)";
+					if (val.type() == QVariant::List)
+					{
+						QList<QVariant> vlist = val.toList();
+						foreach (const QVariant& velem, vlist)
+						{
+							rt.push_back( Element( Element::OpenTag, dataelem));
+							rt.push_back( Element( Element::Value, velem));
+							rt.push_back( Element( Element::CloseTag, ""));
+						}
+					}
+					else if (dataelem.isEmpty())
+					{
+						rt.push_back( Element( Element::Value, val));
+					}
+					else
+					{
+						rt.push_back( Element( Element::OpenTag, dataelem));
+						rt.push_back( Element( Element::Value, val));
+						rt.push_back( Element( Element::CloseTag, ""));
+					}
 				}
-				++elemstk.top().dataelementidx;
+				else
+				{
+					rt.push_back( Element( Element::Attribute, dataelem));
+					rt.push_back( Element( Element::Value, val));
+				}
 			}
+			else if (elemstk.top().hasSelectedDataelements)
+			{
+				qCritical() << "not found element:" << dataelem << "(elements defined with dataelement are mandatory)";
+			}
+			++elemstk.top().dataelementidx;
 		}
 		else
 		{
