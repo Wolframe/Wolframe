@@ -52,7 +52,8 @@ PROVIDER_OBJS = \
 ADT_OBJS = \
 	types_bcdArithmetic.o \
 	types_dateArithmetic.o \
-	types_doctype.o
+	types_doctype.o \
+	types_variant.o
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
