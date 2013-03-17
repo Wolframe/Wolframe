@@ -682,6 +682,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 		{
 			const QByteArray& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
 
+			/* [1] Handling explicit attribute selection: */
 			if (elemstk.top().hasSelectedDataelements && !elemstk.top().isContent && elemstk.top().dataelementidx < elemstk.top().nof_attributes)
 			{
 				//... special handling of dataelement explicitely marked as attribute '@':
@@ -695,71 +696,41 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 					continue;
 				}
 			}
-			int stksize = m_stk.size();
-			if (m_stk.top()->isRepeatingDataElement( dataelem))
+			/* [2] Handling grouping of multiple selections with same prefix together (e.g. person.name,person.id): */
+			int pntidx = dataelem.indexOf('.');
+			if (pntidx >= 0)
 			{
-				//... handle array
-				if (m_stk.top()->enter( dataelem, false))
-				{
-					///... if enter is internal in widget then we accumulate data
-					//     element references for comparison with selected data elements
-					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, dataelem);
-					elemstk.top().isContent = true;
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
-					rt.push_back( Element( Element::OpenTag, dataelem));
-				}
-				else
-				{
-					++elemstk.top().dataelementidx;
-				}
-				continue;
-			}
-			int pntidx;
-			QByteArray prefix;
-			if ((pntidx=dataelem.indexOf('.')) >= 0)
-			{
-				prefix = dataelem.mid( 0, pntidx);
+				QByteArray prefix = dataelem.mid( 0, pntidx);
 				if (enter( prefix, false))
 				{
+					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
 					elemstk.top().isContent = true;
-					if (stksize == m_stk.size())
+					if (!m_stk.top()->isRepeatingDataElement( prefix))
 					{
-						///... if enter is internal in widget then we accumulate data
-						//     element references for comparison with selected data elements
-						QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
 						++elemstk.top().dataelementidx;
-						elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
-						rt.push_back( Element( Element::OpenTag, prefix));
-						continue;
 					}
-					else
-					{
-						leave( false);
-					}
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
+					rt.push_back( Element( Element::OpenTag, prefix));
+					continue;
 				}
 			}
-			if (enter( dataelem, false))
+			/* [3] Handling ordinary substructures: */
+			else if (enter( dataelem, false))
 			{
 				elemstk.top().isContent = true;
-				if (stksize == m_stk.size())
-				{
-					///... if enter is internal in widget then we accumulate data
-					//     element references for comparison with selected data elements
-					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, dataelem);
-					++elemstk.top().dataelementidx;
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
-				}
-				else
+				if (!m_stk.top()->isRepeatingDataElement( dataelem))
 				{
 					++elemstk.top().dataelementidx;
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
 				}
+				elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
 				rt.push_back( Element( Element::OpenTag, dataelem));
 				continue;
 			}
+			/* [4] Handling ordinary properties: */
 			QVariant val = property( dataelem);
 			if (val.isValid())
 			{
+				// evaluate if is attribute or content element:
 				if (dataelem.isEmpty() || val.type() == QVariant::List)
 				{
 					elemstk.top().isContent = true;
@@ -778,6 +749,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 						if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
 					}
 				}
+				// print the output property value with its tag context:
 				if (elemstk.top().isContent)
 				{
 					if (val.type() == QVariant::List)
@@ -807,7 +779,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 					rt.push_back( Element( Element::Value, val));
 				}
 			}
-			else if (elemstk.top().hasSelectedDataelements)
+			else if (elemstk.top().hasSelectedDataelements && !m_stk.top()->isRepeatingDataElement( dataelem))
 			{
 				qCritical() << "not found element:" << dataelem << "(elements defined with dataelement are mandatory)";
 			}
@@ -815,6 +787,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 		}
 		else
 		{
+			// end of elements of this tree node, print close tag:
 			elemstk.pop_back();
 			if (!elemstk.isEmpty())
 			{
