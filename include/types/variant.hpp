@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file types/variant.hpp
-///\brief template for map with case insensitive key strings
+///\brief Variant value type
 
 #ifndef _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
@@ -44,7 +44,7 @@ namespace types {
 class StructDescription;
 
 ///\class Variant
-///\brief Variant for holding values with their type
+///\brief Variant value type
 class Variant
 {
 public:
@@ -72,7 +72,7 @@ public:
 			int int_;
 			unsigned int uint_;
 			char* string_;
-			void* data_;
+			void* ref_;
 		} value;
 	};
 	Variant()					{init();}
@@ -100,8 +100,9 @@ public:
 
 	std::string tostring() const;
 	double tonumber() const;
+	std::size_t size() const			{return (m_type == string_)?m_data.dim.size:1;}
 
-private:
+protected:
 	void init();
 	void release();
 	void initstring( const char* str_, std::size_t strsize_);
@@ -111,7 +112,7 @@ private:
 	///\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable
 	int compare( const Variant& o) const;
 
-private:
+protected:
 	Type m_type;
 	Data m_data;
 };

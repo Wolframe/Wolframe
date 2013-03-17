@@ -45,15 +45,15 @@ void Variant::initcopy( Variant& dest, const Variant& orig)
 
 static int compare_double( double d1, double d2)
 {
-	return (int)(d1 >= d2)
-		+ (int)((d1 - d2) > std::numeric_limits<double>::epsilon() || (d1 - d2) < -std::numeric_limits<double>::epsilon())
-		- 1;
+	if (d1 > d2 + std::numeric_limits<double>::epsilon()) return 1;
+	if ((d1 - d2) <= std::numeric_limits<double>::epsilon() && (d1 - d2) >= -std::numeric_limits<double>::epsilon()) return 0;
+	return - 1;
 }
 
 template <typename TYPE>
 static int compare_int( TYPE d1, TYPE d2)
 {
-	return (int)(d1 >= d2) + (int)(d1 != d2) -1;
+	return (int)(d1 >= d2) + (int)(d1 > d2) -1;
 }
 
 static int compare_bool( bool d1, bool d2)

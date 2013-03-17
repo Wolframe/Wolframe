@@ -50,7 +50,8 @@ ADT_OBJS = \
 	types_bcdArithmetic.obj \
 	types_dateArithmetic.obj \
 	types_doctype.obj \
-	types_variant.obj
+	types_variant.obj \
+	types_variantStruct.obj
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \

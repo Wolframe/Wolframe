@@ -53,7 +53,8 @@ ADT_OBJS = \
 	types_bcdArithmetic.o \
 	types_dateArithmetic.o \
 	types_doctype.o \
-	types_variant.o
+	types_variant.o \
+	types_variantStruct.o
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
