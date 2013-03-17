@@ -53,7 +53,13 @@ public:
 	virtual QVariant getState() const;
 
 private:
+	enum Mode {Init,File};
+	Mode m_mode;
 	FileChooser* m_fileChooser;
+	QList<QString> m_filenames;
+	QByteArray m_filecontent;
+	QByteArray m_filecontent_encoded;
+	int m_fileidx;
 };
 
 #endif

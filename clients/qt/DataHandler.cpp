@@ -321,7 +321,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 				QByteArray fileContent = file.readAll( );
 				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
 				QString encoded = QString( fileContent.toBase64( ) );
-				file.close( );	
+				file.close( );
 				xml.writeCharacters( encoded );
 				xml.writeEndElement( );
 			}
