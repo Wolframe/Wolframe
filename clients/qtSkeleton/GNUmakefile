@@ -112,7 +112,7 @@ CPP_OBJS = \
 	moc_HistoryLineEdit.o
 		
 CPP_BINS = \
-	qtclient$(EXE)
+	qtSkeleton$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -208,7 +208,7 @@ UIS += \
 	ui_serverDefinitionDialogNoSSL.h
 endif
 	
-qtclient.d: ui_MainWindow.h
+qtSkeleton.d: ui_MainWindow.h
 MainWindow.d: ui_MainWindow.h
 manageServersDialog.d: ui_manageServersDialog.h
 ifeq ($(WITH_SSL),1)
@@ -220,7 +220,7 @@ loginDialog.d: ui_loginDialog.h
 moc_PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 
-qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
+qtSkeleton$(EXE): $(CPP_OBJS) qrc_qtclient.o qtSkeleton.o
 
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
@@ -228,12 +228,12 @@ qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 %.rcc : %.qrc
 	$(QT_RCC) -binary $< -o $@
 	
-qrc_qtclient.cpp: qtclient.qrc
-	$(QT_RCC) -name qtclient $< -o $@
+qrc_qtclient.cpp: qtSkeleton.qrc
+	$(QT_RCC) -name qtSkeleton $< -o $@
 
 I18NS = \
-	i18n/qtclient.de_CH.qm \
-	i18n/qtclient.ro_RO.qm
+	i18n/qtSkeleton.de_CH.qm \
+	i18n/qtSkeleton.ro_RO.qm
 
 I18NS_TS = $(I18NS:.qm=.ts)
 
@@ -254,19 +254,19 @@ local_install:
 	$(INSTALL) -m 0755 $(CPP_BINS) $(DESTDIR)$(bindir)
 
 local_uninstall:
-	-rm -f $(DESTDIR)$(bindir)/qtclient$(EXE)
+	-rm -f $(DESTDIR)$(bindir)/qtSkeleton$(EXE)
 	-rmdir $(DESTDIR)$(bindir)
 
 local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c apps/testcases.conf
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtSkeleton -c apps/testcases.conf
 
 .PHONY: buildi18n
 buildi18n:
-	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.de_CH.ts
-	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.ro_RO.ts
+	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtSkeleton.de_CH.ts
+	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtSkeleton.ro_RO.ts
 
 geany-ctags:
 	CFLAGS="$(ALL_CXXFLAGS) -I$(QT_INCLUDE_DIR)/QtDesigner -Iplugins/filechooser -Iplugins/picturechooser -Iplugins/formwidget" \

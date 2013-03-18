@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-TARGET = qtclient
+TARGET = qtSkeleton
 
 CONFIG += thread qt uitools designer debug
 
@@ -8,7 +8,7 @@ DEFINES += QCOMMANDLINE_STATIC
 
 INCLUDEPATH += .
 
-#LIBS += plugins/release\wolframewidgets.lib
+#LIBS += plugins/release/wolframewidgets.lib
 #LIBS += plugins/build/Release/libwolframewidgets.dylib
 
 QT += core gui network sql
@@ -35,7 +35,7 @@ SOURCES += \
 	LoadMode.cpp \
 	DebugTerminal.cpp \
 	HistoryLineEdit.cpp \
-	qtclient.cpp
+	qtSkeleton.cpp
 
 HEADERS += \
 	MainWindow.hpp \
@@ -70,14 +70,14 @@ FORMS += \
 	PreferencesDialogInterface.ui \
 	loginDialog.ui \
 	manageServersDialog.ui \
-	serverDefinitionDialogNoSSL.ui
-#	serverDefinitionDialog.ui
-	
-TRANSLATIONS += \
-	i18n/qtclient.de_CH.ts \
-	i18n/qtclient.ro_RO.ts
+	serverDefinitionDialog.ui
+#	serverDefinitionDialogNoSSL.ui
 
-QT_LRELEASE = $$QMAKE_MOC 
+TRANSLATIONS += \
+	i18n/qtSkeleton.de_CH.ts \
+	i18n/qtSkeleton.ro_RO.ts
+
+QT_LRELEASE = $$QMAKE_MOC
 QT_LRELEASE ~= s,moc,lrelease,
 
 updateqm.input = TRANSLATIONS

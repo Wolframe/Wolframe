@@ -36,7 +36,7 @@
 
 #define ORGANIZATION_NAME "Wolframe"
 #define ORGANIZATION_DOMAIN "wolframe.org"
-#define APPLICATION_NAME "Wolframe Client"
+#define APPLICATION_NAME "Wolframe Client Skeleton"
 
 #define WOLFRAME_VERSION "0.0.1"
 
