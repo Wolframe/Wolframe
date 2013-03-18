@@ -19,22 +19,35 @@ bool WidgetVisitorState_QSlider::leave( bool /*writemode*/)
 
 void WidgetVisitorState_QSlider::clear()
 {
+	// set to value between minimum and maximum
+	int midval = (m_slider->minimum() + m_slider->maximum()) / 2;
+	int stp = midval / m_slider->singleStep();
+	double initval = m_slider->minimum() + stp * m_slider->singleStep();
+	m_slider->setValue( initval);
 }
 
-QVariant WidgetVisitorState_QSlider::property( const QByteArray& /*name*/)
+QVariant WidgetVisitorState_QSlider::property( const QByteArray& name)
 {
+	if (name.isEmpty())
+	{
+		return m_slider->value();
+	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QSlider::setProperty( const QByteArray& /*name*/, const QVariant& /*data*/)
+bool WidgetVisitorState_QSlider::setProperty( const QByteArray& name, const QVariant& data)
 {
+	if (name.isEmpty())
+	{
+		m_slider->setValue( data.toInt());
+	}
 	return false;
 }
 
 const QList<QByteArray>& WidgetVisitorState_QSlider::dataelements() const
 {
-	static const QList<QByteArray> noDataElements;
-	return noDataElements;
+	static const DataElements dataElements( "");
+	return dataElements;
 }
 
 bool WidgetVisitorState_QSlider::isRepeatingDataElement( const QByteArray& /*name*/)
@@ -42,12 +55,13 @@ bool WidgetVisitorState_QSlider::isRepeatingDataElement( const QByteArray& /*nam
 	return false;
 }
 
-void WidgetVisitorState_QSlider::setState( const QVariant& /*state*/)
+void WidgetVisitorState_QSlider::setState( const QVariant& state)
 {
+	if (state.isValid()) m_slider->setValue( state.toDouble());
 }
 
 QVariant WidgetVisitorState_QSlider::getState() const
 {
-	return QVariant();
+	return QVariant( m_slider->value());
 }
 

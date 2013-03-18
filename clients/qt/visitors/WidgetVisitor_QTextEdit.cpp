@@ -44,18 +44,27 @@ void WidgetVisitorState_QTextEdit::clear()
 
 QVariant WidgetVisitorState_QTextEdit::property( const QByteArray& name)
 {
-	if (strcmp( name, "") == 0)
+	if (strcmp( name, "text") == 0)
 	{
 		return QVariant( m_textEdit->toPlainText());
+	}
+	if (strcmp( name, "html") == 0)
+	{
+		return QVariant( m_textEdit->toHtml());
 	}
 	return QVariant();
 }
 
 bool WidgetVisitorState_QTextEdit::setProperty( const QByteArray& name, const QVariant& data)
 {
-	if (strcmp( name, "") == 0)
+	if (strcmp( name, "text") == 0)
 	{
 		m_textEdit->setPlainText( data.toString());
+		return true;
+	}
+	if (strcmp( name, "html") == 0)
+	{
+		m_textEdit->setHtml( data.toString());
 		return true;
 	}
 	return false;
@@ -63,13 +72,12 @@ bool WidgetVisitorState_QTextEdit::setProperty( const QByteArray& name, const QV
 
 const QList<QByteArray>& WidgetVisitorState_QTextEdit::dataelements() const
 {
-	static const DataElements ar( "", 0);
-	return ar;
+	static const DataElements dataElements( "text", "html");
+	return dataElements;
 }
 
 void WidgetVisitorState_QTextEdit::setState( const QVariant& state)
 {
-	qDebug() << "Restoring tree state for text edit" << m_textEdit->objectName();
 	if (state.isValid()) m_textEdit->setHtml( state.toString());
 }
 

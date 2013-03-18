@@ -83,8 +83,8 @@ CPP_OBJS = \
 	moc_WolframeClient.o \
 	WolframeClientProtocol.o \
 	WolframeClientProtocolBase.o \
-	WidgetVisitor.o \
 	$(VISITOR_OBJS) \
+	WidgetVisitor.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
 	FormCall.o \

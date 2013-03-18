@@ -19,22 +19,31 @@ bool WidgetVisitorState_QRadioButton::leave( bool /*writemode*/)
 
 void WidgetVisitorState_QRadioButton::clear()
 {
+	m_radioButton->setChecked( false);
 }
 
-QVariant WidgetVisitorState_QRadioButton::property( const QByteArray& /*name*/)
+QVariant WidgetVisitorState_QRadioButton::property( const QByteArray& name)
 {
+	if (name.isEmpty())
+	{
+		return QVariant( m_radioButton->isChecked());
+	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QRadioButton::setProperty( const QByteArray& /*name*/, const QVariant& /*data*/)
+bool WidgetVisitorState_QRadioButton::setProperty( const QByteArray& name, const QVariant& data)
 {
+	if (name.isEmpty())
+	{
+		m_radioButton->setChecked( data.toBool());
+	}
 	return false;
 }
 
 const QList<QByteArray>& WidgetVisitorState_QRadioButton::dataelements() const
 {
-	static const QList<QByteArray> noDataElements;
-	return noDataElements;
+	static const DataElements dataElements( "");
+	return dataElements;
 }
 
 bool WidgetVisitorState_QRadioButton::isRepeatingDataElement( const QByteArray& /*name*/)
@@ -42,12 +51,14 @@ bool WidgetVisitorState_QRadioButton::isRepeatingDataElement( const QByteArray& 
 	return false;
 }
 
-void WidgetVisitorState_QRadioButton::setState( const QVariant& /*state*/)
+void WidgetVisitorState_QRadioButton::setState( const QVariant& state)
 {
+	if (state.isValid()) m_radioButton->setChecked( state.toBool());
 }
 
 QVariant WidgetVisitorState_QRadioButton::getState() const
 {
-	return QVariant();
+	return QVariant( m_radioButton->isChecked());
 }
+
 

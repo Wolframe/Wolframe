@@ -363,7 +363,6 @@ const QList<QByteArray>& WidgetVisitorState_QTableWidget::dataelements() const
 
 void WidgetVisitorState_QTableWidget::setState( const QVariant& state)
 {
-	qDebug() << "Restoring Table state for table" << m_tableWidget->objectName();
 	QTableWidgetSelectionRange all( 0, 0, m_tableWidget->rowCount(), m_tableWidget->columnCount());
 	m_tableWidget->setRangeSelected( all, false);
 

@@ -85,7 +85,7 @@ QVariant WidgetVisitorState_FileChooser::property( const QByteArray& name)
 			{
 				return QVariant( m_filecontent.size());
 			}
-			if (name == "")
+			if (name.isEmpty())
 			{
 				return QVariant( m_filecontent_encoded);
 			}

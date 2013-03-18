@@ -236,7 +236,6 @@ static QTreeWidgetItem* findchild( const QTreeWidgetItem* item, int keyidx, cons
 
 void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 {
-	qDebug() << "Restoring tree state for tree" << m_elementname;
 	QStack<StackElement> stk;
 	int keyidx = m_headers.indexOf( "id");
 	if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined

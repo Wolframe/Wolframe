@@ -53,7 +53,7 @@ public:
 	virtual QVariant getState() const;
 
 private:
-	QDateEdit* m_dataEdit;
+	QDateEdit* m_dateEdit;
 };
 
 #endif

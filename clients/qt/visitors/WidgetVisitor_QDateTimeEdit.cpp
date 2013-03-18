@@ -5,6 +5,7 @@ WidgetVisitorState_QDateTimeEdit::WidgetVisitorState_QDateTimeEdit( QWidget* wid
 	:WidgetVisitor::State(widget_)
 	,m_dateTimeEdit(qobject_cast<QDateTimeEdit*>( widget_))
 {
+	m_dateTimeEdit->setDateTime( QDateTime::currentDateTime());
 }
 
 bool WidgetVisitorState_QDateTimeEdit::enter( const QByteArray& /*name*/, bool /*writemode*/)
@@ -19,22 +20,31 @@ bool WidgetVisitorState_QDateTimeEdit::leave( bool /*writemode*/)
 
 void WidgetVisitorState_QDateTimeEdit::clear()
 {
+	m_dateTimeEdit->setDateTime( QDateTime::currentDateTime());
 }
 
-QVariant WidgetVisitorState_QDateTimeEdit::property( const QByteArray& /*name*/)
+QVariant WidgetVisitorState_QDateTimeEdit::property( const QByteArray& name)
 {
+	if (name.isEmpty())
+	{
+		QVariant( m_dateTimeEdit->dateTime().toString( Qt::ISODate));
+	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QDateTimeEdit::setProperty( const QByteArray& /*name*/, const QVariant& /*data*/)
+bool WidgetVisitorState_QDateTimeEdit::setProperty( const QByteArray& name, const QVariant& data)
 {
+	if (name.isEmpty())
+	{
+		m_dateTimeEdit->setDateTime( QDateTime::fromString( data.toString(), Qt::ISODate));
+	}
 	return false;
 }
 
 const QList<QByteArray>& WidgetVisitorState_QDateTimeEdit::dataelements() const
 {
-	static const QList<QByteArray> noDataElements;
-	return noDataElements;
+	static const DataElements dataElements( "");
+	return dataElements;
 }
 
 bool WidgetVisitorState_QDateTimeEdit::isRepeatingDataElement( const QByteArray& /*name*/)
@@ -42,12 +52,14 @@ bool WidgetVisitorState_QDateTimeEdit::isRepeatingDataElement( const QByteArray&
 	return false;
 }
 
-void WidgetVisitorState_QDateTimeEdit::setState( const QVariant& /*state*/)
+void WidgetVisitorState_QDateTimeEdit::setState( const QVariant& state)
 {
+	if (state.isValid()) m_dateTimeEdit->setDateTime( state.toDateTime());
 }
 
 QVariant WidgetVisitorState_QDateTimeEdit::getState() const
 {
-	return QVariant();
+	return QVariant( m_dateTimeEdit->dateTime());
 }
+
 
