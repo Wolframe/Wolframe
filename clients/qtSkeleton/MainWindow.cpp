@@ -32,14 +32,11 @@
 ************************************************************************/
 
 #include "MainWindow.hpp"
-#include "FileFormLoader.hpp"
 #include "FileDataLoader.hpp"
-#include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
 #include "settings.hpp"
 #include "PreferencesDialog.hpp"
 #include "global.hpp"
-#include "FormChooseDialog.hpp"
 #include "manageServersDialog.hpp"
 
 #include <QtGui>
@@ -232,21 +229,6 @@ void MainWindow::initialize( )
 	m_uiLoader->addPluginPath( "." );
 	QStringList paths = m_uiLoader->pluginPaths( );
 	qDebug( ) << "Will load custom widget plugins from" << paths;
-
-// for testing, load lists of available forms from the files system or
-// a local sqlite database, pass the form loader to the FormWidget
-	switch( settings.uiLoadMode ) {
-		case LocalFile:
-			m_formLoader = new FileFormLoader( settings.uiFormsDir, settings.uiFormTranslationsDir, settings.uiFormResourcesDir );
-			break;
-
-		case Network:
-			// skip, delay
-			break;
-
-		case Unknown:
-			break;
-	}
 
 // ..same for the data loader
 	switch( settings.dataLoadMode ) {
@@ -489,11 +471,6 @@ void MainWindow::authOk( )
 
 	statusBar( )->showMessage( tr( "Ready" ) );
 
-// create network based form ...
-	if( settings.uiLoadMode == Network ) {
-		m_formLoader = new NetworkFormLoader( m_wolframeClient );
-	}
-
 // ...and data loaders
 	if( settings.dataLoadMode == Network ) {
 		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
@@ -608,20 +585,13 @@ void MainWindow::loadLanguage( QString language )
 
 void MainWindow::changeEvent( QEvent* _event )
 {
-	if( _event ) {
-		switch( _event->type( ) ) {
-
-			case QEvent::LanguageChange:
-				m_ui.retranslateUi( this );
-				break;
-
-			case QEvent::LocaleChange:
-			{
-				QString locale = QLocale::system( ).name( );
-				locale.truncate( locale.lastIndexOf( '_' ) );
-				loadLanguage( locale );
-			}
-			break;
+	if( _event )	{
+		if ( _event->type() == QEvent::LanguageChange )
+			m_ui.retranslateUi( this );
+		else if ( _event->type() == QEvent::LocaleChange )	{
+			QString locale = QLocale::system( ).name( );
+			locale.truncate( locale.lastIndexOf( '_' ) );
+			loadLanguage( locale );
 		}
 	}
 
@@ -699,7 +669,7 @@ void MainWindow::formModal( QString name )
 	m_modalDialog->show( );
 }
 
-void MainWindow::formLoaded( QString name )
+void MainWindow::formLoaded( QString /*name*/ )
 {
 // in MDI mode update the title of the sub window, otherwise update window title
 	if( settings.mdi ) {

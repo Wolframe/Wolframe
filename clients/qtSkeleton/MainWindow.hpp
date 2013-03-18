@@ -34,7 +34,7 @@
 #ifndef _MAIN_WINDOW_HPP_INCLUDED
 #define _MAIN_WINDOW_HPP_INCLUDED
 
-#include <QCommandLine>	
+#include <QCommandLine>
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QTranslator>
@@ -46,9 +46,7 @@
 #include <QCloseEvent>
 
 #include "global.hpp"
-#include "FormLoader.hpp"
 #include "WolframeClient.hpp"
-#include "FormWidget.hpp"
 #include "loginDialog.hpp"
 #include "LoadMode.hpp"
 #include "ui_MainWindow.h"
@@ -62,17 +60,14 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow( QWidget *_parent = 0 );
-		virtual ~MainWindow( );		
-			
+		virtual ~MainWindow( );
+
 	private:
 		Ui::MainWindow m_ui;		// ui definition from designer
 		QTranslator m_translatorApp;	// contains the translations for this application
 		QTranslator m_translatorQt; 	// contains the translations for qt
-		QCommandLine *m_cmdline;	// command line parser	
-		FormWidget *m_formWidget;	// current active form
+		QCommandLine *m_cmdline;	// command line parser
 		QUiLoader *m_uiLoader;		// the UI loader for all forms
-		FormLoader *m_formLoader;	// form loader (visible form)
-		DataLoader *m_dataLoader;	// load and saves data (data form)
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_settings;		// file to read settings from
 		QStringList m_languages;	// available interface translations
@@ -88,9 +83,9 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarConn;
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
-		QAction *m_debugTerminalAction;	
+		QAction *m_debugTerminalAction;
 		QDialog *m_modalDialog;
-		
+
 	public slots:
 		void readSettings( );
 		void parseArgs( );
@@ -98,11 +93,11 @@ class MainWindow : public QMainWindow
 		void loadLanguages( );
 		void loadForm( QString formName );
 		void loadLanguage( QString language );
-		
+
 	protected:
 		void changeEvent( QEvent *_event );
 		void closeEvent( QCloseEvent *e );
-	
+
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
 		void CreateFormWidget( const QString &name );
@@ -125,7 +120,7 @@ class MainWindow : public QMainWindow
 		void paramFound( const QString &name, const QVariant &value );
 		void parseError( const QString &error );
 
-// slots for the wolframe client		
+// slots for the wolframe client
 		void wolframeError( QString error );
 		void connected( );
 		void disconnected( );
@@ -142,7 +137,7 @@ class MainWindow : public QMainWindow
 		void formModal( QString name );
 		void endModal( void );
 		void formError( QString error );
-		
+
 // MDI slots
 		void subWindowSelected( QAction *action );
 		void subWindowChanged( QMdiSubWindow *w );
@@ -163,7 +158,7 @@ class MainWindow : public QMainWindow
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
 		void on_actionOpenForm_triggered( );
-		void on_actionOpenFormNewWindow_triggered( );	
+		void on_actionOpenFormNewWindow_triggered( );
 		void on_actionReload_triggered( );
 		void on_actionNextWindow_triggered( );
 		void on_actionPreviousWindow_triggered( );

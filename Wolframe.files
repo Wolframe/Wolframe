@@ -214,16 +214,9 @@ clients/qtSkeleton/FileChooser.cpp
 clients/qtSkeleton/FileChooser.hpp
 clients/qtSkeleton/FileDataLoader.cpp
 clients/qtSkeleton/FileDataLoader.hpp
-clients/qtSkeleton/FileFormLoader.cpp
-clients/qtSkeleton/FileFormLoader.hpp
 clients/qtSkeleton/FormCall.cpp
 clients/qtSkeleton/FormCall.hpp
-clients/qtSkeleton/FormChooseDialog.cpp
-clients/qtSkeleton/FormChooseDialog.hpp
 clients/qtSkeleton/FormLoader.cpp
-clients/qtSkeleton/FormLoader.hpp
-clients/qtSkeleton/FormWidget.cpp
-clients/qtSkeleton/FormWidget.hpp
 clients/qtSkeleton/global.hpp
 clients/qtSkeleton/GNUmakefile
 clients/qtSkeleton/HistoryLineEdit.cpp
@@ -239,8 +232,6 @@ clients/qtSkeleton/manageServersDialog.cpp
 clients/qtSkeleton/manageServersDialog.hpp
 clients/qtSkeleton/NetworkDataLoader.cpp
 clients/qtSkeleton/NetworkDataLoader.hpp
-clients/qtSkeleton/NetworkFormLoader.cpp
-clients/qtSkeleton/NetworkFormLoader.hpp
 clients/qtSkeleton/PictureChooser.cpp
 clients/qtSkeleton/PictureChooser.hpp
 clients/qtSkeleton/plugins/filechooser/FileChooserPlugin.cpp

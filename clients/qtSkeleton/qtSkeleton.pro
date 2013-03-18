@@ -16,17 +16,13 @@ QT += core gui network sql
 SOURCES += \
 	MainWindow.cpp \
 	FormLoader.cpp \
-	FileFormLoader.cpp \
-	NetworkFormLoader.cpp \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \
 	DataHandler.cpp \
 	WolframeClient.cpp \
-	FormWidget.cpp \
 	qcommandline.cpp \
 	PreferencesDialog.cpp \
-	FormChooseDialog.cpp \
 	connection.cpp \
 	manageServersDialog.cpp \
 	serverDefinitionDialog.cpp \
@@ -39,18 +35,13 @@ SOURCES += \
 
 HEADERS += \
 	MainWindow.hpp \
-	FormLoader.hpp \
-	FileFormLoader.hpp \
-	NetworkFormLoader.hpp \
 	DataLoader.hpp \
 	FileDataLoader.hpp \
 	NetworkDataLoader.hpp \
 	DataHandler.hpp \
 	WolframeClient.hpp \
-	FormWidget.hpp \
 	qcommandline.h \
 	PreferencesDialog.hpp \
-	FormChooseDialog.hpp \
 	connection.hpp \
 	manageServersDialog.hpp \
 	serverDefinitionDialog.hpp \

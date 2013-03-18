@@ -33,7 +33,6 @@
 
 #ifndef _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
 #define _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
-#include "WidgetVisitor.hpp"
 
 ///\class WidgetMessageDispatcher
 ///\brief Structure to initialize widgets of a form and issue commands as client/server requests
