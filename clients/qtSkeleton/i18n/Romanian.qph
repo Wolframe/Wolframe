@@ -1,0 +1,51 @@
+<!DOCTYPE QPH>
+<QPH sourcelanguage="en" language="ro">
+<phrase>
+    <source>MainWindow</source>
+    <target>Fereastra Principală</target>
+</phrase>
+<phrase>
+    <source>&amp;File</source>
+    <target>&amp;Fișier</target>
+</phrase>
+<phrase>
+    <source>F&amp;orms</source>
+    <target>F&amp;ormulare</target>
+</phrase>
+<phrase>
+    <source>&amp;Help</source>
+    <target>&amp;Ajutor</target>
+</phrase>
+<phrase>
+    <source>Th&amp;emes</source>
+    <target>T&amp;eme</target>
+</phrase>
+<phrase>
+    <source>&amp;Language</source>
+    <target>&amp;Limbă</target>
+</phrase>
+<phrase>
+    <source>&amp;Open</source>
+    <target>&amp;Deschide</target>
+</phrase>
+<phrase>
+    <source>&amp;Exit</source>
+    <target>&amp;Ieșire</target>
+</phrase>
+<phrase>
+    <source>&amp;About</source>
+    <target>&amp;Despre</target>
+</phrase>
+<phrase>
+    <source>About &amp;Qt</source>
+    <target>Despre &amp;Qt</target>
+</phrase>
+<phrase>
+    <source>&amp;Debug Terminal</source>
+    <target>Terminal &amp;Depanare</target>
+</phrase>
+<phrase>
+    <source>&amp;Preferences</source>
+    <target>&amp;Preferințe</target>
+</phrase>
+</QPH>
