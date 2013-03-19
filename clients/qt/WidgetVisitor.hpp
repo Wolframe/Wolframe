@@ -199,6 +199,8 @@ class WidgetVisitor
 			friend class WidgetVisitor;
 			QWidget* m_widget;							//< widget reference
 			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
+			typedef QPair< QByteArray,QByteArray> LinkDef;
+			QList<LinkDef> m_links;							//< symbolic links to other objects
 			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
 			int m_entercnt;								//< counter for leaving multipart synonyms
 		};
@@ -223,6 +225,15 @@ class WidgetVisitor
 		///\brief Resolve reference to a variable
 		///\param[in] value to resolve
 		QVariant resolve( const QVariant& value);
+
+		///\brief Get the UI root widget
+		QWidget* uirootwidget() const;
+		///\brief Get the UI root widget
+		QWidget* predwidget( const QByteArray& name) const;
+
+		///\brief Resolve a symbolic link to a widget
+		///\param[in] link name of symbolic link to resolve
+		QWidget* resolveLink( const QByteArray& link);
 
 		///\brief Backup state description in a dynamic property and reset widget state
 		void resetState();

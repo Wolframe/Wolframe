@@ -82,10 +82,24 @@ WidgetVisitor::State::State( QWidget* widget_)
 			QVariant synonym = m_widget->property( prop);
 			m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
 		}
+		if (prop.startsWith( "link:"))
+		{
+			QVariant link = m_widget->property( prop);
+			m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
+		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
 			m_dynamicProperties.insert( prop, m_widget->property( prop));
 		}
+	}
+	static qint64 g_cnt = 0;
+	QVariant ruid = m_widget->property( "_w_requestid");
+	if (ruid.type() != QVariant::ByteArray)
+	{
+		QByteArray rt =  m_widget->objectName().toAscii();
+		rt.append( ":");
+		rt.append( QVariant( ++g_cnt).toByteArray());
+		m_widget->setProperty( "_w_requestid", QVariant(rt));
 	}
 }
 
@@ -192,7 +206,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 	{
 		return true;
 	}
-	if (level == 0 && enter_root( name))
+	if (level == 0 && !name.isEmpty() && enter_root( name))
 	{
 		return true;
 	}
@@ -340,6 +354,45 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
+QWidget* WidgetVisitor::predwidget( const QByteArray& name) const
+{
+	if (m_stk.isEmpty()) return 0;
+	QWidget* wdg = m_stk.at(0)->m_widget;
+	QObject* prn = wdg->parent();
+	for (; prn != 0; prn = prn->parent())
+	{
+		if (qobject_cast<QWidget*>( prn))
+		{
+			wdg = qobject_cast<QWidget*>( prn);
+			if (wdg->objectName() == name) return wdg;
+			QList<QWidget*> cld = wdg->findChildren<QWidget*>(name);
+			if (cld.size() == 1) return cld.at(0);
+		}
+	}
+	return 0;
+}
+
+QWidget* WidgetVisitor::uirootwidget() const
+{
+	if (m_stk.isEmpty()) return 0;
+	QWidget* wdg = m_stk.at(0)->m_widget;
+	QObject* prn = wdg->parent();
+	for (; prn != 0; prn = prn->parent())
+	{
+		if (qobject_cast<QWidget*>( prn))
+		{
+			wdg = qobject_cast<QWidget*>( prn);
+		}
+	}
+	return wdg;
+}
+
+QWidget* WidgetVisitor::resolveLink( const QByteArray& link)
+{
+	QWidget* wdg = uirootwidget();
+	return wdg;
+}
+
 void WidgetVisitor::resetState()
 {
 	if (!m_stk.isEmpty())
@@ -365,15 +418,10 @@ void WidgetVisitor::restoreState()
 bool WidgetVisitor::enter_root( const QByteArray& name)
 {
 	if (m_stk.empty()) return false;
-	if (m_stk.at(0)->m_widget->objectName() == name)
+	QWidget* ww = predwidget( name);
+	if (ww)
 	{
-		m_stk.push_back( createWidgetVisitorState( m_stk.at(0)->m_widget));
-		return true;
-	}
-	QList<QWidget*> ww = m_stk.at(0)->m_widget->findChildren<QWidget*>(name);
-	if (ww.size() == 1)
-	{
-		m_stk.push_back( createWidgetVisitorState( ww[0]));
+		m_stk.push_back( createWidgetVisitorState( ww));
 		return true;
 	}
 	return false;
@@ -454,14 +502,13 @@ QByteArray WidgetVisitor::className() const
 QByteArray WidgetVisitor::requestUID()
 {
 	if (m_stk.isEmpty()) return QByteArray();
-	static qint64 g_cnt = 0;
 	QVariant ruid = m_stk.top()->m_widget->property( "_w_requestid");
-	if (ruid.type() == QVariant::ByteArray) return ruid.toByteArray();
-	QByteArray rt =  objectName();
-	rt.append( ":");
-	rt.append( QVariant( ++g_cnt).toByteArray());
-	m_stk.top()->m_widget->setProperty( "_w_requestid", QVariant(rt));
-	return rt;
+	if (ruid.type() != QVariant::ByteArray)
+	{
+		qCritical() << "property _w_requestid missing in state";
+		return objectName();
+	}
+	return ruid.toByteArray();
 }
 
 QVariant WidgetVisitor::property( const QByteArray& name)
