@@ -140,10 +140,15 @@ WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_)
 
 bool WidgetVisitor::enter( const QString& name, bool writemode)
 {
-	return enter( name.toAscii(), writemode);
+	return enter( name.toAscii(), writemode, 0);
 }
 
 bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
+{
+	return enter( name, writemode, 0);
+}
+
+bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 {
 	if (m_stk.empty()) return false;
 	QByteArray synonym = m_stk.top()->getSynonym( name);
@@ -157,7 +162,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 			QByteArray rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
 			do
 			{
-				if (!enter( prefix, writemode))
+				if (!enter( prefix, writemode, level+entercnt))
 				{
 					for (; entercnt > 0; --entercnt) leave( writemode);
 					return false;
@@ -166,7 +171,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 				followidx = rest.indexOf( '.');
 				if (followidx < 0)
 				{
-					if (!enter( rest, writemode))
+					if (!enter( rest, writemode, level+entercnt))
 					{
 						for (; entercnt > 0; --entercnt) leave( writemode);
 						return false;
@@ -180,10 +185,14 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 		}
 		else
 		{
-			return enter( synonym, writemode);
+			return enter( synonym, writemode, level);
 		}
 	}
 	if (m_stk.top()->enter( name, writemode))
+	{
+		return true;
+	}
+	if (level == 0 && enter_root( name))
 	{
 		return true;
 	}
@@ -353,21 +362,21 @@ void WidgetVisitor::restoreState()
 	if (initialFocus.toBool()) widget()->setFocus();
 }
 
-WidgetVisitor WidgetVisitor::getRootElement( const QByteArray& name)
+bool WidgetVisitor::enter_root( const QByteArray& name)
 {
-	if (m_stk.empty()) return WidgetVisitor();
+	if (m_stk.empty()) return false;
 	if (m_stk.at(0)->m_widget->objectName() == name)
 	{
-		WidgetVisitor rt( m_stk.at(0));
-		return rt;
+		m_stk.push_back( createWidgetVisitorState( m_stk.at(0)->m_widget));
+		return true;
 	}
 	QList<QWidget*> ww = m_stk.at(0)->m_widget->findChildren<QWidget*>(name);
 	if (ww.size() == 1)
 	{
-		WidgetVisitor rt( ww[0]);
-		return rt;
+		m_stk.push_back( createWidgetVisitorState( ww[0]));
+		return true;
 	}
-	return WidgetVisitor();
+	return false;
 }
 
 QVariant WidgetVisitor::property( const QByteArray& name, int level)
@@ -380,7 +389,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 	}
 	QVariant rt;
 	if ((rt = m_stk.top()->property( name)).isValid()) return resolve( rt);
-	if ((rt = m_stk.top()->dynamicProperty( name)).isValid()) return resolve( rt);
+	if (level == 0 && (rt = m_stk.top()->dynamicProperty( name)).isValid()) return resolve( rt);
 
 	bool subelem = false;
 	QByteArray prefix;
@@ -390,15 +399,17 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 	{
 		prefix = name.mid( 0, followidx);
 		rest = name.mid( followidx+1, name.size()-followidx-1);
-		if (enter( prefix, false))
+		if (enter( prefix, false, level))
 		{
+			level += 1;
 			subelem = true;
 		}
 	}
 	else
 	{
-		if (enter( name, false))
+		if (enter( name, false, level))
 		{
+			level += 1;
 			subelem = true;
 			prefix = name;
 			rest.clear();
@@ -406,7 +417,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 	}
 	if (subelem)
 	{
-		rt = property( rest, level+1);
+		rt = property( rest, level);
 		leave( false);
 		if (m_stk.top()->isRepeatingDataElement( prefix))
 		{
@@ -414,9 +425,9 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 			QList<QVariant> rtlist;
 			rtlist.push_back( rt);
 
-			while (enter( prefix, false))
+			while (enter( prefix, false, level))
 			{
-				rt = property( rest, level+1);
+				rt = property( rest, level);
 				leave( false);
 				rtlist.push_back( rt);
 			}
@@ -424,10 +435,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 		}
 		return rt;
 	}
-	if (level == 0)
-	{
-		return getRootElement( prefix).property( rest, 1);
-	}
+	rt = m_stk.top()->dynamicProperty( name);
 	return rt;
 }
 
@@ -484,14 +492,14 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	{
 		prefix = name.mid( 0, followidx);
 		rest = name.mid( followidx+1, name.size()-followidx-1);
-		if (enter( prefix, false))
+		if (enter( prefix, false, level))
 		{
 			subelem = true;
 		}
 	}
 	else
 	{
-		if (enter( name, true))
+		if (enter( name, true, level))
 		{
 			subelem = true;
 			prefix = name;
@@ -508,14 +516,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 		}
 		return rt;
 	}
-	if (level == 0)
-	{
-		return getRootElement( prefix).setProperty( rest, value, 1);
-	}
-	else
-	{
-		if (m_stk.top()->setDynamicProperty( name, value)) return true;
-	}
+	if (m_stk.top()->setDynamicProperty( name, value)) return true;
 	return false;
 }
 
@@ -614,18 +615,21 @@ struct WidgetVisitorStackElement
 	int dataelementidx;
 	bool isContent;
 	bool hasSelectedDataelements;
+	int level;
 
 	WidgetVisitorStackElement()
 		:nof_attributes(0)
 		,dataelementidx(0)
 		,isContent(false)
 		,hasSelectedDataelements(false)
+		,level(0)
 	{}
-	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QByteArray>* selectedDataElements)
+	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QByteArray>* selectedDataElements, int level_=0)
 		:nof_attributes(0)
 		,dataelementidx(0)
 		,isContent(false)
 		,hasSelectedDataelements(selectedDataElements?true:false)
+		,level(level_)
 	{
 		if (!selectedDataElements)
 		{
@@ -719,7 +723,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 			{
 				//... special handling of dataelement explicitely marked as attribute '@':
 				//    we allow digging in substructures for this one single element if it exists
-				QVariant val = property( dataelem);
+				QVariant val = property( dataelem, elemstk.top().level);
 				if (val.isValid() && !dataelem.isEmpty() && val.type() != QVariant::List)
 				{
 					rt.push_back( Element( Element::Attribute, dataelem));
@@ -733,7 +737,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 			if (pntidx >= 0)
 			{
 				QByteArray prefix = dataelem.mid( 0, pntidx);
-				if (enter( prefix, false))
+				if (enter( prefix, false, elemstk.top().level))
 				{
 					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
 					elemstk.top().isContent = true;
@@ -741,13 +745,13 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 					{
 						++elemstk.top().dataelementidx;
 					}
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected, elemstk.top().level+1));
 					rt.push_back( Element( Element::OpenTag, prefix));
 					continue;
 				}
 			}
 			/* [3] Handling ordinary substructures: */
-			else if (enter( dataelem, false))
+			else if (enter( dataelem, false, elemstk.top().level))
 			{
 				elemstk.top().isContent = true;
 				if (!m_stk.top()->isRepeatingDataElement( dataelem))
@@ -759,7 +763,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 				continue;
 			}
 			/* [4] Handling ordinary properties: */
-			QVariant val = property( dataelem);
+			QVariant val = property( dataelem, elemstk.top().level);
 			if (val.isValid())
 			{
 				// evaluate if is attribute or content element:

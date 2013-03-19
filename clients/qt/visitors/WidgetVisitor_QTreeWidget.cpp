@@ -84,11 +84,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 	else if (m_mode != Tree && name == m_elementname)
 	{
 		m_mode = List;
-		if (m_stk.size() != 1)
-		{
-			qCritical() << "illegal header in middle of content (stack size=" << m_stk.size() << ")";
-			return false;
-		}
+		if (m_stk.size() != 1) return false;
 		if (writemode)
 		{
 			m_stk.push_back( StackElement( new QTreeWidgetItem( m_stk.top().item)));

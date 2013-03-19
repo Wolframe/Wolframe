@@ -61,8 +61,8 @@ class WidgetVisitor
 		bool enter( const QString& name, bool writemode);
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QByteArray& name, bool writemode);
-		///\brief Return the addressed visitor of this with name as root element
-		WidgetVisitor getRootElement( const QByteArray& name);
+		///\brief Sets the current node to the root widget or child with name 'name' of the root widget
+		bool enter_root( const QByteArray& name);
 
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave( bool writemode);
@@ -238,8 +238,15 @@ class WidgetVisitor
 		///\brief Internal property set using 'level' to check property resolving step (B).
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
+		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		///\return true on success
 		bool setProperty( const QByteArray& name, const QVariant& value, int level);
+
+		///\brief Sets the current node to the child with name 'name'
+		///\param[in] name name of the subnode
+		///\param[in] writemode true if in write/create access and not in read access
+		///\param[in] level element index in path (element is first element of a path <=> level == 0)
+		bool enter( const QByteArray& name, bool writemode, int level);
 
 		///\brief Internal implementation of 'elements(...)'
 		QList<Element> elements( const QList<QByteArray>* selected_dataelements);

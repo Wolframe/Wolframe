@@ -44,41 +44,38 @@
 #define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
 #endif
 
-static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& dataobject, bool debugmode)
+static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 {
-	QList<QByteArray> props = visitor.widget()->dynamicPropertyNames();
+	QVariant prop;
 	QString docType,rootElement;
 	bool isStandalone = true;
 	QList<QByteArray> selectedDataElements;
 	bool hasSelectedDataElements = false;
 
-	if (props.contains("dataelement"))
+	foreach (const QByteArray& ee, visitor.property( "dataelement").toByteArray().trimmed().split( ','))
 	{
-		foreach (const QByteArray& ee, visitor.property( "dataelement").toByteArray().trimmed().split( ','))
+		QByteArray elem = ee.trimmed();
+		if (!elem.isEmpty())
 		{
-			QByteArray elem = ee.trimmed();
-			if (!elem.isEmpty())
+			if (elem[0] == '_')
 			{
-				if (elem[0] == '_')
-				{
-					selectedDataElements.push_back( QByteArray());
-				}
-				else
-				{
-					selectedDataElements.push_back( elem);
-				}
+				selectedDataElements.push_back( QByteArray());
+			}
+			else
+			{
+				selectedDataElements.push_back( elem);
 			}
 		}
 		hasSelectedDataElements = true;
 	}
-	if (props.contains("doctype"))
+	if ((prop = visitor.property("doctype")).isValid())
 	{
-		docType = visitor.property( "doctype").toString();
+		docType = prop.toString();
 		isStandalone = false;
 	}
-	if (props.contains("rootelement"))
+	if ((prop = visitor.property("rootelement")).isValid())
 	{
-		rootElement = visitor.property( "rootelement").toString();
+		rootElement = prop.toString();
 		isStandalone = false;
 	}
 	if (!isStandalone && rootElement.isEmpty())
@@ -89,16 +86,22 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 	{
 		docType = rootElement;
 	}
+	QVariant dataobjectname = visitor.property( "dataobject");
+	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toByteArray(), false))
+	{
+		qCritical() << "action dataobject does not address a known widget:" << dataobjectname.toByteArray();
+		return QByteArray();
+	}
 	QByteArray rt;
 	QXmlStreamWriter xml( &rt);
 	QList<WidgetVisitor::Element> elements;
 	if (hasSelectedDataElements)
 	{
-		elements = dataobject.elements( selectedDataElements);
+		elements = visitor.elements( selectedDataElements);
 	}
 	else
 	{
-		elements = dataobject.elements();
+		elements = visitor.elements();
 	}
 	if (debugmode)
 	{
@@ -139,7 +142,7 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 				if (ie == ee || ie->type() != WidgetVisitor::Element::Value)
 				{
 					qCritical() << "producing illegal XML";
-					return QByteArray();
+					goto ERROR;
 				}
 				xml.writeAttribute( attribute.toString(), ie->value().toString());
 				break;
@@ -152,35 +155,32 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 
 	xml.writeEndElement();
 	xml.writeEndDocument();
+
+	if (dataobjectname.isValid())
+	{
+		visitor.leave( false);
+	}
 	return rt;
+ERROR:
+	if (dataobjectname.isValid())
+	{
+		visitor.leave( false);
+	}
+	return QByteArray();
 }
 
 QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	QByteArray rt;
-	QVariant dataobjectname = visitor.property( "dataobject");
-	if (dataobjectname.isValid())
-	{
-		WidgetVisitor dataobject = visitor.getRootElement( dataobjectname.toByteArray());
-		if (!dataobject.widget())
-		{
-			qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
-			return rt;
-		}
-		rt = getWigdetRequest_( visitor, dataobject, debugmode);
-		qDebug() << "widget request of " << dataobject.objectName() << "=" << rt;
-		visitor.leave( false);
-	}
-	else
-	{
-		rt = getWigdetRequest_( visitor, visitor, debugmode);
-	}
+	QByteArray rt = getWigdetRequest_( visitor, debugmode);
+	qDebug() << "action request of " << visitor.objectName() << "=" << rt;
 	return rt;
 }
 
 QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	return getWigdetRequest_( visitor, visitor, debugmode);
+	QByteArray rt = getWigdetRequest_( visitor, debugmode);
+	qDebug() << "widget request of " << visitor.objectName() << "=" << rt;
+	return rt;
 }
 
 struct WidgetAnswerStackElement
