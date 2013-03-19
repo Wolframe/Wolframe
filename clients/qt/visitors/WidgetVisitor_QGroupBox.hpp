@@ -51,9 +51,18 @@ public:
 	virtual bool isRepeatingDataElement( const QByteArray& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+	virtual QList<QWidget*> datachildren() const;
+
+private:
+	bool setChecked( const QByteArray& name);
+	void setAllUnchecked();
+	QList<QVariant> checkedList() const;
 
 private:
 	QGroupBox* m_groupBox;
+	enum Mode {Init,Selected};
+	Mode m_mode;
+	QHash<QByteArray,QWidget*> m_childmap;
 };
 
 #endif

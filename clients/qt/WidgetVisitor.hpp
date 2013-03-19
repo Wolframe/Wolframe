@@ -172,6 +172,8 @@ class WidgetVisitor
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
 			///\brief Get all dataelements readable in the current substructure context
 			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
+			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
+			virtual QList<QWidget*> datachildren() const				{return m_widget->findChildren<QWidget*>();}
 			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
 			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
 			///\brief Restore the widget state from a variable

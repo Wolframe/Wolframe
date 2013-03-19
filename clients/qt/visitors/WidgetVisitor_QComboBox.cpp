@@ -35,7 +35,7 @@
 
 WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
-	,m_stateid(None)
+	,m_mode(None)
 	,m_comboBox(qobject_cast<QComboBox*>(widget_))
 	,m_elementname(widget_->objectName().toAscii())
 	,m_currentindex(0)
@@ -48,12 +48,12 @@ void WidgetVisitorState_QComboBox::clear()
 {
 	m_comboBox->clear();
 	m_currentindex = 0;
-	m_stateid = None;
+	m_mode = None;
 }
 
 bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode)
 {
-	switch (m_stateid)
+	switch (m_mode)
 	{
 		case None:
 			if (name == m_elementname)
@@ -64,7 +64,7 @@ bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode
 					{
 						m_comboBox->addItem( "");
 						m_comboBox->setCurrentIndex( m_comboBox->count()-1);
-						m_stateid = Value;
+						m_mode = Value;
 					}
 					else
 					{
@@ -76,7 +76,7 @@ bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode
 					if (m_currentindex < m_comboBox->count())
 					{
 						m_comboBox->setCurrentIndex( m_currentindex++);
-						m_stateid = Select;
+						m_mode = Select;
 					}
 					else
 					{
@@ -94,18 +94,18 @@ bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode
 
 bool WidgetVisitorState_QComboBox::leave( bool /*writemode*/)
 {
-	switch (m_stateid)
+	switch (m_mode)
 	{
 		case None:	return false;
-		case Value:	m_stateid = None; m_comboBox->setCurrentIndex( m_currentindex=0); return true;
-		case Select:	m_stateid = None; return true;
+		case Value:	m_mode = None; m_comboBox->setCurrentIndex( m_currentindex=0); return true;
+		case Select:	m_mode = None; return true;
 	}
 	return false;
 }
 
 QVariant WidgetVisitorState_QComboBox::property( const QByteArray& name)
 {
-	switch (m_stateid)
+	switch (m_mode)
 	{
 		case None:
 			if (strcmp( name, "selected") == 0)
@@ -132,7 +132,7 @@ QVariant WidgetVisitorState_QComboBox::property( const QByteArray& name)
 
 bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QVariant& data)
 {
-	switch (m_stateid)
+	switch (m_mode)
 	{
 		case None:
 			if (strcmp( name, "selected") == 0)
@@ -183,7 +183,7 @@ const QList<QByteArray>& WidgetVisitorState_QComboBox::dataelements() const
 	static const DataElements ar_Value( "id", 0);
 	static const QList<QByteArray> ar_Empty;
 
-	switch (m_stateid)
+	switch (m_mode)
 	{
 		case None:	return m_dataelements;
 		case Value:	return ar_Value;

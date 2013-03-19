@@ -53,8 +53,8 @@ public:
 	virtual QVariant getState() const;
 
 private:
-	enum StateId {None,Value,Select};
-	StateId m_stateid;
+	enum Mode {None,Value,Select};
+	Mode m_mode;
 	QComboBox* m_comboBox;
 	QByteArray m_elementname;
 	QList<QByteArray> m_dataelements;

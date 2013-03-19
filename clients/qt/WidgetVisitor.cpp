@@ -637,7 +637,7 @@ struct WidgetVisitorStackElement
 				}
 			}
 			dataelements.append( state->dataelements());
-			foreach (const QWidget* child, state->m_widget->findChildren<QWidget*>())
+			foreach (const QWidget* child, state->datachildren())
 			{
 				if (qobject_cast<const QLabel*>(child)) continue;
 				if (qobject_cast<const QAbstractButton*>(child)) continue;
