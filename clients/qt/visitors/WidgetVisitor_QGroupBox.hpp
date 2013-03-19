@@ -48,10 +48,10 @@ public:
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
+	virtual QList<QWidget*> datachildren() const;
 	virtual bool isRepeatingDataElement( const QByteArray& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
-	virtual QList<QWidget*> datachildren() const;
 
 private:
 	bool setChecked( const QByteArray& name);
