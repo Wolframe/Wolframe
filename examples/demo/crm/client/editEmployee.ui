@@ -155,7 +155,7 @@
         <string notr="true">employee</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">UpdateEmployee.simpleform</string>
+        <string notr="true">UpdateEmployee</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listEmployee</string>

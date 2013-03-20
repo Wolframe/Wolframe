@@ -64,8 +64,11 @@ class WidgetMessageDispatcher
 		};
 
 		QList<Request> getDomainLoadRequests( bool debugmode=false);
+		Request getDomainLoadRequest( bool debugmode=false);
 		Request getFormActionRequest( bool debugmode=false);
 		bool feedResult( const QByteArray& tag, const QByteArray& data);
+
+		static QByteArray getActionId( const QByteArray& tag);
 
 	private:
 		WidgetVisitor m_visitor;			//< visitor of elements

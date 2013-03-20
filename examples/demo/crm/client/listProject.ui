@@ -49,7 +49,7 @@
          <string>listProject</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">DeleteProject.simpleform</string>
+         <string notr="true">DeleteProject</string>
         </property>
         <property name="rootelement" stdset="0">
          <string notr="true">project</string>
@@ -97,7 +97,7 @@
       <string>ListProject</string>
      </property>
      <property name="dataelement" stdset="0">
-      <string> </string>
+      <string/>
      </property>
      <column>
       <property name="text">

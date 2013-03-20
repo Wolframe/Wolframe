@@ -63,6 +63,7 @@ class DataHandler : public QObject
 		void loadFormDomains( QString name, QWidget *form );
 		QString readFormVariable( QString variable, QWidget *form );
 		void loadActionReloadTriggerMap( QWidget *form);
+		QList<QByteArray> getTriggeredDoctypes( const QByteArray& tag);
 
 	private:
 		void writeWidgets( QWidget *_parent, QStringList *dataElements, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );

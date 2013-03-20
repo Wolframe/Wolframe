@@ -245,6 +245,7 @@ class WidgetVisitor
 
 		typedef QHash<QByteArray,QList<QByteArray> > ActionToObjectnameMap;
 		void getReloadTriggers( ActionToObjectnameMap& aomap);
+		QList<QWidget*> findDoctypeWidgets( const QByteArray& doctype) const;
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

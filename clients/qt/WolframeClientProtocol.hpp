@@ -124,6 +124,7 @@ class WolframeClientProtocol
 		QByteArray nextAnswerTag();
 		void pushAnswerError( const QByteArray& msg);
 		void pushAnswerContent( const QByteArray& content);
+		bool hasPendingRequest( const QByteArray& tag);
 
 	private:
 		State m_state;

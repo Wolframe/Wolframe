@@ -363,11 +363,28 @@ bool WolframeClientProtocol::process()
 	}
 }
 
+bool WolframeClientProtocol::hasPendingRequest( const QByteArray& tag)
+{
+	typedef QPair<QByteArray,QByteArray> Request;
+	foreach (const QByteArray& rq, m_requesttagqueue) if (rq == tag) return true;
+	foreach (const Request& rq, m_requestqueue) if (rq.first == tag) return true;
+	foreach (const Request& rq, m_errorqueue) if (rq.first == tag) return true;
+	foreach (const Request& rq, m_answerqueue) if (rq.first == tag) return true;
+	return false;
+}
+
 void WolframeClientProtocol::pushRequest( const QByteArray& tag, const QByteArray& content)
 {
-	qDebug() << "push request tag=" << tag << "doc=" << content;
-	m_requestqueue.enqueue( qMakePair( tag, content));
-	process();
+	if (hasPendingRequest( tag))
+	{
+		qDebug() << "suppress pending request tag=" << tag;
+	}
+	else
+	{
+		qDebug() << "push request tag=" << tag << "doc=" << content;
+		m_requestqueue.enqueue( qMakePair( tag, content));
+		process();
+	}
 }
 
 bool WolframeClientProtocol::getAnswerSuccess() const

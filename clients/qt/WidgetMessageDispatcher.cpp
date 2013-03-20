@@ -65,15 +65,32 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	return rt;
 }
 
-static const QByteArray ignoreResultContentTag = "-emptyresult";
+WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
+{
+	return Request( m_visitor.widgetid(), getWigdetRequest( m_visitor, debugmode));
+}
+
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	return Request( ignoreResultContentTag, getActionRequest( m_visitor, debugmode));
+	QPair<QByteArray,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
+	QByteArray actiontag;
+	actiontag.push_back( '-');
+	actiontag.append( actionrequest.first);
+	return Request( actiontag, actionrequest.second);
+}
+
+QByteArray WidgetMessageDispatcher::getActionId( const QByteArray& tag)
+{
+	if (!tag.isEmpty() && tag.at(0) == '-')
+	{
+		return tag.mid( 1, tag.size()-1);
+	}
+	return QByteArray();
 }
 
 bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArray& data)
 {
-	if (tag == ignoreResultContentTag) return true;
+	if (!tag.isEmpty() && tag.at(0) == '-') return true;
 
 	bool found = false;
 	bool rt = true;

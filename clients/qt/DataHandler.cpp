@@ -565,6 +565,13 @@ void DataHandler::loadActionReloadTriggerMap( QWidget *form)
 	visitor.getReloadTriggers( m_actionReloadTriggerMap);
 }
 
+QList<QByteArray> DataHandler::getTriggeredDoctypes( const QByteArray& tag)
+{
+	QHash< QByteArray, QList< QByteArray> >::const_iterator ti = m_actionReloadTriggerMap.find( tag);
+	if (ti == m_actionReloadTriggerMap.end()) return QList<QByteArray>();
+	return ti.value();
+}
+
 void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 {
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );

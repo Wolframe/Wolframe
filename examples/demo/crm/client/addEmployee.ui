@@ -143,7 +143,7 @@
         <string notr="true">employee</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">InsertEmployee.simpleform</string>
+        <string notr="true">InsertEmployee</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listEmployee</string>

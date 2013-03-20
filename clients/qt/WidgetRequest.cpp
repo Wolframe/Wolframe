@@ -44,7 +44,7 @@
 #define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
 #endif
 
-static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
+static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QByteArray* cmdname=0)
 {
 	QVariant prop;
 	QString docType,rootElement;
@@ -85,6 +85,10 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	if (!isStandalone && docType.isEmpty())
 	{
 		docType = rootElement;
+	}
+	if (cmdname)
+	{
+		*cmdname = docType.toAscii();
 	}
 	QVariant dataobjectname = visitor.property( "dataobject");
 	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toByteArray(), false))
@@ -169,10 +173,11 @@ ERROR:
 	return QByteArray();
 }
 
-QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode)
+QPair<QByteArray,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	QByteArray rt = getWigdetRequest_( visitor, debugmode);
-	qDebug() << "action request of " << visitor.objectName() << "=" << rt;
+	QPair<QByteArray,QByteArray> rt;
+	rt.second = getWigdetRequest_( visitor, debugmode, &rt.first);
+	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
 	return rt;
 }
 

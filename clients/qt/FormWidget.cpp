@@ -328,7 +328,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		m_dataLoader->datarequest( request.tag, request.content);
 	}
 
-
 // load localication of the form now
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
 		<< m_locale.name( );		
@@ -338,8 +337,27 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 void FormWidget::gotAnswer( const QByteArray& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
-	WidgetMessageDispatcher dispatcher( m_ui);
-	dispatcher.feedResult( tag_, data_);
+	QByteArray actiontag = WidgetMessageDispatcher::getActionId( tag_);
+	if (actiontag.isEmpty())
+	{
+		WidgetMessageDispatcher dispatcher( m_ui);
+		dispatcher.feedResult( tag_, data_);
+	}
+	else
+	{
+		// find all forms with a domain load that is bound over a trigger to the action completed
+		// and issue a domain load request for them:
+		WidgetVisitor visitor( WidgetVisitor(m_ui).uirootwidget());
+		foreach (const QByteArray& doctype, m_dataHandler->getTriggeredDoctypes( actiontag))
+		{
+			foreach (QWidget* wdg, visitor.findDoctypeWidgets( doctype))
+			{
+				WidgetMessageDispatcher dispatcher( m_ui);
+				WidgetMessageDispatcher::Request request = dispatcher.getDomainLoadRequest( m_debug);
+				m_dataLoader->datarequest( request.tag, request.content);
+			}
+		}
+	}
 }
 
 void FormWidget::gotError( const QByteArray& tag_, const QByteArray& data_)

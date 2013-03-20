@@ -969,14 +969,15 @@ static bool nodeProperty_isActionWidgetWithDoctype( const QWidget* widget, const
 
 void WidgetVisitor::getReloadTriggers( ActionToObjectnameMap& aomap)
 {
-	foreach (const QWidget* form, findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	foreach (QWidget* form, findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
 		QByteArray formdoctype = form->property( "doctype").toByteArray();
 		QVariant triggers = form->property( "datatrigger");
 		if (!triggers.isValid())
 		{
 			// ... collect implicit triggers from actions (QAbstractButtons*)
-			foreach (const QWidget* actionwidget, findSubNodes( nodeProperty_isActionWidgetWithDoctype))
+			WidgetVisitor formvisitor( form);
+			foreach (const QWidget* actionwidget, formvisitor.findSubNodes( nodeProperty_isActionWidgetWithDoctype))
 			{
 				QByteArray action = actionwidget->property( "doctype").toByteArray();
 				if (!aomap[ action].contains( formdoctype))
@@ -998,6 +999,21 @@ void WidgetVisitor::getReloadTriggers( ActionToObjectnameMap& aomap)
 			}
 		}
 	}
+}
+
+///\brief Return true if the widget is not an action widget with a specific doctype.
+//	in an action widget the doctype is associated with the request on action and not on domain load
+static bool nodeProperty_Doctype( const QWidget* widget, const QByteArray& doctype)
+{
+	if (!widget->isEnabled()) return false;
+	if (qobject_cast<const QAbstractButton*>( widget)) return false;
+	QVariant property = widget->property( "doctype");
+	return (property.type() == QVariant::ByteArray && property.toByteArray() == doctype);
+}
+
+QList<QWidget*> WidgetVisitor::findDoctypeWidgets( const QByteArray& doctype) const
+{
+	return findSubNodes( nodeProperty_Doctype, doctype);
 }
 
 static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray& )

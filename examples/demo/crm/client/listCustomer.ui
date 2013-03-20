@@ -49,7 +49,7 @@
          <string>listCustomer</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">DeleteCustomer.simpleform</string>
+         <string notr="true">DeleteCustomer</string>
         </property>
         <property name="rootelement" stdset="0">
          <string notr="true">customer</string>
