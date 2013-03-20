@@ -106,12 +106,9 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const char* name, const QVariant& value);
 
-		///\brief Find all widgets matching a condition and return them as their visitor context
+		///\brief Find all sub widgets matching a condition and return them as their visitor context
 		typedef bool (*NodeProperty)( const QWidget* widget, const QByteArray& cond);
-		QList<WidgetVisitor> findNodes( NodeProperty prop, const QByteArray& cond=QByteArray());
-
-		///\brief Find a dedicated widget and return its visitor object relative to this
-		WidgetVisitor getSubWidgetVisitor( const QWidget* subwidget) const;
+		QList<QWidget*> findSubNodes( NodeProperty prop, const QByteArray& cond=QByteArray()) const;
 
 		///\class Element
 		///\brief Element of serialization of widget data (for constructing a server request out of the widget data)
@@ -183,6 +180,7 @@ class WidgetVisitor
 
 		public://Common methods:
 			const QByteArray& getSynonym( const QByteArray& name) const;
+			QByteArray getLink( const QByteArray& name) const;
 			QVariant dynamicProperty( const QByteArray& name) const;
 			bool setDynamicProperty( const QByteArray&, const QVariant& value);
 
@@ -214,7 +212,7 @@ class WidgetVisitor
 		QList<Element> elements( const QList<QByteArray>& selected_dataelements);
 
 		///\brief Get the unique identifier of the widget for server requests (construct one if not defined as dynamic property yet)
-		QByteArray requestUID();
+		QByteArray requestid();
 		///\brief Get the widget of the current state
 		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->m_widget;}
 		///\brief Get the object name of the widget of the current state
@@ -229,7 +227,7 @@ class WidgetVisitor
 		///\brief Get the UI root widget
 		QWidget* uirootwidget() const;
 		///\brief Get the UI root widget
-		QWidget* predwidget( const QByteArray& name) const;
+		QWidget* predecessor( const QByteArray& name) const;
 
 		///\brief Resolve a symbolic link to a widget
 		///\param[in] link name of symbolic link to resolve

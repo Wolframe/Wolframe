@@ -54,9 +54,10 @@ static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* wid
 QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
 {
 	QList<Request> rt;
-	foreach (WidgetVisitor visitor, m_visitor.findNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
-		rt.push_back( Request( visitor.requestUID(), getWigdetRequest( visitor, debugmode)));
+		WidgetVisitor visitor( widget);
+		rt.push_back( Request( visitor.requestid(), getWigdetRequest( visitor, debugmode)));
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -76,9 +77,10 @@ bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArra
 
 	bool found = false;
 	bool rt = true;
-	foreach (WidgetVisitor visitor, m_visitor.findNodes( nodeProperty_hasRequestId, tag))
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_hasRequestId, tag))
 	{
 		found = true;
+		WidgetVisitor visitor( widget);
 		if (!setWidgetAnswer( visitor, data))
 		{
 			qCritical() << "Failed assign request answer tag:" << tag << "data:" << data;

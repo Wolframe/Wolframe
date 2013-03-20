@@ -95,8 +95,7 @@ void FormWidget::formListLoaded( QStringList forms )
 
 void FormWidget::switchForm( QWidget *actionwidget )
 {
-	WidgetVisitor visitor( m_ui);
-	visitor = visitor.getSubWidgetVisitor( actionwidget);
+	WidgetVisitor visitor( actionwidget);
 
 	QVariant doctype = visitor.property( "doctype");
 	if (doctype.isValid())

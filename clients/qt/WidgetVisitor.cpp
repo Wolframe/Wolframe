@@ -125,6 +125,19 @@ const QByteArray& WidgetVisitor::State::getSynonym( const QByteArray& name) cons
 	return syi.value();
 }
 
+QByteArray WidgetVisitor::State::getLink( const QByteArray& name) const
+{
+	int ii = 0, nn = m_links.size();
+	for (; ii<nn; ++ii)
+	{
+		if (m_links.at( ii).first == name)
+		{
+			return m_links.at( ii).second;
+		}
+	}
+	return QByteArray();
+}
+
 WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
 {
 	va_list ap;
@@ -166,11 +179,13 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 {
 	if (m_stk.empty()) return false;
 	QByteArray synonym = m_stk.top()->getSynonym( name);
+	// check if name is a synonym and follow it if yes:
 	if (!synonym.isEmpty())
 	{
 		int followidx = synonym.indexOf( '.');
 		if (followidx >= 0)
 		{
+			// ... the referenced item is a multipart reference so it gets complicated
 			int entercnt = 0;
 			QByteArray prefix( synonym.mid( 0, followidx));
 			QByteArray rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
@@ -202,14 +217,30 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 			return enter( synonym, writemode, level);
 		}
 	}
+	// check if name refers to a link and follow the symbolic link if yes:
+	QByteArray lnk = m_stk.top()->getLink( name);
+	if (!lnk.isEmpty())
+	{
+		QWidget* lnkwdg = resolveLink( lnk);
+		if (!lnkwdg)
+		{
+			qCritical() << "failed to resolve symbolic link to widget";
+			return false;
+		}
+		m_stk.push_back( createWidgetVisitorState( lnkwdg));
+		return true;
+	}
+	// check if name refers to a widget internal item and follow it if yes:
 	if (m_stk.top()->enter( name, writemode))
 	{
 		return true;
 	}
+	// on top level check if name refers to an ancessor or an ancessor child and follow it if yes:
 	if (level == 0 && !name.isEmpty() && enter_root( name))
 	{
 		return true;
 	}
+	// check if name refers to a child and follow it if yes:
 	if (!name.isEmpty())
 	{
 		QList<QWidget*> children = m_stk.top()->m_widget->findChildren<QWidget*>( name);
@@ -354,7 +385,7 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
-QWidget* WidgetVisitor::predwidget( const QByteArray& name) const
+QWidget* WidgetVisitor::predecessor( const QByteArray& name) const
 {
 	if (m_stk.isEmpty()) return 0;
 	QWidget* wdg = m_stk.at(0)->m_widget;
@@ -387,10 +418,24 @@ QWidget* WidgetVisitor::uirootwidget() const
 	return wdg;
 }
 
+static bool nodeProperty_hasRequestId( const QWidget* widget, const QByteArray& cond)
+{
+	QVariant requestid = widget->property( "_w_requestid");
+	return (requestid.isValid() && requestid.toByteArray() == cond);
+}
+
 QWidget* WidgetVisitor::resolveLink( const QByteArray& link)
 {
 	QWidget* wdg = uirootwidget();
-	return wdg;
+	if (!wdg) return 0;
+	WidgetVisitor visitor( wdg);
+	QList<QWidget*> wdglist = visitor.findSubNodes( nodeProperty_hasRequestId, link);
+	if (wdglist.isEmpty()) return 0;
+	if (wdglist.size() > 1)
+	{
+		qCritical() << "ambiguus widget link reference:" << link;
+	}
+	return wdglist.at(0);
 }
 
 void WidgetVisitor::resetState()
@@ -418,7 +463,7 @@ void WidgetVisitor::restoreState()
 bool WidgetVisitor::enter_root( const QByteArray& name)
 {
 	if (m_stk.empty()) return false;
-	QWidget* ww = predwidget( name);
+	QWidget* ww = predecessor( name);
 	if (ww)
 	{
 		m_stk.push_back( createWidgetVisitorState( ww));
@@ -499,7 +544,7 @@ QByteArray WidgetVisitor::className() const
 	return m_stk.top()->m_widget->metaObject()->className();
 }
 
-QByteArray WidgetVisitor::requestUID()
+QByteArray WidgetVisitor::requestid()
 {
 	if (m_stk.isEmpty()) return QByteArray();
 	QVariant ruid = m_stk.top()->m_widget->property( "_w_requestid");
@@ -567,55 +612,30 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	return false;
 }
 
-QList<WidgetVisitor> WidgetVisitor::findNodes( NodeProperty prop, const QByteArray& cond)
+QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QByteArray& cond) const
 {
-	if (m_stk.isEmpty()) return QList<WidgetVisitor>();
-	QList<WidgetVisitor> rt;
-	QVector<WidgetVisitor> ar;
-	ar.push_back( *this);
-	if (prop( m_stk.top()->m_widget, cond))
-	{
-		rt.push_back( *this);
-		//... append *this matching to result
-	}
+	QList<QWidget*> rt;
+	if (m_stk.isEmpty()) return rt;
+	QVector<QWidget*> ar;
+
+	if (prop( m_stk.top()->m_widget, cond)) rt.push_back( m_stk.top()->m_widget);
+	ar.push_back( m_stk.top()->m_widget);
+
 	int endidx = ar.size(), idx = 0;
-	QStack<StateR> stk = m_stk;
 	do
 	{
 		endidx = ar.size();
 		while (idx < endidx)
 		{
-			stk = ar[idx].m_stk;
-			foreach( QWidget* ww, ar[idx].widget()->findChildren<QWidget*>())
+			foreach( QWidget* ww, ar[idx]->findChildren<QWidget*>())
 			{
-				stk.push_back( createWidgetVisitorState( ww));
-				ar.push_back( WidgetVisitor( stk));
-				if (prop( ww, cond))
-				{
-					rt.push_back( WidgetVisitor( stk));
-					//... append child matching to result
-				}
-				stk.pop();
+				if (prop( ww, cond)) rt.push_back( ww);
+				ar.push_back( ww);
 			}
 			++idx;
 		}
 	} while (endidx < ar.size());
 	return rt;
-}
-
-WidgetVisitor WidgetVisitor::getSubWidgetVisitor( const QWidget* subwidget) const
-{
-	if (m_stk.isEmpty()) return WidgetVisitor();
-	WidgetVisitor rt( *this);
-	foreach (QWidget* ww, widget()->findChildren<QWidget*>())
-	{
-		rt.m_stk.push_back( createWidgetVisitorState( ww));
-		if (ww == subwidget) return rt;
-		WidgetVisitor follow( rt.getSubWidgetVisitor( subwidget));
-		if (follow.widget()) return follow;
-		rt.m_stk.pop_back();
-	}
-	return WidgetVisitor();
 }
 
 bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
@@ -788,6 +808,15 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 				{
 					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
 					elemstk.top().isContent = true;
+					int di=elemstk.top().dataelementidx,de=elemstk.top().dataelements.size();
+					for (++di; di<de; ++di)
+					{
+						if (elemstk.top().dataelements.at(di).startsWith( prefix)
+						&&  elemstk.top().dataelements.at(di).at( prefix.size()) == '.')
+						{
+							elemstk.top().dataelements.removeAt( di);
+						}
+					}
 					if (!m_stk.top()->isRepeatingDataElement( prefix))
 					{
 						++elemstk.top().dataelementidx;
