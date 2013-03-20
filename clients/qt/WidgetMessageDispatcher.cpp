@@ -35,13 +35,13 @@
 #include <QDebug>
 #include <QAbstractButton>
 
-static bool nodeProperty_hasRequestId( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasWidgetId( const QWidget* widget, const QByteArray& cond)
 {
-	QVariant requestid = widget->property( "_w_requestid");
-	return (requestid.isValid() && requestid.toByteArray() == cond);
+	QVariant widgetid = widget->property( "widgetid");
+	return (widgetid.isValid() && widgetid.toByteArray() == cond);
 }
 
-///\brief Return true if the widget is not an action widget.
+///\brief Return true if the widget is not an action widget with a doctype defined.
 //	in an action widget the doctype is associated with the request on action and not on domain load
 static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
 {
@@ -57,7 +57,7 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
 		WidgetVisitor visitor( widget);
-		rt.push_back( Request( visitor.requestid(), getWigdetRequest( visitor, debugmode)));
+		rt.push_back( Request( visitor.widgetid(), getWigdetRequest( visitor, debugmode)));
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -77,7 +77,7 @@ bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArra
 
 	bool found = false;
 	bool rt = true;
-	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_hasRequestId, tag))
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag))
 	{
 		found = true;
 		WidgetVisitor visitor( widget);

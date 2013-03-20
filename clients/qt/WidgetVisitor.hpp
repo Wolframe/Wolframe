@@ -199,6 +199,8 @@ class WidgetVisitor
 			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
 			typedef QPair< QByteArray,QByteArray> LinkDef;
 			QList<LinkDef> m_links;							//< symbolic links to other objects
+			typedef QPair< QByteArray,QByteArray> Assignment;
+			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
 			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
 			int m_entercnt;								//< counter for leaving multipart synonyms
 		};
@@ -211,8 +213,8 @@ class WidgetVisitor
 		///\param[in] selected_dataelements data elements selected by name
 		QList<Element> elements( const QList<QByteArray>& selected_dataelements);
 
-		///\brief Get the unique identifier of the widget for server requests (construct one if not defined as dynamic property yet)
-		QByteArray requestid();
+		///\brief Get the unique identifier of the widget for server requests
+		QByteArray widgetid() const;
 		///\brief Get the widget of the current state
 		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->m_widget;}
 		///\brief Get the object name of the widget of the current state
@@ -237,6 +239,12 @@ class WidgetVisitor
 		void resetState();
 		///\brief Restore the state from its description backup (resetState)
 		void restoreState();
+
+		void readAssignments();
+		void writeAssignments();
+
+		typedef QHash<QByteArray,QList<QByteArray> > ActionToObjectnameMap;
+		void getReloadTriggers( ActionToObjectnameMap& aomap);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
@@ -268,6 +276,11 @@ class WidgetVisitor
 	private:
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
 };
+
+///\brief Do assignments to form widgets based on assign: declarations
+void doFormInitInititalizations( QWidget* formwidget);
+///\brief Do assignments from form widgets based on assign: declarations
+void doFormCloseInititalizations( QWidget* formwidget);
 
 #endif
 

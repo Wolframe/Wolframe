@@ -87,19 +87,24 @@ WidgetVisitor::State::State( QWidget* widget_)
 			QVariant link = m_widget->property( prop);
 			m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
 		}
+		if (prop.startsWith( "assign:"))
+		{
+			QVariant value = m_widget->property( prop);
+			m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toByteArray()));
+		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
 			m_dynamicProperties.insert( prop, m_widget->property( prop));
 		}
 	}
 	static qint64 g_cnt = 0;
-	QVariant ruid = m_widget->property( "_w_requestid");
+	QVariant ruid = m_widget->property( "widgetid");
 	if (ruid.type() != QVariant::ByteArray)
 	{
 		QByteArray rt =  m_widget->objectName().toAscii();
 		rt.append( ":");
 		rt.append( QVariant( ++g_cnt).toByteArray());
-		m_widget->setProperty( "_w_requestid", QVariant(rt));
+		m_widget->setProperty( "widgetid", QVariant(rt));
 	}
 }
 
@@ -418,9 +423,9 @@ QWidget* WidgetVisitor::uirootwidget() const
 	return wdg;
 }
 
-static bool nodeProperty_hasRequestId( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasWidgetId( const QWidget* widget, const QByteArray& cond)
 {
-	QVariant requestid = widget->property( "_w_requestid");
+	QVariant requestid = widget->property( "widgetid");
 	return (requestid.isValid() && requestid.toByteArray() == cond);
 }
 
@@ -429,7 +434,7 @@ QWidget* WidgetVisitor::resolveLink( const QByteArray& link)
 	QWidget* wdg = uirootwidget();
 	if (!wdg) return 0;
 	WidgetVisitor visitor( wdg);
-	QList<QWidget*> wdglist = visitor.findSubNodes( nodeProperty_hasRequestId, link);
+	QList<QWidget*> wdglist = visitor.findSubNodes( nodeProperty_hasWidgetId, link);
 	if (wdglist.isEmpty()) return 0;
 	if (wdglist.size() > 1)
 	{
@@ -458,6 +463,32 @@ void WidgetVisitor::restoreState()
 
 	QVariant initialFocus = m_stk.top()->m_widget->property( "initialFocus");
 	if (initialFocus.toBool()) widget()->setFocus();
+}
+
+void WidgetVisitor::readAssignments()
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
+	{
+		QVariant value = property( assignment.second);
+		if (!setProperty( assignment.first, value))
+		{
+			qCritical() << "Assigment failed:" << assignment.first << value;
+		}
+	}
+}
+
+void WidgetVisitor::writeAssignments()
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
+	{
+		QVariant value = property( assignment.first);
+		if (!setProperty( assignment.second, value))
+		{
+			qCritical() << "Assigment failed:" << assignment.second << value;
+		}
+	}
 }
 
 bool WidgetVisitor::enter_root( const QByteArray& name)
@@ -544,13 +575,13 @@ QByteArray WidgetVisitor::className() const
 	return m_stk.top()->m_widget->metaObject()->className();
 }
 
-QByteArray WidgetVisitor::requestid()
+QByteArray WidgetVisitor::widgetid() const
 {
 	if (m_stk.isEmpty()) return QByteArray();
-	QVariant ruid = m_stk.top()->m_widget->property( "_w_requestid");
+	QVariant ruid = m_stk.top()->m_widget->property( "widgetid");
 	if (ruid.type() != QVariant::ByteArray)
 	{
-		qCritical() << "property _w_requestid missing in state";
+		qCritical() << "property 'widgetid' missing in state";
 		return objectName();
 	}
 	return ruid.toByteArray();
@@ -660,14 +691,14 @@ static bool isReservedProperty( const QByteArray& key)
 	// ignore Wolframe elements:
 	if (key[0] == 'd')
 	{
-		if (key == "doctype" || key == "dataobject" || key == "dataelement")
+		if (key == "doctype" || key == "dataobject" || key == "dataelement" || key == "datatrigger")
 		{
 			return true;
 		}
 	}
 	else
 	{
-		if (key == "rootelement" || key == "form")
+		if (key == "rootelement" || key == "form" || key == "widgetid")
 		{
 			return true;
 		}
@@ -918,5 +949,84 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 	return rt;
 }
 
+///\brief Return true if the widget is not an action widget with a doctype defined.
+//	in an action widget the doctype is associated with the request on action and not on domain load
+static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
+{
+	if (!widget->isEnabled()) return false;
+	if (qobject_cast<const QAbstractButton*>( widget)) return false;
+	QVariant property = widget->property( "doctype");
+	return (property.isValid());
+}
+
+///\brief Return true if the widget is an action widget with a doctype action
+static bool nodeProperty_isActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
+{
+	if (!qobject_cast<const QAbstractButton*>( widget)) return false;
+	QVariant property = widget->property( "doctype");
+	return (property.isValid());
+}
+
+void WidgetVisitor::getReloadTriggers( ActionToObjectnameMap& aomap)
+{
+	foreach (const QWidget* form, findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	{
+		QByteArray formdoctype = form->property( "doctype").toByteArray();
+		QVariant triggers = form->property( "datatrigger");
+		if (!triggers.isValid())
+		{
+			// ... collect implicit triggers from actions (QAbstractButtons*)
+			foreach (const QWidget* actionwidget, findSubNodes( nodeProperty_isActionWidgetWithDoctype))
+			{
+				QByteArray action = actionwidget->property( "doctype").toByteArray();
+				if (!aomap[ action].contains( formdoctype))
+				{
+					aomap[ action].push_back( formdoctype);
+					qDebug() << "Reloading form" << form->objectName() << "(doctype" << formdoctype << ") on action" << action;
+				}
+			}
+		}
+		else
+		{
+			foreach (const QByteArray& action, triggers.toByteArray().trimmed().split( ','))
+			{
+				if (!aomap[ action].contains( formdoctype))
+				{
+					qDebug() << "Reloading form" << form->objectName() << "(doctype" << formdoctype << ") on action" << action;
+					aomap[ action].push_back( formdoctype);
+				}
+			}
+		}
+	}
+}
+
+static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray& )
+{
+	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
+	{
+		if (prop.startsWith( "assign:")) return true;
+	}
+	return false;
+}
+
+void doFormInitInititalizations( QWidget* formwidget)
+{
+	WidgetVisitor visitor( formwidget);
+	foreach (QWidget* wdg, visitor.findSubNodes( nodeProperty_hasAssignment))
+	{
+		WidgetVisitor chldvisitor( wdg);
+		chldvisitor.readAssignments();
+	}
+}
+
+void doFormCloseInititalizations( QWidget* formwidget)
+{
+	WidgetVisitor visitor( formwidget);
+	foreach (QWidget* wdg, visitor.findSubNodes( nodeProperty_hasAssignment))
+	{
+		WidgetVisitor chldvisitor( wdg);
+		chldvisitor.writeAssignments();
+	}
+}
 
 

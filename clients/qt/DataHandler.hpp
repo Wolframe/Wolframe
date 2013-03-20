@@ -62,6 +62,7 @@ class DataHandler : public QObject
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void loadFormDomains( QString name, QWidget *form );
 		QString readFormVariable( QString variable, QWidget *form );
+		void loadActionReloadTriggerMap( QWidget *form);
 
 	private:
 		void writeWidgets( QWidget *_parent, QStringList *dataElements, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
@@ -71,6 +72,7 @@ class DataHandler : public QObject
 		DataLoader *m_dataLoader;
 		FormWidget *m_formWidget;
 		bool m_debug;
+		QHash< QByteArray, QList< QByteArray> > m_actionReloadTriggerMap;
 };
 
 #endif // _DATA_HANDLER_INCLUDED

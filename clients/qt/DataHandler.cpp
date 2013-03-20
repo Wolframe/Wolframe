@@ -61,6 +61,7 @@
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
 #include "FormWidget.hpp"
+#include "WidgetVisitor.hpp"
 
 DataHandler::DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool _debug )
 	: m_dataLoader( _dataLoader ), m_formWidget( _formWidget ), m_debug( _debug )
@@ -556,6 +557,12 @@ void DataHandler::resetFormData( QWidget *form )
 
 		resetWidgetData( widget, name );
 	}
+}
+
+void DataHandler::loadActionReloadTriggerMap( QWidget *form)
+{
+	WidgetVisitor visitor( form);
+	visitor.getReloadTriggers( m_actionReloadTriggerMap);
 }
 
 void DataHandler::loadFormDomains( QString form_name, QWidget *form )

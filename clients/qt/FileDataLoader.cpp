@@ -73,7 +73,7 @@ void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, 
 	file.open( QFile::WriteOnly );
 	file.write( xml );
 	file.close( );
-	emit answer( (*props)[ "_w_requestid"].toAscii(), QByteArray( ) );
+	emit answer( (*props)[ "widgetid"].toAscii(), QByteArray( ) );
 }
 
 void FileDataLoader::handleRead( QString name, QHash<QString, QString> *props )
@@ -83,7 +83,7 @@ void FileDataLoader::handleRead( QString name, QHash<QString, QString> *props )
 	file.open( QFile::ReadOnly );
 	QByteArray xml = file.readAll( );
 	file.close( );
-	emit answer( (*props)[ "_w_requestid"].toAscii(), xml );
+	emit answer( (*props)[ "widgetid"].toAscii(), xml );
 }
 
 void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> *props )
@@ -92,14 +92,14 @@ void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, 
 	file.open( QFile::WriteOnly );
 	file.write( xml );
 	file.close( );
-	emit answer( (*props)[ "_w_requestid"].toAscii(), QByteArray( ) );
+	emit answer( (*props)[ "widgetid"].toAscii(), QByteArray( ) );
 }
 
 void FileDataLoader::handleDelete( QString name, QHash<QString, QString> *props )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.remove( );	
-	emit answer( (*props)[ "_w_requestid"].toAscii(), QByteArray( ) );
+	emit answer( (*props)[ "widgetid"].toAscii(), QByteArray( ) );
 }
 
 void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props )
@@ -108,6 +108,6 @@ void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName,
 	file.open( QFile::ReadOnly );
 	QByteArray xml = file.readAll( );
 	file.close( );
-	emit answer( (*props)[ "_w_requestid"].toAscii(), xml );
+	emit answer( (*props)[ "widgetid"].toAscii(), xml );
 }
 

@@ -107,6 +107,7 @@ void FormWidget::switchForm( QWidget *actionwidget )
 	
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
+	doFormCloseInititalizations( actionwidget);
 	if (formlink.isValid())
 	{
 		QString nextForm = formlink.toString();
@@ -316,8 +317,10 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 
 // reset the form now, this also loads the domains
-	m_dataHandler->resetFormData( m_ui );
+	doFormInitInititalizations( m_ui);
+	//[+]m_dataHandler->resetFormData( m_ui );
 	m_dataHandler->loadFormDomains( m_form, m_ui );
+	m_dataHandler->loadActionReloadTriggerMap( m_ui);
 
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
