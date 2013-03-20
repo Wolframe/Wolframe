@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>464</width>
+    <width>496</width>
     <height>314</height>
    </rect>
   </property>
@@ -85,7 +85,7 @@
       <item row="4" column="0">
        <widget class="QCheckBox" name="rememberLogin">
         <property name="text">
-         <string>&amp;Remember login (server and username, not credentials)</string>
+         <string>&amp;Remember login (server and username, not the password)</string>
         </property>
        </widget>
       </item>

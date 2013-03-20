@@ -17,7 +17,7 @@
    <string>Manage Connections</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qWolfClient.qrc">
+   <iconset>
     <normaloff>:/images/world-setup.png</normaloff>:/images/world-setup.png</iconset>
   </property>
   <property name="modal">
@@ -127,9 +127,7 @@
   <tabstop>editConBttn</tabstop>
   <tabstop>delConnBttn</tabstop>
  </tabstops>
- <resources>
-  <include location="qWolfClient.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -14,7 +14,7 @@
    <string>Login to Server</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qWolfClient.qrc">
+   <iconset>
     <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -134,9 +134,7 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="qWolfClient.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

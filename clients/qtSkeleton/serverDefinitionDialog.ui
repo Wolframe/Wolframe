@@ -17,7 +17,7 @@
    <string>Connection Parameters</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qWolfClient.qrc">
+   <iconset>
     <normaloff>:/images/world.png</normaloff>:/images/world.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -404,9 +404,7 @@
   <tabstop>buttonBox</tabstop>
   <tabstop>testBttn</tabstop>
  </tabstops>
- <resources>
-  <include location="qWolfClient.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

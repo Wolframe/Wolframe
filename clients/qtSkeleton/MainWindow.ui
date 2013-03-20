@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>607</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -182,7 +182,7 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/exit.png</normaloff>:/images/exit.png</iconset>
    </property>
    <property name="text">
@@ -233,7 +233,7 @@
   </action>
   <action name="actionPreferences">
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/configure.png</normaloff>:/images/configure.png</iconset>
    </property>
    <property name="text">
@@ -343,7 +343,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/refresh.png</normaloff>:/images/refresh.png</iconset>
    </property>
    <property name="text">
@@ -414,7 +414,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/next.png</normaloff>:/images/next.png</iconset>
    </property>
    <property name="text">
@@ -432,7 +432,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/previous.png</normaloff>:/images/previous.png</iconset>
    </property>
    <property name="text">
@@ -450,7 +450,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/undo.png</normaloff>:/images/undo.png</iconset>
    </property>
    <property name="text">
@@ -468,7 +468,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/redo.png</normaloff>:/images/redo.png</iconset>
    </property>
    <property name="text">
@@ -486,7 +486,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/cut.png</normaloff>:/images/cut.png</iconset>
    </property>
    <property name="text">
@@ -504,7 +504,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/paste.png</normaloff>:/images/paste.png</iconset>
    </property>
    <property name="text">
@@ -522,7 +522,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/delete.png</normaloff>:/images/delete.png</iconset>
    </property>
    <property name="text">
@@ -554,7 +554,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/copy.png</normaloff>:/images/copy.png</iconset>
    </property>
    <property name="text">
@@ -572,7 +572,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>
    </property>
    <property name="text">
@@ -587,7 +587,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/logout.png</normaloff>:/images/logout.png</iconset>
    </property>
    <property name="text">
@@ -602,7 +602,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="qtclient.qrc">
+    <iconset>
      <normaloff>:/images/print.png</normaloff>:/images/print.png</iconset>
    </property>
    <property name="text">
@@ -640,8 +640,6 @@
    </property>
   </action>
  </widget>
- <resources>
-  <include location="qtclient.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

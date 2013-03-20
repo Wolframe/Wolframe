@@ -62,7 +62,6 @@ FORMS += \
 	loginDialog.ui \
 	manageServersDialog.ui \
 	serverDefinitionDialog.ui
-#	serverDefinitionDialogNoSSL.ui
 
 TRANSLATIONS += \
 	i18n/qtSkeleton.de_CH.ts \

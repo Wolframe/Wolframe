@@ -60,7 +60,7 @@ struct ApplicationSettings
 	bool		saveUsername;		///< persistent username ?
 	QString		lastUsername;		///< last username in case of persisting it
 	QString		lastConnection;		///< name of the last used connection
-	
+
 	QVector< ConnectionParameters >	connectionParams; ///< defined connections parameters
 
 	bool mdi;				///< MDI mode with many forms
@@ -76,7 +76,7 @@ struct ApplicationSettings
 
 	bool saveRestoreState;
 	QVector<WinState> states;		///< states of subwindow(s)
-	
+
 	bool errorsMessageBoxes;		///< show message boxes or status bar text on errors
 
 public:
@@ -84,12 +84,12 @@ public:
 
 	void write( const QString& organization, const QString& application );
 	void read( const QString& organization, const QString& application );
-	void write( const QString &fileName );
-	void read( const QString &fileName );
+	void write( const QString& fileName );
+	void read( const QString& fileName );
 
 private:
-	void write( QSettings &settings );
-	void read( QSettings &settings );
+	void write( QSettings& settings );
+	void read( QSettings& settings );
 };
 
 #endif // _SETTINGS_HPP_INCLUDED
