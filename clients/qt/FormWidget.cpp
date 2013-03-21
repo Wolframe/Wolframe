@@ -103,6 +103,15 @@ void FormWidget::switchForm( QWidget *actionwidget )
 		WidgetMessageDispatcher dispatcher( visitor);
 		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
 		m_dataLoader->datarequest( request.tag, request.content);
+
+		// foreach widget linked to this action via datasignal:domainload/dataslot:domainload do issue a domain load
+		foreach (QWidget* triggered_domainload, visitor.get_datasignal_receivers( WidgetVisitor::DomainChange))
+		{
+			WidgetVisitor tv( triggered_domainload);
+			WidgetMessageDispatcher dp( tv);
+			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
+			m_dataLoader->datarequest( domload.tag, domload.content);
+		}
 	}
 	
 	// switch form now, formLoaded will inform parent and others

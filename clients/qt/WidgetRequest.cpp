@@ -238,7 +238,7 @@ static void setAttributes( WidgetVisitor& visitor, const QList<WidgetAnswerStack
 	}
 }
 
-static bool setWidgetContent( WidgetVisitor& visitor, const QByteArray& answer)
+bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 {
 	QList<WidgetAnswerStackElement> stk;
 	QXmlStreamReader xml( answer);
@@ -340,20 +340,6 @@ static bool setWidgetContent( WidgetVisitor& visitor, const QByteArray& answer)
 	return true;
 }
 
-bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
-{
-	if (setWidgetContent( visitor, answer))
-	{
-		visitor.emit_datasignal_onload( answer);
-		return true;
-	}
-	return false;
-}
-
-bool pushWidgetDataSignalOnLoad( WidgetVisitor& visitor, const QByteArray& content)
-{
-	return setWidgetContent( visitor, content);
-}
 
 
 

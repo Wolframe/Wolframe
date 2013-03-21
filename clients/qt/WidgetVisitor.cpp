@@ -113,6 +113,10 @@ WidgetVisitor::State::State( QWidget* widget_)
 			{
 				m_datasignals.onload.push_back( value.toByteArray());
 			}
+			else if (signame == "domainchange")
+			{
+				m_datasignals.domainchange.push_back( value.toByteArray());
+			}
 			else
 			{
 				qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown signal name" << signame;
@@ -125,6 +129,10 @@ WidgetVisitor::State::State( QWidget* widget_)
 			if (signame == "onload")
 			{
 				m_dataslots.onload.push_back( value.toByteArray());
+			}
+			else if (signame == "domainchange")
+			{
+				m_dataslots.domainchange.push_back( value.toByteArray());
 			}
 			else
 			{
@@ -993,24 +1001,6 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 	return rt;
 }
 
-///\brief Return true if the widget is not an action widget with a doctype defined.
-//	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
-{
-	if (!widget->isEnabled()) return false;
-	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant property = widget->property( "doctype");
-	return (property.isValid());
-}
-
-///\brief Return true if the widget is an action widget with a doctype action
-static bool nodeProperty_isActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
-{
-	if (!qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant property = widget->property( "doctype");
-	return (property.isValid());
-}
-
 static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray& )
 {
 	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
@@ -1048,26 +1038,6 @@ void WidgetVisitor::ERROR( const char* msg, const QByteArray& arg) const
 	logError( widget(), msg, QString( arg));
 }
 
-void WidgetVisitor::handle_datasignal_onload( const QByteArray& senderid, const QByteArray& content)
-{
-	qDebug() << "handle datasignal onload from" << senderid << content;
-	if (!setWidgetAnswer( *this, content))
-	{
-		ERROR( "failed to set widget answer", senderid);
-	}
-}
-
-void WidgetVisitor::emit_datasignal_onload( const QByteArray& content)
-{
-	if (m_stk.isEmpty()) return;
-	WidgetVisitor mainvisitor( uirootwidget());
-	foreach (const QByteArray& receiverprop, m_stk.top()->m_datasignals.onload)
-	{
-		QVariant receiverid = resolve( receiverprop);
-		mainvisitor.distribute_datasignal_onload( widgetid(), receiverid.toByteArray(), content);
-	}
-}
-
 static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
 {
 	QVariant dataslots = widget->property( "dataslot:onload");
@@ -1080,25 +1050,56 @@ static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteA
 	return false;
 }
 
-void WidgetVisitor::distribute_datasignal_onload( const QByteArray& senderid, const QByteArray& receiverid, const QByteArray& content)
+static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QByteArray& cond)
 {
-	QList<QWidget*> receiverlist;
-	if (is_widgetid( receiverid))
+	QVariant dataslots = widget->property( "dataslot:domainchange");
+	int idx;
+	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
 	{
-		receiverlist = findSubNodes( nodeProperty_hasWidgetId, receiverid);
+		QByteArray dd = dataslots.toByteArray();
+		return (dd.size() == idx || dd.at(idx) == ' ' || dd.at(idx) == ',');
 	}
-	else
+	return false;
+}
+
+QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
+{
+	QList<QWidget*> rt;
+	if (m_stk.isEmpty()) return rt;
+	QList<QByteArray> receiverprops;
+	switch (type)
 	{
-		receiverlist = findSubNodes( nodeProperty_hasDataSlot_onload, receiverid);
+		case OnLoad:
+			receiverprops = m_stk.top()->m_datasignals.onload;
+		break;
+		case DomainChange:
+			receiverprops = m_stk.top()->m_datasignals.domainchange;
+		break;
 	}
-	foreach (QWidget* receiver, receiverlist)
+	foreach (const QByteArray& receiverprop, receiverprops)
 	{
-		WidgetVisitor visitor( receiver);
-		if (visitor.widgetid() != senderid)
+		QByteArray receiverid = resolve( receiverprop).toByteArray();
+		WidgetVisitor mainvisitor( uirootwidget());
+
+		if (is_widgetid( receiverid))
 		{
-			visitor.handle_datasignal_onload( senderid, content);
+			rt.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
+		}
+		else
+		{
+			switch (type)
+			{
+				case OnLoad:
+					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_onload, receiverid));
+					break;
+				case DomainChange:
+					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_domainchange, receiverid));
+					break;
+			}
 		}
 	}
+	return rt;
 }
+
 
 

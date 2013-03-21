@@ -143,6 +143,14 @@ class WidgetVisitor
 			QVariant m_value;
 		};
 
+		///\enum DataSignalType
+		///\brief Data signal type
+		enum DataSignalType
+		{
+			OnLoad,
+			DomainChange
+		};
+
 		///\class State
 		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
 		struct State
@@ -196,10 +204,12 @@ class WidgetVisitor
 			struct DataSignals
 			{
 				QList<QByteArray> onload;
+				QList<QByteArray> domainchange;
 			};
 			struct DataSlots
 			{
 				QList<QByteArray> onload;
+				QList<QByteArray> domainchange;
 			};
 			friend class WidgetVisitorStackElement;
 			friend class WidgetVisitor;
@@ -255,9 +265,8 @@ class WidgetVisitor
 		///\brief Restore the state from its description backup (resetState)
 		void restoreState();
 
-		///\brief Send the datasignal 'onload' to all receivers adressed by property definition 'signal:onload'
-		///\remark This might be implemented as real Qt signal or not, it depends
-		void emit_datasignal_onload( const QByteArray& content);
+		///\brief Get all receivers of a datasignal (type)
+		QList<QWidget*> get_datasignal_receivers( DataSignalType type);
 
 		void readAssignments();
 		void writeAssignments();
@@ -295,9 +304,6 @@ class WidgetVisitor
 
 		void ERROR( const char* msg, const QString& arg=QString()) const;
 		void ERROR( const char* msg, const QByteArray& arg) const;
-
-		void handle_datasignal_onload( const QByteArray& senderid, const QByteArray& content);
-		void distribute_datasignal_onload( const QByteArray& senderid, const QByteArray& receiverid, const QByteArray& content);
 
 	private:
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
