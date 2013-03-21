@@ -40,6 +40,79 @@
 #include <QSharedPointer>
 #include <QVariant>
 
+/** Implementation Documentation:
+
+1 Introduction
+The WidgetVisitor iterates on a tree of widget nodes and their internal states.
+It uses a stack of WidgetState references and a counter for the internal states
+of widgets visited for keeping track of its position in the widget tree and its state.
+
+2 Widget Stack
+The widget stack grows with one element every time a widget references something across its own borders.
+Such an element can be a child widget or a widget referenced by a symbolic link to another widget.
+
+2.1 Widget stack example
+For resolving a property
+         'customertable.customer.address.name'
+where address refers to a customer subwidget and name defines a symbolic link, we
+have the following elements on the widget visitor stack (a very artificial example :-):
+
+    [customertable 1]   (1 is the internal state of customertable after selection of customer)
+    [address 0]
+    [name 0]
+
+We get to this state calling:
+    WidgetVisitor visitor( <customertable widget>* )
+    visitor.enter( "customer");
+    visitor.enter( "address");
+
+We can access the property name with:
+    QVariant name = visitor.property( "name");
+
+If we are just interested in the property only, we can also call instead:
+    QVariant name = WidgetVisitor( <customertable widget>* ).property( "customer.address.name");
+
+Internally happens the same.
+
+
+3 Symbol Resolving Algorithm
+
+3.1 Property Name Resolving
+ [A] Check if a synonym is referenced and return its redirected property if yes
+ [B] Check if an internal property of the widget is referenced return it if yes
+ [C] Check if an multipart property is referenced and try to step into the substructures to return the property if yes (see "2.2")
+ [D] Check if a dynamic property is referenced and return it if yes
+
+3.2 Step Into Substructures
+ [A] Check if name is a synonym and follow it if yes
+ [B] Check if name refers to a widget internal item and follow it if yes
+ [C] Check if name refers to a symbolic link and follow the link if yes
+ [D] On top level check if name refers to an ancessor or an ancessor child and follow it if yes
+ [E] Check if name refers to a child and follow it if yes
+
+
+4. Dynamic Properties Used
+
+4.1 Used Dynamic Property Prefixes of widgets
+ 'synonym:'              Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is selected with enter)
+ 'link:'                 Rewrite rule for property "link:IDENTIFIER": push the widget referenced as property value of "link:IDENTIFIER" if IDENTIFIER is selected with enter)
+ 'datasignal:IDENTIFIER' Defines a signal of type IDENTIFIER (domainchange,onload) with the destination slot identifer defined as property value of "datasignal:IDENTIFIER"
+ 'dataslot:IDENTIFIER'   Defines a slot for the signal of type IDENTIFIER (domainchange,onload) with the identifer defined as property value of "dataslot:IDENTIFIER"
+ 'assign:PROP'           Defines an assingment of property PROP to the property defined as value "assign:PROP" on an avent. Used to update linked values on signal
+ '_w_'                   Prefix for a Wolframe internal property not of interest for the user
+
+ 4.2 Used Dynamic Properties of widgets
+ 'widgetid'              Unique identifier of the widget used for identifying it (resolving symbolic links, address of a request aswer)
+
+
+5. Mapping XML to and from Widgets
+The module WidgetRequest uses the visitors defined here to iterate on the widget structure
+to set and get the elements in the XML of a request/answer or some other representation
+of the widget data.
+
+**/
+
+
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
@@ -67,16 +140,6 @@ class WidgetVisitor
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave( bool writemode);
 
-		/** Property name resolving process:
-		*	(A) Split name to SELECT.REST and try to enter SELECT from the current node and eveluate there REST
-		*	(B) Otherwise if first element of a path try to enter SELECT from the root node of the widget tree
-		*	(C) Otherwise try to evaluate name as widget property of the current node
-		*	(D) Otherwise try to evaluate it as a a dynamic property
-		*	(E) Otherwise find a dynamic property synonym:name and redo evaluation with the synonym:name value as name
-		*/
-		/** Used dynamic property prefixes:
-		*	'synonym:' Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is searched
-		*/
 		///\brief Get the property of the current node by 'name'
 		///\param[in] name name of the property
 		///\return Property variant (any type)
@@ -160,8 +223,8 @@ class WidgetVisitor
 			explicit State( QWidget* widget_);
 
 			///\brief Copy constructor
-			State( const State& o)
-				:m_widget(o.m_widget),m_synonyms(o.m_synonyms),m_dynamicProperties(o.m_dynamicProperties),m_entercnt(o.m_entercnt){}
+			State( const State& o);
+
 			///\brief Destructor
 			virtual ~State(){}
 
@@ -212,16 +275,18 @@ class WidgetVisitor
 			};
 			friend class WidgetVisitorStackElement;
 			friend class WidgetVisitor;
+			typedef QPair< QByteArray,QByteArray> LinkDef;
+			typedef QPair< QByteArray,QByteArray> Assignment;
+
 			QWidget* m_widget;							//< widget reference
 			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
-			typedef QPair< QByteArray,QByteArray> LinkDef;
 			QList<LinkDef> m_links;							//< symbolic links to other objects
-			typedef QPair< QByteArray,QByteArray> Assignment;
 			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
 			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
 			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
 			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
-			int m_entercnt;								//< counter for leaving multipart synonyms
+			int m_synonym_entercnt;							//< counter for how many stack elements to pop on a leave (for multipart synonyms)
+			int m_internal_entercnt;						//< counter for calling State::leave() before removing stack elements
 		};
 		typedef QSharedPointer<State> StateR;
 

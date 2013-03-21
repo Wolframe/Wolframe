@@ -85,8 +85,21 @@ static bool isConvertibleToInt( const QVariant& val)
 	return false;
 }
 
+WidgetVisitor::State::State( const State& o)
+	:m_widget(o.m_widget)
+	,m_synonyms(o.m_synonyms)
+	,m_links(o.m_links)
+	,m_assignments(o.m_assignments)
+	,m_datasignals(o.m_datasignals)
+	,m_dataslots(o.m_dataslots)
+	,m_dynamicProperties(o.m_dynamicProperties)
+	,m_synonym_entercnt(o.m_synonym_entercnt)
+	,m_internal_entercnt(o.m_internal_entercnt){}
+
 WidgetVisitor::State::State( QWidget* widget_)
-	:m_widget(widget_),m_entercnt(1)
+	:m_widget(widget_)
+	,m_synonym_entercnt(1)
+	,m_internal_entercnt(0)
 {
 	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
 	{
@@ -233,11 +246,24 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 	return enter( name, writemode, 0);
 }
 
+bool WidgetVisitor::enter_root( const QByteArray& name)
+{
+	if (m_stk.empty()) return false;
+	QWidget* ww = predecessor( name);
+	if (ww)
+	{
+		m_stk.push_back( createWidgetVisitorState( ww));
+		return true;
+	}
+	return false;
+}
+
 bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 {
 	if (m_stk.empty()) return false;
+
+	// [A] check if name is a synonym and follow it if yes:
 	QByteArray synonym = m_stk.top()->getSynonym( name);
-	// check if name is a synonym and follow it if yes:
 	if (!synonym.isEmpty())
 	{
 		int followidx = synonym.indexOf( '.');
@@ -268,48 +294,56 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 				prefix = rest.mid( 0, followidx);
 				rest = rest.mid( followidx+1, rest.size()-followidx-1);
 			} while (followidx >= 0);
-			m_stk.top()->m_entercnt = entercnt;
+			m_stk.top()->m_synonym_entercnt = entercnt;
 		}
 		else
 		{
 			return enter( synonym, writemode, level);
 		}
 	}
-	// check if name refers to a link and follow the symbolic link if yes:
-	QByteArray lnk = m_stk.top()->getLink( name);
-	if (!lnk.isEmpty())
-	{
-		QWidget* lnkwdg = resolveLink( lnk);
-		if (!lnkwdg)
-		{
-			ERROR( "failed to resolve symbolic link to widget");
-			return false;
-		}
-		m_stk.push_back( createWidgetVisitorState( lnkwdg));
-		return true;
-	}
-	// check if name refers to a widget internal item and follow it if yes:
+
+	// [B] check if name refers to a widget internal item and follow it if yes:
 	if (m_stk.top()->enter( name, writemode))
 	{
+		++m_stk.top()->m_internal_entercnt;
 		return true;
 	}
-	// on top level check if name refers to an ancessor or an ancessor child and follow it if yes:
-	if (level == 0 && !name.isEmpty() && enter_root( name))
+
+	if (m_stk.top()->m_internal_entercnt == 0)
 	{
-		return true;
-	}
-	// check if name refers to a child and follow it if yes:
-	if (!name.isEmpty())
-	{
-		QList<QWidget*> children = m_stk.top()->m_widget->findChildren<QWidget*>( name);
-		if (children.size() > 1)
+		// [C] check if name refers to a symbolic link and follow the link if yes:
+		QByteArray lnk = m_stk.top()->getLink( name);
+		if (!lnk.isEmpty())
 		{
-			ERROR( "ambiguus widget reference", name);
-			return false;
+			QWidget* lnkwdg = resolveLink( lnk);
+			if (!lnkwdg)
+			{
+				ERROR( "failed to resolve symbolic link to widget");
+				return false;
+			}
+			m_stk.push_back( createWidgetVisitorState( lnkwdg));
+			return true;
 		}
-		if (children.isEmpty()) return false;
-		m_stk.push( createWidgetVisitorState( children[0]));
-		return true;
+
+		// [D] on top level check if name refers to an ancessor or an ancessor child and follow it if yes:
+		if (level == 0 && !name.isEmpty() && enter_root( name))
+		{
+			return true;
+		}
+
+		// [E] check if name refers to a child and follow it if yes:
+		if (!name.isEmpty())
+		{
+			QList<QWidget*> children = m_stk.top()->m_widget->findChildren<QWidget*>( name);
+			if (children.size() > 1)
+			{
+				ERROR( "ambiguus widget reference", name);
+				return false;
+			}
+			if (children.isEmpty()) return false;
+			m_stk.push( createWidgetVisitorState( children[0]));
+			return true;
+		}
 	}
 	return false;
 }
@@ -317,24 +351,22 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 void WidgetVisitor::leave( bool writemode)
 {
 	if (m_stk.empty()) return;
-	int cnt = m_stk.top()->m_entercnt;
+	int cnt = m_stk.top()->m_synonym_entercnt;
 	while (cnt-- > 0)
 	{
-		if (!m_stk.top()->leave( writemode))
+		if (m_stk.top()->m_internal_entercnt)
+		{
+			if (!m_stk.top()->leave( writemode))
+			{
+				ERROR( "illegal state: internal state leave failed");
+			}
+			--m_stk.top()->m_internal_entercnt;
+		}
+		else
 		{
 			m_stk.pop();
 		}
 	}
-}
-
-QVariant WidgetVisitor::property( const char* name)
-{
-	return property( QByteArray( name));
-}
-
-QVariant WidgetVisitor::property( const QString& name)
-{
-	return property( name.toAscii());
 }
 
 template <class StringType>
@@ -544,30 +576,31 @@ void WidgetVisitor::writeAssignments()
 	}
 }
 
-bool WidgetVisitor::enter_root( const QByteArray& name)
+QVariant WidgetVisitor::property( const char* name)
 {
-	if (m_stk.empty()) return false;
-	QWidget* ww = predecessor( name);
-	if (ww)
-	{
-		m_stk.push_back( createWidgetVisitorState( ww));
-		return true;
-	}
-	return false;
+	return property( QByteArray( name));
+}
+
+QVariant WidgetVisitor::property( const QString& name)
+{
+	return property( name.toAscii());
 }
 
 QVariant WidgetVisitor::property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
+	// [A] check if a synonym is referenced and redirect to evaluate synonym value instead if yes
 	QByteArray synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
 		return property( synonym, level);
 	}
+
+	// [B] check if an internal property of the widget is referenced and return its value if yes
 	QVariant rt;
 	if ((rt = m_stk.top()->property( name)).isValid()) return resolve( rt);
-	if (level == 0 && (rt = m_stk.top()->dynamicProperty( name)).isValid()) return resolve( rt);
 
+	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
 	bool subelem = false;
 	QByteArray prefix;
 	QByteArray rest;
@@ -612,9 +645,14 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 		}
 		return rt;
 	}
-	rt = m_stk.top()->dynamicProperty( name);
+	// [D] check if a dynamic property is referenced and return its value if yes
+	if (m_stk.top()->m_internal_entercnt == 0)
+	{
+		rt = m_stk.top()->dynamicProperty( name);
+	}
 	return rt;
 }
+
 
 QByteArray WidgetVisitor::objectName() const
 {
@@ -653,13 +691,18 @@ bool WidgetVisitor::setProperty( const char* name, const QVariant& value)
 bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
 {
 	if (m_stk.empty()) return false;
+
+	// [A] check if a synonym is referenced and redirect set the synonym value instead if yes
 	QByteArray synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
 		return setProperty( synonym, value, level);
 	}
+
+	// [B] check if an internal property of the widget is referenced and set its value if yes
 	if (m_stk.top()->setProperty( name, value)) return true;
 
+	// [C] check if an multipart property is referenced and try to step into the substructures to set the property (must a single value and must not have any repeating elements) if yes
 	bool subelem = false;
 	QByteArray prefix;
 	QByteArray rest;
@@ -667,6 +710,10 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	if (followidx >= 0)
 	{
 		prefix = name.mid( 0, followidx);
+		if (m_stk.top()->isRepeatingDataElement( prefix))
+		{
+			ERROR( "cannot set property addressing a set of properties", prefix);
+		}
 		rest = name.mid( followidx+1, name.size()-followidx-1);
 		if (enter( prefix, false, level))
 		{
@@ -675,6 +722,10 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	}
 	else
 	{
+		if (m_stk.top()->isRepeatingDataElement( name))
+		{
+			ERROR( "cannot set property addressing a set of properties", prefix);
+		}
 		if (enter( name, true, level))
 		{
 			subelem = true;
@@ -686,13 +737,14 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	{
 		bool rt = setProperty( rest, value, level+1);
 		leave( true);
-		if (m_stk.top()->isRepeatingDataElement( prefix))
-		{
-			ERROR( "cannot set property addressing a set of properties", prefix);
-		}
 		return rt;
 	}
-	if (m_stk.top()->setDynamicProperty( name, value)) return true;
+
+	// [D] check if a dynamic property is referenced and set its value if yes
+	if (m_stk.top()->m_internal_entercnt == 0)
+	{
+		if (m_stk.top()->setDynamicProperty( name, value)) return true;
+	}
 	return false;
 }
 
