@@ -39,6 +39,7 @@
 QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode=false);
 QPair<QByteArray,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
 bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
+bool pushWidgetDataSignalOnLoad( WidgetVisitor& visitor, const QByteArray& content);
 
 #endif
 

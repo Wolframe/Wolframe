@@ -107,7 +107,7 @@ void FormWidget::switchForm( QWidget *actionwidget )
 	
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
-	doFormCloseInititalizations( actionwidget);
+	visitor.do_closeInititalizations();
 	if (formlink.isValid())
 	{
 		QString nextForm = formlink.toString();
@@ -317,10 +317,9 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 
 // reset the form now, this also loads the domains
-	doFormInitInititalizations( m_ui);
+	visitor.do_initInititalizations();
 	//[+]m_dataHandler->resetFormData( m_ui );
 	m_dataHandler->loadFormDomains( m_form, m_ui );
-	m_dataHandler->loadActionReloadTriggerMap( m_ui);
 
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
@@ -338,26 +337,9 @@ void FormWidget::gotAnswer( const QByteArray& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
 	QByteArray actiontag = WidgetMessageDispatcher::getActionId( tag_);
-	if (actiontag.isEmpty())
-	{
-		WidgetMessageDispatcher dispatcher( m_ui);
-		dispatcher.feedResult( tag_, data_);
-	}
-	else
-	{
-		// find all forms with a domain load that is bound over a trigger to the action completed
-		// and issue a domain load request for them:
-		WidgetVisitor visitor( WidgetVisitor(m_ui).uirootwidget());
-		foreach (const QByteArray& doctype, m_dataHandler->getTriggeredDoctypes( actiontag))
-		{
-			foreach (QWidget* wdg, visitor.findDoctypeWidgets( doctype))
-			{
-				WidgetMessageDispatcher dispatcher( m_ui);
-				WidgetMessageDispatcher::Request request = dispatcher.getDomainLoadRequest( m_debug);
-				m_dataLoader->datarequest( request.tag, request.content);
-			}
-		}
-	}
+
+	WidgetMessageDispatcher dispatcher( m_ui);
+	dispatcher.feedResult( tag_, data_);
 }
 
 void FormWidget::gotError( const QByteArray& tag_, const QByteArray& data_)

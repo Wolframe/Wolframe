@@ -193,6 +193,14 @@ class WidgetVisitor
 			};
 
 		private:
+			struct DataSignals
+			{
+				QList<QByteArray> onload;
+			};
+			struct DataSlots
+			{
+				QList<QByteArray> onload;
+			};
 			friend class WidgetVisitorStackElement;
 			friend class WidgetVisitor;
 			QWidget* m_widget;							//< widget reference
@@ -201,6 +209,8 @@ class WidgetVisitor
 			QList<LinkDef> m_links;							//< symbolic links to other objects
 			typedef QPair< QByteArray,QByteArray> Assignment;
 			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
+			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
+			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
 			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
 			int m_entercnt;								//< counter for leaving multipart synonyms
 		};
@@ -212,6 +222,11 @@ class WidgetVisitor
 		///\brief Get a serialization of a selecte list of widget elements in the current state
 		///\param[in] selected_dataelements data elements selected by name
 		QList<Element> elements( const QList<QByteArray>& selected_dataelements);
+
+		///\brief Eval if id describes a widget id of an identifier
+		///\param[in] id identifier to check
+		///\return true if 'id' is a widget id
+		static bool is_widgetid( const QByteArray& id);
 
 		///\brief Get the unique identifier of the widget for server requests
 		QByteArray widgetid() const;
@@ -240,12 +255,16 @@ class WidgetVisitor
 		///\brief Restore the state from its description backup (resetState)
 		void restoreState();
 
+		///\brief Send the datasignal 'onload' to all receivers adressed by property definition 'signal:onload'
+		///\remark This might be implemented as real Qt signal or not, it depends
+		void emit_datasignal_onload( const QByteArray& content);
+
 		void readAssignments();
 		void writeAssignments();
-
-		typedef QHash<QByteArray,QList<QByteArray> > ActionToObjectnameMap;
-		void getReloadTriggers( ActionToObjectnameMap& aomap);
-		QList<QWidget*> findDoctypeWidgets( const QByteArray& doctype) const;
+		///\brief Do assignments to form widgets based on assign: declarations
+		void do_initInititalizations();
+		///\brief Do assignments from form widgets based on assign: declarations
+		void do_closeInititalizations();
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
@@ -274,14 +293,15 @@ class WidgetVisitor
 		///\brief Constructor internal
 		WidgetVisitor( const QStack<StateR>& stk_);
 
+		void ERROR( const char* msg, const QString& arg=QString()) const;
+		void ERROR( const char* msg, const QByteArray& arg) const;
+
+		void handle_datasignal_onload( const QByteArray& senderid, const QByteArray& content);
+		void distribute_datasignal_onload( const QByteArray& senderid, const QByteArray& receiverid, const QByteArray& content);
+
 	private:
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
 };
-
-///\brief Do assignments to form widgets based on assign: declarations
-void doFormInitInititalizations( QWidget* formwidget);
-///\brief Do assignments from form widgets based on assign: declarations
-void doFormCloseInititalizations( QWidget* formwidget);
 
 #endif
 

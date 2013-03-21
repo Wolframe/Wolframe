@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "WidgetVisitor.hpp"
+#include "WidgetRequest.hpp"
 #include "WidgetVisitorStateConstructor.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -48,6 +49,18 @@
 #include <QTableWidget>
 #include <QSharedPointer>
 #include <QLayout>
+
+static void logError( QWidget* widget, const char* msg, const QString& arg)
+{
+	if (widget)
+	{
+		qCritical() << "error widget visitor" << widget->metaObject()->className() << widget->objectName() << msg << (arg.isEmpty()?"":":") << arg;
+	}
+	else
+	{
+		qCritical() << "error " << msg << (arg.isEmpty()?"":":") << arg;
+	}
+}
 
 static bool isConvertibleToInt( const QVariant& val)
 {
@@ -82,15 +95,41 @@ WidgetVisitor::State::State( QWidget* widget_)
 			QVariant synonym = m_widget->property( prop);
 			m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
 		}
-		if (prop.startsWith( "link:"))
+		else if (prop.startsWith( "link:"))
 		{
 			QVariant link = m_widget->property( prop);
 			m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
 		}
-		if (prop.startsWith( "assign:"))
+		else if (prop.startsWith( "assign:"))
 		{
 			QVariant value = m_widget->property( prop);
 			m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toByteArray()));
+		}
+		else if (prop.startsWith( "datasignal:"))
+		{
+			QVariant value = m_widget->property( prop);
+			QByteArray signame( prop.mid( 11, prop.size()-11));
+			if (signame == "onload")
+			{
+				m_datasignals.onload.push_back( value.toByteArray());
+			}
+			else
+			{
+				qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown signal name" << signame;
+			}
+		}
+		else if (prop.startsWith( "dataslot:"))
+		{
+			QVariant value = m_widget->property( prop);
+			QByteArray signame( prop.mid( 9, prop.size()-9));
+			if (signame == "onload")
+			{
+				m_dataslots.onload.push_back( value.toByteArray());
+			}
+			else
+			{
+				qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown slot name" << signame;
+			}
 		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
@@ -106,6 +145,11 @@ WidgetVisitor::State::State( QWidget* widget_)
 		rt.append( QVariant( ++g_cnt).toByteArray());
 		m_widget->setProperty( "widgetid", QVariant(rt));
 	}
+}
+
+bool WidgetVisitor::is_widgetid( const QByteArray& id)
+{
+	return id.indexOf(':') >= 0;
 }
 
 QVariant WidgetVisitor::State::dynamicProperty( const QByteArray& name) const
@@ -229,7 +273,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 		QWidget* lnkwdg = resolveLink( lnk);
 		if (!lnkwdg)
 		{
-			qCritical() << "failed to resolve symbolic link to widget";
+			ERROR( "failed to resolve symbolic link to widget");
 			return false;
 		}
 		m_stk.push_back( createWidgetVisitorState( lnkwdg));
@@ -251,7 +295,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 		QList<QWidget*> children = m_stk.top()->m_widget->findChildren<QWidget*>( name);
 		if (children.size() > 1)
 		{
-			qCritical() << "ambiguus widget reference" << name;
+			ERROR( "ambiguus widget reference", name);
 			return false;
 		}
 		if (children.isEmpty()) return false;
@@ -331,14 +375,14 @@ static QVariant expand_variable_references( WidgetVisitor& visitor, const String
 	{
 		if (endidx < substidx)
 		{
-			qCritical() << "brackets { } not balanced";
+			logError( visitor.widget(), "brackets { } not balanced", "");
 			break;
 		}
 		rt.append( value.mid( startidx, substidx-startidx));
 		int sb = value.indexOf( '{', substidx+1);
 		if (sb > 0 && sb < endidx)
 		{
-			qCritical() << "brackets { { nested";
+			logError( visitor.widget(), "brackets { { nested", "");
 			break;
 		}
 		substidx++;
@@ -438,7 +482,7 @@ QWidget* WidgetVisitor::resolveLink( const QByteArray& link)
 	if (wdglist.isEmpty()) return 0;
 	if (wdglist.size() > 1)
 	{
-		qCritical() << "ambiguus widget link reference:" << link;
+		ERROR( "ambiguus widget link reference", link);
 	}
 	return wdglist.at(0);
 }
@@ -473,7 +517,7 @@ void WidgetVisitor::readAssignments()
 		QVariant value = property( assignment.second);
 		if (!setProperty( assignment.first, value))
 		{
-			qCritical() << "Assigment failed:" << assignment.first << value;
+			ERROR( "assigment failed", assignment.first);
 		}
 	}
 }
@@ -486,7 +530,7 @@ void WidgetVisitor::writeAssignments()
 		QVariant value = property( assignment.first);
 		if (!setProperty( assignment.second, value))
 		{
-			qCritical() << "Assigment failed:" << assignment.second << value;
+			ERROR( "assigment failed", assignment.second);
 		}
 	}
 }
@@ -581,7 +625,7 @@ QByteArray WidgetVisitor::widgetid() const
 	QVariant ruid = m_stk.top()->m_widget->property( "widgetid");
 	if (ruid.type() != QVariant::ByteArray)
 	{
-		qCritical() << "property 'widgetid' missing in state";
+		ERROR( "property 'widgetid' missing in state");
 		return objectName();
 	}
 	return ruid.toByteArray();
@@ -635,7 +679,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 		leave( true);
 		if (m_stk.top()->isRepeatingDataElement( prefix))
 		{
-			qCritical() << "cannot set property addressing a set of properties:" << prefix;
+			ERROR( "cannot set property addressing a set of properties", prefix);
 		}
 		return rt;
 	}
@@ -686,12 +730,12 @@ static bool isReservedProperty( const QByteArray& key)
 	if (key == "initialFocus") return true;
 	// skip _w_ dynamic properties, they are used as internal Wolframe properties:
 	if (key.startsWith( "_w_")) return true;
-	// skip synonym/link declarations:
+	// skip synonym/link/assign/datasignal/dataslot declarations:
 	if (key.indexOf( ':') >= 0) return true;
 	// ignore Wolframe elements:
 	if (key[0] == 'd')
 	{
-		if (key == "doctype" || key == "dataobject" || key == "dataelement" || key == "datatrigger")
+		if (key == "doctype" || key == "dataobject" || key == "dataelement")
 		{
 			return true;
 		}
@@ -924,7 +968,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 			}
 			else if (elemstk.top().hasSelectedDataelements && !m_stk.top()->isRepeatingDataElement( dataelem))
 			{
-				qCritical() << "data element not found:" << dataelem << "(elements defined with dataelement are mandatory)";
+				ERROR( "data element not found (elements defined with dataelement are mandatory)", dataelem);
 			}
 			++elemstk.top().dataelementidx;
 		}
@@ -967,55 +1011,6 @@ static bool nodeProperty_isActionWidgetWithDoctype( const QWidget* widget, const
 	return (property.isValid());
 }
 
-void WidgetVisitor::getReloadTriggers( ActionToObjectnameMap& aomap)
-{
-	foreach (QWidget* form, findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
-	{
-		QByteArray formdoctype = form->property( "doctype").toByteArray();
-		QVariant triggers = form->property( "datatrigger");
-		if (!triggers.isValid())
-		{
-			// ... collect implicit triggers from actions (QAbstractButtons*)
-			WidgetVisitor formvisitor( form);
-			foreach (const QWidget* actionwidget, formvisitor.findSubNodes( nodeProperty_isActionWidgetWithDoctype))
-			{
-				QByteArray action = actionwidget->property( "doctype").toByteArray();
-				if (!aomap[ action].contains( formdoctype))
-				{
-					aomap[ action].push_back( formdoctype);
-					qDebug() << "Reloading form" << form->objectName() << "(doctype" << formdoctype << ") on action" << action;
-				}
-			}
-		}
-		else
-		{
-			foreach (const QByteArray& action, triggers.toByteArray().trimmed().split( ','))
-			{
-				if (!aomap[ action].contains( formdoctype))
-				{
-					qDebug() << "Reloading form" << form->objectName() << "(doctype" << formdoctype << ") on action" << action;
-					aomap[ action].push_back( formdoctype);
-				}
-			}
-		}
-	}
-}
-
-///\brief Return true if the widget is not an action widget with a specific doctype.
-//	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_Doctype( const QWidget* widget, const QByteArray& doctype)
-{
-	if (!widget->isEnabled()) return false;
-	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant property = widget->property( "doctype");
-	return (property.type() == QVariant::ByteArray && property.toByteArray() == doctype);
-}
-
-QList<QWidget*> WidgetVisitor::findDoctypeWidgets( const QByteArray& doctype) const
-{
-	return findSubNodes( nodeProperty_Doctype, doctype);
-}
-
 static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray& )
 {
 	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
@@ -1025,23 +1020,84 @@ static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray&
 	return false;
 }
 
-void doFormInitInititalizations( QWidget* formwidget)
+void WidgetVisitor::do_initInititalizations()
 {
-	WidgetVisitor visitor( formwidget);
-	foreach (QWidget* wdg, visitor.findSubNodes( nodeProperty_hasAssignment))
+	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasAssignment))
 	{
 		WidgetVisitor chldvisitor( wdg);
 		chldvisitor.readAssignments();
 	}
 }
 
-void doFormCloseInititalizations( QWidget* formwidget)
+void WidgetVisitor::do_closeInititalizations()
 {
-	WidgetVisitor visitor( formwidget);
-	foreach (QWidget* wdg, visitor.findSubNodes( nodeProperty_hasAssignment))
+	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasAssignment))
 	{
 		WidgetVisitor chldvisitor( wdg);
 		chldvisitor.writeAssignments();
+	}
+}
+
+void WidgetVisitor::ERROR( const char* msg, const QString& arg) const
+{
+	logError( widget(), msg, arg);
+}
+
+void WidgetVisitor::ERROR( const char* msg, const QByteArray& arg) const
+{
+	logError( widget(), msg, QString( arg));
+}
+
+void WidgetVisitor::handle_datasignal_onload( const QByteArray& senderid, const QByteArray& content)
+{
+	qDebug() << "handle datasignal onload from" << senderid << content;
+	if (!setWidgetAnswer( *this, content))
+	{
+		ERROR( "failed to set widget answer", senderid);
+	}
+}
+
+void WidgetVisitor::emit_datasignal_onload( const QByteArray& content)
+{
+	if (m_stk.isEmpty()) return;
+	WidgetVisitor mainvisitor( uirootwidget());
+	foreach (const QByteArray& receiverprop, m_stk.top()->m_datasignals.onload)
+	{
+		QVariant receiverid = resolve( receiverprop);
+		mainvisitor.distribute_datasignal_onload( widgetid(), receiverid.toByteArray(), content);
+	}
+}
+
+static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
+{
+	QVariant dataslots = widget->property( "dataslot:onload");
+	int idx;
+	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
+	{
+		QByteArray dd = dataslots.toByteArray();
+		return (dd.size() == idx || dd.at(idx) == ' ' || dd.at(idx) == ',');
+	}
+	return false;
+}
+
+void WidgetVisitor::distribute_datasignal_onload( const QByteArray& senderid, const QByteArray& receiverid, const QByteArray& content)
+{
+	QList<QWidget*> receiverlist;
+	if (is_widgetid( receiverid))
+	{
+		receiverlist = findSubNodes( nodeProperty_hasWidgetId, receiverid);
+	}
+	else
+	{
+		receiverlist = findSubNodes( nodeProperty_hasDataSlot_onload, receiverid);
+	}
+	foreach (QWidget* receiver, receiverlist)
+	{
+		WidgetVisitor visitor( receiver);
+		if (visitor.widgetid() != senderid)
+		{
+			visitor.handle_datasignal_onload( senderid, content);
+		}
 	}
 }
 
