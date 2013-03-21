@@ -90,53 +90,54 @@ WidgetVisitor::State::State( QWidget* widget_)
 {
 	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
 	{
-		if (prop.startsWith( "synonym:"))
+		if (prop.indexOf(':') >= 0)
 		{
-			QVariant synonym = m_widget->property( prop);
-			m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
-		}
-		else if (prop.startsWith( "link:"))
-		{
-			QVariant link = m_widget->property( prop);
-			m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
-		}
-		else if (prop.startsWith( "assign:"))
-		{
-			QVariant value = m_widget->property( prop);
-			m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toByteArray()));
-		}
-		else if (prop.startsWith( "datasignal:"))
-		{
-			QVariant value = m_widget->property( prop);
-			QByteArray signame( prop.mid( 11, prop.size()-11));
-			if (signame == "onload")
+			if (prop.startsWith( "synonym:"))
 			{
-				m_datasignals.onload.push_back( value.toByteArray());
+				QVariant synonym = m_widget->property( prop);
+				m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
 			}
-			else if (signame == "domainchange")
+			else if (prop.startsWith( "link:"))
 			{
-				m_datasignals.domainchange.push_back( value.toByteArray());
+				QVariant link = m_widget->property( prop);
+				m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
 			}
-			else
+			else if (prop.startsWith( "assign:"))
 			{
-				qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown signal name" << signame;
+				QVariant value = m_widget->property( prop);
+				m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toByteArray()));
 			}
-		}
-		else if (prop.startsWith( "dataslot:"))
-		{
-			QVariant value = m_widget->property( prop);
-			QByteArray signame( prop.mid( 9, prop.size()-9));
-			if (signame == "onload")
+			else if (prop.startsWith( "datasignal:"))
 			{
-				m_dataslots.onload.push_back( value.toByteArray());
+				QVariant value = m_widget->property( prop);
+				if (prop == "datasignal:onload")
+				{
+					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
+				}
+				if (prop == "datasignal:domainload")
+				{
+					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
+				}
+				else
+				{
+					qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown data signal name" << prop;
+				}
 			}
-			else if (signame == "domainchange")
+			else if (prop.startsWith( "dataslot:"))
 			{
-				m_dataslots.domainchange.push_back( value.toByteArray());
-			}
-			else
-			{
-				qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown slot name" << signame;
+				QVariant value = m_widget->property( prop);
+				if (prop == "dataslot:onload")
+				{
+					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
+				}
+				if (prop == "dataslot:domainload")
+				{
+					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
+				}
+				else
+				{
+					qCritical() << "error widget visitor state" << widget_->metaObject()->className() << widget_->objectName() << ": defined unknown data slot name" << prop;
+				}
 			}
 		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
@@ -1038,9 +1039,10 @@ void WidgetVisitor::ERROR( const char* msg, const QByteArray& arg) const
 	logError( widget(), msg, QString( arg));
 }
 
-static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const QWidget* widget, const QByteArray& cond)
 {
-	QVariant dataslots = widget->property( "dataslot:onload");
+	static const char* ar[] = {"dataslot:onload","dataslot:domainchange"};
+	QVariant dataslots = widget->property( ar[(int)type]);
 	int idx;
 	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
 	{
@@ -1050,33 +1052,21 @@ static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteA
 	return false;
 }
 
+static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
+{
+	return nodeProperty_hasDataSlot( WidgetVisitor::OnLoad, widget, cond);
+}
 static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QByteArray& cond)
 {
-	QVariant dataslots = widget->property( "dataslot:domainchange");
-	int idx;
-	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
-	{
-		QByteArray dd = dataslots.toByteArray();
-		return (dd.size() == idx || dd.at(idx) == ' ' || dd.at(idx) == ',');
-	}
-	return false;
+	return nodeProperty_hasDataSlot( WidgetVisitor::DomainChange, widget, cond);
 }
 
 QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 {
 	QList<QWidget*> rt;
 	if (m_stk.isEmpty()) return rt;
-	QList<QByteArray> receiverprops;
-	switch (type)
-	{
-		case OnLoad:
-			receiverprops = m_stk.top()->m_datasignals.onload;
-		break;
-		case DomainChange:
-			receiverprops = m_stk.top()->m_datasignals.domainchange;
-		break;
-	}
-	foreach (const QByteArray& receiverprop, receiverprops)
+
+	foreach (const QByteArray& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
 		QByteArray receiverid = resolve( receiverprop).toByteArray();
 		WidgetVisitor mainvisitor( uirootwidget());

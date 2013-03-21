@@ -150,6 +150,7 @@ class WidgetVisitor
 			OnLoad,
 			DomainChange
 		};
+		enum {NofDataSignalTypes=(int)DomainChange+1};
 
 		///\class State
 		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
@@ -203,13 +204,11 @@ class WidgetVisitor
 		private:
 			struct DataSignals
 			{
-				QList<QByteArray> onload;
-				QList<QByteArray> domainchange;
+				QList<QByteArray> id[(int)NofDataSignalTypes];
 			};
 			struct DataSlots
 			{
-				QList<QByteArray> onload;
-				QList<QByteArray> domainchange;
+				QList<QByteArray> id[(int)NofDataSignalTypes];
 			};
 			friend class WidgetVisitorStackElement;
 			friend class WidgetVisitor;
