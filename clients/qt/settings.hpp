@@ -77,6 +77,8 @@ struct ApplicationSettings
 	bool saveRestoreState;
 	QVector<WinState> states;		///< states of subwindow(s)
 	
+	bool errorsMessageBoxes;		///< show message boxes or status bar text on errors
+
 public:
 	ApplicationSettings();
 

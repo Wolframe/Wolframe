@@ -46,10 +46,9 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
-	  m_globals( 0 ), m_props( 0 ), m_debug( _debug ), m_modal( false ),
-	  m_switchForm( false )
+	  m_globals( 0 ), m_props( 0 ), m_debug( _debug ), m_modal( false )
 {
-	initialize( );
+	initialize( );	
 }
 
 void FormWidget::initialize( )
@@ -63,12 +62,12 @@ void FormWidget::initialize( )
 	if( !m_layout ) {
 		m_layout = new QHBoxLayout( this );
 	}
-
+	
 // link the form loader for form loader notifications
 	connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray ) ) );
+		this, SLOT( formLoaded( QString, QByteArray ) ) );	
 	connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
-		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );
+		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
 	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
 		this, SLOT( formListLoaded( QStringList ) ) );
 
@@ -78,7 +77,7 @@ void FormWidget::initialize( )
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
-
+	
 // the form must be switched after 'action' has been taken in the current form
 	connect( m_signalMapper, SIGNAL( mapped( QObject * ) ),
 		this, SLOT( switchForm( QObject * ) ) );
@@ -98,7 +97,7 @@ void FormWidget::storeToGlobals( QHash<QString, QString> *props )
 			m_globals->insert( parts[1], props->value( key ) );
 		}
 	}
-
+	
 	qDebug( ) << "GLOBALS:" << *m_globals;
 }
 
@@ -140,27 +139,22 @@ void FormWidget::switchForm( QObject *object )
 	QHash<QString, QString> *props = widgetProps->props( );
 
 	restoreFromGlobals( props );
-	
+
+	storeToGlobals( props );
+
 // execute the action (old style, action mandatory)
 // execute the action (new style request, doctype mandatory)
 	if( props->contains( "action" ) || props->contains( "doctype" ) ) {
-		m_switchForm = true;
 		sendRequest( props );
-	} else {
-// store globals normally, we don't have a answer to a request which we
-// must evaluate
-		storeToGlobals( props );
+	}
 	
-// switch form now, formLoaded will inform parent and others,
-// if we have a request we should wait for the result before
-// switching the form
-		if( props->contains( "form" ) ) {
-			QString nextForm = props->value( "form" );
-			if( m_modal && nextForm == "_CLOSE_" ) {
-				emit closed( );
-			} else {
-				loadForm( nextForm );
-			}
+// switch form now, formLoaded will inform parent and others
+	if( props->contains( "form" ) ) {
+		QString nextForm = props->value( "form" );
+		if( m_modal && nextForm == "_CLOSE_" ) {
+			emit closed( );
+		} else {
+			loadForm( nextForm );
 		}
 	}
 }
@@ -201,22 +195,22 @@ QString FormWidget::form( ) const
 QIcon FormWidget::getWindowIcon( ) const
 {
 	return m_ui->windowIcon( );
-}
+}	
 
 void FormWidget::loadForm( QString name, bool modal )
 {
 	if( !m_formLoader ) return;
 
 //	if( name == m_form ) return;
-
+	
 	m_previousForm = m_form;
 	m_form = name;
 	m_modal = modal;
 
 	qDebug( ) << "Initiating form load for " << m_form << m_modal;
-
+	
 	m_formLoader->initiateFormLoad( m_form );
-}
+}	
 
 void FormWidget::setLocale( QLocale locale )
 {
@@ -231,8 +225,11 @@ void FormWidget::setLanguage( QString language )
 void FormWidget::changeEvent( QEvent* _event )
 {
 	if( _event ) {
-		if ( _event->type( ) == QEvent::LanguageChange )
-			m_ui->update( );
+		switch( _event->type( ) ) {			
+			case QEvent::LanguageChange:
+				m_ui->update( );
+				break;
+		}
 	}
 
 	QWidget::changeEvent( _event );
@@ -245,7 +242,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		<< ", size " << localization.length( );
 
 	qApp->removeTranslator( &m_translator );
-
+	
 	if( m_locale.name( ) != DEFAULT_LOCALE ) {
 		if( !m_translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
 			qWarning( ) << "Error while loading translations for form " <<
@@ -257,7 +254,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 
 	QEvent ev( QEvent::LanguageChange );
 	qApp->sendEvent( qApp, &ev );
-
+	
 // signal completion of form loading
 	qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
@@ -293,7 +290,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 {
 // that's not us
 	if( name != m_form ) return;
-
+	
 	qDebug( ) << "Form " << name << " loaded";
 
 // read the form and construct it from the UI file
@@ -309,7 +306,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 	buf.close( );
 	qDebug( ) << "Constructed UI form XML for form" << name << m_modal;
-
+	
 // if we have a modal dialog, we must not replace our own form, but emit
 // a signal, so the main window can rearange and load the form modal in
 // a new window
@@ -322,7 +319,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
-
+	
 	setWindowTitle( m_ui->windowTitle( ) );
 
 	if( oldUi ) {
@@ -342,17 +339,17 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( );
+		QString clazz = widget->metaObject( )->className( ); 
 		QString _name = widget->objectName( );
-
+		
 		if( clazz == "QPushButton" ) {
 			QHash<QString, QString> *props = new QHash<QString, QString>( );
 			readDynamicStringProperties( props, widget );
-
+						
 			qDebug( ) << "connecting button" << _name << "to properties" << *props;
 
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
-
+			
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ) );
 
@@ -384,10 +381,10 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // load localication of the form now
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
-		<< m_locale.name( );
+		<< m_locale.name( );		
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
-
+		
 void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
 	qDebug( ) << "Handling request for form " << m_form << "[" << *props << "]";
@@ -395,7 +392,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 // go trough the widgets of the form and construct the request XML
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
-
+	
 // HACK: m_props
 	qDebug( ) << "props(sendRequest):" << props << this;
 	m_props = props;
@@ -409,21 +406,21 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 			return;
 		}
 		QString name = parts[0];
-
+		
 		// expecting a property identifier as second argument
 		if( parts[1].isNull( ) ) {
 			qWarning( ) << "Expecting a function name in action" << action;
 			return;
 		}
 		QString function = parts[1];
-
+		
 		QWidget *widget = qFindChild<QWidget *>( m_ui, name );
 		// no widget found with that name
 		if( !widget ) {
 			qWarning( ) << "Unknown widget" << name << "in action" << action << "of form" << m_form;
 			return;
 		}
-
+		
 		// we only support reload of domains in other widgets currently
 		if( function != "reload" ) {
 			qWarning( ) << "Unsupported action function" << function << "in widget" << name;
@@ -433,21 +430,22 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 		m_dataHandler->clearFormData( m_ui, name );
 		m_dataHandler->resetFormData( m_ui, name );
 		m_dataHandler->loadFormDomains( m_form, m_ui, name );
+
 	} else {
 		// send regular request	for the form
 		m_dataLoader->request( QString::number( (int)winId( ) ), m_form, QString( ), xml, props );
 	}
 }
 
-void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray data )
+void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml )
 {
 // that's not us
 	if( formName != m_form ) return;
-
+	
 	qDebug( ) << "Got answer for form" << formName;
 
-// do whatever we have to do with data to the widgets
-	if( !data.isEmpty( ) ) {
+// do whatever we have to do with data to the widgets	
+	if( !xml.isEmpty( ) ) {
 		if( !widgetName.isEmpty( ) ) {
 			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
 
@@ -458,62 +456,11 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray dat
 			restoreFromGlobals( props );
 
 // restore domains and state
-			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, data, props );
+			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml, props );
 		} else {
 			// HACK: m_props are the properties of the form
 			qDebug( ) << "props(gotAnswer):" << m_props << this;
-			m_dataHandler->readFormData( formName, m_ui, data, m_props );
-		}
-	}
-
-// switch now after having received the answer to our request
-	if( m_switchForm && !m_dataLoader->hasRunningRequests( ) && m_props && m_props->contains( "form" ) ) {
-		m_switchForm = false;
-		QString nextForm = m_props->value( "form" );
-		if( m_modal && nextForm == "_CLOSE_" ) {
-			emit closed( );
-		} else {
-// set global variables here based on answers from the server, should be something like
-// 'answer.configuration.id', which is a path into the returned structure, for now
-// hardcoded
-			foreach( const QString key, m_props->keys( ) ) {
-				QString value = m_props->value( key );
-				if( value.startsWith( "answer." ) ) {
-					QStringList parts = value.split( "." );
-					int pos = 1;
-					QXmlStreamReader xml( data );
-					while( !xml.atEnd( ) ) {
-						xml.readNext( );
-						if( xml.isStartElement( ) && ( xml.name( ) == parts[pos] ) ) {
-							if( pos == parts.size( )-1 ) {
-								// found
-								QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-								m_props->insert( key, text );
-								break;
-							} else {
-								pos++;
-								// check attributes first
-								QXmlStreamAttributes attributes = xml.attributes( );
-								foreach( QXmlStreamAttribute attr, attributes ) {
-									if( attr.name( ) == parts[pos] ) {
-										if( pos == parts.size( )-1 ) {
-											// found
-											QString text = attr.value( ).toString( );
-											m_props->insert( key, text );
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-// HACK: m_props are the properties of the form
-			storeToGlobals( m_props );
-			
-			loadForm( nextForm );
+			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
 		}
 	}
 }

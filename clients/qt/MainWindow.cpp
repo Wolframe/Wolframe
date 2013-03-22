@@ -479,7 +479,11 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
-	QMessageBox::warning( this, tr( "Server error" ), error, QMessageBox::Ok );
+	if( settings.errorsMessageBoxes ) {
+		QMessageBox::warning( this, tr( "Server error" ), error, QMessageBox::Ok );
+	} else {
+		statusBar( )->showMessage( error, 6000 );
+	}
 
 	updateMenusAndToolbars( );
 }
@@ -610,13 +614,19 @@ void MainWindow::loadLanguage( QString language )
 void MainWindow::changeEvent( QEvent* _event )
 {
 	if( _event ) {
-		if ( _event->type( ) == QEvent::LanguageChange ) {
-			m_ui.retranslateUi( this );
-		}
-		else if ( _event->type( ) == QEvent::LocaleChange )	{
-			QString locale = QLocale::system( ).name( );
-			locale.truncate( locale.lastIndexOf( '_' ) );
-			loadLanguage( locale );
+		switch( _event->type( ) ) {
+
+			case QEvent::LanguageChange:
+				m_ui.retranslateUi( this );
+				break;
+
+			case QEvent::LocaleChange:
+			{
+				QString locale = QLocale::system( ).name( );
+				locale.truncate( locale.lastIndexOf( '_' ) );
+				loadLanguage( locale );
+			}
+			break;
 		}
 	}
 
@@ -694,7 +704,7 @@ void MainWindow::formModal( QString name )
 	m_modalDialog->show( );
 }
 
-void MainWindow::formLoaded( QString /*name*/ )
+void MainWindow::formLoaded( QString name )
 {
 // in MDI mode update the title of the sub window, otherwise update window title
 	if( settings.mdi ) {
@@ -749,7 +759,11 @@ void MainWindow::updateWindowMenu( )
 
 void MainWindow::formError( QString error )
 {
-	QMessageBox::critical( this, tr( "Form error" ), error, QMessageBox::Ok );
+	if( settings.errorsMessageBoxes ) {
+		QMessageBox::critical( this, tr( "Form error" ), error, QMessageBox::Ok );
+	} else {
+		statusBar( )->showMessage( error, 6000 );
+	}
 }
 
 void MainWindow::on_actionRestart_triggered( )
@@ -1079,7 +1093,7 @@ void MainWindow::updateMenusAndToolbars( )
 // logged in or logged out?
 	activateAction( "actionOpenForm",
 		( ( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile )
-		|| ( m_wolframeClient && m_wolframeClient->isConnected( ) ) )
+		|| m_wolframeClient )
 		&& ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionReload",
 		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||

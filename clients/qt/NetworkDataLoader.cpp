@@ -40,7 +40,7 @@
 NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug )
 	: m_wolframeClient( _wolframeClient ),
 	  m_map( new QHash<QString, QPair<QString, QString> >( ) ),
-	  m_debug( _debug ), m_runningRequests( 0 )
+	  m_debug( _debug )
 {
 	connect( m_wolframeClient, SIGNAL( answerReceived( QStringList, QString ) ),
 		this, SLOT( gotAnswer( QStringList, QString ) ) );
@@ -51,17 +51,17 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _deb
 void NetworkDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "NETWORK REQUEST" << windowName << formName << widgetName;
-
+	
 	if( !props->contains( "doctype" ) ) {
 		qCritical( ) << "FATAL: request impossible without 'doctype' for form " << formName << " and widget " << widgetName;
 		return;
 	}
-
+	
 	if( !props->contains( "rootelement" ) ) {
 		qCritical( ) << "FATAL: request impossible without 'rootelement' for form " << formName << " and widget " << widgetName;
 		return;
 	}
-
+	
 	if( !props->contains( "action" ) ) {
 		handleRequest( windowName, formName, widgetName, xml, props );
 		return;
@@ -83,7 +83,7 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 	} else {
 		qCritical( ) << "ERROR: unknown action " << action << " for window" << windowName << "for form " << formName << " and widget " << widgetName;
 		return;
-	}
+	}	
 }
 
 QString NetworkDataLoader::mapAction( QString action )
@@ -97,7 +97,7 @@ QString NetworkDataLoader::mapAction( QString action )
 	} else if( action == "delete" ) {
 		return "delete";
 	}
-
+	
 	return QString( );
 }
 
@@ -105,7 +105,7 @@ QString NetworkDataLoader::mapDoctype( QString action, bool domain, QString docT
 {
 // the doctype has also a ".simpleform" which doesn't come back?
 	QStringList p = docType.split( "." );
-
+	
 	if( action == "create" ) {
 		return QString( "create%1" ).arg( p[0] );
 	} else if( action == "read" ) {
@@ -119,44 +119,31 @@ QString NetworkDataLoader::mapDoctype( QString action, bool domain, QString docT
 	} else if( action == "delete" ) {
 		return QString( "delete%1" ).arg( p[0] );
 	}
-
+	
 	return QString( );
 }
 
-QString NetworkDataLoader::mapDoctype2( QString docType )
-{
-// the doctype has also a ".simpleform" which doesn't come back?
-	QStringList p = docType.split( "." );
-
-	if( p.size( ) > 0 ) {
-		return p[0];
-	} else {
-		return docType;
-	}
-}
-
-void NetworkDataLoader::handleCreate( QString /*windowName*/, QString name, QByteArray xml, QHash<QString, QString> *props )
+void NetworkDataLoader::handleCreate( QString windowName, QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
-
+	
 // what doctype do we expect in the answer?
 	QString docType = props->value( "doctype" );
 	QString action = props->value( "action" );
 	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
-
-	m_runningRequests++;
+	
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
-void NetworkDataLoader::handleRead( QString /*windowName*/, QString name, QHash<QString, QString> *props )
+void NetworkDataLoader::handleRead( QString windowName, QString name, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
-
+	
 // pretty-printing only in debug mode (because of superfluous
 // white spaces sent to server)
 	if( m_debug ) {
@@ -208,15 +195,15 @@ void NetworkDataLoader::handleRead( QString /*windowName*/, QString name, QHash<
 	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
-
-	m_runningRequests++;
+	 
 	m_wolframeClient->request( mapAction( action ), data );
+
 }
 
-void NetworkDataLoader::handleUpdate( QString /*windowName*/, QString name, QByteArray xml, QHash<QString, QString> *props )
+void NetworkDataLoader::handleUpdate( QString windowName, QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
-
+	
 	QString docType = props->value( "doctype" );
 
 // what doctype do we expect in the answer?
@@ -224,12 +211,11 @@ void NetworkDataLoader::handleUpdate( QString /*windowName*/, QString name, QByt
 	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
-
-	m_runningRequests++;
+	 
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
-void NetworkDataLoader::handleDelete( QString /*windowName*/, QString name, QHash<QString, QString> *props )
+void NetworkDataLoader::handleDelete( QString windowName, QString name, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
@@ -266,12 +252,11 @@ void NetworkDataLoader::handleDelete( QString /*windowName*/, QString name, QHas
 	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
-
-	m_runningRequests++;
+	 
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
-void NetworkDataLoader::handleDomainDataLoad( QString /*windowName*/, QString formName, QString widgetName, QHash<QString, QString> *props )
+void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
@@ -325,23 +310,22 @@ void NetworkDataLoader::handleDomainDataLoad( QString /*windowName*/, QString fo
 	xml.writeEndDocument( );
 
 	qDebug( ) << "domain data load network request"<< formName << widgetName << ":\n" << data;
-
+	
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
 	m_map->insert( mapDoctype( action, true, docType ), qMakePair( formName, widgetName ) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, true, docType );
-
-	m_runningRequests++;
+	 
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
-void NetworkDataLoader::handleRequest( QString /*windowName*/, QString formName, QString widgetName, QString data, QHash<QString, QString> *props )
+void NetworkDataLoader::handleRequest( QString windowName, QString formName, QString widgetName, QString data, QHash<QString, QString> *props )
 {
 	QString docType = props->value( "doctype" );
 
 // the data handler didn't compose the request yet: do it here. This is the
-// case for domain reads (hack)
+// case for domain reads (hack)	
 	if( data.isEmpty( ) ) {
 		QString rootElement = props->value( "rootelement" );
 		QByteArray buffer;
@@ -394,63 +378,51 @@ void NetworkDataLoader::handleRequest( QString /*windowName*/, QString formName,
 		}
 		xml.writeEndElement( );
 		xml.writeEndDocument( );
-
+		
 		data = buffer;
 	}
-
+	
 	qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
 
 // what doctype do we expect in the answer?
-	m_map->insert( mapDoctype2( docType ), qMakePair( formName, widgetName ) );
+	m_map->insert( docType, qMakePair( formName, widgetName ) );
 
 	qDebug( ) << "MAP:" << docType << "new style request map";
 
-	m_runningRequests++;
 	m_wolframeClient->request( data );
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 {
-	m_runningRequests--;
-
 	if( params.size( ) < 2 ) {
 		qCritical( ) << "ERROR: got an empty parameter list for a command, can't link it to form and widget!";
 		return;
 	}
-
+	
 // TODO: how can we tag requests in the protocol, so we actually get back the right
 // data??! Now we get 'REQUEST doctype', for now, push the form and widget into a
 // hash and receive it by doctype
 	QString docType = params[1];
 
 	qDebug( ) << "OK: answer in network data loader, params:" << params << "\ncontent:\n" << content;
-
+	
 	if( !m_map->contains( docType ) ) {
 		qCritical( ) << "ERROR: answer for unknown request of doctype" << docType << m_map;
 		return;
 	}
-
+	
 	QPair<QString, QString> pair = m_map->value( docType );
 	QString formName = pair.first;
 	QString widgetName = pair.second;
-
+	
 	m_map->remove( docType );
-
+	
 	qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
-
+	
 	emit answer( formName, widgetName, content.toAscii( ) );
 }
 
 void NetworkDataLoader::gotError( QString error )
 {
-	m_runningRequests--;
-
 	qCritical( ) << "ERROR: error in network data loader" << error;
 }
-
-bool NetworkDataLoader::hasRunningRequests( )
-{
-	qDebug( ) << "RUNNING REQUESTS:" << m_runningRequests;
-	return( m_runningRequests > 0 );
-}
-

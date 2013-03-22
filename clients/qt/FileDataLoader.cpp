@@ -37,19 +37,19 @@
 #include <QFile>
 #include <QDebug>
 
-FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir )
+FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir ) 
 {
 }
 
 void FileDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "Request" << windowName << formName << widgetName << *props;
-
-// nothing to do
+	
+// nothing to do	
 	if( !props->contains( "action" ) ) {
 		return;
 	}
-
+	
 // handle CRUD actions, they are file system dataloader specific
 	QString action = props->value( "action" );
 	if( action == "create" ) {
@@ -64,15 +64,10 @@ void FileDataLoader::request( QString windowName, QString formName, QString widg
 		handleUpdate( formName, xml, props );
 	} else if( action == "delete" ) {
 		handleDelete( formName, props );
-	}
+	}	
 }
 
-bool FileDataLoader::hasRunningRequests( )
-{
-	return false;
-}
-
-void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> * /*props*/ )
+void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
@@ -81,17 +76,17 @@ void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, 
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleRead( QString name, QHash<QString, QString> * /*props*/ )
+void FileDataLoader::handleRead( QString name, QHash<QString, QString> *props )
 {
 // read directly here and stuff data into the signal
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::ReadOnly );
 	QByteArray xml = file.readAll( );
-	file.close( );
+	file.close( );	
 	emit answer( name, QString( ), xml );
 }
 
-void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> * /*props*/ )
+void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
@@ -100,14 +95,14 @@ void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, 
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleDelete( QString name, QHash<QString, QString> * /*props*/ )
+void FileDataLoader::handleDelete( QString name, QHash<QString, QString> *props )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
-	file.remove( );
+	file.remove( );	
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> * /*props*/ )
+void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props )
 {
 	QFile file( m_dir + "/domain_" + formName + "_" + widgetName + ".xml" );
 	file.open( QFile::ReadOnly );

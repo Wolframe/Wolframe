@@ -568,7 +568,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QString nam
 	loadFormDomains( form_name, form, widget, name );
 }
 
-void DataHandler::loadFormDomains( QString form_name, QWidget * /*form*/, QWidget *widget, QString name )
+void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name )
 {
 	QString clazz = widget->metaObject( )->className( ); 
 	
@@ -669,6 +669,8 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				if( xml.name( ) == widget_name ) {
 					inData = true;
 					tableWidget->insertRow( row );
+// HACK: set height of rows to thumbnail heigth					
+					tableWidget->setRowHeight( row, 50 );
 // HACK: map attributes of rows into cells, not happy with that one!					
 					attributes = xml.attributes( );
 				} else if( inData ) {
@@ -693,8 +695,6 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							tableWidget->setItem( row, col, item );
 							
 							tableWidget->setCellWidget( row, col, label );
-// HACK: set height of rows to thumbnail heigth					
-							tableWidget->setRowHeight( row, 50 );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
 							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
@@ -1049,39 +1049,16 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 								item->setSelected( true );
 							}
 						} else if( clazz == "QTreeWidget" ) {
-							QXmlStreamAttributes attributes = xml.attributes( );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 							// TODO: select by name (text in first field), for backwards compatibility, should be done by id
 							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 0 );
-							if( treeWidget->selectionMode( ) == QAbstractItemView::SingleSelection ) {
-								// problem: single selection, but more than one match, iterate over user data
-								// till we find the proper it
-								foreach( QTreeWidgetItem *item, items ) {
-									QString id = item->data( 0, Qt::UserRole ).toString( );
-									foreach( QXmlStreamAttribute attr, attributes ) {
-										if( attr.name( ) == "id" ) {
-											QString mustId = attr.value( ).toString( );
-											if( id == mustId ) {
-												item->setSelected( true );
-												QTreeWidgetItem *parent = item->parent( );
-												while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
-													parent->setExpanded( true );
-													parent = parent->parent( );
-												}
-												break;
-											}
-										}
-									}									
-								}
-							} else {
-								foreach( QTreeWidgetItem *item, items ) {
-									item->setSelected( true );
-									QTreeWidgetItem *parent = item->parent( );
-									while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
-										parent->setExpanded( true );
-										parent = parent->parent( );
-									}
+							foreach( QTreeWidgetItem *item, items ) {
+								item->setSelected( true );
+								QTreeWidgetItem *parent = item->parent( );
+								while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
+									parent->setExpanded( true );
+									parent = parent->parent( );
 								}
 							}
 						} else if( clazz == "QTableWidget" ) {
@@ -1159,12 +1136,6 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		return QString( );
 	}
 	QString name = parts[0];
-
-// answers from the protocol are handled later and ignored for now, keep
-// as is and substitute later
-	if( name == "answer" ) {
-		return variable;
-	}
 	
 // expecting a property identifier as second argument
 	if( parts.count() != 2 ) {

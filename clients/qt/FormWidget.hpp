@@ -106,7 +106,6 @@ class FormWidget : public QWidget
 		bool m_debug;
 		QTranslator m_translator;	// contains the translations for the current form
 		bool m_modal;
-		bool m_switchForm;
 		
 	private:
 		void initialize( );

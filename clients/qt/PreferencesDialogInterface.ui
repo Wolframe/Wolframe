@@ -96,6 +96,13 @@
         </property>
        </widget>
       </item>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="errorsMessageBoxes">
+        <property name="text">
+         <string>&amp;Show errors as message boxes (default: in status bar)</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
