@@ -401,7 +401,7 @@ QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QStrin
 void MainWindow::updateActionShortcuts( )
 {
 	foreach( QAction *action, findChildren<QAction *>( ) ) {
-		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
+		QString s = action->property( "defaultShortcut" ).toString();
 		if( !s.isEmpty( ) ) {
 			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
 			if( shortcut != QKeySequence::UnknownKey ) {
@@ -689,7 +689,6 @@ void MainWindow::formModal( QString name )
 	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
 	l->addWidget( formWidget );
 
-	formWidget->setGlobals( m_formWidget->globals( ) );
 	formWidget->setLanguage( m_language );
 	formWidget->loadForm( name, true );
 

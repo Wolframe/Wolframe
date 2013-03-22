@@ -48,16 +48,13 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
-	  m_globals( 0 ), m_props( 0 ), m_debug( _debug ), m_modal( false )
+	  m_debug( _debug ), m_modal( false )
 {
 	initialize( );	
 }
 
 void FormWidget::initialize( )
 {
-// the global map to pass variables between forms
-	m_globals = new QHash< QString, QString >( );
-
 	if( !m_layout ) {
 		m_layout = new QHBoxLayout( this );
 	}
@@ -133,18 +130,6 @@ void FormWidget::reload( )
 FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
-	if( !m_modal && m_globals ) delete m_globals;
-}
-
-QHash<QString, QString> *FormWidget::globals( ) const
-{
-	return m_globals;
-}
-
-void FormWidget::setGlobals( QHash<QString, QString> *_globals )
-{
-	delete m_globals;
-	m_globals = _globals;
 }
 
 void FormWidget::setForm( const QString &_form )
@@ -221,32 +206,6 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 // signal completion of form loading
 	qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
-}
-
-QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
-{
-	QVariant v = o->property( name );
-	if( !v.isValid( ) ) {
-		return QString( );
-	} else {
-		return v.toString( );
-	}
-}
-
-void FormWidget::writeDynamicStringProperty( QObject *o, const char *name, const QString &value )
-{
-	QVariant v( value );
-	o->setProperty( name, v );
-	qDebug( ) << "setting dynamic property" << name << ":" << value << "in" << o;
-}
-
-void FormWidget::readDynamicStringProperties( QHash<QString, QString> *props, QObject *o )
-{
-	foreach( QByteArray b, o->dynamicPropertyNames( ) ) {
-		QString propName = QString::fromAscii( b.data( ) );
-		QString propValue = readDynamicStringProperty( o, b.data( ) );
-		props->insert( propName, propValue );
-	}
 }
 
 void FormWidget::formLoaded( QString name, QByteArray formXml )

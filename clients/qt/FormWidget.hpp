@@ -61,14 +61,7 @@ class FormWidget : public QWidget
 	public:
 		QString form( ) const;
 		QIcon getWindowIcon( ) const;
-		
-		QHash<QString, QString> *globals( ) const;
-		void setGlobals( QHash<QString, QString> *_globals );
-		
-		static QString readDynamicStringProperty( QObject *o, const char *name );
-		static void writeDynamicStringProperty( QObject *o, const char *name, const QString &value );
-		static void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
-		
+
 	public slots:
 		void setForm( const QString &_form );
 		void reload( );
@@ -84,10 +77,8 @@ class FormWidget : public QWidget
 		QHBoxLayout *m_layout;		// main layout swallowing the form
 		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
 		QStringList m_forms;		// names of all currently loaded forms
-		QHash<QString, QString> *m_globals;
-		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
-		bool m_debug;
 		QTranslator m_translator;	// contains the translations for the current form
+		bool m_debug;
 		bool m_modal;
 		
 	private:
