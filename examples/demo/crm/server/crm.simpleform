@@ -137,14 +137,20 @@ Form ProjectInserted
 	customername	?entityname
 	_ Project
 }
-
+Form ProjectListElem
+{
+	id		!@ID
+	customername	entityname
+	name		entityname
+	description	?string
+}
 ; * Forms:
 Form InsertProject	{ project { _ Project } }
 Form UpdateProject	{ project { _ ProjectInserted } }
 Form DeleteProject	{ project { id !@ID } }
 Form GetProject		{ project { id !@ID } }
 Form ProjectResult	{ project { _ ProjectInserted } }
-Form ProjectListResult	{ projects { project ProjectInserted[] } }
+Form ProjectListResult	{ projects { project ProjectListElem[] } }
 Form ListProject	{ project { } }
 
 Form SearchProject

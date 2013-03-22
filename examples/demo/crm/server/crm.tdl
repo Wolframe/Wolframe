@@ -160,7 +160,7 @@ END
 
 TRANSACTION ListProject
 BEGIN
-	INTO project DO SELECT Project.id,Project.customerid,Customer.name as customername,Project.name,Project.description
+	INTO project DO SELECT Project.id,Customer.name as customername,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id;
 END

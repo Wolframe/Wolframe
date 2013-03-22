@@ -160,7 +160,7 @@ WidgetVisitor::State::State( QWidget* widget_)
 	}
 	static qint64 g_cnt = 0;
 	QVariant ruid = m_widget->property( "widgetid");
-	if (ruid.type() != QVariant::ByteArray)
+	if (!ruid.isValid())
 	{
 		QByteArray rt =  m_widget->objectName().toAscii();
 		rt.append( ":");
@@ -598,7 +598,10 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 
 	// [B] check if an internal property of the widget is referenced and return its value if yes
 	QVariant rt;
-	if ((rt = m_stk.top()->property( name)).isValid()) return resolve( rt);
+	if ((rt = m_stk.top()->property( name)).isValid())
+	{
+		return resolve( rt);
+	}
 
 	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
 	bool subelem = false;
@@ -649,6 +652,10 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 	if (m_stk.top()->m_internal_entercnt == 0)
 	{
 		rt = m_stk.top()->dynamicProperty( name);
+		if (rt.isValid())
+		{
+			return resolve( rt);
+		}
 	}
 	return rt;
 }
