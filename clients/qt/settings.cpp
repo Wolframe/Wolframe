@@ -116,8 +116,6 @@ void ApplicationSettings::write( QSettings &settings )
 		settings.setValue( "size", states[i].size );
 	}
 	settings.endArray();
-	
-	settings.setValue( "errorsMessageBoxes", errorsMessageBoxes );
 }
 
 void ApplicationSettings::read( const QString &fileName )
@@ -190,6 +188,4 @@ void ApplicationSettings::read( QSettings &settings )
 		states.append( state );
 	}
 	settings.endArray( );
-	
-	errorsMessageBoxes = settings.value( "errorsMessageBoxes", false ).toBool( );
 }
