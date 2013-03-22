@@ -1,0 +1,167 @@
+now configurator:
+- generally: no nice interface possible, current qtclient is too limited
+- finish recipes
+  - creationDate (set by system? by user? default?)
+- finish configurations
+  - ComposedConfig: 1:n self-relation on a tree, no clue yet how to do this
+- show thumbnails:
+  - 1:n relation pictures, which picture should be shown? example:
+    component 3 pictures, one is a symbol, two are a front and a back view.
+    => pictures need a qualifier like (first picture)?
+- thumbnails for components (dito recipes), currently broken
+- open info box (modal) in feature/category/component edit and add to
+  show picture information
+- multi-line plain text fields (like desription in recipe) loose newlines
+
+- stop the "whiteout", especially seen after assigning pictures
+  (must be a protocol thing), happens mainly on Windows 7/8, not
+  on Linux/Windows XPL:
+  on FreeBSD: REQUEST, still in Data state, so the protocol misses
+  the end somehow, the last m_answer contains a category tree (so
+  it's a domain read), the tree stops in the middle: <tree><item id="45">,
+  requests get stuffed into the queue, nothing gets ever executed,
+  second time with printqstring m_answer (QString)0x7bae258 (length=0): ""
+  - can be provoked by using non-debug XML sending and textwolf XML filter
+    on Windows XP, so it is a failed signal for a partial line, must add
+    a state like DataLeft (Data gets DataReading or so)
+- ILLEGAL STATE 4 in dataAvailable!
+- MDI interface
+  - open forms via click on button
+  - close forms on click on button
+  - reload forms from other forms
+  - some wiring trouble in datahandler:
+    CRITICAL: ERROR: answer for unknown request of doctype "xxx": most likely the
+    formwidgets share the same datahandler and the signals are missed, its list and hierarchy
+    requests, so it's the domain filler.
+    It happens only if the same form is picked as already shown in another window
+    => happens also with only one window?!
+  - resizing issues: example view picture when picture list window is quite small
+- more errors
+  - proper logout send a "Connection closed by server"
+  
+musts:
+- modal dialogs
+  - improve now refresh of parent form after closing the modal dialog,
+    otherwise state propagation in the UI gets far too complicated!
+  - reload has anomalies, initAction/doctype on form are execute after
+    the state reset. Order must be clear - reset - initAction - state restore
+- file UI and data mode
+  - resizing issues
+- multi-language support
+  - language switch in MDI case (not only m_formWidget!)
+  - window names and form widget titles must be translated dynamically
+- integrate from qWolfClient
+  - help system, context sensitive help, HTMLish
+- configurator specific:
+  - use simpleforms instead of funny lua parsers (example
+    picture parsers)
+  - redo, use inheritance in forms
+  - rewrite categories, so that joins to pictures, requires/provides, tags,
+    etc. are possible through the lua layer
+  - linking of categories and features
+- FormChooseDialog
+  - titles of windows instead of filenames of forms
+  - structure? icons? menu?
+  - the FormChooserList needs localized titles of all possible forms
+    (maybe custom menus which would be added would be better? or a
+    tree view in the dialog and a tree menu in the menubar?)
+- ask for restart of the client when changing to developer mode
+- search with flag (with children)
+- delete needs manual set parameters, update and add use XML from widgets,
+  slightly assymetrical maybe?
+- tags picked from a list and added (needs events)
+- optimal size on qtreewidget to fit items (needed for linking categories
+  and features linking view)
+- tabbed preferences dialog, like thunderbird (in security, form management,
+  etc.)
+- show pictures in tree view
+- scroll to selected element in a single-selection list
+- push button state (disabled/enabled) based on a
+  condition like {picture.id>0}
+- get sensible error message from business layer, not "lua call failed"
+  - e.g. avoid deletion of in-use-pictures
+  - better even: provide conditions for buttons, so they can't be
+    pressed (button.state={something})
+- improve group_concat to take a parameter as separator
+- allow grouping into tags without a dummy groupbox or
+  similar widget around it, where to put the data then?
+- how to comminicate tags which are used by picture and 
+  they should not be deletable?
+- QTableWidget
+  - implement other selection modes (column, cells)
+  - remember states like column width, etc.
+- QDialog instead of QWidget for forms
+  - would allow to have default Enter and ESC behaviour
+  - must be treated specially, as the form should NOT
+    replace the UI currently being shown
+- save global state to settings and read it from there
+  - global.XXX variables
+- unselect trees
+- element operations
+  - reorganize tree
+    - move elements/subtrees
+- protocol
+  - network loader via protocol or use client library?
+- custom widgets for designer
+  - picture viewer
+    - show 0 to N pictures, scrollable
+    - alternative to QTableWidget approach
+- localize data:
+  - lists and trees need id and translations.
+  - where to store the translations? server side, same as domains,
+    maybe language attributes for now and separated translations later?
+  - classes to map from/to:
+    - QListWidget
+      - localization
+      - form init doesn't work when language is not en_US
+    - QTreeWidget
+      - localization
+      - keep state of
+        - sorting order of columns
+        - header width
+      - expandAll on load
+      - open and make an item visible (for instance the location of the
+        last add)
+- for completion and presentation of big data
+  - QListView: with model for big data, on request
+  - QTreeView: with model for big data, on request
+
+nice to do:
+- file download, later, for reports, PDFs, etc.
+  - PDF widget poppler qt4 for previews
+- designer mode
+  - call designer, linguist, lupdate and lrelease as external processes
+  - have a spooler to delegate editing of ui, ts, qss, data to external processes
+    - multiple repositores, move objects between them
+    - sqlite storage
+    - configuration dialog
+    - http://www.vision.ee.ethz.ch/computing/sepp-irix/qt-3.0-mo/designer-manual-6.html
+- add a data handler
+- completion
+  - combobox with linedit combined search
+  - lists? trees?
+- validators
+  - add dynamic property for a series of validators like
+    - mandatory/optional
+    - integer range
+    - regex
+- tooltips
+- how to handle domain enums with internal and presentation
+  (e.g. combobox, selection)
+- representation of lists of variable size, e.g. list of
+  phone numbers
+- states (enable/disabled, read/write or read/only) can depend
+  on states of other widgets, best example is a checked group
+  box for a bunch of settings, see preferences dialog)
+- add authentication dialog
+- action/form switchForm:
+  - need a small state machine for handling the sequence [{action}] <form>
+    correctly with error handling
+  - as with state machines we would have a "go back wherever you came from"
+- most likely not the idea
+  - 1:n relations (pick a foreign reference to another
+    object), domains (e.g. pick a city in a list of possibilities)
+  - grid views
+- check how to implement "check for updates" and actually do the update.
+  Example: https://github.com/pypt/fervor
+  Check also how to get around MSI problems

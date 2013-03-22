@@ -7,6 +7,7 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \
+	$(QT_CXXFLAGS) \
 	-DQT_PLUGIN -DQT_SHARED -DQT_NO_DEBUG \
 	-DQDESIGNER_EXPORT_WIDGETS
 
@@ -20,7 +21,7 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtDesigner \
 	-I$(QT_INCLUDE_DIR)/QtUiTools
-
+	
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \

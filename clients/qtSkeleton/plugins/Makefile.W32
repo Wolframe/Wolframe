@@ -1,0 +1,91 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x403 \
+	/DQT_PLUGIN /DQT_SHARED /DQT_DLL \
+	/DQDESIGNER_EXPORT_WIDGETS \
+	/DQT_THREAD_SUPPORT
+
+!IFNDEF DEBUG
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DQT_NO_DEBUG
+!ENDIF
+
+INCLUDE_DIRS = \
+	/I. \
+	/I.. \
+	/Ifilechooser \
+	/Ipicturechooser \
+	/I"$(QT_DIR)\include" \
+	/I"$(QT_DIR)\include\QtCore" \
+	/I"$(QT_DIR)\include\QtGui" \
+	/I"$(QT_DIR)\include\QtDesigner" \
+	/I"$(QT_DIR)\include\QtUiTools"
+
+QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(QT_LDFLAGS)
+
+# FormWidget will need: QtUiTools.lib, QtUiToolsd.lib
+!IFNDEF DEBUG
+INCLUDE_LIBS = \
+	QtCore4.lib QtGui4.lib QtDesigner4.lib
+!ELSE
+INCLUDE_LIBS = \
+	QtCored4.lib QtGuid4.lib QtDesignerd4.lib
+!ENDIF
+
+MOC_FLAGS =
+
+CPP_OBJS = \
+	WolframeWidgets.obj \
+	moc_WolframeWidgets.obj \
+	..\FileChooser.obj \
+	..\moc_FileChooser.obj \
+	filechooser\FileChooserPlugin.obj \
+	filechooser\moc_FileChooserPlugin.obj \
+	..\PictureChooser.obj \
+	..\moc_PictureChooser.obj \
+	picturechooser\PictureChooserPlugin.obj \
+	picturechooser\moc_PictureChooserPlugin.obj
+
+DYNAMIC_MODULE = \
+	wolframewidgets.dll
+
+all: $(DYNAMIC_MODULE)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+moc_WolframeWidgets.cpp: WolframeWidgets.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
+
+..\moc_FileChooser.cpp: ..\FileChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
+
+filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp
+
+..\moc_PictureChooser.cpp: ..\PictureChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ipicturechooser ..\PictureChooser.hpp -o ..\moc_PictureChooser.cpp
+
+picturechooser\moc_PictureChooserPlugin.cpp: picturechooser\PictureChooserPlugin.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iicturechooser -I"$(QT_DIR)\include\QtDesigner" picturechooser\PictureChooserPlugin.hpp -o picturechooser\moc_PictureChooserPlugin.cpp
+
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $(CPP_OBJS)
+
+local_clean:
+	@-erase moc_*.cpp filechooser\moc_*.cpp picturechooser\moc_*.cpp 2>NUL
+	@-erase filechooser\*.obj picturechooser\*.obj 2>NUL
+	@-erase Makefile Makefile.Release Makefile.Debug 2>NUL
+	
+local_distclean:
+
+local_test:
+	

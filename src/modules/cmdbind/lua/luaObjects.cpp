@@ -1952,29 +1952,45 @@ LuaScript::LuaScript( const std::string& path_)
 {
 	// Load the source of the script from file
 	m_content = utils::readSourceFileContent( m_path);
+	std::map<std::string,bool> sysfuncmap;
 
-	// Check the script syntax and get the list of all global functions
-	LuaScriptInstance instance( this, 0/*modulemap*/);
-	instance.init( 0);
-	lua_State* ls = instance.ls();
-
-	lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-	lua_pushnil(ls);
-	while (lua_next( ls, -2))
+	// Fill the map of all system functions to exclude them from the list of exported functions:
 	{
-		if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
+		LuaScriptInstance instance( this, 0/*modulemap*/);
+		instance.init( 0, false);
+		lua_State* ls = instance.ls();
+		lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+		lua_pushnil(ls);
+		while (lua_next( ls, -2))
 		{
-			const char* uname = lua_getupvalue( ls, -1, 1);
-			if (uname)
+			if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
 			{
-				if (uname[0])
-				{
-					m_functions.push_back( lua_tostring( ls, -3));
-				}
-				lua_pop( ls, 1);
+				sysfuncmap[ lua_tostring( ls, -2)] = true;
 			}
+			lua_pop( ls, 1);
 		}
-		lua_pop( ls, 1);
+	}
+	// Check the script syntax and get the list of all global functions (that are not system or module functions)
+	{
+		LuaScriptInstance instance( this, 0/*modulemap*/);
+		instance.init( 0, true);
+		lua_State* ls = instance.ls();
+
+		lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+		lua_pushnil(ls);
+		while (lua_next( ls, -2))
+		{
+			if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
+			{
+				std::string funcname( lua_tostring( ls, -2));
+				std::map<std::string,bool>::const_iterator fi = sysfuncmap.find( funcname);
+				if (fi == sysfuncmap.end() || fi->second == false)
+				{
+					m_functions.push_back( funcname);
+				}
+			}
+			lua_pop( ls, 1);
+		}
 	}
 }
 
@@ -2028,7 +2044,7 @@ std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
 	return rt;
 }
 
-void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
+void LuaScriptInstance::init( const proc::ProcessorProvider* provider_, bool callMain)
 {
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
@@ -2064,11 +2080,14 @@ void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
 			lua_setglobal( m_ls, "module");
 		}
 		// call main (initialization part):
-		if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
+		if (callMain)
 		{
-			std::ostringstream buf;
-			buf << "Unable to call main entry of script: " << luaErrorMessage( m_ls);
-			throw std::runtime_error( buf.str());
+			if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
+			{
+				std::ostringstream buf;
+				buf << "Unable to call main entry of script: " << luaErrorMessage( m_ls);
+				throw std::runtime_error( buf.str());
+			}
 		}
 		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<ddl::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);

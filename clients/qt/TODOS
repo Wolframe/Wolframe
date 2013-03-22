@@ -1,29 +1,5 @@
-now configurator:
-- generally: no nice interface possible, current qtclient is too limited
-- finish recipes
-  - creationDate (set by system? by user? default?)
-- finish configurations
-  - ComposedConfig: 1:n self-relation on a tree, no clue yet how to do this
-- show thumbnails:
-  - 1:n relation pictures, which picture should be shown? example:
-    component 3 pictures, one is a symbol, two are a front and a back view.
-    => pictures need a qualifier like (first picture)?
-- thumbnails for components (dito recipes), currently broken
-- open info box (modal) in feature/category/component edit and add to
-  show picture information
+musts:
 - multi-line plain text fields (like desription in recipe) loose newlines
-
-- stop the "whiteout", especially seen after assigning pictures
-  (must be a protocol thing), happens mainly on Windows 7/8, not
-  on Linux/Windows XPL:
-  on FreeBSD: REQUEST, still in Data state, so the protocol misses
-  the end somehow, the last m_answer contains a category tree (so
-  it's a domain read), the tree stops in the middle: <tree><item id="45">,
-  requests get stuffed into the queue, nothing gets ever executed,
-  second time with printqstring m_answer (QString)0x7bae258 (length=0): ""
-  - can be provoked by using non-debug XML sending and textwolf XML filter
-    on Windows XP, so it is a failed signal for a partial line, must add
-    a state like DataLeft (Data gets DataReading or so)
 - ILLEGAL STATE 4 in dataAvailable!
 - MDI interface
   - open forms via click on button
@@ -36,10 +12,6 @@ now configurator:
     It happens only if the same form is picked as already shown in another window
     => happens also with only one window?!
   - resizing issues: example view picture when picture list window is quite small
-- more errors
-  - proper logout send a "Connection closed by server"
-  
-musts:
 - modal dialogs
   - improve now refresh of parent form after closing the modal dialog,
     otherwise state propagation in the UI gets far too complicated!
@@ -165,3 +137,5 @@ nice to do:
 - check how to implement "check for updates" and actually do the update.
   Example: https://github.com/pypt/fervor
   Check also how to get around MSI problems
+
+

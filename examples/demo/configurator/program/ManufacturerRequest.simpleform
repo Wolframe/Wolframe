@@ -1,8 +1,0 @@
-FORM ManufacturerRequest
-{
-	manufacturer
-	{
-		id @int
-		form @string
-	}
-}

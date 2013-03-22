@@ -120,7 +120,8 @@ public:
 
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
 	///\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const proc::ProcessorProvider* provider_);
+	///\param[in] callMain wheter to call the script for initialization of its objects or not
+	void init( const proc::ProcessorProvider* provider_, bool callMain=true);
 
 private:
 	friend class LuaScript;

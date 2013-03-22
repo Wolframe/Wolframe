@@ -1,8 +1,0 @@
-AUTH
-MECH NONE
-REQUEST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE CategoryFeature SYSTEM 'CategoryFeatureListRequest.simpleform'>
-<CategoryFeature category_id="63" id="1"/>
-.
-CAPA

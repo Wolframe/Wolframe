@@ -54,12 +54,12 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			case TransactionInput::Element::ResultColumn:
 				if (ai->ref() == 0)
 				{
-					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
 				if (ai->ref() > resrow->size())
 				{
-					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
 				val = (*resrow)[ ai->ref() -1];
@@ -123,13 +123,13 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			} while (stmh->next());
 			if (unique && rescnt > 1)
 			{
-				db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(1), 0/*dbname*/, cmditr->name().c_str(), "NOTUNIQUE", "more than one result result for command (UNIQUE)", "internal data constraint validation error");
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(1), 0/*dbname*/, cmditr->name().c_str(), "NOTUNIQUE", "more than one result result for command (UNIQUE)", "internal data constraint validation error");
 				throw db::DatabaseErrorException( dberr);
 			}
 		}
 		else if (nonempty)
 		{
-			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(2), 0/*dbname*/, cmditr->name().c_str(), "NOTNONEMPTY", "missing result for command (NONEMPTY)", "internal data constraint validation error");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(2), 0/*dbname*/, cmditr->name().c_str(), "NOTNONEMPTY", "missing result for command (NONEMPTY)", "internal data constraint validation error");
 			throw db::DatabaseErrorException( dberr);
 		}
 	}
@@ -137,12 +137,12 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	{
 		if (nonempty)
 		{
-			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(11), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition NONEMPTY on result for a command without result set", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(11), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition NONEMPTY on result for a command without result set", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (unique)
 		{
-			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(12), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition UNIQUE on result for a command without result set", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(12), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition UNIQUE on result for a command without result set", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 	}
@@ -161,12 +161,12 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 			case TransactionInput::Element::ResultColumn:
 				if (ai->ref() == 0)
 				{
-					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
 				if (ai->ref() > resrow->size())
 				{
-					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
 				val = (*resrow)[ ai->ref() -1];

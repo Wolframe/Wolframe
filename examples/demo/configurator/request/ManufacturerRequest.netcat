@@ -1,8 +1,0 @@
-AUTH
-MECH NONE
-REQUEST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE manufacturer SYSTEM 'ManufacturerRequest.simpleform'>
-<manufacturer id="8"/>
-.
-CAPA

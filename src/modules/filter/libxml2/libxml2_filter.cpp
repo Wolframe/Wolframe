@@ -299,14 +299,12 @@ struct InputFilterImpl :public InputFilter
 				if (m_taglevel >= 0)
 				{
 					m_taglevel -= 1;
-					m_doc = DocumentReader();
 					elementsize = 0;
 					type = InputFilter::CloseTag;
 					rt = true;
 				}
 				else
 				{
-					setState( Error, "illegal state - get next called after end of document");
 					rt = false;
 				}
 			}

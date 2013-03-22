@@ -24,7 +24,8 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtDesigner" \
-	/I"$(QT_DIR)\include\QtUiTools"
+	/I"$(QT_DIR)\include\QtUiTools" \
+	/I:$(QT_DIR)\include\QtWidgets
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
