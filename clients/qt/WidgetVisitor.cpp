@@ -543,11 +543,22 @@ void WidgetVisitor::resetState()
 
 void WidgetVisitor::restoreState()
 {
-	QVariant state = m_stk.top()->m_widget->property( "_w_state");
-	m_stk.top()->setState( state);
+	if (!m_stk.isEmpty())
+	{
+		QVariant state = m_stk.top()->m_widget->property( "_w_state");
+		m_stk.top()->setState( state);
 
-	QVariant initialFocus = m_stk.top()->m_widget->property( "initialFocus");
-	if (initialFocus.toBool()) widget()->setFocus();
+		QVariant initialFocus = m_stk.top()->m_widget->property( "initialFocus");
+		if (initialFocus.toBool()) widget()->setFocus();
+	}
+}
+
+void WidgetVisitor::clear()
+{
+	if (!m_stk.isEmpty())
+	{
+		m_stk.top()->clear();
+	}
 }
 
 void WidgetVisitor::readAssignments()

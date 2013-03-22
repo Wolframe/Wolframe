@@ -96,7 +96,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		xml.setAutoFormatting( true );
 		xml.setAutoFormattingIndent( 2 );
 	}
-	
+
 	xml.writeStartDocument( );
 	if( props->contains( "rootelement" ) && props->contains( "doctype" ) ) {
 		xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" )
@@ -123,7 +123,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	} else {
 		xml.writeStartElement( form_name );
 	}
-	
+
 	writeWidgets( form, &dataElements, xml, props, &seen );
 
 	xml.writeEndElement( );

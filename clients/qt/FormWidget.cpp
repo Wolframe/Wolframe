@@ -46,7 +46,7 @@
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent, bool _debug )
 	: QWidget( _parent ), m_form( ),
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
-	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
+	  m_dataLoader( _dataLoader ), m_ui( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
 	  m_globals( 0 ), m_props( 0 ), m_debug( _debug ), m_modal( false )
 {
@@ -55,9 +55,6 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 
 void FormWidget::initialize( )
 {
-// maps data between constructed widgets from .ui and the data loader
-	m_dataHandler = new DataHandler( m_dataLoader, this, m_debug );
-
 // the global map to pass variables between forms
 	m_globals = new QHash< QString, QString >( );
 
@@ -136,7 +133,6 @@ void FormWidget::reload( )
 FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
-	if( m_dataHandler ) delete m_dataHandler;
 	if( !m_modal && m_globals ) delete m_globals;
 }
 
@@ -327,8 +323,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // reset the form now, this also loads the domains
 	visitor.do_initInititalizations();
-	//[+]m_dataHandler->resetFormData( m_ui );
-	m_dataHandler->loadFormDomains( m_form, m_ui );
 
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))

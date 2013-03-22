@@ -76,7 +76,6 @@ class WolframeClient : public QObject
 		ConnectionParameters m_connParams;
 		State m_state;
 		QAbstractSocket *m_socket;
-		QWidget *m_parent;
 		bool m_hasErrors;
 		WolframeClientProtocol m_protocol;
 #ifdef WITH_SSL
@@ -89,11 +88,10 @@ class WolframeClient : public QObject
 		virtual ~WolframeClient( );
 
 // low-level commands, pre-protocol, for debugging mainly
-		void connect( );
-		void disconnect( );
+		void connect();
+		void disconnect();
 		void auth();
 		void request( const QByteArray& tag, const QByteArray& content );
-		void sendLine( const QString&)	{qDebug()<< "NOT IMPLEMENTED: sendLine";}
 // inquire status
 		bool isConnected( ) const;
 		const QString serverName() const;

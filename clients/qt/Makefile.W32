@@ -90,8 +90,6 @@ OBJS = \
 	moc_DataLoader.obj \
 	FileDataLoader.obj \
 	NetworkDataLoader.obj \
-	DataHandler.obj \
-	moc_DataHandler.obj \
 	WolframeClient.obj \
 	moc_WolframeClient.obj \
 	WolframeClientProtocol.obj \
@@ -172,9 +170,6 @@ moc_FormLoader.cpp: FormLoader.hpp
 
 moc_DataLoader.cpp: DataLoader.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataLoader.hpp -o moc_DataLoader.cpp
-
-moc_DataHandler.cpp: DataHandler.hpp
-	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataHandler.hpp -o moc_DataHandler.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp

@@ -117,7 +117,7 @@ void DebugTerminal::lineEntered( QString line )
 		QStringList m;
 		if( rx.indexIn( line ) != -1 ) {
 			QString host = rx.cap( 1 );
-			unsigned short port = rx.cap( 2 ).toUShort( );
+			//~ unsigned short port = rx.cap( 2 ).toUShort( );
 			//~ m_wolframeClient->setHost( host );
 			//~ m_wolframeClient->setPort( port );
 //~ #ifdef WITH_SSL
@@ -141,7 +141,10 @@ void DebugTerminal::lineEntered( QString line )
 		m_output->append( "QUIT - terminate connection to Wolframe server" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else {
-		m_wolframeClient->sendLine( line );
+		//[+]m_wolframeClient->sendLine( line );
+		//PF:NOTE: sending single lines is a bad idea because the protocol
+		//state machine cat only exist as one instance. We have to discuss
+		//what we provide in the debug window
 	}
 }
 

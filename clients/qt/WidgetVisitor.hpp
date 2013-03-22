@@ -329,6 +329,9 @@ class WidgetVisitor
 		///\brief Restore the state from its description backup (resetState)
 		void restoreState();
 
+		///\brief Clear widget data
+		void clear();
+
 		///\brief Get all receivers of a datasignal (type)
 		QList<QWidget*> get_datasignal_receivers( DataSignalType type);
 
