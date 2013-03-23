@@ -51,6 +51,8 @@ class NetworkDataLoader : public DataLoader
 
 		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
 
+		virtual bool hasRunningRequests( );
+
 	private:
 		void handleCreate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );
 		void handleRead( QString windowName, QString name, QHash<QString, QString> *props );
@@ -60,6 +62,7 @@ class NetworkDataLoader : public DataLoader
 		void handleRequest( QString windowName, QString formName, QString widgetName, QString xml, QHash<QString, QString> *props );
 		QString mapAction( QString action );
 		QString mapDoctype( QString action, bool domain, QString docType );
+		QString mapDoctype2( QString docType );
 		
 	public slots:
 		virtual void gotAnswer( QStringList params, QString content );
@@ -69,6 +72,7 @@ class NetworkDataLoader : public DataLoader
 		WolframeClient *m_wolframeClient;
 		QScopedPointer<QHash<QString, QPair<QString, QString> > > m_map;
 		bool m_debug;
+		int m_runningRequests;
 };
 
 #endif // _NETWORK_DATA_LOADER_INCLUDED

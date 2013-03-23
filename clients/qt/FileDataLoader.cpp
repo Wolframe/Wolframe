@@ -67,6 +67,11 @@ void FileDataLoader::request( QString windowName, QString formName, QString widg
 	}
 }
 
+bool FileDataLoader::hasRunningRequests( )
+{
+	return false;
+}
+
 void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> * /*props*/ )
 {
 	QFile file( m_dir + "/" + name + ".xml" );

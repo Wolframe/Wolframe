@@ -49,6 +49,8 @@ class DataLoader : public QObject
 		
 		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
 
+		virtual bool hasRunningRequests( ) = 0;
+		
 	// for NetworkDataLoader
 	public slots:
 		virtual void gotAnswer( QStringList /* params */, QString /* content */ ) { }
