@@ -1,8 +1,0 @@
-AUTH
-MECH NONE
-REQUEST delete
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE category SYSTEM 'Category.simpleform'>
-<category id="47"/>
-.
-CAPA

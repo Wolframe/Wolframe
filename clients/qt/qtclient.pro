@@ -21,7 +21,6 @@ SOURCES += \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \
-	DataHandler.cpp \
 	WolframeClient.cpp \
 	FormWidget.cpp \
 	qcommandline.cpp \
@@ -45,7 +44,6 @@ HEADERS += \
 	DataLoader.hpp \
 	FileDataLoader.hpp \
 	NetworkDataLoader.hpp \
-	DataHandler.hpp \
 	WolframeClient.hpp \
 	FormWidget.hpp \
 	qcommandline.h \
@@ -70,9 +68,9 @@ FORMS += \
 	PreferencesDialogInterface.ui \
 	loginDialog.ui \
 	manageServersDialog.ui \
-	serverDefinitionDialogNoSSL.ui
+	serverDefinitionDialogNoSSL.ui \
 #	serverDefinitionDialog.ui
-	
+
 TRANSLATIONS += \
 	i18n/qtclient.de_CH.ts \
 	i18n/qtclient.ro_RO.ts

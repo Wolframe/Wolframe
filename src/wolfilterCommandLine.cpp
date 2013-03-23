@@ -234,7 +234,7 @@ struct WolfilterOptionStruct
 	}
 };
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_inbufsize(8<<10)
@@ -280,7 +280,9 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		if (configfile.size() == 0 || configfile[0] != '.')
 		{
 			configfile = utils::getCanonicalPath( vmap["config"].as<std::string>(), m_referencePath);
-		} else {
+		}
+		else
+		{
 			m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
 		}
 		m_config = utils::readPropertyTreeFile( configfile);
@@ -295,7 +297,14 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::iterator itr=m_modules.begin(), end=m_modules.end();
 		for (; itr != end; ++itr)
 		{
-			*itr = utils::getCanonicalPath( *itr, m_modulePath);
+			if (itr->size() == 0 || (*itr).at(0) != '.')
+			{
+				*itr = utils::getCanonicalPath( *itr, m_modulePath);
+			}
+			else if (!currentPath.empty())
+			{
+				*itr = utils::getCanonicalPath( *itr, currentPath);
+			}
 		}
 	}
 	// Load modules
@@ -319,7 +328,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		if (vmap.count( "input-filter")) throw std::runtime_error( "incompatible options: --filter specified with --input-filter");
 		if (vmap.count( "output-filter")) throw std::runtime_error( "incompatible options: --filter specified with --output-filter");
 	}
-	else
+	else if (vmap.count( "input-filter") || vmap.count( "output-filter"))
 	{
 		if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
 		if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();

@@ -34,7 +34,7 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
-	@-rm thumb.png thumbcpp.png testmem.png
+	@-rm -f thumb.png thumbcpp.png testmem.png
 
 local_distclean:
 

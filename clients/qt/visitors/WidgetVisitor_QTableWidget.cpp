@@ -224,7 +224,7 @@ bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QByteArray& 
 	return false;
 }
 
-void WidgetVisitorState_QTableWidget::set_thumbnail( int itemidx, const QVariant& data)
+void WidgetVisitorState_QTableWidget::set_thumbnail( int row, int itemidx, const QVariant& data)
 {
 	QByteArray decoded = QByteArray::fromBase64( data.toByteArray());
 	QPixmap pixmap;
@@ -234,6 +234,9 @@ void WidgetVisitorState_QTableWidget::set_thumbnail( int itemidx, const QVariant
 	label->setFixedSize( pixmap.size());
 	if (m_cellwidgets.at( itemidx)) delete m_cellwidgets[ itemidx];
 	m_cellwidgets[ itemidx] = label;
+// Aba, HACK: backport from configurator, force size of row to be at
+// least 50px
+	m_tableWidget->setRowHeight( row, 50 );
 }
 
 QVariant WidgetVisitorState_QTableWidget::get_thumbnail( int row, int col) const
@@ -326,7 +329,7 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const
 			}
 			if (name == "thumbnail")
 			{
-				set_thumbnail( m_column, data);
+				set_thumbnail( m_row, m_column, data);
 				return true;
 			}
 			break;
@@ -338,7 +341,7 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const
 			}
 			if (name == "thumbnail")
 			{
-				set_thumbnail( m_row, data);
+				set_thumbnail( m_row, m_row, data);
 				return true;
 			}
 			break;

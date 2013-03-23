@@ -55,7 +55,7 @@ public:
 
 private:
 	void fill_cell( int row, int col, int itemidx);
-	void set_thumbnail( int itemidx, const QVariant& data);
+	void set_thumbnail( int row, int itemidx, const QVariant& data);
 	QVariant get_thumbnail( int row, int col) const;
 
 private:

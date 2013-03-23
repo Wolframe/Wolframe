@@ -188,3 +188,5 @@ examples/demo/crm/server/crm.db
 *.rcc
 *.gcno
 *.gcda
+clients/qt/qtclient.pro.user
+clients/qtSkeleton/qtSkeleton.pro.user

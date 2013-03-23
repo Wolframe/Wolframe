@@ -50,7 +50,7 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
 	  m_debug( _debug ), m_modal( false )
 {
-	initialize( );	
+	initialize( );
 }
 
 void FormWidget::initialize( )
@@ -58,12 +58,12 @@ void FormWidget::initialize( )
 	if( !m_layout ) {
 		m_layout = new QHBoxLayout( this );
 	}
-	
+
 // link the form loader for form loader notifications
 	connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray ) ) );	
+		this, SLOT( formLoaded( QString, QByteArray ) ) );
 	connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
-		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
+		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );
 	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
 		this, SLOT( formListLoaded( QStringList ) ) );
 
@@ -75,7 +75,7 @@ void FormWidget::initialize( )
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
-	
+
 // the form must be switched after 'action' has been taken in the current form
 	connect( m_signalMapper, SIGNAL( mapped( QWidget * ) ),
 		this, SLOT( switchForm( QWidget * ) ) );
@@ -107,6 +107,9 @@ void FormWidget::switchForm( QWidget *actionwidget )
 			m_dataLoader->datarequest( domload.tag, domload.content);
 		}
 	}
+
+	// ABa, TODO: this is wrong, we should wait for error or answer, after
+	// that we switch the form on ok, not on error..
 	
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
@@ -145,20 +148,20 @@ QString FormWidget::form( ) const
 QIcon FormWidget::getWindowIcon( ) const
 {
 	return m_ui->windowIcon( );
-}	
+}
 
 void FormWidget::loadForm( QString name, bool modal )
 {
 	if( !m_formLoader ) return;
-	
+
 	m_previousForm = m_form;
 	m_form = name;
 	m_modal = modal;
 
 	qDebug( ) << "Initiating form load for " << m_form << m_modal;
-	
+
 	m_formLoader->initiateFormLoad( m_form );
-}	
+}
 
 void FormWidget::setLocale( QLocale locale )
 {
@@ -173,11 +176,8 @@ void FormWidget::setLanguage( QString language )
 void FormWidget::changeEvent( QEvent* _event )
 {
 	if( _event ) {
-		switch( _event->type( ) ) {			
-			case QEvent::LanguageChange:
-				m_ui->update( );
-				break;
-		}
+		if ( _event->type( ) == QEvent::LanguageChange )
+			m_ui->update( );
 	}
 
 	QWidget::changeEvent( _event );
@@ -190,7 +190,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		<< ", size " << localization.length( );
 
 	qApp->removeTranslator( &m_translator );
-	
+
 	if( m_locale.name( ) != DEFAULT_LOCALE ) {
 		if( !m_translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
 			qWarning( ) << "Error while loading translations for form " <<
@@ -202,7 +202,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 
 	QEvent ev( QEvent::LanguageChange );
 	qApp->sendEvent( qApp, &ev );
-	
+
 // signal completion of form loading
 	qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
@@ -229,7 +229,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 	buf.close( );
 	qDebug( ) << "Constructed UI form XML for form" << name << m_modal;
-	
+
 // if we have a modal dialog, we must not replace our own form, but emit
 // a signal, so the main window can rearange and load the form modal in
 // a new window
@@ -270,11 +270,11 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // connect push buttons with form names to loadForms
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( ); 
+		QString clazz = widget->metaObject( )->className( );
 		
 		if( clazz == "QPushButton" ) {
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
-			
+
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ) );
 
@@ -293,7 +293,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // load localication of the form now
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
-		<< m_locale.name( );		
+		<< m_locale.name( );
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 		

@@ -1,8 +1,0 @@
-FORM CategoryFeatureListRequest
-{
-	CategoryFeature
-	{
-		category_id @int
-		id @int
-	}
-}

@@ -669,6 +669,24 @@ endif
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+
+QT_PACKAGE=$(shell pacman -Q qt4 2>/dev/null)
+ifeq (qt4, $(findstring qt4,$(QT_PACKAGE)))
+QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIR ?= /usr/include/qt4
+QT_LIB_DIR ?= /usr/lib
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate  
+QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
+QT_LDFLAGS =
+QT_CXXFLAGS =
+else
+
+QT_PACKAGE=$(shell pacman -Q qt 2>/dev/null)
+ifeq (qt,$(findstring qt,$(QT_PACKAGE)))
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -679,6 +697,13 @@ QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
 QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
+QT_CXXFLAGS =
+else
+$(error WITH_QT requires installation of 'qt' or 'qt4' package!)
+endif
+
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"

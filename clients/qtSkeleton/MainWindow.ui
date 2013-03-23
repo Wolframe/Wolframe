@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>607</width>
+    <height>395</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Wolframe Qt Client</string>
+  </property>
+  <property name="documentMode">
+   <bool>true</bool>
+  </property>
+  <property name="themeAuthor" stdset="0">
+   <string>Andreas Baumann</string>
+  </property>
+  <property name="themeBaseStyle" stdset="0">
+   <string>plastique</string>
+  </property>
+  <widget class="QMdiArea" name="centralWidget">
+   <property name="viewMode">
+    <enum>QMdiArea::SubWindowView</enum>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>607</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionContents"/>
+    <addaction name="actionIndex"/>
+    <addaction name="actionContextHelp"/>
+    <addaction name="separator"/>
+    <addaction name="actionTechnicalSupport"/>
+    <addaction name="actionReportBug"/>
+    <addaction name="separator"/>
+    <addaction name="actionCheckForUpdates"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAboutQt"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelectAll"/>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+    <addaction name="actionReload"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionCloseAll"/>
+    <addaction name="separator"/>
+    <addaction name="actionTile"/>
+    <addaction name="actionCascade"/>
+    <addaction name="separator"/>
+    <addaction name="actionNextWindow"/>
+    <addaction name="actionPreviousWindow"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionLogin"/>
+    <addaction name="actionLogout"/>
+    <addaction name="actionManageServers"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenFormNewWindow"/>
+    <addaction name="actionOpenForm"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint"/>
+    <addaction name="separator"/>
+    <addaction name="actionRestart"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>&amp;Settings</string>
+    </property>
+    <widget class="QMenu" name="menuLanguages">
+     <property name="title">
+      <string>&amp;Language</string>
+     </property>
+     <addaction name="actionTest"/>
+    </widget>
+    <addaction name="actionPreferences"/>
+    <addaction name="menuLanguages"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBarConnection">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLogin"/>
+   <addaction name="actionLogout"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarEdit">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionDelete"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarWindow">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionReload"/>
+   <addaction name="actionPreviousWindow"/>
+   <addaction name="actionNextWindow"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/exit.png</normaloff>:/images/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit the Wolframe client</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Quit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About Wolframe Client</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="actionDebugTerminal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Debug Terminal</string>
+   </property>
+   <property name="iconText">
+    <string>Debug Terminal</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/configure.png</normaloff>:/images/configure.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure application preferences</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::PreferencesRole</enum>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Preferences</string>
+   </property>
+  </action>
+  <action name="actionManageStorage">
+   <property name="text">
+    <string>&amp;Manage Storage</string>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="text">
+    <string>&amp;Restart</string>
+   </property>
+   <property name="toolTip">
+    <string>Restart the Wolframe client</string>
+   </property>
+  </action>
+  <action name="actionOpenForm">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Open form..</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::Open</string>
+   </property>
+  </action>
+  <action name="actionOpenFormNewWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Open form in &amp;new window..</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::New</string>
+   </property>
+  </action>
+  <action name="actionContents">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Contents</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::HelpContents</string>
+   </property>
+  </action>
+  <action name="actionIndex">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Index</string>
+   </property>
+  </action>
+  <action name="actionContextHelp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Context Help</string>
+   </property>
+  </action>
+  <action name="actionTechnicalSupport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Technical Support</string>
+   </property>
+  </action>
+  <action name="actionReportBug">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Report Bug...</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Check for Updates...</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/refresh.png</normaloff>:/images/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Reload Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload the active window</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Refresh</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Close the active window</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Close</string>
+   </property>
+  </action>
+  <action name="actionCloseAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close &amp;all</string>
+   </property>
+   <property name="toolTip">
+    <string>Close all the windows</string>
+   </property>
+  </action>
+  <action name="actionTile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Tile</string>
+   </property>
+   <property name="toolTip">
+    <string>Tile the windows</string>
+   </property>
+  </action>
+  <action name="actionCascade">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Cascade</string>
+   </property>
+   <property name="toolTip">
+    <string>Cascade the windows</string>
+   </property>
+  </action>
+  <action name="actionNextWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/next.png</normaloff>:/images/next.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ne&amp;xt</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the focus to the next window</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::NextChild</string>
+   </property>
+  </action>
+  <action name="actionPreviousWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/previous.png</normaloff>:/images/previous.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pre&amp;vious</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the focus to the previous window</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::PreviousChild</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/undo.png</normaloff>:/images/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo the last action</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/redo.png</normaloff>:/images/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Redo the last undo</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Redo</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/cut.png</normaloff>:/images/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cu&amp;t</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut the current selection's contents to the clipboard</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Cut</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/paste.png</normaloff>:/images/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste the clipboard's contents into the current selection</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Paste</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/delete.png</normaloff>:/images/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the current selection's contents</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Delete</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+   <property name="toolTip">
+    <string>Select all items in the current window</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::SelectAll</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/copy.png</normaloff>:/images/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy the current selection's contents to the clipboard</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Copy</string>
+   </property>
+  </action>
+  <action name="actionLogin">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Login</string>
+   </property>
+   <property name="toolTip">
+    <string>Login to a Wolframe server</string>
+   </property>
+  </action>
+  <action name="actionLogout">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/logout.png</normaloff>:/images/logout.png</iconset>
+   </property>
+   <property name="text">
+    <string>L&amp;ogout</string>
+   </property>
+   <property name="toolTip">
+    <string>Logout from the Wolframe server</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/print.png</normaloff>:/images/print.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Print</string>
+   </property>
+   <property name="toolTip">
+    <string>Print current document</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Print</string>
+   </property>
+  </action>
+  <action name="actionManageServers">
+   <property name="text">
+    <string>&amp;Manage servers...</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage the list of Wolframe servers</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>&amp;English</string>
+   </property>
+   <property name="iconText">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="action_Close_form">
+   <property name="text">
+    <string>&amp;Close form</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::Close</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

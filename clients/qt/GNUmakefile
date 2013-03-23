@@ -1,12 +1,13 @@
 TOPDIR = ../..
 
-SUBDIRS = plugins apps
+SUBDIRS = plugins tests
 
 .NOTPARALLEL:
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CXXFLAGS =
+INCLUDE_CXXFLAGS = \
+	$(QT_CXXFLAGS) -DBUILD_AS_PLUGIN
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/clients/qt \
@@ -16,7 +17,7 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtUiTools \
 	-I$(QT_INCLUDE_DIR)/QtDesigner
-	
+
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \
@@ -261,7 +262,7 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c apps/testcases.conf
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c test.conf
 
 .PHONY: buildi18n
 buildi18n:

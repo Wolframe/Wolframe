@@ -1,13 +1,13 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
 pkgver=20130221
-pkgrel=1
+pkgrel=2
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
-         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt' 'libharu'
+         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt4' 'libharu'
          'freeimage')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 backup=('etc/wolframe/wolframe.conf')

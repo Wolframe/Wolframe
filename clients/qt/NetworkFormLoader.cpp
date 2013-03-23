@@ -61,7 +61,7 @@ void NetworkFormLoader::initiateListLoad( )
 	emit formListLoaded( forms );
 }
 
-void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
+void NetworkFormLoader::initiateFormLocalizationLoad( QString& /*name*/, QLocale /*locale*/ )
 {
 	//~ QString s = m_wolframeClient->syncRun( "getFormLocalization " + name + " " + locale.name( ) );
 	//~ if( s.isNull( ) ) {
@@ -72,7 +72,7 @@ void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale loc
 	//~ }
 }
 
-void NetworkFormLoader::initiateFormLoad( QString &name )
+void NetworkFormLoader::initiateFormLoad( QString& /*name*/ )
 {
 	// int paramidx = FormCall::name( name);
 	// QString formname( paramidx<0?name:name.mid( 0, paramidx));
@@ -88,7 +88,7 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
 	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
-	
+
 	//~ QString s = m_wolframeClient->syncRun( "getFormLanguages" );
 	//~ if( s.isNull( ) ) {
 		//~ qWarning( ) << "Trouble getting form languages";
@@ -97,23 +97,23 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 		//~ languageCodes.append( lines );
 		//~ languageCodes.removeDuplicates( );
 	//~ }
-	
+
 	emit languageCodesLoaded( languageCodes );
 }
 
-void NetworkFormLoader::initiateFormSave( QString name, QByteArray form )
+void NetworkFormLoader::initiateFormSave( QString /*name*/, QByteArray /*form*/ )
 {
 }
 
-void NetworkFormLoader::initiateFormLocalizationSave( QString name, QLocale locale, QByteArray localizationSrc, QByteArray localizationBin )
-{
-}
-			
-void NetworkFormLoader::initiateFormDelete( QString name )
+void NetworkFormLoader::initiateFormLocalizationSave( QString /*name*/, QLocale /*locale*/, QByteArray /*localizationSrc*/, QByteArray /*localizationBin*/ )
 {
 }
 
-void NetworkFormLoader::initiateFormLocalizationDelete( QString name, QLocale locale )
+void NetworkFormLoader::initiateFormDelete( QString /*name*/ )
+{
+}
+
+void NetworkFormLoader::initiateFormLocalizationDelete( QString /*name*/, QLocale /*locale*/ )
 {
 }
 

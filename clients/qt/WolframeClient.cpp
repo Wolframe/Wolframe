@@ -85,6 +85,11 @@ WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget 
 		this, SLOT( handleResult( ) ) );
 }
 
+void WolframeClient::setConnectionParameters( const ConnectionParameters _connParams )
+{
+	m_connParams = _connParams;
+}
+
 void WolframeClient::timeoutOccurred( )
 {
 	m_timeoutTimer->stop( );
@@ -263,7 +268,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
 				m_socket->close( );
 				m_state = Disconnected;
-				emit error( tr( "Connection closed by server." ) );
+//				emit error( tr( "Connection closed by server." ) );
 			} else {
 				if( !m_hasErrors ) {
 					emit error( m_socket->errorString( ) );
@@ -287,7 +292,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
 				m_socket->close( );
 				m_state = Disconnected;
-				emit error( tr( "Connection closed by server." ) );
+				//emit error( tr( "Connection closed by server." ) );
 			} else {
 				emit error( m_socket->errorString( ) );
 			}

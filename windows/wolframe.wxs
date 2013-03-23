@@ -566,11 +566,16 @@ Project Wolframe.
 				<Feature Id="CommandLineTool" Title="Command Line Tool" Description="A simple command line interpreter to access the Wolframe server." Level="3">
 					<ComponentRef Id="Wolframec"/>
 				</Feature>
+				<?ifdef var.with_qt?>
 				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
 					<ComponentRef Id="WolframeQtClient"/>
 					<ComponentRef Id="WolframeWidgets"/>
 					<ComponentRef Id="QtDlls"/>
-				</Feature>
+					<?ifdef var.with_ssl?>				
+					<ComponentRef Id="OpenSSL"/>
+					<?endif?>
+				<?endif?>
+			</Feature>
 			</Feature>
 			
 			<Feature Id="Documentation" Title="Documentation" Description="The Wolframe documentation." Level="3">
