@@ -1,12 +1,13 @@
 TOPDIR = ../..
 
-SUBDIRS = plugins apps
+SUBDIRS = plugins tests
 
 .NOTPARALLEL:
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CXXFLAGS =
+INCLUDE_CXXFLAGS = \
+	$(QT_CXXFLAGS) -DBUILD_AS_PLUGIN
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/clients/qt \
@@ -16,7 +17,7 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtUiTools \
 	-I$(QT_INCLUDE_DIR)/QtDesigner
-	
+
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \
@@ -77,14 +78,12 @@ CPP_OBJS = \
 	moc_DataLoader.o \
 	FileDataLoader.o \
 	NetworkDataLoader.o \
-	DataHandler.o \
-	moc_DataHandler.o \
 	WolframeClient.o \
 	moc_WolframeClient.o \
 	WolframeClientProtocol.o \
 	WolframeClientProtocolBase.o \
-	WidgetVisitor.o \
 	$(VISITOR_OBJS) \
+	WidgetVisitor.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
 	FormCall.o \
@@ -126,9 +125,6 @@ moc_FormLoader.cpp: FormLoader.hpp
 
 moc_DataLoader.cpp: DataLoader.hpp
 	$(QT_MOC) $(MOC_FLAGS) DataLoader.hpp -o moc_DataLoader.cpp
-
-moc_DataHandler.cpp: DataHandler.hpp
-	$(QT_MOC) $(MOC_FLAGS) DataHandler.hpp -o moc_DataHandler.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp

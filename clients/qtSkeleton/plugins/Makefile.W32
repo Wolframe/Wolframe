@@ -8,7 +8,8 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x403 \
 	/DQT_PLUGIN /DQT_SHARED /DQT_DLL \
 	/DQDESIGNER_EXPORT_WIDGETS \
-	/DQT_THREAD_SUPPORT
+	/DQT_THREAD_SUPPORT \
+	/DBUILD_AS_PLUGIN
 
 !IFNDEF DEBUG
 INCLUDE_CXXFLAGS = \
@@ -24,7 +25,8 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtDesigner" \
-	/I"$(QT_DIR)\include\QtUiTools"
+	/I"$(QT_DIR)\include\QtUiTools" \
+	/I:$(QT_DIR)\include\QtWidgets
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
