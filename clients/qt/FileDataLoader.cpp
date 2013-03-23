@@ -37,19 +37,19 @@
 #include <QFile>
 #include <QDebug>
 
-FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir ) 
+FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir )
 {
 }
 
 void FileDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "Request" << windowName << formName << widgetName << *props;
-	
-// nothing to do	
+
+// nothing to do
 	if( !props->contains( "action" ) ) {
 		return;
 	}
-	
+
 // handle CRUD actions, they are file system dataloader specific
 	QString action = props->value( "action" );
 	if( action == "create" ) {
@@ -64,7 +64,7 @@ void FileDataLoader::request( QString windowName, QString formName, QString widg
 		handleUpdate( formName, xml, props );
 	} else if( action == "delete" ) {
 		handleDelete( formName, props );
-	}	
+	}
 }
 
 void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> *props )

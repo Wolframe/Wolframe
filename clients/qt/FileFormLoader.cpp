@@ -86,7 +86,6 @@ QByteArray FileFormLoader::readFile( QString name )
 void FileFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
 {
 	QByteArray localization = readFile( m_localeDir + "/" + FormCall::name(name) + "." + locale.name( ) + ".qm" );
-	
 	emit formLocalizationLoaded( name, localization );
 }
 
@@ -103,7 +102,7 @@ void FileFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
 	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
-	
+
 // read list of supported languages for all forms based on their qm files available
 	QDir translationDir( m_localeDir );
 	translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
@@ -116,27 +115,27 @@ void FileFormLoader::initiateGetLanguageCodes( )
 	while( it.hasNext( ) ) {
 		it.next( );
 		QStringList parts = it.value( ).split( "." );
-		languageCodes.push_back( parts[1] );		
+		languageCodes.push_back( parts[1] );
 	}
-	
+
 	languageCodes.removeDuplicates( );
 
 	emit languageCodesLoaded( languageCodes );
 }
 
-void FileFormLoader::initiateFormSave( QString name, QByteArray form )
+void FileFormLoader::initiateFormSave( QString /*name*/, QByteArray /*form*/ )
 {
 }
 
-void FileFormLoader::initiateFormLocalizationSave( QString name, QLocale locale, QByteArray localizationSrc, QByteArray localizationBin )
-{
-}
-			
-void FileFormLoader::initiateFormDelete( QString name )
+void FileFormLoader::initiateFormLocalizationSave( QString /*name*/, QLocale /*locale*/, QByteArray /*localizationSrc*/, QByteArray /*localizationBin*/ )
 {
 }
 
-void FileFormLoader::initiateFormLocalizationDelete( QString name, QLocale locale )
+void FileFormLoader::initiateFormDelete( QString /*name*/ )
+{
+}
+
+void FileFormLoader::initiateFormLocalizationDelete( QString /*name*/, QLocale /*locale*/ )
 {
 }
 
