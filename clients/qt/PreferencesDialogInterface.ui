@@ -85,7 +85,7 @@
       <item row="4" column="0">
        <widget class="QCheckBox" name="rememberLogin">
         <property name="text">
-         <string>&amp;Remember login (server and username, not credentials)</string>
+         <string>&amp;Remember login (server and username, not the password)</string>
         </property>
        </widget>
       </item>
