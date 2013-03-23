@@ -112,11 +112,102 @@ of the widget data.
 
 **/
 
+///\class WidgetListener
+///\brief Formward declaration
+class WidgetListener;
 
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
 {
+	public:
+		///\enum DataSignalType
+		///\brief Data signal type
+		enum DataSignalType
+		{
+			OnLoad,
+			OnChange,
+			DomainChange
+		};
+		enum {NofDataSignalTypes=(int)DomainChange+1};
+
+		///\class State
+		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
+		struct State
+		{
+			///\brief Constructor
+			explicit State( QWidget* widget_);
+
+			///\brief Copy constructor
+			State( const State& o);
+
+			///\brief Destructor
+			virtual ~State(){}
+
+		public://Interface methods implemented for different widget types:
+			///\brief Clear contents of the widget
+			virtual void clear(){}
+			///\brief Switch to a substructure context inside the widget but not to a child widget
+			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
+			///\brief Leave the current substructure context an switch to ist (enter) ancessor
+			virtual bool leave( bool /*writemode*/)					{return false;}
+			///\brief Get a property or set of properties of the current substructure context addressed by name
+			virtual QVariant property( const QByteArray&)				{return QVariant();}
+			///\brief Set a property of the current substructure context addressed by name
+			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
+			///\brief Get all dataelements readable in the current substructure context
+			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
+			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
+			virtual QList<QWidget*> datachildren() const				{return m_widget->findChildren<QWidget*>();}
+			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
+			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
+			///\brief Restore the widget state from a variable
+			virtual void setState( const QVariant& /*state*/){}
+			///\brief Get the current the widget state
+			virtual QVariant getState()						{return QVariant();}
+			///\brief Connect all widget signals that should trigger an onchange event to the listener slot 'changed'
+			virtual void ConnectOnChangeSignals( WidgetListener& /*listener*/){}
+
+		public://Common methods:
+			const QByteArray& getSynonym( const QByteArray& name) const;
+			QByteArray getLink( const QByteArray& name) const;
+			QVariant dynamicProperty( const QByteArray& name) const;
+			bool setDynamicProperty( const QByteArray&, const QVariant& value);
+
+		protected:
+			///\class DataElements
+			///\brief Constructor helper for State::dataelements()
+			struct DataElements :public QList<QByteArray>
+			{
+				DataElements( const char* initializer, ...);			//< constructor from 0 terminated vararg initializer list
+			};
+
+		private:
+			struct DataSignals
+			{
+				QList<QByteArray> id[(int)NofDataSignalTypes];
+			};
+			struct DataSlots
+			{
+				QList<QByteArray> id[(int)NofDataSignalTypes];
+			};
+			friend class WidgetVisitorStackElement;
+			friend class WidgetVisitor;
+			typedef QPair< QByteArray,QByteArray> LinkDef;
+			typedef QPair< QByteArray,QByteArray> Assignment;
+
+			QWidget* m_widget;							//< widget reference
+			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
+			QList<LinkDef> m_links;							//< symbolic links to other objects
+			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
+			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
+			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
+			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
+			int m_synonym_entercnt;							//< counter for how many stack elements to pop on a leave (for multipart synonyms)
+			int m_internal_entercnt;						//< counter for calling State::leave() before removing stack elements
+		};
+		typedef QSharedPointer<State> StateR;
+
 	public:
 		///\brief Default constructor
 		WidgetVisitor(){}
@@ -129,6 +220,9 @@ class WidgetVisitor
 		///\param[in] o object to copy
 		WidgetVisitor( const WidgetVisitor& o)
 			:m_stk(o.m_stk){}
+
+		///\brief Constructor by state
+		explicit WidgetVisitor( const StateR& state);
 
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name, bool writemode);
@@ -206,89 +300,6 @@ class WidgetVisitor
 			QVariant m_value;
 		};
 
-		///\enum DataSignalType
-		///\brief Data signal type
-		enum DataSignalType
-		{
-			OnLoad,
-			DomainChange
-		};
-		enum {NofDataSignalTypes=(int)DomainChange+1};
-
-		///\class State
-		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
-		struct State
-		{
-			///\brief Constructor
-			explicit State( QWidget* widget_);
-
-			///\brief Copy constructor
-			State( const State& o);
-
-			///\brief Destructor
-			virtual ~State(){}
-
-		public://Interface methods implemented for different widget types:
-			///\brief Clear contents of the widget
-			virtual void clear(){}
-			///\brief Switch to a substructure context inside the widget but not to a child widget
-			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
-			///\brief Leave the current substructure context an switch to ist (enter) ancessor
-			virtual bool leave( bool /*writemode*/)					{return false;}
-			///\brief Get a property or set of properties of the current substructure context addressed by name
-			virtual QVariant property( const QByteArray&)				{return QVariant();}
-			///\brief Set a property of the current substructure context addressed by name
-			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
-			///\brief Get all dataelements readable in the current substructure context
-			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
-			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
-			virtual QList<QWidget*> datachildren() const				{return m_widget->findChildren<QWidget*>();}
-			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
-			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
-			///\brief Restore the widget state from a variable
-			virtual void setState( const QVariant& /*state*/){}
-			///\brief Get the current the widget state
-			virtual QVariant getState()						{return QVariant();}
-
-		public://Common methods:
-			const QByteArray& getSynonym( const QByteArray& name) const;
-			QByteArray getLink( const QByteArray& name) const;
-			QVariant dynamicProperty( const QByteArray& name) const;
-			bool setDynamicProperty( const QByteArray&, const QVariant& value);
-
-		protected:
-			///\class DataElements
-			///\brief Constructor helper for State::dataelements()
-			struct DataElements :public QList<QByteArray>
-			{
-				DataElements( const char* initializer, ...);			//< constructor from 0 terminated vararg initializer list
-			};
-
-		private:
-			struct DataSignals
-			{
-				QList<QByteArray> id[(int)NofDataSignalTypes];
-			};
-			struct DataSlots
-			{
-				QList<QByteArray> id[(int)NofDataSignalTypes];
-			};
-			friend class WidgetVisitorStackElement;
-			friend class WidgetVisitor;
-			typedef QPair< QByteArray,QByteArray> LinkDef;
-			typedef QPair< QByteArray,QByteArray> Assignment;
-
-			QWidget* m_widget;							//< widget reference
-			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
-			QList<LinkDef> m_links;							//< symbolic links to other objects
-			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
-			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
-			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
-			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
-			int m_synonym_entercnt;							//< counter for how many stack elements to pop on a leave (for multipart synonyms)
-			int m_internal_entercnt;						//< counter for calling State::leave() before removing stack elements
-		};
-		typedef QSharedPointer<State> StateR;
 
 		///\brief Get a serialization of all visible widget elements in the current state
 		QList<Element> elements();
@@ -365,9 +376,7 @@ class WidgetVisitor
 		QList<Element> elements( const QList<QByteArray>* selected_dataelements);
 
 		///\brief Constructor internal
-		WidgetVisitor( const StateR& state);
-		///\brief Constructor internal
-		WidgetVisitor( const QStack<StateR>& stk_);
+		explicit WidgetVisitor( const QStack<StateR>& stk_);
 
 		void ERROR( const char* msg, const QString& arg=QString()) const;
 		void ERROR( const char* msg, const QByteArray& arg) const;

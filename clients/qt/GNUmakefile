@@ -81,10 +81,12 @@ CPP_OBJS = \
 	moc_WolframeClient.o \
 	WolframeClientProtocol.o \
 	WolframeClientProtocolBase.o \
-	$(VISITOR_OBJS) \
 	WidgetVisitor.o \
+	WidgetListener.o \
+	moc_WidgetListener.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
+	$(VISITOR_OBJS) \
 	FormCall.o \
 	FormWidget.o \
 	moc_FormWidget.o \
@@ -127,6 +129,9 @@ moc_DataLoader.cpp: DataLoader.hpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
+
+moc_WidgetListener.cpp: WidgetListener.hpp
+	$(QT_MOC) $(MOC_FLAGS) WidgetListener.hpp -o moc_WidgetListener.cpp
 
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp

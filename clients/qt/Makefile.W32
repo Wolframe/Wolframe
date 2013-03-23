@@ -95,9 +95,10 @@ OBJS = \
 	WolframeClientProtocol.obj \
 	WolframeClientProtocolBase.obj \
 	WidgetVisitor.obj \
-	$(VISITOR_OBJS) \
+	WidgetListener.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
+	$(VISITOR_OBJS) \
 	FormCall.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \

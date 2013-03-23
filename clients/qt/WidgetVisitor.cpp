@@ -127,7 +127,11 @@ WidgetVisitor::State::State( QWidget* widget_)
 				{
 					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
 				}
-				if (prop == "datasignal:domainload")
+				else if (prop == "datasignal:onchange")
+				{
+					m_datasignals.id[(int)WidgetVisitor::OnChange].push_back( value.toByteArray());
+				}
+				else if (prop == "datasignal:domainload")
 				{
 					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
 				}
@@ -143,7 +147,11 @@ WidgetVisitor::State::State( QWidget* widget_)
 				{
 					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
 				}
-				if (prop == "dataslot:domainload")
+				else if (prop == "dataslot:onchange")
+				{
+					m_dataslots.id[(int)WidgetVisitor::OnChange].push_back( value.toByteArray());
+				}
+				else if (prop == "dataslot:domainload")
 				{
 					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
 				}
@@ -1111,7 +1119,7 @@ void WidgetVisitor::ERROR( const char* msg, const QByteArray& arg) const
 
 static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const QWidget* widget, const QByteArray& cond)
 {
-	static const char* ar[] = {"dataslot:onload","dataslot:domainchange"};
+	static const char* ar[] = {"dataslot:onload","dataslot:onchange","dataslot:domainchange"};
 	QVariant dataslots = widget->property( ar[(int)type]);
 	int idx;
 	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
@@ -1125,6 +1133,10 @@ static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const 
 static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
 {
 	return nodeProperty_hasDataSlot( WidgetVisitor::OnLoad, widget, cond);
+}
+static bool nodeProperty_hasDataSlot_onchange( const QWidget* widget, const QByteArray& cond)
+{
+	return nodeProperty_hasDataSlot( WidgetVisitor::OnChange, widget, cond);
 }
 static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QByteArray& cond)
 {
@@ -1151,6 +1163,9 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 			{
 				case OnLoad:
 					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_onload, receiverid));
+					break;
+				case OnChange:
+					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_onchange, receiverid));
 					break;
 				case DomainChange:
 					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_domainchange, receiverid));

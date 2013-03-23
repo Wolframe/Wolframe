@@ -246,6 +246,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		visitor.setProperty( param.first, param.second);
 		qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 	}
+// initialize the form variables given by assignments
+	visitor.readAssignments();
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
