@@ -7,7 +7,7 @@ SUBDIRS = plugins tests
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \
-	$(QT_CXXFLAGS)
+	$(QT_CXXFLAGS) -DBUILD_AS_PLUGIN
 
 INCLUDE_DIRS = \
 	-I. \
