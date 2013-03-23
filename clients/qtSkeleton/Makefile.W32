@@ -2,13 +2,14 @@ TOPDIR = ..\..
 
 # do this manually, nmake is broken!
 #SUBDIRS = plugins
-SUBDIRS = apps
+SUBDIRS = tests
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x403 \
-	/DQCOMMANDLINE_STATIC
+	/DQCOMMANDLINE_STATIC \
+	/DBUILD_AS_PLUGIN
 
 INCLUDE_DIRS = \
 	/I. /I$(TOPDIR)\clients\qt \
@@ -90,8 +91,6 @@ OBJS = \
 	moc_DataLoader.obj \
 	FileDataLoader.obj \
 	NetworkDataLoader.obj \
-	DataHandler.obj \
-	moc_DataHandler.obj \
 	WolframeClient.obj \
 	moc_WolframeClient.obj \
 	WolframeClientProtocol.obj \
@@ -157,8 +156,8 @@ i18n\qtclient.de_CH.qm: i18n\qtclient.de_CH.ts
 i18n\qtclient.ro_RO.qm: i18n\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.ro_RO.ts -qm i18n\qtclient.ro_RO.qm
 
-apps\test\resources\test.rcc: apps\test\resources\test.qrc
-	$(QT_DIR)\bin\rcc.exe -binary apps\test\resources\test.qrc -o apps\test\resources\test.rcc
+tests\resources\testcases.rcc: tests\resources\testcases.qrc
+	$(QT_DIR)\bin\rcc.exe -binary tests\resources\testcases.qrc -o tests\resources\testcases.rcc
 
 local_all: $(I18NS) $(CPP_BINS)
 
@@ -172,9 +171,6 @@ moc_FormLoader.cpp: FormLoader.hpp
 
 moc_DataLoader.cpp: DataLoader.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataLoader.hpp -o moc_DataLoader.cpp
-
-moc_DataHandler.cpp: DataHandler.hpp
-	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataHandler.hpp -o moc_DataHandler.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp
@@ -290,37 +286,26 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe i18n\MainWindow.ui -ts i18n\qtclient.ro_RO.ts
 
 # TODO: should go to Wix deployment and UI loading mechanism (for apps dir)
-zip:
-	-del qtclient.zip
-	-del /s /q C:\qtclient\*
-	-rmdir C:\qtclient\i18n
-	-rmdir C:\qtclient\apps\configurator\private
-	-rmdir C:\qtclient\apps\configurator\certs
-	-rmdir C:\qtclient\apps\configurator\data
-	-rmdir C:\qtclient\apps\configurator\i18n
-	-rmdir C:\qtclient\apps\configurator\forms
-	-rmdir C:\qtclient\apps\configurator\resources
-	-rmdir C:\qtclient\apps\configurator
-	-rmdir C:\qtclient\apps
-	-rmdir C:\qtclient\imageformats
-	-rmdir C:\qtclient
-	mkdir C:\qtclient
-	mkdir C:\qtclient\apps
-	mkdir C:\qtclient\apps\configurator
-	mkdir C:\qtclient\i18n
-	mkdir C:\qtclient\imageformats
-	copy qtclient.exe C:\qtclient
-	copy $(QT_DIR)\bin\QtCored4.dll C:\qtclient
-	copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
-	copy $(QT_DIR)\bin\QtNetworkd4.dll C:\qtclient
-	copy $(QT_DIR)\bin\QtWebkitd4.dll C:\qtclient
-	copy $(QT_DIR)\plugins\imageformats\*.dll C:\qtclient\imageformats
-	copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
-	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
-	copy plugins\wolframewidgets.dll C:\qtclient
-	xcopy /e i18n C:\qtclient\i18n
-	xcopy /e apps\configurator C:\qtclient\apps\configurator
-	copy C:\windows\system32\msvcp100d.dll C:\qtclient
-	copy C:\windows\system32\msvcr100d.dll C:\qtclient
-	cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient
-	move %TEMP%\qtclient.zip .
+#~ zip:
+	#~ -del qtclient.zip
+	#~ -del /s /q C:\qtclient\*
+	#~ -rmdir C:\qtclient\i18n
+	#~ -rmdir C:\qtclient\imageformats
+	#~ -rmdir C:\qtclient
+	#~ mkdir C:\qtclient
+	#~ mkdir C:\qtclient\i18n
+	#~ mkdir C:\qtclient\imageformats
+	#~ copy qtclient.exe C:\qtclient
+	#~ copy $(QT_DIR)\bin\QtCored4.dll C:\qtclient
+	#~ copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
+	#~ copy $(QT_DIR)\bin\QtNetworkd4.dll C:\qtclient
+	#~ copy $(QT_DIR)\bin\QtWebkitd4.dll C:\qtclient
+	#~ copy $(QT_DIR)\plugins\imageformats\*.dll C:\qtclient\imageformats
+	#~ copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
+	#~ copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
+	#~ copy plugins\wolframewidgets.dll C:\qtclient
+	#~ xcopy /e i18n C:\qtclient\i18n
+	#~ copy C:\windows\system32\msvcp100d.dll C:\qtclient
+	#~ copy C:\windows\system32\msvcr100d.dll C:\qtclient
+	#~ cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient
+	#~ move %TEMP%\qtclient.zip .

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>314</height>
+    <width>462</width>
+    <height>326</height>
    </rect>
   </property>
   <layout class="QGridLayout">
@@ -93,13 +93,6 @@
        <widget class="QCheckBox" name="saveRestoreState">
         <property name="text">
          <string>S&amp;ave and restore state, position and size of (sub)windows</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="errorsMessageBoxes">
-        <property name="text">
-         <string>&amp;Show errors as message boxes (default: in status bar)</string>
         </property>
        </widget>
       </item>

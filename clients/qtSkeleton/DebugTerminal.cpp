@@ -32,6 +32,7 @@
 ************************************************************************/
 
 #include "DebugTerminal.hpp"
+#include "connection.hpp"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -108,7 +109,7 @@ void DebugTerminal::sendComment( QString line )
 	m_output->append( line );
 	m_output->setTextColor( QColor( "black" ) );
 }
-	
+
 void DebugTerminal::lineEntered( QString line )
 {
 	if( line.toLower( ).startsWith( "connect" ) ||
@@ -116,13 +117,14 @@ void DebugTerminal::lineEntered( QString line )
 		QRegExp rx( "^s?connect\\s+([^:]+):(\\d+)$", Qt::CaseInsensitive );
 		QStringList m;
 		if( rx.indexIn( line ) != -1 ) {
-			QString host = rx.cap( 1 );
-			unsigned short port = rx.cap( 2 ).toUShort( );
-			//~ m_wolframeClient->setHost( host );
-			//~ m_wolframeClient->setPort( port );
+			ConnectionParameters connParams;
+			connParams.name = "debug";
+			connParams.host = rx.cap( 1 );
+			connParams.port = rx.cap( 2 ).toUShort( );
 //~ #ifdef WITH_SSL
 			//~ m_wolframeClient->setSecure( line.toLower( ).startsWith( "sconnect" ) );
 //~ #endif
+			m_wolframeClient->setConnectionParameters( connParams );
 			m_wolframeClient->connect( );
 		} else {
 			m_output->setTextColor( QColor( "red" ) );
@@ -141,7 +143,10 @@ void DebugTerminal::lineEntered( QString line )
 		m_output->append( "QUIT - terminate connection to Wolframe server" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else {
-		m_wolframeClient->sendLine( line );
+		//[+]m_wolframeClient->sendLine( line );
+		//PF:NOTE: sending single lines is a bad idea because the protocol
+		//state machine cat only exist as one instance. We have to discuss
+		//what we provide in the debug window
 	}
 }
 
