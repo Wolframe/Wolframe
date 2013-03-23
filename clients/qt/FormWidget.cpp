@@ -108,6 +108,9 @@ void FormWidget::switchForm( QWidget *actionwidget )
 		}
 	}
 
+	// ABa, TODO: this is wrong, we should wait for error or answer, after
+	// that we switch the form on ok, not on error..
+	
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
 	visitor.do_closeInititalizations();
