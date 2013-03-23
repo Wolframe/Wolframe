@@ -52,6 +52,4 @@ QList<QDesignerCustomWidgetInterface *> WolframeWidgets::customWidgets( ) const
 	return m_plugins;
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 Q_EXPORT_PLUGIN2( wolframewidgets, WolframeWidgets )
-#endif
