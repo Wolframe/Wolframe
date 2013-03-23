@@ -568,7 +568,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QString nam
 	loadFormDomains( form_name, form, widget, name );
 }
 
-void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name )
+void DataHandler::loadFormDomains( QString form_name, QWidget * /*form*/, QWidget *widget, QString name )
 {
 	QString clazz = widget->metaObject( )->className( ); 
 	
