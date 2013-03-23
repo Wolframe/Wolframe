@@ -87,6 +87,8 @@ class WolframeClient : public QObject
 		WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent = 0 );
 		virtual ~WolframeClient( );
 
+		void setConnectionParameters( const ConnectionParameters _connParams );
+
 // low-level commands, pre-protocol, for debugging mainly
 		void connect();
 		void disconnect();
