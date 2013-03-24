@@ -42,13 +42,13 @@ class WidgetVisitorState_QCheckBox
 public:
 	WidgetVisitorState_QCheckBox( QWidget* widget_);
 
-	virtual bool enter( const QByteArray& name, bool writemode);
+	virtual bool enter( const QString& name, bool writemode);
 	virtual bool leave( bool writemode);
 	virtual void clear();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
+	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 

@@ -84,9 +84,9 @@ bool WolframeClientProtocol::sendRequestContent()
 	return true;
 }
 
-QByteArray WolframeClientProtocol::nextAnswerTag()
+QString WolframeClientProtocol::nextAnswerTag()
 {
-	QByteArray rt = m_requesttagqueue.head();
+	QString rt = m_requesttagqueue.head();
 	m_requesttagqueue.dequeue();
 	return rt;
 }
@@ -363,17 +363,17 @@ bool WolframeClientProtocol::process()
 	}
 }
 
-bool WolframeClientProtocol::hasPendingRequest( const QByteArray& tag)
+bool WolframeClientProtocol::hasPendingRequest( const QString& tag)
 {
-	typedef QPair<QByteArray,QByteArray> Request;
-	foreach (const QByteArray& rq, m_requesttagqueue) if (rq == tag) return true;
+	typedef QPair<QString,QByteArray> Request;
+	foreach (const QString& rq, m_requesttagqueue) if (rq == tag) return true;
 	foreach (const Request& rq, m_requestqueue) if (rq.first == tag) return true;
 	foreach (const Request& rq, m_errorqueue) if (rq.first == tag) return true;
 	foreach (const Request& rq, m_answerqueue) if (rq.first == tag) return true;
 	return false;
 }
 
-void WolframeClientProtocol::pushRequest( const QByteArray& tag, const QByteArray& content)
+void WolframeClientProtocol::pushRequest( const QString& tag, const QByteArray& content)
 {
 	if (hasPendingRequest( tag))
 	{
@@ -392,7 +392,7 @@ bool WolframeClientProtocol::getAnswerSuccess() const
 	return m_errorqueue.isEmpty();
 }
 
-const QByteArray* WolframeClientProtocol::getAnswerTag() const
+const QString* WolframeClientProtocol::getAnswerTag() const
 {
 	if (m_errorqueue.isEmpty())
 	{

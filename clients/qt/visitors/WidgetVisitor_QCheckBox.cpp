@@ -7,7 +7,7 @@ WidgetVisitorState_QCheckBox::WidgetVisitorState_QCheckBox( QWidget* widget_)
 {
 }
 
-bool WidgetVisitorState_QCheckBox::enter( const QByteArray& /*name*/, bool /*writemode*/)
+bool WidgetVisitorState_QCheckBox::enter( const QString& /*name*/, bool /*writemode*/)
 {
 	return false;
 }
@@ -22,7 +22,7 @@ void WidgetVisitorState_QCheckBox::clear()
 	m_checkBox->setChecked( false);
 }
 
-QVariant WidgetVisitorState_QCheckBox::property( const QByteArray& name)
+QVariant WidgetVisitorState_QCheckBox::property( const QString& name)
 {
 	if (name.isEmpty())
 	{
@@ -31,7 +31,7 @@ QVariant WidgetVisitorState_QCheckBox::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QCheckBox::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QCheckBox::setProperty( const QString& name, const QVariant& data)
 {
 	if (name.isEmpty())
 	{
@@ -40,13 +40,13 @@ bool WidgetVisitorState_QCheckBox::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QCheckBox::dataelements() const
+const QList<QString>& WidgetVisitorState_QCheckBox::dataelements() const
 {
 	static const DataElements dataElements( "");
 	return dataElements;
 }
 
-bool WidgetVisitorState_QCheckBox::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_QCheckBox::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

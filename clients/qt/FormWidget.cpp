@@ -68,10 +68,10 @@ void FormWidget::initialize( )
 		this, SLOT( formListLoaded( QStringList ) ) );
 
 // link the data loader to our form widget
-	connect( m_dataLoader, SIGNAL( answer( const QByteArray&, const QByteArray& ) ),
-		this, SLOT( gotAnswer( const QByteArray&, const QByteArray& ) ) );
-	connect( m_dataLoader, SIGNAL( error( const QByteArray&, const QByteArray& ) ),
-		this, SLOT( gotError( const QByteArray&, const QByteArray& ) ) );
+	connect( m_dataLoader, SIGNAL( answer( const QString&, const QByteArray& ) ),
+		this, SLOT( gotAnswer( const QString&, const QByteArray& ) ) );
+	connect( m_dataLoader, SIGNAL( error( const QString&, const QByteArray& ) ),
+		this, SLOT( gotError( const QString&, const QByteArray& ) ) );
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
@@ -243,7 +243,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	WidgetVisitor visitor( m_ui);
 	foreach (const FormCall::Parameter& param, formCall.parameter())
 	{
-		visitor.setProperty( param.first, param.second);
+		visitor.setProperty( QString( param.first), param.second);
 		qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 	}
 // initialize the form variables given by assignments
@@ -297,16 +297,14 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 		
-void FormWidget::gotAnswer( const QByteArray& tag_, const QByteArray& data_)
+void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
-	QByteArray actiontag = WidgetMessageDispatcher::getActionId( tag_);
-
 	WidgetMessageDispatcher dispatcher( m_ui);
 	dispatcher.feedResult( tag_, data_);
 }
 
-void FormWidget::gotError( const QByteArray& tag_, const QByteArray& data_)
+void FormWidget::gotError( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got error tag=" << tag_ << "data=" << data_;
 	emit error( QString( data_));

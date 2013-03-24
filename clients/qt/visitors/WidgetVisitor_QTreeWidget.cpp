@@ -41,7 +41,7 @@ WidgetVisitorState_QTreeWidget::WidgetVisitorState_QTreeWidget( QWidget* widget_
 {
 	QTreeWidgetItem* header = m_treeWidget->headerItem();
 	for( int ii = 0; ii < header->columnCount(); ii++) {
-		QByteArray headerText = header->data( ii, Qt::DisplayRole).toByteArray();
+		QString headerText = header->data( ii, Qt::DisplayRole).toByteArray();
 		m_headers << headerText;
 	}
 	if (m_elementname.isEmpty())
@@ -65,9 +65,9 @@ void WidgetVisitorState_QTreeWidget::clear()
 	m_stk.push_back( StackElement( m_treeWidget->invisibleRootItem()));
 }
 
-bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemode)
+bool WidgetVisitorState_QTreeWidget::enter( const QString& name, bool writemode)
 {
-	if (m_mode != List && strcmp( name, "item") == 0)
+	if (m_mode != List && name == "item")
 	{
 		m_mode = Tree;
 		if (writemode)
@@ -106,16 +106,16 @@ bool WidgetVisitorState_QTreeWidget::leave( bool /*writemode*/)
 	return true;
 }
 
-bool WidgetVisitorState_QTreeWidget::isRepeatingDataElement( const QByteArray& name)
+bool WidgetVisitorState_QTreeWidget::isRepeatingDataElement( const QString& name)
 {
 	if (m_mode != List && name == "item") return true;
 	if (m_mode != Tree && name == m_elementname) return true;
 	return false;
 }
 
-QVariant WidgetVisitorState_QTreeWidget::property( const QByteArray& name)
+QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 {
-	if (strcmp( name,"selected") == 0)
+	if (name == "selected")
 	{
 		if (m_treeWidget->selectionMode() == QAbstractItemView::SingleSelection)
 		{
@@ -140,14 +140,14 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QByteArray& name)
 	{
 		return QVariant( m_stk.top().item->text( col));
 	}
-	if (strcmp( name,"id") == 0)
+	if (name == "id")
 	{
 		return m_stk.top().item->data( 0, Qt::UserRole);
 	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QTreeWidget::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVariant& data)
 {
 	if (m_stk.isEmpty()) return false;
 	int col = m_headers.indexOf( name);
@@ -156,7 +156,7 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QByteArray& name, const 
 		m_stk.top().item->setText( col, data.toString());
 		return true;
 	}
-	if (strcmp( name,"id") == 0)
+	if (name == "id")
 	{
 		m_stk.top().item->setData( 0, Qt::UserRole, data);
 		return true;
@@ -164,9 +164,9 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QByteArray& name, const 
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QTreeWidget::dataelements() const
+const QList<QString>& WidgetVisitorState_QTreeWidget::dataelements() const
 {
-	static const QList<QByteArray> noDataElements;
+	static const QList<QString> noDataElements;
 	switch (m_mode)
 	{
 		case Init: return m_dataelements_init;

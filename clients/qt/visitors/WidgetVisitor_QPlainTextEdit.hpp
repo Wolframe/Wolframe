@@ -43,9 +43,9 @@ public:
 	WidgetVisitorState_QPlainTextEdit( QWidget* widget_);
 
 	virtual void clear();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 

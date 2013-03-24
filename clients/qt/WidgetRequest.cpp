@@ -44,22 +44,22 @@
 #define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
 #endif
 
-static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QByteArray* cmdname=0)
+static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QString* cmdname=0)
 {
 	QVariant prop;
 	QString docType,rootElement;
 	bool isStandalone = true;
-	QList<QByteArray> selectedDataElements;
+	QList<QString> selectedDataElements;
 	bool hasSelectedDataElements = false;
 
-	foreach (const QByteArray& ee, visitor.property( "dataelement").toByteArray().trimmed().split( ','))
+	foreach (const QString& ee, visitor.property( "dataelement").toString().trimmed().split( ','))
 	{
-		QByteArray elem = ee.trimmed();
+		QString elem = ee.trimmed();
 		if (!elem.isEmpty())
 		{
-			if (elem[0] == '_')
+			if (elem[0] == '_' && elem.size() == 1)
 			{
-				selectedDataElements.push_back( QByteArray());
+				selectedDataElements.push_back( QString());
 			}
 			else
 			{
@@ -88,12 +88,12 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QBy
 	}
 	if (cmdname)
 	{
-		*cmdname = docType.toAscii();
+		*cmdname = docType;
 	}
 	QVariant dataobjectname = visitor.property( "dataobject");
-	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toByteArray(), false))
+	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toString(), false))
 	{
-		qCritical() << "action dataobject does not address a known widget:" << dataobjectname.toByteArray();
+		qCritical() << "action dataobject does not address a known widget:" << dataobjectname.toString();
 		return QByteArray();
 	}
 	QByteArray rt;
@@ -173,9 +173,9 @@ ERROR:
 	return QByteArray();
 }
 
-QPair<QByteArray,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
+QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	QPair<QByteArray,QByteArray> rt;
+	QPair<QString,QByteArray> rt;
 	rt.second = getWigdetRequest_( visitor, debugmode, &rt.first);
 	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
 	return rt;
@@ -190,13 +190,13 @@ QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode)
 
 struct WidgetAnswerStackElement
 {
-	QByteArray name;
+	QString name;
 	QString tok;
 	bool istag;
 	bool ischild;
 
 	explicit WidgetAnswerStackElement( const QXmlStreamReader& xml, bool istag_, bool ischild_)
-		:name(xml.name().toString().toAscii())
+		:name(xml.name().toString())
 		,tok()
 		,istag(istag_)
 		,ischild(ischild_)
@@ -304,7 +304,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			if (stk.last().istag)
 			{
 				TRACE_VALUE( "CONTENT", stk.last().tok);
-				if (!tokIsEmpty && !visitor.setProperty( QByteArray(""), stk.last().tok))
+				if (!tokIsEmpty && !visitor.setProperty( "", stk.last().tok))
 				{
 					XMLERROR( xml, stk, "failed to set content element");
 				}

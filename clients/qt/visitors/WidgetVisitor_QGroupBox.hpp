@@ -42,19 +42,19 @@ class WidgetVisitorState_QGroupBox
 public:
 	WidgetVisitorState_QGroupBox( QWidget* widget_);
 
-	virtual bool enter( const QByteArray& name, bool writemode);
+	virtual bool enter( const QString& name, bool writemode);
 	virtual bool leave( bool writemode);
 	virtual void clear();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
 	virtual QList<QWidget*> datachildren() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 
 private:
-	bool setChecked( const QByteArray& name);
+	bool setChecked( const QString& name);
 	void setAllUnchecked();
 	QList<QVariant> checkedList() const;
 
@@ -62,7 +62,7 @@ private:
 	QGroupBox* m_groupBox;
 	enum Mode {Init,Selected};
 	Mode m_mode;
-	QHash<QByteArray,QWidget*> m_childmap;
+	QHash<QString,QWidget*> m_childmap;
 };
 
 #endif

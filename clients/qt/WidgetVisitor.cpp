@@ -37,7 +37,6 @@
 #include "PictureChooser.hpp"
 
 #include <QDebug>
-#include <QByteArray>
 #include <QXmlStreamWriter>
 #include <QLineEdit>
 #include <QComboBox>
@@ -72,14 +71,6 @@ static bool isConvertibleToInt( const QVariant& val)
 		for (; vi != ve; ++vi) if (*vi < '0' || *vi > '9') return false;
 		return true;
 	}
-	if (val.type() == QVariant::ByteArray)
-	{
-		QByteArray val_ = val.toByteArray();
-		QByteArray::const_iterator vi = val_.begin(), ve = val_.end();
-		if (*vi == '-') ++vi;
-		for (; vi != ve; ++vi) if (*vi < '0' || *vi > '9') return false;
-		return true;
-	}
 	if (val.type() == QVariant::Int) return true;
 	if (val.type() == QVariant::UInt) return true;
 	return false;
@@ -101,39 +92,39 @@ WidgetVisitor::State::State( QWidget* widget_)
 	,m_synonym_entercnt(1)
 	,m_internal_entercnt(0)
 {
-	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
+	foreach (const QString& prop, m_widget->dynamicPropertyNames())
 	{
 		if (prop.indexOf(':') >= 0)
 		{
 			if (prop.startsWith( "synonym:"))
 			{
-				QVariant synonym = m_widget->property( prop);
-				m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
+				QVariant synonym = m_widget->property( prop.toAscii());
+				m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toString());
 			}
 			else if (prop.startsWith( "link:"))
 			{
-				QVariant link = m_widget->property( prop);
-				m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toByteArray()));
+				QVariant link = m_widget->property( prop.toAscii());
+				m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toString()));
 			}
 			else if (prop.startsWith( "assign:"))
 			{
-				QVariant value = m_widget->property( prop);
-				m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toByteArray()));
+				QVariant value = m_widget->property( prop.toAscii());
+				m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toString()));
 			}
 			else if (prop.startsWith( "datasignal:"))
 			{
-				QVariant value = m_widget->property( prop);
+				QVariant value = m_widget->property( prop.toAscii());
 				if (prop == "datasignal:onload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
+					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
 				}
 				else if (prop == "datasignal:onchange")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnChange].push_back( value.toByteArray());
+					m_datasignals.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
 				}
 				else if (prop == "datasignal:domainload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
+					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
 				}
 				else
 				{
@@ -142,18 +133,18 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "dataslot:"))
 			{
-				QVariant value = m_widget->property( prop);
+				QVariant value = m_widget->property( prop.toAscii());
 				if (prop == "dataslot:onload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toByteArray());
+					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
 				}
 				else if (prop == "dataslot:onchange")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnChange].push_back( value.toByteArray());
+					m_dataslots.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
 				}
 				else if (prop == "dataslot:domainload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toByteArray());
+					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
 				}
 				else
 				{
@@ -163,48 +154,48 @@ WidgetVisitor::State::State( QWidget* widget_)
 		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
-			m_dynamicProperties.insert( prop, m_widget->property( prop));
+			m_dynamicProperties.insert( prop, m_widget->property( prop.toAscii()));
 		}
 	}
 	static qint64 g_cnt = 0;
 	QVariant ruid = m_widget->property( "widgetid");
 	if (!ruid.isValid())
 	{
-		QByteArray rt =  m_widget->objectName().toAscii();
+		QString rt =  m_widget->objectName();
 		rt.append( ":");
-		rt.append( QVariant( ++g_cnt).toByteArray());
+		rt.append( QVariant( ++g_cnt).toString());
 		m_widget->setProperty( "widgetid", QVariant(rt));
 	}
 }
 
-bool WidgetVisitor::is_widgetid( const QByteArray& id)
+bool WidgetVisitor::is_widgetid( const QString& id)
 {
 	return id.indexOf(':') >= 0;
 }
 
-QVariant WidgetVisitor::State::dynamicProperty( const QByteArray& name) const
+QVariant WidgetVisitor::State::dynamicProperty( const QString& name) const
 {
-	QHash<QByteArray,QVariant>::const_iterator di = m_dynamicProperties.find( name);
+	QHash<QString,QVariant>::const_iterator di = m_dynamicProperties.find( name);
 	if (di == m_dynamicProperties.end()) return QVariant();
 	return di.value();
 }
 
-bool WidgetVisitor::State::setDynamicProperty( const QByteArray& name, const QVariant& value)
+bool WidgetVisitor::State::setDynamicProperty( const QString& name, const QVariant& value)
 {
 	m_dynamicProperties.insert( name, value);
-	m_widget->setProperty( name, value);
+	m_widget->setProperty( name.toAscii(), value);
 	return true;
 }
 
-const QByteArray& WidgetVisitor::State::getSynonym( const QByteArray& name) const
+const QString& WidgetVisitor::State::getSynonym( const QString& name) const
 {
-	static const QByteArray empty;
-	QHash<QByteArray,QByteArray>::const_iterator syi = m_synonyms.find( name);
+	static const QString empty;
+	QHash<QString,QString>::const_iterator syi = m_synonyms.find( name);
 	if (syi == m_synonyms.end()) return empty;
 	return syi.value();
 }
 
-QByteArray WidgetVisitor::State::getLink( const QByteArray& name) const
+QString WidgetVisitor::State::getLink( const QString& name) const
 {
 	int ii = 0, nn = m_links.size();
 	for (; ii<nn; ++ii)
@@ -214,7 +205,7 @@ QByteArray WidgetVisitor::State::getLink( const QByteArray& name) const
 			return m_links.at( ii).second;
 		}
 	}
-	return QByteArray();
+	return QString();
 }
 
 WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
@@ -246,15 +237,10 @@ WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_)
 
 bool WidgetVisitor::enter( const QString& name, bool writemode)
 {
-	return enter( name.toAscii(), writemode, 0);
-}
-
-bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
-{
 	return enter( name, writemode, 0);
 }
 
-bool WidgetVisitor::enter_root( const QByteArray& name)
+bool WidgetVisitor::enter_root( const QString& name)
 {
 	if (m_stk.empty()) return false;
 	QWidget* ww = predecessor( name);
@@ -266,12 +252,12 @@ bool WidgetVisitor::enter_root( const QByteArray& name)
 	return false;
 }
 
-bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
+bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 {
 	if (m_stk.empty()) return false;
 
 	// [A] check if name is a synonym and follow it if yes:
-	QByteArray synonym = m_stk.top()->getSynonym( name);
+	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
 		int followidx = synonym.indexOf( '.');
@@ -279,8 +265,8 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 		{
 			// ... the referenced item is a multipart reference so it gets complicated
 			int entercnt = 0;
-			QByteArray prefix( synonym.mid( 0, followidx));
-			QByteArray rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
+			QString prefix( synonym.mid( 0, followidx));
+			QString rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
 			do
 			{
 				if (!enter( prefix, writemode, level+entercnt))
@@ -320,7 +306,7 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode, int level)
 	if (m_stk.top()->m_internal_entercnt == 0)
 	{
 		// [C] check if name refers to a symbolic link and follow the link if yes:
-		QByteArray lnk = m_stk.top()->getLink( name);
+		QString lnk = m_stk.top()->getLink( name);
 		if (!lnk.isEmpty())
 		{
 			QWidget* lnkwdg = resolveLink( lnk);
@@ -377,8 +363,7 @@ void WidgetVisitor::leave( bool writemode)
 	}
 }
 
-template <class StringType>
-static void append_escaped_( StringType& dest, const StringType& value)
+static void append_escaped_( QString& dest, const QString& value)
 {
 	if (value.indexOf('\'') >= 0 || value.indexOf(',') >= 0 || value.indexOf('&') >= 0)
 	{
@@ -404,18 +389,12 @@ static void append_escaped( QString& dest, const QVariant& value)
 	append_escaped_( dest, value.toString());
 }
 
-static void append_escaped( QByteArray& dest, const QVariant& value)
-{
-	append_escaped_( dest, value.toByteArray());
-}
-
-template <class StringType>
-static QVariant expand_variable_references( WidgetVisitor& visitor, const StringType& value)
+static QVariant expand_variable_references( WidgetVisitor& visitor, const QString& value)
 {
 	int startidx = 0;
 	int substidx = value.indexOf( '{');
 	int endidx = value.indexOf( '}', substidx);
-	StringType rt;
+	QString rt;
 	if (substidx == 0 && endidx == value.size()-1)
 	{
 		return visitor.property( value.mid( substidx+1, endidx-substidx-1));
@@ -464,26 +443,15 @@ static QVariant expand_variable_references( WidgetVisitor& visitor, const String
 
 QVariant WidgetVisitor::resolve( const QVariant& value)
 {
-	if (value.type() == QVariant::String)
+	QString valuestr = value.toString();
+	if (valuestr.indexOf( '{') >= 0)
 	{
-		QString valuestr = value.toString();
-		if (valuestr.indexOf( '{') >= 0)
-		{
-			return expand_variable_references( *this, valuestr);
-		}
-	}
-	else if (value.type() == QVariant::ByteArray)
-	{
-		QByteArray valuestr = value.toByteArray();
-		if (valuestr.indexOf( '{') >= 0)
-		{
-			return expand_variable_references( *this, valuestr);
-		}
+		return expand_variable_references( *this, valuestr);
 	}
 	return value;
 }
 
-QWidget* WidgetVisitor::predecessor( const QByteArray& name) const
+QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
 	QWidget* wdg = m_stk.at(0)->m_widget;
@@ -516,13 +484,13 @@ QWidget* WidgetVisitor::uirootwidget() const
 	return wdg;
 }
 
-static bool nodeProperty_hasWidgetId( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasWidgetId( const QWidget* widget, const QVariant& cond)
 {
 	QVariant requestid = widget->property( "widgetid");
-	return (requestid.isValid() && requestid.toByteArray() == cond);
+	return (requestid.isValid() && requestid == cond);
 }
 
-QWidget* WidgetVisitor::resolveLink( const QByteArray& link)
+QWidget* WidgetVisitor::resolveLink( const QString& link)
 {
 	QWidget* wdg = uirootwidget();
 	if (!wdg) return 0;
@@ -595,21 +563,21 @@ void WidgetVisitor::writeAssignments()
 	}
 }
 
-QVariant WidgetVisitor::property( const char* name)
-{
-	return property( QByteArray( name));
-}
-
 QVariant WidgetVisitor::property( const QString& name)
 {
-	return property( name.toAscii());
+	return property( name, 0);
 }
 
-QVariant WidgetVisitor::property( const QByteArray& name, int level)
+QVariant WidgetVisitor::property( const char* name)
+{
+	return property( QString( name), 0);
+}
+
+QVariant WidgetVisitor::property( const QString& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 	// [A] check if a synonym is referenced and redirect to evaluate synonym value instead if yes
-	QByteArray synonym = m_stk.top()->getSynonym( name);
+	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
 		return property( synonym, level);
@@ -624,8 +592,8 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 
 	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
 	bool subelem = false;
-	QByteArray prefix;
-	QByteArray rest;
+	QString prefix;
+	QString rest;
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
@@ -680,46 +648,46 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 }
 
 
-QByteArray WidgetVisitor::objectName() const
+QString WidgetVisitor::objectName() const
 {
-	if (m_stk.isEmpty()) return QByteArray();
-	return m_stk.top()->m_widget->objectName().toAscii();
+	if (m_stk.isEmpty()) return QString();
+	return m_stk.top()->m_widget->objectName();
 }
 
-QByteArray WidgetVisitor::className() const
+QString WidgetVisitor::className() const
 {
-	if (m_stk.isEmpty()) return QByteArray();
+	if (m_stk.isEmpty()) return QString();
 	return m_stk.top()->m_widget->metaObject()->className();
 }
 
-QByteArray WidgetVisitor::widgetid() const
+QString WidgetVisitor::widgetid() const
 {
-	if (m_stk.isEmpty()) return QByteArray();
+	if (m_stk.isEmpty()) return QString();
 	QVariant ruid = m_stk.top()->m_widget->property( "widgetid");
-	if (ruid.type() != QVariant::ByteArray)
+	if (ruid.type() != QVariant::String)
 	{
 		ERROR( "property 'widgetid' missing in state");
 		return objectName();
 	}
-	return ruid.toByteArray();
+	return ruid.toString();
 }
 
-QVariant WidgetVisitor::property( const QByteArray& name)
+bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
 {
-	return property( name, 0);
+	return setProperty( name, value, 0);
 }
 
 bool WidgetVisitor::setProperty( const char* name, const QVariant& value)
 {
-	return setProperty( QByteArray(name), value);
+	return setProperty( QString(name), value, 0);
 }
 
-bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
+bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int level)
 {
 	if (m_stk.empty()) return false;
 
 	// [A] check if a synonym is referenced and redirect set the synonym value instead if yes
-	QByteArray synonym = m_stk.top()->getSynonym( name);
+	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
 		return setProperty( synonym, value, level);
@@ -730,8 +698,8 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 
 	// [C] check if an multipart property is referenced and try to step into the substructures to set the property (must a single value and must not have any repeating elements) if yes
 	bool subelem = false;
-	QByteArray prefix;
-	QByteArray rest;
+	QString prefix;
+	QString rest;
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
@@ -774,7 +742,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	return false;
 }
 
-QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QByteArray& cond) const
+QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QVariant& cond) const
 {
 	QList<QWidget*> rt;
 	if (m_stk.isEmpty()) return rt;
@@ -800,17 +768,7 @@ QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QByteArray
 	return rt;
 }
 
-bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
-{
-	return setProperty( name.toAscii(), value, 0);
-}
-
-bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
-{
-	return setProperty( name, value, 0);
-}
-
-static bool isReservedProperty( const QByteArray& key)
+static bool isReservedProperty( const QString& key)
 {
 	// skip dynamic properties used by the Qt stylesheet engine:
 	if (key.startsWith( "_q_")) return true;
@@ -839,7 +797,7 @@ static bool isReservedProperty( const QByteArray& key)
 
 struct WidgetVisitorStackElement
 {
-	QList<QByteArray> dataelements;
+	QList<QString> dataelements;
 	int nof_attributes;
 	int dataelementidx;
 	bool isContent;
@@ -853,7 +811,7 @@ struct WidgetVisitorStackElement
 		,hasSelectedDataelements(false)
 		,level(0)
 	{}
-	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QByteArray>* selectedDataElements, int level_=0)
+	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QString>* selectedDataElements, int level_=0)
 		:nof_attributes(0)
 		,dataelementidx(0)
 		,isContent(false)
@@ -862,7 +820,7 @@ struct WidgetVisitorStackElement
 	{
 		if (!selectedDataElements)
 		{
-			foreach (const QByteArray& prop, state->m_widget->dynamicPropertyNames())
+			foreach (const QString& prop, state->m_widget->dynamicPropertyNames())
 			{
 				if (!isReservedProperty( prop))
 				{
@@ -875,7 +833,7 @@ struct WidgetVisitorStackElement
 				if (qobject_cast<const QLabel*>(child)) continue;
 				if (qobject_cast<const QAbstractButton*>(child)) continue;
 				if (qobject_cast<const QLayout*>(child)) continue;
-				QByteArray objname = child->objectName().toAscii();
+				QString objname = child->objectName();
 				if (!objname.isEmpty() && !objname.startsWith("qt_"))
 				{
 					dataelements << objname;
@@ -884,7 +842,7 @@ struct WidgetVisitorStackElement
 		}
 		else
 		{
-			foreach (const QByteArray& elem, *selectedDataElements)
+			foreach (const QString& elem, *selectedDataElements)
 			{
 				if (elem.size() > 0 && elem[0] == '@')
 				{
@@ -892,7 +850,7 @@ struct WidgetVisitorStackElement
 				}
 			}
 			nof_attributes = dataelements.size();
-			foreach (const QByteArray& elem, *selectedDataElements)
+			foreach (const QString& elem, *selectedDataElements)
 			{
 				if (elem.size() == 0 || elem[0] != '@')
 				{
@@ -910,7 +868,7 @@ struct WidgetVisitorStackElement
 	{}
 };
 
-QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>& selectedDataElements)
+QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>& selectedDataElements)
 {
 	return elements( &selectedDataElements);
 }
@@ -920,10 +878,10 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 	return elements( 0);
 }
 
-static QList<QByteArray> getSuffixDataElements( const QList<QByteArray>& ba, const QByteArray& prefix)
+static QList<QString> getSuffixDataElements( const QList<QString>& ba, const QString& prefix)
 {
-	QList<QByteArray> rt;
-	foreach (const QByteArray& de, ba)
+	QList<QString> rt;
+	foreach (const QString& de, ba)
 	{
 		if (de.startsWith( prefix) && de.size() > prefix.size() && de.at( prefix.size()) == '.')
 		{
@@ -933,7 +891,7 @@ static QList<QByteArray> getSuffixDataElements( const QList<QByteArray>& ba, con
 	return rt;
 }
 
-QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* selectedDataElements)
+QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* selectedDataElements)
 {
 	if (m_stk.isEmpty()) return QList<WidgetVisitor::Element>();
 
@@ -945,7 +903,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 	{
 		if (elemstk.top().dataelements.size() > elemstk.top().dataelementidx)
 		{
-			const QByteArray& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
+			const QString& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
 
 			/* [1] Handling explicit attribute selection: */
 			if (elemstk.top().hasSelectedDataelements && !elemstk.top().isContent && elemstk.top().dataelementidx < elemstk.top().nof_attributes)
@@ -965,10 +923,10 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 			int pntidx = dataelem.indexOf('.');
 			if (pntidx >= 0)
 			{
-				QByteArray prefix = dataelem.mid( 0, pntidx);
+				QString prefix = dataelem.mid( 0, pntidx);
 				if (enter( prefix, false, elemstk.top().level))
 				{
-					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
+					QList<QString> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
 					elemstk.top().isContent = true;
 					int di=elemstk.top().dataelementidx,de=elemstk.top().dataelements.size();
 					for (++di; di<de; ++di)
@@ -1080,9 +1038,9 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 	return rt;
 }
 
-static bool nodeProperty_hasAssignment( const QWidget* widget, const QByteArray& )
+static bool nodeProperty_hasAssignment( const QWidget* widget, const QVariant& )
 {
-	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
+	foreach (const QString& prop, widget->dynamicPropertyNames())
 	{
 		if (prop.startsWith( "assign:")) return true;
 	}
@@ -1109,36 +1067,32 @@ void WidgetVisitor::do_closeInititalizations()
 
 void WidgetVisitor::ERROR( const char* msg, const QString& arg) const
 {
-	logError( widget(), msg, arg);
-}
-
-void WidgetVisitor::ERROR( const char* msg, const QByteArray& arg) const
-{
 	logError( widget(), msg, QString( arg));
 }
 
-static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const QWidget* widget, const QVariant& cond)
 {
 	static const char* ar[] = {"dataslot:onload","dataslot:onchange","dataslot:domainchange"};
 	QVariant dataslots = widget->property( ar[(int)type]);
-	int idx;
-	if ((idx=dataslots.toByteArray().indexOf( cond)) >= 0)
+	int idx = 0;
+	while ((idx=dataslots.toString().indexOf( cond.toString(), idx)) >= 0)
 	{
-		QByteArray dd = dataslots.toByteArray();
-		return (dd.size() == idx || dd.at(idx) == ' ' || dd.at(idx) == ',');
+		idx += cond.toString().length();
+		QString dd = dataslots.toString();
+		if (dd.size() == idx || dd.at(idx) == ' ' || dd.at(idx) == ',') return true;
 	}
 	return false;
 }
 
-static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QVariant& cond)
 {
 	return nodeProperty_hasDataSlot( WidgetVisitor::OnLoad, widget, cond);
 }
-static bool nodeProperty_hasDataSlot_onchange( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasDataSlot_onchange( const QWidget* widget, const QVariant& cond)
 {
 	return nodeProperty_hasDataSlot( WidgetVisitor::OnChange, widget, cond);
 }
-static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QVariant& cond)
 {
 	return nodeProperty_hasDataSlot( WidgetVisitor::DomainChange, widget, cond);
 }
@@ -1148,12 +1102,12 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 	QList<QWidget*> rt;
 	if (m_stk.isEmpty()) return rt;
 
-	foreach (const QByteArray& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
+	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
-		QByteArray receiverid = resolve( receiverprop).toByteArray();
+		QVariant receiverid = resolve( receiverprop);
 		WidgetVisitor mainvisitor( uirootwidget());
 
-		if (is_widgetid( receiverid))
+		if (is_widgetid( receiverid.toString()))
 		{
 			rt.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
 		}

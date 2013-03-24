@@ -7,7 +7,7 @@ WidgetVisitorState_QSpinBox::WidgetVisitorState_QSpinBox( QWidget* widget_)
 {
 }
 
-bool WidgetVisitorState_QSpinBox::enter( const QByteArray& /*name*/, bool /*writemode*/)
+bool WidgetVisitorState_QSpinBox::enter( const QString& /*name*/, bool /*writemode*/)
 {
 	return false;
 }
@@ -26,7 +26,7 @@ void WidgetVisitorState_QSpinBox::clear()
 	m_spinBox->setValue( initval);
 }
 
-QVariant WidgetVisitorState_QSpinBox::property( const QByteArray& name)
+QVariant WidgetVisitorState_QSpinBox::property( const QString& name)
 {
 	if (name.isEmpty())
 	{
@@ -35,7 +35,7 @@ QVariant WidgetVisitorState_QSpinBox::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QSpinBox::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QSpinBox::setProperty( const QString& name, const QVariant& data)
 {
 	if (name.isEmpty())
 	{
@@ -44,13 +44,13 @@ bool WidgetVisitorState_QSpinBox::setProperty( const QByteArray& name, const QVa
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QSpinBox::dataelements() const
+const QList<QString>& WidgetVisitorState_QSpinBox::dataelements() const
 {
 	static const DataElements dataElements( "");
 	return dataElements;
 }
 
-bool WidgetVisitorState_QSpinBox::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_QSpinBox::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

@@ -7,7 +7,7 @@ WidgetVisitorState_QSlider::WidgetVisitorState_QSlider( QWidget* widget_)
 {
 }
 
-bool WidgetVisitorState_QSlider::enter( const QByteArray& /*name*/, bool /*writemode*/)
+bool WidgetVisitorState_QSlider::enter( const QString& /*name*/, bool /*writemode*/)
 {
 	return false;
 }
@@ -26,7 +26,7 @@ void WidgetVisitorState_QSlider::clear()
 	m_slider->setValue( initval);
 }
 
-QVariant WidgetVisitorState_QSlider::property( const QByteArray& name)
+QVariant WidgetVisitorState_QSlider::property( const QString& name)
 {
 	if (name.isEmpty())
 	{
@@ -35,7 +35,7 @@ QVariant WidgetVisitorState_QSlider::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QSlider::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QSlider::setProperty( const QString& name, const QVariant& data)
 {
 	if (name.isEmpty())
 	{
@@ -44,13 +44,13 @@ bool WidgetVisitorState_QSlider::setProperty( const QByteArray& name, const QVar
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QSlider::dataelements() const
+const QList<QString>& WidgetVisitorState_QSlider::dataelements() const
 {
 	static const DataElements dataElements( "");
 	return dataElements;
 }
 
-bool WidgetVisitorState_QSlider::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_QSlider::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

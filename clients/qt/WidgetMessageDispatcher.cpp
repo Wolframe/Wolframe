@@ -35,15 +35,15 @@
 #include <QDebug>
 #include <QAbstractButton>
 
-static bool nodeProperty_hasWidgetId( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasWidgetId( const QWidget* widget, const QVariant& cond)
 {
 	QVariant widgetid = widget->property( "widgetid");
-	return (widgetid.isValid() && widgetid.toByteArray() == cond);
+	return (widgetid.isValid() && widgetid == cond);
 }
 
 ///\brief Return true if the widget is not an action widget with a doctype defined.
 //	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
+static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QVariant&)
 {
 	if (!widget->isEnabled()) return false;
 	if (qobject_cast<const QAbstractButton*>( widget)) return false;
@@ -72,23 +72,23 @@ WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( 
 
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	QPair<QByteArray,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
-	QByteArray actiontag;
+	QPair<QString,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
+	QString actiontag;
 	actiontag.push_back( '-');
 	actiontag.append( actionrequest.first);
 	return Request( actiontag, actionrequest.second);
 }
 
-QByteArray WidgetMessageDispatcher::getActionId( const QByteArray& tag)
+QString WidgetMessageDispatcher::getActionId( const QString& tag)
 {
 	if (!tag.isEmpty() && tag.at(0) == '-')
 	{
 		return tag.mid( 1, tag.size()-1);
 	}
-	return QByteArray();
+	return QString();
 }
 
-bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArray& data)
+bool WidgetMessageDispatcher::feedResult( const QString& tag, const QByteArray& data)
 {
 	if (!tag.isEmpty() && tag.at(0) == '-') return true;
 

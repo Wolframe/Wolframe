@@ -41,7 +41,7 @@ WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	,m_currentindex(0)
 {
 	m_dataelements.push_back( m_elementname);
-	m_dataelements.push_back( QByteArray("selected"));
+	m_dataelements.push_back( QString("selected"));
 }
 
 void WidgetVisitorState_QComboBox::clear()
@@ -51,7 +51,7 @@ void WidgetVisitorState_QComboBox::clear()
 	m_mode = None;
 }
 
-bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode)
+bool WidgetVisitorState_QComboBox::enter( const QString& name, bool writemode)
 {
 	switch (m_mode)
 	{
@@ -103,12 +103,12 @@ bool WidgetVisitorState_QComboBox::leave( bool /*writemode*/)
 	return false;
 }
 
-QVariant WidgetVisitorState_QComboBox::property( const QByteArray& name)
+QVariant WidgetVisitorState_QComboBox::property( const QString& name)
 {
 	switch (m_mode)
 	{
 		case None:
-			if (strcmp( name, "selected") == 0)
+			if (name == "selected")
 			{
 				if (m_comboBox->currentIndex() < 0) return QVariant();
 				return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
@@ -117,11 +117,11 @@ QVariant WidgetVisitorState_QComboBox::property( const QByteArray& name)
 		case Value:
 			break;
 		case Select:
-			if (strcmp( name,"") == 0)
+			if (name.isEmpty())
 			{
 				return QVariant( m_comboBox->currentText());
 			}
-			if (strcmp( name,"id") == 0)
+			if (name == "id")
 			{
 				if (m_comboBox->currentIndex() < 0) return QVariant();
 				return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
@@ -130,12 +130,12 @@ QVariant WidgetVisitorState_QComboBox::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QComboBox::setProperty( const QString& name, const QVariant& data)
 {
 	switch (m_mode)
 	{
 		case None:
-			if (strcmp( name, "selected") == 0)
+			if (name == "selected")
 			{
 				int idx = m_comboBox->findData( data, Qt::UserRole, Qt::MatchExactly);
 				if (idx < 0) return false;
@@ -144,13 +144,13 @@ bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QV
 			}
 			return false;
 		case Value:
-			if (strcmp( name,"") == 0)
+			if (name.isEmpty())
 			{
 				if (m_comboBox->currentIndex() < 0) return false;
 				m_comboBox->setItemText( m_comboBox->currentIndex(), data.toString());
 				return true;
 			}
-			if (strcmp( name, "id") == 0)
+			if (name == "id")
 			{
 				if (m_comboBox->currentIndex() < 0) return false;
 				m_comboBox->setItemData( m_comboBox->currentIndex(), data, Qt::UserRole);
@@ -158,14 +158,14 @@ bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QV
 			}
 			return false;
 		case Select:
-			if (strcmp( name,"") == 0)
+			if (name.isEmpty())
 			{
 				int idx = m_comboBox->findText( data.toString(), Qt::MatchExactly);
 				if (idx < 0) return false;
 				m_comboBox->setCurrentIndex( idx);
 				return true;
 			}
-			if (strcmp( name,"id") == 0)
+			if (name == "id")
 			{
 				int idx = m_comboBox->findData( data, Qt::UserRole, Qt::MatchExactly);
 				if (idx < 0) return false;
@@ -177,11 +177,11 @@ bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QComboBox::dataelements() const
+const QList<QString>& WidgetVisitorState_QComboBox::dataelements() const
 {
 	static const DataElements ar_Select( "id", 0);
 	static const DataElements ar_Value( "id", 0);
-	static const QList<QByteArray> ar_Empty;
+	static const QList<QString> ar_Empty;
 
 	switch (m_mode)
 	{
@@ -192,7 +192,7 @@ const QList<QByteArray>& WidgetVisitorState_QComboBox::dataelements() const
 	return ar_Empty;
 }
 
-bool WidgetVisitorState_QComboBox::isRepeatingDataElement( const QByteArray& name)
+bool WidgetVisitorState_QComboBox::isRepeatingDataElement( const QString& name)
 {
 	return (name == m_elementname);
 }

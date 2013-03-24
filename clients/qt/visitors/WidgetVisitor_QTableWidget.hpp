@@ -43,13 +43,13 @@ public:
 	WidgetVisitorState_QTableWidget( QWidget* widget_);
 	~WidgetVisitorState_QTableWidget();
 
-	virtual bool enter( const QByteArray& name, bool writemode);
+	virtual bool enter( const QString& name, bool writemode);
 	virtual bool leave( bool writemode);
 	virtual void clear();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
+	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 
@@ -69,8 +69,8 @@ private:
 	};
 
 	QTableWidget* m_tableWidget;
-	QHash<QByteArray,int> m_colheaders;
-	QHash<QByteArray,int> m_rowheaders;
+	QHash<QString,int> m_colheaders;
+	QHash<QString,int> m_rowheaders;
 	enum Mode {Init,Row,Column,RowData,ColumnData};
 	static const char* modeName( Mode i)
 	{
@@ -84,9 +84,9 @@ private:
 	int m_column;
 	int m_rowcount;
 	int m_columncount;
-	QList<QByteArray> m_dataelements_init;
-	QList<QByteArray> m_dataelements_row;
-	QList<QByteArray> m_dataelements_col;
+	QList<QString> m_dataelements_init;
+	QList<QString> m_dataelements_row;
+	QList<QString> m_dataelements_col;
 };
 
 #endif

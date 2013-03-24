@@ -42,9 +42,9 @@ void WidgetVisitorState_QListWidget::clear()
 	m_listWidget->clear();
 }
 
-QVariant WidgetVisitorState_QListWidget::property( const QByteArray& name)
+QVariant WidgetVisitorState_QListWidget::property( const QString& name)
 {
-	if (strcmp( name,"selected") == 0)
+	if (name == "selected")
 	{
 		QList<QVariant> rt;
 		foreach( QListWidgetItem *item, m_listWidget->selectedItems())
@@ -56,14 +56,14 @@ QVariant WidgetVisitorState_QListWidget::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QListWidget::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QListWidget::setProperty( const QString& name, const QVariant& data)
 {
-	if (strcmp( name,"value") == 0)
+	if (name == "value")
 	{
 		m_listWidget->addItem( data.toString());
 		return true;
 	}
-	if (strcmp( name,"selected") == 0)
+	if (name == "selected")
 	{
 		QList<QListWidgetItem *> items = m_listWidget->findItems( data.toString(), Qt::MatchExactly);
 		foreach( QListWidgetItem *item, items)
@@ -74,7 +74,7 @@ bool WidgetVisitorState_QListWidget::setProperty( const QByteArray& name, const 
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QListWidget::dataelements() const
+const QList<QString>& WidgetVisitorState_QListWidget::dataelements() const
 {
 	static const DataElements ar( "select", 0);
 	return ar;

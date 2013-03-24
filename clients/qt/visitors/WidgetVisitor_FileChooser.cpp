@@ -9,7 +9,7 @@ WidgetVisitorState_FileChooser::WidgetVisitorState_FileChooser( QWidget* widget_
 	,m_fileidx(-1)
 {}
 
-bool WidgetVisitorState_FileChooser::enter( const QByteArray& name, bool writemode)
+bool WidgetVisitorState_FileChooser::enter( const QString& name, bool writemode)
 {
 	switch (m_mode)
 	{
@@ -70,7 +70,7 @@ void WidgetVisitorState_FileChooser::clear()
 	m_mode = Init;
 }
 
-QVariant WidgetVisitorState_FileChooser::property( const QByteArray& name)
+QVariant WidgetVisitorState_FileChooser::property( const QString& name)
 {
 	switch (m_mode)
 	{
@@ -94,16 +94,16 @@ QVariant WidgetVisitorState_FileChooser::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_FileChooser::setProperty( const QByteArray& /*name*/, const QVariant& /*data*/)
+bool WidgetVisitorState_FileChooser::setProperty( const QString& /*name*/, const QVariant& /*data*/)
 {
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_FileChooser::dataelements() const
+const QList<QString>& WidgetVisitorState_FileChooser::dataelements() const
 {
 	static const DataElements dataelements_init( "file");
 	static const DataElements dataelements_file( "name", "size", "");
-	static const QList<QByteArray> noDataElements;
+	static const QList<QString> noDataElements;
 
 	switch (m_mode)
 	{
@@ -113,7 +113,7 @@ const QList<QByteArray>& WidgetVisitorState_FileChooser::dataelements() const
 	return noDataElements;
 }
 
-bool WidgetVisitorState_FileChooser::isRepeatingDataElement( const QByteArray& name)
+bool WidgetVisitorState_FileChooser::isRepeatingDataElement( const QString& name)
 {
 	if (name == "file") return true;
 	return false;

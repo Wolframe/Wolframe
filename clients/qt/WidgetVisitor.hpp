@@ -148,19 +148,19 @@ class WidgetVisitor
 			///\brief Clear contents of the widget
 			virtual void clear(){}
 			///\brief Switch to a substructure context inside the widget but not to a child widget
-			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
+			virtual bool enter( const QString& /*name*/, bool /*writemode*/)	{return false;}
 			///\brief Leave the current substructure context an switch to ist (enter) ancessor
 			virtual bool leave( bool /*writemode*/)					{return false;}
 			///\brief Get a property or set of properties of the current substructure context addressed by name
-			virtual QVariant property( const QByteArray&)				{return QVariant();}
+			virtual QVariant property( const QString&)				{return QVariant();}
 			///\brief Set a property of the current substructure context addressed by name
-			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
+			virtual bool setProperty( const QString&, const QVariant&)		{return false;}
 			///\brief Get all dataelements readable in the current substructure context
-			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
+			virtual const QList<QString>& dataelements() const			{static const QList<QString> ar; return ar;}
 			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
 			virtual QList<QWidget*> datachildren() const				{return m_widget->findChildren<QWidget*>();}
 			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
-			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
+			virtual bool isRepeatingDataElement( const QString&/*name*/)		{return false;}
 			///\brief Restore the widget state from a variable
 			virtual void setState( const QVariant& /*state*/){}
 			///\brief Get the current the widget state
@@ -169,15 +169,15 @@ class WidgetVisitor
 			virtual void ConnectOnChangeSignals( WidgetListener& /*listener*/){}
 
 		public://Common methods:
-			const QByteArray& getSynonym( const QByteArray& name) const;
-			QByteArray getLink( const QByteArray& name) const;
-			QVariant dynamicProperty( const QByteArray& name) const;
-			bool setDynamicProperty( const QByteArray&, const QVariant& value);
+			const QString& getSynonym( const QString& name) const;
+			QString getLink( const QString& name) const;
+			QVariant dynamicProperty( const QString& name) const;
+			bool setDynamicProperty( const QString&, const QVariant& value);
 
 		protected:
 			///\class DataElements
 			///\brief Constructor helper for State::dataelements()
-			struct DataElements :public QList<QByteArray>
+			struct DataElements :public QList<QString>
 			{
 				DataElements( const char* initializer, ...);			//< constructor from 0 terminated vararg initializer list
 			};
@@ -185,24 +185,24 @@ class WidgetVisitor
 		private:
 			struct DataSignals
 			{
-				QList<QByteArray> id[(int)NofDataSignalTypes];
+				QList<QString> id[(int)NofDataSignalTypes];
 			};
 			struct DataSlots
 			{
-				QList<QByteArray> id[(int)NofDataSignalTypes];
+				QList<QString> id[(int)NofDataSignalTypes];
 			};
 			friend class WidgetVisitorStackElement;
 			friend class WidgetVisitor;
-			typedef QPair< QByteArray,QByteArray> LinkDef;
-			typedef QPair< QByteArray,QByteArray> Assignment;
+			typedef QPair< QString,QString> LinkDef;
+			typedef QPair< QString,QString> Assignment;
 
 			QWidget* m_widget;							//< widget reference
-			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
+			QHash<QString,QString> m_synonyms;				//< synonym name map
 			QList<LinkDef> m_links;							//< symbolic links to other objects
 			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
 			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
 			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
-			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
+			QHash<QString,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
 			int m_synonym_entercnt;							//< counter for how many stack elements to pop on a leave (for multipart synonyms)
 			int m_internal_entercnt;						//< counter for calling State::leave() before removing stack elements
 		};
@@ -226,32 +226,21 @@ class WidgetVisitor
 
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name, bool writemode);
-		///\brief Sets the current node to the child with name 'name'
-		bool enter( const QByteArray& name, bool writemode);
 		///\brief Sets the current node to the root widget or child with name 'name' of the root widget
-		bool enter_root( const QByteArray& name);
+		bool enter_root( const QString& name);
 
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave( bool writemode);
 
 		///\brief Get the property of the current node by 'name'
 		///\param[in] name name of the property
-		///\return Property variant (any type)
-		QVariant property( const QString& name);
-		///\brief Get the property of the current node by 'name'
-		///\param[in] name name of the property
 		///\return property variant (any type)
-		QVariant property( const QByteArray& name);
+		QVariant property( const QString& name);
 		///\brief Get the property of the current node by 'name'
 		///\param[in] name name of the property
 		///\return property variant (any type)
 		QVariant property( const char* name);
 
-		///\brief Set the property of the current node
-		///\param[in] name name of the property
-		///\param[in] value property value as variant (any type)
-		///\return true on success
-		bool setProperty( const QByteArray& name, const QVariant& value);
 		///\brief Set the property of the current node
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
@@ -264,8 +253,8 @@ class WidgetVisitor
 		bool setProperty( const char* name, const QVariant& value);
 
 		///\brief Find all sub widgets matching a condition and return them as their visitor context
-		typedef bool (*NodeProperty)( const QWidget* widget, const QByteArray& cond);
-		QList<QWidget*> findSubNodes( NodeProperty prop, const QByteArray& cond=QByteArray()) const;
+		typedef bool (*NodeProperty)( const QWidget* widget, const QVariant& cond);
+		QList<QWidget*> findSubNodes( NodeProperty prop, const QVariant& cond=QVariant()) const;
 
 		///\class Element
 		///\brief Element of serialization of widget data (for constructing a server request out of the widget data)
@@ -306,21 +295,21 @@ class WidgetVisitor
 
 		///\brief Get a serialization of a selecte list of widget elements in the current state
 		///\param[in] selected_dataelements data elements selected by name
-		QList<Element> elements( const QList<QByteArray>& selected_dataelements);
+		QList<Element> elements( const QList<QString>& selected_dataelements);
 
 		///\brief Eval if id describes a widget id of an identifier
 		///\param[in] id identifier to check
 		///\return true if 'id' is a widget id
-		static bool is_widgetid( const QByteArray& id);
+		static bool is_widgetid( const QString& id);
 
 		///\brief Get the unique identifier of the widget for server requests
-		QByteArray widgetid() const;
+		QString widgetid() const;
 		///\brief Get the widget of the current state
 		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->m_widget;}
 		///\brief Get the object name of the widget of the current state
-		QByteArray objectName() const;
+		QString objectName() const;
 		///\brief Get the class name of the widget of the current state
-		QByteArray className() const;
+		QString className() const;
 
 		///\brief Resolve reference to a variable
 		///\param[in] value to resolve
@@ -329,11 +318,11 @@ class WidgetVisitor
 		///\brief Get the UI root widget
 		QWidget* uirootwidget() const;
 		///\brief Get the UI root widget
-		QWidget* predecessor( const QByteArray& name) const;
+		QWidget* predecessor( const QString& name) const;
 
 		///\brief Resolve a symbolic link to a widget
 		///\param[in] link name of symbolic link to resolve
-		QWidget* resolveLink( const QByteArray& link);
+		QWidget* resolveLink( const QString& link);
 
 		///\brief Backup state description in a dynamic property and reset widget state
 		void resetState();
@@ -357,29 +346,28 @@ class WidgetVisitor
 		///\brief Internal property get using 'level' to check property resolving step (B).
 		///\param[in] name name of the property
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
-		QVariant property( const QByteArray& name, int level);
+		QVariant property( const QString& name, int level);
 
 		///\brief Internal property set using 'level' to check property resolving step (B).
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		///\return true on success
-		bool setProperty( const QByteArray& name, const QVariant& value, int level);
+		bool setProperty( const QString& name, const QVariant& value, int level);
 
 		///\brief Sets the current node to the child with name 'name'
 		///\param[in] name name of the subnode
 		///\param[in] writemode true if in write/create access and not in read access
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
-		bool enter( const QByteArray& name, bool writemode, int level);
+		bool enter( const QString& name, bool writemode, int level);
 
 		///\brief Internal implementation of 'elements(...)'
-		QList<Element> elements( const QList<QByteArray>* selected_dataelements);
+		QList<Element> elements( const QList<QString>* selected_dataelements);
 
 		///\brief Constructor internal
 		explicit WidgetVisitor( const QStack<StateR>& stk_);
 
 		void ERROR( const char* msg, const QString& arg=QString()) const;
-		void ERROR( const char* msg, const QByteArray& arg) const;
 
 	private:
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element

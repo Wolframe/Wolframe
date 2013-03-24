@@ -10,18 +10,18 @@ void WidgetVisitorState_QPlainTextEdit::clear()
 	m_plainTextEdit->clear();
 }
 
-QVariant WidgetVisitorState_QPlainTextEdit::property( const QByteArray& name)
+QVariant WidgetVisitorState_QPlainTextEdit::property( const QString& name)
 {
-	if (strcmp( name, "") == 0)
+	if (name.isEmpty())
 	{
 		return QVariant( m_plainTextEdit->toPlainText());
 	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QPlainTextEdit::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QPlainTextEdit::setProperty( const QString& name, const QVariant& data)
 {
-	if (strcmp( name, "") == 0)
+	if (name.isEmpty())
 	{
 		m_plainTextEdit->setPlainText( data.toString());
 		return true;
@@ -29,7 +29,7 @@ bool WidgetVisitorState_QPlainTextEdit::setProperty( const QByteArray& name, con
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QPlainTextEdit::dataelements() const
+const QList<QString>& WidgetVisitorState_QPlainTextEdit::dataelements() const
 {
 	static const DataElements ar( "", 0);
 	return ar;

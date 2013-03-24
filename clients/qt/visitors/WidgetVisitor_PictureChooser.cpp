@@ -7,7 +7,7 @@ WidgetVisitorState_PictureChooser::WidgetVisitorState_PictureChooser( QWidget* w
 {
 }
 
-bool WidgetVisitorState_PictureChooser::enter( const QByteArray& /*name*/, bool /*writemode*/)
+bool WidgetVisitorState_PictureChooser::enter( const QString& /*name*/, bool /*writemode*/)
 {
 	return false;
 }
@@ -22,7 +22,7 @@ void WidgetVisitorState_PictureChooser::clear()
 	m_pictureChooser->setFileName( "");
 }
 
-QVariant WidgetVisitorState_PictureChooser::property( const QByteArray& name)
+QVariant WidgetVisitorState_PictureChooser::property( const QString& name)
 {
 	if (name == "filename")
 	{
@@ -39,7 +39,7 @@ QVariant WidgetVisitorState_PictureChooser::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_PictureChooser::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_PictureChooser::setProperty( const QString& name, const QVariant& data)
 {
 	if (name == "filename")
 	{
@@ -52,13 +52,13 @@ bool WidgetVisitorState_PictureChooser::setProperty( const QByteArray& name, con
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_PictureChooser::dataelements() const
+const QList<QString>& WidgetVisitorState_PictureChooser::dataelements() const
 {
 	static const DataElements dataElements( "filename", "size", "");
 	return dataElements;
 }
 
-bool WidgetVisitorState_PictureChooser::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_PictureChooser::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

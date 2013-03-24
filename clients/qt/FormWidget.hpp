@@ -100,8 +100,8 @@ class FormWidget : public QWidget
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void formListLoaded( QStringList forms );
 		
-		void gotAnswer( const QByteArray& tag_, const QByteArray& data_);
-		void gotError( const QByteArray& tag_, const QByteArray& data_);
+		void gotAnswer( const QString& tag_, const QByteArray& data_);
+		void gotError( const QString& tag_, const QByteArray& data_);
 
 		void switchForm( QWidget *object );
 };

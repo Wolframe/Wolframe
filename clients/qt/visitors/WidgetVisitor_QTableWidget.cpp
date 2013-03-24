@@ -82,13 +82,13 @@ void WidgetVisitorState_QTableWidget::clear()
 	m_column = -1;
 }
 
-bool WidgetVisitorState_QTableWidget::enter( const QByteArray& name, bool writemode)
+bool WidgetVisitorState_QTableWidget::enter( const QString& name, bool writemode)
 {
 	switch (m_mode)
 	{
 		case Init:
 		{
-			if (strcmp( name, "row") == 0)
+			if (name == "row")
 			{
 				if (writemode)
 				{
@@ -101,7 +101,7 @@ bool WidgetVisitorState_QTableWidget::enter( const QByteArray& name, bool writem
 				m_mode = Row;
 				return true;
 			}
-			if (strcmp( name, "column") == 0)
+			if (name == "column")
 			{
 				if (writemode)
 				{
@@ -118,7 +118,7 @@ bool WidgetVisitorState_QTableWidget::enter( const QByteArray& name, bool writem
 		}
 		case Row:
 		{
-			QHash<QByteArray,int>::const_iterator itr = m_colheaders.find( name);
+			QHash<QString,int>::const_iterator itr = m_colheaders.find( name);
 			if (itr == m_colheaders.end()) return false;
 			m_column = itr.value();
 			if (writemode)
@@ -131,7 +131,7 @@ bool WidgetVisitorState_QTableWidget::enter( const QByteArray& name, bool writem
 		}
 		case Column:
 		{
-			QHash<QByteArray,int>::const_iterator itr = m_rowheaders.find( name);
+			QHash<QString,int>::const_iterator itr = m_rowheaders.find( name);
 			if (itr == m_rowheaders.end()) return false;
 			m_row = itr.value();
 			if (writemode)
@@ -218,7 +218,7 @@ bool WidgetVisitorState_QTableWidget::leave( bool writemode)
 	return false;
 }
 
-bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QByteArray& name)
+bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QString& name)
 {
 	if (m_mode == Init && (name == "row" || name == "column")) return true;
 	return false;
@@ -254,7 +254,7 @@ QVariant WidgetVisitorState_QTableWidget::get_thumbnail( int row, int col) const
 	return QVariant( bytes.toBase64());
 }
 
-QVariant WidgetVisitorState_QTableWidget::property( const QByteArray& name)
+QVariant WidgetVisitorState_QTableWidget::property( const QString& name)
 {
 	QTableWidgetItem* item;
 	switch (m_mode)
@@ -296,9 +296,9 @@ QVariant WidgetVisitorState_QTableWidget::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QTableWidget::setProperty( const QString& name, const QVariant& data)
 {
-	QHash<QByteArray,int>::const_iterator itr;
+	QHash<QString,int>::const_iterator itr;
 	switch (m_mode)
 	{
 		case Init:
@@ -349,9 +349,9 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QByteArray& name, const
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QTableWidget::dataelements() const
+const QList<QString>& WidgetVisitorState_QTableWidget::dataelements() const
 {
-	static const QList<QByteArray> noDataElements;
+	static const QList<QString> noDataElements;
 	static const DataElements dataelements_data( "", "thumbnail");
 	switch (m_mode)
 	{

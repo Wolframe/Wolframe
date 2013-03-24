@@ -54,10 +54,10 @@ class WidgetMessageDispatcher
 
 		struct Request
 		{
-			QByteArray tag;
+			QString tag;
 			QByteArray content;
 
-			Request( QByteArray tag_, QByteArray content_)
+			Request( QString tag_, QByteArray content_)
 				:tag(tag_),content(content_){}
 			Request( const Request& o)
 				:tag(o.tag),content(o.content){}
@@ -66,9 +66,9 @@ class WidgetMessageDispatcher
 		QList<Request> getDomainLoadRequests( bool debugmode=false);
 		Request getDomainLoadRequest( bool debugmode=false);
 		Request getFormActionRequest( bool debugmode=false);
-		bool feedResult( const QByteArray& tag, const QByteArray& data);
+		bool feedResult( const QString& tag, const QByteArray& data);
 
-		static QByteArray getActionId( const QByteArray& tag);
+		static QString getActionId( const QString& tag);
 
 	private:
 		WidgetVisitor m_visitor;			//< visitor of elements

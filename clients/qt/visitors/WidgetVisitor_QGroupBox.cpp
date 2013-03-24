@@ -11,7 +11,7 @@ WidgetVisitorState_QGroupBox::WidgetVisitorState_QGroupBox( QWidget* widget_)
 	,m_mode(Init)
 {}
 
-bool WidgetVisitorState_QGroupBox::setChecked( const QByteArray& name)
+bool WidgetVisitorState_QGroupBox::setChecked( const QString& name)
 {
 	if (m_childmap.size() == 0)
 	{
@@ -20,7 +20,7 @@ bool WidgetVisitorState_QGroupBox::setChecked( const QByteArray& name)
 			m_childmap[ child->objectName().toAscii()] = child;
 		}
 	}
-	QHash<QByteArray,QWidget*>::const_iterator ci = m_childmap.find( name);
+	QHash<QString,QWidget*>::const_iterator ci = m_childmap.find( name);
 	if (ci == m_childmap.end()) return false;
 
 	QRadioButton* radioButton = qobject_cast<QRadioButton*>( ci.value());
@@ -65,7 +65,7 @@ QList<QVariant> WidgetVisitorState_QGroupBox::checkedList() const
 	return rt;
 }
 
-bool WidgetVisitorState_QGroupBox::enter( const QByteArray& name, bool writemode)
+bool WidgetVisitorState_QGroupBox::enter( const QString& name, bool writemode)
 {
 	if (writemode && m_mode == Init && name == "selected")
 	{
@@ -91,7 +91,7 @@ void WidgetVisitorState_QGroupBox::clear()
 	m_childmap.clear();
 }
 
-QVariant WidgetVisitorState_QGroupBox::property( const QByteArray& name)
+QVariant WidgetVisitorState_QGroupBox::property( const QString& name)
 {
 	if (name == "selected")
 	{
@@ -100,7 +100,7 @@ QVariant WidgetVisitorState_QGroupBox::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QGroupBox::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QGroupBox::setProperty( const QString& name, const QVariant& data)
 {
 	if (m_mode == Selected && name.isEmpty())
 	{
@@ -109,7 +109,7 @@ bool WidgetVisitorState_QGroupBox::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QGroupBox::dataelements() const
+const QList<QString>& WidgetVisitorState_QGroupBox::dataelements() const
 {
 	static const DataElements dataElements( "selected");
 	return dataElements;
@@ -125,7 +125,7 @@ QList<QWidget*> WidgetVisitorState_QGroupBox::datachildren() const
 	return rt;
 }
 
-bool WidgetVisitorState_QGroupBox::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_QGroupBox::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

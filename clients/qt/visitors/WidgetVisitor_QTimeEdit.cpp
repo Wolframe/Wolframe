@@ -8,7 +8,7 @@ WidgetVisitorState_QTimeEdit::WidgetVisitorState_QTimeEdit( QWidget* widget_)
 	m_timeEdit->setTime( QTime::currentTime());
 }
 
-bool WidgetVisitorState_QTimeEdit::enter( const QByteArray& /*name*/, bool /*writemode*/)
+bool WidgetVisitorState_QTimeEdit::enter( const QString& /*name*/, bool /*writemode*/)
 {
 	return false;
 }
@@ -23,7 +23,7 @@ void WidgetVisitorState_QTimeEdit::clear()
 	m_timeEdit->setTime( QTime::currentTime());
 }
 
-QVariant WidgetVisitorState_QTimeEdit::property( const QByteArray& name)
+QVariant WidgetVisitorState_QTimeEdit::property( const QString& name)
 {
 	if (name.isEmpty())
 	{
@@ -32,7 +32,7 @@ QVariant WidgetVisitorState_QTimeEdit::property( const QByteArray& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QTimeEdit::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QTimeEdit::setProperty( const QString& name, const QVariant& data)
 {
 	if (name.isEmpty())
 	{
@@ -41,13 +41,13 @@ bool WidgetVisitorState_QTimeEdit::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QTimeEdit::dataelements() const
+const QList<QString>& WidgetVisitorState_QTimeEdit::dataelements() const
 {
 	static const DataElements dataElements( "");
 	return dataElements;
 }
 
-bool WidgetVisitorState_QTimeEdit::isRepeatingDataElement( const QByteArray& /*name*/)
+bool WidgetVisitorState_QTimeEdit::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }

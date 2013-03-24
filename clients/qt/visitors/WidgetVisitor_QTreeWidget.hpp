@@ -42,13 +42,13 @@ class WidgetVisitorState_QTreeWidget
 public:
 	WidgetVisitorState_QTreeWidget( QWidget* widget_);
 
-	virtual bool enter( const QByteArray& name, bool writemode);
+	virtual bool enter( const QString& name, bool writemode);
 	virtual bool leave( bool writemode);
 	virtual void clear();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
+	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 
@@ -64,8 +64,8 @@ private:
 
 	QTreeWidget* m_treeWidget;
 	QStack<StackElement> m_stk;
-	QList<QByteArray> m_headers;
-	QByteArray m_elementname;
+	QList<QString> m_headers;
+	QString m_elementname;
 	enum Mode {Init,Tree,List};
 	static const char* modeName( Mode i)
 	{
@@ -73,9 +73,9 @@ private:
 		return ar[(int)i];
 	}
 	Mode m_mode;
-	QList<QByteArray> m_dataelements_init;
-	QList<QByteArray> m_dataelements_tree;
-	QList<QByteArray> m_dataelements_list;
+	QList<QString> m_dataelements_init;
+	QList<QString> m_dataelements_tree;
+	QList<QString> m_dataelements_list;
 };
 
 #endif

@@ -42,18 +42,18 @@ void WidgetVisitorState_QLineEdit::clear()
 	m_lineEdit->clear();
 }
 
-QVariant WidgetVisitorState_QLineEdit::property( const QByteArray& name)
+QVariant WidgetVisitorState_QLineEdit::property( const QString& name)
 {
-	if (strcmp( name, "") == 0)
+	if (name.isEmpty())
 	{
 		return QVariant( m_lineEdit->text());
 	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QLineEdit::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QLineEdit::setProperty( const QString& name, const QVariant& data)
 {
-	if (strcmp( name, "") == 0)
+	if (name.isEmpty())
 	{
 		m_lineEdit->setText( data.toString());
 		return true;
@@ -61,7 +61,7 @@ bool WidgetVisitorState_QLineEdit::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QLineEdit::dataelements() const
+const QList<QString>& WidgetVisitorState_QLineEdit::dataelements() const
 {
 	static const DataElements ar( "", 0);
 	return ar;

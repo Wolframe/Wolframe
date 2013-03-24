@@ -93,7 +93,7 @@ class WolframeClient : public QObject
 		void connect();
 		void disconnect();
 		void auth();
-		void request( const QByteArray& tag, const QByteArray& content );
+		void request( const QString& tag, const QByteArray& content );
 // inquire status
 		bool isConnected( ) const;
 		const QString serverName() const;
@@ -133,7 +133,7 @@ class WolframeClient : public QObject
 		void resultHandled( );
 
 // high-level commands
-		void answerReceived( bool success, const QByteArray& tag, const QByteArray& content );
+		void answerReceived( bool success, const QString& tag, const QByteArray& content );
 };
 
 #endif // _Wolframe_CLIENT_HPP_INCLUDED

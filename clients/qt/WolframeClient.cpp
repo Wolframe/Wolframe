@@ -392,7 +392,7 @@ void WolframeClient::dataAvailable( )
 }
 
 // high-level
-void WolframeClient::request( const QByteArray& tag, const QByteArray& content )
+void WolframeClient::request( const QString& tag, const QByteArray& content )
 {
 	m_protocol.pushRequest( tag, content);
 }
@@ -401,7 +401,7 @@ void WolframeClient::handleResult( )
 {
 	m_state = Connected;
 
-	const QByteArray* tag;
+	const QString* tag;
 	while ((tag=m_protocol.getAnswerTag()) != 0)
 	{
 		bool success = m_protocol.getAnswerSuccess();

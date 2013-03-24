@@ -42,27 +42,27 @@ void WidgetVisitorState_QTextEdit::clear()
 	m_textEdit->clear();
 }
 
-QVariant WidgetVisitorState_QTextEdit::property( const QByteArray& name)
+QVariant WidgetVisitorState_QTextEdit::property( const QString& name)
 {
-	if (strcmp( name, "text") == 0)
+	if (name == "text")
 	{
 		return QVariant( m_textEdit->toPlainText());
 	}
-	if (strcmp( name, "html") == 0)
+	if (name == "html")
 	{
 		return QVariant( m_textEdit->toHtml());
 	}
 	return QVariant();
 }
 
-bool WidgetVisitorState_QTextEdit::setProperty( const QByteArray& name, const QVariant& data)
+bool WidgetVisitorState_QTextEdit::setProperty( const QString& name, const QVariant& data)
 {
-	if (strcmp( name, "text") == 0)
+	if (name == "text")
 	{
 		m_textEdit->setPlainText( data.toString());
 		return true;
 	}
-	if (strcmp( name, "html") == 0)
+	if (name == "html")
 	{
 		m_textEdit->setHtml( data.toString());
 		return true;
@@ -70,7 +70,7 @@ bool WidgetVisitorState_QTextEdit::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const QList<QByteArray>& WidgetVisitorState_QTextEdit::dataelements() const
+const QList<QString>& WidgetVisitorState_QTextEdit::dataelements() const
 {
 	static const DataElements dataElements( "text", "html");
 	return dataElements;
