@@ -52,7 +52,7 @@ class FormWidget : public QWidget
 	Q_OBJECT
 
 	public:		
-		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
+		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QHash<QString,QVariant>* _globals, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
 		virtual ~FormWidget( );
 		void loadForm( QString name, bool modal = false );
 		void setLocale( QLocale locale );
@@ -67,17 +67,18 @@ class FormWidget : public QWidget
 		void reload( );
 			
 	private:
-		QString m_form;			// name of the form
+		QString m_form;				// name of the form
 		QString m_previousForm;
-		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
-		FormLoader *m_formLoader;	// form loader (visible form)
-		DataLoader *m_dataLoader;	// load and saves data (data form)
-		QWidget *m_ui;			// the ui loaded from the designer XML file
-		QLocale m_locale;		// current locale to use for form translations
-		QHBoxLayout *m_layout;		// main layout swallowing the form
-		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
-		QStringList m_forms;		// names of all currently loaded forms
-		QTranslator m_translator;	// contains the translations for the current form
+		QUiLoader *m_uiLoader;			// UI loader to user for loading designer XML files
+		FormLoader *m_formLoader;		// form loader (visible form)
+		DataLoader *m_dataLoader;		// load and saves data (data form)
+		QHash<QString,QVariant>* m_globals;	// global variable assignments read in init form and written in switch/close form
+		QWidget *m_ui;				// the ui loaded from the designer XML file
+		QLocale m_locale;			// current locale to use for form translations
+		QHBoxLayout *m_layout;			// main layout swallowing the form
+		QSignalMapper *m_signalMapper;		// delegate for form push buttons pointing to forms
+		QStringList m_forms;			// names of all currently loaded forms
+		QTranslator m_translator;		// contains the translations for the current form
 		bool m_debug;
 		bool m_modal;
 		

@@ -43,10 +43,10 @@
 #include <QFrame>
 #include <QList>
 
-FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent, bool _debug )
+FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QHash<QString,QVariant>* _globals, QUiLoader *_uiLoader, QWidget *_parent, bool _debug )
 	: QWidget( _parent ), m_form( ),
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
-	  m_dataLoader( _dataLoader ), m_ui( 0 ),
+	  m_dataLoader( _dataLoader ), m_globals(_globals ), m_ui( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
 	  m_debug( _debug ), m_modal( false )
 {
@@ -114,7 +114,7 @@ void FormWidget::switchForm( QWidget *actionwidget )
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
 	visitor.do_writeAssignments();
-	//[+] visitor.do_writeGlobals();
+	visitor.do_writeGlobals( *m_globals);
 
 	if (formlink.isValid())
 	{
@@ -249,7 +249,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 	}
 // initialize the form variables given by globals and assignments
-	//[+] visitor.do_readGlobals();
+	visitor.do_readGlobals( *m_globals);
 	visitor.do_readAssignments();
 
 // add new form to layout (which covers the whole widget)

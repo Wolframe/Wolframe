@@ -73,6 +73,7 @@ class MainWindow : public QMainWindow
 		QUiLoader *m_uiLoader;		// the UI loader for all forms
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
+		QHash<QString,QVariant> m_globals;// global form variables
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_settings;		// file to read settings from
 		QStringList m_languages;	// available interface translations
