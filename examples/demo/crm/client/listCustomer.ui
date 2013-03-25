@@ -31,6 +31,16 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="AddPicture">
+        <property name="text">
+         <string>AddPicture</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>addCustomerPicture?customerid={customer.id}</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="NavAddCustomer">
         <property name="text">
          <string>Add</string>

@@ -25,6 +25,14 @@ CREATE TABLE Customer
 	addr_country	TEXT
 );
 
+-- Customer:
+CREATE TABLE CustomerPicture
+(
+	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	customerid	INT	REFERENCES Customer( id ),
+	picture		TEXT
+);
+
 -- CustomerNote:
 CREATE TABLE CustomerNote
 (
