@@ -113,7 +113,9 @@ void FormWidget::switchForm( QWidget *actionwidget )
 	
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
-	visitor.do_closeInititalizations();
+	visitor.do_writeAssignments();
+	//[+] visitor.do_writeGlobals();
+
 	if (formlink.isValid())
 	{
 		QString nextForm = formlink.toString();
@@ -246,8 +248,9 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		visitor.setProperty( QString( param.first), param.second);
 		qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 	}
-// initialize the form variables given by assignments
-	visitor.readAssignments();
+// initialize the form variables given by globals and assignments
+	//[+] visitor.do_readGlobals();
+	visitor.do_readAssignments();
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
@@ -283,8 +286,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 
 // reset the form now, this also loads the domains
-	visitor.do_initInititalizations();
-
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
 	{

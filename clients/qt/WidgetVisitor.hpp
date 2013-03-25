@@ -196,15 +196,16 @@ class WidgetVisitor
 			typedef QPair< QString,QString> LinkDef;
 			typedef QPair< QString,QString> Assignment;
 
-			QWidget* m_widget;							//< widget reference
-			QHash<QString,QString> m_synonyms;				//< synonym name map
-			QList<LinkDef> m_links;							//< symbolic links to other objects
-			QList<Assignment> m_assignments;					//< assignment done at initialization and destruction
-			DataSignals m_datasignals;						//< datasignals to emit on certain state changes
-			DataSlots m_dataslots;							//< dataslot to declare a receiver by name for being informed on certain state changes
-			QHash<QString,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
-			int m_synonym_entercnt;							//< counter for how many stack elements to pop on a leave (for multipart synonyms)
-			int m_internal_entercnt;						//< counter for calling State::leave() before removing stack elements
+			QWidget* m_widget;				//< widget reference
+			QHash<QString,QString> m_synonyms;		//< synonym name map
+			QList<LinkDef> m_links;				//< symbolic links to other objects
+			QList<Assignment> m_assignments;		//< assignment done at initialization and destruction
+			QList<Assignment> m_globals;			//< assignment done at initialization and destruction
+			DataSignals m_datasignals;			//< datasignals to emit on certain state changes
+			DataSlots m_dataslots;				//< dataslot to declare a receiver by name for being informed on certain state changes
+			QHash<QString,QVariant> m_dynamicProperties;	//< map of defined dynamic properties
+			int m_synonym_entercnt;				//< counter for how many stack elements to pop on a leave (for multipart synonyms)
+			int m_internal_entercnt;			//< counter for calling State::leave() before removing stack elements
 		};
 		typedef QSharedPointer<State> StateR;
 
@@ -335,12 +336,25 @@ class WidgetVisitor
 		///\brief Get all receivers of a datasignal (type)
 		QList<QWidget*> get_datasignal_receivers( DataSignalType type);
 
+		///\brief Execute dynamic properties declared as 'assign:var' := 'value' as assingments "var = <value>"
 		void readAssignments();
+		///\brief Execute dynamic properties declared as 'assign:var' := 'value' as assingments "value = <var>"
 		void writeAssignments();
-		///\brief Do assignments to form widgets based on assign: declarations
-		void do_initInititalizations();
-		///\brief Do assignments from form widgets based on assign: declarations
-		void do_closeInititalizations();
+
+		///\brief For all visitor sub widgets do assignments to form widgets based on assign: declarations
+		void do_readAssignments();
+		///\brief For all visitor sub widgets do assignments from form widgets based on assign: declarations
+		void do_writeAssignments();
+
+		///\brief Do assignments from global variables to form widgets based on global: declarations
+		void readGlobals( const QHash<QString,QVariant>& globals);
+		///\brief Do assignments to global variables from form widgets based on global: declarations
+		void writeGlobals( QHash<QString,QVariant>& globals);
+
+		///\brief For all visitor sub widgets do assignments from global variables to form widgets based on global: declarations
+		void do_readGlobals( const QHash<QString,QVariant>& globals);
+		///\brief For all visitor sub widgets do assignments to global variables from form widgets based on global: declarations
+		void do_writeGlobals( QHash<QString,QVariant>& globals);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

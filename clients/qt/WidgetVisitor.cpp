@@ -111,6 +111,11 @@ WidgetVisitor::State::State( QWidget* widget_)
 				QVariant value = m_widget->property( prop.toAscii());
 				m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toString()));
 			}
+			else if (prop.startsWith( "global:"))
+			{
+				QVariant value = m_widget->property( prop.toAscii());
+				m_globals.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toString()));
+			}
 			else if (prop.startsWith( "datasignal:"))
 			{
 				QVariant value = m_widget->property( prop.toAscii());
@@ -534,32 +539,6 @@ void WidgetVisitor::clear()
 	if (!m_stk.isEmpty())
 	{
 		m_stk.top()->clear();
-	}
-}
-
-void WidgetVisitor::readAssignments()
-{
-	if (m_stk.isEmpty()) return;
-	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
-	{
-		QVariant value = property( assignment.second);
-		if (!setProperty( assignment.first, value))
-		{
-			ERROR( "assigment failed", assignment.first);
-		}
-	}
-}
-
-void WidgetVisitor::writeAssignments()
-{
-	if (m_stk.isEmpty()) return;
-	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
-	{
-		QVariant value = property( assignment.first);
-		if (!setProperty( assignment.second, value))
-		{
-			ERROR( "assigment failed", assignment.second);
-		}
 	}
 }
 
@@ -1038,6 +1017,55 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 	return rt;
 }
 
+static bool nodeProperty_hasGlobal( const QWidget* widget, const QVariant& )
+{
+	foreach (const QString& prop, widget->dynamicPropertyNames())
+	{
+		if (prop.startsWith( "global:")) return true;
+	}
+	return false;
+}
+
+void WidgetVisitor::readGlobals( const QHash<QString,QVariant>& globals)
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_globals)
+	{
+		QHash<QString,QVariant>::const_iterator gi = globals.find( assignment.first);
+		if (gi != globals.end())
+		{
+			setProperty( assignment.second, gi.value());
+		}
+	}
+}
+
+void WidgetVisitor::writeGlobals( QHash<QString,QVariant>& globals)
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_globals)
+	{
+		globals[ assignment.first] = property( assignment.second);
+	}
+}
+
+void WidgetVisitor::do_readGlobals( const QHash<QString,QVariant>& globals)
+{
+	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasGlobal))
+	{
+		WidgetVisitor chldvisitor( wdg);
+		chldvisitor.readGlobals( globals);
+	}
+}
+
+void WidgetVisitor::do_writeGlobals( QHash<QString,QVariant>& globals)
+{
+	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasGlobal))
+	{
+		WidgetVisitor chldvisitor( wdg);
+		chldvisitor.writeGlobals( globals);
+	}
+}
+
 static bool nodeProperty_hasAssignment( const QWidget* widget, const QVariant& )
 {
 	foreach (const QString& prop, widget->dynamicPropertyNames())
@@ -1047,7 +1075,33 @@ static bool nodeProperty_hasAssignment( const QWidget* widget, const QVariant& )
 	return false;
 }
 
-void WidgetVisitor::do_initInititalizations()
+void WidgetVisitor::readAssignments()
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
+	{
+		QVariant value = property( assignment.second);
+		if (!setProperty( assignment.first, value))
+		{
+			ERROR( "assigment failed", assignment.first);
+		}
+	}
+}
+
+void WidgetVisitor::writeAssignments()
+{
+	if (m_stk.isEmpty()) return;
+	foreach (const State::Assignment& assignment, m_stk.top()->m_assignments)
+	{
+		QVariant value = property( assignment.first);
+		if (!setProperty( assignment.second, value))
+		{
+			ERROR( "assigment failed", assignment.second);
+		}
+	}
+}
+
+void WidgetVisitor::do_readAssignments()
 {
 	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasAssignment))
 	{
@@ -1056,7 +1110,7 @@ void WidgetVisitor::do_initInititalizations()
 	}
 }
 
-void WidgetVisitor::do_closeInititalizations()
+void WidgetVisitor::do_writeAssignments()
 {
 	foreach (QWidget* wdg, findSubNodes( nodeProperty_hasAssignment))
 	{
