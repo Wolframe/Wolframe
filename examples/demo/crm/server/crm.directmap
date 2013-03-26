@@ -22,6 +22,16 @@ DeleteCustomerNote( xml);
 GetCustomerNote( xml) :CustomerNoteResult;
 SearchCustomerNote( xml) :CustomerNoteListResult;
 
+#--- Picture
+#UpdatePicture( xml);
+#GetPicture( xml) :CustomerPictureResult;
+
+#--- CustomerPicture
+#InsertCustomerPicture( xml) :CustomerPictureResult;
+#DeleteCustomerPicture( xml);
+#GetCustomerPicture( xml) :CustomerPictureResult;
+#GetCustomerPictureList( xml) :CustomerPictureResultList;
+
 #--- Project
 InsertProject( xml);
 UpdateProject( xml);

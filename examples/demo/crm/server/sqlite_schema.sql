@@ -1,3 +1,15 @@
+-- Picture:
+CREATE TABLE Picture	(
+	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	caption		TEXT,
+	info		TEXT,
+	width		INT,
+	height		INT,
+	image		TEXT,
+	thumbnail	TEXT
+);
+
+
 -- Employee:
 CREATE TABLE Employee
 (
@@ -25,12 +37,12 @@ CREATE TABLE Customer
 	addr_country	TEXT
 );
 
--- Customer:
+-- CustomerPicture:
 CREATE TABLE CustomerPicture
 (
-	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	pictureid	INT	REFERENCES Picture( id ),
 	customerid	INT	REFERENCES Customer( id ),
-	picture		TEXT
+	UNIQUE ( pictureid, customerid )
 );
 
 -- CustomerNote:

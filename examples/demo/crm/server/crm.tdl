@@ -28,7 +28,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchEmployee
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchEmployeeResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchEmployeeResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchEmployeeResult SELECT id FROM Employee
 		WHERE name LIKE '%$(.)%'
 		OR status LIKE '%$(.)%'
@@ -79,7 +79,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchCustomer
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchCustomerResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchCustomerResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchCustomerResult SELECT id FROM Customer
 		WHERE name LIKE '%$(.)%'
 		OR description LIKE '%$(.)%'
@@ -146,7 +146,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchProject
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchProjectResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchProjectResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchProjectResult SELECT id FROM Project
 		WHERE name LIKE '%$(.)%'
 		OR description LIKE '%$(.)%';
@@ -197,7 +197,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchActivityCategory
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchActivityCategoryResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchActivityCategoryResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchActivityCategoryResult SELECT id FROM ActivityCategory
 		WHERE name LIKE '%$(.)%'
 		OR description LIKE '%$(.)%';
@@ -274,7 +274,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchActivity
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchActivityResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchActivityResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchActivityResult SELECT id FROM Project
 		WHERE description LIKE '%$(.)%'
 		AND ($(emloyeeid) = NULL OR emloyeeid = $(emloyeeid))
@@ -285,6 +285,59 @@ BEGIN
 		AND ($(rangeto) = NULL OR (start + duration) <= $(rangeto));
 	INTO project DO SELECT * FROM Project WHERE id IN (SELECT DISTINCT id FROM tmpSearchActivityResult);
 	DO DROP TABLE tmpSearchActivityResult;
+END
+
+
+--  PICTURE
+TRANSACTION UpdatePicture -- ($1=id, caption, info, image, width, height, thumbnail)
+BEGIN
+	DO UPDATE Picture SET
+		caption = $(caption), info = $(info), image = $(image),
+		width = $(width), height = $(height), thumbnail = $(thumbnail)
+		WHERE id = $1;
+END
+
+OPERATION insertPicture -- (caption, info, image, width, height, thumbnail)
+BEGIN
+	DO INSERT INTO Picture( caption, info, image, width, height, thumbnail)
+		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
+	DO NONEMPTY UNIQUE getLastIdPicture();
+END
+
+OPERATION deletePicture -- ($1=id)
+BEGIN
+	DO DELETE FROM Picture WHERE id = $1;
+END
+
+TRANSACTION GetPicture
+BEGIN
+	INTO . DO UNIQUE NONEMPTY SELECT id, caption, info, image, width, height, thumbnail
+		FROM Picture WHERE Picture.id=$(id);
+END
+
+
+
+--  CUSTOMER PICTURE
+TRANSACTION InsertCustomerPicture
+BEGIN
+	DO insertPicture();
+	DO INSERT INTO CustomerPicture (customerid, pictureid) VALUES ($(customerid), $1);
+	INTO . DO SELECT $1 AS pictureid;
+END
+
+TRANSACTION DeleteCustomerPicture
+BEGIN
+	DO SELECT $(pictureid);
+	DO deletePicture( $1);
+	DO DELETE FROM CustomerPicture WHERE pictureid=$(pictureid) AND customerid=$(customerid);
+END
+
+TRANSACTION GetCustomerPictureList
+BEGIN
+	INTO picture DO UNIQUE NONEMPTY SELECT id, caption, info, width, height, thumbnail
+		FROM Picture,CustomerPicture
+		WHERE CustomerPicture.customerid = $(customerid)
+		AND CustomerPicture.pictureid = Picture.id;
 END
 
 
@@ -302,7 +355,7 @@ END
 TRANSACTION UpdateCustomerNote
 BEGIN
 	DO UPDATE CustomerNote SET
-			name=customerid=$(customerid), content=$(content), link=$(link)
+			customerid=$(customerid), content=$(content), link=$(link)
 		WHERE id=$(id);
 END
 
@@ -319,7 +372,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchCustomerNote
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchCustomerNoteResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchCustomerNoteResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchCustomerNoteResult SELECT id FROM CustomerNote
 		WHERE (content LIKE '%$(.)%' OR link LIKE '%$(.)%')
 		AND ($(customerid) = NULL OR customerid = $(customerid))
@@ -342,7 +395,7 @@ END
 TRANSACTION UpdateProjectNote
 BEGIN
 	DO UPDATE ProjectNote SET
-			name=projectid=$(projectid), content=$(content), link=$(link)
+			projectid=$(projectid), content=$(content), link=$(link)
 		WHERE id=$(id);
 END
 
@@ -359,7 +412,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchProjectNote
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchProjectNoteResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchProjectNoteResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchProjectNoteResult SELECT id FROM ProjectNote
 		WHERE (content LIKE '%$(.)%' OR link LIKE '%$(.)%')
 		AND ($(projectid) = NULL OR projectid = $(projectid))
@@ -382,7 +435,7 @@ END
 TRANSACTION UpdateActivityNote
 BEGIN
 	DO UPDATE ActivityNote SET
-			name=activityid=$(activityid), content=$(content), link=$(link)
+			activityid=$(activityid), content=$(content), link=$(link)
 		WHERE id=$(id);
 END
 
@@ -399,7 +452,7 @@ END
 --  Not very efficient search :-)
 TRANSACTION SearchActivityNote
 BEGIN
-	DO CREATE TEMPORARY TABLE tmpSearchActivityNoteResult( id int );
+	DO CREATE TEMPORARY TABLE tmpSearchActivityNoteResult( id int);
 	FOREACH pattern DO INSERT INTO tmpSearchActivityNoteResult SELECT id FROM ActivityNote
 		WHERE (content LIKE '%$(.)%' OR link LIKE '%$(.)%')
 		AND ($(activityid) = NULL OR activityid = $(activityid))

@@ -111,10 +111,12 @@ void FormWidget::switchForm( QWidget *actionwidget )
 	// ABa, TODO: this is wrong, we should wait for error or answer, after
 	// that we switch the form on ok, not on error..
 	
+	WidgetVisitor formvisitor( m_ui);
+	formvisitor.do_writeAssignments();
+	formvisitor.do_writeGlobals( *m_globals);
+
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
-	visitor.do_writeAssignments();
-	visitor.do_writeGlobals( *m_globals);
 
 	if (formlink.isValid())
 	{

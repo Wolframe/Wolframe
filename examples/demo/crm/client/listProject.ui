@@ -31,13 +31,6 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="AddPicture">
-        <property name="text">
-         <string>AddPicture</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="NavAddProject">
         <property name="text">
          <string>Add</string>

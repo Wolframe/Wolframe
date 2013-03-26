@@ -336,6 +336,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			stk.last().tok.append( xml.text());
 		}
 	}
+	visitor.endofDataFeed();
 	visitor.restoreState();
 	return true;
 }

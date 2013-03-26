@@ -163,6 +163,9 @@
        <property name="dataobject" stdset="0">
         <string>employee</string>
        </property>
+       <property name="dataelement" stdset="0">
+        <string>@id,name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country</string>
+       </property>
       </widget>
      </item>
      <item>

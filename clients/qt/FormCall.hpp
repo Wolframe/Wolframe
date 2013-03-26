@@ -49,18 +49,21 @@ class FormCall
 public:
 	///\brief Constructor from definition
 	explicit FormCall( const QString& callstr);
+	///\brief Default constructor
+	FormCall();
+
+	void init( const QString& callstr);
 
 	///\brief Form name to call
-	const QByteArray& name() const					{return m_name;}
-	static QByteArray name( const QByteArray& callstr);
+	const QString& name() const					{return m_name;}
 	static QString name( const QString& callstr);
 
-	typedef QPair<QByteArray,QVariant> Parameter;
+	typedef QPair<QString,QVariant> Parameter;
 	///\brief List of parameters to pass to the form called
 	const QList<Parameter>& parameter() const			{return m_parameter;}
 
 private:
-	QByteArray m_name;			//< name of the form to load
+	QString m_name;				//< name of the form to load
 	QList<Parameter> m_parameter;		//< list of parameters to set in the loaded form before initializing it with data
 };
 

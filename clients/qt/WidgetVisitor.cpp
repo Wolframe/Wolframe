@@ -35,6 +35,7 @@
 #include "WidgetVisitorStateConstructor.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
+#include "FormWidget.hpp"
 
 #include <QDebug>
 #include <QXmlStreamWriter>
@@ -474,6 +475,18 @@ QWidget* WidgetVisitor::predecessor( const QString& name) const
 	return 0;
 }
 
+QWidget* WidgetVisitor::formwidget() const
+{
+	if (m_stk.isEmpty()) return 0;
+	QObject* wdg = m_stk.at(0)->m_widget;
+	for (; wdg != 0; wdg = wdg->parent())
+	{
+		FormWidget* rt = qobject_cast<FormWidget*>( wdg);
+		if (rt) return rt;
+	}
+	return 0;
+}
+
 QWidget* WidgetVisitor::uirootwidget() const
 {
 	if (m_stk.isEmpty()) return 0;
@@ -532,6 +545,11 @@ void WidgetVisitor::restoreState()
 		QVariant initialFocus = m_stk.top()->m_widget->property( "initialFocus");
 		if (initialFocus.toBool()) widget()->setFocus();
 	}
+}
+
+void WidgetVisitor::endofDataFeed()
+{
+	if (!m_stk.isEmpty()) m_stk.top()->endofDataFeed();
 }
 
 void WidgetVisitor::clear()
@@ -597,8 +615,9 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 	if (subelem)
 	{
 		rt = property( rest, level);
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
 		leave( false);
-		if (m_stk.top()->isRepeatingDataElement( prefix))
+		if (isArray)
 		{
 			// ... handle array
 			QList<QVariant> rtlist;
@@ -683,27 +702,29 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	if (followidx >= 0)
 	{
 		prefix = name.mid( 0, followidx);
-		if (m_stk.top()->isRepeatingDataElement( prefix))
-		{
-			ERROR( "cannot set property addressing a set of properties", prefix);
-		}
 		rest = name.mid( followidx+1, name.size()-followidx-1);
 		if (enter( prefix, false, level))
 		{
 			subelem = true;
 		}
-	}
-	else
-	{
-		if (m_stk.top()->isRepeatingDataElement( name))
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
+		if (isArray)
 		{
 			ERROR( "cannot set property addressing a set of properties", prefix);
 		}
+	}
+	else
+	{
 		if (enter( name, true, level))
 		{
 			subelem = true;
 			prefix = name;
 			rest.clear();
+		}
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( name);
+		if (isArray)
+		{
+			ERROR( "cannot set property addressing a set of properties", prefix);
 		}
 	}
 	if (subelem)
@@ -807,6 +828,7 @@ struct WidgetVisitorStackElement
 				}
 			}
 			dataelements.append( state->dataelements());
+
 			foreach (const QWidget* child, state->datachildren())
 			{
 				if (qobject_cast<const QLabel*>(child)) continue;
@@ -916,7 +938,8 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 							elemstk.top().dataelements.removeAt( di);
 						}
 					}
-					if (!m_stk.top()->isRepeatingDataElement( prefix))
+					bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
+					if (!isArray)
 					{
 						++elemstk.top().dataelementidx;
 					}
@@ -929,7 +952,8 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 			else if (enter( dataelem, false, elemstk.top().level))
 			{
 				elemstk.top().isContent = true;
-				if (!m_stk.top()->isRepeatingDataElement( dataelem))
+				bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( dataelem);
+				if (!isArray)
 				{
 					++elemstk.top().dataelementidx;
 				}

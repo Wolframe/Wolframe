@@ -110,6 +110,8 @@ QVariant WidgetVisitorState_QComboBox::property( const QString& name)
 		case None:
 			if (name == "selected")
 			{
+				QVariant selected = m_comboBox->property( "_w_selected");
+				if (selected.isValid()) return selected;
 				if (m_comboBox->currentIndex() < 0) return QVariant();
 				return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
 			}
@@ -137,9 +139,7 @@ bool WidgetVisitorState_QComboBox::setProperty( const QString& name, const QVari
 		case None:
 			if (name == "selected")
 			{
-				int idx = m_comboBox->findData( data, Qt::UserRole, Qt::MatchExactly);
-				if (idx < 0) return false;
-				m_comboBox->setCurrentIndex( idx);
+				m_comboBox->setProperty( "_w_selected", data);
 				return true;
 			}
 			return false;
@@ -206,5 +206,16 @@ void WidgetVisitorState_QComboBox::setState( const QVariant& state)
 QVariant WidgetVisitorState_QComboBox::getState() const
 {
 	return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
+}
+
+void WidgetVisitorState_QComboBox::endofDataFeed()
+{
+	QVariant selected = m_comboBox->property( "_w_selected");
+	if (selected.isValid())
+	{
+		int idx = m_comboBox->findData( selected, Qt::UserRole, Qt::MatchExactly);
+		if (idx < 0) return;
+		m_comboBox->setCurrentIndex( idx);
+	}
 }
 

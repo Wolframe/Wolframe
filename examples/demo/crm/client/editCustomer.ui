@@ -157,11 +157,11 @@
        <property name="form" stdset="0">
         <string notr="true">listCustomer</string>
        </property>
-       <property name="id" stdset="0">
-        <string/>
-       </property>
        <property name="dataobject" stdset="0">
         <string>customer</string>
+       </property>
+       <property name="dataelement" stdset="0">
+        <string>@id,name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country</string>
        </property>
       </widget>
      </item>

@@ -36,7 +36,10 @@
          <string>AddPicture</string>
         </property>
         <property name="form" stdset="0">
-         <string>addCustomerPicture?customerid={customer.id}</string>
+         <string>addCustomerPicture?customerid={customer.selected}</string>
+        </property>
+        <property name="global:listCustomer_selected" stdset="0">
+         <string>customer.selected</string>
         </property>
        </widget>
       </item>
@@ -105,6 +108,9 @@
      </property>
      <property name="doctype" stdset="0">
       <string>ListCustomer</string>
+     </property>
+     <property name="dataelement" stdset="0">
+      <string/>
      </property>
      <column>
       <property name="text">

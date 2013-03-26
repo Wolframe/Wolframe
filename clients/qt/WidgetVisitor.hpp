@@ -165,6 +165,8 @@ class WidgetVisitor
 			virtual void setState( const QVariant& /*state*/){}
 			///\brief Get the current the widget state
 			virtual QVariant getState()						{return QVariant();}
+			///\brief Hook to complete the feeding of data
+			virtual void endofDataFeed(){}
 			///\brief Connect all widget signals that should trigger an onchange event to the listener slot 'changed'
 			virtual void ConnectOnChangeSignals( WidgetListener& /*listener*/){}
 
@@ -316,6 +318,9 @@ class WidgetVisitor
 		///\param[in] value to resolve
 		QVariant resolve( const QVariant& value);
 
+		///\brief Get the form widget of this widget
+		///\brief Return the form widget reference if this widget is a sub widget of a form or 0 if it does not exist
+		QWidget* formwidget() const;
 		///\brief Get the UI root widget
 		QWidget* uirootwidget() const;
 		///\brief Get the UI root widget
@@ -329,6 +334,8 @@ class WidgetVisitor
 		void resetState();
 		///\brief Restore the state from its description backup (resetState)
 		void restoreState();
+		///\brief Declare end of data feed
+		void endofDataFeed();
 
 		///\brief Clear widget data
 		void clear();

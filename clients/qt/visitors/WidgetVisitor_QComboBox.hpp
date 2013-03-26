@@ -51,6 +51,7 @@ public:
 	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+	virtual void endofDataFeed();
 
 private:
 	enum Mode {None,Value,Select};

@@ -1,3 +1,4 @@
+PREPARE getLastIdPicture AS SELECT DISTINCT last_insert_rowid() FROM Picture;
 PREPARE getLastIdEmployee AS SELECT DISTINCT last_insert_rowid() FROM Employee;
 PREPARE getLastIdCustomer AS SELECT DISTINCT last_insert_rowid() FROM Customer;
 PREPARE getLastIdProject AS SELECT DISTINCT last_insert_rowid() FROM Project;

@@ -71,6 +71,46 @@ Form ListCustomerRef	{ customer { } }
 
 
 
+; ------------ CustomerPicture
+; * Sub structures:
+Form CustomerPicture
+{
+	customerid	!ID
+	caption		?string
+	info		?string
+	filename	string
+}
+
+Form CustomerPictureInserted
+{
+	id		!@ID
+	_ CustomerPicture
+}
+
+; * Forms:
+Form InsertCustomerPicture	{ note { _ CustomerPicture } }
+Form UpdateCustomerPicture	{ note { _ CustomerPictureInserted } }
+Form DeleteCustomerPicture	{ note { id !@ID } }
+Form GetCustomerPicture		{ note { id !@ID } }
+
+Form CustomerPictureResult
+{
+	picture
+	{
+		_ CustomerPictureInserted
+	}
+}
+Form CustomerPictureListResult
+{
+	picturelist
+	{
+		picture CustomerPictureResult[]
+	}
+}
+
+
+
+
 ; ------------ CustomerNote
 ; * Sub structures:
 Form CustomerNote
