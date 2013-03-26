@@ -54,7 +54,7 @@ public:
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return FORM_FUNCTION_PROGRAMTYPE_OBJECT;
+		return PROGRAM_TYPE_OBJECT;
 	}
 	virtual const char* objectClassName() const
 	{
@@ -90,7 +90,7 @@ public:
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return ObjectConstructorBase::FORM_FUNCTION_PROGRAMTYPE_OBJECT;
+		return ObjectConstructorBase::PROGRAM_TYPE_OBJECT;
 	}
 	virtual ObjectConstructorBase* constructor()
 	{

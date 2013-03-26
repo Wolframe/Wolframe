@@ -172,7 +172,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
-			case ObjectConstructorBase::FORM_FUNCTION_PROGRAMTYPE_OBJECT:
+			case ObjectConstructorBase::PROGRAM_TYPE_OBJECT:
 			{	// object is a form function program type
 				module::ProgramTypeConstructor* ffo = dynamic_cast< module::ProgramTypeConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
