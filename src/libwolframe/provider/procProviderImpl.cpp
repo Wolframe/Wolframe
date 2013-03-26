@@ -40,6 +40,7 @@
 #include "module/builtInFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
+#include "module/programTypeBuilder.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -165,6 +166,30 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					catch (const std::runtime_error& e)
 					{
 						LOG_FATAL << "Error loading DDL compiler '" << ffo->name() << "':" << e.what();
+					}
+					delete ffo;
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::PROGRAM_TYPE_OBJECT:
+			{	// object is a form function program type
+				module::ProgramTypeConstructor* ffo = dynamic_cast< module::ProgramTypeConstructor* >((*it)->constructor());
+				if ( ffo == NULL )	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "'' is not a DDL compiler";
+					throw std::logic_error( "Object is not a form function. See log." );
+				}
+				else {
+					try
+					{
+						prgbind::ProgramR prgtype( ffo->object());
+						m_programs->defineProgramType( prgtype);
+						LOG_TRACE << "registered '" << ffo->name() << "' form function program type";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading form function program type '" << ffo->name() << "':" << e.what();
 					}
 					delete ffo;
 				}

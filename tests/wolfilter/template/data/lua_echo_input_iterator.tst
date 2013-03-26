@@ -8,10 +8,10 @@ testscripts=$luascript					# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=$docin						# output document name
 
-testcmd="$opt --program $luascript run"			# command to execute by the test
+testcmd="$opt --cmdprogram $luascript run"		# command to execute by the test
 csetlist="UCS-2LE UCS-2BE UCS-4BE UCS-4LE"		# character set encodings to test
 . ./output_tst_textwolf.sh
 
-testcmd="$opt --program $luascript run"			# command to execute by the test
+testcmd="$opt --cmdprogram $luascript run"		# command to execute by the test
 csetlist="UTF-8 UTF-16LE UTF-16BE"			# character set encodings to test
 . ./output_tst_libxml2.sh

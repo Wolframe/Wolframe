@@ -444,6 +444,7 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 	switch (typ)
 	{
 		case LUA_TTABLE:
+			lua_pushvalue( ls, idx);
 			rt.reset( new LuaTableInputFilter( ls));
 			break;
 
@@ -1957,7 +1958,7 @@ LuaScript::LuaScript( const std::string& path_)
 	// Fill the map of all system functions to exclude them from the list of exported functions:
 	{
 		LuaScriptInstance instance( this, 0/*modulemap*/);
-		instance.init( 0, false);
+		instance.initbase( 0, false);
 		lua_State* ls = instance.ls();
 		lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
 		lua_pushnil(ls);
@@ -1973,7 +1974,7 @@ LuaScript::LuaScript( const std::string& path_)
 	// Check the script syntax and get the list of all global functions (that are not system or module functions)
 	{
 		LuaScriptInstance instance( this, 0/*modulemap*/);
-		instance.init( 0, true);
+		instance.initbase( 0, true);
 		lua_State* ls = instance.ls();
 
 		lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
@@ -2044,7 +2045,12 @@ std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
 	return rt;
 }
 
-void LuaScriptInstance::init( const proc::ProcessorProvider* provider_, bool callMain)
+void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
+{
+	initbase( provider_, true);
+}
+
+void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool callMain)
 {
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
@@ -2116,7 +2122,7 @@ void LuaScriptInstance::init( const proc::ProcessorProvider* provider_, bool cal
 
 void LuaScriptInstance::init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_)
 {
-	init( provider_);
+	initbase( provider_, true);
 	LuaExceptionHandlerScope luaThrows(m_ls);
 	{
 		LuaObject<Input>::createGlobal( m_ls, "input", input_, input_methodtable);
@@ -2221,4 +2227,41 @@ std::list<std::string> LuaFunctionMap::commands() const
 	for (; ii != ee; ++ii) rt.push_back( ii->first);
 	return rt;
 }
+
+TypedInputFilterR LuaScriptInstance::getObject( int idx)
+{
+	TypedInputFilterR rt;
+	int typ = lua_type( thread(), idx);
+	if (typ == LUA_TTABLE || typ == LUA_TFUNCTION)
+	{
+		rt = get_operand_TypedInputFilter( thread(), idx);
+	}
+	else
+	{
+		ddl::FormR* form;
+		if ((form=LuaObject<ddl::FormR>::get( thread(), idx)) != 0)
+		{
+			return TypedInputFilterR( new serialize::DDLStructSerializer( form->get()));
+		}
+		TypedInputFilterR* resultref;
+		if ((resultref=LuaObject<TypedInputFilterR>::get( thread(), idx)) != 0)
+		{
+			return *resultref;
+		}
+		serialize::StructSerializer* obj;
+		if ((obj=LuaObject<serialize::StructSerializer>::get( thread(), idx)) != 0)
+		{
+			return TypedInputFilterR( obj->copy());
+		}
+	}
+	return rt;
+}
+
+void LuaScriptInstance::pushObject( const TypedInputFilterR& obj)
+{
+	LuaObject<TypedInputFilterR>::push_luastack( thread(), obj);
+}
+
+
+
 

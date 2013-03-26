@@ -151,7 +151,7 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
 		std::map<std::string,std::vector<std::string> > cmdhandler_programs;
-		std::vector<std::string>::const_iterator gi = m_programs.begin(), ge = m_programs.end();
+		std::vector<std::string>::const_iterator gi = m_cmdprograms.begin(), ge = m_cmdprograms.end();
 		for (; gi != ge; ++gi)
 		{
 			bool cfgid_set = false;
@@ -181,8 +181,13 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			}
 			if (!cfgid_set)
 			{
-				proccfg.add_child( "program", boost::property_tree::ptree( *gi));
+				throw std::runtime_error( std::string( "no command handler found for comman handler program (") + *gi + ")");
 			}
+		}
+		gi = m_programs.begin(), ge = m_programs.end();
+		for (; gi != ge; ++gi)
+		{
+			proccfg.add_child( "program", boost::property_tree::ptree( *gi));
 		}
 		std::map<std::string,std::vector<std::string> >::const_iterator mi = cmdhandler_programs.begin(), me = cmdhandler_programs.end();
 		for (; mi != me; ++mi)
@@ -224,7 +229,8 @@ struct WolfilterOptionStruct
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 			( "filter,e", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
-			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
+			( "program,p", po::value< std::vector<std::string> >(), "specify a program to load by path" )
+			( "cmdprogram,x", po::value< std::vector<std::string> >(), "specify command handler program to load by path" )
 			( "config,c", po::value<std::string>(), "specify configuration file to load" )
 			( "database,d", po::value<std::string>(), "specifiy transaction database" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
@@ -288,6 +294,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		m_config = utils::readPropertyTreeFile( configfile);
 		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
+		if (vmap.count( "cmdprogram")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "database")) throw std::runtime_error( "incompatible options: --config specified with --database");
 	}
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
@@ -319,6 +326,10 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "program"))
 	{
 		m_programs = vmap["program"].as<std::vector<std::string> >();
+	}
+	if (vmap.count( "cmdprogram"))
+	{
+		m_cmdprograms = vmap["cmdprogram"].as<std::vector<std::string> >();
 	}
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "filter"))

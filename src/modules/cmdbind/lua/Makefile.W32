@@ -33,7 +33,8 @@ LUA_CPP_OBJS = \
 	luaObjects.obj \
 	luaGetFunctionClosure.obj \
 	luaDebug.obj \
-	luaScriptContext.obj
+	luaScriptContext.obj \
+	luaFunctionProgramType.obj
 
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \

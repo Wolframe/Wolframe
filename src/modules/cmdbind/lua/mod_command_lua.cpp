@@ -33,7 +33,9 @@
 ///\file mod_command_lua.cpp
 ///\brief Module for command handler executing lua scripts
 #include "module/scriptCommandHandlerBuilder.hpp"
+#include "module/programTypeBuilder.hpp"
 #include "luaCommandHandler.hpp"
+#include "luaFunctionProgramType.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -47,20 +49,32 @@ static void setModuleLogger( void* logger)
 }
 
 namespace {
-static ConfiguredBuilder* createLuaCommandHandlerModule()
+static ConfiguredBuilder* createLuaCommandHandler()
 {
 	static ScriptCommandHandlerBuilder<cmdbind::LuaCommandHandler>
 		mod( "LuaCommandHandler", "command handler for lua scripts", "cmdhandler", "lua", "LuaCommandHandler");
 	return &mod;
 }
+static SimpleBuilder* createLuaProgramType()
+{
+	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "luaformfunc", langbind::createLuaProgramType);
+}
 }//anonymous namespace
 
-enum {NofContainers=1};
-static ConfiguredBuilder* (*containers[ NofContainers])() =
+enum {NofConfiguredBuilder=1};
+static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
 {
-	createLuaCommandHandlerModule
+	createLuaCommandHandler
+};
+enum {NofSimpleBuilder=1};
+static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
+{
+	createLuaProgramType
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler for lua scripts",
-				setModuleLogger, NofContainers, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "command handler and form function handler for lua",
+				setModuleLogger,
+				NofConfiguredBuilder, configuredBuilder,
+				NofSimpleBuilder, simpleBuilder);
+
 

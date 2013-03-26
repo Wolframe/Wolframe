@@ -19,7 +19,7 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
-opt="$opt --program=test.directmap"
+opt="$opt --cmdprogram=test.directmap"
 testscripts="$formname"					# list of scripts of the test
 testcmd="$opt run"					# command to execute by the test
 docin=schema_select_task_by_id				# input document name

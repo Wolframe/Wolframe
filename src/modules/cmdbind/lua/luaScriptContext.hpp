@@ -51,6 +51,7 @@ struct LuaScriptContext
 	~LuaScriptContext();
 
 	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
+	std::vector<std::string> loadProgram( const std::string& prgfile);
 
 	void setDefaultFilter( const std::string& defaultfilter_)
 	{

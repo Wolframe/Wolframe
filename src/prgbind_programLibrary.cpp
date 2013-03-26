@@ -191,6 +191,11 @@ public:
 		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
 	}
 
+	void defineProgramType( const ProgramR& prg)
+	{
+		m_programTypes.push_back( prg);
+	}
+
 	void defineFilterConstructor( const module::FilterConstructorR& f)
 	{
 		m_filterMap.insert( f->name(), f);
@@ -337,6 +342,11 @@ void ProgramLibrary::definePrintLayoutType( const module::PrintFunctionConstruct
 void ProgramLibrary::defineFilterConstructor( const module::FilterConstructorR& f)
 {
 	return m_impl->defineFilterConstructor( f);
+}
+
+void ProgramLibrary::defineProgramType( const ProgramR& prg)
+{
+	m_impl->defineProgramType( prg);
 }
 
 const ddl::TypeMap* ProgramLibrary::formtypemap() const

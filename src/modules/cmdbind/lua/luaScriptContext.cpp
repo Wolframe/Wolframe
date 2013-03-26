@@ -80,4 +80,18 @@ void LuaScriptContext::load( const std::vector<std::string>& prgfiles_, const mo
 	}
 }
 
+std::vector<std::string> LuaScriptContext::loadProgram( const std::string& prgfile)
+{
+	std::vector<std::string> rt;
+	langbind::LuaScript script( prgfile);
+	std::vector<std::string>::const_iterator ni = script.functions().begin(), ne = script.functions().end();
+	for (; ni != ne; ++ni)
+	{
+		rt.push_back( *ni);
+		funcmap.defineLuaFunction( *ni, script);
+	}
+	return rt;
+}
+
+
 

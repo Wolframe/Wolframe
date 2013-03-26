@@ -144,5 +144,5 @@ end
 --module ../../src/modules/filter/line/mod_filter_line
 --module ../../src/modules/lua/datetime/mod_lua_datetime
 --module ../../src/modules/cmdbind/lua/mod_command_lua
---program date_calc.lua run
+--cmdprogram date_calc.lua run
 **end

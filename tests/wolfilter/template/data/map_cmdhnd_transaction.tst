@@ -17,7 +17,7 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
-opt="$opt --program=test.directmap"
+opt="$opt --cmdprogram=test.directmap"
 opt="$opt --program $formname"				# form for invoice
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 testcmd="$opt run"					# command to execute by the test
