@@ -34497,5 +34497,5 @@ end
 
 
 **config
---module ../../src/modules/filter/line/mod_filter_line --module ../../src/modules/lua/bcdnumber/mod_lua_bcdnumber --module ../../src/modules/cmdbind/lua/mod_command_lua --program bcdnumber_calc.lua run
+--module ../../src/modules/filter/line/mod_filter_line --module ../../src/modules/lua/bcdnumber/mod_lua_bcdnumber --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram bcdnumber_calc.lua run
 **end

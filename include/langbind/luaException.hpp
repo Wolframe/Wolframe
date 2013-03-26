@@ -56,7 +56,7 @@ public:
 	{}
 
 	LuaExceptionHandlerScope( const LuaExceptionHandlerScope& o)
-		:m_panicf(o.m_panicf){}
+		:m_ls(o.m_ls),m_panicf(o.m_panicf){}
 
 	~LuaExceptionHandlerScope()
 	{

@@ -79,6 +79,7 @@ private:
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	std::vector<std::string> m_programs;
+	std::vector<std::string> m_cmdprograms;
 	boost::property_tree::ptree m_dbconfig;
 	boost::property_tree::ptree m_config;
 	std::string m_cmd;

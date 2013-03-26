@@ -120,8 +120,22 @@ public:
 
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
 	///\param[in] provider_ processor provider for allocation of objects accessed
+	void init( const proc::ProcessorProvider* provider_);
+
+	///\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
+	///\param[in] idx index of the object on the lua stack
+	///\return the lua object
+	TypedInputFilterR getObject( int idx);
+
+	///\brief Push a lua object as typed input filter on the lua stack of the executed lua thread context
+	///\param[in] obj the object to push
+	void pushObject( const TypedInputFilterR& obj);
+
+private:
+	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
+	///\param[in] provider_ processor provider for allocation of objects accessed
 	///\param[in] callMain wheter to call the script for initialization of its objects or not
-	void init( const proc::ProcessorProvider* provider_, bool callMain=true);
+	void initbase( const proc::ProcessorProvider* provider_, bool callMain);
 
 private:
 	friend class LuaScript;
@@ -131,6 +145,7 @@ private:
 	int m_threadref;
 	const LuaScript* m_script;
 	const LuaModuleMap* m_modulemap;
+
 private:
 	LuaScriptInstance( const LuaScriptInstance&){} //non copyable
 };

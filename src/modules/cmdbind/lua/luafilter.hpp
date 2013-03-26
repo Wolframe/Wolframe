@@ -68,7 +68,13 @@ public:
 		,m_ls(o.m_ls)
 		,m_stk(o.m_stk)
 	{
-		if (m_stk.size() > 0) throw std::runtime_error( "copy of lua input filter not allowed in this state");
+		if (m_stk.size() > 0)
+		{
+			if (m_stk.size() > 1 || m_stk.back().id != FetchState::Init)
+			{
+				throw std::runtime_error( "copy of lua input filter not allowed in this state");
+			}
+		}
 	}
 
 	///\brief Destructor

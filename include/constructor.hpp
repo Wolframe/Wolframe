@@ -57,6 +57,7 @@ public:
 		PRINT_FUNCTION_OBJECT,
 		CMD_HANDLER_OBJECT,
 		LANGUAGE_EXTENSION_OBJECT,
+		FORM_FUNCTION_PROGRAMTYPE_OBJECT,
 		TEST_OBJECT
 	};
 
@@ -76,6 +77,7 @@ public:
 			"Print Function",
 			"Command Handler",
 			"Language Extension",
+			"Form Function Program Type",
 			"Test"
 		};
 		return ar[ (int)tp];

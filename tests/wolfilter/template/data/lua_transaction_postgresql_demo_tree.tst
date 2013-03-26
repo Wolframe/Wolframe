@@ -4,7 +4,7 @@ opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
 luascript=`echo $testname | sed 's/lua_//' | sed 's/_postgresql//'`.lua
-opt="$opt --program=$luascript"
+opt="$opt --cmdprogram=$luascript"
 ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp

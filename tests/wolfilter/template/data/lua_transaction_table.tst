@@ -8,7 +8,7 @@ opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
 luascript=`echo $testname | sed 's/lua_//'`.lua
-opt="$opt --program $luascript"
+opt="$opt --cmdprogram $luascript"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript"				# list of scripts of the test
 docin=employee_assignment_print				# input document name

@@ -68,6 +68,7 @@ public:
 	virtual void defineFormDDL( const ddl::DDLCompilerR& c);
 	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& f);
 	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
+	virtual void defineProgramType( const ProgramR& prg);
 
 	virtual const ddl::TypeMap* formtypemap() const;
 	virtual const types::keymap<module::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;

@@ -19,7 +19,7 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
-opt="$opt --program=test.directmap"
+opt="$opt --cmdprogram=test.directmap"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$formname"					# list of scripts of the test
 docin=employee_assignment_doctype			# input document name
