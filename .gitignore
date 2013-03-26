@@ -130,6 +130,7 @@ tests/bignum/testbignum
 tests/temp/
 tests/testProtocolLFdotEscaping
 tests/testWolfilter
+tests/testWolfilter.sh
 tests/testDatabaseProcessorVM
 wtest/wtestcheck
 src/modules/authentication/textfile/wolfpasswd
