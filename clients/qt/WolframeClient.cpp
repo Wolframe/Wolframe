@@ -85,6 +85,11 @@ WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget 
 		this, SLOT( handleResult( ) ) );
 }
 
+void WolframeClient::setConnectionParameters( const ConnectionParameters _connParams )
+{
+	m_connParams = _connParams;
+}
+
 void WolframeClient::timeoutOccurred( )
 {
 	m_timeoutTimer->stop( );
