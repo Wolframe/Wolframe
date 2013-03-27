@@ -32,7 +32,7 @@
 ************************************************************************/
 
 #include "WolframeClientProtocolBase.hpp"
-#include "DebugTerminal.hpp"
+#include <QDebug>
 
 void WolframeClientProtocolBase::pushData( const QByteArray& buf)
 {
