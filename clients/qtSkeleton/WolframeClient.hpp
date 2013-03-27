@@ -1,4 +1,4 @@
-/************************************************************************
+m/************************************************************************
 
  Copyright (C) 2011 - 2013 Project Wolframe.
  All rights reserved.
@@ -76,7 +76,6 @@ class WolframeClient : public QObject
 		ConnectionParameters m_connParams;
 		State m_state;
 		QAbstractSocket *m_socket;
-		QWidget *m_parent;
 		bool m_hasErrors;
 		WolframeClientProtocol m_protocol;
 #ifdef WITH_SSL
