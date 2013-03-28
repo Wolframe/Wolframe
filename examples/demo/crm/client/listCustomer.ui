@@ -14,6 +14,57 @@
    <string>Customer List</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QTreeWidget" name="customer">
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>customer</string>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>ListCustomer</string>
+     </property>
+     <property name="dataelement" stdset="0">
+      <string/>
+     </property>
+     <column>
+      <property name="text">
+       <string>name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>description</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_line1</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_line2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_postalcode</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_district</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_country</string>
+      </property>
+     </column>
+    </widget>
+   </item>
    <item row="2" column="1">
     <widget class="QGroupBox" name="horizontalGroupBox">
      <layout class="QHBoxLayout" name="navigate">
@@ -29,6 +80,16 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="CustomerListRelation">
+        <property name="text">
+         <string>Releations</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>relationCustomerEmployee?customer.selected={customer.selected}</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="AddPicture">
@@ -96,57 +157,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QTreeWidget" name="customer">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>ListCustomer</string>
-     </property>
-     <property name="dataelement" stdset="0">
-      <string/>
-     </property>
-     <column>
-      <property name="text">
-       <string>name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>description</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_line1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_line2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_postalcode</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_district</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_country</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

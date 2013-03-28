@@ -49,7 +49,12 @@ Form CustomerInserted
 	id		!@ID
 	_ Customer
 }
-
+Form CustomerInsertedShort
+{
+	id		!@ID
+	name		entityname
+	description	string
+}
 Form CustomerRef
 {
 	id		!@ID
@@ -63,6 +68,7 @@ Form DeleteCustomer	{ customer { id !@ID } }
 Form GetCustomer	{ customer { id !@ID } }
 Form CustomerResult	{ customer { _ CustomerInserted } }
 Form CustomerListResult	{ customers { customer CustomerInserted[] } }
+Form CustomerListShortResult	{ customers { customer CustomerInsertedShort[] } }
 Form CustomerRefListResult { customers { customer CustomerRef[] } }
 Form SearchCustomer	{ customer { pattern string } }
 Form ListCustomer	{ customer { } }
