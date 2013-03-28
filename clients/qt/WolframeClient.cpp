@@ -43,11 +43,12 @@
 #endif
 
 WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent )
-	: m_connParams( _connParams )
-	,m_state( Disconnected )
-	,m_hasErrors( false )
+	: QObject( _parent ),
+	m_connParams( _connParams ),
+	m_state( Disconnected ),
+	m_hasErrors( false ),
 #ifdef WITH_SSL
-	,m_initializedSsl( false )
+	m_initializedSsl( false )
 #endif
 {
 #ifdef WITH_SSL

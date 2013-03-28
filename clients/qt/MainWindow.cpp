@@ -53,7 +53,6 @@
 
 // built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
-	m_cmdline( 0 ),
 	m_formWidget( 0 ), m_uiLoader( 0 ), m_formLoader( 0 ),
 	m_dataLoader( 0 ), m_wolframeClient( 0 ), m_settings( ),
 	m_languages( ), m_language( ),
@@ -64,14 +63,12 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 // setup designer UI
 	m_ui.setupUi( this );
 
-// read arguments for the '-s <setting file>' parameter
+// read parameters, first and only one is the optional configurartion files
+// containint the settings
 	parseArgs( );
 
 // settings override built-in defaults
 	readSettings( );
-
-// command line options override settings
-	parseArgs( );
 
 	initialize( );
 }
@@ -165,57 +162,13 @@ MainWindow::~MainWindow( )
 
 void MainWindow::parseArgs( )
 {
-	const struct QCommandLineConfigEntry conf[] =
-	{
-		{ QCommandLine::Option, 'c', "configuration", "Use configuration from this file (default .config/Wolframe/Wolframe Client.conf)", QCommandLine::Optional },
-		QCOMMANDLINE_CONFIG_ENTRY_END
-	};
-
-	if( !m_cmdline ) {
-		m_cmdline = new QCommandLine( this );
-		m_cmdline->setConfig( conf );
-		m_cmdline->enableVersion( true );
-		m_cmdline->enableHelp( true );
-
-		connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
-			this, SLOT( switchFound( const QString & ) ) );
-
-		connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
-			this, SLOT( optionFound( const QString &, const QVariant & ) ) );
-
-		connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
-			this, SLOT( paramFound( const QString &, const QVariant & ) ) );
-
-		connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
-			this, SLOT( parseError( const QString & ) ) );
+	QStringList args = QApplication::arguments( );
+	foreach( QString arg, args ) {
+		qDebug( ) << arg;
 	}
-
-	m_cmdline->parse( );
-}
-
-void MainWindow::switchFound( const QString &name )
-{
-	qDebug( ) << "switch" << name;
-}
-
-void MainWindow::optionFound( const QString &name, const QVariant &value )
-{
-	qDebug( ) << "option" << name << "with" << value;
-	if( name == "configuration" ) {
-		m_settings = value.toString( );
+	if( args.size( ) > 1 ) {
+		m_settings = args[1];
 	}
-}
-
-void MainWindow::paramFound( const QString &name, const QVariant &value )
-{
-	qDebug( ) << "param" << name << "with" << value;
-}
-
-void MainWindow::parseError( const QString &error )
-{
-	qWarning( ) << qPrintable( error );
-	m_cmdline->showHelp( true, -1 );
-	QCoreApplication::quit( );
 }
 
 // -- initialization
@@ -1125,8 +1078,20 @@ void MainWindow::on_actionLogin_triggered( )
 			settings.lastConnection = loginDlg->selectedConnection( ).name;
 		}
 
-// create a Wolframe protocol client
 		m_selectedConnection = loginDlg->selectedConnection( );
+
+// no SSL compiled in and the user picks a secure connection, warn him,
+// don't blindly connect
+#ifndef WITH_SSL
+	if( m_selectedConnection.SSL ) {
+		QMessageBox::critical( this, tr( "Parameters error"),
+			"No SSL support is compiled in, can't open a secure connection" );
+		delete loginDlg;
+		return;
+	}
+#endif
+
+// create a Wolframe protocol client
 		m_wolframeClient = new WolframeClient( m_selectedConnection );
 
 // create a debug terminal and attach it to the protocol client
