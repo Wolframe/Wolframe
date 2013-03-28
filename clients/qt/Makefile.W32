@@ -103,8 +103,6 @@ OBJS = \
 	FormCall.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \
-	qcommandline.obj \
-	moc_qcommandline.obj \
 	PreferencesDialog.obj \
 	moc_PreferencesDialog.obj \
 	FormChooseDialog.obj \
@@ -133,15 +131,8 @@ UIS = \
 	ui_loginDialog.h \
 	ui_PreferencesDialog.h \
 	ui_PreferencesDialogDeveloper.h \
-	ui_PreferencesDialogInterface.h
-
-!IFDEF WITH_SSL
-UIS = $(UIS) \
+	ui_PreferencesDialogInterface.h \
 	ui_serverDefinitionDialog.h
-!ELSE
-UIS = $(UIS) \
-	ui_serverDefinitionDialogNoSSL.h
-!ENDIF
 
 all: $(UIS) $(OBJS) $(CPP_BINS)
 
@@ -179,9 +170,6 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
 
-moc_qcommandline.cpp: qcommandline.h
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
-
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
 
@@ -209,13 +197,8 @@ ui_MainWindow.h: MainWindow.ui
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_DIR)\bin\uic -o ui_manageServersDialog.h manageServersDialog.ui
 
-!IFDEF WITH_SSL
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
-!ELSE
-ui_serverDefinitionDialogNoSSL.h: serverDefinitionDialogNoSSL.ui
-	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialogNoSSL.h serverDefinitionDialogNoSSL.ui
-!ENDIF
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_DIR)\bin\uic -o ui_loginDialog.h loginDialog.ui

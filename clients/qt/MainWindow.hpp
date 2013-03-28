@@ -34,7 +34,6 @@
 #ifndef _MAIN_WINDOW_HPP_INCLUDED
 #define _MAIN_WINDOW_HPP_INCLUDED
 
-#include <QCommandLine>	
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QTranslator>
@@ -68,7 +67,6 @@ class MainWindow : public QMainWindow
 		Ui::MainWindow m_ui;		// ui definition from designer
 		QTranslator m_translatorApp;	// contains the translations for this application
 		QTranslator m_translatorQt; 	// contains the translations for qt
-		QCommandLine *m_cmdline;	// command line parser	
 		FormWidget *m_formWidget;	// current active form
 		QUiLoader *m_uiLoader;		// the UI loader for all forms
 		FormLoader *m_formLoader;	// form loader (visible form)
@@ -120,12 +118,6 @@ class MainWindow : public QMainWindow
 		void addDeveloperMenu( );
 
 	private slots:
-// slots for command line parsing
-		void switchFound( const QString &name );
-		void optionFound( const QString &name, const QVariant &value );
-		void paramFound( const QString &name, const QVariant &value );
-		void parseError( const QString &error );
-
 // slots for the wolframe client		
 		void wolframeError( QString error );
 		void connected( );

@@ -4,12 +4,13 @@ TARGET = qtclient
 
 CONFIG += thread qt uitools designer debug
 
-DEFINES += QCOMMANDLINE_STATIC
+DEFINES += WITH_SSL
 
 INCLUDEPATH += .
 
-#LIBS += plugins/release\wolframewidgets.lib
-#LIBS += plugins/build/Release/libwolframewidgets.dylib
+unix:LIBS += plugins/release\wolframewidgets.lib
+win32:LIBS += plugins/release\wolframewidgets.lib
+macxLIBS += plugins/build/Release/libwolframewidgets.dylib
 
 QT += core gui network sql
 
@@ -23,7 +24,6 @@ SOURCES += \
 	NetworkDataLoader.cpp \
 	WolframeClient.cpp \
 	FormWidget.cpp \
-	qcommandline.cpp \
 	PreferencesDialog.cpp \
 	FormChooseDialog.cpp \
 	connection.cpp \
@@ -46,7 +46,6 @@ HEADERS += \
 	NetworkDataLoader.hpp \
 	WolframeClient.hpp \
 	FormWidget.hpp \
-	qcommandline.h \
 	PreferencesDialog.hpp \
 	FormChooseDialog.hpp \
 	connection.hpp \
@@ -68,8 +67,7 @@ FORMS += \
 	PreferencesDialogInterface.ui \
 	loginDialog.ui \
 	manageServersDialog.ui \
-	serverDefinitionDialogNoSSL.ui \
-#	serverDefinitionDialog.ui
+	serverDefinitionDialog.ui
 
 TRANSLATIONS += \
 	i18n/qtclient.de_CH.ts \
