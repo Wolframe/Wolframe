@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>relationCurstomerEmployee</class>
+ <widget class="QWidget" name="relationCurstomerEmployee">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>677</width>
+    <height>406</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>40</y>
+     <width>671</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="relation">
+    <item>
+     <widget class="QTableWidget" name="customer">
+      <property name="rootelement" stdset="0">
+       <string>customer</string>
+      </property>
+      <property name="doctype" stdset="0">
+       <string>ListCustomerShort</string>
+      </property>
+      <property name="dataelement" stdset="0">
+       <string> </string>
+      </property>
+      <property name="datasignal:onchange" stdset="0">
+       <string>relation.employee</string>
+      </property>
+      <property name="synonym:customerfocus" stdset="0">
+       <string>customer.selected</string>
+      </property>
+      <property name="synonym:customer" stdset="0">
+       <string>row</string>
+      </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>description</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QListWidget" name="employee">
+        <item>
+         <property name="text">
+          <string>name</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>status</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="project_label">
+        <property name="text">
+         <string>Projects</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="project">
+        <item>
+         <property name="text">
+          <string>name</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>description</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>350</y>
+     <width>671</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="action">
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="mainmenuButton">
+      <property name="text">
+       <string>Main Menu</string>
+      </property>
+      <property name="form" stdset="0">
+       <string>init</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="KPushButton" name="cancel_action">
+      <property name="text">
+       <string>cancel</string>
+      </property>
+      <property name="form" stdset="0">
+       <string>listCustomer?customer.selected={customer.selected}</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>671</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QLabel" name="customer_label">
+      <property name="text">
+       <string>Customers</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="employee_label">
+      <property name="text">
+       <string>Employees</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <zorder>horizontalLayoutWidget</zorder>
+  <zorder>horizontalLayoutWidget_2</zorder>
+  <zorder>horizontalLayoutWidget_3</zorder>
+  <zorder>horizontalSpacer</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KPushButton</class>
+   <extends>QPushButton</extends>
+   <header>kpushbutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

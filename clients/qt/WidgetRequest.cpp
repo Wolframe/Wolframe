@@ -93,7 +93,7 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QSt
 	QVariant dataobjectname = visitor.property( "dataobject");
 	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toString(), false))
 	{
-		qCritical() << "action dataobject does not address a known widget:" << dataobjectname.toString();
+		qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
 		return QByteArray();
 	}
 	QByteArray rt;
@@ -245,7 +245,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 	int taglevel = 0;
 	visitor.resetState();
 
-	qDebug( ) << "feeding widget " << visitor.objectName() << "with XML";
+	qDebug() << "feeding widget " << visitor.objectName() << "with XML";
 
 	for (xml.readNext(); !xml.atEnd(); xml.readNext())
 	{

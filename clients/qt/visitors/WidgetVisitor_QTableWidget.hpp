@@ -52,11 +52,23 @@ public:
 	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+	virtual void endofDataFeed();
 
 private:
 	void fill_cell( int row, int col, int itemidx);
 	void set_thumbnail( int row, int itemidx, const QVariant& data);
 	QVariant get_thumbnail( int row, int col) const;
+
+	QVariant getRowValue( int row) const;
+	void setRowValue( int row, QVariant value);
+	QVariant getColumnValue( int col) const;
+	void setColumnValue( int col, QVariant value);
+	QVariant getDataValue( const char* propertyname, int idx) const;
+	void setDataValue( const char* propertyname, int idx, QVariant value);
+	QVariant getSelectedValue( int idx) const;
+	int findSelectedData( const char* propertyname, QVariant value);
+	int findSelectedRow( QVariant value);
+	int findSelectedColumn( QVariant value);
 
 private:
 	struct StackElement

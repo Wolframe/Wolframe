@@ -49,6 +49,22 @@
 #include <QTableWidget>
 #include <QSharedPointer>
 #include <QLayout>
+#include <QLayout>
+
+#define WOLFRAME_LOWLEVEL_DEBUG
+#ifdef WOLFRAME_LOWLEVEL_DEBUG
+#define TRACE_STATUS( TITLE, OBJ, NAME)			qDebug() << "widget visit state" << (TITLE) << (OBJ) << (NAME);
+#define TRACE_FETCH( TITLE, OBJ, NAME, VALUE)		qDebug() << "widget visit get" << (TITLE) << (OBJ) << (NAME) << "=" << (VALUE);
+#define TRACE_ASSIGNMENT( TITLE, OBJ, NAME, VALUE)	qDebug() << "widget visit set" << (TITLE) << (OBJ) << (NAME) << "=" << (VALUE);
+#define TRACE_ENTER( TITLE, OBJ, NAME)			qDebug() << "widget visit enter" << (TITLE) << (OBJ) << "into" << (NAME);
+#define TRACE_LEAVE( TITLE)				qDebug() << "widget visit leave" << (TITLE);
+#else
+#define TRACE_STATUS( TITLE, OBJ, NAME)
+#define TRACE_FETCH( TITLE, OBJ, NAME, VALUE)
+#define TRACE_ASSIGNMENT( TITLE, OBJ, NAME, VALUE)
+#define TRACE_ENTER( TITLE, OBJ, NAME)
+#define TRACE_LEAVE( TITLE)
+#endif
 
 static void logError( QWidget* widget, const char* msg, const QString& arg)
 {
@@ -60,6 +76,29 @@ static void logError( QWidget* widget, const char* msg, const QString& arg)
 	{
 		qCritical() << "error " << msg << (arg.isEmpty()?"":":") << arg;
 	}
+}
+
+static void getWidgetChildren_( QList<QWidget*>& rt, QObject* wdg)
+{
+	QWidget* we;
+	foreach (QObject* cld, wdg->children())
+	{
+		if (qobject_cast<QBoxLayout*>( cld))
+		{
+			getWidgetChildren_( rt, cld);
+		}
+		else if ((we=qobject_cast<QWidget*>( cld)) != 0)
+		{
+			rt.push_back( we);
+		}
+	}
+}
+
+static QList<QWidget*> getWidgetChildren( QWidget* wdg)
+{
+	QList<QWidget*> rt;
+	getWidgetChildren_( rt, wdg);
+	return rt;
 }
 
 static bool isConvertibleToInt( const QVariant& val)
@@ -174,9 +213,25 @@ WidgetVisitor::State::State( QWidget* widget_)
 	}
 }
 
+QList<QWidget*> WidgetVisitor::State::datachildren() const
+{
+	return getWidgetChildren( m_widget);
+}
+
 bool WidgetVisitor::is_widgetid( const QString& id)
 {
 	return id.indexOf(':') >= 0;
+}
+
+QWidget* WidgetVisitor::get_widget_reference( const QString& id)
+{
+	if (enter( id, true) && m_stk.top()->m_internal_entercnt == 0)
+	{
+		QWidget* rt = widget();
+		leave( true);
+		return rt;
+	}
+	return 0;
 }
 
 QVariant WidgetVisitor::State::dynamicProperty( const QString& name) const
@@ -258,53 +313,70 @@ bool WidgetVisitor::enter_root( const QString& name)
 	return false;
 }
 
+QList<QWidget*> WidgetVisitor::children( const QString& name) const
+{
+	QList<QWidget*> rt;
+	if (!m_stk.empty() && !m_stk.top()->m_internal_entercnt)
+	{
+		foreach( QWidget* ww, getWidgetChildren( m_stk.top()->m_widget))
+		{
+			/*[-]*/qDebug() << "+++ visit child" << ww->objectName() << name;
+			if (!name.isEmpty() && ww->objectName() != name) continue;
+			rt.push_back( ww);
+		}
+	}
+	return rt;
+}
+
 bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 {
+	TRACE_STATUS( "try enter", objectName(), name)
 	if (m_stk.empty()) return false;
 
 	// [A] check if name is a synonym and follow it if yes:
 	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
-		int followidx = synonym.indexOf( '.');
-		if (followidx >= 0)
+		return enter( synonym, writemode, level);
+	}
+	// [A.1] check if name is a multipart reference and follow it if yes:
+	int followidx = name.indexOf( '.');
+	if (followidx >= 0)
+	{
+		// ... the referenced item is a multipart reference so it gets complicated
+		int entercnt = 0;
+		QString prefix( name.mid( 0, followidx));
+		QString rest( name.mid( followidx+1, name.size()-followidx-1));
+		do
 		{
-			// ... the referenced item is a multipart reference so it gets complicated
-			int entercnt = 0;
-			QString prefix( synonym.mid( 0, followidx));
-			QString rest( synonym.mid( followidx+1, synonym.size()-followidx-1));
-			do
+			if (!enter( prefix, writemode, level+entercnt))
 			{
-				if (!enter( prefix, writemode, level+entercnt))
+				for (; entercnt > 0; --entercnt) leave( writemode);
+				return false;
+			}
+			++entercnt;
+			followidx = rest.indexOf( '.');
+			if (followidx < 0)
+			{
+				if (!enter( rest, writemode, level+entercnt))
 				{
 					for (; entercnt > 0; --entercnt) leave( writemode);
 					return false;
 				}
 				++entercnt;
-				followidx = rest.indexOf( '.');
-				if (followidx < 0)
-				{
-					if (!enter( rest, writemode, level+entercnt))
-					{
-						for (; entercnt > 0; --entercnt) leave( writemode);
-						return false;
-					}
-					++entercnt;
-				}
-				prefix = rest.mid( 0, followidx);
-				rest = rest.mid( followidx+1, rest.size()-followidx-1);
-			} while (followidx >= 0);
-			m_stk.top()->m_synonym_entercnt = entercnt;
-		}
-		else
-		{
-			return enter( synonym, writemode, level);
-		}
+			}
+			prefix = rest.mid( 0, followidx);
+			rest = rest.mid( followidx+1, rest.size()-followidx-1);
+		} while (followidx >= 0);
+		m_stk.top()->m_synonym_entercnt = entercnt;
+		return true;
 	}
 
+	TRACE_STATUS( "try enter internal", objectName(), name)
 	// [B] check if name refers to a widget internal item and follow it if yes:
 	if (m_stk.top()->enter( name, writemode))
 	{
+		TRACE_ENTER( "internal", objectName(), name);
 		++m_stk.top()->m_internal_entercnt;
 		return true;
 	}
@@ -312,6 +384,7 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 	if (m_stk.top()->m_internal_entercnt == 0)
 	{
 		// [C] check if name refers to a symbolic link and follow the link if yes:
+		TRACE_STATUS( "try enter link", objectName(), name)
 		QString lnk = m_stk.top()->getLink( name);
 		if (!lnk.isEmpty())
 		{
@@ -322,26 +395,31 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 				return false;
 			}
 			m_stk.push_back( createWidgetVisitorState( lnkwdg));
+			TRACE_ENTER( "link", objectName(), name);
 			return true;
 		}
 
 		// [D] on top level check if name refers to an ancessor or an ancessor child and follow it if yes:
+		TRACE_STATUS( "try enter root", objectName(), name)
 		if (level == 0 && !name.isEmpty() && enter_root( name))
 		{
+			TRACE_ENTER( "root", objectName(), name);
 			return true;
 		}
 
 		// [E] check if name refers to a child and follow it if yes:
 		if (!name.isEmpty())
 		{
-			QList<QWidget*> children = m_stk.top()->m_widget->findChildren<QWidget*>( name);
-			if (children.size() > 1)
+			TRACE_STATUS( "try enter children", objectName(), name)
+			QList<QWidget*> cn = children( name);
+			if (cn.size() > 1)
 			{
 				ERROR( "ambiguus widget reference", name);
 				return false;
 			}
-			if (children.isEmpty()) return false;
-			m_stk.push( createWidgetVisitorState( children[0]));
+			if (cn.isEmpty()) return false;
+			m_stk.push( createWidgetVisitorState( cn[0]));
+			TRACE_ENTER( "child", objectName(), name);
 			return true;
 		}
 	}
@@ -356,6 +434,7 @@ void WidgetVisitor::leave( bool writemode)
 	{
 		if (m_stk.top()->m_internal_entercnt)
 		{
+			TRACE_LEAVE( "internal")
 			if (!m_stk.top()->leave( writemode))
 			{
 				ERROR( "illegal state: internal state leave failed");
@@ -364,6 +443,7 @@ void WidgetVisitor::leave( bool writemode)
 		}
 		else
 		{
+			TRACE_LEAVE( "")
 			m_stk.pop();
 		}
 	}
@@ -468,8 +548,13 @@ QWidget* WidgetVisitor::predecessor( const QString& name) const
 		{
 			wdg = qobject_cast<QWidget*>( prn);
 			if (wdg->objectName() == name) return wdg;
-			QList<QWidget*> cld = wdg->findChildren<QWidget*>(name);
-			if (cld.size() == 1) return cld.at(0);
+			if (wdg) foreach (QWidget* chld, getWidgetChildren( wdg))
+			{
+				if (chld->objectName() == name)
+				{
+					return chld;
+				}
+			}
 		}
 	}
 	return 0;
@@ -580,13 +665,6 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 		return property( synonym, level);
 	}
 
-	// [B] check if an internal property of the widget is referenced and return its value if yes
-	QVariant rt;
-	if ((rt = m_stk.top()->property( name)).isValid())
-	{
-		return resolve( rt);
-	}
-
 	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
 	bool subelem = false;
 	QString prefix;
@@ -614,7 +692,7 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 	}
 	if (subelem)
 	{
-		rt = property( rest, level);
+		QVariant rt = property( rest, level);
 		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
 		leave( false);
 		if (isArray)
@@ -633,16 +711,28 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 		}
 		return rt;
 	}
-	// [D] check if a dynamic property is referenced and return its value if yes
-	if (m_stk.top()->m_internal_entercnt == 0)
+	if (followidx < 0)
 	{
-		rt = m_stk.top()->dynamicProperty( name);
-		if (rt.isValid())
+		// [B] check if an internal property of the widget is referenced and return its value if yes
+		QVariant rt;
+		if ((rt = m_stk.top()->property( name)).isValid())
 		{
+			TRACE_FETCH( "internal property", objectName(), name, rt)
 			return resolve( rt);
 		}
+
+		// [D] check if a dynamic property is referenced and return its value if yes
+		if (m_stk.top()->m_internal_entercnt == 0)
+		{
+			rt = m_stk.top()->dynamicProperty( name);
+			if (rt.isValid())
+			{
+				TRACE_FETCH( "dynamic property", objectName(), name, rt)
+				return resolve( rt);
+			}
+		}
 	}
-	return rt;
+	return QVariant();
 }
 
 
@@ -688,11 +778,9 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
+		TRACE_STATUS( "found synonym", name, value)
 		return setProperty( synonym, value, level);
 	}
-
-	// [B] check if an internal property of the widget is referenced and set its value if yes
-	if (m_stk.top()->setProperty( name, value)) return true;
 
 	// [C] check if an multipart property is referenced and try to step into the substructures to set the property (must a single value and must not have any repeating elements) if yes
 	bool subelem = false;
@@ -703,6 +791,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	{
 		prefix = name.mid( 0, followidx);
 		rest = name.mid( followidx+1, name.size()-followidx-1);
+		TRACE_STATUS( "structured property", prefix, rest)
 		if (enter( prefix, false, level))
 		{
 			subelem = true;
@@ -715,6 +804,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	}
 	else
 	{
+		TRACE_STATUS( "identifier property", objectName(), name)
 		if (enter( name, true, level))
 		{
 			subelem = true;
@@ -733,11 +823,23 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 		leave( true);
 		return rt;
 	}
-
-	// [D] check if a dynamic property is referenced and set its value if yes
-	if (m_stk.top()->m_internal_entercnt == 0)
+	if (followidx < 0)
 	{
-		if (m_stk.top()->setDynamicProperty( name, value)) return true;
+		TRACE_STATUS( "try to set internal property", objectName(), name)
+		// [B] check if an internal property of the widget is referenced and set its value if yes
+		if (m_stk.top()->setProperty( name, value))
+		{
+			TRACE_ASSIGNMENT( "internal property", objectName(), name, value)
+			return true;
+		}
+
+		TRACE_STATUS( "try to set dynamic property", objectName(), name)
+		// [D] check if a dynamic property is referenced and set its value if yes
+		if (m_stk.top()->m_internal_entercnt == 0)
+		{
+			TRACE_ASSIGNMENT( "dynamic property", objectName(), name, value)
+			if (m_stk.top()->setDynamicProperty( name, value)) return true;
+		}
 	}
 	return false;
 }
@@ -757,7 +859,7 @@ QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QVariant& 
 		endidx = ar.size();
 		while (idx < endidx)
 		{
-			foreach( QWidget* ww, ar[idx]->findChildren<QWidget*>())
+			foreach( QWidget* ww, getWidgetChildren( ar[idx]))
 			{
 				if (prop( ww, cond)) rt.push_back( ww);
 				ar.push_back( ww);
@@ -1183,14 +1285,21 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
 		QVariant receiverid = resolve( receiverprop);
-		WidgetVisitor mainvisitor( uirootwidget());
+		QString receiveridstr = receiverid.toString();
+		QWidget* rcvwidget;
 
-		if (is_widgetid( receiverid.toString()))
+		if (is_widgetid( receiveridstr))
 		{
+			WidgetVisitor mainvisitor( uirootwidget());
 			rt.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
+		}
+		else if ((rcvwidget = get_widget_reference( receiveridstr)) != 0)
+		{
+			rt.append( rcvwidget);
 		}
 		else
 		{
+			WidgetVisitor mainvisitor( uirootwidget());
 			switch (type)
 			{
 				case OnLoad:

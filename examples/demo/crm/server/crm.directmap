@@ -13,6 +13,7 @@ DeleteCustomer( xml);
 GetCustomer( xml) :CustomerResult;
 SearchCustomer( xml) :CustomerListResult;
 ListCustomer( xml) :CustomerListResult;
+ListCustomerShort( xml) :CustomerListShortResult;
 ListCustomerRef( xml) :CustomerRefListResult;
 
 #--- CustomerNote

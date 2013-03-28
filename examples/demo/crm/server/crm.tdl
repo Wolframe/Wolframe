@@ -96,6 +96,10 @@ TRANSACTION ListCustomer
 BEGIN
 	INTO customer DO SELECT * FROM Customer;
 END
+TRANSACTION ListCustomerShort
+BEGIN
+	INTO customer DO SELECT id,name,description FROM Customer;
+END
 TRANSACTION ListCustomerRef
 BEGIN
 	INTO customer DO SELECT id,name AS _ FROM Customer;

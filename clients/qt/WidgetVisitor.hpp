@@ -158,7 +158,7 @@ class WidgetVisitor
 			///\brief Get all dataelements readable in the current substructure context
 			virtual const QList<QString>& dataelements() const			{static const QList<QString> ar; return ar;}
 			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
-			virtual QList<QWidget*> datachildren() const				{return m_widget->findChildren<QWidget*>();}
+			virtual QList<QWidget*> datachildren() const;
 			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
 			virtual bool isRepeatingDataElement( const QString&/*name*/)		{return false;}
 			///\brief Restore the widget state from a variable
@@ -259,6 +259,8 @@ class WidgetVisitor
 		typedef bool (*NodeProperty)( const QWidget* widget, const QVariant& cond);
 		QList<QWidget*> findSubNodes( NodeProperty prop, const QVariant& cond=QVariant()) const;
 
+		QList<QWidget*> children( const QString& name=QString()) const;
+
 		///\class Element
 		///\brief Element of serialization of widget data (for constructing a server request out of the widget data)
 		class Element
@@ -304,6 +306,11 @@ class WidgetVisitor
 		///\param[in] id identifier to check
 		///\return true if 'id' is a widget id
 		static bool is_widgetid( const QString& id);
+
+		///\brief Eval if id describes a widget reference from the current widget
+		///\param[in] id identifier to check
+		///\return the widget reference if it exists
+		QWidget* get_widget_reference( const QString& id);
 
 		///\brief Get the unique identifier of the widget for server requests
 		QString widgetid() const;
