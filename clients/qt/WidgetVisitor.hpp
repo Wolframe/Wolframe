@@ -94,6 +94,7 @@ Internally happens the same.
 4. Dynamic Properties Used
 
 4.1 Used Dynamic Property Prefixes of widgets
+ 'global:IDENTIFIER'     Defines an assignment from a global variable IDENTIFIER at initialization and writing the global variable when closing the widget
  'synonym:'              Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is selected with enter)
  'link:'                 Rewrite rule for property "link:IDENTIFIER": push the widget referenced as property value of "link:IDENTIFIER" if IDENTIFIER is selected with enter)
  'datasignal:IDENTIFIER' Defines a signal of type IDENTIFIER (domainchange,onload) with the destination slot identifer defined as property value of "datasignal:IDENTIFIER"
@@ -109,6 +110,57 @@ Internally happens the same.
 The module WidgetRequest uses the visitors defined here to iterate on the widget structure
 to set and get the elements in the XML of a request/answer or some other representation
 of the widget data.
+
+
+6. Actions
+
+Form/Widget Load
+    (1) set form parameters
+    (2) read globals         ('global:VAR')
+    (3) read assignments     ('assign:VAR')
+              (disabled show UI here)
+    (4) initiate form localization load
+    (5) connect event signal/slots
+    (6) issue all domain load requests in reverse order of depht (children widgets first)
+
+Widget Request Answer
+    (1) *** find form and check if all domain load requests were successful,
+            if yes show form and hide old one, if not close form
+    (2) save widget state
+    (3) clear widget data
+    (4) read globals
+    (5) read assignments
+    (6) load answer
+    (7) restore widget state
+    (8) emit data loaded signal if defined
+
+Widget Request Error
+    (1) *** find form and increment error counter (last answer closes form)
+    (2) show error
+    (3) emit data load error if defined
+
+Refresh With Domain Load Request
+    (1) emit domain load request if defined
+
+Refresh Without Domain Load Request
+    (1) save widget state
+    (2) clear widget data
+    (3) read globals
+    (4) read assignments
+    (5) restore widget state
+    (6) emit data loaded signal if defined
+
+Additional Signals
+    (a) emit onchange signal if defined the recipient issues a self refresh
+    (b) emit onclose signal if defined the recipient issues a self refresh
+
+Remark:
+    (a) subsequent data requests with same tag are deleted if not sent yet to
+        the server (only the last one is sent)
+
+Use Cases:
+a) Sharing Data between widgets: A widget can read the data of a subwidget
+by a declared assignment and a refresh issued onclose or onchange by the subwidget.
 
 **/
 
