@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = plugins tests
+SUBDIRS = plugins
 
 .NOTPARALLEL:
 
