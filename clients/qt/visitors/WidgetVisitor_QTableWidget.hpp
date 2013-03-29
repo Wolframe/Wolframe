@@ -65,7 +65,7 @@ private:
 	void setColumnValue( int col, QVariant value);
 	QVariant getDataValue( const char* propertyname, int idx) const;
 	void setDataValue( const char* propertyname, int idx, QVariant value);
-	QVariant getSelectedValue( int idx) const;
+	QVariant getSelectedValue() const;
 	int findSelectedData( const char* propertyname, QVariant value);
 	int findSelectedRow( QVariant value);
 	int findSelectedColumn( QVariant value);

@@ -80,16 +80,28 @@ static void logError( QWidget* widget, const char* msg, const QString& arg)
 
 static void getWidgetChildren_( QList<QWidget*>& rt, QObject* wdg)
 {
-	QWidget* we;
+	static const QString str_QWidget("QWidget");
+
 	foreach (QObject* cld, wdg->children())
 	{
-		if (qobject_cast<QBoxLayout*>( cld))
+		if (qobject_cast<QLayout*>( cld))
 		{
 			getWidgetChildren_( rt, cld);
 		}
-		else if ((we=qobject_cast<QWidget*>( cld)) != 0)
+		else
 		{
-			rt.push_back( we);
+			QWidget* we = qobject_cast<QWidget*>( cld);
+			if (we)
+			{
+				if (we->layout() && cld->metaObject()->className() == str_QWidget)
+				{
+					getWidgetChildren_( rt, cld);
+				}
+				else
+				{
+					rt.push_back( we);
+				}
+			}
 		}
 	}
 }
@@ -320,9 +332,10 @@ QList<QWidget*> WidgetVisitor::children( const QString& name) const
 	{
 		foreach( QWidget* ww, getWidgetChildren( m_stk.top()->m_widget))
 		{
-			/*[-]*/qDebug() << "+++ visit child" << ww->objectName() << name;
-			if (!name.isEmpty() && ww->objectName() != name) continue;
-			rt.push_back( ww);
+			if (name.isEmpty() || ww->objectName() == name)
+			{
+				rt.push_back( ww);
+			}
 		}
 	}
 	return rt;
@@ -403,7 +416,7 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 		TRACE_STATUS( "try enter root", objectName(), name)
 		if (level == 0 && !name.isEmpty() && enter_root( name))
 		{
-			TRACE_ENTER( "root", objectName(), name);
+			TRACE_ENTER( "root", className(), name);
 			return true;
 		}
 
@@ -540,22 +553,26 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
-	QWidget* wdg = m_stk.at(0)->m_widget;
-	QObject* prn = wdg->parent();
+	QObject* prn = m_stk.top()->m_widget;
 	for (; prn != 0; prn = prn->parent())
 	{
-		if (qobject_cast<QWidget*>( prn))
+		QWidget* wdg = qobject_cast<QWidget*>( prn);
+		if (wdg)
 		{
-			wdg = qobject_cast<QWidget*>( prn);
+			/*[-]*/qDebug() << "inspect parent" << wdg->metaObject()->className() << wdg->objectName();
+
 			if (wdg->objectName() == name) return wdg;
-			if (wdg) foreach (QWidget* chld, getWidgetChildren( wdg))
+			if (wdg) foreach (QWidget* cld, getWidgetChildren( wdg))
 			{
-				if (chld->objectName() == name)
+				/*[-]*/qDebug() << "inspect child" << cld->metaObject()->className() << cld->objectName() << name;
+				if (cld->objectName() == name)
 				{
-					return chld;
+					/*[-]*/qDebug() << "found predecessor" << cld->metaObject()->className() << cld->objectName();
+					return cld;
 				}
 			}
 		}
+		if (qobject_cast<FormWidget*>( wdg)) break;
 	}
 	return 0;
 }
