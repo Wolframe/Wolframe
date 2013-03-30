@@ -44,15 +44,15 @@ int main( int argc, char* argv[] ) {
 
 	int code;
 	do {
-		Q_INIT_RESOURCE( qtclient );
-		
+		Q_INIT_RESOURCE( qtSkeleton );
+
 		QApplication app( argc, argv );
 		app.setWindowIcon( QIcon( QString( ":/images/wolframe.png" ) ) );
-		MainWindow mainWindow;		
+		MainWindow mainWindow;
 		mainWindow.show( );
 		code = app.exec( );
 	} while( code == RESTART_CODE );
-	
+
 
 	return code;
 }

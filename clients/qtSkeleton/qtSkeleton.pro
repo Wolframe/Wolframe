@@ -50,7 +50,8 @@ HEADERS += \
 	HistoryLineEdit.hpp
 
 RESOURCES = \
-	qtclient.qrc
+	qtclient.qrc \
+    qtSkeleton.qrc
 
 FORMS += \
 	MainWindow.ui \
