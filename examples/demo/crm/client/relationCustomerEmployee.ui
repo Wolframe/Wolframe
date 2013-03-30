@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>406</height>
+    <width>673</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
        <string>ListCustomerShort</string>
       </property>
       <property name="dataelement" stdset="0">
-       <string> </string>
+       <string/>
       </property>
       <property name="datasignal:onchange" stdset="0">
        <string>relation.employee</string>
@@ -59,41 +59,209 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="relations">
       <item>
-       <widget class="QListWidget" name="employee">
-        <item>
+       <widget class="QTreeWidget" name="employee">
+        <property name="doctype" stdset="0">
+         <string>GetCustomerRelationCustomer</string>
+        </property>
+        <property name="rootelement" stdset="0">
+         <string>relation</string>
+        </property>
+        <property name="dataelement" stdset="0">
+         <string>@customerid</string>
+        </property>
+        <property name="customerid" stdset="0">
+         <string>{customer.selected}</string>
+        </property>
+        <property name="synonym:employeename" stdset="0">
+         <string>name</string>
+        </property>
+        <property name="synonym:employeestatus" stdset="0">
+         <string>status</string>
+        </property>
+        <property name="synonym:employeeid" stdset="0">
+         <string>id</string>
+        </property>
+        <column>
          <property name="text">
           <string>name</string>
          </property>
-        </item>
-        <item>
+        </column>
+        <column>
          <property name="text">
           <string>status</string>
          </property>
-        </item>
+        </column>
+        <column>
+         <property name="text">
+          <string>description</string>
+         </property>
+        </column>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="relationactions">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_3">
+          <property name="text">
+           <string>Add</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>addEmployeeRelation?customerid={customer.selected}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_2">
+          <property name="text">
+           <string>Delete</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>relationCustomerEmployee</string>
+          </property>
+          <property name="doctype" stdset="0">
+           <string>DeleteCustomerRelation</string>
+          </property>
+          <property name="rootelement" stdset="0">
+           <string>relation</string>
+          </property>
+          <property name="dataelement" stdset="0">
+           <string>@customerid,@employeeid</string>
+          </property>
+          <property name="customerid" stdset="0">
+           <string>{customer.selected}</string>
+          </property>
+          <property name="employeeid" stdset="0">
+           <string>{employee.selected}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_4">
+          <property name="text">
+           <string>Edit</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>editRelationCustomerEmployee?customerid={customer.selected}&amp;employeeid={employee.selected}</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QLabel" name="project_label">
         <property name="text">
-         <string>Projects</string>
+         <string>Customer Projects</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="project">
-        <item>
+       <widget class="QTreeWidget" name="project">
+        <property name="doctype" stdset="0">
+         <string>ListProjectCustomer</string>
+        </property>
+        <property name="rootelement" stdset="0">
+         <string>project</string>
+        </property>
+        <property name="dataelement" stdset="0">
+         <string>@customerid</string>
+        </property>
+        <property name="customerid" stdset="0">
+         <string>{customer.selected}</string>
+        </property>
+        <column>
          <property name="text">
           <string>name</string>
          </property>
-        </item>
-        <item>
+        </column>
+        <column>
          <property name="text">
           <string>description</string>
          </property>
-        </item>
+        </column>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_5">
+          <property name="text">
+           <string>Add</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>addCustomerrojectRelation?customerid={customer.selected}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_7">
+          <property name="text">
+           <string>Edit</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>editRelationCustomerEmployee?customerid={customer.selected}&amp;employeeid={employee.selected}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addEmployeeRelation_6">
+          <property name="text">
+           <string>Delete</string>
+          </property>
+          <property name="form" stdset="0">
+           <string>relationCustomerEmployee</string>
+          </property>
+          <property name="doctype" stdset="0">
+           <string>DeleteCustomerRelation</string>
+          </property>
+          <property name="rootelement" stdset="0">
+           <string>relation</string>
+          </property>
+          <property name="dataelement" stdset="0">
+           <string>@customerid,@employeeid</string>
+          </property>
+          <property name="customerid" stdset="0">
+           <string>{customer.selected}</string>
+          </property>
+          <property name="employeeid" stdset="0">
+           <string>{employee.selected}</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -105,7 +273,7 @@
      <x>0</x>
      <y>350</y>
      <width>671</width>
-     <height>51</height>
+     <height>31</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="action">
@@ -133,12 +301,12 @@
      </widget>
     </item>
     <item>
-     <widget class="KPushButton" name="cancel_action">
+     <widget class="QPushButton" name="cancel_action">
       <property name="text">
-       <string>cancel</string>
+       <string>Cancel</string>
       </property>
       <property name="form" stdset="0">
-       <string>listCustomer?customer.selected={customer.selected}</string>
+       <string>_CLOSE_</string>
       </property>
      </widget>
     </item>
@@ -153,7 +321,7 @@
      <height>41</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QHBoxLayout" name="toplabels">
     <item>
      <widget class="QLabel" name="customer_label">
       <property name="text">
@@ -164,24 +332,13 @@
     <item>
      <widget class="QLabel" name="employee_label">
       <property name="text">
-       <string>Employees</string>
+       <string>Customer Employee Relations</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <zorder>horizontalLayoutWidget</zorder>
-  <zorder>horizontalLayoutWidget_2</zorder>
-  <zorder>horizontalLayoutWidget_3</zorder>
-  <zorder>horizontalSpacer</zorder>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KPushButton</class>
-   <extends>QPushButton</extends>
-   <header>kpushbutton.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

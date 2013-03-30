@@ -116,6 +116,36 @@ Form CustomerPictureListResult
 
 
 
+; ------------ CustomerRelation
+Form CustomerRelation
+{
+	customerid	!ID
+	employeeid	!ID
+	description	string
+}
+Form CustomerRelationCustomerView
+{
+	customerid	!ID
+	employeeid	!ID
+	employeename	string
+	employeestatus	string
+	description	string
+}
+
+Form InsertCustomerRelation	{ relation { _ CustomerRelation } }
+Form UpdateCustomerRelation	{ relation { _ CustomerRelation } }
+Form DeleteCustomerRelation	{ relation { customerid !@ID employeeid !@ID } }
+Form GetCustomerRelation	{ relation { customerid !@ID employeeid !@ID } }
+Form GetCustomerRelationCustomer { relation { customerid !@ID } }
+Form GetCustomerRelationEmployee { relation { employee !@ID } }
+
+Form CustomerRelationResult	{ relation { _ CustomerRelation } }
+Form CustomerRelationListResult	{ relations { relation CustomerRelation[] } }
+Form CustomerRelationCustomerViewListResult	{ relations { relation CustomerRelationCustomerView[] } }
+
+
+
+
 
 ; ------------ CustomerNote
 ; * Sub structures:
@@ -191,13 +221,14 @@ Form ProjectListElem
 	description	?string
 }
 ; * Forms:
-Form InsertProject	{ project { _ Project } }
-Form UpdateProject	{ project { _ ProjectInserted } }
-Form DeleteProject	{ project { id !@ID } }
-Form GetProject		{ project { id !@ID } }
-Form ProjectResult	{ project { _ ProjectInserted } }
-Form ProjectListResult	{ projects { project ProjectListElem[] } }
-Form ListProject	{ project { } }
+Form InsertProject		{ project { _ Project } }
+Form UpdateProject		{ project { _ ProjectInserted } }
+Form DeleteProject		{ project { id !@ID } }
+Form GetProject			{ project { id !@ID } }
+Form ProjectResult		{ project { _ ProjectInserted } }
+Form ProjectListResult		{ projects { project ProjectListElem[] } }
+Form ListProject		{ project { } }
+Form ListProjectCustomer	{ project { customerid !@ID } }
 
 Form SearchProject
 {

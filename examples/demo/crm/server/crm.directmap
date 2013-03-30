@@ -16,6 +16,14 @@ ListCustomer( xml) :CustomerListResult;
 ListCustomerShort( xml) :CustomerListShortResult;
 ListCustomerRef( xml) :CustomerRefListResult;
 
+#--- CustomerRelation
+InsertCustomerRelation( xml);
+UpdateCustomerRelation( xml);
+DeleteCustomerRelation( xml);
+GetCustomerRelation( xml) :CustomerRelationResult;
+GetCustomerRelationCustomer( xml) :CustomerRelationCustomerViewListResult;
+
+
 #--- CustomerNote
 InsertCustomerNote( xml) :CustomerNoteResult;
 UpdateCustomerNote( xml);
@@ -41,6 +49,7 @@ GetProject( xml) :ProjectResult;
 GetProjectEdit( xml) :ProjectEditResult;
 SearchProject( xml) :ProjectListResult;
 ListProject( xml) :ProjectListResult;
+ListProjectCustomer( xml) :ProjectListResult;
 
 #--- ProjectNote
 InsertProjectNote( xml) :ProjectNoteResult;

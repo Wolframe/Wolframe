@@ -45,6 +45,15 @@ CREATE TABLE CustomerPicture
 	UNIQUE ( pictureid, customerid )
 );
 
+-- CustomerRelation:
+CREATE TABLE CustomerRelation
+(
+	employeeid	INT	REFERENCES Employee( id ),
+	customerid	INT	REFERENCES Customer( id ),
+	description	TEXT,
+	UNIQUE ( employeeid, customerid )
+);
+
 -- CustomerNote:
 CREATE TABLE CustomerNote
 (

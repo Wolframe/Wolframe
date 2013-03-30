@@ -107,6 +107,45 @@ END
 
 
 
+-- CUSTOMER RELATION
+TRANSACTION InsertCustomerRelation
+BEGIN
+	DO INSERT INTO CustomerRelation (employeeid, customerid, description)
+		VALUES ($(employeeid), $(customerid), $(description));
+END
+
+TRANSACTION UpdateCustomerRelation
+BEGIN
+	DO UPDATE CustomerRelation SET
+			description=$(description)
+		WHERE employeeid=$(employeeid) AND customerid=$(customerid);
+END
+
+TRANSACTION DeleteCustomerRelation
+BEGIN
+	DO DELETE FROM CustomerRelation
+		WHERE employeeid=$(employeeid) AND customerid=$(customerid);
+END
+
+TRANSACTION GetCustomerRelation
+BEGIN
+	INTO . DO UNIQUE SELECT employeeid, customerid, description FROM CustomerRelation
+		WHERE employeeid=$(employeeid) AND customerid=$(customerid);
+END
+TRANSACTION GetCustomerRelationEmployee
+BEGIN
+	INTO . DO SELECT CustomerRelation.employeeid, Customer.name AS customername, CustomerRelation.customerid, CustomerRelation.description FROM Customer,CustomerRelation
+		WHERE employeeid=$(employeeid) AND Customer.id=$(CustomerRelation.customerid);
+END
+TRANSACTION GetCustomerRelationCustomer
+BEGIN
+	INTO relation DO SELECT CustomerRelation.employeeid, Employee.name AS employeename, Employee.status AS employeestatus, CustomerRelation.customerid, CustomerRelation.description FROM Employee,CustomerRelation
+		WHERE customerid=$(customerid) AND Employee.id=$(CustomerRelation.employeeid);
+END
+
+
+
+
 
 --  PROJECT
 TRANSACTION InsertProject
@@ -167,6 +206,13 @@ BEGIN
 	INTO project DO SELECT Project.id,Customer.name as customername,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id;
+END
+
+TRANSACTION ListProjectCustomer
+BEGIN
+	INTO project DO SELECT Project.id,Customer.name as customername,Project.name,Project.description
+		FROM Project,Customer
+		WHERE Project.customerid = Customer.id AND Customer.id = $(customerid);
 END
 
 
