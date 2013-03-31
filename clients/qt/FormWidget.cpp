@@ -34,6 +34,7 @@
 #include "FormWidget.hpp"
 #include "FormCall.hpp"
 #include "WidgetMessageDispatcher.hpp"
+#include "WidgetRequest.hpp"
 #include "global.hpp"
 
 #include <QDebug>
@@ -168,9 +169,9 @@ void FormWidget::loadForm( QString name, bool modal )
 	m_formLoader->initiateFormLoad( m_form );
 }
 
-void FormWidget::setLocale( QLocale locale )
+void FormWidget::setLocale( QLocale locale_ )
 {
-	m_locale = locale;
+	m_locale = locale_;
 }
 
 void FormWidget::setLanguage( QString language )
@@ -211,6 +212,12 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 // signal completion of form loading
 	qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
+}
+
+static bool nodeProperty_hasDatasignalListener( const QWidget* widget, const QVariant&)
+{
+	if (WidgetListener::hasOnChangeSignals( widget)) return true;
+	return false;
 }
 
 void FormWidget::formLoaded( QString name, QByteArray formXml )
@@ -260,6 +267,13 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // initialize the form variables given by globals and assignments
 	visitor.do_readGlobals( *m_globals);
 	visitor.do_readAssignments();
+
+// connect listener to signals converted to datasignals
+	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDatasignalListener))
+	{
+		WidgetVisitor datasig_widget_visitor( datasig_widget);
+		m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+	}
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
@@ -311,7 +325,35 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
 	WidgetMessageDispatcher dispatcher( m_ui);
-	dispatcher.feedResult( tag_, data_);
+
+	QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
+	if (li != m_listeners.end())
+	{
+		li.value().clear();
+		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		{
+			WidgetVisitor visitor( rcp);
+			if (!setWidgetAnswer( visitor, data_))
+			{
+				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+			}
+			WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
+			visitor.connectOnChangeListener( *listener);
+			li.value().push_back( listener);
+		}
+
+	}
+	else
+	{
+		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		{
+			WidgetVisitor visitor( rcp);
+			if (!setWidgetAnswer( visitor, data_))
+			{
+				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+			}
+		}
+	}
 }
 
 void FormWidget::gotError( const QString& tag_, const QByteArray& data_)

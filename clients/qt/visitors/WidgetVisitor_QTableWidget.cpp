@@ -31,10 +31,13 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QTableWidget.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 #include <QLabel>
 #include <QBuffer>
 #include <QHeaderView>
+#include <QSignalMapper>
+#include <QWidget>
 
 WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -266,7 +269,7 @@ QVariant WidgetVisitorState_QTableWidget::getDataValue( const char* propertyname
 {
 	QVariant values_p = m_tableWidget->property( propertyname);
 	QList<QVariant> values = values_p.toList();
-	if (idx >= values.size()) return QVariant();
+	if (idx < 0 || idx >= values.size()) return QVariant();
 	return values.at( idx);
 }
 
@@ -535,4 +538,10 @@ void WidgetVisitorState_QTableWidget::endofDataFeed()
 	}
 }
 
+void WidgetVisitorState_QTableWidget::connectOnChangeSignals( WidgetListener& listener)
+{
+	QObject::connect( m_tableWidget, SIGNAL( cellActivated( int,int)), &listener, SLOT( changed()));
+	QObject::connect( m_tableWidget, SIGNAL( cellChanged( int,int)), &listener, SLOT( changed()));
+	QObject::connect( m_tableWidget, SIGNAL( cellClicked( int,int)), &listener, SLOT( changed()));
+}
 

@@ -36,7 +36,7 @@
 
 #include "DataLoader.hpp"
 #include "FormLoader.hpp"
-
+#include "WidgetListener.hpp"
 #include <QWidget>
 #include <QBuffer>
 #include <QtUiTools>
@@ -79,6 +79,7 @@ class FormWidget : public QWidget
 		QSignalMapper *m_signalMapper;		// delegate for form push buttons pointing to forms
 		QStringList m_forms;			// names of all currently loaded forms
 		QTranslator m_translator;		// contains the translations for the current form
+		QHash<QString,QList<WidgetListenerR> > m_listeners;// widget signal listeners for this form
 		bool m_debug;
 		bool m_modal;
 		

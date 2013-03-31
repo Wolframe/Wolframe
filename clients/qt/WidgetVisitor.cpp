@@ -170,18 +170,22 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "datasignal:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QList<QString> values;
+				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				{
+					values.push_back( vv.trimmed());
+				}
 				if (prop == "datasignal:onload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::OnLoad] = values;
 				}
 				else if (prop == "datasignal:onchange")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::OnChange] = values;
 				}
 				else if (prop == "datasignal:domainload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::DomainChange] = values;
 				}
 				else
 				{
@@ -190,18 +194,22 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "dataslot:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QList<QString> values;
+				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				{
+					values.push_back( vv.trimmed());
+				}
 				if (prop == "dataslot:onload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::OnLoad] = values;
 				}
 				else if (prop == "dataslot:onchange")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::OnChange] = values;
 				}
 				else if (prop == "dataslot:domainload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::DomainChange] = values;
 				}
 				else
 				{
@@ -550,6 +558,18 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
+FormWidget* WidgetVisitor::formwidget() const
+{
+	if (m_stk.isEmpty()) return 0;
+	QObject* prn = m_stk.top()->m_widget;
+	for (; prn != 0; prn = prn->parent())
+	{
+		FormWidget* fw = qobject_cast<FormWidget*>( prn);
+		if (fw) return fw;
+	}
+	return 0;
+}
+
 QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
@@ -569,18 +589,6 @@ QWidget* WidgetVisitor::predecessor( const QString& name) const
 			}
 		}
 		if (qobject_cast<FormWidget*>( wdg)) break;
-	}
-	return 0;
-}
-
-QWidget* WidgetVisitor::formwidget() const
-{
-	if (m_stk.isEmpty()) return 0;
-	QObject* wdg = m_stk.at(0)->m_widget;
-	for (; wdg != 0; wdg = wdg->parent())
-	{
-		FormWidget* rt = qobject_cast<FormWidget*>( wdg);
-		if (rt) return rt;
 	}
 	return 0;
 }
@@ -1258,6 +1266,14 @@ void WidgetVisitor::do_writeAssignments()
 	}
 }
 
+void WidgetVisitor::connectOnChangeListener( WidgetListener& listener)
+{
+	if (!m_stk.isEmpty())
+	{
+		m_stk.top()->connectOnChangeSignals( listener);
+	}
+}
+
 void WidgetVisitor::ERROR( const char* msg, const QString& arg) const
 {
 	logError( widget(), msg, QString( arg));
@@ -1297,6 +1313,7 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 
 	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
+		/*[-]*/qDebug() << "find datasignal receiver" << receiverprop;
 		QVariant receiverid = resolve( receiverprop);
 		QString receiveridstr = receiverid.toString();
 		QWidget* rcvwidget;

@@ -35,7 +35,7 @@
        <string/>
       </property>
       <property name="datasignal:onchange" stdset="0">
-       <string>relation.employee</string>
+       <string>relation, project</string>
       </property>
       <property name="synonym:customerfocus" stdset="0">
        <string>customer.selected</string>

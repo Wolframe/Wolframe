@@ -35,7 +35,7 @@
 #include "WidgetMessageDispatcher.hpp"
 #include <QAbstractButton>
 
-bool WidgetListener::hasOnChangeSignals( QWidget* widget_)
+bool WidgetListener::hasOnChangeSignals( const QWidget* widget_)
 {
 	QVariant prop = widget_->property( "datasignal:onchange");
 	return prop.isValid();

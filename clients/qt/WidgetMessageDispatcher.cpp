@@ -88,6 +88,11 @@ QString WidgetMessageDispatcher::getActionId( const QString& tag)
 	return QString();
 }
 
+QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
+{
+	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);
+}
+
 bool WidgetMessageDispatcher::feedResult( const QString& tag, const QByteArray& data)
 {
 	if (!tag.isEmpty() && tag.at(0) == '-') return true;

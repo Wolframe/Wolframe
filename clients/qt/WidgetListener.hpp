@@ -44,7 +44,7 @@ class WidgetListener :public QObject
 	Q_OBJECT
 public:
 	///\brief Function to check, if an 'onchange' lister has to be created for a widget
-	static bool hasOnChangeSignals( QWidget* widget_);
+	static bool hasOnChangeSignals( const QWidget* widget_);
 
 public:
 	///\brief Constructor

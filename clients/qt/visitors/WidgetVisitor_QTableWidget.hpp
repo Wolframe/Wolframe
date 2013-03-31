@@ -53,6 +53,7 @@ public:
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
+	virtual void connectOnChangeSignals( WidgetListener& listener);
 
 private:
 	void fill_cell( int row, int col, int itemidx);

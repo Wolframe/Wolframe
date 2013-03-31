@@ -363,28 +363,25 @@ bool WolframeClientProtocol::process()
 	}
 }
 
-bool WolframeClientProtocol::hasPendingRequest( const QString& tag)
-{
-	typedef QPair<QString,QByteArray> Request;
-	foreach (const QString& rq, m_requesttagqueue) if (rq == tag) return true;
-	foreach (const Request& rq, m_requestqueue) if (rq.first == tag) return true;
-	foreach (const Request& rq, m_errorqueue) if (rq.first == tag) return true;
-	foreach (const Request& rq, m_answerqueue) if (rq.first == tag) return true;
-	return false;
-}
-
 void WolframeClientProtocol::pushRequest( const QString& tag, const QByteArray& content)
 {
-	if (hasPendingRequest( tag))
+	typedef QPair<QString,QByteArray> Request;
+	if (tag[0] != '-')
 	{
-		qDebug() << "suppress pending request tag=" << tag;
+		QList<Request>::iterator ri = m_requestqueue.begin(), re = m_requestqueue.end();
+		for (; ri != re; ++ri)
+		{
+			if (ri->first == tag)
+			{
+				qDebug() << "replace pending domain load request, tag=" << tag;
+				ri->second = content;
+				return;
+			}
+		}
 	}
-	else
-	{
-		qDebug() << "push request tag=" << tag << "doc=" << content;
-		m_requestqueue.enqueue( qMakePair( tag, content));
-		process();
-	}
+	qDebug() << "push request tag=" << tag << "doc=" << content;
+	m_requestqueue.enqueue( qMakePair( tag, content));
+	process();
 }
 
 bool WolframeClientProtocol::getAnswerSuccess() const
