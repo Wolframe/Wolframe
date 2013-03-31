@@ -5,6 +5,8 @@ DeleteEmployee( xml);
 GetEmployee( xml) :EmployeeResult;
 SearchEmployee( xml) :EmployeeListResult;
 ListEmployee( xml) :EmployeeListResult;
+ListEmployeeRef( xml) :EmployeeRefListResult;
+
 
 #--- Customer
 InsertCustomer( xml) :CustomerResult;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>673</width>
-    <height>384</height>
+    <height>414</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <height>311</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="relation">
+   <layout class="QHBoxLayout" name="relation_hl">
     <item>
      <widget class="QTableWidget" name="customer">
       <property name="rootelement" stdset="0">
@@ -59,9 +59,9 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="relations">
+     <layout class="QVBoxLayout" name="relation_vl">
       <item>
-       <widget class="QTreeWidget" name="employee">
+       <widget class="QTreeWidget" name="relation">
         <property name="doctype" stdset="0">
          <string>GetCustomerRelationCustomer</string>
         </property>
@@ -119,22 +119,22 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_3">
+         <widget class="QPushButton" name="addEmployeeRelation">
           <property name="text">
            <string>Add</string>
           </property>
           <property name="form" stdset="0">
-           <string>addEmployeeRelation?customerid={customer.selected}</string>
+           <string>addCustomerEmployeeRelation?customerid={customer.selected}</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_2">
+         <widget class="QPushButton" name="deleteEmployeeRelation">
           <property name="text">
            <string>Delete</string>
           </property>
           <property name="form" stdset="0">
-           <string>relationCustomerEmployee</string>
+           <string>relationCustomerEmployee?customer.selected={customer.selected}</string>
           </property>
           <property name="doctype" stdset="0">
            <string>DeleteCustomerRelation</string>
@@ -149,17 +149,17 @@
            <string>{customer.selected}</string>
           </property>
           <property name="employeeid" stdset="0">
-           <string>{employee.selected}</string>
+           <string>{relation.selected}</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_4">
+         <widget class="QPushButton" name="editEmployeeRelation">
           <property name="text">
            <string>Edit</string>
           </property>
           <property name="form" stdset="0">
-           <string>editRelationCustomerEmployee?customerid={customer.selected}&amp;employeeid={employee.selected}</string>
+           <string>editCustomerEmployeeRelation?customerid={customer.selected}&amp;employeeid={relation.selected}</string>
           </property>
          </widget>
         </item>
@@ -217,47 +217,44 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_5">
+         <widget class="QPushButton" name="addCustomerProject">
           <property name="text">
            <string>Add</string>
           </property>
           <property name="form" stdset="0">
-           <string>addCustomerrojectRelation?customerid={customer.selected}</string>
+           <string>addProject?customer.selected={customer.selected}</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_7">
+         <widget class="QPushButton" name="editCustomerProject">
           <property name="text">
            <string>Edit</string>
           </property>
           <property name="form" stdset="0">
-           <string>editRelationCustomerEmployee?customerid={customer.selected}&amp;employeeid={employee.selected}</string>
+           <string>editProject?id={project.selected}</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addEmployeeRelation_6">
+         <widget class="QPushButton" name="deleteCustomerProject">
           <property name="text">
            <string>Delete</string>
           </property>
           <property name="form" stdset="0">
-           <string>relationCustomerEmployee</string>
+           <string>relationCustomerEmployee?customer.selected={customer.selected}</string>
           </property>
           <property name="doctype" stdset="0">
-           <string>DeleteCustomerRelation</string>
+           <string>DeleteProject</string>
           </property>
           <property name="rootelement" stdset="0">
-           <string>relation</string>
+           <string>project</string>
           </property>
           <property name="dataelement" stdset="0">
-           <string>@customerid,@employeeid</string>
+           <string>@id</string>
           </property>
-          <property name="customerid" stdset="0">
-           <string>{customer.selected}</string>
-          </property>
-          <property name="employeeid" stdset="0">
-           <string>{employee.selected}</string>
+          <property name="id" stdset="0">
+           <string>{project.selected}</string>
           </property>
          </widget>
         </item>

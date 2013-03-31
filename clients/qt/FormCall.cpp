@@ -79,15 +79,16 @@ void FormCall::init( const QString& callstr)
 		while (paramidx < callstr.size())
 		{
 			int eqidx = callstr.indexOf( '=', paramidx);
-			int amidx = callstr.indexOf( '&', paramidx);
-			if (eqidx < 0 || (eqidx > amidx && amidx >= 0))
+			int amidx = callstr.indexOf( '&', paramidx+1);
+			if (amidx < 0) amidx = callstr.size();
+			if (eqidx < 0 || eqidx > amidx)
 			{
 				qCritical() << "Syntax error in form parameter list. missing assignment '=' in declaration";
 				return;
 			}
 			else
 			{
-				QString paramname( callstr.mid( paramidx+1, eqidx-paramidx-1).toAscii());
+				QString paramname( callstr.mid( paramidx+1, eqidx-paramidx-1));
 				paramidx = eqidx + 1;
 				QVariant paramvalue( parseValue( callstr, paramidx));
 				m_parameter.push_back( Parameter( paramname, paramvalue));

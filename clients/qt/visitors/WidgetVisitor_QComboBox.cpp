@@ -217,5 +217,6 @@ void WidgetVisitorState_QComboBox::endofDataFeed()
 		if (idx < 0) return;
 		m_comboBox->setCurrentIndex( idx);
 	}
+	m_comboBox->setSizeAdjustPolicy( QComboBox::AdjustToContents);
 }
 

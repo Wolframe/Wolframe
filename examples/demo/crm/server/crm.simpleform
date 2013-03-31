@@ -17,6 +17,11 @@ Form EmployeeInserted
 	_ Employee
 }
 
+Form EmployeeRef
+{
+	id		!@ID
+	_		entityname
+}
 
 ; * Forms:
 Form InsertEmployee	{ employee { _ Employee } }
@@ -25,8 +30,10 @@ Form DeleteEmployee	{ employee { id !@ID } }
 Form GetEmployee	{ employee { id !@ID } }
 Form EmployeeResult	{ employee { _ EmployeeInserted } }
 Form EmployeeListResult	{ employees { employee EmployeeInserted[] } }
+Form EmployeeRefListResult { employees { employee EmployeeRef[] } }
 Form SearchEmployee	{ employee { pattern string } }
 Form ListEmployee	{ employee { } }
+Form ListEmployeeRef	{ employee { } }
 
 
 
@@ -119,28 +126,28 @@ Form CustomerPictureListResult
 ; ------------ CustomerRelation
 Form CustomerRelation
 {
-	customerid	!ID
-	employeeid	!ID
+	customerid	@!ID
+	employeeid	@!ID
 	description	string
 }
 Form CustomerRelationCustomerView
 {
-	customerid	!ID
-	employeeid	!ID
+	customerid	@!ID
+	employeeid	@!ID
 	employeename	string
 	employeestatus	string
 	description	string
 }
 
-Form InsertCustomerRelation	{ relation { _ CustomerRelation } }
-Form UpdateCustomerRelation	{ relation { _ CustomerRelation } }
-Form DeleteCustomerRelation	{ relation { customerid !@ID employeeid !@ID } }
-Form GetCustomerRelation	{ relation { customerid !@ID employeeid !@ID } }
-Form GetCustomerRelationCustomer { relation { customerid !@ID } }
-Form GetCustomerRelationEmployee { relation { employee !@ID } }
+Form InsertCustomerRelation			{ relation { _ CustomerRelation } }
+Form UpdateCustomerRelation			{ relation { _ CustomerRelation } }
+Form DeleteCustomerRelation			{ relation { customerid !@ID employeeid !@ID } }
+Form GetCustomerRelation			{ relation { customerid !@ID employeeid !@ID } }
+Form GetCustomerRelationCustomer		{ relation { customerid !@ID } }
+Form GetCustomerRelationEmployee		{ relation { employee !@ID } }
 
-Form CustomerRelationResult	{ relation { _ CustomerRelation } }
-Form CustomerRelationListResult	{ relations { relation CustomerRelation[] } }
+Form CustomerRelationResult			{ relation { _ CustomerRelation } }
+Form CustomerRelationListResult			{ relations { relation CustomerRelation[] } }
 Form CustomerRelationCustomerViewListResult	{ relations { relation CustomerRelationCustomerView[] } }
 
 

@@ -89,7 +89,6 @@ void FormWidget::formListLoaded( QStringList forms )
 
 void FormWidget::switchForm( QWidget *actionwidget )
 {
-	/*[-]*/qDebug() << "++++++++++ SWITCH FORM";
 	WidgetVisitor visitor( actionwidget);
 
 	QVariant doctype = visitor.property( "doctype");
@@ -118,6 +117,7 @@ void FormWidget::switchForm( QWidget *actionwidget )
 
 	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
+	qDebug() << "Switch form to" << formlink;
 
 	if (formlink.isValid())
 	{
@@ -248,7 +248,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	WidgetVisitor visitor( m_ui);
 	foreach (const FormCall::Parameter& param, formCall.parameter())
 	{
-		/*[-]*/qDebug() << "++++++++++++ SET PROPERTY UI PARAM";
 		if (!visitor.setProperty( QString( param.first), param.second))
 		{
 			qCritical() << "Failed to set UI parameter" << param.first << "=" << param.second;

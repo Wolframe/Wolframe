@@ -45,6 +45,10 @@ TRANSACTION ListEmployee
 BEGIN
 	INTO employee DO SELECT * FROM Employee;
 END
+TRANSACTION ListEmployeeRef
+BEGIN
+	INTO employee DO SELECT id,name AS _ FROM Employee;
+END
 
 
 
@@ -135,12 +139,12 @@ END
 TRANSACTION GetCustomerRelationEmployee
 BEGIN
 	INTO . DO SELECT CustomerRelation.employeeid, Customer.name AS customername, CustomerRelation.customerid, CustomerRelation.description FROM Customer,CustomerRelation
-		WHERE employeeid=$(employeeid) AND Customer.id=$(CustomerRelation.customerid);
+		WHERE employeeid=$(employeeid) AND Customer.id=CustomerRelation.customerid;
 END
 TRANSACTION GetCustomerRelationCustomer
 BEGIN
 	INTO relation DO SELECT CustomerRelation.employeeid, Employee.name AS employeename, Employee.status AS employeestatus, CustomerRelation.customerid, CustomerRelation.description FROM Employee,CustomerRelation
-		WHERE customerid=$(customerid) AND Employee.id=$(CustomerRelation.employeeid);
+		WHERE customerid=$(customerid) AND Employee.id=CustomerRelation.employeeid;
 END
 
 
