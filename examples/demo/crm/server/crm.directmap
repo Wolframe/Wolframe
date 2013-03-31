@@ -51,7 +51,7 @@ GetProject( xml) :ProjectResult;
 GetProjectEdit( xml) :ProjectEditResult;
 SearchProject( xml) :ProjectListResult;
 ListProject( xml) :ProjectListResult;
-ListProjectCustomer( xml) :ProjectListResult;
+ListProjectCustomer( xml) :ProjectCustomerListResult;
 
 #--- ProjectNote
 InsertProjectNote( xml) :ProjectNoteResult;

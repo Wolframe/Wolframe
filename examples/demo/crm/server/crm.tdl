@@ -143,7 +143,7 @@ BEGIN
 END
 TRANSACTION GetCustomerRelationCustomer
 BEGIN
-	INTO relation DO SELECT CustomerRelation.employeeid, Employee.name AS employeename, Employee.status AS employeestatus, CustomerRelation.customerid, CustomerRelation.description FROM Employee,CustomerRelation
+	INTO relation DO SELECT CustomerRelation.employeeid, Employee.name AS employeename, Employee.status AS employeestatus, CustomerRelation.description FROM Employee,CustomerRelation
 		WHERE customerid=$(customerid) AND Employee.id=CustomerRelation.employeeid;
 END
 
@@ -214,7 +214,7 @@ END
 
 TRANSACTION ListProjectCustomer
 BEGIN
-	INTO project DO SELECT Project.id,Customer.name as customername,Project.name,Project.description
+	INTO project DO SELECT Project.id,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id AND Customer.id = $(customerid);
 END

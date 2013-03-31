@@ -132,7 +132,6 @@ Form CustomerRelation
 }
 Form CustomerRelationCustomerView
 {
-	customerid	@!ID
 	employeeid	@!ID
 	employeename	string
 	employeestatus	string
@@ -227,6 +226,12 @@ Form ProjectListElem
 	name		entityname
 	description	?string
 }
+Form ProjectCustomerListElem
+{
+	id		!@ID
+	name		entityname
+	description	?string
+}
 ; * Forms:
 Form InsertProject		{ project { _ Project } }
 Form UpdateProject		{ project { _ ProjectInserted } }
@@ -234,6 +239,7 @@ Form DeleteProject		{ project { id !@ID } }
 Form GetProject			{ project { id !@ID } }
 Form ProjectResult		{ project { _ ProjectInserted } }
 Form ProjectListResult		{ projects { project ProjectListElem[] } }
+Form ProjectCustomerListResult	{ projects { project ProjectCustomerListElem[] } }
 Form ListProject		{ project { } }
 Form ListProjectCustomer	{ project { customerid !@ID } }
 
