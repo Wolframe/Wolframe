@@ -576,7 +576,7 @@ FormWidget* WidgetVisitor::formwidget() const
 QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
-	QObject* prn = m_stk.top()->m_widget->parent();
+	QObject* prn = m_stk.top()->m_widget;
 	for (; prn != 0; prn = prn->parent())
 	{
 		QWidget* wdg = qobject_cast<QWidget*>( prn);
