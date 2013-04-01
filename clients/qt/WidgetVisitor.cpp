@@ -327,8 +327,11 @@ bool WidgetVisitor::enter_root( const QString& name)
 	QWidget* ww = predecessor( name);
 	if (ww)
 	{
-		m_stk.push_back( createWidgetVisitorState( ww));
-		return true;
+		if (ww != m_stk.top()->m_widget)
+		{
+			m_stk.push_back( createWidgetVisitorState( ww));
+			return true;
+		}
 	}
 	return false;
 }
@@ -573,7 +576,7 @@ FormWidget* WidgetVisitor::formwidget() const
 QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
-	QObject* prn = m_stk.top()->m_widget;
+	QObject* prn = m_stk.top()->m_widget->parent();
 	for (; prn != 0; prn = prn->parent())
 	{
 		QWidget* wdg = qobject_cast<QWidget*>( prn);
@@ -943,6 +946,7 @@ struct WidgetVisitorStackElement
 	{
 		if (!selectedDataElements)
 		{
+			level += 1; //... disallow root element reference with implicit references
 			foreach (const QString& prop, state->m_widget->dynamicPropertyNames())
 			{
 				if (!isReservedProperty( prop))
@@ -963,6 +967,7 @@ struct WidgetVisitorStackElement
 					dataelements << objname;
 				}
 			}
+			TRACE_ASSIGNMENT( "implicit dataelements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements);
 		}
 		else
 		{
@@ -981,6 +986,8 @@ struct WidgetVisitorStackElement
 					dataelements.push_back( elem);
 				}
 			}
+			TRACE_ASSIGNMENT( "selected attribute elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( 0, nof_attributes));
+			TRACE_ASSIGNMENT( "selected content elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( nof_attributes, dataelements.size()));
 		}
 	}
 	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
@@ -1017,6 +1024,7 @@ static QList<QString> getSuffixDataElements( const QList<QString>& ba, const QSt
 
 QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* selectedDataElements)
 {
+	int loopcnt = 0;
 	if (m_stk.isEmpty()) return QList<WidgetVisitor::Element>();
 
 	QStack<WidgetVisitorStackElement> elemstk;
@@ -1313,7 +1321,7 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 
 	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
-		/*[-]*/qDebug() << "find datasignal receiver" << receiverprop;
+		TRACE_STATUS( "find datasignal receiver", className(), objectName(), receiverprop);
 		QVariant receiverid = resolve( receiverprop);
 		QString receiveridstr = receiverid.toString();
 		QWidget* rcvwidget;
@@ -1322,9 +1330,11 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 		{
 			WidgetVisitor mainvisitor( uirootwidget());
 			rt.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
+			foreach (QWidget* rcvwidget, rt) TRACE_STATUS( "found widget by address", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
 		}
 		else if ((rcvwidget = get_widget_reference( receiveridstr)) != 0)
 		{
+			TRACE_STATUS( "found widget reference", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
 			rt.append( rcvwidget);
 		}
 		else
@@ -1342,6 +1352,7 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_domainchange, receiverid));
 					break;
 			}
+			foreach (QWidget* rcvwidget, rt) TRACE_STATUS( "found widget by data slot identifier", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
 		}
 	}
 	return rt;

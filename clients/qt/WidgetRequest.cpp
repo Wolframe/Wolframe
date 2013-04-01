@@ -52,18 +52,22 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode, QSt
 	QList<QString> selectedDataElements;
 	bool hasSelectedDataElements = false;
 
-	foreach (const QString& ee, visitor.property( "dataelement").toString().trimmed().split( ','))
+	QVariant dataelement_v = visitor.property( "dataelement");
+	if (dataelement_v.isValid())
 	{
-		QString elem = ee.trimmed();
-		if (!elem.isEmpty())
+		foreach (const QString& ee, dataelement_v.toString().trimmed().split( ','))
 		{
-			if (elem[0] == '_' && elem.size() == 1)
+			QString elem = ee.trimmed();
+			if (!elem.isEmpty())
 			{
-				selectedDataElements.push_back( QString());
-			}
-			else
-			{
-				selectedDataElements.push_back( elem);
+				if (elem[0] == '_' && elem.size() == 1)
+				{
+					selectedDataElements.push_back( QString());
+				}
+				else
+				{
+					selectedDataElements.push_back( elem);
+				}
 			}
 		}
 		hasSelectedDataElements = true;

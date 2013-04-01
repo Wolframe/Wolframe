@@ -79,7 +79,7 @@ void FormWidget::initialize( )
 
 // the form must be switched after 'action' has been taken in the current form
 	connect( m_signalMapper, SIGNAL( mapped( QWidget * ) ),
-		this, SLOT( switchForm( QWidget * ) ) );
+		this, SLOT( switchForm( QWidget * ) ), Qt::UniqueConnection );
 }
 
 void FormWidget::formListLoaded( QStringList forms )
@@ -302,7 +302,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
 
 			connect( pushButton, SIGNAL( clicked( ) ),
-				m_signalMapper, SLOT( map( ) ) );
+				m_signalMapper, SLOT( map( ) ), Qt::UniqueConnection);
 
 			m_signalMapper->setMapping( pushButton, widget );
 		}
