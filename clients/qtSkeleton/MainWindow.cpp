@@ -126,11 +126,6 @@ MainWindow::~MainWindow( )
 	if( settings.mdi ) {
 		if( m_mdiArea )
 			m_mdiArea->closeAllSubWindows( );
-	} else {
-		if( m_formWidget ) {
-			delete m_formWidget;
-			m_formWidget = 0;
-		}
 	}
 	if( m_wolframeClient ) {
 		delete m_wolframeClient;
@@ -140,14 +135,6 @@ MainWindow::~MainWindow( )
 		delete m_debugTerminal;
 		m_debugTerminal = 0;
 		_debugTerminal = 0;
-	}
-	if( m_formLoader ) {
-		delete m_formLoader;
-		m_formLoader = 0;
-	}
-	if( m_dataLoader ) {
-		delete m_dataLoader;
-		m_dataLoader = 0;
 	}
 	if( m_uiLoader ) {
 		delete m_uiLoader;
