@@ -51,18 +51,18 @@
 #include <QLayout>
 #include <QLayout>
 
-#define WOLFRAME_LOWLEVEL_DEBUG
+#undef WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
-#define TRACE_STATUS( TITLE, OBJ, NAME)			qDebug() << "widget visit state" << (TITLE) << (OBJ) << (NAME);
+#define TRACE_STATUS( TITLE, CLASS, OBJ, NAME)		qDebug() << "widget visit state" << (TITLE) << (CLASS) << (OBJ) << (NAME);
 #define TRACE_FETCH( TITLE, OBJ, NAME, VALUE)		qDebug() << "widget visit get" << (TITLE) << (OBJ) << (NAME) << "=" << (VALUE);
 #define TRACE_ASSIGNMENT( TITLE, OBJ, NAME, VALUE)	qDebug() << "widget visit set" << (TITLE) << (OBJ) << (NAME) << "=" << (VALUE);
-#define TRACE_ENTER( TITLE, OBJ, NAME)			qDebug() << "widget visit enter" << (TITLE) << (OBJ) << "into" << (NAME);
+#define TRACE_ENTER( TITLE, CLASS, OBJ, NAME)		qDebug() << "widget visit enter" << (TITLE) << (CLASS) << (OBJ) << "into" << (NAME);
 #define TRACE_LEAVE( TITLE)				qDebug() << "widget visit leave" << (TITLE);
 #else
-#define TRACE_STATUS( TITLE, OBJ, NAME)
+#define TRACE_STATUS( TITLE, CLASS, OBJ, NAME)
 #define TRACE_FETCH( TITLE, OBJ, NAME, VALUE)
 #define TRACE_ASSIGNMENT( TITLE, OBJ, NAME, VALUE)
-#define TRACE_ENTER( TITLE, OBJ, NAME)
+#define TRACE_ENTER( TITLE, CLASS, OBJ, NAME)
 #define TRACE_LEAVE( TITLE)
 #endif
 
@@ -170,18 +170,22 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "datasignal:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QList<QString> values;
+				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				{
+					values.push_back( vv.trimmed());
+				}
 				if (prop == "datasignal:onload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::OnLoad] = values;
 				}
 				else if (prop == "datasignal:onchange")
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::OnChange] = values;
 				}
 				else if (prop == "datasignal:domainload")
 				{
-					m_datasignals.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
+					m_datasignals.id[(int)WidgetVisitor::DomainChange] = values;
 				}
 				else
 				{
@@ -190,18 +194,22 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "dataslot:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QList<QString> values;
+				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				{
+					values.push_back( vv.trimmed());
+				}
 				if (prop == "dataslot:onload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnLoad].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::OnLoad] = values;
 				}
 				else if (prop == "dataslot:onchange")
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnChange].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::OnChange] = values;
 				}
 				else if (prop == "dataslot:domainload")
 				{
-					m_dataslots.id[(int)WidgetVisitor::DomainChange].push_back( value.toString());
+					m_dataslots.id[(int)WidgetVisitor::DomainChange] = values;
 				}
 				else
 				{
@@ -343,7 +351,7 @@ QList<QWidget*> WidgetVisitor::children( const QString& name) const
 
 bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 {
-	TRACE_STATUS( "try enter", objectName(), name)
+	TRACE_STATUS( "try enter", className(), objectName(), name)
 	if (m_stk.empty()) return false;
 
 	// [A] check if name is a synonym and follow it if yes:
@@ -385,11 +393,11 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 		return true;
 	}
 
-	TRACE_STATUS( "try enter internal", objectName(), name)
+	TRACE_STATUS( "try enter internal", className(), objectName(), name)
 	// [B] check if name refers to a widget internal item and follow it if yes:
 	if (m_stk.top()->enter( name, writemode))
 	{
-		TRACE_ENTER( "internal", objectName(), name);
+		TRACE_ENTER( "internal", className(), objectName(), name);
 		++m_stk.top()->m_internal_entercnt;
 		return true;
 	}
@@ -397,7 +405,7 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 	if (m_stk.top()->m_internal_entercnt == 0)
 	{
 		// [C] check if name refers to a symbolic link and follow the link if yes:
-		TRACE_STATUS( "try enter link", objectName(), name)
+		TRACE_STATUS( "try enter link", className(), objectName(), name)
 		QString lnk = m_stk.top()->getLink( name);
 		if (!lnk.isEmpty())
 		{
@@ -408,22 +416,22 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 				return false;
 			}
 			m_stk.push_back( createWidgetVisitorState( lnkwdg));
-			TRACE_ENTER( "link", objectName(), name);
+			TRACE_ENTER( "link", className(), objectName(), name);
 			return true;
 		}
 
 		// [D] on top level check if name refers to an ancessor or an ancessor child and follow it if yes:
-		TRACE_STATUS( "try enter root", objectName(), name)
+		TRACE_STATUS( "try enter root", className(), objectName(), name)
 		if (level == 0 && !name.isEmpty() && enter_root( name))
 		{
-			TRACE_ENTER( "root", className(), name);
+			TRACE_ENTER( "root", className(), objectName(), name);
 			return true;
 		}
 
 		// [E] check if name refers to a child and follow it if yes:
 		if (!name.isEmpty())
 		{
-			TRACE_STATUS( "try enter children", objectName(), name)
+			TRACE_STATUS( "try enter children", className(), objectName(), name)
 			QList<QWidget*> cn = children( name);
 			if (cn.size() > 1)
 			{
@@ -432,7 +440,7 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 			}
 			if (cn.isEmpty()) return false;
 			m_stk.push( createWidgetVisitorState( cn[0]));
-			TRACE_ENTER( "child", objectName(), name);
+			TRACE_ENTER( "child", className(), objectName(), name);
 			return true;
 		}
 	}
@@ -550,6 +558,18 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
+FormWidget* WidgetVisitor::formwidget() const
+{
+	if (m_stk.isEmpty()) return 0;
+	QObject* prn = m_stk.top()->m_widget;
+	for (; prn != 0; prn = prn->parent())
+	{
+		FormWidget* fw = qobject_cast<FormWidget*>( prn);
+		if (fw) return fw;
+	}
+	return 0;
+}
+
 QWidget* WidgetVisitor::predecessor( const QString& name) const
 {
 	if (m_stk.isEmpty()) return 0;
@@ -559,32 +579,16 @@ QWidget* WidgetVisitor::predecessor( const QString& name) const
 		QWidget* wdg = qobject_cast<QWidget*>( prn);
 		if (wdg)
 		{
-			/*[-]*/qDebug() << "inspect parent" << wdg->metaObject()->className() << wdg->objectName();
-
 			if (wdg->objectName() == name) return wdg;
 			if (wdg) foreach (QWidget* cld, getWidgetChildren( wdg))
 			{
-				/*[-]*/qDebug() << "inspect child" << cld->metaObject()->className() << cld->objectName() << name;
 				if (cld->objectName() == name)
 				{
-					/*[-]*/qDebug() << "found predecessor" << cld->metaObject()->className() << cld->objectName();
 					return cld;
 				}
 			}
 		}
 		if (qobject_cast<FormWidget*>( wdg)) break;
-	}
-	return 0;
-}
-
-QWidget* WidgetVisitor::formwidget() const
-{
-	if (m_stk.isEmpty()) return 0;
-	QObject* wdg = m_stk.at(0)->m_widget;
-	for (; wdg != 0; wdg = wdg->parent())
-	{
-		FormWidget* rt = qobject_cast<FormWidget*>( wdg);
-		if (rt) return rt;
 	}
 	return 0;
 }
@@ -795,7 +799,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
-		TRACE_STATUS( "found synonym", name, value)
+		TRACE_STATUS( "found synonym", synonym, name, value)
 		return setProperty( synonym, value, level);
 	}
 
@@ -808,7 +812,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	{
 		prefix = name.mid( 0, followidx);
 		rest = name.mid( followidx+1, name.size()-followidx-1);
-		TRACE_STATUS( "structured property", prefix, rest)
+		TRACE_STATUS( "structured property", name, prefix, rest)
 		if (enter( prefix, false, level))
 		{
 			subelem = true;
@@ -821,7 +825,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	}
 	else
 	{
-		TRACE_STATUS( "identifier property", objectName(), name)
+		TRACE_STATUS( "identifier property", className(), objectName(), name)
 		if (enter( name, true, level))
 		{
 			subelem = true;
@@ -842,7 +846,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	}
 	if (followidx < 0)
 	{
-		TRACE_STATUS( "try to set internal property", objectName(), name)
+		TRACE_STATUS( "try to set internal property", className(), objectName(), name)
 		// [B] check if an internal property of the widget is referenced and set its value if yes
 		if (m_stk.top()->setProperty( name, value))
 		{
@@ -850,7 +854,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 			return true;
 		}
 
-		TRACE_STATUS( "try to set dynamic property", objectName(), name)
+		TRACE_STATUS( "try to set dynamic property", className(), objectName(), name)
 		// [D] check if a dynamic property is referenced and set its value if yes
 		if (m_stk.top()->m_internal_entercnt == 0)
 		{
@@ -1262,6 +1266,14 @@ void WidgetVisitor::do_writeAssignments()
 	}
 }
 
+void WidgetVisitor::connectOnChangeListener( WidgetListener& listener)
+{
+	if (!m_stk.isEmpty())
+	{
+		m_stk.top()->connectOnChangeSignals( listener);
+	}
+}
+
 void WidgetVisitor::ERROR( const char* msg, const QString& arg) const
 {
 	logError( widget(), msg, QString( arg));
@@ -1301,6 +1313,7 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 
 	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
+		/*[-]*/qDebug() << "find datasignal receiver" << receiverprop;
 		QVariant receiverid = resolve( receiverprop);
 		QString receiveridstr = receiverid.toString();
 		QWidget* rcvwidget;

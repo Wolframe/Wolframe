@@ -165,8 +165,11 @@ by a declared assignment and a refresh issued onclose or onchange by the subwidg
 **/
 
 ///\class WidgetListener
-///\brief Formward declaration
+///\brief Forward declaration
 class WidgetListener;
+///\class FormWidget
+///\brief Forward declaration
+class FormWidget;
 
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
@@ -220,7 +223,7 @@ class WidgetVisitor
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
 			///\brief Connect all widget signals that should trigger an onchange event to the listener slot 'changed'
-			virtual void ConnectOnChangeSignals( WidgetListener& /*listener*/){}
+			virtual void connectOnChangeSignals( WidgetListener& /*listener*/){}
 
 		public://Common methods:
 			const QString& getSynonym( const QString& name) const;
@@ -379,7 +382,7 @@ class WidgetVisitor
 
 		///\brief Get the form widget of this widget
 		///\brief Return the form widget reference if this widget is a sub widget of a form or 0 if it does not exist
-		QWidget* formwidget() const;
+		FormWidget* formwidget() const;
 		///\brief Get the UI root widget
 		QWidget* uirootwidget() const;
 		///\brief Get the UI root widget
@@ -421,6 +424,8 @@ class WidgetVisitor
 		void do_readGlobals( const QHash<QString,QVariant>& globals);
 		///\brief For all visitor sub widgets do assignments to global variables from form widgets based on global: declarations
 		void do_writeGlobals( QHash<QString,QVariant>& globals);
+
+		void connectOnChangeListener( WidgetListener& listener);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
