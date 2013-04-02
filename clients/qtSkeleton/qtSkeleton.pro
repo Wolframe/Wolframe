@@ -4,7 +4,7 @@ TARGET = qtSkeleton
 
 CONFIG += thread qt uitools designer debug
 
-DEFINES += QCOMMANDLINE_STATIC
+#DEFINES += WITH_SSL
 
 INCLUDEPATH += .
 
@@ -21,7 +21,6 @@ SOURCES += \
 	NetworkDataLoader.cpp \
 	DataHandler.cpp \
 	WolframeClient.cpp \
-	qcommandline.cpp \
 	PreferencesDialog.cpp \
 	connection.cpp \
 	manageServersDialog.cpp \
@@ -40,7 +39,6 @@ HEADERS += \
 	NetworkDataLoader.hpp \
 	DataHandler.hpp \
 	WolframeClient.hpp \
-	qcommandline.h \
 	PreferencesDialog.hpp \
 	connection.hpp \
 	manageServersDialog.hpp \

@@ -75,7 +75,6 @@ class WolframeClient : public QObject
 		ConnectionParameters m_connParams;
 		State m_state;
 		QAbstractSocket *m_socket;
-		QWidget *m_parent;
 		bool m_hasErrors;
 #ifdef WITH_SSL
 		bool m_initializedSsl;

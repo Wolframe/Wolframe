@@ -62,7 +62,7 @@ QString ConnectionParameters::toString() const
 	if ( !name.isEmpty() )	{
 		QString str;
 		str = QString( "Host: %1\nPort: %2\n" ).arg( host ).arg( port );
-#ifdef WITH_SSL
+
 		if ( SSL )	{
 			str += "SSL on";
 			if ( clientCertificate )
@@ -72,9 +72,7 @@ QString ConnectionParameters::toString() const
 		}
 		else
 			str += "SSL off";
-#else
-		str += "<no SSL compiled in>";
-#endif
+
 		return str;
 	}
 	else
@@ -100,7 +98,6 @@ bool ConnectionParameters::check( QString& error ) const
 		error += QObject::tr( "Server port must be defined (> 0)" );
 		ret = false;
 	}
-#ifdef WITH_SSL
 	if ( SSL )	{
 		if ( clientCertificate )	{
 			if ( SSLcertificate.isEmpty() )	{
@@ -125,7 +122,6 @@ bool ConnectionParameters::check( QString& error ) const
 			}
 		}
 	}
-#endif
 	return ret;
 }
 

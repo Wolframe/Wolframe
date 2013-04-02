@@ -2,7 +2,6 @@ TOPDIR = ..\..
 
 # do this manually, nmake is broken!
 #SUBDIRS = plugins
-SUBDIRS = tests
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
