@@ -1,5 +1,9 @@
 #include "WidgetVisitor_QDateEdit.hpp"
 #include "WidgetVisitor.hpp"
+#include <QSignalMapper>
+#include <QWidget>
+#include <QObject>
+#include <QDebug>
 
 WidgetVisitorState_QDateEdit::WidgetVisitorState_QDateEdit( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -62,4 +66,18 @@ QVariant WidgetVisitorState_QDateEdit::getState() const
 	return QVariant( m_dateEdit->date());
 }
 
+void WidgetVisitorState_QDateEdit::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( (const QObject*)m_dateEdit, SIGNAL( dateChanged( const QDate&)), (const QObject*)&listener, SLOT( changed())); break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_dateEdit->objectName() << WidgetVisitor::dataSignalTypeName(dt);
+	}
+}
 
