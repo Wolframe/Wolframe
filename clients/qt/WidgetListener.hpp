@@ -43,16 +43,23 @@ class WidgetListener :public QObject
 {
 	Q_OBJECT
 public:
-	///\brief Function to check, if an 'onchange' lister has to be created for a widget
-	static bool hasOnChangeSignals( const QWidget* widget_);
+	///\brief Function to check, if data signal lister has to be created for a widget
+	static bool hasDataSignals( const QWidget* widget_);
 
 public:
 	///\brief Constructor
 	WidgetListener( QWidget* widget_, DataLoader* dataLoader_, bool debug_);
 	virtual ~WidgetListener(){}
 
+	void handleDataSignal( WidgetVisitor::DataSignalType dt);
+
 public slots:
-	void changed();
+	void changed()		{handleDataSignal( WidgetVisitor::SigChanged);}
+	void activated()	{handleDataSignal( WidgetVisitor::SigActivated);}
+	void entered()		{handleDataSignal( WidgetVisitor::SigEntered);}
+	void pressed()		{handleDataSignal( WidgetVisitor::SigPressed);}
+	void clicked()		{handleDataSignal( WidgetVisitor::SigClicked);}
+	void doubleclicked()	{handleDataSignal( WidgetVisitor::SigDoubleClicked);}
 
 private:
 	WidgetVisitor::StateR m_state;

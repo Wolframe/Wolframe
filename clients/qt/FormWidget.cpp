@@ -99,13 +99,10 @@ void FormWidget::switchForm( QWidget *actionwidget )
 		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
 		m_dataLoader->datarequest( request.tag, request.content);
 
-		// foreach widget linked to this action via datasignal:domainload/dataslot:domainload do issue a domain load
-		foreach (QWidget* triggered_domainload, visitor.get_datasignal_receivers( WidgetVisitor::DomainChange))
+		if (actionwidget->property( "datasignal:clicked").isValid())
 		{
-			WidgetVisitor tv( triggered_domainload);
-			WidgetMessageDispatcher dp( tv);
-			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
-			m_dataLoader->datarequest( domload.tag, domload.content);
+			WidgetListener listener( actionwidget, m_dataLoader, m_debug);
+			listener.handleDataSignal( WidgetVisitor::SigClicked);
 		}
 	}
 
@@ -214,9 +211,9 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 	emit formLoaded( m_form );
 }
 
-static bool nodeProperty_hasDatasignalListener( const QWidget* widget, const QVariant&)
+static bool nodeProperty_hasDataSignals( const QWidget* widget, const QVariant&)
 {
-	if (WidgetListener::hasOnChangeSignals( widget)) return true;
+	if (WidgetListener::hasDataSignals( widget)) return true;
 	return false;
 }
 
@@ -268,8 +265,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	visitor.do_readGlobals( *m_globals);
 	visitor.do_readAssignments();
 
-// connect listener to signals converted to datasignals
-	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDatasignalListener))
+// connect listener to signals converted to data signals
+	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDataSignals))
 	{
 		WidgetVisitor datasig_widget_visitor( datasig_widget);
 		m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
@@ -338,7 +335,7 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
 			}
 			WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
-			visitor.connectOnChangeListener( *listener);
+			visitor.connectDataSignals( *listener);
 			li.value().push_back( listener);
 		}
 

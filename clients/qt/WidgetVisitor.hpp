@@ -180,11 +180,22 @@ class WidgetVisitor
 		///\brief Data signal type
 		enum DataSignalType
 		{
-			OnLoad,
-			OnChange,
-			DomainChange
+			SigChanged,
+			SigActivated,
+			SigEntered,
+			SigPressed,
+			SigClicked,
+			SigDoubleClicked,
+			SigLoaded
 		};
-		enum {NofDataSignalTypes=(int)DomainChange+1};
+		enum {NofDataSignalTypes=(int)SigLoaded+1};
+		static const char* dataSignalTypeName( DataSignalType ii)
+		{
+			static const char* ar[]
+			= {"changed", "activated", "entered", "pressed", "clicked", "doubleclicked", "loaded", 0};
+			return ar[(int)ii];
+		}
+		static bool getDataSignalType( const char* name, DataSignalType& dt);
 
 		///\class State
 		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
@@ -222,8 +233,8 @@ class WidgetVisitor
 			virtual QVariant getState()						{return QVariant();}
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
-			///\brief Connect all widget signals that should trigger an onchange event to the listener slot 'changed'
-			virtual void connectOnChangeSignals( WidgetListener& /*listener*/){}
+			///\brief Connect all widget signals that should trigger an event on a signal of type 'type'
+			virtual void connectDataSignals( DataSignalType /*type*/, WidgetListener& /*listener*/){}
 
 		public://Common methods:
 			const QString& getSynonym( const QString& name) const;
@@ -425,7 +436,8 @@ class WidgetVisitor
 		///\brief For all visitor sub widgets do assignments to global variables from form widgets based on global: declarations
 		void do_writeGlobals( QHash<QString,QVariant>& globals);
 
-		void connectOnChangeListener( WidgetListener& listener);
+		///\brief Connect for the current widget all widget signals that should trigger an event on a signal of type 'dt'
+		void connectDataSignals( WidgetListener& listener);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
