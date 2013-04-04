@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QListWidget.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QListWidget::WidgetVisitorState_QListWidget( QWidget* widget_)
@@ -110,5 +111,22 @@ QVariant WidgetVisitorState_QListWidget::getState() const
 	return QVariant(selected);
 }
 
+void WidgetVisitorState_QListWidget::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_listWidget, SIGNAL( currentItemChanged(QListWidgetItem*,QListWidgetItem*)), &listener, SLOT( changed()));
+			QObject::connect( m_listWidget, SIGNAL( currentRowChanged(int)), &listener, SLOT( changed()));
+			QObject::connect( m_listWidget, SIGNAL( currentTextChanged(const QString&)), &listener, SLOT( changed()));
+			QObject::connect( m_listWidget, SIGNAL( itemChanged(QListWidgetItem*)), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigActivated: QObject::connect( m_listWidget, SIGNAL( itemActivated( QListWidgetItem*)), &listener, SLOT( activated())); break;
+		case WidgetVisitor::SigEntered: QObject::connect( m_listWidget, SIGNAL( itemEntered( QListWidgetItem*)), &listener, SLOT( entered())); break;
+		case WidgetVisitor::SigPressed: QObject::connect( m_listWidget, SIGNAL( itemPressed( QListWidgetItem*)), &listener, SLOT( pressed())); break;
+		case WidgetVisitor::SigClicked: QObject::connect( m_listWidget, SIGNAL( itemClicked( QListWidgetItem*)), &listener, SLOT( clicked())); break;
+		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_listWidget, SIGNAL( itemDoubleClicked( QListWidgetItem*)), &listener, SLOT( doubleclicked()));
+	}
+}
 
 

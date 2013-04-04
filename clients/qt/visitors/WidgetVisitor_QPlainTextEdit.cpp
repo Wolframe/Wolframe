@@ -1,5 +1,7 @@
 #include "WidgetVisitor_QPlainTextEdit.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QPlainTextEdit::WidgetVisitorState_QPlainTextEdit( QWidget* widget_)
 	:WidgetVisitor::State(widget_)

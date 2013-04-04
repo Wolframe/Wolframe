@@ -1,5 +1,7 @@
 #include "WidgetVisitor_QSlider.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QSlider::WidgetVisitorState_QSlider( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -63,5 +65,20 @@ void WidgetVisitorState_QSlider::setState( const QVariant& state)
 QVariant WidgetVisitorState_QSlider::getState() const
 {
 	return QVariant( m_slider->value());
+}
+
+void WidgetVisitorState_QSlider::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_slider, SIGNAL( valueChanged( int)), &listener, SLOT( changed())); break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_slider->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
 }
 

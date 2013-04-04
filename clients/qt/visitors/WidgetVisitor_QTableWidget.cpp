@@ -32,6 +32,7 @@
 ************************************************************************/
 #include "WidgetVisitor_QTableWidget.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 #include <QLabel>
 #include <QBuffer>

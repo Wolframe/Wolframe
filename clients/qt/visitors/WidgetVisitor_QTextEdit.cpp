@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QTextEdit.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QTextEdit::WidgetVisitorState_QTextEdit( QWidget* widget_)

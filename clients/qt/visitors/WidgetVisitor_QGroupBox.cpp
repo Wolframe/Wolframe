@@ -1,5 +1,6 @@
 #include "WidgetVisitor_QGroupBox.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 #include <QAbstractButton>
 #include <QRadioButton>

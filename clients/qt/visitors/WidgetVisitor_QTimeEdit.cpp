@@ -1,5 +1,6 @@
 #include "WidgetVisitor_QTimeEdit.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
 #include <QSignalMapper>
 #include <QWidget>
 #include <QDebug>
@@ -76,7 +77,7 @@ void WidgetVisitorState_QTimeEdit::connectDataSignals( WidgetVisitor::DataSignal
 		case WidgetVisitor::SigPressed:
 		case WidgetVisitor::SigClicked:
 		case WidgetVisitor::SigDoubleClicked:
-			qCritical() << "try to connect to signal not provided" << m_timeEdit->objectName() << WidgetVisitor::dataSignalTypeName(dt);
+			qCritical() << "try to connect to signal not provided" << m_timeEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 			break;
 	}
 }

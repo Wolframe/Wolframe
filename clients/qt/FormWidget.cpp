@@ -124,8 +124,20 @@ void FormWidget::switchForm( QWidget *actionwidget)
 	{
 		qDebug() << "Switch form to" << formlink;
 		QString nextForm = formlink.toString();
-		if( m_modal && nextForm == "_CLOSE_" ) {
-			emit closed( );
+		if (nextForm == "_CLOSE_")
+		{
+			if (m_modal)
+			{
+				emit closed( );
+			}
+			else
+			{
+				QList<QVariant> formstack = m_ui->property("_w_formstack").toList();
+				nextForm = formstack.back().toString();
+				formstack.pop_back();
+				m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				loadForm( nextForm);
+			}
 		} else {
 			loadForm( nextForm );
 		}
@@ -296,12 +308,12 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // connect push buttons with form names to loadForms
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
-	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( );
-		
-		if( clazz == "QPushButton" ) {
-			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
-
+	foreach( QWidget *widget, widgets )
+	{
+		QPushButton *pushButton = qobject_cast<QPushButton*>( widget);
+		if (pushButton)
+		{
+			// connect button
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ), Qt::UniqueConnection);
 
@@ -309,7 +321,23 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		}
 	}
 
-// reset the form now, this also loads the domains
+// set back link stack in form if there is a back link
+	foreach (QWidget *widget, widgets)
+	{
+		QPushButton *pushButton = qobject_cast<QPushButton*>( widget);
+		if (pushButton)
+		{
+			// if there is a back link define the stack of the form accordingly
+			if (widget->property( "form").toString().trimmed() == "_CLOSE_")
+			{
+				QList<QVariant> formstack = oldUi->property( "_w_formstack").toList();
+				formstack.push_back( QVariant( m_previousForm));
+				m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				break;
+			}
+		}
+	}
+// loads the domains
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
 	{
