@@ -79,15 +79,6 @@ WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( 
 	return Request( actiontag, actionrequest.second);
 }
 
-QString WidgetMessageDispatcher::getActionId( const QString& tag)
-{
-	if (!tag.isEmpty() && tag.at(0) == '-')
-	{
-		return tag.mid( 1, tag.size()-1);
-	}
-	return QString();
-}
-
 QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
 {
 	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);

@@ -1280,16 +1280,11 @@ void WidgetVisitor::connectDataSignals( WidgetListener& listener)
 {
 	if (!m_stk.isEmpty())
 	{
-		foreach (const QByteArray& prop, m_stk.top()->m_widget->dynamicPropertyNames())
+		for (int dt=0; dt<NofDataSignalTypes; ++dt)
 		{
-			if (prop.startsWith( "datasignal:"))
+			if (!m_stk.top()->m_datasignals.id[ dt].isEmpty())
 			{
-				const char* dtname = (const char*)prop + 11/*std::strlen("datasignal:")*/;
-				DataSignalType dt;
-				if (getDataSignalType( dtname, dt))
-				{
-					m_stk.top()->connectDataSignals( dt, listener);
-				}
+				m_stk.top()->connectDataSignals( (DataSignalType)dt, listener);
 			}
 		}
 	}

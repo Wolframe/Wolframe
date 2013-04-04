@@ -69,8 +69,6 @@ class WidgetMessageDispatcher
 		bool feedResult( const QString& tag, const QByteArray& data);
 		QList<QWidget*> findRecipients( const QString& tag) const;
 
-		static QString getActionId( const QString& tag);
-
 	private:
 		WidgetVisitor m_visitor;			//< visitor of elements
 };

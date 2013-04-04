@@ -79,7 +79,7 @@ void FormWidget::initialize( )
 
 // the form must be switched after 'action' has been taken in the current form
 	connect( m_signalMapper, SIGNAL( mapped( QWidget * ) ),
-		this, SLOT( switchForm( QWidget * ) ), Qt::UniqueConnection );
+		this, SLOT( executeAction( QWidget * ) ), Qt::UniqueConnection );
 }
 
 void FormWidget::formListLoaded( QStringList forms )
@@ -88,7 +88,7 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void FormWidget::switchForm( QWidget *actionwidget )
+void FormWidget::executeAction( QWidget *actionwidget )
 {
 	WidgetVisitor visitor( actionwidget);
 
@@ -105,20 +105,24 @@ void FormWidget::switchForm( QWidget *actionwidget )
 			listener.handleDataSignal( WidgetVisitor::SigClicked);
 		}
 	}
+	else
+	{
+		switchForm( actionwidget);
+	}
+}
 
-	// ABa, TODO: this is wrong, we should wait for error or answer, after
-	// that we switch the form on ok, not on error..
-	
+void FormWidget::switchForm( QWidget *actionwidget)
+{
 	WidgetVisitor formvisitor( m_ui);
 	formvisitor.do_writeAssignments();
 	formvisitor.do_writeGlobals( *m_globals);
 
 	// switch form now, formLoaded will inform parent and others
+	WidgetVisitor visitor( actionwidget);
 	QVariant formlink = visitor.property( "form");
-	qDebug() << "Switch form to" << formlink;
-
 	if (formlink.isValid())
 	{
+		qDebug() << "Switch form to" << formlink;
 		QString nextForm = formlink.toString();
 		if( m_modal && nextForm == "_CLOSE_" ) {
 			emit closed( );
@@ -321,33 +325,46 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
-	WidgetMessageDispatcher dispatcher( m_ui);
+	WidgetVisitor visitor( m_ui);
+	WidgetMessageDispatcher dispatcher( visitor.uirootwidget());
 
-	QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
-	if (li != m_listeners.end())
+	if (isActionRequest( tag_[0]))
 	{
-		li.value().clear();
-		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		foreach (QWidget* actionwidget, dispatcher.findRecipients( tag_.mid( 1, tag_.size()-1)))
 		{
-			WidgetVisitor visitor( rcp);
-			if (!setWidgetAnswer( visitor, data_))
-			{
-				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
-			}
-			WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
-			visitor.connectDataSignals( *listener);
-			li.value().push_back( listener);
+			WidgetVisitor actionvisitor( actionwidget);
+			FormWidget* THIS_ = actionvisitor.formwidget();
+			THIS_->switchForm( actionwidget);
 		}
-
 	}
 	else
 	{
-		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
+		if (li != m_listeners.end())
 		{
-			WidgetVisitor visitor( rcp);
-			if (!setWidgetAnswer( visitor, data_))
+			li.value().clear();
+			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
 			{
-				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				WidgetVisitor rcpvisitor( rcp);
+				if (!setWidgetAnswer( rcpvisitor, data_))
+				{
+					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				}
+				WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
+				rcpvisitor.connectDataSignals( *listener);
+				li.value().push_back( listener);
+			}
+
+		}
+		else
+		{
+			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+			{
+				WidgetVisitor rcpvisitor( rcp);
+				if (!setWidgetAnswer( rcpvisitor, data_))
+				{
+					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				}
 			}
 		}
 	}
