@@ -132,7 +132,6 @@ Widget Request Answer
     (5) read assignments
     (6) load answer
     (7) restore widget state
-    (8) emit data loaded signal if defined
 
 Widget Request Error
     (1) *** find form and increment error counter (last answer closes form)
@@ -148,7 +147,6 @@ Refresh Without Domain Load Request
     (3) read globals
     (4) read assignments
     (5) restore widget state
-    (6) emit data loaded signal if defined
 
 Additional Signals
     (a) emit onchange signal if defined the recipient issues a self refresh
@@ -185,14 +183,13 @@ class WidgetVisitor
 			SigEntered,
 			SigPressed,
 			SigClicked,
-			SigDoubleClicked,
-			SigLoaded
+			SigDoubleClicked
 		};
-		enum {NofDataSignalTypes=(int)SigLoaded+1};
+		enum {NofDataSignalTypes=(int)SigDoubleClicked+1};
 		static const char* dataSignalTypeName( DataSignalType ii)
 		{
 			static const char* ar[]
-			= {"changed", "activated", "entered", "pressed", "clicked", "doubleclicked", "loaded", 0};
+			= {"changed", "activated", "entered", "pressed", "clicked", "doubleclicked", 0};
 			return ar[(int)ii];
 		}
 		static bool getDataSignalType( const char* name, DataSignalType& dt);

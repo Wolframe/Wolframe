@@ -1352,11 +1352,6 @@ static bool nodeProperty_hasDataSlot_doubleclicked( const QWidget* widget, const
 	static const DataSlotPropertyName dataslot( WidgetVisitor::SigDoubleClicked);
 	return nodeProperty_hasDataSlot( dataslot, widget, cond);
 }
-static bool nodeProperty_hasDataSlot_loaded( const QWidget* widget, const QVariant& cond)
-{
-	static const DataSlotPropertyName dataslot( WidgetVisitor::SigLoaded);
-	return nodeProperty_hasDataSlot( dataslot, widget, cond);
-}
 
 QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 {
@@ -1395,7 +1390,6 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 				case SigPressed: nodeprop = nodeProperty_hasDataSlot_pressed; break;
 				case SigClicked: nodeprop = nodeProperty_hasDataSlot_clicked; break;
 				case SigDoubleClicked: nodeprop = nodeProperty_hasDataSlot_doubleclicked; break;
-				case SigLoaded: nodeprop = nodeProperty_hasDataSlot_loaded; break;
 			}
 			QWidget* thiswidget = widget();
 			foreach (QWidget* rcvwidget, mainvisitor.findSubNodes( nodeprop, receiverid))

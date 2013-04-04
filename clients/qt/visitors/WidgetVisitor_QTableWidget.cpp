@@ -548,9 +548,6 @@ void WidgetVisitorState_QTableWidget::connectDataSignals( WidgetVisitor::DataSig
 		case WidgetVisitor::SigPressed: QObject::connect( m_tableWidget, SIGNAL( cellPressed( int,int)), &listener, SLOT( pressed())); break;
 		case WidgetVisitor::SigClicked: QObject::connect( m_tableWidget, SIGNAL( cellClicked( int,int)), &listener, SLOT( clicked())); break;
 		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_tableWidget, SIGNAL( cellDoubleClicked( int,int)), &listener, SLOT( doubleclicked()));
-		case WidgetVisitor::SigLoaded: break;
 	}
-
-
 }
 
