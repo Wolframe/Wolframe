@@ -79,3 +79,25 @@ QVariant WidgetVisitorState_QLineEdit::getState() const
 	return QVariant( m_lineEdit->text());
 }
 
+void WidgetVisitorState_QLineEdit::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_lineEdit, SIGNAL( cursorPositionChanged(int,int)), &listener, SLOT( changed()));
+			QObject::connect( m_lineEdit, SIGNAL( editingFinished()), &listener, SLOT( changed()));
+			QObject::connect( m_lineEdit, SIGNAL( returnPressed()), &listener, SLOT( changed()));
+			QObject::connect( m_lineEdit, SIGNAL( selectionChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_lineEdit, SIGNAL( textChanged( const QString & text)), &listener, SLOT( changed()));
+			// redundant (to textChanged):
+			// QObject::connect( m_lineEdit, SIGNAL( textEdited( const QString & text)), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_lineEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
+}
+

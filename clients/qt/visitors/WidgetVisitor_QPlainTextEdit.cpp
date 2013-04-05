@@ -47,3 +47,23 @@ QVariant WidgetVisitorState_QPlainTextEdit::getState() const
 	return QVariant( m_plainTextEdit->toPlainText());
 }
 
+void WidgetVisitorState_QPlainTextEdit::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_plainTextEdit, SIGNAL( blockCountChanged( int)), &listener, SLOT( changed()));
+			QObject::connect( m_plainTextEdit, SIGNAL( cursorPositionChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_plainTextEdit, SIGNAL( modificationChanged( bool)), &listener, SLOT( changed()));
+			QObject::connect( m_plainTextEdit, SIGNAL( selectionChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_plainTextEdit, SIGNAL( textChanged()), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_plainTextEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
+}
+
