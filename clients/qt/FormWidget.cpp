@@ -133,10 +133,15 @@ void FormWidget::switchForm( QWidget *actionwidget)
 			else
 			{
 				QList<QVariant> formstack = m_ui->property("_w_formstack").toList();
-				nextForm = formstack.back().toString();
-				formstack.pop_back();
-				m_ui->setProperty( "_w_formstack", QVariant( formstack));
-				loadForm( nextForm);
+				// Aba, HACK: formstack can be empty! segfault here
+				if( formstack.size( ) > 0 ) {
+					nextForm = formstack.back().toString();
+					formstack.pop_back();
+					m_ui->setProperty( "_w_formstack", QVariant( formstack));
+					loadForm( nextForm);
+				} else {
+					// what to do here?
+				}
 			}
 		} else {
 			loadForm( nextForm );
@@ -330,9 +335,16 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			// if there is a back link define the stack of the form accordingly
 			if (widget->property( "form").toString().trimmed() == "_CLOSE_")
 			{
-				QList<QVariant> formstack = oldUi->property( "_w_formstack").toList();
-				formstack.push_back( QVariant( m_previousForm));
-				m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				// Aba: HACK:
+				if( oldUi ) {
+					QList<QVariant> formstack = oldUi->property( "_w_formstack").toList();
+					formstack.push_back( QVariant( m_previousForm));
+					m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				} else {
+					// first widget loaded, no oldUi exists.. setting an empty formstack?
+					QList<QVariant> formstack;
+					m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				}
 				break;
 			}
 		}
