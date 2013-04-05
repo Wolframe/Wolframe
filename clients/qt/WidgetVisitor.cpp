@@ -241,6 +241,11 @@ QList<QWidget*> WidgetVisitor::State::datachildren() const
 	return getWidgetChildren( m_widget);
 }
 
+void WidgetVisitor::State::connectDataSignals( DataSignalType dt, WidgetListener& /*listener*/)
+{
+	qCritical() << "try to connect to signal not provided" << m_widget->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+}
+
 bool WidgetVisitor::is_widgetid( const QString& id)
 {
 	return id.indexOf(':') >= 0;

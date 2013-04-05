@@ -231,7 +231,7 @@ class WidgetVisitor
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
 			///\brief Connect all widget signals that should trigger an event on a signal of type 'type'
-			virtual void connectDataSignals( DataSignalType /*type*/, WidgetListener& /*listener*/){}
+			virtual void connectDataSignals( DataSignalType dt, WidgetListener& listener);
 
 		public://Common methods:
 			const QString& getSynonym( const QString& name) const;
