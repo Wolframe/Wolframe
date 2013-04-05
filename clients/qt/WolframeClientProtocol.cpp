@@ -32,6 +32,7 @@
 ************************************************************************/
 
 #include "WolframeClientProtocol.hpp"
+#undef WOLFRAME_LOWLEVEL_DEBUG
 
 const QString* WolframeClientProtocol::getLastError() const
 {
@@ -78,7 +79,9 @@ bool WolframeClientProtocol::sendRequestContent()
 		m_lasterror = "write request content failed (only partial write on socket)";
 		return false;
 	}
+#ifdef WOLFRAME_LOWLEVEL_DEBUG
 	qDebug() << "network send content (esc" << status <<"):" << escdata;
+#endif
 	m_requesttagqueue.enqueue( m_requestqueue.head().first);
 	m_requestqueue.dequeue();
 	return true;
@@ -379,7 +382,7 @@ void WolframeClientProtocol::pushRequest( const QString& tag, const QByteArray& 
 			}
 		}
 	}
-	qDebug() << "push request tag=" << tag << "doc=" << content;
+	qDebug() << "push request tag=" << tag;
 	m_requestqueue.enqueue( qMakePair( tag, content));
 	process();
 }

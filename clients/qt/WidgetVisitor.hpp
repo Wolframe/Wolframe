@@ -132,7 +132,6 @@ Widget Request Answer
     (5) read assignments
     (6) load answer
     (7) restore widget state
-    (8) emit data loaded signal if defined
 
 Widget Request Error
     (1) *** find form and increment error counter (last answer closes form)
@@ -148,7 +147,6 @@ Refresh Without Domain Load Request
     (3) read globals
     (4) read assignments
     (5) restore widget state
-    (6) emit data loaded signal if defined
 
 Additional Signals
     (a) emit onchange signal if defined the recipient issues a self refresh
@@ -180,11 +178,21 @@ class WidgetVisitor
 		///\brief Data signal type
 		enum DataSignalType
 		{
-			OnLoad,
-			OnChange,
-			DomainChange
+			SigChanged,
+			SigActivated,
+			SigEntered,
+			SigPressed,
+			SigClicked,
+			SigDoubleClicked
 		};
-		enum {NofDataSignalTypes=(int)DomainChange+1};
+		enum {NofDataSignalTypes=(int)SigDoubleClicked+1};
+		static const char* dataSignalTypeName( DataSignalType ii)
+		{
+			static const char* ar[]
+			= {"changed", "activated", "entered", "pressed", "clicked", "doubleclicked", 0};
+			return ar[(int)ii];
+		}
+		static bool getDataSignalType( const char* name, DataSignalType& dt);
 
 		///\class State
 		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
@@ -222,8 +230,8 @@ class WidgetVisitor
 			virtual QVariant getState()						{return QVariant();}
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
-			///\brief Connect all widget signals that should trigger an onchange event to the listener slot 'changed'
-			virtual void connectOnChangeSignals( WidgetListener& /*listener*/){}
+			///\brief Connect all widget signals that should trigger an event on a signal of type 'type'
+			virtual void connectDataSignals( DataSignalType dt, WidgetListener& listener);
 
 		public://Common methods:
 			const QString& getSynonym( const QString& name) const;
@@ -425,7 +433,8 @@ class WidgetVisitor
 		///\brief For all visitor sub widgets do assignments to global variables from form widgets based on global: declarations
 		void do_writeGlobals( QHash<QString,QVariant>& globals);
 
-		void connectOnChangeListener( WidgetListener& listener);
+		///\brief Connect for the current widget all widget signals that should trigger an event on a signal of type 'dt'
+		void connectDataSignals( WidgetListener& listener);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

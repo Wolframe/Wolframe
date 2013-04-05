@@ -50,6 +50,7 @@
 #include <QSharedPointer>
 #include <QLayout>
 #include <QLayout>
+#include <cstring>
 
 #undef WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
@@ -128,6 +129,20 @@ static bool isConvertibleToInt( const QVariant& val)
 	return false;
 }
 
+bool WidgetVisitor::getDataSignalType( const char* name, WidgetVisitor::DataSignalType& dt)
+{
+	const char* signame;
+	for (int ii=0; 0!=(signame=dataSignalTypeName((DataSignalType)ii)); ++ii)
+	{
+		if (std::strcmp( name, signame) == 0)
+		{
+			dt = (DataSignalType)ii;
+			return true;
+		}
+	}
+	return false;
+}
+
 WidgetVisitor::State::State( const State& o)
 	:m_widget(o.m_widget)
 	,m_synonyms(o.m_synonyms)
@@ -144,48 +159,42 @@ WidgetVisitor::State::State( QWidget* widget_)
 	,m_synonym_entercnt(1)
 	,m_internal_entercnt(0)
 {
-	foreach (const QString& prop, m_widget->dynamicPropertyNames())
+	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
 	{
 		if (prop.indexOf(':') >= 0)
 		{
 			if (prop.startsWith( "synonym:"))
 			{
-				QVariant synonym = m_widget->property( prop.toAscii());
+				QVariant synonym = m_widget->property( prop);
 				m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toString());
 			}
 			else if (prop.startsWith( "link:"))
 			{
-				QVariant link = m_widget->property( prop.toAscii());
+				QVariant link = m_widget->property( prop);
 				m_links.push_back( LinkDef( prop.mid( 5, prop.size()-5), link.toString()));
 			}
 			else if (prop.startsWith( "assign:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QVariant value = m_widget->property( prop);
 				m_assignments.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toString()));
 			}
 			else if (prop.startsWith( "global:"))
 			{
-				QVariant value = m_widget->property( prop.toAscii());
+				QVariant value = m_widget->property( prop);
 				m_globals.push_back( Assignment( prop.mid( 7, prop.size()-7), value.toString()));
 			}
 			else if (prop.startsWith( "datasignal:"))
 			{
+				const char* signalname = (const char*)prop + 11/*std::strlen( "datasignal:")*/;
 				QList<QString> values;
-				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				foreach (const QString& vv, m_widget->property( prop).toString().trimmed().split(','))
 				{
 					values.push_back( vv.trimmed());
 				}
-				if (prop == "datasignal:onload")
+				DataSignalType dt;
+				if (WidgetVisitor::getDataSignalType( signalname, dt))
 				{
-					m_datasignals.id[(int)WidgetVisitor::OnLoad] = values;
-				}
-				else if (prop == "datasignal:onchange")
-				{
-					m_datasignals.id[(int)WidgetVisitor::OnChange] = values;
-				}
-				else if (prop == "datasignal:domainload")
-				{
-					m_datasignals.id[(int)WidgetVisitor::DomainChange] = values;
+					m_datasignals.id[ (int)dt] = values;
 				}
 				else
 				{
@@ -194,22 +203,16 @@ WidgetVisitor::State::State( QWidget* widget_)
 			}
 			else if (prop.startsWith( "dataslot:"))
 			{
+				const char* slotname = (const char*)prop + 9/*std::strlen( "dataslot:")*/;
 				QList<QString> values;
-				foreach (const QString& vv, m_widget->property( prop.toAscii()).toString().trimmed().split(','))
+				foreach (const QString& vv, m_widget->property( prop).toString().trimmed().split(','))
 				{
 					values.push_back( vv.trimmed());
 				}
-				if (prop == "dataslot:onload")
+				DataSignalType dt;
+				if (WidgetVisitor::getDataSignalType( slotname, dt))
 				{
-					m_dataslots.id[(int)WidgetVisitor::OnLoad] = values;
-				}
-				else if (prop == "dataslot:onchange")
-				{
-					m_dataslots.id[(int)WidgetVisitor::OnChange] = values;
-				}
-				else if (prop == "dataslot:domainload")
-				{
-					m_dataslots.id[(int)WidgetVisitor::DomainChange] = values;
+					m_dataslots.id[(int)dt] = values;
 				}
 				else
 				{
@@ -219,7 +222,7 @@ WidgetVisitor::State::State( QWidget* widget_)
 		}
 		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
-			m_dynamicProperties.insert( prop, m_widget->property( prop.toAscii()));
+			m_dynamicProperties.insert( prop, m_widget->property( prop));
 		}
 	}
 	static qint64 g_cnt = 0;
@@ -236,6 +239,11 @@ WidgetVisitor::State::State( QWidget* widget_)
 QList<QWidget*> WidgetVisitor::State::datachildren() const
 {
 	return getWidgetChildren( m_widget);
+}
+
+void WidgetVisitor::State::connectDataSignals( DataSignalType dt, WidgetListener& /*listener*/)
+{
+	qCritical() << "try to connect to signal not provided" << m_widget->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 }
 
 bool WidgetVisitor::is_widgetid( const QString& id)
@@ -327,8 +335,11 @@ bool WidgetVisitor::enter_root( const QString& name)
 	QWidget* ww = predecessor( name);
 	if (ww)
 	{
-		m_stk.push_back( createWidgetVisitorState( ww));
-		return true;
+		if (ww != m_stk.top()->m_widget)
+		{
+			m_stk.push_back( createWidgetVisitorState( ww));
+			return true;
+		}
 	}
 	return false;
 }
@@ -943,6 +954,7 @@ struct WidgetVisitorStackElement
 	{
 		if (!selectedDataElements)
 		{
+			level += 1; //... disallow root element reference with implicit references
 			foreach (const QString& prop, state->m_widget->dynamicPropertyNames())
 			{
 				if (!isReservedProperty( prop))
@@ -963,6 +975,7 @@ struct WidgetVisitorStackElement
 					dataelements << objname;
 				}
 			}
+			TRACE_ASSIGNMENT( "implicit dataelements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements);
 		}
 		else
 		{
@@ -981,6 +994,8 @@ struct WidgetVisitorStackElement
 					dataelements.push_back( elem);
 				}
 			}
+			TRACE_ASSIGNMENT( "selected attribute elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( 0, nof_attributes));
+			TRACE_ASSIGNMENT( "selected content elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( nof_attributes, dataelements.size()));
 		}
 	}
 	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
@@ -1266,11 +1281,17 @@ void WidgetVisitor::do_writeAssignments()
 	}
 }
 
-void WidgetVisitor::connectOnChangeListener( WidgetListener& listener)
+void WidgetVisitor::connectDataSignals( WidgetListener& listener)
 {
 	if (!m_stk.isEmpty())
 	{
-		m_stk.top()->connectOnChangeSignals( listener);
+		for (int dt=0; dt<NofDataSignalTypes; ++dt)
+		{
+			if (!m_stk.top()->m_datasignals.id[ dt].isEmpty())
+			{
+				m_stk.top()->connectDataSignals( (DataSignalType)dt, listener);
+			}
+		}
 	}
 }
 
@@ -1279,10 +1300,9 @@ void WidgetVisitor::ERROR( const char* msg, const QString& arg) const
 	logError( widget(), msg, QString( arg));
 }
 
-static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const QWidget* widget, const QVariant& cond)
+static bool nodeProperty_hasDataSlot( const QByteArray& sigpropname, const QWidget* widget, const QVariant& cond)
 {
-	static const char* ar[] = {"dataslot:onload","dataslot:onchange","dataslot:domainchange"};
-	QVariant dataslots = widget->property( ar[(int)type]);
+	QVariant dataslots = widget->property( sigpropname);
 	int idx = 0;
 	while ((idx=dataslots.toString().indexOf( cond.toString(), idx)) >= 0)
 	{
@@ -1293,17 +1313,44 @@ static bool nodeProperty_hasDataSlot( WidgetVisitor::DataSignalType type, const 
 	return false;
 }
 
-static bool nodeProperty_hasDataSlot_onload( const QWidget* widget, const QVariant& cond)
+struct DataSlotPropertyName :public QByteArray
 {
-	return nodeProperty_hasDataSlot( WidgetVisitor::OnLoad, widget, cond);
+	DataSlotPropertyName( WidgetVisitor::DataSignalType dt)
+	{
+		append( "dataslot:");
+		append( WidgetVisitor::dataSignalTypeName( dt));
+	}
+};
+
+static bool nodeProperty_hasDataSlot_changed( const QWidget* widget, const QVariant& cond)
+{
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigChanged);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
 }
-static bool nodeProperty_hasDataSlot_onchange( const QWidget* widget, const QVariant& cond)
+static bool nodeProperty_hasDataSlot_activated( const QWidget* widget, const QVariant& cond)
 {
-	return nodeProperty_hasDataSlot( WidgetVisitor::OnChange, widget, cond);
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigActivated);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
 }
-static bool nodeProperty_hasDataSlot_domainchange( const QWidget* widget, const QVariant& cond)
+static bool nodeProperty_hasDataSlot_entered( const QWidget* widget, const QVariant& cond)
 {
-	return nodeProperty_hasDataSlot( WidgetVisitor::DomainChange, widget, cond);
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigEntered);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
+}
+static bool nodeProperty_hasDataSlot_pressed( const QWidget* widget, const QVariant& cond)
+{
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigPressed);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
+}
+static bool nodeProperty_hasDataSlot_clicked( const QWidget* widget, const QVariant& cond)
+{
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigClicked);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
+}
+static bool nodeProperty_hasDataSlot_doubleclicked( const QWidget* widget, const QVariant& cond)
+{
+	static const DataSlotPropertyName dataslot( WidgetVisitor::SigDoubleClicked);
+	return nodeProperty_hasDataSlot( dataslot, widget, cond);
 }
 
 QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
@@ -1313,34 +1360,45 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 
 	foreach (const QString& receiverprop, m_stk.top()->m_datasignals.id[(int)type])
 	{
-		/*[-]*/qDebug() << "find datasignal receiver" << receiverprop;
+		TRACE_STATUS( "find datasignal receiver", className(), objectName(), receiverprop);
 		QVariant receiverid = resolve( receiverprop);
 		QString receiveridstr = receiverid.toString();
 		QWidget* rcvwidget;
+		QList<QWidget*> wl;
 
 		if (is_widgetid( receiveridstr))
 		{
 			WidgetVisitor mainvisitor( uirootwidget());
-			rt.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
+			wl.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
+			foreach (QWidget* rcvwidget, wl) TRACE_STATUS( "found widget by address", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
+			rt.append( wl);
 		}
 		else if ((rcvwidget = get_widget_reference( receiveridstr)) != 0)
 		{
+			TRACE_STATUS( "found widget reference", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
 			rt.append( rcvwidget);
 		}
 		else
 		{
 			WidgetVisitor mainvisitor( uirootwidget());
+			NodeProperty nodeprop = 0;
 			switch (type)
 			{
-				case OnLoad:
-					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_onload, receiverid));
-					break;
-				case OnChange:
-					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_onchange, receiverid));
-					break;
-				case DomainChange:
-					rt.append( mainvisitor.findSubNodes( nodeProperty_hasDataSlot_domainchange, receiverid));
-					break;
+				case SigChanged: nodeprop = nodeProperty_hasDataSlot_changed; break;
+				case SigActivated: nodeprop = nodeProperty_hasDataSlot_activated; break;
+				case SigEntered: nodeprop = nodeProperty_hasDataSlot_entered; break;
+				case SigPressed: nodeprop = nodeProperty_hasDataSlot_pressed; break;
+				case SigClicked: nodeprop = nodeProperty_hasDataSlot_clicked; break;
+				case SigDoubleClicked: nodeprop = nodeProperty_hasDataSlot_doubleclicked; break;
+			}
+			QWidget* thiswidget = widget();
+			foreach (QWidget* rcvwidget, mainvisitor.findSubNodes( nodeprop, receiverid))
+			{
+				if (rcvwidget != thiswidget)
+				{
+					TRACE_STATUS( "found widget by data slot identifier", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
+					rt.push_back( rcvwidget);
+				}
 			}
 		}
 	}

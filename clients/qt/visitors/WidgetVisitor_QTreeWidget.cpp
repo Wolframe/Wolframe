@@ -31,12 +31,13 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QTreeWidget.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QTreeWidget::WidgetVisitorState_QTreeWidget( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
 	,m_treeWidget(qobject_cast<QTreeWidget*>(widget_))
-	,m_elementname(widget_->objectName().toAscii())
+	,m_elementname(widget_->objectName())
 	,m_mode(Init)
 {
 	QTreeWidgetItem* header = m_treeWidget->headerItem();
@@ -67,9 +68,9 @@ void WidgetVisitorState_QTreeWidget::clear()
 
 bool WidgetVisitorState_QTreeWidget::enter( const QString& name, bool writemode)
 {
-	if (m_mode != List && name == "item")
+	static const QString item_str( "item");
+	if (m_mode != List && name == item_str)
 	{
-		m_mode = Tree;
 		if (writemode)
 		{
 			m_stk.push_back( StackElement( new QTreeWidgetItem( m_stk.top().item)));
@@ -79,11 +80,11 @@ bool WidgetVisitorState_QTreeWidget::enter( const QString& name, bool writemode)
 			if (m_stk.top().readpos >= m_stk.top().item->childCount()) return false;
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 		}
+		m_mode = Tree;
 		return true;
 	}
 	else if (m_mode != Tree && name == m_elementname)
 	{
-		m_mode = List;
 		if (m_stk.size() != 1) return false;
 		if (writemode)
 		{
@@ -94,6 +95,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QString& name, bool writemode)
 			if (m_stk.top().readpos >= m_stk.top().item->childCount()) return false;
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 		}
+		m_mode = List;
 		return true;
 	}
 	return false;
@@ -108,14 +110,17 @@ bool WidgetVisitorState_QTreeWidget::leave( bool /*writemode*/)
 
 bool WidgetVisitorState_QTreeWidget::isRepeatingDataElement( const QString& name)
 {
-	if (m_mode != List && name == "item") return true;
+	static const QString item_str( "item");
+	if (m_mode != List && name == item_str) return true;
 	if (m_mode != Tree && name == m_elementname) return true;
 	return false;
 }
 
 QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 {
-	if (name == "selected")
+	static const QString selected_str( "selected");
+	static const QString id_str( "id");
+	if (name == selected_str)
 	{
 		if (m_treeWidget->selectionMode() == QAbstractItemView::SingleSelection)
 		{
@@ -140,7 +145,7 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 	{
 		return QVariant( m_stk.top().item->text( col));
 	}
-	if (name == "id")
+	if (name == id_str)
 	{
 		return m_stk.top().item->data( 0, Qt::UserRole);
 	}
@@ -149,6 +154,7 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 
 bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVariant& data)
 {
+	static const QString id_str( "id");
 	if (m_stk.isEmpty()) return false;
 	int col = m_headers.indexOf( name);
 	if (col != -1)
@@ -156,7 +162,7 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVa
 		m_stk.top().item->setText( col, data.toString());
 		return true;
 	}
-	if (name == "id")
+	if (name == id_str)
 	{
 		m_stk.top().item->setData( 0, Qt::UserRole, data);
 		return true;
@@ -232,8 +238,9 @@ static QTreeWidgetItem* findchild( const QTreeWidgetItem* item, int keyidx, cons
 
 void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 {
+	static const QString id_str( "id");
 	QStack<StackElement> stk;
-	int keyidx = m_headers.indexOf( "id");
+	int keyidx = m_headers.indexOf( id_str);
 	if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined
 
 	stk.push_back( m_treeWidget->invisibleRootItem());
@@ -292,7 +299,8 @@ QVariant WidgetVisitorState_QTreeWidget::getState() const
 {
 	QList<QVariant> rt;
 	QStack<StackElement> stk;
-	int keyidx = m_headers.indexOf( "id");
+	static const QString id_str( "id");
+	int keyidx = m_headers.indexOf( id_str);
 	if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined
 
 	stk.push_back( m_treeWidget->invisibleRootItem());
@@ -328,6 +336,22 @@ QVariant WidgetVisitorState_QTreeWidget::getState() const
 		}
 	}
 	return QVariant(rt);
+}
+
+void WidgetVisitorState_QTreeWidget::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_treeWidget, SIGNAL( currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), &listener, SLOT( changed()));
+			QObject::connect( m_treeWidget, SIGNAL( itemChanged(QTreeWidgetItem*,int)), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigActivated: QObject::connect( m_treeWidget, SIGNAL( itemActivated( QTreeWidgetItem*,int)), &listener, SLOT( activated())); break;
+		case WidgetVisitor::SigEntered: QObject::connect( m_treeWidget, SIGNAL( itemEntered( QTreeWidgetItem*,int)), &listener, SLOT( entered())); break;
+		case WidgetVisitor::SigPressed: QObject::connect( m_treeWidget, SIGNAL( itemPressed( QTreeWidgetItem*,int)), &listener, SLOT( pressed())); break;
+		case WidgetVisitor::SigClicked: QObject::connect( m_treeWidget, SIGNAL( itemClicked( QTreeWidgetItem*,int)), &listener, SLOT( clicked())); break;
+		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_treeWidget, SIGNAL( itemDoubleClicked( QTreeWidgetItem*,int)), &listener, SLOT( doubleclicked()));
+	}
 }
 
 

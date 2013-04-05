@@ -79,7 +79,7 @@ void FormWidget::initialize( )
 
 // the form must be switched after 'action' has been taken in the current form
 	connect( m_signalMapper, SIGNAL( mapped( QWidget * ) ),
-		this, SLOT( switchForm( QWidget * ) ) );
+		this, SLOT( executeAction( QWidget * ) ), Qt::UniqueConnection );
 }
 
 void FormWidget::formListLoaded( QStringList forms )
@@ -88,7 +88,7 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void FormWidget::switchForm( QWidget *actionwidget )
+void FormWidget::executeAction( QWidget *actionwidget )
 {
 	WidgetVisitor visitor( actionwidget);
 
@@ -99,32 +99,45 @@ void FormWidget::switchForm( QWidget *actionwidget )
 		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
 		m_dataLoader->datarequest( request.tag, request.content);
 
-		// foreach widget linked to this action via datasignal:domainload/dataslot:domainload do issue a domain load
-		foreach (QWidget* triggered_domainload, visitor.get_datasignal_receivers( WidgetVisitor::DomainChange))
+		if (actionwidget->property( "datasignal:clicked").isValid())
 		{
-			WidgetVisitor tv( triggered_domainload);
-			WidgetMessageDispatcher dp( tv);
-			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
-			m_dataLoader->datarequest( domload.tag, domload.content);
+			WidgetListener listener( actionwidget, m_dataLoader, m_debug);
+			listener.handleDataSignal( WidgetVisitor::SigClicked);
 		}
 	}
+	else
+	{
+		switchForm( actionwidget);
+	}
+}
 
-	// ABa, TODO: this is wrong, we should wait for error or answer, after
-	// that we switch the form on ok, not on error..
-	
+void FormWidget::switchForm( QWidget *actionwidget)
+{
 	WidgetVisitor formvisitor( m_ui);
 	formvisitor.do_writeAssignments();
 	formvisitor.do_writeGlobals( *m_globals);
 
 	// switch form now, formLoaded will inform parent and others
+	WidgetVisitor visitor( actionwidget);
 	QVariant formlink = visitor.property( "form");
-	qDebug() << "Switch form to" << formlink;
-
 	if (formlink.isValid())
 	{
+		qDebug() << "Switch form to" << formlink;
 		QString nextForm = formlink.toString();
-		if( m_modal && nextForm == "_CLOSE_" ) {
-			emit closed( );
+		if (nextForm == "_CLOSE_")
+		{
+			if (m_modal)
+			{
+				emit closed( );
+			}
+			else
+			{
+				QList<QVariant> formstack = m_ui->property("_w_formstack").toList();
+				nextForm = formstack.back().toString();
+				formstack.pop_back();
+				m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				loadForm( nextForm);
+			}
 		} else {
 			loadForm( nextForm );
 		}
@@ -214,9 +227,9 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 	emit formLoaded( m_form );
 }
 
-static bool nodeProperty_hasDatasignalListener( const QWidget* widget, const QVariant&)
+static bool nodeProperty_hasDataSignals( const QWidget* widget, const QVariant&)
 {
-	if (WidgetListener::hasOnChangeSignals( widget)) return true;
+	if (WidgetListener::hasDataSignals( widget)) return true;
 	return false;
 }
 
@@ -268,8 +281,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	visitor.do_readGlobals( *m_globals);
 	visitor.do_readAssignments();
 
-// connect listener to signals converted to datasignals
-	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDatasignalListener))
+// connect listener to signals converted to data signals
+	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDataSignals))
 	{
 		WidgetVisitor datasig_widget_visitor( datasig_widget);
 		m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
@@ -295,20 +308,36 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // connect push buttons with form names to loadForms
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
-	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( );
-		
-		if( clazz == "QPushButton" ) {
-			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
-
+	foreach( QWidget *widget, widgets )
+	{
+		QPushButton *pushButton = qobject_cast<QPushButton*>( widget);
+		if (pushButton)
+		{
+			// connect button
 			connect( pushButton, SIGNAL( clicked( ) ),
-				m_signalMapper, SLOT( map( ) ) );
+				m_signalMapper, SLOT( map( ) ), Qt::UniqueConnection);
 
 			m_signalMapper->setMapping( pushButton, widget );
 		}
 	}
 
-// reset the form now, this also loads the domains
+// set back link stack in form if there is a back link
+	foreach (QWidget *widget, widgets)
+	{
+		QPushButton *pushButton = qobject_cast<QPushButton*>( widget);
+		if (pushButton)
+		{
+			// if there is a back link define the stack of the form accordingly
+			if (widget->property( "form").toString().trimmed() == "_CLOSE_")
+			{
+				QList<QVariant> formstack = oldUi->property( "_w_formstack").toList();
+				formstack.push_back( QVariant( m_previousForm));
+				m_ui->setProperty( "_w_formstack", QVariant( formstack));
+				break;
+			}
+		}
+	}
+// loads the domains
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
 	{
@@ -324,33 +353,46 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
-	WidgetMessageDispatcher dispatcher( m_ui);
+	WidgetVisitor visitor( m_ui);
+	WidgetMessageDispatcher dispatcher( visitor.uirootwidget());
 
-	QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
-	if (li != m_listeners.end())
+	if (isActionRequest( tag_[0]))
 	{
-		li.value().clear();
-		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		foreach (QWidget* actionwidget, dispatcher.findRecipients( tag_.mid( 1, tag_.size()-1)))
 		{
-			WidgetVisitor visitor( rcp);
-			if (!setWidgetAnswer( visitor, data_))
-			{
-				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
-			}
-			WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
-			visitor.connectOnChangeListener( *listener);
-			li.value().push_back( listener);
+			WidgetVisitor actionvisitor( actionwidget);
+			FormWidget* THIS_ = actionvisitor.formwidget();
+			THIS_->switchForm( actionwidget);
 		}
-
 	}
 	else
 	{
-		foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+		QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
+		if (li != m_listeners.end())
 		{
-			WidgetVisitor visitor( rcp);
-			if (!setWidgetAnswer( visitor, data_))
+			li.value().clear();
+			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
 			{
-				qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				WidgetVisitor rcpvisitor( rcp);
+				if (!setWidgetAnswer( rcpvisitor, data_))
+				{
+					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				}
+				WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
+				rcpvisitor.connectDataSignals( *listener);
+				li.value().push_back( listener);
+			}
+
+		}
+		else
+		{
+			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+			{
+				WidgetVisitor rcpvisitor( rcp);
+				if (!setWidgetAnswer( rcpvisitor, data_))
+				{
+					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
+				}
 			}
 		}
 	}

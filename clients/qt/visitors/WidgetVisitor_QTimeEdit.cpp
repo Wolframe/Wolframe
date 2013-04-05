@@ -1,5 +1,9 @@
 #include "WidgetVisitor_QTimeEdit.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
+#include <QSignalMapper>
+#include <QWidget>
+#include <QDebug>
 
 WidgetVisitorState_QTimeEdit::WidgetVisitorState_QTimeEdit( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -60,5 +64,21 @@ void WidgetVisitorState_QTimeEdit::setState( const QVariant& state)
 QVariant WidgetVisitorState_QTimeEdit::getState() const
 {
 	return QVariant( m_timeEdit->time());
+}
+
+void WidgetVisitorState_QTimeEdit::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( (const QObject*)m_timeEdit, SIGNAL( timeChanged( const QDate&)), (const QObject*)&listener, SLOT( changed())); break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_timeEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+			break;
+	}
 }
 

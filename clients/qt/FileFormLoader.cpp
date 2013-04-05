@@ -67,10 +67,27 @@ void FileFormLoader::initialize( )
 
 void FileFormLoader::initiateListLoad( )
 {
-	QDir formsDir( m_formDir );
-	QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
-		.replaceInStrings( ".ui", "" );
-	emit formListLoaded( forms );
+	QFile indexFile( m_formDir + "/" + "index.txt" );
+	if( indexFile.open( QIODevice::ReadOnly ) ) {
+// explicit index file listing uis to load
+		QStringList forms;
+		QTextStream in( &indexFile );
+		while( !in.atEnd( ) ) {
+			QString line = in.readLine( );
+			forms << line;
+		}
+		indexFile.close( );
+		emit formListLoaded( forms );
+	} else {
+// implicit, fetch all ui files from the given directory
+		QDir formsDir( m_formDir );
+		QStringList filters;
+		filters << "*.ui";
+		formsDir.setNameFilters( filters );
+		QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
+			.replaceInStrings( ".ui", "" );
+		emit formListLoaded( forms );
+	}
 }
 
 QByteArray FileFormLoader::readFile( QString name )

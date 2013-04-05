@@ -1,5 +1,7 @@
 #include "WidgetVisitor_QRadioButton.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QRadioButton::WidgetVisitorState_QRadioButton( QWidget* widget_)
 	:WidgetVisitor::State(widget_)

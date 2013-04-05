@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "WidgetVisitor_QTextEdit.hpp"
+#include "WidgetListener.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QTextEdit::WidgetVisitorState_QTextEdit( QWidget* widget_)
@@ -86,3 +87,21 @@ QVariant WidgetVisitorState_QTextEdit::getState() const
 	return QVariant( m_textEdit->toHtml());
 }
 
+void WidgetVisitorState_QTextEdit::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_textEdit, SIGNAL( currentCharFormatChanged(const QTextCharFormat&)), &listener, SLOT( changed()));
+			QObject::connect( m_textEdit, SIGNAL( cursorPositionChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_textEdit, SIGNAL( selectionChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_textEdit, SIGNAL( textChanged()), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigPressed:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_textEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
+}

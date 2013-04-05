@@ -35,10 +35,13 @@
 #include "WidgetMessageDispatcher.hpp"
 #include <QAbstractButton>
 
-bool WidgetListener::hasOnChangeSignals( const QWidget* widget_)
+bool WidgetListener::hasDataSignals( const QWidget* widget_)
 {
-	QVariant prop = widget_->property( "datasignal:onchange");
-	return prop.isValid();
+	foreach (const QByteArray& prop, widget_->dynamicPropertyNames())
+	{
+		if (prop.startsWith( "datasignal:") && widget_->property( prop).isValid()) return true;
+	}
+	return false;
 }
 
 WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_, bool debug_)
@@ -48,10 +51,10 @@ WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_, bool 
 	,m_debug(debug_)
 {}
 
-void WidgetListener::changed()
+void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 {
 	WidgetVisitor tv( m_state);
-	foreach (QWidget* receiver, tv.get_datasignal_receivers( WidgetVisitor::OnChange))
+	foreach (QWidget* receiver, tv.get_datasignal_receivers( dt))
 	{
 		WidgetVisitor visitor( receiver);
 		visitor.readAssignments();

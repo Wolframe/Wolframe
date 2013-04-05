@@ -42,17 +42,16 @@ int main( int argc, char* argv[] ) {
 	QCoreApplication::setOrganizationDomain( ORGANIZATION_DOMAIN );
 	QCoreApplication::setApplicationName( APPLICATION_NAME );
 
+	Q_INIT_RESOURCE( qtSkeleton );
+	QApplication app( argc, argv );
+	app.setWindowIcon( QIcon( QString( ":/images/wolframe.png" ) ) );
+
 	int code;
 	do {
-		Q_INIT_RESOURCE( qtSkeleton );
-
-		QApplication app( argc, argv );
-		app.setWindowIcon( QIcon( QString( ":/images/wolframe.png" ) ) );
 		MainWindow mainWindow;
 		mainWindow.show( );
 		code = app.exec( );
 	} while( code == RESTART_CODE );
-
 
 	return code;
 }

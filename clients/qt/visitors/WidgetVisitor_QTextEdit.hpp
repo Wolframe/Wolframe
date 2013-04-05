@@ -48,6 +48,7 @@ public:
 	virtual const QList<QString>& dataelements() const;
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
 
 private:
 	QTextEdit* m_textEdit;

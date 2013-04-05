@@ -54,6 +54,7 @@ class FormWidget : public QWidget
 	public:		
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QHash<QString,QVariant>* _globals, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
 		virtual ~FormWidget( );
+
 		void loadForm( QString name, bool modal = false );
 		void setLocale( QLocale locale );
 		void setLanguage( QString language );
@@ -85,7 +86,8 @@ class FormWidget : public QWidget
 		
 	private:
 		void initialize( );
-	
+		void switchForm( QWidget *actionwidget);
+
 	signals:
 		void formLoaded( QString name );
 		void formModal( QString m_form );
@@ -105,7 +107,7 @@ class FormWidget : public QWidget
 		void gotAnswer( const QString& tag_, const QByteArray& data_);
 		void gotError( const QString& tag_, const QByteArray& data_);
 
-		void switchForm( QWidget *object );
+		void executeAction( QWidget *object );
 };
 	
 #endif // _FORM_WIDGET_HPP_INCLUDED

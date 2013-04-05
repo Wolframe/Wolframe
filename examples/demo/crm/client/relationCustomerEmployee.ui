@@ -34,14 +34,14 @@
       <property name="dataelement" stdset="0">
        <string/>
       </property>
-      <property name="datasignal:onchange" stdset="0">
-       <string>relation, project</string>
-      </property>
       <property name="synonym:customerfocus" stdset="0">
        <string>customer.selected</string>
       </property>
       <property name="synonym:customer" stdset="0">
        <string>row</string>
+      </property>
+      <property name="datasignal:clicked" stdset="0">
+       <string>relation, project</string>
       </property>
       <attribute name="verticalHeaderVisible">
        <bool>true</bool>
