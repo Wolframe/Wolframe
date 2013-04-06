@@ -50,8 +50,8 @@
 
 // built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
-	m_formWidget( 0 ), m_uiLoader( 0 ), m_formLoader( 0 ),
-	m_dataLoader( 0 ), m_wolframeClient( 0 ), m_settings( ),
+	m_uiLoader( 0 ),
+	m_wolframeClient( 0 ), m_settings( ),
 	m_languages( ), m_language( ),
 	m_mdiArea( 0 ), m_subWinGroup( 0 ),
 	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 ),
@@ -126,11 +126,6 @@ MainWindow::~MainWindow( )
 	if( settings.mdi ) {
 		if( m_mdiArea )
 			m_mdiArea->closeAllSubWindows( );
-	} else {
-		if( m_formWidget ) {
-			delete m_formWidget;
-			m_formWidget = 0;
-		}
 	}
 	if( m_wolframeClient ) {
 		delete m_wolframeClient;
@@ -140,14 +135,6 @@ MainWindow::~MainWindow( )
 		delete m_debugTerminal;
 		m_debugTerminal = 0;
 		_debugTerminal = 0;
-	}
-	if( m_formLoader ) {
-		delete m_formLoader;
-		m_formLoader = 0;
-	}
-	if( m_dataLoader ) {
-		delete m_dataLoader;
-		m_dataLoader = 0;
 	}
 	if( m_uiLoader ) {
 		delete m_uiLoader;

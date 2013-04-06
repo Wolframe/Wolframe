@@ -84,6 +84,9 @@ WidgetVisitorState_QTableWidget::~WidgetVisitorState_QTableWidget()
 void WidgetVisitorState_QTableWidget::clear()
 {
 	m_tableWidget->clearContents();
+	for( int i = m_tableWidget->rowCount( ) - 1; i >= 0; i-- ) {
+		m_tableWidget->removeRow( i );
+	}
 	m_mode = Init;
 	m_row = -1;
 	m_column = -1;

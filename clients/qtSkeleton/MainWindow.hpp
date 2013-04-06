@@ -38,6 +38,7 @@
 #include <QtUiTools>
 #include <QTranslator>
 #include <QEvent>
+#include <QLabel>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMap>
@@ -112,7 +113,7 @@ class MainWindow : public QMainWindow
 		void addDeveloperMenu( );
 
 	private slots:
-// slots for the wolframe client		
+// slots for the wolframe client
 		void wolframeError( QString error );
 		void connected( );
 		void disconnected( );
