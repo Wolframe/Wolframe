@@ -73,10 +73,7 @@ WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( 
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
 	QPair<QString,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
-	QString actiontag;
-	actiontag.push_back( '-');
-	actiontag.append( actionrequest.first);
-	return Request( actiontag, actionrequest.second);
+	return Request( actionrequest.first, actionrequest.second);
 }
 
 QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
@@ -84,27 +81,5 @@ QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) con
 	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);
 }
 
-bool WidgetMessageDispatcher::feedResult( const QString& tag, const QByteArray& data)
-{
-	if (!tag.isEmpty() && tag.at(0) == '-') return true;
-
-	bool found = false;
-	bool rt = true;
-	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag))
-	{
-		found = true;
-		WidgetVisitor visitor( widget);
-		if (!setWidgetAnswer( visitor, data))
-		{
-			qCritical() << "Failed assign request answer tag:" << tag << "data:" << data;
-			rt = false;
-		}
-	}
-	if (!found)
-	{
-		qCritical() << "Request not found: tag=" << tag;
-	}
-	return rt;
-}
 
 

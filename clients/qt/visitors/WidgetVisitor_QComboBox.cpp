@@ -110,10 +110,14 @@ QVariant WidgetVisitorState_QComboBox::property( const QString& name)
 		case None:
 			if (name == "selected")
 			{
-				QVariant selected = m_comboBox->property( "_w_selected");
-				if (selected.isValid()) return selected;
-				if (m_comboBox->currentIndex() < 0) return QVariant();
-				return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
+				if (m_comboBox->currentIndex() >= 0)
+				{
+					return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
+				}
+				else
+				{
+					return m_comboBox->property( "_w_selected");
+				}
 			}
 			break;
 		case Value:
@@ -134,12 +138,14 @@ QVariant WidgetVisitorState_QComboBox::property( const QString& name)
 
 bool WidgetVisitorState_QComboBox::setProperty( const QString& name, const QVariant& data)
 {
+	/*[-]*/qDebug() << "WidgetVisitorState_QComboBox::setProperty" << name << data;
 	switch (m_mode)
 	{
 		case None:
 			if (name == "selected")
 			{
 				m_comboBox->setProperty( "_w_selected", data);
+				endofDataFeed();
 				return true;
 			}
 			return false;

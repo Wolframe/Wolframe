@@ -66,7 +66,6 @@ class WidgetMessageDispatcher
 		QList<Request> getDomainLoadRequests( bool debugmode=false);
 		Request getDomainLoadRequest( bool debugmode=false);
 		Request getFormActionRequest( bool debugmode=false);
-		bool feedResult( const QString& tag, const QByteArray& data);
 		QList<QWidget*> findRecipients( const QString& tag) const;
 
 	private:

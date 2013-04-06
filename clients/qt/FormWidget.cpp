@@ -370,7 +370,7 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 
 	if (isActionRequest( tag_))
 	{
-		foreach (QWidget* actionwidget, dispatcher.findRecipients( tag_.mid( 1, tag_.size()-1)))
+		foreach (QWidget* actionwidget, dispatcher.findRecipients( actionRequestRecipientId( tag_)))
 		{
 			WidgetVisitor actionvisitor( actionwidget);
 			FormWidget* THIS_ = actionvisitor.formwidget();

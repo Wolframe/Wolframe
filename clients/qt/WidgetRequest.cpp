@@ -178,11 +178,17 @@ bool isActionRequest( const QString& tag)
 	return !tag.isEmpty() && tag.at(0) == '-';
 }
 
+QString actionRequestRecipientId( const QString& tag)
+{
+	if (tag.isEmpty()) return QString();
+	return tag.mid( 1, tag.size()-1);
+}
+
 QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	QPair<QString,QByteArray> rt;
 	rt.second = getWigdetRequest_( visitor, debugmode);
-	rt.first = QString("-") + rt.first;
+	rt.first = QString("-") + visitor.widgetid();
 	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
 	return rt;
 }
@@ -314,7 +320,11 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				{
 					XMLERROR( xml, stk, "failed to set content element");
 				}
-				if (stk.last().ischild) visitor.restoreState();
+				if (stk.last().ischild)
+				{
+					visitor.endofDataFeed();
+					visitor.restoreState();
+				}
 				visitor.leave( true);
 			}
 			else
