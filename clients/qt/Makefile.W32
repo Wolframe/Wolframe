@@ -64,6 +64,7 @@ VISITOR_OBJS = \
 	visitors\WidgetVisitor_QComboBox.obj \
 	visitors\WidgetVisitor_QCheckBox.obj \
 	visitors\WidgetVisitor_QRadioButton.obj \
+	visitors\WidgetVisitor_QButtonGroup.obj \
 	visitors\WidgetVisitor_QGroupBox.obj \
 	visitors\WidgetVisitor_QSpinBox.obj \
 	visitors\WidgetVisitor_QDoubleSpinBox.obj \

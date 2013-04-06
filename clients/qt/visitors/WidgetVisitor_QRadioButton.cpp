@@ -63,4 +63,22 @@ QVariant WidgetVisitorState_QRadioButton::getState() const
 	return QVariant( m_radioButton->isChecked());
 }
 
+void WidgetVisitorState_QRadioButton::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_radioButton, SIGNAL( clicked( bool)), &listener, SLOT( changed()));
+			QObject::connect( m_radioButton, SIGNAL( released()), &listener, SLOT( changed()));
+			QObject::connect( m_radioButton, SIGNAL( toggled( bool)), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigPressed:
+			QObject::connect( m_radioButton, SIGNAL( pressed()), &listener, SLOT( pressed())); break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_radioButton->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
+}
 

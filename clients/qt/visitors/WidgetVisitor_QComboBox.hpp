@@ -52,6 +52,7 @@ public:
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
+	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
 
 private:
 	enum Mode {None,Value,Select};

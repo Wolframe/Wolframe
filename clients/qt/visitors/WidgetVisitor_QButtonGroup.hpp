@@ -31,16 +31,16 @@
 
 ************************************************************************/
 
-#ifndef _WIDGET_VISIOR_QCheckBox_HPP_INCLUDED
-#define _WIDGET_VISIOR_QCheckBox_HPP_INCLUDED
+#ifndef _WIDGET_VISIOR_QButtonGroup_HPP_INCLUDED
+#define _WIDGET_VISIOR_QButtonGroup_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
-#include <QCheckBox>
+#include <QButtonGroup>
 
-class WidgetVisitorState_QCheckBox
+class WidgetVisitorState_QButtonGroup
 	:public WidgetVisitor::State
 {
 public:
-	WidgetVisitorState_QCheckBox( QWidget* widget_);
+	WidgetVisitorState_QButtonGroup( QWidget* widget_);
 
 	virtual bool enter( const QString& name, bool writemode);
 	virtual bool leave( bool writemode);
@@ -48,13 +48,22 @@ public:
 	virtual QVariant property( const QString& name);
 	virtual bool setProperty( const QString& name, const QVariant& data);
 	virtual const QList<QString>& dataelements() const;
+	virtual QList<QWidget*> datachildren() const;
 	virtual bool isRepeatingDataElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
 
 private:
-	QCheckBox* m_checkBox;
+	bool setChecked( const QString& name);
+	void setAllUnchecked();
+	QList<QVariant> checkedList() const;
+
+private:
+	QButtonGroup* m_buttonGroup;
+	enum Mode {Init,Selected};
+	Mode m_mode;
+	QHash<QString,QWidget*> m_childmap;
 };
 
 #endif

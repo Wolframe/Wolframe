@@ -1,4 +1,4 @@
-#include "WidgetVisitor_QGroupBox.hpp"
+#include "WidgetVisitor_QButtonGroup.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
 #include <QDebug>
@@ -6,17 +6,17 @@
 #include <QRadioButton>
 #include <QCheckBox>
 
-WidgetVisitorState_QGroupBox::WidgetVisitorState_QGroupBox( QWidget* widget_)
+WidgetVisitorState_QButtonGroup::WidgetVisitorState_QButtonGroup( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
-	,m_groupBox(qobject_cast<QGroupBox*>( widget_))
+	,m_buttonGroup(qobject_cast<QButtonGroup*>( widget_))
 	,m_mode(Init)
 {}
 
-bool WidgetVisitorState_QGroupBox::setChecked( const QString& name)
+bool WidgetVisitorState_QButtonGroup::setChecked( const QString& name)
 {
 	if (m_childmap.size() == 0)
 	{
-		foreach (QAbstractButton* child, m_groupBox->findChildren<QAbstractButton*>())
+		foreach (QAbstractButton* child, m_buttonGroup->findChildren<QAbstractButton*>())
 		{
 			m_childmap[ child->objectName().toAscii()] = child;
 		}
@@ -39,9 +39,9 @@ bool WidgetVisitorState_QGroupBox::setChecked( const QString& name)
 	return false;
 }
 
-void WidgetVisitorState_QGroupBox::setAllUnchecked()
+void WidgetVisitorState_QButtonGroup::setAllUnchecked()
 {
-	foreach (QAbstractButton* child, m_groupBox->findChildren<QAbstractButton*>())
+	foreach (QAbstractButton* child, m_buttonGroup->findChildren<QAbstractButton*>())
 	{
 		QRadioButton* radioButton = qobject_cast<QRadioButton*>( child);
 		if (radioButton)
@@ -56,17 +56,17 @@ void WidgetVisitorState_QGroupBox::setAllUnchecked()
 	}
 }
 
-QList<QVariant> WidgetVisitorState_QGroupBox::checkedList() const
+QList<QVariant> WidgetVisitorState_QButtonGroup::checkedList() const
 {
 	QList<QVariant> rt;
-	foreach (QAbstractButton* child, m_groupBox->findChildren<QAbstractButton*>())
+	foreach (QAbstractButton* child, m_buttonGroup->findChildren<QAbstractButton*>())
 	{
 		if (child->isChecked()) rt.push_back( QVariant( child->objectName().toAscii()));
 	}
 	return rt;
 }
 
-bool WidgetVisitorState_QGroupBox::enter( const QString& name, bool writemode)
+bool WidgetVisitorState_QButtonGroup::enter( const QString& name, bool writemode)
 {
 	if (writemode && m_mode == Init && name == "selected")
 	{
@@ -76,7 +76,7 @@ bool WidgetVisitorState_QGroupBox::enter( const QString& name, bool writemode)
 	return false;
 }
 
-bool WidgetVisitorState_QGroupBox::leave( bool writemode)
+bool WidgetVisitorState_QButtonGroup::leave( bool writemode)
 {
 	if (writemode && m_mode == Selected)
 	{
@@ -86,13 +86,13 @@ bool WidgetVisitorState_QGroupBox::leave( bool writemode)
 	return false;
 }
 
-void WidgetVisitorState_QGroupBox::clear()
+void WidgetVisitorState_QButtonGroup::clear()
 {
 	setAllUnchecked();
 	m_childmap.clear();
 }
 
-QVariant WidgetVisitorState_QGroupBox::property( const QString& name)
+QVariant WidgetVisitorState_QButtonGroup::property( const QString& name)
 {
 	if (name == "selected")
 	{
@@ -101,7 +101,7 @@ QVariant WidgetVisitorState_QGroupBox::property( const QString& name)
 	return QVariant();
 }
 
-bool WidgetVisitorState_QGroupBox::setProperty( const QString& name, const QVariant& data)
+bool WidgetVisitorState_QButtonGroup::setProperty( const QString& name, const QVariant& data)
 {
 	if (m_mode == Selected && name.isEmpty())
 	{
@@ -110,57 +110,57 @@ bool WidgetVisitorState_QGroupBox::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QGroupBox::dataelements() const
+const QList<QString>& WidgetVisitorState_QButtonGroup::dataelements() const
 {
 	static const DataElements dataElements( "selected");
 	return dataElements;
 }
 
-QList<QWidget*> WidgetVisitorState_QGroupBox::datachildren() const
+QList<QWidget*> WidgetVisitorState_QButtonGroup::datachildren() const
 {
 	QList<QWidget*> rt;
-	foreach (QWidget* ww, m_groupBox->findChildren<QWidget*>())
+	foreach (QWidget* ww, m_buttonGroup->findChildren<QWidget*>())
 	{
 		if (!qobject_cast<QAbstractButton*>( ww)) rt.push_back( ww);
 	}
 	return rt;
 }
 
-bool WidgetVisitorState_QGroupBox::isRepeatingDataElement( const QString& /*name*/)
+bool WidgetVisitorState_QButtonGroup::isRepeatingDataElement( const QString& /*name*/)
 {
 	return false;
 }
 
-void WidgetVisitorState_QGroupBox::setState( const QVariant& state)
+void WidgetVisitorState_QButtonGroup::setState( const QVariant& state)
 {
 	foreach (const QVariant& name, state.toList())
 	{
 		if (!setChecked( name.toByteArray()))
 		{
-			qCritical() << "set checked failed for QGroupBox object" << name.toByteArray();
+			qCritical() << "set checked failed for QButtonGroup object" << name.toByteArray();
 		}
 	}
 }
 
-QVariant WidgetVisitorState_QGroupBox::getState() const
+QVariant WidgetVisitorState_QButtonGroup::getState() const
 {
 	return QVariant( checkedList());
 }
 
-void WidgetVisitorState_QGroupBox::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+void WidgetVisitorState_QButtonGroup::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
 {
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_groupBox, SIGNAL( toggled( bool)), &listener, SLOT( changed())); break;
+			QObject::connect( m_buttonGroup, SIGNAL( toggled( bool)), &listener, SLOT( changed())); break;
 		case WidgetVisitor::SigClicked:
-			QObject::connect( m_groupBox, SIGNAL( clicked( bool)), &listener, SLOT( clicked())); break;
+			QObject::connect( m_buttonGroup, SIGNAL( clicked( bool)), &listener, SLOT( clicked())); break;
 
 		case WidgetVisitor::SigPressed:
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigDoubleClicked:
-			qCritical() << "try to connect to signal not provided" << m_groupBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+			qCritical() << "try to connect to signal not provided" << m_buttonGroup->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
 

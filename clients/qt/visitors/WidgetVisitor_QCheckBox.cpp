@@ -1,5 +1,7 @@
 #include "WidgetVisitor_QCheckBox.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetListener.hpp"
+#include <QDebug>
 
 WidgetVisitorState_QCheckBox::WidgetVisitorState_QCheckBox( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -59,6 +61,25 @@ void WidgetVisitorState_QCheckBox::setState( const QVariant& state)
 QVariant WidgetVisitorState_QCheckBox::getState() const
 {
 	return QVariant( (int)m_checkBox->checkState());
+}
+
+void WidgetVisitorState_QCheckBox::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)
+{
+	switch (dt)
+	{
+		case WidgetVisitor::SigChanged:
+			QObject::connect( m_checkBox, SIGNAL( clicked( bool)), &listener, SLOT( changed()));
+			QObject::connect( m_checkBox, SIGNAL( released()), &listener, SLOT( changed()));
+			QObject::connect( m_checkBox, SIGNAL( toggled( bool)), &listener, SLOT( changed()));
+			break;
+		case WidgetVisitor::SigPressed:
+			QObject::connect( m_checkBox, SIGNAL( pressed()), &listener, SLOT( pressed())); break;
+		case WidgetVisitor::SigActivated:
+		case WidgetVisitor::SigEntered:
+		case WidgetVisitor::SigClicked:
+		case WidgetVisitor::SigDoubleClicked:
+			qCritical() << "try to connect to signal not provided" << m_checkBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
+	}
 }
 
 
