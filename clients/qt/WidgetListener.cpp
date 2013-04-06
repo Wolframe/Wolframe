@@ -59,9 +59,13 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 		WidgetVisitor visitor( receiver);
 		visitor.readAssignments();
 
-		if (qobject_cast<const QAbstractButton*>( receiver)) continue;
-
-		if (visitor.property( "doctype").isValid())
+		QAbstractButton* button = qobject_cast<QAbstractButton*>( receiver);
+		if (button)
+		{
+			button->toggle();
+			button->click();
+		}
+		else if (visitor.property( "doctype").isValid())
 		{
 			WidgetMessageDispatcher dp( visitor);
 			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
