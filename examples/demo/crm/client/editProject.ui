@@ -96,7 +96,7 @@
         <string notr="true">UpdateProject</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listProject</string>
+        <string notr="true">_CLOSE_</string>
        </property>
        <property name="dataelement" stdset="0">
         <string>@id,@customerid,name,description</string>
@@ -112,7 +112,7 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listProject</string>
+        <string notr="true">_CLOSE_</string>
        </property>
       </widget>
      </item>

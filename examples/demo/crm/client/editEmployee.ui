@@ -158,7 +158,7 @@
         <string notr="true">UpdateEmployee</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listEmployee</string>
+        <string notr="true">_CLOSE_</string>
        </property>
        <property name="dataobject" stdset="0">
         <string>employee</string>
@@ -174,7 +174,7 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listEmployee</string>
+        <string notr="true">_CLOSE_</string>
        </property>
       </widget>
      </item>

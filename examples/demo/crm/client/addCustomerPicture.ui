@@ -87,9 +87,6 @@
        <string>customer</string>
       </property>
      </widget>
-     <zorder>customer</zorder>
-     <zorder>info</zorder>
-     <zorder>caption</zorder>
     </widget>
    </item>
    <item row="4" column="0">
@@ -142,7 +139,7 @@
         <string notr="true">create</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">pictures</string>
+        <string notr="true">_CLOSE_</string>
        </property>
        <property name="global.lastPictureDir" stdset="0">
         <string notr="true">{image.state}</string>
@@ -155,7 +152,7 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listCustomer</string>
+        <string notr="true">_CLOSE_</string>
        </property>
       </widget>
      </item>
@@ -202,7 +199,6 @@
   <tabstop>cancel</tabstop>
  </tabstops>
  <resources>
-  <include location="../qtclient.qrc"/>
   <include location="qtclient.qrc"/>
  </resources>
  <connections/>

@@ -41,7 +41,6 @@ WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	,m_currentindex(0)
 {
 	m_dataelements.push_back( m_elementname);
-	m_dataelements.push_back( QString("selected"));
 }
 
 void WidgetVisitorState_QComboBox::clear()
