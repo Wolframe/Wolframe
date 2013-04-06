@@ -354,9 +354,9 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
 	WidgetVisitor visitor( m_ui);
-	WidgetMessageDispatcher dispatcher( visitor.uirootwidget());
+	WidgetMessageDispatcher dispatcher( visitor);
 
-	if (isActionRequest( tag_[0]))
+	if (isActionRequest( tag_))
 	{
 		foreach (QWidget* actionwidget, dispatcher.findRecipients( tag_.mid( 1, tag_.size()-1)))
 		{
