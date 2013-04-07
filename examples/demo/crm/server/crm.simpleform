@@ -79,7 +79,6 @@ Form CustomerListShortResult	{ customers { customer CustomerInsertedShort[] } }
 Form CustomerRefListResult { customers { customer CustomerRef[] } }
 Form SearchCustomer	{ customer { pattern string } }
 Form ListCustomer	{ customer { } }
-Form ListCustomerRef	{ customer { } }
 
 
 

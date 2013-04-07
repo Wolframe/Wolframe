@@ -87,6 +87,15 @@ bool WolframeClientProtocol::sendRequestContent()
 	return true;
 }
 
+void WolframeClientProtocol::discardPendingRequests( const char* errmsg)
+{
+	while (!m_requestqueue.isEmpty())
+	{
+		m_errorqueue.enqueue( qMakePair( m_requestqueue.head().first, QByteArray(errmsg)));
+		m_requestqueue.dequeue();
+	}
+}
+
 QString WolframeClientProtocol::nextAnswerTag()
 {
 	QString rt = m_requesttagqueue.head();
@@ -170,11 +179,13 @@ bool WolframeClientProtocol::process()
 				if (strcmp( item->m_tag, "BYE") == 0)
 				{
 					m_lasterror = "server closed connection";
+					discardPendingRequests( "discarded pending request because the server closed connection");
 					m_state = Close;
 					return false;
 				}
 				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				discardPendingRequests( "discarded pending request because of an unrecoverable protocol error");
 				m_state = Close;
 				return false;
 
@@ -182,6 +193,7 @@ bool WolframeClientProtocol::process()
 				if (m_gotQuit)
 				{
 					if (!sendLine( "QUIT")) return false;
+					discardPendingRequests( "discarded pending request because client invoked connection close");
 					m_state = Close;
 					return true;
 				}
@@ -198,12 +210,14 @@ bool WolframeClientProtocol::process()
 					QList<QByteArray> mechs = item->m_data.split(' ');
 					if (!mechs.contains("NONE"))
 					{
-						m_lasterror = "requred authorization mech NONE is not supported by the server";
+						m_lasterror = "required authorization mech NONE is not supported by the server";
+						discardPendingRequests( "discarded pending request because authorization failed");
 						m_state = Close;
 					}
 					if (m_gotQuit)
 					{
 						if (!sendLine( "QUIT")) return false;
+						discardPendingRequests( "discarded pending request because client invoked connection close");
 						m_state = Close;
 						return true;
 					}
@@ -219,11 +233,13 @@ bool WolframeClientProtocol::process()
 				if (strcmp( item->m_tag, "BYE") == 0)
 				{
 					m_lasterror = "server closed connection";
+					discardPendingRequests( "discarded pending request because server closed connection");
 					m_state = Close;
 					return false;
 				}
 				m_lasterror = "protocol error. MECHS/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				discardPendingRequests( "discarded pending request because of an unrecoverable protocol error");
 				m_state = Close;
 				return false;
 
@@ -244,17 +260,20 @@ bool WolframeClientProtocol::process()
 				{
 					m_lasterror = "error on MECH NONE request: ";
 					m_lasterror.append( item->m_data);
+					discardPendingRequests( "discarded pending request because authorization failed");
 					m_state = Close;
 					return false;
 				}
 				if (strcmp( item->m_tag, "BYE") == 0)
 				{
 					m_lasterror = "server closed connection";
+					discardPendingRequests( "discarded pending request because the server closed connection");
 					m_state = Close;
 					return false;
 				}
 				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				discardPendingRequests( "discarded pending request because of an unrecoverable protocol error");
 				m_state = Close;
 				return false;
 
@@ -268,6 +287,7 @@ bool WolframeClientProtocol::process()
 				if (m_gotQuit)
 				{
 					if (!sendLine( "QUIT")) return false;
+					discardPendingRequests( "discarded pending request because client invoked connection close");
 					m_state = Close;
 					return true;
 				}
@@ -314,11 +334,13 @@ bool WolframeClientProtocol::process()
 				if (strcmp( item->m_tag, "BYE") == 0)
 				{
 					m_lasterror = "server closed connection";
+					discardPendingRequests( "discarded pending request because the server closed connection");
 					m_state = Close;
 					return false;
 				}
 				m_lasterror = "protocol error. ANSWER/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				discardPendingRequests( "discarded pending request because an unrecoverable protocol error");
 				m_state = Close;
 				return false;
 
@@ -355,11 +377,13 @@ bool WolframeClientProtocol::process()
 				if (strcmp( item->m_tag, "BYE") == 0)
 				{
 					m_lasterror = "server closed connection";
+					discardPendingRequests( "discarded pending request because the server closed connection");
 					m_state = Close;
 					return false;
 				}
 				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				discardPendingRequests( "discarded pending request because an unrecoverable protocol error");
 				m_state = Close;
 				return false;
 		}

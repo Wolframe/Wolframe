@@ -103,7 +103,7 @@ class WolframeClientProtocol
 		const QString* getAnswerTag() const;
 		///\brief Get the success of the last answer or true if no answer available yet
 		bool getAnswerSuccess() const;
-		///\brief Get the content or message of the last answer or NULL if no answer available yet
+		///\brief Get the content of the last answer or NULL if no answer available yet or the corresponding request failed
 		const QByteArray* getAnswerContent() const;
 		///\brief Dispose the last answer
 		void removeAnswer();
@@ -114,6 +114,7 @@ class WolframeClientProtocol
 		void quit()						{m_gotQuit = true;}
 		bool isAuthorized() const				{return (int)m_state >= (int)AuthorizedIdle;}
 		bool isConnected() const				{return (int)m_state >= (int)AuthStart;}
+		bool isDisconnected() const				{return (int)m_state == (int)Close;}
 		void authorize()					{m_gotAuthorize = true;}
 
 	private:
@@ -125,6 +126,7 @@ class WolframeClientProtocol
 		QString nextAnswerTag();
 		void pushAnswerError( const QByteArray& msg);
 		void pushAnswerContent( const QByteArray& content);
+		void discardPendingRequests( const char* errmsg);
 
 	private:
 		State m_state;

@@ -100,6 +100,9 @@ class WolframeClient : public QObject
 		bool isEncrypted( ) const;
 		const QString encryptionName() const;
 
+	private:
+		void processProtocol();
+
 	private slots:
 		void timeoutOccurred( );
 		void error( QAbstractSocket::SocketError );
