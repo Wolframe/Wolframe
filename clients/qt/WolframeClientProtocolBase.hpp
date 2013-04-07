@@ -42,13 +42,15 @@ class WolframeClientProtocolBase
 {
 public:
 	WolframeClientProtocolBase()
-		:m_parsestate(InitMode){}
+		:m_parsestate(InitMode),m_bufpos(0){}
 
 	void pushData( const QByteArray& buf);
 	void pushData( const char* buf, int bufsize);
 
 	struct Item
 	{
+		Item() :m_type(Line){}
+
 		enum Type
 		{
 			Data,		//< m_tag=request tag, m_data=unescaped data
