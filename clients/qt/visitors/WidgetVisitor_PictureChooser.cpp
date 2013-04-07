@@ -54,7 +54,7 @@ bool WidgetVisitorState_PictureChooser::setProperty( const QString& name, const 
 
 const QList<QString>& WidgetVisitorState_PictureChooser::dataelements() const
 {
-	static const DataElements dataElements( "filename", "size", "");
+	static const DataElements dataElements( "filename", "size", "", 0);
 	return dataElements;
 }
 

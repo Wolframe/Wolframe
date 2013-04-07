@@ -101,8 +101,8 @@ bool WidgetVisitorState_FileChooser::setProperty( const QString& /*name*/, const
 
 const QList<QString>& WidgetVisitorState_FileChooser::dataelements() const
 {
-	static const DataElements dataelements_init( "file");
-	static const DataElements dataelements_file( "name", "size", "");
+	static const DataElements dataelements_init( "file", 0);
+	static const DataElements dataelements_file( "name", "size", "", 0);
 	static const QList<QString> noDataElements;
 
 	switch (m_mode)

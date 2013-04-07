@@ -48,7 +48,7 @@ bool WidgetVisitorState_QSlider::setProperty( const QString& name, const QVarian
 
 const QList<QString>& WidgetVisitorState_QSlider::dataelements() const
 {
-	static const DataElements dataElements( "");
+	static const DataElements dataElements( "", 0);
 	return dataElements;
 }
 

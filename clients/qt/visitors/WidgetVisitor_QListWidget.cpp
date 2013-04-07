@@ -52,8 +52,14 @@ QVariant WidgetVisitorState_QListWidget::property( const QString& name)
 		{
 			rt.append( QVariant( item->text()));
 		}
-		return QVariant( rt);
-	}
+		if (rt.isEmpty())
+		{
+			return m_listWidget->property( "_w_selected");
+		}
+		else
+		{
+			return QVariant( rt);
+	}	}
 	return QVariant();
 }
 
@@ -66,11 +72,9 @@ bool WidgetVisitorState_QListWidget::setProperty( const QString& name, const QVa
 	}
 	if (name == "selected")
 	{
-		QList<QListWidgetItem *> items = m_listWidget->findItems( data.toString(), Qt::MatchExactly);
-		foreach( QListWidgetItem *item, items)
-		{
-			item->setSelected( true);
-		}
+		m_listWidget->setProperty( "_w_selected", data);
+		endofDataFeed();
+		return true;
 	}
 	return false;
 }
@@ -109,6 +113,31 @@ QVariant WidgetVisitorState_QListWidget::getState() const
 		selected.push_back( QVariant( item->text()));
 	}
 	return QVariant(selected);
+}
+
+void WidgetVisitorState_QListWidget::endofDataFeed()
+{
+	QVariant selected = m_listWidget->property( "_w_selected");
+	if (selected.isValid())
+	{
+		if (selected.type() == QVariant::List)
+		{
+			foreach (const QVariant& sel, selected.toList())
+			{
+				foreach( QListWidgetItem *item, m_listWidget->findItems( sel.toString(), Qt::MatchExactly))
+				{
+					item->setSelected( true);
+				}
+			}
+		}
+		else
+		{
+			foreach( QListWidgetItem *item, m_listWidget->findItems( selected.toString(), Qt::MatchExactly))
+			{
+				item->setSelected( true);
+			}
+		}
+	}
 }
 
 void WidgetVisitorState_QListWidget::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)

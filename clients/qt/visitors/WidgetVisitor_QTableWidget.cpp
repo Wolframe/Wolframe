@@ -475,7 +475,7 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QString& name, const QV
 const QList<QString>& WidgetVisitorState_QTableWidget::dataelements() const
 {
 	static const QList<QString> noDataElements;
-	static const DataElements dataelements_data( "", "thumbnail");
+	static const DataElements dataelements_data( "", "thumbnail", 0);
 	switch (m_mode)
 	{
 		case Init: return m_dataelements_init;

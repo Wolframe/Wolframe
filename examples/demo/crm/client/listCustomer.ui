@@ -97,7 +97,7 @@
          <string>AddPicture</string>
         </property>
         <property name="form" stdset="0">
-         <string>addCustomerPicture?customerid={customer.selected}</string>
+         <string>addCustomerPicture?customer.selected={customer.selected}</string>
         </property>
         <property name="global:listCustomer_selected" stdset="0">
          <string>customer.selected</string>

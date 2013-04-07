@@ -44,7 +44,7 @@ bool WidgetVisitorState_QRadioButton::setProperty( const QString& name, const QV
 
 const QList<QString>& WidgetVisitorState_QRadioButton::dataelements() const
 {
-	static const DataElements dataElements( "");
+	static const DataElements dataElements( "", 0);
 	return dataElements;
 }
 

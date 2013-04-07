@@ -269,8 +269,12 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		emit formModal( name );
 		return;
 	}
-// initialize the form variables given by form parameters
+
+// initialize the form variables given by globals
 	WidgetVisitor visitor( m_ui);
+	visitor.do_readGlobals( *m_globals);
+
+// initialize the form variables given by form parameters
 	foreach (const FormCall::Parameter& param, formCall.parameter())
 	{
 		if (!visitor.setProperty( QString( param.first), param.second))
@@ -282,8 +286,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 		}
 	}
-// initialize the form variables given by globals and assignments
-	visitor.do_readGlobals( *m_globals);
+// initialize the form variables given by assignments
 	visitor.do_readAssignments();
 
 // connect listener to signals converted to data signals

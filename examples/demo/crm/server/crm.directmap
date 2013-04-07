@@ -38,10 +38,10 @@ SearchCustomerNote( xml) :CustomerNoteListResult;
 #GetPicture( xml) :CustomerPictureResult;
 
 #--- CustomerPicture
-#InsertCustomerPicture( xml) :CustomerPictureResult;
-#DeleteCustomerPicture( xml);
-#GetCustomerPicture( xml) :CustomerPictureResult;
-#GetCustomerPictureList( xml) :CustomerPictureResultList;
+InsertCustomerPicture( xml) :CustomerPictureResult;
+DeleteCustomerPicture( xml);
+GetCustomerPicture( xml) :CustomerPictureResult;
+GetCustomerPictureList( xml) :CustomerPictureResultList;
 
 #--- Project
 InsertProject( xml);

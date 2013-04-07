@@ -47,7 +47,7 @@ bool WidgetVisitorState_QDateTimeEdit::setProperty( const QString& name, const Q
 
 const QList<QString>& WidgetVisitorState_QDateTimeEdit::dataelements() const
 {
-	static const DataElements dataElements( "");
+	static const DataElements dataElements( "", 0);
 	return dataElements;
 }
 

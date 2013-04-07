@@ -112,7 +112,7 @@ bool WidgetVisitorState_QButtonGroup::setProperty( const QString& name, const QV
 
 const QList<QString>& WidgetVisitorState_QButtonGroup::dataelements() const
 {
-	static const DataElements dataElements( "selected");
+	static const DataElements dataElements( "selected", 0);
 	return dataElements;
 }
 

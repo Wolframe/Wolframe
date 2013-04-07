@@ -73,7 +73,7 @@ bool WidgetVisitorState_QTextEdit::setProperty( const QString& name, const QVari
 
 const QList<QString>& WidgetVisitorState_QTextEdit::dataelements() const
 {
-	static const DataElements dataElements( "text", "html");
+	static const DataElements dataElements( "text", "html", 0);
 	return dataElements;
 }
 

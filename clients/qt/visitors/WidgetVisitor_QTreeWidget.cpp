@@ -128,6 +128,7 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 			{
 				return sel->data( 0, Qt::UserRole);
 			}
+			return m_treeWidget->property( "_w_selected");
 		}
 		else
 		{
@@ -135,6 +136,10 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 			foreach (const QTreeWidgetItem* sel, m_treeWidget->selectedItems())
 			{
 				idlist.push_back( sel->data( 0, Qt::UserRole));
+			}
+			if (idlist.isEmpty())
+			{
+				return m_treeWidget->property( "_w_selected");
 			}
 			return QVariant( idlist);
 		}
@@ -155,6 +160,7 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QString& name)
 bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVariant& data)
 {
 	static const QString id_str( "id");
+	static const QString selected_str( "selected");
 	if (m_stk.isEmpty()) return false;
 	int col = m_headers.indexOf( name);
 	if (col != -1)
@@ -165,6 +171,12 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVa
 	if (name == id_str)
 	{
 		m_stk.top().item->setData( 0, Qt::UserRole, data);
+		return true;
+	}
+	if (name == selected_str)
+	{
+		m_treeWidget->setProperty( "_w_selected", data);
+		endofDataFeed();
 		return true;
 	}
 	return false;
@@ -227,7 +239,7 @@ static void skipTag( QList<QVariant>::const_iterator& itr, const QList<QVariant>
 static QTreeWidgetItem* findchild( const QTreeWidgetItem* item, int keyidx, const QVariant& elemkey)
 {
 	int ii=0,chldcnt = item->childCount();
-	QString elemkeystr = stateElementValue( elemkey);
+	QString elemkeystr = elemkey.toString();
 	for (; ii<chldcnt; ++ii)
 	{
 		QTreeWidgetItem* chld = item->child( ii);
@@ -254,7 +266,7 @@ void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 		switch (stateElementTag(*stateitr))
 		{
 			case Open:
-				chld = findchild( stk.top().item, keyidx, *stateitr);
+				chld = findchild( stk.top().item, keyidx, stateElementValue( *stateitr));
 				if (chld)
 				{
 					stk.push_back( chld);
@@ -336,6 +348,32 @@ QVariant WidgetVisitorState_QTreeWidget::getState() const
 		}
 	}
 	return QVariant(rt);
+}
+
+void WidgetVisitorState_QTreeWidget::endofDataFeed()
+{
+	QVariant selected = m_treeWidget->property( "_w_selected");
+	if (selected.isValid())
+	{
+		static const QString id_str( "id");
+		QStack<StackElement> stk;
+		int keyidx = m_headers.indexOf( id_str);
+		if (keyidx < 0) keyidx = 0; //... first element is key if "id" not defined
+
+		if (selected.type() == QVariant::List)
+		{
+			foreach (const QVariant& sel, selected.toList())
+			{
+				QTreeWidgetItem* item = findchild( m_treeWidget->invisibleRootItem(), keyidx, sel);
+				if (item) item->setSelected( true);
+			}
+		}
+		else
+		{
+			QTreeWidgetItem* item = findchild( m_treeWidget->invisibleRootItem(), keyidx, selected);
+			if (item) item->setSelected( true);
+		}
+	}
 }
 
 void WidgetVisitorState_QTreeWidget::connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener)

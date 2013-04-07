@@ -217,6 +217,7 @@ QVariant WidgetVisitorState_QComboBox::getState() const
 void WidgetVisitorState_QComboBox::endofDataFeed()
 {
 	QVariant selected = m_comboBox->property( "_w_selected");
+	/*[-]*/qDebug() << "WidgetVisitorState_QComboBox::endofDataFeed()" << selected;
 	if (selected.isValid())
 	{
 		int idx = m_comboBox->findData( selected, Qt::UserRole, Qt::MatchExactly);

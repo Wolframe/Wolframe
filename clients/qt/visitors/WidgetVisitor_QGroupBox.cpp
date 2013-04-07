@@ -112,7 +112,7 @@ bool WidgetVisitorState_QGroupBox::setProperty( const QString& name, const QVari
 
 const QList<QString>& WidgetVisitorState_QGroupBox::dataelements() const
 {
-	static const DataElements dataElements( "selected");
+	static const DataElements dataElements( "selected", 0);
 	return dataElements;
 }
 

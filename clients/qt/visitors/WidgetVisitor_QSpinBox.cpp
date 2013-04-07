@@ -48,7 +48,7 @@ bool WidgetVisitorState_QSpinBox::setProperty( const QString& name, const QVaria
 
 const QList<QString>& WidgetVisitorState_QSpinBox::dataelements() const
 {
-	static const DataElements dataElements( "");
+	static const DataElements dataElements( "", 0);
 	return dataElements;
 }
 
