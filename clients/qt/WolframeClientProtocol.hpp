@@ -113,6 +113,7 @@ class WolframeClientProtocol
 
 		void quit()						{m_gotQuit = true;}
 		bool isAuthorized() const				{return (int)m_state >= (int)AuthorizedIdle;}
+		bool isConnected() const				{return (int)m_state >= (int)AuthStart;}
 		void authorize()					{m_gotAuthorize = true;}
 
 	private:
