@@ -87,7 +87,7 @@ Form ListCustomer	{ customer { } }
 ; * Sub structures:
 Form CustomerPicture
 {
-	customerid	!ID
+	customerid	@!ID
 	caption		?string
 	info		?string
 	filename	string
@@ -100,10 +100,10 @@ Form CustomerPictureInserted
 }
 
 ; * Forms:
-Form InsertCustomerPicture	{ note { _ CustomerPicture } }
-Form UpdateCustomerPicture	{ note { _ CustomerPictureInserted } }
-Form DeleteCustomerPicture	{ note { id !@ID } }
-Form GetCustomerPicture		{ note { id !@ID } }
+Form InsertCustomerPicture	{ picture { _ CustomerPicture } }
+Form UpdateCustomerPicture	{ picture { _ CustomerPictureInserted } }
+Form DeleteCustomerPicture	{ picture { id !@ID } }
+Form GetCustomerPicture		{ picture { id !@ID } }
 
 Form CustomerPictureResult
 {

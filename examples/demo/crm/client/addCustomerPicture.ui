@@ -137,6 +137,15 @@
        <property name="dataobject" stdset="0">
         <string>addCustomerPicture</string>
        </property>
+       <property name="dataelement" stdset="0">
+        <string>@customerid, caption, info, filename</string>
+       </property>
+       <property name="synonym:customerid" stdset="0">
+        <string notr="true">customer.selected</string>
+       </property>
+       <property name="synonym:filename" stdset="0">
+        <string>picture.filename</string>
+       </property>
       </widget>
      </item>
      <item>
