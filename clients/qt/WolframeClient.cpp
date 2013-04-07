@@ -354,7 +354,8 @@ void WolframeClient::privateDisconnected( )
 
 void WolframeClient::dataAvailable( )
 {
-	bool isAuth;
+	bool isAuthorized;
+	bool isConnected;
 	bool success;
 	switch( m_state ) {
 		case Disconnected:
@@ -366,11 +367,17 @@ void WolframeClient::dataAvailable( )
 		case AboutToDisconnect:
 		case Connected:
 		case Data:
-			isAuth = m_protocol.isAuthorized();
+			isAuthorized = m_protocol.isAuthorized();
+			isConnected = m_protocol.isConnected();
 			success = m_protocol.process();
-			if (!isAuth && m_protocol.isAuthorized())
+
+			if (!isAuthorized && m_protocol.isAuthorized())
 			{
 				emit authOk();
+			}
+			if (!isConnected && m_protocol.isConnected())
+			{
+				emit connected();
 			}
 			if (!success)
 			{
