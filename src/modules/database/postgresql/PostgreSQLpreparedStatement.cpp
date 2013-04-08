@@ -203,7 +203,7 @@ bool PreparedStatementHandler_postgres::commit()
 	{
 		LOG_WARNING << "executed transaction is empty";
 	}
-	else if (m_state != Executed)
+	else if (m_state != Executed && m_state != Prepared)
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
