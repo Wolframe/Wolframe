@@ -369,6 +369,7 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
+		TRACE_ASSIGNMENT( "found synonym", objectName(), name, synonym);
 		return enter( synonym, writemode, level);
 	}
 	// [A.1] check if name is a multipart reference and follow it if yes:
@@ -694,6 +695,7 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 	QString synonym = m_stk.top()->getSynonym( name);
 	if (!synonym.isEmpty())
 	{
+		TRACE_ASSIGNMENT( "found synonym", objectName(), name, synonym);
 		return property( synonym, level);
 	}
 
@@ -1370,12 +1372,12 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 		{
 			WidgetVisitor mainvisitor( uirootwidget());
 			wl.append( mainvisitor.findSubNodes( nodeProperty_hasWidgetId, receiverid));
-			foreach (QWidget* rcvwidget, wl) TRACE_STATUS( "found widget by address", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
+			foreach (QWidget* rcvwidget, wl) TRACE_STATUS( "found widget by address", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->property("widgetid"));
 			rt.append( wl);
 		}
 		else if ((rcvwidget = get_widget_reference( receiveridstr)) != 0)
 		{
-			TRACE_STATUS( "found widget reference", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
+			TRACE_STATUS( "found widget reference", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->property("widgetid"));
 			rt.append( rcvwidget);
 		}
 		else
@@ -1396,7 +1398,7 @@ QList<QWidget*> WidgetVisitor::get_datasignal_receivers( DataSignalType type)
 			{
 				if (rcvwidget != thiswidget)
 				{
-					TRACE_STATUS( "found widget by data slot identifier", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->widgetid());
+					TRACE_STATUS( "found widget by data slot identifier", rcvwidget->metaObject()->className(), rcvwidget->objectName(), rcvwidget->property("widgetid"));
 					rt.push_back( rcvwidget);
 				}
 			}

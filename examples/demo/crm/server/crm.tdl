@@ -351,18 +351,6 @@ BEGIN
 		WHERE id = $1;
 END
 
-OPERATION insertPicture -- (caption, info, image, width, height, thumbnail)
-BEGIN
-	DO INSERT INTO Picture( caption, info, image, width, height, thumbnail)
-		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE getLastIdPicture();
-END
-
-OPERATION deletePicture -- ($1=id)
-BEGIN
-	DO DELETE FROM Picture WHERE id = $1;
-END
-
 TRANSACTION GetPicture
 BEGIN
 	INTO . DO UNIQUE NONEMPTY SELECT id, caption, info, image, width, height, thumbnail
@@ -372,17 +360,19 @@ END
 
 
 --  CUSTOMER PICTURE
-TRANSACTION InsertCustomerPicture
+TRANSACTION DoInsertCustomerPicture
 BEGIN
-	DO insertPicture();
+	DO INSERT INTO Picture( caption, info, image, width, height, thumbnail)
+		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
+	DO NONEMPTY UNIQUE getLastIdPicture();
 	DO INSERT INTO CustomerPicture (customerid, pictureid) VALUES ($(customerid), $1);
-	INTO . DO SELECT $1 AS pictureid;
+	INTO . DO SELECT $1 AS id;
 END
 
 TRANSACTION DeleteCustomerPicture
 BEGIN
 	DO SELECT $(pictureid);
-	DO deletePicture( $1);
+	DO DELETE FROM Picture WHERE id = $1;
 	DO DELETE FROM CustomerPicture WHERE pictureid=$(pictureid) AND customerid=$(customerid);
 END
 

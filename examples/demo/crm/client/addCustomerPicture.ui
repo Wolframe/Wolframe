@@ -16,6 +16,9 @@
   <property name="synonym:customerid" stdset="0">
    <string>customer.selected</string>
   </property>
+  <property name="synonym:image" stdset="0">
+   <string>picture.base64</string>
+  </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -93,7 +96,7 @@
     </widget>
    </item>
    <item row="6" column="1">
-    <widget class="PictureChooser" name="image" native="true">
+    <widget class="PictureChooser" name="picture" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -138,13 +141,7 @@
         <string>addCustomerPicture</string>
        </property>
        <property name="dataelement" stdset="0">
-        <string>@customerid, caption, info, filename</string>
-       </property>
-       <property name="synonym:customerid" stdset="0">
-        <string notr="true">customer.selected</string>
-       </property>
-       <property name="synonym:filename" stdset="0">
-        <string>picture.filename</string>
+        <string>@customerid,caption,info,image</string>
        </property>
       </widget>
      </item>
@@ -171,7 +168,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>info</tabstop>
-  <tabstop>image</tabstop>
+  <tabstop>picture</tabstop>
   <tabstop>add</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>

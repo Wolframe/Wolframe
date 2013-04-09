@@ -138,7 +138,6 @@ QVariant WidgetVisitorState_QComboBox::property( const QString& name)
 
 bool WidgetVisitorState_QComboBox::setProperty( const QString& name, const QVariant& data)
 {
-	/*[-]*/qDebug() << "WidgetVisitorState_QComboBox::setProperty" << name << data;
 	switch (m_mode)
 	{
 		case None:
@@ -217,7 +216,6 @@ QVariant WidgetVisitorState_QComboBox::getState() const
 void WidgetVisitorState_QComboBox::endofDataFeed()
 {
 	QVariant selected = m_comboBox->property( "_w_selected");
-	/*[-]*/qDebug() << "WidgetVisitorState_QComboBox::endofDataFeed()" << selected;
 	if (selected.isValid())
 	{
 		int idx = m_comboBox->findData( selected, Qt::UserRole, Qt::MatchExactly);

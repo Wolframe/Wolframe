@@ -32,7 +32,7 @@ QVariant WidgetVisitorState_PictureChooser::property( const QString& name)
 	{
 		return QVariant( m_pictureChooser->picture().size());
 	}
-	if (name.isEmpty())
+	if (name == "base64")
 	{
 		return QVariant( m_pictureChooser->picture().toBase64());
 	}
@@ -45,7 +45,7 @@ bool WidgetVisitorState_PictureChooser::setProperty( const QString& name, const 
 	{
 		m_pictureChooser->setFileName( data.toString());
 	}
-	if (name.isEmpty())
+	else if (name == "base64")
 	{
 		m_pictureChooser->setPicture( QByteArray::fromBase64( data.toByteArray()));
 	}
@@ -54,7 +54,7 @@ bool WidgetVisitorState_PictureChooser::setProperty( const QString& name, const 
 
 const QList<QString>& WidgetVisitorState_PictureChooser::dataelements() const
 {
-	static const DataElements dataElements( "filename", "size", "", 0);
+	static const DataElements dataElements( "filename", "size", "base64", 0);
 	return dataElements;
 }
 

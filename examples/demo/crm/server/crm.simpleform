@@ -88,9 +88,12 @@ Form ListCustomer	{ customer { } }
 Form CustomerPicture
 {
 	customerid	@!ID
-	caption		?string
-	info		?string
-	filename	string
+	caption		string
+	info		string
+	image		string
+	width		int
+	height		int
+	thumbnail	string
 }
 
 Form CustomerPictureInserted
@@ -100,10 +103,11 @@ Form CustomerPictureInserted
 }
 
 ; * Forms:
-Form InsertCustomerPicture	{ picture { _ CustomerPicture } }
-Form UpdateCustomerPicture	{ picture { _ CustomerPictureInserted } }
-Form DeleteCustomerPicture	{ picture { id !@ID } }
-Form GetCustomerPicture		{ picture { id !@ID } }
+Form InsertCustomerPicture		{ picture { _ CustomerPicture } }
+Form UpdateCustomerPicture		{ picture { _ CustomerPictureInserted } }
+Form DeleteCustomerPicture		{ picture { id !@ID } }
+Form GetCustomerPicture			{ picture { id !@ID } }
+Form CustomerPictureInsertResult	{ picture { id !@ID } }
 
 Form CustomerPictureResult
 {

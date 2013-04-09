@@ -133,13 +133,15 @@ void FormWidget::switchForm( QWidget *actionwidget)
 			else
 			{
 				QList<QVariant> formstack = m_ui->property("_w_formstack").toList();
-				if ( formstack.size( ) > 0 )
+				if (!formstack.isEmpty())
 				{
 					nextForm = formstack.back().toString();
 					formstack.pop_back();
 					m_ui->setProperty( "_w_formstack", QVariant( formstack));
 					loadForm( nextForm);
-				} else {
+				}
+				else
+				{
 					emit closed();
 				}
 			}
@@ -338,12 +340,20 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			// if there is a back link define the stack of the form accordingly
 			if (widget->property( "form").toString().trimmed() == "_CLOSE_")
 			{
+				QList<QVariant> formstack;
 				if( oldUi )
 				{
-					QList<QVariant> formstack = oldUi->property( "_w_formstack").toList();
-					formstack.push_back( QVariant( m_previousForm));
-					m_ui->setProperty( "_w_formstack", QVariant( formstack));
+					formstack = oldUi->property( "_w_formstack").toList();
 				}
+				if (m_previousForm.isEmpty())
+				{
+					formstack.push_back( QVariant( QString("init")));
+				}
+				else
+				{
+					formstack.push_back( QVariant( m_previousForm));
+				}
+				m_ui->setProperty( "_w_formstack", QVariant( formstack));
 				break;
 			}
 		}

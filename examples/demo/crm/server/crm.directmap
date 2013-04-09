@@ -38,7 +38,7 @@ SearchCustomerNote( xml) :CustomerNoteListResult;
 #GetPicture( xml) :CustomerPictureResult;
 
 #--- CustomerPicture
-InsertCustomerPicture( xml) :CustomerPictureResult;
+InsertCustomerPicture( xml) :CustomerPictureInsertResult;
 DeleteCustomerPicture( xml);
 GetCustomerPicture( xml) :CustomerPictureResult;
 GetCustomerPictureList( xml) :CustomerPictureResultList;
