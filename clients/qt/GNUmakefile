@@ -89,6 +89,7 @@ CPP_OBJS = \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
 	$(VISITOR_OBJS) \
+	DataTree.o \
 	FormCall.o \
 	FormWidget.o \
 	moc_FormWidget.o \

@@ -101,6 +101,7 @@ OBJS = \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
 	$(VISITOR_OBJS) \
+	DataTree.obj \
 	FormCall.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \
