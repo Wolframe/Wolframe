@@ -36,6 +36,7 @@
 #include <QVariant>
 #include <QPair>
 #include <QList>
+#include <QSharedPointer>
 
 ///\class DataTree
 ///\brief Defines a tree of data items
@@ -65,8 +66,10 @@ public:
 
 private:
 	void setNodeValue( const QVariant& nodevalue);
-	static void skipBrk( QString::const_iterator& itr, const QString::const_iterator& end);
 	static QString parseString( QString::const_iterator& itr, const QString::const_iterator& end);
+	static void mapDataTreeToString( const DataTree& dt, QString& str);
+	static void mapDataValueToString( const QVariant& val, QString& str);
+	static ElementType parseNodeHeader( QString& nodename, QString::const_iterator& itr, const QString::const_iterator& end);
 
 private:
 	struct Node
@@ -74,17 +77,35 @@ private:
 		Node( const QString& name_, const DataTree& value_)
 			:name(name_),value( new DataTree( value_)){}
 		Node( const Node& o)
-			:name(o.name),value( new DataTree( *o.value)){}
+			:name(o.name),value(o.value){}
 		Node(){}
 
 		QString name;
-		DataTree* value;
+		QSharedPointer<DataTree> value;
 	};
 
 	ElementType m_elemtype;
 	QVariant m_value;
 	QList<Node> m_nodear;
 	int m_nofattributes;
+};
+
+class ActionDefinition
+{
+public:
+	ActionDefinition( const QString& content);
+	ActionDefinition( const ActionDefinition& o)
+		:m_doctype(o.m_doctype),m_rootelement(o.m_rootelement),m_structure(o.m_structure){}
+	QString toString() const;
+
+	const QString& doctype() const		{return m_doctype;}
+	const QString& rootelement() const	{return m_rootelement;}
+	const DataTree& structure() const	{return m_structure;}
+
+private:
+	QString m_doctype;
+	QString m_rootelement;
+	DataTree m_structure;
 };
 
 #endif
