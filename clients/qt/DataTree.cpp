@@ -163,13 +163,23 @@ void DataTree::setNodeValue( const QVariant& nodevalue)
 	}
 }
 
+static void skipSpaces( QString::const_iterator& itr, const QString::const_iterator& end)
+{
+	for (; itr != end && itr->isSpace(); ++itr);
+}
+
+static void skipNonSpaces( QString::const_iterator& itr, const QString::const_iterator& end)
+{
+	for (; itr != end && !itr->isSpace(); ++itr);
+}
+
 DataTree::ElementType DataTree::parseNodeHeader( QString& nodename, QString::const_iterator& itr, const QString::const_iterator& end)
 {
 	for (; itr != end && itr->isLetter(); ++itr)
 	{
 		nodename.push_back( *itr);
 	}
-	for (++itr; itr != end && itr->isSpace(); ++itr);
+	skipSpaces( itr, end);
 
 	if (*itr == '[')
 	{
@@ -192,11 +202,6 @@ DataTree::ElementType DataTree::parseNodeHeader( QString& nodename, QString::con
 	}
 }
 
-static void skipSpaces( QString::const_iterator& itr, const QString::const_iterator& end)
-{
-	for (++itr; itr != end && itr->isSpace(); ++itr);
-}
-
 DataTree DataTree::fromString( const QString::const_iterator& begin, const QString::const_iterator& end)
 {
 	DataTree rt( Single);
@@ -217,6 +222,7 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 				return DataTree( Invalid);
 			}
 			skipSpaces( is, es);
+			TRACE_PARSE_OBJECT( "node name", nodename);
 
 			if (is == es)
 			{
@@ -246,22 +252,30 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 					TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
 					return DataTree( Invalid);
 				}
-
 				if (*is == '\'' || *is == '\"')
 				{
-					rt.addAttribute( nodename, DataTree( QVariant( parseString( is, es))));
+					QString content( parseString( is, es));
+					TRACE_PARSE_OBJECT( "string attribute", content);
+					rt.addAttribute( nodename, DataTree( QVariant( content)));
 				}
 				else if (*is == '{')
 				{
 					QString::const_iterator start = is;
 					skipBrk( is, es);
 					if (is != es) is++;
+					TRACE_PARSE_OBJECT( "brk attribute", QString( start, is-start));
 					rt.addAttribute( nodename, DataTree( QVariant( QString( start, is-start))));
 				}
 				else
 				{
 					QString::const_iterator start = is;
-					skipSpaces( is, es);
+					skipNonSpaces( is, es);
+					if (is == start)
+					{
+						TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+						return DataTree( Invalid);
+					}
+					TRACE_PARSE_OBJECT( "nonspace attribute", QString( start, is-start));
 					rt.addAttribute( nodename, DataTree( QVariant( QString( start, is-start))));
 				}
 				if (is == es) break;
@@ -293,7 +307,6 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 		skipSpaces( is, es);
 		if (is != es)
 		{
-			TRACE_PARSE_ITEM( "char", *is);
 			if (*is == ';')
 			{
 				TRACE_PARSE_STATE( "node delimiter (semicolon)");
