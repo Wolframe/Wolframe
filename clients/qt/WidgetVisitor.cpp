@@ -241,6 +241,11 @@ QList<QWidget*> WidgetVisitor::State::datachildren() const
 	return getWidgetChildren( m_widget);
 }
 
+WidgetListener* WidgetVisitor::State::createListener( DataLoader* dataLoader)
+{
+	new WidgetListener( m_widget, dataLoader);
+}
+
 void WidgetVisitor::State::connectDataSignals( DataSignalType dt, WidgetListener& /*listener*/)
 {
 	qCritical() << "try to connect to signal not provided" << m_widget->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
@@ -638,6 +643,24 @@ QWidget* WidgetVisitor::resolveLink( const QString& link)
 		ERROR( "ambiguus widget link reference", link);
 	}
 	return wdglist.at(0);
+}
+
+QVariant WidgetVisitor::getState()
+{
+	QVariant state;
+	if (!m_stk.isEmpty())
+	{
+		state = m_stk.top()->getState();
+	}
+	return state;
+}
+
+void WidgetVisitor::setState( const QVariant& state)
+{
+	if (!m_stk.isEmpty())
+	{
+		m_stk.top()->setState( state);
+	}
 }
 
 void WidgetVisitor::resetState()
@@ -1283,18 +1306,24 @@ void WidgetVisitor::do_writeAssignments()
 	}
 }
 
-void WidgetVisitor::connectDataSignals( WidgetListener& listener)
+WidgetListener* WidgetVisitor::createListener( DataLoader* dataLoader)
 {
+	WidgetListener* listener = 0;
 	if (!m_stk.isEmpty())
 	{
-		for (int dt=0; dt<NofDataSignalTypes; ++dt)
+		listener = m_stk.top()->createListener( dataLoader);
+		if (listener)
 		{
-			if (!m_stk.top()->m_datasignals.id[ dt].isEmpty())
+			for (int dt=0; dt<NofDataSignalTypes; ++dt)
 			{
-				m_stk.top()->connectDataSignals( (DataSignalType)dt, listener);
+				if (!m_stk.top()->m_datasignals.id[ dt].isEmpty())
+				{
+					m_stk.top()->connectDataSignals( (DataSignalType)dt, *listener);
+				}
 			}
 		}
 	}
+	return listener;
 }
 
 void WidgetVisitor::ERROR( const char* msg, const QString& arg) const

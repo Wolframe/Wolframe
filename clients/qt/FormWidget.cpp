@@ -101,8 +101,9 @@ void FormWidget::executeAction( QWidget *actionwidget )
 
 		if (actionwidget->property( "datasignal:clicked").isValid())
 		{
-			WidgetListener listener( actionwidget, m_dataLoader, m_debug);
-			listener.handleDataSignal( WidgetVisitor::SigClicked);
+			WidgetListenerR listener( visitor.createListener( m_dataLoader));
+			listener->setDebug( m_debug);
+			listener->handleDataSignal( WidgetVisitor::SigClicked);
 		}
 	}
 	else
@@ -399,9 +400,12 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 				{
 					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
 				}
-				WidgetListenerR listener = WidgetListenerR( new WidgetListener( rcp, m_dataLoader, m_debug));
-				rcpvisitor.connectDataSignals( *listener);
-				li.value().push_back( listener);
+				WidgetListener* listener = rcpvisitor.createListener( m_dataLoader);
+				if (listener)
+				{
+					listener->setDebug( m_debug);
+					li.value().push_back( WidgetListenerR( listener));
+				}
 			}
 
 		}

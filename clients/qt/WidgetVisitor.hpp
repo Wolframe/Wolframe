@@ -165,6 +165,9 @@ by a declared assignment and a refresh issued onclose or onchange by the subwidg
 ///\class WidgetListener
 ///\brief Forward declaration
 class WidgetListener;
+///\class DataLoader
+///\brief Forward declaration
+class DataLoader;
 ///\class FormWidget
 ///\brief Forward declaration
 class FormWidget;
@@ -230,6 +233,9 @@ class WidgetVisitor
 			virtual QVariant getState()						{return QVariant();}
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
+
+			///\brief Create listener object for the widget
+			virtual WidgetListener* createListener( DataLoader* dataLoader);
 			///\brief Connect all widget signals that should trigger an event on a signal of type 'type'
 			virtual void connectDataSignals( DataSignalType dt, WidgetListener& listener);
 
@@ -400,6 +406,10 @@ class WidgetVisitor
 		///\param[in] link name of symbolic link to resolve
 		QWidget* resolveLink( const QString& link);
 
+		///\brief Get the current widget state
+		QVariant getState();
+		///\brief Set the current widget state
+		void setState( const QVariant& state);
 		///\brief Backup state description in a dynamic property and reset widget state
 		void resetState();
 		///\brief Restore the state from its description backup (resetState)
@@ -433,8 +443,8 @@ class WidgetVisitor
 		///\brief For all visitor sub widgets do assignments to global variables from form widgets based on global: declarations
 		void do_writeGlobals( QHash<QString,QVariant>& globals);
 
-		///\brief Connect for the current widget all widget signals that should trigger an event on a signal of type 'dt'
-		void connectDataSignals( WidgetListener& listener);
+		///\brief Create listener object for the widget and wire all data signals
+		WidgetListener* createListener( DataLoader* dataLoader);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

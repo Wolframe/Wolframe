@@ -44,11 +44,11 @@ bool WidgetListener::hasDataSignals( const QWidget* widget_)
 	return false;
 }
 
-WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_, bool debug_)
+WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_)
 	:QObject()
 	,m_state(createWidgetVisitorState(widget_))
 	,m_dataLoader(dataLoader_)
-	,m_debug(debug_)
+	,m_debug(false)
 {}
 
 void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)

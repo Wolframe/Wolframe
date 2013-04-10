@@ -48,10 +48,11 @@ public:
 
 public:
 	///\brief Constructor
-	WidgetListener( QWidget* widget_, DataLoader* dataLoader_, bool debug_);
+	WidgetListener( QWidget* widget_, DataLoader* dataLoader_);
 	virtual ~WidgetListener(){}
 
 	void handleDataSignal( WidgetVisitor::DataSignalType dt);
+	void setDebug( bool v)	{m_debug=v;}
 
 public slots:
 	void changed()		{handleDataSignal( WidgetVisitor::SigChanged);}
