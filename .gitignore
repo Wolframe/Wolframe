@@ -190,3 +190,4 @@ examples/demo/crm/server/crm.db
 *.gcda
 clients/qt/qtclient.pro.user
 clients/qtSkeleton/qtSkeleton.pro.user
+clients/qt/tests/functions/testDataTree

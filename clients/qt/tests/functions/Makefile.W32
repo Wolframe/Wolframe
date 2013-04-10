@@ -1,0 +1,88 @@
+TOPDIR = ..\..
+
+# do this manually, nmake is broken!
+#SUBDIRS = plugins
+SUBDIRS = tests
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x403 \
+	/DQCOMMANDLINE_STATIC \
+	/DBUILD_AS_PLUGIN
+
+INCLUDE_DIRS = \
+	/I. /I$(TOPDIR)\clients\qt \
+	/I"$(QT_DIR)\include" \
+	/I"$(QT_DIR)\include\QtCore" \
+	/I"$(QT_DIR)\include\QtGui" \
+	/I"$(QT_DIR)\include\QtUiTools" \
+	/I"$(QT_DIR)\include\QtDesigner" \
+	/I"$(QT_DIR)\include\QtNetwork"
+
+QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(QT_LDFLAGS) \
+	/SUBSYSTEM:WINDOWS
+
+!IFNDEF DEBUG
+INCLUDE_LIBS = \
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtMain.lib
+!ELSE
+INCLUDE_LIBS = \
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtMaind.lib
+!ENDIF
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) plugins\wolframewidgets.lib
+
+MOC_FLAGS =
+
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+MOC_FLAGS = \
+	$(MOC_FLAGS) -DWITH_SSL
+
+!ENDIF
+
+OBJS = \
+	DataTree.obj
+	
+CPP_BINS = \
+	testDataTree.exe
+
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+
+local_all: $(CPP_BINS)
+
+testDataTree.exe: testDataTree.res testDataTree.obj
+	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
+	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
+
+local_clean:
+	@-erase $(OBJS)
+	@-erase $(CPP_BINS)
+	@-erase testDataTree.res
+
+local_distclean:
+
+local_test:
+
