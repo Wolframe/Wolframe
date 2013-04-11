@@ -19,27 +19,16 @@
 ###########################################
 
 # version of the boost library
-
-#BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_51
+BOOST_VERSION = 1.49
 
 # base dir where boost is installed
-
-#BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32
-#BOOST_DIR = D:\boost\boost_1_45_0
-#BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
+BOOST_DIR = C:\boost\boost-1.49.0
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_51
-#BOOST_INCLUDE_DIR = $(BOOST_DIR)
+BOOST_INCLUDE_DIR = C:\boost\boost-1.49.0\include
+BOOST_LIB_DIR = C:\boost\boost-1.49.0\lib
 
 # visual studio version used for compiling
-
-#BOOST_VC_VER = vc80
-#BOOST_VC_VER = vc90
 BOOST_VC_VER = vc100
 
 # TODO: probe those
@@ -81,7 +70,7 @@ OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 # take the VC2008 version SDK Opensource, not the MinGW one
 ############################################################
 
-QT_DIR = C:\Qt\4.8.1
+QT_DIR = C:\Qt\4.8.4
 #QT_DIR = /home/user/qt
 #QT_DIR = D:\Qt\4.7.2
 
@@ -160,5 +149,5 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+#CC="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+#CXX="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe"

@@ -243,7 +243,7 @@ QList<QWidget*> WidgetVisitor::State::datachildren() const
 
 WidgetListener* WidgetVisitor::State::createListener( DataLoader* dataLoader)
 {
-	new WidgetListener( m_widget, dataLoader);
+	return new WidgetListener( m_widget, dataLoader);
 }
 
 void WidgetVisitor::State::connectDataSignals( DataSignalType dt, WidgetListener& /*listener*/)
@@ -954,8 +954,9 @@ static bool isReservedProperty( const QString& key)
 	return false;
 }
 
-struct WidgetVisitorStackElement
+class WidgetVisitorStackElement
 {
+public:
 	QList<QString> dataelements;
 	int nof_attributes;
 	int dataelementidx;
