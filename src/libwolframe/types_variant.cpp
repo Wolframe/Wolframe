@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <boost/lexical_cast.hpp>
+#include <boost/utility/enable_if.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
