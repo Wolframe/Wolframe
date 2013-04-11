@@ -32,17 +32,17 @@
 ************************************************************************/
 #include "DataTree.hpp"
 #include <QDebug>
-#define WOLFRAME_LOWLEVEL_DEBUG
+#undef WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
-#define TRACE_PARSE_ERROR( TITLE, LINE)			qDebug() << "data tree parse error" << (TITLE) << "at line" << (LINE);
-#define TRACE_PARSE_STATE( TITLE)			qDebug() << "data tree parser state" << (TITLE);
-#define TRACE_PARSE_ITEM( TITLE, VALUE)			qDebug() << "data tree parser fetch item" << (TITLE) << (VALUE);
-#define TRACE_PARSE_OBJECT( TITLE, VALUE)		qDebug() << "data tree parser create object" << (TITLE) << (VALUE);
+#define TRACE_ERROR( COMP, TITLE, LINE)			qDebug() << "DataTree" << (COMP) << "error" << (TITLE) << "at line" << (LINE);
+#define TRACE_STATE( COMP, TITLE)			qDebug() << "DataTree" << (COMP) << "state" << (TITLE);
+#define TRACE_ITEM( COMP, TITLE, VALUE)			qDebug() << "DataTree" << (COMP) << "item" << (TITLE) << (VALUE);
+#define TRACE_OBJECT( COMP, TITLE, VALUE)		qDebug() << "DataTree" << (COMP) << "object" << (TITLE) << (VALUE);
 #else
-#define TRACE_PARSE_ERROR( TITLE, LINE)
-#define TRACE_PARSE_STATE( TITLE)
-#define TRACE_PARSE_ITEM( TITLE, VALUE)
-#define TRACE_PARSE_OBJECT( TITLE, VALUE)
+#define TRACE_ERROR( COMP, TITLE, LINE)
+#define TRACE_STATE( COMP, TITLE)
+#define TRACE_ITEM( COMP, TITLE, VALUE)
+#define TRACE_OBJECT( COMP, TITLE, VALUE)
 #endif
 
 void DataTree::addNode( const QString& name_, const DataTree& value_)
@@ -140,26 +140,23 @@ void DataTree::setNodeValue( const QVariant& nodevalue)
 {
 	if (m_value.isValid())
 	{
-		if (m_value.isValid())
+		if (m_value.type() == QVariant::List)
 		{
-			if (m_value.type() == QVariant::List)
-			{
-				QList<QVariant> lst = m_value.toList();
-				lst.push_back( nodevalue);
-				m_value = QVariant( lst);
-			}
-			else
-			{
-				QList<QVariant> lst;
-				lst.push_back( m_value);
-				lst.push_back( nodevalue);
-				m_value = QVariant( lst);
-			}
+			QList<QVariant> lst = m_value.toList();
+			lst.push_back( nodevalue);
+			m_value = QVariant( lst);
 		}
 		else
 		{
-			m_value = QVariant( nodevalue);
+			QList<QVariant> lst;
+			lst.push_back( m_value);
+			lst.push_back( nodevalue);
+			m_value = QVariant( lst);
 		}
+	}
+	else
+	{
+		m_value = QVariant( nodevalue);
 	}
 }
 
@@ -170,7 +167,7 @@ static void skipSpaces( QString::const_iterator& itr, const QString::const_itera
 
 static void skipNonSpaces( QString::const_iterator& itr, const QString::const_iterator& end)
 {
-	for (; itr != end && !itr->isSpace(); ++itr);
+	for (; itr != end && !itr->isSpace() && *itr != ';'; ++itr);
 }
 
 DataTree::ElementType DataTree::parseNodeHeader( QString& nodename, QString::const_iterator& itr, const QString::const_iterator& end)
@@ -206,6 +203,7 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 {
 	DataTree rt( Single);
 	QString::const_iterator is = begin, es = end;
+	TRACE_OBJECT( "fromString", "enter", QString(is,es-is))
 
 	while (is != es)
 	{
@@ -213,16 +211,16 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 
 		if (is->isLetter())
 		{
-			TRACE_PARSE_ITEM( "letter", *is);
+			TRACE_ITEM( "fromString", "letter", *is);
 			QString nodename;
 			ElementType elemtype = parseNodeHeader( nodename, is, es);
 			if (elemtype == Invalid)
 			{
-				TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+				TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
 				return DataTree( Invalid);
 			}
 			skipSpaces( is, es);
-			TRACE_PARSE_OBJECT( "node name", nodename);
+			TRACE_OBJECT( "fromString", "node name", nodename);
 
 			if (is == es)
 			{
@@ -230,32 +228,35 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 			}
 			else if (*is == '{')
 			{
-				TRACE_PARSE_STATE( "open node bracket");
+				TRACE_STATE( "fromString", "open node bracket");
 				QString::const_iterator start = is+1;
 				skipBrk( is, es);
 				DataTree elem( fromString( start, is));
 				if (elem.m_elemtype == Invalid)
 				{
-					TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+					TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
 					return DataTree( Invalid);
 				}
 				elem.m_elemtype = elemtype;
 				rt.addNode( nodename, elem);
-				if (is != es) ++is;
+				if (is != es)
+				{
+					++is;
+				}
 			}
 			else if (*is == '=' && elemtype == Single)
 			{
-				TRACE_PARSE_STATE( "assignment");
+				TRACE_STATE( "fromString", "assignment");
 				++is; skipSpaces( is, es);
 				if (is == es)
 				{
-					TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+					TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
 					return DataTree( Invalid);
 				}
 				if (*is == '\'' || *is == '\"')
 				{
 					QString content( parseString( is, es));
-					TRACE_PARSE_OBJECT( "string attribute", content);
+					TRACE_OBJECT( "fromString", "string attribute", content);
 					rt.addAttribute( nodename, DataTree( QVariant( content)));
 				}
 				else if (*is == '{')
@@ -263,7 +264,7 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 					QString::const_iterator start = is;
 					skipBrk( is, es);
 					if (is != es) is++;
-					TRACE_PARSE_OBJECT( "brk attribute", QString( start, is-start));
+					TRACE_OBJECT( "fromString", "brk attribute", QString( start, is-start));
 					rt.addAttribute( nodename, DataTree( QVariant( QString( start, is-start))));
 				}
 				else
@@ -272,53 +273,59 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 					skipNonSpaces( is, es);
 					if (is == start)
 					{
-						TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+						TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
 						return DataTree( Invalid);
 					}
-					TRACE_PARSE_OBJECT( "nonspace attribute", QString( start, is-start));
+					TRACE_OBJECT( "fromString", "nonspace attribute", QString( start, is-start));
 					rt.addAttribute( nodename, DataTree( QVariant( QString( start, is-start))));
 				}
 				if (is == es) break;
 			}
 			else
 			{
-				TRACE_PARSE_OBJECT( "node value", nodename);
+				TRACE_OBJECT( "fromString", "node value", nodename);
 				rt.setNodeValue( QVariant( nodename));
 			}
 		}
 		else if (*is == '\'' || *is == '\"')
 		{
-			TRACE_PARSE_STATE( "open string");
+			TRACE_STATE( "fromString", "open string");
 			QString nodevalue = parseString( is, es);
 			rt.setNodeValue( QVariant( nodevalue));
 		}
 		else if (*is == '{')
 		{
-			TRACE_PARSE_STATE( "open value bracket");
+			TRACE_STATE( "fromString", "open value bracket");
 			QString::const_iterator start = ++is;
 			skipBrk( is, es);
 			QString nodevalue;
 			nodevalue.push_back( '{');
 			nodevalue.append( QString( start, is-start).trimmed());
 			nodevalue.push_back( '}');
+			TRACE_OBJECT( "fromString", "curly bracket value", nodevalue);
 			rt.setNodeValue( nodevalue);
-			if (is != es) ++is;
+			if (is != es)
+			{
+				++is;
+			}
 		}
 		skipSpaces( is, es);
 		if (is != es)
 		{
 			if (*is == ';')
 			{
-				TRACE_PARSE_STATE( "node delimiter (semicolon)");
+				TRACE_STATE( "fromString", "node delimiter (semicolon)");
 				++is;
 			}
 			else
 			{
-				TRACE_PARSE_ERROR( "invalid tree", (int)__LINE__)
+				TRACE_ITEM( "fromString", "delimiter char", *is)
+				TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
 				return DataTree( Invalid);
 			}
 		}
 	}
+	TRACE_STATE( "fromString", "return")
 	return rt;
 }
 
@@ -327,68 +334,94 @@ DataTree DataTree::fromString( const QString& str)
 	return fromString( str.begin(), str.end());
 }
 
-void DataTree::mapDataValueToString( const QVariant& val, QString& str)
+bool DataTree::mapDataValueToString( const QVariant& val, QString& str)
 {
+	TRACE_ITEM( "toString", "value variant", val)
 	QString valstr = val.toString();
 	QString::const_iterator vi = valstr.begin(), ve = valstr.end();
-	skipSpaces( vi, ve);
-	if (vi == ve)
+	int brkcnt=0;
+	for (; vi != ve; ++vi)
 	{
+		if (*vi == '}') --brkcnt;
+		if (*vi == '{') ++brkcnt;
+	}
+	if (brkcnt != 0) return false;
+
+	vi = valstr.begin(), ve = valstr.end();
+	skipNonSpaces( vi, ve);
+
+	bool hasSQuotes = (valstr.indexOf('\'') >= 0);
+	bool hasDQuotes = (valstr.indexOf('\"') >= 0);
+
+	if (vi == ve && !hasSQuotes && !hasDQuotes)
+	{
+		TRACE_OBJECT( "toString", "value without spaces", valstr)
 		str.append( valstr);
 	}
-	if (valstr.indexOf('\"') < 0)
+	else if (!hasDQuotes)
 	{
+		TRACE_OBJECT( "toString", "value without double quotes", valstr)
 		str.push_back( '\"');
 		str.append( valstr);
 		str.push_back( '\"');
 	}
-	else if (valstr.indexOf('\'') < 0)
+	else if (!hasSQuotes)
 	{
+		TRACE_OBJECT( "toString", "value without single quotes", valstr)
 		str.push_back( '\'');
 		str.append( valstr);
 		str.push_back( '\'');
 	}
 	else
 	{
+		TRACE_OBJECT( "toString", "value in curly brackets", valstr)
 		str.push_back( '{');
 		str.append( valstr);
 		str.push_back( '}');
 	}
+	return true;
 }
 
-void DataTree::mapDataTreeToString( const DataTree& dt, QString& str)
+bool DataTree::mapDataTreeToString( const DataTree& dt, QString& str)
 {
 	if (dt.m_value.isValid())
 	{
-		mapDataValueToString( dt.m_value, str);
+		TRACE_STATE( "toString", "map node value")
+		return mapDataValueToString( dt.m_value, str);
 	}
-	else
+	QList<DataTree::Node>::const_iterator ni = dt.m_nodear.begin(), ne = dt.m_nodear.end();
+	for (; ni != ne; ++ni)
 	{
-		QList<DataTree::Node>::const_iterator ni = dt.m_nodear.begin(), ne = dt.m_nodear.end();
-		for (; ni != ne; ++ni)
+		if (ni != dt.m_nodear.begin())
 		{
-			str.append( ni->name);
-			if (ni - dt.m_nodear.begin() < dt.m_nofattributes)
-			{
-				str.append( " = ");
-				QString valstr;
-				mapDataTreeToString( *ni->value, valstr);
-				mapDataValueToString( valstr, valstr);
-			}
-			else
-			{
-				str.append( " { ");
-				mapDataTreeToString( *ni->value, str);
-				str.append( " } ");
-			}
+			str.append( "; ");
+		}
+		TRACE_OBJECT( "toString", "node name", ni->name)
+		str.append( ni->name);
+		if (ni - dt.m_nodear.begin() < dt.m_nofattributes)
+		{
+			TRACE_STATE( "toString", "attribute")
+			str.append( " = ");
+			if (!mapDataTreeToString( *ni->value, str)) return false;
+		}
+		else
+		{
+			TRACE_STATE( "toString", "content")
+			str.append( " { ");
+			if (!mapDataTreeToString( *ni->value, str)) return false;
+			str.append( " }");
 		}
 	}
+	return true;
 }
 
 QString DataTree::toString() const
 {
 	QString rt;
-	mapDataTreeToString( *this, rt);
+	if (!mapDataTreeToString( *this, rt))
+	{
+		qCritical() << "Failed to map tree to string (tree data may contain non escapable characters)";
+	}
 	return rt;
 }
 

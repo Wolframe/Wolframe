@@ -67,8 +67,8 @@ public:
 private:
 	void setNodeValue( const QVariant& nodevalue);
 	static QString parseString( QString::const_iterator& itr, const QString::const_iterator& end);
-	static void mapDataTreeToString( const DataTree& dt, QString& str);
-	static void mapDataValueToString( const QVariant& val, QString& str);
+	static bool mapDataTreeToString( const DataTree& dt, QString& str);
+	static bool mapDataValueToString( const QVariant& val, QString& str);
 	static ElementType parseNodeHeader( QString& nodename, QString::const_iterator& itr, const QString::const_iterator& end);
 
 private:

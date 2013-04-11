@@ -1,29 +1,69 @@
 #include "DataTree.hpp"
-#include <iostream>
+#include <QDebug>
 
-static const char* testDataTree[] =
+struct Test
 {
-	"xyz =1",
-	"aa= 1.0",
-	"doc { a = b }",
-	0
+	const char* input;
+	const char* output;
+};
+
+static const Test testDataTree[] =
+{
+	{"xyz =1", "xyz = 1"},
+	{"aa= 1.0", "aa = 1.0"},
+	{"doc { a = b }","doc { a = b }"},
+	{"doc { bli = 1.0; bla='723974' }","doc { bli = 1.0; bla = 723974 }"},
+	{"doc { substruct{ bla='72 3974'} }","doc { substruct { bla = \"72 3974\" } }"},
+	{"doc { bli = 1.0; substruct{ bla='72 3974'} }","doc { bli = 1.0; substruct { bla = \"72 3974\" } }"},
+	{"doc { bli = 1.0; substruct{ bla='\"72 3974\"'}; oth { x {{abc}} }}","doc { bli = 1.0; substruct { bla = '\"72 3974\"' }; oth { x { {abc} } } }"},
+	{0,0}
 };
 
 int main( int, const char**)
 {
 	int ii=0;
-	for (; testDataTree[ii]; ++ii)
+	int successCnt = 0;
+	int failedCnt = 0;
+	for (; testDataTree[ii].input; ++ii)
 	{
-		DataTree dt = DataTree::fromString( QString( testDataTree[ii]));
+		DataTree dt = DataTree::fromString( QString( testDataTree[ii].input));
 		if (dt.isValid())
 		{
-			std::cerr << "test " << ii << " returned valid structure" << std::endl;
+			QString output = dt.toString();
+			QString expected = QString( testDataTree[ii].output);
+			if (output != expected)
+			{
+				qCritical() << "test " << ii << " failed (output does not match):";
+				qDebug() << "output:" << output;
+				qDebug() << "expected:" << expected;
+				++failedCnt;
+			}
+			else
+			{
+				dt = DataTree::fromString( QString( testDataTree[ii].output));
+				output = dt.toString();
+				if (output != expected)
+				{
+					qCritical() << "test " << ii << " failed (non idempotent):";
+					qDebug() << "output:" << output;
+					qDebug() << "expected:" << expected;
+					++failedCnt;
+				}
+				else
+				{
+					++successCnt;
+				}
+			}
 		}
 		else
 		{
-			std::cerr << "test " << ii << " failed (returned invalid structure)" << std::endl;
+			qCritical() << "test " << ii << " failed (returned invalid structure)";
+			++failedCnt;
 		}
 	}
-	return 0;
+	qDebug() << "number of tests executed:" << ii;
+	qDebug() << "number of tests succeded:" << successCnt;
+	qDebug() << "number of tests failed:" << failedCnt;
+	return failedCnt==0?0:1;
 }
 
