@@ -33,6 +33,7 @@
 #include "WidgetRequest.hpp"
 #include "WidgetVisitor.hpp"
 #include "DebugTerminal.hpp"
+#include "DataSerializeItem.hpp"
 #include <QXmlStreamWriter>
 #include <QVariant>
 #undef WOLFRAME_LOWLEVEL_DEBUG
@@ -98,7 +99,7 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	}
 	QByteArray rt;
 	QXmlStreamWriter xml( &rt);
-	QList<WidgetVisitor::Element> elements;
+	QList<DataSerializeItem> elements;
 	if (hasSelectedDataElements)
 	{
 		elements = visitor.elements( selectedDataElements);
@@ -126,24 +127,24 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	}
 
 	xml.writeStartElement( rootElement);
-	QList<WidgetVisitor::Element>::const_iterator ie = elements.begin(), ee = elements.end();
+	QList<DataSerializeItem>::const_iterator ie = elements.begin(), ee = elements.end();
 	for (; ie != ee; ++ie)
 	{
 		QVariant attribute;
 		switch (ie->type())
 		{
-			case WidgetVisitor::Element::OpenTag:
+			case DataSerializeItem::OpenTag:
 				xml.writeStartElement( ie->value().toString());
 				break;
 
-			case WidgetVisitor::Element::CloseTag:
+			case DataSerializeItem::CloseTag:
 				xml.writeEndElement();
 				break;
 
-			case WidgetVisitor::Element::Attribute:
+			case DataSerializeItem::Attribute:
 				attribute = ie->value();
 				++ie;
-				if (ie == ee || ie->type() != WidgetVisitor::Element::Value)
+				if (ie == ee || ie->type() != DataSerializeItem::Value)
 				{
 					qCritical() << "producing illegal XML";
 					goto ERROR;
@@ -151,7 +152,7 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 				xml.writeAttribute( attribute.toString(), ie->value().toString());
 				break;
 
-			case WidgetVisitor::Element::Value:
+			case DataSerializeItem::Value:
 				xml.writeCharacters( ie->value().toString());
 				break;
 		}

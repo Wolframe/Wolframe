@@ -70,4 +70,6 @@ local_install:
 local_uninstall:
 
 local_test:
+	@echo "Test DataTree Operations:"
+	@./testDataTree
 

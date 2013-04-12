@@ -57,8 +57,14 @@ public:
 	void addArrayElement( const DataTree& value_);
 	void setNode( const QString& name_, const DataTree& value_);
 	const DataTree& node( const QString& name_) const;
-	const QVariant& value() const;
-	bool isValid() const;
+
+	const QString nodename( int idx) const			{return m_nodear.at(idx).name;}
+	const QSharedPointer<DataTree>& nodevalue(int i) const	{return m_nodear.at(i).value;}
+	bool isAttributeNode( int idx) const			{return (idx >= 0 && idx < m_nofattributes);}
+	int size() const					{return m_nodear.size();}
+	const QVariant& value() const				{return m_value;}
+	ElementType elemtype() const				{return m_elemtype;}
+	bool isValid() const					{return m_elemtype != Invalid;}
 
 	static DataTree fromString( const QString::const_iterator& begin, const QString::const_iterator& end);
 	static DataTree fromString( const QString& str);

@@ -33,6 +33,7 @@
 
 #ifndef _WIDGET_VISIOR_HPP_INCLUDED
 #define _WIDGET_VISIOR_HPP_INCLUDED
+#include "DataSerializeItem.hpp"
 #include <QWidget>
 #include <QStack>
 #include <QHash>
@@ -330,46 +331,12 @@ class WidgetVisitor
 
 		QList<QWidget*> children( const QString& name=QString()) const;
 
-		///\class Element
-		///\brief Element of serialization of widget data (for constructing a server request out of the widget data)
-		class Element
-		{
-		public:
-			enum Type {OpenTag,CloseTag,Attribute,Value};
-			static const char* typeName( Type i)
-			{
-				static const char* ar[] = {"OpenTag","CloseTag","Attribute","Value"};
-				return ar[i];
-			}
-			Type type() const		{return m_type;}
-			const QVariant& value() const	{return m_value;}
-
-			Element( Type type_, const QVariant& value_)
-				:m_type(type_),m_value(value_){}
-			Element( const Element& o)
-				:m_type(o.m_type),m_value(o.m_value){}
-
-			///\brief Get the element as string for debugging output
-			QString toString() const
-			{
-				QString rt( typeName( m_type));
-				rt.append( " '");
-				rt.append( m_value.toString());
-				rt.append( "'");
-				return rt;
-			}
-		private:
-			Type m_type;
-			QVariant m_value;
-		};
-
-
 		///\brief Get a serialization of all visible widget elements in the current state
-		QList<Element> elements();
+		QList<DataSerializeItem> elements();
 
 		///\brief Get a serialization of a selecte list of widget elements in the current state
 		///\param[in] selected_dataelements data elements selected by name
-		QList<Element> elements( const QList<QString>& selected_dataelements);
+		QList<DataSerializeItem> elements( const QList<QString>& selected_dataelements);
 
 		///\brief Eval if id describes a widget id of an identifier
 		///\param[in] id identifier to check
@@ -466,7 +433,7 @@ class WidgetVisitor
 		bool enter( const QString& name, bool writemode, int level);
 
 		///\brief Internal implementation of 'elements(...)'
-		QList<Element> elements( const QList<QString>* selected_dataelements);
+		QList<DataSerializeItem> elements( const QList<QString>* selected_dataelements);
 
 		///\brief Constructor internal
 		explicit WidgetVisitor( const QStack<StateR>& stk_);

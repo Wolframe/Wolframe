@@ -1033,12 +1033,12 @@ public:
 	{}
 };
 
-QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>& selectedDataElements)
+QList<DataSerializeItem> WidgetVisitor::elements( const QList<QString>& selectedDataElements)
 {
 	return elements( &selectedDataElements);
 }
 
-QList<WidgetVisitor::Element> WidgetVisitor::elements()
+QList<DataSerializeItem> WidgetVisitor::elements()
 {
 	return elements( 0);
 }
@@ -1056,14 +1056,14 @@ static QList<QString> getSuffixDataElements( const QList<QString>& ba, const QSt
 	return rt;
 }
 
-QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* selectedDataElements)
+QList<DataSerializeItem> WidgetVisitor::elements( const QList<QString>* selectedDataElements)
 {
-	if (m_stk.isEmpty()) return QList<WidgetVisitor::Element>();
+	if (m_stk.isEmpty()) return QList<DataSerializeItem>();
 
 	QStack<WidgetVisitorStackElement> elemstk;
 	elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), selectedDataElements));
 
-	QList<WidgetVisitor::Element> rt;
+	QList<DataSerializeItem> rt;
 	while (!elemstk.isEmpty())
 	{
 		if (elemstk.top().dataelements.size() > elemstk.top().dataelementidx)
@@ -1078,8 +1078,8 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 				QVariant val = property( dataelem, elemstk.top().level);
 				if (val.isValid() && !dataelem.isEmpty() && val.type() != QVariant::List)
 				{
-					rt.push_back( Element( Element::Attribute, dataelem));
-					rt.push_back( Element( Element::Value, val));
+					rt.push_back( DataSerializeItem( DataSerializeItem::Attribute, dataelem));
+					rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
 					++elemstk.top().dataelementidx;
 					continue;
 				}
@@ -1108,7 +1108,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 						++elemstk.top().dataelementidx;
 					}
 					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected, elemstk.top().level+1));
-					rt.push_back( Element( Element::OpenTag, prefix));
+					rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, prefix));
 					continue;
 				}
 			}
@@ -1122,7 +1122,7 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 					++elemstk.top().dataelementidx;
 				}
 				elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
-				rt.push_back( Element( Element::OpenTag, dataelem));
+				rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
 				continue;
 			}
 			/* [4] Handling ordinary properties: */
@@ -1156,26 +1156,26 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 						QList<QVariant> vlist = val.toList();
 						foreach (const QVariant& velem, vlist)
 						{
-							rt.push_back( Element( Element::OpenTag, dataelem));
-							rt.push_back( Element( Element::Value, velem));
-							rt.push_back( Element( Element::CloseTag, ""));
+							rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
+							rt.push_back( DataSerializeItem( DataSerializeItem::Value, velem));
+							rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
 						}
 					}
 					else if (dataelem.isEmpty())
 					{
-						rt.push_back( Element( Element::Value, val));
+						rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
 					}
 					else
 					{
-						rt.push_back( Element( Element::OpenTag, dataelem));
-						rt.push_back( Element( Element::Value, val));
-						rt.push_back( Element( Element::CloseTag, ""));
+						rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
+						rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
+						rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
 					}
 				}
 				else
 				{
-					rt.push_back( Element( Element::Attribute, dataelem));
-					rt.push_back( Element( Element::Value, val));
+					rt.push_back( DataSerializeItem( DataSerializeItem::Attribute, dataelem));
+					rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
 				}
 			}
 			else if (elemstk.top().hasSelectedDataelements && !m_stk.top()->isRepeatingDataElement( dataelem))
@@ -1190,13 +1190,13 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QString>* sel
 			elemstk.pop_back();
 			if (!elemstk.isEmpty())
 			{
-				if (rt.back().type() == Element::OpenTag)
+				if (rt.back().type() == DataSerializeItem::OpenTag)
 				{
 					rt.pop_back();
 				}
 				else
 				{
-					rt.push_back( Element( Element::CloseTag, ""));
+					rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
 				}
 				leave( false);
 			}

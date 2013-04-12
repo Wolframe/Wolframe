@@ -97,16 +97,6 @@ const DataTree& DataTree::node( const QString& name_) const
 	return inValidNode;
 }
 
-const QVariant& DataTree::value() const
-{
-	return m_value;
-}
-
-bool DataTree::isValid() const
-{
-	return m_elemtype != Invalid;
-}
-
 QString DataTree::parseString( QString::const_iterator& itr, const QString::const_iterator& end)
 {
 	QChar eb = *itr;
@@ -244,8 +234,13 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 					++is;
 				}
 			}
-			else if (*is == '=' && elemtype == Single)
+			else if (*is == '=')
 			{
+				if (elemtype != Single)
+				{
+					TRACE_ERROR( "fromString", "invalid tree", (int)__LINE__)
+					return DataTree( Invalid);
+				}
 				TRACE_STATE( "fromString", "assignment");
 				++is; skipSpaces( is, es);
 				if (is == es)
@@ -407,6 +402,10 @@ bool DataTree::mapDataTreeToString( const DataTree& dt, QString& str)
 		else
 		{
 			TRACE_STATE( "toString", "content")
+			if (ni->value->m_elemtype == Array)
+			{
+				str.append( "[]");
+			}
 			str.append( " { ");
 			if (!mapDataTreeToString( *ni->value, str)) return false;
 			str.append( " }");
@@ -459,6 +458,5 @@ QString ActionDefinition::toString() const
 	rt.push_back( '}');
 	return rt;
 }
-
 
 

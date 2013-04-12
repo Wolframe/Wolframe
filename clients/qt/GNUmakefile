@@ -90,6 +90,8 @@ CPP_OBJS = \
 	WidgetMessageDispatcher.o \
 	$(VISITOR_OBJS) \
 	DataTree.o \
+	DataSerializeItem.o \
+	DataTreeSerialize.o \
 	FormCall.o \
 	FormWidget.o \
 	moc_FormWidget.o \
