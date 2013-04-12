@@ -239,6 +239,7 @@ local_clean:
 	@-erase $(I18NS) 2>NUL
 	@-erase qtclient.res 2>NUL
 	@-erase $(UIS) 2>NUL
+	@-erase $(VISITOR_OBJS) 2>NUL
 
 local_distclean:
 
