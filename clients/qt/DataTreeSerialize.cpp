@@ -21,7 +21,7 @@ struct StackElement
 		:tree(o.tree),arraysize(o.arraysize),arrayelemidx(o.arrayelemidx),nodeidx(o.nodeidx),arrayValueMap(o.arrayValueMap){}
 };
 
-static void mapValue( QList<DataSerializeItem> rt, WidgetVisitor& visitor, QList<StackElement>& stk, int arrayidx)
+static void mapValue( QList<DataSerializeItem>& rt, WidgetVisitor& visitor, QList<StackElement>& stk, int arrayidx)
 {
 	QString value = stk.back().tree->value().toString();
 	if (value.size() > 1)
@@ -53,9 +53,13 @@ static void mapValue( QList<DataSerializeItem> rt, WidgetVisitor& visitor, QList
 						rt.push_back( DataSerializeItem( DataSerializeItem::Value, ""));
 					}
 				}
-				else
+				else if (prop.isValid())
 				{
 					rt.push_back( DataSerializeItem( DataSerializeItem::Value, prop.toString()));
+				}
+				else
+				{
+					qCritical() << "accessing non existing property" << propkey;
 				}
 			}
 			else
@@ -66,9 +70,13 @@ static void mapValue( QList<DataSerializeItem> rt, WidgetVisitor& visitor, QList
 					qCritical() << "referencing list of element in a single element context:" << propkey;
 					rt.push_back( DataSerializeItem( DataSerializeItem::Value, ""));
 				}
-				else
+				else if (prop.isValid())
 				{
 					rt.push_back( DataSerializeItem( DataSerializeItem::Value, prop.toString()));
+				}
+				else
+				{
+					qCritical() << "accessing non existing property" << propkey;
 				}
 			}
 		}
@@ -149,6 +157,14 @@ QList<DataSerializeItem> getWidgetDataSerialization( const DataTree& datatree, Q
 				if (!stk.isEmpty()) stk.back().nodeidx++;
 			}
 			continue;
+		}
+		else if (stk.back().tree->isAttribute( ni))
+		{
+			rt.push_back( DataSerializeItem( DataSerializeItem::Attribute, stk.back().tree->nodename( ni)));
+			stk.push_back( StackElement( stk.back().tree->nodevalue(ni)));
+			mapValue( rt, visitor, stk, arrayidx);
+			stk.pop_back();
+			stk.back().nodeidx++;
 		}
 		else
 		{

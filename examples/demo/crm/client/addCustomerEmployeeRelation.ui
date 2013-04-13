@@ -98,6 +98,9 @@
       <property name="dataobject" stdset="0">
        <string>relation</string>
       </property>
+      <property name="action" stdset="0">
+       <string>InsertCustomerRelation relation {employeeid={relation.employeeid}; customerid={relation.customerid}; description{{relation.description}} }</string>
+      </property>
      </widget>
     </item>
     <item>

@@ -65,6 +65,7 @@ public:
 	const QVariant& value() const				{return m_value;}
 	ElementType elemtype() const				{return m_elemtype;}
 	bool isValid() const					{return m_elemtype != Invalid;}
+	bool isAttribute( int idx) const			{return idx<m_nofattributes;}
 
 	static DataTree fromString( const QString::const_iterator& begin, const QString::const_iterator& end);
 	static DataTree fromString( const QString& str);

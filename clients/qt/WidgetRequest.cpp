@@ -54,12 +54,26 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	QList<QString> selectedDataElements;
 	bool hasSelectedDataElements = false;
 	QList<DataSerializeItem> elements;
+	QWidget* widget = visitor.widget();
 
-	QVariant action_v = visitor.property( "action");
+	if (!widget)
+	{
+		qCritical() << "Invalid request (no widget defined)";
+		return QByteArray();
+	}
+	QVariant action_v = widget->property( "action");
 	if (action_v.isValid())
 	{
-		DataTree datatree( action_v);
-		elements = getWidgetDataSerialization( datatree, visitor.widget());
+		ActionDefinition action( action_v.toString());
+		docType = action.doctype();
+		rootElement = action.rootelement();
+		isStandalone = rootElement.isEmpty();
+		if (!action.isValid())
+		{
+			qCritical() << "Invalid request for doctype" << docType << "root" << rootElement;
+			return QByteArray();
+		}
+		elements = getWidgetDataSerialization( action.structure(), visitor.widget());
 	}
 	else
 	{

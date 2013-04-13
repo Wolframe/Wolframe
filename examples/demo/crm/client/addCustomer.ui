@@ -151,6 +151,9 @@
        <property name="dataobject" stdset="0">
         <string>addCustomer</string>
        </property>
+       <property name="action" stdset="0">
+        <string>InsertCustomer customer {name {{name}}; description {{description}}; addr_line1 {{addr_line1}}; addr_line2{{addr_line2}}; addr_postalcode{{addr_postalcode}}; addr_district{{addr_district}}; addr_country{{addr_country}} }</string>
+       </property>
       </widget>
      </item>
      <item>
