@@ -1,8 +1,6 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..\..
 
-# do this manually, nmake is broken!
-#SUBDIRS = plugins
-SUBDIRS = tests
+SUBDIRS = 
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -78,9 +76,9 @@ testDataTree.exe: testDataTree.res testDataTree.obj
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 local_clean:
-	@-erase $(OBJS)
-	@-erase $(CPP_BINS)
-	@-erase testDataTree.res
+	@-erase $(OBJS) 2>NUL
+	@-erase $(CPP_BINS) 2>NUL
+	@-erase testDataTree.res 2>NUL
 
 local_distclean:
 

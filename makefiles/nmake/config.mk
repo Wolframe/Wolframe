@@ -70,7 +70,7 @@ OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 # take the VC2008 version SDK Opensource, not the MinGW one
 ############################################################
 
-QT_DIR = C:\Qt\4.8.4
+QT_DIR = C:\Qt\4.8.1
 #QT_DIR = /home/user/qt
 #QT_DIR = D:\Qt\4.7.2
 
