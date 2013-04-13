@@ -34,6 +34,7 @@
 #include "WidgetVisitor.hpp"
 #include "DebugTerminal.hpp"
 #include "DataSerializeItem.hpp"
+#include "DataTreeSerialize.hpp"
 #include <QXmlStreamWriter>
 #include <QVariant>
 #undef WOLFRAME_LOWLEVEL_DEBUG
@@ -52,62 +53,75 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	bool isStandalone = true;
 	QList<QString> selectedDataElements;
 	bool hasSelectedDataElements = false;
-
-	QVariant dataelement_v = visitor.property( "dataelement");
-	if (dataelement_v.isValid())
-	{
-		foreach (const QString& ee, dataelement_v.toString().trimmed().split( ','))
-		{
-			QString elem = ee.trimmed();
-			if (!elem.isEmpty())
-			{
-				if (elem[0] == '_' && elem.size() == 1)
-				{
-					selectedDataElements.push_back( QString());
-				}
-				else
-				{
-					selectedDataElements.push_back( elem);
-				}
-			}
-		}
-		hasSelectedDataElements = true;
-	}
-	if ((prop = visitor.property("doctype")).isValid())
-	{
-		docType = prop.toString();
-		isStandalone = false;
-	}
-	if ((prop = visitor.property("rootelement")).isValid())
-	{
-		rootElement = prop.toString();
-		isStandalone = false;
-	}
-	if (!isStandalone && rootElement.isEmpty())
-	{
-		rootElement = docType;
-	}
-	if (!isStandalone && docType.isEmpty())
-	{
-		docType = rootElement;
-	}
-	QVariant dataobjectname = visitor.property( "dataobject");
-	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toString(), false))
-	{
-		qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
-		return QByteArray();
-	}
-	QByteArray rt;
-	QXmlStreamWriter xml( &rt);
 	QList<DataSerializeItem> elements;
-	if (hasSelectedDataElements)
+
+	QVariant action_v = visitor.property( "action");
+	if (action_v.isValid())
 	{
-		elements = visitor.elements( selectedDataElements);
+		DataTree datatree( action_v);
+		elements = getWidgetDataSerialization( datatree, visitor.widget());
 	}
 	else
 	{
-		elements = visitor.elements();
+		QVariant dataelement_v = visitor.property( "dataelement");
+		if (dataelement_v.isValid())
+		{
+			foreach (const QString& ee, dataelement_v.toString().trimmed().split( ','))
+			{
+				QString elem = ee.trimmed();
+				if (!elem.isEmpty())
+				{
+					if (elem[0] == '_' && elem.size() == 1)
+					{
+						selectedDataElements.push_back( QString());
+					}
+					else
+					{
+						selectedDataElements.push_back( elem);
+					}
+				}
+			}
+			hasSelectedDataElements = true;
+		}
+		if ((prop = visitor.property("doctype")).isValid())
+		{
+			docType = prop.toString();
+			isStandalone = false;
+		}
+		if ((prop = visitor.property("rootelement")).isValid())
+		{
+			rootElement = prop.toString();
+			isStandalone = false;
+		}
+		if (!isStandalone && rootElement.isEmpty())
+		{
+			rootElement = docType;
+		}
+		if (!isStandalone && docType.isEmpty())
+		{
+			docType = rootElement;
+		}
+		QVariant dataobjectname = visitor.property( "dataobject");
+		if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toString(), false))
+		{
+			qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
+			return QByteArray();
+		}
+		if (hasSelectedDataElements)
+		{
+			elements = visitor.elements( selectedDataElements);
+		}
+		else
+		{
+			elements = visitor.elements();
+		}
+		if (dataobjectname.isValid())
+		{
+			visitor.leave( false);
+		}
 	}
+	QByteArray rt;
+	QXmlStreamWriter xml( &rt);
 	if (debugmode)
 	{
 		xml.setAutoFormatting( true);
@@ -147,7 +161,7 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 				if (ie == ee || ie->type() != DataSerializeItem::Value)
 				{
 					qCritical() << "producing illegal XML";
-					goto ERROR;
+					return QByteArray();
 				}
 				xml.writeAttribute( attribute.toString(), ie->value().toString());
 				break;
@@ -157,21 +171,9 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 				break;
 		}
 	}
-
 	xml.writeEndElement();
 	xml.writeEndDocument();
-
-	if (dataobjectname.isValid())
-	{
-		visitor.leave( false);
-	}
 	return rt;
-ERROR:
-	if (dataobjectname.isValid())
-	{
-		visitor.leave( false);
-	}
-	return QByteArray();
 }
 
 bool isActionRequest( const QString& tag)

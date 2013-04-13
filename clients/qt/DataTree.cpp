@@ -126,27 +126,27 @@ static void skipBrk( QString::const_iterator& itr, const QString::const_iterator
 	}
 }
 
-void DataTree::setNodeValue( const QVariant& nodevalue)
+void DataTree::setNodeValue( const QVariant& value_)
 {
 	if (m_value.isValid())
 	{
 		if (m_value.type() == QVariant::List)
 		{
 			QList<QVariant> lst = m_value.toList();
-			lst.push_back( nodevalue);
+			lst.push_back( value_);
 			m_value = QVariant( lst);
 		}
 		else
 		{
 			QList<QVariant> lst;
 			lst.push_back( m_value);
-			lst.push_back( nodevalue);
+			lst.push_back( value_);
 			m_value = QVariant( lst);
 		}
 	}
 	else
 	{
-		m_value = QVariant( nodevalue);
+		m_value = QVariant( value_);
 	}
 }
 

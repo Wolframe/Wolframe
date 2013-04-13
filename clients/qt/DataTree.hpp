@@ -107,6 +107,7 @@ public:
 	const QString& doctype() const		{return m_doctype;}
 	const QString& rootelement() const	{return m_rootelement;}
 	const DataTree& structure() const	{return m_structure;}
+	bool isValid() const			{return m_structure.isValid();}
 
 private:
 	QString m_doctype;
