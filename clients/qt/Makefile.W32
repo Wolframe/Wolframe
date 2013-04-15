@@ -61,6 +61,7 @@ MOC_FLAGS = \
 
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.obj \
+	visitors\WidgetVisitor_QLabel.obj \
 	visitors\WidgetVisitor_QComboBox.obj \
 	visitors\WidgetVisitor_QCheckBox.obj \
 	visitors\WidgetVisitor_QRadioButton.obj \

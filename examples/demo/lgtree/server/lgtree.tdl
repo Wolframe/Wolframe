@@ -1,0 +1,56 @@
+--
+-- InsertLanguage
+--
+TRANSACTION InsertLanguage -- (parentid, name, status, description)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT rgt FROM Language WHERE ID = $(parentid);
+	DO NONEMPTY UNIQUE SELECT $1,ID FROM Status WHERE name = $(status);
+	DO UPDATE Language SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE Language SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO Language (parentid, name, status, description, lft, rgt) VALUES ($(parentid), $(name), $2, $(description), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT id from Language WHERE lft = $1;
+END
+
+--
+-- DeleteLanguage
+--
+TRANSACTION DeleteLanguage -- (id)
+BEGIN
+	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Language WHERE id = $(id);
+	DO DELETE FROM Language WHERE lft >= $1 AND lft <= $2;
+	DO UPDATE Language SET lft = lft-$3 WHERE lft>$2;
+	DO UPDATE Language SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- GetLanguage
+--
+TRANSACTION GetLanguage
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT Language.id,Language.parentid,Language.name,Status.name AS status,Language.description
+		FROM Language,Status
+		WHERE Language.id = $(id) AND Language.status = Status.id;
+END
+
+--
+-- GetLanguageTreeNode
+--
+TRANSACTION GetLanguageTreeNode
+BEGIN
+	INTO language DO SELECT P1.id,P1.parentid,P1.name,Status.name AS status,P1.description
+		FROM Language AS P1, Language AS P2, Status
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.id = $(id) AND Status.id = P1.status
+		ORDER BY P1.id;
+END
+
+--
+-- GetLanguageTree
+--
+TRANSACTION GetLanguageTree
+BEGIN
+	INTO language DO SELECT Language.id,Language.parentid,Language.name,Status.name AS status,Language.description
+		FROM Language, Status
+		WHERE Status.id = Language.status
+		ORDER BY Language.id;
+END
+

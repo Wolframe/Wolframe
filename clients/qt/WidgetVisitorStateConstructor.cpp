@@ -1,4 +1,5 @@
 #include "WidgetVisitorStateConstructor.hpp"
+#include "visitors/WidgetVisitor_QLabel.hpp"
 #include "visitors/WidgetVisitor_QComboBox.hpp"
 #include "visitors/WidgetVisitor_QCheckBox.hpp"
 #include "visitors/WidgetVisitor_QGroupBox.hpp"
@@ -37,6 +38,7 @@ struct WidgetVisitorTypeMap :QHash<QString,StateConstructor>
 	WidgetVisitorTypeMap()
 	{
 		ADD_WidgetVisitorType( QComboBox)
+		ADD_WidgetVisitorType( QLabel)
 		ADD_WidgetVisitorType( QCheckBox)
 		ADD_WidgetVisitorType( QGroupBox)
 		ADD_WidgetVisitorType( QButtonGroup)

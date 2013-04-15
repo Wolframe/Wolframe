@@ -60,6 +60,7 @@ static void mapValue( QList<DataSerializeItem>& rt, WidgetVisitor& visitor, QLis
 				else
 				{
 					qCritical() << "accessing non existing property" << propkey;
+					rt.push_back( DataSerializeItem( DataSerializeItem::Value, QString()));
 				}
 			}
 			else
@@ -77,6 +78,7 @@ static void mapValue( QList<DataSerializeItem>& rt, WidgetVisitor& visitor, QLis
 				else
 				{
 					qCritical() << "accessing non existing property" << propkey;
+					rt.push_back( DataSerializeItem( DataSerializeItem::Value, QString()));
 				}
 			}
 		}

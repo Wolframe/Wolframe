@@ -47,8 +47,9 @@ static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* wid
 {
 	if (!widget->isEnabled()) return false;
 	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant property = widget->property( "doctype");
-	return (property.isValid());
+	QVariant doctype_property = widget->property( "doctype");
+	QVariant action_property = widget->property( "action");
+	return (doctype_property.isValid() || action_property.isValid());
 }
 
 QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
@@ -57,7 +58,7 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
 		WidgetVisitor visitor( widget);
-		rt.push_back( Request( visitor.widgetid(), getWigdetRequest( visitor, debugmode)));
+		rt.push_back( Request( visitor.widgetid(), getWidgetRequest( visitor, debugmode)));
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -67,7 +68,7 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
 {
-	return Request( m_visitor.widgetid(), getWigdetRequest( m_visitor, debugmode));
+	return Request( m_visitor.widgetid(), getWidgetRequest( m_visitor, debugmode));
 }
 
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)

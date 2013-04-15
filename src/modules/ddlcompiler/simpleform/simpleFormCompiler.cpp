@@ -341,6 +341,9 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 			{
 				IndirectionConstructorR ind;
 				StructType val;
+				val.optional(true);
+				val.mandatory(false);
+
 				if (fa.isAttribute())
 				{
 					throw std::runtime_error( "Syntax error: Form declared as attribute");

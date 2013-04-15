@@ -65,11 +65,23 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 			button->toggle();
 			button->click();
 		}
-		else if (visitor.property( "doctype").isValid())
+		else if (receiver->property( "doctype").isValid())
 		{
 			WidgetMessageDispatcher dp( visitor);
 			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
-			m_dataLoader->datarequest( domload.tag, domload.content);
+			if (!domload.content.isEmpty())
+			{
+				m_dataLoader->datarequest( domload.tag, domload.content);
+			}
+		}
+		else if (receiver->property( "action").isValid())
+		{
+			WidgetMessageDispatcher dp( visitor);
+			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
+			if (!domload.content.isEmpty())
+			{
+				m_dataLoader->datarequest( domload.tag, domload.content);
+			}
 		}
 	}
 }

@@ -152,6 +152,7 @@ public:
 		try
 		{
 			checkValidXML( data, datasize);
+			std::cerr << "ok request" << std::endl;
 		}
 		catch (const std::runtime_error& e)
 		{

@@ -262,7 +262,14 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	if (!execch)
 	{
 		std::ostringstream msg;
-		msg << "no command handler for '" << m_command << "'";
+		if (m_command.empty())
+		{
+			msg << "ERR got no document type and no command defined (empty request ?)";
+		}
+		else
+		{
+			msg << "no command handler for '" << m_command << "'";
+		}
 		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 		if (m_commandtag.empty())
 		{

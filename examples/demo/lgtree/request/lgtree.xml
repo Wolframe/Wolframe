@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE languages SYSTEM 'InsertLanguageTree'>
+<languages>
+	<language name="celtic" status="living">
+		<language name="gaulisch" status="dead"/>
+		<language name="goidelic" status="dead">
+			<language name="old irish" status="dead"/>
+			<language name="middle irish" status="dead"/>
+			<language name="manx" status="dead"/>
+			<language name="irish" status="living"/>
+			<language name="scotts gaelic" status="living"/>
+		</language>
+		<language name="brythonic" status="dead">
+			<language name="comish" status="dead"/>
+			<language name="welsh" status="living"/>
+			<language name="breton" status="living"/>
+		</language>
+	</language>
+	<language name="germanic" status="living">
+		<language name="west germanic" status="living">
+			<language name="anglo-frisian" status="living">
+				<language name="old english" status="dead">
+					<language name="middle english" status="dead">
+						<language name="english" status="living"/>
+					</language>
+				</language>
+				<language name="old frisian" status="dead">
+					<language name="frisian" status="living"/>
+				</language>
+			</language>
+			<language name="german" status="living">
+				<language name="low german" status="living">
+					<language name="old saxon" status="dead">
+						<language name="plattdeutsch" status="dead"/>
+					</language>
+					<language name="old low franconian" status="dead">
+						<language name="dutch" status="living"/>
+						<language name="flemish" status="living"/>
+						<language name="afrikaans" status="living"/>
+						<language name="south african dutch" status="dead"/>
+					</language>
+				</language>
+				<language name="high german" status="living">
+					<language name="alemannic" status="living"/>
+					<language name="alsatian" status="living"/>
+					<language name="bavarian" status="living"/>
+					<language name="franconian" status="living"/>
+					<language name="german" status="living"/>
+					<language name="pensilvania german" status="living"/>
+					<language name="swiss" status="living"/>
+					<language name="yiddish" status="living"/>
+				</language>
+			</language>
+		</language>
+		<language name="east germanic" status="living"/>
+		<language name="north germanic" status="living">
+			<language name="old west norse" status="living">
+				<language name="islandic" status="living"/>
+				<language name="faroese" status="living"/>
+			</language>
+			<language name="old east norse" status="living">
+				<language name="norwegian" status="living"/>
+				<language name="danish" status="living"/>
+				<language name="swedish" status="living"/>
+			</language>
+		</language>
+	</language>
+	<language name="italic" status="living">
+		<language name="oscan" status="dead"/>
+		<language name="umbrian" status="dead"/>
+		<language name="old latin" status="living">
+			<language name="catalan" status="living"/>
+			<language name="french" status="living"/>
+			<language name="galician" status="living"/>
+			<language name="portuguese" status="living"/>
+			<language name="italian" status="living"/>
+			<language name="provencal" status="living"/>
+			<language name="romansch" status="living"/>
+			<language name="romanian" status="living"/>
+			<language name="spanish" status="living"/>
+		</language>
+	</language>
+	<language name="slavonic" status="living">
+		<language name="west slavic" status="living">
+			<language name="chech" status="living"/>
+			<language name="polish" status="living"/>
+			<language name="slovak" status="living"/>
+			<language name="sorbian" status="living"/>
+		</language>
+		<language name="east slavic" status="living">
+			<language name="belarussian" status="living"/>
+			<language name="russian" status="living"/>
+			<language name="ukrainian" status="living"/>
+		</language>
+		<language name="south slavic" status="living">
+			<language name="bosnian" status="living"/>
+			<language name="bulgarian" status="living"/>
+			<language name="macedonian" status="living"/>
+			<language name="serbo-croatian" status="living"/>
+			<language name="slovene" status="living"/>
+		</language>
+	</language>
+	<language name="albanian" status="living"/>
+	<language name="armenian" status="living"/>
+	<language name="hellenic" status="living">
+		<language name="greek" status="living"/>
+	</language>
+	<language name="baltic" status="living">
+		<language name="lettish" status="living"/>
+		<language name="latvian" status="living"/>
+		<language name="lithuanian" status="living"/>
+	</language>
+	<language name="hittie" status="dead">
+	</language>
+	<language name="indo iranian" status="living">
+		<language name="iranian" status="living">
+			<language name="avestan" status="dead">
+				<language name="pashto" status="living"/>
+			</language>
+			<language name="old persian" status="dead">
+				<language name="balushti" status="living"/>
+				<language name="kurdish" status="living"/>
+				<language name="ossetic" status="living"/>
+				<language name="pashto" status="living"/>
+				<language name="persian" status="living"/>
+			</language>
+			<language name="scythian" status="dead"/>
+		</language>
+		<language name="indic" status="living">
+			<language name="sanskrit" status="dead"/>
+			<language name="prakrit" status="dead"/>
+			<language name="pali" status="dead"/>
+			<language name="bengali" status="living"/>
+			<language name="bihari" status="living"/>
+			<language name="bhili" status="living"/>
+			<language name="gujarati" status="living"/>
+			<language name="hindi" status="living"/>
+			<language name="hindustani" status="living"/>
+			<language name="marati" status="living"/>
+			<language name="nepali" status="living"/>
+			<language name="bahari" status="living"/>
+			<language name="punjabi" status="living"/>
+			<language name="rajasthani" status="living"/>
+			<language name="sindhi" status="living"/>
+			<language name="singhalese" status="living"/>
+			<language name="urdu" status="living"/>
+		</language>
+	</language>
+	<language name="tocharian" status="dead">
+	</language>
+</languages>

@@ -52,7 +52,7 @@
 #include <QLayout>
 #include <cstring>
 
-#undef WOLFRAME_LOWLEVEL_DEBUG
+#define WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
 #define TRACE_STATUS( TITLE, CLASS, OBJ, NAME)		qDebug() << "widget visit state" << (TITLE) << (CLASS) << (OBJ) << (NAME);
 #define TRACE_FETCH( TITLE, OBJ, NAME, VALUE)		qDebug() << "widget visit get" << (TITLE) << (OBJ) << (NAME) << "=" << (VALUE);
@@ -281,12 +281,14 @@ bool WidgetVisitor::State::setDynamicProperty( const QString& name, const QVaria
 	return true;
 }
 
-const QString& WidgetVisitor::State::getSynonym( const QString& name) const
+QVariant WidgetVisitor::State::getSynonym( const QString& name) const
 {
 	static const QString empty;
+	/*[-]*/qDebug() << "Try to find synonym" << name;
 	QHash<QString,QString>::const_iterator syi = m_synonyms.find( name);
-	if (syi == m_synonyms.end()) return empty;
-	return syi.value();
+	if (syi == m_synonyms.end()) return QVariant();
+	/*[-]*/qDebug() << "Found synonym value" << syi.value();
+	return QVariant( syi.value());
 }
 
 QString WidgetVisitor::State::getLink( const QString& name) const
@@ -371,11 +373,11 @@ bool WidgetVisitor::enter( const QString& name, bool writemode, int level)
 	if (m_stk.empty()) return false;
 
 	// [A] check if name is a synonym and follow it if yes:
-	QString synonym = m_stk.top()->getSynonym( name);
-	if (!synonym.isEmpty())
+	QVariant synonym = m_stk.top()->getSynonym( name);
+	if (synonym.isValid())
 	{
 		TRACE_ASSIGNMENT( "found synonym", objectName(), name, synonym);
-		return enter( synonym, writemode, level);
+		return enter( synonym.toString(), writemode, level);
 	}
 	// [A.1] check if name is a multipart reference and follow it if yes:
 	int followidx = name.indexOf( '.');
@@ -715,11 +717,11 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 	// [A] check if a synonym is referenced and redirect to evaluate synonym value instead if yes
-	QString synonym = m_stk.top()->getSynonym( name);
-	if (!synonym.isEmpty())
+	QVariant synonym = m_stk.top()->getSynonym( name);
+	if (synonym.isValid())
 	{
 		TRACE_ASSIGNMENT( "found synonym", objectName(), name, synonym);
-		return property( synonym, level);
+		return property( synonym.toString(), level);
 	}
 
 	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
@@ -832,11 +834,11 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 	if (m_stk.empty()) return false;
 
 	// [A] check if a synonym is referenced and redirect set the synonym value instead if yes
-	QString synonym = m_stk.top()->getSynonym( name);
-	if (!synonym.isEmpty())
+	QVariant synonym = m_stk.top()->getSynonym( name);
+	if (synonym.isValid())
 	{
 		TRACE_STATUS( "found synonym", synonym, name, value)
-		return setProperty( synonym, value, level);
+		return setProperty( synonym.toString(), value, level);
 	}
 
 	// [C] check if an multipart property is referenced and try to step into the substructures to set the property (must a single value and must not have any repeating elements) if yes

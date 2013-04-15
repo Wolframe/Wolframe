@@ -93,12 +93,15 @@ void FormWidget::executeAction( QWidget *actionwidget )
 	WidgetVisitor visitor( actionwidget);
 
 	QVariant doctype = visitor.property( "doctype");
-	if (doctype.isValid())
+	QVariant action = visitor.property( "action");
+	if (doctype.isValid() || action.isValid())
 	{
 		WidgetMessageDispatcher dispatcher( visitor);
 		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
-		m_dataLoader->datarequest( request.tag, request.content);
-
+		if (!request.content.isEmpty())
+		{
+			m_dataLoader->datarequest( request.tag, request.content);
+		}
 		if (actionwidget->property( "datasignal:clicked").isValid())
 		{
 			WidgetListenerR listener( visitor.createListener( m_dataLoader));
@@ -363,7 +366,10 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
 	{
-		m_dataLoader->datarequest( request.tag, request.content);
+		if (!request.content.isEmpty())
+		{
+			m_dataLoader->datarequest( request.tag, request.content);
+		}
 	}
 
 // load localication of the form now

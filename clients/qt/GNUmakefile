@@ -48,6 +48,7 @@ endif
 
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.o \
+	visitors/WidgetVisitor_QLabel.o \
 	visitors/WidgetVisitor_QComboBox.o \
 	visitors/WidgetVisitor_QCheckBox.o \
 	visitors/WidgetVisitor_QGroupBox.o \
