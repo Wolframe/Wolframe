@@ -37,12 +37,12 @@
 #include <QString>
 
 enum LoadMode {
-	Unknown,
-	Network,
-	LocalFile
+	UNDEFINED,
+	NETWORK,
+	FILE
 };
 
-QString LoadModeToStr( LoadMode m );
+QString& LoadModeToStr( LoadMode mode );
 
 LoadMode LoadModeFromStr( const QString s );
 
