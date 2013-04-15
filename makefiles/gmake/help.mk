@@ -2,8 +2,7 @@
 Available targets:
 
 make [all]              create all artifacts
-make test               create test binaries and execute tests and execute
-                        fast tests
+make test               create test binaries and execute fast tests
 make longtest           execute all tests, including long lasting ones
 make clean              clean up build artifacts
 make distclean          clean up all generated artifacts
