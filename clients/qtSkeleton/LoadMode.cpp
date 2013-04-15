@@ -33,19 +33,25 @@
 
 #include "LoadMode.hpp"
 
-QString LoadModeToStr( LoadMode m )
+static const QString	modeNetwork  = QString( "network" );
+static const QString	modeFile  = QString( "file" );
+static const QString	modeUndefined = QString( "undefined" );
+
+QString& LoadModeToStr( LoadMode mode )
 {
-	switch( m ) {
-		case Network: return QString( "Network" );
-		case LocalFile: return QString( "LocalFile" );
-		case Unknown: return QString( );
+	switch( mode ) {
+		case NETWORK:	return modeNetwork;
+		case FILE:	return modeFile;
+		case UNDEFINED:	return modeUndefined;
 	}
-	return QString( );
+	return modeUndefined;
 }
 
-LoadMode LoadModeFromStr( const QString s )
+LoadMode LoadModeFromStr( const QString str )
 {
-	if( s == "Network" ) return Network;
-	else if( s == "LocalFile" ) return LocalFile;
-	return Unknown;
+	if ( str.compare( modeNetwork, Qt::CaseInsensitive ))
+		return NETWORK;
+	else if ( str.compare( modeFile, Qt::CaseInsensitive ))
+		return FILE;
+	return UNDEFINED;
 }

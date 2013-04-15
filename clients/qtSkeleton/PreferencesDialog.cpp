@@ -150,31 +150,31 @@ void PreferencesDialog::loadSettings( )
 	m_developer->uiFormResourcesDir->setEnabled( false );
 	m_developer->dataLoaderDir->setEnabled( false );
 	switch( m_settings.uiLoadMode ) {
-		case LocalFile:			
+		case FILE:			
 			m_developer->uiLoadModeLocalFile->setChecked( true );
 			m_developer->uiFormsDir->setEnabled( true );
 			m_developer->uiFormTranslationsDir->setEnabled( true );
 			m_developer->uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Network:
+		case NETWORK:
 			m_developer->uiLoadModeNetwork->setChecked( true );
 			break;
 		
-		case Unknown:
+		case UNDEFINED:
 			break;
 	}
 	switch( m_settings.dataLoadMode ) {
-		case LocalFile:			
+		case FILE:			
 			m_developer->dataLoadModeLocalFile->setChecked( true );
 			m_developer->dataLoaderDir->setEnabled( true );
 			break;
 
-		case Network:
+		case NETWORK:
 			m_developer->dataLoadModeNetwork->setChecked( true );
 			break;
 
-		case Unknown:
+		case UNDEFINED:
 			break;
 	}
 	
@@ -209,14 +209,14 @@ void PreferencesDialog::apply( )
 	// developer
 	
 	if( m_developer->uiLoadModeLocalFile->isChecked( ) ) {
-		m_settings.uiLoadMode = LocalFile;
+		m_settings.uiLoadMode = FILE;
 	} else if( m_developer->uiLoadModeNetwork->isChecked( ) ) {
-		m_settings.uiLoadMode = Network;
+		m_settings.uiLoadMode = NETWORK;
 	}
 	if( m_developer->dataLoadModeLocalFile->isChecked( ) ) {
-		m_settings.dataLoadMode = LocalFile;
+		m_settings.dataLoadMode = FILE;
 	} else if( m_developer->dataLoadModeNetwork->isChecked( ) ) {
-		m_settings.dataLoadMode = Network;
+		m_settings.dataLoadMode = NETWORK;
 	}
 	m_settings.debug = m_developer->debug->isChecked( );
 	m_settings.developEnabled = m_developer->developer->isChecked( );
@@ -256,31 +256,31 @@ void PreferencesDialog::restoreDefaults( )
 	m_developer->uiFormResourcesDir->setEnabled( false );
 	m_developer->dataLoaderDir->setEnabled( false );
 	switch( DEFAULT_UILOADMODE ) {
-		case LocalFile:			
+		case FILE:			
 			m_developer->uiLoadModeLocalFile->setChecked( true );
 			m_developer->uiFormsDir->setEnabled( true );
 			m_developer->uiFormTranslationsDir->setEnabled( true );
 			m_developer->uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Network:
+		case NETWORK:
 			m_developer->uiLoadModeNetwork->setChecked( true );
 			break;
 		
-		case Unknown:
+		case UNDEFINED:
 			break;
 	}
 	switch( DEFAULT_DATALOADMODE ) {
-		case LocalFile:			
+		case FILE:			
 			m_developer->dataLoadModeLocalFile->setChecked( true );
 			m_developer->dataLoaderDir->setEnabled( true );
 			break;
 
-		case Network:
+		case NETWORK:
 			m_developer->dataLoadModeNetwork->setChecked( true );
 			break;
 
-		case Unknown:
+		case UNDEFINED:
 			break;
 	}
 	m_developer->debug->setChecked( false );
