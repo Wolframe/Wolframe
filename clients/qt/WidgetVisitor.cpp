@@ -284,10 +284,8 @@ bool WidgetVisitor::State::setDynamicProperty( const QString& name, const QVaria
 QVariant WidgetVisitor::State::getSynonym( const QString& name) const
 {
 	static const QString empty;
-	/*[-]*/qDebug() << "Try to find synonym" << name;
 	QHash<QString,QString>::const_iterator syi = m_synonyms.find( name);
 	if (syi == m_synonyms.end()) return QVariant();
-	/*[-]*/qDebug() << "Found synonym value" << syi.value();
 	return QVariant( syi.value());
 }
 

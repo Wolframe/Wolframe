@@ -97,7 +97,7 @@
        <string>Cancel</string>
       </property>
       <property name="form" stdset="0">
-       <string/>
+       <string>_CLOSE_</string>
       </property>
      </widget>
     </item>
@@ -119,7 +119,7 @@
     <string>?language.selected GetLanguage language {id={language.selected}} }</string>
    </property>
    <property name="synonym:name" stdset="0">
-    <string> </string>
+    <string/>
    </property>
    <property name="synonym:description" stdset="0">
     <string>LanguageDescription</string>
