@@ -62,7 +62,7 @@ PreferencesDialog::PreferencesDialog( ApplicationSettings &_settings, QStringLis
 void PreferencesDialog::initialize( )
 {
 	setupUi( this );
-	
+
 	m_interface = new PreferencesDialogInterface( this );
 	m_developer = new PreferencesDialogDeveloper( this );
 
@@ -75,18 +75,18 @@ void PreferencesDialog::initialize( )
 	listWidget->addItem( new QListWidgetItem( QIcon( QString( ":/images/development.png") ),
 		tr( "Developer" ), listWidget ) );
 	listWidget->setCurrentRow( 0 );
-	
+
 	connect( buttonBox->button( QDialogButtonBox::Save ), SIGNAL( clicked( ) ),
 		this, SLOT( apply( ) ) );
-		
+
 	connect( buttonBox->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
-		this, SLOT( cancel( ) ) );	
+		this, SLOT( cancel( ) ) );
 
 	connect( buttonBox->button( QDialogButtonBox::RestoreDefaults ), SIGNAL( clicked( ) ),
-		this, SLOT( restoreDefaults( ) ) );	
-	
+		this, SLOT( restoreDefaults( ) ) );
+
 	// interface
-	
+
 	if( !m_languages.empty( ) ) {
 		connect( m_interface->systemLocale, SIGNAL( toggled( bool ) ),
 			this, SLOT( toggleLocale( bool ) ) );
@@ -99,24 +99,24 @@ void PreferencesDialog::initialize( )
 			m_interface->locales->addItem( printableLanguage, language );
 		}
 	}
-	
+
 	// developer
-	
+
 	connect( m_developer->uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
-		
+
 	connect( m_developer->uiLoadModeNetwork, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 
 	connect( m_developer->dataLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
-		
+
 	connect( m_developer->dataLoadModeNetwork, SIGNAL( toggled( bool ) ),
-		this, SLOT( toggleLoadMode( bool ) ) );	
+		this, SLOT( toggleLoadMode( bool ) ) );
 }
 
 void PreferencesDialog::loadSettings( )
-{	
+{
 	// interface
 
 	m_interface->mdi->setChecked( m_settings.mdi );
@@ -135,12 +135,12 @@ void PreferencesDialog::loadSettings( )
 			}
 		}
 	}
-	
+
 	m_interface->rememberLogin->setChecked( m_settings.saveUsername );
 	m_interface->saveRestoreState->setChecked( m_settings.saveRestoreState );
-	
+
 	// developer
-	
+
 	m_developer->uiLoadModeLocalFile->setChecked( false );
 	m_developer->uiLoadModeNetwork->setChecked( false );
 	m_developer->dataLoadModeLocalFile->setChecked( false );
@@ -150,38 +150,38 @@ void PreferencesDialog::loadSettings( )
 	m_developer->uiFormResourcesDir->setEnabled( false );
 	m_developer->dataLoaderDir->setEnabled( false );
 	switch( m_settings.uiLoadMode ) {
-		case LocalFile:			
+		case LoadMode::FILE:
 			m_developer->uiLoadModeLocalFile->setChecked( true );
 			m_developer->uiFormsDir->setEnabled( true );
 			m_developer->uiFormTranslationsDir->setEnabled( true );
 			m_developer->uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Network:
+		case LoadMode::NETWORK:
 			m_developer->uiLoadModeNetwork->setChecked( true );
 			break;
-		
-		case Unknown:
+
+		case LoadMode::UNDEFINED:
 			break;
 	}
 	switch( m_settings.dataLoadMode ) {
-		case LocalFile:			
+		case LoadMode::FILE:
 			m_developer->dataLoadModeLocalFile->setChecked( true );
 			m_developer->dataLoaderDir->setEnabled( true );
 			break;
 
-		case Network:
+		case LoadMode::NETWORK:
 			m_developer->dataLoadModeNetwork->setChecked( true );
 			break;
 
-		case Unknown:
+		case LoadMode::UNDEFINED:
 			break;
 	}
-	
+
 	m_developer->debug->setChecked( m_settings.debug );
 	m_developer->developer->setChecked( m_settings.developEnabled );
 	m_developer->autoLogin->setChecked( m_settings.autoLogin );
-	
+
 	m_developer->uiFormsDir->setFileName( m_settings.uiFormsDir );
 	m_developer->uiFormTranslationsDir->setFileName( m_settings.uiFormTranslationsDir );
 	m_developer->uiFormResourcesDir->setFileName( m_settings.uiFormResourcesDir );
@@ -202,21 +202,21 @@ void PreferencesDialog::apply( )
 			m_settings.locale = lang;
 		}
 	}
-	
+
 	m_settings.saveUsername = m_interface->rememberLogin->isChecked( );
 	m_settings.saveRestoreState = m_interface->saveRestoreState->isChecked( );
-	
+
 	// developer
-	
+
 	if( m_developer->uiLoadModeLocalFile->isChecked( ) ) {
-		m_settings.uiLoadMode = LocalFile;
+		m_settings.uiLoadMode = LoadMode::FILE;
 	} else if( m_developer->uiLoadModeNetwork->isChecked( ) ) {
-		m_settings.uiLoadMode = Network;
+		m_settings.uiLoadMode = LoadMode::NETWORK;
 	}
 	if( m_developer->dataLoadModeLocalFile->isChecked( ) ) {
-		m_settings.dataLoadMode = LocalFile;
+		m_settings.dataLoadMode = LoadMode::FILE;
 	} else if( m_developer->dataLoadModeNetwork->isChecked( ) ) {
-		m_settings.dataLoadMode = Network;
+		m_settings.dataLoadMode = LoadMode::NETWORK;
 	}
 	m_settings.debug = m_developer->debug->isChecked( );
 	m_settings.developEnabled = m_developer->developer->isChecked( );
@@ -225,8 +225,8 @@ void PreferencesDialog::apply( )
 	m_settings.uiFormTranslationsDir = m_developer->uiFormTranslationsDir->fileName( );
 	m_settings.uiFormResourcesDir = m_developer->uiFormResourcesDir->fileName( );
 	m_settings.dataLoaderDir = m_developer->dataLoaderDir->fileName( );
-	
-	accept( );	
+
+	accept( );
 }
 
 void PreferencesDialog::restoreDefaults( )
@@ -256,31 +256,31 @@ void PreferencesDialog::restoreDefaults( )
 	m_developer->uiFormResourcesDir->setEnabled( false );
 	m_developer->dataLoaderDir->setEnabled( false );
 	switch( DEFAULT_UILOADMODE ) {
-		case LocalFile:			
+		case LoadMode::FILE:
 			m_developer->uiLoadModeLocalFile->setChecked( true );
 			m_developer->uiFormsDir->setEnabled( true );
 			m_developer->uiFormTranslationsDir->setEnabled( true );
 			m_developer->uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Network:
+		case LoadMode::NETWORK:
 			m_developer->uiLoadModeNetwork->setChecked( true );
 			break;
-		
-		case Unknown:
+
+		case LoadMode::UNDEFINED:
 			break;
 	}
 	switch( DEFAULT_DATALOADMODE ) {
-		case LocalFile:			
+		case LoadMode::FILE:
 			m_developer->dataLoadModeLocalFile->setChecked( true );
 			m_developer->dataLoaderDir->setEnabled( true );
 			break;
 
-		case Network:
+		case LoadMode::NETWORK:
 			m_developer->dataLoadModeNetwork->setChecked( true );
 			break;
 
-		case Unknown:
+		case LoadMode::UNDEFINED:
 			break;
 	}
 	m_developer->debug->setChecked( false );

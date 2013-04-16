@@ -60,7 +60,6 @@
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
-#include "FormWidget.hpp"
 
 DataHandler::DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool _debug )
 	: m_dataLoader( _dataLoader ), m_formWidget( _formWidget ), m_debug( _debug )
@@ -301,7 +300,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 			// this is actually for all elements, get hidden properties and attach
 			// them again as XML attributes of the current element
 			QHash<QString, QString> p;
-			FormWidget::readDynamicStringProperties( &p, widget );
+//			FormWidget::readDynamicStringProperties( &p, widget );
 			foreach( QString key, p.keys( ) ) {
 				if (isReservedAttribute( key)) continue;
 				xml.writeAttribute( key, p.value( key ) );
@@ -440,7 +439,7 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 
 // get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
-	FormWidget::readDynamicStringProperties( props, widget );
+//	FormWidget::readDynamicStringProperties( props, widget );
 
 	if( clazz == "QLineEdit" ) {
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
@@ -1000,7 +999,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							// a dynamic property in the widget
 							QXmlStreamAttributes attributes = xml.attributes( );
 							foreach( QXmlStreamAttribute attr, attributes ) {
-								FormWidget::writeDynamicStringProperty( widget, attr.name( ).toString( ).toLatin1( ).data( ), attr.value( ).toString( ) );
+//								FormWidget::writeDynamicStringProperty( widget, attr.name( ).toString( ).toLatin1( ).data( ), attr.value( ).toString( ) );
 							}
 						} else if( clazz == "QListWidget" ) {
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );

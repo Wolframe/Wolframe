@@ -67,8 +67,8 @@ struct ApplicationSettings
 	bool debug;				///< debug output
 	bool autoLogin;				///< develop only: easier to write interface with autologin
 	QString locale;				///< startup locale
-	LoadMode uiLoadMode;			///< developer UI file load mode or network mode
-	LoadMode dataLoadMode;			///< data forms to network or local stubs in XML files
+	LoadMode::Mode uiLoadMode;		///< developer UI file load mode or network mode
+	LoadMode::Mode dataLoadMode;		///< data forms to network or local stubs in XML files
 	QString uiFormsDir;			///< UI forms
 	QString uiFormTranslationsDir;		///< QM files (translations)
 	QString uiFormResourcesDir;		///< resources (e.g. pictures)

@@ -15,7 +15,6 @@ QT += core gui network sql
 
 SOURCES += \
 	MainWindow.cpp \
-	FormLoader.cpp \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \
@@ -50,7 +49,7 @@ HEADERS += \
 	HistoryLineEdit.hpp
 
 RESOURCES = \
-	qtclient.qrc
+	qtSkeleton.qrc
 
 FORMS += \
 	MainWindow.ui \
