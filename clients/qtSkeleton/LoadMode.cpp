@@ -37,7 +37,7 @@ static const QString	modeNetwork  = QString( "network" );
 static const QString	modeFile  = QString( "file" );
 static const QString	modeUndefined = QString( "undefined" );
 
-QString& LoadModeToStr( LoadMode mode )
+const QString& LoadMode::LoadModeToStr( LoadMode::Mode mode )
 {
 	switch( mode ) {
 		case NETWORK:	return modeNetwork;
@@ -47,7 +47,7 @@ QString& LoadModeToStr( LoadMode mode )
 	return modeUndefined;
 }
 
-LoadMode LoadModeFromStr( const QString str )
+LoadMode::Mode LoadMode::LoadModeFromStr( const QString str )
 {
 	if ( str.compare( modeNetwork, Qt::CaseInsensitive ))
 		return NETWORK;

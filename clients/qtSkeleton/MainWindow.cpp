@@ -172,24 +172,24 @@ void MainWindow::initialize( )
 
 // ..same for the data loader
 	switch( settings.dataLoadMode ) {
-		case FILE:
-			m_dataLoader = new FileDataLoader( settings.dataLoaderDir );
+		case LoadMode::FILE:
+//			m_dataLoader = new FileDataLoader( settings.dataLoaderDir );
 			break;
 
-		case NETWORK:
+		case LoadMode::NETWORK:
 			// skip, delay, needs a working connection for this
 			break;
 
-		case UNDEFINED:
+		case LoadMode::UNDEFINED:
 			break;
 	}
 
-// link the form loader for form loader notifications needed by the main window
-// (list of forms for form menu, list of language for language picker)
-	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
-		this, SLOT( languageCodesLoaded( QStringList ) ) );
-	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
-		this, SLOT( formListLoaded( QStringList ) ) );
+//// link the form loader for form loader notifications needed by the main window
+//// (list of forms for form menu, list of language for language picker)
+//	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
+//		this, SLOT( languageCodesLoaded( QStringList ) ) );
+//	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+//		this, SLOT( formListLoaded( QStringList ) ) );
 
 // create central widget, either as MDI area or as one form widget
 	if( settings.mdi ) {
@@ -222,7 +222,7 @@ void MainWindow::initialize( )
 
 // in local file UI and data mode we can load the form right away, we don't
 // wait for the user to log in
-	if( settings.uiLoadMode == FILE && settings.dataLoadMode == FILE ) {
+	if( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) {
 		restoreStateAndPositions( );
 	}
 
@@ -240,8 +240,8 @@ void MainWindow::initialize( )
 // update menus and toolbars
 	updateMenusAndToolbars( );
 
-// now that we have a menu where we can add things, we start the form list loading
-	m_formLoader->initiateListLoad( );
+//// now that we have a menu where we can add things, we start the form list loading
+//	m_formLoader->initiateListLoad( );
 
 // load language codes for language picker
 	loadLanguages( );
@@ -254,22 +254,22 @@ void MainWindow::initialize( )
 		on_actionLogin_triggered( );
 }
 
-void MainWindow::CreateFormWidget( const QString &name )
-{
-	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
+//void MainWindow::CreateFormWidget( const QString &name )
+//{
+//	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( m_formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( m_formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
+//	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+//		this, SLOT( formLoaded( QString ) ) );
+//	connect( m_formWidget, SIGNAL( formModal( QString ) ),
+//		this, SLOT( formModal( QString ) ) );
+//	connect( m_formWidget, SIGNAL( error( QString ) ),
+//		this, SLOT( formError( QString ) ) );
 
-	setCentralWidget( m_formWidget );
-	m_formWidget->setLanguage( m_language );
+//	setCentralWidget( m_formWidget );
+//	m_formWidget->setLanguage( m_language );
 
-	loadForm( name );
-}
+//	loadForm( name );
+//}
 
 void MainWindow::activateAction( const QString name, bool enabled )
 {
@@ -320,24 +320,24 @@ QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QStrin
 	}
 }
 
-void MainWindow::updateActionShortcuts( )
-{
-	foreach( QAction *action, findChildren<QAction *>( ) ) {
-		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
-		if( !s.isEmpty( ) ) {
-			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
-			if( shortcut != QKeySequence::UnknownKey ) {
-				QKeySequence seq( shortcut );
-				if( !seq.isEmpty( ) ) {
-					action->setShortcuts( defaultKeySequenceFromString( s ) );
-					qDebug( ) << "ACTION" << action << "gets default shortcut" << s;
-				} else {
-					qDebug( ) << "ACTION" << action << "keeps shortcuts from ui resource" << action->shortcuts( );
-				}
-			}
-		}
-	}
-}
+//void MainWindow::updateActionShortcuts( )
+//{
+//	foreach( QAction *action, findChildren<QAction *>( ) ) {
+//		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
+//		if( !s.isEmpty( ) ) {
+//			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
+//			if( shortcut != QKeySequence::UnknownKey ) {
+//				QKeySequence seq( shortcut );
+//				if( !seq.isEmpty( ) ) {
+//					action->setShortcuts( defaultKeySequenceFromString( s ) );
+//					qDebug( ) << "ACTION" << action << "gets default shortcut" << s;
+//				} else {
+//					qDebug( ) << "ACTION" << action << "keeps shortcuts from ui resource" << action->shortcuts( );
+//				}
+//			}
+//		}
+//	}
+//}
 
 void MainWindow::addStatusBarIndicators( )
 {
@@ -375,15 +375,15 @@ void MainWindow::disconnected( )
 		_debugTerminal = 0;
 	}
 
-	if( settings.uiLoadMode == NETWORK ) {
-		delete m_uiLoader;
-		m_uiLoader = 0;
-	}
+//	if( settings.uiLoadMode == LoadMode::NETWORK ) {
+//		delete m_uiLoader;
+//		m_uiLoader = 0;
+//	}
 
-	if( settings.dataLoadMode == NETWORK ) {
-		delete m_dataLoader;
-		m_dataLoader = 0;
-	}
+//	if( settings.dataLoadMode == LoadMode::NETWORK ) {
+//		delete m_dataLoader;
+//		m_dataLoader = 0;
+//	}
 
 	updateMenusAndToolbars( );
 
@@ -407,10 +407,10 @@ void MainWindow::authOk( )
 
 	statusBar( )->showMessage( tr( "Ready" ) );
 
-// ...and data loaders
-	if( settings.dataLoadMode == NETWORK ) {
-		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
-	}
+//// ...and data loaders
+//	if( settings.dataLoadMode == LoadMode::NETWORK ) {
+//		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
+//	}
 
 	restoreStateAndPositions( );
 
@@ -423,11 +423,11 @@ void MainWindow::authFailed( )
 	qDebug( ) << "authentication failed";
 }
 
-void MainWindow::loadLanguages( )
-{
-// get the list of available languages in the forms
-	m_formLoader->initiateGetLanguageCodes( );
-}
+//void MainWindow::loadLanguages( )
+//{
+//// get the list of available languages in the forms
+//	m_formLoader->initiateGetLanguageCodes( );
+//}
 
 void MainWindow::languageCodesLoaded( QStringList languages )
 {
@@ -494,30 +494,30 @@ void MainWindow::switchTranslator( QTranslator &translator, const QString &filen
 	}
 }
 
-void MainWindow::loadLanguage( QString language )
-{
-	qDebug( ) << "Switching interface language to " << language;
+//void MainWindow::loadLanguage( QString language )
+//{
+//	qDebug( ) << "Switching interface language to " << language;
 
-// change language on global level
-	switchTranslator( m_translatorApp, QString( "qtclient.%1.qm" ).arg( language ), "i18n" );
-	switchTranslator( m_translatorQt, QString( "qt_%1.qm" ).arg( language ), "/usr/share/qt/translations/" );
+//// change language on global level
+//	switchTranslator( m_translatorApp, QString( "qtclient.%1.qm" ).arg( language ), "i18n" );
+//	switchTranslator( m_translatorQt, QString( "qt_%1.qm" ).arg( language ), "/usr/share/qt/translations/" );
 
-// also set language of the form widget(s)
-	if( settings.mdi ) {
-		foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
-			FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
-			f->setLanguage( language );
-			f->reload( );
-		}
-	} else {
-		if( m_formWidget ) {
-			m_formWidget->setLanguage( language );
-			m_formWidget->reload( );
-		}
-	}
+//// also set language of the form widget(s)
+//	if( settings.mdi ) {
+//		foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+//			FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
+//			f->setLanguage( language );
+//			f->reload( );
+//		}
+//	} else {
+//		if( m_formWidget ) {
+//			m_formWidget->setLanguage( language );
+//			m_formWidget->reload( );
+//		}
+//	}
 
-	m_language = language;
-}
+//	m_language = language;
+//}
 
 void MainWindow::changeEvent( QEvent* _event )
 {
@@ -539,103 +539,103 @@ void MainWindow::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void MainWindow::loadForm( QString name )
-{
-// delegate form loading to form widget
-	if( m_formWidget )
-		m_formWidget->loadForm( name );
-}
+//void MainWindow::loadForm( QString name )
+//{
+//// delegate form loading to form widget
+//	if( m_formWidget )
+//		m_formWidget->loadForm( name );
+//}
 
-void MainWindow::endModal( )
-{
-	qDebug( ) << "endModal";
+//void MainWindow::endModal( )
+//{
+//	qDebug( ) << "endModal";
 
-// restore wiring in main frame
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( m_formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( m_formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
-	connect( m_formWidget,SIGNAL( destroyed( ) ),
-		this, SLOT( updateMenusAndToolbars( ) ) );
+//// restore wiring in main frame
+//	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+//		this, SLOT( formLoaded( QString ) ) );
+//	connect( m_formWidget, SIGNAL( formModal( QString ) ),
+//		this, SLOT( formModal( QString ) ) );
+//	connect( m_formWidget, SIGNAL( error( QString ) ),
+//		this, SLOT( formError( QString ) ) );
+//	connect( m_formWidget,SIGNAL( destroyed( ) ),
+//		this, SLOT( updateMenusAndToolbars( ) ) );
 
-	m_modalDialog->close( );
-	m_modalDialog->deleteLater( );
+//	m_modalDialog->close( );
+//	m_modalDialog->deleteLater( );
 
-	// hacky: should go without, especially because we loose data already
-	// entered in the parent dialog this way..
-	m_formWidget->reload( );
-}
+//	// hacky: should go without, especially because we loose data already
+//	// entered in the parent dialog this way..
+//	m_formWidget->reload( );
+//}
 
-void MainWindow::formModal( QString name )
-{
-	m_modalDialog = new QDialog( this );
+//void MainWindow::formModal( QString name )
+//{
+//	m_modalDialog = new QDialog( this );
 
-	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, m_modalDialog, settings.debug );
+//	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, m_modalDialog, settings.debug );
 
-	connect( formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
-	connect( formWidget,SIGNAL( destroyed( ) ),
-		this, SLOT( updateMenusAndToolbars( ) ) );
-	connect( formWidget,SIGNAL( closed( ) ),
-		this, SLOT( endModal( ) ) );
+//	connect( formWidget, SIGNAL( formLoaded( QString ) ),
+//		this, SLOT( formLoaded( QString ) ) );
+//	connect( formWidget, SIGNAL( formModal( QString ) ),
+//		this, SLOT( formModal( QString ) ) );
+//	connect( formWidget, SIGNAL( error( QString ) ),
+//		this, SLOT( formError( QString ) ) );
+//	connect( formWidget,SIGNAL( destroyed( ) ),
+//		this, SLOT( updateMenusAndToolbars( ) ) );
+//	connect( formWidget,SIGNAL( closed( ) ),
+//		this, SLOT( endModal( ) ) );
 
-// we are modal, so tempoarily we have to disconnect the parent form from
-// the main window in order not to trigger funny results
-	disconnect( m_formWidget, SIGNAL( formLoaded( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( formModal( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( error( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( destroyed( ) ), 0, 0 );
+//// we are modal, so tempoarily we have to disconnect the parent form from
+//// the main window in order not to trigger funny results
+//	disconnect( m_formWidget, SIGNAL( formLoaded( QString ) ), 0, 0 );
+//	disconnect( m_formWidget, SIGNAL( formModal( QString ) ), 0, 0 );
+//	disconnect( m_formWidget, SIGNAL( error( QString ) ), 0, 0 );
+//	disconnect( m_formWidget, SIGNAL( destroyed( ) ), 0, 0 );
 
-	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
-	l->addWidget( formWidget );
+//	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
+//	l->addWidget( formWidget );
 
-	formWidget->setGlobals( m_formWidget->globals( ) );
-	formWidget->setLanguage( m_language );
-	formWidget->loadForm( name, true );
+//	formWidget->setGlobals( m_formWidget->globals( ) );
+//	formWidget->setLanguage( m_language );
+//	formWidget->loadForm( name, true );
 
-	connect( m_modalDialog, SIGNAL( rejected( ) ),
-		this, SLOT( endModal( ) ) );
+//	connect( m_modalDialog, SIGNAL( rejected( ) ),
+//		this, SLOT( endModal( ) ) );
 
-	m_modalDialog->show( );
-}
+//	m_modalDialog->show( );
+//}
 
-void MainWindow::formLoaded( QString /*name*/ )
-{
-// in MDI mode update the title of the sub window, otherwise update window title
-	if( settings.mdi ) {
-		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
-		if( mdiSubWindow ) {
-			QString title = m_formWidget->windowTitle( );
-			mdiSubWindow->setWindowTitle( title );
+//void MainWindow::formLoaded( QString /*name*/ )
+//{
+//// in MDI mode update the title of the sub window, otherwise update window title
+//	if( settings.mdi ) {
+//		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
+//		if( mdiSubWindow ) {
+//			QString title = m_formWidget->windowTitle( );
+//			mdiSubWindow->setWindowTitle( title );
 
-			QIcon icon = m_formWidget->getWindowIcon( );
-			if( !icon.isNull( ) ) {
-				qDebug( ) << "Setting window icon" << m_formWidget;
-				mdiSubWindow->setWindowIcon( icon );
-			} else {
-				qDebug( ) << "Setting application icon";
-				mdiSubWindow->setWindowIcon( windowIcon( ) );
-			}
+//			QIcon icon = m_formWidget->getWindowIcon( );
+//			if( !icon.isNull( ) ) {
+//				qDebug( ) << "Setting window icon" << m_formWidget;
+//				mdiSubWindow->setWindowIcon( icon );
+//			} else {
+//				qDebug( ) << "Setting application icon";
+//				mdiSubWindow->setWindowIcon( windowIcon( ) );
+//			}
 
-			m_mdiArea->update( );
+//			m_mdiArea->update( );
 
-			QAction *action = m_revSubWinMap.value( mdiSubWindow );
-			if( action ) {
-				int idx = action->data( ).toInt( );
-				QString text = composeWindowListTitle( idx, title );
-				action->setText( text );
-			}
-		}
-	} else {
-		setWindowTitle( tr( "Wolframe Qt Client - %1" ).arg( m_formWidget->windowTitle( ) ) );
-	}
-}
+//			QAction *action = m_revSubWinMap.value( mdiSubWindow );
+//			if( action ) {
+//				int idx = action->data( ).toInt( );
+//				QString text = composeWindowListTitle( idx, title );
+//				action->setText( text );
+//			}
+//		}
+//	} else {
+//		setWindowTitle( tr( "Wolframe Qt Client - %1" ).arg( m_formWidget->windowTitle( ) ) );
+//	}
+//}
 
 QString MainWindow::composeWindowListTitle( const int idx, const QString title )
 {
@@ -674,7 +674,7 @@ void MainWindow::on_actionExit_triggered( )
 {
 	m_terminating = true;
 
-	if( settings.uiLoadMode == NETWORK || settings.dataLoadMode == NETWORK ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK || settings.dataLoadMode == LoadMode::NETWORK ) {
 		if( m_wolframeClient ) {
 			m_wolframeClient->disconnect( );
 		} else {
@@ -685,7 +685,7 @@ void MainWindow::on_actionExit_triggered( )
 		if( m_wolframeClient )
 			disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
 
-		if( settings.uiLoadMode == FILE && settings.dataLoadMode == FILE ) {
+		if( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) {
 			storeStateAndPositions( );
 		}
 
@@ -738,21 +738,21 @@ void MainWindow::storeStateAndPositions( )
 		if( settings.mdi ) {
 			foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
 				WinState state;
-				FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
-				state.form = f->form( );
+//				FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
+//				state.form = f->form( );
 				state.position = w->pos( );
 				state.size = w->size( );
 				settings.states.append( state );
 			}
 		} else {
 			settings.states.clear( );
-			if( m_formWidget ) {
-				WinState state;
-				state.form = m_formWidget->form( );
-				state.position = m_formWidget->pos( );
-				state.size = m_formWidget->size( );
-				settings.states.append( state );
-			}
+//			if( m_formWidget ) {
+//				WinState state;
+//				state.form = m_formWidget->form( );
+//				state.position = m_formWidget->pos( );
+//				state.size = m_formWidget->size( );
+//				settings.states.append( state );
+//			}
 		}
 	}
 }
@@ -804,47 +804,47 @@ void MainWindow::on_actionAboutQt_triggered( )
 
 // -- form handling
 
-void MainWindow::on_actionOpenForm_triggered( )
-{
-	FormChooseDialog d( m_forms, this );
-	if( d.exec( ) == QDialog::Accepted ) {
-		QString form = d.form( );
-		loadForm( form );
-	}
-}
+//void MainWindow::on_actionOpenForm_triggered( )
+//{
+//	FormChooseDialog d( m_forms, this );
+//	if( d.exec( ) == QDialog::Accepted ) {
+//		QString form = d.form( );
+//		loadForm( form );
+//	}
+//}
 
-void MainWindow::on_actionReload_triggered( )
-{
-	m_formWidget->reload( );
-}
+//void MainWindow::on_actionReload_triggered( )
+//{
+//	m_formWidget->reload( );
+//}
 
 // -- MDI mode
 
-QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
-{
-	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
+//QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
+//{
+//	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
-	connect( formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
-	connect( formWidget,SIGNAL( destroyed( ) ),
-		this, SLOT( updateMenusAndToolbars( ) ) );
+//	connect( formWidget, SIGNAL( formLoaded( QString ) ),
+//		this, SLOT( formLoaded( QString ) ) );
+//	connect( formWidget, SIGNAL( formModal( QString ) ),
+//		this, SLOT( formModal( QString ) ) );
+//	connect( formWidget, SIGNAL( error( QString ) ),
+//		this, SLOT( formError( QString ) ) );
+//	connect( formWidget,SIGNAL( destroyed( ) ),
+//		this, SLOT( updateMenusAndToolbars( ) ) );
 
-	QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
-	mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+//	QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
+//	mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
 
-	m_formWidget = formWidget; // ugly dirty hack, must ammend later
-	formWidget->show( );
-	formWidget->setLanguage( m_language );
-	loadForm( form );
+//	m_formWidget = formWidget; // ugly dirty hack, must ammend later
+//	formWidget->show( );
+//	formWidget->setLanguage( m_language );
+//	loadForm( form );
 
-	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
+//	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
 
-	return mdiSubWindow;
-}
+//	return mdiSubWindow;
+//}
 
 void MainWindow::subWindowSelected( QAction *action )
 {
@@ -852,24 +852,24 @@ void MainWindow::subWindowSelected( QAction *action )
 	m_mdiArea->setActiveSubWindow( w );
 }
 
-void MainWindow::subWindowChanged( QMdiSubWindow *w )
-{
-	if( !w ) return;
+//void MainWindow::subWindowChanged( QMdiSubWindow *w )
+//{
+//	if( !w ) return;
 
-	m_formWidget = qobject_cast<FormWidget *>( w->widget( ) );
+//	m_formWidget = qobject_cast<FormWidget *>( w->widget( ) );
 
-	updateWindowMenu( );
-}
+//	updateWindowMenu( );
+//}
 
-void MainWindow::on_actionOpenFormNewWindow_triggered( )
-{
-	FormChooseDialog d( m_forms, this );
-	if( d.exec( ) == QDialog::Accepted ) {
-		(void)CreateMdiSubWindow( d.form( ) );
-	}
+//void MainWindow::on_actionOpenFormNewWindow_triggered( )
+//{
+//	FormChooseDialog d( m_forms, this );
+//	if( d.exec( ) == QDialog::Accepted ) {
+//		(void)CreateMdiSubWindow( d.form( ) );
+//	}
 
-	updateMenusAndToolbars( );
-}
+//	updateMenusAndToolbars( );
+//}
 
 void MainWindow::on_actionNextWindow_triggered( )
 {
@@ -909,7 +909,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 {
 // present new form menu entry if logged in
 	activateAction( "actionOpenFormNewWindow",
-		( settings.uiLoadMode == FILE && settings.dataLoadMode == FILE ) ||
+		( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) ||
 		m_wolframeClient );
 
 // enable/disable menu/toolbar items depending on the number of subwindows
@@ -989,14 +989,14 @@ void MainWindow::updateMenusAndToolbars( )
 
 // logged in or logged out?
 	activateAction( "actionOpenForm",
-		( ( settings.uiLoadMode == FILE && settings.dataLoadMode == FILE )
+		( ( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE )
 		|| ( m_wolframeClient && m_wolframeClient->isConnected( ) ) )
 		&& ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionReload",
-		( settings.uiLoadMode == FILE && settings.dataLoadMode == FILE ) ||
+		( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) ||
 		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
 
-	if( settings.uiLoadMode == NETWORK || settings.dataLoadMode == NETWORK ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK || settings.dataLoadMode == LoadMode::NETWORK ) {
 		activateAction( "actionLogin", !m_wolframeClient || !m_wolframeClient->isConnected( ) );
 		activateAction( "actionLogout", m_wolframeClient && m_wolframeClient->isConnected( ) );
 	}
@@ -1096,10 +1096,10 @@ void MainWindow::on_actionLogout_triggered( )
 
 	if( settings.mdi ) {
 		m_mdiArea->closeAllSubWindows( );
-	} else {
+	} /*else {
 		delete m_formWidget;
 		m_formWidget = 0;
-	}
+	}*/
 
 	m_wolframeClient->disconnect( );
 }
