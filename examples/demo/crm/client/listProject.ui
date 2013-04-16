@@ -60,6 +60,9 @@
         <property name="dataelement" stdset="0">
          <string>@id</string>
         </property>
+        <property name="action" stdset="0">
+         <string>DeleteProject project {id = {project.selected} }</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -98,6 +101,9 @@
      </property>
      <property name="dataelement" stdset="0">
       <string/>
+     </property>
+     <property name="action" stdset="0">
+      <string>ListProject project {} </string>
      </property>
      <column>
       <property name="text">

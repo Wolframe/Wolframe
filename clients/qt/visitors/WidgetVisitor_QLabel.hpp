@@ -30,17 +30,27 @@
  Project Wolframe.
 
 ************************************************************************/
-#ifndef _WIDGET_XML_HPP_INCLUDED
-#define _WIDGET_XML_HPP_INCLUDED
-#include "WidgetVisitor.hpp"
-#include <QWidget>
-#include <QByteArray>
 
-QByteArray getWidgetRequest( WidgetVisitor& visitor, bool debugmode=false);
-QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
-bool isActionRequest( const QString& tag);
-QString actionRequestRecipientId( const QString& tag);
-bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
+#ifndef _WIDGET_VISIOR_QLabel_HPP_INCLUDED
+#define _WIDGET_VISIOR_QLabel_HPP_INCLUDED
+#include "WidgetVisitor.hpp"
+#include <QLabel>
+
+class WidgetVisitorState_QLabel
+	:public WidgetVisitor::State
+{
+public:
+	WidgetVisitorState_QLabel( QWidget* widget_);
+
+	virtual void clear();
+	virtual QVariant property( const QString& name);
+	virtual bool setProperty( const QString& name, const QVariant& data);
+	virtual const QList<QString>& dataelements() const;
+	virtual void setState( const QVariant& state);
+	virtual QVariant getState() const;
+
+private:
+	QLabel* m_label;
+};
 
 #endif
-

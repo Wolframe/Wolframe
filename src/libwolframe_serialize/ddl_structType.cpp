@@ -310,7 +310,9 @@ void StructType::expandIndirection()
 {
 	REQUIRE(Indirection);
 	types::CountedReference<StructType> st( m_indirection->create( m_indirection));
+	bool initialized_ = initialized();
 	*this = *st.get();
+	initialized( initialized_);
 }
 
 void StructType::print( std::ostream& out, size_t level) const

@@ -32,7 +32,7 @@
 ************************************************************************/
 #include "DataTree.hpp"
 #include <QDebug>
-#undef WOLFRAME_LOWLEVEL_DEBUG
+#define WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
 #define TRACE_ERROR( COMP, TITLE, LINE)			qDebug() << "DataTree" << (COMP) << "error" << (TITLE) << "at line" << (LINE);
 #define TRACE_STATE( COMP, TITLE)			qDebug() << "DataTree" << (COMP) << "state" << (TITLE);
@@ -44,6 +44,11 @@
 #define TRACE_ITEM( COMP, TITLE, VALUE)
 #define TRACE_OBJECT( COMP, TITLE, VALUE)
 #endif
+
+static bool isAlphaNum( QChar ch)
+{
+	return ch.isLetter() || ch == '_' || ch.isDigit();
+}
 
 void DataTree::addNode( const QString& name_, const DataTree& value_)
 {
@@ -162,7 +167,7 @@ static void skipNonSpaces( QString::const_iterator& itr, const QString::const_it
 
 DataTree::ElementType DataTree::parseNodeHeader( QString& nodename, QString::const_iterator& itr, const QString::const_iterator& end)
 {
-	for (; itr != end && itr->isLetter(); ++itr)
+	for (; itr != end && isAlphaNum(*itr); ++itr)
 	{
 		nodename.push_back( *itr);
 	}
@@ -199,7 +204,7 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 	{
 		skipSpaces( is, es);
 
-		if (is->isLetter())
+		if (isAlphaNum(*is))
 		{
 			TRACE_ITEM( "fromString", "letter", *is);
 			QString nodename;
@@ -427,20 +432,19 @@ QString DataTree::toString() const
 ActionDefinition::ActionDefinition( const QString& str)
 {
 	QString::const_iterator itr = str.begin(), end = str.end();
-	for (; itr != end && itr->isLetter(); ++itr)
+	for (; itr != end && isAlphaNum(*itr); ++itr);
 	m_doctype = QString( str.begin(), itr-str.begin());
 	skipSpaces( itr, end);
-	if (itr != end && itr->isLetter())
+	if (itr != end && isAlphaNum(*itr))
 	{
 		QString::const_iterator rootstart = itr;
-		for (; itr != end && itr->isLetter(); ++itr);
+		for (; itr != end && isAlphaNum(*itr); ++itr);
 		m_rootelement = QString( rootstart, itr-rootstart);
 		skipSpaces( itr, end);
 	}
 	if (itr != end && *itr == '{')
 	{
-		++itr;
-		QString::const_iterator start = itr;
+		QString::const_iterator start = itr+1;
 		skipBrk( itr, end);
 		m_structure = DataTree::fromString( start, itr);
 	}

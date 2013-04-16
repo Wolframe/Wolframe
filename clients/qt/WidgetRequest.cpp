@@ -46,7 +46,7 @@
 #define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
 #endif
 
-static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
+static QByteArray getWidgetRequest_( WidgetVisitor& visitor, bool debugmode)
 {
 	QVariant prop;
 	QString docType,rootElement;
@@ -54,12 +54,46 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, bool debugmode)
 	QList<QString> selectedDataElements;
 	bool hasSelectedDataElements = false;
 	QList<DataSerializeItem> elements;
+	QWidget* widget = visitor.widget();
 
-	QVariant action_v = visitor.property( "action");
+	if (!widget)
+	{
+		qCritical() << "Invalid request (no widget defined)";
+		return QByteArray();
+	}
+	QVariant action_v = widget->property( "action");
 	if (action_v.isValid())
 	{
-		DataTree datatree( action_v);
-		elements = getWidgetDataSerialization( datatree, visitor.widget());
+		QString actionstr( action_v.toString());
+		if (actionstr.size()>2)
+		{
+			if (actionstr[0] == '?')
+			{
+				int idx = actionstr.indexOf(' ');
+				if (idx >= 0)
+				{
+					QString condprop( actionstr.mid( 1, idx-1));
+					if (!visitor.property( condprop).isValid())
+					{
+						return QByteArray();
+					}
+					else
+					{
+						actionstr = actionstr.mid( idx+1, actionstr.size()-1-idx);
+					}
+				}
+			}
+		}
+		ActionDefinition action( actionstr);
+		docType = action.doctype();
+		rootElement = action.rootelement();
+		isStandalone = rootElement.isEmpty();
+		if (!action.isValid())
+		{
+			qCritical() << "Invalid request for doctype" << docType << "root" << rootElement;
+			return QByteArray();
+		}
+		elements = getWidgetDataSerialization( action.structure(), visitor.widget());
 	}
 	else
 	{
@@ -190,15 +224,15 @@ QString actionRequestRecipientId( const QString& tag)
 QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	QPair<QString,QByteArray> rt;
-	rt.second = getWigdetRequest_( visitor, debugmode);
+	rt.second = getWidgetRequest_( visitor, debugmode);
 	rt.first = QString("-") + visitor.widgetid();
 	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
 	return rt;
 }
 
-QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode)
+QByteArray getWidgetRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	QByteArray rt = getWigdetRequest_( visitor, debugmode);
+	QByteArray rt = getWidgetRequest_( visitor, debugmode);
 	qDebug() << "widget request of " << visitor.objectName() << "=" << rt;
 	return rt;
 }

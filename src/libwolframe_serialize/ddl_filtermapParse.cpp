@@ -298,10 +298,11 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		}
 		case ddl::StructType::Indirection:
 		{
-			stk.back().value()->expandIndirection();
-			if (stk.back().value()->contentType() == ddl::StructType::Indirection)
+			ddl::StructType* st = stk.back().value();
+			st->expandIndirection();
+			if (st->contentType() == ddl::StructType::Indirection)
 			{
-				throw SerializationErrorException( "indirection expanding to inderection", getElementPath( stk));
+				throw SerializationErrorException( "indirection expanding to indirection", getElementPath( stk));
 			}
 			return parseObject( inp, ctx, stk);
 		}

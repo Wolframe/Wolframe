@@ -241,7 +241,7 @@ class WidgetVisitor
 			virtual void connectDataSignals( DataSignalType dt, WidgetListener& listener);
 
 		public://Common methods:
-			const QString& getSynonym( const QString& name) const;
+			QVariant getSynonym( const QString& name) const;
 			QString getLink( const QString& name) const;
 			QVariant dynamicProperty( const QString& name) const;
 			bool setDynamicProperty( const QString&, const QVariant& value);

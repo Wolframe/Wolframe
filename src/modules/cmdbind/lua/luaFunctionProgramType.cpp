@@ -65,6 +65,10 @@ public:
 		if (m_firstcall)
 		{
 			lua_getglobal( m_interp->thread(), m_name.c_str());
+			if (!m_arg.get())
+			{
+				LOG_ERROR << "lua function got no valid argument";
+			}
 			m_interp->pushObject( m_arg);
 			m_firstcall = false;
 		}
@@ -77,6 +81,11 @@ public:
 			throw std::runtime_error( m_interp->luaUserErrorMessage( m_interp->thread()));
 		}
 		m_result = m_interp->getObject( -1);
+		if (!m_result.get())
+		{
+			LOG_ERROR << "lua function returned no result or nil (structure expected)";
+			throw std::runtime_error( "called lua function without result");
+		}
 		return true;
 	}
 

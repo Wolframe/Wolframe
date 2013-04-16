@@ -30,17 +30,53 @@
  Project Wolframe.
 
 ************************************************************************/
-#ifndef _WIDGET_XML_HPP_INCLUDED
-#define _WIDGET_XML_HPP_INCLUDED
-#include "WidgetVisitor.hpp"
-#include <QWidget>
-#include <QByteArray>
+#include "WidgetVisitor_QLabel.hpp"
+#include "WidgetListener.hpp"
+#include <QDebug>
 
-QByteArray getWidgetRequest( WidgetVisitor& visitor, bool debugmode=false);
-QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
-bool isActionRequest( const QString& tag);
-QString actionRequestRecipientId( const QString& tag);
-bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
+WidgetVisitorState_QLabel::WidgetVisitorState_QLabel( QWidget* widget_)
+	:WidgetVisitor::State(widget_)
+	,m_label(qobject_cast<QLabel*>(widget_)){}
 
-#endif
+void WidgetVisitorState_QLabel::clear()
+{
+	m_label->clear();
+}
+
+QVariant WidgetVisitorState_QLabel::property( const QString& name)
+{
+	if (name.isEmpty())
+	{
+		return QVariant( m_label->text());
+	}
+	return QVariant();
+}
+
+bool WidgetVisitorState_QLabel::setProperty( const QString& name, const QVariant& data)
+{
+	/*[-]*/qDebug() << "WidgetVisitorState_QLabel::setProperty" << name << data;
+	if (name.isEmpty())
+	{
+		m_label->setText( data.toString());
+		return true;
+	}
+	return false;
+}
+
+const QList<QString>& WidgetVisitorState_QLabel::dataelements() const
+{
+	static const DataElements ar( "", 0);
+	return ar;
+}
+
+void WidgetVisitorState_QLabel::setState( const QVariant& state)
+{
+	qDebug() << "Restoring tree state for line edit" << m_label->objectName();
+	if (state.isValid()) m_label->setText( state.toString());
+}
+
+QVariant WidgetVisitorState_QLabel::getState() const
+{
+	return QVariant( m_label->text());
+}
 
