@@ -15,7 +15,6 @@ QT += core gui network sql
 
 SOURCES += \
 	MainWindow.cpp \
-	FormLoader.cpp \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \

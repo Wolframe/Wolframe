@@ -52,8 +52,8 @@
 
 #define SYSTEM_LANGUAGE "SYSTEM"
 
-#define DEFAULT_UILOADMODE LocalFile
-#define DEFAULT_DATALOADMODE Network
+#define DEFAULT_UILOADMODE	LoadMode::FILE
+#define DEFAULT_DATALOADMODE	LoadMode::NETWORK
 
 #define DEFAULT_MDI false
 

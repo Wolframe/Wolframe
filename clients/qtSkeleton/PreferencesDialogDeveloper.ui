@@ -94,11 +94,8 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="FileChooser" name="uiFormTranslationsDir">
-             <property name="selectionMode">
-              <enum>FileChooser::SelectExistingDir</enum>
-             </property>
-             <property name="title">
+            <widget class="FileChooser" name="uiFormTranslationsDir" native="true">
+             <property name="title" stdset="0">
               <string>Select a directory holding UI form translations</string>
              </property>
             </widget>
@@ -108,11 +105,8 @@
          <item row="2" column="0">
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="1">
-            <widget class="FileChooser" name="uiFormsDir">
-             <property name="selectionMode">
-              <enum>FileChooser::SelectExistingDir</enum>
-             </property>
-             <property name="title">
+            <widget class="FileChooser" name="uiFormsDir" native="true">
+             <property name="title" stdset="0">
               <string>Select a directory holding UI forms</string>
              </property>
             </widget>
@@ -136,11 +130,8 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="FileChooser" name="uiFormResourcesDir">
-             <property name="selectionMode">
-              <enum>FileChooser::SelectExistingDir</enum>
-             </property>
-             <property name="title">
+            <widget class="FileChooser" name="uiFormResourcesDir" native="true">
+             <property name="title" stdset="0">
               <string>Select a directory holding UI form resources</string>
              </property>
             </widget>
@@ -189,11 +180,8 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="FileChooser" name="dataLoaderDir">
-             <property name="selectionMode">
-              <enum>FileChooser::SelectExistingDir</enum>
-             </property>
-             <property name="title">
+            <widget class="FileChooser" name="dataLoaderDir" native="true">
+             <property name="title" stdset="0">
               <string>Select a directory which contains local XML data</string>
              </property>
             </widget>
@@ -203,7 +191,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Usually requests and answers containing data forms are sent between client and server. For testing the UI some mock data can retrieved from the local file system.</string>
+            <string>Usually requests and answers containing data forms are sent between client and server. For testing the UI some mock data can be retrieved from the file system and saved to the file system .</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
