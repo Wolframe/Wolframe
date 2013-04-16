@@ -60,9 +60,11 @@ MOC_FLAGS = \
 
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.obj \
+	visitors\WidgetVisitor_QLabel.obj \
 	visitors\WidgetVisitor_QComboBox.obj \
 	visitors\WidgetVisitor_QCheckBox.obj \
 	visitors\WidgetVisitor_QRadioButton.obj \
+	visitors\WidgetVisitor_QButtonGroup.obj \
 	visitors\WidgetVisitor_QGroupBox.obj \
 	visitors\WidgetVisitor_QSpinBox.obj \
 	visitors\WidgetVisitor_QDoubleSpinBox.obj \
@@ -95,14 +97,17 @@ OBJS = \
 	WolframeClientProtocol.obj \
 	WolframeClientProtocolBase.obj \
 	WidgetVisitor.obj \
-	$(VISITOR_OBJS) \
+	WidgetListener.obj \
+	moc_WidgetListener.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
+	$(VISITOR_OBJS) \
+	DataTree.obj \
+	DataSerializeItem.obj \
+	DataTreeSerialize.obj \
 	FormCall.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \
-	qcommandline.obj \
-	moc_qcommandline.obj \
 	PreferencesDialog.obj \
 	moc_PreferencesDialog.obj \
 	FormChooseDialog.obj \
@@ -131,15 +136,8 @@ UIS = \
 	ui_loginDialog.h \
 	ui_PreferencesDialog.h \
 	ui_PreferencesDialogDeveloper.h \
-	ui_PreferencesDialogInterface.h
-
-!IFDEF WITH_SSL
-UIS = $(UIS) \
+	ui_PreferencesDialogInterface.h \
 	ui_serverDefinitionDialog.h
-!ELSE
-UIS = $(UIS) \
-	ui_serverDefinitionDialogNoSSL.h
-!ENDIF
 
 all: $(UIS) $(OBJS) $(CPP_BINS)
 
@@ -174,11 +172,11 @@ moc_DataLoader.cpp: DataLoader.hpp
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp
 
+moc_WidgetListener.cpp: WidgetListener.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WidgetListener.hpp -o moc_WidgetListener.cpp
+
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
-
-moc_qcommandline.cpp: qcommandline.h
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
@@ -207,13 +205,8 @@ ui_MainWindow.h: MainWindow.ui
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_DIR)\bin\uic -o ui_manageServersDialog.h manageServersDialog.ui
 
-!IFDEF WITH_SSL
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
-!ELSE
-ui_serverDefinitionDialogNoSSL.h: serverDefinitionDialogNoSSL.ui
-	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialogNoSSL.h serverDefinitionDialogNoSSL.ui
-!ENDIF
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_DIR)\bin\uic -o ui_loginDialog.h loginDialog.ui
@@ -250,6 +243,7 @@ local_clean:
 	@-erase $(I18NS) 2>NUL
 	@-erase qtclient.res 2>NUL
 	@-erase $(UIS) 2>NUL
+	@-erase $(VISITOR_OBJS) 2>NUL
 
 local_distclean:
 

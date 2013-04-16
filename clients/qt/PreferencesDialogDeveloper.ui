@@ -203,7 +203,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Usually requests and answers containing data forms are sent between client and server. For testing the UI some mock data can retrieved from the local file system.</string>
+            <string>Usually requests and answers containing data forms are sent between client and server. For testing the UI some mock data can be retrieved from the file system and saved to the file system .</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>

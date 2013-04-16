@@ -189,29 +189,29 @@ void MainWindow::initialize( )
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
 	switch( settings.uiLoadMode ) {
-		case LocalFile:
+		case LoadMode::FILE:
 			m_formLoader = new FileFormLoader( settings.uiFormsDir, settings.uiFormTranslationsDir, settings.uiFormResourcesDir );
 			break;
 
-		case Network:
-			// skip, delay
+		case LoadMode::NETWORK:
+			// skip, delay, needs a working connection for this
 			break;
 
-		case Unknown:
+		case LoadMode::UNDEFINED:
 			break;
 	}
 
 // ..same for the data loader
 	switch( settings.dataLoadMode ) {
-		case LocalFile:
+		case LoadMode::FILE:
 			m_dataLoader = new FileDataLoader( settings.dataLoaderDir );
 			break;
 
-		case Network:
+		case LoadMode::NETWORK:
 			// skip, delay, needs a working connection for this
 			break;
 
-		case Unknown:
+		case LoadMode::UNDEFINED:
 			break;
 	}
 
@@ -253,7 +253,7 @@ void MainWindow::initialize( )
 
 // in local file UI and data mode we can load the form right away, we don't
 // wait for the user to log in
-	if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
+	if( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) {
 		restoreStateAndPositions( );
 	}
 
@@ -406,12 +406,12 @@ void MainWindow::disconnected( )
 		_debugTerminal = 0;
 	}
 
-	if( settings.uiLoadMode == Network ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK ) {
 		delete m_uiLoader;
 		m_uiLoader = 0;
 	}
 
-	if( settings.dataLoadMode == Network ) {
+	if( settings.dataLoadMode == LoadMode::NETWORK ) {
 		delete m_dataLoader;
 		m_dataLoader = 0;
 	}
@@ -439,12 +439,12 @@ void MainWindow::authOk( )
 	statusBar( )->showMessage( tr( "Ready" ) );
 
 // create network based form ...
-	if( settings.uiLoadMode == Network ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK ) {
 		m_formLoader = new NetworkFormLoader( m_wolframeClient );
 	}
 
 // ...and data loaders
-	if( settings.dataLoadMode == Network ) {
+	if( settings.dataLoadMode == LoadMode::NETWORK ) {
 		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
 	}
 
@@ -557,11 +557,10 @@ void MainWindow::loadLanguage( QString language )
 
 void MainWindow::changeEvent( QEvent* _event )
 {
-	if( _event ) {
-		if ( _event->type( ) == QEvent::LanguageChange ) {
+	if( _event )	{
+		if ( _event->type() == QEvent::LanguageChange )
 			m_ui.retranslateUi( this );
-		}
-		else if ( _event->type( ) == QEvent::LocaleChange )	{
+		else if ( _event->type() == QEvent::LocaleChange )	{
 			QString locale = QLocale::system( ).name( );
 			locale.truncate( locale.lastIndexOf( '_' ) );
 			loadLanguage( locale );
@@ -710,7 +709,7 @@ void MainWindow::on_actionExit_triggered( )
 {
 	m_terminating = true;
 
-	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK || settings.dataLoadMode == LoadMode::NETWORK ) {
 		if( m_wolframeClient ) {
 			m_wolframeClient->disconnect( );
 		} else {
@@ -721,7 +720,7 @@ void MainWindow::on_actionExit_triggered( )
 		if( m_wolframeClient )
 			disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
 
-		if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
+		if( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) {
 			storeStateAndPositions( );
 		}
 
@@ -945,7 +944,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 {
 // present new form menu entry if logged in
 	activateAction( "actionOpenFormNewWindow",
-		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
+		( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) ||
 		m_wolframeClient );
 
 // enable/disable menu/toolbar items depending on the number of subwindows
@@ -1025,14 +1024,14 @@ void MainWindow::updateMenusAndToolbars( )
 
 // logged in or logged out?
 	activateAction( "actionOpenForm",
-		( ( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile )
+		( ( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE )
 		|| ( m_wolframeClient && m_wolframeClient->isConnected( ) ) )
 		&& ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionReload",
-		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
+		( settings.uiLoadMode == LoadMode::FILE && settings.dataLoadMode == LoadMode::FILE ) ||
 		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
 
-	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
+	if( settings.uiLoadMode == LoadMode::NETWORK || settings.dataLoadMode == LoadMode::NETWORK ) {
 		activateAction( "actionLogin", !m_wolframeClient || !m_wolframeClient->isConnected( ) );
 		activateAction( "actionLogout", m_wolframeClient && m_wolframeClient->isConnected( ) );
 	}

@@ -90,16 +90,18 @@ class WolframeClient : public QObject
 		void setConnectionParameters( const ConnectionParameters _connParams );
 
 // low-level commands, pre-protocol, for debugging mainly
-		void connect( );
-		void disconnect( );
+		void connect();
+		void disconnect();
 		void auth();
-		void request( const QByteArray& tag, const QByteArray& content );
-		void sendLine( const QString&)	{qDebug()<< "NOT IMPLEMENTED: sendLine";}
+		void request( const QString& tag, const QByteArray& content );
 // inquire status
 		bool isConnected( ) const;
 		const QString serverName() const;
 		bool isEncrypted( ) const;
 		const QString encryptionName() const;
+
+	private:
+		void processProtocol();
 
 	private slots:
 		void timeoutOccurred( );
@@ -134,7 +136,7 @@ class WolframeClient : public QObject
 		void resultHandled( );
 
 // high-level commands
-		void answerReceived( bool success, const QByteArray& tag, const QByteArray& content );
+		void answerReceived( bool success, const QString& tag, const QByteArray& content );
 };
 
 #endif // _Wolframe_CLIENT_HPP_INCLUDED

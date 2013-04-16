@@ -30,43 +30,42 @@
  Project Wolframe.
 
 ************************************************************************/
-
-#ifndef _FORM_CALL_HPP_INCLUDED
-#define _FORM_CALL_HPP_INCLUDED
-#include <QString>
-#include <QByteArray>
-#include <QPair>
+#ifndef _WIDGET_DATA_SERIALIZE_ITEM_HPP_INCLUDED
+#define _WIDGET_DATA_SERIALIZE_ITEM_HPP_INCLUDED
 #include <QVariant>
-#include <QList>
+#include <QString>
 
-///\class FormCall
-///\brief Form call interpreted as string "formname?param1=...&param2=..."
-//	commas ',' in the parameter definition are interpreted as list element separator for a variant list
-//	single quotes "'" are marking string content that can contain the special characters '&' and '?' and comma ','
-//	single quotes in strings are escaped as double single quotes
-class FormCall
+///\class DataSerializeItem
+///\brief DataSerializeItem of serialization of widget data (for constructing a server request out of the widget data)
+class DataSerializeItem
 {
 public:
-	///\brief Constructor from definition
-	explicit FormCall( const QString& callstr);
-	///\brief Default constructor
-	FormCall();
+	enum Type {OpenTag,CloseTag,Attribute,Value};
+	static const char* typeName( Type i)
+	{
+		static const char* ar[] = {"OpenTag","CloseTag","Attribute","Value"};
+		return ar[i];
+	}
+	Type type() const		{return m_type;}
+	const QVariant& value() const	{return m_value;}
 
-	void init( const QString& callstr);
+	DataSerializeItem( Type type_, const QVariant& value_)
+		:m_type(type_),m_value(value_){}
+	DataSerializeItem( const DataSerializeItem& o)
+		:m_type(o.m_type),m_value(o.m_value){}
 
-	///\brief Form name to call
-	const QString& name() const					{return m_name;}
-	static QString name( const QString& callstr);
-
-	typedef QPair<QString,QVariant> Parameter;
-	///\brief List of parameters to pass to the form called
-	const QList<Parameter>& parameter() const			{return m_parameter;}
-
+	///\brief Get the element as string for debugging output
+	QString toString() const
+	{
+		QString rt( typeName( m_type));
+		rt.append( " '");
+		rt.append( m_value.toString());
+		rt.append( "'");
+		return rt;
+	}
 private:
-	QString m_name;				//< name of the form to load
-	QList<Parameter> m_parameter;		//< list of parameters to set in the loaded form before initializing it with data
+	Type m_type;
+	QVariant m_value;
 };
 
 #endif
-
-

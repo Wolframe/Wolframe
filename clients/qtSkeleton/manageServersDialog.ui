@@ -17,7 +17,7 @@
    <string>Manage Connections</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="qtSkeleton.qrc">
     <normaloff>:/images/world-setup.png</normaloff>:/images/world-setup.png</iconset>
   </property>
   <property name="modal">
@@ -127,7 +127,9 @@
   <tabstop>editConBttn</tabstop>
   <tabstop>delConnBttn</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="qtSkeleton.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -49,10 +49,10 @@ class NetworkDataLoader : public DataLoader
 		NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug = false );
 		virtual ~NetworkDataLoader( ) {}
 
-		virtual void datarequest( const QByteArray& tag, const QByteArray& content);
+		virtual void datarequest( const QString& tag, const QByteArray& content);
 
 	public slots:
-		virtual void gotAnswer( bool success, const QByteArray& tag, const QByteArray& content);
+		virtual void gotAnswer( bool success, const QString& tag, const QByteArray& content);
 
 	private:
 		WolframeClient *m_wolframeClient;

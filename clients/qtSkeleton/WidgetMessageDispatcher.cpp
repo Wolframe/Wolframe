@@ -35,28 +35,30 @@
 #include <QDebug>
 #include <QAbstractButton>
 
-static bool nodeProperty_hasRequestId( const QWidget* widget, const QByteArray& cond)
+static bool nodeProperty_hasWidgetId( const QWidget* widget, const QVariant& cond)
 {
-	QVariant requestid = widget->property( "_w_requestid");
-	return (requestid.isValid() && requestid.toByteArray() == cond);
+	QVariant widgetid = widget->property( "widgetid");
+	return (widgetid.isValid() && widgetid == cond);
 }
 
-///\brief Return true if the widget is not an action widget.
+///\brief Return true if the widget is not an action widget with a doctype defined.
 //	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QByteArray&)
+static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QVariant&)
 {
 	if (!widget->isEnabled()) return false;
 	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant property = widget->property( "doctype");
-	return (property.isValid());
+	QVariant doctype_property = widget->property( "doctype");
+	QVariant action_property = widget->property( "action");
+	return (doctype_property.isValid() || action_property.isValid());
 }
 
 QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
 {
 	QList<Request> rt;
-	foreach (WidgetVisitor visitor, m_visitor.findNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
-		rt.push_back( Request( visitor.requestUID(), getWigdetRequest( visitor, debugmode)));
+		WidgetVisitor visitor( widget);
+		rt.push_back( Request( visitor.widgetid(), getWidgetRequest( visitor, debugmode)));
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -64,32 +66,21 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	return rt;
 }
 
-static const QByteArray ignoreResultContentTag = "-emptyresult";
+WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
+{
+	return Request( m_visitor.widgetid(), getWidgetRequest( m_visitor, debugmode));
+}
+
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	return Request( ignoreResultContentTag, getActionRequest( m_visitor, debugmode));
+	QPair<QString,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
+	return Request( actionrequest.first, actionrequest.second);
 }
 
-bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArray& data)
+QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
 {
-	if (tag == ignoreResultContentTag) return true;
-
-	bool found = false;
-	bool rt = true;
-	foreach (WidgetVisitor visitor, m_visitor.findNodes( nodeProperty_hasRequestId, tag))
-	{
-		found = true;
-		if (!setWidgetAnswer( visitor, data))
-		{
-			qCritical() << "Failed assign request answer tag:" << tag << "data:" << data;
-			rt = false;
-		}
-	}
-	if (!found)
-	{
-		qCritical() << "Request not found: tag=" << tag;
-	}
-	return rt;
+	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);
 }
+
 
 

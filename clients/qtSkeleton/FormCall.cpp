@@ -1,12 +1,6 @@
 #include "FormCall.hpp"
 #include <QDebug>
 
-QByteArray FormCall::name( const QByteArray& callstr)
-{
-	int idx=callstr.indexOf('?');
-	return idx>=0?callstr.mid(0,idx):callstr;
-}
-
 QString FormCall::name( const QString& callstr)
 {
 	int idx=callstr.indexOf('?');
@@ -65,24 +59,36 @@ static QVariant parseValue( const QString& callstr, int& idx)
 	return rt;
 }
 
+FormCall::FormCall()
+{}
+
 FormCall::FormCall( const QString& callstr)
 {
+	init( callstr);
+}
+
+void FormCall::init( const QString& callstr)
+{
+	m_name.clear();
+	m_parameter.clear();
+
 	int paramidx = callstr.indexOf( '?');
 	if (paramidx >= 0)
 	{
-		m_name = callstr.mid( 0, paramidx).toAscii();
+		m_name = callstr.mid( 0, paramidx);
 		while (paramidx < callstr.size())
 		{
 			int eqidx = callstr.indexOf( '=', paramidx);
-			int amidx = callstr.indexOf( '&', paramidx);
-			if (eqidx < 0 || (eqidx > amidx && amidx >= 0))
+			int amidx = callstr.indexOf( '&', paramidx+1);
+			if (amidx < 0) amidx = callstr.size();
+			if (eqidx < 0 || eqidx > amidx)
 			{
 				qCritical() << "Syntax error in form parameter list. missing assignment '=' in declaration";
 				return;
 			}
 			else
 			{
-				QByteArray paramname( callstr.mid( paramidx+1, eqidx-paramidx-1).toAscii());
+				QString paramname( callstr.mid( paramidx+1, eqidx-paramidx-1));
 				paramidx = eqidx + 1;
 				QVariant paramvalue( parseValue( callstr, paramidx));
 				m_parameter.push_back( Parameter( paramname, paramvalue));
@@ -91,7 +97,7 @@ FormCall::FormCall( const QString& callstr)
 	}
 	else
 	{
-		m_name = callstr.toAscii();
+		m_name = callstr;
 	}
 }
 

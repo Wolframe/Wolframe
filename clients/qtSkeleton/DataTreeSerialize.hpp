@@ -30,43 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-
-#ifndef _FORM_CALL_HPP_INCLUDED
-#define _FORM_CALL_HPP_INCLUDED
-#include <QString>
-#include <QByteArray>
-#include <QPair>
-#include <QVariant>
+#ifndef _WIDGET_DATATREE_SERIALIZE_HPP_INCLUDED
+#define _WIDGET_DATATREE_SERIALIZE_HPP_INCLUDED
+#include "DataSerializeItem.hpp"
+#include "DataTree.hpp"
 #include <QList>
+#include <QWidget>
 
-///\class FormCall
-///\brief Form call interpreted as string "formname?param1=...&param2=..."
-//	commas ',' in the parameter definition are interpreted as list element separator for a variant list
-//	single quotes "'" are marking string content that can contain the special characters '&' and '?' and comma ','
-//	single quotes in strings are escaped as double single quotes
-class FormCall
-{
-public:
-	///\brief Constructor from definition
-	explicit FormCall( const QString& callstr);
-	///\brief Default constructor
-	FormCall();
-
-	void init( const QString& callstr);
-
-	///\brief Form name to call
-	const QString& name() const					{return m_name;}
-	static QString name( const QString& callstr);
-
-	typedef QPair<QString,QVariant> Parameter;
-	///\brief List of parameters to pass to the form called
-	const QList<Parameter>& parameter() const			{return m_parameter;}
-
-private:
-	QString m_name;				//< name of the form to load
-	QList<Parameter> m_parameter;		//< list of parameters to set in the loaded form before initializing it with data
-};
+QList<DataSerializeItem> getWidgetDataSerialization( const DataTree& datatree, QWidget* widget);
 
 #endif
-
 

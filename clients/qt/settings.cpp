@@ -57,7 +57,7 @@ void ApplicationSettings::write( const QString &fileName )
 void ApplicationSettings::write( const QString& organization, const QString& application )
 {
 	QSettings settings( organization, application );
-	
+
 	write( settings );
 }
 
@@ -96,12 +96,12 @@ void ApplicationSettings::write( QSettings &settings )
 		settings.setValue( "timeout", connectionParams[ i ].timeout );
 	}
 	settings.endArray();
-	
+
 	settings.setValue( "mdi", mdi );
 	settings.setValue( "debug", debug );
 	settings.setValue( "locale", locale );
-	settings.setValue( "uiLoadMode", LoadModeToStr( uiLoadMode ) );
-	settings.setValue( "dataLoadMode", LoadModeToStr( dataLoadMode ) );
+	settings.setValue( "uiLoadMode", LoadMode::LoadModeToStr( uiLoadMode ) );
+	settings.setValue( "dataLoadMode", LoadMode::LoadModeToStr( dataLoadMode ) );
 	settings.setValue( "uiFormsDir", uiFormsDir );
 	settings.setValue( "uiFormTranslationsDir", uiFormTranslationsDir );
 	settings.setValue( "uiFormResourcesDir", uiFormResourcesDir );
@@ -121,14 +121,14 @@ void ApplicationSettings::write( QSettings &settings )
 void ApplicationSettings::read( const QString &fileName )
 {
 	QSettings settings( fileName, QSettings::IniFormat );
-	
+
 	read( settings );
 }
 
 void ApplicationSettings::read( const QString& organization, const QString& application )
 {
 	QSettings settings( organization, application );
-	
+
 	read( settings );
 }
 
@@ -168,8 +168,8 @@ void ApplicationSettings::read( QSettings &settings )
 	mdi = settings.value( "mdi", false ).toBool( );
 	debug = settings.value( "debug", false ).toBool( );
 	locale = settings.value( "locale", SYSTEM_LANGUAGE ).toString( );
-	uiLoadMode = LoadModeFromStr( settings.value( "uiLoadMode", LoadModeToStr( DEFAULT_UILOADMODE ) ).toString( ) );
-	dataLoadMode = LoadModeFromStr( settings.value( "dataLoadMode", LoadModeToStr( DEFAULT_DATALOADMODE ) ).toString( ) );
+	uiLoadMode = LoadMode::LoadModeFromStr( settings.value( "uiLoadMode", LoadMode::LoadModeToStr( DEFAULT_UILOADMODE ) ).toString( ) );
+	dataLoadMode = LoadMode::LoadModeFromStr( settings.value( "dataLoadMode", LoadMode::LoadModeToStr( DEFAULT_DATALOADMODE ) ).toString( ) );
 	uiFormsDir = settings.value( "uiFormsDir", DEFAULT_UI_FORMS_DIR ).toString( );
 	uiFormTranslationsDir = settings.value( "uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
 	uiFormResourcesDir = settings.value( "uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
@@ -179,12 +179,12 @@ void ApplicationSettings::read( QSettings &settings )
 	size = settings.beginReadArray( "WindowStates" );
 	for ( int i = 0; i < size; ++i )	{
 		settings.setArrayIndex( i );
-		
+
 		WinState state;
 		state.form = settings.value( "form" ).toString( );
 		state.position = settings.value( "position", QPoint( 0, 0 ) ).toPoint( );
 		state.size = settings.value( "size",QSize( 350, 350 ) ).toSize( );
-		
+
 		states.append( state );
 	}
 	settings.endArray( );

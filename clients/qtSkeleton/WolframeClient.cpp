@@ -43,10 +43,10 @@
 #endif
 
 WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent )
-	: QObject( _parent )
-	,m_connParams( _connParams )
-	,m_state( Disconnected )
-	,m_hasErrors( false )
+	: QObject( _parent ),
+	m_connParams( _connParams ),
+	m_state( Disconnected ),
+	m_hasErrors( false )
 #ifdef WITH_SSL
 	,m_initializedSsl( false )
 #endif
@@ -244,13 +244,13 @@ void WolframeClient::disconnect( )
 
 		case Data:
 			m_protocol.quit();
-			m_protocol.process();
+			processProtocol();
 			m_state = AboutToDisconnect;
 			break;
 
 		case Connected:
 			m_protocol.quit();
-			m_protocol.process();
+			processProtocol();
 			m_state = AboutToDisconnect;
 			break;
 
@@ -352,10 +352,43 @@ void WolframeClient::privateDisconnected( )
 	}
 }
 
+void WolframeClient::processProtocol()
+{
+	bool prt_isAuthorized = m_protocol.isAuthorized();
+	bool prt_isConnected = m_protocol.isConnected();
+	bool success = m_protocol.process();
+
+	if (!prt_isAuthorized && m_protocol.isAuthorized())
+	{
+		emit authOk();
+	}
+	if (!prt_isConnected && m_protocol.isConnected())
+	{
+		emit connected();
+	}
+	if (m_protocol.getAnswerTag())
+	{
+		emit resultReceived();
+	}
+	if (success)
+	{
+		if (m_protocol.isDisconnected())
+		{
+			emit disconnected();
+		}
+	}
+	else
+	{
+		if (m_protocol.getLastError())
+		{
+			qCritical() << *m_protocol.getLastError();
+			emit error( tr( "error in protocol: %1").arg( *m_protocol.getLastError()));
+		}
+	}
+}
+
 void WolframeClient::dataAvailable( )
 {
-	bool isAuth;
-	bool success;
 	switch( m_state ) {
 		case Disconnected:
 		case AboutToConnect:
@@ -366,25 +399,7 @@ void WolframeClient::dataAvailable( )
 		case AboutToDisconnect:
 		case Connected:
 		case Data:
-			isAuth = m_protocol.isAuthorized();
-			success = m_protocol.process();
-			if (!isAuth && m_protocol.isAuthorized())
-			{
-				emit authOk();
-			}
-			if (!success)
-			{
-				if (m_protocol.getLastError())
-				{
-					qCritical() << *m_protocol.getLastError();
-					emit error( tr( "error in protocol: %1").arg( *m_protocol.getLastError()));
-				}
-				break;
-			}
-			if (m_protocol.getAnswerTag())
-			{
-				emit resultReceived();
-			}
+			processProtocol();
 			break;
 
 		default:
@@ -393,7 +408,7 @@ void WolframeClient::dataAvailable( )
 }
 
 // high-level
-void WolframeClient::request( const QByteArray& tag, const QByteArray& content )
+void WolframeClient::request( const QString& tag, const QByteArray& content )
 {
 	m_protocol.pushRequest( tag, content);
 }
@@ -402,7 +417,7 @@ void WolframeClient::handleResult( )
 {
 	m_state = Connected;
 
-	const QByteArray* tag;
+	const QString* tag;
 	while ((tag=m_protocol.getAnswerTag()) != 0)
 	{
 		bool success = m_protocol.getAnswerSuccess();
@@ -418,7 +433,7 @@ void WolframeClient::handleResult( )
 void WolframeClient::auth()
 {
 	m_protocol.authorize();
-	m_protocol.process();
+	processProtocol();
 }
 
 bool WolframeClient::isConnected( ) const

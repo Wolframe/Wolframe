@@ -256,7 +256,7 @@ void MainWindow::initialize( )
 
 //void MainWindow::CreateFormWidget( const QString &name )
 //{
-//	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
+//	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, &m_globals, m_uiLoader, this, settings.debug );
 
 //	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 //		this, SLOT( formLoaded( QString ) ) );
@@ -323,7 +323,7 @@ QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QStrin
 //void MainWindow::updateActionShortcuts( )
 //{
 //	foreach( QAction *action, findChildren<QAction *>( ) ) {
-//		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
+//		QString s = action->property( "defaultShortcut" ).toString();
 //		if( !s.isEmpty( ) ) {
 //			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
 //			if( shortcut != QKeySequence::UnknownKey ) {
@@ -595,7 +595,6 @@ void MainWindow::formListLoaded( QStringList forms )
 //	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
 //	l->addWidget( formWidget );
 
-//	formWidget->setGlobals( m_formWidget->globals( ) );
 //	formWidget->setLanguage( m_language );
 //	formWidget->loadForm( name, true );
 

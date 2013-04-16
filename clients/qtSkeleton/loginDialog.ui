@@ -14,7 +14,7 @@
    <string>Login to Server</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="qtSkeleton.qrc">
     <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -134,7 +134,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="qtSkeleton.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

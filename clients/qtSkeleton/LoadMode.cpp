@@ -49,9 +49,9 @@ const QString& LoadMode::LoadModeToStr( LoadMode::Mode mode )
 
 LoadMode::Mode LoadMode::LoadModeFromStr( const QString str )
 {
-	if ( str.compare( modeNetwork, Qt::CaseInsensitive ))
+	if ( str.compare( modeNetwork, Qt::CaseInsensitive ) == 0)
 		return NETWORK;
-	else if ( str.compare( modeFile, Qt::CaseInsensitive ))
+	else if ( str.compare( modeFile, Qt::CaseInsensitive ) == 0)
 		return FILE;
 	return UNDEFINED;
 }

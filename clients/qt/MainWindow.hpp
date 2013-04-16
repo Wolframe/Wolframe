@@ -61,8 +61,8 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow( QWidget *_parent = 0 );
-		virtual ~MainWindow( );		
-			
+		virtual ~MainWindow( );
+
 	private:
 		Ui::MainWindow m_ui;		// ui definition from designer
 		QTranslator m_translatorApp;	// contains the translations for this application
@@ -87,9 +87,9 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarConn;
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
-		QAction *m_debugTerminalAction;	
+		QAction *m_debugTerminalAction;
 		QDialog *m_modalDialog;
-		
+
 	public slots:
 		void readSettings( );
 		void parseArgs( );
@@ -97,11 +97,11 @@ class MainWindow : public QMainWindow
 		void loadLanguages( );
 		void loadForm( QString formName );
 		void loadLanguage( QString language );
-		
+
 	protected:
 		void changeEvent( QEvent *_event );
 		void closeEvent( QCloseEvent *e );
-	
+
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
 		void CreateFormWidget( const QString &name );
@@ -118,7 +118,7 @@ class MainWindow : public QMainWindow
 		void addDeveloperMenu( );
 
 	private slots:
-// slots for the wolframe client		
+// slots for the wolframe client
 		void wolframeError( QString error );
 		void connected( );
 		void disconnected( );
@@ -135,7 +135,7 @@ class MainWindow : public QMainWindow
 		void formModal( QString name );
 		void endModal( void );
 		void formError( QString error );
-		
+
 // MDI slots
 		void subWindowSelected( QAction *action );
 		void subWindowChanged( QMdiSubWindow *w );
@@ -156,7 +156,7 @@ class MainWindow : public QMainWindow
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
 		void on_actionOpenForm_triggered( );
-		void on_actionOpenFormNewWindow_triggered( );	
+		void on_actionOpenFormNewWindow_triggered( );
 		void on_actionReload_triggered( );
 		void on_actionNextWindow_triggered( );
 		void on_actionPreviousWindow_triggered( );

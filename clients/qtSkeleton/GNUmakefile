@@ -48,9 +48,11 @@ endif
 
 VISITOR_OBJS = \
 	WidgetVisitorStateConstructor.o \
+	visitors/WidgetVisitor_QLabel.o \
 	visitors/WidgetVisitor_QComboBox.o \
 	visitors/WidgetVisitor_QCheckBox.o \
 	visitors/WidgetVisitor_QGroupBox.o \
+	visitors/WidgetVisitor_QButtonGroup.o \
 	visitors/WidgetVisitor_QRadioButton.o \
 	visitors/WidgetVisitor_QSpinBox.o \
 	visitors/WidgetVisitor_QDoubleSpinBox.o \
@@ -82,15 +84,18 @@ CPP_OBJS = \
 	moc_WolframeClient.o \
 	WolframeClientProtocol.o \
 	WolframeClientProtocolBase.o \
-	$(VISITOR_OBJS) \
 	WidgetVisitor.o \
+	WidgetListener.o \
+	moc_WidgetListener.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
+	$(VISITOR_OBJS) \
+	DataTree.o \
+	DataSerializeItem.o \
+	DataTreeSerialize.o \
 	FormCall.o \
 	FormWidget.o \
 	moc_FormWidget.o \
-	qcommandline.o \
-	moc_qcommandline.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
 	FormChooseDialog.o \
@@ -129,11 +134,11 @@ moc_DataLoader.cpp: DataLoader.hpp
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
 
+moc_WidgetListener.cpp: WidgetListener.hpp
+	$(QT_MOC) $(MOC_FLAGS) WidgetListener.hpp -o moc_WidgetListener.cpp
+
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
-
-moc_qcommandline.cpp: qcommandline.h
-	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
@@ -168,13 +173,8 @@ ui_MainWindow.h: MainWindow.ui
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_UIC) -o ui_manageServersDialog.h manageServersDialog.ui
 
-ifeq ($(WITH_SSL),1)
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_UIC) -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
-else
-ui_serverDefinitionDialogNoSSL.h: serverDefinitionDialogNoSSL.ui
-	$(QT_UIC) -o ui_serverDefinitionDialogNoSSL.h serverDefinitionDialogNoSSL.ui
-endif
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_UIC) -o ui_loginDialog.h loginDialog.ui
@@ -194,24 +194,13 @@ UIS = \
 	ui_loginDialog.h \
 	ui_PreferencesDialog.h \
 	ui_PreferencesDialogDeveloper.h \
-	ui_PreferencesDialogInterface.h
-
-ifeq ($(WITH_SSL),1)
-UIS += \
+	ui_PreferencesDialogInterface.h \
 	ui_serverDefinitionDialog.h
-else
-UIS += \
-	ui_serverDefinitionDialogNoSSL.h
-endif
 	
 qtSkeleton.d: ui_MainWindow.h
 MainWindow.d: ui_MainWindow.h
 manageServersDialog.d: ui_manageServersDialog.h
-ifeq ($(WITH_SSL),1)
 serverDefinitionDialog.d: ui_serverDefinitionDialog.h
-else
-serverDefinitionDialog.d: ui_serverDefinitionDialogNoSSL.h
-endif
 loginDialog.d: ui_loginDialog.h
 moc_PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h

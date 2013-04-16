@@ -42,16 +42,16 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _deb
 	  m_map( new QHash<QByteArray, QPair<QString, QString> >( ) ),
 	  m_debug( _debug )
 {
-	connect( m_wolframeClient, SIGNAL( answerReceived( bool,const QByteArray&,const QByteArray&) ),
-		this, SLOT( gotAnswer( bool,const QByteArray&,const QByteArray&) ) );
+	connect( m_wolframeClient, SIGNAL( answerReceived( bool,const QString&,const QByteArray&) ),
+		this, SLOT( gotAnswer( bool,const QString&,const QByteArray&) ) );
 }
 
-void NetworkDataLoader::datarequest( const QByteArray& tag, const QByteArray& content)
+void NetworkDataLoader::datarequest( const QString& tag, const QByteArray& content)
 {
 	m_wolframeClient->request( tag, content);
 }
 
-void NetworkDataLoader::gotAnswer( bool success, const QByteArray& tag, const QByteArray& content )
+void NetworkDataLoader::gotAnswer( bool success, const QString& tag, const QByteArray& content )
 {
 	if( !success ) {
 		qCritical( ) << "ERROR: " << tag << content;

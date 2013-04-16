@@ -31,19 +31,22 @@
 
 ************************************************************************/
 
-#ifndef _LOADMODE_HPP
-#define _LOADMODE_HPP
+#ifndef _LOAD_MODE_HPP
+#define _LOAD_MODE_HPP
 
 #include <QString>
 
-enum LoadMode {
-	Unknown,
-	Network,
-	LocalFile
+class LoadMode	{
+public:
+	enum Mode {
+		UNDEFINED,
+		NETWORK,
+		FILE
+	};
+
+	static const QString& LoadModeToStr( LoadMode::Mode mode );
+
+	static LoadMode::Mode LoadModeFromStr( const QString str );
 };
 
-QString LoadModeToStr( LoadMode m );
-
-LoadMode LoadModeFromStr( const QString s );
-
-#endif // _LOADMODE_HPP
+#endif // _LOAD_MODE_HPP

@@ -97,13 +97,13 @@ class WolframeClientProtocol
 		bool process();
 
 		///\brief Push a request and process it if possible
-		void pushRequest( const QByteArray& tag, const QByteArray& content);
+		void pushRequest( const QString& tag, const QByteArray& content);
 
 		///\brief Get the tag of the last answer or NULL if no answer available yet
-		const QByteArray* getAnswerTag() const;
+		const QString* getAnswerTag() const;
 		///\brief Get the success of the last answer or true if no answer available yet
 		bool getAnswerSuccess() const;
-		///\brief Get the content or message of the last answer or NULL if no answer available yet
+		///\brief Get the content of the last answer or NULL if no answer available yet or the corresponding request failed
 		const QByteArray* getAnswerContent() const;
 		///\brief Dispose the last answer
 		void removeAnswer();
@@ -113,6 +113,8 @@ class WolframeClientProtocol
 
 		void quit()						{m_gotQuit = true;}
 		bool isAuthorized() const				{return (int)m_state >= (int)AuthorizedIdle;}
+		bool isConnected() const				{return (int)m_state >= (int)AuthStart;}
+		bool isDisconnected() const				{return (int)m_state == (int)Close;}
 		void authorize()					{m_gotAuthorize = true;}
 
 	private:
@@ -121,17 +123,18 @@ class WolframeClientProtocol
 		bool sendCommandLine( const QByteArray& cmd, const QByteArray& arg);
 		bool sendRequestContent();
 		bool hasRequests() const;
-		QByteArray nextAnswerTag();
+		QString nextAnswerTag();
 		void pushAnswerError( const QByteArray& msg);
 		void pushAnswerContent( const QByteArray& content);
+		void discardPendingRequests( const char* errmsg);
 
 	private:
 		State m_state;
 		QAbstractSocket *m_socket;
-		QQueue<QPair<QByteArray,QByteArray> > m_requestqueue;	// queued commands (tag,content)
-		QQueue<QByteArray> m_requesttagqueue;			// queued tags of issued commands (tag)
-		QQueue<QPair<QByteArray,QByteArray> > m_answerqueue;	// queued answers (tag,content)
-		QQueue<QPair<QByteArray,QByteArray> > m_errorqueue;	// queued error answers (tag,message)
+		QQueue<QPair<QString,QByteArray> > m_requestqueue;	// queued commands (tag,content)
+		QQueue<QString> m_requesttagqueue;			// queued tags of issued commands (tag)
+		QQueue<QPair<QString,QByteArray> > m_answerqueue;	// queued answers (tag,content)
+		QQueue<QPair<QString,QByteArray> > m_errorqueue;	// queued error answers (tag,message)
 		QByteArray m_content;					// buffer for pending answer content
 		QString m_lasterror;
 		bool m_gotQuit;

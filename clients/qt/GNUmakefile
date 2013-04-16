@@ -246,7 +246,7 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c test.conf
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient test.conf
 
 .PHONY: buildi18n
 buildi18n:
