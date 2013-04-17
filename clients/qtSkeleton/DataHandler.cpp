@@ -307,34 +307,6 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 			}
 			writeWidgets( groupBox, &subDataElements, xml, props, seen );
 			xml.writeEndElement( );
-		} else if( clazz == "FileChooser" ) {
-			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			QStringList fileNames = fileChooser->fileNames( );
-			xml.writeStartElement( name );
-			foreach( QString fileName, fileNames ) {
-				if( fileName.isEmpty( ) ) continue;
-				xml.writeStartElement( "file" );
-				xml.writeAttribute( "filename", fileName );
-				QFile file( fileName );
-				file.open( QFile::ReadOnly );
-				QByteArray fileContent = file.readAll( );
-				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
-				QString encoded = QString( fileContent.toBase64( ) );
-				file.close( );
-				xml.writeCharacters( encoded );
-				xml.writeEndElement( );
-			}
-			xml.writeEndElement( );
-		} else if( clazz == "PictureChooser" ) {
-			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-			QString fileName = pictureChooser->fileName( );
-			xml.writeStartElement( name );
-			xml.writeAttribute( "filename", fileName );
-			QByteArray fileContent = pictureChooser->picture( );
-			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
-			QString encoded = QString( fileContent.toBase64( ) );
-			xml.writeCharacters( encoded );
-			xml.writeEndElement( );
 		} else if( clazz == "QPushButton" ) {
 			// skip, ok, buttons can't be reset
 		} else if( clazz == "QWidget" ) {
@@ -406,12 +378,6 @@ void DataHandler::clearWidgetData( QWidget *widget, QString name )
 		for( int i = tableWidget->rowCount( ) - 1; i >= 0; i-- ) {
 			tableWidget->removeRow( i );
 		}
-	} else if( clazz == "FileChooser" ) {
-		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-		fileChooser->setFileName( "" );
-	} else if( clazz == "PictureChooser" ) {
-		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-		pictureChooser->setFileName( "" );
 	} else if( clazz == "QPushButton" ) {
 		// skip, ok, buttons can't be reset
 	} else if( clazz == "QGroupBox" ) {
@@ -511,17 +477,6 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 				QTableWidgetItem *item = tableWidget->item( row, col );
 				if( item ) item->setSelected( false );
 			}
-		}
-	} else if( clazz == "FileChooser" ) {
-		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-		fileChooser->setFileName( "" );
-		// TODO
-	} else if( clazz == "PictureChooser" ) {
-		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-		if( props->contains( "state" ) ) {
-			pictureChooser->setFileName( props->value( "state" ) );
-		} else {
-			pictureChooser->setFileName( "" );
 		}
 	} else if( clazz == "QPushButton" ) {
 		// skip, ok, buttons can't be reset
@@ -1032,14 +987,6 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									tableWidget->selectRow( index.row( ) );
 								}
 							}
-						} else if( clazz == "FileChooser" ) {
-							// don't restore anything, this is an upload component only
-						} else if( clazz == "PictureChooser" ) {
-							PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-							QByteArray encoded = text.toAscii( );
-							QByteArray decoded = QByteArray::fromBase64( encoded );
-							pictureChooser->setPicture( decoded );
 						} else if( clazz == "QPushButton" ) {
 							// skip, ok, buttons can't be reset
 						} else if( clazz == "QWidget" ) {

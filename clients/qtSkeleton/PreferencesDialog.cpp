@@ -182,10 +182,10 @@ void PreferencesDialog::loadSettings( )
 	m_developer->developer->setChecked( m_settings.developEnabled );
 	m_developer->autoLogin->setChecked( m_settings.autoLogin );
 
-	m_developer->uiFormsDir->setFileName( m_settings.uiFormsDir );
-	m_developer->uiFormTranslationsDir->setFileName( m_settings.uiFormTranslationsDir );
-	m_developer->uiFormResourcesDir->setFileName( m_settings.uiFormResourcesDir );
-	m_developer->dataLoaderDir->setFileName( m_settings.dataLoaderDir );
+//	m_developer->uiFormsDir->setFileName( m_settings.uiFormsDir );
+//	m_developer->uiFormTranslationsDir->setFileName( m_settings.uiFormTranslationsDir );
+//	m_developer->uiFormResourcesDir->setFileName( m_settings.uiFormResourcesDir );
+//	m_developer->dataLoaderDir->setFileName( m_settings.dataLoaderDir );
 }
 
 void PreferencesDialog::apply( )
@@ -221,10 +221,10 @@ void PreferencesDialog::apply( )
 	m_settings.debug = m_developer->debug->isChecked( );
 	m_settings.developEnabled = m_developer->developer->isChecked( );
 	m_settings.autoLogin = m_developer->autoLogin->isChecked( );
-	m_settings.uiFormsDir = m_developer->uiFormsDir->fileName( );
-	m_settings.uiFormTranslationsDir = m_developer->uiFormTranslationsDir->fileName( );
-	m_settings.uiFormResourcesDir = m_developer->uiFormResourcesDir->fileName( );
-	m_settings.dataLoaderDir = m_developer->dataLoaderDir->fileName( );
+//	m_settings.uiFormsDir = m_developer->uiFormsDir->fileName( );
+//	m_settings.uiFormTranslationsDir = m_developer->uiFormTranslationsDir->fileName( );
+//	m_settings.uiFormResourcesDir = m_developer->uiFormResourcesDir->fileName( );
+//	m_settings.dataLoaderDir = m_developer->dataLoaderDir->fileName( );
 
 	accept( );
 }
@@ -285,10 +285,10 @@ void PreferencesDialog::restoreDefaults( )
 	}
 	m_developer->debug->setChecked( false );
 	m_developer->developer->setChecked( false );
-	m_developer->uiFormsDir->setFileName( DEFAULT_UI_FORMS_DIR );
-	m_developer->uiFormTranslationsDir->setFileName( DEFAULT_UI_FORM_TRANSLATIONS_DIR );
-	m_developer->uiFormResourcesDir->setFileName( DEFAULT_UI_FORM_RESOURCES_DIR );
-	m_developer->dataLoaderDir->setFileName( DEFAULT_DATA_LOADER_DIR );
+//	m_developer->uiFormsDir->setFileName( DEFAULT_UI_FORMS_DIR );
+//	m_developer->uiFormTranslationsDir->setFileName( DEFAULT_UI_FORM_TRANSLATIONS_DIR );
+//	m_developer->uiFormResourcesDir->setFileName( DEFAULT_UI_FORM_RESOURCES_DIR );
+//	m_developer->dataLoaderDir->setFileName( DEFAULT_DATA_LOADER_DIR );
 }
 
 void PreferencesDialog::cancel( )
