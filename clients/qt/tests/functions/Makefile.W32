@@ -31,8 +31,8 @@ INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtMaind.lib
 !ENDIF
 
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) plugins\wolframewidgets.lib
+#INCLUDE_LIBS = \
+#	$(INCLUDE_LIBS) plugins\wolframewidgets.lib
 
 MOC_FLAGS =
 
@@ -58,7 +58,7 @@ MOC_FLAGS = \
 !ENDIF
 
 OBJS = \
-	DataTree.obj
+	..\..\DataTree.obj
 	
 CPP_BINS = \
 	testDataTree.exe
@@ -71,7 +71,7 @@ all: $(OBJS) $(CPP_BINS)
 
 local_all: $(CPP_BINS)
 
-testDataTree.exe: testDataTree.res testDataTree.obj
+testDataTree.exe: testDataTree.obj
 	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -82,5 +82,26 @@ local_clean:
 
 local_distclean:
 
-local_test:
+copy_prereq:
+!IFNDEF DEBUG
+	@-copy $(QT_DIR)\bin\QtCore4.dll .
+	@-copy $(QT_DIR)\bin\QtGui4.dll .
+	@-copy $(QT_DIR)\bin\QtNetwork4.dll .
+	@-copy $(QT_DIR)\bin\QtWebkit4.dll .
+!ELSE
+	@-copy $(QT_DIR)\bin\QtCored4.dll .
+	@-copy $(QT_DIR)\bin\QtGuid4.dll .
+	@-copy $(QT_DIR)\bin\QtNetworkd4.dll .
+	@-copy $(QT_DIR)\bin\QtWebkitd4.dll .
+!ENDIF
+!IFDEF WITH_SSL
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+!ENDIF
+
+local_test: copy_prereq
+	@-echo @echo off > test.bat
+	@-echo echo Test DataTree Operations: >> test.bat
+	@-echo testDataTree.exe >> test.bat
+	@-test.bat
 

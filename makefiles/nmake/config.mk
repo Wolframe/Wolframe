@@ -19,16 +19,27 @@
 ###########################################
 
 # version of the boost library
-BOOST_VERSION = 1.49
+
+#BOOST_VERSION = 1_46_1
+BOOST_VERSION = 1_51
 
 # base dir where boost is installed
-BOOST_DIR = C:\boost\boost-1.49.0
+
+#BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
+BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32
+#BOOST_DIR = D:\boost\boost_1_45_0
+#BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = C:\boost\boost-1.49.0\include
-BOOST_LIB_DIR = C:\boost\boost-1.49.0\lib
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_51
+#BOOST_INCLUDE_DIR = $(BOOST_DIR)
 
 # visual studio version used for compiling
+
+#BOOST_VC_VER = vc80
+#BOOST_VC_VER = vc90
 BOOST_VC_VER = vc100
 
 # TODO: probe those
@@ -149,5 +160,5 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-#CC="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-#CXX="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
