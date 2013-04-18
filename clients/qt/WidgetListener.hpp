@@ -49,18 +49,20 @@ public:
 public:
 	///\brief Constructor
 	WidgetListener( QWidget* widget_, DataLoader* dataLoader_);
-	virtual ~WidgetListener(){}
+	virtual ~WidgetListener();
 
 	void handleDataSignal( WidgetVisitor::DataSignalType dt);
 	void setDebug( bool v)	{m_debug=v;}
 
 public slots:
-	void changed()		{handleDataSignal( WidgetVisitor::SigChanged);}
-	void activated()	{handleDataSignal( WidgetVisitor::SigActivated);}
-	void entered()		{handleDataSignal( WidgetVisitor::SigEntered);}
-	void pressed()		{handleDataSignal( WidgetVisitor::SigPressed);}
-	void clicked()		{handleDataSignal( WidgetVisitor::SigClicked);}
-	void doubleclicked()	{handleDataSignal( WidgetVisitor::SigDoubleClicked);}
+	void changed()			{handleDataSignal( WidgetVisitor::SigChanged);}
+	void activated()		{handleDataSignal( WidgetVisitor::SigActivated);}
+	void entered()			{handleDataSignal( WidgetVisitor::SigEntered);}
+	void pressed()			{handleDataSignal( WidgetVisitor::SigPressed);}
+	void clicked()			{handleDataSignal( WidgetVisitor::SigClicked);}
+	void doubleclicked()		{handleDataSignal( WidgetVisitor::SigDoubleClicked);}
+
+	void showContextMenu( const QPoint& pos);
 
 private:
 	WidgetVisitor::StateR m_state;

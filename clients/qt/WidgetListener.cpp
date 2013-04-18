@@ -33,7 +33,15 @@
 #include "WidgetListener.hpp"
 #include "WidgetVisitorStateConstructor.hpp"
 #include "WidgetMessageDispatcher.hpp"
+#include "FormWidget.hpp"
 #include <QAbstractButton>
+#include <QAbstractScrollArea>
+#include <QMenu>
+#include <QDebug>
+
+WidgetListener::~WidgetListener()
+{
+}
 
 bool WidgetListener::hasDataSignals( const QWidget* widget_)
 {
@@ -49,7 +57,14 @@ WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_)
 	,m_state(createWidgetVisitorState(widget_))
 	,m_dataLoader(dataLoader_)
 	,m_debug(false)
-{}
+{
+	if (widget_->property( "contextmenu").isValid())
+	{
+		widget_->setContextMenuPolicy( Qt::CustomContextMenu);
+		connect( widget_, SIGNAL( customContextMenuRequested( const QPoint&)),
+			this, SLOT( showContextMenu( const QPoint&)));
+	}
+}
 
 void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 {
@@ -86,7 +101,67 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 	}
 }
 
+void WidgetListener::showContextMenu( const QPoint& pos)
+{
+	QPoint globalPos;
+	QWidget* widget = m_state->widget();
+	if (qobject_cast<QAbstractScrollArea*>(widget))
+	{
+		QAbstractScrollArea* as = qobject_cast<QAbstractScrollArea*>( widget);
+		globalPos = as->viewport()->mapToGlobal( pos);
+	}
+	else
+	{
+		globalPos = widget->mapToGlobal( pos);
+	}
+	QMenu menu;
+	WidgetVisitor visitor( m_state);
+	QVariant contextmenudef_p( visitor.property( "contextmenu"));
+	QList<QString> contextmenudef( contextmenudef_p.toString().split(','));
 
+	foreach (const QString& item, contextmenudef)
+	{
+		if (item.trimmed().isEmpty())
+		{
+			menu.addSeparator();
+		}
+		else
+		{
+			QList<QString> action_text = item.split(':');
+			if (action_text.size() == 1)
+			{
+				QAction* action = menu.addAction( action_text.at(0));
+				action->setData( QVariant( action_text.at(0)));
+			}
+			else if (action_text.size() == 1)
+			{
+				QAction* action = menu.addAction( action_text.at(1));
+				action->setData( QVariant( action_text.at(0)));
+			}
+			else
+			{
+				qCritical() << "error in menu definition. more than one ':' for" << item;
+			}
+		}
+	}
+	QAction* selectedItem = menu.exec( globalPos);
+	if (selectedItem)
+	{
+		FormWidget* form = visitor.formwidget();
+		if (!form)
+		{
+			qCritical() << "no form associated with widget woth context menu action";
+			return;
+		}
+		QVariant action = selectedItem->data();
+		if (!action.isValid())
+		{
+			qCritical() << "no data associated context menu action";
+			return;
+		}
+		form->executeMenuAction( widget, action.toString());
+	}
+}
 
 
 

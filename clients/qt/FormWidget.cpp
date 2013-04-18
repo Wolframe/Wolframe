@@ -91,9 +91,10 @@ void FormWidget::formListLoaded( QStringList forms )
 void FormWidget::executeAction( QWidget *actionwidget )
 {
 	WidgetVisitor visitor( actionwidget);
-
+	QString suffix;
 	QVariant doctype = visitor.property( "doctype");
 	QVariant action = visitor.property( "action");
+
 	if (doctype.isValid() || action.isValid())
 	{
 		WidgetMessageDispatcher dispatcher( visitor);
@@ -107,6 +108,26 @@ void FormWidget::executeAction( QWidget *actionwidget )
 			WidgetListenerR listener( visitor.createListener( m_dataLoader));
 			listener->setDebug( m_debug);
 			listener->handleDataSignal( WidgetVisitor::SigClicked);
+		}
+	}
+	else
+	{
+		switchForm( actionwidget);
+	}
+}
+
+void FormWidget::executeMenuAction( QWidget *actionwidget, const QString& menuaction)
+{
+	WidgetVisitor visitor( actionwidget);
+	QString suffix;
+	QVariant action = visitor.property( QString( "action") + ":" + menuaction);
+
+	if (action.isValid())
+	{
+		QPair<QString,QByteArray> request = getMenuActionRequest( visitor, menuaction, m_debug);
+		if (!request.second.isEmpty())
+		{
+			m_dataLoader->datarequest( request.first, request.second);
 		}
 	}
 	else

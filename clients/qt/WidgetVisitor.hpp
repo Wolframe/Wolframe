@@ -245,6 +245,7 @@ class WidgetVisitor
 			QString getLink( const QString& name) const;
 			QVariant dynamicProperty( const QString& name) const;
 			bool setDynamicProperty( const QString&, const QVariant& value);
+			QWidget* widget() const		{return m_widget;}
 
 		protected:
 			///\class DataElements
