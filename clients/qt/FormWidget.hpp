@@ -58,7 +58,8 @@ class FormWidget : public QWidget
 		void loadForm( QString name, bool modal = false );
 		void setLocale( QLocale locale );
 		void setLanguage( QString language );
-	
+		void executeMenuAction( QWidget *actionwidget, const QString& action);
+
 	public:
 		QString form( ) const;
 		QIcon getWindowIcon( ) const;
@@ -66,7 +67,7 @@ class FormWidget : public QWidget
 	public slots:
 		void setForm( const QString &_form );
 		void reload( );
-			
+
 	private:
 		QString m_form;				// name of the form
 		QString m_previousForm;
