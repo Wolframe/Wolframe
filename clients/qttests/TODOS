@@ -1,0 +1,144 @@
+- setting properties
+  - what about QVariantMaps or QVariantArays instead of the visitor
+    iterators?
+- state of the branch
+  - form?param=xx&param2=yy is webish, I don't like this syntax at all!
+    Even globals is easier readable..
+  - initAction doesn't work (example CRM, project combobox)
+  - MDI doesn't work at all
+  - form loading sequence is wrong
+  - too many branches and isles of development!
+  - dynamic properties instead of roles of data items? Where did selection
+    ids and stuff go?
+  - what is widgetid as dynamic property good for? There is winId(), and
+    there is find(winId). Stable after showing the widget and if not
+    reparenting it (at least from the code). there is also a winidchange
+    event which could be catched as last resort.
+    
+- fundamental questions
+  - what is a:
+    - window
+    - MDI window
+    - form
+      - a set of widgets
+      - they act on the same data and request/answers
+      - quasi a delegator/collector
+    - form widget:
+      - the widget implementing the form
+    - widget
+      - uniquely addressable
+      - has properties, exposed via getters and setters
+      - have QVariantMaps and QVariantArrays instead of complicated
+        iterators?
+    - domains
+      - optimization, sort of a per widget data preload
+
+- designer view
+  - annotate widgets how they interact with the data in the internal
+    structure
+      
+Form/Widget Load
+    (1) set form parameters
+    (2) read globals             ('global:VAR')
+        => declare as VAR to have global semantics
+    (3) read assignments     ('assign:VAR')
+              (disabled show UI here)
+    (4) initiate form localization load
+    (5) connect event signal/slots
+    (6) issue all domain load requests in reverse order of depht
+(children widgets first)
+
+Form/Widget Close
+   (1) write globals
+   (2) emit onclose signal if defined
+   (3) close
+
+Widget Request Answer
+    (1) *** find form and check if all domain load requests were successful,
+            if yes show form and hide old one, if not close form
+    (2) save widget state
+    (3) clear widget data
+    (4) read globals
+    (5) read assignments
+    (6) load answer
+    (7) restore widget state
+    (8) emit data loaded signal if defined
+
+Widget Request Error
+    (1) *** find form and increment error counter (last answer closes form)
+    (2) show error
+    (3) emit data load error if defined
+
+Refresh With Domain Load Request
+    (1) emit domain load request if defined
+
+Refresh Without Domain Load Request
+    (1) save widget state
+    (2) clear widget data
+    (3) read globals
+    (4) read assignments
+    (5) restore widget state
+    (6) emit data loaded signal if defined
+
+Additional Signals
+    (a) emit onchange signal if defined -> the recipient issues a self refresh
+    (b) emit onclose signal if defined -> the recipient issues a self refresh
+
+Remark:
+    (a) subsequent data requests with same tag are deleted if not sent yet to
+        the server (only the last one is sent)
+
+Use Cases:
+a) Sharing Data between widgets: A widget can read the data of a subwidget
+by a declared assignment and a refresh issued onclose or onchange by
+the subwidget.
+
+--
+
+todos:
+- make a library for basic communication and authentication
+  (libwolframeclient)
+- have a skeleton application which shows the basic flow
+- xml to internal data
+- json to internal data
+- internal data structure references in widgets
+
+custom widgets:
+- code and visual form separation, names of widgets and slot/signal
+  combinations must be fix
+- QUiTools with the loader
+
+we should be able to do:
+- custom menus
+- custom properties
+- get a list of widgets and their properties
+
+some examples:
+- yape (Yet another property editor) 2.1.3:
+  code for typed property editor
+  http://code.google.com/p/propertyeditor/
+
+other things found:
+- console mode in debug window
+  - QTermWidget or kconsole-like thing to replace the contents of the
+    debug window in qtclient
+- efficient data model for wolframe model
+  - Thethys data browser: should give nice insight on how to make huge
+    data in wolframe work
+  - QAIV, item
+- data structure
+  - typing:
+    - JSON, JSON Schema 
+    - XML, Schema/RelaxNG
+    - I would opt to pass it as part of the protocol as it forms the
+      contract, type semantics in the data is wrong!
+- version management in form designer
+  - Extended SCM Log Viewer: shows logs/graphs, quite nice
+- no clue for what yet
+  - http://www.workslikeclockwork.com/: nice plotting widgets
+    language picker, Qt hash functions
+  - http://root.cern.ch/: fast data handling, graphs, ROOT framework from
+    CERN, not sure where we can use it
+  
+        
+  
