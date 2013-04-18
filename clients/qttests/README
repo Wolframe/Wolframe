@@ -1,0 +1,37 @@
+reorganization of qtclient
+--------------------------
+
+libwolframeclient:
+
+- currently the client library with protocol and SSL
+- in the future authentication plugins:
+  - using QCA for
+    - SASL
+    - some cyphers and hash functions
+    - certificate handling
+  - using QOauth for OAuth authentication
+- have plugins for various marshalling of data
+  - use QVariant, QVariantList and QVariantMap as the lingua franca
+  - XML (XML parser of Qt)
+  - JSON (QJson, libqt4json, Qt5 JSON integrated library)
+  
+skeleton:
+
+- basic skeleton
+- using libwolframewidgets
+
+wolframewidgets:
+
+- the qt designer plugins for Wolframe specific widgets
+- currently implemented plugins
+  - FileChooser (single and multiple file upload, picking a directory)
+  - PictureChooser (picture preview and upload)
+- in the future
+  - PicturePicker (preview of a list pictures and single and multiple
+    selection)
+
+qtclient:
+
+- the generic client
+- built using libwolframeclient and skeleton (as a test case)
+- using plugins from wolframewidgets (dynamically, not as now hardcoded!)

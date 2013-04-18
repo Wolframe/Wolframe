@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="/">
+    <file>images/16x16/disconnected.png</file>
+    <file>images/16x16/connected.png</file>
+    <file>images/16x16/encrypted.png</file>
+    <file>images/16x16/unencrypted.png</file>
+    <file>images/login.png</file>
+    <file>images/logout.png</file>
+  </qresource>
+</RCC>
