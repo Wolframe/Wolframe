@@ -32,7 +32,7 @@
 ************************************************************************/
 #include "DataTree.hpp"
 #include <QDebug>
-#define WOLFRAME_LOWLEVEL_DEBUG
+#undef WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
 #define TRACE_ERROR( COMP, TITLE, LINE)			qDebug() << "DataTree" << (COMP) << "error" << (TITLE) << "at line" << (LINE);
 #define TRACE_STATE( COMP, TITLE)			qDebug() << "DataTree" << (COMP) << "state" << (TITLE);

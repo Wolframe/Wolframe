@@ -114,21 +114,6 @@ static QList<QWidget*> getWidgetChildren( QWidget* wdg)
 	return rt;
 }
 
-static bool isConvertibleToInt( const QVariant& val)
-{
-	if (val.type() == QVariant::String)
-	{
-		QString val_ = val.toString();
-		QString::const_iterator vi = val_.begin(), ve = val_.end();
-		if (*vi == '-') ++vi;
-		for (; vi != ve; ++vi) if (*vi < '0' || *vi > '9') return false;
-		return true;
-	}
-	if (val.type() == QVariant::Int) return true;
-	if (val.type() == QVariant::UInt) return true;
-	return false;
-}
-
 bool WidgetVisitor::getDataSignalType( const char* name, WidgetVisitor::DataSignalType& dt)
 {
 	const char* signame;
@@ -693,6 +678,77 @@ QVariant WidgetVisitor::property( const char* name)
 	return property( QString( name), 0);
 }
 
+QWidget* WidgetVisitor::getPropertyOwnerWidget( const QString& name) const
+{
+	if (m_stk.empty()) return 0;
+	WidgetVisitor visitor( m_stk.top()->widget());
+	return visitor.getPropertyOwnerWidget( name, 0);
+}
+
+QWidget* WidgetVisitor::getPropertyOwnerWidget( const QString& name, int level)
+{
+	if (m_stk.empty()) return 0;
+	// [A] check if a synonym is referenced and redirect to evaluate synonym value instead if yes
+	QVariant synonym = m_stk.top()->getSynonym( name);
+	if (synonym.isValid())
+	{
+		TRACE_ASSIGNMENT( "found synonym", objectName(), name, synonym);
+		return getPropertyOwnerWidget( synonym.toString(), level);
+	}
+
+	// [C] check if an multipart property is referenced and try to step into the substructure to get the property if yes
+	bool subelem = false;
+	QString prefix;
+	QString rest;
+	int followidx = name.indexOf( '.');
+	if (followidx >= 0)
+	{
+		prefix = name.mid( 0, followidx);
+		rest = name.mid( followidx+1, name.size()-followidx-1);
+		if (enter( prefix, false, level))
+		{
+			level += 1;
+			subelem = true;
+		}
+	}
+	else
+	{
+		if (enter( name, false, level))
+		{
+			level += 1;
+			subelem = true;
+			prefix = name;
+			rest.clear();
+		}
+	}
+	if (subelem)
+	{
+		return getPropertyOwnerWidget( rest, level);
+	}
+	if (followidx < 0)
+	{
+		// [B] check if an internal property of the widget is referenced and return its value if yes
+		QVariant rt;
+		if ((rt = m_stk.top()->property( name)).isValid())
+		{
+			TRACE_FETCH( "internal property", objectName(), name, rt)
+			return m_stk.top()->widget();
+		}
+
+		// [D] check if a dynamic property is referenced and return its value if yes
+		if (m_stk.top()->m_internal_entercnt == 0)
+		{
+			rt = m_stk.top()->dynamicProperty( name);
+			if (rt.isValid())
+			{
+				TRACE_FETCH( "dynamic property", objectName(), name, rt)
+				return m_stk.top()->widget();
+			}
+		}
+	}
+	return m_stk.top()->widget();
+}
+
 QVariant WidgetVisitor::property( const QString& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
@@ -1029,6 +1085,14 @@ WidgetListener* WidgetVisitor::createListener( DataLoader* dataLoader)
 		}
 	}
 	return listener;
+}
+
+void WidgetVisitor::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	if (!m_stk.isEmpty())
+	{
+		m_stk.top()->connectWidgetEnabler( enabler);
+	}
 }
 
 void WidgetVisitor::ERROR( const char* msg, const QString& arg) const

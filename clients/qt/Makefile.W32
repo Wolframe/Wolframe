@@ -99,6 +99,7 @@ OBJS = \
 	WolframeClientProtocolBase.obj \
 	WidgetVisitor.obj \
 	WidgetListener.obj \
+	WidgetEnabler.obj \
 	moc_WidgetListener.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \

@@ -33,6 +33,7 @@
 #include "WidgetVisitor_QTableWidget.hpp"
 #include "WidgetListener.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 #include <QLabel>
 #include <QBuffer>
@@ -524,12 +525,22 @@ void WidgetVisitorState_QTableWidget::connectDataSignals( WidgetVisitor::DataSig
 {
 	switch (dt)
 	{
-		case WidgetVisitor::SigChanged: QObject::connect( m_tableWidget, SIGNAL( cellChanged( int,int)), &listener, SLOT( changed())); break;
-		case WidgetVisitor::SigActivated: QObject::connect( m_tableWidget, SIGNAL( cellActivated( int,int)), &listener, SLOT( activated())); break;
-		case WidgetVisitor::SigEntered: QObject::connect( m_tableWidget, SIGNAL( cellEntered( int,int)), &listener, SLOT( entered())); break;
-		case WidgetVisitor::SigPressed: QObject::connect( m_tableWidget, SIGNAL( cellPressed( int,int)), &listener, SLOT( pressed())); break;
-		case WidgetVisitor::SigClicked: QObject::connect( m_tableWidget, SIGNAL( cellClicked( int,int)), &listener, SLOT( clicked())); break;
-		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_tableWidget, SIGNAL( cellDoubleClicked( int,int)), &listener, SLOT( doubleclicked()));
+		case WidgetVisitor::SigChanged: QObject::connect( m_tableWidget, SIGNAL( cellChanged( int,int)), &listener, SLOT( changed()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigActivated: QObject::connect( m_tableWidget, SIGNAL( cellActivated( int,int)), &listener, SLOT( activated()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigEntered: QObject::connect( m_tableWidget, SIGNAL( cellEntered( int,int)), &listener, SLOT( entered()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigPressed: QObject::connect( m_tableWidget, SIGNAL( cellPressed( int,int)), &listener, SLOT( pressed()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigClicked: QObject::connect( m_tableWidget, SIGNAL( cellClicked( int,int)), &listener, SLOT( clicked()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_tableWidget, SIGNAL( cellDoubleClicked( int,int)), &listener, SLOT( doubleclicked()), Qt::UniqueConnection);
 	}
+}
+
+void WidgetVisitorState_QTableWidget::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_tableWidget, SIGNAL( cellChanged( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_tableWidget, SIGNAL( cellActivated( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_tableWidget, SIGNAL( cellEntered( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_tableWidget, SIGNAL( cellPressed( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_tableWidget, SIGNAL( cellClicked( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_tableWidget, SIGNAL( cellDoubleClicked( int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
 }
 

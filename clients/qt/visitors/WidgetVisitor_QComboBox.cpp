@@ -32,6 +32,7 @@
 ************************************************************************/
 #include "WidgetVisitor_QComboBox.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
@@ -213,9 +214,9 @@ void WidgetVisitorState_QComboBox::connectDataSignals( WidgetVisitor::DataSignal
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_comboBox, SIGNAL( currentIndexChanged( int)), &listener, SLOT( changed())); break;
+			QObject::connect( m_comboBox, SIGNAL( currentIndexChanged( int)), &listener, SLOT( changed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
-			QObject::connect( m_comboBox, SIGNAL( activated( int)), &listener, SLOT( activated())); break;
+			QObject::connect( m_comboBox, SIGNAL( activated( int)), &listener, SLOT( activated()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigClicked:
 		case WidgetVisitor::SigPressed:
 		case WidgetVisitor::SigEntered:
@@ -223,3 +224,10 @@ void WidgetVisitorState_QComboBox::connectDataSignals( WidgetVisitor::DataSignal
 			qCritical() << "try to connect to signal not provided" << m_comboBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QComboBox::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_comboBox, SIGNAL( currentIndexChanged( int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_comboBox, SIGNAL( activated( int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+

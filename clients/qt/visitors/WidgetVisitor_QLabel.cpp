@@ -32,6 +32,7 @@
 ************************************************************************/
 #include "WidgetVisitor_QLabel.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QLabel::WidgetVisitorState_QLabel( QWidget* widget_)
@@ -71,5 +72,9 @@ void WidgetVisitorState_QLabel::setState( const QVariant& state)
 QVariant WidgetVisitorState_QLabel::getState() const
 {
 	return QVariant( m_label->text());
+}
+
+void WidgetVisitorState_QLabel::connectWidgetEnabler( WidgetEnabler& /*enabler*/)
+{
 }
 

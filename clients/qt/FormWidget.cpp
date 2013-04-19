@@ -96,12 +96,20 @@ void FormWidget::executeAction( QWidget *actionwidget )
 
 	if (action.isValid())
 	{
+		QPushButton* button = qobject_cast<QPushButton*>( actionwidget);
+		if (button->isDown())
+		{
+			qDebug() << "button pressed twice" << visitor.objectName();
+			return;
+		}
+
 		WidgetMessageDispatcher dispatcher( visitor);
 		WidgetRequest request = dispatcher.getFormActionRequest( m_debug);
 
 		if (!request.content.isEmpty())
 		{
 			m_dataLoader->datarequest( request.tag, request.content);
+			button->setDown( true);
 		}
 		if (actionwidget->property( "datasignal:clicked").isValid())
 		{
@@ -436,6 +444,8 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 	{
 		foreach (QWidget* actionwidget, dispatcher.findRecipients( rq.recipientid()))
 		{
+			QPushButton* button = qobject_cast<QPushButton*>( actionwidget);
+			if (button) button->setDown( false);
 			WidgetVisitor actionvisitor( actionwidget);
 			FormWidget* THIS_ = actionvisitor.formwidget();
 			THIS_->switchForm( actionwidget, rq.followform());
@@ -481,6 +491,19 @@ void FormWidget::gotError( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got error tag=" << tag_ << "data=" << data_;
 	emit error( QString( data_));
+
+	WidgetVisitor visitor( m_ui);
+	WidgetMessageDispatcher dispatcher( visitor);
+	WidgetRequest rq( tag_, "");
+
+	if (rq.type() == WidgetRequest::Action)
+	{
+		foreach (QWidget* actionwidget, dispatcher.findRecipients( rq.recipientid()))
+		{
+			QPushButton* button = qobject_cast<QPushButton*>( actionwidget);
+			if (button) button->setDown( false);
+		}
+	}
 }
 
 void FormWidget::closeEvent( QCloseEvent *e )

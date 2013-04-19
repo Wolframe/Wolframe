@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QSpinBox.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QSpinBox::WidgetVisitorState_QSpinBox( QWidget* widget_)
@@ -61,7 +62,7 @@ void WidgetVisitorState_QSpinBox::connectDataSignals( WidgetVisitor::DataSignalT
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_spinBox, SIGNAL( valueChanged( int)), &listener, SLOT( changed())); break;
+			QObject::connect( m_spinBox, SIGNAL( valueChanged( int)), &listener, SLOT( changed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigPressed:
@@ -70,3 +71,11 @@ void WidgetVisitorState_QSpinBox::connectDataSignals( WidgetVisitor::DataSignalT
 			qCritical() << "try to connect to signal not provided" << m_spinBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QSpinBox::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_spinBox, SIGNAL( valueChanged( int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
+
+

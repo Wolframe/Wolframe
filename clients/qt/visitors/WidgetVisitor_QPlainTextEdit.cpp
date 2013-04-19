@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QPlainTextEdit.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QPlainTextEdit::WidgetVisitorState_QPlainTextEdit( QWidget* widget_)
@@ -46,11 +47,11 @@ void WidgetVisitorState_QPlainTextEdit::connectDataSignals( WidgetVisitor::DataS
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_plainTextEdit, SIGNAL( blockCountChanged( int)), &listener, SLOT( changed()));
-			QObject::connect( m_plainTextEdit, SIGNAL( cursorPositionChanged()), &listener, SLOT( changed()));
-			QObject::connect( m_plainTextEdit, SIGNAL( modificationChanged( bool)), &listener, SLOT( changed()));
-			QObject::connect( m_plainTextEdit, SIGNAL( selectionChanged()), &listener, SLOT( changed()));
-			QObject::connect( m_plainTextEdit, SIGNAL( textChanged()), &listener, SLOT( changed()));
+			QObject::connect( m_plainTextEdit, SIGNAL( blockCountChanged( int)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_plainTextEdit, SIGNAL( cursorPositionChanged()), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_plainTextEdit, SIGNAL( modificationChanged( bool)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_plainTextEdit, SIGNAL( selectionChanged()), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_plainTextEdit, SIGNAL( textChanged()), &listener, SLOT( changed()), Qt::UniqueConnection);
 			break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
@@ -60,4 +61,14 @@ void WidgetVisitorState_QPlainTextEdit::connectDataSignals( WidgetVisitor::DataS
 			qCritical() << "try to connect to signal not provided" << m_plainTextEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QPlainTextEdit::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_plainTextEdit, SIGNAL( blockCountChanged( int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_plainTextEdit, SIGNAL( cursorPositionChanged()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_plainTextEdit, SIGNAL( modificationChanged( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_plainTextEdit, SIGNAL( selectionChanged()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_plainTextEdit, SIGNAL( textChanged()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
 

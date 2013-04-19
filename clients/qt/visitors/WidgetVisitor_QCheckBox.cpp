@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QCheckBox.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QCheckBox::WidgetVisitorState_QCheckBox( QWidget* widget_)
@@ -57,18 +58,26 @@ void WidgetVisitorState_QCheckBox::connectDataSignals( WidgetVisitor::DataSignal
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_checkBox, SIGNAL( clicked( bool)), &listener, SLOT( changed()));
-			QObject::connect( m_checkBox, SIGNAL( released()), &listener, SLOT( changed()));
-			QObject::connect( m_checkBox, SIGNAL( toggled( bool)), &listener, SLOT( changed()));
+			QObject::connect( m_checkBox, SIGNAL( clicked( bool)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_checkBox, SIGNAL( released()), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_checkBox, SIGNAL( toggled( bool)), &listener, SLOT( changed()), Qt::UniqueConnection);
 			break;
 		case WidgetVisitor::SigPressed:
-			QObject::connect( m_checkBox, SIGNAL( pressed()), &listener, SLOT( pressed())); break;
+			QObject::connect( m_checkBox, SIGNAL( pressed()), &listener, SLOT( pressed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigClicked:
 		case WidgetVisitor::SigDoubleClicked:
 			qCritical() << "try to connect to signal not provided" << m_checkBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
+}
+
+void WidgetVisitorState_QCheckBox::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_checkBox, SIGNAL( clicked( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_checkBox, SIGNAL( released()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_checkBox, SIGNAL( toggled( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_checkBox, SIGNAL( pressed()), &enabler, SLOT( changed()), Qt::UniqueConnection);
 }
 
 

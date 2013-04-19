@@ -1,5 +1,6 @@
 #include "WidgetVisitor_PictureChooser.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetEnabler.hpp"
 
 WidgetVisitorState_PictureChooser::WidgetVisitorState_PictureChooser( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
@@ -63,5 +64,10 @@ void WidgetVisitorState_PictureChooser::setState( const QVariant& state)
 QVariant WidgetVisitorState_PictureChooser::getState() const
 {
 	return QVariant( QVariant( m_pictureChooser->fileName()));
+}
+
+void WidgetVisitorState_PictureChooser::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_pictureChooser, SIGNAL( changed()), &enabler, SLOT( changed()), Qt::UniqueConnection);
 }
 

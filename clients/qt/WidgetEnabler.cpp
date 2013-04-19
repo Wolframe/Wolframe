@@ -30,30 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-
-#ifndef _WIDGET_VISIOR_QDoubleSpinBox_HPP_INCLUDED
-#define _WIDGET_VISIOR_QDoubleSpinBox_HPP_INCLUDED
+#include "WidgetEnabler.hpp"
 #include "WidgetVisitor.hpp"
-#include <QDoubleSpinBox>
+#include "WidgetVisitorStateConstructor.hpp"
+#include <QDebug>
 
-class WidgetVisitorState_QDoubleSpinBox
-	:public WidgetVisitor::State
+WidgetEnabler::WidgetEnabler( QWidget* widget_, const QList<QString>& properties_)
+	:QObject()
+	,m_state(createWidgetVisitorState(widget_))
+	,m_properties(properties_)
+{}
+
+void WidgetEnabler::changed()
 {
-public:
-	WidgetVisitorState_QDoubleSpinBox( QWidget* widget_);
+	QWidget* widget = m_state->widget();
+	if (!widget)
+	{
+		qCritical() << "enabler has no widget defined";
+		return;
+	}
+	WidgetVisitor visitor( m_state);
+	foreach (const QString& prop, m_properties)
+	{
+		if (!visitor.property( prop).isValid())
+		{
+			widget->setEnabled( false);
+			return;
+		}
+	}
+	widget->setEnabled( true);
+}
 
-	virtual bool enter( const QString& name, bool writemode);
-	virtual bool leave( bool writemode);
-	virtual void clear();
-	virtual QVariant property( const QString& name);
-	virtual bool setProperty( const QString& name, const QVariant& data);
-	virtual void setState( const QVariant& state);
-	virtual QVariant getState() const;
-	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
-	virtual void connectWidgetEnabler( WidgetEnabler& enabler);
-
-private:
-	QDoubleSpinBox* m_doubleSpinBox;
-};
-
-#endif

@@ -53,6 +53,7 @@ public:
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
 	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
+	virtual void connectWidgetEnabler( WidgetEnabler& enabler);
 
 private:
 	void fill_cell( int row, int col, int itemidx);

@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QRadioButton.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QRadioButton::WidgetVisitorState_QRadioButton( QWidget* widget_)
@@ -57,12 +58,12 @@ void WidgetVisitorState_QRadioButton::connectDataSignals( WidgetVisitor::DataSig
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_radioButton, SIGNAL( clicked( bool)), &listener, SLOT( changed()));
-			QObject::connect( m_radioButton, SIGNAL( released()), &listener, SLOT( changed()));
-			QObject::connect( m_radioButton, SIGNAL( toggled( bool)), &listener, SLOT( changed()));
+			QObject::connect( m_radioButton, SIGNAL( clicked( bool)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_radioButton, SIGNAL( released()), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_radioButton, SIGNAL( toggled( bool)), &listener, SLOT( changed()), Qt::UniqueConnection);
 			break;
 		case WidgetVisitor::SigPressed:
-			QObject::connect( m_radioButton, SIGNAL( pressed()), &listener, SLOT( pressed())); break;
+			QObject::connect( m_radioButton, SIGNAL( pressed()), &listener, SLOT( pressed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigClicked:
@@ -70,4 +71,13 @@ void WidgetVisitorState_QRadioButton::connectDataSignals( WidgetVisitor::DataSig
 			qCritical() << "try to connect to signal not provided" << m_radioButton->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QRadioButton::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_radioButton, SIGNAL( clicked( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_radioButton, SIGNAL( released()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_radioButton, SIGNAL( toggled( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_radioButton, SIGNAL( pressed()), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
 

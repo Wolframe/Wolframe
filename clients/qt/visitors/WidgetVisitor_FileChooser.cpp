@@ -1,5 +1,6 @@
 #include "WidgetVisitor_FileChooser.hpp"
 #include "WidgetVisitor.hpp"
+#include "WidgetEnabler.hpp"
 #include <QFile>
 
 WidgetVisitorState_FileChooser::WidgetVisitorState_FileChooser( QWidget* widget_)
@@ -114,3 +115,8 @@ QVariant WidgetVisitorState_FileChooser::getState() const
 	return QVariant();
 }
 
+void WidgetVisitorState_FileChooser::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_fileChooser, SIGNAL( fileNameChanged( const QString)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_fileChooser, SIGNAL( fileNamesChanged( const QStringList)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}

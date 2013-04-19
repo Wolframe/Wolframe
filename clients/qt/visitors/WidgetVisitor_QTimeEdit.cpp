@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QTimeEdit.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QSignalMapper>
 #include <QWidget>
 #include <QDebug>
@@ -60,7 +61,7 @@ void WidgetVisitorState_QTimeEdit::connectDataSignals( WidgetVisitor::DataSignal
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( (const QObject*)m_timeEdit, SIGNAL( timeChanged( const QDate&)), (const QObject*)&listener, SLOT( changed())); break;
+			QObject::connect( (const QObject*)m_timeEdit, SIGNAL( timeChanged( const QDate&)), (const QObject*)&listener, SLOT( changed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigPressed:
@@ -70,4 +71,10 @@ void WidgetVisitorState_QTimeEdit::connectDataSignals( WidgetVisitor::DataSignal
 			break;
 	}
 }
+
+void WidgetVisitorState_QTimeEdit::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( (const QObject*)m_timeEdit, SIGNAL( timeChanged( const QDate&)), (const QObject*)&enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
 

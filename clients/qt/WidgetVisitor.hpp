@@ -166,6 +166,9 @@ by a declared assignment and a refresh issued onclose or onchange by the subwidg
 ///\class WidgetListener
 ///\brief Forward declaration
 class WidgetListener;
+///\class WidgetEnabler
+///\brief Forward declaration
+class WidgetEnabler;
 ///\class DataLoader
 ///\brief Forward declaration
 class DataLoader;
@@ -235,6 +238,8 @@ class WidgetVisitor
 			virtual WidgetListener* createListener( DataLoader* dataLoader);
 			///\brief Connect all widget signals that should trigger an event on a signal of type 'type'
 			virtual void connectDataSignals( DataSignalType dt, WidgetListener& listener);
+			///\brief Connect widget signals that should trigger an event for enabling or disabling a data referencing widget
+			virtual void connectWidgetEnabler( WidgetEnabler& /*enabler*/){}
 
 		public://Common methods:
 			QVariant getSynonym( const QString& name) const;
@@ -313,6 +318,9 @@ class WidgetVisitor
 		///\param[in] value property value as variant (any type)
 		///\return true on success
 		bool setProperty( const char* name, const QVariant& value);
+
+		QWidget* getPropertyOwnerWidget( const QString& name) const;
+		void connectWidgetEnabler( WidgetEnabler& enabler);
 
 		///\brief Find all sub widgets matching a condition and return them as their visitor context
 		typedef bool (*NodeProperty)( const QWidget* widget, const QVariant& cond);
@@ -407,6 +415,8 @@ class WidgetVisitor
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		///\return true on success
 		bool setProperty( const QString& name, const QVariant& value, int level);
+
+		QWidget* getPropertyOwnerWidget( const QString& name, int level);
 
 		///\brief Sets the current node to the child with name 'name'
 		///\param[in] name name of the subnode

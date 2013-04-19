@@ -32,6 +32,7 @@
 ************************************************************************/
 #include "WidgetVisitor_QListWidget.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QListWidget::WidgetVisitorState_QListWidget( QWidget* widget_)
@@ -139,17 +140,29 @@ void WidgetVisitorState_QListWidget::connectDataSignals( WidgetVisitor::DataSign
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_listWidget, SIGNAL( currentItemChanged(QListWidgetItem*,QListWidgetItem*)), &listener, SLOT( changed()));
-			QObject::connect( m_listWidget, SIGNAL( currentRowChanged(int)), &listener, SLOT( changed()));
-			QObject::connect( m_listWidget, SIGNAL( currentTextChanged(const QString&)), &listener, SLOT( changed()));
-			QObject::connect( m_listWidget, SIGNAL( itemChanged(QListWidgetItem*)), &listener, SLOT( changed()));
+			QObject::connect( m_listWidget, SIGNAL( currentItemChanged(QListWidgetItem*,QListWidgetItem*)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_listWidget, SIGNAL( currentRowChanged(int)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_listWidget, SIGNAL( currentTextChanged(const QString&)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_listWidget, SIGNAL( itemChanged(QListWidgetItem*)), &listener, SLOT( changed()), Qt::UniqueConnection);
 			break;
-		case WidgetVisitor::SigActivated: QObject::connect( m_listWidget, SIGNAL( itemActivated( QListWidgetItem*)), &listener, SLOT( activated())); break;
-		case WidgetVisitor::SigEntered: QObject::connect( m_listWidget, SIGNAL( itemEntered( QListWidgetItem*)), &listener, SLOT( entered())); break;
-		case WidgetVisitor::SigPressed: QObject::connect( m_listWidget, SIGNAL( itemPressed( QListWidgetItem*)), &listener, SLOT( pressed())); break;
-		case WidgetVisitor::SigClicked: QObject::connect( m_listWidget, SIGNAL( itemClicked( QListWidgetItem*)), &listener, SLOT( clicked())); break;
-		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_listWidget, SIGNAL( itemDoubleClicked( QListWidgetItem*)), &listener, SLOT( doubleclicked()));
+		case WidgetVisitor::SigActivated: QObject::connect( m_listWidget, SIGNAL( itemActivated( QListWidgetItem*)), &listener, SLOT( activated()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigEntered: QObject::connect( m_listWidget, SIGNAL( itemEntered( QListWidgetItem*)), &listener, SLOT( entered()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigPressed: QObject::connect( m_listWidget, SIGNAL( itemPressed( QListWidgetItem*)), &listener, SLOT( pressed()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigClicked: QObject::connect( m_listWidget, SIGNAL( itemClicked( QListWidgetItem*)), &listener, SLOT( clicked()), Qt::UniqueConnection); break;
+		case WidgetVisitor::SigDoubleClicked: QObject::connect( m_listWidget, SIGNAL( itemDoubleClicked( QListWidgetItem*)), &listener, SLOT( doubleclicked()), Qt::UniqueConnection);
 	}
 }
 
+void WidgetVisitorState_QListWidget::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_listWidget, SIGNAL( currentItemChanged(QListWidgetItem*,QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( currentRowChanged(int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( currentTextChanged(const QString&)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemChanged(QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemActivated( QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemEntered( QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemPressed( QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemClicked( QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_listWidget, SIGNAL( itemDoubleClicked( QListWidgetItem*)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
 

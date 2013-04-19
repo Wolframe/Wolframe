@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QDateTimeEdit.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QSignalMapper>
 #include <QWidget>
 #include <QDebug>
@@ -60,9 +61,9 @@ void WidgetVisitorState_QDateTimeEdit::connectDataSignals( WidgetVisitor::DataSi
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_dateTimeEdit, SIGNAL( dateTimeChanged( const QDate&)), &listener, SLOT( changed()));
-			QObject::connect( m_dateTimeEdit, SIGNAL( timeChanged( const QDate&)), &listener, SLOT( changed()));
-			QObject::connect( m_dateTimeEdit, SIGNAL( dateChanged( const QDate&)), &listener, SLOT( changed()));
+			QObject::connect( m_dateTimeEdit, SIGNAL( dateTimeChanged( const QDate&)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_dateTimeEdit, SIGNAL( timeChanged( const QDate&)), &listener, SLOT( changed()), Qt::UniqueConnection);
+			QObject::connect( m_dateTimeEdit, SIGNAL( dateChanged( const QDate&)), &listener, SLOT( changed()), Qt::UniqueConnection);
 			break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
@@ -71,6 +72,13 @@ void WidgetVisitorState_QDateTimeEdit::connectDataSignals( WidgetVisitor::DataSi
 		case WidgetVisitor::SigDoubleClicked:
 			qCritical() << "try to connect to signal not provided" << m_dateTimeEdit->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
+}
+
+void WidgetVisitorState_QDateTimeEdit::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_dateTimeEdit, SIGNAL( dateTimeChanged( const QDate&)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_dateTimeEdit, SIGNAL( timeChanged( const QDate&)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_dateTimeEdit, SIGNAL( dateChanged( const QDate&)), &enabler, SLOT( changed()), Qt::UniqueConnection);
 }
 
 

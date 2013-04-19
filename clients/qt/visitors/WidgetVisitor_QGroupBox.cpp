@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QGroupBox.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 #include <QAbstractButton>
 #include <QRadioButton>
@@ -131,9 +132,9 @@ void WidgetVisitorState_QGroupBox::connectDataSignals( WidgetVisitor::DataSignal
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_groupBox, SIGNAL( toggled( bool)), &listener, SLOT( changed())); break;
+			QObject::connect( m_groupBox, SIGNAL( toggled( bool)), &listener, SLOT( changed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigClicked:
-			QObject::connect( m_groupBox, SIGNAL( clicked( bool)), &listener, SLOT( clicked())); break;
+			QObject::connect( m_groupBox, SIGNAL( clicked( bool)), &listener, SLOT( clicked()), Qt::UniqueConnection); break;
 
 		case WidgetVisitor::SigPressed:
 		case WidgetVisitor::SigActivated:
@@ -142,4 +143,12 @@ void WidgetVisitorState_QGroupBox::connectDataSignals( WidgetVisitor::DataSignal
 			qCritical() << "try to connect to signal not provided" << m_groupBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QGroupBox::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_groupBox, SIGNAL( toggled( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+	QObject::connect( m_groupBox, SIGNAL( clicked( bool)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
+
 

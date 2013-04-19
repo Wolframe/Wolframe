@@ -31,29 +31,35 @@
 
 ************************************************************************/
 
-#ifndef _WIDGET_VISIOR_QDoubleSpinBox_HPP_INCLUDED
-#define _WIDGET_VISIOR_QDoubleSpinBox_HPP_INCLUDED
+#ifndef _WIDGET_Enabler_HPP_INCLUDED
+#define _WIDGET_Enabler_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
-#include <QDoubleSpinBox>
+#include <QObject>
+#include <QWidget>
+#include <QList>
+#include <QString>
+#include <QSharedPointer>
 
-class WidgetVisitorState_QDoubleSpinBox
-	:public WidgetVisitor::State
+///\class WidgetEnabler
+///\brief Structure to enable widgets based on a set of properties
+class WidgetEnabler :public QObject
 {
-public:
-	WidgetVisitorState_QDoubleSpinBox( QWidget* widget_);
+	Q_OBJECT
 
-	virtual bool enter( const QString& name, bool writemode);
-	virtual bool leave( bool writemode);
-	virtual void clear();
-	virtual QVariant property( const QString& name);
-	virtual bool setProperty( const QString& name, const QVariant& data);
-	virtual void setState( const QVariant& state);
-	virtual QVariant getState() const;
-	virtual void connectDataSignals( WidgetVisitor::DataSignalType dt, WidgetListener& listener);
-	virtual void connectWidgetEnabler( WidgetEnabler& enabler);
+public:
+	///\brief Constructor
+	WidgetEnabler( QWidget* widget_, const QList<QString>& properties_);
+	virtual ~WidgetEnabler(){}
+
+public slots:
+	void changed();
 
 private:
-	QDoubleSpinBox* m_doubleSpinBox;
+	WidgetVisitor::StateR m_state;
+	const QList<QString> m_properties;
 };
 
+typedef QSharedPointer<WidgetEnabler> WidgetEnablerR;
+
 #endif
+

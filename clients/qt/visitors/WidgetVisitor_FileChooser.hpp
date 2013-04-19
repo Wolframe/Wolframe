@@ -50,6 +50,7 @@ public:
 	virtual bool isArrayElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
+	virtual void connectWidgetEnabler( WidgetEnabler& enabler);
 
 private:
 	enum Mode {Init,File};

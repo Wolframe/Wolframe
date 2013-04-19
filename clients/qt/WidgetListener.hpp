@@ -36,6 +36,8 @@
 #include "WidgetVisitor.hpp"
 #include "DataLoader.hpp"
 #include <QObject>
+#include <QWidget>
+#include <QSharedPointer>
 
 ///\class WidgetListener
 ///\brief Structure to redirect Qt widget signals to widget visitor events

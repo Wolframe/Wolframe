@@ -1,6 +1,7 @@
 #include "WidgetVisitor_QDoubleSpinBox.hpp"
 #include "WidgetVisitor.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QDebug>
 
 WidgetVisitorState_QDoubleSpinBox::WidgetVisitorState_QDoubleSpinBox( QWidget* widget_)
@@ -61,7 +62,7 @@ void WidgetVisitorState_QDoubleSpinBox::connectDataSignals( WidgetVisitor::DataS
 	switch (dt)
 	{
 		case WidgetVisitor::SigChanged:
-			QObject::connect( m_doubleSpinBox, SIGNAL( valueChanged( double)), &listener, SLOT( changed())); break;
+			QObject::connect( m_doubleSpinBox, SIGNAL( valueChanged( double)), &listener, SLOT( changed()), Qt::UniqueConnection); break;
 		case WidgetVisitor::SigActivated:
 		case WidgetVisitor::SigEntered:
 		case WidgetVisitor::SigPressed:
@@ -70,3 +71,10 @@ void WidgetVisitorState_QDoubleSpinBox::connectDataSignals( WidgetVisitor::DataS
 			qCritical() << "try to connect to signal not provided" << m_doubleSpinBox->metaObject()->className() << WidgetVisitor::dataSignalTypeName(dt);
 	}
 }
+
+void WidgetVisitorState_QDoubleSpinBox::connectWidgetEnabler( WidgetEnabler& enabler)
+{
+	QObject::connect( m_doubleSpinBox, SIGNAL( valueChanged( double)), &enabler, SLOT( changed()), Qt::UniqueConnection);
+}
+
+
