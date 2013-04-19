@@ -36,11 +36,31 @@
 #include <QWidget>
 #include <QByteArray>
 
-QByteArray getWidgetRequest( WidgetVisitor& visitor, bool debugmode=false);
-QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
-QPair<QString,QByteArray> getMenuActionRequest( WidgetVisitor& visitor, const QString& menuitem, bool debugmode=false);
+struct WidgetRequest
+{
+	enum Type {Action,DomainLoad};
+	QString tag;
+	QByteArray content;
+
+	Type type() const;
+	QString recipientid() const;
+	QString followform() const;
+
+	static QString actionWidgetRequestTag( QString recipientid_);
+	static QString actionWidgetRequestTag( QString recipientid_, QString followform_);
+	static QString domainLoadWidgetRequestTag( QString recipientid_);
+
+	WidgetRequest(){}
+	WidgetRequest( QString tag_, QByteArray content_)
+		:tag(tag_),content(content_){}
+	WidgetRequest( const WidgetRequest& o)
+		:tag(o.tag),content(o.content){}
+};
+
+WidgetRequest getWidgetRequest( WidgetVisitor& visitor, bool debugmode=false);
+WidgetRequest getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
+WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menuitem, bool debugmode=false);
 bool isActionRequest( const QString& tag);
-QString actionRequestRecipientId( const QString& tag);
 bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
 
 #endif

@@ -52,13 +52,14 @@ static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* wid
 	return (doctype_property.isValid() || action_property.isValid());
 }
 
-QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
+QList<WidgetRequest> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
 {
-	QList<Request> rt;
+	QList<WidgetRequest> rt;
 	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
 	{
 		WidgetVisitor visitor( widget);
-		rt.push_back( Request( visitor.widgetid(), getWidgetRequest( visitor, debugmode)));
+		WidgetRequest request = getWidgetRequest( visitor, debugmode);
+		rt.push_back( request);
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -66,20 +67,20 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	return rt;
 }
 
-WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
+WidgetRequest WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
 {
-	return Request( m_visitor.widgetid(), getWidgetRequest( m_visitor, debugmode));
+	return getWidgetRequest( m_visitor, debugmode);
 }
 
-WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
+WidgetRequest WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	QPair<QString,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
-	return Request( actionrequest.first, actionrequest.second);
+	return getActionRequest( m_visitor, debugmode);
 }
 
 QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
 {
-	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);
+	WidgetRequest request( tag, "");
+	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, request.recipientid());
 }
 
 

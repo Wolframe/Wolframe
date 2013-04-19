@@ -46,6 +46,57 @@
 #define TRACE_ASSIGNMENT( TITLE, NAME, VALUE)
 #endif
 
+QString WidgetRequest::actionWidgetRequestTag( QString recipientid_)
+{
+	return QString("-") + recipientid_;
+}
+
+QString WidgetRequest::actionWidgetRequestTag( QString recipientid_, QString followform_)
+{
+	return QString("-") + recipientid_ + "-" + followform_;
+}
+
+QString WidgetRequest::domainLoadWidgetRequestTag( QString recipientid_)
+{
+	return recipientid_;
+}
+
+WidgetRequest::Type WidgetRequest::type() const
+{
+	if (tag.size() && tag.at(0) == '-') return Action;
+	return DomainLoad;
+}
+
+QString WidgetRequest::recipientid() const
+{
+	if (type() == Action)
+	{
+		int formidx = tag.indexOf( '-', 1);
+		if (formidx < 0)
+		{
+			return tag.mid( 1, tag.size()-1);
+		}
+		else
+		{
+			return tag.mid( 1, formidx-1);
+		}
+	}
+	return tag;
+}
+
+QString WidgetRequest::followform() const
+{
+	int formidx = tag.indexOf( '-', 1);
+	if (formidx < 0)
+	{
+		return "";
+	}
+	else
+	{
+		return tag.mid( formidx+1, tag.size()-formidx-1);
+	}
+}
+
 static QByteArray getRequestXML( const QString& docType, const QString& rootElement, bool isStandalone, const QList<DataSerializeItem>& elements, bool debugmode)
 {
 	QByteArray rt;
@@ -229,51 +280,43 @@ static QByteArray getWidgetRequest_( WidgetVisitor& visitor, bool debugmode)
 	}
 }
 
-bool isActionRequest( const QString& tag)
+WidgetRequest getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	return !tag.isEmpty() && tag.at(0) == '-';
-}
-
-QString actionRequestRecipientId( const QString& tag)
-{
-	if (tag.isEmpty()) return QString();
-	return tag.mid( 1, tag.size()-1);
-}
-
-QPair<QString,QByteArray> getActionRequest( WidgetVisitor& visitor, bool debugmode)
-{
-	QPair<QString,QByteArray> rt;
-	rt.second = getWidgetRequest_( visitor, debugmode);
-	rt.first = QString("-") + visitor.widgetid();
-	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
+	WidgetRequest rt;
+	rt.content = getWidgetRequest_( visitor, debugmode);
+	rt.tag = WidgetRequest::actionWidgetRequestTag( visitor.widgetid());
+	qDebug() << "action request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
 }
 
-QPair<QString,QByteArray> getMenuActionRequest( WidgetVisitor& visitor, const QString& menuitem, bool debugmode)
+WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menuitem, bool debugmode)
 {
-	QPair<QString,QByteArray> rt;
+	WidgetRequest rt;
 	QWidget* widget = visitor.widget();
 	if (!widget)
 	{
 		qCritical() << "menu action on non existing widget" << menuitem;
 		return rt;
 	}
-	QVariant action_v = widget->property( QByteArray("action:") + menuitem.toAscii());
-	if (action_v.isValid())
+	QByteArray propname = QByteArray("action:") + menuitem.toAscii();
+	QVariant action_v = widget->property( propname);
+	if (!action_v.isValid())
 	{
-		qCritical() << "menu item action does not exist for" << menuitem << "in" << visitor.className() << visitor.objectName();
+		qCritical() << "menu item action (property" << propname << ") does not exist for" << menuitem << "in" << visitor.className() << visitor.objectName();
 		return rt;
 	}
-	rt.second = getWidgetActionRequest_( visitor, action_v, debugmode);
-	rt.first = QString("-") + visitor.widgetid();
-	qDebug() << "action request of " << visitor.objectName() << "=" << rt.first << ":" << rt.second;
+	rt.content = getWidgetActionRequest_( visitor, action_v, debugmode);
+	rt.tag = WidgetRequest::actionWidgetRequestTag( visitor.widgetid(), menuitem);
+	qDebug() << "action request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
 }
 
-QByteArray getWidgetRequest( WidgetVisitor& visitor, bool debugmode)
+WidgetRequest getWidgetRequest( WidgetVisitor& visitor, bool debugmode)
 {
-	QByteArray rt = getWidgetRequest_( visitor, debugmode);
-	qDebug() << "widget request of " << visitor.objectName() << "=" << rt;
+	WidgetRequest rt;
+	rt.tag = WidgetRequest::domainLoadWidgetRequestTag( visitor.widgetid());
+	rt.content = getWidgetRequest_( visitor, debugmode);
+	qDebug() << "widget request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
 }
 

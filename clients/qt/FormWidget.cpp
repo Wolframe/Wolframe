@@ -98,7 +98,8 @@ void FormWidget::executeAction( QWidget *actionwidget )
 	if (doctype.isValid() || action.isValid())
 	{
 		WidgetMessageDispatcher dispatcher( visitor);
-		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
+		WidgetRequest request = dispatcher.getFormActionRequest( m_debug);
+
 		if (!request.content.isEmpty())
 		{
 			m_dataLoader->datarequest( request.tag, request.content);
@@ -118,25 +119,27 @@ void FormWidget::executeAction( QWidget *actionwidget )
 
 void FormWidget::executeMenuAction( QWidget *actionwidget, const QString& menuaction)
 {
+	qDebug() << "execute menu action" << menuaction;
+
 	WidgetVisitor visitor( actionwidget);
 	QString suffix;
-	QVariant action = visitor.property( QString( "action") + ":" + menuaction);
+	QVariant action = actionwidget->property( QByteArray( "action") + ":" + menuaction.toAscii());
 
 	if (action.isValid())
 	{
-		QPair<QString,QByteArray> request = getMenuActionRequest( visitor, menuaction, m_debug);
-		if (!request.second.isEmpty())
+		WidgetRequest request = getMenuActionRequest( visitor, menuaction, m_debug);
+		if (!request.content.isEmpty())
 		{
-			m_dataLoader->datarequest( request.first, request.second);
+			m_dataLoader->datarequest( request.tag, request.content);
 		}
 	}
 	else
 	{
-		switchForm( actionwidget);
+		switchForm( actionwidget, menuaction);
 	}
 }
 
-void FormWidget::switchForm( QWidget *actionwidget)
+void FormWidget::switchForm( QWidget *actionwidget, const QString& followform)
 {
 	WidgetVisitor formvisitor( m_ui);
 	formvisitor.do_writeAssignments();
@@ -144,7 +147,15 @@ void FormWidget::switchForm( QWidget *actionwidget)
 
 	// switch form now, formLoaded will inform parent and others
 	WidgetVisitor visitor( actionwidget);
-	QVariant formlink = visitor.property( "form");
+	QVariant formlink;
+	if (followform.isEmpty())
+	{
+		formlink = visitor.property( "form");
+	}
+	else
+	{
+		formlink = visitor.property( QString("form") + ":" + followform);
+	}
 	if (formlink.isValid())
 	{
 		qDebug() << "Switch form to" << formlink;
@@ -160,17 +171,28 @@ void FormWidget::switchForm( QWidget *actionwidget)
 				QList<QVariant> formstack = m_ui->property("_w_formstack").toList();
 				if (!formstack.isEmpty())
 				{
-					nextForm = formstack.back().toString();
+					qDebug() << "form stack before pop:" << formstack;
 					formstack.pop_back();
-					m_ui->setProperty( "_w_formstack", QVariant( formstack));
-					loadForm( nextForm);
+					if (formstack.isEmpty())
+					{
+						emit closed();
+					}
+					else
+					{
+						nextForm = formstack.back().toString();
+						m_ui->setProperty( "_w_formstack", QVariant( formstack));
+						qDebug() << "load form from stack:" << nextForm;
+						loadForm( nextForm);
+					}
 				}
 				else
 				{
 					emit closed();
 				}
 			}
-		} else {
+		}
+		else
+		{
 			loadForm( nextForm );
 		}
 	}
@@ -356,36 +378,41 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		}
 	}
 
-// set back link stack in form if there is a back link
-	foreach (QWidget *widget, widgets)
+// push on form stack for back link
+	QList<QVariant> formstack;
+	if( oldUi )
 	{
-		QPushButton *pushButton = qobject_cast<QPushButton*>( widget);
-		if (pushButton)
+		formstack = oldUi->property( "_w_formstack").toList();
+	}
+	else
+	{
+		formstack.push_back( QVariant( QString( "init")));
+	}
+	QString topform = formstack.back().toString();
+	int qmidx_c = m_form.indexOf( '?');
+	int qmidx_p = topform.indexOf( '?');
+	if (qmidx_c != qmidx_p || qmidx_p < 0)
+	{
+		if (m_form != topform)
 		{
-			// if there is a back link define the stack of the form accordingly
-			if (widget->property( "form").toString().trimmed() == "_CLOSE_")
-			{
-				QList<QVariant> formstack;
-				if( oldUi )
-				{
-					formstack = oldUi->property( "_w_formstack").toList();
-				}
-				if (m_previousForm.isEmpty())
-				{
-					formstack.push_back( QVariant( QString("init")));
-				}
-				else
-				{
-					formstack.push_back( QVariant( m_previousForm));
-				}
-				m_ui->setProperty( "_w_formstack", QVariant( formstack));
-				break;
-			}
+			formstack.push_back( QVariant( m_form));
 		}
 	}
+	else if (m_form.mid( 0, qmidx_c) == topform.mid( 0, qmidx_c))
+	{
+		formstack.pop_back();
+		formstack.push_back( QVariant( m_form));
+	}
+	else
+	{
+		formstack.push_back( m_form);
+	}
+	qDebug() << "form stack for " << m_form << ":" << formstack;
+	m_ui->setProperty( "_w_formstack", QVariant( formstack));
+
 // loads the domains
 	WidgetMessageDispatcher dispatcher( m_ui);
-	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
+	foreach (const WidgetRequest& request, dispatcher.getDomainLoadRequests( m_debug))
 	{
 		if (!request.content.isEmpty())
 		{
@@ -404,23 +431,24 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
 	WidgetVisitor visitor( m_ui);
 	WidgetMessageDispatcher dispatcher( visitor);
+	WidgetRequest rq( tag_, "");
 
-	if (isActionRequest( tag_))
+	if (rq.type() == WidgetRequest::Action)
 	{
-		foreach (QWidget* actionwidget, dispatcher.findRecipients( actionRequestRecipientId( tag_)))
+		foreach (QWidget* actionwidget, dispatcher.findRecipients( rq.recipientid()))
 		{
 			WidgetVisitor actionvisitor( actionwidget);
 			FormWidget* THIS_ = actionvisitor.formwidget();
-			THIS_->switchForm( actionwidget);
+			THIS_->switchForm( actionwidget, rq.followform());
 		}
 	}
 	else
 	{
-		QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( tag_);
+		QHash<QString,QList<WidgetListenerR> >::iterator li = m_listeners.find( rq.recipientid());
 		if (li != m_listeners.end())
 		{
 			li.value().clear();
-			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+			foreach (QWidget* rcp, dispatcher.findRecipients( rq.recipientid()))
 			{
 				WidgetVisitor rcpvisitor( rcp);
 				if (!setWidgetAnswer( rcpvisitor, data_))
@@ -438,7 +466,7 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 		}
 		else
 		{
-			foreach (QWidget* rcp, dispatcher.findRecipients( tag_))
+			foreach (QWidget* rcp, dispatcher.findRecipients( rq.recipientid()))
 			{
 				WidgetVisitor rcpvisitor( rcp);
 				if (!setWidgetAnswer( rcpvisitor, data_))

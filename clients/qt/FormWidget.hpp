@@ -87,7 +87,7 @@ class FormWidget : public QWidget
 		
 	private:
 		void initialize( );
-		void switchForm( QWidget *actionwidget);
+		void switchForm( QWidget *actionwidget, const QString& actionid=QString());
 
 	signals:
 		void formLoaded( QString name );

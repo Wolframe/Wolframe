@@ -83,7 +83,7 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 		else if (receiver->property( "doctype").isValid())
 		{
 			WidgetMessageDispatcher dp( visitor);
-			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
+			WidgetRequest domload = dp.getDomainLoadRequest( m_debug);
 			if (!domload.content.isEmpty())
 			{
 				m_dataLoader->datarequest( domload.tag, domload.content);
@@ -92,7 +92,7 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 		else if (receiver->property( "action").isValid())
 		{
 			WidgetMessageDispatcher dp( visitor);
-			WidgetMessageDispatcher::Request domload = dp.getDomainLoadRequest( m_debug);
+			WidgetRequest domload = dp.getDomainLoadRequest( m_debug);
 			if (!domload.content.isEmpty())
 			{
 				m_dataLoader->datarequest( domload.tag, domload.content);
@@ -130,13 +130,14 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 			QList<QString> action_text = item.split(':');
 			if (action_text.size() == 1)
 			{
-				QAction* action = menu.addAction( action_text.at(0));
-				action->setData( QVariant( action_text.at(0)));
+				QString itemtext( action_text.at(0).trimmed());
+				QAction* action = menu.addAction( itemtext);
+				action->setData( QVariant( itemtext));
 			}
-			else if (action_text.size() == 1)
+			else if (action_text.size() == 2)
 			{
-				QAction* action = menu.addAction( action_text.at(1));
-				action->setData( QVariant( action_text.at(0)));
+				QAction* action = menu.addAction( action_text.at(1).trimmed());
+				action->setData( QVariant( action_text.at(0).trimmed()));
 			}
 			else
 			{

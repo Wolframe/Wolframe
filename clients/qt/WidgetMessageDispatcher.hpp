@@ -34,6 +34,7 @@
 #ifndef _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
 #define _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
+#include "WidgetRequest.hpp"
 
 ///\class WidgetMessageDispatcher
 ///\brief Structure to initialize widgets of a form and issue commands as client/server requests
@@ -52,20 +53,9 @@ class WidgetMessageDispatcher
 		WidgetMessageDispatcher( const WidgetMessageDispatcher& o)
 			:m_visitor(o.m_visitor){}
 
-		struct Request
-		{
-			QString tag;
-			QByteArray content;
-
-			Request( QString tag_, QByteArray content_)
-				:tag(tag_),content(content_){}
-			Request( const Request& o)
-				:tag(o.tag),content(o.content){}
-		};
-
-		QList<Request> getDomainLoadRequests( bool debugmode=false);
-		Request getDomainLoadRequest( bool debugmode=false);
-		Request getFormActionRequest( bool debugmode=false);
+		QList<WidgetRequest> getDomainLoadRequests( bool debugmode=false);
+		WidgetRequest getDomainLoadRequest( bool debugmode=false);
+		WidgetRequest getFormActionRequest( bool debugmode=false);
 		QList<QWidget*> findRecipients( const QString& tag) const;
 
 	private:

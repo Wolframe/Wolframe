@@ -25,15 +25,6 @@
    <layout class="QHBoxLayout" name="relation_hl">
     <item>
      <widget class="QTableWidget" name="customer">
-      <property name="rootelement" stdset="0">
-       <string>customer</string>
-      </property>
-      <property name="doctype" stdset="0">
-       <string>ListCustomerShort</string>
-      </property>
-      <property name="dataelement" stdset="0">
-       <string/>
-      </property>
       <property name="synonym:customerfocus" stdset="0">
        <string>customer.selected</string>
       </property>
@@ -42,6 +33,24 @@
       </property>
       <property name="datasignal:clicked" stdset="0">
        <string>relation, project</string>
+      </property>
+      <property name="action" stdset="0">
+       <string>ListCustomerShort customer {}</string>
+      </property>
+      <property name="contextmenu" stdset="0">
+       <string>edit:Edit Customer, delete:Delete, add:Add Customer,,cancel:Cancel</string>
+      </property>
+      <property name="form:add" stdset="0">
+       <string>addCustomer</string>
+      </property>
+      <property name="form:edit" stdset="0">
+       <string>editCustomer?id={selected}</string>
+      </property>
+      <property name="form:delete" stdset="0">
+       <string>relationCustomerEmployee?customer.selected={selected}</string>
+      </property>
+      <property name="action:delete" stdset="0">
+       <string>DeleteCustomer customer {id = {selected} }</string>
       </property>
       <attribute name="verticalHeaderVisible">
        <bool>true</bool>
