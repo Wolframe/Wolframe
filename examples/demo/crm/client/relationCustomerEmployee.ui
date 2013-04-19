@@ -38,7 +38,7 @@
        <string>ListCustomerShort customer {}</string>
       </property>
       <property name="contextmenu" stdset="0">
-       <string>edit:Edit Customer, delete:Delete, add:Add Customer,,cancel:Cancel</string>
+       <string>edit, delete, add,,cancel</string>
       </property>
       <property name="form:add" stdset="0">
        <string>addCustomer</string>
@@ -51,6 +51,15 @@
       </property>
       <property name="action:delete" stdset="0">
        <string>DeleteCustomer customer {id = {selected} }</string>
+      </property>
+      <property name="contextmenu:add" stdset="0">
+       <string>Add Customer</string>
+      </property>
+      <property name="contextmenu:edit" stdset="0">
+       <string>Edit Customer</string>
+      </property>
+      <property name="contextmenu:delete" stdset="0">
+       <string>Delete Customer</string>
       </property>
       <attribute name="verticalHeaderVisible">
        <bool>true</bool>

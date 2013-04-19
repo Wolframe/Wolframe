@@ -121,27 +121,24 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 
 	foreach (const QString& item, contextmenudef)
 	{
-		if (item.trimmed().isEmpty())
+		QString itemname = item.trimmed();
+		if (itemname.isEmpty())
 		{
 			menu.addSeparator();
 		}
 		else
 		{
-			QList<QString> action_text = item.split(':');
-			if (action_text.size() == 1)
+			QByteArray prop( QByteArray( "contextmenu:") + itemname.toAscii());
+			QVariant actiontext( widget->property( prop));
+			if (actiontext.isValid())
 			{
-				QString itemtext( action_text.at(0).trimmed());
-				QAction* action = menu.addAction( itemtext);
-				action->setData( QVariant( itemtext));
-			}
-			else if (action_text.size() == 2)
-			{
-				QAction* action = menu.addAction( action_text.at(1).trimmed());
-				action->setData( QVariant( action_text.at(0).trimmed()));
+				QAction* action = menu.addAction( actiontext.toString());
+				action->setData( QVariant( itemname));
 			}
 			else
 			{
-				qCritical() << "error in menu definition. more than one ':' for" << item;
+				QAction* action = menu.addAction( item);
+				action->setData( QVariant( itemname));
 			}
 		}
 	}
