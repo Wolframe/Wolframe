@@ -189,6 +189,6 @@ examples/demo/lgtree/server/database/lgtree.db
 *.gcno
 *.gcda
 clients/qt/qtclient.pro.user
-clients/qtSkeleton/qtSkeleton.pro.user
+clients/qtSkeleton/qtSkeleton.pro.user*
 clients/qt/tests/functions/testDataTree
-clients/qtSkeleton/plugins/plugins.pro.user
+clients/qtSkeleton/plugins/plugins.pro.user*

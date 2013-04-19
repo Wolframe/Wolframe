@@ -80,7 +80,7 @@ public:
 	Type type() const					{return (Type)m_type;}
 	const Data& data() const				{return m_data;}
 	std::size_t size() const				{return ((Type)m_type==array_)?m_data.dim.size:Variant::size();}
-	const StructDescription* description() const		{return ((Type)m_type==struct_)?(StructDescription*)m_data.dim.metadata:0;}
+	const StructDescription* description() const		{return ((Type)m_type==struct_)?(const StructDescription*)m_data.dim.metadata:0;}
 
 	std::string tostring() const;
 	const VariantStruct& operator[]( std::size_t idx) const;
