@@ -35,11 +35,8 @@
     </item>
     <item row="0" column="1">
      <widget class="QComboBox" name="employee">
-      <property name="doctype" stdset="0">
-       <string>ListEmployeeRef</string>
-      </property>
-      <property name="rootelement" stdset="0">
-       <string>employee</string>
+      <property name="action" stdset="0">
+       <string>ListEmployeeRef employee {}</string>
       </property>
      </widget>
     </item>
@@ -83,20 +80,8 @@
       <property name="text">
        <string>Add</string>
       </property>
-      <property name="rootelement" stdset="0">
-       <string notr="true">relation</string>
-      </property>
-      <property name="doctype" stdset="0">
-       <string notr="true">InsertCustomerRelation</string>
-      </property>
       <property name="form" stdset="0">
        <string notr="true">relationCustomerEmployee?customer.selected={relation.customerid}</string>
-      </property>
-      <property name="dataelement" stdset="0">
-       <string>@employeeid,@customerid,description</string>
-      </property>
-      <property name="dataobject" stdset="0">
-       <string>relation</string>
       </property>
       <property name="action" stdset="0">
        <string>InsertCustomerRelation relation {employeeid={relation.employeeid}; customerid={relation.customerid}; description{{relation.description}} }</string>

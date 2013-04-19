@@ -52,17 +52,6 @@ bool WidgetVisitorState_PictureChooser::setProperty( const QString& name, const 
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_PictureChooser::dataelements() const
-{
-	static const DataElements dataElements( "filename", "size", "base64", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_PictureChooser::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_PictureChooser::setState( const QVariant& state)
 {
 	if (state.isValid())

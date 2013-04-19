@@ -62,12 +62,6 @@ bool WidgetVisitorState_QLineEdit::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QLineEdit::dataelements() const
-{
-	static const DataElements ar( "", 0);
-	return ar;
-}
-
 void WidgetVisitorState_QLineEdit::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for line edit" << m_lineEdit->objectName();

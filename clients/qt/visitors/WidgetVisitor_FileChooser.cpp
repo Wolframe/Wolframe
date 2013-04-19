@@ -99,21 +99,7 @@ bool WidgetVisitorState_FileChooser::setProperty( const QString& /*name*/, const
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_FileChooser::dataelements() const
-{
-	static const DataElements dataelements_init( "file", 0);
-	static const DataElements dataelements_file( "name", "size", "", 0);
-	static const QList<QString> noDataElements;
-
-	switch (m_mode)
-	{
-		case Init: return dataelements_init;
-		case File: return dataelements_file;
-	}
-	return noDataElements;
-}
-
-bool WidgetVisitorState_FileChooser::isRepeatingDataElement( const QString& name)
+bool WidgetVisitorState_FileChooser::isArrayElement( const QString& name)
 {
 	if (name == "file") return true;
 	return false;

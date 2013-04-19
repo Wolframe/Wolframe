@@ -139,20 +139,11 @@
        <property name="text">
         <string>Add</string>
        </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">customer</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">InsertCustomer</string>
-       </property>
        <property name="form" stdset="0">
         <string notr="true">_CLOSE_</string>
        </property>
-       <property name="dataobject" stdset="0">
-        <string>addCustomer</string>
-       </property>
        <property name="action" stdset="0">
-        <string>InsertCustomer customer {name {{name}}; description {{description}}; addr_line1 {{addr_line1}}; addr_line2{{addr_line2}}; addr_postalcode{{addr_postalcode}}; addr_district{{addr_district}}; addr_country{{addr_country}} }</string>
+        <string>InsertCustomer customer {name {{addCustomer.name}}; description {{addCustomer.description}}; addr_line1 {{addCustomer.addr_line1}}; addr_line2{{addCustomer.addr_line2}}; addr_postalcode{{addCustomer.addr_postalcode}}; addr_district{{addCustomer.addr_district}}; addr_country{{addCustomer.addr_country}} }</string>
        </property>
       </widget>
      </item>

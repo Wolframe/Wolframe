@@ -222,18 +222,14 @@ class WidgetVisitor
 			virtual QVariant property( const QString&)				{return QVariant();}
 			///\brief Set a property of the current substructure context addressed by name
 			virtual bool setProperty( const QString&, const QVariant&)		{return false;}
-			///\brief Get all dataelements readable in the current substructure context
-			virtual const QList<QString>& dataelements() const			{static const QList<QString> ar; return ar;}
-			///\brief Get all children widgets that have data elements not handled (owned) by this. default is all children
-			virtual QList<QWidget*> datachildren() const;
-			///\brief Evaluate if a dataelements is possibly addressing a list of elements, thus appearing more than once
-			virtual bool isRepeatingDataElement( const QString&/*name*/)		{return false;}
 			///\brief Restore the widget state from a variable
 			virtual void setState( const QVariant& /*state*/){}
 			///\brief Get the current the widget state
 			virtual QVariant getState()						{return QVariant();}
 			///\brief Hook to complete the feeding of data
 			virtual void endofDataFeed(){}
+			///\brief Check if a an element can appear more than once
+			virtual bool isArrayElement( const QString&/*name*/)		{return false;}
 
 			///\brief Create listener object for the widget
 			virtual WidgetListener* createListener( DataLoader* dataLoader);
@@ -246,14 +242,6 @@ class WidgetVisitor
 			QVariant dynamicProperty( const QString& name) const;
 			bool setDynamicProperty( const QString&, const QVariant& value);
 			QWidget* widget() const		{return m_widget;}
-
-		protected:
-			///\class DataElements
-			///\brief Constructor helper for State::dataelements()
-			struct DataElements :public QList<QString>
-			{
-				DataElements( const char* initializer, ...);			//< constructor from 0 terminated vararg initializer list
-			};
 
 		private:
 			struct DataSignals
@@ -331,13 +319,6 @@ class WidgetVisitor
 		QList<QWidget*> findSubNodes( NodeProperty prop, const QVariant& cond=QVariant()) const;
 
 		QList<QWidget*> children( const QString& name=QString()) const;
-
-		///\brief Get a serialization of all visible widget elements in the current state
-		QList<DataSerializeItem> elements();
-
-		///\brief Get a serialization of a selecte list of widget elements in the current state
-		///\param[in] selected_dataelements data elements selected by name
-		QList<DataSerializeItem> elements( const QList<QString>& selected_dataelements);
 
 		///\brief Eval if id describes a widget id of an identifier
 		///\param[in] id identifier to check
@@ -432,9 +413,6 @@ class WidgetVisitor
 		///\param[in] writemode true if in write/create access and not in read access
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		bool enter( const QString& name, bool writemode, int level);
-
-		///\brief Internal implementation of 'elements(...)'
-		QList<DataSerializeItem> elements( const QList<QString>* selected_dataelements);
 
 		///\brief Constructor internal
 		explicit WidgetVisitor( const QStack<StateR>& stk_);

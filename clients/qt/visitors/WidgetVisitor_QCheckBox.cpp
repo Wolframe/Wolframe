@@ -42,17 +42,6 @@ bool WidgetVisitorState_QCheckBox::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QCheckBox::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QCheckBox::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QCheckBox::setState( const QVariant& state)
 {
 	if (state.isValid()) m_checkBox->setCheckState( (Qt::CheckState)state.toInt());

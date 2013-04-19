@@ -48,17 +48,8 @@
         <property name="form" stdset="0">
          <string>listEmployee</string>
         </property>
-        <property name="doctype" stdset="0">
-         <string notr="true">DeleteEmployee</string>
-        </property>
-        <property name="rootelement" stdset="0">
-         <string notr="true">employee</string>
-        </property>
-        <property name="id" stdset="0">
-         <string>{employee.selected}</string>
-        </property>
-        <property name="dataelement" stdset="0">
-         <string>@id</string>
+        <property name="action" stdset="0">
+         <string notr="true">DeleteEmployee employee {id={employee.selected}}</string>
         </property>
        </widget>
       </item>
@@ -90,11 +81,8 @@
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
-     <property name="rootelement" stdset="0">
-      <string>employee</string>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>ListEmployee</string>
+     <property name="action" stdset="0">
+      <string>ListEmployee employee {}</string>
      </property>
      <column>
       <property name="text">

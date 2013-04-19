@@ -49,11 +49,8 @@
    </item>
    <item row="2" column="1">
     <widget class="QComboBox" name="customer">
-     <property name="doctype" stdset="0">
-      <string>ListCustomerRef</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
+     <property name="action" stdset="0">
+      <string>ListCustomerRef customer {}</string>
      </property>
     </widget>
    </item>
@@ -128,20 +125,11 @@
        <property name="text">
         <string>Add</string>
        </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">picture</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">InsertCustomerPicture</string>
+       <property name="action" stdset="0">
+        <string notr="true">InsertCustomerPicture picture {customerid={addCustomerPicture.customerid},caption{{addCustomerPicture.caption}},info{{addCustomerPicture.info}},image{{addCustomerPicture.image}}}</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">_CLOSE_</string>
-       </property>
-       <property name="dataobject" stdset="0">
-        <string>addCustomerPicture</string>
-       </property>
-       <property name="dataelement" stdset="0">
-        <string>@customerid,caption,info,image</string>
        </property>
       </widget>
      </item>

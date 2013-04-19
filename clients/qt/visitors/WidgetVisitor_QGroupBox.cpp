@@ -110,27 +110,6 @@ bool WidgetVisitorState_QGroupBox::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QGroupBox::dataelements() const
-{
-	static const DataElements dataElements( "selected", 0);
-	return dataElements;
-}
-
-QList<QWidget*> WidgetVisitorState_QGroupBox::datachildren() const
-{
-	QList<QWidget*> rt;
-	foreach (QWidget* ww, m_groupBox->findChildren<QWidget*>())
-	{
-		if (!qobject_cast<QAbstractButton*>( ww)) rt.push_back( ww);
-	}
-	return rt;
-}
-
-bool WidgetVisitorState_QGroupBox::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QGroupBox::setState( const QVariant& state)
 {
 	foreach (const QVariant& name, state.toList())

@@ -48,18 +48,6 @@
         <property name="form" stdset="0">
          <string>listProject</string>
         </property>
-        <property name="doctype" stdset="0">
-         <string notr="true">DeleteProject</string>
-        </property>
-        <property name="rootelement" stdset="0">
-         <string notr="true">project</string>
-        </property>
-        <property name="id" stdset="0">
-         <string>{project.selected}</string>
-        </property>
-        <property name="dataelement" stdset="0">
-         <string>@id</string>
-        </property>
         <property name="action" stdset="0">
          <string>DeleteProject project {id = {project.selected} }</string>
         </property>
@@ -92,15 +80,6 @@
     <widget class="QTreeWidget" name="project">
      <property name="rootIsDecorated">
       <bool>false</bool>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>project</string>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>ListProject</string>
-     </property>
-     <property name="dataelement" stdset="0">
-      <string/>
      </property>
      <property name="action" stdset="0">
       <string>ListProject project {} </string>

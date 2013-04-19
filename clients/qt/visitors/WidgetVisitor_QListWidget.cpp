@@ -79,12 +79,6 @@ bool WidgetVisitorState_QListWidget::setProperty( const QString& name, const QVa
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QListWidget::dataelements() const
-{
-	static const DataElements ar( "select", 0);
-	return ar;
-}
-
 void WidgetVisitorState_QListWidget::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for list widget" << m_listWidget->objectName();

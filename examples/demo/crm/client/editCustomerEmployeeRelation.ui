@@ -16,14 +16,8 @@
   <property name="synonym:employeeid" stdset="0">
    <string>employee.selected</string>
   </property>
-  <property name="doctype" stdset="0">
-   <string>GetCustomerRelation</string>
-  </property>
-  <property name="rootelement" stdset="0">
-   <string>relation</string>
-  </property>
-  <property name="dataelement" stdset="0">
-   <string>@employeeid,@customerid</string>
+  <property name="action" stdset="0">
+   <string>GetCustomerRelation relation {employeeid={employee.selected},customerid={customerid}}</string>
   </property>
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
@@ -44,11 +38,8 @@
     </item>
     <item row="0" column="1">
      <widget class="QComboBox" name="employee">
-      <property name="doctype" stdset="0">
-       <string>ListEmployeeRef</string>
-      </property>
-      <property name="rootelement" stdset="0">
-       <string>employee</string>
+      <property name="action" stdset="0">
+       <string>ListEmployeeRef employee {}</string>
       </property>
      </widget>
     </item>
@@ -92,20 +83,11 @@
       <property name="text">
        <string>Update</string>
       </property>
-      <property name="rootelement" stdset="0">
-       <string notr="true">relation</string>
-      </property>
-      <property name="doctype" stdset="0">
-       <string notr="true">UpdateCustomerRelation</string>
+      <property name="action" stdset="0">
+       <string>UpdateCustomerRelation relation {employeeid={relation.employeeid},customerid={relation.customerid},description{{relation.description}}}</string>
       </property>
       <property name="form" stdset="0">
        <string notr="true">relationCustomerEmployee?customer.selected={relation.customerid}</string>
-      </property>
-      <property name="dataelement" stdset="0">
-       <string>@employeeid,@customerid,description</string>
-      </property>
-      <property name="dataobject" stdset="0">
-       <string>relation</string>
       </property>
      </widget>
     </item>

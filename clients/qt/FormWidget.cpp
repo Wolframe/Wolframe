@@ -92,10 +92,9 @@ void FormWidget::executeAction( QWidget *actionwidget )
 {
 	WidgetVisitor visitor( actionwidget);
 	QString suffix;
-	QVariant doctype = visitor.property( "doctype");
 	QVariant action = visitor.property( "action");
 
-	if (doctype.isValid() || action.isValid())
+	if (action.isValid())
 	{
 		WidgetMessageDispatcher dispatcher( visitor);
 		WidgetRequest request = dispatcher.getFormActionRequest( m_debug);

@@ -71,12 +71,6 @@ bool WidgetVisitorState_QTextEdit::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QTextEdit::dataelements() const
-{
-	static const DataElements dataElements( "text", "html", 0);
-	return dataElements;
-}
-
 void WidgetVisitorState_QTextEdit::setState( const QVariant& state)
 {
 	if (state.isValid()) m_textEdit->setHtml( state.toString());

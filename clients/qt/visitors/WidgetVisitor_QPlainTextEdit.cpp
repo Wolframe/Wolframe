@@ -31,12 +31,6 @@ bool WidgetVisitorState_QPlainTextEdit::setProperty( const QString& name, const 
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QPlainTextEdit::dataelements() const
-{
-	static const DataElements ar( "", 0);
-	return ar;
-}
-
 void WidgetVisitorState_QPlainTextEdit::setState( const QVariant& state)
 {
 	if (state.isValid()) m_plainTextEdit->setPlainText( state.toString());

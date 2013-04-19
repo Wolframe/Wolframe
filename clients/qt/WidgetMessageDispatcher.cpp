@@ -41,21 +41,19 @@ static bool nodeProperty_hasWidgetId( const QWidget* widget, const QVariant& con
 	return (widgetid.isValid() && widgetid == cond);
 }
 
-///\brief Return true if the widget is not an action widget with a doctype defined.
-//	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QVariant&)
+///\brief Return true if the widget is not an action widget with an action property defined.
+//	in an action widget the action is associated with the click and not with the domain load
+static bool nodeProperty_isEnabledNonActionWidgetWithAction( const QWidget* widget, const QVariant&)
 {
 	if (!widget->isEnabled()) return false;
 	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant doctype_property = widget->property( "doctype");
-	QVariant action_property = widget->property( "action");
-	return (doctype_property.isValid() || action_property.isValid());
+	return (widget->property( "action").isValid());
 }
 
 QList<WidgetRequest> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
 {
 	QList<WidgetRequest> rt;
-	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithAction))
 	{
 		WidgetVisitor visitor( widget);
 		WidgetRequest request = getWidgetRequest( visitor, debugmode);

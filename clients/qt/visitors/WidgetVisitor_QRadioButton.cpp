@@ -42,17 +42,6 @@ bool WidgetVisitorState_QRadioButton::setProperty( const QString& name, const QV
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QRadioButton::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QRadioButton::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QRadioButton::setState( const QVariant& state)
 {
 	if (state.isValid()) m_radioButton->setChecked( state.toBool());

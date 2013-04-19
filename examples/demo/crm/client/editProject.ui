@@ -13,14 +13,8 @@
   <property name="windowTitle">
    <string>Edit Project</string>
   </property>
-  <property name="doctype" stdset="0">
-   <string>GetProject</string>
-  </property>
-  <property name="rootelement" stdset="0">
-   <string>project</string>
-  </property>
-  <property name="dataelement" stdset="0">
-   <string>@id</string>
+  <property name="action" stdset="0">
+   <string>GetProject project {id={id}}</string>
   </property>
   <property name="synonym:customerid" stdset="0">
    <string>customer.selected</string>
@@ -92,17 +86,11 @@
        <property name="rootelement" stdset="0">
         <string notr="true">project</string>
        </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">UpdateProject</string>
+       <property name="action" stdset="0">
+        <string notr="true">UpdateProject project {id={project.id},customerid={project.customerid},name{{project.name}},description{{project.description}}}</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">_CLOSE_</string>
-       </property>
-       <property name="dataelement" stdset="0">
-        <string>@id,@customerid,name,description</string>
-       </property>
-       <property name="dataobject" stdset="0">
-        <string>project</string>
        </property>
       </widget>
      </item>
@@ -120,11 +108,8 @@
    </item>
    <item row="1" column="1">
     <widget class="QComboBox" name="customer">
-     <property name="doctype" stdset="0">
-      <string>ListCustomerRef</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
+     <property name="action" stdset="0">
+      <string>ListCustomerRef customer {}</string>
      </property>
     </widget>
    </item>

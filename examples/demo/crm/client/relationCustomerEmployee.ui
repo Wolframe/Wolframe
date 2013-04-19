@@ -80,17 +80,8 @@
      <layout class="QVBoxLayout" name="relation_vl">
       <item>
        <widget class="QTreeWidget" name="relation">
-        <property name="doctype" stdset="0">
-         <string>GetCustomerRelationCustomer</string>
-        </property>
-        <property name="rootelement" stdset="0">
-         <string>relation</string>
-        </property>
-        <property name="dataelement" stdset="0">
-         <string>@customerid</string>
-        </property>
-        <property name="customerid" stdset="0">
-         <string>{customer.selected}</string>
+        <property name="action" stdset="0">
+         <string>GetCustomerRelationCustomer relation {customerid={customer.selected}}</string>
         </property>
         <property name="synonym:employeename" stdset="0">
          <string>name</string>
@@ -154,20 +145,8 @@
           <property name="form" stdset="0">
            <string>relationCustomerEmployee?customer.selected={customer.selected}</string>
           </property>
-          <property name="doctype" stdset="0">
-           <string>DeleteCustomerRelation</string>
-          </property>
-          <property name="rootelement" stdset="0">
-           <string>relation</string>
-          </property>
-          <property name="dataelement" stdset="0">
-           <string>@customerid,@employeeid</string>
-          </property>
-          <property name="customerid" stdset="0">
-           <string>{customer.selected}</string>
-          </property>
-          <property name="employeeid" stdset="0">
-           <string>{relation.selected}</string>
+          <property name="action" stdset="0">
+           <string>DeleteCustomerRelation relation {customerid={customer.selected},employeeid={relation.selected}}</string>
           </property>
          </widget>
         </item>
@@ -192,17 +171,8 @@
       </item>
       <item>
        <widget class="QTreeWidget" name="project">
-        <property name="doctype" stdset="0">
-         <string>ListProjectCustomer</string>
-        </property>
-        <property name="rootelement" stdset="0">
-         <string>project</string>
-        </property>
-        <property name="dataelement" stdset="0">
-         <string>@customerid</string>
-        </property>
-        <property name="customerid" stdset="0">
-         <string>{customer.selected}</string>
+        <property name="action" stdset="0">
+         <string>ListProjectCustomer project {customerid={customer.selected}}</string>
         </property>
         <column>
          <property name="text">
@@ -262,17 +232,8 @@
           <property name="form" stdset="0">
            <string>relationCustomerEmployee?customer.selected={customer.selected}</string>
           </property>
-          <property name="doctype" stdset="0">
-           <string>DeleteProject</string>
-          </property>
-          <property name="rootelement" stdset="0">
-           <string>project</string>
-          </property>
-          <property name="dataelement" stdset="0">
-           <string>@id</string>
-          </property>
-          <property name="id" stdset="0">
-           <string>{project.selected}</string>
+          <property name="action" stdset="0">
+           <string>DeleteProject project {id={project.selected}}</string>
           </property>
          </widget>
         </item>

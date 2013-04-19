@@ -46,17 +46,6 @@ bool WidgetVisitorState_QSlider::setProperty( const QString& name, const QVarian
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QSlider::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QSlider::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QSlider::setState( const QVariant& state)
 {
 	if (state.isValid()) m_slider->setValue( state.toDouble());

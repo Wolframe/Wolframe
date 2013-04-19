@@ -47,8 +47,7 @@ public:
 	virtual void clear();
 	virtual QVariant property( const QString& name);
 	virtual bool setProperty( const QString& name, const QVariant& data);
-	virtual const QList<QString>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QString& name);
+	virtual bool isArrayElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
@@ -75,9 +74,6 @@ private:
 		return ar[(int)i];
 	}
 	Mode m_mode;
-	QList<QString> m_dataelements_init;
-	QList<QString> m_dataelements_tree;
-	QList<QString> m_dataelements_list;
 };
 
 #endif

@@ -46,17 +46,6 @@ bool WidgetVisitorState_QDateEdit::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QDateEdit::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QDateEdit::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QDateEdit::setState( const QVariant& state)
 {
 	if (state.isValid()) m_dateEdit->setDate( state.toDate());

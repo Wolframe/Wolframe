@@ -48,8 +48,7 @@ public:
 	virtual void clear();
 	virtual QVariant property( const QString& name);
 	virtual bool setProperty( const QString& name, const QVariant& data);
-	virtual const QList<QString>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QString& name);
+	virtual bool isArrayElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
@@ -97,9 +96,6 @@ private:
 	int m_column;
 	int m_rowcount;
 	int m_columncount;
-	QList<QString> m_dataelements_init;
-	QList<QString> m_dataelements_row;
-	QList<QString> m_dataelements_col;
 };
 
 #endif

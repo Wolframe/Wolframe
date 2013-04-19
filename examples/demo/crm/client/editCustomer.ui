@@ -13,14 +13,8 @@
   <property name="windowTitle">
    <string>Edit Customer</string>
   </property>
-  <property name="doctype" stdset="0">
-   <string>GetCustomer</string>
-  </property>
-  <property name="rootelement" stdset="0">
-   <string>customer</string>
-  </property>
-  <property name="dataelement" stdset="0">
-   <string>@id</string>
+  <property name="action" stdset="0">
+   <string>GetCustomer customer {id={id}}</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -148,20 +142,11 @@
        <property name="text">
         <string>Update</string>
        </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">customer</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">UpdateCustomer</string>
+       <property name="action" stdset="0">
+        <string notr="true">UpdateCustomer customer {id={id},name{{name}},description{{description}},addr_line1{{addr_line1}},addr_line2{{addr_line2}},addr_postalcode{{addr_postalcode}},addr_district{{addr_district}},addr_country{{addr_country}}}</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">_CLOSE_</string>
-       </property>
-       <property name="dataobject" stdset="0">
-        <string>customer</string>
-       </property>
-       <property name="dataelement" stdset="0">
-        <string>@id,name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country</string>
        </property>
       </widget>
      </item>

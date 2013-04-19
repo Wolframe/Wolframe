@@ -45,17 +45,6 @@ bool WidgetVisitorState_QTimeEdit::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QTimeEdit::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QTimeEdit::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QTimeEdit::setState( const QVariant& state)
 {
 	if (state.isValid()) m_timeEdit->setTime( state.toTime());

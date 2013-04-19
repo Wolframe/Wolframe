@@ -80,20 +80,11 @@
        <property name="text">
         <string>Add</string>
        </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">project</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">InsertProject</string>
+       <property name="action" stdset="0">
+        <string notr="true">InsertProject project {customerid={addProject.customerid},name{{addProject.name}},description{{addProject.description}}}</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
-       </property>
-       <property name="dataelement" stdset="0">
-        <string>@customerid,name,description</string>
-       </property>
-       <property name="dataobject" stdset="0">
-        <string>addProject</string>
        </property>
       </widget>
      </item>
@@ -111,11 +102,8 @@
    </item>
    <item row="1" column="1">
     <widget class="QComboBox" name="customer">
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>ListCustomerRef</string>
+     <property name="action" stdset="0">
+      <string>ListCustomerRef customer {}</string>
      </property>
     </widget>
    </item>

@@ -19,14 +19,8 @@
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>ListCustomer</string>
-     </property>
-     <property name="dataelement" stdset="0">
-      <string/>
+     <property name="action" stdset="0">
+      <string>ListCustomer customer {}</string>
      </property>
      <column>
       <property name="text">
@@ -122,17 +116,8 @@
         <property name="form" stdset="0">
          <string>listCustomer</string>
         </property>
-        <property name="doctype" stdset="0">
-         <string notr="true">DeleteCustomer</string>
-        </property>
-        <property name="rootelement" stdset="0">
-         <string notr="true">customer</string>
-        </property>
-        <property name="id" stdset="0">
-         <string>{customer.selected}</string>
-        </property>
-        <property name="dataelement" stdset="0">
-         <string>@id</string>
+        <property name="action" stdset="0">
+         <string>DeleteCustomer customer {id={customer.selected}}</string>
         </property>
        </widget>
       </item>

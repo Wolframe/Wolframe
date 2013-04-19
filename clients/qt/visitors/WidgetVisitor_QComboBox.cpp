@@ -40,9 +40,7 @@ WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	,m_comboBox(qobject_cast<QComboBox*>(widget_))
 	,m_elementname(widget_->objectName().toAscii())
 	,m_currentindex(0)
-{
-	m_dataelements.push_back( m_elementname);
-}
+{}
 
 void WidgetVisitorState_QComboBox::clear()
 {
@@ -182,22 +180,7 @@ bool WidgetVisitorState_QComboBox::setProperty( const QString& name, const QVari
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QComboBox::dataelements() const
-{
-	static const DataElements ar_Select( "id", 0);
-	static const DataElements ar_Value( "id", 0);
-	static const QList<QString> ar_Empty;
-
-	switch (m_mode)
-	{
-		case None:	return m_dataelements;
-		case Value:	return ar_Value;
-		case Select:	return ar_Select;
-	}
-	return ar_Empty;
-}
-
-bool WidgetVisitorState_QComboBox::isRepeatingDataElement( const QString& name)
+bool WidgetVisitorState_QComboBox::isArrayElement( const QString& name)
 {
 	return (name == m_elementname);
 }

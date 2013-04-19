@@ -46,17 +46,6 @@ bool WidgetVisitorState_QSpinBox::setProperty( const QString& name, const QVaria
 	return false;
 }
 
-const QList<QString>& WidgetVisitorState_QSpinBox::dataelements() const
-{
-	static const DataElements dataElements( "", 0);
-	return dataElements;
-}
-
-bool WidgetVisitorState_QSpinBox::isRepeatingDataElement( const QString& /*name*/)
-{
-	return false;
-}
-
 void WidgetVisitorState_QSpinBox::setState( const QVariant& state)
 {
 	if (state.isValid()) m_spinBox->setValue( state.toDouble());

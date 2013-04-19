@@ -47,8 +47,7 @@ public:
 	virtual bool leave( bool writemode);
 	virtual QVariant property( const QString& name);
 	virtual bool setProperty( const QString& name, const QVariant& data);
-	virtual const QList<QString>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QString& name);
+	virtual bool isArrayElement( const QString& name);
 	virtual void setState( const QVariant& state);
 	virtual QVariant getState() const;
 	virtual void endofDataFeed();
@@ -59,7 +58,6 @@ private:
 	Mode m_mode;
 	QComboBox* m_comboBox;
 	QByteArray m_elementname;
-	QList<QString> m_dataelements;
 	int m_currentindex;
 };
 

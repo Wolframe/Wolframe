@@ -236,11 +236,6 @@ WidgetVisitor::State::State( QWidget* widget_)
 	}
 }
 
-QList<QWidget*> WidgetVisitor::State::datachildren() const
-{
-	return getWidgetChildren( m_widget);
-}
-
 WidgetListener* WidgetVisitor::State::createListener( DataLoader* dataLoader)
 {
 	return new WidgetListener( m_widget, dataLoader);
@@ -300,19 +295,6 @@ QString WidgetVisitor::State::getLink( const QString& name) const
 		}
 	}
 	return QString();
-}
-
-WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
-{
-	va_list ap;
-	va_start( ap, elem);
-	*this << elem;
-	for(;;)
-	{
-		const char* name = va_arg( ap, const char*);
-		if (!name) break;
-		*this << name;
-	}
 }
 
 WidgetVisitor::WidgetVisitor( QWidget* root)
@@ -750,7 +732,7 @@ QVariant WidgetVisitor::property( const QString& name, int level)
 	if (subelem)
 	{
 		QVariant rt = property( rest, level);
-		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isArrayElement( prefix);
 		leave( false);
 		if (isArray)
 		{
@@ -853,7 +835,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 		{
 			subelem = true;
 		}
-		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isArrayElement( prefix);
 		if (isArray)
 		{
 			ERROR( "cannot set property addressing a set of properties", prefix);
@@ -868,7 +850,7 @@ bool WidgetVisitor::setProperty( const QString& name, const QVariant& value, int
 			prefix = name;
 			rest.clear();
 		}
-		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( name);
+		bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isArrayElement( name);
 		if (isArray)
 		{
 			ERROR( "cannot set property addressing a set of properties", prefix);
@@ -924,284 +906,6 @@ QList<QWidget*> WidgetVisitor::findSubNodes( NodeProperty prop, const QVariant& 
 			++idx;
 		}
 	} while (endidx < ar.size());
-	return rt;
-}
-
-static bool isReservedProperty( const QString& key)
-{
-	// skip dynamic properties used by the Qt stylesheet engine:
-	if (key.startsWith( "_q_")) return true;
-	if (key == "initialFocus") return true;
-	// skip _w_ dynamic properties, they are used as internal Wolframe properties:
-	if (key.startsWith( "_w_")) return true;
-	// skip synonym/link/assign/datasignal/dataslot declarations:
-	if (key.indexOf( ':') >= 0) return true;
-	// ignore Wolframe elements:
-	if (key[0] == 'd')
-	{
-		if (key == "doctype" || key == "dataobject" || key == "dataelement")
-		{
-			return true;
-		}
-	}
-	else
-	{
-		if (key == "rootelement" || key == "form" || key == "widgetid")
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-class WidgetVisitorStackElement
-{
-public:
-	QList<QString> dataelements;
-	int nof_attributes;
-	int dataelementidx;
-	bool isContent;
-	bool hasSelectedDataelements;
-	int level;
-
-	WidgetVisitorStackElement()
-		:nof_attributes(0)
-		,dataelementidx(0)
-		,isContent(false)
-		,hasSelectedDataelements(false)
-		,level(0)
-	{}
-	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QString>* selectedDataElements, int level_=0)
-		:nof_attributes(0)
-		,dataelementidx(0)
-		,isContent(false)
-		,hasSelectedDataelements(selectedDataElements?true:false)
-		,level(level_)
-	{
-		if (!selectedDataElements)
-		{
-			level += 1; //... disallow root element reference with implicit references
-			foreach (const QString& prop, state->m_widget->dynamicPropertyNames())
-			{
-				if (!isReservedProperty( prop))
-				{
-					dataelements.push_back( prop);
-				}
-			}
-			dataelements.append( state->dataelements());
-
-			foreach (const QWidget* child, state->datachildren())
-			{
-				if (qobject_cast<const QLabel*>(child)) continue;
-				if (qobject_cast<const QAbstractButton*>(child)) continue;
-				if (qobject_cast<const QLayout*>(child)) continue;
-				QString objname = child->objectName();
-				if (!objname.isEmpty() && !objname.startsWith("qt_"))
-				{
-					dataelements << objname;
-				}
-			}
-			TRACE_ASSIGNMENT( "implicit dataelements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements);
-		}
-		else
-		{
-			foreach (const QString& elem, *selectedDataElements)
-			{
-				if (elem.size() > 0 && elem[0] == '@')
-				{
-					dataelements.push_back( elem.mid( 1, elem.size()-1));
-				}
-			}
-			nof_attributes = dataelements.size();
-			foreach (const QString& elem, *selectedDataElements)
-			{
-				if (elem.size() == 0 || elem[0] != '@')
-				{
-					dataelements.push_back( elem);
-				}
-			}
-			TRACE_ASSIGNMENT( "selected attribute elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( 0, nof_attributes));
-			TRACE_ASSIGNMENT( "selected content elements", state->m_widget->metaObject()->className(), state->m_widget->objectName(), dataelements.mid( nof_attributes, dataelements.size()));
-		}
-	}
-	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
-		:dataelements( o.dataelements)
-		,nof_attributes(o.nof_attributes)
-		,dataelementidx( o.dataelementidx)
-		,isContent(o.isContent)
-		,hasSelectedDataelements(o.hasSelectedDataelements)
-	{}
-};
-
-QList<DataSerializeItem> WidgetVisitor::elements( const QList<QString>& selectedDataElements)
-{
-	return elements( &selectedDataElements);
-}
-
-QList<DataSerializeItem> WidgetVisitor::elements()
-{
-	return elements( 0);
-}
-
-static QList<QString> getSuffixDataElements( const QList<QString>& ba, const QString& prefix)
-{
-	QList<QString> rt;
-	foreach (const QString& de, ba)
-	{
-		if (de.startsWith( prefix) && de.size() > prefix.size() && de.at( prefix.size()) == '.')
-		{
-			rt.push_back( de.mid( prefix.size(), de.size()- prefix.size()));
-		}
-	}
-	return rt;
-}
-
-QList<DataSerializeItem> WidgetVisitor::elements( const QList<QString>* selectedDataElements)
-{
-	if (m_stk.isEmpty()) return QList<DataSerializeItem>();
-
-	QStack<WidgetVisitorStackElement> elemstk;
-	elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), selectedDataElements));
-
-	QList<DataSerializeItem> rt;
-	while (!elemstk.isEmpty())
-	{
-		if (elemstk.top().dataelements.size() > elemstk.top().dataelementidx)
-		{
-			const QString& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
-
-			/* [1] Handling explicit attribute selection: */
-			if (elemstk.top().hasSelectedDataelements && !elemstk.top().isContent && elemstk.top().dataelementidx < elemstk.top().nof_attributes)
-			{
-				//... special handling of dataelement explicitely marked as attribute '@':
-				//    we allow digging in substructures for this one single element if it exists
-				QVariant val = property( dataelem, elemstk.top().level);
-				if (val.isValid() && !dataelem.isEmpty() && val.type() != QVariant::List)
-				{
-					rt.push_back( DataSerializeItem( DataSerializeItem::Attribute, dataelem));
-					rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
-					++elemstk.top().dataelementidx;
-					continue;
-				}
-			}
-			/* [2] Handling grouping of multiple selections with same prefix together (e.g. person.name,person.id): */
-			int pntidx = dataelem.indexOf('.');
-			if (pntidx >= 0)
-			{
-				QString prefix = dataelem.mid( 0, pntidx);
-				if (enter( prefix, false, elemstk.top().level))
-				{
-					QList<QString> selected = getSuffixDataElements( elemstk.top().dataelements, prefix);
-					elemstk.top().isContent = true;
-					int di=elemstk.top().dataelementidx,de=elemstk.top().dataelements.size();
-					for (++di; di<de; ++di)
-					{
-						if (elemstk.top().dataelements.at(di).startsWith( prefix)
-						&&  elemstk.top().dataelements.at(di).at( prefix.size()) == '.')
-						{
-							elemstk.top().dataelements.removeAt( di);
-						}
-					}
-					bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( prefix);
-					if (!isArray)
-					{
-						++elemstk.top().dataelementidx;
-					}
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected, elemstk.top().level+1));
-					rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, prefix));
-					continue;
-				}
-			}
-			/* [3] Handling ordinary substructures: */
-			else if (enter( dataelem, false, elemstk.top().level))
-			{
-				elemstk.top().isContent = true;
-				bool isArray = m_stk.top()->m_internal_entercnt != 0 && m_stk.top()->isRepeatingDataElement( dataelem);
-				if (!isArray)
-				{
-					++elemstk.top().dataelementidx;
-				}
-				elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
-				rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
-				continue;
-			}
-			/* [4] Handling ordinary properties: */
-			QVariant val = property( dataelem, elemstk.top().level);
-			if (val.isValid())
-			{
-				// evaluate if is attribute or content element:
-				if (dataelem.isEmpty() || val.type() == QVariant::List)
-				{
-					elemstk.top().isContent = true;
-				}
-				if (!elemstk.top().isContent)
-				{
-					if (elemstk.top().hasSelectedDataelements)
-					{
-						if (elemstk.top().dataelementidx >= elemstk.top().nof_attributes)
-						{
-							elemstk.top().isContent = true;
-						}
-					}
-					else
-					{
-						if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
-					}
-				}
-				// print the output property value with its tag context:
-				if (elemstk.top().isContent)
-				{
-					if (val.type() == QVariant::List)
-					{
-						QList<QVariant> vlist = val.toList();
-						foreach (const QVariant& velem, vlist)
-						{
-							rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
-							rt.push_back( DataSerializeItem( DataSerializeItem::Value, velem));
-							rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
-						}
-					}
-					else if (dataelem.isEmpty())
-					{
-						rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
-					}
-					else
-					{
-						rt.push_back( DataSerializeItem( DataSerializeItem::OpenTag, dataelem));
-						rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
-						rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
-					}
-				}
-				else
-				{
-					rt.push_back( DataSerializeItem( DataSerializeItem::Attribute, dataelem));
-					rt.push_back( DataSerializeItem( DataSerializeItem::Value, val));
-				}
-			}
-			else if (elemstk.top().hasSelectedDataelements && !m_stk.top()->isRepeatingDataElement( dataelem))
-			{
-				ERROR( "data element not found (elements defined with dataelement are mandatory)", dataelem);
-			}
-			++elemstk.top().dataelementidx;
-		}
-		else
-		{
-			// end of elements of this tree node, print close tag:
-			elemstk.pop_back();
-			if (!elemstk.isEmpty())
-			{
-				if (rt.back().type() == DataSerializeItem::OpenTag)
-				{
-					rt.pop_back();
-				}
-				else
-				{
-					rt.push_back( DataSerializeItem( DataSerializeItem::CloseTag, ""));
-				}
-				leave( false);
-			}
-		}
-	}
 	return rt;
 }
 

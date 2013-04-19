@@ -155,135 +155,49 @@ static QByteArray getRequestXML( const QString& docType, const QString& rootElem
 	return rt;
 }
 
-static QByteArray getWidgetActionRequest_( WidgetVisitor& visitor, const QVariant& actiondef, bool debugmode)
+static QByteArray getWidgetRequest_( WidgetVisitor& visitor, const QVariant& actiondef, bool debugmode)
 {
+	QWidget* widget = visitor.widget();
 	QString actionstr( actiondef.toString());
-	if (actionstr.size()>2)
+	ActionDefinition action( actionstr);
+	qDebug() << "checking action condition properties" << action.condProperties();
+	foreach (const QString& cond, action.condProperties())
 	{
-		if (actionstr[0] == '?')
+		if (!visitor.property( cond).isValid())
 		{
-			int idx = actionstr.indexOf(' ');
-			if (idx >= 0)
-			{
-				QString condprop( actionstr.mid( 1, idx-1));
-				if (!visitor.property( condprop).isValid())
-				{
-					return QByteArray();
-				}
-				else
-				{
-					actionstr = actionstr.mid( idx+1, actionstr.size()-1-idx);
-				}
-			}
+			// one of the preconditions is not met, return empty (no) request
+			qDebug() << "suppressing action" << actionstr << "because condition" << cond << "is not met (condition not valid)";
+			return QByteArray();
 		}
 	}
-	ActionDefinition action( actionstr);
 	QString docType = action.doctype();
 	QString rootElement = action.rootelement();
 	bool isStandalone = rootElement.isEmpty();
 	if (!action.isValid())
 	{
-		qCritical() << "Invalid request for doctype" << docType << "root" << rootElement;
+		qCritical() << "invalid request for action doctype=" << docType << "root=" << rootElement;
 		return QByteArray();
 	}
-	QList<DataSerializeItem> elements = getWidgetDataSerialization( action.structure(), visitor.widget());
+	QList<DataSerializeItem> elements = getWidgetDataSerialization( action.structure(), widget);
 	return getRequestXML( docType, rootElement, isStandalone, elements, debugmode);
-}
-
-static QByteArray getWidgetDoctypeRequest_( WidgetVisitor& visitor, bool debugmode)
-{
-	QList<DataSerializeItem> elements;
-	QVariant prop;
-	QString docType,rootElement;
-	bool isStandalone = true;
-	QList<QString> selectedDataElements;
-	bool hasSelectedDataElements = false;
-
-	QVariant dataelement_v = visitor.property( "dataelement");
-	if (dataelement_v.isValid())
-	{
-		foreach (const QString& ee, dataelement_v.toString().trimmed().split( ','))
-		{
-			QString elem = ee.trimmed();
-			if (!elem.isEmpty())
-			{
-				if (elem[0] == '_' && elem.size() == 1)
-				{
-					selectedDataElements.push_back( QString());
-				}
-				else
-				{
-					selectedDataElements.push_back( elem);
-				}
-			}
-		}
-		hasSelectedDataElements = true;
-	}
-	if ((prop = visitor.property("doctype")).isValid())
-	{
-		docType = prop.toString();
-		isStandalone = false;
-	}
-	if ((prop = visitor.property("rootelement")).isValid())
-	{
-		rootElement = prop.toString();
-		isStandalone = false;
-	}
-	if (!isStandalone && rootElement.isEmpty())
-	{
-		rootElement = docType;
-	}
-	if (!isStandalone && docType.isEmpty())
-	{
-		docType = rootElement;
-	}
-	QVariant dataobjectname = visitor.property( "dataobject");
-	if (dataobjectname.isValid() && !visitor.enter( dataobjectname.toString(), false))
-	{
-		qCritical() << "action dataobject does not address a known widget:" << dataobjectname;
-		return QByteArray();
-	}
-	if (hasSelectedDataElements)
-	{
-		elements = visitor.elements( selectedDataElements);
-	}
-	else
-	{
-		elements = visitor.elements();
-	}
-	if (dataobjectname.isValid())
-	{
-		visitor.leave( false);
-	}
-	return getRequestXML( docType, rootElement, isStandalone, elements, debugmode);
-}
-
-static QByteArray getWidgetRequest_( WidgetVisitor& visitor, bool debugmode)
-{
-	QVariant prop;
-	QString docType,rootElement;
-	QWidget* widget = visitor.widget();
-
-	if (!widget)
-	{
-		qCritical() << "Invalid request (no widget defined)";
-		return QByteArray();
-	}
-	QVariant action_v = widget->property( "action");
-	if (action_v.isValid())
-	{
-		return getWidgetActionRequest_( visitor, action_v, debugmode);
-	}
-	else
-	{
-		return getWidgetDoctypeRequest_( visitor, debugmode);
-	}
 }
 
 WidgetRequest getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	WidgetRequest rt;
-	rt.content = getWidgetRequest_( visitor, debugmode);
+	QWidget* widget = visitor.widget();
+	if (!widget)
+	{
+		qCritical() << "invalid request (no widget defined)";
+		return rt;
+	}
+	QVariant action_v = widget->property( "action");
+	if (!action_v.isValid())
+	{
+		qCritical() << "undefined request. action (property action) does not exist in" << visitor.className() << visitor.objectName();
+		return rt;
+	}
+	rt.content = getWidgetRequest_( visitor, action_v, debugmode);
 	rt.tag = WidgetRequest::actionWidgetRequestTag( visitor.widgetid());
 	qDebug() << "action request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
@@ -305,7 +219,7 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 		qCritical() << "menu item action (property" << propname << ") does not exist for" << menuitem << "in" << visitor.className() << visitor.objectName();
 		return rt;
 	}
-	rt.content = getWidgetActionRequest_( visitor, action_v, debugmode);
+	rt.content = getWidgetRequest_( visitor, action_v, debugmode);
 	rt.tag = WidgetRequest::actionWidgetRequestTag( visitor.widgetid(), menuitem);
 	qDebug() << "action request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
@@ -314,8 +228,20 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 WidgetRequest getWidgetRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	WidgetRequest rt;
+	QWidget* widget = visitor.widget();
+	if (!widget)
+	{
+		qCritical() << "request on non existing widget";
+		return rt;
+	}
+	QVariant action_v = widget->property( "action");
+	if (!action_v.isValid())
+	{
+		qCritical() << "undefined request. action (property action) does not exist in" << visitor.className() << visitor.objectName();
+		return rt;
+	}
 	rt.tag = WidgetRequest::domainLoadWidgetRequestTag( visitor.widgetid());
-	rt.content = getWidgetRequest_( visitor, debugmode);
+	rt.content = getWidgetRequest_( visitor, action_v, debugmode);
 	qDebug() << "widget request of " << visitor.objectName() << "=" << rt.tag << ":" << rt.content;
 	return rt;
 }

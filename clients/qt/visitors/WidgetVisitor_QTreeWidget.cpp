@@ -50,12 +50,6 @@ WidgetVisitorState_QTreeWidget::WidgetVisitorState_QTreeWidget( QWidget* widget_
 		qCritical() << "empty or illegal object name defined for tree widget";
 	}
 	m_stk.push_back( StackElement( m_treeWidget->invisibleRootItem()));
-	m_dataelements_init = DataElements( "item", 0);
-	m_dataelements_init.push_back( m_elementname);
-	m_dataelements_tree = DataElements( "item", "id", 0);
-	m_dataelements_tree.append( m_headers);
-	m_dataelements_list = DataElements( "id", 0);
-	m_dataelements_list.append( m_headers);
 }
 
 void WidgetVisitorState_QTreeWidget::clear()
@@ -108,7 +102,7 @@ bool WidgetVisitorState_QTreeWidget::leave( bool /*writemode*/)
 	return true;
 }
 
-bool WidgetVisitorState_QTreeWidget::isRepeatingDataElement( const QString& name)
+bool WidgetVisitorState_QTreeWidget::isArrayElement( const QString& name)
 {
 	static const QString item_str( "item");
 	if (m_mode != List && name == item_str) return true;
@@ -180,18 +174,6 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QString& name, const QVa
 		return true;
 	}
 	return false;
-}
-
-const QList<QString>& WidgetVisitorState_QTreeWidget::dataelements() const
-{
-	static const QList<QString> noDataElements;
-	switch (m_mode)
-	{
-		case Init: return m_dataelements_init;
-		case Tree: return m_dataelements_tree;
-		case List: return m_dataelements_list;
-	}
-	return noDataElements;
 }
 
 enum StateTag {None,Open,Close,Expand,Select,ExpandSelect};

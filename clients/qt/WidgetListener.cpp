@@ -80,16 +80,7 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 			button->toggle();
 			button->click();
 		}
-		else if (receiver->property( "doctype").isValid())
-		{
-			WidgetMessageDispatcher dp( visitor);
-			WidgetRequest domload = dp.getDomainLoadRequest( m_debug);
-			if (!domload.content.isEmpty())
-			{
-				m_dataLoader->datarequest( domload.tag, domload.content);
-			}
-		}
-		else if (receiver->property( "action").isValid())
+		if (receiver->property( "action").isValid())
 		{
 			WidgetMessageDispatcher dp( visitor);
 			WidgetRequest domload = dp.getDomainLoadRequest( m_debug);

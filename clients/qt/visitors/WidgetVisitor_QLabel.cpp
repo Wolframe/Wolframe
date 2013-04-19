@@ -54,19 +54,12 @@ QVariant WidgetVisitorState_QLabel::property( const QString& name)
 
 bool WidgetVisitorState_QLabel::setProperty( const QString& name, const QVariant& data)
 {
-	/*[-]*/qDebug() << "WidgetVisitorState_QLabel::setProperty" << name << data;
 	if (name.isEmpty())
 	{
 		m_label->setText( data.toString());
 		return true;
 	}
 	return false;
-}
-
-const QList<QString>& WidgetVisitorState_QLabel::dataelements() const
-{
-	static const DataElements ar( "", 0);
-	return ar;
 }
 
 void WidgetVisitorState_QLabel::setState( const QVariant& state)

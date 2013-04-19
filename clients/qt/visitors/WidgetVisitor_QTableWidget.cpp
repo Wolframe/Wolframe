@@ -55,8 +55,7 @@ WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widge
 		QTableWidgetItem* item = m_tableWidget->verticalHeaderItem( rr);
 		if (item)
 		{
-			m_dataelements_row.push_back( item->text().toAscii());
-			m_rowheaders[ m_dataelements_row.back()] = rr;
+			m_rowheaders[ item->text().toAscii()] = rr;
 		}
 	}
 	m_columncount = m_tableWidget->columnCount();
@@ -65,15 +64,9 @@ WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widge
 		QTableWidgetItem* item = m_tableWidget->horizontalHeaderItem( cc);
 		if (item)
 		{
-			m_dataelements_col.push_back( item->text().toAscii());
-			m_colheaders[ m_dataelements_col.back()] = cc;
+			m_colheaders[ item->text().toAscii()] = cc;
 		}
 	}
-	m_dataelements_row.push_back( "title");
-	m_dataelements_row.push_back( "id");
-	m_dataelements_col.push_back( "title");
-	m_dataelements_col.push_back( "id");
-	m_dataelements_init = DataElements( "row", "column", 0);
 }
 
 WidgetVisitorState_QTableWidget::~WidgetVisitorState_QTableWidget()
@@ -233,7 +226,7 @@ bool WidgetVisitorState_QTableWidget::leave( bool writemode)
 	return false;
 }
 
-bool WidgetVisitorState_QTableWidget::isRepeatingDataElement( const QString& name)
+bool WidgetVisitorState_QTableWidget::isArrayElement( const QString& name)
 {
 	if (m_mode == Init && (name == "row" || name == "column")) return true;
 	return false;
@@ -470,21 +463,6 @@ bool WidgetVisitorState_QTableWidget::setProperty( const QString& name, const QV
 			break;
 	}
 	return false;
-}
-
-const QList<QString>& WidgetVisitorState_QTableWidget::dataelements() const
-{
-	static const QList<QString> noDataElements;
-	static const DataElements dataelements_data( "", "thumbnail", 0);
-	switch (m_mode)
-	{
-		case Init: return m_dataelements_init;
-		case Column: return m_dataelements_col;
-		case Row: return m_dataelements_row;
-		case ColumnData:  return dataelements_data;
-		case RowData: return dataelements_data;
-	}
-	return noDataElements;
 }
 
 void WidgetVisitorState_QTableWidget::setState( const QVariant& state)

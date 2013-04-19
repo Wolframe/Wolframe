@@ -116,7 +116,7 @@
     <string/>
    </property>
    <property name="action" stdset="0">
-    <string>?language.selected GetLanguage language {id={language.selected}} }</string>
+    <string>GetLanguage language {id={language.selected}} }</string>
    </property>
    <property name="synonym:name" stdset="0">
     <string/>
