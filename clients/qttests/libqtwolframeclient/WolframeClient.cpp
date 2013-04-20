@@ -140,7 +140,11 @@ QSslCertificate WolframeClient::getCertificate( QString filename )
 	if( cert.isNull( ) )
 		emit error( tr( "empty certificate in file %1" ).arg( filename ) );
 
+#if QT_VERSION >= 0x050000
+	if( !cert.isBlacklisted( ) )
+#else
 	if( !cert.isValid( ) )
+#endif
 		emit error( tr( "certificate in %1 is invalid" ).arg( filename ) );
 
 	return cert;
