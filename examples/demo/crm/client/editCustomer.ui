@@ -143,7 +143,7 @@
         <string>Update</string>
        </property>
        <property name="action" stdset="0">
-        <string notr="true">UpdateCustomer customer {id={id},name{{name}},description{{description}},addr_line1{{addr_line1}},addr_line2{{addr_line2}},addr_postalcode{{addr_postalcode}},addr_district{{addr_district}},addr_country{{addr_country}}}</string>
+        <string notr="true">UpdateCustomer customer {id={customer.id},name{{customer.name}},description{{customer.description}},addr_line1{{customer.addr_line1}},addr_line2{{customer.addr_line2}},addr_postalcode{{customer.addr_postalcode}},addr_district{{customer.addr_district}},addr_country{{customer.addr_country}}}</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">_CLOSE_</string>
