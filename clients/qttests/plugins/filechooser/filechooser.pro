@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-TARGET = wolframewidgets
+TARGET = filechooser
 
 CONFIG += qt warn_on plugin
 
@@ -33,15 +33,9 @@ build_all:!build_pass {
 
 # Input
 SOURCES += \
-	WolframeWidgets.cpp \
-	filechooser/FileChooserPlugin.cpp \
-	filechooser/FileChooser.cpp \
-	picturechooser/PictureChooserPlugin.cpp \
-	picturechooser/PictureChooser.cpp
+	FileChooserPlugin.cpp \
+	FileChooser.cpp
 
 HEADERS += \
-	WolframeWidgets.hpp \
-	filechooser/FileChooserPlugin.hpp \
-	filechooser/FileChooser.hpp \
-	picturechooser/PictureChooserPlugin.hpp \
-	picturechooser/PictureChooser.hpp
+	FileChooserPlugin.hpp \
+	FileChooser.hpp

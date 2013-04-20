@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS = libqtwolframeclient skeleton example wolframewidgets qtclient
+SUBDIRS = libqtwolframeclient skeleton example plugins qtclient
 
 skeleton.depends = libqtwolframeclient
 qtclient.depends = libqtwolframeclient
