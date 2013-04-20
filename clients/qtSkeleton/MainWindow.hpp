@@ -88,7 +88,7 @@ class MainWindow : public QMainWindow
 	public slots:
 		void readSettings( );
 		void parseArgs( );
-		void initialize( );
+		bool initialize( );
 		void loadLanguages( );
 		void loadForm( QString formName );
 		void loadLanguage( QString language );

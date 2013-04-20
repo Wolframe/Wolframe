@@ -31,36 +31,37 @@
 
 ************************************************************************/
 
-#ifndef _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
-#define _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
+#ifndef _WIDGET_Enabler_HPP_INCLUDED
+#define _WIDGET_Enabler_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
-#include "WidgetRequest.hpp"
+#include <QObject>
+#include <QWidget>
+#include <QList>
+#include <QString>
+#include <QSharedPointer>
 
-///\class WidgetMessageDispatcher
-///\brief Structure to initialize widgets of a form and issue commands as client/server requests
-class WidgetMessageDispatcher
+///\class WidgetEnabler
+///\brief Structure to enable widgets based on a set of properties
+class WidgetEnabler :public QObject
 {
-	public:
-		///\brief Constructor
-		///\param[in] root Root of widget tree visited
-		WidgetMessageDispatcher( QWidget* formwidget)
-			:m_visitor( formwidget){}
-		WidgetMessageDispatcher( const WidgetVisitor& visitor_)
-			:m_visitor( visitor_){}
+	Q_OBJECT
 
-		///\brief Copy constructor
-		///\param[in] o object to copy
-		WidgetMessageDispatcher( const WidgetMessageDispatcher& o)
-			:m_visitor(o.m_visitor){}
+public:
+	///\brief Constructor
+	WidgetEnabler( QWidget* widget_, const QList<QString>& properties_);
+	virtual ~WidgetEnabler(){}
+	QWidget* actionwidget() const			{return m_state->widget();}
+	const QList<QString>& actionproperties() const	{return m_properties;}
 
-		QList<WidgetRequest> getDomainLoadRequests( bool debugmode=false);
-		WidgetRequest getDomainLoadRequest( bool debugmode=false);
-		WidgetRequest getFormActionRequest( bool debugmode=false);
-		QList<QWidget*> findRecipients( const QString& tag) const;
+public slots:
+	void changed();
 
-	private:
-		WidgetVisitor m_visitor;			//< visitor of elements
+private:
+	WidgetVisitor::StateR m_state;
+	const QList<QString> m_properties;
 };
+
+typedef QSharedPointer<WidgetEnabler> WidgetEnablerR;
 
 #endif
 

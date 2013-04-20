@@ -30,37 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-
-#ifndef _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
-#define _WOLFRAME_WIDGET_MESSAGE_DISPATCHER_HPP_INCLUDED
+#include "WidgetEnabler.hpp"
 #include "WidgetVisitor.hpp"
-#include "WidgetRequest.hpp"
+#include "WidgetVisitorStateConstructor.hpp"
+#include <QDebug>
 
-///\class WidgetMessageDispatcher
-///\brief Structure to initialize widgets of a form and issue commands as client/server requests
-class WidgetMessageDispatcher
+WidgetEnabler::WidgetEnabler( QWidget* widget_, const QList<QString>& properties_)
+	:QObject()
+	,m_state(createWidgetVisitorState(widget_))
+	,m_properties(properties_)
+{}
+
+void WidgetEnabler::changed()
 {
-	public:
-		///\brief Constructor
-		///\param[in] root Root of widget tree visited
-		WidgetMessageDispatcher( QWidget* formwidget)
-			:m_visitor( formwidget){}
-		WidgetMessageDispatcher( const WidgetVisitor& visitor_)
-			:m_visitor( visitor_){}
-
-		///\brief Copy constructor
-		///\param[in] o object to copy
-		WidgetMessageDispatcher( const WidgetMessageDispatcher& o)
-			:m_visitor(o.m_visitor){}
-
-		QList<WidgetRequest> getDomainLoadRequests( bool debugmode=false);
-		WidgetRequest getDomainLoadRequest( bool debugmode=false);
-		WidgetRequest getFormActionRequest( bool debugmode=false);
-		QList<QWidget*> findRecipients( const QString& tag) const;
-
-	private:
-		WidgetVisitor m_visitor;			//< visitor of elements
-};
-
-#endif
+	QWidget* widget = m_state->widget();
+	if (!widget)
+	{
+		qCritical() << "enabler has no widget defined";
+		return;
+	}
+	WidgetVisitor visitor( m_state);
+	foreach (const QString& prop, m_properties)
+	{
+		if (!visitor.property( prop).isValid())
+		{
+			widget->setEnabled( false);
+			return;
+		}
+	}
+	widget->setEnabled( true);
+}
 

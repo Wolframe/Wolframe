@@ -32,7 +32,7 @@
 ************************************************************************/
 #include "DataTree.hpp"
 #include <QDebug>
-#define WOLFRAME_LOWLEVEL_DEBUG
+#undef WOLFRAME_LOWLEVEL_DEBUG
 #ifdef WOLFRAME_LOWLEVEL_DEBUG
 #define TRACE_ERROR( COMP, TITLE, LINE)			qDebug() << "DataTree" << (COMP) << "error" << (TITLE) << "at line" << (LINE);
 #define TRACE_STATE( COMP, TITLE)			qDebug() << "DataTree" << (COMP) << "state" << (TITLE);
@@ -312,9 +312,9 @@ DataTree DataTree::fromString( const QString::const_iterator& begin, const QStri
 		skipSpaces( is, es);
 		if (is != es)
 		{
-			if (*is == ';')
+			if (*is == ';' || *is == ',')
 			{
-				TRACE_STATE( "fromString", "node delimiter (semicolon)");
+				TRACE_STATE( "fromString", "node delimiter (semicolon or comma)");
 				++is;
 			}
 			else
@@ -429,9 +429,44 @@ QString DataTree::toString() const
 	return rt;
 }
 
+static QList<QString> getConditionProperties( const QString& str)
+{
+	bool isValue = false;
+	QList<QString> rt;
+
+	QString::const_iterator itr = str.begin(), end = str.end();
+	QString::const_iterator start = end;
+	for (; itr != end; ++itr)
+	{
+		if (*itr == '{')
+		{
+			++itr;
+			skipSpaces( itr, end);
+			if (*itr == '{') isValue = true;
+			start = itr;
+		}
+		else if (*itr == '}')
+		{
+			if (start != end && isValue)
+			{
+				rt.push_back( QString( start, itr-start).trimmed());
+			}
+			isValue = false;
+		}
+		else if (*itr == '=')
+		{
+			isValue = true;
+		}
+	}
+	return rt;
+}
+
 ActionDefinition::ActionDefinition( const QString& str)
 {
+	m_condProperties = getConditionProperties( str);
+
 	QString::const_iterator itr = str.begin(), end = str.end();
+	skipSpaces( itr, end);
 	for (; itr != end && isAlphaNum(*itr); ++itr);
 	m_doctype = QString( str.begin(), itr-str.begin());
 	skipSpaces( itr, end);

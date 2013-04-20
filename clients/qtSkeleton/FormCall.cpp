@@ -101,4 +101,29 @@ void FormCall::init( const QString& callstr)
 	}
 }
 
+QList<QString> getFormCallProperties( const QString& str)
+{
+	QList<QString> rt;
+
+	QString::const_iterator itr = str.begin(), end = str.end();
+	QString::const_iterator start = end;
+	for (; itr != end; ++itr)
+	{
+		if (*itr == '{')
+		{
+			++itr;
+			start = itr;
+		}
+		else if (*itr == '}')
+		{
+			if (start != end)
+			{
+				rt.push_back( QString( start, itr-start).trimmed());
+			}
+		}
+	}
+	return rt;
+}
+
+
 

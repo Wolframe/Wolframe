@@ -63,9 +63,12 @@ class EXPORT_AS_PLUGIN PictureChooser : public QWidget
 		void setFileName( const QString &_filename );
 		void setPicture( const QByteArray &_data );
 
+	signals:
+		void changed();
+
 	private:
 		void initialize( );
-				
+
 	private slots:
 		void updatePicture( );
 		void updatePicture( QString _fileName );

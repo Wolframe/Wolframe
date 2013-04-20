@@ -41,24 +41,23 @@ static bool nodeProperty_hasWidgetId( const QWidget* widget, const QVariant& con
 	return (widgetid.isValid() && widgetid == cond);
 }
 
-///\brief Return true if the widget is not an action widget with a doctype defined.
-//	in an action widget the doctype is associated with the request on action and not on domain load
-static bool nodeProperty_isEnabledNonActionWidgetWithDoctype( const QWidget* widget, const QVariant&)
+///\brief Return true if the widget is not an action widget with an action property defined.
+//	in an action widget the action is associated with the click and not with the domain load
+static bool nodeProperty_isEnabledNonActionWidgetWithAction( const QWidget* widget, const QVariant&)
 {
 	if (!widget->isEnabled()) return false;
 	if (qobject_cast<const QAbstractButton*>( widget)) return false;
-	QVariant doctype_property = widget->property( "doctype");
-	QVariant action_property = widget->property( "action");
-	return (doctype_property.isValid() || action_property.isValid());
+	return (widget->property( "action").isValid());
 }
 
-QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
+QList<WidgetRequest> WidgetMessageDispatcher::getDomainLoadRequests( bool debugmode)
 {
-	QList<Request> rt;
-	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithDoctype))
+	QList<WidgetRequest> rt;
+	foreach (QWidget* widget, m_visitor.findSubNodes( nodeProperty_isEnabledNonActionWidgetWithAction))
 	{
 		WidgetVisitor visitor( widget);
-		rt.push_back( Request( visitor.widgetid(), getWidgetRequest( visitor, debugmode)));
+		WidgetRequest request = getWidgetRequest( visitor, debugmode);
+		rt.push_back( request);
 	}
 	int nn = rt.size()/2;
 	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
@@ -66,20 +65,20 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	return rt;
 }
 
-WidgetMessageDispatcher::Request WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
+WidgetRequest WidgetMessageDispatcher::getDomainLoadRequest( bool debugmode)
 {
-	return Request( m_visitor.widgetid(), getWidgetRequest( m_visitor, debugmode));
+	return getWidgetRequest( m_visitor, debugmode);
 }
 
-WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
+WidgetRequest WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	QPair<QString,QByteArray> actionrequest = getActionRequest( m_visitor, debugmode);
-	return Request( actionrequest.first, actionrequest.second);
+	return getActionRequest( m_visitor, debugmode);
 }
 
 QList<QWidget*> WidgetMessageDispatcher::findRecipients( const QString& tag) const
 {
-	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, tag);
+	WidgetRequest request( tag, "");
+	return m_visitor.findSubNodes( nodeProperty_hasWidgetId, request.recipientid());
 }
 
 

@@ -67,7 +67,9 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 // settings override built-in defaults
 	readSettings( );
 
-	initialize( );
+	if( !initialize( ) ) {
+		QApplication::instance( )->exit( 1 );
+	}
 }
 
 static bool _debug = false;
@@ -157,7 +159,7 @@ void MainWindow::parseArgs( )
 
 // -- initialization
 
-void MainWindow::initialize( )
+bool MainWindow::initialize( )
 {
 // install custom output handler (mainly for Unix debugging)
 	qInstallMsgHandler( &myMessageOutput );
@@ -181,7 +183,8 @@ void MainWindow::initialize( )
 			break;
 
 		case LoadMode::UNDEFINED:
-			break;
+			QMessageBox::critical( this, tr( "Configuration error" ), "Unknown value for data load mode in the configuration", QMessageBox::Ok );
+			return false;
 	}
 
 //// link the form loader for form loader notifications needed by the main window
@@ -252,6 +255,8 @@ void MainWindow::initialize( )
 // auto login for developers
 	if( settings.autoLogin )
 		on_actionLogin_triggered( );
+	
+	return true;
 }
 
 //void MainWindow::CreateFormWidget( const QString &name )
