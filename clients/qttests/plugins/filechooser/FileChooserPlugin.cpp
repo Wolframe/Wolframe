@@ -74,7 +74,7 @@ QString FileChooserPlugin::domXml( ) const
 
 QString FileChooserPlugin::group( ) const
 {
-	return "Wolframe Widgets 2";
+	return "Wolframe Widgets";
 }
 
 QString FileChooserPlugin::includeFile( ) const
