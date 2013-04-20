@@ -67,6 +67,7 @@ void WidgetEnabler::changed()
 			break;
 		}
 	}
+	if (enabled) qDebug() << "widget" << widget->objectName() << "enabled";
 	widget->setEnabled( enabled);
 }
 
