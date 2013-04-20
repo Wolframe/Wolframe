@@ -50,6 +50,8 @@ public:
 	///\brief Constructor
 	WidgetEnabler( QWidget* widget_, const QList<QString>& properties_);
 	virtual ~WidgetEnabler(){}
+	QWidget* actionwidget() const			{return m_state->widget();}
+	const QList<QString>& actionproperties() const	{return m_properties;}
 
 public slots:
 	void changed();

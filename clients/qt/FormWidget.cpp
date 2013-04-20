@@ -294,6 +294,103 @@ static bool nodeProperty_hasDataSignals( const QWidget* widget, const QVariant&)
 	return false;
 }
 
+void FormWidget::setPushButtonEnablers( QPushButton* pushButton)
+{
+	QList<QString> enable_props;
+	WidgetVisitor button_visitor( pushButton);
+
+	foreach (const QString& prop, getActionRequestProperties( button_visitor))
+	{
+		if (!enable_props.contains( prop)) enable_props.push_back( prop);
+	}
+	foreach (const QString& prop, getFormCallProperties( pushButton->property( "form").toString()))
+	{
+		if (!enable_props.contains( prop)) enable_props.push_back( prop);
+	}
+
+	bool enabled = true;
+	QHash<QString,WidgetEnablerR> button_enablermap;
+
+	foreach (const QString& prop, enable_props)
+	{
+		QWidget* ownerwidget = button_visitor.getPropertyOwnerWidget( prop);
+		if (ownerwidget)
+		{
+			WidgetEnablerR enabler;
+			QString objName = ownerwidget->objectName();
+
+			QHash<QString,WidgetEnablerR>::const_iterator eni = button_enablermap.find( objName);
+			if (eni != button_enablermap.end())
+			{
+				enabler = eni.value();
+			}
+			else
+			{
+				enabler = WidgetEnablerR( new WidgetEnabler( pushButton, enable_props));
+				QHash<QString,QList<WidgetEnablerR> >::const_iterator fi = m_enablers.find( objName), fe = m_enablers.end();
+				if (fi == fe)
+				{
+					m_enablers.insert( objName, QList<WidgetEnablerR>());
+				}
+				button_enablermap[ objName] = enabler;
+				m_enablers[ objName].push_back( enabler);
+			}
+			WidgetVisitor ownervisitor( ownerwidget);
+			ownervisitor.connectWidgetEnabler( *enabler);
+
+			if (!button_visitor.property( prop).isValid())
+			{
+				enabled = false;
+			}
+		}
+		else
+		{
+			qCritical() << "could not evaluate widget delivering property" << prop;
+			enabled = false;
+		}
+	}
+	pushButton->setEnabled( enabled);
+}
+
+void FormWidget::disablePushButtonEnablers( QWidget* ownerwidget)
+{
+	QHash<QString,QList<WidgetEnablerR> >::iterator enl = m_enablers.find( ownerwidget->objectName());
+	if (enl == m_enablers.end()) return;
+
+	QList<WidgetEnablerR>::iterator ei = enl->begin(), ee = enl->end();
+	for (; ei != ee; ++ei)
+	{
+		WidgetEnabler* eref = ei->data();
+		QPushButton* pushButton = qobject_cast<QPushButton*>( eref->actionwidget());
+		const QList<QString>& properties = eref->actionproperties();
+		*ei = WidgetEnablerR( new WidgetEnabler( pushButton, properties));
+	}
+}
+
+void FormWidget::enablePushButtonEnablers( QWidget* ownerwidget)
+{
+	QHash<QString,QList<WidgetEnablerR> >::iterator enl = m_enablers.find( ownerwidget->objectName());
+	if (enl == m_enablers.end()) return;
+
+	QList<WidgetEnablerR>::iterator ei = enl->begin(), ee = enl->end();
+	for (; ei != ee; ++ei)
+	{
+		WidgetEnabler* eref = ei->data();
+		WidgetVisitor ownervisitor( ownerwidget);
+		ownervisitor.connectWidgetEnabler( *eref);
+	}
+}
+
+void FormWidget::signalPushButtonEnablers()
+{
+	QHash<QString,QList<WidgetEnablerR> >::iterator li = m_enablers.begin(), le = m_enablers.end();
+	for (; li != le; ++li)
+	{
+		QList<WidgetEnablerR>::iterator ei = li->begin(), ee = li->end();
+		for (; ei != ee; ++ei) ei->data()->changed();
+	}
+}
+
 void FormWidget::formLoaded( QString name, QByteArray formXml )
 {
 // that's not us
@@ -369,6 +466,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // set localization now
 	qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
+	m_enablers.clear();
 
 // connect push buttons with form names to loadForms
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
@@ -382,10 +480,11 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 				m_signalMapper, SLOT( map( ) ), Qt::UniqueConnection);
 
 			m_signalMapper->setMapping( pushButton, widget );
+			setPushButtonEnablers( pushButton);
 		}
 	}
 
-// push on form stack for back link
+// push on form stack for back link, if form is not the same and differs only in parameters
 	QList<QVariant> formstack;
 	if( oldUi )
 	{
@@ -397,21 +496,23 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 	QString topform = formstack.back().toString();
 	int qmidx_c = m_form.indexOf( '?');
+	if (qmidx_c < 0) qmidx_c = m_form.size();
 	int qmidx_p = topform.indexOf( '?');
-	if (qmidx_c != qmidx_p || qmidx_p < 0)
+	if (qmidx_p < 0) qmidx_p = topform.size();
+	if (qmidx_c != qmidx_p)
 	{
-		if (m_form != topform)
-		{
-			formstack.push_back( QVariant( m_form));
-		}
+		// ... form name differs (in size)
+		formstack.push_back( QVariant( m_form));
 	}
 	else if (m_form.mid( 0, qmidx_c) == topform.mid( 0, qmidx_c))
 	{
+		// ... form differs only in parameters
 		formstack.pop_back();
 		formstack.push_back( QVariant( m_form));
 	}
 	else
 	{
+		// ... form name differs
 		formstack.push_back( m_form);
 	}
 	qDebug() << "form stack for " << m_form << ":" << formstack;
@@ -432,7 +533,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		<< m_locale.name( );
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
-		
+
 void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 {
 	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
@@ -459,11 +560,15 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 			li.value().clear();
 			foreach (QWidget* rcp, dispatcher.findRecipients( rq.recipientid()))
 			{
+				disablePushButtonEnablers( rcp);
+
 				WidgetVisitor rcpvisitor( rcp);
 				if (!setWidgetAnswer( rcpvisitor, data_))
 				{
 					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
 				}
+				enablePushButtonEnablers( rcp);
+
 				WidgetListener* listener = rcpvisitor.createListener( m_dataLoader);
 				if (listener)
 				{
@@ -477,14 +582,17 @@ void FormWidget::gotAnswer( const QString& tag_, const QByteArray& data_)
 		{
 			foreach (QWidget* rcp, dispatcher.findRecipients( rq.recipientid()))
 			{
+				disablePushButtonEnablers( rcp);
 				WidgetVisitor rcpvisitor( rcp);
 				if (!setWidgetAnswer( rcpvisitor, data_))
 				{
 					qCritical() << "Failed assign request answer tag:" << tag_ << "data:" << data_;
 				}
+				enablePushButtonEnablers( rcp);
 			}
 		}
 	}
+	signalPushButtonEnablers();
 }
 
 void FormWidget::gotError( const QString& tag_, const QByteArray& data_)

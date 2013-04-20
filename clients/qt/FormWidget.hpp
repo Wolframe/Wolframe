@@ -37,7 +37,9 @@
 #include "DataLoader.hpp"
 #include "FormLoader.hpp"
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include <QWidget>
+#include <QPushButton>
 #include <QBuffer>
 #include <QtUiTools>
 #include <QHBoxLayout>
@@ -81,13 +83,22 @@ class FormWidget : public QWidget
 		QSignalMapper *m_signalMapper;		// delegate for form push buttons pointing to forms
 		QStringList m_forms;			// names of all currently loaded forms
 		QTranslator m_translator;		// contains the translations for the current form
-		QHash<QString,QList<WidgetListenerR> > m_listeners;// widget signal listeners for this form
+		QHash<QString,QList<WidgetListenerR> > m_listeners;	// widget signal listeners for this form
+		QHash<QString,QList<WidgetEnablerR> > m_enablers;	// objects holding the logic for enabling buttons when conditions defined by properties referenced are met
 		bool m_debug;
 		bool m_modal;
 		
 	private:
 		void initialize( );
 		void switchForm( QWidget *actionwidget, const QString& actionid=QString());
+		///\brief Define all listeners for events bound to properties 'pushButton' depends on, and let the disable/enable state of 'pushButton' be dependent on these properties
+		void setPushButtonEnablers( QPushButton* pushButton);
+		///\brief Temporarily disable the button enablers dependent on 'ownerwidget' (while injecting the domain load request answer data)
+		void disablePushButtonEnablers( QWidget* ownerwidget);
+		///\brief Reenable the button enablers disabled with disablePushButtonEnablers(QWidget*) (after the domain load request)
+		void enablePushButtonEnablers( QWidget* ownerwidget);
+		///\brief Signal the push button enablers to recheck their state
+		void signalPushButtonEnablers();
 
 	signals:
 		void formLoaded( QString name );

@@ -225,6 +225,25 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 	return rt;
 }
 
+QList<QString> getMenuActionRequestProperties( WidgetVisitor& visitor, const QString& menuitem)
+{
+	QWidget* widget = visitor.widget();
+	QByteArray propname = QByteArray("action:") + menuitem.toAscii();
+	QVariant action = widget->property( propname);
+	if (!action.isValid()) return QList<QString>();
+	ActionDefinition actiondef( action.toString());
+	return actiondef.condProperties();
+}
+
+QList<QString> getActionRequestProperties( WidgetVisitor& visitor)
+{
+	QWidget* widget = visitor.widget();
+	QVariant action = widget->property( "action");
+	if (!action.isValid()) return QList<QString>();
+	ActionDefinition actiondef( action.toString());
+	return actiondef.condProperties();
+}
+
 WidgetRequest getWidgetRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	WidgetRequest rt;

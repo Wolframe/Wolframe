@@ -63,5 +63,8 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 bool isActionRequest( const QString& tag);
 bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
 
+QList<QString> getMenuActionRequestProperties( WidgetVisitor& visitor, const QString& menuitem);
+QList<QString> getActionRequestProperties( WidgetVisitor& visitor);
+
 #endif
 
