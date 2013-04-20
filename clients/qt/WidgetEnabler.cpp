@@ -50,14 +50,24 @@ void WidgetEnabler::changed()
 		return;
 	}
 	WidgetVisitor visitor( m_state);
+	bool enabled = true;
 	foreach (const QString& prop, m_properties)
 	{
 		if (!visitor.property( prop).isValid())
 		{
-			widget->setEnabled( false);
-			return;
+			if (visitor.getPropertyOwnerWidget( prop))
+			{
+				qDebug() << "widget" << widget->objectName() << "disabled because condition" << prop << "is not met (condition not valid)";
+			}
+			else
+			{
+				qDebug() << "widget" << widget->objectName() << "disabled because condition" << prop << "is not met (condition not valid - owner undefined)";
+			}
+			enabled = false;
+			break;
 		}
 	}
-	widget->setEnabled( true);
+	widget->setEnabled( enabled);
 }
+
 

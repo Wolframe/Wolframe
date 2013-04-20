@@ -38,7 +38,7 @@
        <string>ListCustomerShort customer {}</string>
       </property>
       <property name="contextmenu" stdset="0">
-       <string>edit, delete, add,,cancel</string>
+       <string>edit, delete, add</string>
       </property>
       <property name="form:add" stdset="0">
        <string>addCustomer</string>

@@ -94,7 +94,7 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listProject</string>
+        <string notr="true">_CLOSE_</string>
        </property>
       </widget>
      </item>
