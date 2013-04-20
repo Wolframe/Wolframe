@@ -67,6 +67,8 @@ private:
 	QList<Parameter> m_parameter;		//< list of parameters to set in the loaded form before initializing it with data
 };
 
+QList<QString> getFormCallProperties( const QString& callstr);
+
 #endif
 
 

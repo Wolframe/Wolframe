@@ -31,35 +31,35 @@
 
 ************************************************************************/
 
-#include "PictureChooserPlugin.hpp"
-#include "PictureChooser.hpp"
+#include "FileChooserPlugin.hpp"
+#include "FileChooser.hpp"
 
 #include <QtPlugin>
  
-PictureChooserPlugin::PictureChooserPlugin( QObject *_parent )
+FileChooserPlugin::FileChooserPlugin( QObject *_parent )
 	: QObject( _parent ), m_initialized( false )
 {
 }
 
-bool PictureChooserPlugin::isContainer( ) const
+bool FileChooserPlugin::isContainer( ) const
 {
 	return false;
 }
 
-bool PictureChooserPlugin::isInitialized( ) const
+bool FileChooserPlugin::isInitialized( ) const
 {
 	return m_initialized;
 }
 
-QIcon PictureChooserPlugin::icon( ) const
+QIcon FileChooserPlugin::icon( ) const
 {
 	return QIcon( );
 }
 
-QString PictureChooserPlugin::domXml( ) const
+QString FileChooserPlugin::domXml( ) const
 {
 	return 	"<ui language=\"c++\">\n"
-		" <widget class=\"PictureChooser\" name=\"pictureChooser\">\n"
+		" <widget class=\"FileChooser\" name=\"fileChooser\">\n"
 		"  <property name=\"geometry\">\n"
 		"   <rect>\n"
 		"    <x>0</x>\n"
@@ -72,40 +72,44 @@ QString PictureChooserPlugin::domXml( ) const
 		"</ui>\n";
 }
 
-QString PictureChooserPlugin::group( ) const
+QString FileChooserPlugin::group( ) const
 {
-	return "Wolframe Widgets";
+	return "Wolframe Widgets 2";
 }
 
-QString PictureChooserPlugin::includeFile( ) const
+QString FileChooserPlugin::includeFile( ) const
 {
-	return "PictureChooser.hpp";
+	return "FileChooser.hpp";
 }
  
-QString PictureChooserPlugin::name( ) const
+QString FileChooserPlugin::name( ) const
 {
-	return "PictureChooser";
+	return "FileChooser";
 }
 
-QString PictureChooserPlugin::toolTip( ) const
-{
-	return "";
-}
-
-QString PictureChooserPlugin::whatsThis( ) const
+QString FileChooserPlugin::toolTip( ) const
 {
 	return "";
 }
 
-QWidget *PictureChooserPlugin::createWidget( QWidget *_parent )
+QString FileChooserPlugin::whatsThis( ) const
+{
+	return "";
+}
+
+QWidget *FileChooserPlugin::createWidget( QWidget *_parent )
 {
 	// is overridden by property
-	return new PictureChooser( _parent );
+	return new FileChooser( FileChooser::SelectExistingFile, _parent );
 }
 
-void PictureChooserPlugin::initialize( QDesignerFormEditorInterface* /* core */ )
+void FileChooserPlugin::initialize( QDesignerFormEditorInterface* /* core */ )
 {
 	if( m_initialized ) return;
 	
 	m_initialized = true;
 }
+
+#if QT_VERSION < 0x050000
+Q_EXPORT_PLUGIN2( filechooser, FileChooserPlugin )
+#endif // QT_VERSION < 0x050000

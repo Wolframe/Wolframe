@@ -102,15 +102,20 @@ class ActionDefinition
 public:
 	ActionDefinition( const QString& content);
 	ActionDefinition( const ActionDefinition& o)
-		:m_doctype(o.m_doctype),m_rootelement(o.m_rootelement),m_structure(o.m_structure){}
+		:m_condProperties(o.m_condProperties)
+		,m_doctype(o.m_doctype)
+		,m_rootelement(o.m_rootelement)
+		,m_structure(o.m_structure){}
 	QString toString() const;
 
-	const QString& doctype() const		{return m_doctype;}
-	const QString& rootelement() const	{return m_rootelement;}
-	const DataTree& structure() const	{return m_structure;}
-	bool isValid() const			{return m_structure.isValid();}
+	const QString& doctype() const			{return m_doctype;}
+	const QString& rootelement() const		{return m_rootelement;}
+	const DataTree& structure() const		{return m_structure;}
+	bool isValid() const				{return m_structure.isValid();}
+	const QList<QString>& condProperties() const	{return m_condProperties;}
 
 private:
+	QList<QString> m_condProperties;
 	QString m_doctype;
 	QString m_rootelement;
 	DataTree m_structure;
