@@ -457,12 +457,15 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	visitor.do_readAssignments();
 
 // connect listener to signals converted to data signals
+	m_listeners.clear();
 	if (m_debug)
 	{
 		foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDebugListener))
 		{
 			WidgetVisitor datasig_widget_visitor( datasig_widget);
-			m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+			WidgetListenerR listener( datasig_widget_visitor.createListener( m_dataLoader));
+			listener->setDebug( m_debug);
+			m_listeners[ datasig_widget_visitor.widgetid()].push_back( listener);
 		}
 	}
 	else
@@ -470,7 +473,9 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasListener))
 		{
 			WidgetVisitor datasig_widget_visitor( datasig_widget);
-			m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+			WidgetListenerR listener( datasig_widget_visitor.createListener( m_dataLoader));
+			listener->setDebug( m_debug);
+			m_listeners[ datasig_widget_visitor.widgetid()].push_back( listener);
 		}
 	}
 
