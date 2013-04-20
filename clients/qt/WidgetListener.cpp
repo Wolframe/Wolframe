@@ -31,9 +31,11 @@
 
 ************************************************************************/
 #include "WidgetListener.hpp"
+#include "WidgetEnabler.hpp"
 #include "WidgetVisitorStateConstructor.hpp"
 #include "WidgetMessageDispatcher.hpp"
 #include "FormWidget.hpp"
+#include "FormCall.hpp"
 #include <QAbstractButton>
 #include <QAbstractScrollArea>
 #include <QMenu>
@@ -119,18 +121,40 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 		}
 		else
 		{
+			// defined context menu item:
 			QByteArray prop( QByteArray( "contextmenu:") + itemname.toAscii());
 			QVariant actiontext( widget->property( prop));
+			QAction* action;
 			if (actiontext.isValid())
 			{
-				QAction* action = menu.addAction( actiontext.toString());
-				action->setData( QVariant( itemname));
+				action = menu.addAction( actiontext.toString());
 			}
 			else
 			{
-				QAction* action = menu.addAction( item);
-				action->setData( QVariant( itemname));
+				action = menu.addAction( item);
 			}
+			action->setData( QVariant( itemname));
+
+			// check if menu item should be enabled or not:
+			QList<QString> menuprops;
+			foreach (const QString& menuprop, getMenuActionRequestProperties( visitor, itemname))
+			{
+				if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
+			}
+			foreach (const QString& menuprop, getFormCallProperties( widget->property( QByteArray("form:") + itemname.toAscii()).toString()))
+			{
+				if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
+			}
+			bool enabled = true;
+			foreach (const QString& menuprop, menuprops)
+			{
+				if (!visitor.property( menuprop).isValid())
+				{
+					qDebug() << "menu item" << itemname << "disabled because of undefined property" << menuprop;
+					enabled = false;
+				}
+			}
+			action->setEnabled( enabled);
 		}
 	}
 	QAction* selectedItem = menu.exec( globalPos);

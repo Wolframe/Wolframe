@@ -352,7 +352,6 @@ QVariant WidgetVisitorState_QTableWidget::property( const QString& name)
 			if (name == "selected")
 			{
 				QVariant sel = getSelectedValue();
-				/*[-]*/qDebug() << "+++++++++ SELECTED RETURNS" << sel;
 				return sel;
 			}
 			break;
