@@ -44,7 +44,10 @@ class FileDataLoader : public DataLoader
 		FileDataLoader( QString dir );
 		virtual ~FileDataLoader( ) {};
 
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
+		virtual void datarequest( const QString& /*tag*/, const QByteArray& /*content*/);
+
+	public slots:
+		virtual void gotAnswer( bool success, const QString& tag, const QByteArray& content);
 
 	private:
 		void handleCreate( QString name, QByteArray data, QHash<QString, QString> *props );

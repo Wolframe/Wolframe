@@ -41,6 +41,18 @@ FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir )
 {
 }
 
+void FileDataLoader::datarequest( const QString& tag, const QByteArray& content)
+{
+	qDebug( ) << "datarequest, tag" << tag << "\n" << content;
+}
+
+void FileDataLoader::gotAnswer( bool success, const QString& tag, const QByteArray& content)
+{
+	// skip, answer signal is emitted above, we don't wait for network
+	// signals here
+}
+
+/*
 void FileDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "Request" << windowName << formName << widgetName << *props;
@@ -111,3 +123,28 @@ void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName,
 	emit answer( (*props)[ "widgetid"], xml );
 }
 
+NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug )
+	: m_wolframeClient( _wolframeClient ),
+	  m_map( new QHash<QByteArray, QPair<QString, QString> >( ) ),
+	  m_debug( _debug )
+{
+	connect( m_wolframeClient, SIGNAL( answerReceived( bool,const QString&,const QByteArray&) ),
+		this, SLOT( gotAnswer( bool,const QString&,const QByteArray&) ) );
+}
+
+void NetworkDataLoader::datarequest( const QString& tag, const QByteArray& content)
+{
+	m_wolframeClient->request( tag, content);
+}
+
+void NetworkDataLoader::gotAnswer( bool success, const QString& tag, const QByteArray& content )
+{
+	if( !success ) {
+		qCritical( ) << "ERROR: " << tag << content;
+		emit error( tag, content);
+		return;
+	}
+	emit answer( tag, content);
+}
+
+*/

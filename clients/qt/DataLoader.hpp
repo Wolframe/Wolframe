@@ -45,13 +45,13 @@ class DataLoader : public QObject
 	Q_OBJECT
 	
 	public:
-		virtual ~DataLoader( ) {};
+		virtual ~DataLoader( ) {}
 		
-		virtual void datarequest( const QString& /*tag*/, const QByteArray& /*content*/){};
+		virtual void datarequest( const QString& /*tag*/, const QByteArray& /*content*/) = 0;
 
 	// for NetworkDataLoader
 	public slots:
-		virtual void gotAnswer( bool /*success*/, const QString& /*tag*/, const QByteArray& /*content*/){}
+		virtual void gotAnswer( bool /*success*/, const QString& /*tag*/, const QByteArray& /*content*/) = 0;
 	
 	Q_SIGNALS:
 		void answer( const QString& tag, const QByteArray& xml );
