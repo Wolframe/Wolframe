@@ -34,14 +34,15 @@
 #ifndef _PICTURECHOOSERPLUGIN_HPP_INCLUDED
 #define _PICTURECHOOSERPLUGIN_HPP_INCLUDED
 
-#include <QObject>
 #include <QDesignerCustomWidgetInterface>
-#include <QWidget>
 
 class PictureChooserPlugin : public QObject, public QDesignerCustomWidgetInterface
 {
 	Q_OBJECT
 	Q_INTERFACES( QDesignerCustomWidgetInterface )
+#if QT_VERSION >= 0x050000
+	Q_PLUGIN_METADATA( IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
+#endif // QT_VERSION >= 0x050000
 	
 	public:
 		PictureChooserPlugin( QObject *_parent = 0 );

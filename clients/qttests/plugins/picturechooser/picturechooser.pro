@@ -1,8 +1,10 @@
 TEMPLATE = lib
 
-TARGET = filechooser
+TARGET = picturechooser
 
 CONFIG += qt warn_on plugin
+
+INCLUDEPATH += ../filechooser
 
 QT += 
 
@@ -16,6 +18,12 @@ contains(QT_VERSION,^5\\..*) {
 	CONFIG += designer
 }
 	
+#unix:LIBS += -L../filechooser -lfilechooser
+#win32:LIBS += ../filechooser/debug/filechooser.lib
+
+#unix;PRE_TARGETDEPS += ../filechooser/filechooser.so
+#win32:PRE_TARGETDEPS += ../filechooser/debug/filechooser.lib
+
 win32|mac: CONFIG+= debug_and_release
 QTDIR_build:DESTDIR = $$QT_BUILD_TREE/plugins/designer
 contains(TEMPLATE, ".*lib"):TARGET = $$qtLibraryTarget($$TARGET)
@@ -31,9 +39,11 @@ build_all:!build_pass {
 
 # Input
 SOURCES += \
-	FileChooserPlugin.cpp \
-	FileChooser.cpp
+	PictureChooserPlugin.cpp \
+	PictureChooser.cpp \
+	../filechooser/FileChooser.cpp
 
 HEADERS += \
-	FileChooserPlugin.hpp \
-	FileChooser.hpp
+	PictureChooserPlugin.hpp \
+	PictureChooser.hpp \
+	../filechooser/FileChooser.hpp

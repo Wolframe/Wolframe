@@ -74,7 +74,7 @@ QString FileChooserPlugin::domXml( ) const
 
 QString FileChooserPlugin::group( ) const
 {
-	return "Wolframe Widgets";
+	return "Wolframe Widgets 2";
 }
 
 QString FileChooserPlugin::includeFile( ) const
@@ -109,3 +109,7 @@ void FileChooserPlugin::initialize( QDesignerFormEditorInterface* /* core */ )
 	
 	m_initialized = true;
 }
+
+#if QT_VERSION < 0x050000
+Q_EXPORT_PLUGIN2( filechooser, FileChooserPlugin )
+#endif // QT_VERSION < 0x050000
