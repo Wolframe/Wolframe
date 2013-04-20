@@ -54,7 +54,7 @@ public:
 	virtual ~WidgetListener();
 
 	void handleDataSignal( WidgetVisitor::DataSignalType dt);
-	void setDebug( bool v)	{m_debug=v;}
+	void setDebug( bool v);
 
 public slots:
 	void changed()			{handleDataSignal( WidgetVisitor::SigChanged);}
@@ -70,6 +70,7 @@ private:
 	WidgetVisitor::StateR m_state;
 	DataLoader* m_dataLoader;
 	bool m_debug;
+	bool m_hasContextMenu;
 };
 
 typedef QSharedPointer<WidgetListener> WidgetListenerR;

@@ -51,7 +51,7 @@ struct WidgetRequest
 	static QString domainLoadWidgetRequestTag( QString recipientid_);
 
 	WidgetRequest(){}
-	WidgetRequest( QString tag_, QByteArray content_)
+	WidgetRequest( QString tag_, QByteArray content_="")
 		:tag(tag_),content(content_){}
 	WidgetRequest( const WidgetRequest& o)
 		:tag(o.tag),content(o.content){}

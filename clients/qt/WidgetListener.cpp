@@ -40,6 +40,7 @@
 #include <QAbstractScrollArea>
 #include <QMenu>
 #include <QDebug>
+#include <QMessageBox>
 
 WidgetListener::~WidgetListener()
 {
@@ -59,13 +60,35 @@ WidgetListener::WidgetListener( QWidget* widget_, DataLoader* dataLoader_)
 	,m_state(createWidgetVisitorState(widget_))
 	,m_dataLoader(dataLoader_)
 	,m_debug(false)
+	,m_hasContextMenu(false)
 {
 	if (widget_->property( "contextmenu").isValid())
 	{
 		widget_->setContextMenuPolicy( Qt::CustomContextMenu);
 		connect( widget_, SIGNAL( customContextMenuRequested( const QPoint&)),
 			this, SLOT( showContextMenu( const QPoint&)));
+		m_hasContextMenu = true;
 	}
+}
+
+void WidgetListener::setDebug( bool v)
+{
+	if (!m_hasContextMenu)
+	{
+		if (v && !m_debug)
+		{
+			m_state->widget()->setContextMenuPolicy( Qt::CustomContextMenu);
+			connect( m_state->widget(), SIGNAL( customContextMenuRequested( const QPoint&)),
+				this, SLOT( showContextMenu( const QPoint&)));
+		}
+		else if (!v && m_debug)
+		{
+			m_state->widget()->setContextMenuPolicy( Qt::NoContextMenu);
+			disconnect( m_state->widget(), SIGNAL( customContextMenuRequested( const QPoint&)),
+				this, SLOT( showContextMenu( const QPoint&)));
+		}
+	}
+	m_debug = v;
 }
 
 void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
@@ -94,6 +117,81 @@ void WidgetListener::handleDataSignal( WidgetVisitor::DataSignalType dt)
 	}
 }
 
+static bool widgetHasActions( QWidget* widget)
+{
+	if (widget->property( "action").isValid()) return true;
+	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
+	{
+		if (prop.startsWith( "action:")) return true;
+	}
+	return false;
+}
+
+static QString widgetRequestText( QWidget* widget, const QString& menuitem=QString())
+{
+	QString text;
+	QVariant action;
+	WidgetVisitor visitor( widget);
+	QList<QString> condprops;
+	WidgetRequest request;
+	QString title;
+
+	if (menuitem.isEmpty())
+	{
+		action = widget->property( "action");
+		condprops = getActionRequestProperties( visitor);
+		request = getActionRequest( visitor, true);
+		if (qobject_cast<QPushButton*>( widget))
+		{
+			title = "Action click";
+		}
+		else
+		{
+			title = "Action domain load";
+		}
+	}
+	else
+	{
+		action = widget->property( QByteArray("action:") + menuitem.toAscii());
+		if (!action.isValid()) return QString();
+		condprops = getMenuActionRequestProperties( visitor, menuitem);
+		request = getMenuActionRequest( visitor, menuitem, true);
+		title = QString("Menu item '") + menuitem + "'";
+	}
+	if (action.isValid())
+	{
+		text.append( title);
+		text.append( "\n");
+		bool enabled = true;
+		foreach (const QString& prop, condprops)
+		{
+			text.append( "Condition property '");
+			text.append( prop);
+			text.append( "'");
+			if (visitor.property( prop).isValid())
+			{
+				text.append( " defined");
+			}
+			else
+			{
+				text.append( " undefined");
+				enabled = false;
+			}
+			text.append( "\n");
+		}
+		if (enabled)
+		{
+			text.append( "Request:\n");
+			text.append( request.content);
+		}
+		else
+		{
+			text.append( "No action because not all conditions are met\n");
+		}
+	}
+	return text;
+}
+
 void WidgetListener::showContextMenu( const QPoint& pos)
 {
 	QPoint globalPos;
@@ -111,6 +209,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 	WidgetVisitor visitor( m_state);
 	QVariant contextmenudef_p( visitor.property( "contextmenu"));
 	QList<QString> contextmenudef( contextmenudef_p.toString().split(','));
+	int nofMenuEntries = 0;
 
 	foreach (const QString& item, contextmenudef)
 	{
@@ -134,6 +233,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 				action = menu.addAction( item);
 			}
 			action->setData( QVariant( itemname));
+			++nofMenuEntries;
 
 			// check if menu item should be enabled or not:
 			QList<QString> menuprops;
@@ -150,29 +250,86 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 			{
 				if (!visitor.property( menuprop).isValid())
 				{
-					qDebug() << "menu item" << itemname << "disabled because of undefined property" << menuprop;
+					qDebug() << "Menu item" << itemname << "disabled because of undefined property" << menuprop;
 					enabled = false;
 				}
 			}
 			action->setEnabled( enabled);
 		}
 	}
-	QAction* selectedItem = menu.exec( globalPos);
-	if (selectedItem)
+	if (m_debug && widgetHasActions( widget))
 	{
-		FormWidget* form = visitor.formwidget();
-		if (!form)
+		if (nofMenuEntries)
 		{
-			qCritical() << "no form associated with widget woth context menu action";
-			return;
+			menu.addSeparator();
 		}
-		QVariant action = selectedItem->data();
-		if (!action.isValid())
+		QAction* action = menu.addAction( "Debug: Show action requests");
+		action->setData( QVariant( 1));
+		++nofMenuEntries;
+	}
+	if (nofMenuEntries)
+	{
+		QAction* selectedItem = menu.exec( globalPos);
+		if (selectedItem)
 		{
-			qCritical() << "no data associated context menu action";
-			return;
+			FormWidget* form = visitor.formwidget();
+			if (!form)
+			{
+				qCritical() << "no form associated with widget with context menu action";
+				return;
+			}
+			QVariant action = selectedItem->data();
+			if (!action.isValid())
+			{
+				qCritical() << "no data associated context menu action";
+				return;
+			}
+			if (action.type() == QVariant::Int)
+			{
+				QString debugtext;
+				if (widget->property( "action").isValid())
+				{
+					QString actionrequest = widgetRequestText( widget);
+					if (actionrequest.isEmpty())
+					{
+						debugtext.append( "Action click has no action defined\n");
+					}
+					else
+					{
+						debugtext.append( actionrequest);
+					}
+				}
+				foreach (const QString& item, contextmenudef)
+				{
+					QString itemname = item.trimmed();
+					if (!itemname.isEmpty())
+					{
+						if (!debugtext.isEmpty())
+						{
+							debugtext.append( "-----------\n");
+						}
+						QString actionrequest = widgetRequestText( widget, itemname);
+						if (actionrequest.isEmpty())
+						{
+							debugtext.append( "Menu item '");
+							debugtext.append( itemname);
+							debugtext.append( "' has no action defined\n");
+						}
+						else
+						{
+							debugtext.append( actionrequest);
+						}
+					}
+				}
+				QMessageBox msg( widget);
+				msg.setText( debugtext);
+				int reply = msg.exec();
+			}
+			else
+			{
+				form->executeMenuAction( widget, action.toString());
+			}
 		}
-		form->executeMenuAction( widget, action.toString());
 	}
 }
 

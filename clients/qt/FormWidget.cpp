@@ -288,9 +288,23 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 	emit formLoaded( m_form );
 }
 
-static bool nodeProperty_hasDataSignals( const QWidget* widget, const QVariant&)
+static bool nodeProperty_hasListener( const QWidget* widget, const QVariant&)
 {
 	if (WidgetListener::hasDataSignals( widget)) return true;
+	if (widget->property( "contextmenu").isValid()) return true;
+	return false;
+}
+
+static bool nodeProperty_hasDebugListener( const QWidget* widget, const QVariant&)
+{
+	if (WidgetListener::hasDataSignals( widget)) return true;
+	if (widget->property( "contextmenu").isValid()) return true;
+	if (widget->property( "action").isValid()) return true;
+	if (widget->property( "form").isValid()) return true;
+	foreach (const QByteArray& prop, widget->dynamicPropertyNames())
+	{
+		if (prop.startsWith( "action:") || prop.startsWith( "form:")) return true;
+	}
 	return false;
 }
 
@@ -443,10 +457,21 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	visitor.do_readAssignments();
 
 // connect listener to signals converted to data signals
-	foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDataSignals))
+	if (m_debug)
 	{
-		WidgetVisitor datasig_widget_visitor( datasig_widget);
-		m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+		foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasDebugListener))
+		{
+			WidgetVisitor datasig_widget_visitor( datasig_widget);
+			m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+		}
+	}
+	else
+	{
+		foreach (QWidget* datasig_widget, visitor.findSubNodes( nodeProperty_hasListener))
+		{
+			WidgetVisitor datasig_widget_visitor( datasig_widget);
+			m_listeners[ datasig_widget_visitor.widgetid()] = QList<WidgetListenerR>();
+		}
 	}
 
 // add new form to layout (which covers the whole widget)
