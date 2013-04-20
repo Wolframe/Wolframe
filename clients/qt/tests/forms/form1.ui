@@ -295,7 +295,7 @@
           <string notr="true">init</string>
          </property>
          <property name="action" stdset="0">
-          <string notr="true">form1 form1 {first{{first}}}</string>
+          <string notr="true">form1 form1 {first={first}}</string>
          </property>
         </widget>
        </item>
