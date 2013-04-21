@@ -714,7 +714,7 @@ QT_PACKAGE=$(shell pacman -Q qt 2>/dev/null)
 ifeq (qt, $(findstring qt,$(QT_PACKAGE)))
 QT_VERSION=4
 QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= /usr/include/qt
+QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= /usr/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
@@ -725,7 +725,7 @@ QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 QT_CXXFLAGS =
 else
-$(error Qt4 requires the 'qt4' or 'qt' package to be installed!)
+$(error 'WITH_QT4' requires the 'qt4' or 'qt' package to be installed!)
 endif
 endif
 endif
@@ -746,7 +746,7 @@ QT_UIC ?= $(QT_BIN_DIR)/uic-qt5
 QT_LDFLAGS =
 QT_CXXFLAGS = -fPIC
 else
-$(error Qt5 requires the 'qt5-base' package to be installed!)
+$(error 'WITH_QT5' requires the 'qt5-base' package to be installed!)
 endif
 endif
 
