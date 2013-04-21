@@ -42,7 +42,7 @@ build() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
   msg "Show build parameters..."
-  make help \
+  make config \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT4=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
