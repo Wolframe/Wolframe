@@ -197,12 +197,12 @@ static QString widgetText( QWidget* widget, const QString& menuitem=QString())
 			text.append( cond);
 			if (visitor.property( cond).isValid())
 			{
-				text.append( " [no]");
+				text.append( " [yes]");
 				enabled = false;
 			}
 			else
 			{
-				text.append( " [yes]");
+				text.append( " [no]");
 			}
 		}
 		text.append( "\n");
