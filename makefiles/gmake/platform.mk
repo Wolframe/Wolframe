@@ -675,12 +675,9 @@ endif
 
 ifeq ($(WITH_QT4),1)
 WITH_QT = 1
-else
+endif
 ifeq ($(WITH_QT5),1)
 WITH_QT = 1
-else
-$(error either 'WITH_QT4' or 'WITH_QT5' must be defined!)
-endif
 endif
 
 ifeq ($(WITH_QT),1)
@@ -756,6 +753,7 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
+QT_VERSION=4
 QT_DIR ?= /usr/$(LIBDIR)/qt
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -772,6 +770,7 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 17 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "17"
+QT_VERSION=4
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
@@ -786,6 +785,7 @@ endif
 
 # Fedora 18 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "18"
+QT_VERSION=4
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
@@ -800,6 +800,7 @@ endif
 
 # RHEL 5
 ifeq "$(LINUX_REV)" "5"
+QT_VERSION=4
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -814,6 +815,7 @@ endif
 
 # RHEL 6
 ifeq "$(LINUX_REV)" "6"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -833,6 +835,7 @@ endif
 ifeq "$(LINUX_DIST)" "ubuntu"
 
 ifeq "$(LINUX_REV)" "13.04"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -846,6 +849,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.10"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -859,6 +863,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -872,6 +877,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "11.04"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -885,6 +891,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -904,6 +911,7 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -920,6 +928,7 @@ endif
 
 ifeq "$(LINUX_DIST)" "sles"
 ifeq "$(LINUX_REV)" "11"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -936,6 +945,7 @@ endif
 ifeq "$(LINUX_DIST)" "suse"
 
 ifeq "$(LINUX_REV)" "11.4"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -949,6 +959,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.1"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -962,6 +973,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.2"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -975,6 +987,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.3"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -988,6 +1001,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "13.1"
+QT_VERSION=4
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -1005,6 +1019,7 @@ endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
+QT_VERSION=4
 ifeq "$(OS_MAJOR_VERSION)" "8"
 ifdef QT_DIR
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
@@ -1025,6 +1040,7 @@ QT_LDFLAGS =
 endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+QT_VERSION=4
 ifdef QT_DIR
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
