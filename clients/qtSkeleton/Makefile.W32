@@ -97,8 +97,9 @@ OBJS = \
 	WolframeClientProtocol.obj \
 	WolframeClientProtocolBase.obj \
 	WidgetVisitor.obj \
-	WidgetListener.obj \
 	WidgetEnabler.obj \
+	moc_WidgetEnabler.obj \
+	WidgetListener.obj \
 	moc_WidgetListener.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
@@ -175,6 +176,9 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 moc_WidgetListener.cpp: WidgetListener.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WidgetListener.hpp -o moc_WidgetListener.cpp
+
+moc_WidgetEnabler.cpp: WidgetEnabler.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WidgetEnabler.hpp -o moc_WidgetEnabler.cpp
 
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp

@@ -94,6 +94,36 @@ void MainWindow::readSettings( )
 	}
 }
 
+#if QT_VERSION >= 0x050000
+static void myMessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &msg )
+{
+	switch( type ) {
+		case QtDebugMsg:
+			if( _debug ) {
+				if( _debugTerminal ) {
+					_debugTerminal->sendComment( msg );
+				}
+				fprintf( stderr, "%s\n", qPrintable( msg ) );
+			}
+			break;
+
+		case QtWarningMsg:
+			fprintf( stderr, "WARNING: %s\n", qPrintable( msg ) );
+			break;
+
+		case QtCriticalMsg:
+			fprintf( stderr, "CRITICAL: %s\n", qPrintable( msg ) );
+			break;
+
+		case QtFatalMsg:
+			fprintf( stderr, "FATAL: %s\n", qPrintable( msg ) );
+			break;
+
+		default:
+			break;
+	}
+}
+#else
 static void myMessageOutput( QtMsgType type, const char *msg )
 {
 	switch( type ) {
@@ -122,6 +152,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 			break;
 	}
 }
+#endif
 
 MainWindow::~MainWindow( )
 {
@@ -162,7 +193,11 @@ void MainWindow::parseArgs( )
 bool MainWindow::initialize( )
 {
 // install custom output handler (mainly for Unix debugging)
+#if QT_VERSION >= 0x050000
+	qInstallMessageHandler( &myMessageOutput );
+#else
 	qInstallMsgHandler( &myMessageOutput );
+#endif
 
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
@@ -462,7 +497,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 	m_languages = languageCodes;
 
 // does the menu exist?
-	QMenu *languageMenu = qFindChild<QMenu *>( this, "menuLanguages" );
+	QMenu *languageMenu = this->findChild<QMenu *>( "menuLanguages" );
 	if( !languageMenu ) return;
 
 // construct a menu showing all languages
@@ -925,7 +960,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 	activateAction( "actionCascade", nofSubWindows( ) > 0 );
 
 // recreate the subwindow menu and mark the currently selected submenu
-	QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
+	QMenu *windowMenu = this->findChild<QMenu *>( "menuWindow" );
 	if( windowMenu ) {
 		m_subWinMap.clear( );
 		m_revSubWinMap.clear( );

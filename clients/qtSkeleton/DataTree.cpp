@@ -438,12 +438,29 @@ static QList<QString> getConditionProperties( const QString& str)
 	QString::const_iterator start = end;
 	for (; itr != end; ++itr)
 	{
-		if (*itr == '{')
+		if (*itr == ';')
 		{
 			++itr;
 			skipSpaces( itr, end);
-			if (*itr == '{') isValue = true;
-			start = itr;
+			if (*itr == '{')
+			{
+				isValue = true;
+				start = itr+1;
+			}
+		}
+		else if (*itr == '{')
+		{
+			++itr;
+			skipSpaces( itr, end);
+			if (*itr == '{')
+			{
+				isValue = true;
+				start = itr+1;
+			}
+			else
+			{
+				start = itr;
+			}
 		}
 		else if (*itr == '}')
 		{
