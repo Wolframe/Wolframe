@@ -130,67 +130,152 @@ static bool widgetHasActions( QWidget* widget)
 	return false;
 }
 
-static QString widgetRequestText( QWidget* widget, const QString& menuitem=QString())
+static QString widgetText( QWidget* widget, const QString& menuitem=QString())
 {
 	QString text;
 	QVariant action;
+	QVariant form;
 	WidgetVisitor visitor( widget);
 	QList<QString> condprops;
 	WidgetRequest request;
+	FormCall formCall;
 	QString title;
+	bool enabled = true;
+	bool showFormDecl = true;
 
 	if (menuitem.isEmpty())
 	{
 		action = widget->property( "action");
-		condprops = getActionRequestProperties( visitor);
-		request = getActionRequest( visitor, true);
+		form = visitor.property( "form");
+		if (action.isValid())
+		{
+			foreach (const QString& cond, getActionRequestProperties( visitor))
+			{
+				if (!condprops.contains(cond))
+				{
+					condprops.push_back( cond);
+				}
+			}
+			request = getActionRequest( visitor, true);
+		}
 		if (qobject_cast<QPushButton*>( widget))
 		{
-			title = "Action click";
+			title = "on click";
 		}
 		else
 		{
-			title = "Action domain load";
+			title = "for domain load";
+			showFormDecl = false;
 		}
 	}
 	else
 	{
 		action = widget->property( QByteArray("action:") + menuitem.toAscii());
-		if (!action.isValid()) return QString();
-		condprops = getMenuActionRequestProperties( visitor, menuitem);
-		request = getMenuActionRequest( visitor, menuitem, true);
-		title = QString("Menu item '") + menuitem + "'";
-	}
-	if (action.isValid())
-	{
-		text.append( title);
-		text.append( "\n");
-		bool enabled = true;
-		foreach (const QString& prop, condprops)
+		form = visitor.property( QString("form:") + menuitem);
+		if (action.isValid())
 		{
-			text.append( "Condition property '");
-			text.append( prop);
-			text.append( "'");
-			if (visitor.property( prop).isValid())
+			foreach (const QString& cond, getMenuActionRequestProperties( visitor, menuitem))
 			{
-				text.append( " defined");
+				if (!condprops.contains(cond))
+				{
+					condprops.push_back( cond);
+				}
+			}
+			request = getMenuActionRequest( visitor, menuitem, true);
+		}
+		title = QString("for menu item '") + menuitem + "'";
+	}
+	if (!condprops.isEmpty())
+	{
+		text.append( "Condition variables ");
+		text.append( title);
+		text.append( ":\n   ");
+		int idx = 0;
+		foreach (const QString& cond, condprops)
+		{
+			if (idx++) text.append( ", ");
+			text.append( cond);
+			if (visitor.property( cond).isValid())
+			{
+				text.append( " [no]");
+				enabled = false;
 			}
 			else
 			{
-				text.append( " undefined");
-				enabled = false;
+				text.append( " [yes]");
 			}
-			text.append( "\n");
 		}
+		text.append( "\n");
+	}
+	if (form.isValid())
+	{
+		foreach (const QString& cond, getFormCallProperties( form.toString()))
+		{
+			if (!condprops.contains(cond))
+			{
+				condprops.push_back( cond);
+			}
+		}
+		formCall.init( form.toString());
+	}
+	if (action.isValid())
+	{
 		if (enabled)
 		{
-			text.append( "Request:\n");
+			text.append( "Request ");
+			text.append( title);
+			text.append( ":\n");
 			text.append( request.content);
 		}
 		else
 		{
-			text.append( "No action because not all conditions are met\n");
+			text.append( "No action (not all conditions are met)\n");
 		}
+	}
+	else
+	{
+		text.append( "No action defined ");
+		text.append( title);
+		text.append( "\n");
+	}
+	if (form.isValid())
+	{
+		if (enabled)
+		{
+			text.append( "Form ");
+			text.append( title);
+			text.append( " is '");
+			text.append( formCall.name());
+
+			if (formCall.parameter().isEmpty())
+			{
+				text.append( "' without parameters\n");
+			}
+			else
+			{
+				text.append( "':\n");
+				foreach (const FormCall::Parameter& param, formCall.parameter())
+				{
+					text.append( "   * Parameter ");
+					text.append( param.first);
+					text.append( " = '");
+					text.append( param.second.toString());
+					text.append( "'\n");
+				}
+			}
+		}
+		else if (showFormDecl)
+		{
+			text.append( "No new form ");
+			text.append( title);
+			text.append(" (not all conditions are met)\n");
+		}
+	}
+	else if (showFormDecl)
+	{
+		text.append( "No form defined ");
+		text.append( title);
+		text.append( "\n");
 	}
 	return text;
 }
@@ -269,7 +354,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 		{
 			menu.addSeparator();
 		}
-		QAction* action = menu.addAction( "Debug: Show action requests");
+		QAction* action = menu.addAction( "Debug: Inspect commands");
 		action->setData( QVariant( 1));
 		++nofMenuEntries;
 	}
@@ -292,19 +377,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 			}
 			if (action.type() == QVariant::Int)
 			{
-				QString debugtext;
-				if (widget->property( "action").isValid())
-				{
-					QString actionrequest = widgetRequestText( widget);
-					if (actionrequest.isEmpty())
-					{
-						debugtext.append( "Action click has no action defined\n");
-					}
-					else
-					{
-						debugtext.append( actionrequest);
-					}
-				}
+				QString debugtext = widgetText( widget);
 				foreach (const QString& item, contextmenudef)
 				{
 					QString itemname = item.trimmed();
@@ -312,19 +385,9 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 					{
 						if (!debugtext.isEmpty())
 						{
-							debugtext.append( "-----------\n");
+							debugtext.append( "-\n");
 						}
-						QString actionrequest = widgetRequestText( widget, itemname);
-						if (actionrequest.isEmpty())
-						{
-							debugtext.append( "Menu item '");
-							debugtext.append( itemname);
-							debugtext.append( "' has no action defined\n");
-						}
-						else
-						{
-							debugtext.append( actionrequest);
-						}
+						debugtext.append( widgetText( widget, itemname));
 					}
 				}
 				QMessageBox msg( widget);
