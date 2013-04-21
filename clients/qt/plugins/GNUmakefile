@@ -22,14 +22,27 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtDesigner \
 	-I$(QT_INCLUDE_DIR)/QtUiTools
+
+ifeq ($(QT_VERSION),5)
+INCLUDE_DIRS += \
+	-I$(QT_INCLUDE_DIR)/QtWidgets \
+	-I$(QT_INCLUDE_DIR)/QtDesigner 
+endif
 	
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \
 	$(QT_LDFLAGS)
 
+ifeq ($(QT_VERSION),4)
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtDesigner
+endif
+
+ifeq ($(QT_VERSION),5)
+INCLUDE_LIBS = \
+	-lQt5Core -lQt5Gui -lQt5Designer
+endif
 
 MOC_FLAGS = \
 	$(INCLUDE_DIRS)

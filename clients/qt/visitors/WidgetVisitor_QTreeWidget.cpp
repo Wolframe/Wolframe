@@ -197,7 +197,7 @@ static QString stateElementValue( const QVariant& elemkey)
 static StateTag stateElementTag( const QVariant& elemkey)
 {
 	QString kk = elemkey.toString();
-	const char* pos = strchr( g_tagchr, kk.at( 0).toAscii());
+	const char* pos = strchr( g_tagchr, kk.at( 0).toLatin1());
 	return pos?(StateTag)(pos-g_tagchr):None;
 }
 

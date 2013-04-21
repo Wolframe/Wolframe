@@ -20,7 +20,8 @@ Available optional features:
 
 WITH_SSL=1              use OpenSSL additionally for communication encryption
 WITH_LUA=1              build code using the Lua interpreter
-WITH_QT=1               build code depending on Qt
+WITH_QT4=1              build code depending on Qt 4
+WITH_QT5=1              build code depending on Qt 5
 WITH_SASL=1             build authentication code with Cyrus SASL2
 WITH_PAM=1              build authentication code with PAM
 WITH_SYSTEM_SQLITE3=1   build AAAA and DB connectors for Sqlite3 (from system) 
@@ -47,7 +48,7 @@ RUN_TESTS=0             don't automatially run tests (default is run them)
 WITH_EXPECT=1           use Expect/Tcl for system testing
 
 Example:
-make WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
+make WITH_SSL=1 WITH_EXPECT=1 WITH_QT5=1 WITH_PAM=1 WITH_SASL=1 \
      WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
      WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_SYSTEM_FREEIMAGE=1
 

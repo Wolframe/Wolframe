@@ -39,7 +39,7 @@ WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	:WidgetVisitor::State(widget_)
 	,m_mode(None)
 	,m_comboBox(qobject_cast<QComboBox*>(widget_))
-	,m_elementname(widget_->objectName().toAscii())
+	,m_elementname(widget_->objectName().toLatin1())
 	,m_currentindex(0)
 {}
 

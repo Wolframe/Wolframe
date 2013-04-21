@@ -257,7 +257,7 @@ QVariant WidgetVisitor::State::dynamicProperty( const QString& name) const
 bool WidgetVisitor::State::setDynamicProperty( const QString& name, const QVariant& value)
 {
 	m_dynamicProperties.insert( name, value);
-	m_widget->setProperty( name.toAscii(), value);
+	m_widget->setProperty( name.toLatin1(), value);
 	return true;
 }
 

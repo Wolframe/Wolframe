@@ -110,6 +110,7 @@ ifeq ($(WITH_LUA),1)
 endif
 ifeq ($(WITH_QT),1)
 	@echo
+	@echo "QT_VERSION: $(QT_VERSION)"
 	@echo "QT_DIR: $(QT_DIR)"
 	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
 	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"

@@ -212,7 +212,7 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 		qCritical() << "menu action on non existing widget" << menuitem;
 		return rt;
 	}
-	QByteArray propname = QByteArray("action:") + menuitem.toAscii();
+	QByteArray propname = QByteArray("action:") + menuitem.toLatin1();
 	QVariant action_v = widget->property( propname);
 	if (!action_v.isValid())
 	{
@@ -228,7 +228,7 @@ WidgetRequest getMenuActionRequest( WidgetVisitor& visitor, const QString& menui
 QList<QString> getMenuActionRequestProperties( WidgetVisitor& visitor, const QString& menuitem)
 {
 	QWidget* widget = visitor.widget();
-	QByteArray propname = QByteArray("action:") + menuitem.toAscii();
+	QByteArray propname = QByteArray("action:") + menuitem.toLatin1();
 	QVariant action = widget->property( propname);
 	if (!action.isValid()) return QList<QString>();
 	ActionDefinition actiondef( action.toString());

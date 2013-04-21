@@ -311,7 +311,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 			else
 			{
 				// defined context menu item:
-				QByteArray prop( QByteArray( "contextmenu:") + itemname.toAscii());
+				QByteArray prop( QByteArray( "contextmenu:") + itemname.toLatin1());
 				QVariant actiontext( widget->property( prop));
 				QAction* action;
 				if (actiontext.isValid())
@@ -331,7 +331,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 				{
 					if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
 				}
-				foreach (const QString& menuprop, getFormCallProperties( widget->property( QByteArray("form:") + itemname.toAscii()).toString()))
+				foreach (const QString& menuprop, getFormCallProperties( widget->property( QByteArray("form:") + itemname.toLatin1()).toString()))
 				{
 					if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
 				}

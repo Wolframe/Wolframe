@@ -56,7 +56,7 @@ WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widge
 		QTableWidgetItem* item = m_tableWidget->verticalHeaderItem( rr);
 		if (item)
 		{
-			m_rowheaders[ item->text().toAscii()] = rr;
+			m_rowheaders[ item->text().toLatin1()] = rr;
 		}
 	}
 	m_columncount = m_tableWidget->columnCount();
@@ -65,7 +65,7 @@ WidgetVisitorState_QTableWidget::WidgetVisitorState_QTableWidget( QWidget* widge
 		QTableWidgetItem* item = m_tableWidget->horizontalHeaderItem( cc);
 		if (item)
 		{
-			m_colheaders[ item->text().toAscii()] = cc;
+			m_colheaders[ item->text().toLatin1()] = cc;
 		}
 	}
 }
@@ -361,7 +361,7 @@ QVariant WidgetVisitorState_QTableWidget::property( const QString& name)
 				item = m_tableWidget->verticalHeaderItem( m_row);
 				if (item)
 				{
-					return QVariant( item->text().toAscii());
+					return QVariant( item->text().toLatin1());
 				}
 			}
 			else if (name == "id")
@@ -375,7 +375,7 @@ QVariant WidgetVisitorState_QTableWidget::property( const QString& name)
 				item = m_tableWidget->horizontalHeaderItem( m_column);
 				if (item)
 				{
-					return QVariant( item->text().toAscii());
+					return QVariant( item->text().toLatin1());
 				}
 			}
 			else if (name == "id")
@@ -483,7 +483,11 @@ void WidgetVisitorState_QTableWidget::setState( const QVariant& state)
 		m_tableWidget->setRangeSelected( selected, true);
 	}
 	m_tableWidget->horizontalHeader()->setStretchLastSection(true);
+#if QT_VERSION >= 0x050000
+	m_tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+#else
 	m_tableWidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+#endif
 	for( int ii = 0; ii < m_tableWidget->columnCount(); ii++)
 	{
 		m_tableWidget->resizeColumnToContents( ii);

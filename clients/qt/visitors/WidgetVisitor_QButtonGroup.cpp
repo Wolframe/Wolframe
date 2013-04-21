@@ -19,7 +19,7 @@ bool WidgetVisitorState_QButtonGroup::setChecked( const QString& name)
 	{
 		foreach (QAbstractButton* child, m_buttonGroup->findChildren<QAbstractButton*>())
 		{
-			m_childmap[ child->objectName().toAscii()] = child;
+			m_childmap[ child->objectName().toLatin1()] = child;
 		}
 	}
 	QHash<QString,QWidget*>::const_iterator ci = m_childmap.find( name);
@@ -62,7 +62,7 @@ QList<QVariant> WidgetVisitorState_QButtonGroup::checkedList() const
 	QList<QVariant> rt;
 	foreach (QAbstractButton* child, m_buttonGroup->findChildren<QAbstractButton*>())
 	{
-		if (child->isChecked()) rt.push_back( QVariant( child->objectName().toAscii()));
+		if (child->isChecked()) rt.push_back( QVariant( child->objectName().toLatin1()));
 	}
 	return rt;
 }

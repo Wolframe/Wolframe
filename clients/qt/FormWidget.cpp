@@ -130,7 +130,7 @@ void FormWidget::executeMenuAction( QWidget *actionwidget, const QString& menuac
 
 	WidgetVisitor visitor( actionwidget);
 	QString suffix;
-	QVariant action = actionwidget->property( QByteArray( "action") + ":" + menuaction.toAscii());
+	QVariant action = actionwidget->property( QByteArray( "action") + ":" + menuaction.toLatin1());
 
 	if (action.isValid())
 	{
