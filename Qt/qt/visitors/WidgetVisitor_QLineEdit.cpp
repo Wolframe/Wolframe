@@ -98,9 +98,6 @@ void WidgetVisitorState_QLineEdit::connectDataSignals( WidgetVisitor::DataSignal
 
 void WidgetVisitorState_QLineEdit::connectWidgetEnabler( WidgetEnabler& enabler)
 {
-	QObject::connect( m_lineEdit, SIGNAL( cursorPositionChanged(int,int)), &enabler, SLOT( changed()), Qt::UniqueConnection);
-	QObject::connect( m_lineEdit, SIGNAL( editingFinished()), &enabler, SLOT( changed()), Qt::UniqueConnection);
-	QObject::connect( m_lineEdit, SIGNAL( returnPressed()), &enabler, SLOT( changed()), Qt::UniqueConnection);
 	QObject::connect( m_lineEdit, SIGNAL( selectionChanged()), &enabler, SLOT( changed()), Qt::UniqueConnection);
 	QObject::connect( m_lineEdit, SIGNAL( textChanged( const QString & text)), &enabler, SLOT( changed()), Qt::UniqueConnection);
 }
