@@ -253,15 +253,20 @@ static QString widgetText( QWidget* widget, const QString& menuitem=QString())
 			}
 			else
 			{
-				text.append( "':\n");
+				text.append( "':\n   Parameter ");
+				int idx = 0;
 				foreach (const FormCall::Parameter& param, formCall.parameter())
 				{
-					text.append( "   * Parameter ");
+					if (idx++)
+					{
+						text.append( "; ");
+					}
 					text.append( param.first);
 					text.append( " = '");
 					text.append( param.second.toString());
-					text.append( "'\n");
+					text.append( "'");
 				}
+				text.append( "\n");
 			}
 		}
 		else if (showFormDecl)
