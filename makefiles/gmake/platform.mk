@@ -36,6 +36,8 @@ WITH_SYSTEM_FREEIMAGE ?= 0
 WITH_LOCAL_FREEIMAGE ?= 0
 WITH_ICU ?= 0
 WITH_QT ?= 0
+WITH_QT4 ?= 0
+WITH_QT5 ?= 0
 WITH_EXAMPLES ?= 1
 ENABLE_NLS ?= 1
 RUN_TESTS ?= 1
@@ -671,6 +673,16 @@ endif
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
 
+ifeq ($(WITH_QT4),1)
+WITH_QT = 1
+else
+ifeq ($(WITH_QT5),1)
+WITH_QT = 1
+else
+$(error either 'WITH_QT4' or 'WITH_QT5' must be defined!)
+endif
+endif
+
 ifeq ($(WITH_QT),1)
 
 ifeq "$(PLATFORM)" "MACOS"
@@ -685,26 +697,13 @@ ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
 
+ifeq ($(WITH_QT4),1)
 QT_PACKAGE=$(shell pacman -Q qt4 2>/dev/null)
 ifeq (qt4, $(findstring qt4,$(QT_PACKAGE)))
+QT_VERSION=4
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= /usr/include/qt4
 QT_LIB_DIR ?= /usr/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate  
-QT_RCC ?= $(QT_BIN_DIR)/rcc
-QT_UIC ?= $(QT_BIN_DIR)/uic
-QT_LDFLAGS =
-QT_CXXFLAGS =
-else
-
-QT_PACKAGE=$(shell pacman -Q qt 2>/dev/null)
-ifeq (qt,$(findstring qt,$(QT_PACKAGE)))
-QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= $(QT_DIR)/include
-QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
@@ -714,9 +713,44 @@ QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 QT_CXXFLAGS =
 else
-$(error WITH_QT requires installation of 'qt' or 'qt4' package!)
+QT_PACKAGE=$(shell pacman -Q qt 2>/dev/null)
+ifeq (qt, $(findstring qt,$(QT_PACKAGE)))
+QT_VERSION=4
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= /usr/include/qt
+QT_LIB_DIR ?= /usr/lib
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
+QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
+QT_LDFLAGS =
+QT_CXXFLAGS =
+else
+$(error Qt4 requires the 'qt4' or 'qt' package to be installed!)
+endif
+endif
 endif
 
+ifeq ($(WITH_QT5),1)
+QT_PACKAGE=$(shell pacman -Q qt5-base 2>/dev/null)
+ifeq (qt5-base, $(findstring qt5-base,$(QT_PACKAGE)))
+QT_VERSION=5
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc-qt5
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease-qt5
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate-qt5
+QT_RCC ?= $(QT_BIN_DIR)/rcc-qt5
+QT_UIC ?= $(QT_BIN_DIR)/uic-qt5
+QT_LDFLAGS =
+QT_CXXFLAGS = -fPIC
+else
+$(error Qt5 requires the 'qt5-base' package to be installed!)
+endif
 endif
 
 endif

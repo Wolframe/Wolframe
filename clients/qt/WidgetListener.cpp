@@ -155,7 +155,7 @@ static QString widgetRequestText( QWidget* widget, const QString& menuitem=QStri
 	}
 	else
 	{
-		action = widget->property( QByteArray("action:") + menuitem.toAscii());
+		action = widget->property( QByteArray("action:") + menuitem.toLatin1());
 		if (!action.isValid()) return QString();
 		condprops = getMenuActionRequestProperties( visitor, menuitem);
 		request = getMenuActionRequest( visitor, menuitem, true);
@@ -226,7 +226,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 			else
 			{
 				// defined context menu item:
-				QByteArray prop( QByteArray( "contextmenu:") + itemname.toAscii());
+				QByteArray prop( QByteArray( "contextmenu:") + itemname.toLatin1());
 				QVariant actiontext( widget->property( prop));
 				QAction* action;
 				if (actiontext.isValid())
@@ -246,7 +246,7 @@ void WidgetListener::showContextMenu( const QPoint& pos)
 				{
 					if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
 				}
-				foreach (const QString& menuprop, getFormCallProperties( widget->property( QByteArray("form:") + itemname.toAscii()).toString()))
+				foreach (const QString& menuprop, getFormCallProperties( widget->property( QByteArray("form:") + itemname.toLatin1()).toString()))
 				{
 					if (!menuprops.contains( menuprop)) menuprops.push_back( menuprop);
 				}
