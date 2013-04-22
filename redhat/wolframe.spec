@@ -96,17 +96,6 @@
 %define with_freeimage	1
 %define with_examples	1
 
-# Qt is far too old on some platforms, we also don't want to build a local
-# version here
-
-%define with_qt4	1
-%if %{rhel} || %{centos}
-%define with_qt4	0
-%endif
-%if %{fedora} || %{suse} || %{sles}
-%define with_qt4	1
-%endif
-
 # Per package decisions
 ###
 
@@ -606,25 +595,6 @@ Requires: %{name}-libclient >= %{version}-%{release}
 %description client
 Command line client to access the Wolframe server.
 
-%if %{with_qt4}
-%package qtclient
-Summary: Wolframe Qt frontend
-Group: Application/Business
-
-%if %{rhel} || %{centos} || %{fedora}
-BuildRequires: qt4-devel >= 4.5
-Requires: qt4 >= 4.5
-%endif
-%if %{suse} || %{sles}
-BuildRequires: libqt4-devel >= 4.5
-Requires: libqt4 >= 4.5
-%endif
-
-%description qtclient
-Qt client for the Wolframe server.
-
-%endif
-
 %prep
 
 %if %{build_boost} && %{build_libxml2}
@@ -677,7 +647,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT4=%{with_qt4} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
 	WITH_LOCAL_LIBHPDF=1 \
@@ -709,7 +679,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT4=%{with_qt4} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
 	WITH_LOCAL_LIBHPDF=1 \
@@ -741,7 +711,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT4=%{with_qt4} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
 	WITH_LOCAL_LIBHPDF=1 \
@@ -774,7 +744,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT4=%{with_qt4} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
 	WITH_LOCAL_LIBHPDF=1 \
@@ -814,7 +784,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT4=%{with_qt4} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
 	WITH_LOCAL_LIBHPDF=1 \
@@ -1258,18 +1228,6 @@ fi
 %dir %{_bindir}
 %endif
 %{_bindir}/wolframec
-
-%if %{with_qt4}
-%files qtclient
-%defattr( -, root, root )
-# funny, why?!
-%if !%{sles}
-%dir %{_bindir}
-%endif
-%{_bindir}/qtclient
-%dir %{_libdir}/wolframe/plugins/
-%{_libdir}/wolframe/plugins/libwolframewidgets.so
-%endif
 
 %changelog
 * Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2

@@ -7,7 +7,7 @@ license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
-         'sqlite' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
+         'sqlite' 'postgresql-libs' 'libxml2' 'libxslt')
 makedepends=()
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
@@ -22,7 +22,7 @@ package() {
 
   msg "Installing.."
   make \
-    WITH_SSL=1 WITH_EXPECT=1 WITH_QT4=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
@@ -43,7 +43,7 @@ build() {
 
   msg "Show build parameters..."
   make config \
-    WITH_SSL=1 WITH_EXPECT=1 WITH_QT4=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
@@ -53,7 +53,7 @@ build() {
 
   msg "Generating dependencies..."
   make depend \
-    WITH_SSL=1 WITH_EXPECT=1 WITH_QT4=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
@@ -63,7 +63,7 @@ build() {
 
   msg "Building..."
   make \
-    WITH_SSL=1 WITH_EXPECT=1 WITH_QT4=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
