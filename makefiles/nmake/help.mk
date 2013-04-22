@@ -14,7 +14,6 @@ Available optional features:
 
 WITH_SSL=1             use OpenSSL additionally for communication encryption
 WITH_LUA=1             build code depending on Lua
-WITH_QT=1              build code depending on Qt
 WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
 WITH_LIBXML2=1         build code using libxml2
@@ -30,7 +29,7 @@ DEBUG=1                build using debug compiler and linker flags
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:
-nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1
+nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1
                               WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1
                               WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
                               WITH_ICU=1 WITH_FREEIMAGE=1

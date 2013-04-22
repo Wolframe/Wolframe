@@ -2,11 +2,6 @@ TOPDIR = ..
 
 SUBDIRS = lib cmdline
 
-!IFDEF WITH_QT
-SUBDIRS = \
-	$(SUBDIRS) qt
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

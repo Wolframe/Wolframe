@@ -108,18 +108,6 @@ ifeq ($(WITH_LUA),1)
 	@echo "LUA_PLATFORM_LDFLAGS: $(LUA_PLATFORM_LDFLAGS)"
 	@echo "LUA_PLATFORM_LIBS: $(LUA_PLATFORM_LIBS)"
 endif
-ifeq ($(WITH_QT),1)
-	@echo
-	@echo "QT_VERSION: $(QT_VERSION)"
-	@echo "QT_DIR: $(QT_DIR)"
-	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
-	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
-	@echo "QT_BIN_DIR: $(QT_BIN_DIR)"
-	@echo "QT_MOC: $(QT_MOC)"
-	@echo "QT_LRELEASE: $(QT_LRELEASE)"
-	@echo "QT_LUPDATE: $(QT_LUPDATE)"
-	@echo "QT_RCC: $(QT_RCC)"
-endif
 ifeq ($(WITH_PAM),1)
 	@echo
 	@echo "PAM_DIR: $(PAM_DIR)"

@@ -43,19 +43,6 @@
 # self-compiled
 #OPENSSL_DIR = /home/user/openssl
 
-# Qt 4 (http://qt.nokia.com/products/)
-######################################
-
-# self-compiled
-#QT_DIR = /home/user/qt
-
-# system-wide
-#QT_DIR = /usr
-
-# usual layout, may differ
-#QT_INCLUDE_DIR = $(QT_DIR)/include
-#QT_LIB_DIR = $(QT_DIR)/lib
-
 # PAM 1.1.3
 ###########
 

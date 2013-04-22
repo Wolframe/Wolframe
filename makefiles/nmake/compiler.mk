@@ -20,7 +20,7 @@
 # /Wp64: warn about possible 64-bit issues
 # using /W2 for now, /W3 shows lots of problems
 # in boost/asio/openssl (size_t -> int conversion)
-# /Wp64 breaks Qt and SSL
+# /Wp64 breaks SSL
 # /Wall: enable all warnings (produces tons of warnings!)
 # /WX: treat warnings as errors
 

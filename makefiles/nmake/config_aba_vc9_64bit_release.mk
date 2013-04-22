@@ -8,7 +8,6 @@
 #
 # optionally:
 # - OPENSSL_DIR: location of the OpenSSL library (WITH_SSL=1 only)
-# - QT_DIR: location of Qt (WITH_QT=1 only)
 # - PGSQL_DIR: location of Postgres libpq and header files (WITH_PGSQL=1 only)
 # - TCL_DIR: location of the Active Tcl installation (for testing only)
 # - EXPECT: location of the expect interpreter (for testing only)
@@ -78,14 +77,6 @@ OPENSSL_DIR = C:\Program Files\OpenSSL
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
-
-# Qt 4 (http://qt.nokia.com/products/)
-# take the VC2008 version SDK Opensource, not the MinGW one
-############################################################
-
-QT_DIR = C:\Qt\4.7.3
-#QT_DIR = /home/user/qt
-#QT_DIR = D:\Qt\4.7.2
 
 # Postgresql libpq
 # (http://www.postgresql.org/)
