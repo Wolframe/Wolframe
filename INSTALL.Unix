@@ -42,8 +42,6 @@ Prerequisites
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
-- for the optional Qt client
-  - optionally (WITH_QT) Qt 4, 4.6.x or later
 - for database support (WITH_SYSTEM_SQLITE3): sqlite3
   WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
   instead of the system version
@@ -122,19 +120,6 @@ Compile and install openssl
 Unless you have a good reason, use the openssl library of
 your Linux distribution.
 
-Compile and install Qt
-----------------------
-
-./configure --prefix /usr/local/qt-4.x.y -openssl
-make
-cd src/3rdparty/webkit/JavaScriptCore/
-make
-cd -
-make install
-
-confiugre Wolframe in ~/config.mk and
-set QT_DIR to /usr/local/qt-4.x.y
-
 Build instructions for specific Linux Distributions
 ---------------------------------------------------
 
@@ -190,7 +175,7 @@ Fedora 17
 No problems with the supplied packages at all, everything builds out of the box:
 
 Required pacakges: boost-devel (1.48.0)
-Optional packages: openssl-devel (1.0.0j), qt4-devel (4.8.2),
+Optional packages: openssl-devel (1.0.0j)
                    pam-devel (1.1.5), cyrus-sasl-devel (2.1.23),
                    sqlite-devel (3.7.11), postgresql-devel (9.1.5),
                    libxml2-devel (2.7.8), libxslt-devel (1.1.26),
@@ -219,7 +204,7 @@ Fedora 18
 No problems with the supplied packages at all, everything builds out of the box:
 
 Required pacakges: boost-devel (1.50.0)
-Optional packages: openssl-devel (1.0.1c), qt4-devel (4.8.4),
+Optional packages: openssl-devel (1.0.1c)
                    pam-devel (1.1.6), cyrus-sasl-devel (2.1.23),
                    sqlite-devel (3.7.13), postgresql-devel (9.2.3),
                    libxml2-devel (2.9.0), libxslt-devel (1.1.27),
@@ -254,8 +239,7 @@ change auth method from 'ident' to 'md5' in pg_hba.conf
 Ubuntu 10.04.1 LTS
 ------------------
 
-Optional packages: libqt4-dev (4.6.2),
-                   libpam-dev (1.1.1), libsasl2-dev (2.1.23),
+Optional packages: libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.6.22), libpq-dev (8.4.7),
                    libxml2-dev (2.7.6), libpng-dev (1.2.42),
                    zlib1g-dev (1.2.3.3.dfsg-15ubuntu1)
@@ -284,7 +268,7 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 Ubuntu 11.04
 ------------
 
-Optional packages: libssl-dev (0.9.8o), libqt4-dev (4.7.2),
+Optional packages: libssl-dev (0.9.8o),
                    libpam-dev (1.1.2), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.7.4), libpq-dev (8.4.8),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
@@ -315,7 +299,7 @@ Required packages: libboost-dev (1.48), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
                    libboost-random-dev, libboost-locale-dev
 
-Optional packages: libssl-dev (1.0.1), libqt4-dev (4.8.1),
+Optional packages: libssl-dev (1.0.1),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
                    libsqlite3-dev (3.7.9), libpq-dev (9.1.3),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
@@ -346,7 +330,7 @@ Required packages: libboost-dev (1.49), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
                    libboost-random-dev,  libboost-locale-dev
 
-Optional packages: libssl-dev (1.0.1c), libqt4-dev (4.8.3),
+Optional packages: libssl-dev (1.0.1c),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
                    libsqlite3-dev (3.7.13), libpq-dev (9.1.6),
                    libxml2-dev (2.8.0), libxslt1-dev (1.1.26)
@@ -382,7 +366,7 @@ Required packages: libboost-dev (1.49), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
                    libboost-random-dev,  libboost-locale-dev
 
-Optional packages: libssl-dev (1.0.1c), libqt4-dev (4.8.4),
+Optional packages: libssl-dev (1.0.1c),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
                    libsqlite3-dev (3.7.15.2), libpq-dev (9.1.8),
                    libxml2-dev (2.9.0), libxslt1-dev (1.1.27)
@@ -411,7 +395,7 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 Debian 6.0
 ----------
 
-Optional packages: libqt4-dev (4.6.3), libpam-dev (1.1.1),
+Optional packages: libpam-dev (1.1.1),
                    libsasl2-dev (2.1.23), libsqlite3-dev (3.7.3),
                    libpq-dev (8.4.7), libxml2-dev (2.7.8),
                    libxslt1-dev (1.1.26), libpng12-dev (1.2.44),
@@ -436,7 +420,7 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 OpenSuSE 11.4
 -------------
 
-Optional packages: qt-devel (4.7.1), pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
+Optional packages: pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.5), postgresql-devel (9.0.3), libxml2-devel (2.7.8),
                    libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.4),
                    libicu-devel (4.4.2)
@@ -453,7 +437,7 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 OpenSuSE 12.1
 -------------
 
-Optional packages: qt-devel (4.7.4), pam-devel (1.1.4), cyrus-sasl-devel (2.1.23),
+Optional packages: pam-devel (1.1.4), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.8), postgresql-devel (9.1.1), libxml2-devel (2.7.8),
                    libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.8),
                    lilicu-devel (4.6.1)
@@ -471,7 +455,7 @@ OpenSuSE 12.2
 -------------
 
 Required packages: boost-devel (1.49.0)
-Optional packages: qt-devel (4.8.1), pam-devel (1.1.5), cyrus-sasl-devel (2.1.25),
+Optional packages: pam-devel (1.1.5), cyrus-sasl-devel (2.1.25),
                    sqlite3-devel (3.7.12.1), postgresql-devel (9.1.1), libxml2-devel (2.7.8),
                    libxslt-devel (1.1.26), zlib-devel (1.2.7), libpng14-devel (1.4.11)
 
@@ -485,7 +469,7 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 SLES 11 SP1
 -----------
 
-Optional packages: libqt4-devel (4.6.2), pam-devel (1.0.4), cyrus-sasl-devel (2.1.22),
+Optional packages: pam-devel (1.0.4), cyrus-sasl-devel (2.1.22),
                    sqlite3-devel (3.6.4), postgresql-devel (8.3.9), libxml2-devel (2.7.6),
                    libxslt (1.1.24), zlib-devel (1.2.3), libpng-devel (1.2.31),
                    libicu-devel (4.0.7)
@@ -502,7 +486,7 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 SLES 11 SP2
 -----------
 
-Optional packages: libqt4-devel (4.6.3), pam-devel (1.1.5), cyrus-sasl-devel (2.1.22),
+Optional packages: pam-devel (1.1.5), cyrus-sasl-devel (2.1.22),
                    sqlite3-devel (3.7.6.3), postgresql-devel (8.3.14), libxml2-devel (2.7.6),
                    libxslt (1.1.24), zlib-devel (1.2.3), libpng-devel (1.2.31),
                    libicu-devel (4.0.7)
@@ -521,7 +505,7 @@ Slackware 14.0
 
 We have boost 1.49.
 
-openssl and qt are there (select the correct "disk" sets while installing)
+openssl is there (select the correct "disk" sets while installing)
 
 PAM doesn't exist on Slackware it may be build manually.
 
@@ -564,7 +548,7 @@ Archlinux
 ---------
 
 Required packages: boost and boost-libs
-Optional packages: openssl, qt, pam, libsasl,
+Optional packages: openssl, pam, libsasl,
                    sqlite, postgresql-libs,
                    libxml2, libxslt, libharu,
                    icu, freeimage
@@ -582,7 +566,7 @@ Instructions for other Unixes
 FreeBSD 8.2
 -----------
 
-Optional packages: qt4-gui (4.7.1), cyrus-sasl (2.1.23)
+Optional packages: cyrus-sasl (2.1.23)
                    sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8),
                    png (1.4.8)
 
@@ -605,9 +589,7 @@ FreeBSD 9.0
 -----------
 
 Required packages: boost-libs (1.45.0)
-Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
-                   qt4-designer (4.7.4), qt4-rcc (4.7.4), qt4-uic (4.7.4),
-                   cyrus-sasl (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
+Optional packages: cyrus-sasl (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
                    libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
                    zlib (1.1.0), icu (4.8.1.1)
 
@@ -618,9 +600,6 @@ See 'contrib/FreeBSD' for patches and the ports files.
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
 FreeImage builds only on 64-bit because of some ill defined constants.
-
-Qt misses some I18N programs on 32-bit, so you can't build the qtclient
-there (WITH_QT=1).
 
 You need 'gmake' (3.82).
 

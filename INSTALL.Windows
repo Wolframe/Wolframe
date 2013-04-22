@@ -12,7 +12,6 @@ Table of Contents
       Notes for Boost 1.50, 1.51
     OpenSSL
       Compile and install openssl
-    Compile and install Qt
     Postgresql C client library
       Compiling Postgresql
       Notes for Postgreslql 9.0.4
@@ -37,7 +36,6 @@ Prerequisites
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
-- optionally (WITH_QT) Qt 4, 4.5.x or later
 - for database support
   - optionally (WITH_SQLITE3): using the sources i n 'sqlite3'
   - optionally (WITH_PGSQL)
@@ -191,45 +189,6 @@ copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
 	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
 	
 Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
-
-Qt
---
-
-Compile and install Qt
-----------------------
-
-Easiest is to get a precompiled MSVC version of the SDK.
-But this version is missing SSL support.
-
-If you insist on compiling on your own:
-
-Get the MinGW version of the SDK.
-If you want SSL support, get also OpenSSL (see above).
-
-(The Openssl parts in INCLUDE, LIB and configure are needed if you enable SSL with WITH_SSL=1)
-
-Make sure the SDK variables for compilation and linking are set correctly:
-
-set PLATFORM_SDK=D:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
-set OPENSSL_DIR=D:\Program Files\OpenSSL-1.0.0d
-set INCLUDE=%INCLUDE%;%PLATFORM_SDK%\include;%OPENSSL_DIR%\include
-set LIB=%LIB%;%PLATFORM_SDK%\lib;%OPENSSL_DIR%\lib
-set PATH=%PATH%;%PLATFORM_SDK%\bin
-
-Clean up first the MinGW build with:
-
-nmake confclean
-del bin\*.dll bin\*.exe
-del lib\*.a
-
-Configure and build it with:
-
-configure -platform win32-msvc2008 -release -openssl
-nmake
-
-See also http://qtnode.net/wiki/Qt4_with_Visual_Studio.
-
-Finally adapt QT_DIR in 'makefiles\nmake\config.mk'.
 
 Postgresql C client library
 ---------------------------
