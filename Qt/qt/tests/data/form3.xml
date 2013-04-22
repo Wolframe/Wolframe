@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<form3>
-  <favouriteVegetable>cucumber</favouriteVegetable>
-  <vegetables>pumpkins</vegetables>
-  <vegetables>cucumbers</vegetables>
-  <sensless>false</sensless>
-  <vegetarian>true</vegetarian>
-</form3>
