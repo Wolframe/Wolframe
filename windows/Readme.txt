@@ -28,16 +28,11 @@ Prepare the build
 
 * Set the location of the WIX toolkit in 'makefiles\nmake\config.mk' in variable 'WIX_DIR'.
 
-* Copy prerequisites in 'src' and 'clients\qt' subdirs, e. g.
+* Copy prerequisites in the 'src' subdir, e. g.
 
   cd src
   nmake /nologo /f Makefile.W32 ^
-     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
-     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1 ^
-     copy_prereq
-  cd clients\qt
-  nmake /nologo /f Makefile.W32 ^
-     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
+     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1 ^
      copy_prereq
 
@@ -49,13 +44,13 @@ Prepare the build
 * Build 'wolframe.msi' in the local 'windows' directory
 
   nmake /nologo /f Makefile.W32 ^
-     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
+     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1
 
 * a standalone setup.exe can be build with
 
   nmake /nologo /f Makefile.W32 ^
-     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
+     WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1 ^
      setup.exe
 

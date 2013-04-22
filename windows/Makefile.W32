@@ -41,11 +41,6 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_icu=1 -dicu_lib_version=$(ICU_LIB_VERSION)
 !ENDIF
 
-!IFDEF WITH_QT
-WIX_FLAGS = $(WIX_FLAGS) \
-	-dwith_qt=1
-!ENDIF
-
 # The name of libintl and libiconv are not always the same
 !IFDEF PGDLL_WITH_I18N
 WIX_FLAGS = $(WIX_FLAGS) \

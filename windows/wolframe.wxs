@@ -92,37 +92,7 @@ Project Wolframe.
 							<Component Id="WolframeCppClientLib" Guid="{5211387d-521f-48d2-930f-efc6de422981}">
 								<File Id="wolframe_client.dll" Name="wolframe_client.dll" DiskId="1" Source="..\clients\lib\wolframe_client.lib"/>
 							</Component>
-
-							<?ifdef var.with_qt?>
-							<Component Id="WolframeQtClient" Guid="{8f1459e5-c247-400b-bbb1-cf2593f7e15c}">
-								<File Id="qtclient.exe" Name="qtclient.exe" DiskId="1" Source="..\clients\qt\qtclient.exe"/>
-							</Component>
-							<?endif?>
-							
-							<?ifdef var.with_qt?>
-							<Component Id="WolframeWidgets" Guid="{9dcd5fa4-62cd-40ed-a970-5f5df11b43cc}">
-								<File Id="qtwolframewidgets.dll" Name="wolframewidgets.dll" DiskId="1" Source="..\clients\qt\plugins\wolframewidgets.dll"/>
-							</Component>
-							<?endif?>
-
-							<?ifdef var.with_qt?>
-							<Component Id="QtDlls" Guid="{75155ec8-6ff0-435d-adb5-53207761a9ae}">
-								<?ifdef var.debug?>
-									<File Id="QtCored4.dll" Name="QtCored4.dll" DiskId="1" Source="..\clients\qt\QtCored4.dll"/>
-									<File Id="QtGuid4.dll" Name="QtGuid4.dll" DiskId="1" Source="..\clients\qt\QtGuid4.dll"/>
-									<File Id="QtNetworkd4.dll" Name="QtNetworkd4.dll" DiskId="1" Source="..\clients\qt\QtNetworkd4.dll"/>
-									<File Id="QtWebkitd4.dll" Name="QtWebkitd4.dll" DiskId="1" Source="..\clients\qt\QtWebkitd4.dll"/>
-									<File Id="QtSqld4.dll" Name="QtSqld4.dll" DiskId="1" Source="..\clients\qt\QtSqld4.dll"/>
-								<?else?>
-									<File Id="QtCore4.dll" Name="QtCore4.dll" DiskId="1" Source="..\clients\qt\QtCore4.dll"/>
-									<File Id="QtGui4.dll" Name="QtGui4.dll" DiskId="1" Source="..\clients\qt\QtGui4.dll"/>
-									<File Id="QtNetwork4.dll" Name="QtNetwork4.dll" DiskId="1" Source="..\clients\qt\QtNetwork4.dll"/>
-									<File Id="QtWebkit4.dll" Name="QtWebkit4.dll" DiskId="1" Source="..\clients\qt\QtWebkit4.dll"/>
-									<File Id="QtSql4.dll" Name="QtSql4.dll" DiskId="1" Source="..\clients\qt\QtSql4.dll"/>
-								<?endif?>
-							</Component>
-							<?endif?>							
-							
+														
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
 								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
 
@@ -566,15 +536,6 @@ Project Wolframe.
 				<Feature Id="CommandLineTool" Title="Command Line Tool" Description="A simple command line interpreter to access the Wolframe server." Level="3">
 					<ComponentRef Id="Wolframec"/>
 				</Feature>
-				<?ifdef var.with_qt?>
-				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
-					<ComponentRef Id="WolframeQtClient"/>
-					<ComponentRef Id="WolframeWidgets"/>
-					<ComponentRef Id="QtDlls"/>
-					<?ifdef var.with_ssl?>				
-					<ComponentRef Id="OpenSSL"/>
-					<?endif?>
-				<?endif?>
 			</Feature>
 			</Feature>
 			
