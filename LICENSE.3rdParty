@@ -11,7 +11,6 @@ Table of Contents
   libpng
   libhpdf
   FreeImage
-  Qt
   SHA1
   SHA2
 
@@ -121,13 +120,6 @@ FreeImage
 ---------
 
 See 'freeimage/license-fi.txt' and 'freeimage/license-gplv3.txt'.
-
-Qt
---
-
-Qt is licensed under the LGPL license.
-
-See '3rdparty/qt/LICENSE.LGPL'.
 
 SHA1
 ----
