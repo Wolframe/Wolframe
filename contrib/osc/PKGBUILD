@@ -7,7 +7,7 @@ license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
-         'sqlite' 'postgresql-libs' 'libxml2' 'libxslt')
+         'sqlite' 'postgresql-libs' 'libxml2' 'libxslt' 'libpng' 'zlib')
 makedepends=()
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
