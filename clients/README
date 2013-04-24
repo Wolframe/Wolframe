@@ -1,7 +1,6 @@
 various clients
 
 Android - Android based cell-phone client
-qt      - Qt client
 lib     - C++ client library
 cmdline - C++ command line tool wolframec using 'lib'
 
