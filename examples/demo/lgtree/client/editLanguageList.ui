@@ -87,7 +87,7 @@
     <string>GetSelectedLanguageList language {selected[] {id={selection.language.selected}} }</string>
    </property>
    <property name="dataslot" stdset="0">
-    <string>selection</string>
+    <string>selection[ {widgetid}_selection ]</string>
    </property>
    <property name="link:selection" stdset="0">
     <string>{widgetid}_selection</string>
