@@ -6,3 +6,8 @@ DeleteLanguage( xml);
 GetLanguage( xml) :LanguageResult;
 GetLanguageTree( xml) :LanguageListResult;
 GetLanguageTreeStructure( xml) :LanguageRefTree;
+
+GetSelectedLanguageList( xml)	:LanguageSelectionList;
+SaveSelectedLanguageList( xml);
+GetStoredLanguageList( xml)	:LanguageSelectionList;
+

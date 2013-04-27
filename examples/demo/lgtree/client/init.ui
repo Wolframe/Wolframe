@@ -24,6 +24,16 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Edit Language List</string>
+      </property>
+      <property name="form" stdset="0">
+       <string>editLanguageList</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="LanguageList">
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get the list of all projects&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -40,7 +50,6 @@
      </widget>
     </item>
    </layout>
-   <zorder>LanguageList</zorder>
   </widget>
  </widget>
  <resources/>

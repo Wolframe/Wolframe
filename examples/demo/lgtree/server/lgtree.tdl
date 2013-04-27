@@ -54,3 +54,17 @@ BEGIN
 		ORDER BY Language.id;
 END
 
+TRANSACTION GetSelectedLanguageList
+BEGIN
+	INTO selected FOREACH selected DO SELECT id,name FROM Language WHERE id = $(id);
+END
+TRANSACTION SaveSelectedLanguageList
+BEGIN
+	DO DELETE FROM LanguageList;
+	FOREACH selected DO INSERT INTO LanguageList (id) VALUES ($(id));
+END
+TRANSACTION GetStoredLanguageList
+BEGIN
+	INTO selected DO SELECT Language.id,Language.name FROM Language,LanguageList WHERE LanguageList.id = Language.id;
+END
+

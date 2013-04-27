@@ -19,3 +19,7 @@ CREATE TABLE Language	(
 
 INSERT INTO Language (parentid,name,description,status,lft,rgt) VALUES (NULL,"invisible root",NULL,NULL,'1','2');
 
+CREATE TABLE LanguageList	(
+	id		INTEGER	REFERENCES Language( id )
+);
+

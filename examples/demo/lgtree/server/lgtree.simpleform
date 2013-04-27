@@ -60,3 +60,23 @@ Form GetLanguageTreeStructure	{ language { } }
 Form LanguageResult		{ language { _ LanguageInserted } }
 Form LanguageListResult		{ languages { language LanguageInserted[] } }
 
+Form LanguageSelection
+{
+	id		!@ID
+	name		!entityname
+}
+Form LanguageSelectionRef
+{
+	id		!@ID
+}
+Form LanguageSelectionList
+{
+	language
+	{
+		selected LanguageSelection[]
+	}
+}
+Form SaveSelectedLanguageList	{ language {selected LanguageSelectionRef[] } }
+Form GetLanguageList		{ language {} }
+Form GetSelectedLanguageList	{ language {selected LanguageSelectionRef[] } }
+
