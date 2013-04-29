@@ -70,7 +70,7 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="MainMenu">
+     <widget class="QPushButton" name="Ok">
       <property name="text">
        <string>Ok</string>
       </property>
