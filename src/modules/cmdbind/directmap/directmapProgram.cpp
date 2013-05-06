@@ -84,6 +84,7 @@ void DirectmapProgram::addProgram( const std::string& source)
 	std::string::const_iterator argstart;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	char ch;
+	bool hasProtocolCmd = false;
 
 	try
 	{
@@ -111,12 +112,21 @@ void DirectmapProgram::addProgram( const std::string& source)
 					throw ERROR( si, "unexpected end of program");
 				case '=':
 					break;
+				case '~':
+					if ('(' !=  (ch=utils::parseNextToken( tok, si, se, optab)))
+					{
+						if (optab[ ch]) throw ERROR( si, MSG << "'(' expected instead of '" << ch << "'");
+						throw ERROR( si, MSG << "'(' expected instead of '" << tok << "'");
+					}
+					cmd_descr.call = prgname;
+					hasProtocolCmd = true;
+					break;
 				case '(':
 					cmd_descr.call = prgname;
 					break;
 				default:
-					if (optab[ ch]) throw ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
-					throw ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
+					if (optab[ ch]) throw ERROR( si, MSG << "'=','~' or '(' expected instead of '" << ch << "'");
+					throw ERROR( si, MSG << "'=','~' or '(' expected instead of '" << tok << "'");
 			}
 			if (cmd_descr.call.empty())
 			{
@@ -155,6 +165,14 @@ void DirectmapProgram::addProgram( const std::string& source)
 						if (optab[ ch]) throw ERROR( si, MSG << "input form identifier expected instead of '" << ch << "'");
 				}
 				ch = utils::gotoNextToken( si, se);
+				if (hasProtocolCmd)
+				{
+					cmd_descr.call.append( cmd_descr.inputform);
+				}
+			}
+			else if (hasProtocolCmd)
+			{
+				throw ERROR( si, "command name referencing document type ('~') but no input document type specified");
 			}
 			if (ch != ')')
 			{
