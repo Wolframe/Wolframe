@@ -9,3 +9,5 @@ fusion-push-front-broken.patch
 math-define-l.patch
 gcc-4.7-threading-detection.patch
 mpi-allocator-c++0x.patch
+boost_1_48_0-superflous-comma-enum.patch
+boost_1_48_0-TIME_UTC.patch
