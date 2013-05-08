@@ -90,8 +90,7 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
-	# the client libraries, the cli deserve their own package,
-	# the Qt client depends on X11/Qt, so it deserves it's own package
+	# the client libraries, the cli deserve their own package
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
