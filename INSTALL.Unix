@@ -21,6 +21,7 @@ Table of Contents
     Ubuntu 12.10
     Ubuntu 13.04
     Debian 6.0
+    Debian 7.0
     OpenSuSE 11.4
     OpenSuSE 12.1
     OpenSuSE 12.2
@@ -408,6 +409,38 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
+
+For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+Debian 7.0
+----------
+
+Required packages: libboost-dev (1.49), libboost-program-options-dev,
+                   libboost-filesystem-dev, libboost-thread-dev,
+                   libboost-random-dev, libboost-locale-dev
+Optional packages: libpam-dev (1.1.3),
+                   libsasl2-dev (2.1.25), libsqlite3-dev (3.7.13),
+                   libpq-dev (9.1.9), libxml2-dev (2.8.0),
+                   libxslt1-dev (1.1.26), libhpdf (2.2.1),
+                   libpng12-dev (1.2.49), zlib1g-dev (1.2.7)
+
+For libhpdf support use WITH_SYSTEM_LIBHPDF=1.
+
+For freeimage support build the local version with WITH_LOCAL_FREEIMAGE=1.
+
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running non-gtest tests you need 'expect' (5.45).
 
 For running the Postgresql database tests you need 'postgresql-client'.
 
