@@ -73,14 +73,27 @@ struct graphix_thumb_func
 	}
 };
 
+struct graphix_rescale_func
+{
+	static SimpleBuilder* constructor()
+	{
+		static const serialize::StructDescriptionBase* param = ImageRescale::getStructDescription( );
+		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
+		langbind::BuiltInFunction func( imageRescale, param, result );
+
+		return new BuiltInFunctionBuilder( "imageRescale", func);
+	}
+};
+
 } //anonymous namespace
 
-enum { NofObjects = 2 };
+enum { NofObjects = 3 };
 
 static createBuilderFunc objdef[NofObjects] =
 {
 	graphix_info_func::constructor,
-	graphix_thumb_func::constructor
+	graphix_thumb_func::constructor,
+	graphix_rescale_func::constructor
 };
 
 ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );

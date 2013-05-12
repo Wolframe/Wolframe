@@ -82,6 +82,17 @@ struct ImageThumbDescription : public serialize::StructDescription<ImageThumb>
 	}
 };
 
+struct ImageRescaleDescription : public serialize::StructDescription<ImageRescale>
+{
+	ImageRescaleDescription( )
+	{
+		( *this )
+		( "image", &ImageRescale::image )
+		( "width", &ImageRescale::width )
+		( "height", &ImageRescale::height );
+	}
+};
+
 struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
 {
 	ImageImplDescription( )
@@ -106,6 +117,12 @@ const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
 const serialize::StructDescriptionBase *ImageThumb::getStructDescription( )
 {
 	static ImageThumbDescription rt;
+	return &rt;
+}
+
+const serialize::StructDescriptionBase *ImageRescale::getStructDescription( )
+{
+	static ImageRescaleDescription rt;
 	return &rt;
 }
 
@@ -196,6 +213,45 @@ int ImageImpl::thumb( Image &res, const ImageThumb &param )
 	return 0;
 }
 
+int ImageImpl::rescale( Image &res, const ImageRescale &param )
+{
+// decode
+	std::string raw;
+	raw = decode( param.image.data );
+
+// copy it into a buffer
+	std::vector<char> buf;
+	buf.assign( raw.begin( ), raw.end( ) );
+
+// create freeimage memory handle
+	fipMemoryIO inIO( (BYTE *)&buf[0], buf.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( inIO );
+
+// make thumbnail
+	fipImage thumb( image );
+	thumb.rescale( param.width, param.height, FILTER_BOX );
+
+// create freeimage memory handle for result
+	fipMemoryIO outIO;
+
+// write thumb into the buffer
+	thumb.saveToMemory( FIF_PNG, outIO );
+	
+// get buffer
+	BYTE *thumbData = NULL;
+	DWORD thumbSize = 0;
+	outIO.acquire( &thumbData, &thumbSize );
+	
+// encode
+	std::string rawRes( (char *)thumbData, thumbSize );
+	res.data = encode( rawRes );
+
+	return 0;
+}
+
 int _Wolframe::graphix::imageInfo( void *res, const void *param )
 {
 	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
@@ -204,4 +260,9 @@ int _Wolframe::graphix::imageInfo( void *res, const void *param )
 int _Wolframe::graphix::imageThumb( void *res, const void *param )
 {
 	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
+}
+
+int _Wolframe::graphix::imageRescale( void *res, const void *param )
+{
+	return ImageImpl::rescale( *(Image *)res, *(const ImageRescale *)param );
 }
