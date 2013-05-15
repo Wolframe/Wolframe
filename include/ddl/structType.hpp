@@ -304,6 +304,8 @@ public:
 	///\return true, if the element was initialized before
 	bool initialized( bool v)			{bool rt = (m_flags&(unsigned char)Initialized); if (v)m_flags|=(unsigned char)Initialized; else m_flags&=((unsigned char)0xFF-(unsigned char)Initialized); return rt;}
 
+	std::string names( const char* sep) const;
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]

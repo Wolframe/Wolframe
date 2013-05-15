@@ -678,7 +678,7 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 		serialize::Context::Flags flags = serialize::Context::None;
 		int ii = 3, nn = lua_gettop( ls);
 		if (nn > 4) throw std::runtime_error( "too many arguments");
-		for (; ii < nn; ++ii)
+		for (; ii <= nn; ++ii)
 		{
 			if (lua_istable( ls, ii))
 			{

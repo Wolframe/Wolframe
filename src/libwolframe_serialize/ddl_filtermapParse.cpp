@@ -159,7 +159,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( element.tostring());
 			if (itr == st.end())
 			{
-				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk));
+				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk), std::string(".. candidates are {") + st.names(", ") + "}");
 			}
 			std::size_t idx = itr - st.begin();
 			if (idx < st.nof_attributes())

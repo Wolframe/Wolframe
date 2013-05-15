@@ -44,6 +44,7 @@ namespace serialize {
 class SerializationErrorException :public std::runtime_error
 {
 public:
+	SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment);
 	SerializationErrorException( const char* title, const std::string& element, const std::string& tag);
 	SerializationErrorException( const char* title, const std::string& tag);
 	SerializationErrorException( const char* title);

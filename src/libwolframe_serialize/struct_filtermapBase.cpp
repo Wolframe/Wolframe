@@ -238,6 +238,72 @@ private:
 	bool m_consumed;
 };
 
+StructDescriptionBase::StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+	:m_constructor(c)
+	,m_destructor(d)
+	,m_typename(tn)
+	,m_ofs(os)
+	,m_size(sz)
+	,m_nof_attributes(0)
+	,m_type(t)
+	,m_parse(pa)
+	,m_fetch(pr)
+	,m_mandatory(mandatory_){}
+
+StructDescriptionBase::StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+	:m_constructor(0)
+	,m_destructor(0)
+	,m_typename(tn)
+	,m_ofs(os)
+	,m_size(sz)
+	,m_nof_attributes(0)
+	,m_type(t)
+	,m_parse(pa)
+	,m_fetch(pr)
+	,m_mandatory(mandatory_){}
+
+StructDescriptionBase::StructDescriptionBase( const StructDescriptionBase& o)
+	:m_constructor(o.m_constructor)
+	,m_destructor(o.m_destructor)
+	,m_typename(o.m_typename)
+	,m_ofs(o.m_ofs)
+	,m_size(o.m_size)
+	,m_nof_attributes(o.m_nof_attributes)
+	,m_elem(o.m_elem)
+	,m_type(o.m_type)
+	,m_parse(o.m_parse)
+	,m_fetch(o.m_fetch)
+	,m_mandatory(o.m_mandatory){}
+
+StructDescriptionBase::StructDescriptionBase()
+	:m_typename(0)
+	,m_ofs(0)
+	,m_size(0)
+	,m_nof_attributes(0)
+	,m_type(Atomic)
+	,m_parse(0)
+	,m_fetch(0)
+	,m_mandatory(false){}
+
+StructDescriptionBase::Map::const_iterator StructDescriptionBase::find( const std::string& name) const
+{
+	for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+	{
+		if (itr->first == name) return itr;
+	}
+	return m_elem.end();
+}
+
+std::string StructDescriptionBase::names( const char* sep) const
+{
+	std::string rt;
+	for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+	{
+		if (itr != m_elem.begin()) rt.append( sep);
+		rt.append( itr->first);
+	}
+	return rt;
+}
 
 bool StructDescriptionBase::setAtomicValue( void* obj, std::size_t idx, const std::string& value) const
 {

@@ -69,6 +69,9 @@ void Context::clear()
 	m_has_elem = false;
 }
 
+SerializationErrorException::SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment)
+	:std::runtime_error( std::string() + (title?title:"unknown error") + " (" + element + ")" + (tag.size()?" at ":"") + tag + "-" + comment){}
+
 SerializationErrorException::SerializationErrorException( const char* title, const std::string& element, const std::string& tag)
 	:std::runtime_error( std::string() + (title?title:"unknown error") + " (" + element + ")" + (tag.size()?" at ":"") + tag){}
 

@@ -141,7 +141,7 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 			StructDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
-				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk));
+				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
 			}
 			std::size_t idx = itr - descr->begin();
 			if (idx < descr->nof_attributes())

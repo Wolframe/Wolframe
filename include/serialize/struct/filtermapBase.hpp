@@ -65,52 +65,10 @@ public:
 	Parse parse() const		{return m_parse;}
 	Fetch fetch() const		{return m_fetch;}
 
-	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
-		:m_constructor(c)
-		,m_destructor(d)
-		,m_typename(tn)
-		,m_ofs(os)
-		,m_size(sz)
-		,m_nof_attributes(0)
-		,m_type(t)
-		,m_parse(pa)
-		,m_fetch(pr)
-		,m_mandatory(mandatory_){}
-
-	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
-		:m_constructor(0)
-		,m_destructor(0)
-		,m_typename(tn)
-		,m_ofs(os)
-		,m_size(sz)
-		,m_nof_attributes(0)
-		,m_type(t)
-		,m_parse(pa)
-		,m_fetch(pr)
-		,m_mandatory(mandatory_){}
-
-	StructDescriptionBase( const StructDescriptionBase& o)
-		:m_constructor(o.m_constructor)
-		,m_destructor(o.m_destructor)
-		,m_typename(o.m_typename)
-		,m_ofs(o.m_ofs)
-		,m_size(o.m_size)
-		,m_nof_attributes(o.m_nof_attributes)
-		,m_elem(o.m_elem)
-		,m_type(o.m_type)
-		,m_parse(o.m_parse)
-		,m_fetch(o.m_fetch)
-		,m_mandatory(o.m_mandatory){}
-
-	StructDescriptionBase()
-		:m_typename(0)
-		,m_ofs(0)
-		,m_size(0)
-		,m_nof_attributes(0)
-		,m_type(Atomic)
-		,m_parse(0)
-		,m_fetch(0)
-		,m_mandatory(false){}
+	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_);
+	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_);
+	StructDescriptionBase( const StructDescriptionBase& o);
+	StructDescriptionBase();
 
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
 
@@ -143,14 +101,8 @@ public:
 		return m_type;
 	}
 
-	Map::const_iterator find( const std::string& name) const
-	{
-		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
-		{
-			if (itr->first == name) return itr;
-		}
-		return m_elem.end();
-	}
+	Map::const_iterator find( const std::string& name) const;
+	std::string names( const char* sep) const;
 
 	Map::const_iterator begin() const {return m_elem.begin();}
 	Map::const_iterator end() const {return m_elem.end();}

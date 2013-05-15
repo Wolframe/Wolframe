@@ -61,6 +61,18 @@ StructType::Map::const_iterator StructType::find( const char* name) const
 	return m_elem.end();
 }
 
+std::string StructType::names( const char* sep) const
+{
+	REQUIRE(Struct);
+	std::string rt;
+	for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+	{
+		if (itr != m_elem.begin()) rt.append( sep);
+		rt.append( itr->first.c_str());
+	}
+	return rt;
+}
+
 StructType::Map::const_iterator StructType::find( const std::string& name) const
 {
 	return find( name.c_str());
