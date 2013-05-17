@@ -1671,6 +1671,7 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLFormParser)
 		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
 		lua_newtable( ls);
 	}
+	luaL_checktype( ls, -1, LUA_TTABLE);
 	return 1;
 }
 

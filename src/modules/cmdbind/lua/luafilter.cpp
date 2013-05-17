@@ -37,6 +37,7 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>
+#include <string>
 
 extern "C" {
 	#include <lualib.h>
@@ -46,6 +47,65 @@ extern "C" {
 
 using namespace _Wolframe;
 using namespace langbind;
+
+#undef WOLFRAME_LOWLEVEL_DEBUG
+#ifdef WOLFRAME_LOWLEVEL_DEBUG
+static std::string get_lua_elem( lua_State* ls, int idx)
+{
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TNIL:		return "nil";
+		case LUA_TNUMBER:	return std::string("V(") + boost::lexical_cast<std::string>( lua_tonumber( ls, idx)) + ")";
+		case LUA_TBOOLEAN:	return std::string("V(") + (lua_toboolean(ls,idx)?"true":"false") + ")";
+		case LUA_TSTRING:	return std::string("V(") + lua_tostring(ls,idx) + ")";
+		case LUA_TTABLE:	return "T";
+		case LUA_TFUNCTION:	return "F";
+		case LUA_TUSERDATA:	return "U";
+		case LUA_TLIGHTUSERDATA:return "U";
+	}
+	return "X";
+}
+
+static void print_luaStack( lua_State* ls)
+{
+	std::string stk;
+	for (int ii=-5; ii<=-1; ++ii)
+	{
+		stk.push_back(' ');
+		stk.append( get_lua_elem( ls, ii));
+	}
+	std::cout << "------------ LUA STACK:" << stk << std::endl;
+}
+
+void wrap_lua_pushnil( lua_State* ls)					{std::cout << "lua_pushnil" << "()" << std::endl; ::lua_pushnil( ls); print_luaStack( ls);}
+void wrap_lua_pushvalue( lua_State* ls, int arg)			{std::cout << "lua_pushvalue" << "("  << arg << ")" << std::endl; ::lua_pushvalue( ls, arg); print_luaStack( ls);}
+void wrap_lua_pushboolean( lua_State* ls, bool arg)			{std::cout << "lua_pushboolean" << "("  << arg << ")" << std::endl; ::lua_pushboolean( ls, arg); print_luaStack( ls);}
+void wrap_lua_pushinteger( lua_State* ls, int arg)			{std::cout << "lua_pushinteger" << "("  << arg << ")" << std::endl; ::lua_pushinteger( ls, arg); print_luaStack( ls);}
+void wrap_lua_pushnumber( lua_State* ls, double arg)			{std::cout << "lua_pushnumber" << "("  << arg << ")" << std::endl; ::lua_pushnumber( ls, arg); print_luaStack( ls);}
+void wrap_lua_pushlstring( lua_State* ls, const char* arg, int n)	{std::cout << "lua_pushlstring" << "("  << arg << "," << n << ")" << std::endl; ::lua_pushlstring( ls, arg, n); print_luaStack( ls);}
+void wrap_lua_pushstring( lua_State* ls, const char* arg)		{std::cout << "lua_pushstring" << "("  << arg << ")" << std::endl; ::lua_pushstring( ls, arg); print_luaStack( ls);}
+void wrap_lua_pop( lua_State* ls, int arg)				{std::cout << "lua_pop" << "(" << arg << ")" << std::endl; ::lua_pop( ls, arg); print_luaStack( ls);}
+void wrap_lua_newtable( lua_State* ls)					{std::cout << "lua_newtable" << "()" << std::endl; ::lua_newtable( ls); print_luaStack( ls);}
+void wrap_lua_gettable( lua_State* ls, int arg)				{std::cout << "lua_gettable" << "("  << arg << ")" << std::endl; lua_gettable( ls, arg); print_luaStack( ls);}
+void wrap_lua_settable( lua_State* ls, int arg)				{std::cout << "lua_settable" << "("  << arg << ")" << std::endl; ::lua_settable( ls, arg); print_luaStack( ls);}
+bool wrap_lua_next( lua_State* ls, int arg)				{std::cout << "lua_next" << "("  << arg << ")" << std::endl; int rt = ::lua_next( ls, arg); print_luaStack( ls); return rt;}
+const char* wrap_lua_tostring( lua_State* ls, int arg)			{std::cout << "lua_tostring" << "("  << arg << ")" << std::endl; return ::lua_tostring( ls, arg);}
+#else
+#define wrap_lua_pushnil( ls)		lua_pushnil(ls)
+#define wrap_lua_pushvalue( ls,a)	lua_pushvalue(ls,a)
+#define wrap_lua_pushboolean( ls,a)	lua_pushboolean(ls,a)
+#define wrap_lua_pushinteger( ls,a)	lua_pushinteger(ls,a)
+#define wrap_lua_pushnumber( ls,a)	lua_pushnumber(ls,a)
+#define wrap_lua_pushlstring( ls,a,n)	lua_pushlstring(ls,a,n)
+#define wrap_lua_pushstring( ls,a)	lua_pushstring(ls,a)
+#define wrap_lua_pop( ls,a)		lua_pop(ls,a)
+#define wrap_lua_newtable( ls)		lua_newtable(ls)
+#define wrap_lua_gettable( ls,a)	lua_gettable(ls,a)
+#define wrap_lua_settable( ls,a)	lua_settable(ls,a)
+#define wrap_lua_settable( ls,a)	lua_settable(ls,a)
+#define wrap_lua_next( ls,a)		lua_next(ls,a)
+#define wrap_lua_tostring( ls,a)	lua_tostring(ls,a)
+#endif
 
 static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& element, const char*& errelemtype)
 {
@@ -295,29 +355,30 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 	return false;
 }
 
+
 bool LuaTableOutputFilter::pushValue( const Element& element)
 {
 	switch (element.type)
 	{
 		case Element::bool_:
-			lua_pushboolean( m_ls, element.value.bool_);
+			wrap_lua_pushboolean( m_ls, element.value.bool_);
 			return true;
 		case Element::double_:
-			lua_pushnumber( m_ls, (lua_Number)element.value.double_);
+			wrap_lua_pushnumber( m_ls, (lua_Number)element.value.double_);
 			return true;
 		case Element::int_:
-			lua_pushinteger( m_ls, (lua_Integer)element.value.int_);
+			wrap_lua_pushinteger( m_ls, (lua_Integer)element.value.int_);
 			return true;
 		case Element::uint_:
-			lua_pushinteger( m_ls, (lua_Integer)element.value.uint_);
+			wrap_lua_pushinteger( m_ls, (lua_Integer)element.value.uint_);
 			return true;
 		case Element::string_:
-			lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
-			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			wrap_lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
+			wrap_lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 		case Element::blob_:
-			lua_pushlstring( m_ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
-			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			wrap_lua_pushlstring( m_ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+			wrap_lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 	}
 	setState( OutputFilter::Error, "illegal value type of element");
@@ -327,40 +388,40 @@ bool LuaTableOutputFilter::pushValue( const Element& element)
 bool LuaTableOutputFilter::openTag( const Element& element)
 {
 	if (!pushValue( element)) return false;		///... LUA STK: t k   (t=Table,k=Key)
-	lua_pushvalue( m_ls, -1);			///... LUA STK: t k k
-	lua_gettable( m_ls, -3);			///... LUA STK: t k t[k]
+	wrap_lua_pushvalue( m_ls, -1);			///... LUA STK: t k k
+	wrap_lua_gettable( m_ls, -3);			///... LUA STK: t k t[k]
 	if (lua_isnil( m_ls, -1))
 	{
 		///... element with this key not yet defined. so we define it
-		lua_pop( m_ls, 1);			///... LUA STK: t k
-		lua_newtable( m_ls);			///... LUA STK: t k NEWTABLE
+		wrap_lua_pop( m_ls, 1);			///... LUA STK: t k
+		wrap_lua_newtable( m_ls);			///... LUA STK: t k NEWTABLE
 		m_statestk.push_back( Struct);
 		return true;
 	}
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
-	lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
-	lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
+	wrap_lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
+	wrap_lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
 	bool isArray = !lua_isnil( m_ls, -1);
 	if (isArray)
 	{
 		///... the table is an array
-		lua_pop( m_ls, 1);			///... LUA STK: t k ar
-		lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
-		lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
+		wrap_lua_pop( m_ls, 1);			///... LUA STK: t k ar
+		wrap_lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
+		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
 		m_statestk.push_back( Vector);
 	}
 	else
 	{
 		///... the table is a structure. but the element is already defined. we create an array
-		lua_pop( m_ls, 2);			///... LUA STK: t k
-		lua_newtable( m_ls);			///... LUA STK: t k ar
-		lua_pushinteger( m_ls, 1);		///... LUA STK: t k ar 1
-		lua_pushvalue( m_ls, -3);		///... LUA STK: t k ar 1 k
-		lua_gettable( m_ls, -5);		///... LUA STK: t k ar 1 t[k]
-		lua_settable( m_ls, -3);		///... LUA STK: t k ar             (ar[1]=t[k])
-		lua_pushinteger( m_ls, 2);		///... LUA STK: t k ar 2
-		lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
+		wrap_lua_pop( m_ls, 2);			///... LUA STK: t k
+		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar
+		wrap_lua_pushinteger( m_ls, 1);		///... LUA STK: t k ar 1
+		wrap_lua_pushvalue( m_ls, -3);		///... LUA STK: t k ar 1 k
+		wrap_lua_gettable( m_ls, -5);		///... LUA STK: t k ar 1 t[k]
+		wrap_lua_settable( m_ls, -3);		///... LUA STK: t k ar             (ar[1]=t[k])
+		wrap_lua_pushinteger( m_ls, 2);		///... LUA STK: t k ar 2
+		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
 		m_statestk.push_back( Vector);
 	}
 	return true;
@@ -373,13 +434,13 @@ bool LuaTableOutputFilter::closeTag()
 		if (m_statestk.back() == Vector)
 		{
 			m_statestk.pop_back();				//... LUA STK: t k ar i v
-			lua_settable( m_ls, -3);			//... LUA STK: t k ar		(ar[i] = v)
-			lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = ar)
+			wrap_lua_settable( m_ls, -3);			//... LUA STK: t k ar		(ar[i] = v)
+			wrap_lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = ar)
 		}
 		else
 		{
 			m_statestk.pop_back();				//... LUA STK: t k v
-			lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = v)
+			wrap_lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = v)
 		}
 		return true;
 	}
@@ -392,19 +453,19 @@ bool LuaTableOutputFilter::closeTag()
 
 bool LuaTableOutputFilter::closeAttribute( const Element& element)
 {
-	lua_pushnil( m_ls);
-	if (lua_next( m_ls, -2))
+	wrap_lua_pushnil( m_ls);			//... LUA STK: t a t nil
+	if (wrap_lua_next( m_ls, -2))
 	{
 		// ... non empty table, we create an element with an empty key
-		lua_pop( m_ls, 2);
+		wrap_lua_pop( m_ls, 2);
 		return openTag( Element()) && closeAttribute( element) && closeTag();
 	}
 	else
 	{
 		// ... table empty. replace it by value 'element'
-		lua_pop( m_ls, 1);
-		m_statestk.back() = Atomic;
-		return pushValue( element);
+		wrap_lua_pop( m_ls, 1);			//... LUA STK: t a t
+		m_statestk.back() = Atomic;		//... LUA STK: t a
+		return pushValue( element);		//... LUA STK: t a v
 	}
 }
 
@@ -419,7 +480,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 	if (m_statestk.size() == 0)
 	{
 		m_statestk.push_back( Struct);
-		lua_newtable( m_ls);
+		wrap_lua_newtable( m_ls);
 	}
 
 	switch (type)
@@ -479,7 +540,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 					m_type = type;
 					if (!m_hasElement)
 					{
-						lua_pop( m_ls, 2);
+						wrap_lua_pop( m_ls, 2);
 						return true;
 					}
 					/*no break here!*/

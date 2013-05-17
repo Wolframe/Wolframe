@@ -64,7 +64,7 @@ public:
 	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
 	const std::string& referencePath() const			{return m_referencePath;}
 
-	void print(std::ostream &) const;
+	static void print( std::ostream &);
 
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
@@ -85,7 +85,6 @@ private:
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
-	std::string m_helpstring;
 	std::size_t m_inbufsize;
 	std::size_t m_outbufsize;
 	types::CountedReference<proc::ProcProviderConfig> m_procProviderConfig;

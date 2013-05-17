@@ -76,10 +76,6 @@ WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::
 	{
 		po::store( po::command_line_parser(argc, argv).options(ost.fopt).run(), vmap);
 		po::notify( vmap);
-
-		std::ostringstream dd;
-		dd << ost.fopt;
-		m_helpstring = dd.str();
 	}
 	catch (std::exception& e)
 	{
@@ -121,11 +117,12 @@ WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::
 	}
 }
 
-void WolfwizardCommandLine::print(std::ostream& out) const
+void WolfwizardCommandLine::print( std::ostream& out)
 {
+	static const WolfwizardOptionStruct ost;
 	out << "Call:" << std::endl;
 	out << "\twolfwizard [OPTION]" << std::endl;
-	out << m_helpstring << std::endl;
+	out << ost.fopt << std::endl;
 }
 
 

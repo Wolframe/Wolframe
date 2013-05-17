@@ -54,7 +54,7 @@ public:
 	bool printversion() const					{return m_printversion;}
 	const std::string& configfile() const				{return m_configfile;}
 
-	void print(std::ostream& out) const;
+	static void print( std::ostream& out);
 	const boost::property_tree::ptree& providerconfig() const	{return m_providerconfig;}
 	const std::list<std::string>& modules() const			{return m_modules;}
 	const std::string& referencePath() const			{return m_referencePath;}
@@ -62,7 +62,6 @@ public:
 private:
 	bool m_printhelp;
 	bool m_printversion;
-	std::string m_helpstring;
 	std::string m_configfile;
 	boost::property_tree::ptree m_providerconfig;
 	std::string m_referencePath;

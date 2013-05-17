@@ -71,6 +71,11 @@ static std::string configurationTree_tostring( const boost::property_tree::ptree
 	return res->content();
 }
 
+boost::filesystem::path makeAbsoluteFromRelativePath( const boost::filesystem::path& pt)
+{
+	return _Wolframe::utils::getCanonicalPath( pt.string(), boost::filesystem::current_path().string());
+}
+
 static boost::property_tree::ptree getTreeNode( const boost::property_tree::ptree& tree, const std::string& name)
 {
 	bool found = false;
@@ -187,7 +192,12 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 		gi = m_programs.begin(), ge = m_programs.end();
 		for (; gi != ge; ++gi)
 		{
-			proccfg.add_child( "program", boost::property_tree::ptree( *gi));
+			std::string programpath = *gi;
+			if (programpath.size() && programpath.at(0) == '.')
+			{
+				programpath = makeAbsoluteFromRelativePath( programpath).string();
+			}
+			proccfg.add_child( "program", boost::property_tree::ptree( programpath));
 		}
 		std::map<std::string,std::vector<std::string> >::const_iterator mi = cmdhandler_programs.begin(), me = cmdhandler_programs.end();
 		for (; mi != me; ++mi)
@@ -196,7 +206,12 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			std::vector<std::string>::const_iterator ri = mi->second.begin(), re = mi->second.end();
 			for (; ri != re; ++ri)
 			{
-				programcfg.add_child( "program", boost::property_tree::ptree(*ri));
+				std::string programpath = *ri;
+				if (programpath.size() && programpath.at(0) == '.')
+				{
+					programpath = makeAbsoluteFromRelativePath( programpath).string();
+				}
+				programcfg.add_child( "program", boost::property_tree::ptree( programpath));
 			}
 			cmdhlcfg.add_child( mi->first, programcfg);
 			proccfg.add_child( "cmdhandler", cmdhlcfg);
@@ -372,10 +387,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		}
 	}
 
-	std::ostringstream dd;
-	dd << ost.fopt;
-	m_helpstring = dd.str();
-
 	// Load, instantiate and check the configuration:
 	m_dbProviderConfig.reset( new db::DBproviderConfig());
 
@@ -416,11 +427,12 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 }
 
-void WolfilterCommandLine::print(std::ostream& out) const
+void WolfilterCommandLine::print( std::ostream& out)
 {
+	static const WolfilterOptionStruct ost;
 	out << "Call:" << std::endl;
 	out << "\twolfilter [OPTION] <cmd> <inputfilter> <outputfilter>" << std::endl;
-	out << m_helpstring << std::endl;
+	out << ost.fopt << std::endl;
 }
 
 

@@ -122,7 +122,8 @@ static void printFormXML( std::ostream& out, const ddl::Form& form)
 
 static void printWizardXML( std::ostream& out, const prgbind::ProgramLibrary& programLibrary)
 {
-	out << "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" << std::endl;
+	out << "<?xml version='1.0' encoding='UTF-8' standalone='no'?>" << std::endl;
+	out << "<!DOCTYPE forms SYSTEM \"Wolfwizard.simpleform\">" << std::endl;
 	out << "<forms>" << std::endl;
 	std::vector<std::string> formnames = programLibrary.getFormNames();
 	std::vector<std::string>::const_iterator fi = formnames.begin(), fe = formnames.end();
@@ -137,6 +138,7 @@ static void printWizardXML( std::ostream& out, const prgbind::ProgramLibrary& pr
 int main( int argc, char **argv )
 {
 	bool doExit = false;
+	bool doPrintHelpOnError = true;
 	try
 	{
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
@@ -147,13 +149,14 @@ int main( int argc, char **argv )
 #else
 		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string(), execdir.string());
 #endif
+		doPrintHelpOnError = false;
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfwizard version ";
 			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
 			doExit = true;
 		}
-		if (cmdline.printhelp())
+		if (cmdline.printhelp() || cmdline.configfile().empty())
 		{
 			cmdline.print( std::cerr);
 			doExit = true;
@@ -194,6 +197,10 @@ int main( int argc, char **argv )
 	catch (const std::runtime_error& e)
 	{
 		std::cerr << e.what() << std::endl;
+		if (doPrintHelpOnError)
+		{
+			config::WolfwizardCommandLine::print( std::cerr);
+		}
 		return 2;
 	}
 	catch (const std::exception& e)
