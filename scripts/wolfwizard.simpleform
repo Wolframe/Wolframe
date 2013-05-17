@@ -1,0 +1,27 @@
+STRUCT Element
+{
+	name @string
+	class @string
+	type ?@string
+	status ?@string
+	size ?@string
+	attribute @string
+	element Element[]
+}
+
+STRUCT FormDef
+{
+	name @string
+	ddl @string
+	xmlroot ?@string
+	element Element[]
+}
+
+FORM Wolfwizard
+{
+	forms
+	{
+		form FormDef[]
+	}
+}
+
