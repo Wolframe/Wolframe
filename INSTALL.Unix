@@ -30,7 +30,7 @@ Table of Contents
     Archlinux
   Instructions for other Unixes
     FreeBSD 8.2
-    FreeBSD 9.0
+    FreeBSD 9.1
     Solaris 10
       Solaris 10 (CSW toolchain)
 
@@ -618,10 +618,10 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
 
-FreeBSD 9.0
+FreeBSD 9.1
 -----------
 
-Required packages: boost-libs (1.45.0)
+Required packages: boost-libs (1.48.0)
 Optional packages: cyrus-sasl (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
                    libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
                    zlib (1.1.0), icu (4.8.1.1)
@@ -639,7 +639,6 @@ You need 'gmake' (3.82).
 So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
 
 Solaris 10
 ----------
