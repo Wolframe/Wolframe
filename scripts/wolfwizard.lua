@@ -11,12 +11,15 @@ local function mapFormElements( elements)
 		elseif element.class == "atomic" then
 			separator()
 			ee = element.name .. "{{?}}"
+		elseif element.class == "indirection" then
+			separator()
+			ee = element.name .. "{{?}}"
 		elseif tonumber(element.size) ~= 0 then
 			separator()
 			if element.class == "vector" then
-				ee = element.name .. " {" .. mapFormElements( element.element ) .. "}"
-			else
 				ee = element.name .. "[] {" .. mapFormElements( element.element ) .. "}"
+			else
+				ee = element.name .. " {" .. mapFormElements( element.element ) .. "}"
 			end
 		else
 			ee = ""
@@ -34,7 +37,7 @@ function filterRequests()
 	for i,form in pairs( inp.forms.form) do
 		if form.xmlroot then
 			if form.element then
-				output:print( form.name .. " " .. form.xmlroot .. " {" .. mapFormElements( form.element) .. "}")
+				output:print( form.name .. " " .. mapFormElements( form.element))
 			else
 				output:print( form.name .. " " .. form.xmlroot)
 			end
