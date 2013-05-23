@@ -202,6 +202,7 @@ void StructType::defineAsVector( const StructType& prototype_)
 	if (m_elem.size()) throw std::logic_error( "defined as structure");
 	m_contentType = Vector;
 	m_elem.push_back( Element( std::string(), prototype_));
+	m_elem.back().second.initialized(true);
 }
 
 void StructType::defineAsAtomic( const AtomicType& tp)
