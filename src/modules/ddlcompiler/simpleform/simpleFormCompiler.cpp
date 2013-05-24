@@ -272,7 +272,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
 	{
-		std::string::const_iterator si = itr->first.begin(), se = itr->first.begin();
+		std::string::const_iterator si = itr->first.begin(), se = itr->first.end();
 		std::string first;
 		std::string second;
 		for (; si != se; ++si)
@@ -293,7 +293,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		}
 		if (!isIdentifier( first))
 		{
-			throw std::runtime_error( "Semantic error: Identifier expected as variable name");
+			throw std::runtime_error( std::string("Semantic error: Identifier expected as variable name (") + first + ")");
 		}
 		if (itr->second.begin() == itr->second.end() && second.size())
 		{
