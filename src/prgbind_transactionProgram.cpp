@@ -100,22 +100,22 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 
 	LOG_DEBUG << "Loading transaction program '" << filename << "':";
 
-	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-		= db::loadTransactionProgramFile( filename, languageDescr, dbsource, embeddedStatementMap);
-
 	try
 	{
-		if (transactionDB)
-		{
-			transactionDB->addProgram( dbsource);
-			transactionDB->addStatements( embeddedStatementMap);
-		}
+		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
+			= db::loadTransactionProgramFile( filename, languageDescr, dbsource, embeddedStatementMap);
+
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
 		{
 			langbind::FormFunctionR func( new TransactionFunction( fi->second));
 			library.defineFormFunction( fi->first, func);
 			LOG_DEBUG << "Loaded transaction function '" << fi->first << "'";
+		}
+		if (transactionDB)
+		{
+			transactionDB->addProgram( dbsource);
+			transactionDB->addStatements( embeddedStatementMap);
 		}
 	}
 	catch (const config::PositionalErrorException& e)

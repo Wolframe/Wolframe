@@ -156,21 +156,41 @@ public:
 
 	void defineBuiltInFunction( const std::string& name, const BuiltInFunction& f)
 	{
+		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
+			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
+		}
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new BuiltInFunction( f)));
 	}
 
 	void defineFormFunction( const std::string& name, langbind::FormFunctionR f)
 	{
+		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
+			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
+		}
 		m_formFunctionMap.insert( name, f);
 	}
 
 	void defineNormalizeFunction( const std::string& name, langbind::NormalizeFunctionR f)
 	{
+		if (m_normalizeFunctionMap.find( name) != m_normalizeFunctionMap.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of normalize function '") + name + "'";
+			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
+		}
 		m_normalizeFunctionMap.insert( name, f);
 	}
 
 	void defineForm( const std::string& name, const ddl::Form& f)
 	{
+		if (m_formMap.find( name) != m_formMap.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of form '") + name + "'";
+			throw std::runtime_error( std::string("duplicate definition of form '") + name + "'");
+		}
 		m_formMap.insert( name, f);
 	}
 
@@ -198,6 +218,11 @@ public:
 
 	void defineFilterConstructor( const module::FilterConstructorR& f)
 	{
+		if (m_filterMap.find( f->name()) != m_filterMap.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of filter '") + f->name() + "'";
+			throw std::runtime_error( std::string("duplicate definition of filter '") + f->name() + "'");
+		}
 		m_filterMap.insert( f->name(), f);
 		if (!f->category().empty())
 		{
@@ -277,6 +302,7 @@ public:
 			}
 			if (pi == pe)
 			{
+				LOG_ERROR << std::string("unknown type of program '") + *fi + "'";
 				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
 			}
 		}
