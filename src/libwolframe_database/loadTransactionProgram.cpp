@@ -468,6 +468,14 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							throw ERROR( operation.start, MSG << "error in definition of transaction: " << err.what());
 						}
+						catch (const std::exception& e)
+						{
+							LOG_ERROR << "uncaught exception loading transaction program: " << e.what();
+						}
+						catch (...)
+						{
+							LOG_ERROR << "uncaught exception loading transaction program";
+						}
 						break;
 					}
 					else if (boost::algorithm::iequals( tok, "FOREACH"))
@@ -572,6 +580,16 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	{
 		config::PositionalFileError err( e, filename);
 		throw config::PositionalFileErrorException( err);
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_ERROR << "error loading program from file '" << filename << "'";
+		throw e;
+	}
+	catch (...)
+	{
+		LOG_ERROR << "uncaught exception loading program from file '" << filename << "'";
+		throw std::runtime_error( "uncaught exception. see logs");
 	}
 }
 

@@ -124,7 +124,7 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	}
 	catch (const std::runtime_error& e)
 	{
-		std::runtime_error( std::string( "error loading transaction definition program '") + filename + "': " + e.what());
+		throw std::runtime_error( std::string( "error loading transaction definition program '") + filename + "': " + e.what());
 	}
 }
 
