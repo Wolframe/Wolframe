@@ -1193,7 +1193,13 @@ struct TransactionFunctionOutput::Impl
 					continue;
 
 				case ResultElement::FunctionStart:
-					if (m_resitr == m_resend || m_resitr->functionidx() > m_structitr->idx)
+					if (m_resitr == m_resend
+						/*PF:NOTE: Results of OPERATIONs
+						where ignored in final
+						result (I forgot why). I
+						reenabled them again:
+					||  m_resitr->functionidx() > m_structitr->idx*/
+					)
 					{
 						for (++m_structitr; m_structitr != m_structend && m_structitr->type != ResultElement::FunctionEnd; ++m_structitr);
 						if (m_structitr == m_structend) throw std::logic_error("illegal stack in transaction result iterator");
