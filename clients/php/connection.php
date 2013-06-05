@@ -148,4 +148,3 @@ class Connection
 	}
 } // class Connection
 } // namespace Wolframe
-?>

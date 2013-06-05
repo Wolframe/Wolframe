@@ -4,7 +4,7 @@ use Wolframe\Session as Session;
 
 try
 {
-	$sslpath = "../../tests/SSL/";
+	$sslpath = "../../../../tests/SSL/";
 	$sslopt = array(
 		"local_cert" => "$sslpath/combinedcert.pem",
 		"verify_peer" => false

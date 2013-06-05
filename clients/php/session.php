@@ -85,4 +85,3 @@ class Session extends Connection
 	}
 } // class Session
 } // namespace Wolframe
-
