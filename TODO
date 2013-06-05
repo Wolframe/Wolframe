@@ -51,6 +51,14 @@ ABa:
 
 
 PF:
+- OPERATIONS return only one row (for $n to work), much better
+  is to return the whole result and say that the last row gets
+  mapped to $n variables,
+  alternative, make 'INTO a/b DO' work, maybe as
+  WITH a DO
+    INTO b DO SELECT ...
+  END
+
 - high prio
   - Widget visitor in QtClient
   - PHP client with SSL
