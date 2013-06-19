@@ -497,14 +497,17 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						mask |= 0x2;
 
-						ch = parseNextToken( langdescr, desc.output, si, se);
+						std::string output;
+						ch = parseNextToken( langdescr, output, si, se);
 						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
-						if (ch == '.') desc.output.push_back(ch);
+						if (ch == '.') output.push_back(ch);
 
-						if (!checkResultIdentifier( desc.output))
+						if (!checkResultIdentifier( output))
 						{
 							throw ERROR( si, "identifier expected after RESULT INTO");
 						}
+						
+						desc.outputs.push_back( output );
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
@@ -544,6 +547,20 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							desc.call = parseCallStatement( si, se);
 						}
+					}
+					else if (boost::algorithm::iequals( tok, "STRUCT"))					
+					{
+						std::string output;
+						ch = parseNextToken( langdescr, output, si, se);
+						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after STRUCT");
+						if (ch == '.') output.push_back(ch);
+
+						if (!checkResultIdentifier( output))
+						{
+							throw ERROR( si, "identifier expected after STRUCT");
+						}
+						
+						desc.outputs.push_back( output );
 					}
 					else
 					{

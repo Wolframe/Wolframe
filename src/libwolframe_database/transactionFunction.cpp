@@ -217,13 +217,13 @@ public:
 		:m_nonemptyResult(false)
 		,m_uniqueResult(false){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
+	FunctionCall( const std::vector<std::string>& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
 
 	const Path& selector() const					{return m_selector;}
 	const std::vector<Path>& arg() const				{return m_arg;}
 	const std::string& name() const					{return m_name;}
-	const std::string& resultname() const				{return m_resultname;}
-	void resultname( const char* r)					{m_resultname = r;}
+	const std::vector<std::string>& resultnames() const		{return m_resultnames;}
+	void resultnames( std::vector<std::string>& r)			{m_resultnames = r;}
 
 	bool hasResultReference() const;
 	bool hasNonemptyResult() const					{return m_nonemptyResult;}
@@ -233,7 +233,7 @@ public:
 	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
 
 private:
-	std::string m_resultname;
+	std::vector<std::string> m_resultnames;
 	std::string m_name;
 	Path m_selector;
 	std::vector<Path> m_arg;
@@ -914,8 +914,8 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
-FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u, std::size_t l, const types::keymap<std::string>& hints_)
-	:m_resultname(r)
+FunctionCall::FunctionCall( const std::vector<std::string>& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u, std::size_t l, const types::keymap<std::string>& hints_)
+	:m_resultnames(r)
 	,m_name(n)
 	,m_selector(s)
 	,m_arg(a)
@@ -925,7 +925,7 @@ FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Pa
 	,m_hints(hints_){}
 
 FunctionCall::FunctionCall( const FunctionCall& o)
-	:m_resultname(o.m_resultname)
+	:m_resultnames(o.m_resultnames)
 	,m_name(o.m_name)
 	,m_selector(o.m_selector)
 	,m_arg(o.m_arg)
@@ -1427,17 +1427,29 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.first);
 			if (fui == functionmap.end())
 			{
-				FunctionCall cc( di->output, di->call.first, selector, param, di->nonempty, di->unique, 1, di->hints);
-				if (!di->output.empty())
+				FunctionCall cc( di->outputs, di->call.first, selector, param, di->nonempty, di->unique, 1, di->hints);
+				if (!di->outputs.empty())
 				{
+// this is just the wrapping structure, iteration is only done with the last tag (othwerwise
+// we get into definition problems :-))					
+					bool hasOutput = (di->outputs.size() > 1 || (di->outputs.size() == 1 && di->outputs[0] != "."));
+					for( std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++ ) {
+						m_resultstruct->openTag( di->outputs[i] );
+					}
 					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
-					bool hasOutput = (di->output != ".");
-					if (hasOutput) m_resultstruct->openTag( di->output);
+					if (hasOutput) {
+						m_resultstruct->openTag( di->outputs[di->outputs.size()-1] );
+					}
 					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
 					m_resultstruct->addValueReference( m_call.size());
 					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
-					if (hasOutput) m_resultstruct->closeTag();
+					if (hasOutput) {
+						m_resultstruct->closeTag( );
+					}
 					m_resultstruct->addMark( ResultElement::FunctionEnd, m_call.size());
+					for( std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++ ) {
+						m_resultstruct->closeTag( );
+					}
 				}
 				m_call.push_back( cc);
 			}
@@ -1457,15 +1469,26 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				{
 					throw Error( eidx, "UNIQUE not supported for call of OPERATION");
 				}
-				if (!di->output.empty())
+				if (!di->outputs.empty() && !di->outputs[0].empty( ) )
 				{
 					m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
-					bool hasOutput = (di->output != ".");
-					if (hasOutput) m_resultstruct->openTag( di->output);
+
+					bool hasOutput = (di->outputs.size() > 1 || (di->outputs.size() == 1 && di->outputs[0] != "."));
+					if (hasOutput) {
+						std::vector<std::string>::const_iterator it;
+						std::vector<std::string>::const_iterator end = di->outputs.end( );
+						for( it = di->outputs.begin( ); it != end; it++ ) {
+							m_resultstruct->openTag( *it );
+						}
+					}
 					m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size());
-					if (hasOutput) m_resultstruct->closeTag();
+					if (hasOutput) {
+						for( std::vector<std::string>::size_type i = 0; i < di->outputs.size(); i++ ) {
+							m_resultstruct->closeTag();
+						}
+					}
 				}
-				FunctionCall paramstk( "", "", selector, param, false, false, 1 + 1/*level*/);
+				FunctionCall paramstk( std::vector<std::string>(), "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
 
 				std::vector<FunctionCall>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
@@ -1476,10 +1499,12 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
 					for (; fai != fae; ++fai) fai->rewrite( rwtab);
-					FunctionCall cc( resultname, fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
+					std::vector<std::string> l;
+					l.push_back( resultname );
+					FunctionCall cc( l, fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
 				}
-				if (!di->output.empty())
+				if (!di->outputs.empty() && !di->outputs[0].empty( ) )
 				{
 					m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
 				}

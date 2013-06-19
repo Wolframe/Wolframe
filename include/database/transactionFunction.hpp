@@ -123,7 +123,7 @@ struct TransactionDescription
 	TransactionDescription( const TransactionDescription& o)
 		:selector(o.selector)
 		,call(o.call)
-		,output(o.output)
+		,outputs(o.outputs)
 		,nonempty(o.nonempty)
 		,unique(o.unique)
 		,hints(o.hints){}
@@ -133,7 +133,7 @@ struct TransactionDescription
 		selector.clear();
 		call.first.clear();
 		call.second.clear();
-		output.clear();
+		outputs.clear();
 		nonempty = false;
 		unique = false;
 		hints.clear();
@@ -154,7 +154,7 @@ struct TransactionDescription
 	std::string selector;
 	typedef std::vector<std::string> ParamList;
 	std::pair<std::string,ParamList> call;
-	std::string output;
+	std::vector<std::string> outputs;
 	bool nonempty;
 	bool unique;
 	types::keymap<std::string> hints;
