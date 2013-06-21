@@ -1,4 +1,5 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
+# Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe
 pkgver=0.0.1
 pkgrel=2
@@ -26,7 +27,7 @@ package() {
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
-    DESTDIR=${pkgdir} prefix=/usr \
+    DESTDIR=${pkgdir} prefix=/usr sbindir=/usr/bin \
     sysconfdir=/etc \
     install
 
