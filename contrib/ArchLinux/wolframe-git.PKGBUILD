@@ -1,7 +1,8 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
+# Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=20130221
-pkgrel=2
+pkgver=20130621
+pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
 arch=('i686' 'x86_64')
@@ -22,7 +23,7 @@ _gitroot=git://github.com/mbarbos/Wolframe.git
 _gitname=Wolframe
 
 package() {
-  cd $startdir/src/$_gitname-build
+  cd ${srcdir}/$_gitname-build
 
   msg "Installing.."
   make \
@@ -30,7 +31,7 @@ package() {
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
     WITH_SYSTEM_FREEIMAGE=1 RELEASE=1 \
-    DESTDIR=${pkgdir} prefix=/usr \
+    DESTDIR=${pkgdir} prefix=/usr sbindir=/usr/bin \
     sysconfdir=/etc \
     install
 
@@ -43,17 +44,17 @@ package() {
 }
 
 build() {
-  cd $startdir/src
+  cd ${srcdir}
   
   msg "Getting source from git..."
-  if [ -d $startdir/src/$_gitname ] ; then
+  if [ -d ${srcdir}/$_gitname ] ; then
     cd $_gitname && git pull origin
   else
     git clone $_gitroot
   fi
 
-  cp -r $startdir/src/$_gitname $startdir/src/$_gitname-build
-  cd $startdir/src/$_gitname-build
+  cp -r ${srcdir}/$_gitname ${srcdir}/$_gitname-build
+  cd ${srcdir}/$_gitname-build
 
   msg "Generating dependencies..."
   make depend \
