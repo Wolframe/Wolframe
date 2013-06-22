@@ -23,6 +23,7 @@
 # set up defaults for the build switches
 WITH_SSL ?= 0
 WITH_LUA ?= 0
+WITH_PYTHON ?= 0
 WITH_SASL ?= 0
 WITH_PAM ?= 0
 WITH_SYSTEM_SQLITE3 ?= 0
@@ -2866,6 +2867,12 @@ FREEIMAGE_LIBS = -lfreeimage
 FREEIMAGEPLUS_LIBS = -lfreeimageplus
 endif
 
+# Python 3.x
+############
+
+ifeq ($(WITH_PYTHON),1)
+
+endif
 
 # Expect (for testing)
 ######################
