@@ -2872,6 +2872,9 @@ endif
 
 ifeq ($(WITH_PYTHON),1)
 
+ifeq "$(PLATFORM)" "LINUX"
+endif
+
 endif
 
 # Expect (for testing)
