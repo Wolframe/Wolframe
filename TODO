@@ -20,6 +20,8 @@ ABa:
     - ArchLinux: all in one, annotated, KISS
     - Debian: includes and split
     - Redhat: includes and split, other pathes than Debian
+  - Ubuntu 13.04 OSC: where is libboost-locale1.49-dev and why is it
+    missing?!
   - local deployed boost libaries (1.48) for Debian and old Ubuntu have
     to be bundled with wolframe-libclient too. They must be in a common
     dependency like 'wolframe-boost-rt'
