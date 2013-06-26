@@ -11,6 +11,9 @@ make \
 	dist-gz
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
 
+# and a nice debian version
+cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
+
 # the Redhat build script
 cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
 
@@ -18,13 +21,27 @@ cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
 cp contrib/osc/boost/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
 
 # compute sizes of packages
-SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.tar.gz`
-CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.tar.gz | cut -f 1 -d' '`
+SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.orig.tar.gz`
+CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.orig.tar.gz | cut -f 1 -d' '`
 
 # copy all Debian versions of the description files.
 cp contrib/osc/wolframe*.dsc $OSC_HOME
-for i in `ls $OSC_HOME/wolframe*.dsc`; do
-	echo " $CHKSUM $SIZE wolframe_$VERSION.tar.gz" >> $i
+for i in `ls $OSC_HOME/wolframe-*.dsc`; do
+	echo " $CHKSUM $SIZE wolframe_$VERSION.orig.tar.gz" >> $i
+	OS_ORIG=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//'`
+	OS=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//' | tr -d '_'`
+	rm -rf $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz
+	rm -rf /tmp/debian
+	cp -a debian /tmp/.
+	cp -a contrib/osc/control-$OS_ORIG /tmp/debian/control
+	OLDDIR=$PWD
+	cd /tmp
+	tar zcf /tmp/wolframe_$VERSION-$OS.debian.tar.gz debian
+	cd $OLDDIR
+	mv -f /tmp/wolframe_$VERSION-$OS.debian.tar.gz $OSC_HOME/.
+	DEBIAN_SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz`
+	DEBIAN_CHKSUM=`md5sum  $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz | cut -f 1 -d' '`
+	echo " $DEBIAN_CHKSUM $DEBIAN_SIZE wolframe_$VERSION-$OS.debian.tar.gz" >> $i
 done
 
 # Archlinux specific files
