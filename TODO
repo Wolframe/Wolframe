@@ -20,9 +20,6 @@ ABa:
     - ArchLinux: all in one, annotated, KISS
     - Debian: includes and split
     - Redhat: includes and split, other pathes than Debian
-  - debian builds always against 1.48 boost, this should only be the
-    case for older Debian/Ubuntu systems (needs a split in OSC dsc
-    files)
   - local deployed boost libaries (1.48) for Debian and old Ubuntu have
     to be bundled with wolframe-libclient too. They must be in a common
     dependency like 'wolframe-boost-rt'
