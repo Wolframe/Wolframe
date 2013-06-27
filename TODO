@@ -15,9 +15,6 @@ ABa:
   - error checking after dependency generation, avoid funny mistakes
 
 - polish deployment
-  - OpenSuse Build Service:
-    - Ubuntu 13.04 OSC: missing libboost-locale1.49-dev?!
-      => disabled WITH_ICU for now
   - template configuration wolframed.conf for all platforms, different
     layouts at least for:
     - ArchLinux: all in one, annotated, KISS
@@ -26,6 +23,8 @@ ABa:
   - local deployed boost libaries (1.48) for Debian and old Ubuntu have
     to be bundled with wolframe-libclient too. They must be in a common
     dependency like 'wolframe-boost-rt'
+    (the alternative of installing the OSC versions of boost libraries
+    is also an option)
   - /usr/lib/x86_64-linux-gnu is a possible module loading place,
     so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
     process and to module loading code 
