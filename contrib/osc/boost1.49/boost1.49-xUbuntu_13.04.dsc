@@ -2,7 +2,7 @@ Format: 3.0 (quilt)
 Source: boost1.49
 Binary: libboost1.49-dbg, libboost1.49-dev, libboost1.49-doc, libboost-chrono1.49.0, libboost-chrono1.49-dev, libboost-date-time1.49.0, libboost-date-time1.49-dev, libboost-filesystem1.49.0, libboost-filesystem1.49-dev, libboost-graph1.49.0, libboost-graph1.49-dev, libboost-iostreams1.49.0, libboost-iostreams1.49-dev, libboost-locale1.49.0, libboost-locale1.49-dev, libboost-math1.49.0, libboost-math1.49-dev, libboost-program-options1.49.0, libboost-program-options1.49-dev, libboost-python1.49.0, libboost-python1.49-dev, libboost-random1.49.0, libboost-random1.49-dev, libboost-regex1.49.0, libboost-regex1.49-dev, libboost-serialization1.49.0, libboost-serialization1.49-dev, libboost-signals1.49.0, libboost-signals1.49-dev, libboost-system1.49.0, libboost-system1.49-dev, libboost-test1.49.0, libboost-test1.49-dev, libboost-thread1.49.0, libboost-thread1.49-dev, libboost-timer1.49.0, libboost-timer1.49-dev, libboost-wave1.49.0, libboost-wave1.49-dev
 Architecture: any all
-Version: 1.49.0
+Version: 1.49.0-xUbuntu13.04
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Uploaders: Steve M. Robbins <smr@debian.org>, Domenico Andreoli <cavok@debian.org>
 Homepage: http://www.boost.org/
