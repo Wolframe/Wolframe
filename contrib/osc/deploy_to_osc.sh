@@ -18,7 +18,7 @@ cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
 cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
 
 # patches
-cp contrib/osc/boost/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
+cp contrib/osc/boost1.48/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
 
 # compute sizes of packages
 SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.orig.tar.gz`
