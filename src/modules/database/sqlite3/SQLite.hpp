@@ -210,7 +210,7 @@ public:
 		      bool foreignKeys, bool profiling,
 		      unsigned short connections,
 		      const std::list<std::string>& programFiles_,
-		      const std::list<std::string>& extensionFiles_);
+		      const std::list<std::string>& extensionFiles_ );
 	~SQLiteDBunit();
 
 	const std::string& ID() const		{ return m_ID; }
