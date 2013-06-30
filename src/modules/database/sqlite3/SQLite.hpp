@@ -78,6 +78,7 @@ public:
 	bool profiling() const					{ return m_profiling; }
 	unsigned short connections() const			{ return m_connections; }
 	const std::list< std::string > programFiles() const	{ return m_programFiles; }
+	const std::list< std::string > extensionFiles() const	{ return m_extensionFiles; }
 
 private:
 	std::string	m_ID;
@@ -86,6 +87,7 @@ private:
 	bool		m_profiling;
 	unsigned short	m_connections;
 	std::list< std::string > m_programFiles;		//< list of program files
+	std::list< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
 };
 
 
@@ -207,7 +209,8 @@ public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      bool foreignKeys, bool profiling,
 		      unsigned short connections,
-		      const std::list<std::string>& programFiles_);
+		      const std::list<std::string>& programFiles_,
+		      const std::list<std::string>& extensionFiles_);
 	~SQLiteDBunit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -242,6 +245,7 @@ private:
 	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
 	std::list<std::string>	m_programFiles;
+	std::list<std::string>	m_extensionFiles;
 };
 
 //***  SQLite database constructor  *******************************************
