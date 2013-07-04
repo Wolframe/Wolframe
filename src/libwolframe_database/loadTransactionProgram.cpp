@@ -82,14 +82,6 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-static bool checkResultIdentifier( const std::string& id)
-{
-	if (id == ".") return true;
-	std::string::const_iterator ii = id.begin(), ie = id.end();
-	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
-	return (ii == ie);
-}
-
 static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
 {
 	const char* commentopr = langdescr->eoln_commentopr();
@@ -336,9 +328,9 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
 						}
 						if (ch == '.') operation.resultname.push_back(ch);
-						if (!checkResultIdentifier( operation.resultname))
+						if (operation.resultname.empty())
 						{
-							throw ERROR( si, "identifier expected after RESULT INTO");
+							throw ERROR( si, "identifier or '.' expected after RESULT INTO");
 						}
 					}
 					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
@@ -497,17 +489,22 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						mask |= 0x2;
 
-						std::string output;
-						ch = parseNextToken( langdescr, output, si, se);
-						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
-						if (ch == '.') output.push_back(ch);
-
-						if (!checkResultIdentifier( output))
+						for (;;)
 						{
-							throw ERROR( si, "identifier expected after RESULT INTO");
+							std::string output;
+							ch = parseNextToken( langdescr, output, si, se);
+							if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
+							if (ch == '.') output.push_back(ch);
+
+							if (output.empty())
+							{
+								throw ERROR( si, "identifier or '.' expected after INTO");
+							}
+							desc.outputs.push_back( output );
+							ch = gotoNextToken( langdescr, si, se);
+							if (ch != '/') break;
+							++si;
 						}
-						
-						desc.outputs.push_back( output );
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
@@ -547,20 +544,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							desc.call = parseCallStatement( si, se);
 						}
-					}
-					else if (boost::algorithm::iequals( tok, "STRUCT"))					
-					{
-						std::string output;
-						ch = parseNextToken( langdescr, output, si, se);
-						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after STRUCT");
-						if (ch == '.') output.push_back(ch);
-
-						if (!checkResultIdentifier( output))
-						{
-							throw ERROR( si, "identifier expected after STRUCT");
-						}
-						
-						desc.outputs.push_back( output );
 					}
 					else
 					{
