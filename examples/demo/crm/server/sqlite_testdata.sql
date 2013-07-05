@@ -1,14 +1,14 @@
 BEGIN;
 
 -- Employee:
-INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Friedrich Muller', 'manager', 'Seerosenweg 3', NULL, '3045', 'Bumplitz', 'Schweiz');
-INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Susanne Tobler', 'project leader', 'Kreuzstrasse 12', NULL, '5012', 'Luzern', 'Schweiz');
-INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Tobias Gruber', 'software engineer', 'Henkersbrunnli 5', NULL, '3031', 'Bern', 'Schweiz');
+INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Friedrich Muller', 'manager', 'Seerosenweg 3', '', '3045', 'Bumplitz', 'Schweiz');
+INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Susanne Tobler', 'project leader', 'Kreuzstrasse 12', '', '5012', 'Luzern', 'Schweiz');
+INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Tobias Gruber', 'software engineer', 'Henkersbrunnli 5', '', '3031', 'Bern', 'Schweiz');
 
 -- Customer:
-INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Area AG', NULL, 'Fernweg 3', NULL, '4014', 'Oberhofen', 'Schweiz');
-INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Bitora Gmbh', 'Zulieferer fur B', 'Planetenstrasse 3', NULL, '7012', 'Lausanne', 'Schweiz');
-INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Turbocom AG', 'Motoren (T)', 'Gerechtigkeitsgasse 41', NULL, '6088', 'Solothurn', 'Schweiz');
+INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Area AG', '', 'Fernweg 3', '', '4014', 'Oberhofen', 'Schweiz');
+INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Bitora Gmbh', 'Zulieferer fur B', 'Planetenstrasse 3', '', '7012', 'Lausanne', 'Schweiz');
+INSERT INTO Customer (name,description,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Turbocom AG', 'Motoren (T)', 'Gerechtigkeitsgasse 41', '', '6088', 'Solothurn', 'Schweiz');
 
 -- CustomerNote:
 INSERT INTO CustomerNote (customerid,content,link) VALUES ('1', 'Note 1 for Customer 1', 'http://link.com/1.1');
