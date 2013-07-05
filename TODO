@@ -54,22 +54,9 @@ ABa:
 
 
 PF:
-- OPERATIONS return only one row (for $n to work), much better
-  is to return the whole result and say that the last row gets
-  mapped to $n variables,
-  alternative, make 'INTO a/b DO' work, maybe as
-  WITH a DO
-    INTO b DO SELECT ...
-  END
-
 - high prio
-  - Widget visitor in QtClient
-  - PHP client with SSL
   - Counter to check for loop forever in all filter STMs
   - Web Page Templates
-  - Project CRM
-  - Lua functions for directmap (struct IN table OUT)
-  - test forms with SELF recursion and inheritance
   - '_' as content identifier in .NET results
   - UIForm loader in client and server
 
