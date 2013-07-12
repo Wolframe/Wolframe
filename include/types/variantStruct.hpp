@@ -40,8 +40,10 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\brief Forward declaration for Variant
+///\brief Forward declaration for VariantStruct
 class StructDescription;
+///\brief Forward declaration for VariantStruct
+class IndirectionDescription;
 
 ///\brief Structure of Variant type
 class VariantStruct :public Variant
@@ -57,7 +59,8 @@ public:
 		uint_=Variant::uint_,
 		string_=Variant::string_,
 		array_,
-		struct_
+		struct_,
+		indirection_
 	};
 
 	VariantStruct()						:Variant(){}
@@ -76,21 +79,72 @@ public:
 	bool operator>=( const VariantStruct& o) const		{int cv = compare( o); return cv >= 0;}
 	bool operator<=( const VariantStruct& o) const		{int cv = compare( o); return cv <= 0 && cv != -2;}
 	bool operator<( const VariantStruct& o) const		{int cv = compare( o); return cv == -1;}
+	int compare( const VariantStruct& o) const;
 
 	Type type() const					{return (Type)m_type;}
 	const Data& data() const				{return m_data;}
 	std::size_t size() const				{return ((Type)m_type==array_)?m_data.dim.size:Variant::size();}
-	const StructDescription* description() const		{return ((Type)m_type==struct_)?(const StructDescription*)m_data.dim.metadata:0;}
+	const StructDescription* description() const		{return ((Type)m_type==struct_ || (Type)m_type==indirection_)?(const StructDescription*)m_data.dim.metadata:0;}
 
+	void expand();
 	std::string tostring() const;
 	const VariantStruct& operator[]( std::size_t idx) const;
 	VariantStruct& operator[]( std::size_t idx);
 
+public:
+	class const_iterator
+	{
+	public:
+		const_iterator( const VariantStruct& visited_, std::size_t idx_=0)
+			:m_visited(&visited_),m_idx(idx_){}
+		const_iterator( const const_iterator& o)
+			:m_visited(o.m_visited),m_idx(o.m_idx){}
+		const_iterator()
+			:m_visited(0),m_idx(0){}
+
+		int compare( const const_iterator& o) const;
+		void increment();
+
+		bool operator==( const const_iterator& o) const			{return compare(o) == 0;}
+		bool operator!=( const const_iterator& o) const			{return compare(o) != 0;}
+		bool operator<( const const_iterator& o) const			{return compare(o) < 0;}
+		bool operator<=( const const_iterator& o) const			{return compare(o) <= 0;}
+		bool operator>( const const_iterator& o) const			{return compare(o) > 0;}
+		bool operator>=( const const_iterator& o) const			{return compare(o) >= 0;}
+
+		const char* name() const;
+		std::size_t idx() const						{return m_idx;}
+		const_iterator& operator++()					{increment(); return *this;}
+		const_iterator operator++(int)					{const_iterator rt(*this); increment(); return rt;}
+		const const_iterator* operator->() const			{return this;}
+		const VariantStruct* value() const;
+	private:
+		friend class iterator;
+		const VariantStruct* m_visited;
+		std::size_t m_idx;
+	};
+
+	class iterator :public const_iterator
+	{
+	public:
+		iterator( const VariantStruct& visited_, std::size_t idx_=0)
+			:const_iterator(visited_,idx_){}
+		iterator( const const_iterator& o)
+			:const_iterator(o){}
+		iterator()
+			:const_iterator(){}
+
+		iterator& operator++()						{increment(); return *this;}
+		iterator operator++(int)					{const_iterator rt(*this); increment(); return rt;}
+		iterator* operator->()						{return this;}
+		VariantStruct* value() const					{return const_cast<VariantStruct*>(const_iterator::value());}
+	};
+
 private:
 	void setType( Type type_)				{m_type = (Variant::Type)type_;}
-	int compare( const VariantStruct& o) const;
 	static int compare_array( std::size_t size, const VariantStruct* a1, const VariantStruct* a2);
-	void initstruct( const StructDescription* description);
+	void initstruct( const StructDescription* descr);
+	void initindirection( const StructDescription* descr);
 	static void initcopy( VariantStruct& dest, const VariantStruct& orig);
 	void release();
 };
@@ -101,19 +155,12 @@ class StructDescription
 public:
 	StructDescription();
 	StructDescription( const StructDescription& o);
-	void add( const char* name, const VariantStruct& initvalue);
-
-	int find( const char* name);
-	VariantStruct* value( VariantStruct* st_, int findidx) const			{return ((std::size_t)findidx >= m_size || findidx < 0)?0:&(*st_)[ findidx];}
-	const VariantStruct* value( const VariantStruct* st_, int findidx) const	{return ((std::size_t)findidx >= m_size || findidx < 0)?0:&(*st_)[ findidx];}
-	const VariantStruct* prototype( int findidx) const				{return ((std::size_t)findidx >= m_size || findidx < 0)?0:m_initvaluear[ findidx];}
-	std::size_t size() const							{return m_size;}
 
 	class const_iterator
 	{
 	public:
-		const_iterator( const StructDescription& visited_)
-			:m_visited(&visited_),m_idx(0){}
+		const_iterator( const StructDescription& visited_, std::size_t idx_=0)
+			:m_visited(&visited_),m_idx(idx_){}
 		const_iterator( const const_iterator& o)
 			:m_visited(o.m_visited),m_idx(o.m_idx){}
 		const_iterator()
@@ -122,26 +169,55 @@ public:
 		int compare( const const_iterator& o) const;
 		void increment();
 
-		bool operator==( const const_iterator& o) const		{return compare(o) == 0;}
-		bool operator!=( const const_iterator& o) const		{return compare(o) != 0;}
-		bool operator<( const const_iterator& o) const		{return compare(o) < 0;}
-		bool operator<=( const const_iterator& o) const		{return compare(o) <= 0;}
-		bool operator>( const const_iterator& o) const		{return compare(o) > 0;}
-		bool operator>=( const const_iterator& o) const		{return compare(o) >= 0;}
+		bool operator==( const const_iterator& o) const			{return compare(o) == 0;}
+		bool operator!=( const const_iterator& o) const			{return compare(o) != 0;}
+		bool operator<( const const_iterator& o) const			{return compare(o) < 0;}
+		bool operator<=( const const_iterator& o) const			{return compare(o) <= 0;}
+		bool operator>( const const_iterator& o) const			{return compare(o) > 0;}
+		bool operator>=( const const_iterator& o) const			{return compare(o) >= 0;}
 
-		const char* name() const				{return (m_visited && m_visited->size() > m_idx)?m_visited->m_namear[ m_idx]:0;}
-		std::size_t idx() const					{return m_idx;}
-		const VariantStruct* prototype() const			{return (m_visited && m_visited->size() > m_idx)?m_visited->m_initvaluear[ m_idx]:0;}
-		const_iterator& operator++()				{increment(); return *this;}
-		const_iterator operator++(int)				{const_iterator rt(*this); increment(); return rt;}
-		const const_iterator* operator->() const		{return this;}
+		const char* name() const					{return (m_visited && m_visited->size() > m_idx)?m_visited->m_namear[ m_idx]:0;}
+		std::size_t idx() const						{return m_idx;}
+		const VariantStruct* prototype() const				{return (m_visited && m_visited->size() > m_idx)?m_visited->m_initvaluear[ m_idx]:0;}
+		const_iterator& operator++()					{increment(); return *this;}
+		const_iterator operator++(int)					{const_iterator rt(*this); increment(); return rt;}
+		const const_iterator* operator->() const			{return this;}
+		const VariantStruct* value( const VariantStruct* v) const	{return m_visited->value( v, m_idx);}
 	private:
+		friend class iterator;
 		const StructDescription* m_visited;
 		std::size_t m_idx;
 	};
 
-	const_iterator begin() const					{return const_iterator( *this);}
-	const_iterator end() const					{return const_iterator();}
+	class iterator :public const_iterator
+	{
+	public:
+		iterator( const StructDescription& visited_, std::size_t idx_=0)
+			:const_iterator(visited_,idx_){}
+		iterator( const const_iterator& o)
+			:const_iterator(o){}
+		iterator()
+			:const_iterator(){}
+
+		iterator& operator++()						{increment(); return *this;}
+		iterator operator++(int)					{const_iterator rt(*this); increment(); return rt;}
+		iterator* operator->()						{return this;}
+		VariantStruct* value( VariantStruct* v) const			{return const_cast<VariantStruct*>(const_iterator::value( v));}
+	};
+
+public:
+	const_iterator begin() const						{return const_iterator( *this);}
+	const_iterator end() const						{return const_iterator();}
+
+	void add( const char* name, const VariantStruct& initvalue);
+	int findidx( const char* name);
+	const_iterator find( const char* name);
+	VariantStruct* value( VariantStruct* st_, int findidx_) const			{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:&(*st_)[ findidx_];}
+	const VariantStruct* value( const VariantStruct* st_, int findidx_) const	{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:&(*st_)[ findidx_];}
+	const VariantStruct* prototype( int findidx_) const				{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:m_initvaluear[ findidx_];}
+	std::size_t size() const							{return m_size;}
+	int compare( const StructDescription& o) const;
+	const char* name( int idx_) const						{return ((std::size_t)idx_ < m_size)?m_namear[idx_]:0;}
 
 private:
 	friend class StructDescription::const_iterator;

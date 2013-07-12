@@ -58,6 +58,14 @@ public:
 		bool_,					//< C++ bool
 		string_					//< null terminated UTF-8 string
 	};
+
+	///\brief Get the name of a type as string
+	static const char* typeName( Type i)
+	{
+		static const char* ar[] = {"double","int","uint","bool","string","array","struct","indirection"};
+		return ar[ (int)i];
+	}
+
 	struct Data
 	{
 		union
@@ -75,9 +83,10 @@ public:
 			void* ref_;
 		} value;
 	};
-	Variant()					{init();}
+	Variant()					{init(); m_type = bool_;}
 	Variant( bool o)				{init(); m_type = bool_; m_data.value.bool_ = o;}
 	Variant( double o)				{init(); m_type = double_; m_data.value.double_ = o;}
+	Variant( float o)				{init(); m_type = double_; m_data.value.double_ = (double)o;}
 	Variant( int o)					{init(); m_type = int_; m_data.value.int_ = o;}
 	Variant( unsigned int o)			{init(); m_type = uint_; m_data.value.uint_ = o;}
 	Variant( const char* o)				{initstring( o, std::strlen(o));}
