@@ -81,10 +81,10 @@ public:
 	bool operator<( const VariantStruct& o) const		{int cv = compare( o); return cv == -1;}
 	int compare( const VariantStruct& o) const;
 
-	Type type() const					{return (Type)m_type;}
+	Type type() const					{return (Type)type();}
 	const Data& data() const				{return m_data;}
-	std::size_t size() const				{return ((Type)m_type==array_)?m_data.dim.size:Variant::size();}
-	const StructDescription* description() const		{return ((Type)m_type==struct_ || (Type)m_type==indirection_)?(const StructDescription*)m_data.dim.metadata:0;}
+	std::size_t nof_elements() const;
+	const StructDescription* description() const		{return ((Type)type()==struct_ || (Type)type()==indirection_)?(const StructDescription*)m_data.dim.metadata:0;}
 
 	void expand();
 	std::string tostring() const;
@@ -140,8 +140,16 @@ public:
 		VariantStruct* value() const					{return const_cast<VariantStruct*>(const_iterator::value());}
 	};
 
+public:
+	const_iterator find( const char* name_) const;
+	iterator find( const char* name_);
+	const_iterator begin() const						{return const_iterator(*this,0);}
+	const_iterator end() const						{return const_iterator();}
+	iterator begin()							{return iterator(*this,0);}
+	iterator end()								{return iterator();}
+
 private:
-	void setType( Type type_)				{m_type = (Variant::Type)type_;}
+	void setType( Type type_)						{Variant::setType((Variant::Type)type_);}
 	static int compare_array( std::size_t size, const VariantStruct* a1, const VariantStruct* a2);
 	void initstruct( const StructDescription* descr);
 	void initindirection( const StructDescription* descr);
@@ -210,8 +218,12 @@ public:
 	const_iterator end() const						{return const_iterator();}
 
 	void add( const char* name, const VariantStruct& initvalue);
-	int findidx( const char* name);
-	const_iterator find( const char* name);
+	int findidx( const char* name) const;
+	const_iterator find( const char* name) const;
+	bool optional( int findidx_) const;
+	void setOptional( int findidx_, bool v=true);
+	bool mandatory( int findidx_) const;
+	void setMandatory( int findidx_, bool v=true);
 	VariantStruct* value( VariantStruct* st_, int findidx_) const			{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:&(*st_)[ findidx_];}
 	const VariantStruct* value( const VariantStruct* st_, int findidx_) const	{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:&(*st_)[ findidx_];}
 	const VariantStruct* prototype( int findidx_) const				{return ((std::size_t)findidx_ >= m_size || findidx_ < 0)?0:m_initvaluear[ findidx_];}
@@ -220,9 +232,16 @@ public:
 	const char* name( int idx_) const						{return ((std::size_t)idx_ < m_size)?m_namear[idx_]:0;}
 
 private:
+	enum Flags
+	{
+		NoFlags=0x0,
+		Optional=0x1,
+		Mandatory=0x2
+	};
 	friend class StructDescription::const_iterator;
 	std::size_t m_size;
 	char** m_namear;
+	unsigned char* m_flagar;
 	VariantStruct** m_initvaluear;
 };
 

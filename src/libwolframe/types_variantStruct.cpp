@@ -7,15 +7,16 @@ using namespace _Wolframe;
 using namespace _Wolframe::types;
 
 StructDescription::StructDescription()
-		:m_size(0),m_namear(0),m_initvaluear(0){}
+		:m_size(0),m_namear(0),m_flagar(0),m_initvaluear(0){}
 
 StructDescription::StructDescription( const StructDescription& o)
-	:m_size(o.m_size),m_namear(0),m_initvaluear(0)
+	:m_size(o.m_size),m_namear(0),m_flagar(0),m_initvaluear(0)
 {
 	std::size_t ii=0;
 	m_namear = (char**)std::calloc( m_size, sizeof(char*));
+	m_flagar = (unsigned char*)std::calloc( m_size, sizeof(char));
 	m_initvaluear = (VariantStruct**)std::calloc( m_size, sizeof(VariantStruct*));
-	if (!m_namear || !m_initvaluear) goto BAD_ALLOC;
+	if (!m_namear || !m_initvaluear || !m_flagar) goto BAD_ALLOC;
 	for (; ii<m_size; ++ii)
 	{
 		m_namear[ ii] = (char*)std::malloc( std::strlen( o.m_namear[ ii])+1);
@@ -35,6 +36,10 @@ StructDescription::StructDescription( const StructDescription& o)
 		{
 			for (; ii>0; --ii) std::free( m_namear[ ii-1]);
 			std::free( m_namear);
+		}
+		if (m_flagar)
+		{
+			std::free( m_flagar);
 		}
 		if (m_initvaluear)
 		{
@@ -66,14 +71,14 @@ void StructDescription::add( const char* name_, const VariantStruct& initvalue)
 	m_size++;
 }
 
-int StructDescription::findidx( const char* name_)
+int StructDescription::findidx( const char* name_) const
 {
 	std::size_t ii = 0;
 	for (; ii<m_size; ++ii) if (std::strcmp( name_, m_namear[ii]) == 0) return (int)ii;
 	return -1;
 }
 
-StructDescription::const_iterator StructDescription::find( const char* name_)
+StructDescription::const_iterator StructDescription::find( const char* name_) const
 {
 	int findidx_ = findidx( name_);
 	if (findidx_ < 0) return end();
@@ -115,6 +120,32 @@ int StructDescription::compare( const StructDescription& o) const
 	if (ai != ae) return -1;
 	if (bi != be) return +1;
 	return 0;
+}
+
+bool StructDescription::optional( int findidx_) const
+{
+	if (findidx_ < 0 || (std::size_t)findidx_ >= m_size) return false;
+	return (m_flagar[findidx_] & (unsigned char)Optional) != 0;
+}
+
+void StructDescription::setOptional( int findidx_, bool v)
+{
+	if (findidx_ < 0 || (std::size_t)findidx_ >= m_size) throw std::logic_error("illegal parameter (UMR)");
+	if (v) m_flagar[findidx_] |= (unsigned char)Optional;
+	else   m_flagar[findidx_] &= ~(unsigned char)Optional;
+}
+
+bool StructDescription::mandatory( int findidx_) const
+{
+	if (findidx_ < 0 || (std::size_t)findidx_ >= m_size) return false;
+	return (m_flagar[findidx_] & (unsigned char)Mandatory) != 0;
+}
+
+void StructDescription::setMandatory( int findidx_, bool v)
+{
+	if (findidx_ < 0 || (std::size_t)findidx_ >= m_size) throw std::logic_error("illegal parameter (UMR)");
+	if (v) m_flagar[findidx_] |= (unsigned char)Mandatory;
+	else   m_flagar[findidx_] &= ~(unsigned char)Mandatory;
 }
 
 VariantStruct VariantStruct::array() const
@@ -241,7 +272,7 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 void VariantStruct::release()
 {
 	std::size_t ii, nn;
-	switch ((Type)m_type)
+	switch ((Type)type())
 	{
 		case VariantStruct::bool_:
 		case VariantStruct::double_:
@@ -287,9 +318,11 @@ int VariantStruct::compare_array( std::size_t size, const VariantStruct* a1, con
 
 int VariantStruct::compare( const VariantStruct& o) const
 {
-	if ((Type)m_type == array_)
+	Type tt = type();
+	Type ot = o.type();
+	if (tt == array_)
 	{
-		if ((Type)o.m_type != array_) return -2;
+		if (o.type() != array_) return -2;
 		if (m_data.dim.size != o.m_data.dim.size)
 		{
 			return (int)(m_data.dim.size >= o.m_data.dim.size) + (int)(m_data.dim.size > o.m_data.dim.size) -1;
@@ -297,24 +330,24 @@ int VariantStruct::compare( const VariantStruct& o) const
 		return compare_array( m_data.dim.size, (const VariantStruct*)m_data.value.ref_ + 1, (const VariantStruct*)o.m_data.value.ref_ + 1);
 		//... ref +1, because prototype is not compared
 	}
-	else if ((Type)m_type == struct_)
+	else if (tt == struct_)
 	{
-		if ((Type)o.m_type != struct_) return -2;
+		if (o.type() != struct_) return -2;
 		int size1 = (int)(description()->size());
 		int size2 = (int)(o.description()->size());
 		if (size1 != size2) return size1 - size2;
 		return compare_array( size1, (const VariantStruct*)m_data.value.ref_, (const VariantStruct*)o.m_data.value.ref_);
 	}
-	else if ((Type)m_type == indirection_)
+	else if (tt == indirection_)
 	{
-		if ((Type)o.m_type != indirection_) return -2;
+		if (o.type() != indirection_) return -2;
 		const StructDescription* dd = description();
 		const StructDescription* od = o.description();
 		if (!dd) return 1;
 		if (!od) return -2;
 		return dd->compare( *od);
 	}
-	else if ((Type)o.m_type == array_ || (Type)o.m_type == struct_ || (Type)o.m_type == indirection_)
+	else if (ot == array_ || ot == struct_ || ot == indirection_)
 	{
 		return +2;
 	}
@@ -323,17 +356,18 @@ int VariantStruct::compare( const VariantStruct& o) const
 
 const VariantStruct& VariantStruct::operator[]( std::size_t idx) const
 {
-	if ((Type)m_type == array_)
+	Type tt = type();
+	if (tt == array_)
 	{
 		if (idx >= m_data.dim.size) throw std::logic_error( "array bound read");
 		return *((const VariantStruct*)m_data.value.ref_ + 1 + idx);
 	}
-	else if ((Type)m_type == struct_)
+	else if (tt == struct_)
 	{
 		if (idx >= description()->size()) throw std::logic_error( "array bound read");
 		return *((const VariantStruct*)m_data.value.ref_ + idx);
 	}
-	else if ((Type)m_type == indirection_)
+	else if (tt == indirection_)
 	{
 		throw std::logic_error( "random access not supported for indirection");
 	}
@@ -345,17 +379,18 @@ const VariantStruct& VariantStruct::operator[]( std::size_t idx) const
 
 VariantStruct& VariantStruct::operator[]( std::size_t idx)
 {
-	if ((Type)m_type == array_)
+	Type tt = type();
+	if (tt == array_)
 	{
 		if (idx >= m_data.dim.size) throw std::logic_error( "array bound read");
 		return *((VariantStruct*)m_data.value.ref_ + 1 + idx);
 	}
-	else if ((Type)m_type == struct_)
+	else if (tt == struct_)
 	{
 		if (idx >= description()->size()) throw std::logic_error( "array bound read");
 		return *((VariantStruct*)m_data.value.ref_ + idx);
 	}
-	else if ((Type)m_type == indirection_)
+	else if (tt == indirection_)
 	{
 		throw std::logic_error( "random access not supported for indirection");
 	}
@@ -379,5 +414,37 @@ const VariantStruct* VariantStruct::const_iterator::value() const
 	const StructDescription* descr = m_visited->description();
 	if (!descr) return 0;
 	return descr->value( m_visited, m_idx);
+}
+
+int VariantStruct::const_iterator::compare( const const_iterator& o) const
+{
+	int oidx = (o.m_visited && o.m_idx < o.m_visited->size())?o.m_idx:std::numeric_limits<int>::max();
+	int tidx = (m_visited && m_idx < m_visited->size())?m_idx:std::numeric_limits<int>::max();
+	return tidx - oidx;
+}
+
+VariantStruct::const_iterator VariantStruct::find( const char* name_) const
+{
+	const StructDescription* descr = description();
+	if (!descr) return const_iterator();
+	int findidx_ = descr->findidx( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::const_iterator( *this, findidx_);
+}
+
+VariantStruct::iterator VariantStruct::find( const char* name_)
+{
+	const StructDescription* descr = description();
+	if (!descr) return iterator();
+	int findidx_ = descr->findidx( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::iterator( *this, findidx_);
+}
+
+std::size_t VariantStruct::nof_elements() const
+{
+	if ((Type)type()==array_) return m_data.dim.size;
+	if ((Type)type()==struct_) return description()->size();
+	return 0;
 }
 
