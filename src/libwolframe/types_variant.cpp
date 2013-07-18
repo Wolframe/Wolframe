@@ -163,6 +163,27 @@ double Variant::tonumber() const
 	return variant_cast<double>( *this);
 }
 
+double Variant::todouble() const
+{
+	return variant_cast<double>( *this);
+}
+
+bool Variant::tobool() const
+{
+	return variant_cast<bool>( *this);
+}
+
+int Variant::toint() const
+{
+	return variant_cast<int>( *this);
+}
+
+unsigned int Variant::touint() const
+{
+	return variant_cast<unsigned int>( *this);
+}
+
+
 
 
 

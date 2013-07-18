@@ -34,13 +34,13 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
 #include <string>
 
 namespace _Wolframe {
 namespace serialize {
 
-std::string ddlStructureToString( const ddl::StructType& st);
+std::string ddlStructureToString( const types::VariantStruct& st);
 std::string typedInputFilterToString( const langbind::TypedInputFilterR& inp);
 
 }}//namespace

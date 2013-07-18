@@ -34,17 +34,14 @@ Project Wolframe.
 
 #ifndef _Wolframe_DDL_STRUCTTYPE_BUILD_HPP_INCLUDED
 #define _Wolframe_DDL_STRUCTTYPE_BUILD_HPP_INCLUDED
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace ddl {
 
-class StructTypeBuild :public StructType
-{
-public:
-	StructTypeBuild( langbind::TypedInputFilter& inp, const TypeMap* typemap);
-};
+void fillStructType( types::VariantStructDescription& st, langbind::TypedInputFilter& inp, const types::NormalizeFunctionMap* typemap);
 
 }}//namespace
 #endif

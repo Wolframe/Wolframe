@@ -105,6 +105,34 @@ public:
 		m_has_elem = true;
 	}
 
+	template <typename VALTYPE>
+	void setElem_( langbind::FilterBase::ElementType t, const VALTYPE& val)
+	{
+		setElem( t, langbind::TypedFilterBase::Element( val));
+	}
+
+	void setElem( langbind::FilterBase::ElementType t, const types::Variant& val)
+	{
+		switch (val.type())
+		{
+			case types::Variant::bool_:
+				setElem_( t, val.tobool());
+				break;
+			case types::Variant::double_:
+				setElem_( t, val.todouble());
+				break;
+			case types::Variant::int_:
+				setElem_( t, val.toint());
+				break;
+			case types::Variant::uint_:
+				setElem_( t, val.touint());
+				break;
+			case types::Variant::string_:
+				setElem_( t, val.tostring());
+				break;
+		}
+	}
+
 	bool getElem( ElementBuffer& e)
 	{
 		if (m_has_elem)

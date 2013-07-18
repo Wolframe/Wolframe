@@ -33,6 +33,8 @@ Project Wolframe.
 
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "filter/typedfilter.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
@@ -65,32 +67,32 @@ enum AtomicValueState
 	AttributeValueOpen
 };
 
-static void setAtomValue( ddl::AtomicType& val, const langbind::TypedFilterBase::Element element)
+static void setAtomValue( types::Variant& val, const langbind::TypedFilterBase::Element element)
 {
 	switch (element.type)
 	{
 		case langbind::TypedFilterBase::Element::bool_:
-			val.set( boost::lexical_cast<std::string>( element.value.bool_));
+			val = element.value.bool_;
 			break;
 		case langbind::TypedFilterBase::Element::double_:
-			val.set( boost::lexical_cast<std::string>( element.value.double_));
+			val = element.value.double_;
 			break;
 		case langbind::TypedFilterBase::Element::int_:
-			val.set( boost::lexical_cast<std::string>( element.value.int_));
+			val = element.value.int_;
 			break;
 		case langbind::TypedFilterBase::Element::uint_:
-			val.set( boost::lexical_cast<std::string>( element.value.uint_));
+			val = element.value.uint_;
 			break;
 		case langbind::TypedFilterBase::Element::string_:
-			val.set( std::string( element.value.string_.ptr, element.value.string_.size));
+			val = std::string( element.value.string_.ptr, element.value.string_.size);
 			break;
 		case langbind::TypedFilterBase::Element::blob_:
-			val.set( std::string( (const char*)element.value.blob_.ptr, element.value.blob_.size));
+			val = std::string( (const char*)element.value.blob_.ptr, element.value.blob_.size);
 			break;
 	}
 }
 
-static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
+static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
@@ -133,7 +135,7 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 			}
 			else if (stk.back().state() == TagValueOpen)
 			{
-				val.set( std::string( ""));
+				val = std::string();
 			}
 			stk.pop_back();
 			return true;
@@ -141,41 +143,50 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 	throw SerializationErrorException( "illegal state in parse DDL form atomic value", getElementPath( stk));
 }
 
-static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
+static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
+
+	const types::VariantStructDescription* descr = st.description();
+	if (!descr) throw SerializationErrorException( "structure expected", element.tostring(), getElementPath( stk));
 
 	if (!inp.getNext( typ, element))
 	{
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
+
 	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
 		{
-			ddl::StructType::Map::iterator itr = st.find( element.tostring());
-			if (itr == st.end())
+			int idx = descr->findidx( element.tostring());
+			if (idx < 0)
 			{
-				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk), std::string(".. candidates are {") + st.names(", ") + "}");
+				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
 			}
-			std::size_t idx = itr - st.begin();
-			if (idx < st.nof_attributes())
+			types::VariantStructDescription::const_iterator
+				ei = descr->begin() + idx;
+
+			if (ei->attribute())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
 					throw SerializationErrorException( "attribute element expected for ", element.tostring(), getElementPath( stk));
 				}
 			}
-			if (itr->second.contentType() != ddl::StructType::Vector && itr->second.initialized())
+			types::VariantStruct* elem = st.at( idx);
+			types::VariantStruct::Type type = elem->type();
+
+			if (type != types::VariantStruct::array_ && elem->initialized())
 			{
 				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
-			itr->second.initialized(true);
-			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
-			if (itr->second.contentType() == ddl::StructType::Atomic)
+			elem->setInitialized();
+			stk.push_back( FiltermapDDLParseState( ei->name, elem));
+			if (elem->atomic())
 			{
 				stk.back().state( TagValueOpen);
 			}
@@ -184,63 +195,73 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::Attribute:
 		{
-			ddl::StructType::Map::iterator itr = st.find( element.tostring());
-			if (itr == st.end())
+			int idx = descr->findidx( element.tostring());
+			if (idx < 0)
 			{
 				throw SerializationErrorException( "unknown attribute ", element.tostring(), getElementPath( stk));
 			}
-			std::size_t idx = itr - st.begin();
-			if (idx >= st.nof_attributes())
+			types::VariantStructDescription::const_iterator
+				ei = descr->begin() + idx;
+			if (!ei->attribute())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
 					throw SerializationErrorException( "content element expected", element.tostring(), getElementPath( stk));
 				}
 			}
-			if (itr->second.contentType() != ddl::StructType::Atomic)
+			types::VariantStruct* elem = st.at( idx);
+			if (!elem->atomic())
 			{
 				throw SerializationErrorException( "atomic element expected", element.tostring(), getElementPath( stk));
 			}
-			if (itr->second.initialized(true))
+			if (elem->initialized())
 			{
 				throw SerializationErrorException( "duplicate structure attribute definition", element.tostring(), getElementPath( stk));
 			}
-			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
+			elem->setInitialized();
+			stk.push_back( FiltermapDDLParseState( ei->name, elem));
 			stk.back().state( AttributeValueOpen);
 			return true;
 		}
 
 		case langbind::InputFilter::Value:
 		{
-			ddl::StructType::Map::iterator itr = st.find( "");
-			if (itr == st.end())
+			int idx = descr->findidx( "");
+			if (idx < 0)
 			{
 				if (element.emptycontent()) return true;
 				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", element.tostring(), getElementPath( stk));
 			}
-			std::size_t idx = itr - st.begin();
-			if (idx < st.nof_attributes())
+			types::VariantStructDescription::const_iterator
+				ei = descr->begin() + idx;
+			if (ei->attribute())
 			{
 				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", element.tostring(), getElementPath( stk));
 			}
-			itr->second.initialized( true);
-			switch (itr->second.contentType())
+			types::VariantStruct* elem = st.at( idx);
+			elem->setInitialized();
+
+			switch (elem->type())
 			{
-				case ddl::StructType::Atomic:
-					setAtomValue( itr->second.value(), element);
+				case types::VariantStruct::bool_:
+				case types::VariantStruct::double_:
+				case types::VariantStruct::int_:
+				case types::VariantStruct::uint_:
+				case types::VariantStruct::string_:
+					setAtomValue( *elem, element);
 					return true;
 
-				case ddl::StructType::Struct:
+				case types::VariantStruct::struct_:
 					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 
-				case ddl::StructType::Indirection:
+				case types::VariantStruct::indirection_:
 					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 
-				case ddl::StructType::Vector:
-					if (itr->second.prototype().contentType() == ddl::StructType::Atomic)
+				case types::VariantStruct::array_:
+					if (elem->prototype()->atomic())
 					{
-						itr->second.push();
-						setAtomValue( itr->second.back().value(), element);
+						elem->push();
+						setAtomValue( elem->back(), element);
 						return true;
 					}
 					else
@@ -252,18 +273,20 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::CloseTag:
 		{
-			ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
-			for (;itr != end; ++itr)
+			types::VariantStruct::iterator itr = st.begin(), end = st.end();
+			types::VariantStructDescription::const_iterator di = descr->begin();
+
+			for (;itr != end; ++itr,++di)
 			{
-				if (itr->second.mandatory() && !itr->second.initialized())
+				if (di->mandatory() && !itr->initialized())
 				{
-					throw SerializationErrorException( "undefined mandatory structure element", itr->first, getElementPath( stk));
+					throw SerializationErrorException( "undefined mandatory structure element", di->name, getElementPath( stk));
 				}
 				if (ctx.flag( Context::ValidateInitialization))
 				{
-					if (!itr->second.optional() && !itr->second.initialized())
+					if (!di->optional() && !itr->initialized())
 					{
-						throw SerializationErrorException( "schema validation failed: undefined non optional structure element", itr->first, getElementPath( stk));
+						throw SerializationErrorException( "schema validation failed: undefined non optional structure element", di->name, getElementPath( stk));
 					}
 				}
 			}
@@ -277,40 +300,45 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
-	switch (stk.back().value()->contentType())
+	types::VariantStruct* elem = stk.back().value();
+	switch (elem->type())
 	{
-		case ddl::StructType::Atomic:
+		case types::VariantStruct::bool_:
+		case types::VariantStruct::double_:
+		case types::VariantStruct::int_:
+		case types::VariantStruct::uint_:
+		case types::VariantStruct::string_:
 		{
-			return parseAtom( stk.back().value()->value(), inp, ctx, stk);
+			return parseAtom( *stk.back().value(), inp, ctx, stk);
 		}
-		case ddl::StructType::Vector:
-		{
-			stk.back().value()->push();
-			ddl::StructType* velem = &stk.back().value()->back();
-			const char* velemname = stk.back().name();
-			stk.pop_back();
-			stk.push_back( FiltermapDDLParseState( velemname, velem));
-			return true;
-		}
-		case ddl::StructType::Struct:
+		case types::VariantStruct::struct_:
 		{
 			return parseStruct( *stk.back().value(), inp, ctx, stk);
 		}
-		case ddl::StructType::Indirection:
+		case types::VariantStruct::indirection_:
 		{
-			ddl::StructType* st = stk.back().value();
+			types::VariantStruct* st = stk.back().value();
 			st->expandIndirection();
-			if (st->contentType() == ddl::StructType::Indirection)
+			if (st->type() == types::VariantStruct::indirection_)
 			{
 				throw SerializationErrorException( "indirection expanding to indirection", getElementPath( stk));
 			}
 			return parseObject( inp, ctx, stk);
 		}
+		case types::VariantStruct::array_:
+		{
+			stk.back().value()->push();
+			types::VariantStruct* velem = &stk.back().value()->back();
+			const char* velemname = stk.back().name();
+			stk.pop_back();
+			stk.push_back( FiltermapDDLParseState( velemname, velem));
+			return true;
+		}
 	}
 	throw SerializationErrorException( "illegal state in parse DDL form object", getElementPath( stk));
 }
 
-DDLStructParser::DDLStructParser( ddl::StructType* st)
+DDLStructParser::DDLStructParser( types::VariantStruct* st)
 	:m_st(st)
 {
 	m_stk.push_back( FiltermapDDLParseState( 0, st));

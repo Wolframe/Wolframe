@@ -33,6 +33,8 @@ Project Wolframe.
 
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typedfilter.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
@@ -49,7 +51,7 @@ static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 	FiltermapDDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
-		if (itr->value() && itr->value()->contentType() != ddl::StructType::Vector)
+		if (itr->value() && itr->value()->type() != types::VariantStruct::array_)
 		{
 			std::string tag = itr->tag().tostring();
 			if (tag.size())
@@ -72,8 +74,8 @@ static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& st
 	}
 	if (stk.back().value()->initialized())
 	{
-		const ddl::AtomicType* val = &stk.back().value()->value();
-		ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( val->value().c_str(), val->value().size()));
+		const types::Variant* val = stk.back().value();
+		ctx.setElem( langbind::FilterBase::Value, *val);
 		rt = true;
 	}
 	stk.back().state( 1);
@@ -83,61 +85,63 @@ static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& st
 static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	bool rt = false;
-	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
+	const types::VariantStruct* obj = (const types::VariantStruct*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx < obj->nof_elements())
 	{
-		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
-		if (!itr->second.initialized())
+		types::VariantStruct::const_iterator itr = obj->begin() + idx;
+		types::VariantStructDescription::const_iterator di = obj->description()->begin() + idx;
+
+		if (!itr->initialized())
 		{
 			stk.back().state( ++idx);
 			return false;
 		}
-		if (idx < obj->nof_attributes())
+		if (di->attribute())
 		{
-			if (itr->first.empty())
+			if (!*di->name)
 			{
 				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", getElementPath( stk));
 			}
-			if (itr->second.contentType() != ddl::StructType::Atomic)
+			if (!itr->atomic())
 			{
 				throw SerializationErrorException( "named atomic value expected for attribute", getElementPath( stk));
 			}
-			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+			langbind::TypedFilterBase::Element elem( di->name);
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
 			rt = true;
 			stk.back().state( ++idx);
-			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+			stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
 		}
 		else
 		{
-			if (itr->first.empty())
+			if (!*di->name)
 			{
 				stk.back().state( ++idx);
 				langbind::TypedFilterBase::Element tag;
-				stk.push_back( FiltermapDDLSerializeState( &itr->second, tag));
+				stk.push_back( FiltermapDDLSerializeState( &*itr, tag));
 			}
 			else
 			{
-				if (itr->second.contentType() == ddl::StructType::Vector && !ctx.flag( Context::SerializeWithIndices))
+				if (itr->type() == types::VariantStruct::array_ && !ctx.flag( Context::SerializeWithIndices))
 				{
-					langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+					langbind::TypedFilterBase::Element elem( di->name);
 					stk.back().state( ++idx);
-					stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
 				}
-				else if (itr->first.empty())
+				else if (!*di->name)
 				{
 					stk.back().state( ++idx);
-					stk.push_back( FiltermapDDLSerializeState( &itr->second, langbind::TypedFilterBase::Element()));
+					stk.push_back( FiltermapDDLSerializeState( &*itr, langbind::TypedFilterBase::Element()));
 				}
 				else
 				{
-					langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+					langbind::TypedFilterBase::Element elem( di->name);
 					ctx.setElem( langbind::FilterBase::OpenTag, elem);
 					rt = true;
 					stk.back().state( ++idx);
 					stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
-					stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
 				}
 			}
 		}
@@ -157,20 +161,20 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	bool rt = false;
-	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
+	const types::VariantStruct* obj = (const types::VariantStruct*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx >= obj->nof_elements())
 	{
 		stk.pop_back();
 		return false;
 	}
-	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
+	types::VariantStruct::const_iterator itr = obj->begin()+idx;
 	if (ctx.flag( Context::SerializeWithIndices))
 	{
 		ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U));
 		stk.back().state( idx+1);
 		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U)));
-		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
+		stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
 		rt = true;
 	}
 	else
@@ -182,12 +186,12 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, stk.back().tag()));
-			stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
+			stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
 		}
 		else
 		{
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
+			stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
 		}
 	}
 	return rt;
@@ -203,23 +207,27 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	}
 	else
 	{
-		switch (stk.back().value()->contentType())
+		switch (stk.back().value()->type())
 		{
-			case ddl::StructType::Atomic:
+			case types::VariantStruct::bool_:
+			case types::VariantStruct::double_:
+			case types::VariantStruct::int_:
+			case types::VariantStruct::uint_:
+			case types::VariantStruct::string_:
 			{
 				return fetchAtom( ctx, stk);
 			}
-			case ddl::StructType::Vector:
-			{
-				return fetchVector( ctx, stk);
-			}
-			case ddl::StructType::Struct:
+			case types::VariantStruct::struct_:
 			{
 				return fetchStruct( ctx, stk);
 			}
-			case ddl::StructType::Indirection:
+			case types::VariantStruct::indirection_:
 			{
 				return false;
+			}
+			case types::VariantStruct::array_:
+			{
+				return fetchVector( ctx, stk);
 			}
 		}
 	}
@@ -268,7 +276,7 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, lang
 	return true;
 }
 
-DDLStructSerializer::DDLStructSerializer( const ddl::StructType* st)
+DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 	:types::TypeSignature("serialize::DDLStructSerializer", __LINE__)
 	,m_st(st)
 {

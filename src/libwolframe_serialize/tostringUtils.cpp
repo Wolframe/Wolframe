@@ -5,7 +5,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
-std::string serialize::ddlStructureToString( const ddl::StructType& st)
+std::string serialize::ddlStructureToString( const types::VariantStruct& st)
 {
 	langbind::ToStringFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));

@@ -64,7 +64,18 @@ struct Name
 	}
 };
 
-StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src, const TypeMap* typemap)
+static bool isAtomic( const types::VariantStructDescription& st)
+{
+	return st.size() == 1 && !*st.begin()->name;
+}
+
+static void setAtomic( types::VariantStructDescription& st, const types::VariantStruct& initvalue, const types::NormalizeFunction* normalizer)
+{
+	if (st.size() != 0) throw std::runtime_error( "specified content value twice");
+	st.add( "", initvalue, normalizer);
+}
+
+static void fillStructType_( types::VariantStructDescription& st, langbind::TypedInputFilter& src, const types::NormalizeFunctionMap* typemap)
 {
 	langbind::FilterBase::ElementType type,lasttype = langbind::FilterBase::OpenTag;
 	Name attribute;
@@ -78,20 +89,32 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src, const TypeMap
 			{
 				Name tag;
 				tag.set( val.tostring());
-				StructTypeBuild rtElem( src, typemap);
-				if (tag.isAttribute && rtElem.contentType() != StructType::Atomic)
+				types::VariantStructDescription elem;
+				fillStructType_( elem, src, typemap);
+
+				int elemidx = 0;
+				if (isAtomic( elem))
 				{
-					throw std::runtime_error( "Attribute type declared with @ has a non atomic value");
-				}
-				if (tag.isArray)
-				{
-					StructType rtElemAr;
-					rtElemAr.defineAsVector( rtElem);
-					defineContent( tag.identifier, rtElemAr);
+					if (tag.isArray)
+					{
+						elemidx = st.add( tag.identifier, elem.begin()->initvalue->array(), elem.begin()->normalizer);
+					}
+					else
+					{
+						elemidx = st.add( tag.identifier, *elem.begin()->initvalue, elem.begin()->normalizer);
+					}
 				}
 				else
 				{
-					defineContent( tag.identifier, rtElem);
+					if (tag.isAttribute)
+					{
+						throw std::runtime_error( "Attribute type declared with @ has a non atomic value");
+					}
+					elemidx = st.add( tag.identifier, elem);
+					if (tag.isArray)
+					{
+						st.at(elemidx)->makeArray();
+					}
 				}
 				lasttype = type;
 				break;
@@ -108,10 +131,10 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src, const TypeMap
 			case langbind::FilterBase::Value:
 			{
 				std::string typenam = val.tostring();
-				const NormalizeFunction* tp = 0;
+				const types::NormalizeFunction* tp = 0;
 				if (!boost::algorithm::iequals( typenam, "string"))
 				{
-					tp = typemap->getType( typenam);
+					tp = typemap->get( typenam);
 					if (!tp)
 					{
 						std::ostringstream msg;
@@ -119,39 +142,55 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src, const TypeMap
 						throw std::runtime_error( msg.str());
 					}
 				}
-				AtomicType at( tp);
-				StructType vv;
+				types::Variant vv("");
 				if (lasttype == langbind::FilterBase::Attribute)
 				{
 					if (attribute.isArray)
 					{
-						vv.defineAsVector( at);
+						if (attribute.isAttribute)
+						{
+							st.addAttribute( attribute.identifier, types::VariantStruct(vv).array(), tp);
+						}
+						else
+						{
+							st.add( attribute.identifier, types::VariantStruct(vv).array(), tp);
+						}
 					}
 					else
 					{
-						vv = at;
-					}
-					if (attribute.isAttribute)
-					{
-						defineAttribute( attribute.identifier, vv);
-					}
-					else
-					{
-						defineContent( attribute.identifier, vv);
+						if (attribute.isAttribute)
+						{
+							st.addAttribute( attribute.identifier, vv, tp);
+						}
+						else
+						{
+							st.add( attribute.identifier, vv, tp);
+						}
 					}
 					lasttype = langbind::FilterBase::OpenTag;
 					break;
 				}
 				else
 				{
-					if (nof_elements() > 0) throw std::runtime_error( "values without tag in structure definition");
+					if (st.size() > 0) throw std::runtime_error( "values without tag in structure definition");
 					lasttype = langbind::FilterBase::Value;
-					defineAsAtomic( at);
+					setAtomic( st, vv, tp);
 				}
 			}
 		}
 	}
 	throw std::runtime_error( "input filter not buffering input");
 }
+
+void ddl::fillStructType( types::VariantStructDescription& st, langbind::TypedInputFilter& src, const types::NormalizeFunctionMap* typemap)
+{
+	fillStructType( st, src, typemap);
+	if (isAtomic( st))
+	{
+		throw std::runtime_error( "structure definition expected (instead of an atomic value)");
+	}
+}
+
+
 
 
