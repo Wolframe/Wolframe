@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
 #include <vector>
 #include <cstddef>
 #include <stdexcept>
@@ -54,7 +54,7 @@ public:
 		,m_tag(o.m_tag)
 		{}
 
-	FiltermapDDLSerializeState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
+	FiltermapDDLSerializeState( const types::VariantStruct* v, const langbind::TypedFilterBase::Element& t)
 		:m_value(v)
 		,m_stateidx(0)
 		,m_elemtype(langbind::FilterBase::Value)
@@ -68,7 +68,7 @@ public:
 		,m_tag(elem)
 		{}
 
-	const ddl::StructType* value() const
+	const types::VariantStruct* value() const
 	{
 		return m_value;
 	}
@@ -94,7 +94,7 @@ public:
 	}
 
 private:
-	const ddl::StructType* m_value;
+	const types::VariantStruct* m_value;
 	std::size_t m_stateidx;
 	langbind::FilterBase::ElementType m_elemtype;
 	langbind::TypedFilterBase::Element m_tag;

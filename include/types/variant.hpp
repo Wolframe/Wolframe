@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #include <string>
 #include <cstring>
+#include <stdexcept>
 #include "types/countedReference.hpp"
 
 namespace _Wolframe {
@@ -113,8 +114,16 @@ public:
 	Type type() const				{return (Type)((unsigned char)m_type&(unsigned char)Data::FlagMask);}
 	const Data& data() const			{return m_data;}
 
+	char* charptr() const				{if (type() != string_) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.string_;}
+	std::size_t charsize() const			{if (type() != string_) throw std::logic_error("illegal access (type mismatch)"); return m_data.dim.size;}
+
 	std::string tostring() const;
 	double tonumber() const;
+	double todouble() const;
+	bool tobool() const;
+	int toint() const;
+	unsigned int touint() const;
+
 	std::size_t size() const			{return (type() == string_)?m_data.dim.size:1;}
 	bool initialized() const			{return ((unsigned char)m_type&(unsigned char)Data::Initialized) == (unsigned char)Data::Initialized;}
 	void setInitialized( bool v=true)		{if (v) m_type = (Type)((unsigned int)m_type | (unsigned int)(Data::Initialized)); else m_type = (Type)((unsigned int)m_type & ~(unsigned int)(Data::Initialized));}

@@ -47,7 +47,7 @@ class DDLStructParser
 {
 public:
 	DDLStructParser(){}
-	explicit DDLStructParser( ddl::StructType* st);
+	explicit DDLStructParser( types::VariantStruct* st);
 
 	DDLStructParser( const DDLStructParser& o);
 	virtual ~DDLStructParser(){}
@@ -59,7 +59,7 @@ public:
 	bool call();
 
 private:
-	ddl::StructType* m_st;
+	types::VariantStruct* m_st;
 	Context m_ctx;
 	langbind::TypedInputFilterR m_inp;
 	FiltermapDDLParseStateStack m_stk;

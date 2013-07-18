@@ -37,7 +37,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/ddl/filtermapDDLSerializeStack.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
 #include <cstddef>
 
 namespace _Wolframe {
@@ -48,7 +48,7 @@ class DDLStructSerializer :public langbind::TypedInputFilter
 public:
 	DDLStructSerializer()
 		:types::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
-	explicit DDLStructSerializer( const ddl::StructType* st);
+	explicit DDLStructSerializer( const types::VariantStruct* st);
 
 	DDLStructSerializer( const DDLStructSerializer& o);
 	virtual ~DDLStructSerializer(){}
@@ -66,7 +66,7 @@ public:
 	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
 
 private:
-	const ddl::StructType* m_st;
+	const types::VariantStruct* m_st;
 	Context m_ctx;
 	langbind::TypedOutputFilterR m_out;
 	FiltermapDDLSerializeStateStack m_stk;

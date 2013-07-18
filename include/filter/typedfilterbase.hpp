@@ -39,6 +39,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
 #include "filter/filterbase.hpp"
+#include "types/variant.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -63,6 +64,36 @@ public:
 		{
 			value.string_.ptr = "";
 			value.string_.size = 0;
+		}
+
+		Element( const types::Variant& val)
+			:type(string_)
+		{
+			switch (val.type())
+			{
+				case types::Variant::bool_:
+					type = bool_;
+					value.bool_ = val.tobool();
+					return;
+				case types::Variant::double_:
+					type = double_;
+					value.double_ = val.todouble();
+					return;
+				case types::Variant::int_:
+					type = int_;
+					value.int_ = val.toint();
+					return;
+				case types::Variant::uint_:
+					type = uint_;
+					value.uint_ = val.touint();
+					return;
+				case types::Variant::string_:
+					type = string_;
+					value.string_.ptr = val.charptr();
+					value.string_.size = val.charsize();
+					return;
+			}
+			throw std::logic_error( "illegal assignment (non atomic type)");
 		}
 
 		Element( const std::string& str)

@@ -124,6 +124,10 @@ public:
 
 		const VariantStruct* operator->() const				{return m_itr;}
 		const VariantStruct& operator*() const				{return *m_itr;}
+
+		int operator - (const const_iterator& o) const			{if (!o.m_itr || !m_itr) throw std::logic_error("illegal operation"); return m_itr - o.m_itr;}
+		const_iterator operator + (int i) const				{if (!m_itr) throw std::logic_error("illegal operation"); return m_itr + i;}
+
 	private:
 		VariantStruct const* m_itr;
 	};
@@ -148,6 +152,10 @@ public:
 
 		VariantStruct* operator->()					{return m_itr;}
 		VariantStruct& operator*()					{return *m_itr;}
+
+		int operator - (const iterator& o) const			{if (!o.m_itr || !m_itr) throw std::logic_error("illegal operation"); return m_itr - o.m_itr;}
+		iterator operator + (int i) const				{if (!m_itr) throw std::logic_error("illegal operation"); return m_itr + i;}
+
 	private:
 		VariantStruct* m_itr;
 	};

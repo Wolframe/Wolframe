@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
 #include <vector>
 #include <stdexcept>
 
@@ -54,7 +54,7 @@ public:
 		,m_stateidx(o.m_stateidx)
 		{}
 
-	FiltermapDDLParseState( const char* name_, ddl::StructType* v)
+	FiltermapDDLParseState( const char* name_, types::VariantStruct* v)
 		:m_size(0)
 		,m_elemidx(0)
 		,m_value(v)
@@ -64,7 +64,7 @@ public:
 
 	~FiltermapDDLParseState(){}
 
-	ddl::StructType* value() const
+	types::VariantStruct* value() const
 	{
 		return m_value;
 	}
@@ -87,7 +87,7 @@ public:
 private:
 	std::size_t m_size;
 	std::size_t m_elemidx;
-	ddl::StructType* m_value;
+	types::VariantStruct* m_value;
 	const char* m_name;
 	std::size_t m_stateidx;
 };
