@@ -63,6 +63,7 @@ public:
 		struct_,
 		indirection_
 	};
+	static const char* typeName( Type i)			{return Variant::typeName( (Variant::Type)i);}
 
 	VariantStruct()						:Variant(){}
 	VariantStruct( const Variant& e)			{Variant::initcopy( *this, e);}

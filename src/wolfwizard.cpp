@@ -40,6 +40,8 @@
 #include "wolfwizardCommandLine.hpp"
 #include "moduleInterface.hpp"
 #include "processor/procProvider.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
@@ -54,36 +56,39 @@ static const unsigned short APP_BUILD = 0;
 #define STRINGIFY(x)	DO_STRINGIFY(x)
 #define INDENTTAB	"  "
 
-static void printStructXML( std::ostream& out, const char* name, const ddl::StructType& st, bool isAttribute, std::string indent="")
+static void printStructXML( std::ostream& out, const char* name, const types::VariantStruct& st, bool isAttribute, std::string indent, bool optional, bool mandatory)
 {
 	const char* status = "";
 	const char* addressing = isAttribute?" attribute='yes'":" attribute='no'";
-	if (st.optional()) status = " status='optional'";
-	if (st.mandatory()) status = " status='mandatory'";
+	if (optional) status = " status='optional'";
+	if (mandatory) status = " status='mandatory'";
 
-
-	switch (st.contentType())
+	switch (st.type())
 	{
-		case ddl::StructType::Atomic:
+		case types::VariantStruct::bool_:
+		case types::VariantStruct::double_:
+		case types::VariantStruct::int_:
+		case types::VariantStruct::uint_:
+		case types::VariantStruct::string_:
 		{
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
 			out << " class='atomic'";
-			out << " type='" << st.value().type() << "'";
+			out << " type='" << types::VariantStruct::typeName(st.type()) << "'";
 			out << addressing << status << "/>" << std::endl;
 			break;
 		}
-		case ddl::StructType::Vector:
+		case types::VariantStruct::array_:
 		{
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
 			out << " class='vector'";
 			out << addressing << status << ">" << std::endl;
-			printStructXML( out, name, st.prototype(), isAttribute, indent+INDENTTAB);
+			printStructXML( out, name, *st.prototype(), isAttribute, indent+INDENTTAB, false, false);
 			out << indent << "</element>" << std::endl;
 			break;
 		}
-		case ddl::StructType::Struct:
+		case types::VariantStruct::struct_:
 		{
 			if (name)
 			{
@@ -92,31 +97,31 @@ static void printStructXML( std::ostream& out, const char* name, const ddl::Stru
 				out << " class='struct'";
 				out << " size='" << st.nof_elements() << "'" << addressing << status << ">" << std::endl;
 			}
-			ddl::StructType::Map::const_iterator ii = st.begin(), ee = st.end();
+			types::VariantStruct::const_iterator ii = st.begin(), ee = st.end();
+			types::VariantStructDescription::const_iterator di = st.description()->begin();
 			std::size_t idx;
-			for (idx=0; ii != ee; ++ii,++idx)
+			for (idx=0; ii != ee; ++di,++ii,++idx)
 			{
-				bool elemIsAttribute = (idx < st.nof_attributes());
-				printStructXML( out, ii->first.c_str(), ii->second, elemIsAttribute, indent+INDENTTAB);
+				printStructXML( out, di->name, *ii, di->attribute(), indent+INDENTTAB, di->optional(), di->mandatory());
 			}
 			if (name) out << indent << "</element>" << std::endl;
 			break;
 		}
-		case ddl::StructType::Indirection:
+		case types::VariantStruct::indirection_:
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
 			out << " class='indirection'";
-			out << " type='" << st.indirection()->name() << "'" << addressing << status << "/>" << std::endl;
+			out << " type='" << types::VariantStruct::typeName( st.prototype()->type()) << "'" << addressing << status << "/>" << std::endl;
 			break;
 	}
 }
 
 static void printFormXML( std::ostream& out, const ddl::Form& form)
 {
-	out << "<form name='" << form.name() << "' " << "ddl='" << form.ddlname() << "'";
-	if (form.xmlRoot()) out << " xmlroot='" << form.xmlRoot() << "'";
+	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
+	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
 	out << ">" << std::endl;
-	printStructXML( out, 0, form, false);
+	printStructXML( out, 0, form, false, "", false, false);
 	out << "</form>" << std::endl;
 }
 

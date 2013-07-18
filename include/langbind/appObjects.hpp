@@ -39,7 +39,8 @@ Project Wolframe.
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "types/typeSignature.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
@@ -157,7 +158,7 @@ public:
 		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
-	DDLFormParser( const ddl::FormR& form_, ddl::StructType* substructure)
+	DDLFormParser( const ddl::FormR& form_, types::VariantStruct* substructure)
 		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(substructure)
 		,m_form(form_){}
@@ -196,7 +197,7 @@ public:
 		,DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
-	explicit DDLFormSerializer( const ddl::FormR& form_, const ddl::StructType* substructure)
+	explicit DDLFormSerializer( const ddl::FormR& form_, const types::VariantStruct* substructure)
 		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(substructure)
 		,m_form(form_){}
