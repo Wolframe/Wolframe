@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #include <string>
 #include <iostream>
+#include "types/countedReference.hpp"
 #include <stdexcept>
 #include "types/variant.hpp"
 
@@ -50,6 +51,7 @@ class VariantStructDescription
 public:
 	VariantStructDescription();
 	VariantStructDescription( const VariantStructDescription& o);
+	~VariantStructDescription();
 
 	struct Element
 	{
@@ -60,16 +62,18 @@ public:
 
 		enum Flags
 		{
-			NoFlags=0x0,
-			Optional=0x1,
-			Mandatory=0x2,
-			Attribute=0x4
+			NoFlags=0x0,		//< no flags set
+			Optional=0x1,		//< element is an optional
+			Mandatory=0x2,		//< element is an mandatory
+			Attribute=0x4,		//< element is an attribute
+			Array=0x8		//< element is an array
 		};
 		char flags;
 
 		bool optional() const						{return (flags & (unsigned char)Optional) != 0;}
 		bool mandatory() const						{return (flags & (unsigned char)Mandatory) != 0;}
 		bool attribute() const						{return (flags & (unsigned char)Attribute) != 0;}
+		bool array() const						{return (flags & (unsigned char)Array) != 0;}
 
 		void setOptional( bool v=true)					{if (v) flags |= (unsigned char)Optional; else flags &= ~(unsigned char)Optional;}
 		void setMandatory( bool v=true)					{if (v) flags |= (unsigned char)Mandatory; else flags &= ~(unsigned char)Mandatory;}
@@ -77,6 +81,7 @@ public:
 
 		Variant::Type type();
 		void makeArray();
+		void copy( const Element& o);
 	};
 
 	class const_iterator
@@ -139,14 +144,20 @@ public:
 	const Element* at( std::size_t idx) const				{if (idx>=m_size) return 0; else return m_ar+idx;}
 	Element* at( std::size_t idx)						{if (idx>=m_size) return 0; else return m_ar+idx;}
 
+	const Element& back() const						{if (m_size==0) throw std::logic_error("array bound read"); return m_ar[ m_size-1];}
+	Element& back()								{if (m_size==0) throw std::logic_error("array bound write"); return m_ar[ m_size-1];}
+
 	const_iterator begin() const						{return at(0);}
 	const_iterator end() const						{return const_iterator();}
 	iterator begin()							{return at(0);}
 	iterator end()								{return iterator();}
 
-	int addAttribute( const std::string& name, const VariantStruct& initvalue, const NormalizeFunction* normalizer);
-	int add( const std::string& name, const VariantStruct& initvalue, const NormalizeFunction* normalizer);
-	int add( const std::string& name, const VariantStructDescription& substruct);
+	int addAttribute( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer);
+	int addAtom( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer);
+	int addStructure( const std::string& name, const VariantStructDescription& substruct);
+	int addIndirection( const std::string& name_, const VariantStructDescription* descr);
+	int addElement( const Element& elem);
+	void inherit( const VariantStructDescription& parent);
 
 	int findidx( const std::string& name) const;
 	const_iterator find( const std::string& name) const;
@@ -163,9 +174,9 @@ private:
 	Element* m_ar;
 };
 
+typedef types::CountedReference<VariantStructDescription> VariantStructDescriptionR;
 
 }} //namespace
 #endif
-
 
 

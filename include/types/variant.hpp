@@ -92,10 +92,10 @@ public:
 	Variant( const char* o)				{initstring( o, std::strlen(o)); setInitialized();}
 	Variant( const char* o, std::size_t n)		{initstring( o, n); setInitialized();}
 	Variant( const std::string& o)			{initstring( o.c_str(), o.size()); setInitialized();}
-	Variant( const Variant& o)			{initcopy( *this, o);}
+	Variant( const Variant& o)			{initCopy( *this, o);}
 	~Variant()					{release();}
 
-	Variant& operator=( const Variant& o)		{release(); initcopy( *this, o); return *this;}
+	Variant& operator=( const Variant& o)		{release(); initCopy( *this, o); return *this;}
 	Variant& operator=( bool o)			{release(); init(); m_type = bool_; m_data.value.bool_ = o; setInitialized(); return *this;}
 	Variant& operator=( double o)			{release(); init(); m_type = double_; m_data.value.double_ = o; setInitialized(); return *this;}
 	Variant& operator=( float o)			{release(); init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized(); return *this;}
@@ -134,7 +134,7 @@ protected:
 	void init();
 	void release();
 	void initstring( const char* str_, std::size_t strsize_);
-	static void initcopy( Variant& dest, const Variant& orig);
+	static void initCopy( Variant& dest, const Variant& orig);
 
 	///\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
 	///\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable

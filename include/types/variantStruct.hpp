@@ -65,30 +65,30 @@ public:
 	};
 	static const char* typeName( Type i)			{return Variant::typeName( (Variant::Type)i);}
 
-	VariantStruct()						:Variant(){}
-	VariantStruct( const Variant& e)			{Variant::initcopy( *this, e);}
-	VariantStruct( const VariantStructDescription* d)	{initstruct( d);}
-	VariantStruct( const VariantStruct& o)			:Variant(){initcopy( *this, o);}
+	VariantStruct()							:Variant(){}
+	explicit VariantStruct( const VariantStructDescription* d)	{initStruct( d);}
+	VariantStruct( const Variant& o)				{Variant::initCopy( *this, *(const VariantStruct*)&o);}
+	VariantStruct( const VariantStruct& o)				:Variant(){initCopy( *this, o);}
 	VariantStruct array() const;
-	~VariantStruct()					{release();}
+	~VariantStruct()						{release();}
 
-	VariantStruct& operator=( const VariantStruct& o)	{release(); initcopy( *this, o); return *this;}
+	VariantStruct& operator=( const VariantStruct& o)		{release(); initCopy( *this, o); return *this;}
 
 public:
-	bool operator==( const VariantStruct& o) const		{return compare( o) == 0;}
-	bool operator!=( const VariantStruct& o) const		{int cv = compare( o); return cv != 0 && cv != -2;}
-	bool operator>( const VariantStruct& o) const		{int cv = compare( o); return cv > 0;}
-	bool operator>=( const VariantStruct& o) const		{int cv = compare( o); return cv >= 0;}
-	bool operator<=( const VariantStruct& o) const		{int cv = compare( o); return cv <= 0 && cv != -2;}
-	bool operator<( const VariantStruct& o) const		{int cv = compare( o); return cv == -1;}
+	bool operator==( const VariantStruct& o) const			{return compare( o) == 0;}
+	bool operator!=( const VariantStruct& o) const			{int cv = compare( o); return cv != 0 && cv != -2;}
+	bool operator>( const VariantStruct& o) const			{int cv = compare( o); return cv > 0;}
+	bool operator>=( const VariantStruct& o) const			{int cv = compare( o); return cv >= 0;}
+	bool operator<=( const VariantStruct& o) const			{int cv = compare( o); return cv <= 0 && cv != -2;}
+	bool operator<( const VariantStruct& o) const			{int cv = compare( o); return cv == -1;}
 	int compare( const VariantStruct& o) const;
 
-	Type type() const					{return (Type)type();}
-	const Data& data() const				{return m_data;}
+	Type type() const						{return (Type)type();}
+	const Data& data() const					{return m_data;}
 	std::size_t nof_elements() const;
 
-	const VariantStructDescription* description() const	{return ((Type)type()==struct_ || (Type)type()==indirection_)?(const VariantStructDescription*)m_data.dim.metadata:0;}
-	const VariantStruct* prototype() const			{return ((Type)type()==array_)?(const VariantStruct*)m_data.value.ref_:0;}
+	const VariantStructDescription* description() const		{return ((Type)type()==struct_ || (Type)type()==indirection_)?(const VariantStructDescription*)m_data.dim.metadata:0;}
+	const VariantStruct* prototype() const				{return ((Type)type()==array_)?(const VariantStruct*)m_data.value.ref_:0;}
 
 	void expandIndirection();
 	void push();
@@ -173,15 +173,26 @@ public:
 	iterator end()								{return iterator();}
 
 private:
+	friend class VariantStructIndirection;
 	void setType( Type type_)						{Variant::setType((Variant::Type)type_);}
 
-	static int compare_array( std::size_t size, const VariantStruct* a1, const VariantStruct* a2);
-	void initstruct( const VariantStructDescription* descr);
-	void initindirection( const VariantStructDescription* descr);
-	static void initcopy( VariantStruct& dest, const VariantStruct& orig);
+	static int compareArray( std::size_t size, const VariantStruct* a1, const VariantStruct* a2);
+	void initStruct( const VariantStructDescription* descr);
+	void initIndirection( const VariantStructDescription* descr);
+	static void initCopy( VariantStruct& dest, const VariantStruct& orig);
 
 	void release();
 };
+
+
+///\class VariantStructIndirection
+///\brief Structure of Variant type
+class VariantIndirection :public Variant
+{
+public:
+	VariantIndirection( const VariantStructDescription* descr);
+};
+
 
 }} //namespace
 #endif

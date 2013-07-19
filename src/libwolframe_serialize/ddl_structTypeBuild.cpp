@@ -72,7 +72,7 @@ static bool isAtomic( const types::VariantStructDescription& st)
 static void setAtomic( types::VariantStructDescription& st, const types::VariantStruct& initvalue, const types::NormalizeFunction* normalizer)
 {
 	if (st.size() != 0) throw std::runtime_error( "specified content value twice");
-	st.add( "", initvalue, normalizer);
+	st.addAtom( "", initvalue, normalizer);
 }
 
 static void fillStructType_( types::VariantStructDescription& st, langbind::TypedInputFilter& src, const types::NormalizeFunctionMap* typemap)
@@ -97,11 +97,11 @@ static void fillStructType_( types::VariantStructDescription& st, langbind::Type
 				{
 					if (tag.isArray)
 					{
-						elemidx = st.add( tag.identifier, elem.begin()->initvalue->array(), elem.begin()->normalizer);
+						elemidx = st.addAtom( tag.identifier, elem.begin()->initvalue->array(), elem.begin()->normalizer);
 					}
 					else
 					{
-						elemidx = st.add( tag.identifier, *elem.begin()->initvalue, elem.begin()->normalizer);
+						elemidx = st.addAtom( tag.identifier, *elem.begin()->initvalue, elem.begin()->normalizer);
 					}
 				}
 				else
@@ -110,7 +110,7 @@ static void fillStructType_( types::VariantStructDescription& st, langbind::Type
 					{
 						throw std::runtime_error( "Attribute type declared with @ has a non atomic value");
 					}
-					elemidx = st.add( tag.identifier, elem);
+					elemidx = st.addStructure( tag.identifier, elem);
 					if (tag.isArray)
 					{
 						st.at(elemidx)->makeArray();
@@ -153,7 +153,7 @@ static void fillStructType_( types::VariantStructDescription& st, langbind::Type
 						}
 						else
 						{
-							st.add( attribute.identifier, types::VariantStruct(vv).array(), tp);
+							st.addAtom( attribute.identifier, types::VariantStruct(vv).array(), tp);
 						}
 					}
 					else
@@ -164,7 +164,7 @@ static void fillStructType_( types::VariantStructDescription& st, langbind::Type
 						}
 						else
 						{
-							st.add( attribute.identifier, vv, tp);
+							st.addAtom( attribute.identifier, vv, tp);
 						}
 					}
 					lasttype = langbind::FilterBase::OpenTag;

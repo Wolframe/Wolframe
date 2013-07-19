@@ -15,7 +15,7 @@ VariantStruct VariantStruct::array() const
 	if (!prototype_) throw std::bad_alloc();
 	try
 	{
-		VariantStruct::initcopy( *prototype_, *this);
+		VariantStruct::initCopy( *prototype_, *this);
 	}
 	catch (const std::bad_alloc& e)
 	{
@@ -29,9 +29,9 @@ VariantStruct VariantStruct::array() const
 	return rt;
 }
 
-void VariantStruct::initindirection( const VariantStructDescription* descr)
+VariantIndirection::VariantIndirection( const VariantStructDescription* descr)
 {
-	setType( indirection_);
+	setType( (Variant::Type)VariantStruct::indirection_);
 	m_data.dim.metadata = (const void*)descr;
 	m_data.value.ref_ = 0;
 }
@@ -39,10 +39,10 @@ void VariantStruct::initindirection( const VariantStructDescription* descr)
 void VariantStruct::expandIndirection()
 {
 	if (type() != indirection_) return;
-	initstruct( description());
+	initStruct( description());
 }
 
-void VariantStruct::initstruct( const VariantStructDescription* descr)
+void VariantStruct::initStruct( const VariantStructDescription* descr)
 {
 	setType( struct_);
 	m_data.dim.metadata = (const void*)descr;
@@ -54,7 +54,7 @@ void VariantStruct::initstruct( const VariantStructDescription* descr)
 	{
 		for (; si!=se; ++si,++idx)
 		{
-			VariantStruct::initcopy( ((VariantStruct*)m_data.value.ref_)[idx], *si->initvalue);
+			VariantStruct::initCopy( ((VariantStruct*)m_data.value.ref_)[idx], *si->initvalue);
 		}
 	}
 	catch (const std::bad_alloc& e)
@@ -65,7 +65,7 @@ void VariantStruct::initstruct( const VariantStructDescription* descr)
 	}
 }
 
-void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
+void VariantStruct::initCopy( VariantStruct& dest, const VariantStruct& orig)
 {
 	std::size_t ii, nn;
 	switch (orig.type())
@@ -75,7 +75,7 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 		case VariantStruct::int_:
 		case VariantStruct::uint_:
 		case VariantStruct::string_:
-			Variant::initcopy( dest, orig);
+			Variant::initCopy( dest, orig);
 			break;
 
 		case VariantStruct::struct_:
@@ -89,7 +89,7 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 			{
 				for (; ii<nn; ++ii)
 				{
-					VariantStruct::initcopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
 				}
 			}
 			catch (const std::bad_alloc& e)
@@ -111,7 +111,7 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 			{
 				for (; ii<nn; ++ii)
 				{
-					VariantStruct::initcopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
 				}
 			}
 			catch (const std::bad_alloc& e)
@@ -138,7 +138,7 @@ void VariantStruct::push()
 	m_data.value.ref_ = ref_;
 	std::size_t idx = m_data.dim.size;
 
-	VariantStruct::initcopy( ((VariantStruct*)m_data.value.ref_)[ idx], ((VariantStruct*)m_data.value.ref_)[ 0]);
+	VariantStruct::initCopy( ((VariantStruct*)m_data.value.ref_)[ idx], ((VariantStruct*)m_data.value.ref_)[ 0]);
 	//... copy prototype as value of the new element pushed
 	++m_data.dim.size;
 }
@@ -146,14 +146,14 @@ void VariantStruct::push()
 const VariantStruct& VariantStruct::back() const
 {
 	if ((Type)type() != VariantStruct::array_) throw std::logic_error("illegal operation push on non array");
-	if (!m_data.dim.size) throw std::runtime_error( "array bound read");
+	if (!m_data.dim.size) throw std::logic_error( "array bound read");
 	return ((VariantStruct*)m_data.value.ref_)[ m_data.dim.size];
 }
 
 VariantStruct& VariantStruct::back()
 {
 	if ((Type)type() != VariantStruct::array_) throw std::logic_error("illegal operation push on non array");
-	if (!m_data.dim.size) throw std::runtime_error( "array bound write");
+	if (!m_data.dim.size) throw std::logic_error( "array bound write");
 	return ((VariantStruct*)m_data.value.ref_)[ m_data.dim.size];
 }
 
@@ -193,7 +193,7 @@ void VariantStruct::release()
 	}
 }
 
-int VariantStruct::compare_array( std::size_t size, const VariantStruct* a1, const VariantStruct* a2)
+int VariantStruct::compareArray( std::size_t size, const VariantStruct* a1, const VariantStruct* a2)
 {
 	std::size_t ii=0;
 	for (; ii<size; ++ii)
@@ -215,7 +215,7 @@ int VariantStruct::compare( const VariantStruct& o) const
 		{
 			return (int)(m_data.dim.size >= o.m_data.dim.size) + (int)(m_data.dim.size > o.m_data.dim.size) -1;
 		}
-		return compare_array( m_data.dim.size, (const VariantStruct*)m_data.value.ref_ + 1, (const VariantStruct*)o.m_data.value.ref_ + 1);
+		return compareArray( m_data.dim.size, (const VariantStruct*)m_data.value.ref_ + 1, (const VariantStruct*)o.m_data.value.ref_ + 1);
 		//... ref +1, because prototype is not compared
 	}
 	else if (tt == struct_)
@@ -224,7 +224,7 @@ int VariantStruct::compare( const VariantStruct& o) const
 		int size1 = (int)(description()->size());
 		int size2 = (int)(o.description()->size());
 		if (size1 != size2) return size1 - size2;
-		return compare_array( size1, (const VariantStruct*)m_data.value.ref_, (const VariantStruct*)o.m_data.value.ref_);
+		return compareArray( size1, (const VariantStruct*)m_data.value.ref_, (const VariantStruct*)o.m_data.value.ref_);
 	}
 	else if (tt == indirection_)
 	{

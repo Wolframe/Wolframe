@@ -32,7 +32,7 @@ void Variant::initstring( const char* str_, std::size_t strsize_)
 	m_data.value.string_[ strsize_] = 0;
 }
 
-void Variant::initcopy( Variant& dest, const Variant& orig)
+void Variant::initCopy( Variant& dest, const Variant& orig)
 {
 	if (orig.type() == string_)
 	{

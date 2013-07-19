@@ -56,11 +56,9 @@ public:
 	///\brief Destructor
 	virtual ~FormDescription(){}
 	///\brief Constructor
-	explicit FormDescription( const std::string& ddlname_)
-		:m_ddlname(ddlname_){}
-	///\brief Constructor
-	explicit FormDescription( const char* ddlname_)
-		:m_ddlname(ddlname_){}
+	FormDescription( const std::string& ddlname_, const std::string& name_)
+		:m_name(name_)
+		,m_ddlname(ddlname_){}
 	///\brief Copy constructor
 	FormDescription( const FormDescription& o)
 		:types::VariantStructDescription(o)
@@ -90,13 +88,6 @@ public:
 	const std::string& ddlname() const
 	{
 		return m_ddlname;
-	}
-
-	///\brief Define the name for this form
-	///\param[in] name_ name of this form
-	void defineName( const std::string& name_)
-	{
-		m_name = name_;
 	}
 
 private:
