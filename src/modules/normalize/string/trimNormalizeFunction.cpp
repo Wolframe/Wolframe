@@ -36,8 +36,9 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-std::string TrimNormalizeFunction::execute( const std::string& str) const
+types::Variant TrimNormalizeFunction::execute( const types::Variant& inp) const
 {
+	std::string str( inp.tostring());
 	std::string::const_iterator ii = str.begin(), ee = str.end();
 	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 	std::string::const_iterator ti = ii, te = ii;

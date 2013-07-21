@@ -34,8 +34,8 @@ Project Wolframe.
 
 #ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
-#include "ddl/atomicType.hpp"
-#include "ddl/structType.hpp"
+#include "ddl/form.hpp"
+#include "types/variant.hpp"
 #include "types/countedReference.hpp"
 #include <string>
 #include <vector>
@@ -54,7 +54,7 @@ struct DDLCompiler
 	///\param[in] srcstring source as string
 	///\param[in] typemap map with atomic type definitions
 	///\return compilation result (a list of forms)
-	virtual std::vector<Form> compile( const std::string& srcstring, const TypeMap* typemap) const=0;
+	virtual std::vector<FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const=0;
 
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}

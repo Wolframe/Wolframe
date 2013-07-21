@@ -250,7 +250,7 @@ db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 	return m_impl->transaction( name );
 }
 
-const langbind::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
 {
 	return m_impl->normalizeFunction( name);
 }
@@ -260,9 +260,9 @@ const langbind::FormFunction* ProcessorProvider::formFunction( const std::string
 	return m_impl->formFunction( name);
 }
 
-const ddl::Form* ProcessorProvider::form( const std::string& name) const
+const ddl::FormDescription* ProcessorProvider::formDescription( const std::string& name) const
 {
-	return m_impl->form( name);
+	return m_impl->formDescription( name);
 }
 
 langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg) const

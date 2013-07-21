@@ -39,18 +39,20 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-std::string Base64DecodeFunction::execute( const std::string& str) const
+types::Variant Base64DecodeFunction::execute( const types::Variant& inp) const
 {
 	base64::Decoder decoder;
+	std::string str( inp.tostring());
 	std::istringstream i( str);
 	std::ostringstream o;
 	decoder.decode( i, o);
 	return o.str();
 }
 
-std::string Base64EncodeFunction::execute( const std::string& str) const
+types::Variant Base64EncodeFunction::execute( const types::Variant& inp) const
 {
 	base64::Encoder encoder;
+	std::string str( inp.tostring());
 	std::istringstream i( str);
 	std::ostringstream o;
 	encoder.encode( i, o);

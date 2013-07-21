@@ -40,19 +40,19 @@
 namespace _Wolframe {
 namespace langbind {
 
-class Base64DecodeFunction :public NormalizeFunction
+class Base64DecodeFunction :public types::NormalizeFunction
 {
 public:
 	Base64DecodeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "decode";}
 };
 
-class Base64EncodeFunction :public NormalizeFunction
+class Base64EncodeFunction :public types::NormalizeFunction
 {
 public:
 	Base64EncodeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "encode";}
 };
 

@@ -104,6 +104,9 @@ public:
 	const VariantStruct& back() const;
 	VariantStruct& back();
 
+	const VariantStruct* select( const std::string& name) const;
+	VariantStruct* select( const std::string& name);
+
 public:
 	class const_iterator
 	{

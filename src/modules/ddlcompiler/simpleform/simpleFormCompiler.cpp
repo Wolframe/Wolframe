@@ -65,7 +65,7 @@ public:
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
 
-	explicit FRMAttribute( const std::string& item, const TypeMap* typemap, const types::keymap<types::VariantStructDescriptionR>& formmap, const std::string& selfname)
+	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
 		:m_isVector(false)
 		,m_isAttribute(false)
 		,m_isOptional(false)
@@ -74,6 +74,7 @@ public:
 		,m_isFormReference(false)
 		,m_isSelfReference(false)
 		,m_type(0)
+		,m_subform(0)
 	{
 		enum State
 		{
@@ -206,14 +207,14 @@ public:
 	bool isOptional() const					{return m_isOptional;}
 	bool isMandatory() const				{return m_isMandatory;}
 	bool isForm() const					{return m_isForm;}
-	const NormalizeFunction* type() const			{return m_type;}
+	const types::NormalizeFunction* type() const		{return m_type;}
 	const std::string& value() const			{return m_value;}
-	const types::VariantStructDescriptionR& subform() const	{return m_subform;}
+	const types::VariantStructDescription* subform() const	{return m_subform;}
 
 private:
-	void parseType( const std::string& typestr, const TypeMap* typemap, const types::keymap<types::VariantStructDescriptionR>& formmap, const std::string& selfname)
+	void parseType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
 	{
-		types::keymap<types::VariantStructDescriptionR>::const_iterator fmi;
+		types::keymap<FormDescriptionR>::const_iterator fmi;
 		if (typestr.size() == 0)
 		{
 			m_isForm = true;
@@ -225,9 +226,9 @@ private:
 		else if ((fmi=formmap.find( typestr)) != formmap.end())
 		{
 			m_isFormReference = true;
-			m_subform = fmi->second;
+			m_subform = fmi->second.get();
 		}
-		else if (0!=(m_type = typemap->getType( typestr)))
+		else if (0!=(m_type = typemap->get( typestr)))
 		{
 		}
 		else if (boost::algorithm::iequals( typestr, selfname))
@@ -247,8 +248,8 @@ private:
 	bool m_isForm;
 	bool m_isFormReference;
 	bool m_isSelfReference;
-	const NormalizeFunction* m_type;
-	types::VariantStructDescriptionR m_subform;
+	const types::NormalizeFunction* m_type;
+	const types::VariantStructDescription* m_subform;
 	std::string m_value;
 };
 
@@ -267,7 +268,7 @@ static bool isIdentifier( const std::string& name)
 	return (ii==ee);
 }
 
-static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescriptionR& result, const TypeMap* typemap, const types::keymap<types::VariantStructDescriptionR>& formmap, const std::string& selfname)
+static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -308,35 +309,35 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 				{
 					throw std::runtime_error( "Syntax error: Form declared as attribute");
 				}
-				types::VariantStructDescriptionR val = fa.subform();
+				const types::VariantStructDescription* val = fa.subform();
 				if (first == "_")
 				{
 					if (fa.isVector()) throw std::runtime_error( "Semantic error: try to inherit from an array ('[]')");
 					if (fa.isOptional()) throw std::runtime_error( "Semantic error: optional ('?') declaration for inherited structure");
 					if (fa.isMandatory()) throw std::runtime_error( "Semantic error: mandatory ('!') declaration for inherited structure");
-					result->inherit( *val);
+					result.inherit( *val);
 				}
 				else
 				{
-					result->addStructure( first, *val);
+					result.addStructure( first, *val);
 					if (fa.isVector())
 					{
 						if (fa.isOptional()) throw std::runtime_error( "Semantic error: try to define an optional array");
 						if (fa.isMandatory()) throw std::runtime_error( "Semantic error: try to define an mandatory array");
-						result->back().makeArray();
+						result.back().makeArray();
 					}
 					else
 					{
-						if (fa.isOptional()) result->back().setOptional();
-						if (fa.isMandatory()) result->back().setMandatory();
+						if (fa.isOptional()) result.back().setOptional();
+						if (fa.isMandatory()) result.back().setMandatory();
 					}
 				}
 			}
 			else if (fa.isSelfReference())
 			{
-				types::VariantStructDescriptionR val = (*formmap)[ selfname];
-				result->addIndirection( val.get());
-				result->back().setOptional();
+				const types::VariantStructDescription* val = formmap.at( selfname).get();
+				result.addIndirection( first, val);
+				result.back().setOptional();
 
 				if (fa.isAttribute())
 				{
@@ -352,7 +353,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 				}
 				if (fa.isVector())
 				{
-					result->back().makeArray();
+					result.back().makeArray();
 				}
 				if (first == "_")
 				{
@@ -365,30 +366,30 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 				if (fa.isAttribute())
 				{
 					if (first == "_") throw std::runtime_error( "empty attribute name is illegal");
-					result->addAttribute( first, val, fa.type());
+					result.addAttribute( first, val, fa.type());
 				}
 				else
 				{
 					if (first == "_")
 					{
-						result->addAtom( "", val, fa.type());
+						result.addAtom( "", val, fa.type());
 					}
 					else
 					{
-						result->addAtom( first, val, fa.type());
+						result.addAtom( first, val, fa.type());
 					}
 				}
 				if (fa.isVector())
 				{
-					result->back()->makeArray();
+					result.back().makeArray();
 				}
 				if (fa.isOptional())
 				{
-					result->back()->setOptional();
+					result.back().setOptional();
 				}
 				if (fa.isMandatory())
 				{
-					result->back()->setMandatory();
+					result.back().setMandatory();
 				}
 			}
 		}
@@ -415,21 +416,21 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 					throw std::runtime_error( "Syntax error: Form declared as attribute");
 				}
 				types::VariantStructDescriptionR substruct;
-				compile_ptree( itr->second, substruct, typemap, formmap, selfname);
+				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
 
-				result->add( first, substruct);
+				result.addStructure( first, *substruct);
 
 				if (fa.isVector())
 				{
-					result->back()->makeArray();
+					result.back().makeArray();
 				}
 				if (fa.isOptional())
 				{
-					result->back()->setOptional();
+					result.back().setOptional();
 				}
 				if (fa.isMandatory())
 				{
-					result->back()->setMandatory();
+					result.back().setMandatory();
 				}
 				if (first == "_")
 				{
@@ -439,76 +440,56 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			else
 			{
 				types::VariantStructDescriptionR substruct;
-				compile_ptree( itr->second, substruct, typemap, formmap, selfname);
+				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
 				result.addStructure( first, *substruct);
 			}
 		}
 	}
 }
 
-static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Form>& result, const TypeMap* typemap)
+static void compile_forms( const boost::property_tree::ptree& pt, std::vector<FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap)
 {
-	types::keymap<types::VariantStructDescriptionR> formmap;
+	types::keymap<FormDescriptionR> formmap;
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
-	if (itr != end && !boost::algorithm::iequals( itr->first, "FORM") && !boost::algorithm::iequals( itr->first, "STRUCT"))
+	for (;itr != end; ++itr)
 	{
-		// ... single form
-		Form form( "simpleform");
-		compile_ptree( pt, form, typemap, formmap, "");
-		result.push_back( form);
-	}
-	else
-	{
-		for (;itr != end; ++itr)
+		bool isForm = false;
+		bool isStruct = false;
+		if (boost::algorithm::iequals( itr->first, "FORM"))
 		{
-			if (boost::algorithm::iequals( itr->first, "FORM"))
+			isForm = true;
+			if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
+		}
+		else if (boost::algorithm::iequals( itr->first, "STRUCT"))
+		{
+			isStruct = true;
+			if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after STRUCT");
+		}
+		if (isForm || isStruct)
+		{
+			try
 			{
-				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-				try
-				{
-					FormDescription* form( new FormDescription("simpleform", itr->second.data()));
-					types::VariantStructDescriptionR formstruct( form);
+				FormDescriptionR form( new FormDescription( "simpleform", itr->second.data()));
 
-					formmap.insert( form.name(), formstruct);
-					compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
-					IndirectionConstructorR selfref( new StructIndirectionConstructor( form.name(), form));
-					StructIndirectionConstructor::substituteSelf( &form, selfref);
-					formmap.insert( form.name(), form);
-					result.push_back( form);
-				}
-				catch (const std::runtime_error& e)
-				{
-					throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
-				}
+				formmap.insert( form->name(), form);
+				compile_ptree( itr->second, *form, typemap, formmap, itr->second.data());
+				if (isForm) result.push_back( form);
 			}
-			else if (boost::algorithm::iequals( itr->first, "STRUCT"))
+			catch (const std::runtime_error& e)
 			{
-				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-				try
-				{
-					Form form( "simpleform");
-					form.defineName( itr->second.data());
-					compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
-					IndirectionConstructorR selfref( new StructIndirectionConstructor( form.name(), form));
-					StructIndirectionConstructor::substituteSelf( &form, selfref);
-					formmap.insert( form.name(), form);
-				}
-				catch (const std::runtime_error& e)
-				{
-					throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
-				}
+				throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
 			}
-			else
-			{
-				throw std::runtime_error( "FORM expected as top level node");
-			}
+		}
+		else
+		{
+			throw std::runtime_error( "FORM or STRUCT expected as start of a structure definition");
 		}
 	}
 }
 
-std::vector<Form> SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
+std::vector<FormDescriptionR> SimpleFormCompiler::compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const
 {
-	std::vector<Form> rt;
+	std::vector<FormDescriptionR> rt;
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);

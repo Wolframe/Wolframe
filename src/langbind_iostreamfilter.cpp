@@ -328,10 +328,10 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		}
 	}
 	{
-		const ddl::Form* st = provider->form( proc);
+		const ddl::FormDescription* st = provider->formDescription( proc);
 		if (st)
 		{
-			ddl::Form df( *st);
+			ddl::Form df( st);
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));

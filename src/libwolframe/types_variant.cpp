@@ -15,33 +15,48 @@ void Variant::init()
 
 void Variant::release()
 {
-	if (type() == string_ && m_data.value.string_)
+	if (type() == string_ && m_data.value.string_ && !constant())
 	{
 		std::free( m_data.value.string_);
 	}
 }
 
-void Variant::initstring( const char* str_, std::size_t strsize_)
+void Variant::initString( const char* str_, std::size_t strsize_, bool constant_)
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = string_;
 	m_data.dim.size = strsize_;
-	m_data.value.string_ = (char*)std::malloc( strsize_+1);
-	if (!m_data.value.string_) throw std::bad_alloc();
-	std::memcpy( m_data.value.string_, str_, strsize_);
-	m_data.value.string_[ strsize_] = 0;
+	if (constant_)
+	{
+		m_data.value.string_ = const_cast<char*>(str_);
+		setConstant();
+	}
+	else
+	{
+		m_data.value.string_ = (char*)std::malloc( strsize_+1);
+		if (!m_data.value.string_) throw std::bad_alloc();
+		std::memcpy( m_data.value.string_, str_, strsize_);
+		m_data.value.string_[ strsize_] = 0;
+	}
 }
 
 void Variant::initCopy( Variant& dest, const Variant& orig)
 {
-	if (orig.type() == string_)
+	if (orig.constant())
 	{
-		dest.initstring( orig.m_data.value.string_, orig.m_data.dim.size);
-		dest.setInitialized( orig.initialized());
+		std::memcpy( &dest, &orig, sizeof(dest));
 	}
 	else
 	{
-		std::memcpy( &dest, &orig, sizeof( dest));
+		if (orig.type() == string_)
+		{
+			dest.initString( orig.m_data.value.string_, orig.m_data.dim.size);
+			dest.setInitialized( orig.initialized());
+		}
+		else
+		{
+			std::memcpy( &dest, &orig, sizeof( dest));
+		}
 	}
 }
 

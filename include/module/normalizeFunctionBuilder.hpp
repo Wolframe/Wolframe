@@ -41,7 +41,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class NormalizeFunctionConstructor :public SimpleObjectConstructor< langbind::NormalizeFunction >
+class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
 	NormalizeFunctionConstructor( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::ResourceHandle* rh, langbind::CreateNormalizeFunction createFunc_)
@@ -63,7 +63,7 @@ public:
 		return m_classname;
 	}
 
-	virtual langbind::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
+	virtual types::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
 	{
 		return m_createFunc( *m_resource, name_, arg_);
 	}

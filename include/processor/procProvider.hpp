@@ -109,9 +109,9 @@ public:
 		return std::map<std::string,std::string>();
 	}
 
-	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
 	const langbind::FormFunction* formFunction( const std::string& name) const;
-	const ddl::Form* form( const std::string& name) const;
+	const ddl::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::string& arg) const;
 
 private:

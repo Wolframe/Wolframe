@@ -57,7 +57,7 @@ private:
 	boost::locale::generator m_gen;
 };
 
-NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+types::NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
 const std::vector<std::string>& normalizeFunctions();
 
 }}//namespace

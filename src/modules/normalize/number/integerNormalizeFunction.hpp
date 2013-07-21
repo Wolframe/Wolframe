@@ -40,14 +40,14 @@
 namespace _Wolframe {
 namespace langbind {
 
-class IntegerNormalizeFunction :public NormalizeFunction
+class IntegerNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	IntegerNormalizeFunction( bool sign_, std::size_t size_)
 		:m_size(size_)
 		,m_sign(sign_){}
 
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return m_sign?"integer":"unsigned";}
 
 private:

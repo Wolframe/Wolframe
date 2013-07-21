@@ -134,8 +134,9 @@ static void printWizardXML( std::ostream& out, const prgbind::ProgramLibrary& pr
 	std::vector<std::string>::const_iterator fi = formnames.begin(), fe = formnames.end();
 	for (; fi != fe; ++fi)
 	{
-		const ddl::Form* form = programLibrary.getForm( *fi);
-		printFormXML( out, *form);
+		const ddl::FormDescription* formdescription = programLibrary.getFormDescription( *fi);
+		ddl::Form form( formdescription);
+		printFormXML( out, form);
 	}
 	out << "</forms>" << std::endl;
 }

@@ -46,7 +46,7 @@ public:
 	ResourceHandle(){}
 };
 
-NormalizeFunction* createStringNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+types::NormalizeFunction* createStringNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
 const std::vector<std::string>& normalizeFunctions();
 
 }}//namespace

@@ -41,10 +41,10 @@ Project Wolframe.
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
-#include "ddl/structTypeBuild.hpp"
 #include "utils/miscUtils.hpp"
 #include "types/doctype.hpp"
 #include "logger-v1.hpp"
+#include <limits>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -101,7 +101,7 @@ template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::Typ
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosureR>()		{return luaname::FormFunctionClosureR;}
 template <> const char* metaTableName<db::TransactionR>()		{return luaname::Transaction;}
-template <> const char* metaTableName<NormalizeFunction>()		{return luaname::NormalizeFunction;}
+template <> const char* metaTableName<types::NormalizeFunction>()	{return luaname::NormalizeFunction;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
 template <> const char* metaTableName<langbind::LuaModuleMap>()		{return luaname::LuaModuleMap;}
@@ -304,13 +304,13 @@ static const proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
 	return rt;
 }
 
-class DDLTypeMap :public ddl::TypeMap
+class DDLTypeMap :public types::NormalizeFunctionMap
 {
 public:
 	DDLTypeMap( lua_State* ls)
 		:m_provider( getProcessorProvider( ls)){}
 
-	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
 		return m_provider->normalizeFunction( name);
 	}
@@ -555,14 +555,84 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 	throw std::runtime_error( "illegal state when fetching next element");
 }
 
+static void getVariantValue( lua_State* ls, types::Variant& val, int idx)
+{
+	std::size_t val_len;
+	const char* val_str;
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TBOOLEAN:
+			val = lua_toboolean( ls, idx);
+			break;
+
+		case LUA_TNUMBER:
+			val = lua_tonumber( ls, idx);
+			break;
+
+		case LUA_TSTRING:
+			val_str = lua_tolstring( ls, idx, &val_len);
+			val.initConstant( val_str, val_len);
+			break;
+
+		default:
+			throw std::runtime_error( "atomic value expected for 'variant type' argument");
+	}
+}
+
+static void pushVariantValue( lua_State* ls, const types::Variant& val)
+{
+	unsigned int val_uint;
+	switch (val.type())
+	{
+		case types::Variant::bool_:
+			lua_pushboolean( ls, val.tobool());
+			break;
+
+		case types::Variant::int_:
+			lua_pushinteger( ls, val.toint());
+			break;
+
+		case types::Variant::uint_:
+			val_uint = val.touint();
+			if (val_uint > (unsigned int)std::numeric_limits<int>::max())
+			{
+				lua_pushnumber( ls, val_uint);
+			}
+			else
+			{
+				lua_pushinteger( ls, val_uint);
+			}
+			break;
+
+		case types::Variant::double_:
+			lua_pushnumber( ls, val.todouble());
+			break;
+
+		case types::Variant::string_:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				lua_pushlstring( ls, val.charptr(), val.charsize());
+			}
+			break;
+		}
+		default:
+			throw std::runtime_error( "atomic value expected for 'variant type' argument");
+	}
+}
+
 LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
 {
-	NormalizeFunction* func = (NormalizeFunction*)lua_touserdata( ls, lua_upvalueindex( 1));
-	check_parameters( ls, 0, 1, LUA_TSTRING);
-	std::size_t len;
-	const char* content = lua_tolstring( ls, 1, &len);
-	std::string rt = func->execute( std::string( content, len));
-	lua_pushlstring( ls, rt.c_str(), rt.size());
+	types::NormalizeFunction* func = (types::NormalizeFunction*)lua_touserdata( ls, lua_upvalueindex( 1));
+	if (lua_gettop( ls) != 1)
+	{
+		throw std::runtime_error( "atomic value expected for 'variant type' argument");
+
+	}
+	types::Variant param;
+	getVariantValue( ls, param, 1);
+	types::Variant result = func->execute( param);
+	pushVariantValue( ls, result);
 	return 1;
 }
 
@@ -572,10 +642,10 @@ LUA_FUNCTION_THROWS( "normalizer(..)", function_normalizer)
 	const char* name = lua_tostring( ls, 1);
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 
-	const NormalizeFunction* func = ctx->normalizeFunction( name);
+	const types::NormalizeFunction* func = ctx->normalizeFunction( name);
 	if (!func) throw std::runtime_error( std::string("normalizer '") + name + "' not defined");
 
-	lua_pushlightuserdata( ls, const_cast<NormalizeFunction*>(func));
+	lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
 	lua_pushcclosure( ls, function_normalizer_call, 1);
 	return 1;
 }
@@ -628,7 +698,7 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 	}
 	std::string content;
 	content.append( "FORM ");
-	content.append( (*form)->name());
+	content.append( (*form)->description()->name());
 	content.append( "\n");
 	content.append( flt->content());
 
@@ -647,12 +717,13 @@ LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 
 	LuaExceptionHandlerScope escope(ls);
 	{
-		lua_pushlstring( ls, (*form)->name().c_str(), (*form)->name().size());
+		const ddl::FormDescription* descr = (*form)->description();
+		lua_pushlstring( ls, descr->name().c_str(), descr->name().size());
 		return 1;
 	}
 }
 
-static ddl::StructType* get_substructure( lua_State* ls, int index, ddl::StructType* st)
+static types::VariantStruct* get_substructure( lua_State* ls, int index, types::VariantStruct* st)
 {
 	if (!lua_istable( ls, index)) throw std::runtime_error( "table (array) expected as substructure path");
 	lua_pushnil(ls);
@@ -674,7 +745,7 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		ddl::StructType* substruct = form->get();
+		types::VariantStruct* substruct = form->get();
 		serialize::Context::Flags flags = serialize::Context::None;
 		int ii = 3, nn = lua_gettop( ls);
 		if (nn > 4) throw std::runtime_error( "too many arguments");
@@ -740,7 +811,7 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 	{
 		form = LuaObject<ddl::FormR>::getSelf( ls, "form", "table");
 
-		ddl::StructType* substruct = form->get();
+		types::VariantStruct* substruct = form->get();
 		int nn = lua_gettop( ls);
 		if (nn > 1)
 		{
@@ -776,7 +847,7 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 {
 	ddl::FormR* result = LuaObject<ddl::FormR>::getSelf( ls, "form", "get");
-	ddl::StructType* substruct = result->get();
+	types::VariantStruct* substruct = result->get();
 	int nn = lua_gettop( ls);
 	if (nn > 1)
 	{
@@ -805,17 +876,7 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 		LuaObject<ddl::FormR>::push_luastack( ls, frm);
 		return 1;
 	}
-	else if (lua_istable( ls, 1))
-	{
-		check_parameters( ls, 0, 1, LUA_TTABLE);
-		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
-		if (!inp.get()) throw std::runtime_error( "unexpected null object intead of table argument");
-		DDLTypeMap typemap( ls);
-		ddl::FormR frm( new ddl::Form( ddl::StructType( ddl::StructTypeBuild( *inp, &typemap))));
-		LuaObject<ddl::FormR>::push_luastack( ls, frm);
-		return 1;
-	}
-	throw std::runtime_error( "expected string or table as argument of form");
+	throw std::runtime_error( "expected string as argument of form");
 }
 
 
@@ -1528,10 +1589,9 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			const char* doctype_form = lua_tostring( ls, ii);
 			const ddl::Form* form = gtc->form( doctype_form);
 			if (!form) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
-			const char* doctype_root = form->xmlRoot();
+			const char* doctype_root = form->description()->xmlRoot();
 			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
-			std::string ddlname = form->ddlname();
-			doctype = gtc->xmlDoctypeString( form->name(), ddlname, doctype_root);
+			doctype = gtc->xmlDoctypeString( form->description()->name(), form->description()->ddlname(), doctype_root);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
@@ -1573,10 +1633,9 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			{
 				const ddl::Form* form = gtc->form( doctype_form);
 				if (!form) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
-				doctype_root = form->xmlRoot();
+				doctype_root = form->description()->xmlRoot();
 				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
-				std::string ddlname = form->ddlname();
-				doctype = gtc->xmlDoctypeString( form->name(), ddlname, doctype_root);
+				doctype = gtc->xmlDoctypeString( form->description()->name(), form->description()->ddlname(), doctype_root);
 			}
 			else
 			{

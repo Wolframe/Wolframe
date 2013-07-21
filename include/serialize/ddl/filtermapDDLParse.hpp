@@ -37,7 +37,8 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/ddl/filtermapDDLParseStack.hpp"
-#include "ddl/structType.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include <cstddef>
 
 namespace _Wolframe {

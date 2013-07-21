@@ -29,17 +29,15 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/structType.hpp
-///\brief Defines a non intrusive structure type for values in the DDLs used for forms
+///\file ddl/form.hpp
+///\brief Defines the form data structure as it is defined by a DDL (data definition language)
 
-#ifndef _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
-#define _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
+#ifndef _Wolframe_DDL_FORM_HPP_INCLUDED
+#define _Wolframe_DDL_FORM_HPP_INCLUDED
 #include <string>
-#include <utility>
-#include <vector>
-#include <stdexcept>
 #include <cstddef>
-#include <boost/lexical_cast.hpp>
+#include <stdexcept>
+#include <iostream>
 #include "types/countedReference.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -95,6 +93,9 @@ private:
 	std::string m_ddlname;
 };
 
+typedef types::CountedReference<FormDescription> FormDescriptionR;
+
+
 class Form
 	:public types::VariantStruct
 {
@@ -126,7 +127,12 @@ public:
 		return m_description;
 	}
 
-	void print( std::ostream& out, size_t level=0) const;
+	void print( std::ostream& out, size_t level=0) const
+	{
+		std::string indent( level, '\t');
+		out << indent << "FORM " << m_description->name() << std::endl;
+		types::VariantStruct::print( out, "\t", "\n", level);
+	}
 
 private:
 	const FormDescription* m_description;

@@ -143,7 +143,7 @@ struct Tokenize
 
 }//anonymous namespace
 
-struct LocaleConvNormalizeFunction :public NormalizeFunction
+struct LocaleConvNormalizeFunction :public types::NormalizeFunction
 {
 	LocaleConvNormalizeFunction( ResourceHandle& reshnd, const std::string& lc, const LocaleConv& func, const char* name_)
 		:m_reshnd(&reshnd)
@@ -153,10 +153,10 @@ struct LocaleConvNormalizeFunction :public NormalizeFunction
 
 	virtual ~LocaleConvNormalizeFunction(){}
 
-	virtual std::string execute( const std::string& i) const
+	virtual types::Variant execute( const types::Variant& inp) const
 	{
 		std::locale loc = m_reshnd->getLocale( m_lc);
-		return m_func( i, loc);
+		return m_func( inp.tostring(), loc);
 	}
 	virtual const char* name() const {return m_name;}
 
@@ -188,12 +188,12 @@ static struct {const char* name; LocaleConv func;} g_functions[] =
 	{0,0}
 };
 
-NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg)
 {
 	std::string key = boost::algorithm::to_lower_copy( name);
 	if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
 
-	std::vector<std::pair< std::string, NormalizeFunctionR> > rt;
+	std::vector<std::pair< std::string, types::NormalizeFunctionR> > rt;
 	for (int ii=0; g_functions[ii].name; ++ii)
 	{
 		if (name == g_functions[ii].name)

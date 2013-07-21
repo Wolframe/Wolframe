@@ -91,7 +91,7 @@ static std::size_t parseIntegerDescription( std::string::const_iterator& ii, con
 	return rt;
 }
 
-NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
 {
 	try
 	{

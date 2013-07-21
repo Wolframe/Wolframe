@@ -29,9 +29,6 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	ddl_atomicType.o \
-	ddl_structType.o \
-	ddl_structTypeBuild.o \
 	ddl_filtermapParse.o \
 	ddl_filtermapSerialize.o \
 	mapContext.o \

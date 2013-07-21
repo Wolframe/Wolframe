@@ -347,7 +347,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return rt;
 }
 
-const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
 {
 	return m_programs->getNormalizeFunction( name);
 }
@@ -358,10 +358,10 @@ const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFun
 	return m_programs->getFormFunction( name);
 }
 
-const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name) const
+const ddl::FormDescription* ProcessorProvider::ProcessorProvider_Impl::formDescription( const std::string& name) const
 {
-	LOG_TRACE << "[provider] get form '" << name << "'";
-	return m_programs->getForm( name);
+	LOG_TRACE << "[provider] get form description '" << name << "'";
+	return m_programs->getFormDescription( name);
 }
 
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg) const

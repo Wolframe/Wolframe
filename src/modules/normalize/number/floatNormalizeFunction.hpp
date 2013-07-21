@@ -40,14 +40,14 @@
 namespace _Wolframe {
 namespace langbind {
 
-class FloatNormalizeFunction :public NormalizeFunction
+class FloatNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_)
 		:m_sizeG(sizeG_)
 		,m_sizeF(sizeF_){}
 
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "float";}
 
 private:

@@ -35,23 +35,20 @@
 #ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
+#include "types/variant.hpp"
 #include <string>
 #include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct NormalizeFunction :public ddl::NormalizeFunction {};
-
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
 class ResourceHandle;
 
 ///\param[in,out] rshnd normalization resources handle
 ///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+typedef types::NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
 typedef const std::vector<std::string>& (*GetNormalizeFunctions)();
 
 }}

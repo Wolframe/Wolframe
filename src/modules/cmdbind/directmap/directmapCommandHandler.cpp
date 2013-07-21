@@ -118,10 +118,10 @@ void DirectmapCommandHandler::initcall()
 	}
 	if (m_outputform.get())
 	{
-		const char* xmlroot = m_outputform->xmlRoot();
+		const char* xmlroot = m_outputform->description()->xmlRoot();
 		if (xmlroot)
 		{
-			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->name(), m_outputform->ddlname(), xmlroot);
+			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->description()->name(), m_outputform->description()->ddlname(), xmlroot);
 			m_outputfilter->setDocType( xmlDoctype);
 		}
 	}
@@ -205,7 +205,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			case 2:
 			{
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
-				const char* xmlroot = m_inputform->xmlRoot();
+				const char* xmlroot = m_inputform->description()->xmlRoot();
 				if (xmlroot)
 				{
 					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
@@ -226,8 +226,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
 				if (m_outputform.get())
 				{
-					const char* xmlroot = m_outputform->xmlRoot();
-					ddl::StructType* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
+					const char* xmlroot = m_outputform->description()->xmlRoot();
+					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
 
 					serialize::DDLStructParser formparser( substructure);
 					formparser.init( m_functionclosure->result(), serialize::Context::None);

@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
 #define _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
+#error DEPRECATED ATOMIC TYPE
 #include "types/countedReference.hpp"
 #include <string>
 #include <stdexcept>

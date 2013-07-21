@@ -81,7 +81,7 @@ public:
 			char* string_;
 			void* ref_;
 		} value;
-		enum {Initialized=0x80,FlagMask=0x7f};
+		enum {Initialized=0x80,Constant=0x40,FlagMask=0x3f};
 	};
 	Variant()					{init(); m_type = bool_;}
 	Variant( bool o)				{init(); m_type = bool_; m_data.value.bool_ = o; setInitialized();}
@@ -89,9 +89,9 @@ public:
 	Variant( float o)				{init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized();}
 	Variant( int o)					{init(); m_type = int_; m_data.value.int_ = o; setInitialized();}
 	Variant( unsigned int o)			{init(); m_type = uint_; m_data.value.uint_ = o; setInitialized();}
-	Variant( const char* o)				{initstring( o, std::strlen(o)); setInitialized();}
-	Variant( const char* o, std::size_t n)		{initstring( o, n); setInitialized();}
-	Variant( const std::string& o)			{initstring( o.c_str(), o.size()); setInitialized();}
+	Variant( const char* o)				{initString( o, std::strlen(o)); setInitialized();}
+	Variant( const char* o, std::size_t n)		{initString( o, n); setInitialized();}
+	Variant( const std::string& o)			{initString( o.c_str(), o.size()); setInitialized();}
 	Variant( const Variant& o)			{initCopy( *this, o);}
 	~Variant()					{release();}
 
@@ -101,8 +101,12 @@ public:
 	Variant& operator=( float o)			{release(); init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized(); return *this;}
 	Variant& operator=( int o)			{release(); init(); m_type = int_; m_data.value.int_ = o; setInitialized(); return *this;}
 	Variant& operator=( unsigned int o)		{release(); init(); m_type = uint_; m_data.value.uint_ = o; setInitialized(); return *this;}
-	Variant& operator=( const char* o)		{release(); initstring( o, std::strlen(o)); setInitialized(); return *this;}
-	Variant& operator=( const std::string& o)	{release(); initstring( o.c_str(), o.size()); setInitialized(); return *this;}
+	Variant& operator=( const char* o)		{release(); initString( o, std::strlen(o)); setInitialized(); return *this;}
+	Variant& operator=( const std::string& o)	{release(); initString( o.c_str(), o.size()); setInitialized(); return *this;}
+
+	void initConstant( const char* o)		{release(); initString( o, std::strlen(o), true); setInitialized(); setConstant();}
+	void initConstant( const char* o, std::size_t l){release(); initString( o, l, true); setInitialized(); setConstant();}
+	void initConstant( const std::string& o)	{release(); initString( o.c_str(), o.size(), true); setInitialized(); setConstant();}
 
 	bool operator==( const Variant& o) const	{return compare( o) == 0;}
 	bool operator!=( const Variant& o) const	{int cv = compare( o); return cv != 0 && cv != -2;}
@@ -125,15 +129,20 @@ public:
 	unsigned int touint() const;
 
 	std::size_t size() const			{return (type() == string_)?m_data.dim.size:1;}
+
 	bool initialized() const			{return ((unsigned char)m_type&(unsigned char)Data::Initialized) == (unsigned char)Data::Initialized;}
 	void setInitialized( bool v=true)		{if (v) m_type = (Type)((unsigned int)m_type | (unsigned int)(Data::Initialized)); else m_type = (Type)((unsigned int)m_type & ~(unsigned int)(Data::Initialized));}
+
+	bool constant() const				{return ((unsigned char)m_type&(unsigned char)Data::Constant) == (unsigned char)Data::Constant;}
+	void setConstant( bool v=true)			{if (v) m_type = (Type)((unsigned int)m_type | (unsigned int)(Data::Constant)); else m_type = (Type)((unsigned int)m_type & ~(unsigned int)(Data::Constant));}
+
 	bool atomic() const				{return (int)type() <= (int)string_;}
 
 protected:
-	void setType( Type type_)			{m_type = (Type)((int)type_ | ((int)m_type&(int)Data::Initialized));}
+	void setType( Type type_)			{m_type = (Type)((int)type_ | ((int)m_type& ~(int)Data::FlagMask));}
 	void init();
 	void release();
-	void initstring( const char* str_, std::size_t strsize_);
+	void initString( const char* str_, std::size_t strsize_, bool constant_=false);
 	static void initCopy( Variant& dest, const Variant& orig);
 
 	///\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
@@ -153,6 +162,8 @@ struct NormalizeFunction
 	virtual const char* name() const=0;
 	virtual Variant execute( const Variant& i) const=0;
 };
+
+typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
 
 struct NormalizeFunctionMap
 {

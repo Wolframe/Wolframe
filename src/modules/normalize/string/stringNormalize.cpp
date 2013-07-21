@@ -44,7 +44,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-NormalizeFunction* _Wolframe::langbind::createStringNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createStringNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
 {
 	try
 	{

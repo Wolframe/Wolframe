@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file tests/testSimpleFormCompiler.cpp
 #include "utils/miscUtils.hpp"
-#include "ddl/atomicType.hpp"
-#include "ddl/structType.hpp"
+#include "types/variant.hpp"
+#include "ddl/form.hpp"
 #include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
 #include "modules/normalize/number/floatNormalizeFunction.hpp"

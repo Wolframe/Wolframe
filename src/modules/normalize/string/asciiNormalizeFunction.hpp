@@ -40,27 +40,27 @@
 namespace _Wolframe {
 namespace langbind {
 
-class ConvDiaNormalizeFunction :public NormalizeFunction
+class ConvDiaNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	ConvDiaNormalizeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "convdia";}
 };
 
-class UppercaseNameNormalizeFunction :public NormalizeFunction
+class UppercaseNameNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	UppercaseNameNormalizeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "ucname";}
 };
 
-class LowercaseNameNormalizeFunction :public NormalizeFunction
+class LowercaseNameNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	LowercaseNameNormalizeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "lcname";}
 };
 

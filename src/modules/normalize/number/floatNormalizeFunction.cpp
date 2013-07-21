@@ -36,8 +36,12 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-std::string FloatNormalizeFunction::execute( const std::string& str) const
+types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {
+	if (inp.type() == types::Variant::double_) return inp;
+	if (inp.type() != types::Variant::string_) return inp.todouble();
+	std::string str( inp.tostring());
+
 	std::string::const_iterator ii = str.begin(), ee = str.end();
 	std::size_t cntG = m_sizeG?m_sizeG:std::numeric_limits<std::size_t>::max();
 	std::size_t cntF = m_sizeF?m_sizeF:std::numeric_limits<std::size_t>::max();

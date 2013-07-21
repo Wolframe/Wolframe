@@ -67,66 +67,73 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 
 void VariantStruct::initCopy( VariantStruct& dest, const VariantStruct& orig)
 {
-	std::size_t ii, nn;
-	switch (orig.type())
+	if (orig.constant())
 	{
-		case VariantStruct::bool_:
-		case VariantStruct::double_:
-		case VariantStruct::int_:
-		case VariantStruct::uint_:
-		case VariantStruct::string_:
-			Variant::initCopy( dest, orig);
-			break;
+		std::memcpy( &dest, &orig, sizeof(dest));
+	}
+	else
+	{
+		std::size_t ii, nn;
+		switch (orig.type())
+		{
+			case VariantStruct::bool_:
+			case VariantStruct::double_:
+			case VariantStruct::int_:
+			case VariantStruct::uint_:
+			case VariantStruct::string_:
+				Variant::initCopy( dest, orig);
+				break;
 
-		case VariantStruct::struct_:
-			dest.init();
-			dest.setType( struct_);
-			dest.m_data.dim.metadata = orig.m_data.dim.metadata;
-			ii=0; nn=orig.description()->size();
-			dest.m_data.value.ref_ = std::malloc( nn * sizeof( dest));
-			if (!dest.m_data.value.ref_) throw std::bad_alloc();
-			try
-			{
-				for (; ii<nn; ++ii)
+			case VariantStruct::struct_:
+				dest.init();
+				dest.setType( struct_);
+				dest.m_data.dim.metadata = orig.m_data.dim.metadata;
+				ii=0; nn=orig.description()->size();
+				dest.m_data.value.ref_ = std::malloc( nn * sizeof( dest));
+				if (!dest.m_data.value.ref_) throw std::bad_alloc();
+				try
 				{
-					VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					for (; ii<nn; ++ii)
+					{
+						VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					}
 				}
-			}
-			catch (const std::bad_alloc& e)
-			{
-				for (; ii>0; --ii) ((VariantStruct*)dest.m_data.value.ref_)[ ii-1].release();
-				std::free( dest.m_data.value.ref_);
-				throw e;
-			}
-			break;
-
-		case VariantStruct::array_:
-			dest.init();
-			dest.setType( array_);
-			dest.m_data.dim.size = orig.m_data.dim.size;
-			dest.m_data.value.ref_ = std::malloc( (orig.m_data.dim.size+1) * sizeof( VariantStruct));
-			if (!dest.m_data.value.ref_) throw std::bad_alloc();
-			ii=0; nn=orig.data().dim.size+1;
-			try
-			{
-				for (; ii<nn; ++ii)
+				catch (const std::bad_alloc& e)
 				{
-					VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					for (; ii>0; --ii) ((VariantStruct*)dest.m_data.value.ref_)[ ii-1].release();
+					std::free( dest.m_data.value.ref_);
+					throw e;
 				}
-			}
-			catch (const std::bad_alloc& e)
-			{
-				for (; ii>0; --ii) ((VariantStruct*)dest.m_data.value.ref_)[ ii-1].release();
-				std::free( dest.m_data.value.ref_);
-				throw e;
-			}
-			break;
+				break;
 
-		case VariantStruct::indirection_:
-			dest.init();
-			dest.setType( indirection_);
-			dest.m_data.dim.metadata = orig.m_data.dim.metadata;
-			break;
+			case VariantStruct::array_:
+				dest.init();
+				dest.setType( array_);
+				dest.m_data.dim.size = orig.m_data.dim.size;
+				dest.m_data.value.ref_ = std::malloc( (orig.m_data.dim.size+1) * sizeof( VariantStruct));
+				if (!dest.m_data.value.ref_) throw std::bad_alloc();
+				ii=0; nn=orig.data().dim.size+1;
+				try
+				{
+					for (; ii<nn; ++ii)
+					{
+						VariantStruct::initCopy( ((VariantStruct*)dest.m_data.value.ref_)[ ii], ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
+					}
+				}
+				catch (const std::bad_alloc& e)
+				{
+					for (; ii>0; --ii) ((VariantStruct*)dest.m_data.value.ref_)[ ii-1].release();
+					std::free( dest.m_data.value.ref_);
+					throw e;
+				}
+				break;
+
+			case VariantStruct::indirection_:
+				dest.init();
+				dest.setType( indirection_);
+				dest.m_data.dim.metadata = orig.m_data.dim.metadata;
+				break;
+		}
 	}
 }
 
@@ -159,6 +166,7 @@ VariantStruct& VariantStruct::back()
 
 void VariantStruct::release()
 {
+	if (constant()) return;
 	std::size_t ii, nn;
 	switch ((Type)type())
 	{
@@ -278,6 +286,22 @@ VariantStruct* VariantStruct::at( std::size_t idx)
 	{
 		return 0;
 	}
+}
+
+const VariantStruct* VariantStruct::select( const std::string& name) const
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return 0;
+	int fi = descr->findidx( name);
+	return (fi < 0)?0:at(fi);
+}
+
+VariantStruct* VariantStruct::select( const std::string& name)
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return 0;
+	int fi = descr->findidx( name);
+	return (fi < 0)?0:at(fi);
 }
 
 const VariantStruct& VariantStruct::operator[]( std::size_t idx) const

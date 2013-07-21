@@ -133,16 +133,38 @@ private:
 	langbind::BuiltInFunction m_impl;
 };
 
+class NormalizeFunctionMap
+	:public types::NormalizeFunctionMap
+{
+public:
+	virtual ~NormalizeFunctionMap(){}
+	virtual const types::NormalizeFunction* get( const std::string& name) const
+	{
+		types::keymap<types::NormalizeFunctionR>::const_iterator fi = m_impl.find( name);
+		if (fi == m_impl.end()) return 0;
+		return fi->second.get();
+	}
+	void define( const std::string& name, types::NormalizeFunctionR f)
+	{
+		if (m_impl.find( name) != m_impl.end())
+		{
+			LOG_ERROR << std::string("duplicate definition of normalize function '") + name + "'";
+			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
+		}
+		m_impl.insert( name, f);
+	}
+private:
+	types::keymap<types::NormalizeFunctionR> m_impl;
+};
 
 class ProgramLibrary::Impl
-	:public ddl::TypeMap
 {
 public:
 	types::keymap<module::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
-	types::keymap<langbind::NormalizeFunctionR> m_normalizeFunctionMap;
+	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<module::FilterConstructorR> m_filterMap;
-	types::keymap<ddl::Form> m_formMap;
+	types::keymap<ddl::FormDescriptionR> m_formMap;
 	std::vector<ProgramR> m_programTypes;
 
 	Impl()
@@ -174,17 +196,12 @@ public:
 		m_formFunctionMap.insert( name, f);
 	}
 
-	void defineNormalizeFunction( const std::string& name, langbind::NormalizeFunctionR f)
+	void defineNormalizeFunction( const std::string& name, types::NormalizeFunctionR f)
 	{
-		if (m_normalizeFunctionMap.find( name) != m_normalizeFunctionMap.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of normalize function '") + name + "'";
-			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
-		}
-		m_normalizeFunctionMap.insert( name, f);
+		m_normalizeFunctionMap.define( name, f);
 	}
 
-	void defineForm( const std::string& name, const ddl::Form& f)
+	void defineForm( const std::string& name, const ddl::FormDescriptionR& f)
 	{
 		if (m_formMap.find( name) != m_formMap.end())
 		{
@@ -234,11 +251,11 @@ public:
 		}
 	}
 
-	const ddl::Form* getForm( const std::string& name) const
+	const ddl::FormDescription* getFormDescription( const std::string& name) const
 	{
-		types::keymap<ddl::Form>::const_iterator fi = m_formMap.find( name);
+		types::keymap<ddl::FormDescriptionR>::const_iterator fi = m_formMap.find( name);
 		if (fi == m_formMap.end()) return 0;
-		return &fi->second;
+		return fi->second.get();
 	}
 
 	std::vector<std::string> getFormNames() const
@@ -255,16 +272,14 @@ public:
 		return fi->second.get();
 	}
 
-	const langbind::NormalizeFunction* getNormalizeFunction( const std::string& name) const
+	const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const
 	{
-		types::keymap<langbind::NormalizeFunctionR>::const_iterator fi = m_normalizeFunctionMap.find( name);
-		if (fi == m_normalizeFunctionMap.end()) return 0;
-		return fi->second.get();
+		return m_normalizeFunctionMap.get( name);
 	}
 
-	const ddl::NormalizeFunction* getType( const std::string& name) const
+	const types::NormalizeFunctionMap* formtypemap() const
 	{
-		return getNormalizeFunction( name);
+		return &m_normalizeFunctionMap;
 	}
 
 	langbind::Filter* createFilter( const std::string& name, const std::string& arg) const
@@ -345,12 +360,12 @@ void ProgramLibrary::defineNormalizeFunctionConstructor( const module::Normalize
 	m_impl->defineNormalizeFunctionConstructor( f);
 }
 
-void ProgramLibrary::defineNormalizeFunction( const std::string& name, const langbind::NormalizeFunctionR& f) const
+void ProgramLibrary::defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const
 {
 	m_impl->defineNormalizeFunction( name, f);
 }
 
-void ProgramLibrary::defineForm( const std::string& name, const ddl::Form& f)
+void ProgramLibrary::defineForm( const std::string& name, const ddl::FormDescriptionR& f)
 {
 	m_impl->defineForm( name, f);
 }
@@ -375,9 +390,9 @@ void ProgramLibrary::defineProgramType( const ProgramR& prg)
 	m_impl->defineProgramType( prg);
 }
 
-const ddl::TypeMap* ProgramLibrary::formtypemap() const
+const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 {
-	return m_impl;
+	return m_impl->formtypemap();
 }
 
 const types::keymap<module::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
@@ -390,9 +405,9 @@ const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string
 	return m_impl->getFormFunction( name);
 }
 
-const ddl::Form* ProgramLibrary::getForm( const std::string& name) const
+const ddl::FormDescription* ProgramLibrary::getFormDescription( const std::string& name) const
 {
-	return m_impl->getForm( name);
+	return m_impl->getFormDescription( name);
 }
 
 std::vector<std::string> ProgramLibrary::getFormNames() const
@@ -400,7 +415,7 @@ std::vector<std::string> ProgramLibrary::getFormNames() const
 	return m_impl->getFormNames();
 }
 
-const langbind::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
 {
 	return m_impl->getNormalizeFunction( name);
 }

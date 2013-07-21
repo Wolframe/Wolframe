@@ -22,9 +22,6 @@ LIBRARIES = \
 	wolframe_serialize.lib
 
 CPP_OBJS = \
-	ddl_atomicType.obj \
-	ddl_structType.obj \
-	ddl_structTypeBuild.obj \
 	ddl_filtermapParse.obj \
 	ddl_filtermapSerialize.obj \
 	mapContext.obj \

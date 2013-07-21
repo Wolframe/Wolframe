@@ -36,8 +36,14 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-std::string IntegerNormalizeFunction::execute( const std::string& str) const
+types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) const
 {
+	if (inp.type() == types::Variant::int_) return inp;
+	if (inp.type() == types::Variant::uint_) return inp;
+	if (inp.type() == types::Variant::bool_) return inp.toint();
+	if (inp.type() == types::Variant::double_) return inp.toint();
+	std::string str( inp.tostring());
+
 	if (!m_size) return str;
 	std::string::const_iterator ii = str.begin(), ee = str.end();
 	std::size_t cnt = m_size;
