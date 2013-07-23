@@ -870,9 +870,9 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 
 		const char* name = lua_tostring( ls, 1);
 		const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-		const ddl::Form* st = ctx->form( name);
+		const ddl::FormDescription* st = ctx->formDescription( name);
 		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
-		ddl::FormR frm( new ddl::Form( *st));
+		ddl::FormR frm( new ddl::Form( st));
 		LuaObject<ddl::FormR>::push_luastack( ls, frm);
 		return 1;
 	}
@@ -1587,11 +1587,11 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		{
 			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
 			const char* doctype_form = lua_tostring( ls, ii);
-			const ddl::Form* form = gtc->form( doctype_form);
-			if (!form) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
-			const char* doctype_root = form->description()->xmlRoot();
+			const ddl::FormDescription* formdescr = gtc->formDescription( doctype_form);
+			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
+			const char* doctype_root = formdescr->xmlRoot();
 			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
-			doctype = gtc->xmlDoctypeString( form->description()->name(), form->description()->ddlname(), doctype_root);
+			doctype = gtc->xmlDoctypeString( formdescr->name(), formdescr->ddlname(), doctype_root);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
@@ -1631,11 +1631,11 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			}
 			else if (doctype_form)
 			{
-				const ddl::Form* form = gtc->form( doctype_form);
-				if (!form) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
-				doctype_root = form->description()->xmlRoot();
+				const ddl::FormDescription* formdescr = gtc->formDescription( doctype_form);
+				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
+				doctype_root = formdescr->xmlRoot();
 				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
-				doctype = gtc->xmlDoctypeString( form->description()->name(), form->description()->ddlname(), doctype_root);
+				doctype = gtc->xmlDoctypeString( formdescr->name(), formdescr->ddlname(), doctype_root);
 			}
 			else
 			{
@@ -1784,9 +1784,9 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			{
 				std::string doctypeid( types::getIdFromDoctype( doctype));
 				const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
-				const ddl::Form* st = gtc->form( doctypeid);
+				const ddl::FormDescription* st = gtc->formDescription( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
-				ddl::FormR form( new ddl::Form( *st));
+				ddl::FormR form( new ddl::Form( st));
 
 				DDLFormParser* closure;
 				serialize::Context::Flags flags = serialize::Context::ValidateAttributes;

@@ -1,8 +1,9 @@
 #include "types/variantStructDescription.hpp"
 #include "types/variantStruct.hpp"
+#include "types/malloc.hpp"
+#include <cstdlib>
 #include <limits>
 #include <stdexcept>
-#include <cstdlib>
 #include <sstream>
 #include <stdint.h>	//... for uintptr_t
 
@@ -12,8 +13,8 @@ using namespace _Wolframe::types;
 void VariantStructDescription::Element::makeArray()
 {
 	if (array()) throw std::logic_error( "illegal operation (make array called on array)");
+	initvalue->makeArray();
 	flags |= (unsigned char)Array;
-	*initvalue = initvalue->array();
 }
 
 void VariantStructDescription::Element::copy( const Element& o)
@@ -21,7 +22,7 @@ void VariantStructDescription::Element::copy( const Element& o)
 	Element elem;
 	std::memset( &elem, 0, sizeof( elem));
 	std::size_t nn = std::strlen( o.name);
-	if (o.name) elem.name = (char*)std::malloc( nn + 1);
+	if (o.name) elem.name = (char*)wolframe_malloc( nn + 1);
 	if (!elem.name) throw std::bad_alloc();
 	std::memcpy( elem.name, o.name, nn);
 	elem.name[ nn] = 0;
@@ -31,7 +32,12 @@ void VariantStructDescription::Element::copy( const Element& o)
 	}
 	catch (const std::bad_alloc& e)
 	{
-		if (elem.name) free( elem.name);
+		if (elem.name) wolframe_free( elem.name);
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (elem.name) wolframe_free( elem.name);
 		throw e;
 	}
 	if (o.substruct) try
@@ -41,15 +47,21 @@ void VariantStructDescription::Element::copy( const Element& o)
 	catch (const std::bad_alloc& e)
 	{
 		if (elem.initvalue) delete elem.initvalue;
-		if (elem.name) free( elem.name);
+		if (elem.name) wolframe_free( elem.name);
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (elem.initvalue) delete elem.initvalue;
+		if (elem.name) wolframe_free( elem.name);
 		throw e;
 	}
 	elem.normalizer = o.normalizer;
 	elem.flags = o.flags;
 
-	if (substruct) delete substruct;
 	if (initvalue) delete initvalue;
-	if (name) delete name;
+	if (substruct) delete substruct;
+	if (name) wolframe_free( name);
 	std::memcpy( this, &elem, sizeof( elem));
 }
 
@@ -64,35 +76,68 @@ VariantStructDescription::VariantStructDescription()
 VariantStructDescription::VariantStructDescription( const VariantStructDescription& o)
 	:m_size(o.m_size),m_nofattributes(o.m_nofattributes),m_ar(0)
 {
+	const char* errmsg = 0;
 	std::size_t ii=0;
-	m_ar = (Element*)std::calloc( m_size, sizeof(Element));
+	m_ar = (Element*)wolframe_calloc( m_size, sizeof(Element));
 	if (!m_ar) goto BAD_ALLOC;
 	for (; ii<m_size; ++ii)
 	{
-		m_ar[ ii].name = (char*)std::malloc( std::strlen( o.m_ar[ ii].name)+1);
-		if (!m_ar[ ii].name) goto BAD_ALLOC;
-		std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
-		try
+		if (o.m_ar[ ii].name)
 		{
-			m_ar[ ii].initvalue = new VariantStruct( *o.m_ar[ ii].initvalue);
+			m_ar[ ii].name = (char*)wolframe_malloc( std::strlen( o.m_ar[ ii].name)+1);
+			if (!m_ar[ ii].name) goto BAD_ALLOC;
+			std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
+		}
+		if (o.m_ar[ ii].substruct) try
+		{
+			m_ar[ ii].substruct = new VariantStructDescription( *o.m_ar[ ii].substruct);
 		}
 		catch (const std::bad_alloc&)
 		{
 			goto BAD_ALLOC;
 		}
+		catch (const std::runtime_error& e)
+		{
+			errmsg = e.what();
+			goto BAD_ALLOC;
+		}
+		if (o.m_ar[ ii].initvalue) try
+		{
+			m_ar[ ii].initvalue = new VariantStruct( *o.m_ar[ ii].initvalue);
+			m_ar[ ii].initvalue->setDescription( m_ar[ ii].substruct);
+		}
+		catch (const std::bad_alloc&)
+		{
+			goto BAD_ALLOC;
+		}
+		catch (const std::runtime_error& e)
+		{
+			errmsg = e.what();
+			goto BAD_ALLOC;
+		}
 		m_ar[ ii].normalizer = o.m_ar[ ii].normalizer;
+		m_ar[ ii].flags = o.m_ar[ ii].flags;
 	}
+	return;
 	BAD_ALLOC:
 		if (m_ar)
 		{
 			for (; ii>0; --ii)
 			{
-				if (m_ar[ ii-1].name) std::free( m_ar[ ii-1].name);
 				if (m_ar[ ii-1].initvalue) delete m_ar[ ii-1].initvalue;
+				if (m_ar[ ii-1].substruct) delete m_ar[ ii-1].substruct;
+				if (m_ar[ ii-1].name) wolframe_free( m_ar[ ii-1].name);
 			}
-			std::free( m_ar);
+			wolframe_free( m_ar);
 		}
-		throw std::bad_alloc();
+		if (errmsg)
+		{
+			throw std::runtime_error( errmsg);
+		}
+		else
+		{
+			throw std::bad_alloc();
+		}
 }
 
 VariantStructDescription::~VariantStructDescription()
@@ -101,24 +146,24 @@ VariantStructDescription::~VariantStructDescription()
 	for (ii=0; ii<m_size; ++ii)
 	{
 		Element* ee = m_ar+ii;
-		if (ee->substruct) delete ee->substruct;
 		if (ee->initvalue) delete ee->initvalue;
-		if (ee->name) delete ee->name;
+		if (ee->substruct) delete ee->substruct;
+		if (ee->name) wolframe_free( ee->name);
 	}
-	if (m_ar) std::free( m_ar);
+	if (m_ar) wolframe_free( m_ar);
 }
 
 int VariantStructDescription::addAtom( const std::string& name_, const Variant& initvalue, const NormalizeFunction* normalizer_)
 {
-	if (findidx( name_) < 0) throw std::runtime_error( std::string("tried to add duplicate element '") + name_ + "' to structure description");
+	if (findidx( name_) >= 0) throw std::runtime_error( std::string("try to add duplicate element '") + name_ + "' to structure description");
 
 	if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
 	{
-		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 	}
-	m_ar[m_size].name = (char*)std::malloc( name_.size() +1);
+	m_ar[m_size].name = (char*)wolframe_malloc( name_.size() +1);
 	if (!m_ar[m_size].name) throw std::bad_alloc();
 	std::memcpy( m_ar[ m_size].name, name_.c_str(), name_.size());
 	m_ar[ m_size].name[ name_.size()] = 0;
@@ -128,26 +173,33 @@ int VariantStructDescription::addAtom( const std::string& name_, const Variant& 
 	}
 	catch (const std::bad_alloc& e)
 	{
-		free( m_ar[ m_size].name);
+		wolframe_free( m_ar[ m_size].name);
+		m_ar[ m_size].name = 0;
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		wolframe_free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
 	m_ar[ m_size].normalizer = normalizer_;
 	m_ar[ m_size].substruct = 0;
+	m_ar[ m_size].flags = 0;
 	return m_size++;
 }
 
 int VariantStructDescription::addStructure( const std::string& name_, const VariantStructDescription& substruct_)
 {
-	if (findidx( name_) < 0) throw std::runtime_error( std::string("tried to add duplicate element '") + name_ + "' to structure description");
+	if (findidx( name_) >= 0) throw std::runtime_error( std::string("try to add duplicate element '") + name_ + "' to structure description");
 
 	if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
 	{
-		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 	}
-	m_ar[m_size].name = (char*)std::malloc( name_.size() +1);
+	m_ar[m_size].name = (char*)wolframe_malloc( name_.size() +1);
 	if (!m_ar[m_size].name) throw std::bad_alloc();
 	std::memcpy( m_ar[ m_size].name, name_.c_str(), name_.size());
 	m_ar[ m_size].name[ name_.size()] = 0;
@@ -157,7 +209,13 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	}
 	catch (const std::bad_alloc& e)
 	{
-		free( m_ar[ m_size].name);
+		wolframe_free( m_ar[ m_size].name);
+		m_ar[ m_size].name = 0;
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		wolframe_free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
@@ -168,11 +226,19 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	catch (const std::bad_alloc& e)
 	{
 		delete m_ar[m_size].substruct;
-		free( m_ar[ m_size].name);
+		wolframe_free( m_ar[ m_size].name);
+		m_ar[ m_size].name = 0;
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		delete m_ar[m_size].substruct;
+		wolframe_free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
 	m_ar[ m_size].normalizer = 0;
+	m_ar[ m_size].flags = 0;
 	return m_size++;
 }
 
@@ -184,7 +250,7 @@ int VariantStructDescription::addIndirection( const std::string& name_, const Va
 int VariantStructDescription::addElement( const Element& elem)
 {
 	if (!elem.name) throw std::runtime_error( "try to add element without name in structure description");
-	if (findidx( elem.name) < 0) throw std::runtime_error( std::string("tried to add duplicate element '") + elem.name + "' to structure description");
+	if (findidx( elem.name) >= 0) throw std::runtime_error( std::string("try to add duplicate element '") + elem.name + "' to structure description");
 
 	if (elem.attribute())
 	{
@@ -194,7 +260,7 @@ int VariantStructDescription::addElement( const Element& elem)
 	else
 	{
 		if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
-		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 		std::memset( m_ar + m_size, 0, sizeof( *m_ar));
@@ -214,7 +280,7 @@ int VariantStructDescription::addAttribute( const std::string& name_, const Vari
 		Element attr;
 		std::memcpy( &attr, &m_ar[ m_size-1], sizeof( attr));			//... store attribute in 'attr'
 		std::size_t mm = (m_size-m_nofattributes) * sizeof(attr);		//... calculate memory to move in the shift operation
-		std::memmove( &m_ar[ m_nofattributes-1], &m_ar[ m_nofattributes], mm);	//... shift elements up one position to get the slot to swap 'attr' with
+		std::memmove( &m_ar[ m_nofattributes], &m_ar[ m_nofattributes-1], mm);	//... shift elements up one position to get the slot to swap 'attr' with
 		std::memcpy( &m_ar[ m_nofattributes-1], &attr, sizeof( attr));		//... move 'attr' to the free slot
 	}
 	return rt;
@@ -236,21 +302,19 @@ int VariantStructDescription::findidx( const std::string& name_) const
 VariantStructDescription::const_iterator VariantStructDescription::find( const std::string& name_) const
 {
 	int findidx_ = findidx( name_);
-	if (findidx_ < 0) return VariantStructDescription::const_iterator();
+	if (findidx_ < 0) return VariantStructDescription::end();
 	return VariantStructDescription::const_iterator( m_ar+findidx_);
 }
 
 VariantStructDescription::iterator VariantStructDescription::find( const std::string& name_)
 {
 	int findidx_ = findidx( name_);
-	if (findidx_ < 0) return VariantStructDescription::iterator();
+	if (findidx_ < 0) return VariantStructDescription::end();
 	return VariantStructDescription::iterator( m_ar+findidx_);
 }
 
 int VariantStructDescription::const_iterator::compare( const const_iterator& o) const
 {
-	if (!o.m_itr) return m_itr?-1:0;
-	if (!m_itr) return o.m_itr?+1:0;
 	if (m_itr > o.m_itr) return +1;
 	if (m_itr < o.m_itr) return -1;
 	return 0;
@@ -258,8 +322,6 @@ int VariantStructDescription::const_iterator::compare( const const_iterator& o) 
 
 int VariantStructDescription::iterator::compare( const iterator& o) const
 {
-	if (!o.m_itr) return m_itr?-1:0;
-	if (!m_itr) return o.m_itr?+1:0;
 	if (m_itr > o.m_itr) return +1;
 	if (m_itr < o.m_itr) return -1;
 	return 0;
@@ -307,6 +369,71 @@ std::string VariantStructDescription::names( const std::string& sep) const
 	return rt;
 }
 
+void VariantStructDescription::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
+{
+	static Variant default_bool( Variant::bool_);
+	static Variant default_int( Variant::int_);
+	static Variant default_uint( Variant::uint_);
+	static Variant default_double( Variant::double_);
+	static Variant default_string( Variant::string_);
 
+	const_iterator di = begin(), de = end();
+	for (; di!=de; ++di)
+	{
+		out << newitem;
+		for (std::size_t ll=0; ll<level; ++ll) out << indent;
+
+		if (di->substruct)
+		{
+			out << di->name;
+			if (di->array()) out << "[]";
+			out << " ";
+			if (di->optional()) out << "?";
+			if (di->mandatory()) out << "!";
+			out << "{";
+			di->substruct->print( out, indent, newitem, level+1);
+			out << newitem;
+			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			out << "}";
+		}
+		else if (di->initvalue)
+		{
+			out << di->name;
+			if (di->array()) out << "[]";
+			out << " ";
+			if (di->optional()) out << "?";
+			if (di->mandatory()) out << "!";
+			if (di->attribute()) out << "@";
+			out << Variant::typeName( (Variant::Type)(di->initvalue->type()));
+			int cmp = 0;
+			if (di->initvalue->atomic())
+			{
+				Variant::Type tp = (Variant::Type)di->initvalue->type();
+				switch (tp)
+				{
+					case Variant::bool_: cmp = di->initvalue->compare( default_bool); break;
+					case Variant::int_: cmp = di->initvalue->compare( default_int); break;
+					case Variant::uint_: cmp = di->initvalue->compare( default_uint); break;
+					case Variant::double_: cmp = di->initvalue->compare( default_double); break;
+					case Variant::string_: cmp = di->initvalue->compare( default_string); break;
+				}
+				if (cmp != 0)
+				{
+					out << " (" << di->initvalue->tostring() << ")";
+				}
+			}
+		}
+		out << ';';
+	}
+}
+
+std::string VariantStructDescription::tostring() const
+{
+	std::stringstream out;
+	out << "{";
+	print( out, "\t", "\n", 0);
+	out << "}";
+	return out.str();
+}
 
 

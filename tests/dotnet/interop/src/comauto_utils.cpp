@@ -588,7 +588,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, con
 
 			for (ii=0,nn=ar.size(); ii<nn; ++ii)
 			{
-				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+				if (vt != ar[ii].vt) throw std::logic_error( "internal: try to create mixed type array");
 				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<void*>(comauto::arithmeticTypeAddress( &ar[ii]))))
 			}
 			rt.vt = VT_ARRAY | vt;
@@ -604,7 +604,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, con
 				case VT_LPSTR:
 					for (ii=0,nn=ar.size(); ii<nn; ++ii)
 					{
-						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: try to create mixed type array");
 						LPSTR* bs = &V_LPSTR( const_cast<VARIANT*>(&ar[ii]));
 						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
 					}
@@ -612,7 +612,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, con
 				case VT_LPWSTR:
 					for (ii=0,nn=ar.size(); ii<nn; ++ii)
 					{
-						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: try to create mixed type array");
 						LPWSTR* bs = &V_LPWSTR( const_cast<VARIANT*>(&ar[ii]));
 						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
 					}
@@ -620,7 +620,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, con
 				case VT_BSTR:
 					for (ii=0,nn=ar.size(); ii<nn; ++ii)
 					{
-						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: try to create mixed type array");
 						BSTR bs = V_BSTR( const_cast<VARIANT*>(&ar[ii]));
 						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
 					}
@@ -638,7 +638,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, con
 
 			for (ii=0,nn=ar.size(); ii<nn; ++ii)
 			{
-				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+				if (vt != ar[ii].vt) throw std::logic_error( "internal: try to create mixed type array");
 				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<void*>(ar[ii].pvRecord)))
 			}
 			rt.vt = VT_ARRAY | VT_RECORD;

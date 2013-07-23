@@ -415,7 +415,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 				{
 					throw std::runtime_error( "Syntax error: Form declared as attribute");
 				}
-				types::VariantStructDescriptionR substruct;
+				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
 				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
 
 				result.addStructure( first, *substruct);
@@ -439,7 +439,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			}
 			else
 			{
-				types::VariantStructDescriptionR substruct;
+				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
 				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
 				result.addStructure( first, *substruct);
 			}

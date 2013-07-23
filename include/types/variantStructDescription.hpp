@@ -68,16 +68,16 @@ public:
 			Attribute=0x4,		//< element is an attribute
 			Array=0x8		//< element is an array
 		};
-		char flags;
+		unsigned char flags;
 
 		bool optional() const						{return (flags & (unsigned char)Optional) != 0;}
 		bool mandatory() const						{return (flags & (unsigned char)Mandatory) != 0;}
 		bool attribute() const						{return (flags & (unsigned char)Attribute) != 0;}
 		bool array() const						{return (flags & (unsigned char)Array) != 0;}
 
-		void setOptional( bool v=true)					{if (v) flags |= (unsigned char)Optional; else flags &= ~(unsigned char)Optional;}
-		void setMandatory( bool v=true)					{if (v) flags |= (unsigned char)Mandatory; else flags &= ~(unsigned char)Mandatory;}
-		void setAttribute( bool v=true)					{if (v) flags |= (unsigned char)Attribute; else flags &= ~(unsigned char)Attribute;}
+		void setOptional( bool v=true)					{if (v) flags |= (unsigned char)Optional;  else flags -= (flags & (unsigned char)Optional);}
+		void setMandatory( bool v=true)					{if (v) flags |= (unsigned char)Mandatory; else flags -= (flags & (unsigned char)Mandatory);}
+		void setAttribute( bool v=true)					{if (v) flags |= (unsigned char)Attribute; else flags -= (flags & (unsigned char)Attribute);}
 
 		Variant::Type type();
 		void makeArray();
@@ -87,7 +87,7 @@ public:
 	class const_iterator
 	{
 	public:
-		const_iterator( Element const* itr_=0)				:m_itr(itr_){}
+		const_iterator( Element const* itr_)				:m_itr(itr_){}
 		const_iterator( const const_iterator& o)			:m_itr(o.m_itr){}
 
 		int compare( const const_iterator& o) const;
@@ -115,7 +115,7 @@ public:
 	class iterator
 	{
 	public:
-		iterator( Element* itr_=0)					:m_itr(itr_){}
+		iterator( Element* itr_)					:m_itr(itr_){}
 		iterator( const iterator& o)					:m_itr(o.m_itr){}
 
 		int compare( const iterator& o) const;
@@ -147,10 +147,10 @@ public:
 	const Element& back() const						{if (m_size==0) throw std::logic_error("array bound read"); return m_ar[ m_size-1];}
 	Element& back()								{if (m_size==0) throw std::logic_error("array bound write"); return m_ar[ m_size-1];}
 
-	const_iterator begin() const						{return at(0);}
-	const_iterator end() const						{return const_iterator();}
-	iterator begin()							{return at(0);}
-	iterator end()								{return iterator();}
+	const_iterator begin() const						{return beginptr();}
+	const_iterator end() const						{return endptr();}
+	iterator begin()							{return beginptr();}
+	iterator end()								{return endptr();}
 
 	int addAttribute( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer);
 	int addAtom( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer);
@@ -167,6 +167,15 @@ public:
 
 	int compare( const VariantStructDescription& o) const;
 	std::string names( const std::string& sep) const;
+
+	void print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const;
+	std::string tostring() const;
+
+private:
+	const Element* beginptr() const						{return m_ar;}
+	Element* beginptr()							{return m_ar;}
+	const Element* endptr() const						{return m_ar+m_size;}
+	Element* endptr()							{return m_ar+m_size;}
 
 private:
 	std::size_t m_size;

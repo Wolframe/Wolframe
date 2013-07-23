@@ -51,11 +51,16 @@ public:
 	///\brief Type of the variant
 	enum Type
 	{
-		double_,				//< C++ double
 		int_,					//< C++ int
 		uint_,					//< C++ unsigned int
 		bool_,					//< C++ bool
+		double_,				//< C++ double
 		string_					//< null terminated UTF-8 string
+	};
+	enum Flags
+	{
+		Initialized	=0x1,
+		Constant	=0x2
 	};
 
 	///\brief Get the name of a type as string
@@ -81,21 +86,21 @@ public:
 			char* string_;
 			void* ref_;
 		} value;
-		enum {Initialized=0x80,Constant=0x40,FlagMask=0x3f};
 	};
-	Variant()					{init(); m_type = bool_;}
-	Variant( bool o)				{init(); m_type = bool_; m_data.value.bool_ = o; setInitialized();}
-	Variant( double o)				{init(); m_type = double_; m_data.value.double_ = o; setInitialized();}
-	Variant( float o)				{init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized();}
-	Variant( int o)					{init(); m_type = int_; m_data.value.int_ = o; setInitialized();}
-	Variant( unsigned int o)			{init(); m_type = uint_; m_data.value.uint_ = o; setInitialized();}
+	Variant( Type type_)				{init(type_);}
+	Variant()					{init();}
+	Variant( bool o)				{init(bool_); m_data.value.bool_ = o; setInitialized();}
+	Variant( double o)				{init(double_); m_data.value.double_ = o; setInitialized();}
+	Variant( float o)				{init(double_); m_data.value.double_ = (double)o; setInitialized();}
+	Variant( int o)					{init(int_); m_data.value.int_ = o; setInitialized();}
+	Variant( unsigned int o)			{init(uint_); m_data.value.uint_ = o; setInitialized();}
 	Variant( const char* o)				{initString( o, std::strlen(o)); setInitialized();}
 	Variant( const char* o, std::size_t n)		{initString( o, n); setInitialized();}
 	Variant( const std::string& o)			{initString( o.c_str(), o.size()); setInitialized();}
-	Variant( const Variant& o)			{initCopy( *this, o);}
+	Variant( const Variant& o)			{initCopy( o);}
 	~Variant()					{release();}
 
-	Variant& operator=( const Variant& o)		{release(); initCopy( *this, o); return *this;}
+	Variant& operator=( const Variant& o)		{release(); initCopy( o); return *this;}
 	Variant& operator=( bool o)			{release(); init(); m_type = bool_; m_data.value.bool_ = o; setInitialized(); return *this;}
 	Variant& operator=( double o)			{release(); init(); m_type = double_; m_data.value.double_ = o; setInitialized(); return *this;}
 	Variant& operator=( float o)			{release(); init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized(); return *this;}
@@ -115,7 +120,7 @@ public:
 	bool operator<=( const Variant& o) const	{int cv = compare( o); return cv <= 0 && cv != -2;}
 	bool operator<( const Variant& o) const		{int cv = compare( o); return cv == -1;}
 
-	Type type() const				{return (Type)((unsigned char)m_type&(unsigned char)Data::FlagMask);}
+	Type type() const				{return (Type)m_type;}
 	const Data& data() const			{return m_data;}
 
 	char* charptr() const				{if (type() != string_) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.string_;}
@@ -130,29 +135,32 @@ public:
 
 	std::size_t size() const			{return (type() == string_)?m_data.dim.size:1;}
 
-	bool initialized() const			{return ((unsigned char)m_type&(unsigned char)Data::Initialized) == (unsigned char)Data::Initialized;}
-	void setInitialized( bool v=true)		{if (v) m_type = (Type)((unsigned int)m_type | (unsigned int)(Data::Initialized)); else m_type = (Type)((unsigned int)m_type & ~(unsigned int)(Data::Initialized));}
+	bool initialized() const			{return flags( Initialized);}
+	void setInitialized( bool v=true)		{setFlags( Initialized, v);}
 
-	bool constant() const				{return ((unsigned char)m_type&(unsigned char)Data::Constant) == (unsigned char)Data::Constant;}
-	void setConstant( bool v=true)			{if (v) m_type = (Type)((unsigned int)m_type | (unsigned int)(Data::Constant)); else m_type = (Type)((unsigned int)m_type & ~(unsigned int)(Data::Constant));}
+	bool constant() const				{return flags( Constant);}
+	void setConstant( bool v=true)			{setFlags( Constant, v);}
 
-	bool atomic() const				{return (int)type() <= (int)string_;}
+	bool atomic() const				{return m_type <= (unsigned char)string_;}
 
 protected:
-	void setType( Type type_)			{m_type = (Type)((int)type_ | ((int)m_type& ~(int)Data::FlagMask));}
+	bool flags( Flags flags_) const			{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
+	void setFlags( Flags flags_, bool v=true)	{if (v) m_flags = (Flags)((unsigned char)m_flags | (unsigned char)flags_); else m_flags = (Flags)((unsigned char)m_flags - ((unsigned char)m_flags & (unsigned char)flags_));}
+
+	void init( Type type_);
 	void init();
 	void release();
 	void initString( const char* str_, std::size_t strsize_, bool constant_=false);
-	static void initCopy( Variant& dest, const Variant& orig);
+	void initCopy( const Variant& o);
 
 	///\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
 	///\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable
 	int compare( const Variant& o) const;
 
-private:
-	Type m_type;
 protected:
 	Data m_data;
+	unsigned char m_type;
+	unsigned char m_flags;
 };
 
 

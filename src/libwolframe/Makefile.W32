@@ -58,6 +58,7 @@ CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(ADT_OBJS) \
+	malloc.obj \
 	version.obj \
 	getPassword.obj \
 	user.obj \
@@ -71,8 +72,6 @@ CPP_OBJS = \
 	HMAC.obj \
 	PBKDF2.obj \
 	CRAM.obj
-
-# DISABLED (only for testing): 	malloc.obj \
 
 OBJS = \
 	b64encode.obj \

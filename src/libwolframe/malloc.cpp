@@ -34,9 +34,14 @@
 ///\file malloc.cpp
 #include "types/malloc.hpp"
 #ifndef _WIN32
+#include <stdexcept>
+#include <cstdlib>
+#include <cstring>
 #include <features.h>
-#include <string.h>
 #endif
+
+#undef WOLFRAME_DEBUG_MALLOC
+#ifdef WOLFRAME_DEBUG_MALLOC
 #ifdef __GLIBC__
 #include <glib.h>
 
@@ -51,8 +56,23 @@ void init_wolframe_malloc()
 	memvtable.realloc = &wolframe_realloc;
 	g_mem_set_vtable( &memvtable);
 }
+#define W_MALLOC_N(N,E) g_malloc_n(N,E)
+#define W_FREE(P) g_free(P)
 #else
-#error Alternative malloc not supported on this platform (only with gcc/glibc)
+void init_wolframe_malloc()
+{
+	throw std::logic_error( "wolframe malloc not implemented: not supported on this platform (only with gcc/glibc)");
+}
+#define W_MALLOC_N(N,E) std::malloc(N*E)
+#define W_FREE(P) std::free(P)
+#endif
+#else
+void init_wolframe_malloc()
+{
+	throw std::logic_error( "wolframe malloc not implemented: define WOLFRAME_DEBUG_MALLOC not set");
+}
+#define W_MALLOC_N(N,E) std::malloc(N*E)
+#define W_FREE(P) std::free(P)
 #endif
 #include <stdexcept>
 
@@ -66,11 +86,21 @@ struct MemChunkHeader
 void* wolframe_malloc( size_t size)
 {
 	MemChunkHeader* hdr;
-	hdr = (MemChunkHeader*)g_malloc_n( size + sizeof(MemChunkHeader), 1);
+	hdr = (MemChunkHeader*)W_MALLOC_N( size + sizeof(MemChunkHeader), 1);
+	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
 	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761/*knuth's integer hash*/;
 	return (void*)(hdr+1);
+}
+
+void* wolframe_calloc( size_t size, size_t esize)
+{
+	std::size_t mm = size * esize;
+	if (mm < size || mm < esize) return 0;
+	void* rt = wolframe_malloc( mm);
+	std::memset( rt, 0, mm);
+	return rt;
 }
 
 static void wolframe_deref_memhdr( MemChunkHeader* hdr)
@@ -90,26 +120,24 @@ void wolframe_free( void* ptr)
 {
 	MemChunkHeader* hdr = (MemChunkHeader*)ptr - 1;
 	wolframe_deref_memhdr( hdr);
-	g_free( hdr);
+	W_FREE( hdr);
 }
 
 void* wolframe_realloc( void* oldptr, size_t size)
 {
-	MemChunkHeader* hdr = (MemChunkHeader*)g_malloc_n( size + sizeof(MemChunkHeader), 1);
+	MemChunkHeader* hdr = (MemChunkHeader*)W_MALLOC_N( size + sizeof(MemChunkHeader), 1);
+	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
 	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761/*knuth's integer hash*/;
 	void* ptr = (void*)(hdr+1);
-	if (!oldptr)
+	if (oldptr)
 	{
-		MemChunkHeader* oldhdr = (MemChunkHeader*)ptr - 1;
+		MemChunkHeader* oldhdr = (MemChunkHeader*)oldptr - 1;
+		std::size_t cpsize = (oldhdr->size > hdr->size)?hdr->size:oldhdr->size;
+		std::memmove( ptr, oldptr, cpsize);
 		wolframe_deref_memhdr( oldhdr);
-		if (oldhdr->size > hdr->size)
-		{
-			oldhdr->size = hdr->size;
-		}
-		g_memmove( ptr, oldptr, oldhdr->size);
-		g_free( oldhdr);
+		W_FREE( oldhdr);
 	}
 	return ptr;
 }

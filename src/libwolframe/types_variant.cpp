@@ -1,12 +1,29 @@
 #include "types/variant.hpp"
+#include "types/malloc.hpp"
+#include <cstdlib>
 #include <limits>
 #include <stdexcept>
-#include <cstdlib>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
+
+void Variant::init( Type type_)
+{
+	static char strinit[1] = "";
+	std::memset( this, 0, sizeof( *this));
+	m_type = type_;
+	switch (m_type)
+	{
+		case int_:
+		case uint_:
+		case bool_: return;
+		case double_: m_data.value.double_ = 0.0; return;
+		case string_: m_data.value.string_ = strinit; setConstant(); return;
+	}
+	throw std::logic_error( "invalid initialzation of atomic type (from structure)");
+}
 
 void Variant::init()
 {
@@ -17,7 +34,12 @@ void Variant::release()
 {
 	if (type() == string_ && m_data.value.string_ && !constant())
 	{
-		std::free( m_data.value.string_);
+		wolframe_free( m_data.value.string_);
+		std::memset( this, 0, sizeof( *this));
+	}
+	else if (!atomic() && !constant())
+	{
+		throw std::logic_error( "invalid free of variant (structure)");
 	}
 }
 
@@ -33,29 +55,33 @@ void Variant::initString( const char* str_, std::size_t strsize_, bool constant_
 	}
 	else
 	{
-		m_data.value.string_ = (char*)std::malloc( strsize_+1);
+		m_data.value.string_ = (char*)wolframe_malloc( strsize_+1);
 		if (!m_data.value.string_) throw std::bad_alloc();
 		std::memcpy( m_data.value.string_, str_, strsize_);
 		m_data.value.string_[ strsize_] = 0;
 	}
 }
 
-void Variant::initCopy( Variant& dest, const Variant& orig)
+void Variant::initCopy( const Variant& orig)
 {
 	if (orig.constant())
 	{
-		std::memcpy( &dest, &orig, sizeof(dest));
+		std::memcpy( this, &orig, sizeof(*this));
 	}
 	else
 	{
 		if (orig.type() == string_)
 		{
-			dest.initString( orig.m_data.value.string_, orig.m_data.dim.size);
-			dest.setInitialized( orig.initialized());
+			initString( orig.m_data.value.string_, orig.m_data.dim.size);
+			setInitialized( orig.initialized());
+		}
+		else if (!orig.atomic())
+		{
+			throw std::logic_error( "illegal copy operation of non atomic type (source)");
 		}
 		else
 		{
-			std::memcpy( &dest, &orig, sizeof( dest));
+			std::memcpy( this, &orig, sizeof( *this));
 		}
 	}
 }
@@ -86,7 +112,15 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 		case Variant::double_:	return compare_double( d1.value.double_, d2.value.double_);
 		case Variant::int_:	return compare_int( d1.value.int_, d2.value.int_);
 		case Variant::uint_:	return compare_int( d1.value.uint_, d2.value.uint_);
-		case Variant::string_:	return std::strcmp( d1.value.string_, d2.value.string_);
+		case Variant::string_:
+			if (d1.dim.size != d2.dim.size)
+			{
+				return (d1.dim.size < d2.dim.size)?-1:+1;
+			}
+			else
+			{
+				return std::memcmp( d1.value.string_, d2.value.string_, d2.dim.size);
+			}
 	}
 	return -2;
 }
@@ -131,19 +165,19 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 
 int Variant::compare( const Variant& o) const
 {
-	Type tt = type();
-	Type ot = o.type();
+	unsigned char tt = type();
+	unsigned char ot = o.type();
 	if (tt == ot)
 	{
-		return compare_type( tt, m_data, o.m_data);
+		return compare_type( type(), m_data, o.m_data);
 	}
-	if ((int)tt > (int)ot)
+	if (tt > ot)
 	{
 		return -o.compare( *this);
 	}
 	try
 	{
-		switch (tt)
+		switch (type())
 		{
 			case Variant::double_:
 				return compare_double( variant_cast<double>( o), m_data.value.double_);
@@ -197,10 +231,5 @@ unsigned int Variant::touint() const
 {
 	return variant_cast<unsigned int>( *this);
 }
-
-
-
-
-
 
 

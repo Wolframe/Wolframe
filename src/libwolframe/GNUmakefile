@@ -61,6 +61,7 @@ CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(ADT_OBJS) \
+	malloc.o \
 	version.o \
 	getPassword.o \
 	user.o \

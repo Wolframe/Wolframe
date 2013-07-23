@@ -59,8 +59,11 @@ PF:
   - Web Page Templates
   - '_' as content identifier in .NET results
   - UIForm loader in client and server
+  - Printing with HPDF (Maguay needs printing configuration PDF)
+  - Exclusive OR (union) of elements in structure and form description
 
 - low prio
+  -
   - XSLT templates for ui form generation wizard
   - auditing extensions for Transactions (at end of transaction)
   - Python bindings
@@ -68,7 +71,6 @@ PF:
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
   - .NET call
-  - Printing with HPDF
-    - The print form configuration can have an xslt script for preprocessing
+  - The print form configuration can have an xslt script for preprocessing
 
 

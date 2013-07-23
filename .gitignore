@@ -71,6 +71,7 @@ tests/AAAA/textFileTest
 tests/AAAA/sasl.db
 tests/testBoostPath
 tests/filter
+tests/testVariantStruct
 tests/libhpdf/testlibhpdf
 tests/libhpdf/*.pdf
 examples/echo/echod
