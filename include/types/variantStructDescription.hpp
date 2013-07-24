@@ -39,6 +39,7 @@ Project Wolframe.
 #include "types/countedReference.hpp"
 #include <stdexcept>
 #include "types/variant.hpp"
+#include "types/normalizeFunction.hpp"
 
 namespace _Wolframe {
 namespace types {

@@ -163,25 +163,6 @@ protected:
 	unsigned char m_flags;
 };
 
-
-struct NormalizeFunction
-{
-	virtual ~NormalizeFunction(){}
-	virtual const char* name() const=0;
-	virtual Variant execute( const Variant& i) const=0;
-};
-
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-
-struct NormalizeFunctionMap
-{
-	virtual ~NormalizeFunctionMap(){}
-	virtual const NormalizeFunction* get( const std::string& name) const=0;
-};
-
-typedef types::CountedReference<NormalizeFunctionMap> NormalizeFunctionMapR;
-
-
 }} //namespace
 #endif
 
