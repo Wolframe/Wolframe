@@ -74,6 +74,7 @@ void VariantStruct::initCopy( const VariantStruct& orig)
 	else
 	{
 		std::size_t ii, nn;
+		bool init_ = orig.initialized();
 
 		switch (orig.type())
 		{
@@ -123,12 +124,14 @@ void VariantStruct::initCopy( const VariantStruct& orig)
 					wolframe_free( m_data.value.ref_);
 					throw e;
 				}
+				setInitialized( init_);
 				break;
 
 			case VariantStruct::indirection_:
 				init();
 				setType( indirection_);
 				m_data.dim.metadata = orig.m_data.dim.metadata;
+				setInitialized( init_);
 				break;
 		}
 	}
@@ -141,7 +144,7 @@ void VariantStruct::push()
 	if (!ref_) throw std::bad_alloc();
 	m_data.value.ref_ = ref_;
 	std::size_t idx = m_data.dim.size;
-	VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + idx;
+	VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + idx+1;
 	elem->init();
 	elem->initCopy( ((VariantStruct*)m_data.value.ref_)[ 0]); //... copy prototype as value of the new element pushed
 	++m_data.dim.size; //... increment size

@@ -35,10 +35,6 @@ TEST_F( VariantStructDescriptionStableTest, tests)
 	outer.addAtom( "bu", types::Variant( "buhu"), 0);
 	outer.addStructure( "chld", inner);
 	main.addStructure( "data", outer);
-
-	/*[-]*/ std::cout << "++++inner" << inner.tostring() << std::endl;
-	/*[-]*/ std::cout << "++++outer" << outer.tostring() << std::endl;
-	/*[-]*/ std::cout << "++++main" << main.tostring() << std::endl;
 }
 
 int main( int argc, char **argv)

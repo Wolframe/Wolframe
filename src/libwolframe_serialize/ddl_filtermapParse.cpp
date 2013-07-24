@@ -262,6 +262,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 					{
 						elem->push();
 						setAtomValue( elem->back(), element);
+						elem->back().setInitialized();
 						return true;
 					}
 					else
@@ -329,6 +330,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		{
 			stk.back().value()->push();
 			types::VariantStruct* velem = &stk.back().value()->back();
+			velem->setInitialized();
 			const char* velemname = stk.back().name();
 			stk.pop_back();
 			stk.push_back( FiltermapDDLParseState( velemname, velem));
@@ -377,6 +379,19 @@ bool DDLStructParser::call()
 	while (rt && m_stk.size())
 	{
 		rt = parseObject( *m_inp, m_ctx, m_stk);
+	}
+	if (rt)
+	{
+		types::VariantStruct::iterator vi = m_st->begin(), ve = m_st->end();
+		types::VariantStructDescription::const_iterator di = m_st->description()->begin();
+		for (; vi != ve; ++vi,++di)
+		{
+			if (vi->initialized())
+			{
+				m_st->setInitialized();
+				break;
+			}
+		}
 	}
 	return rt;
 }

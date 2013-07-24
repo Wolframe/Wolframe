@@ -89,29 +89,29 @@ public:
 	};
 	Variant( Type type_)				{init(type_);}
 	Variant()					{init();}
-	Variant( bool o)				{init(bool_); m_data.value.bool_ = o; setInitialized();}
-	Variant( double o)				{init(double_); m_data.value.double_ = o; setInitialized();}
-	Variant( float o)				{init(double_); m_data.value.double_ = (double)o; setInitialized();}
-	Variant( int o)					{init(int_); m_data.value.int_ = o; setInitialized();}
-	Variant( unsigned int o)			{init(uint_); m_data.value.uint_ = o; setInitialized();}
-	Variant( const char* o)				{initString( o, std::strlen(o)); setInitialized();}
-	Variant( const char* o, std::size_t n)		{initString( o, n); setInitialized();}
-	Variant( const std::string& o)			{initString( o.c_str(), o.size()); setInitialized();}
+	Variant( bool o)				{init(bool_); m_data.value.bool_ = o;}
+	Variant( double o)				{init(double_); m_data.value.double_ = o;}
+	Variant( float o)				{init(double_); m_data.value.double_ = (double)o;}
+	Variant( int o)					{init(int_); m_data.value.int_ = o;}
+	Variant( unsigned int o)			{init(uint_); m_data.value.uint_ = o;}
+	Variant( const char* o)				{initString( o, std::strlen(o));}
+	Variant( const char* o, std::size_t n)		{initString( o, n);}
+	Variant( const std::string& o)			{initString( o.c_str(), o.size());}
 	Variant( const Variant& o)			{initCopy( o);}
 	~Variant()					{release();}
 
 	Variant& operator=( const Variant& o)		{release(); initCopy( o); return *this;}
-	Variant& operator=( bool o)			{release(); init(); m_type = bool_; m_data.value.bool_ = o; setInitialized(); return *this;}
-	Variant& operator=( double o)			{release(); init(); m_type = double_; m_data.value.double_ = o; setInitialized(); return *this;}
-	Variant& operator=( float o)			{release(); init(); m_type = double_; m_data.value.double_ = (double)o; setInitialized(); return *this;}
-	Variant& operator=( int o)			{release(); init(); m_type = int_; m_data.value.int_ = o; setInitialized(); return *this;}
-	Variant& operator=( unsigned int o)		{release(); init(); m_type = uint_; m_data.value.uint_ = o; setInitialized(); return *this;}
-	Variant& operator=( const char* o)		{release(); initString( o, std::strlen(o)); setInitialized(); return *this;}
-	Variant& operator=( const std::string& o)	{release(); initString( o.c_str(), o.size()); setInitialized(); return *this;}
+	Variant& operator=( bool o)			{unsigned char flags_=m_flags; release(); init(bool_); m_data.value.bool_ = o; m_flags=flags_; return *this;}
+	Variant& operator=( double o)			{unsigned char flags_=m_flags; release(); init(double_); m_data.value.double_ = o; m_flags=flags_; return *this;}
+	Variant& operator=( float o)			{unsigned char flags_=m_flags; release(); init(double_); m_data.value.double_ = (double)o; m_flags=flags_; return *this;}
+	Variant& operator=( int o)			{unsigned char flags_=m_flags; release(); init(int_); m_data.value.int_ = o; m_flags=flags_; return *this;}
+	Variant& operator=( unsigned int o)		{unsigned char flags_=m_flags; release(); init(uint_); m_data.value.uint_ = o; m_flags=flags_; return *this;}
+	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
+	Variant& operator=( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
-	void initConstant( const char* o)		{release(); initString( o, std::strlen(o), true); setInitialized(); setConstant();}
-	void initConstant( const char* o, std::size_t l){release(); initString( o, l, true); setInitialized(); setConstant();}
-	void initConstant( const std::string& o)	{release(); initString( o.c_str(), o.size(), true); setInitialized(); setConstant();}
+	void initConstant( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o), true); setInitialized(init_); setConstant();}
+	void initConstant( const char* o, std::size_t l){bool init_=initialized(); release(); initString( o, l, true); setInitialized(init_); setConstant();}
+	void initConstant( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size(), true); setInitialized(init_); setConstant();}
 
 	bool operator==( const Variant& o) const	{return compare( o) == 0;}
 	bool operator!=( const Variant& o) const	{int cv = compare( o); return cv != 0 && cv != -2;}

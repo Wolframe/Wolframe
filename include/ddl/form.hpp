@@ -103,15 +103,17 @@ public:
 	///\brief Default constructor
 	Form()
 		:m_description(0){}
-	///\brief Destructor
-	virtual ~Form(){}
 	///\brief Constructor
 	explicit Form( const FormDescription* description_)
-		:m_description(description_){}
+		:types::VariantStruct(description_)
+		,m_description(description_){}
 	///\brief Copy constructor
 	Form( const Form& o)
 		:types::VariantStruct(o)
 		,m_description(o.m_description){}
+
+	///\brief Destructor
+	virtual ~Form(){}
 
 	///\brief Assignement operator
 	///\param[in] o object to copy

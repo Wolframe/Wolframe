@@ -129,11 +129,6 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 					stk.back().state( ++idx);
 					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
 				}
-				else if (!*di->name)
-				{
-					stk.back().state( ++idx);
-					stk.push_back( FiltermapDDLSerializeState( &*itr, langbind::TypedFilterBase::Element()));
-				}
 				else
 				{
 					langbind::TypedFilterBase::Element elem( di->name);
