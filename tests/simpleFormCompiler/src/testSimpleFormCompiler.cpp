@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file tests/testSimpleFormCompiler.cpp
 #include "utils/miscUtils.hpp"
 #include "types/variant.hpp"
+#include "types/normalizeFunction.hpp"
 #include "ddl/form.hpp"
 #include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
@@ -48,12 +49,12 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-class DDLTypeMap :public ddl::TypeMap
+class DDLTypeMap :public types::NormalizeFunctionMap
 {
 public:
 	DDLTypeMap(){}
 
-	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
 		static IntegerNormalizeFunction int_( true, 10);
 		static IntegerNormalizeFunction uint_( false, 10);
@@ -98,11 +99,11 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		std::vector<ddl::Form> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
-		std::vector<ddl::Form>::const_iterator si = sr.begin(), se = sr.end();
+		std::vector<ddl::FormDescriptionR> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		std::vector<ddl::FormDescriptionR>::const_iterator si = sr.begin(), se = sr.end();
 		for (; si != se; ++si)
 		{
-			si->print( std::cerr);
+			std::cout << "FORM " << (*si)->name() << ":" << std::endl << (*si)->tostring() << std::endl;
 		}
 	}
 }

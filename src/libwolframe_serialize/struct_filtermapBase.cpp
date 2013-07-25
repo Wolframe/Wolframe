@@ -173,19 +173,19 @@ bool StructSerializer::call()
 	if (!m_out.get()) throw std::runtime_error( "no output for serialize");
 	while (m_stk.size())
 	{
-		Context::ElementBuffer elem;
-		if (m_ctx.getElem( elem))
+		const Context::ElementBuffer* elem = m_ctx.getElem();
+		if (elem)
 		{
-			if (!m_out->print( elem.m_type, elem.m_value))
+			if (!m_out->print( elem->m_type, elem->m_value))
 			{
 				if (m_out->getError())
 				{
 					throw SerializationErrorException( m_out->getError(), getElementPath( m_stk));
 				}
-				m_ctx.setElem( elem);
+				m_ctx.setElementUnconsumed();
 				return false;
 			}
-			LOG_DATA << "[C++ structure serialization print] element " << langbind::InputFilter::elementTypeName( elem.m_type) << " '" << elem.m_value.tostring() << "'";
+			LOG_DATA << "[C++ structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
 		}
 		m_stk.back().fetch()( m_ctx, m_stk);
 	}
@@ -194,17 +194,17 @@ bool StructSerializer::call()
 
 bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
 {
-	Context::ElementBuffer elem;
-	while (m_stk.size() && !m_ctx.getElem( elem))
+	const Context::ElementBuffer* elem;
+	while (m_stk.size() && (elem = m_ctx.getElem()) == 0)
 	{
 		m_stk.back().fetch()( m_ctx, m_stk);
 	}
 	if (!m_stk.size()) return false;
 
-	type = elem.m_type;
-	value = elem.m_value;
+	type = elem->m_type;
+	value = elem->m_value;
 	setState( langbind::InputFilter::Open);
-	LOG_DATA << "[C++ structure serialization get] element " << langbind::InputFilter::elementTypeName( elem.m_type) << " '" << elem.m_value.tostring() << "'";
+	LOG_DATA << "[C++ structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
 	return true;
 }
 

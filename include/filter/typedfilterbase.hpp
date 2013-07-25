@@ -66,7 +66,7 @@ public:
 			value.string_.size = 0;
 		}
 
-		Element( const types::Variant& val)
+		explicit Element( const types::Variant& val)
 			:type(string_)
 		{
 			switch (val.type())

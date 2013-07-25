@@ -38,6 +38,7 @@
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"
+#include "types/normalizeFunction.hpp"
 #include <string>
 #include <vector>
 
