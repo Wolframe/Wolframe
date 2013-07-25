@@ -32,58 +32,64 @@ void Variant::init()
 
 void Variant::release()
 {
-	if (type() == string_ && m_data.value.string_ && !constant())
+	if (!constant())
 	{
-		wolframe_free( m_data.value.string_);
-		std::memset( this, 0, sizeof( *this));
-	}
-	else if (!atomic() && !constant())
-	{
-		throw std::logic_error( "invalid free of variant (structure)");
+		if (type() == string_ && m_data.value.string_)
+		{
+			wolframe_free( m_data.value.string_);
+			std::memset( this, 0, sizeof( *this));
+		}
+		else if (!atomic())
+		{
+			throw std::logic_error( "invalid free of variant (structure)");
+		}
 	}
 }
 
-void Variant::initString( const char* str_, std::size_t strsize_, bool constant_)
+void Variant::initConstant( const char* o, std::size_t l)
+{
+	bool init_ = initialized();
+	release();
+	init( string_);
+	m_data.dim.size = l;
+	m_data.value.string_ = const_cast<char*>(o);
+	setInitialized(init_);
+	setConstant();
+}
+
+void Variant::initString( const char* str_, std::size_t strsize_)
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = string_;
 	m_data.dim.size = strsize_;
-	if (constant_)
+	m_data.value.string_ = (char*)wolframe_malloc( strsize_+1);
+	if (!m_data.value.string_) throw std::bad_alloc();
+	std::memcpy( m_data.value.string_, str_, strsize_);
+	m_data.value.string_[ strsize_] = 0;
+}
+
+void Variant::initCopy( const Variant& o)
+{
+	if (o.type() == string_)
 	{
-		m_data.value.string_ = const_cast<char*>(str_);
-		setConstant();
+		initString( o.m_data.value.string_, o.m_data.dim.size);
+		setInitialized( o.initialized());
+	}
+	else if (!o.atomic())
+	{
+		throw std::logic_error( "illegal copy operation of non atomic type (source)");
 	}
 	else
 	{
-		m_data.value.string_ = (char*)wolframe_malloc( strsize_+1);
-		if (!m_data.value.string_) throw std::bad_alloc();
-		std::memcpy( m_data.value.string_, str_, strsize_);
-		m_data.value.string_[ strsize_] = 0;
+		std::memcpy( this, &o, sizeof( *this));
+		setConstant( false);
 	}
 }
 
-void Variant::initCopy( const Variant& orig)
+void Variant::initConstCopy( const Variant& o)
 {
-	if (orig.constant())
-	{
-		std::memcpy( this, &orig, sizeof(*this));
-	}
-	else
-	{
-		if (orig.type() == string_)
-		{
-			initString( orig.m_data.value.string_, orig.m_data.dim.size);
-			setInitialized( orig.initialized());
-		}
-		else if (!orig.atomic())
-		{
-			throw std::logic_error( "illegal copy operation of non atomic type (source)");
-		}
-		else
-		{
-			std::memcpy( this, &orig, sizeof( *this));
-		}
-	}
+	std::memcpy( this, &o, sizeof(*this));
+	setConstant();
 }
 
 static int compare_double( double d1, double d2)
@@ -230,11 +236,5 @@ int Variant::toint() const
 unsigned int Variant::touint() const
 {
 	return variant_cast<unsigned int>( *this);
-}
-
-ConstVariant::ConstVariant( const Variant& o)
-{
-	std::memcpy( this, &o, sizeof( *this));
-	setConstant();
 }
 

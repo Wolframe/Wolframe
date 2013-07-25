@@ -109,9 +109,9 @@ public:
 	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
 	Variant& operator=( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
-	void initConstant( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o), true); setInitialized(init_); setConstant();}
-	void initConstant( const char* o, std::size_t l){bool init_=initialized(); release(); initString( o, l, true); setInitialized(init_); setConstant();}
-	void initConstant( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size(), true); setInitialized(init_); setConstant();}
+	void initConstant( const char* o, std::size_t l);
+	void initConstant( const std::string& o)	{initConstant( o.c_str(),o.size());}
+	void initConstant( const char* o)		{initConstant( o, std::strlen(o));}
 
 	bool operator==( const Variant& o) const	{return compare( o) == 0;}
 	bool operator!=( const Variant& o) const	{int cv = compare( o); return cv != 0 && cv != -2;}
@@ -150,8 +150,9 @@ protected:
 	void init( Type type_);
 	void init();
 	void release();
-	void initString( const char* str_, std::size_t strsize_, bool constant_=false);
+	void initString( const char* str_, std::size_t strsize_);
 	void initCopy( const Variant& o);
+	void initConstCopy( const Variant& o);
 
 	///\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
 	///\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable
@@ -164,12 +165,36 @@ protected:
 };
 
 
-///\class ConstVariant
+///\class VariantConst
 ///\brief Variant value type that references another Variant
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
-struct ConstVariant :public Variant
+struct VariantConst :public Variant
 {
-	ConstVariant( const Variant& o);
+	VariantConst( const Variant& o)			:Variant(){initConstCopy( o);}
+	VariantConst( const VariantConst& o)		:Variant(){initConstCopy( o);}
+	VariantConst( bool o)				:Variant(bool_){m_data.value.bool_ = o; setConstant(); }
+	VariantConst( double o)				:Variant(double_){m_data.value.double_ = o; setConstant(); }
+	VariantConst( float o)				:Variant(double_){m_data.value.double_ = (double)o; setConstant();}
+	VariantConst( int o)				:Variant(int_){m_data.value.int_ = o; setConstant();}
+	VariantConst( unsigned int o)			:Variant(uint_){m_data.value.uint_ = o; setConstant();}
+	VariantConst( const char* o)			:Variant(){initConstant( o, std::strlen(o));}
+	VariantConst( const char* o, std::size_t n)	:Variant(){initConstant( o, n);}
+	VariantConst( const std::string& o)		:Variant(){initConstant( o.c_str(), o.size());}
+	~VariantConst(){}
+
+	VariantConst& operator=( const Variant& o)	{initConstCopy( o); return *this;}
+	VariantConst& operator=( const VariantConst& o)	{initConstCopy( o); return *this;}
+	VariantConst& operator=( bool o)		{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantConst& operator=( float o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
+	VariantConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantConst& operator=( unsigned int o)	{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
+	VariantConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
+
+	void init( const char* o, std::size_t len)	{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
+	void init( const char* o)			{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
+	void init( const std::string& o)		{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
 };
 
 }} //namespace

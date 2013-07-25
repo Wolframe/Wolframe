@@ -65,75 +65,80 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 	}
 }
 
-void VariantStruct::initCopy( const VariantStruct& orig)
+void VariantStruct::initConstCopy( const VariantStruct& o)
 {
-	if (orig.constant())
+	std::memcpy( this, &o, sizeof(*this));
+	setConstant();
+}
+
+void VariantStruct::initConstCopy( const Variant& o)
+{
+	std::memcpy( this, &o, sizeof(*this));
+	setConstant();
+}
+
+void VariantStruct::initCopy( const VariantStruct& o)
+{
+	std::size_t ii, nn;
+	bool init_ = o.initialized();
+
+	switch (o.type())
 	{
-		std::memcpy( this, &orig, sizeof(*this));
-	}
-	else
-	{
-		std::size_t ii, nn;
-		bool init_ = orig.initialized();
+		case VariantStruct::bool_:
+		case VariantStruct::double_:
+		case VariantStruct::int_:
+		case VariantStruct::uint_:
+		case VariantStruct::string_:
+			Variant::initCopy( o);
+			break;
 
-		switch (orig.type())
-		{
-			case VariantStruct::bool_:
-			case VariantStruct::double_:
-			case VariantStruct::int_:
-			case VariantStruct::uint_:
-			case VariantStruct::string_:
-				Variant::initCopy( orig);
-				break;
+		case VariantStruct::struct_:
+		case VariantStruct::array_:
+			init();
+			if (o.type() == VariantStruct::struct_)
+			{
+				nn = o.description()->size();
+				setType( struct_);
+				m_data.dim.metadata = o.m_data.dim.metadata;
+			}
+			else
+			{
+				nn = o.m_data.dim.size+1;
+				setType( array_);
+				m_data.dim.size = o.m_data.dim.size;
+			}
+			m_data.value.ref_ = wolframe_calloc( nn, sizeof( VariantStruct));
+			if (!m_data.value.ref_) throw std::bad_alloc();
+			ii = 0;
+			try
+			{
+				for (; ii<nn; ++ii)
+				{
+					VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + ii;
+					elem->initCopy( ((VariantStruct*)o.m_data.value.ref_)[ ii]);
+				}
+			}
+			catch (const std::bad_alloc& e)
+			{
+				for (; ii>0; --ii) ((VariantStruct*)m_data.value.ref_)[ ii-1].release();
+				wolframe_free( m_data.value.ref_);
+				throw e;
+			}
+			catch (const std::runtime_error& e)
+			{
+				for (; ii>0; --ii) ((VariantStruct*)m_data.value.ref_)[ ii-1].release();
+				wolframe_free( m_data.value.ref_);
+				throw e;
+			}
+			setInitialized( init_);
+			break;
 
-			case VariantStruct::struct_:
-			case VariantStruct::array_:
-				init();
-				if (orig.type() == VariantStruct::struct_)
-				{
-					nn = orig.description()->size();
-					setType( struct_);
-					m_data.dim.metadata = orig.m_data.dim.metadata;
-				}
-				else
-				{
-					nn = orig.m_data.dim.size+1;
-					setType( array_);
-					m_data.dim.size = orig.m_data.dim.size;
-				}
-				m_data.value.ref_ = wolframe_calloc( nn, sizeof( VariantStruct));
-				if (!m_data.value.ref_) throw std::bad_alloc();
-				ii = 0;
-				try
-				{
-					for (; ii<nn; ++ii)
-					{
-						VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + ii;
-						elem->initCopy( ((VariantStruct*)orig.m_data.value.ref_)[ ii]);
-					}
-				}
-				catch (const std::bad_alloc& e)
-				{
-					for (; ii>0; --ii) ((VariantStruct*)m_data.value.ref_)[ ii-1].release();
-					wolframe_free( m_data.value.ref_);
-					throw e;
-				}
-				catch (const std::runtime_error& e)
-				{
-					for (; ii>0; --ii) ((VariantStruct*)m_data.value.ref_)[ ii-1].release();
-					wolframe_free( m_data.value.ref_);
-					throw e;
-				}
-				setInitialized( init_);
-				break;
-
-			case VariantStruct::indirection_:
-				init();
-				setType( indirection_);
-				m_data.dim.metadata = orig.m_data.dim.metadata;
-				setInitialized( init_);
-				break;
-		}
+		case VariantStruct::indirection_:
+			init();
+			setType( indirection_);
+			m_data.dim.metadata = o.m_data.dim.metadata;
+			setInitialized( init_);
+			break;
 	}
 }
 
@@ -520,10 +525,5 @@ std::string VariantStruct::tostring() const
 	return buf.str();
 }
 
-ConstVariantStruct::ConstVariantStruct( const VariantStruct& o)
-{
-	std::memcpy( this, &o, sizeof( *this));
-	setConstant();
-}
 
 

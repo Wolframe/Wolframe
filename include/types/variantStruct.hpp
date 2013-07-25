@@ -182,11 +182,14 @@ private:
 	VariantStruct* elementptr( std::size_t idx);
 
 	friend class VariantStructIndirection;
+	friend class VariantStructConst;
 	void setType( Type type_)						{m_type = (unsigned char)type_;}
 
 	static int compareArray( std::size_t size, const VariantStruct* a1, const VariantStruct* a2);
 	void initStruct( const VariantStructDescription* descr);
 	void initCopy( const VariantStruct& orig);
+	void initConstCopy( const VariantStruct& o);
+	void initConstCopy( const Variant& o);
 
 	void release();
 };
@@ -201,12 +204,38 @@ public:
 };
 
 
-///\class ConstVariantStruct
+///\class VariantStructConst
 ///\brief Variant value type that references another Variant
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
-struct ConstVariantStruct :public VariantStruct
+struct VariantStructConst :public VariantStruct
 {
-	ConstVariantStruct( const VariantStruct& o);
+	VariantStructConst( const VariantConst& o)		:VariantStruct(){Variant::initConstCopy( o);}
+	VariantStructConst( const Variant& o)			:VariantStruct(){Variant::initConstCopy( o);}
+	VariantStructConst( const VariantStruct& o)		:VariantStruct(){initConstCopy( o);}
+	VariantStructConst( const VariantStructConst& o)	:VariantStruct(){initConstCopy( o);}
+	VariantStructConst( bool o)				:VariantStruct(bool_){m_data.value.bool_ = o; setConstant(); }
+	VariantStructConst( double o)				:VariantStruct(double_){m_data.value.double_ = o; setConstant(); }
+	VariantStructConst( float o)				:VariantStruct(double_){m_data.value.double_ = (double)o; setConstant();}
+	VariantStructConst( int o)				:VariantStruct(int_){m_data.value.int_ = o; setConstant();}
+	VariantStructConst( unsigned int o)			:VariantStruct(uint_){m_data.value.uint_ = o; setConstant();}
+	VariantStructConst( const char* o)			{initConstant( o, std::strlen(o));}
+	VariantStructConst( const char* o, std::size_t n)	{initConstant( o, n);}
+	VariantStructConst( const std::string& o)		{initConstant( o.c_str(), o.size());}
+	~VariantStructConst(){}
+
+	VariantStructConst& operator=( const Variant& o)	{initConstCopy( o); return *this;}
+	VariantStructConst& operator=( const VariantConst& o)	{initConstCopy( o); return *this;}
+	VariantStructConst& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( float o)			{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( unsigned int o)		{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
+	VariantStructConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
+
+	void init( const char* o, std::size_t len)		{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
+	void init( const char* o)				{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
+	void init( const std::string& o)			{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
 };
 
 }} //namespace
