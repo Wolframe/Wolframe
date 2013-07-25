@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file parseUtils.cpp
 ///\brief Some utility functions for reading and parsing source files
 
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <cstring>
 #include <cstdio>
 #include <sstream>
@@ -40,10 +40,6 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/filesystem.hpp>
 
 using namespace _Wolframe::utils;
 
@@ -205,148 +201,6 @@ std::pair<unsigned int,unsigned int> _Wolframe::utils::getLineInfo( const std::s
 			continue;
 		}
 		++rt.second;
-	}
-	return rt;
-}
-
-static void readFileContent( const std::string& filename, std::string& res)
-{
-	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), "r");
-	if (!fh)
-	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
-	}
-	boost::shared_ptr<FILE> fhr( fh, fclose);
-	while (1 == fread( &ch, 1, 1, fh))
-	{
-		res.push_back( ch);
-	}
-	if (!feof( fh))
-	{
-		int ec = ferror( fh);
-		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
-	}
-}
-
-static void readSourceFileLines_( const std::string& filename, std::vector<std::string>& res)
-{
-	unsigned char ch;
-	std::string ln;
-	FILE* fh = fopen( filename.c_str(), "r");
-	if (!fh)
-	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
-	}
-	boost::shared_ptr<FILE> fhr( fh, fclose);
-	while (1 == fread( &ch, 1, 1, fh))
-	{
-		if (ch == '\n')
-		{
-			res.push_back( ln);
-			ln.clear();
-		}
-		else
-		{
-			ln.push_back( ch);
-		}
-	}
-	if (!feof( fh))
-	{
-		int ec = ferror( fh);
-		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
-	}
-}
-
-void _Wolframe::utils::writeFile( const std::string& filename, const std::string& content)
-{
-	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), "w");
-	if (!fh)
-	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
-	}
-	boost::shared_ptr<FILE> fhr( fh, fclose);
-	std::string::const_iterator fi = content.begin(), fe = content.end();
-	for (; fi != fe; ++fi)
-	{
-		ch = *fi;
-		if (1 > fwrite( &ch, 1, 1, fh))
-		{
-			int ec = ferror( fh);
-			if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
-		}
-	}
-}
-
-std::string _Wolframe::utils::readSourceFileContent( const std::string& filename)
-{
-	std::string rt;
-	readFileContent( filename, rt);
-	return rt;
-}
-
-std::vector<std::string> _Wolframe::utils::readSourceFileLines( const std::string& filename)
-{
-	std::vector<std::string> rt;
-	readSourceFileLines_( filename, rt);
-	return rt;
-}
-
-std::string _Wolframe::utils::getFileType( const std::string& filename)
-{
-	enum
-	{
-		B10000000 = 128,
-		B11000000 = 128 + 64,
-		B11100000 = 128 + 64 + 32,
-		B11110000 = 128 + 64 + 32 + 16,
-		B11111000 = 128 + 64 + 32 + 16 + 8,
-		B11111100 = 128 + 64 + 32 + 16 + 8 + 4,
-		B11111110 = 128 + 64 + 32 + 16 + 8 + 4 + 2,
-		B11111111 = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1
-	};
-	std::string source;
-	readFileContent( filename, source);
-	if (source[0] == '<') return "XML";
-	std::string::const_iterator si = source.begin(), se = source.end();
-	bool ascii = true;
-	bool utf8 = true;
-	for (; si != se; ++si)
-	{
-		if (!*si) return "";
-		if (*si < 0) ascii = false;
-		if ((*si & B11000000) != B11000000) utf8 = false;
-		if ((*si & B11100000) == B11000000) for (int ii=1; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-		if ((*si & B11110000) == B11100000) for (int ii=2; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-		if ((*si & B11111000) == B11110000) for (int ii=3; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-		if ((*si & B11111100) == B11111000) for (int ii=4; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-		if ((*si & B11111110) == B11111100) for (int ii=5; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-		if ((*si & B11111111) == B11111110) for (int ii=6; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-	}
-	if (ascii) return "TEXT:ASCII";
-	if (utf8) return "TEXT:UTF-8";
-	return "TEXT";
-}
-
-boost::property_tree::ptree _Wolframe::utils::readPropertyTreeFile( const std::string& filename)
-{
-	std::string filetype = getFileType( filename);
-	if (filetype.empty()) throw std::runtime_error( "Configuration file is not recognized as TEXT or XML");
-	boost::property_tree::ptree rt;
-
-	if (boost::istarts_with( filetype, "XML"))
-	{
-		namespace opt = boost::property_tree::xml_parser;
-		read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
-	}
-	else if (boost::istarts_with( filetype, "TEXT"))
-	{
-		read_info( filename, rt);
-	}
-	else
-	{
-		throw std::runtime_error( std::string( "file type not recognized for '") + filename + "'");
 	}
 	return rt;
 }

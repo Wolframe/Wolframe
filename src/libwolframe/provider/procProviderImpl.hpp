@@ -70,7 +70,7 @@ public:
 
 	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
 	const langbind::FormFunction* formFunction( const std::string& name) const;
-	const ddl::FormDescription* formDescription( const std::string& name) const;
+	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::string& arg) const;
 
 	bool loadPrograms();

@@ -41,7 +41,7 @@ Project Wolframe.
 #include "types/typeSignature.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "ddl/compilerInterface.hpp"
+#include "langbind/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
@@ -153,12 +153,12 @@ class DDLFormParser
 	,public serialize::DDLStructParser
 {
 public:
-	explicit DDLFormParser( const ddl::FormR& form_)
+	explicit DDLFormParser( const types::FormR& form_)
 		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
-	DDLFormParser( const ddl::FormR& form_, types::VariantStruct* substructure)
+	DDLFormParser( const types::FormR& form_, types::VariantStruct* substructure)
 		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(substructure)
 		,m_form(form_){}
@@ -178,10 +178,10 @@ public:
 		return *this;
 	}
 
-	const ddl::FormR& form() const	{return m_form;}
+	const types::FormR& form() const	{return m_form;}
 
 private:
-	ddl::FormR m_form;
+	types::FormR m_form;
 };
 
 class DDLFormSerializer
@@ -192,12 +192,12 @@ public:
 	DDLFormSerializer()
 		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
 
-	explicit DDLFormSerializer( const ddl::FormR& form_)
+	explicit DDLFormSerializer( const types::FormR& form_)
 		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
-	explicit DDLFormSerializer( const ddl::FormR& form_, const types::VariantStruct* substructure)
+	explicit DDLFormSerializer( const types::FormR& form_, const types::VariantStruct* substructure)
 		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(substructure)
 		,m_form(form_){}
@@ -216,10 +216,10 @@ public:
 		return *this;
 	}
 
-	const ddl::FormR& form() const	{return m_form;}
+	const types::FormR& form() const	{return m_form;}
 
 private:
-	ddl::FormR m_form;
+	types::FormR m_form;
 };
 
 ///\class RedirectFilterClosure

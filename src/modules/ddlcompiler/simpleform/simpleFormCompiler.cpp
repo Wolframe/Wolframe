@@ -45,7 +45,7 @@ Project Wolframe.
 #include <boost/property_tree/info_parser.hpp>
 
 using namespace _Wolframe;
-using namespace ddl;
+using namespace _Wolframe::langbind;
 
 namespace
 {
@@ -65,7 +65,7 @@ public:
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
 
-	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
+	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
 		:m_isVector(false)
 		,m_isAttribute(false)
 		,m_isOptional(false)
@@ -212,9 +212,9 @@ public:
 	const types::VariantStructDescription* subform() const	{return m_subform;}
 
 private:
-	void parseType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
+	void parseType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
 	{
-		types::keymap<FormDescriptionR>::const_iterator fmi;
+		types::keymap<types::FormDescriptionR>::const_iterator fmi;
 		if (typestr.size() == 0)
 		{
 			m_isForm = true;
@@ -268,7 +268,7 @@ static bool isIdentifier( const std::string& name)
 	return (ii==ee);
 }
 
-static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<FormDescriptionR>& formmap, const std::string& selfname)
+static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -447,9 +447,9 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 	}
 }
 
-static void compile_forms( const boost::property_tree::ptree& pt, std::vector<FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap)
+static void compile_forms( const boost::property_tree::ptree& pt, std::vector<types::FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap)
 {
-	types::keymap<FormDescriptionR> formmap;
+	types::keymap<types::FormDescriptionR> formmap;
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
 	{
@@ -469,7 +469,7 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 		{
 			try
 			{
-				FormDescriptionR form( new FormDescription( "simpleform", itr->second.data()));
+				types::FormDescriptionR form( new types::FormDescription( "simpleform", itr->second.data()));
 
 				formmap.insert( form->name(), form);
 				compile_ptree( itr->second, *form, typemap, formmap, itr->second.data());
@@ -487,9 +487,9 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 	}
 }
 
-std::vector<FormDescriptionR> SimpleFormCompiler::compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const
+std::vector<types::FormDescriptionR> SimpleFormCompiler::compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const
 {
-	std::vector<FormDescriptionR> rt;
+	std::vector<types::FormDescriptionR> rt;
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);
@@ -497,7 +497,7 @@ std::vector<FormDescriptionR> SimpleFormCompiler::compile( const std::string& sr
 	return rt;
 }
 
-DDLCompiler* _Wolframe::ddl::createSimpleFormCompilerFunc()
+DDLCompiler* langbind::createSimpleFormCompilerFunc()
 {
 	return new SimpleFormCompiler();
 }

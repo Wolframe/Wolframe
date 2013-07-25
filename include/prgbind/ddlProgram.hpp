@@ -36,7 +36,7 @@
 #ifndef _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "ddl/compilerInterface.hpp"
+#include "langbind/compilerInterface.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -46,7 +46,7 @@ class DDLProgram
 	:public Program
 {
 public:
-	DDLProgram( const ddl::DDLCompilerR& constructor_)
+	DDLProgram( const langbind::DDLCompilerR& constructor_)
 		:Program( Form)
 		,m_constructor(constructor_){}
 
@@ -56,7 +56,7 @@ public:
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 
 private:
-	ddl::DDLCompilerR m_constructor;
+	langbind::DDLCompilerR m_constructor;
 };
 
 }}//namespace

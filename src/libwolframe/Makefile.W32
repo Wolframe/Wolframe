@@ -65,6 +65,7 @@ CPP_OBJS = \
 	moduleDirectory.obj \
 	resolvePath.obj \
 	stringUtils.obj \
+	fileUtils.obj \
 	parseUtils.obj \
 	types_allocators.obj \
 	password.obj \

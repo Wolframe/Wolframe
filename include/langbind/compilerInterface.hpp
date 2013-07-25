@@ -29,19 +29,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/compilerInterface.hpp
+///\file langbind/compilerInterface.hpp
 ///\brief Defines the interface for different type of data definition languages used for forms
 
 #ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
-#include "ddl/form.hpp"
+#include "types/form.hpp"
 #include "types/variant.hpp"
 #include "types/countedReference.hpp"
 #include <string>
 #include <vector>
 
 namespace _Wolframe {
-namespace ddl {
+namespace langbind {
 
 ///\class DDLCompiler
 ///\brief Interface for DDL compilers
@@ -54,7 +54,7 @@ struct DDLCompiler
 	///\param[in] srcstring source as string
 	///\param[in] typemap map with atomic type definitions
 	///\return compilation result (a list of forms)
-	virtual std::vector<FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const=0;
+	virtual std::vector<types::FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const=0;
 
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}

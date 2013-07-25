@@ -260,7 +260,7 @@ const langbind::FormFunction* ProcessorProvider::formFunction( const std::string
 	return m_impl->formFunction( name);
 }
 
-const ddl::FormDescription* ProcessorProvider::formDescription( const std::string& name) const
+const types::FormDescription* ProcessorProvider::formDescription( const std::string& name) const
 {
 	return m_impl->formDescription( name);
 }

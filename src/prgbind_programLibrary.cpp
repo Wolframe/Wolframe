@@ -164,7 +164,7 @@ public:
 	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<module::FilterConstructorR> m_filterMap;
-	types::keymap<ddl::FormDescriptionR> m_formMap;
+	types::keymap<types::FormDescriptionR> m_formMap;
 	std::vector<ProgramR> m_programTypes;
 
 	Impl()
@@ -201,7 +201,7 @@ public:
 		m_normalizeFunctionMap.define( name, f);
 	}
 
-	void defineForm( const std::string& name, const ddl::FormDescriptionR& f)
+	void defineForm( const std::string& name, const types::FormDescriptionR& f)
 	{
 		if (m_formMap.find( name) != m_formMap.end())
 		{
@@ -211,7 +211,7 @@ public:
 		m_formMap.insert( name, f);
 	}
 
-	void defineFormDDL( const ddl::DDLCompilerR& c)
+	void defineFormDDL( const langbind::DDLCompilerR& c)
 	{
 		DDLProgram* prg = new DDLProgram( c);
 		m_programTypes.push_back( ProgramR( prg));
@@ -251,9 +251,9 @@ public:
 		}
 	}
 
-	const ddl::FormDescription* getFormDescription( const std::string& name) const
+	const types::FormDescription* getFormDescription( const std::string& name) const
 	{
-		types::keymap<ddl::FormDescriptionR>::const_iterator fi = m_formMap.find( name);
+		types::keymap<types::FormDescriptionR>::const_iterator fi = m_formMap.find( name);
 		if (fi == m_formMap.end()) return 0;
 		return fi->second.get();
 	}
@@ -365,12 +365,12 @@ void ProgramLibrary::defineNormalizeFunction( const std::string& name, const typ
 	m_impl->defineNormalizeFunction( name, f);
 }
 
-void ProgramLibrary::defineForm( const std::string& name, const ddl::FormDescriptionR& f)
+void ProgramLibrary::defineForm( const std::string& name, const types::FormDescriptionR& f)
 {
 	m_impl->defineForm( name, f);
 }
 
-void ProgramLibrary::defineFormDDL( const ddl::DDLCompilerR& c)
+void ProgramLibrary::defineFormDDL( const langbind::DDLCompilerR& c)
 {
 	m_impl->defineFormDDL( c);
 }
@@ -405,7 +405,7 @@ const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string
 	return m_impl->getFormFunction( name);
 }
 
-const ddl::FormDescription* ProgramLibrary::getFormDescription( const std::string& name) const
+const types::FormDescription* ProgramLibrary::getFormDescription( const std::string& name) const
 {
 	return m_impl->getFormDescription( name);
 }

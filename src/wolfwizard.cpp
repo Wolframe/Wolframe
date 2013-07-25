@@ -116,7 +116,7 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 	}
 }
 
-static void printFormXML( std::ostream& out, const ddl::Form& form)
+static void printFormXML( std::ostream& out, const types::Form& form)
 {
 	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
 	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
@@ -134,8 +134,8 @@ static void printWizardXML( std::ostream& out, const prgbind::ProgramLibrary& pr
 	std::vector<std::string>::const_iterator fi = formnames.begin(), fe = formnames.end();
 	for (; fi != fe; ++fi)
 	{
-		const ddl::FormDescription* formdescription = programLibrary.getFormDescription( *fi);
-		ddl::Form form( formdescription);
+		const types::FormDescription* formdescription = programLibrary.getFormDescription( *fi);
+		types::Form form( formdescription);
 		printFormXML( out, form);
 	}
 	out << "</forms>" << std::endl;

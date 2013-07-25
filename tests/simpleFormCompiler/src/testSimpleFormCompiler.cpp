@@ -33,7 +33,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "types/variant.hpp"
 #include "types/normalizeFunction.hpp"
-#include "ddl/form.hpp"
+#include "types/form.hpp"
 #include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
 #include "modules/normalize/number/floatNormalizeFunction.hpp"
@@ -97,10 +97,10 @@ TEST_F( SimpleFormCompilerTest, tests)
 	{
 		boost::filesystem::path pp = g_testdir / "data" / testDescription[ti].srcfile;
 		std::string srcfile = pp.string() + ".simpleform";
-		ddl::SimpleFormCompiler mm;
+		langbind::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		std::vector<ddl::FormDescriptionR> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
-		std::vector<ddl::FormDescriptionR>::const_iterator si = sr.begin(), se = sr.end();
+		std::vector<types::FormDescriptionR> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		std::vector<types::FormDescriptionR>::const_iterator si = sr.begin(), se = sr.end();
 		for (; si != se; ++si)
 		{
 			std::cout << "FORM " << (*si)->name() << ":" << std::endl << (*si)->tostring() << std::endl;

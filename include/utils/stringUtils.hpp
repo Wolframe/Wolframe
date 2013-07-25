@@ -31,9 +31,29 @@
 
 ************************************************************************/
 //
-// collection of miscelaneous utility functions
+// utility functions for string handling
 //
-#include "parseUtils.hpp"
-#include "stringUtils.hpp"
-#include "fileUtils.hpp"
+#ifndef _WOLFRAME_STRING_UTILS_HPP_INCLUDED
+#define _WOLFRAME_STRING_UTILS_HPP_INCLUDED
+#include <string>
+#include <vector>
 
+namespace _Wolframe {
+namespace utils {
+
+///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[out] res result of the split
+///\param[in] inp string to split
+///\param[in] splitchr set of characters to split with (each of them is one separating character)
+void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
+
+///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[out] res result of the split
+///\param[in] begin begin input iterator
+///\param[in] end end input iterator
+///\param[in] splitchr set of characters to split with (each of them is one separating character)
+void splitString( std::vector<std::string>& res, std::string::const_iterator begin, std::string::const_iterator end, const char* splitchr);
+
+}} //namespace _Wolframe::utils
+
+#endif // _MISC_UTILS_HPP_INCLUDED

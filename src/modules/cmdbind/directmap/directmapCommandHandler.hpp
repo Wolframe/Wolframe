@@ -104,8 +104,8 @@ private:
 	const langbind::DirectmapCommandDescription* m_cmd;			//< description of command to execute
 	int m_state;								//< internal state
 	const langbind::FormFunction* m_function;				//< function to execute
-	ddl::FormR m_inputform;							//< (optional) form for validating and formating input
-	ddl::FormR m_outputform;						//< (optional) form for validating and formating output
+	types::FormR m_inputform;							//< (optional) form for validating and formating input
+	types::FormR m_outputform;						//< (optional) form for validating and formating output
 	langbind::TypedInputFilterR m_input;					//< structure for input
 	langbind::TypedOutputFilterR m_output;					//< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction

@@ -36,7 +36,7 @@ Project Wolframe.
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #endif
-#include "utils/miscUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include <cstring>
 #include <sstream>
 #include <string>

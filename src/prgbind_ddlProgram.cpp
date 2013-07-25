@@ -54,8 +54,8 @@ void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std:
 	try
 	{
 		const types::NormalizeFunctionMap* typemap = library.formtypemap();
-		std::vector<ddl::FormDescriptionR> forms = m_constructor->compile( utils::readSourceFileContent( filename), typemap);
-		std::vector<ddl::FormDescriptionR>::const_iterator fi = forms.begin(), fe = forms.end();
+		std::vector<types::FormDescriptionR> forms = m_constructor->compile( utils::readSourceFileContent( filename), typemap);
+		std::vector<types::FormDescriptionR>::const_iterator fi = forms.begin(), fe = forms.end();
 		for (; fi != fe; ++fi)
 		{
 			library.defineForm( (*fi)->name(), *fi);

@@ -36,11 +36,11 @@ Project Wolframe.
 #define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #include <string>
 #include "types/variant.hpp"
-#include "ddl/form.hpp"
-#include "ddl/compilerInterface.hpp"
+#include "types/form.hpp"
+#include "langbind/compilerInterface.hpp"
 
 namespace _Wolframe {
-namespace ddl {
+namespace langbind {
 
 class SimpleFormCompiler :public DDLCompiler
 {
@@ -48,7 +48,7 @@ public:
 	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
 
 	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
-	virtual std::vector<FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const;
+	virtual std::vector<types::FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const;
 };
 
 DDLCompiler* createSimpleFormCompilerFunc();

@@ -93,7 +93,7 @@ template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
-template <> const char* metaTableName<ddl::FormR>()			{return luaname::Form;}
+template <> const char* metaTableName<types::FormR>()			{return luaname::Form;}
 template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
 template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
@@ -677,7 +677,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 
 LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 {
-	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "__tostring");
+	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "__tostring");
 	check_parameters( ls, 1, 0);
 
 	ToStringFilter* flt = new ToStringFilter();
@@ -712,12 +712,12 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 
 LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 {
-	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "doctype");
+	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "doctype");
 	check_parameters( ls, 1, 0);
 
 	LuaExceptionHandlerScope escope(ls);
 	{
-		const ddl::FormDescription* descr = (*form)->description();
+		const types::FormDescription* descr = (*form)->description();
 		lua_pushlstring( ls, descr->name().c_str(), descr->name().size());
 		return 1;
 	}
@@ -740,7 +740,7 @@ static types::VariantStruct* get_substructure( lua_State* ls, int index, types::
 
 LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 {
-	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "fill");
+	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "fill");
 	DDLFormParser* closure;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
@@ -797,19 +797,19 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 		lua_pushlightuserdata( ls, closure);
 		lua_yieldk( ls, 0, 1, function_form_fill);
 	}
-	LuaObject<ddl::FormR>::push_luastack( ls, *form);
+	LuaObject<types::FormR>::push_luastack( ls, *form);
 	return 1;
 }
 
 
 LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 {
-	ddl::FormR* form;
+	types::FormR* form;
 	DDLFormSerializer* result;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		form = LuaObject<ddl::FormR>::getSelf( ls, "form", "table");
+		form = LuaObject<types::FormR>::getSelf( ls, "form", "table");
 
 		types::VariantStruct* substruct = form->get();
 		int nn = lua_gettop( ls);
@@ -825,7 +825,7 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 	}
 	else
 	{
-		form = (ddl::FormR*)lua_touserdata( ls, -2);
+		form = (types::FormR*)lua_touserdata( ls, -2);
 		result = (DDLFormSerializer*)lua_touserdata( ls, -1);
 		lua_pop( ls, 2);
 	}
@@ -846,7 +846,7 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 
 LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 {
-	ddl::FormR* result = LuaObject<ddl::FormR>::getSelf( ls, "form", "get");
+	types::FormR* result = LuaObject<types::FormR>::getSelf( ls, "form", "get");
 	types::VariantStruct* substruct = result->get();
 	int nn = lua_gettop( ls);
 	if (nn > 1)
@@ -870,10 +870,10 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 
 		const char* name = lua_tostring( ls, 1);
 		const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-		const ddl::FormDescription* st = ctx->formDescription( name);
+		const types::FormDescription* st = ctx->formDescription( name);
 		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
-		ddl::FormR frm( new ddl::Form( st));
-		LuaObject<ddl::FormR>::push_luastack( ls, frm);
+		types::FormR frm( new types::Form( st));
+		LuaObject<types::FormR>::push_luastack( ls, frm);
 		return 1;
 	}
 	throw std::runtime_error( "expected string as argument of form");
@@ -1587,7 +1587,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		{
 			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
 			const char* doctype_form = lua_tostring( ls, ii);
-			const ddl::FormDescription* formdescr = gtc->formDescription( doctype_form);
+			const types::FormDescription* formdescr = gtc->formDescription( doctype_form);
 			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
 			const char* doctype_root = formdescr->xmlRoot();
 			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
@@ -1631,7 +1631,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			}
 			else if (doctype_form)
 			{
-				const ddl::FormDescription* formdescr = gtc->formDescription( doctype_form);
+				const types::FormDescription* formdescr = gtc->formDescription( doctype_form);
 				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
 				doctype_root = formdescr->xmlRoot();
 				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
@@ -1744,7 +1744,7 @@ LUA_FUNCTION_THROWS( "input:form()", function_input_form_DDLFormParser)
 		lua_pushlightuserdata( ls, closure);
 		lua_yieldk( ls, 0, 1, function_input_form_DDLFormParser);
 	}
-	LuaObject<ddl::FormR>::push_luastack( ls, closure->form());
+	LuaObject<types::FormR>::push_luastack( ls, closure->form());
 	return 1;
 }
 
@@ -1784,9 +1784,9 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			{
 				std::string doctypeid( types::getIdFromDoctype( doctype));
 				const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
-				const ddl::FormDescription* st = gtc->formDescription( doctypeid);
+				const types::FormDescription* st = gtc->formDescription( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
-				ddl::FormR form( new ddl::Form( st));
+				types::FormR form( new types::Form( st));
 
 				DDLFormParser* closure;
 				serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
@@ -2156,7 +2156,7 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 			}
 		}
 		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<ddl::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);
+		LuaObject<types::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);
 		LuaObject<DDLFormParser>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<DDLFormSerializer>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<serialize::StructSerializer>::createMetatable( m_ls, 0, 0, struct_methodtable);
@@ -2298,8 +2298,8 @@ TypedInputFilterR LuaScriptInstance::getObject( int idx)
 	}
 	else
 	{
-		ddl::FormR* form;
-		if ((form=LuaObject<ddl::FormR>::get( thread(), idx)) != 0)
+		types::FormR* form;
+		if ((form=LuaObject<types::FormR>::get( thread(), idx)) != 0)
 		{
 			return TypedInputFilterR( new serialize::DDLStructSerializer( form->get()));
 		}

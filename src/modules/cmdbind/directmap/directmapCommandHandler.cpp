@@ -56,21 +56,21 @@ void DirectmapCommandHandler::initcall()
 	m_cmd = m_ctx->command( m_name);
 	if (!m_cmd->inputform.empty())
 	{
-		const ddl::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
+		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
 		if (!df)
 		{
 			throw std::runtime_error( std::string( "input form is not defined '") + m_cmd->inputform + "'");
 		}
-		m_inputform.reset( new ddl::Form( df));
+		m_inputform.reset( new types::Form( df));
 	}
 	if (!m_cmd->outputform.empty())
 	{
-		const ddl::FormDescription* df = m_provider->formDescription( m_cmd->outputform);
+		const types::FormDescription* df = m_provider->formDescription( m_cmd->outputform);
 		if (!df)
 		{
 			throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
 		}
-		m_outputform.reset( new ddl::Form( df));
+		m_outputform.reset( new types::Form( df));
 	}
 	std::string filtername;
 	if (m_cmd->filter.empty())
@@ -155,10 +155,10 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						// if no input form is defined we check for the input document type and set the form on our own:
 						std::string doctypeid( types::getIdFromDoctype( doctype));
-						const ddl::FormDescription* df = m_provider->formDescription( doctypeid);
+						const types::FormDescription* df = m_provider->formDescription( doctypeid);
 						if (df)
 						{
-							m_inputform.reset( new ddl::Form( df));
+							m_inputform.reset( new types::Form( df));
 							m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
 							m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
 							m_state = 2;

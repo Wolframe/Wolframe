@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/form.hpp
-///\brief Defines the form data structure as it is defined by a DDL (data definition language)
+///\file types/form.hpp
+///\brief Defines the unified form data structure as defined by a DDL (data definition language). A form data structure represents the document unit of a wolframe request or answer.
 
-#ifndef _Wolframe_DDL_FORM_HPP_INCLUDED
-#define _Wolframe_DDL_FORM_HPP_INCLUDED
+#ifndef _Wolframe_TYPES_FORM_HPP_INCLUDED
+#define _Wolframe_TYPES_FORM_HPP_INCLUDED
 #include <string>
 #include <cstddef>
 #include <stdexcept>
@@ -43,7 +43,7 @@ Project Wolframe.
 #include "types/variantStructDescription.hpp"
 
 namespace _Wolframe {
-namespace ddl {
+namespace types {
 
 class FormDescription
 	:public types::VariantStructDescription

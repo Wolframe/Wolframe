@@ -159,7 +159,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else {
 					try
 					{
-						ddl::DDLCompilerR constructor( ffo->object());
+						langbind::DDLCompilerR constructor( ffo->object());
 						m_programs->defineFormDDL( constructor);
 						LOG_TRACE << "registered '" << constructor->ddlname() << "' DDL compiler";
 					}
@@ -358,7 +358,7 @@ const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFun
 	return m_programs->getFormFunction( name);
 }
 
-const ddl::FormDescription* ProcessorProvider::ProcessorProvider_Impl::formDescription( const std::string& name) const
+const types::FormDescription* ProcessorProvider::ProcessorProvider_Impl::formDescription( const std::string& name) const
 {
 	LOG_TRACE << "[provider] get form description '" << name << "'";
 	return m_programs->getFormDescription( name);

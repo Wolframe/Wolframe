@@ -39,8 +39,8 @@
 #include "module/filterBuilder.hpp"
 #include "database/database.hpp"
 #include "langbind/builtInFunction.hpp"
-#include "ddl/compilerInterface.hpp"
-#include "ddl/form.hpp"
+#include "langbind/compilerInterface.hpp"
+#include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "module/printFunctionBuilder.hpp"
@@ -64,10 +64,10 @@ public:
 	virtual ~ProgramLibrary();
 	virtual void defineBuiltInFunction( const std::string& name, const langbind::BuiltInFunction& f);
 	virtual void defineFormFunction( const std::string& name, langbind::FormFunctionR f);
-	virtual void defineForm( const std::string& name, const ddl::FormDescriptionR& f);
+	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
 	virtual void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f);
 	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
-	virtual void defineFormDDL( const ddl::DDLCompilerR& c);
+	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
 	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& f);
 	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
 	virtual void defineProgramType( const ProgramR& prg);
@@ -75,7 +75,7 @@ public:
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
 	virtual const types::keymap<module::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
 
-	virtual const ddl::FormDescription* getFormDescription( const std::string& name) const;
+	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
 	virtual std::vector<std::string> getFormNames() const;
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;

@@ -33,17 +33,17 @@ Project Wolframe.
 ///\brief Interface template for object builder of form DDL compilers
 #ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "ddl/compilerInterface.hpp"
+#include "langbind/compilerInterface.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class DDLCompilerConstructor :public SimpleObjectConstructor< ddl::DDLCompiler >
+class DDLCompilerConstructor :public SimpleObjectConstructor< langbind::DDLCompiler >
 {
 public:
-	DDLCompilerConstructor( const char* classname_, const char* name_, ddl::CreateDDLCompilerFunc createFunc_ )
+	DDLCompilerConstructor( const char* classname_, const char* name_, langbind::CreateDDLCompilerFunc createFunc_ )
 		: m_classname(classname_)
 		, m_name(name_)
 		, m_createFunc(createFunc_) {}
@@ -62,7 +62,7 @@ public:
 	{
 		return m_name.c_str();
 	}
-	virtual ddl::DDLCompiler* object() const
+	virtual langbind::DDLCompiler* object() const
 	{
 		return m_createFunc();
 	}
@@ -74,13 +74,13 @@ public:
 private:
 	std::string m_classname;
 	std::string m_name;
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	langbind::CreateDDLCompilerFunc m_createFunc;
 };
 
 class DDLCompilerBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerBuilder( const char* classname_, const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
+	DDLCompilerBuilder( const char* classname_, const char* name_, langbind::CreateDDLCompilerFunc createFunc_)
 		:SimpleBuilder( classname_)
 		,m_name( name_)
 		,m_createFunc(createFunc_){}
@@ -102,7 +102,7 @@ public:
 
 private:
 	const char* m_name;
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	langbind::CreateDDLCompilerFunc m_createFunc;
 };
 
 }}//namespace
