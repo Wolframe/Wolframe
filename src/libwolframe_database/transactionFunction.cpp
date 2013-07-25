@@ -33,7 +33,7 @@
 ///\brief Implementation of the builder of transaction input and reader of output
 ///\file transactionFunction.cpp
 #include "types/allocators.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include "database/transactionFunction.hpp"
 #include "database/transaction.hpp"
 #include "textwolf/xmlscanner.hpp"

@@ -32,7 +32,8 @@ Project Wolframe.
 ///\file types_doctype.cpp
 ///\brief ADT for XML document type definition handling
 #include "types/doctype.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include <cstring>
 #include <stdexcept>
 

@@ -38,10 +38,10 @@
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
+#include "utils/fileUtils.hpp"
 
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -51,8 +51,6 @@ extern "C" {
 	#include "lualib.h"
 	#include "lauxlib.h"
 }
-
-using namespace _Wolframe::utils;
 
 namespace _Wolframe {
 

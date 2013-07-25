@@ -36,7 +36,7 @@ Project Wolframe.
 #include "prnt/pdfPrinterMethod.hpp"
 #include "prnt/pdfPrinterExpression.hpp"
 #include "prnt/pdfPrinterDocument.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
 #include <boost/algorithm/string.hpp>

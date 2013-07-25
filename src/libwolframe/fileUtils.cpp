@@ -42,9 +42,97 @@ Project Wolframe.
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/thread/thread.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
+using namespace _Wolframe;
 using namespace _Wolframe::utils;
+
+
+std::string _Wolframe::utils::resolvePath( const std::string& path )
+{
+	boost::filesystem::path result;
+	boost::filesystem::path	p( path );
+
+	for ( boost::filesystem::path::iterator it = p.begin(); it != p.end(); ++it )	{
+		if ( *it == ".." )	{
+			// /a/b/.. is not necessarily /a.. if b is a symbolic link
+			if ( boost::filesystem::is_symlink( result ) )
+				result /= *it;
+			// /a/b/../.. is not /a/b/.. under most circumstances
+			// We can end up with ..s in our result because of symbolic links
+			else if( result.filename() == ".." )
+				result /= *it;
+			// Otherwise it should be safe to resolve the parent
+			else
+				result = result.parent_path();
+		}
+		else if( *it == "." )	{
+			// Ignore
+		}
+		else {
+			// Just cat other path entries
+			result /= *it;
+		}
+	}
+	return result.string();
+}
+
+std::string _Wolframe::utils::getFileExtension( const std::string& path)
+{
+	boost::filesystem::path p(path);
+	std::string rt = p.extension().string();
+	return rt;
+}
+
+std::string _Wolframe::utils::getFileStem( const std::string& path)
+{
+	boost::filesystem::path p(path);
+	std::string rt = p.stem().string();
+	return rt;
+}
+
+std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const std::string& refPath )
+{
+	boost::filesystem::path pt( path );
+	if ( pt.is_absolute() )
+		return resolvePath( pt.string() );
+	else
+		return resolvePath( boost::filesystem::absolute( pt,
+								 boost::filesystem::path( refPath ) ).string() );
+}
+
+bool _Wolframe::utils::fileExists( const std::string& path)
+{
+	try
+	{
+		boost::filesystem::path pt( path);
+		return boost::filesystem::exists( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
+std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned int levels)
+{
+	boost::filesystem::path pt( path);
+	if (!pt.is_absolute())
+	{
+		pt = boost::filesystem::absolute( pt, boost::filesystem::current_path()).string();
+	}
+	pt = boost::filesystem::path( resolvePath( pt.string()));
+
+	while (levels > 0)
+	{
+		pt = pt.parent_path();
+		--levels;
+	}
+	return pt.string();
+}
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
@@ -95,7 +183,7 @@ static void readSourceFileLines_( const std::string& filename, std::vector<std::
 	}
 }
 
-void ::utils::writeFile( const std::string& filename, const std::string& content)
+void utils::writeFile( const std::string& filename, const std::string& content)
 {
 	unsigned char ch;
 	FILE* fh = fopen( filename.c_str(), "w");
@@ -116,21 +204,21 @@ void ::utils::writeFile( const std::string& filename, const std::string& content
 	}
 }
 
-std::string ::utils::readSourceFileContent( const std::string& filename)
+std::string utils::readSourceFileContent( const std::string& filename)
 {
 	std::string rt;
 	readFileContent( filename, rt);
 	return rt;
 }
 
-std::vector<std::string> _Wolframe::utils::readSourceFileLines( const std::string& filename)
+std::vector<std::string> utils::readSourceFileLines( const std::string& filename)
 {
 	std::vector<std::string> rt;
 	readSourceFileLines_( filename, rt);
 	return rt;
 }
 
-std::string _Wolframe::utils::getFileType( const std::string& filename)
+std::string utils::getFileType( const std::string& filename)
 {
 	enum
 	{
@@ -166,7 +254,7 @@ std::string _Wolframe::utils::getFileType( const std::string& filename)
 	return "TEXT";
 }
 
-boost::property_tree::ptree _Wolframe::utils::readPropertyTreeFile( const std::string& filename)
+boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& filename)
 {
 	std::string filetype = getFileType( filename);
 	if (filetype.empty()) throw std::runtime_error( "Configuration file is not recognized as TEXT or XML");
@@ -187,5 +275,6 @@ boost::property_tree::ptree _Wolframe::utils::readPropertyTreeFile( const std::s
 	}
 	return rt;
 }
+
 
 

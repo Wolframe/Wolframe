@@ -35,7 +35,7 @@ Project Wolframe.
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4127)
 #endif

@@ -33,7 +33,6 @@
 ///\file modules/normalize/locale/localeNormalize.cpp
 ///\brief Implementation of normalization functions based on boost locale (ICU)
 #include "localeNormalize.hpp"
-#include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/locale.hpp>
 #include <boost/locale/utf.hpp>

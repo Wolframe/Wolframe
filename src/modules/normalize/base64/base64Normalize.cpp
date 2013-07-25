@@ -34,7 +34,6 @@
 ///\brief Implementation of base64 based normalization functions
 #include "base64Normalize.hpp"
 #include "base64NormalizeFunction.hpp"
-#include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>

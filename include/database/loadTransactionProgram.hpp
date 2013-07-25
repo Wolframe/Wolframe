@@ -38,7 +38,6 @@
 #include "types/keymap.hpp"
 #include "database/transactionFunction.hpp"
 #include "database/databaseLanguage.hpp"
-#include "utils/miscUtils.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>

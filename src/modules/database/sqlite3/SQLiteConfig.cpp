@@ -37,12 +37,11 @@
 #include "SQLite.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
-using namespace _Wolframe::utils;
 
 namespace _Wolframe {
 namespace db {

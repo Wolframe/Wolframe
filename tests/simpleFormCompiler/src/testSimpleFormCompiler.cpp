@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file tests/testSimpleFormCompiler.cpp
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "types/variant.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/form.hpp"

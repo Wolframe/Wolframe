@@ -36,7 +36,6 @@
 #define _DATABASE_LANGUAGE_HPP_INCLUDED
 #include "database/transaction.hpp"
 #include "types/keymap.hpp"
-#include "utils/miscUtils.hpp"
 #include "UserInterface.hpp"
 #include <string>
 #include <iostream>

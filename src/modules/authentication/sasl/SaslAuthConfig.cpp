@@ -37,7 +37,6 @@
 #include "logger-v1.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "utils/miscUtils.hpp"
 #include "SaslAuth.hpp"
 
 #include "boost/algorithm/string.hpp"

@@ -66,9 +66,9 @@ CPP_OBJS = \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
-	resolvePath.o \
 	stringUtils.o \
 	parseUtils.o \
+	fileUtils.o \
 	types_allocators.o \
 	password.o \
 	globalRndGen.o \

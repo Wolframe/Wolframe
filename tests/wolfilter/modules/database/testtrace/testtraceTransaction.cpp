@@ -34,7 +34,8 @@
 ///\file modules/database/testtrace/testtraceTransaction.cpp
 #include "testtraceTransaction.hpp"
 #include "database/preparedStatement.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/stringUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <iostream>
 #include <fstream>
 #include <limits>

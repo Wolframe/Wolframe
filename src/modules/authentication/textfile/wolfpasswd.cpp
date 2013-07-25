@@ -35,16 +35,16 @@
 //
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
 #include <string>
 #include <iostream>
 
 #include "utils/getPassword.hpp"
+#include "utils/fileUtils.hpp"
 #include "passwdFile.hpp"
 #include "AAAA/password.hpp"
 #include "globalRngGen.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 namespace PO = boost::program_options;
 namespace WA = _Wolframe::AAAA;

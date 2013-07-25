@@ -41,7 +41,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include "moduleDirectory.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/filesystem.hpp>
 

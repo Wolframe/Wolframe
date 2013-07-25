@@ -34,7 +34,6 @@
 ///\file PostgreSQLprogram.cpp
 #include "PostgreSQLprogram.hpp"
 #include "config/programBase.hpp"
-#include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

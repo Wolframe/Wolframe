@@ -37,12 +37,10 @@
 #include "PostgreSQL.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
-using namespace _Wolframe::utils;
 
 static const unsigned short DEFAULT_POSTGRESQL_CONNECTIONS = 4;
 static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;

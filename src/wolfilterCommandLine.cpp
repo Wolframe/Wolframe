@@ -40,7 +40,7 @@
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "serialize/structOptionParser.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "types/doctype.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"

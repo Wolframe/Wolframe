@@ -35,7 +35,8 @@
 
 #include "prgbind/normalizeProgram.hpp"
 #include "langbind/normalizeFunction.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "config/programBase.hpp"
 #include <string>
 

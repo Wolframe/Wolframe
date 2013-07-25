@@ -39,12 +39,10 @@
 #include "config/ConfigurationTree.hpp"
 
 #include "TextFileAuth.hpp"
+#include "utils/fileUtils.hpp"
 
 #include "boost/algorithm/string.hpp"
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
-using namespace _Wolframe::utils;
 
 namespace _Wolframe {
 namespace AAAA {

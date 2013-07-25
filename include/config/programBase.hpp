@@ -35,7 +35,7 @@
 //
 #ifndef _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #define _CONFIG_PROGRAM_BASE_HPP_INCLUDED
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>

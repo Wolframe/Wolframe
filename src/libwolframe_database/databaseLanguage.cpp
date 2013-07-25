@@ -33,7 +33,7 @@
 ///\file databaseLanguage.cpp
 ///\brief Implementation of language definitions for embedded commands in transactions
 #include "database/databaseLanguage.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>

@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file serialize_structOptionParser.cpp
 ///\brief Implements uniform handling of structures in program command line options
 #include "serialize/structOptionParser.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
 

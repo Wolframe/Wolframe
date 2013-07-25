@@ -34,8 +34,8 @@
 #include "asciiNormalizeFunction.hpp"
 #include "textwolf/charset_utf8.hpp"
 #include "textwolf/istreamiterator.hpp"
+#include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
-#include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;

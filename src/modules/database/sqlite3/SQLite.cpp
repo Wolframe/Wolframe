@@ -35,9 +35,10 @@
 //
 
 #include "logger-v1.hpp"
-#include "utils/miscUtils.hpp"
 #include "SQLite.hpp"
 #include "SQLitePreparedStatement.hpp"
+#include "utils/fileUtils.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "sqlite3.h"
 #undef LOWLEVEL_DEBUG

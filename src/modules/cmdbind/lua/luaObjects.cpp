@@ -41,8 +41,8 @@ Project Wolframe.
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
-#include "utils/miscUtils.hpp"
 #include "types/doctype.hpp"
+#include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <limits>
 #include <fstream>

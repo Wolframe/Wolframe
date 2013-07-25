@@ -33,7 +33,7 @@
 ///\brief Implementation of directmap programs
 ///\file directmapProgram.cpp
 #include "directmapProgram.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>

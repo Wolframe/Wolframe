@@ -36,7 +36,6 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/filter.hpp"
-#include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include <boost/algorithm/string.hpp>

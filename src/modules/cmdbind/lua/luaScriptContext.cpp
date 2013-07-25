@@ -33,7 +33,6 @@
 ///\file luaScriptConfig.cpp
 ///\brief Implementation of the lua script objects configuration
 #include "luaScriptContext.hpp"
-#include "utils/miscUtils.hpp"
 #include "moduleInterface.hpp"
 #include "moduleDirectory.hpp"
 #include <algorithm>

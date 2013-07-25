@@ -34,7 +34,6 @@
 ///\file modules/database/sqlite3/SQLiteProgram.cpp
 #include "SQLiteProgram.hpp"
 #include "config/programBase.hpp"
-#include "utils/miscUtils.hpp"
 #include "sqlite3.h"
 #include <boost/algorithm/string.hpp>
 

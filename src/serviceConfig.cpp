@@ -41,7 +41,7 @@
 #include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>

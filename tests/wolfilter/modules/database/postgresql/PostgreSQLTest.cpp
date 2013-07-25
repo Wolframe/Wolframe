@@ -35,10 +35,11 @@
 //
 #include "logger-v1.hpp"
 #include "PostgreSQLTest.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include <boost/system/error_code.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include "libpq-fe.h"

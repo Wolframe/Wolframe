@@ -33,7 +33,8 @@
 ///\brief Loading function for transaction definition programs
 ///\file loadTransactionProgram.cpp
 #include "database/loadTransactionProgram.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>

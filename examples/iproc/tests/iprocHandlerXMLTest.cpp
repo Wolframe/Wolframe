@@ -42,7 +42,7 @@
 #include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "wtest/testModules.hpp"
 #include <iostream>
 #include <list>

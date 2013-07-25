@@ -40,7 +40,6 @@
 #endif
 
 #include "testDescription.hpp"
-#include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>

@@ -44,7 +44,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testModules.hpp"
 #include <boost/filesystem.hpp>

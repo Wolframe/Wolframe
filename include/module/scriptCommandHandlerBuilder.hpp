@@ -39,7 +39,7 @@ Project Wolframe.
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "constructor.hpp"
 #include <boost/type_traits.hpp>
 #include <boost/algorithm/string.hpp>

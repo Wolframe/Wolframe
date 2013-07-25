@@ -37,12 +37,12 @@
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appConfig.hpp"
+#include "utils/fileUtils.hpp"
 #include "wolframedCommandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
 #include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
@@ -124,7 +124,7 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName,
 
 ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( const char *filename, ConfigFileType type )
 {
-	std::string file = resolvePath( boost::filesystem::absolute( filename ).string() );
+	std::string file = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	if ( !boost::filesystem::exists( file ))	{
 		LOG_FATAL << "Configuration file " << file << " does not exist.";
 		return CONFIG_UNDEFINED;
@@ -193,7 +193,7 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileType type )
 {
 	m_type = type;
-	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
+	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
 	// Create an empty property tree object
@@ -302,7 +302,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 
 bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type )
 {
-	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
+	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
 	// Create an empty property tree object

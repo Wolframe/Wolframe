@@ -45,7 +45,7 @@
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "wtest/testModules.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>

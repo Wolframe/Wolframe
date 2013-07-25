@@ -36,13 +36,11 @@
 
 #include <string>
 #include "serverEndpoint.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-
-using namespace _Wolframe::utils;
+#include "utils/fileUtils.hpp"
 
 namespace _Wolframe	{
 namespace net	{

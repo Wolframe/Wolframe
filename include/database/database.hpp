@@ -39,7 +39,6 @@
 #include "database/transaction.hpp"
 #include "database/databaseLanguage.hpp"
 #include "types/keymap.hpp"
-#include "utils/miscUtils.hpp"
 #include "UserInterface.hpp"
 #include <string>
 #include <iostream>

@@ -35,7 +35,7 @@
 #include "numberNormalize.hpp"
 #include "integerNormalizeFunction.hpp"
 #include "floatNormalizeFunction.hpp"
-#include "utils/miscUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
