@@ -232,4 +232,9 @@ unsigned int Variant::touint() const
 	return variant_cast<unsigned int>( *this);
 }
 
+ConstVariant::ConstVariant( const Variant& o)
+{
+	std::memcpy( this, &o, sizeof( *this));
+	setConstant();
+}
 

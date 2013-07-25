@@ -520,5 +520,10 @@ std::string VariantStruct::tostring() const
 	return buf.str();
 }
 
+ConstVariantStruct::ConstVariantStruct( const VariantStruct& o)
+{
+	std::memcpy( this, &o, sizeof( *this));
+	setConstant();
+}
 
 

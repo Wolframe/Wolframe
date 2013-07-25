@@ -46,7 +46,7 @@ class VariantStructDescription;
 ///\brief Forward declaration for VariantStruct
 class IndirectionDescription;
 
-///\brief Structure of Variant type
+///\brief Structure of variant type atoms or substructures
 class VariantStruct :public Variant
 {
 public:
@@ -200,6 +200,14 @@ public:
 	VariantIndirection( const VariantStructDescription* descr);
 };
 
+
+///\class ConstVariantStruct
+///\brief Variant value type that references another Variant
+///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
+struct ConstVariantStruct :public VariantStruct
+{
+	ConstVariantStruct( const VariantStruct& o);
+};
 
 }} //namespace
 #endif

@@ -163,6 +163,15 @@ protected:
 	unsigned char m_flags;
 };
 
+
+///\class ConstVariant
+///\brief Variant value type that references another Variant
+///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
+struct ConstVariant :public Variant
+{
+	ConstVariant( const Variant& o);
+};
+
 }} //namespace
 #endif
 

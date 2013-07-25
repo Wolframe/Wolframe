@@ -37,11 +37,10 @@
 #include "TextFileAudit.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-
-using namespace _Wolframe::utils;
 
 namespace _Wolframe {
 namespace AAAA {
@@ -95,10 +94,10 @@ void TextFileAuditConfig::setCanonicalPathes( const std::string& refPath )
 
 	if ( ! m_file.empty() )	{
 		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
+			m_file = utils::resolvePath( absolute( m_file,
 							path( refPath ).branch_path()).string());
 		else
-			m_file = resolvePath( m_file );
+			m_file = utils::resolvePath( m_file );
 	}
 }
 
