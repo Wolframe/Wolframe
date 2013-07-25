@@ -58,7 +58,6 @@ public:
 	{
 		langbind::FilterBase::ElementType m_type;
 		langbind::TypedFilterBase::Element m_value;
-		std::string m_stringbuf;
 
 		ElementBuffer()
 			:m_type(langbind::FilterBase::Value)
@@ -66,7 +65,6 @@ public:
 		ElementBuffer( const ElementBuffer& o)
 			:m_type(o.m_type)
 			,m_value(o.m_value)
-			,m_stringbuf(o.m_stringbuf)
 			{}
 	};
 	enum Flags
@@ -97,7 +95,6 @@ public:
 	{
 		m_elem.m_type = t;
 		m_elem.m_value = langbind::TypedFilterBase::Element();
-		m_elem.m_stringbuf.clear();
 		m_has_elem = true;
 	}
 
@@ -131,8 +128,7 @@ public:
 				setElem_( t, val.touint());
 				break;
 			case types::Variant::string_:
-				m_elem.m_stringbuf = val.tostring();
-				setElem_( t, m_elem.m_stringbuf);
+				setElem( t, langbind::TypedFilterBase::Element( val.charptr(), val.charsize()));
 				break;
 		}
 	}
