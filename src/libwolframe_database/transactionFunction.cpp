@@ -970,7 +970,7 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInp
 	,m_func(o.m_func)
 	,m_lasttype(o.m_lasttype){}
 
-bool TransactionFunctionInput::print( ElementType type, const Element& element)
+bool TransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
 {
 	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
 	switch (type)
@@ -1175,7 +1175,7 @@ struct TransactionFunctionOutput::Impl
 		m_resend = m_data->end();
 	}
 
-	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
+	bool getNext( ElementType& type, types::VariantConst& element, bool doSerializeWithIndices)
 	{
 		if (!m_started)
 		{
@@ -1196,13 +1196,13 @@ struct TransactionFunctionOutput::Impl
 			{
 				case ResultElement::OpenTag:
 					type = TypedInputFilter::OpenTag;
-					element = TypedFilterBase::Element( m_structitr->value);
+					element = m_structitr->value;
 					++m_structitr;
 					return true;
 
 				case ResultElement::CloseTag:
 					type = TypedInputFilter::CloseTag;
-					element = TypedFilterBase::Element();
+					element.init();
 					++m_structitr;
 					return true;
 
@@ -1236,7 +1236,7 @@ struct TransactionFunctionOutput::Impl
 					m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr));
 					++m_structitr;
 					type = TypedInputFilter::OpenTag;
-					element = TypedInputFilter::Element( (unsigned int)++m_stack.back().m_cnt);
+					element = types::VariantConst( (unsigned int)++m_stack.back().m_cnt);
 					return true;
 
 				case ResultElement::IndexEnd:
@@ -1244,7 +1244,7 @@ struct TransactionFunctionOutput::Impl
 					{
 						m_valuestate = 1;
 						type = TypedInputFilter::CloseTag;
-						element = TypedInputFilter::Element();
+						element.init();
 						return true;
 					}
 					m_valuestate = 0;
@@ -1256,7 +1256,7 @@ struct TransactionFunctionOutput::Impl
 					{
 						m_structitr = m_stack.back().m_structitr;
 						type = TypedInputFilter::OpenTag;
-						element = TypedInputFilter::Element( (unsigned int)++m_stack.back().m_cnt);
+						element = types::VariantConst( (unsigned int)++m_stack.back().m_cnt);
 						++m_structitr;
 						return true;
 					}
@@ -1343,7 +1343,7 @@ struct TransactionFunctionOutput::Impl
 						}
 						type = TypedInputFilter::OpenTag;
 						element = m_resitr->columnName( m_colidx);
-						if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 0)
+						if (element.type() == types::Variant::string_ && element.charsize() == 0)
 						{
 							//... untagged content value (column name '_')
 							type = langbind::TypedInputFilter::Value;
@@ -1368,7 +1368,7 @@ struct TransactionFunctionOutput::Impl
 					if (m_valuestate == 2)
 					{
 						type = langbind::TypedInputFilter::CloseTag;
-						element = TypedFilterBase::Element();
+						element.init();
 						m_valuestate = 0;
 						++m_colidx;
 						return true;
@@ -1383,7 +1383,7 @@ struct TransactionFunctionOutput::Impl
 		if (!m_endofoutput)
 		{
 			type = TypedInputFilter::CloseTag;
-			element = TypedFilterBase::Element();
+			element.init();
 			m_endofoutput = true;
 			return true;
 		}
@@ -1408,7 +1408,7 @@ TransactionFunctionOutput::~TransactionFunctionOutput()
 	delete m_impl;
 }
 
-bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Element& element)
+bool TransactionFunctionOutput::getNext( ElementType& type, types::VariantConst& element)
 {
 	bool rt = m_impl->getNext( type, element, flag( SerializeWithIndices));
 	return rt;

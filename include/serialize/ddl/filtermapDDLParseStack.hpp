@@ -37,6 +37,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "types/variantStruct.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 #include <stdexcept>
 
@@ -50,14 +51,16 @@ public:
 		:m_size(o.m_size)
 		,m_elemidx(o.m_elemidx)
 		,m_value(o.m_value)
+		,m_normalizer(o.m_normalizer)
 		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
 		{}
 
-	FiltermapDDLParseState( const char* name_, types::VariantStruct* v)
+	FiltermapDDLParseState( const char* name_, types::VariantStruct* v, const types::NormalizeFunction* n)
 		:m_size(0)
 		,m_elemidx(0)
 		,m_value(v)
+		,m_normalizer(n)
 		,m_name(name_)
 		,m_stateidx(0)
 		{}
@@ -84,10 +87,16 @@ public:
 		return m_stateidx;
 	}
 
+	const types::NormalizeFunction* normalizer() const
+	{
+		return m_normalizer;
+	}
+
 private:
 	std::size_t m_size;
 	std::size_t m_elemidx;
 	types::VariantStruct* m_value;
+	const types::NormalizeFunction* m_normalizer;
 	const char* m_name;
 	std::size_t m_stateidx;
 };

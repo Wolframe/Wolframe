@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
+#include "types/variant.hpp"
 #include "types/variantStruct.hpp"
 #include <vector>
 #include <cstddef>
@@ -54,19 +55,29 @@ public:
 		,m_tag(o.m_tag)
 		{}
 
-	FiltermapDDLSerializeState( const types::VariantStruct* v, const langbind::TypedFilterBase::Element& t)
+	FiltermapDDLSerializeState( const types::VariantStruct* v, const types::VariantConst& t)
 		:m_value(v)
 		,m_stateidx(0)
 		,m_elemtype(langbind::FilterBase::Value)
 		,m_tag(t)
+		{
+			m_tag.setInitialized();
+		}
+
+	FiltermapDDLSerializeState( const types::VariantStruct* v)
+		:m_value(v)
+		,m_stateidx(0)
+		,m_elemtype(langbind::FilterBase::Value)
 		{}
 
-	FiltermapDDLSerializeState( langbind::FilterBase::ElementType typ, const langbind::TypedFilterBase::Element& elem)
+	FiltermapDDLSerializeState( langbind::FilterBase::ElementType typ, const types::VariantConst& elem)
 		:m_value(0)
 		,m_stateidx(0)
 		,m_elemtype(typ)
 		,m_tag(elem)
-		{}
+		{
+			m_tag.setInitialized();
+		}
 
 	const types::VariantStruct* value() const
 	{
@@ -88,7 +99,7 @@ public:
 		return m_elemtype;
 	}
 
-	const langbind::TypedFilterBase::Element& tag() const
+	const types::VariantConst& tag() const
 	{
 		return m_tag;
 	}
@@ -97,7 +108,7 @@ private:
 	const types::VariantStruct* m_value;
 	std::size_t m_stateidx;
 	langbind::FilterBase::ElementType m_elemtype;
-	langbind::TypedFilterBase::Element m_tag;
+	types::VariantConst m_tag;
 };
 
 typedef std::vector<FiltermapDDLSerializeState> FiltermapDDLSerializeStateStack;

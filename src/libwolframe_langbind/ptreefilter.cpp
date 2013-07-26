@@ -39,7 +39,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool PropertyTreeInputFilter::getNext( ElementType& type, Element& element)
+bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	while (m_stk.size())
 	{
@@ -48,22 +48,22 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, Element& element)
 		{
 			m_stk.pop_back();
 			m_state = 0;
-			type = TypedFilterBase::CloseTag;
-			element = Element();
+			type = FilterBase::CloseTag;
+			element.init();
 			return true;
 		}
 		switch (m_state)
 		{
 			case 0:
-				element = Element( m_stk.back().itr->first);
-				type = TypedFilterBase::OpenTag;
+				element.init( m_stk.back().itr->first);
+				type = FilterBase::OpenTag;
 				m_state = 1;
 				return true;
 			case 1:
 				if (m_stk.back().itr->second.data().size())
 				{
-					element = Element( m_stk.back().itr->second.data());
-					type = TypedFilterBase::Value;
+					element.init( m_stk.back().itr->second.data());
+					type = FilterBase::Value;
 					m_state = 2;
 					return true;
 				}
@@ -102,12 +102,12 @@ static std::string ptree_tostring( const boost::property_tree::ptree& pt)
 }
 
 
-bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
+bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
 	std::string elem = element.tostring();
 	switch (type)
 	{
-		case TypedFilterBase::OpenTag:
+		case FilterBase::OpenTag:
 		{
 			m_stk.push_back( State( elem));
 			if (!m_attribute.empty())
@@ -116,7 +116,7 @@ bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 			}
 		}
 		break;
-		case TypedFilterBase::CloseTag:
+		case FilterBase::CloseTag:
 			if (!m_attribute.empty())
 			{
 				std::runtime_error( "unspecified attribute value in property tree output filter");
@@ -132,14 +132,14 @@ bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 			}
 			m_stk.pop_back();
 		break;
-		case TypedFilterBase::Attribute:
+		case FilterBase::Attribute:
 			m_attribute = elem;
 			if (m_attribute.empty())
 			{
 				std::runtime_error( "empty attribute name in property tree output filter");
 			}
 		break;
-		case TypedFilterBase::Value:
+		case FilterBase::Value:
 		{
 			if (!m_attribute.empty())
 			{

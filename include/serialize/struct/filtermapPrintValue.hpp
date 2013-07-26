@@ -92,37 +92,37 @@ struct PrintValueType
 
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::bool_&, langbind::TypedInputFilter::Element& element)
+bool printValue_( const ValueType& val, const PrintValueType::bool_&, types::VariantConst& element)
 {
-	element.type = langbind::TypedInputFilter::Element::bool_;
-	element.value.bool_ = val;
+	element = val;
 	return true;
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::string_&, langbind::TypedInputFilter::Element& element)
+bool printValue_( const ValueType& val, const PrintValueType::string_&, types::VariantConst& element)
 {
-	element.type = langbind::TypedInputFilter::Element::string_;
-	element.value.string_.ptr = val.c_str();
-	element.value.string_.size = val.size();
+	element.init( val.c_str(), val.size());
 	return true;
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::double_&, langbind::TypedInputFilter::Element& element)
-{
-	element.type = langbind::TypedInputFilter::Element::double_;
-	element.value.double_ = val;
-	return true;
-}
-
-template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::int_&, langbind::TypedInputFilter::Element& element)
+bool printValue_( const ValueType& val, const PrintValueType::double_&, types::VariantConst& element)
 {
 	try
 	{
-		element.type = langbind::TypedInputFilter::Element::int_;
-		element.value.int_ = boost::numeric_cast<int>( val);
+		element = boost::numeric_cast<double>( val);
+		return true;
+	}
+	catch (boost::bad_numeric_cast&){}
+	return false;
+}
+
+template <typename ValueType>
+bool printValue_( const ValueType& val, const PrintValueType::int_&, types::VariantConst& element)
+{
+	try
+	{
+		element = boost::numeric_cast<int>( val);
 		return true;
 	}
 	catch (boost::bad_numeric_cast&){}
@@ -131,12 +131,11 @@ bool printValue_( const ValueType& val, const PrintValueType::int_&, langbind::T
 
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::uint_&, langbind::TypedInputFilter::Element& element)
+bool printValue_( const ValueType& val, const PrintValueType::uint_&, types::VariantConst& element)
 {
 	try
 	{
-		element.type = langbind::TypedInputFilter::Element::uint_;
-		element.value.uint_ = boost::numeric_cast<unsigned int>( val);
+		element = boost::numeric_cast<unsigned int>( val);
 		return true;
 	}
 	catch (boost::bad_numeric_cast&){}
@@ -144,7 +143,7 @@ bool printValue_( const ValueType& val, const PrintValueType::uint_&, langbind::
 }
 
 template <typename ValueType>
-bool printValue( const ValueType& val, langbind::TypedInputFilter::Element& element)
+bool printValue( const ValueType& val, types::VariantConst& element)
 {
 	return printValue_( val, PrintValueType::get(val), element);
 }

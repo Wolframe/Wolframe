@@ -38,57 +38,57 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
-bool _Wolframe::serialize::printValue_int( const signed int* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_int( const signed int* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const int*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_uint( const unsigned int* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_uint( const unsigned int* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned int*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_ulong( const unsigned long* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_ulong( const unsigned long* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned long*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_long( const signed long* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_long( const signed long* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned long*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_short( const signed short* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_short( const signed short* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const signed short*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_ushort( const unsigned short* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_ushort( const unsigned short* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned short*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_char( const signed char* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_char( const signed char* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const signed char*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_uchar( const unsigned char* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_uchar( const unsigned char* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned char*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_float( const float* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_float( const float* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const float*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_double( const double* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_double( const double* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const double*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_string( const std::string* ptr, langbind::TypedFilterBase::Element& value)
+bool _Wolframe::serialize::printValue_string( const std::string* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const std::string*)ptr, value);
 }
@@ -104,7 +104,7 @@ bool _Wolframe::serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateSt
 {
 	ctx.setElem(
 		langbind::FilterBase::OpenTag,
-		langbind::TypedFilterBase::Element( stk.back().name()));
+		types::VariantConst( stk.back().name()));
 	stk.pop_back();
 	return true;
 }
@@ -126,7 +126,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 			}
 			ctx.setElem(
 				langbind::FilterBase::Attribute,
-				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
+				types::VariantConst( itr->first.c_str(), itr->first.size()));
 			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
@@ -151,7 +151,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 			{
 				ctx.setElem(
 					langbind::FilterBase::OpenTag,
-					langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
+					types::VariantConst( itr->first.c_str(), itr->first.size()));
 				rt = true;
 				stk.back().state( idx+1);
 				stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
@@ -164,7 +164,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 		stk.pop_back();
 		if (stk.size() == 0)
 		{
-			ctx.setElem( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element());
+			ctx.setElem( langbind::FilterBase::CloseTag, types::VariantConst());
 			rt = true;
 		}
 	}
@@ -191,7 +191,7 @@ bool _Wolframe::serialize::fetchObjectVectorElement( FetchElement fetchElement, 
 
 	if (ctx.flag( Context::SerializeWithIndices))
 	{
-		ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1));
+		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1));
 		stk.back().state( idx+1);
 		stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, 0));
 		stk.push_back( FiltermapSerializeState( stk.back().name(), fetchElement, ve));
@@ -201,7 +201,7 @@ bool _Wolframe::serialize::fetchObjectVectorElement( FetchElement fetchElement, 
 		const char* tagname = stk.back().name();
 		if (tagname)
 		{
-			ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( tagname));
+			ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( tagname));
 			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( tagname, &fetchCloseTag, tagname));

@@ -120,28 +120,24 @@ AGAIN:
 }
 
 
-static void push_element( lua_State* ls, const TypedInputFilter::Element& element)
+static void push_element( lua_State* ls, const types::VariantConst& element)
 {
-	switch (element.type)
+	switch (element.type())
 	{
-		case TypedInputFilter::Element::bool_:
-			lua_pushboolean( ls, element.value.bool_);
+		case types::Variant::bool_:
+			lua_pushboolean( ls, element.tobool());
 			break;
-		case TypedInputFilter::Element::double_:
-			lua_pushnumber( ls, (lua_Number)element.value.double_);
+		case types::Variant::double_:
+			lua_pushnumber( ls, (lua_Number)element.todouble());
 			break;
-		case TypedInputFilter::Element::int_:
-			lua_pushinteger( ls, (lua_Integer)element.value.int_);
+		case types::Variant::int_:
+			lua_pushinteger( ls, (lua_Integer)element.toint());
 			break;
-		case TypedInputFilter::Element::uint_:
-			lua_pushinteger( ls, (lua_Integer)element.value.uint_);
+		case types::Variant::uint_:
+			lua_pushinteger( ls, (lua_Integer)element.touint());
 			break;
-		case TypedInputFilter::Element::string_:
-			lua_pushlstring( ls, element.value.string_.ptr, element.value.string_.size);
-			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-			break;
-		case TypedInputFilter::Element::blob_:
-			lua_pushlstring( ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+		case types::Variant::string_:
+			lua_pushlstring( ls, element.charptr(), element.charsize());
 			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			break;
 		default:
@@ -153,7 +149,7 @@ static void push_element( lua_State* ls, const TypedInputFilter::Element& elemen
 TypedInputFilterClosure::ItemType TypedInputFilterClosure::fetch( lua_State* ls)
 {
 	InputFilter::ElementType elemtype;
-	TypedInputFilter::Element element;
+	types::VariantConst element;
 
 	if (!m_inputfilter.get() || m_taglevel < 0)
 	{

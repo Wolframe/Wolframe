@@ -35,7 +35,8 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
-#include "filter/typedfilterbase.hpp"
+#include "types/variant.hpp"
+#include "filter/filterbase.hpp"
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
 #include <boost/shared_ptr.hpp>
@@ -46,7 +47,7 @@ namespace langbind {
 
 ///\class TypedInputFilter
 ///\brief Input filter with atomic values having a type
-class TypedInputFilter :public TypedFilterBase
+class TypedInputFilter :public FilterBase
 {
 public:
 	typedef InputFilter::State State;
@@ -61,7 +62,7 @@ public:
 	///\param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
 		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
-		,TypedFilterBase(o)
+		,FilterBase(o)
 		,m_state(o.m_state)
 		,m_flags(o.m_flags){}
 
@@ -77,7 +78,7 @@ public:
 	///\param [out] element reference to element returned
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
-	virtual bool getNext( ElementType& type, Element& element)=0;
+	virtual bool getNext( ElementType& type, types::VariantConst& element)=0;
 
 	///\brief Get the current state
 	///\return the current state
@@ -114,7 +115,7 @@ typedef types::CountedReference<TypedInputFilter> TypedInputFilterR;
 
 ///\class TypedOutputFilter
 ///\brief Output filter with atomic values having a type
-class TypedOutputFilter :public TypedFilterBase
+class TypedOutputFilter :public FilterBase
 {
 public:
 	typedef OutputFilter::State State;
@@ -128,7 +129,7 @@ public:
 	///\param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
 		:types::TypeSignature(o)
-		,TypedFilterBase(o)
+		,FilterBase(o)
 		,m_state(o.m_state){}
 
 	///\brief Destructor
@@ -143,7 +144,7 @@ public:
 	///\param [out] element reference to element returned
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
-	virtual bool print( ElementType type, const Element& element)=0;
+	virtual bool print( ElementType type, const types::VariantConst& element)=0;
 
 	///\brief Get the current state
 	///\return the current state

@@ -63,7 +63,7 @@ public:
 
 	virtual langbind::TypedInputFilterR result() const
 	{
-		langbind::TypedInputFilter::Element elem( langbind::PrintFunctionClosure::result());
+		types::VariantConst elem( langbind::PrintFunctionClosure::result());
 		return langbind::TypedInputFilterR( new langbind::SingleElementInputFilter( elem));
 	}
 };

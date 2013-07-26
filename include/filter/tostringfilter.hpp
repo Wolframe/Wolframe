@@ -67,8 +67,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new ToStringFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element);
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	virtual bool print( ElementType type, const types::VariantConst& element);
 
 	///\brief Get the content
 	const std::string& content() const		{return m_content;}

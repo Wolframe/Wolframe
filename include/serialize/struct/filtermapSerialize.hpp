@@ -57,23 +57,23 @@ bool fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk);
 
 bool fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk);
 
-typedef bool (*PrintValue)( const void* ptr, langbind::TypedFilterBase::Element& value);
+typedef bool (*PrintValue)( const void* ptr, types::VariantConst& value);
 
 bool fetchObjectAtomic( PrintValue prnt, Context& ctx, FiltermapSerializeStateStack& stk);
 
-typedef bool (*PrintValue)( const void* value, langbind::TypedFilterBase::Element& element);
+typedef bool (*PrintValue)( const void* value, types::VariantConst& element);
 
-bool printValue_int( const signed int*, langbind::TypedFilterBase::Element& element);
-bool printValue_uint( const unsigned int*, langbind::TypedFilterBase::Element& element);
-bool printValue_ulong( const unsigned long*, langbind::TypedFilterBase::Element& element);
-bool printValue_long( const signed long*, langbind::TypedFilterBase::Element& element);
-bool printValue_short( const signed short*, langbind::TypedFilterBase::Element& element);
-bool printValue_ushort( const unsigned short*, langbind::TypedFilterBase::Element& element);
-bool printValue_char( const signed char*, langbind::TypedFilterBase::Element& element);
-bool printValue_uchar( const unsigned char*, langbind::TypedFilterBase::Element& element);
-bool printValue_float( const float*, langbind::TypedFilterBase::Element& element);
-bool printValue_double( const double*, langbind::TypedFilterBase::Element& element);
-bool printValue_string( const std::string*, langbind::TypedFilterBase::Element& element);
+bool printValue_int( const signed int*, types::VariantConst& element);
+bool printValue_uint( const unsigned int*, types::VariantConst& element);
+bool printValue_ulong( const unsigned long*, types::VariantConst& element);
+bool printValue_long( const signed long*, types::VariantConst& element);
+bool printValue_short( const signed short*, types::VariantConst& element);
+bool printValue_ushort( const unsigned short*, types::VariantConst& element);
+bool printValue_char( const signed char*, types::VariantConst& element);
+bool printValue_uchar( const unsigned char*, types::VariantConst& element);
+bool printValue_float( const float*, types::VariantConst& element);
+bool printValue_double( const double*, types::VariantConst& element);
+bool printValue_string( const std::string*, types::VariantConst& element);
 
 typedef bool (*FetchElement)( Context& ctx, FiltermapSerializeStateStack& stk);
 
@@ -81,29 +81,29 @@ bool fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Contex
 
 namespace {
 template <typename TYPE>
-static bool printValue_( const void*, langbind::TypedFilterBase::Element&)
+static bool printValue_( const void*, types::VariantConst&)
 {throw std::runtime_error( "unable to serialize atomic value of this type");}
-template <> bool printValue_<signed int>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<signed int>( const void* value, types::VariantConst& element)
 {return printValue_int( (const int*)value, element);}
-template <> bool printValue_<unsigned int>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<unsigned int>( const void* value, types::VariantConst& element)
 {return printValue_uint( (const unsigned int*)value, element);}
-template <> bool printValue_<signed long>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<signed long>( const void* value, types::VariantConst& element)
 {return printValue_long( (const signed long*)value, element);}
-template <> bool printValue_<unsigned long>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<unsigned long>( const void* value, types::VariantConst& element)
 {return printValue_ulong( (const unsigned long*)value, element);}
-template <> bool printValue_<signed short>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<signed short>( const void* value, types::VariantConst& element)
 {return printValue_short( (const signed short*)value, element);}
-template <> bool printValue_<unsigned short>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<unsigned short>( const void* value, types::VariantConst& element)
 {return printValue_ushort( (const unsigned short*)value, element);}
-template <> bool printValue_<signed char>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<signed char>( const void* value, types::VariantConst& element)
 {return printValue_char( (const signed char*)value, element);}
-template <> bool printValue_<unsigned char>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<unsigned char>( const void* value, types::VariantConst& element)
 {return printValue_uchar( (const unsigned char*)value, element);}
-template <> bool printValue_<float>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<float>( const void* value, types::VariantConst& element)
 {return printValue_float( (const float*)value, element);}
-template <> bool printValue_<double>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<double>( const void* value, types::VariantConst& element)
 {return printValue_double( (const double*)value, element);}
-template <> bool printValue_<std::string>( const void* value, langbind::TypedFilterBase::Element& element)
+template <> bool printValue_<std::string>( const void* value, types::VariantConst& element)
 {return printValue_string( (const std::string*)value, element);}
 
 template <typename TYPE>

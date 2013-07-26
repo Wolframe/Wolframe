@@ -71,8 +71,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new PropertyTreeInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	virtual bool getNext( ElementType& type, Element& element);
+	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
 private:
 	struct State
@@ -101,8 +101,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const			{return new PropertyTreeOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element);
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	virtual bool print( ElementType type, const types::VariantConst& element);
 
 	///\brief Get the content
 	const boost::property_tree::ptree& content() const	{return m_stk.back().m_node;}

@@ -44,7 +44,7 @@ class SingleElementInputFilter :public TypedInputFilter
 {
 public:
 	///\brief Constructor
-	explicit SingleElementInputFilter( const TypedInputFilter::Element& e)
+	explicit SingleElementInputFilter( const types::VariantConst& e)
 		:types::TypeSignature("langbind::SingleElementInputFilter", __LINE__)
 		,m_element(e)
 		,m_consumed(false){}
@@ -68,7 +68,7 @@ public:
 	}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	virtual bool getNext( ElementType& type, Element& element)
+	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
 		if (m_consumed)
 		{
@@ -83,7 +83,7 @@ public:
 	}
 
 private:
-	TypedInputFilter::Element m_element;
+	types::VariantConst m_element;
 	bool m_consumed;
 };
 

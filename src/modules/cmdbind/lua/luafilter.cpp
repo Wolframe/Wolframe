@@ -107,27 +107,26 @@ const char* wrap_lua_tostring( lua_State* ls, int arg)			{std::cout << "lua_tost
 #define wrap_lua_tostring( ls,a)	lua_tostring(ls,a)
 #endif
 
-static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& element, const char*& errelemtype)
+static bool getElementValue( lua_State* ls, int idx, types::VariantConst& element, const char*& errelemtype)
 {
+	const char* lstr;
+	std::size_t lstrlen = 0;
 	switch (lua_type( ls, idx))
 	{
 		case LUA_TNIL:
 			return false;
 
 		case LUA_TNUMBER:
-			element.type = TypedFilterBase::Element::double_;
-			element.value.double_ = (double)lua_tonumber(ls, idx);
+			element = (double)lua_tonumber(ls, idx);
 			return true;
 
 		case LUA_TBOOLEAN:
-			element.type = TypedFilterBase::Element::bool_;
-			element.value.bool_ = (bool)lua_toboolean(ls, idx);
+			element = (bool)lua_toboolean(ls, idx);
 			return true;
 
 		case LUA_TSTRING:
-			element.type = TypedFilterBase::Element::string_;
-			element.value.string_.ptr = (const char*)lua_tostring(ls, idx);
-			element.value.string_.size = std::strlen( element.value.string_.ptr);
+			lstr = (const char*)lua_tolstring( ls, idx, &lstrlen);
+			element.init( lstr, lstrlen);
 			return true;
 		default:
 			errelemtype = lua_typename( ls, lua_type( ls, idx));
@@ -147,14 +146,12 @@ LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	m_stk.push_back( fs);
 }
 
-void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& element)
+void LuaTableInputFilter::FetchState::getTagElement( types::VariantConst& element)
 {
-	element.type = Element::string_;
-	element.value.string_.ptr = tag;
-	element.value.string_.size = tagsize;
+	element.init( tag, tagsize);
 }
 
-bool LuaTableInputFilter::getValue( int idx, TypedFilterBase::Element& element)
+bool LuaTableInputFilter::getValue( int idx, types::VariantConst& element)
 {
 	const char* errelemtype = 0;
 	if (!getElementValue( m_ls, idx, element, errelemtype))
@@ -220,7 +217,7 @@ bool LuaTableInputFilter::nextTableElem()
 	return true;
 }
 
-bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
+bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	if (!lua_checkstack( m_ls, 10))
 	{
@@ -283,7 +280,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 
 			case FetchState::TableIterOpen:
 				if (!getValue( -2, element)) return false;
-				if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 0)
+				if (element.type() == types::Variant::string_ && element.charsize() == 0)
 				{
 					m_stk.back().id = FetchState::TableIterValueNoTag;
 					continue;
@@ -323,7 +320,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 				}
 
 			case FetchState::TableIterClose:
-				element = TypedInputFilter::Element();
+				element.init();
 				m_stk.back().id = FetchState::TableIterNext;
 				type = CloseTag;
 				return true;
@@ -345,7 +342,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 				if (m_stk.size() == 0)
 				{
 					type = CloseTag;
-					element = Element();
+					element.init();
 					return true;
 				}
 				continue;
@@ -356,28 +353,24 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 }
 
 
-bool LuaTableOutputFilter::pushValue( const Element& element)
+bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 {
-	switch (element.type)
+	switch (element.type())
 	{
-		case Element::bool_:
-			wrap_lua_pushboolean( m_ls, element.value.bool_);
+		case types::Variant::bool_:
+			wrap_lua_pushboolean( m_ls, element.tobool());
 			return true;
-		case Element::double_:
-			wrap_lua_pushnumber( m_ls, (lua_Number)element.value.double_);
+		case types::Variant::double_:
+			wrap_lua_pushnumber( m_ls, (lua_Number)element.todouble());
 			return true;
-		case Element::int_:
-			wrap_lua_pushinteger( m_ls, (lua_Integer)element.value.int_);
+		case types::Variant::int_:
+			wrap_lua_pushinteger( m_ls, (lua_Integer)element.toint());
 			return true;
-		case Element::uint_:
-			wrap_lua_pushinteger( m_ls, (lua_Integer)element.value.uint_);
+		case types::Variant::uint_:
+			wrap_lua_pushinteger( m_ls, (lua_Integer)element.touint());
 			return true;
-		case Element::string_:
-			wrap_lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
-			wrap_lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-			return true;
-		case Element::blob_:
-			wrap_lua_pushlstring( m_ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+		case types::Variant::string_:
+			wrap_lua_pushlstring( m_ls, element.charptr(), element.charsize());
 			wrap_lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 	}
@@ -385,7 +378,7 @@ bool LuaTableOutputFilter::pushValue( const Element& element)
 	return false;
 }
 
-bool LuaTableOutputFilter::openTag( const Element& element)
+bool LuaTableOutputFilter::openTag( const types::VariantConst& element)
 {
 	if (!pushValue( element)) return false;		///... LUA STK: t k   (t=Table,k=Key)
 	wrap_lua_pushvalue( m_ls, -1);			///... LUA STK: t k k
@@ -451,14 +444,14 @@ bool LuaTableOutputFilter::closeTag()
 	}
 }
 
-bool LuaTableOutputFilter::closeAttribute( const Element& element)
+bool LuaTableOutputFilter::closeAttribute( const types::VariantConst& element)
 {
 	wrap_lua_pushnil( m_ls);			//... LUA STK: t a t nil
 	if (wrap_lua_next( m_ls, -2))
 	{
 		// ... non empty table, we create an element with an empty key
 		wrap_lua_pop( m_ls, 2);
-		return openTag( Element()) && closeAttribute( element) && closeTag();
+		return openTag( types::VariantConst()) && closeAttribute( element) && closeTag();
 	}
 	else
 	{
@@ -469,7 +462,7 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 	}
 }
 
-bool LuaTableOutputFilter::print( ElementType type, const Element& element)
+bool LuaTableOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
 	LOG_DATA << "[lua table] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
 	if (!lua_checkstack( m_ls, 16))

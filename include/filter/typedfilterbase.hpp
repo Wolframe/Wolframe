@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_TYPED_FILTERBASE_HPP_INCLUDED
 #define _Wolframe_FILTER_TYPED_FILTERBASE_HPP_INCLUDED
+#error DEPRECATED
 #include <string>
 #include <cstring>
 #include <stdexcept>

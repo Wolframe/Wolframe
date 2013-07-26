@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/ddl/filtermapDDLSerializeStack.hpp"
 #include "types/variantStruct.hpp"
@@ -63,7 +64,7 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
 
-	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 
 private:
 	const types::VariantStruct* m_st;

@@ -63,18 +63,32 @@ public:
 		struct_,
 		indirection_
 	};
+	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)				{return Variant::typeName( (Variant::Type)i);}
 
+	///\brief Default constructor
 	VariantStruct()							:Variant(){}
+	///\brief Constructor from structure description
 	explicit VariantStruct( const VariantStructDescription* d)	:Variant(){initStruct( d);}
+	///\brief Copy constructor
 	VariantStruct( const Variant& o)				:Variant(){VariantStruct::initCopy( *(const VariantStruct*)&o);}
+	///\brief Copy constructor
 	VariantStruct( const VariantStruct& o)				:Variant(){VariantStruct::initCopy( o);}
-	void makeArray();
+	///\brief Destructor
 	~VariantStruct()						{VariantStruct::release();}
 
-	VariantStruct& operator=( const VariantStruct& o)		{VariantStruct::release(); VariantStruct::initCopy( o); return *this;}
+	///\brief Make the structure to be an array with the currently defined value as prototype element
+	void makeArray();
+
+	///\brief Assignment operator, keeping the initialization flag of this
+	VariantStruct& operator=( const VariantStruct& o)		{bool init_=initialized(); VariantStruct::release(); VariantStruct::initCopy( o); setInitialized(init_); return *this;}
+	VariantStruct& operator=( const Variant& o)			{bool init_=initialized(); VariantStruct::release(); Variant::initCopy( o); setInitialized(init_); return *this;}
+
+	///\brief Reseting the content of this
+	void clear()							{release(); init();}
 
 public:
+	///\brief Compare structures
 	bool operator==( const VariantStruct& o) const			{return compare( o) == 0;}
 	bool operator!=( const VariantStruct& o) const			{int cv = compare( o); return cv != 0;}
 	bool operator>( const VariantStruct& o) const			{int cv = compare( o); return cv > 0;}
@@ -83,33 +97,47 @@ public:
 	bool operator<( const VariantStruct& o) const			{int cv = compare( o); return cv < 0;}
 	int compare( const VariantStruct& o) const;
 
+	///\brief Get the type of the structure
 	Type type() const						{return (Type)m_type;}
+
+	///\brief Get the number of elements defined (throws for other types than struct_ or array_)
 	std::size_t nof_elements() const;
 
+	///\brief Get the description of a structure (throws for other types than struct_)
 	const VariantStructDescription* description() const		{return ((Type)m_type == struct_ || (Type)m_type == indirection_) ? (const VariantStructDescription*)m_data.dim.metadata:0;}
 	void setDescription( const VariantStructDescription* descr);
 
+	///\brief Return the prototype element (initialization of new element) of an array (throws for other types than array_)
 	const VariantStruct* prototype() const				{return ((Type)m_type == array_)?(const VariantStruct*)m_data.value.ref_:0;}
 	VariantStruct* prototype()					{return ((Type)m_type == array_)?(VariantStruct*)m_data.value.ref_:0;}
 
+	///\brief Expands an Indirection (throws for other types than indirection_)
 	void expandIndirection();
+
+	///\brief Add a new element to an array (throws for other types than array_)
 	void push();
 
+	///\brief Gets the value of the structure as string
 	std::string tostring() const;
 
+	///\brief Random access (throws logic error on ABR/ABW)
 	const VariantStruct& operator[]( std::size_t idx) const;
 	VariantStruct& operator[]( std::size_t idx);
 
+	///\brief Random access or 0 if no random access defined (throws logic error on ABR/ABW)
 	const VariantStruct* at( std::size_t idx) const;
 	VariantStruct* at( std::size_t idx);
 
+	///\brief Get the last element (throws logic error on ABR/ABW)
 	const VariantStruct& back() const;
 	VariantStruct& back();
 
+	///\brief Get a substructure reference
 	const VariantStruct* select( const std::string& name) const;
 	VariantStruct* select( const std::string& name);
 
 public:
+	///\brief Const iterator on struct or array elements
 	class const_iterator
 	{
 	public:
@@ -138,6 +166,7 @@ public:
 		VariantStruct const* m_itr;
 	};
 
+	///\brief Iterator on struct or array elements
 	class iterator
 	{
 	public:
@@ -167,17 +196,22 @@ public:
 	};
 
 public:
+	///\brief Print the value of a structure as string (curly bracket syntax)
 	void print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level=0) const;
 
+	///\brief Find an element (direct child)
 	const_iterator find( const std::string& name_) const;
 	iterator find( const std::string& name_);
 
+	///\brief Get the an iterator on the first element (direct child)
 	const_iterator begin() const						{return elementptr(0);}
-	const_iterator end() const						{return elementptr( nof_elements());}
 	iterator begin()							{return elementptr(0);}
+	///\brief Get the an iterator on the end of the list of elements
+	const_iterator end() const						{return elementptr( nof_elements());}
 	iterator end()								{return elementptr( nof_elements());}
 
 private:
+	///\brief Random access or 0 if no random access defined or invalid access
 	const VariantStruct* elementptr( std::size_t idx) const;
 	VariantStruct* elementptr( std::size_t idx);
 
@@ -200,6 +234,7 @@ private:
 class VariantIndirection :public Variant
 {
 public:
+	///\brief Constructor
 	VariantIndirection( const VariantStructDescription* descr);
 };
 
@@ -209,6 +244,7 @@ public:
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
 struct VariantStructConst :public VariantStruct
 {
+	///\brief Constructor
 	VariantStructConst( const VariantConst& o)		:VariantStruct(){Variant::initConstCopy( o);}
 	VariantStructConst( const Variant& o)			:VariantStruct(){Variant::initConstCopy( o);}
 	VariantStructConst( const VariantStruct& o)		:VariantStruct(){initConstCopy( o);}
@@ -221,10 +257,12 @@ struct VariantStructConst :public VariantStruct
 	VariantStructConst( const char* o)			{initConstant( o, std::strlen(o));}
 	VariantStructConst( const char* o, std::size_t n)	{initConstant( o, n);}
 	VariantStructConst( const std::string& o)		{initConstant( o.c_str(), o.size());}
+	///\brief Destructor
 	~VariantStructConst(){}
 
-	VariantStructConst& operator=( const Variant& o)	{initConstCopy( o); return *this;}
-	VariantStructConst& operator=( const VariantConst& o)	{initConstCopy( o); return *this;}
+	///\brief Assignment operator, keeping the initialization flag of this
+	VariantStructConst& operator=( const Variant& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
+	VariantStructConst& operator=( const VariantConst& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantStructConst& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
 	VariantStructConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
 	VariantStructConst& operator=( float o)			{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
@@ -233,9 +271,13 @@ struct VariantStructConst :public VariantStruct
 	VariantStructConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantStructConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
+	///\brief Initialization as string constant
 	void init( const char* o, std::size_t len)		{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
 	void init( const char* o)				{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
 	void init( const std::string& o)			{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
+
+	///\brief Reseting the content of this
+	void clear()						{Variant::init();}
 };
 
 }} //namespace

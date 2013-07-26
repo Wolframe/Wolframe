@@ -82,7 +82,7 @@ public:
 	///\param [out] element reference to element returned
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
-	virtual bool getNext( TypedInputFilter::ElementType& type, TypedInputFilter::Element& element);
+	virtual bool getNext( TypedInputFilter::ElementType& type, types::VariantConst& element);
 
 	///\brief Set the iterator to the start (if implemented)
 	virtual void resetIterator();

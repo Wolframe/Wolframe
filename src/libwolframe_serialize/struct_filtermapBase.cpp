@@ -192,7 +192,7 @@ bool StructSerializer::call()
 	return true;
 }
 
-bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
+bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value)
 {
 	const Context::ElementBuffer* elem;
 	while (m_stk.size() && (elem = m_ctx.getElem()) == 0)
@@ -225,7 +225,7 @@ public:
 
 	virtual TypedInputFilter* copy() const	{return new OneElementTypedInputFilter(*this);}
 
-	virtual bool getNext( ElementType& type, Element& element)
+	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
 		if (m_consumed) return false;
 		type = TypedInputFilter::Value;

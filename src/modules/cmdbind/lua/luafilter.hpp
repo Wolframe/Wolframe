@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_LUA_FILTER_HPP_INCLUDED
 #define _Wolframe_LUA_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "langbind/luaException.hpp"
 #include <vector>
 #include <stdexcept>
@@ -56,7 +57,7 @@ class LuaTableInputFilter :public TypedInputFilter, public LuaExceptionHandlerSc
 {
 public:
 	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableInputFilter::getNext(ElementType&,Element&)
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableInputFilter::getNext(ElementType&,types::VariantConst&)
 	explicit LuaTableInputFilter( lua_State* ls);
 
 	///\brief Copy constructor
@@ -85,9 +86,9 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new LuaTableInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
+	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	///\remark Expects the table to iterate as top element (-1) on the lua stack when called the first time
-	virtual bool getNext( ElementType& type, Element& element);
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
 private:
 	///\class FetchState
@@ -117,10 +118,10 @@ private:
 		const char* tag;		//< caller tag, used enclosing tag by arrays
 		std::size_t tagsize;		//< size of tag
 
-		void getTagElement( Element& e);
+		void getTagElement( types::VariantConst& e);
 	};
 
-	bool getValue( int idx, Element& e);	//< fetch the element with index 'idx' as atomic value
+	bool getValue( int idx, types::VariantConst& e);//< fetch the element with index 'idx' as atomic value
 	bool firstTableElem( const char* tag);	//< opens a new table iterator on an array or lua table
 	bool nextTableElem();			//< fetches the next element of the currently iterated array or lua table
 
@@ -136,7 +137,7 @@ class LuaTableOutputFilter :public TypedOutputFilter, public LuaExceptionHandler
 {
 public:
 	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableOutputFilter::print(ElementType,const Element&)
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableOutputFilter::print(ElementType,const types::VariantConst&)
 	explicit LuaTableOutputFilter( lua_State* ls)
 		:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
 		,LuaExceptionHandlerScope(ls)
@@ -165,14 +166,14 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new LuaTableOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element);
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	virtual bool print( ElementType type, const types::VariantConst& element);
 
 private:
-	bool pushValue( const Element& element);
-	bool openTag( const Element& element);
+	bool pushValue( const types::VariantConst& element);
+	bool openTag( const types::VariantConst& element);
 	bool closeTag();
-	bool closeAttribute( const Element& element);
+	bool closeAttribute( const types::VariantConst& element);
 
 private:
 	enum ContentType

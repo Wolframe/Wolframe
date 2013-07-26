@@ -180,7 +180,7 @@ public:
 		,m_document( func->createDocument())
 		,m_func(func)
 		,m_selectState(&func->parser())
-		,m_lasttype( langbind::TypedFilterBase::OpenTag){}
+		,m_lasttype( langbind::FilterBase::OpenTag){}
 
 	PrintInput( const PrintInput& o)
 		:types::TypeSignature("langbind::TypedOutputFilter (pdfPrinter)", __LINE__)
@@ -197,18 +197,18 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new PrintInput(*this);}
 
-	virtual bool print( langbind::TypedFilterBase::ElementType type, const langbind::TypedFilterBase::Element& element)
+	virtual bool print( langbind::FilterBase::ElementType type, const types::VariantConst& element)
 	{
 		std::string elemstr = element.tostring();
 		textwolf::XMLScannerBase::ElementType xtype = textwolf::XMLScannerBase::None;
 		switch (type)
 		{
-			case langbind::TypedFilterBase::OpenTag:
+			case langbind::FilterBase::OpenTag:
 				xtype = textwolf::XMLScannerBase::OpenTag;
 				m_variableScope.push( elemstr);
 				break;
 
-			case langbind::TypedFilterBase::CloseTag:
+			case langbind::FilterBase::CloseTag:
 			{
 				xtype = textwolf::XMLScannerBase::CloseTag;
 				std::vector<std::size_t>::const_iterator mi = m_variableScope.begin_marker();
@@ -221,12 +221,12 @@ public:
 				break;
 			}
 
-			case langbind::TypedFilterBase::Attribute:
+			case langbind::FilterBase::Attribute:
 				xtype = textwolf::XMLScannerBase::TagAttribName;
 				break;
 
-			case langbind::TypedFilterBase::Value:
-				if (m_lasttype == langbind::TypedFilterBase::Attribute)
+			case langbind::FilterBase::Value:
+				if (m_lasttype == langbind::FilterBase::Attribute)
 				{
 					xtype = textwolf::XMLScannerBase::TagAttribValue;
 				}
@@ -271,7 +271,7 @@ private:
 	VariableScope m_variableScope;
 	const HaruPdfPrintFunction::Impl* m_func;
 	XMLPathSelect m_selectState;
-	langbind::TypedFilterBase::ElementType m_lasttype;
+	langbind::FilterBase::ElementType m_lasttype;
 };
 
 PrintFunction::InputR HaruPdfPrintFunction::getInput() const

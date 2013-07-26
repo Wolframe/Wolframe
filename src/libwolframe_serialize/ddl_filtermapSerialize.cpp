@@ -33,6 +33,7 @@ Project Wolframe.
 
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
@@ -107,7 +108,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			{
 				throw SerializationErrorException( "named atomic value expected for attribute", getElementPath( stk));
 			}
-			langbind::TypedFilterBase::Element elem( di->name);
+			types::VariantConst elem( di->name);
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
 			rt = true;
 			stk.back().state( ++idx);
@@ -118,20 +119,19 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			if (!*di->name)
 			{
 				stk.back().state( ++idx);
-				langbind::TypedFilterBase::Element tag;
-				stk.push_back( FiltermapDDLSerializeState( &*itr, tag));
+				stk.push_back( FiltermapDDLSerializeState( &*itr));
 			}
 			else
 			{
 				if (itr->type() == types::VariantStruct::array_ && !ctx.flag( Context::SerializeWithIndices))
 				{
-					langbind::TypedFilterBase::Element elem( di->name);
+					types::VariantConst elem( di->name);
 					stk.back().state( ++idx);
 					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
 				}
 				else
 				{
-					langbind::TypedFilterBase::Element elem( di->name);
+					types::VariantConst elem( di->name);
 					ctx.setElem( langbind::FilterBase::OpenTag, elem);
 					rt = true;
 					stk.back().state( ++idx);
@@ -166,15 +166,15 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	types::VariantStruct::const_iterator itr = obj->begin()+idx;
 	if (ctx.flag( Context::SerializeWithIndices))
 	{
-		ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U));
+		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1U));
 		stk.back().state( idx+1);
-		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U)));
+		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, types::VariantConst( (unsigned int)idx+1U)));
 		stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
 		rt = true;
 	}
 	else
 	{
-		bool hasTag = !stk.back().tag().empty();
+		bool hasTag = stk.back().tag().initialized();
 		if (hasTag)
 		{
 			ctx.setElem( langbind::FilterBase::OpenTag, stk.back().tag());
@@ -255,7 +255,7 @@ bool DDLStructSerializer::call()
 }
 
 
-bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
+bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value)
 {
 	const Context::ElementBuffer* elem;
 	while (m_stk.size() && (elem = m_ctx.getElem()) == 0)
@@ -276,7 +276,7 @@ DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 	,m_st(st)
 {
 	if (!m_st) throw std::runtime_error( "empty form passed to serializer");
-	m_stk.push_back( FiltermapDDLSerializeState( st, langbind::TypedFilterBase::Element()));
+	m_stk.push_back( FiltermapDDLSerializeState( st));
 }
 
 DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
@@ -303,7 +303,7 @@ void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLSerializeState( m_st, langbind::TypedFilterBase::Element()));
+	m_stk.push_back( FiltermapDDLSerializeState( m_st));
 	m_out = out;
 }
 

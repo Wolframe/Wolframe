@@ -33,6 +33,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/tostringUtils.hpp"
 #include "types/doctype.hpp"
+#include "types/variant.hpp"
 #include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
 #include "logger-v1.hpp"
@@ -189,7 +190,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			{
 				// ... treat document as standalone: swallow root element
 				langbind::InputFilter::ElementType typ;
-				langbind::TypedFilterBase::Element element;
+				types::VariantConst element;
 				if (!m_input->getNext( typ, element))
 				{
 					switch (m_inputfilter->state())

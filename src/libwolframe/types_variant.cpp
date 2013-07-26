@@ -238,3 +238,17 @@ unsigned int Variant::touint() const
 	return variant_cast<unsigned int>( *this);
 }
 
+void Variant::convert( Type type_)
+{
+	if (m_type == type_) return;
+	switch (type_)
+	{
+		case bool_: *this = tobool(); return;
+		case int_: *this = toint(); return;
+		case uint_: *this = touint(); return;
+		case double_: *this = todouble(); return;
+		case string_: *this = tostring(); return;
+	}
+	throw std::runtime_error( "illegal conversion of atomic type");
+}
+

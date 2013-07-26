@@ -62,8 +62,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new TypingInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	virtual bool getNext( ElementType& type, Element& element);
+	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
 private:
 	InputFilterR m_inputfilter;
@@ -93,8 +93,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new TypingOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element);
+	///\brief Implementation of TypedOutputFilter::print( ElementType,const types::VariantConst&)
+	virtual bool print( ElementType type, const types::VariantConst& element);
 
 private:
 	OutputFilterR m_outputfilter;

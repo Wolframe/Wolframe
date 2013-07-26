@@ -48,7 +48,7 @@ static std::string substquot( const std::string& o)
 	return rt;
 }
 
-bool ToStringFilter::print( ElementType type, const Element& element)
+bool ToStringFilter::print( ElementType type, const types::VariantConst& element)
 {
 	switch (type)
 	{

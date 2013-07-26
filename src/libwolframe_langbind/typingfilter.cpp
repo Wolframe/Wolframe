@@ -39,16 +39,24 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-bool TypingInputFilter::getNext( ElementType& type, Element& element)
+bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	if (!m_inputfilter.get()) return false;
-	element.type = TypedInputFilter::Element::string_;
-	bool rt = m_inputfilter->getNext( type, element.value.blob_.ptr, element.value.blob_.size);
-	if (!rt) setState( m_inputfilter->state(), m_inputfilter->getError());
+	const void* charptr;
+	std::size_t charsize;
+	bool rt = m_inputfilter->getNext( type, charptr, charsize);
+	if (!rt)
+	{
+		setState( m_inputfilter->state(), m_inputfilter->getError());
+	}
+	else
+	{
+		element.init( (const char*)charptr, charsize);
+	}
 	return rt;
 }
 
-bool TypingOutputFilter::print( ElementType type, const Element& element)
+bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
 	bool rt = true;
 
@@ -56,10 +64,10 @@ bool TypingOutputFilter::print( ElementType type, const Element& element)
 	try
 	{
 		std::string castelement;
-		switch (element.type)
+		switch (element.type())
 		{
-			case TypedOutputFilter::Element::bool_:
-				if (element.value.bool_)
+			case types::Variant::bool_:
+				if (element.tobool())
 				{
 					rt = m_outputfilter->print( type, "true", 4);
 					break;
@@ -70,27 +78,23 @@ bool TypingOutputFilter::print( ElementType type, const Element& element)
 					break;
 				}
 
-			case TypedOutputFilter::Element::double_:
-				castelement = boost::lexical_cast<std::string>( element.value.double_);
+			case types::Variant::double_:
+				castelement = boost::lexical_cast<std::string>( element.todouble());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case TypedOutputFilter::Element::int_:
-				castelement = boost::lexical_cast<std::string>( element.value.int_);
+			case types::Variant::int_:
+				castelement = boost::lexical_cast<std::string>( element.toint());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case TypedOutputFilter::Element::uint_:
-				castelement = boost::lexical_cast<std::string>( element.value.uint_);
+			case types::Variant::uint_:
+				castelement = boost::lexical_cast<std::string>( element.touint());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case TypedOutputFilter::Element::string_:
-				rt = m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
-				break;
-
-			case TypedOutputFilter::Element::blob_:
-				rt = m_outputfilter->print( type, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+			case types::Variant::string_:
+				rt = m_outputfilter->print( type, element.charptr(), element.charsize());
 				break;
 		}
 		setState( m_outputfilter->state(), m_outputfilter->getError());

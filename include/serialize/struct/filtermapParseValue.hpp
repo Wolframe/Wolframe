@@ -89,36 +89,31 @@ static bool getBool( bool& val, int boolnum)
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::string_&, const langbind::TypedInputFilter::Element& element)
+static bool parseValue_( ValueType& val, const ParseValueType::string_&, const types::VariantConst& element)
 {
 	try
 	{
-		switch (element.type)
+		switch (element.type())
 		{
-			case langbind::TypedInputFilter::Element::bool_:
-				val = (element.value.bool_)?"true":"false";
+			case types::Variant::bool_:
+				val = (element.tobool())?"true":"false";
 				return true;
 
-			case langbind::TypedInputFilter::Element::double_:
-				val = boost::lexical_cast<ValueType>( element.value.double_);
+			case types::Variant::double_:
+				val = boost::lexical_cast<ValueType>( element.todouble());
 				return true;
 
-			case langbind::TypedInputFilter::Element::int_:
-				val = boost::lexical_cast<ValueType>( element.value.int_);
+			case types::Variant::int_:
+				val = boost::lexical_cast<ValueType>( element.toint());
 				return true;
 
-			case langbind::TypedInputFilter::Element::uint_:
-				val = boost::lexical_cast<ValueType>( element.value.uint_);
+			case types::Variant::uint_:
+				val = boost::lexical_cast<ValueType>( element.touint());
 				return true;
 
-			case langbind::TypedInputFilter::Element::string_:
+			case types::Variant::string_:
 				val.clear();
-				val.append( element.value.string_.ptr, element.value.string_.size);
-				return true;
-
-			case langbind::TypedInputFilter::Element::blob_:
-				val.clear();
-				val.append( (const char*)element.value.blob_.ptr, element.value.blob_.size);
+				val.append( element.charptr(), element.charsize());
 				return true;
 		}
 	}
@@ -130,35 +125,32 @@ static bool parseValue_( ValueType& val, const ParseValueType::string_&, const l
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const langbind::TypedInputFilter::Element& element)
+static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const types::VariantConst& element)
 {
 	try
 	{
-		switch (element.type)
+		switch (element.type())
 		{
-			case langbind::TypedInputFilter::Element::bool_:
-				val = element.value.bool_;
+			case types::Variant::bool_:
+				val = element.tobool();
 				return true;
 
-			case langbind::TypedInputFilter::Element::double_:
-				return getBool( val, boost::numeric_cast<int>( element.value.double_));
+			case types::Variant::double_:
+				return getBool( val, boost::numeric_cast<int>( element.todouble()));
 
-			case langbind::TypedInputFilter::Element::int_:
-				return getBool( val, boost::numeric_cast<ValueType>( element.value.int_));
+			case types::Variant::int_:
+				return getBool( val, boost::numeric_cast<ValueType>( element.toint()));
 
-			case langbind::TypedInputFilter::Element::uint_:
-				return getBool( val, boost::numeric_cast<ValueType>( element.value.uint_));
+			case types::Variant::uint_:
+				return getBool( val, boost::numeric_cast<ValueType>( element.touint()));
 
-			case langbind::TypedInputFilter::Element::blob_:
-				return false;
-
-			case langbind::TypedInputFilter::Element::string_:
-				if (element.value.string_.size == 4 && std::memcmp( element.value.string_.ptr, "true", 4) == 0)
+			case types::Variant::string_:
+				if (element.charsize() == 4 && std::memcmp( element.charptr(), "true", 4) == 0)
 				{
 					val = true;
 					return true;
 				}
-				if (element.value.string_.size == 5 && std::memcmp( element.value.string_.ptr, "false", 5) == 0)
+				if (element.charsize() == 5 && std::memcmp( element.charptr(), "false", 5) == 0)
 				{
 					val = false;
 					return true;
@@ -173,34 +165,31 @@ static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const lan
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, const langbind::TypedInputFilter::Element& element)
+static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, const types::VariantConst& element)
 {
 	try
 	{
-		switch (element.type)
+		switch (element.type())
 		{
-			case langbind::TypedInputFilter::Element::bool_:
-				val = boost::numeric_cast<ValueType>( element.value.bool_);
+			case types::Variant::bool_:
+				val = boost::numeric_cast<ValueType>( element.tobool());
 				return true;
 
-			case langbind::TypedInputFilter::Element::double_:
-				val = boost::numeric_cast<ValueType>( element.value.double_);
+			case types::Variant::double_:
+				val = boost::numeric_cast<ValueType>( element.todouble());
 				return true;
 
-			case langbind::TypedInputFilter::Element::int_:
-				val = boost::numeric_cast<ValueType>( element.value.int_);
+			case types::Variant::int_:
+				val = boost::numeric_cast<ValueType>( element.toint());
 				return true;
 
-			case langbind::TypedInputFilter::Element::uint_:
-				val = boost::numeric_cast<ValueType>( element.value.uint_);
+			case types::Variant::uint_:
+				val = boost::numeric_cast<ValueType>( element.touint());
 				return true;
 
-			case langbind::TypedInputFilter::Element::string_:
-				val = boost::lexical_cast<ValueType>( std::string( element.value.string_.ptr, element.value.string_.size));
+			case types::Variant::string_:
+				val = boost::lexical_cast<ValueType>( element.tostring());
 				return true;
-
-			case langbind::TypedInputFilter::Element::blob_:
-				return false;
 		}
 	}
 	catch (const boost::bad_lexical_cast&)
@@ -215,7 +204,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, con
 }
 
 template <typename ValueType>
-bool parseValue( ValueType& val, const langbind::TypedInputFilter::Element& element)
+bool parseValue( ValueType& val, const types::VariantConst& element)
 {
 	return parseValue_( val, ParseValueType::get(val), element);
 }

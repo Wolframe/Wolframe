@@ -36,6 +36,7 @@
 #define _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
+#include "types/variant.hpp"
 #include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
@@ -70,7 +71,7 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new TransactionFunctionOutput(*this);}
 
-	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 	virtual void resetIterator();
 
 private:
@@ -95,7 +96,7 @@ public:
 	///\return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new TransactionFunctionInput(*this);}
 
-	virtual bool print( ElementType type, const Element& element);
+	virtual bool print( ElementType type, const types::VariantConst& element);
 	virtual TransactionInput get() const;
 
 	const Structure& structure() const

@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "filter/bufferingfilter.hpp"
+#include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapSerializeStack.hpp"
@@ -181,8 +182,8 @@ public:
 	///\return allocated pointer to copy of this
 	virtual langbind::TypedInputFilter* copy() const;
 
-	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,langbind::TypedFilterBase::Element&)
-	virtual bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
+	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 
 private:
 	const void* m_ptr;

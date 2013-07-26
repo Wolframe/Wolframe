@@ -250,7 +250,7 @@ private:
 	TypedInputFilterR m_inputfilter;	//< input filter
 	TypedOutputFilterR m_outputfilter;	//< output filter
 	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
-	TypedInputFilter::Element m_elem;	//< last element read from command result
+	types::VariantConst m_elem;		//< last element read from command result
 };
 
 class ApiFormData

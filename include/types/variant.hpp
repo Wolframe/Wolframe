@@ -59,17 +59,19 @@ public:
 	};
 	enum Flags
 	{
-		Initialized	=0x1,
-		Constant	=0x2
+		Initialized	=0x1,			//< value is initialized (meaning depends on the user of this value)
+		Constant	=0x2			//< value is a reference that is not owned and freed by this)
 	};
 
-	///\brief Get the name of a type as string
+	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)
 	{
 		static const char* ar[] = {"double","int","uint","bool","string","array","struct","indirection"};
 		return ar[ (int)i];
 	}
 
+	///\class Data
+	///\brief Internal representation of this value
 	struct Data
 	{
 		union
@@ -87,6 +89,7 @@ public:
 			void* ref_;
 		} value;
 	};
+	///\brief Constructor
 	Variant( Type type_)				{init(type_);}
 	Variant()					{init();}
 	Variant( bool o)				{init(bool_); m_data.value.bool_ = o;}
@@ -98,21 +101,25 @@ public:
 	Variant( const char* o, std::size_t n)		{initString( o, n);}
 	Variant( const std::string& o)			{initString( o.c_str(), o.size());}
 	Variant( const Variant& o)			{initCopy( o);}
+	///\brief Destructor
 	~Variant()					{release();}
 
-	Variant& operator=( const Variant& o)		{release(); initCopy( o); return *this;}
-	Variant& operator=( bool o)			{unsigned char flags_=m_flags; release(); init(bool_); m_data.value.bool_ = o; m_flags=flags_; return *this;}
-	Variant& operator=( double o)			{unsigned char flags_=m_flags; release(); init(double_); m_data.value.double_ = o; m_flags=flags_; return *this;}
-	Variant& operator=( float o)			{unsigned char flags_=m_flags; release(); init(double_); m_data.value.double_ = (double)o; m_flags=flags_; return *this;}
-	Variant& operator=( int o)			{unsigned char flags_=m_flags; release(); init(int_); m_data.value.int_ = o; m_flags=flags_; return *this;}
-	Variant& operator=( unsigned int o)		{unsigned char flags_=m_flags; release(); init(uint_); m_data.value.uint_ = o; m_flags=flags_; return *this;}
+	///\brief Assignment operator, keeping the initialization flag of this
+	Variant& operator=( const Variant& o)		{bool init_=initialized(); release(); initCopy( o); setInitialized(init_); return *this;}
+	Variant& operator=( bool o)			{bool init_=initialized(); release(); init(bool_); m_data.value.bool_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( double o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( float o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = (double)o; setInitialized(init_); return *this;}
+	Variant& operator=( int o)			{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( unsigned int o)		{bool init_=initialized(); release(); init(uint_); m_data.value.uint_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
 	Variant& operator=( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
+	///\brief Initialization as string constant (Constant flag set, data not owned by this)
 	void initConstant( const char* o, std::size_t l);
 	void initConstant( const std::string& o)	{initConstant( o.c_str(),o.size());}
 	void initConstant( const char* o)		{initConstant( o, std::strlen(o));}
 
+	///\brief Compare data with conversion (value with different types is converted first)
 	bool operator==( const Variant& o) const	{return compare( o) == 0;}
 	bool operator!=( const Variant& o) const	{int cv = compare( o); return cv != 0 && cv != -2;}
 	bool operator>( const Variant& o) const		{int cv = compare( o); return cv > 0;}
@@ -120,12 +127,17 @@ public:
 	bool operator<=( const Variant& o) const	{int cv = compare( o); return cv <= 0 && cv != -2;}
 	bool operator<( const Variant& o) const		{int cv = compare( o); return cv == -1;}
 
+	///\brief Get the type of this
 	Type type() const				{return (Type)m_type;}
+	///\brief Get the internal representation of the data of this
 	const Data& data() const			{return m_data;}
 
+	///\brief Get the pointer to the C representation of a string (throws for non string)
 	char* charptr() const				{if (type() != string_) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.string_;}
+	///\brief Get the size of a string (throws for non string)
 	std::size_t charsize() const			{if (type() != string_) throw std::logic_error("illegal access (type mismatch)"); return m_data.dim.size;}
 
+	///\brief Getter with value conversion
 	std::string tostring() const;
 	double tonumber() const;
 	double todouble() const;
@@ -133,15 +145,28 @@ public:
 	int toint() const;
 	unsigned int touint() const;
 
+	///\brief Get the size of a string
 	std::size_t size() const			{return (type() == string_)?m_data.dim.size:1;}
 
+	///\brief Test if this value is initialized
 	bool initialized() const			{return flags( Initialized);}
+	///\brief Set the value to be initialized
 	void setInitialized( bool v=true)		{setFlags( Initialized, v);}
 
+	///\brief Test if this value is constant (owned by this)
 	bool constant() const				{return flags( Constant);}
+	///\brief Set the value to be constant
+	///\remark Setting this flag for a value owned by this can cause memory leaks
 	void setConstant( bool v=true)			{setFlags( Constant, v);}
 
+	///\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
 	bool atomic() const				{return m_type <= (unsigned char)string_;}
+
+	///\brief Reseting the content of this
+	void clear()					{release(); init();}
+
+	///\brief Converting the value of this to a defined type
+	void convert( Type type_);
 
 protected:
 	bool flags( Flags flags_) const			{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
@@ -170,6 +195,8 @@ protected:
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
 struct VariantConst :public Variant
 {
+	///\brief Constructor
+	VariantConst()					{init();}
 	VariantConst( const Variant& o)			:Variant(){initConstCopy( o);}
 	VariantConst( const VariantConst& o)		:Variant(){initConstCopy( o);}
 	VariantConst( bool o)				:Variant(bool_){m_data.value.bool_ = o; setConstant(); }
@@ -180,10 +207,12 @@ struct VariantConst :public Variant
 	VariantConst( const char* o)			:Variant(){initConstant( o, std::strlen(o));}
 	VariantConst( const char* o, std::size_t n)	:Variant(){initConstant( o, n);}
 	VariantConst( const std::string& o)		:Variant(){initConstant( o.c_str(), o.size());}
+	///\brief Destructor
 	~VariantConst(){}
 
-	VariantConst& operator=( const Variant& o)	{initConstCopy( o); return *this;}
-	VariantConst& operator=( const VariantConst& o)	{initConstCopy( o); return *this;}
+	///\brief Assignment operator, keeping the initialization flag of this
+	VariantConst& operator=( const Variant& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
+	VariantConst& operator=( const VariantConst& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantConst& operator=( bool o)		{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( float o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
@@ -192,9 +221,16 @@ struct VariantConst :public Variant
 	VariantConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
+	///\brief Initialization as string constant
 	void init( const char* o, std::size_t len)	{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
 	void init( const char* o)			{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
 	void init( const std::string& o)		{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
+
+	///\brief Empty initialization
+	void init()					{Variant::init(); setConstant();}
+
+	///\brief Reseting the content of this
+	void clear()					{Variant::init();}
 };
 
 }} //namespace

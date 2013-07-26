@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
@@ -56,48 +57,48 @@ bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, Filter
 
 bool parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 
-typedef bool (*ParseValue)( void* value, const langbind::TypedFilterBase::Element& element);
+typedef bool (*ParseValue)( void* value, const types::VariantConst& element);
 
-bool parseValue_int( signed int*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_uint( unsigned int*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_ulong( unsigned long*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_long( signed long*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_short( signed short*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_ushort( unsigned short*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_char( signed char*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_uchar( unsigned char*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_float( float*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_double( double*, const langbind::TypedFilterBase::Element& element);
-bool parseValue_string( std::string*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_int( signed int*, const types::VariantConst& element);
+bool parseValue_uint( unsigned int*, const types::VariantConst& element);
+bool parseValue_ulong( unsigned long*, const types::VariantConst& element);
+bool parseValue_long( signed long*, const types::VariantConst& element);
+bool parseValue_short( signed short*, const types::VariantConst& element);
+bool parseValue_ushort( unsigned short*, const types::VariantConst& element);
+bool parseValue_char( signed char*, const types::VariantConst& element);
+bool parseValue_uchar( unsigned char*, const types::VariantConst& element);
+bool parseValue_float( float*, const types::VariantConst& element);
+bool parseValue_double( double*, const types::VariantConst& element);
+bool parseValue_string( std::string*, const types::VariantConst& element);
 
 bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
 
 
 namespace {
 template <typename TYPE>
-static bool parseValue_( void*, const langbind::TypedFilterBase::Element&)
+static bool parseValue_( void*, const types::VariantConst&)
 {throw std::runtime_error( "unable to parse atomic value of this type");}
-template <> bool parseValue_<signed int>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<signed int>( void* value, const types::VariantConst& element)
 {return parseValue_int( (signed int*)value, element);}
-template <> bool parseValue_<unsigned int>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<unsigned int>( void* value, const types::VariantConst& element)
 {return parseValue_uint( (unsigned int*)value, element);}
-template <> bool parseValue_<signed long>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<signed long>( void* value, const types::VariantConst& element)
 {return parseValue_long( (signed long*)value, element);}
-template <> bool parseValue_<unsigned long>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<unsigned long>( void* value, const types::VariantConst& element)
 {return parseValue_ulong( (unsigned long*)value, element);}
-template <> bool parseValue_<signed short>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<signed short>( void* value, const types::VariantConst& element)
 {return parseValue_short( (signed short*)value, element);}
-template <> bool parseValue_<unsigned short>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<unsigned short>( void* value, const types::VariantConst& element)
 {return parseValue_ushort( (unsigned short*)value, element);}
-template <> bool parseValue_<signed char>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<signed char>( void* value, const types::VariantConst& element)
 {return parseValue_char( (signed char*)value, element);}
-template <> bool parseValue_<unsigned char>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<unsigned char>( void* value, const types::VariantConst& element)
 {return parseValue_uchar( (unsigned char*)value, element);}
-template <> bool parseValue_<float>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<float>( void* value, const types::VariantConst& element)
 {return parseValue_float( (float*)value, element);}
-template <> bool parseValue_<double>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<double>( void* value, const types::VariantConst& element)
 {return parseValue_double( (double*)value, element);}
-template <> bool parseValue_<std::string>( void* value, const langbind::TypedFilterBase::Element& element)
+template <> bool parseValue_<std::string>( void* value, const types::VariantConst& element)
 {return parseValue_string( (std::string*)value, element);}
 
 template <typename TYPE>

@@ -42,6 +42,19 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
+static bool emptycontent( const types::VariantConst& val)
+{
+	if (val.type() != types::Variant::string_) return false;
+	std::size_t ii = 0, nn = val.charsize();
+	const char* cc = val.charptr();
+
+	for (; ii<nn; ++ii)
+	{
+		if ((unsigned char)cc[ii]> 32) return false;
+	}
+	return true;
+}
+
 static std::string getElementPath( const FiltermapDDLParseStateStack& stk)
 {
 	std::string rt;
@@ -67,35 +80,24 @@ enum AtomicValueState
 	AttributeValueOpen
 };
 
-static void setAtomValue( types::Variant& val, const langbind::TypedFilterBase::Element element)
+static void setAtomValue( types::Variant& val, const types::VariantConst& element, const types::NormalizeFunction* normalizer)
 {
-	switch (element.type)
+	types::Variant::Type valueType = val.type();
+	if (normalizer)
 	{
-		case langbind::TypedFilterBase::Element::bool_:
-			val = element.value.bool_;
-			break;
-		case langbind::TypedFilterBase::Element::double_:
-			val = element.value.double_;
-			break;
-		case langbind::TypedFilterBase::Element::int_:
-			val = element.value.int_;
-			break;
-		case langbind::TypedFilterBase::Element::uint_:
-			val = element.value.uint_;
-			break;
-		case langbind::TypedFilterBase::Element::string_:
-			val = std::string( element.value.string_.ptr, element.value.string_.size);
-			break;
-		case langbind::TypedFilterBase::Element::blob_:
-			val = std::string( (const char*)element.value.blob_.ptr, element.value.blob_.size);
-			break;
+		val = normalizer->execute( element);
 	}
+	else
+	{
+		val = element;
+	}
+	val.convert( valueType);
 }
 
 static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+	types::VariantConst element;
 
 	if (!inp.getNext( typ, element))
 	{
@@ -116,7 +118,7 @@ static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Con
 			{
 				throw SerializationErrorException( "two subsequent values for atomic value", element.tostring(), getElementPath( stk));
 			}
-			setAtomValue( val, element);
+			setAtomValue( val, element, stk.back().normalizer());
 
 			if (stk.back().state() == AttributeValueOpen)
 			{
@@ -146,7 +148,7 @@ static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Con
 static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+	types::VariantConst element;
 
 	const types::VariantStructDescription* descr = st.description();
 	if (!descr) throw SerializationErrorException( "structure expected", element.tostring(), getElementPath( stk));
@@ -185,7 +187,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
-			stk.push_back( FiltermapDDLParseState( ei->name, elem));
+			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
 			if (elem->atomic())
 			{
 				stk.back().state( TagValueOpen);
@@ -219,7 +221,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				throw SerializationErrorException( "duplicate structure attribute definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
-			stk.push_back( FiltermapDDLParseState( ei->name, elem));
+			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
 			stk.back().state( AttributeValueOpen);
 			return true;
 		}
@@ -229,7 +231,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			int idx = descr->findidx( "");
 			if (idx < 0)
 			{
-				if (element.emptycontent()) return true;
+				if (emptycontent( element)) return true;
 				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", element.tostring(), getElementPath( stk));
 			}
 			types::VariantStructDescription::const_iterator
@@ -248,7 +250,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				case types::VariantStruct::int_:
 				case types::VariantStruct::uint_:
 				case types::VariantStruct::string_:
-					setAtomValue( *elem, element);
+					setAtomValue( *elem, element, stk.back().normalizer());
 					return true;
 
 				case types::VariantStruct::struct_:
@@ -261,7 +263,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 					if (elem->prototype()->atomic())
 					{
 						elem->push();
-						setAtomValue( elem->back(), element);
+						setAtomValue( elem->back(), element, stk.back().normalizer());
 						elem->back().setInitialized();
 						return true;
 					}
@@ -333,7 +335,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 			velem->setInitialized();
 			const char* velemname = stk.back().name();
 			stk.pop_back();
-			stk.push_back( FiltermapDDLParseState( velemname, velem));
+			stk.push_back( FiltermapDDLParseState( velemname, velem, stk.back().normalizer()));
 			return true;
 		}
 	}
@@ -343,7 +345,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 DDLStructParser::DDLStructParser( types::VariantStruct* st)
 	:m_st(st)
 {
-	m_stk.push_back( FiltermapDDLParseState( 0, st));
+	m_stk.push_back( FiltermapDDLParseState( 0, st, 0));
 }
 
 DDLStructParser::DDLStructParser( const DDLStructParser& o)
@@ -368,7 +370,7 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLParseState( 0, m_st));
+	m_stk.push_back( FiltermapDDLParseState( 0, m_st, 0));
 }
 
 bool DDLStructParser::call()

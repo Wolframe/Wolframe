@@ -57,7 +57,7 @@ public:
 	struct ElementBuffer
 	{
 		langbind::FilterBase::ElementType m_type;
-		langbind::TypedFilterBase::Element m_value;
+		types::VariantConst m_value;
 
 		ElementBuffer()
 			:m_type(langbind::FilterBase::Value)
@@ -94,11 +94,11 @@ public:
 	void setElem( langbind::FilterBase::ElementType t)
 	{
 		m_elem.m_type = t;
-		m_elem.m_value = langbind::TypedFilterBase::Element();
+		m_elem.m_value.init();
 		m_has_elem = true;
 	}
 
-	void setElem( langbind::FilterBase::ElementType t, langbind::TypedFilterBase::Element v)
+	void setElem( langbind::FilterBase::ElementType t, const types::VariantConst& v)
 	{
 		m_elem.m_type = t;
 		m_elem.m_value = v;
@@ -108,29 +108,7 @@ public:
 	template <typename VALTYPE>
 	void setElem_( langbind::FilterBase::ElementType t, const VALTYPE& val)
 	{
-		setElem( t, langbind::TypedFilterBase::Element( val));
-	}
-
-	void setElem( langbind::FilterBase::ElementType t, const types::Variant& val)
-	{
-		switch (val.type())
-		{
-			case types::Variant::bool_:
-				setElem_( t, val.tobool());
-				break;
-			case types::Variant::double_:
-				setElem_( t, val.todouble());
-				break;
-			case types::Variant::int_:
-				setElem_( t, val.toint());
-				break;
-			case types::Variant::uint_:
-				setElem_( t, val.touint());
-				break;
-			case types::Variant::string_:
-				setElem( t, langbind::TypedFilterBase::Element( val.charptr(), val.charsize()));
-				break;
-		}
+		setElem( t, types::VariantConst( val));
 	}
 
 	const ElementBuffer* getElem()

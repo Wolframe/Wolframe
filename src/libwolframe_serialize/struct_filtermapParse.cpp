@@ -39,65 +39,78 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
-bool _Wolframe::serialize::parseValue_int( signed int* val, const langbind::TypedFilterBase::Element& element)
+static bool emptycontent( const types::VariantConst& val)
+{
+	if (val.type() != types::Variant::string_) return false;
+	std::size_t ii = 0, nn = val.charsize();
+	const char* cc = val.charptr();
+
+	for (; ii<nn; ++ii)
+	{
+		if ((unsigned char)cc[ii]> 32) return false;
+	}
+	return true;
+}
+
+bool serialize::parseValue_int( signed int* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_uint( unsigned int* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_uint( unsigned int* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_ulong( unsigned long* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_ulong( unsigned long* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_long( signed long* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_long( signed long* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_short( signed short* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_short( signed short* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_ushort( unsigned short* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_ushort( unsigned short* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_char( signed char* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_char( signed char* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_uchar( unsigned char* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_uchar( unsigned char* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_float( float* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_float( float* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_double( double* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_double( double* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseValue_string( std::string* val, const langbind::TypedFilterBase::Element& element)
+bool serialize::parseValue_string( std::string* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);
 }
 
-bool _Wolframe::serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
+bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+	types::VariantConst element;
 
 	if (!inp.getNext( typ, element))
 	{
@@ -118,10 +131,10 @@ bool _Wolframe::serialize::parseAtomicElementEndTag( langbind::TypedInputFilter&
 	return true;
 }
 
-bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+	types::VariantConst element;
 
 	if (stk.hasbufvalue())
 	{
@@ -199,7 +212,7 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 			StructDescriptionBase::Map::const_iterator itr = descr->find( "");
 			if (itr == descr->end())
 			{
-				if (element.emptycontent()) return true;
+				if (emptycontent( element)) return true;
 				throw SerializationErrorException( "structure instead of value expected or definition of untagged value in structure must be available", element.tostring(), StructParser::getElementPath( stk));
 			}
 			std::size_t idx = itr - descr->begin();
@@ -237,11 +250,10 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 	throw SerializationErrorException( "illegal state in parse structure", StructParser::getElementPath( stk));
 }
 
-
-bool _Wolframe::serialize::parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
+bool serialize::parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+	types::VariantConst element;
 
 	if (stk.hasbufvalue())
 	{
@@ -270,7 +282,7 @@ bool _Wolframe::serialize::parseObjectAtomic( ParseValue parseVal, langbind::Typ
 			return true;
 
 		case langbind::InputFilter::CloseTag:
-			element = langbind::TypedFilterBase::Element();
+			element.init();
 			if (!parseVal( stk.back().value(), element))
 			{
 				throw SerializationErrorException( "cannot convert empty value to expected atomic type", StructParser::getElementPath( stk));

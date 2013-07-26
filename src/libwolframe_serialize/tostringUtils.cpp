@@ -20,7 +20,7 @@ std::string serialize::typedInputFilterToString( const langbind::TypedInputFilte
 	langbind::ToStringFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
 	langbind::TypedInputFilter::ElementType type;
-	langbind::TypedInputFilter::Element element;
+	types::VariantConst element;
 	int taglevel = 0;
 	while (taglevel >= 0 && inp->getNext( type, element))
 	{

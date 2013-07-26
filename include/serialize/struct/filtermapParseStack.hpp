@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
 #include <vector>
 #include <stdexcept>
@@ -80,13 +81,13 @@ public:
 		:std::vector<FiltermapParseState>(o)
 		,m_valuebuf(o.m_valuebuf){}
 
-	bool hasbufvalue() const					{return !m_valuebuf.empty();}
-	void bufvalue( const langbind::TypedFilterBase::Element& e)	{m_valuebuf = e;}
+	bool hasbufvalue() const					{return m_valuebuf.initialized();}
+	void bufvalue( const types::VariantConst& e)			{m_valuebuf = e; m_valuebuf.setInitialized();}
 	void clearbuf()							{m_valuebuf.clear();}
-	const langbind::TypedFilterBase::Element& valuebuf() const	{return m_valuebuf;}
+	const types::VariantConst& valuebuf() const			{return m_valuebuf;}
 
 private:
-	langbind::TypedFilterBase::Element m_valuebuf;
+	types::VariantConst m_valuebuf;
 };
 
 }}//namespace

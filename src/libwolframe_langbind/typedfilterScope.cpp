@@ -37,7 +37,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-bool TypedInputFilterScope::getNext( TypedInputFilter::ElementType& type, TypedInputFilter::Element& element)
+bool TypedInputFilterScope::getNext( TypedInputFilter::ElementType& type, types::VariantConst& element)
 {
 	setState( InputFilter::Open);
 
@@ -45,7 +45,7 @@ bool TypedInputFilterScope::getNext( TypedInputFilter::ElementType& type, TypedI
 	if (m_taglevel == 0 || !ref)
 	{
 		type = TypedInputFilter::CloseTag;
-		element = Element();
+		element.init();
 	}
 	else
 	{
