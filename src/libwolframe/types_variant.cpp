@@ -174,7 +174,7 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 		case Variant::uint_:
 			return boost::lexical_cast<std::string>( o.data().value.uint_);
 		case Variant::string_:
-			return std::string( o.data().value.string_);
+			return std::string( o.data().value.string_, o.data().dim.size);
 	}
 	throw boost::bad_lexical_cast();
 }
