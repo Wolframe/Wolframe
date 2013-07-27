@@ -16,6 +16,7 @@ void Variant::init( Type type_)
 	m_type = type_;
 	switch (m_type)
 	{
+		case null_:
 		case int_:
 		case uint_:
 		case bool_: return;
@@ -114,6 +115,11 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 {
 	switch (type)
 	{
+		case Variant::null_:
+		{
+			int cmp = std::memcmp( &d1, &d2, sizeof(d1));
+			return (cmp < 0)?-1:((cmp==0)?0:+1);
+		}
 		case Variant::bool_:	return compare_int( (int)d1.value.bool_, (int)d2.value.bool_);
 		case Variant::double_:	return compare_double( d1.value.double_, d2.value.double_);
 		case Variant::int_:	return compare_int( d1.value.int_, d2.value.int_);
@@ -136,6 +142,8 @@ static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type
 {
 	switch (o.type())
 	{
+		case Variant::null_:
+			throw boost::bad_lexical_cast();
 		case Variant::bool_:
 			return boost::numeric_cast<TYPE>( o.data().value.bool_);
 		case Variant::double_:
@@ -155,6 +163,8 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 {
 	switch (o.type())
 	{
+		case Variant::null_:
+			throw boost::bad_lexical_cast();
 		case Variant::bool_:
 			return boost::lexical_cast<std::string>( o.data().value.bool_);
 		case Variant::double_:
@@ -185,6 +195,8 @@ int Variant::compare( const Variant& o) const
 	{
 		switch (type())
 		{
+			case Variant::null_:
+				return -1;
 			case Variant::double_:
 				return compare_double( variant_cast<double>( o), m_data.value.double_);
 			case Variant::int_:
@@ -243,6 +255,7 @@ void Variant::convert( Type type_)
 	if (m_type == type_) return;
 	switch (type_)
 	{
+		case null_: release(); init(); return;
 		case bool_: *this = tobool(); return;
 		case int_: *this = toint(); return;
 		case uint_: *this = touint(); return;
@@ -250,5 +263,11 @@ void Variant::convert( Type type_)
 		case string_: *this = tostring(); return;
 	}
 	throw std::runtime_error( "illegal conversion of atomic type");
+}
+
+
+std::ostream& std::operator << (std::ostream &os, const _Wolframe::types::Variant& o)
+{
+	return os << o.tostring();
 }
 

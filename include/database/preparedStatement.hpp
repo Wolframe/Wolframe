@@ -37,6 +37,7 @@
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
 #include "database/databaseError.hpp"
+#include "types/variant.hpp"
 #include <string>
 #include <cstdlib>
 
@@ -57,7 +58,7 @@ public:
 	///\param[in] stmname name of prepared statement
 	virtual bool start( const std::string& stmname)=0;
 	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const char* value)=0;
+	virtual bool bind( std::size_t idx, const types::Variant& value)=0;
 	///\brief Execute instance of current statement
 	virtual bool execute()=0;
 	///\brief Get the number of columns of the last result
@@ -65,7 +66,7 @@ public:
 	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx)=0;
 	///\brief Get a column of the last result
-	virtual const char* get( std::size_t idx)=0;
+	virtual types::VariantConst get( std::size_t idx)=0;
 	///\brief Skip to the next row of the last result
 	virtual bool next()=0;
 	///\brief Get the number of rows of the last result

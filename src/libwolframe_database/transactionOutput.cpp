@@ -56,9 +56,9 @@ std::string TransactionOutput::tostring() const
 			rt << ">";
 			for (ci=0; ci<ce; ++ci)
 			{
-				if ((*wi)[ci])
+				if (wi->at(ci).defined())
 				{
-					rt << " '" << (*wi)[ci] << "'";
+					rt << " '" << wi->at(ci).tostring() << "'";
 				}
 				else
 				{

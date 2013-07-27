@@ -34,6 +34,7 @@
 ///\file modules/database/testtrace/testtraceTransaction.cpp
 #include "testtraceTransaction.hpp"
 #include "database/preparedStatement.hpp"
+#include "types/variant.hpp"
 #include "utils/stringUtils.hpp"
 #include "utils/parseUtils.hpp"
 #include <iostream>
@@ -159,11 +160,11 @@ public:
 		return true;
 	}
 
-	virtual bool bind( std::size_t idx, const char* value)
+	virtual bool bind( std::size_t idx, const types::Variant& value)
 	{
-		if (value)
+		if (value.defined())
 		{
-			(*m_out) << "bind( " << idx << ", '" << value << "' );" << std::endl;
+			(*m_out) << "bind( " << idx << ", '" << value.tostring() << "' );" << std::endl;
 		}
 		else
 		{
@@ -212,11 +213,18 @@ public:
 		return rt;
 	}
 
-	virtual const char* get( std::size_t idx)
+	virtual types::VariantConst get( std::size_t idx)
 	{
 		const char* rt = m_fakeres.get( idx);
 		(*m_out) << "get( " << idx << " ); returns " << rt << std::endl;
-		return rt;
+		if (rt)
+		{
+			return types::VariantConst(rt);
+		}
+		else
+		{
+			return types::VariantConst(rt);
+		}
 	}
 
 	virtual const db::DatabaseError* getLastError()
@@ -234,22 +242,29 @@ private:
 
 static void printTransactionInput( std::ostream& out, const TransactionInput& input)
 {
-	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
+	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
 		out << ci->name();
-		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
+		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
 		if (ai != ae) out << " ";
 
 		for (; ai != ae; ++ai)
 		{
 			switch (ai->type())
 			{
-				case TransactionInput::Element::ResultColumn:
-					out << "#[" << ai->ref() << "]";
+				case TransactionInput::Command::Argument::ResultColumn:
+					out << "#[" << ai->value().touint() << "]";
 					break;
-				case TransactionInput::Element::String:
-					out << "#" << (ai->value()?ai->value():"NULL");
+				case TransactionInput::Command::Argument::Value:
+					if (ai->value().defined())
+					{
+						out << "#" << ai->value().tostring();
+					}
+					else
+					{
+						out << "#NULL";
+					}
 					break;
 			}
 		}

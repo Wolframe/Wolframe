@@ -584,6 +584,10 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 	unsigned int val_uint;
 	switch (val.type())
 	{
+		case types::Variant::null_:
+			lua_pushnil( ls);
+			break;
+
 		case types::Variant::bool_:
 			lua_pushboolean( ls, val.tobool());
 			break;

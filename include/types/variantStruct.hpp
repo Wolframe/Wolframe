@@ -54,6 +54,7 @@ public:
 	///\brief Typed filter element type
 	enum Type
 	{
+		null_=Variant::null_,
 		int_=Variant::int_,
 		uint_=Variant::uint_,
 		bool_=Variant::bool_,
@@ -281,6 +282,13 @@ struct VariantStructConst :public VariantStruct
 };
 
 }} //namespace
+
+namespace std
+{
+///\brief Output stream operators for logging etc.
+ostream& operator << (ostream &os, const _Wolframe::types::VariantStruct& o);
+} //namespace
+
 #endif
 
 

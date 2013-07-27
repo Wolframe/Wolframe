@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #include <string>
 #include <cstring>
+#include <ostream>
 #include <stdexcept>
 #include "types/countedReference.hpp"
 
@@ -51,6 +52,7 @@ public:
 	///\brief Type of the variant
 	enum Type
 	{
+		null_,					//< value undefined (NULL)
 		int_,					//< C++ int
 		uint_,					//< C++ unsigned int
 		bool_,					//< C++ bool
@@ -66,7 +68,7 @@ public:
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"double","int","uint","bool","string","array","struct","indirection"};
+		static const char* ar[] = {"null","int","uint","bool","double","string","array","struct","indirection"};
 		return ar[ (int)i];
 	}
 
@@ -162,6 +164,9 @@ public:
 	///\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
 	bool atomic() const				{return m_type <= (unsigned char)string_;}
 
+	///\brief Test if this value is defined (not null)
+	bool defined() const				{return m_type != (unsigned char)null_;}
+
 	///\brief Reseting the content of this
 	void clear()					{release(); init();}
 
@@ -234,5 +239,12 @@ struct VariantConst :public Variant
 };
 
 }} //namespace
+
+namespace std
+{
+///\brief Output stream operators for logging etc.
+ostream& operator << (ostream &os, const _Wolframe::types::Variant& o);
+} //namespace
+
 #endif
 

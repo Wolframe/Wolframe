@@ -204,6 +204,7 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	{
 		switch (stk.back().value()->type())
 		{
+			case types::VariantStruct::null_:
 			case types::VariantStruct::bool_:
 			case types::VariantStruct::double_:
 			case types::VariantStruct::int_:

@@ -248,9 +248,9 @@ bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 	return true;
 }
 
-bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value)
+bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::Variant& value)
 {
-	if (value)
+	if (value.defined())
 	{
 		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "' )";
 	}
@@ -272,14 +272,14 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value
 		errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
 		return false;
 	}
-	if (value)
+	if (value.defined())
 	{
-		size_t valuesize = std::strlen( value);
-		char* encvalue = (char*)std::malloc( valuesize * 2 + 3);
+		std::string strval = value.tostring();
+		char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
 		encvalue[0] = '\'';
 		boost::shared_ptr<void> encvaluer( encvalue, std::free);
 		int error = 0;
-		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, value, valuesize, &error);
+		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
 		encvalue[encvaluesize+1] = '\'';
 		std::string bindval( encvalue, encvaluesize+2);
 		m_statement.bind( idx, bindval);
@@ -356,29 +356,29 @@ const DatabaseError* PreparedStatementHandler_postgres::getLastError()
 	return m_lasterror.get();
 }
 
-const char* PreparedStatementHandler_postgres::get( std::size_t idx)
+types::VariantConst PreparedStatementHandler_postgres::get( std::size_t idx)
 {
 	LOG_TRACE << "[postgresql statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "inspect command result not possible in state '") + stateName(m_state) + "'");
-		return 0;
+		return types::VariantConst();
 	}
 	if (!m_lastresult)
 	{
 		errorStatus( "command result is empty");
-		return 0;
+		return types::VariantConst();
 	}
-	if (m_idx_row >= m_nof_rows) return 0;
+	if (m_idx_row >= m_nof_rows) return types::VariantConst();
 	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
 	if (!rt || rt[0] == '\0')
 	{
 		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
 		{
-			return 0;
+			return types::VariantConst();
 		}
 	}
-	return rt;
+	return types::VariantConst( rt);
 }
 
 bool PreparedStatementHandler_postgres::next()

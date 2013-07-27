@@ -233,9 +233,9 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 	return status( rc, Prepared);
 }
 
-bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
+bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Variant& value)
 {
-	if (value)
+	if (value.defined())
 	{
 		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "' )";
 	}
@@ -256,9 +256,10 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 	{
 		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm->second + ")");
 	}
-	if (value)
+	if (value.defined())
 	{
-		return status( sqlite3_bind_text( m_stm, (int)idx, value, std::strlen( value),  SQLITE_STATIC), Prepared);
+		std::string strval = value.tostring();
+		return status( sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(),  SQLITE_STATIC), Prepared);
 	}
 	else
 	{
@@ -318,30 +319,30 @@ const db::DatabaseError* PreparedStatementHandler_sqlite3::getLastError()
 	return m_lasterror.get();
 }
 
-const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)
+types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
 {
 	LOG_TRACE << "[sqlite3 statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "number of columns not available in state '") + stateName(m_state) + "'");
-		return 0;
+		return types::VariantConst();
 	}
 	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
 	{
 		errorStatus( std::string( "column index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
-		return 0;
+		return types::VariantConst();
 	}
 	if (sqlite3_column_type( m_stm, (int)idx-1) == SQLITE_NULL)
 	{
-		return 0;
+		return types::VariantConst();
 	}
 	const char* rt = (const char*)sqlite3_column_text( m_stm, (int)idx-1);
 	if (!rt && idx <= (std::size_t)sqlite3_column_count( m_stm))
 	{
 		errorStatus( std::string( "cannot convert result value to string for column (") + boost::lexical_cast<std::string>(idx) + ")");
-		return 0;
+		return types::VariantConst();
 	}
-	return rt;
+	return types::VariantConst( rt);
 }
 
 bool PreparedStatementHandler_sqlite3::next()

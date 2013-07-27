@@ -66,6 +66,9 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 		std::string castelement;
 		switch (element.type())
 		{
+			case types::Variant::null_:
+				break;
+
 			case types::Variant::bool_:
 				if (element.tobool())
 				{

@@ -66,7 +66,7 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	///\brief Start new command statement
 	virtual bool start( const std::string& stmname);
 	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const char* value);
+	virtual bool bind( std::size_t idx, const types::Variant& value);
 	///\brief Execute instance of current statement
 	virtual bool execute();
 	///\brief Return true is the last command has at least one result row returned
@@ -78,7 +78,7 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	///\brief Get the last database error as string
 	virtual const db::DatabaseError* getLastError();
 	///\brief Get a column of the last result
-	virtual const char* get( std::size_t idx);
+	virtual types::VariantConst get( std::size_t idx);
 	///\brief Skip to the next row of the last result
 	virtual bool next();
 

@@ -65,6 +65,8 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 
 	switch (st.type())
 	{
+		case types::VariantStruct::null_:
+			break;
 		case types::VariantStruct::bool_:
 		case types::VariantStruct::double_:
 		case types::VariantStruct::int_:

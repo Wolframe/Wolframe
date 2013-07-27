@@ -124,6 +124,9 @@ static void push_element( lua_State* ls, const types::VariantConst& element)
 {
 	switch (element.type())
 	{
+		case types::Variant::null_:
+			lua_pushnil( ls);
+			break;
 		case types::Variant::bool_:
 			lua_pushboolean( ls, element.tobool());
 			break;

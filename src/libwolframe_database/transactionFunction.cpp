@@ -1011,7 +1011,7 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 		}
 		else if ((cns = pi->constantReference()) != 0)
 		{
-			ti.bindCommandArgAsValue( cns, std::strlen(cns));
+			ti.bindCommandArgAsValue( types::VariantConst( cns));
 		}
 		else
 		{
@@ -1031,7 +1031,7 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 				std::pair<const char*,std::size_t> value = inputst->structure().nodevalue( *gs);
 				if (value.first)
 				{
-					ti.bindCommandArgAsValue( value.first, value.second);
+					ti.bindCommandArgAsValue( types::VariantConst( value.first, value.second));
 				}
 				else
 				{
@@ -1048,8 +1048,21 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 	std::size_t fidx = startfidx;
 	for (; ci != ce; ++ci,++fidx)
 	{
-		if (ci->hasNonemptyResult()) rt.setNonemptyResult( fidx);
-		if (ci->hasUniqueResult()) rt.setUniqueResult( fidx);
+		TransactionInput::cmd_iterator ti = rt.begin(), te = rt.end();
+		for (; ti != te; ++ti)
+		{
+			if (ti->functionidx() == fidx)
+			{
+				if (ci->hasNonemptyResult())
+				{
+					ti->setNonemptyResult();
+				}
+				if (ci->hasUniqueResult())
+				{
+					ti->setUniqueResult();
+				}
+			}
+		}
 
 		// Select the nodes to execute the command with:
 		std::vector<Node> nodearray;
@@ -1336,7 +1349,7 @@ struct TransactionFunctionOutput::Impl
 							}
 							continue;
 						}
-						if (!(*m_rowitr)[ m_colidx])
+						if (!m_rowitr->at(m_colidx).defined())
 						{
 							++m_colidx;
 							continue;
@@ -1347,7 +1360,7 @@ struct TransactionFunctionOutput::Impl
 						{
 							//... untagged content value (column name '_')
 							type = langbind::TypedInputFilter::Value;
-							element = (*m_rowitr)[ m_colidx];
+							element = m_rowitr->at(m_colidx);
 							m_valuestate = 0;
 							++m_colidx;
 							return true;
@@ -1361,7 +1374,7 @@ struct TransactionFunctionOutput::Impl
 					if (m_valuestate == 1)
 					{
 						type = langbind::TypedInputFilter::Value;
-						element = (*m_rowitr)[ m_colidx];
+						element = m_rowitr->at(m_colidx);
 						m_valuestate = 2;
 						return true;
 					}

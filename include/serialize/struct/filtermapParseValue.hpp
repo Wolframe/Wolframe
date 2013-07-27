@@ -95,6 +95,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::string_&, const t
 	{
 		switch (element.type())
 		{
+			case types::Variant::null_:
+				return false;
+
 			case types::Variant::bool_:
 				val = (element.tobool())?"true":"false";
 				return true;
@@ -131,6 +134,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const typ
 	{
 		switch (element.type())
 		{
+			case types::Variant::null_:
+				return false;
+
 			case types::Variant::bool_:
 				val = element.tobool();
 				return true;
@@ -171,6 +177,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, con
 	{
 		switch (element.type())
 		{
+			case types::Variant::null_:
+				return false;
+
 			case types::Variant::bool_:
 				val = boost::numeric_cast<ValueType>( element.tobool());
 				return true;

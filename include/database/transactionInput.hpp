@@ -35,6 +35,7 @@
 #ifndef _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/variant.hpp"
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -43,238 +44,135 @@
 namespace _Wolframe {
 namespace db {
 
+///\class TransactionInput
+///\brief Input of a transaction
 class TransactionInput
 {
 public:
-	TransactionInput()
-		:m_strings("\0\0",2){}
+	///\brief Constructor
+	TransactionInput(){}
+	///\brief Copy constructor
 	TransactionInput( const TransactionInput& o)
-		:m_cmd(o.m_cmd)
-		,m_strings(o.m_strings){}
+		:m_cmd(o.m_cmd){}
 
-	class Element
-	{
-	public:
-		enum Type
-		{
-			String,
-			ResultColumn
-		};
-
-		Element(){}
-		Element( Type type_, std::size_t idx_, std::size_t size_)
-			:m_type( type_)
-			,m_idx(idx_)
-			,m_size(size_){}
-		Element( const Element& o)
-			:m_type(o.m_type)
-			,m_idx(o.m_idx)
-			,m_size(o.m_size){}
-
-		Type type() const					{return m_type;}
-		std::size_t idx() const					{return m_idx;}
-		std::size_t size() const				{return m_size;}
-
-	private:
-		Type m_type;
-		std::size_t m_idx;
-		std::size_t m_size;
-	};
-
+	///\class Command
+	///\brief Structure representing one command in a transaction
 	class Command
 	{
 	public:
+		///\class Argument
+		///\brief Structure representing one argument of a command in a transaction
+		class Argument
+		{
+		public:
+			enum Type
+			{
+				Value,
+				ResultColumn
+			};
+
+			///\brief Default constructor
+			Argument()
+				:m_type(Value){}
+			///\brief Constructor
+			Argument( Type type_, const types::Variant& value_)
+				:m_type( type_)
+				,m_value(value_){}
+			///\brief Copy constructor
+			Argument( const Argument& o)
+				:m_type(o.m_type)
+				,m_value(o.m_value){}
+
+			Type type() const			{return m_type;}
+			const types::Variant& value() const	{return m_value;}
+
+		private:
+			Type m_type;
+			types::Variant m_value;
+		};
+	public:
+		///\brief Default constructor
 		Command()
-			:m_functionidx(0)
+			:m_flags(0)
+			,m_functionidx(0)
 			,m_level(0){}
+		///\brief Constructor
 		Command( std::size_t functionidx_, std::size_t level_, const std::string& name_)
-			:m_functionidx(functionidx_)
+			:m_flags(0)
+			,m_functionidx(functionidx_)
 			,m_level(level_)
 			,m_name(name_){}
+		///\brief Copy constructor
 		Command( const Command& o)
-			:m_functionidx(o.m_functionidx)
+			:m_flags(o.m_flags)
+			,m_functionidx(o.m_functionidx)
 			,m_level(o.m_level)
 			,m_name(o.m_name)
 			,m_arg(o.m_arg){}
 
-		void bind( Element::Type type, std::size_t idx, std::size_t size)
+		///\brief Bind value the the next argument of a command
+		void bind( Argument::Type type, const types::Variant& value)
 		{
-			m_arg.push_back( Element( type, idx, size));
+			m_arg.push_back( Argument( type, value));
 		}
 
-		std::size_t level() const				{return m_level;}
-		std::size_t functionidx() const				{return m_functionidx;}
-		const std::string& name() const				{return m_name;}
-		const std::vector<Element>& arg() const			{return m_arg;}
+		///\brief Get the scope level of this command
+		std::size_t level() const			{return m_level;}
+		///\brief Get the id of the associated function description
+		std::size_t functionidx() const			{return m_functionidx;}
+		///\brief Get the name of the command
+		const std::string& name() const			{return m_name;}
+		///\brief Get the list of arguments of the command
+		const std::vector<Argument>& arg() const	{return m_arg;}
+
+		///\brief Test if he result of this command is defined as non empty
+		bool nonemptyResult() const			{return flags( NonEmptyResult);}
+		///\brief Define the result to be non empty
+		void setNonemptyResult( bool v=true)		{setFlags( NonEmptyResult, v);}
+
+		///\brief Test if he result of this command is defined as unique
+		bool uniqueResult() const			{return flags( UniqueResult);}
+		///\brief Define the result to be unique
+		void setUniqueResult( bool v=true)		{setFlags( UniqueResult, v);}
+
+	public:
+		typedef std::vector<Argument>::const_iterator arg_const_iterator;
+		typedef std::vector<Argument>::iterator arg_iterator;
+
+		arg_const_iterator begin() const			{return m_arg.begin();}
+		arg_iterator begin()					{return m_arg.begin();}
+
+		arg_const_iterator end() const				{return m_arg.end();}
+		arg_iterator end()					{return m_arg.end();}
 
 	private:
-		std::size_t m_functionidx;
-		std::size_t m_level;
-		std::string m_name;
-		std::vector<Element> m_arg;
-	};
-
-	class arg_iterator
-	{
-	public:
-		arg_iterator()
-			:m_ref(0){}
-		arg_iterator( const arg_iterator& o)
-			:m_ref(o.m_ref)
-			,m_itr(o.m_itr)
-			,m_end(o.m_end)
+		enum Flags
 		{
-			initContent();
-		}
-		arg_iterator( const TransactionInput* ref_, const std::vector<Element>::const_iterator& itr_, const std::vector<Element>::const_iterator& end_)
-			:m_ref(ref_)
-			,m_itr(itr_)
-			,m_end(end_)
-		{
-			initContent();
-		}
-
-		bool compare( const arg_iterator& o) const		{return m_itr==o.m_itr;}
-		bool operator==( const arg_iterator& o) const		{return compare(o);}
-		bool operator!=( const arg_iterator& o) const		{return !compare(o);}
-
-		arg_iterator& operator++()				{++m_itr; initContent(); return *this;}
-		arg_iterator operator++(int)				{arg_iterator rt(*this); ++m_itr; initContent(); return rt;}
-
-	public:
-		class Content
-		{
-		public:
-			Content()
-				:m_type(Element::String)
-				,m_value(0)
-				,m_size(0)
-				,m_ref(0){}
-
-			Content( const Content& o)
-				:m_type(o.m_type)
-				,m_value(o.m_value)
-				,m_size(o.m_size)
-				,m_ref(o.m_ref){}
-
-			void initString( const char* value_, std::size_t size_)
-			{
-				m_type = Element::String;
-				m_value = value_;
-				m_size = size_;
-				m_ref = 0;
-			}
-
-			void initResultColumn( std::size_t ref_)
-			{
-				m_type = Element::ResultColumn;
-				m_value = 0;
-				m_size = 0;
-				m_ref = ref_;
-			}
-
-			Element::Type type() const	{return m_type;}
-			const char* value() const	{return m_value;}
-			std::size_t ref() const		{return m_ref;}
-			std::size_t size() const	{return m_size;}
-
-		private:
-			Element::Type m_type;
-			const char* m_value;
-			std::size_t m_size;
-			std::size_t m_ref;
+			None=0x0,
+			NonEmptyResult=0x1,
+			UniqueResult=0x2
 		};
 
-		const Content& operator*() const			{return m_content;}
-		const Content* operator->() const			{return &m_content;}
+		bool flags( Flags flags_) const			{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
+		void setFlags( Flags flags_, bool v=true)	{if (v) m_flags = (Flags)((unsigned char)m_flags | (unsigned char)flags_); else m_flags = (Flags)((unsigned char)m_flags - ((unsigned char)m_flags & (unsigned char)flags_));}
 
 	private:
-		void initContent()
-		{
-			if (m_itr == m_end)
-			{
-				m_content.initString( (const char*)0, 0);
-			}
-			else
-			{
-				switch (m_itr->type())
-				{
-					case Element::String:
-						m_content.initString( m_ref->value( m_itr->idx()), m_itr->size());
-						break;
-					case Element::ResultColumn:
-						m_content.initResultColumn( m_itr->idx());
-						break;
-				}
-			}
-		}
-		Content m_content;
-		const TransactionInput* m_ref;
-		std::vector<Element>::const_iterator m_itr;
-		std::vector<Element>::const_iterator m_end;
+		unsigned char m_flags;				//< Flags defining some constraints on the command result (bitfield for enum Flags)
+		std::size_t m_functionidx;			//< Identifier used to associate a function description with a result for output with markup
+		std::size_t m_level;				//< Identifier used to implement the scope of values that can be referenced by this command
+		std::string m_name;				//< Name of the command (internal name for embedded database instructions)
+		std::vector<Argument> m_arg;			//< List of arguments passed to the command
 	};
 
-	class cmd_iterator
-	{
-	public:
-		cmd_iterator(){}
-		cmd_iterator( const cmd_iterator& o)
-			:m_content(o.m_content){}
-		cmd_iterator( const TransactionInput* ref_, const std::vector<Command>::const_iterator& itr_)
-			:m_content(ref_, itr_){}
+public:
+	typedef std::vector<Command>::const_iterator cmd_const_iterator;
+	typedef std::vector<Command>::iterator cmd_iterator;
 
-		bool compare( const cmd_iterator& o) const		{return m_content.m_itr==o.m_content.m_itr;}
-		bool operator==( const cmd_iterator& o) const		{return compare(o);}
-		bool operator!=( const cmd_iterator& o) const		{return !compare(o);}
+	cmd_const_iterator begin() const			{return m_cmd.begin();}
+	cmd_iterator begin()					{return m_cmd.begin();}
 
-		cmd_iterator& operator++()				{++m_content.m_itr; return *this;}
-		cmd_iterator operator++(int)				{cmd_iterator rt(*this); ++m_content.m_itr; return rt;}
-		cmd_iterator& operator--()				{--m_content.m_itr; return *this;}
-		cmd_iterator operator--(int)				{cmd_iterator rt(*this); --m_content.m_itr; return rt;}
-
-		struct Content
-		{
-			const TransactionInput* m_ref;
-			std::vector<Command>::const_iterator m_itr;
-
-			const std::string& name() const			{return m_itr->name();}
-			std::size_t functionidx() const			{return m_itr->functionidx();}
-			std::size_t level() const			{return m_itr->level();}
-
-			arg_iterator begin() const			{return arg_iterator(m_ref, m_itr->arg().begin(), m_itr->arg().end());}
-			arg_iterator end() const			{return arg_iterator(m_ref, m_itr->arg().end(), m_itr->arg().end());}
-
-			Content()
-				:m_ref(0){}
-			Content( const Content& o)
-				:m_ref(o.m_ref)
-				,m_itr(o.m_itr){}
-			Content( const TransactionInput* ref_, const std::vector<Command>::const_iterator& itr_)
-				:m_ref(ref_)
-				,m_itr(itr_){}
-		};
-
-		const Content& operator*() const			{return m_content;}
-		const Content* operator->() const			{return &m_content;}
-
-	private:
-		Content m_content;
-	};
-
-	cmd_iterator begin() const					{return cmd_iterator( this, m_cmd.begin());}
-	cmd_iterator end() const					{return cmd_iterator( this, m_cmd.end());}
-
-	const char* value( std::size_t idx) const			{return (idx)?(m_strings.c_str()+idx):0;}
-
-	std::size_t getValueIdx( const char* v, std::size_t n)
-	{
-		if (!v) return 0;
-		if (!*v || !n) return 1;
-		std::size_t rt = m_strings.size();
-		m_strings.append( std::string( v, n));
-		m_strings.push_back('\0');
-		return rt;
-	}
+	cmd_const_iterator end() const				{return m_cmd.end();}
+	cmd_iterator end()					{return m_cmd.end();}
 
 public:
 	///\brief Start new command statement
@@ -287,71 +185,28 @@ public:
 	}
 
 	///\brief Bind parameter value on current command statement
-	void bindCommandArgAsValue( const char* value_, std::size_t size_)
+	void bindCommandArgAsValue( const types::Variant& value)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::String, getValueIdx( value_, size_), size_);
+		m_cmd.back().bind( Command::Argument::Value, value);
 	}
 
 	///\brief Bind parameter value on current command statement
 	void bindCommandArgAsNull()
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::String, 0, 0);
+		m_cmd.back().bind( Command::Argument::Value, types::Variant());
 	}
 
 	///\brief Bind parameter value on current command statement
 	void bindCommandArgAsResultReference( std::size_t resultref)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::ResultColumn, resultref, 0);
-	}
-
-	bool hasNonemptyResult( std::size_t functionidx) const
-	{
-		return hasFlag( functionidx, NonEmptyResult);
-	}
-
-	bool hasUniqueResult( std::size_t functionidx) const
-	{
-		return hasFlag( functionidx, UniqueResult);
-	}
-
-	void setNonemptyResult( std::size_t functionidx)
-	{
-		setFlag( functionidx, NonEmptyResult);
-	}
-
-	void setUniqueResult( std::size_t functionidx)
-	{
-		setFlag( functionidx, UniqueResult);
+		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant((unsigned int)resultref));
 	}
 
 private:
-	enum Flags
-	{
-		None=0x0,
-		NonEmptyResult=0x1,
-		UniqueResult=0x2
-	};
-
-	void setFlag( std::size_t functionidx, Flags f)
-	{
-		std::size_t nn = (functionidx >= m_flags.size())?(functionidx-m_flags.size()+1):0;
-		for (; nn>0; --nn) m_flags.push_back(None);
-		m_flags[ functionidx] = (Flags)((int)(m_flags[ functionidx])|(int)f);
-	}
-
-	bool hasFlag( std::size_t functionidx, Flags f) const
-	{
-		if (functionidx >= m_flags.size()) return false;
-		return (int)(m_flags[ functionidx])&(int)f;
-	}
-
-private:
-	std::vector<Command> m_cmd;
-	std::string m_strings;
-	std::vector<Flags> m_flags;
+	std::vector<Command> m_cmd;				//< list of commands of the transaction
 };
 
 typedef types::CountedReference<TransactionInput> TransactionInputR;

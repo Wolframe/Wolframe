@@ -84,6 +84,7 @@ void VariantStruct::initCopy( const VariantStruct& o)
 
 	switch (o.type())
 	{
+		case VariantStruct::null_:
 		case VariantStruct::bool_:
 		case VariantStruct::double_:
 		case VariantStruct::int_:
@@ -176,10 +177,12 @@ void VariantStruct::release()
 
 	switch (type())
 	{
+		case VariantStruct::null_:
 		case VariantStruct::bool_:
 		case VariantStruct::double_:
 		case VariantStruct::int_:
 		case VariantStruct::uint_:
+			break;
 		case VariantStruct::string_:
 			Variant::release();
 			break;
@@ -526,4 +529,8 @@ std::string VariantStruct::tostring() const
 }
 
 
+std::ostream& std::operator << (std::ostream &os, const _Wolframe::types::VariantStruct& o)
+{
+	return os << o.tostring();
+}
 

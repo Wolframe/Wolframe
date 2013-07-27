@@ -245,6 +245,9 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 
 			switch (elem->type())
 			{
+				case types::VariantStruct::null_:
+					throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
+
 				case types::VariantStruct::bool_:
 				case types::VariantStruct::double_:
 				case types::VariantStruct::int_:
@@ -306,6 +309,9 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 	types::VariantStruct* elem = stk.back().value();
 	switch (elem->type())
 	{
+		case types::VariantStruct::null_:
+			throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
+
 		case types::VariantStruct::bool_:
 		case types::VariantStruct::double_:
 		case types::VariantStruct::int_:

@@ -43,29 +43,32 @@ using namespace _Wolframe::db;
 
 #define ERRORCODE(E) (E+0x1000000)
 
-static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool nonempty, bool unique)
+static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResult& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
-	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
+	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
 	{
-		const char* val = 0;
+		types::VariantConst val;
+
 		switch (ai->type())
 		{
-			case TransactionInput::Element::ResultColumn:
-				if (ai->ref() == 0)
+			case TransactionInput::Command::Argument::ResultColumn:
+			{
+				unsigned int ref = ai->value().touint();
+				if (ref == 0)
 				{
 					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
-				if (ai->ref() > resrow->size())
+				if (ref > resrow->size())
 				{
 					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
-				val = (*resrow)[ ai->ref() -1];
+				val = resrow->at( ref - 1);
 				break;
-
-			case TransactionInput::Element::String:
+			}
+			case TransactionInput::Command::Argument::Value:
 				val = ai->value();
 				break;
 		}
@@ -110,8 +113,8 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 				cmdres.openRow();
 				for (si=0; si != se; ++si)
 				{
-					const char* col = stmh->get( si+1);
-					if (col)
+					types::VariantConst col = stmh->get( si+1);
+					if (col.defined())
 					{
 						cmdres.addValue( col);
 					}
@@ -149,30 +152,33 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	return true;
 }
 
-static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
+static bool pushArguments( TransactionOutput::CommandResult& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
 {
-	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
+	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
 	cmdres.openRow();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
 	{
-		const char* val = 0;
+		types::VariantConst val;
+
 		switch (ai->type())
 		{
-			case TransactionInput::Element::ResultColumn:
-				if (ai->ref() == 0)
+			case TransactionInput::Command::Argument::ResultColumn:
+			{
+				unsigned int ref = ai->value().touint();
+				if (ref == 0)
 				{
 					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
-				if (ai->ref() > resrow->size())
+				if (ref > resrow->size())
 				{
 					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 					throw db::DatabaseErrorException( dberr);
 				}
-				val = (*resrow)[ ai->ref() -1];
+				val = resrow->at( ref - 1);
 				break;
-
-			case TransactionInput::Element::String:
+			}
+			case TransactionInput::Command::Argument::Value:
 				val = ai->value();
 				break;
 		}
@@ -180,7 +186,7 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 		colname << "_" << argidx;
 		cmdres.addColumn( colname.str());
 
-		if (val)
+		if (val.defined())
 		{
 			cmdres.addValue( val);
 		}
@@ -192,7 +198,7 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 	return true;
 }
 
-static TransactionInput::cmd_iterator endOfOperation( TransactionInput::cmd_iterator ci, TransactionInput::cmd_iterator ce)
+static TransactionInput::cmd_const_iterator endOfOperation( TransactionInput::cmd_const_iterator ci, TransactionInput::cmd_const_iterator ce)
 {
 	std::size_t level = ci->level();
 	for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->name().empty())); ++ci);
@@ -203,9 +209,9 @@ namespace {
 struct OperationLoop
 {
 	TransactionOutput::row_iterator wi,we;
-	TransactionInput::cmd_iterator ci,ce;
+	TransactionInput::cmd_const_iterator ci,ce;
 
-	OperationLoop( TransactionInput::cmd_iterator ci_, TransactionInput::cmd_iterator ce_, TransactionOutput::row_iterator wi_, TransactionOutput::row_iterator we_)
+	OperationLoop( TransactionInput::cmd_const_iterator ci_, TransactionInput::cmd_const_iterator ce_, TransactionOutput::row_iterator wi_, TransactionOutput::row_iterator we_)
 		:wi(wi_),we(we_),ci(ci_),ce(ce_){}
 	OperationLoop( const OperationLoop& o)
 		:wi(o.wi),we(o.we),ci(o.ci),ce(o.ce){}
@@ -221,10 +227,10 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	};
 	OperationType optype = DatabaseCall;
 	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
-	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx, 0);
+	TransactionOutput::CommandResult cmdres( null_functionidx, 0);
 	std::vector<OperationLoop> loopstk;
 
-	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
+	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
 
 	for (; ci != ce; ++ci)
 	{
@@ -253,8 +259,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			optype = DatabaseCall;
 			if (!start( ci->name())) return false;
 		}
-		bool nonempty = input.hasNonemptyResult( ci->functionidx());
-		bool unique = input.hasUniqueResult( ci->functionidx());
+		bool nonempty = ci->nonemptyResult();
+		bool unique = ci->uniqueResult();
 
 		if (cmdres.functionidx() != ci->functionidx())
 		{
@@ -265,11 +271,11 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			{
 				output.addCommandResult( cmdres);
 			}
-			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
+			cmdres = TransactionOutput::CommandResult( ci->functionidx(), ci->level());
 		}
-		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
+		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
 
-		for (; ai != ae && ai->type() != TransactionInput::Element::ResultColumn; ++ai);
+		for (; ai != ae && ai->type() != TransactionInput::Command::Argument::ResultColumn; ++ai);
 		if (ai != ae)
 		{
 			// ... command has result reference, then we call it for every result row
