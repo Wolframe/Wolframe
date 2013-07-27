@@ -357,6 +357,9 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 {
 	switch (element.type())
 	{
+		case types::Variant::null_:
+			wrap_lua_pushnil( m_ls);
+			return true;
 		case types::Variant::bool_:
 			wrap_lua_pushboolean( m_ls, element.tobool());
 			return true;
@@ -451,7 +454,7 @@ bool LuaTableOutputFilter::closeAttribute( const types::VariantConst& element)
 	{
 		// ... non empty table, we create an element with an empty key
 		wrap_lua_pop( m_ls, 2);
-		return openTag( types::VariantConst()) && closeAttribute( element) && closeTag();
+		return openTag( types::VariantConst("")) && closeAttribute( element) && closeTag();
 	}
 	else
 	{

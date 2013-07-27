@@ -164,7 +164,7 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 	switch (o.type())
 	{
 		case Variant::null_:
-			throw boost::bad_lexical_cast();
+			return std::string();
 		case Variant::bool_:
 			return boost::lexical_cast<std::string>( o.data().value.bool_);
 		case Variant::double_:

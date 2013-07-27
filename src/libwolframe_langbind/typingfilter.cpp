@@ -67,6 +67,7 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 		switch (element.type())
 		{
 			case types::Variant::null_:
+				rt = m_outputfilter->print( type, 0, 0);
 				break;
 
 			case types::Variant::bool_:
