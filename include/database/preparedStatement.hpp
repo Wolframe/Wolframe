@@ -58,7 +58,7 @@ public:
 	///\param[in] stmname name of prepared statement
 	virtual bool start( const std::string& stmname)=0;
 	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const types::Variant& value)=0;
+	virtual bool bind( std::size_t idx, const types::VariantConst& value)=0;
 	///\brief Execute instance of current statement
 	virtual bool execute()=0;
 	///\brief Get the number of columns of the last result

@@ -248,7 +248,7 @@ bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 	return true;
 }
 
-bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::Variant& value)
+bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::VariantConst& value)
 {
 	if (value.defined())
 	{

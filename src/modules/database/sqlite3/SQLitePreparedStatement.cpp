@@ -40,12 +40,66 @@
 #include <limits>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
+#include <boost/cstdint.hpp>
 #if SQLITE_VERSION_NUMBER < 3005000
 #error This SQLite version is not supported by this module. It relies on the 'V2' interface
 #endif
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+
+#undef WOLFRAME_LOWLEVEL_DEBUG
+#ifdef WOLFRAME_LOWLEVEL_DEBUG
+int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_stmt** stm, const char** t)
+{
+	LOG_DATA << "call sqlite3_prepare_v2 '" << ((n<0)?std::string(s):std::string(s,n)) << "'";
+	return sqlite3_prepare_v2( c, s, n, stm, t);
+}
+std::size_t wrap_sqlite3_bind_parameter_count( sqlite3_stmt* stm)
+{
+	std::size_t rt = sqlite3_bind_parameter_count(stm);
+	LOG_DATA << "call sqlite3_bind_parameter_count returns " << rt;
+	return rt;
+}
+int wrap_sqlite3_bind_text( sqlite3_stmt* stm, int idx, const char* s, int n, void(*f)(void*))
+{
+	int rt = sqlite3_bind_text( stm, idx, s, n, f);
+	LOG_DATA << "call sqlite3_bind_text " << idx << " '" << ((n<0)?std::string(s):std::string(s,n)) << "' returns " << rt;
+	return rt;
+}
+int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
+{
+	int rt = sqlite3_bind_int( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_int " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, boost::int64_t val)
+{
+	int rt = sqlite3_bind_int64( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_int64 " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+int wrap_sqlite3_bind_double( sqlite3_stmt* stm, int idx, double val)
+{
+	int rt = sqlite3_bind_double( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_double " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
+{
+	int rt = sqlite3_bind_null( stm, idx);
+	LOG_DATA << "call sqlite3_bind_null " << idx << " returns " << rt;
+	return rt;
+}
+#else
+#define wrap_sqlite3_prepare_v2			sqlite3_prepare_v2
+#define wrap_sqlite3_bind_parameter_count	sqlite3_bind_parameter_count
+#define wrap_sqlite3_bind_text			sqlite3_bind_text
+#define wrap_sqlite3_bind_null			sqlite3_bind_null
+#define wrap_sqlite3_bind_int			sqlite3_bind_int
+#define wrap_sqlite3_bind_int64			sqlite3_bind_int64
+#define wrap_sqlite3_bind_double		sqlite3_bind_double
+#endif
 
 PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
@@ -125,7 +179,7 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 	m_curstm = m_stmmap->end();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
-	int rc = sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
 
 	if (rc != SQLITE_OK && rc != SQLITE_DONE) return status( rc, newstate);
 
@@ -216,8 +270,9 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 	{
 		return errorStatus( std::string( "statement not found '") + stmname + "'");
 	}
-	const char *stmtail;
-	int rc = sqlite3_prepare_v2( m_conn, m_curstm->second.c_str(), -1, &m_stm, &stmtail);
+	const char *stmtail = 0;
+
+	int rc = wrap_sqlite3_prepare_v2( m_conn, m_curstm->second.c_str(), m_curstm->second.size(), &m_stm, &stmtail);
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -233,7 +288,7 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 	return status( rc, Prepared);
 }
 
-bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Variant& value)
+bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::VariantConst& value)
 {
 	if (value.defined())
 	{
@@ -251,20 +306,35 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 	{
 		return errorStatus( std::string( "bind index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 	}
-	std::size_t stmcnt = (std::size_t)sqlite3_bind_parameter_count( m_stm);
+	std::size_t stmcnt = (std::size_t)wrap_sqlite3_bind_parameter_count( m_stm);
 	if (idx > stmcnt)
 	{
 		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm->second + ")");
 	}
-	if (value.defined())
+	switch (value.type())
 	{
-		std::string strval = value.tostring();
-		return status( sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(),  SQLITE_STATIC), Prepared);
+		case types::Variant::null_:
+			return status( wrap_sqlite3_bind_null( m_stm, (int)idx), Prepared);
+		case types::Variant::bool_:
+			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool()), Prepared);
+		case types::Variant::int_:
+			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), Prepared);
+		case types::Variant::uint_:
+			if (value.touint() < std::numeric_limits<int64_t>::max())
+			{
+				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), Prepared);
+			}
+			else
+			{
+				std::string strval( value.tostring());
+				return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), Prepared);
+			}
+		case types::Variant::double_:
+			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), Prepared);
+		case types::Variant::string_:
+			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), Prepared);
 	}
-	else
-	{
-		return status( sqlite3_bind_null( m_stm, (int)idx), Prepared);
-	}
+	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
 }
 
 bool PreparedStatementHandler_sqlite3::execute()

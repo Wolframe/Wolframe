@@ -160,7 +160,7 @@ public:
 		return true;
 	}
 
-	virtual bool bind( std::size_t idx, const types::Variant& value)
+	virtual bool bind( std::size_t idx, const types::VariantConst& value)
 	{
 		if (value.defined())
 		{

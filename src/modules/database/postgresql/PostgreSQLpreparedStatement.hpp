@@ -68,7 +68,7 @@ struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 	///\brief Start new command statement
 	virtual bool start( const std::string& stmname);
 	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const types::Variant& value);
+	virtual bool bind( std::size_t idx, const types::VariantConst& value);
 	///\brief Execute instance of current statement
 	virtual bool execute();
 	///\brief Return true is the last command has at least one result row returned
