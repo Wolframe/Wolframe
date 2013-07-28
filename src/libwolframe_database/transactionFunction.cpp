@@ -118,14 +118,13 @@ public:
 		std::size_t childidx() const			{return (m_element < 0)?(std::size_t)-m_element:0;}
 		std::size_t nofchild() const			{return (m_element < 0)?(std::size_t)m_elementsize:0;}
 		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
-		std::size_t valuesize() const			{return (m_element > 0)?(std::size_t)m_elementsize:0;}
 	};
 
 	Node root() const;
 	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void up( const Node& nd, std::vector<Node>& rt) const;
-	const std::pair<const char*,std::size_t> nodevalue( const Node& nd) const;
+	const types::Variant* nodevalue( const Node& nd) const;
 
 	const std::string tostring() const;
 
@@ -134,13 +133,12 @@ public:
 	void openTag( const std::string& tag);
 	void closeTag();
 	void createRootNode();
-	void pushValue( const char* val, std::size_t valsize);
-	void pushValue( const std::string& val);
+	void pushValue( const types::VariantConst& val);
 	void check() const;
 
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
-	types::TypedArrayDoublingAllocator<char> m_strmem;
+	std::vector<types::Variant> m_content;
 	const TransactionFunction::TagTable* m_tagmap;
 	std::size_t m_rootidx;
 	std::size_t m_rootsize;
@@ -528,7 +526,7 @@ bool TransactionFunctionInput::Structure::Node::operator == (const Node& o) cons
 
 TransactionFunctionInput::Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
-	,m_strmem(o.m_strmem)
+	,m_content(o.m_content)
 	,m_tagmap(o.m_tagmap)
 	,m_rootidx(o.m_rootidx)
 	,m_rootsize(o.m_rootsize)
@@ -541,7 +539,7 @@ TransactionFunctionInput::Structure::Structure( const TransactionFunction::TagTa
 	,m_rootsize(0)
 {
 	m_nodemem.alloc( 1);
-	m_strmem.alloc( 1);
+	m_content.push_back( types::Variant());
 	m_data.push_back( std::vector<Node>());
 }
 
@@ -584,10 +582,10 @@ const std::string TransactionFunctionInput::Structure::tostring() const
 			if (cd->valueidx())
 			{
 				std::size_t indent = stk.size() -1;
-				const char* val = &m_strmem[ cd->m_element];
+				const types::Variant* val = &m_content.at( cd->m_element);
 				while (indent--) rt << '\t';
 				if (cd->m_tag) rt << cd->m_tag << ": ";
-				rt << "'" << val << "'" << std::endl;
+				rt << "'" << val->tostring() << "'" << std::endl;
 			}
 			else
 			{
@@ -640,7 +638,7 @@ void TransactionFunctionInput::Structure::closeTag()
 	}
 	if (m_data.back().size() == 0)
 	{
-		pushValue( "", 0);
+		pushValue( types::Variant());
 	}
 	createRootNode();
 	m_data.pop_back();
@@ -659,18 +657,11 @@ void TransactionFunctionInput::Structure::closeTag()
 	}
 }
 
-void TransactionFunctionInput::Structure::pushValue( const char* val, std::size_t valsize)
+void TransactionFunctionInput::Structure::pushValue( const types::VariantConst& val)
 {
-	std::size_t mi = m_strmem.alloc( valsize+1);
-	char* mem = m_strmem.base() + mi;
-	std::memcpy( mem, val, (valsize+1)*sizeof(char));
-
-	m_data.back().push_back( Node( 0, 0, valsize, Node::val_element( mi)));
-}
-
-void TransactionFunctionInput::Structure::pushValue( const std::string& val)
-{
-	pushValue( val.c_str(), val.size());
+	std::size_t mi = m_content.size();
+	m_content.push_back( val);
+	m_data.back().push_back( Node( 0, 0, 0, Node::val_element( mi)));
 }
 
 void TransactionFunctionInput::Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
@@ -733,9 +724,9 @@ TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::r
 	return rt;
 }
 
-const std::pair<const char*,std::size_t> TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
+const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
 {
-	std::pair<const char*,std::size_t> rt((const char*)0,0);
+	const types::Variant* rt = 0;
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
@@ -744,9 +735,9 @@ const std::pair<const char*,std::size_t> TransactionFunctionInput::Structure::no
 		{
 			if (!cd[ii].m_tag)
 			{
-				if (rt.first) throw std::runtime_error( "node selected has more than one value");
+				if (rt) throw std::runtime_error( "node selected has more than one value");
 				std::size_t validx = cd[ii].valueidx();
-				if (validx) rt = std::pair<const char*,std::size_t>( &m_strmem[ validx], cd[ii].valuesize());
+				if (validx) rt = &m_content.at( validx);
 			}
 		}
 	}
@@ -1028,10 +1019,10 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 				{
 					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 				}
-				std::pair<const char*,std::size_t> value = inputst->structure().nodevalue( *gs);
-				if (value.first)
+				const types::Variant* valref = inputst->structure().nodevalue( *gs);
+				if (valref)
 				{
-					ti.bindCommandArgAsValue( types::VariantConst( value.first, value.second));
+					ti.bindCommandArgAsValue( *valref);
 				}
 				else
 				{

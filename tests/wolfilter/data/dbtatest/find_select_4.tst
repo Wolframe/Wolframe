@@ -15,13 +15,13 @@ TRANSACTION testcall BEGIN
 END
 **outputfile:DBOUT
 **output
-run #1#2#3#
+run #1#2#3#NULL
 
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
-bind( 4, '' );
+bind( 4, NULL );
 execute();
 nofColumns(); returns 0
 **end
