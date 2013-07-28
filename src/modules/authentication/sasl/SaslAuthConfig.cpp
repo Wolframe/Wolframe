@@ -42,8 +42,6 @@
 #include "boost/algorithm/string.hpp"
 #include <boost/filesystem.hpp>
 
-using namespace _Wolframe::utils;
-
 namespace _Wolframe {
 namespace AAAA {
 
