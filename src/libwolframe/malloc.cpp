@@ -85,6 +85,7 @@ struct MemChunkHeader
 
 void* wolframe_malloc( size_t size)
 {
+	if (!size) return 0;
 	MemChunkHeader* hdr;
 	hdr = (MemChunkHeader*)W_MALLOC_N( size + sizeof(MemChunkHeader), 1);
 	if (!hdr) return 0;
@@ -96,6 +97,7 @@ void* wolframe_malloc( size_t size)
 
 void* wolframe_calloc( size_t size, size_t esize)
 {
+	if (!size) return 0;
 	std::size_t mm = size * esize;
 	if (mm < size || mm < esize) return 0;
 	void* rt = wolframe_malloc( mm);
@@ -118,6 +120,7 @@ static void wolframe_deref_memhdr( MemChunkHeader* hdr)
 
 void wolframe_free( void* ptr)
 {
+	if (!ptr) return;
 	MemChunkHeader* hdr = (MemChunkHeader*)ptr - 1;
 	wolframe_deref_memhdr( hdr);
 	W_FREE( hdr);

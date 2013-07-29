@@ -70,20 +70,20 @@ public:
 	///\brief Default constructor
 	VariantStruct()							:Variant(){}
 	///\brief Constructor from structure description
-	explicit VariantStruct( const VariantStructDescription* d)	:Variant(){initStruct( d);}
+	explicit VariantStruct( const VariantStructDescription* d)	:Variant(){initStruct( d); check();}
 	///\brief Copy constructor
 	VariantStruct( const Variant& o)				:Variant(){VariantStruct::initCopy( *(const VariantStruct*)&o);}
 	///\brief Copy constructor
 	VariantStruct( const VariantStruct& o)				:Variant(){VariantStruct::initCopy( o);}
 	///\brief Destructor
-	~VariantStruct()						{VariantStruct::release();}
+	~VariantStruct()						{check(); VariantStruct::release();}
 
 	///\brief Make the structure to be an array with the currently defined value as prototype element
 	void makeArray();
 
 	///\brief Assignment operator, keeping the initialization flag of this
-	VariantStruct& operator=( const VariantStruct& o)		{bool init_=initialized(); VariantStruct::release(); VariantStruct::initCopy( o); setInitialized(init_); return *this;}
-	VariantStruct& operator=( const Variant& o)			{bool init_=initialized(); VariantStruct::release(); Variant::initCopy( o); setInitialized(init_); return *this;}
+	VariantStruct& operator=( const VariantStruct& o)		{bool init_=initialized(); VariantStruct::release(); VariantStruct::initCopy( o); setInitialized(init_); check(); return *this;}
+	VariantStruct& operator=( const Variant& o)			{bool init_=initialized(); VariantStruct::release(); Variant::initCopy( o); setInitialized(init_); check(); return *this;}
 
 	///\brief Reseting the content of this
 	void clear()							{release(); init();}
@@ -227,6 +227,7 @@ private:
 	void initConstCopy( const Variant& o);
 
 	void release();
+	void check() const;
 };
 
 

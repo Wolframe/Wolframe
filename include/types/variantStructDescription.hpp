@@ -198,6 +198,8 @@ public:
 	///\brief Return the contents of a structure description as string (format as in print with no indent and newlines)
 	std::string tostring() const;
 
+	void check() const;
+
 private:
 	const Element* beginptr() const						{return m_ar;}
 	Element* beginptr()							{return m_ar;}

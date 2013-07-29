@@ -10,6 +10,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+#define _Wolframe_LOWLEVEL_DEBUG
+
 void VariantStruct::makeArray()
 {
 	VariantStruct* prototype_ = (VariantStruct*)wolframe_malloc( sizeof( *this));
@@ -39,29 +41,38 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 {
 	setType( struct_);
 	m_data.dim.metadata = (const void*)descr;
-	m_data.value.ref_ = (VariantStruct*)wolframe_calloc( descr->size(), sizeof(VariantStruct));
-	if (!m_data.value.ref_) throw std::bad_alloc();
-	VariantStructDescription::const_iterator si = descr->begin(), se = descr->end();
-	std::size_t idx=0;
-	try
+
+	if (descr->size())
 	{
-		for (; si!=se; ++si,++idx)
+		m_data.value.ref_ = (VariantStruct*)wolframe_calloc( descr->size(), sizeof(VariantStruct));
+		if (!m_data.value.ref_) throw std::bad_alloc();
+
+		VariantStructDescription::const_iterator si = descr->begin(), se = descr->end();
+		std::size_t idx=0;
+		try
 		{
-			VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + idx;
-			elem->initCopy( *si->initvalue);
+			for (; si!=se; ++si,++idx)
+			{
+				VariantStruct* elem = (VariantStruct*)m_data.value.ref_ + idx;
+				elem->initCopy( *si->initvalue);
+			}
+		}
+		catch (const std::bad_alloc& e)
+		{
+			for (; idx>0; --idx) ((VariantStruct*)m_data.value.ref_)[idx-1].release();
+			wolframe_free( m_data.value.ref_);
+			throw e;
+		}
+		catch (const std::runtime_error& e)
+		{
+			for (; idx>0; --idx) ((VariantStruct*)m_data.value.ref_)[idx-1].release();
+			wolframe_free( m_data.value.ref_);
+			throw e;
 		}
 	}
-	catch (const std::bad_alloc& e)
+	else
 	{
-		for (; idx>0; --idx) ((VariantStruct*)m_data.value.ref_)[idx-1].release();
-		wolframe_free( m_data.value.ref_);
-		throw e;
-	}
-	catch (const std::runtime_error& e)
-	{
-		for (; idx>0; --idx) ((VariantStruct*)m_data.value.ref_)[idx-1].release();
-		wolframe_free( m_data.value.ref_);
-		throw e;
+		m_data.value.ref_ = 0;
 	}
 }
 
@@ -108,8 +119,15 @@ void VariantStruct::initCopy( const VariantStruct& o)
 				setType( array_);
 				m_data.dim.size = o.m_data.dim.size;
 			}
-			m_data.value.ref_ = wolframe_calloc( nn, sizeof( VariantStruct));
-			if (!m_data.value.ref_) throw std::bad_alloc();
+			if (nn)
+			{
+				m_data.value.ref_ = wolframe_calloc( nn, sizeof( VariantStruct));
+				if (!m_data.value.ref_) throw std::bad_alloc();
+			}
+			else
+			{
+				m_data.value.ref_ = 0;
+			}
 			ii = 0;
 			try
 			{
@@ -532,5 +550,19 @@ std::string VariantStruct::tostring() const
 std::ostream& std::operator << (std::ostream &os, const _Wolframe::types::VariantStruct& o)
 {
 	return os << o.tostring();
+}
+
+void VariantStruct::check() const
+{
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+	if ((Type)m_type == struct_ || (Type)m_type == indirection_)
+	{
+		const VariantStructDescription* descr = (const VariantStructDescription*)m_data.dim.metadata;
+		if (descr->size() > 1000)
+		{
+			throw std::logic_error( "structure referencing deallocated description");
+		}
+	}
+#endif
 }
 

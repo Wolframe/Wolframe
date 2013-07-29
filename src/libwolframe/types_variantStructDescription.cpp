@@ -7,6 +7,8 @@
 #include <sstream>
 #include <stdint.h>	//... for uintptr_t
 
+#define _Wolframe_LOWLEVEL_DEBUG
+
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
@@ -58,7 +60,10 @@ void VariantStructDescription::Element::copy( const Element& o)
 	}
 	elem.normalizer = o.normalizer;
 	elem.flags = o.flags;
-
+	if (elem.initvalue)
+	{
+		elem.initvalue->setDescription( elem.substruct);
+	}
 	if (initvalue) delete initvalue;
 	if (substruct) delete substruct;
 	if (name) wolframe_free( name);
@@ -71,53 +76,57 @@ Variant::Type VariantStructDescription::Element::type()
 }
 
 VariantStructDescription::VariantStructDescription()
-		:m_size(0),m_nofattributes(0),m_ar(0){}
+	:m_size(0),m_nofattributes(0),m_ar(0){}
 
 VariantStructDescription::VariantStructDescription( const VariantStructDescription& o)
 	:m_size(o.m_size),m_nofattributes(o.m_nofattributes),m_ar(0)
 {
 	const char* errmsg = 0;
 	std::size_t ii=0;
-	m_ar = (Element*)wolframe_calloc( m_size, sizeof(Element));
-	if (!m_ar) goto BAD_ALLOC;
-	for (; ii<m_size; ++ii)
+	if (m_size)
 	{
-		if (o.m_ar[ ii].name)
+		m_ar = (Element*)wolframe_calloc( m_size, sizeof(Element));
+		if (!m_ar) goto BAD_ALLOC;
+		for (; ii<m_size; ++ii)
 		{
-			m_ar[ ii].name = (char*)wolframe_malloc( std::strlen( o.m_ar[ ii].name)+1);
-			if (!m_ar[ ii].name) goto BAD_ALLOC;
-			std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
+			if (o.m_ar[ ii].name)
+			{
+				m_ar[ ii].name = (char*)wolframe_malloc( std::strlen( o.m_ar[ ii].name)+1);
+				if (!m_ar[ ii].name) goto BAD_ALLOC;
+				std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
+			}
+			if (o.m_ar[ ii].substruct) try
+			{
+				m_ar[ ii].substruct = new VariantStructDescription( *o.m_ar[ ii].substruct);
+			}
+			catch (const std::bad_alloc&)
+			{
+				goto BAD_ALLOC;
+			}
+			catch (const std::runtime_error& e)
+			{
+				errmsg = e.what();
+				goto BAD_ALLOC;
+			}
+			if (o.m_ar[ ii].initvalue) try
+			{
+				m_ar[ ii].initvalue = new VariantStruct( *o.m_ar[ ii].initvalue);
+				m_ar[ ii].initvalue->setDescription( m_ar[ ii].substruct);
+			}
+			catch (const std::bad_alloc&)
+			{
+				goto BAD_ALLOC;
+			}
+			catch (const std::runtime_error& e)
+			{
+				errmsg = e.what();
+				goto BAD_ALLOC;
+			}
+			m_ar[ ii].normalizer = o.m_ar[ ii].normalizer;
+			m_ar[ ii].flags = o.m_ar[ ii].flags;
 		}
-		if (o.m_ar[ ii].substruct) try
-		{
-			m_ar[ ii].substruct = new VariantStructDescription( *o.m_ar[ ii].substruct);
-		}
-		catch (const std::bad_alloc&)
-		{
-			goto BAD_ALLOC;
-		}
-		catch (const std::runtime_error& e)
-		{
-			errmsg = e.what();
-			goto BAD_ALLOC;
-		}
-		if (o.m_ar[ ii].initvalue) try
-		{
-			m_ar[ ii].initvalue = new VariantStruct( *o.m_ar[ ii].initvalue);
-			m_ar[ ii].initvalue->setDescription( m_ar[ ii].substruct);
-		}
-		catch (const std::bad_alloc&)
-		{
-			goto BAD_ALLOC;
-		}
-		catch (const std::runtime_error& e)
-		{
-			errmsg = e.what();
-			goto BAD_ALLOC;
-		}
-		m_ar[ ii].normalizer = o.m_ar[ ii].normalizer;
-		m_ar[ ii].flags = o.m_ar[ ii].flags;
 	}
+	check();
 	return;
 	BAD_ALLOC:
 		if (m_ar)
@@ -186,6 +195,7 @@ int VariantStructDescription::addAtom( const std::string& name_, const Variant& 
 	m_ar[ m_size].normalizer = normalizer_;
 	m_ar[ m_size].substruct = 0;
 	m_ar[ m_size].flags = 0;
+	check();
 	return m_size++;
 }
 
@@ -239,23 +249,27 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	}
 	m_ar[ m_size].normalizer = 0;
 	m_ar[ m_size].flags = 0;
+	check();
 	return m_size++;
 }
 
 int VariantStructDescription::addIndirection( const std::string& name_, const VariantStructDescription* descr)
 {
-	return addAtom( name_, VariantIndirection( descr), 0);
+	int rt = addAtom( name_, VariantIndirection( descr), 0);
+	check();
+	return rt;
 }
 
 int VariantStructDescription::addElement( const Element& elem)
 {
+	int rt;
 	if (!elem.name) throw std::runtime_error( "try to add element without name in structure description");
 	if (findidx( elem.name) >= 0) throw std::runtime_error( std::string("try to add duplicate element '") + elem.name + "' to structure description");
 
 	if (elem.attribute())
 	{
 		if (!elem.initvalue) throw std::runtime_error( "try to add incomplete element (null value)");
-		return addAttribute( elem.name, *elem.initvalue, elem.normalizer);
+		rt = addAttribute( elem.name, *elem.initvalue, elem.normalizer);
 	}
 	else
 	{
@@ -265,8 +279,10 @@ int VariantStructDescription::addElement( const Element& elem)
 		m_ar = ar_;
 		std::memset( m_ar + m_size, 0, sizeof( *m_ar));
 		m_ar[ m_size].copy( elem);
-		return m_size++;
+		rt = m_size++;
 	}
+	check();
+	return rt;
 }
 
 int VariantStructDescription::addAttribute( const std::string& name_, const Variant& initvalue_, const NormalizeFunction* normalizer_)
@@ -283,6 +299,7 @@ int VariantStructDescription::addAttribute( const std::string& name_, const Vari
 		std::memmove( &m_ar[ m_nofattributes], &m_ar[ m_nofattributes-1], mm);	//... shift elements up one position to get the slot to swap 'attr' with
 		std::memcpy( &m_ar[ m_nofattributes-1], &attr, sizeof( attr));		//... move 'attr' to the free slot
 	}
+	check();
 	return rt;
 }
 
@@ -290,6 +307,7 @@ void VariantStructDescription::inherit( const VariantStructDescription& parent)
 {
 	const_iterator pi = parent.begin(), pe = parent.end();
 	for (; pi != pe; ++pi) addElement( *pi);
+	check();
 }
 
 int VariantStructDescription::findidx( const std::string& name_) const
@@ -411,6 +429,7 @@ void VariantStructDescription::print( std::ostream& out, const std::string& inde
 				Variant::Type tp = (Variant::Type)di->initvalue->type();
 				switch (tp)
 				{
+					case Variant::null_: cmp = 0; break;
 					case Variant::bool_: cmp = di->initvalue->compare( default_bool); break;
 					case Variant::int_: cmp = di->initvalue->compare( default_int); break;
 					case Variant::uint_: cmp = di->initvalue->compare( default_uint); break;
@@ -434,6 +453,25 @@ std::string VariantStructDescription::tostring() const
 	print( out, "\t", "\n", 0);
 	out << "}";
 	return out.str();
+}
+
+void VariantStructDescription::check() const
+{
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+	const_iterator di = begin(), de = end();
+	for (; di != de; ++di)
+	{
+		if (di->substruct)
+		{
+			const VariantStructDescription* sd = di->initvalue->description();
+			if (sd && sd != di->substruct)
+			{
+				throw std::logic_error( "structure referencing wrong description");
+			}
+			di->substruct->check();
+		}
+	}
+#endif
 }
 
 
