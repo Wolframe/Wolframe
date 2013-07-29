@@ -36,9 +36,6 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <cstring>
-#ifndef _WIN32
-#include <features.h>
-#endif
 
 #undef WOLFRAME_DEBUG_MALLOC
 #ifdef WOLFRAME_DEBUG_MALLOC
