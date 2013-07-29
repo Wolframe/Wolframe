@@ -40,38 +40,77 @@
 #undef WOLFRAME_DEBUG_MALLOC
 #ifdef WOLFRAME_DEBUG_MALLOC
 #ifdef __GLIBC__
-#include <glib.h>
+#include <malloc.h>
+///\link http://www.gnu.org/software/libc/manual/html_node/Hooks-for-Malloc.html
+
+static void* (*system_malloc)( size_t size, const void *caller) = 0;
+static void  (*system_free)( void *ptr, const void *caller) = 0;
+static void* (*system_realloc)( void *ptr, size_t size, const void *caller) = 0;
+static void  (*system_initialize)() = 0;
+
+#define SYSTEM_MALLOC(N)	(*system_malloc)(N,0)
+#define SYSTEM_REALLOC(P,N)	(*system_realloc)(P,N,0)
+#define SYSTEM_FREE(P)		(*system_free)(P,0)
+
+static void* this_malloc( size_t size, const void*)
+{
+	return wolframe_malloc( size);
+}
+static void* this_realloc( void *ptr, size_t size, const void*)
+{
+	return wolframe_realloc( ptr, size);
+}
+static void this_free( void *ptr, const void*)
+{
+	wolframe_free( ptr);
+}
+static void this_initialize()
+{
+	system_malloc = __malloc_hook;
+	__malloc_hook = this_malloc;
+	system_realloc = __realloc_hook;
+	__realloc_hook = this_realloc;
+	system_free = __free_hook;
+	__free_hook = this_free;
+}
 
 ///\brief Installs the malloc wrapper
 ///\remark Must be created before any malloc call
 void init_wolframe_malloc()
 {
-	static GMemVTable memvtable;
-	memset( &memvtable, 0, sizeof(memvtable));
-	memvtable.malloc = &wolframe_malloc;
-	memvtable.free = &wolframe_free;
-	memvtable.realloc = &wolframe_realloc;
-	g_mem_set_vtable( &memvtable);
+	system_initialize = __malloc_initialize_hook;
+	__malloc_initialize_hook = this_initialize;
 }
-#define W_MALLOC_N(N,E) g_malloc_n(N,E)
-#define W_FREE(P) g_free(P)
+
+struct MallocIntializer
+{
+	MallocIntializer()
+	{
+		init_wolframe_malloc();
+	}
+};
+static MallocIntializer mallocIntializer;
+
 #else
+#define SYSTEM_MALLOC(size)		std::malloc(size)
+#define SYSTEM_FREE(ptr)		std::free(ptr)
+#define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
+
 void init_wolframe_malloc()
 {
 	throw std::logic_error( "wolframe malloc not implemented: not supported on this platform (only with gcc/glibc)");
 }
-#define W_MALLOC_N(N,E) std::malloc(N*E)
-#define W_FREE(P) std::free(P)
 #endif
 #else
+#define SYSTEM_MALLOC(size)		std::malloc(size)
+#define SYSTEM_FREE(ptr)		std::free(ptr)
+#define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
+
 void init_wolframe_malloc()
 {
 	throw std::logic_error( "wolframe malloc not implemented: define WOLFRAME_DEBUG_MALLOC not set");
 }
-#define W_MALLOC_N(N,E) std::malloc(N*E)
-#define W_FREE(P) std::free(P)
 #endif
-#include <stdexcept>
 
 struct MemChunkHeader
 {
@@ -84,7 +123,7 @@ void* wolframe_malloc( size_t size)
 {
 	if (!size) return 0;
 	MemChunkHeader* hdr;
-	hdr = (MemChunkHeader*)W_MALLOC_N( size + sizeof(MemChunkHeader), 1);
+	hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
@@ -120,12 +159,12 @@ void wolframe_free( void* ptr)
 	if (!ptr) return;
 	MemChunkHeader* hdr = (MemChunkHeader*)ptr - 1;
 	wolframe_deref_memhdr( hdr);
-	W_FREE( hdr);
+	SYSTEM_FREE( hdr);
 }
 
 void* wolframe_realloc( void* oldptr, size_t size)
 {
-	MemChunkHeader* hdr = (MemChunkHeader*)W_MALLOC_N( size + sizeof(MemChunkHeader), 1);
+	MemChunkHeader* hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
@@ -137,7 +176,7 @@ void* wolframe_realloc( void* oldptr, size_t size)
 		std::size_t cpsize = (oldhdr->size > hdr->size)?hdr->size:oldhdr->size;
 		std::memmove( ptr, oldptr, cpsize);
 		wolframe_deref_memhdr( oldhdr);
-		W_FREE( oldhdr);
+		SYSTEM_FREE( oldhdr);
 	}
 	return ptr;
 }
