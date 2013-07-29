@@ -243,8 +243,9 @@ public:
 ///\class VariantStructConst
 ///\brief Variant value type that references another Variant
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
-struct VariantStructConst :public VariantStruct
+class VariantStructConst :public VariantStruct
 {
+	public:
 	///\brief Constructor
 	VariantStructConst( const VariantConst& o)		:VariantStruct(){Variant::initConstCopy( o);}
 	VariantStructConst( const Variant& o)			:VariantStruct(){Variant::initConstCopy( o);}
