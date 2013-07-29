@@ -33,10 +33,10 @@
 ///\brief Alternative malloc that checks for memory corruption (only for testing)
 ///\file malloc.cpp
 #include "types/malloc.hpp"
-#ifndef _WIN32
 #include <stdexcept>
 #include <cstdlib>
 #include <cstring>
+#ifndef _WIN32
 #include <features.h>
 #endif
 
