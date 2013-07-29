@@ -43,7 +43,7 @@ using namespace _Wolframe::db;
 
 #define ERRORCODE(E) (E+0x1000000)
 
-static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResult& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
+static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -152,7 +152,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	return true;
 }
 
-static bool pushArguments( TransactionOutput::CommandResult& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
+static bool pushArguments( TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
 	cmdres.openRow();
@@ -208,10 +208,10 @@ static TransactionInput::cmd_const_iterator endOfOperation( TransactionInput::cm
 namespace {
 struct OperationLoop
 {
-	TransactionOutput::row_iterator wi,we;
+	std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi,we;
 	TransactionInput::cmd_const_iterator ci,ce;
 
-	OperationLoop( TransactionInput::cmd_const_iterator ci_, TransactionInput::cmd_const_iterator ce_, TransactionOutput::row_iterator wi_, TransactionOutput::row_iterator we_)
+	OperationLoop( TransactionInput::cmd_const_iterator ci_, TransactionInput::cmd_const_iterator ce_, std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi_, std::vector<TransactionOutput::CommandResult::Row>::const_iterator we_)
 		:wi(wi_),we(we_),ci(ci_),ce(ce_){}
 	OperationLoop( const OperationLoop& o)
 		:wi(o.wi),we(o.we),ci(o.ci),ce(o.ce){}
@@ -279,7 +279,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		if (ai != ae)
 		{
 			// ... command has result reference, then we call it for every result row
-			TransactionOutput::result_iterator ri;
+			TransactionOutput::result_const_iterator ri;
 			switch (optype)
 			{
 				case PushArguments:
@@ -287,7 +287,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					ri = output.last( ci->level()-1);
 					if (ri != output.end())
 					{
-						TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
+						std::vector<TransactionOutput::CommandResult::Row>::const_iterator
+							wi = ri->begin(), we = ri->end();
 						if (wi != we)
 						{
 							if (!pushArguments( cmdres, wi, ci)) return false;
@@ -304,7 +305,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					ri = output.last( ci->level());
 					if (ri != output.end())
 					{
-						TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
+						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
 						for (; wi != we; ++wi)
 						{
 							if (!executeCommand( this, cmdres, wi, ci, nonempty, unique))
@@ -325,7 +326,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		else
 		{
 			// ... command has no result reference, then we call it once
-			TransactionOutput::row_iterator wi;
+			std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi;
 			switch (optype)
 			{
 				case PushArguments:

@@ -43,14 +43,14 @@ using namespace _Wolframe::db;
 std::string TransactionOutput::tostring() const
 {
 	std::ostringstream rt;
-	result_iterator ri = begin(), re = end();
+	result_const_iterator ri = begin(), re = end();
 	for (; ri != re; ++ri)
 	{
 		std::size_t ci = 0,ce = ri->nofColumns();
 		rt << "RESULT " << ri->functionidx() << " COLUMNS " << ce << ":";
 		for (; ci<ce; ++ci) rt << " " << ri->columnName( ci);
 		rt << std::endl;
-		row_iterator wi = ri->begin(), we = ri->end();
+		std::vector<CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
 		for (;wi != we; ++wi)
 		{
 			rt << ">";

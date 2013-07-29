@@ -109,17 +109,16 @@ public:
 	};
 
 public:// interface for accessing the result and iterating on the result:
-	typedef std::vector<CommandResult::Row>::const_iterator row_iterator;
-	typedef std::vector<CommandResult>::const_iterator result_iterator;
+	typedef std::vector<CommandResult>::const_iterator result_const_iterator;
 
-	result_iterator begin() const						{return m_result.begin();}
-	result_iterator end() const						{return m_result.end();}
+	result_const_iterator begin() const					{return m_result.begin();}
+	result_const_iterator end() const					{return m_result.end();}
 
-	result_iterator last( std::size_t level) const
+	result_const_iterator last( std::size_t level) const
 	{
 		if (m_result.empty()) return end();
-		result_iterator rt = m_result.begin() + m_result.size() -1;
-		result_iterator begin_ = begin();
+		result_const_iterator rt = m_result.begin() + m_result.size() -1;
+		result_const_iterator begin_ = begin();
 		while (rt->level() > level && rt != begin_) --rt;
 		if (rt->level() != level) return end();
 		return rt;

@@ -1131,10 +1131,10 @@ struct TransactionFunctionOutput::Impl
 	ResultStruct::const_iterator m_structitr;
 	ResultStruct::const_iterator m_structend;
 	std::vector<StackElement> m_stack;
-	db::TransactionOutput::result_iterator m_resitr;
-	db::TransactionOutput::result_iterator m_resend;
-	db::TransactionOutput::row_iterator m_rowitr;
-	db::TransactionOutput::row_iterator m_rowend;
+	db::TransactionOutput::result_const_iterator m_resitr;
+	db::TransactionOutput::result_const_iterator m_resend;
+	std::vector<db::TransactionOutput::CommandResult::Row>::const_iterator m_rowitr;
+	std::vector<db::TransactionOutput::CommandResult::Row>::const_iterator m_rowend;
 	db::TransactionOutputR m_data;
 
 	Impl( const ResultStructR& resultstruct_, const db::TransactionOutputR& data_)
