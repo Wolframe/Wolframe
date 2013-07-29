@@ -1095,8 +1095,6 @@ fi
 %{_includedir}/wolframe/prnt/*.hpp
 %dir %{_includedir}/wolframe/config/
 %{_includedir}/wolframe/config/*.hpp
-%dir %{_includedir}/wolframe/ddl/
-%{_includedir}/wolframe/ddl/*.hpp
 %dir %{_includedir}/wolframe/logger/
 %{_includedir}/wolframe/logger/*.hpp
 %dir %{_includedir}/wolframe/utils/
