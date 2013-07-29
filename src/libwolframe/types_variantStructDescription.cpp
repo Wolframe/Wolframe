@@ -215,6 +215,7 @@ std::string VariantStructDescription::names( const std::string& sep) const
 		if (rt.size()) rt.append( sep);
 		rt.append( ni->name);
 	}
+	return rt;
 }
 
 
