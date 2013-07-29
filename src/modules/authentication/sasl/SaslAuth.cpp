@@ -39,6 +39,7 @@
 
 #include "logger-v1.hpp"
 #include "SaslAuth.hpp"
+#include "utils/fileUtils.hpp"
 
 #include <boost/filesystem.hpp>
 

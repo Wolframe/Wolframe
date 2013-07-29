@@ -33,10 +33,10 @@
 ///\brief Alternative malloc that checks for memory corruption (only for testing)
 ///\file malloc.cpp
 #include "types/malloc.hpp"
-#ifndef _WIN32
 #include <stdexcept>
 #include <cstdlib>
 #include <cstring>
+#ifndef _WIN32
 #include <features.h>
 #endif
 
@@ -90,7 +90,7 @@ void* wolframe_malloc( size_t size)
 	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
-	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761/*knuth's integer hash*/;
+	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
 	return (void*)(hdr+1);
 }
 
@@ -109,7 +109,7 @@ static void wolframe_deref_memhdr( MemChunkHeader* hdr)
 	{
 		throw std::runtime_error( "free: invalid or double free detected");
 	}
-	if (hdr->chk != (hdr->size + sizeof(MemChunkHeader)) * 2654435761/*knuth's integer hash*/)
+	if (hdr->chk != (hdr->size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/)
 	{
 		throw std::runtime_error( "free: check of memory block checksum failed");
 	}
@@ -129,7 +129,7 @@ void* wolframe_realloc( void* oldptr, size_t size)
 	if (!hdr) return 0;
 	hdr->size = size;
 	hdr->ref = 1;
-	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761/*knuth's integer hash*/;
+	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
 	void* ptr = (void*)(hdr+1);
 	if (oldptr)
 	{
