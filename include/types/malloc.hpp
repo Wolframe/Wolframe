@@ -40,7 +40,6 @@ void* wolframe_malloc( size_t size);
 void* wolframe_calloc( size_t size, size_t esize);
 void wolframe_free( void* ptr);
 void* wolframe_realloc( void* ptr, size_t size);
-void init_wolframe_malloc();
 
 #endif
 

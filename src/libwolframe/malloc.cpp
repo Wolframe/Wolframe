@@ -67,49 +67,25 @@ static void this_free( void *ptr, const void*)
 static void this_initialize()
 {
 	system_malloc = __malloc_hook;
-	__malloc_hook = this_malloc;
 	system_realloc = __realloc_hook;
-	__realloc_hook = this_realloc;
 	system_free = __free_hook;
+
+	__malloc_hook = this_malloc;
+	__realloc_hook = this_realloc;
 	__free_hook = this_free;
 }
-
-///\brief Installs the malloc wrapper
-///\remark Must be created before any malloc call
-void init_wolframe_malloc()
-{
-	system_initialize = __malloc_initialize_hook;
-	__malloc_initialize_hook = this_initialize;
-}
-
-struct MallocIntializer
-{
-	MallocIntializer()
-	{
-		init_wolframe_malloc();
-	}
-};
-static MallocIntializer mallocIntializer;
+///\brief Installs the malloc library hooks
+void (*volatile __malloc_initialize_hook)() = &this_initialize;
 
 #else
 #define SYSTEM_MALLOC(size)		std::malloc(size)
 #define SYSTEM_FREE(ptr)		std::free(ptr)
 #define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
-
-void init_wolframe_malloc()
-{
-	throw std::logic_error( "wolframe malloc not implemented: not supported on this platform (only with gcc/glibc)");
-}
 #endif
 #else
 #define SYSTEM_MALLOC(size)		std::malloc(size)
 #define SYSTEM_FREE(ptr)		std::free(ptr)
 #define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
-
-void init_wolframe_malloc()
-{
-	throw std::logic_error( "wolframe malloc not implemented: define WOLFRAME_DEBUG_MALLOC not set");
-}
 #endif
 
 struct MemChunkHeader
