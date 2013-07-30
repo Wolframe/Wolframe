@@ -622,7 +622,7 @@ FreeBSD 9.1
 -----------
 
 Required packages: boost-libs (1.48.0)
-Optional packages: cyrus-sasl2 (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
+Optional packages: cyrus-sasl2 (2.1.25_1), sqlite3 (3.7.9), postgresql92-client (9.1.2),
                    libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
                    zlib (1.1.0), icu (4.8.1.1)
 
@@ -639,6 +639,8 @@ You need 'gmake' (3.82).
 So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For testing postgresql you also need 'postgresql92-server'.
 
 Solaris 10
 ----------
