@@ -33,8 +33,9 @@ VariantIndirection::VariantIndirection( const VariantStructDescription* descr)
 void VariantStruct::expandIndirection()
 {
 	if (type() != indirection_) return;
+	VariantStructDescription* descr = description();
 	release();
-	initStruct( description());
+	initStruct( descr);
 }
 
 void VariantStruct::initStruct( const VariantStructDescription* descr)
@@ -344,28 +345,24 @@ void VariantStruct::setDescription( const VariantStructDescription* descr)
 	}
 }
 
-void VariantStruct::setIndirectionDescription( const std::vector<DescriptionAssignment>& assignments)
+void VariantStruct::setIndirectionDescription( const DescriptionAssignmentMap& assignmentmap)
 {
 	Type tp = (Type)type();
 	if (tp == indirection_)
 	{
-		std::vector<DescriptionAssignment>::const_iterator ai = assignments.begin(), ae = assignments.end();
-		for (; ai != ae; ++ai)
+		DescriptionAssignmentMap::const_iterator ai = assignmentmap.find( (const VariantStructDescription*)m_data.dim.metadata);
+		if (ai != assignmentmap.end())
 		{
-			if (m_data.dim.metadata == ai->first)
-			{
-				m_data.dim.metadata = ai->second;
-				break;
-			}
+			m_data.dim.metadata = ai->second;
 		}
 	}
 	else if (tp == array_)
 	{
-		prototype()->setIndirectionDescription( assignments);
+		prototype()->setIndirectionDescription( assignmentmap);
 		VariantStruct::iterator vi = begin(), ve = end();
 		for (; vi != ve; vi++)
 		{
-			vi->setIndirectionDescription( assignments);
+			vi->setIndirectionDescription( assignmentmap);
 		}
 	}
 	else if (tp == struct_)
@@ -373,16 +370,12 @@ void VariantStruct::setIndirectionDescription( const std::vector<DescriptionAssi
 		VariantStruct::iterator vi = begin(), ve = end();
 		for (; vi != ve; vi++)
 		{
-			vi->setIndirectionDescription( assignments);
+			vi->setIndirectionDescription( assignmentmap);
 		}
-		std::vector<DescriptionAssignment>::const_iterator ai = assignments.begin(), ae = assignments.end();
-		for (; ai != ae; ++ai)
+		DescriptionAssignmentMap::const_iterator ai = assignmentmap.find( (const VariantStructDescription*)m_data.dim.metadata);
+		if (ai != assignmentmap.end())
 		{
-			if (m_data.dim.metadata == ai->first)
-			{
-				m_data.dim.metadata = ai->second;
-				break;
-			}
+			m_data.dim.metadata = ai->second;
 		}
 	}
 }
