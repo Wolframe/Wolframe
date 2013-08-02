@@ -41,16 +41,52 @@
 #ifdef WOLFRAME_DEBUG_MALLOC
 #ifdef __GLIBC__
 #include <malloc.h>
+#include <dlfcn.h>
 ///\link http://www.gnu.org/software/libc/manual/html_node/Hooks-for-Malloc.html
+///\link http://stackoverflow.com/questions/6083337/overriding-malloc-using-the-ld-preload-mechanism
+
+typedef void* (*real_malloc_f)(size_t);
+static void* (*real_malloc)(size_t)=0;
+typedef void* (*real_realloc_f)(void*,size_t);
+static void* (*real_realloc)(void*,size_t)=0;
+typedef void (*real_free_f)(void*);
+static void (*real_free)(void*)=0;
+
+extern "C" void* __libc_calloc( size_t, size_t);
+extern "C" void* __libc_malloc( size_t);
+extern "C" void* __libc_realloc( void*, size_t);
+extern "C" void __libc_free( void*);
+
+static void real_malloc_initialize()
+{
+	real_malloc = (real_malloc_f)(dlsym( RTLD_NEXT, "malloc"));
+	if (!real_malloc)
+	{
+		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
+		return;
+	}
+	real_realloc = (real_realloc_f)dlsym( RTLD_NEXT, "realloc");
+	if (!real_realloc)
+	{
+		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
+		return;
+	}
+	real_free = (real_free_f)dlsym( RTLD_NEXT, "free");
+	if (!real_free)
+	{
+		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
+		return;
+	}
+}
 
 static void* (*system_malloc)( size_t size, const void *caller) = 0;
 static void  (*system_free)( void *ptr, const void *caller) = 0;
 static void* (*system_realloc)( void *ptr, size_t size, const void *caller) = 0;
 static void  (*system_initialize)() = 0;
 
-#define SYSTEM_MALLOC(N)	(*system_malloc)(N,0)
-#define SYSTEM_REALLOC(P,N)	(*system_realloc)(P,N,0)
-#define SYSTEM_FREE(P)		(*system_free)(P,0)
+#define SYSTEM_MALLOC(N)	(*real_malloc)(N)
+#define SYSTEM_REALLOC(P,N)	(*real_realloc)(P,N)
+#define SYSTEM_FREE(P)		(*real_free)(P)
 
 static void* this_malloc( size_t size, const void*)
 {
@@ -73,6 +109,8 @@ static void this_initialize()
 	__malloc_hook = this_malloc;
 	__realloc_hook = this_realloc;
 	__free_hook = this_free;
+
+	real_malloc_initialize();
 }
 ///\brief Installs the malloc library hooks
 void (*volatile __malloc_initialize_hook)() = &this_initialize;
