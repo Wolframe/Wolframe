@@ -35,7 +35,9 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_VARIANT_STRUCT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_STRUCT_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <iostream>
+#include <utility>
 #include "types/variant.hpp"
 
 namespace _Wolframe {
@@ -107,6 +109,9 @@ public:
 	///\brief Get the description of a structure (throws for other types than struct_)
 	const VariantStructDescription* description() const		{return ((Type)m_type == struct_ || (Type)m_type == indirection_) ? (const VariantStructDescription*)m_data.dim.metadata:0;}
 	void setDescription( const VariantStructDescription* descr);
+
+	typedef std::pair< const VariantStructDescription*, const VariantStructDescription*> DescriptionAssignment;
+	void setIndirectionDescription( const std::vector<DescriptionAssignment>& assignments);
 
 	///\brief Return the prototype element (initialization of new element) of an array (throws for other types than array_)
 	const VariantStruct* prototype() const				{return ((Type)m_type == array_)?(const VariantStruct*)m_data.value.ref_:0;}

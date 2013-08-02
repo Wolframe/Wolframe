@@ -344,6 +344,49 @@ void VariantStruct::setDescription( const VariantStructDescription* descr)
 	}
 }
 
+void VariantStruct::setIndirectionDescription( const std::vector<DescriptionAssignment>& assignments)
+{
+	Type tp = (Type)type();
+	if (tp == indirection_)
+	{
+		std::vector<DescriptionAssignment>::const_iterator ai = assignments.begin(), ae = assignments.end();
+		for (; ai != ae; ++ai)
+		{
+			if (m_data.dim.metadata == ai->first)
+			{
+				m_data.dim.metadata = ai->second;
+				break;
+			}
+		}
+	}
+	else if (tp == array_)
+	{
+		prototype()->setIndirectionDescription( assignments);
+		VariantStruct::iterator vi = begin(), ve = end();
+		for (; vi != ve; vi++)
+		{
+			vi->setIndirectionDescription( assignments);
+		}
+	}
+	else if (tp == struct_)
+	{
+		VariantStruct::iterator vi = begin(), ve = end();
+		for (; vi != ve; vi++)
+		{
+			vi->setIndirectionDescription( assignments);
+		}
+		std::vector<DescriptionAssignment>::const_iterator ai = assignments.begin(), ae = assignments.end();
+		for (; ai != ae; ++ai)
+		{
+			if (m_data.dim.metadata == ai->first)
+			{
+				m_data.dim.metadata = ai->second;
+				break;
+			}
+		}
+	}
+}
+
 const VariantStruct* VariantStruct::at( std::size_t idx) const
 {
 	Type tt = type();
