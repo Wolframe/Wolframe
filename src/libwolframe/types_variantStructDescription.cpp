@@ -474,4 +474,26 @@ void VariantStructDescription::check() const
 #endif
 }
 
+void VariantStructDescription::fillAssignmentMap( AssignmentMap& res, const VariantStructDescription* dest) const
+{
+	const_iterator di = begin(), de = end();
+	const_iterator oi = dest->begin(), oe = dest->end();
+	for (; di != de && oi != oe; ++di,++oi)
+	{
+		if (di->substruct && oi->substruct)
+		{
+			res[ di->substruct] = oi->substruct;
+			di->substruct->fillAssignmentMap( res, oi->substruct);
+		}
+		else if (di->substruct || oi->substruct)
+		{
+			throw std::logic_error("internal: filling assignment map with incompatible structures (substructure)");
+		}
+	}
+	if (di != de || oi != oe)
+	{
+		throw std::logic_error("internal: filling assignment map with incompatible structures (size)");
+	}
+}
+
 

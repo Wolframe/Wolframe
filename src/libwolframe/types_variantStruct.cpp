@@ -33,7 +33,7 @@ VariantIndirection::VariantIndirection( const VariantStructDescription* descr)
 void VariantStruct::expandIndirection()
 {
 	if (type() != indirection_) return;
-	VariantStructDescription* descr = description();
+	const VariantStructDescription* descr = description();
 	release();
 	initStruct( descr);
 }

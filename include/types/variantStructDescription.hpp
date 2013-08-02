@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #include <string>
+#include <map>
 #include <iostream>
 #include "types/countedReference.hpp"
 #include <stdexcept>
@@ -199,6 +200,9 @@ public:
 	std::string tostring() const;
 
 	void check() const;
+
+	typedef std::map< const VariantStructDescription*, const VariantStructDescription*> AssignmentMap;
+	void fillAssignmentMap( AssignmentMap& res, const VariantStructDescription* dest) const;
 
 private:
 	const Element* beginptr() const						{return m_ar;}
