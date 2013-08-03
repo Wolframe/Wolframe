@@ -53,6 +53,8 @@ class VariantStruct;
 class VariantStructDescription
 {
 public:
+	typedef std::map<std::string,const VariantStructDescription*> ResolveMap;
+
 	///\brief Constructor
 	VariantStructDescription();
 	///\brief Copy constructor
@@ -181,6 +183,8 @@ public:
 	int addElement( const Element& elem);
 	///\brief Inherit the elements from another structure description
 	void inherit( const VariantStructDescription& parent);
+	///\brief Resolve all unresolved externals in intialzation values according to the given map. Throws, if not all unresolved symbols could be resolved !
+	void resolve( const ResolveMap& rmap);
 
 	///\brief Find an element by name in the structure description
 	int findidx( const std::string& name) const;

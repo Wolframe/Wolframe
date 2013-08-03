@@ -65,7 +65,7 @@ public:
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
 
-	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
+	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
 		:m_isVector(false)
 		,m_isAttribute(false)
 		,m_isOptional(false)
@@ -145,7 +145,7 @@ public:
 					}
 					if (!m_isIndirection)
 					{
-						resolveType( m_symbol, typemap, formmap, selfname);
+						resolveType( m_symbol, typemap, formmap);
 					}
 					st = ParseEndName;
 					/* no break here !*/
@@ -294,7 +294,7 @@ static bool isIdentifier( const std::string& name)
 	return (ii==ee);
 }
 
-static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
+static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, std::vector<std::string>& unresolvedSymbols)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -324,13 +324,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 		}
 		if (itr->second.begin() == itr->second.end() && second.size())
 		{
-			FRMAttribute fa( second, typemap, formmap, selfname);
+			FRMAttribute fa( second, typemap, formmap);
 			if (fa.isForm())
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
 			}
 			else if (fa.isIndirection())
 			{
+				unresolvedSymbols.push_back( fa.symbol());
 				result.addUnresolved( fa.symbol());
 				if (fa.isVector())
 				{
@@ -409,7 +410,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			//...  Embedded substructure definition
 			if (!second.empty())
 			{
-				FRMAttribute fa( second, typemap, formmap, selfname);
+				FRMAttribute fa( second, typemap, formmap);
 				if (!fa.isForm())
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
@@ -427,7 +428,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 					throw std::runtime_error( "Syntax error: Form declared as attribute");
 				}
 				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
-				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
+				compile_ptree( itr->second, *substruct, typemap, formmap, unresolvedSymbols);
 
 				result.addStructure( first, *substruct);
 
@@ -451,7 +452,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			else
 			{
 				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
-				compile_ptree( itr->second, *substruct, typemap, formmap, selfname);
+				compile_ptree( itr->second, *substruct, typemap, formmap, unresolvedSymbols);
 				result.addStructure( first, *substruct);
 			}
 		}
@@ -460,14 +461,19 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 
 static void compile_forms( const boost::property_tree::ptree& pt, std::vector<types::FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap)
 {
+	std::vector<std::string> unresolvedSymbols;
 	types::keymap<types::FormDescriptionR> formmap;
+
+	// Compile all forms and structures:
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
 	{
+		std::string exportname;
 		bool isForm = false;
 		bool isStruct = false;
 		if (boost::algorithm::iequals( itr->first, "FORM"))
 		{
+			exportname = itr->second.data();
 			isForm = true;
 			if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
 		}
@@ -480,10 +486,9 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<ty
 		{
 			try
 			{
-				types::FormDescriptionR form( new types::FormDescription( "simpleform", itr->second.data()));
-
-				formmap.insert( form->name(), form);
-				compile_ptree( itr->second, *form, typemap, formmap, itr->second.data());
+				types::FormDescriptionR form( new types::FormDescription( "simpleform", exportname));
+				compile_ptree( itr->second, *form, typemap, formmap, unresolvedSymbols);
+				formmap.insert( itr->second.data(), form);
 				if (isForm) result.push_back( form);
 			}
 			catch (const std::runtime_error& e)
@@ -495,6 +500,27 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<ty
 		{
 			throw std::runtime_error( "FORM or STRUCT expected as start of a structure definition");
 		}
+	}
+
+	// Do resolve unresolved form indirection references:
+	types::FormDescription::ResolveMap resolvemap;
+
+	std::vector<std::string>::const_iterator ui = unresolvedSymbols.begin(), ue = unresolvedSymbols.end();
+	for (; ui != ue; ++ui)
+	{
+		types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.find( *ui);
+		if (ri == formmap.end())
+		{
+			throw std::runtime_error( std::string("could not resolve reference to STRUCT or FORM '") + *ui + "'");
+		}
+		result.push_back( ri->second);
+		resolvemap[ *ui] = ri->second.get();
+	}
+
+	types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.begin(), re = formmap.end();
+	for (; ri != re; ++ri)
+	{
+		re->second.get()->resolve( resolvemap);
 	}
 }
 

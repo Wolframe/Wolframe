@@ -120,7 +120,9 @@ public:
 	const VariantStruct* prototype() const				{return ((Type)m_type == array_)?(const VariantStruct*)m_data.value.ref_:0;}
 	VariantStruct* prototype()					{return ((Type)m_type == array_)?(VariantStruct*)m_data.value.ref_:0;}
 
+	///\brief Return the referenced name in case of an unresolved external
 	const std::string unresolvedName() const			{if ((Type)m_type != unresolved_) throw std::logic_error("undefined access of unresolved name"); return std::string( (const char*)m_data.value.ref_, m_data.dim.size);}
+	///\brief Resolve all unresolved externals according to the given map. Throws, if not all unresolved symbols could be resolved !
 	void resolve( const ResolveMap& rmap);
 
 	///\brief Expands an Indirection (throws for other types than indirection_)

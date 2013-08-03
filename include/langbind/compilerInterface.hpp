@@ -53,7 +53,8 @@ struct DDLCompiler
 	///\brief Compile a source from a string. Throws in case of error.
 	///\param[in] srcstring source as string
 	///\param[in] typemap map with atomic type definitions
-	///\return compilation result (a list of forms)
+	///\return compilation result (a list of public and private forms).
+	///\renmark Forms with an empty name are declared as private and not inserted into the map of public forms. But they are also not deleted and kept in a list, so that they can still be referenced by other forms in the list (for indirection).
 	virtual std::vector<types::FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const=0;
 
 	///\brief Get the name of the ddl this compiler is for

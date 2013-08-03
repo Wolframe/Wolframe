@@ -58,7 +58,14 @@ void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std:
 		std::vector<types::FormDescriptionR>::const_iterator fi = forms.begin(), fe = forms.end();
 		for (; fi != fe; ++fi)
 		{
-			library.defineForm( (*fi)->name(), *fi);
+			if ((*fi)->name().empty())
+			{
+				library.definePrivateForm( *fi);
+			}
+			else
+			{
+				library.defineForm( (*fi)->name(), *fi);
+			}
 		}
 	}
 	catch (const std::runtime_error& e)

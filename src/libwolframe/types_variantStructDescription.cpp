@@ -162,7 +162,18 @@ VariantStructDescription::~VariantStructDescription()
 	if (m_ar) wolframe_free( m_ar);
 }
 
+void VariantStructDescription::resolve( const ResolveMap& rmap)
+{
+	std::size_t ii;
+	for (ii=0; ii<m_size; ++ii)
+	{
+		Element* ee = m_ar+ii;
+		if (ee->initvalue) ee->initvalue->resolve( rmap);
+	}
+}
+
 int VariantStructDescription::addAtom( const std::string& name_, const Variant& initvalue, const NormalizeFunction* normalizer_)
+
 {
 	if (findidx( name_) >= 0) throw std::runtime_error( std::string("try to add duplicate element '") + name_ + "' to structure description");
 
