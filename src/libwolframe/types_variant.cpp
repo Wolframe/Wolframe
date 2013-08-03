@@ -35,7 +35,7 @@ void Variant::release()
 {
 	if (!constant())
 	{
-		if (type() == string_ && m_data.value.string_)
+		if (m_type == string_ && m_data.value.string_)
 		{
 			wolframe_free( m_data.value.string_);
 			std::memset( this, 0, sizeof( *this));
@@ -71,7 +71,7 @@ void Variant::initString( const char* str_, std::size_t strsize_)
 
 void Variant::initCopy( const Variant& o)
 {
-	if (o.type() == string_)
+	if (o.m_type == string_)
 	{
 		initString( o.m_data.value.string_, o.m_data.dim.size);
 		setInitialized( o.initialized());
@@ -181,19 +181,17 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 
 int Variant::compare( const Variant& o) const
 {
-	unsigned char tt = type();
-	unsigned char ot = o.type();
-	if (tt == ot)
+	if (m_type == o.m_type)
 	{
-		return compare_type( type(), m_data, o.m_data);
+		return compare_type( (Type)m_type, m_data, o.m_data);
 	}
-	if (tt > ot)
+	if (m_type > o.m_type)
 	{
 		return -o.compare( *this);
 	}
 	try
 	{
-		switch (type())
+		switch (m_type)
 		{
 			case Variant::null_:
 				return -1;

@@ -175,6 +175,8 @@ public:
 	int addStructure( const std::string& name, const VariantStructDescription& substruct);
 	///\brief Add an indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
 	int addIndirection( const std::string& name_, const VariantStructDescription* descr);
+	///\brief Add an unresolved indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
+	int addUnresolved( const std::string& name_);
 	///\brief Add an element copy to the structure description
 	int addElement( const Element& elem);
 	///\brief Inherit the elements from another structure description
@@ -200,9 +202,6 @@ public:
 	std::string tostring() const;
 
 	void check() const;
-
-	typedef std::map< const VariantStructDescription*, const VariantStructDescription*> AssignmentMap;
-	void fillAssignmentMap( AssignmentMap& res, const VariantStructDescription* dest) const;
 
 private:
 	const Element* beginptr() const						{return m_ar;}

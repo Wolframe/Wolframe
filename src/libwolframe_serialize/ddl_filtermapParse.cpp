@@ -257,9 +257,8 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 					return true;
 
 				case types::VariantStruct::struct_:
-					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
-
 				case types::VariantStruct::indirection_:
+				case types::VariantStruct::unresolved_:
 					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 
 				case types::VariantStruct::array_:
@@ -324,6 +323,10 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		{
 			return parseStruct( *stk.back().value(), inp, ctx, stk);
 		}
+		case types::VariantStruct::unresolved_:
+		{
+			throw SerializationErrorException( "incomplete structure definition (unresolved indirection)", getElementPath( stk));
+		}
 		case types::VariantStruct::indirection_:
 		{
 			types::VariantStruct* st = stk.back().value();
@@ -377,6 +380,7 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 	m_ctx.setFlags(flags);
 	m_stk.clear();
 	m_stk.push_back( FiltermapDDLParseState( 0, m_st, 0));
+	LOG_DATA << "[DDL structure serialization parse] init structure" << "[" << (m_st->description()?m_st->description()->tostring():m_st->tostring()) << "]";
 }
 
 bool DDLStructParser::call()

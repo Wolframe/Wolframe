@@ -68,7 +68,7 @@ public:
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"null","int","uint","bool","double","string","array","struct","indirection"};
+		static const char* ar[] = {"null","int","uint","bool","double","string","array","struct","indirection","unresolved"};
 		return ar[ (int)i];
 	}
 

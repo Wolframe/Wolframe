@@ -52,19 +52,22 @@ class IndirectionDescription;
 class VariantStruct :public Variant
 {
 public:
+	typedef std::map<std::string,const VariantStructDescription*> ResolveMap;
+
 	///\enum Type
 	///\brief Typed filter element type
 	enum Type
 	{
-		null_=Variant::null_,
-		int_=Variant::int_,
-		uint_=Variant::uint_,
-		bool_=Variant::bool_,
-		double_=Variant::double_,
-		string_=Variant::string_,
-		array_,
-		struct_,
-		indirection_
+		null_=Variant::null_,		//< undefined value
+		int_=Variant::int_,		//< atomic signed int
+		uint_=Variant::uint_,		//< atomic unsigned int
+		bool_=Variant::bool_,		//< atomic boolean
+		double_=Variant::double_,	//< atomic double
+		string_=Variant::string_,	//< atomic string
+		array_,				//< array of VariantStruct
+		struct_,			//< content of structure
+		indirection_,			//< pointer to structure
+		unresolved_			//< unresolved indirection
 	};
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)				{return Variant::typeName( (Variant::Type)i);}
@@ -116,6 +119,9 @@ public:
 	///\brief Return the prototype element (initialization of new element) of an array (throws for other types than array_)
 	const VariantStruct* prototype() const				{return ((Type)m_type == array_)?(const VariantStruct*)m_data.value.ref_:0;}
 	VariantStruct* prototype()					{return ((Type)m_type == array_)?(VariantStruct*)m_data.value.ref_:0;}
+
+	const std::string unresolvedName() const			{if ((Type)m_type != unresolved_) throw std::logic_error("undefined access of unresolved name"); return std::string( (const char*)m_data.value.ref_, m_data.dim.size);}
+	void resolve( const ResolveMap& rmap);
 
 	///\brief Expands an Indirection (throws for other types than indirection_)
 	void expandIndirection();
@@ -221,7 +227,7 @@ private:
 	const VariantStruct* elementptr( std::size_t idx) const;
 	VariantStruct* elementptr( std::size_t idx);
 
-	friend class VariantStructIndirection;
+	friend class VariantUnresolved;
 	friend class VariantStructConst;
 	void setType( Type type_)						{m_type = (unsigned char)type_;}
 
@@ -230,6 +236,8 @@ private:
 	void initCopy( const VariantStruct& orig);
 	void initConstCopy( const VariantStruct& o);
 	void initConstCopy( const Variant& o);
+	void initUnresolved( const std::string& name_);
+	void initIndirection( const VariantStructDescription* descr);
 
 	void release();
 	void check() const;
@@ -242,7 +250,18 @@ class VariantIndirection :public Variant
 {
 public:
 	///\brief Constructor
-	VariantIndirection( const VariantStructDescription* descr);
+	explicit VariantIndirection( const VariantStructDescription* descr);
+	~VariantIndirection()	{m_type=0;}
+};
+
+
+///\class VariantUnresolved
+///\brief Unresolved indirection
+class VariantUnresolved :public VariantStruct
+{
+public:
+	///\brief Constructor
+	explicit VariantUnresolved( const std::string& name_);
 };
 
 

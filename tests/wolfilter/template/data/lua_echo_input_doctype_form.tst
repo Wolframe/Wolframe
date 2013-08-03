@@ -1,7 +1,6 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
-testscripts=$luascript					# list of scripts of the test
 formname="employee_assignment_print.simpleform"
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
@@ -21,6 +20,7 @@ opt="$opt --cmdprogram $luascript"
 testcmd="$opt run"					# command to execute by the test
 docin=employee_assignment_doctype			# input document name
 docout=$testname					# output document name
+testscripts=`echo "$luascript $formname"`		# list of scripts of the test
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`"

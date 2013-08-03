@@ -221,6 +221,10 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			{
 				return false;
 			}
+			case types::VariantStruct::unresolved_:
+			{
+				return false;
+			}
 			case types::VariantStruct::array_:
 			{
 				return fetchVector( ctx, stk);

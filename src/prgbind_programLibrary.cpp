@@ -165,6 +165,7 @@ public:
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<module::FilterConstructorR> m_filterMap;
 	types::keymap<types::FormDescriptionR> m_formMap;
+	std::vector<types::FormDescriptionR> m_privateFormList;
 	std::vector<ProgramR> m_programTypes;
 
 	Impl()
@@ -199,6 +200,11 @@ public:
 	void defineNormalizeFunction( const std::string& name, types::NormalizeFunctionR f)
 	{
 		m_normalizeFunctionMap.define( name, f);
+	}
+
+	void definePrivateForm( const types::FormDescriptionR& f)
+	{
+		m_privateFormList.push_back( f);
 	}
 
 	void defineForm( const std::string& name, const types::FormDescriptionR& f)
@@ -363,6 +369,11 @@ void ProgramLibrary::defineNormalizeFunctionConstructor( const module::Normalize
 void ProgramLibrary::defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const
 {
 	m_impl->defineNormalizeFunction( name, f);
+}
+
+void ProgramLibrary::definePrivateForm( const types::FormDescriptionR& f)
+{
+	m_impl->definePrivateForm( f);
 }
 
 void ProgramLibrary::defineForm( const std::string& name, const types::FormDescriptionR& f)

@@ -30,6 +30,18 @@ VariantIndirection::VariantIndirection( const VariantStructDescription* descr)
 	m_data.value.ref_ = 0;
 }
 
+VariantUnresolved::VariantUnresolved( const std::string& name_)
+{
+	initUnresolved( name_);
+}
+
+void VariantStruct::initIndirection( const VariantStructDescription* descr)
+{
+	m_type = (unsigned char)( indirection_);
+	m_data.dim.metadata = (const void*)descr;
+	m_data.value.ref_ = 0;
+}
+
 void VariantStruct::expandIndirection()
 {
 	if (type() != indirection_) return;
@@ -74,6 +86,41 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 	else
 	{
 		m_data.value.ref_ = 0;
+	}
+}
+
+void VariantStruct::initUnresolved( const std::string& name_)
+{
+	setType( unresolved_);
+	char* nm = (char*)wolframe_malloc( name_.size()+1);
+	if (!nm) throw std::bad_alloc();
+	std::memcpy( nm, name_.c_str(), name_.size());
+	nm[ name_.size()] = 0;
+	m_data.value.ref_ = nm;
+	m_data.dim.size = name_.size();
+}
+
+void VariantStruct::resolve( const ResolveMap& rmap)
+{
+	if (type() == unresolved_)
+	{
+		const std::string rname( std::string( (const char*)m_data.value.ref_, m_data.dim.size));
+		ResolveMap::const_iterator ri = rmap.find( rname);
+		if (ri == rmap.end()) throw std::runtime_error( std::string( "failed to resolve reference to '") + rname + "'");
+		wolframe_free( m_data.value.ref_);
+		init();
+		initIndirection( ri->second);
+	}
+	else if (type() == struct_)
+	{
+		VariantStruct::iterator vi = begin(), ve = end();
+		for (; vi != ve; ++vi) vi->resolve( rmap);
+	}
+	else if (type() == array_)
+	{
+		prototype()->resolve( rmap);
+		VariantStruct::iterator vi = begin(), ve = end();
+		for (; vi != ve; ++vi) vi->resolve( rmap);
 	}
 }
 
@@ -159,6 +206,18 @@ void VariantStruct::initCopy( const VariantStruct& o)
 			m_data.dim.metadata = o.m_data.dim.metadata;
 			setInitialized( init_);
 			break;
+
+		case VariantStruct::unresolved_:
+			init();
+			setType( unresolved_);
+			char* nm = (char*)wolframe_malloc( o.m_data.dim.size+1);
+			if (!nm) throw std::bad_alloc();
+			std::memcpy( nm, o.m_data.value.ref_, o.m_data.dim.size);
+			nm[ o.m_data.dim.size] = 0;
+			m_data.value.ref_ = nm;
+			m_data.dim.size = o.m_data.dim.size;
+			setInitialized( init_);
+			break;
 	}
 }
 
@@ -213,7 +272,7 @@ void VariantStruct::release()
 				((VariantStruct*)m_data.value.ref_)[ ii].release();
 			}
 			wolframe_free( m_data.value.ref_);
-			std::memset( this, 0, sizeof( *this));
+			init();
 			break;
 
 		case VariantStruct::array_:
@@ -223,11 +282,16 @@ void VariantStruct::release()
 				((VariantStruct*)m_data.value.ref_)[ ii].release();
 			}
 			wolframe_free( m_data.value.ref_);
-			std::memset( this, 0, sizeof( *this));
+			init();
 			break;
 
 		case VariantStruct::indirection_:
-			std::memset( this, 0, sizeof( *this));
+			init();
+			break;
+
+		case VariantStruct::unresolved_:
+			wolframe_free( m_data.value.ref_);
+			init();
 			break;
 	}
 }
@@ -274,7 +338,12 @@ int VariantStruct::compare( const VariantStruct& o) const
 		if (!od) return -2;
 		return dd->compare( *od);
 	}
-	else if (ot == array_ || ot == struct_ || ot == indirection_)
+	else if (tt == unresolved_)
+	{
+		if (o.type() != unresolved_) return -2;
+		return std::strcmp( (char*)m_data.value.ref_, (char*)o.m_data.value.ref_);
+	}
+	else if (ot == array_ || ot == struct_ || ot == indirection_ || ot == unresolved_)
 	{
 		return +2;
 	}
@@ -284,15 +353,7 @@ int VariantStruct::compare( const VariantStruct& o) const
 void VariantStruct::setDescription( const VariantStructDescription* descr)
 {
 	Type tp = (Type)type();
-	if (tp == indirection_)
-	{
-		if ((!m_data.dim.metadata && descr) || (m_data.dim.metadata && !descr))
-		{
-			throw std::logic_error("illegal operation (set description does not match to indirection type)");
-		}
-		m_data.dim.metadata = descr;
-	}
-	else if (tp == array_)
+	if (tp == array_)
 	{
 		if (descr)
 		{
@@ -371,11 +432,6 @@ void VariantStruct::setIndirectionDescription( const DescriptionAssignmentMap& a
 		for (; vi != ve; vi++)
 		{
 			vi->setIndirectionDescription( assignmentmap);
-		}
-		DescriptionAssignmentMap::const_iterator ai = assignmentmap.find( (const VariantStructDescription*)m_data.dim.metadata);
-		if (ai != assignmentmap.end())
-		{
-			m_data.dim.metadata = ai->second;
 		}
 	}
 }
@@ -537,7 +593,7 @@ void VariantStruct::print( std::ostream& out, const std::string& indent, const s
 		out << '{';
 		for (; ii<nn; ++ii)
 		{
-			if (ii>0) out << ',';
+			if (ii>0) out << ';';
 			out << newitem;
 			for (std::size_t ll=0; ll<level; ++ll) out << indent;
 			((VariantStruct*)m_data.value.ref_ + 1 + ii)->print( out, indent, newitem, level+1);
@@ -551,21 +607,28 @@ void VariantStruct::print( std::ostream& out, const std::string& indent, const s
 	}
 	else if (tt == struct_)
 	{
+		out << '{';
 		const VariantStructDescription* descr = description();
 		VariantStructDescription::const_iterator di = descr->begin();
 		const_iterator ii = begin(), ee = end();
-		for (; ii!=ee; ++ii,++di)
+		for (int idx=0; ii!=ee; ++ii,++di,++idx)
 		{
+			if (idx) out << "; ";
 			out << newitem;
 			for (std::size_t ll=0; ll<level; ++ll) out << indent;
 
 			out << di->name << '=';
 			ii->print( out, indent, newitem, level+1);
-			out << ';';
 		}
+		out << '}';
 	}
 	else if (tt == indirection_)
 	{
+		out << "*";
+	}
+	else if (tt == unresolved_)
+	{
+		out << "->" << unresolvedName();
 	}
 	else
 	{

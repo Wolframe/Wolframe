@@ -60,7 +60,7 @@ public:
 		,m_isMandatory(o.m_isMandatory)
 		,m_isForm(o.m_isForm)
 		,m_isFormReference(o.m_isFormReference)
-		,m_isSelfReference(o.m_isSelfReference)
+		,m_isIndirection(o.m_isIndirection)
 		,m_type(o.m_type)
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
@@ -72,7 +72,7 @@ public:
 		,m_isMandatory(false)
 		,m_isForm(false)
 		,m_isFormReference(false)
-		,m_isSelfReference(false)
+		,m_isIndirection(false)
 		,m_type(0)
 		,m_subform(0)
 	{
@@ -87,8 +87,6 @@ public:
 			ParseEnd
 		};
 		State st = ParseStart;
-		std::string vv;
-
 		std::string::const_iterator ii=item.begin(), ee=item.end();
 		for (; ii != ee; ++ii)
 		{
@@ -97,12 +95,14 @@ public:
 				case ParseStart:
 					if (*ii == '@')
 					{
+						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be an attribute('@')");
 						if (m_isAttribute) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '@'");
 						m_isAttribute = true;
 						continue;
 					}
 					if (*ii == '!')
 					{
+						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be mandatory('!')");
 						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '*'");
 						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '*' and '?' set");
 						m_isMandatory = true;
@@ -110,9 +110,29 @@ public:
 					}
 					if (*ii == '?')
 					{
+						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be optional('?')");
 						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '?'");
 						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '?' and '*' set");
 						m_isOptional = true;
+						continue;
+					}
+					if (*ii == '-')
+					{
+						++ii;
+						if (ii == ee)
+						{
+							throw std::runtime_error( "Syntax error in Simple Form: unexpected end of expression");
+						}
+						if (*ii != '>')
+						{
+							throw std::runtime_error( "Syntax error in Simple Form: unexpected operator '-'");
+						}
+						++ii;
+						m_isIndirection = true;
+						if (m_isOptional || m_isMandatory || m_isAttribute)
+						{
+							throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be optional('?'), mandatory ('!') or defined as attribute ('@')");
+						}
 						continue;
 					}
 					st = ParseName;
@@ -120,10 +140,13 @@ public:
 				case ParseName:
 					if (((*ii|32) >= 'a' && (*ii|32) <= 'z') || (*ii >= '0' && *ii <= '9') || *ii == '_')
 					{
-						vv.push_back( *ii);
+						m_symbol.push_back( *ii);
 						continue;
 					}
-					parseType( vv, typemap, formmap, selfname);
+					if (!m_isIndirection)
+					{
+						resolveType( m_symbol, typemap, formmap, selfname);
+					}
 					st = ParseEndName;
 					/* no break here !*/
 				case ParseEndName:
@@ -139,6 +162,10 @@ public:
 					}
 					if (*ii == '(')
 					{
+						if (m_isIndirection)
+						{
+							throw std::runtime_error( "Syntax error in Simple Form Attribute: Indirection cannon have a default value");
+						}
 						st = ParseDfOpen;
 						break;
 					}
@@ -167,19 +194,17 @@ public:
 						break;
 					}
 					st = ParseDfValue;
-					vv.clear();
 					/* no break here !*/
 
 				case ParseDfValue:
 					if (*ii == ')')
 					{
-						m_value = vv;
 						st = ParseEnd;
 						break;
 					}
 					else
 					{
-						vv.push_back( *ii);
+						m_value.push_back( *ii);
 					}
 				break;
 				case ParseEnd:
@@ -192,7 +217,10 @@ public:
 		}
 		if (st == ParseName)
 		{
-			parseType( vv, typemap, formmap, selfname);
+			if (!m_isIndirection)
+			{
+				resolveType( m_symbol, typemap, formmap);
+			}
 		}
 		else if (st != ParseEnd)
 		{
@@ -201,7 +229,7 @@ public:
 	}
 
 	bool isFormReference() const				{return m_isFormReference;}
-	bool isSelfReference() const				{return m_isSelfReference;}
+	bool isIndirection() const				{return m_isIndirection;}
 	bool isVector() const					{return m_isVector;}
 	bool isAttribute() const				{return m_isAttribute;}
 	bool isOptional() const					{return m_isOptional;}
@@ -209,10 +237,11 @@ public:
 	bool isForm() const					{return m_isForm;}
 	const types::NormalizeFunction* type() const		{return m_type;}
 	const std::string& value() const			{return m_value;}
+	const std::string& symbol() const			{return m_symbol;}
 	const types::VariantStructDescription* subform() const	{return m_subform;}
 
 private:
-	void parseType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
+	void resolveType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
 	{
 		types::keymap<types::FormDescriptionR>::const_iterator fmi;
 		if (typestr.size() == 0)
@@ -231,10 +260,6 @@ private:
 		else if (0!=(m_type = typemap->get( typestr)))
 		{
 		}
-		else if (boost::algorithm::iequals( typestr, selfname))
-		{
-			m_isSelfReference = true;
-		}
 		else
 		{
 			throw std::runtime_error( (std::string( "unknown type: '") += typestr) += "'");
@@ -247,9 +272,10 @@ private:
 	bool m_isMandatory;
 	bool m_isForm;
 	bool m_isFormReference;
-	bool m_isSelfReference;
+	bool m_isIndirection;
 	const types::NormalizeFunction* m_type;
 	const types::VariantStructDescription* m_subform;
+	std::string m_symbol;
 	std::string m_value;
 };
 
@@ -268,7 +294,7 @@ static bool isIdentifier( const std::string& name)
 	return (ii==ee);
 }
 
-static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, const std::string& selfname)
+static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -303,7 +329,19 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
 			}
-			if (fa.isFormReference())
+			else if (fa.isIndirection())
+			{
+				result.addUnresolved( fa.symbol());
+				if (fa.isVector())
+				{
+					result.back().makeArray();
+				}
+				if (first == "_")
+				{
+					throw std::runtime_error( "Syntax error: Reference declared as inherited (untagged content element '_')");
+				}
+			}
+			else if (fa.isFormReference())
 			{
 				if (fa.isAttribute())
 				{
@@ -331,33 +369,6 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 						if (fa.isOptional()) result.back().setOptional();
 						if (fa.isMandatory()) result.back().setMandatory();
 					}
-				}
-			}
-			else if (fa.isSelfReference())
-			{
-				const types::VariantStructDescription* val = formmap.at( selfname).get();
-				result.addIndirection( first, val);
-				result.back().setOptional();
-
-				if (fa.isAttribute())
-				{
-					throw std::runtime_error( "Syntax error: Form declared as attribute");
-				}
-				if (fa.isOptional())
-				{
-					throw std::runtime_error( "Syntax error: Self references are always optional");
-				}
-				if (fa.isMandatory())
-				{
-					throw std::runtime_error( "Syntax error: Self references are never mandatory");
-				}
-				if (fa.isVector())
-				{
-					result.back().makeArray();
-				}
-				if (first == "_")
-				{
-					throw std::runtime_error( "Syntax error: Self reference declared as untagged content element");
 				}
 			}
 			else
@@ -403,13 +414,13 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
 				}
-				if (fa.isFormReference())
-				{
-					throw std::runtime_error( "Syntax error: Form reference declared as structure");
-				}
-				else if (fa.isSelfReference())
+				else if (fa.isIndirection())
 				{
 					throw std::runtime_error( "Syntax error: Form self indirection declared as structure");
+				}
+				else if (fa.isFormReference())
+				{
+					throw std::runtime_error( "Syntax error: Form reference declared as structure");
 				}
 				if (fa.isAttribute())
 				{
