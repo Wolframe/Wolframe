@@ -272,9 +272,9 @@ int VariantStructDescription::addIndirection( const std::string& name_, const Va
 	return rt;
 }
 
-int VariantStructDescription::addUnresolved( const std::string& name_)
+int VariantStructDescription::addUnresolved( const std::string& name_, const std::string& symbol_)
 {
-	int rt = addAtom( name_, VariantUnresolved( name_), 0);
+	int rt = addAtom( name_, VariantUnresolved( symbol_), 0);
 	back().setOptional();
 	check();
 	return rt;

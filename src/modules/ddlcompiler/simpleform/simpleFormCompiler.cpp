@@ -127,7 +127,6 @@ public:
 						{
 							throw std::runtime_error( "Syntax error in Simple Form: unexpected operator '-'");
 						}
-						++ii;
 						m_isIndirection = true;
 						if (m_isOptional || m_isMandatory || m_isAttribute)
 						{
@@ -332,7 +331,8 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			else if (fa.isIndirection())
 			{
 				unresolvedSymbols.push_back( fa.symbol());
-				result.addUnresolved( fa.symbol());
+				result.addUnresolved( first, fa.symbol());
+
 				if (fa.isVector())
 				{
 					result.back().makeArray();
@@ -520,7 +520,7 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<ty
 	types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.begin(), re = formmap.end();
 	for (; ri != re; ++ri)
 	{
-		re->second.get()->resolve( resolvemap);
+		ri->second.get()->resolve( resolvemap);
 	}
 }
 
