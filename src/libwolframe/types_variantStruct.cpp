@@ -44,10 +44,12 @@ void VariantStruct::initIndirection( const VariantStructDescription* descr)
 
 void VariantStruct::expandIndirection()
 {
+	bool init_ = initialized();
 	if (type() != indirection_) return;
 	const VariantStructDescription* descr = description();
 	release();
 	initStruct( descr);
+	setInitialized( init_);
 }
 
 void VariantStruct::initStruct( const VariantStructDescription* descr)
