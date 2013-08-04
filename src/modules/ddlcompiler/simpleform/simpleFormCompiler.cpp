@@ -94,6 +94,14 @@ public:
 			switch (st)
 			{
 				case ParseStart:
+					if (*ii == '-')
+					{
+						// parse over ignored new construct '->'
+						++ii;
+						if (ii == ee) throw std::runtime_error( "Syntax error in Simple Form: unexpected end of declaration");
+						if (*ii != '>') throw std::runtime_error( "Syntax error in Simple Form: unexpected token");
+						continue;
+					}
 					if (*ii == '@')
 					{
 						if (m_isAttribute) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '@'");
