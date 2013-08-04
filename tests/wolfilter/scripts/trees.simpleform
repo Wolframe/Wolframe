@@ -2,15 +2,15 @@ STRUCT MulTreeNode
 {
 	id		@int
 	name		normname
-	node		->MulTreeNode[]
+	node		^MulTreeNode[]
 }
 
 STRUCT BinTreeNode
 {
 	id		@int
 	name		normname
-	left		->BinTreeNode
-	right		->BinTreeNode
+	left		^BinTreeNode
+	right		^BinTreeNode
 }
 
 FORM trees

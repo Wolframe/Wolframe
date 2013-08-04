@@ -116,17 +116,8 @@ public:
 						m_isOptional = true;
 						continue;
 					}
-					if (*ii == '-')
+					if (*ii == '^')
 					{
-						++ii;
-						if (ii == ee)
-						{
-							throw std::runtime_error( "Syntax error in Simple Form: unexpected end of expression");
-						}
-						if (*ii != '>')
-						{
-							throw std::runtime_error( "Syntax error in Simple Form: unexpected operator '-'");
-						}
 						m_isIndirection = true;
 						if (m_isOptional || m_isMandatory || m_isAttribute)
 						{
@@ -513,7 +504,12 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<ty
 		{
 			throw std::runtime_error( std::string("could not resolve reference to STRUCT or FORM '") + *ui + "'");
 		}
-		result.push_back( ri->second);
+		if (ri->second->name().empty())
+		{
+			//... push referenced private STRUCT declarations.
+			// (public form declarations are already part of the result)
+			result.push_back( ri->second);
+		}
 		resolvemap[ *ui] = ri->second.get();
 	}
 
