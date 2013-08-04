@@ -94,12 +94,9 @@ public:
 			switch (st)
 			{
 				case ParseStart:
-					if (*ii == '-')
+					if (*ii == '^')
 					{
-						// parse over ignored new construct '->'
-						++ii;
-						if (ii == ee) throw std::runtime_error( "Syntax error in Simple Form: unexpected end of declaration");
-						if (*ii != '>') throw std::runtime_error( "Syntax error in Simple Form: unexpected token");
+						// parse over ignored new construct '^' for indirection
 						continue;
 					}
 					if (*ii == '@')
