@@ -41,7 +41,6 @@ Project Wolframe.
 #include "types/typeSignature.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "langbind/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"

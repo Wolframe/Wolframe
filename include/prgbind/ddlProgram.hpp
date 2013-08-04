@@ -36,7 +36,7 @@
 #ifndef _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "langbind/compilerInterface.hpp"
+#include "langbind/ddlCompilerInterface.hpp"
 #include <string>
 
 namespace _Wolframe {

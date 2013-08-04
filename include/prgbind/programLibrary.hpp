@@ -39,7 +39,7 @@
 #include "module/filterBuilder.hpp"
 #include "database/database.hpp"
 #include "langbind/builtInFunction.hpp"
-#include "langbind/compilerInterface.hpp"
+#include "langbind/ddlCompilerInterface.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
 #include "prnt/printFunction.hpp"

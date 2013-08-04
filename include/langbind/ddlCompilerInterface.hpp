@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/compilerInterface.hpp
-///\brief Defines the interface for different type of data definition languages used for forms
+///\file langbind/ddlCompilerInterface.hpp
+///\brief Defines the compiler interface for definition languages (DDL) used for specifying forms
 
 #ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED

@@ -38,7 +38,6 @@
 #include <string>
 #include "cmdbind/execCommandHandler.hpp"
 #include "config/configurationBase.hpp"
-#include "langbind/compilerInterface.hpp"
 #include "standardConfigs.hpp"
 
 namespace _Wolframe {

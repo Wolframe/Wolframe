@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of form DDL compilers
 #ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/compilerInterface.hpp"
+#include "langbind/ddlCompilerInterface.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 

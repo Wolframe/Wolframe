@@ -30,14 +30,14 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file simpleFormCompiler.hpp
-///\brief Interface for a compiler of a simple language to describe forms
+///\brief Interface for a DDL compiler of a simple language to describe forms
 
 #ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #include <string>
 #include "types/variant.hpp"
 #include "types/form.hpp"
-#include "langbind/compilerInterface.hpp"
+#include "langbind/ddlCompilerInterface.hpp"
 
 namespace _Wolframe {
 namespace langbind {
