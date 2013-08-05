@@ -33,10 +33,10 @@
 ///\\file iprocHandlerXMLTest.cpp class unit tests using google test framework (gTest)
 
 #include "iprocHandler.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "moduleDirectory.hpp"
+#include "processor/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/procProvider.hpp"

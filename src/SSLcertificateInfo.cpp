@@ -34,7 +34,7 @@
 // SSLcertificateInfo.cpp
 //
 
-#include "SSLcertificateInfo.hpp"
+#include "system/SSLcertificateInfo.hpp"
 
 #include <string>
 #include <cstring>

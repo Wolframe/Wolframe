@@ -44,8 +44,8 @@
 #include "database/transaction.hpp"
 #include "PostgreSQLprogram.hpp"
 #include "config/configurationBase.hpp"
-#include "constructor.hpp"
-#include "objectPool.hpp"
+#include "module/constructor.hpp"
+#include "system/objectPool.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable:4250)

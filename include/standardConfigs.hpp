@@ -38,7 +38,7 @@
 #define _STANDARD_CONFIGS_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "serverEndpoint.hpp"
+#include "system/serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
 
 #include "logger/logSyslogFacility.hpp"

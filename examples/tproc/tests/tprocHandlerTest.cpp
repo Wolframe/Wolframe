@@ -35,11 +35,11 @@
 
 #include "tprocHandler.hpp"
 #include "handlerConfig.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "testDescription.hpp"
-#include "moduleDirectory.hpp"
+#include "processor/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "langbind/appObjects.hpp"

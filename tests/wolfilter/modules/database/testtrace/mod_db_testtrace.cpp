@@ -33,7 +33,7 @@
 ///\file modules/database/testtrace/mod_database_testtrace.cpp
 ///\brief Module for a fake database implementation used for tests
 #include "testtraceDatabase.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "logger/logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

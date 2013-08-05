@@ -34,9 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "langbind/normalizeFunction.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "types/countedReference.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace module {

@@ -1,2 +1,28 @@
-Include files for Wolframe interface(s)
+Include files and directories for Wolframe interface(s)
+
+appConfig.hpp		:Wolframe server configuration definition
+appProperties.hpp	:Wolframe server global properties
+standardConfigs.hpp	:Standard configuration objects
+
+System and core header files:
+AAAA			:Authorization,Authentication,....
+config			:Templates and base classes to define configurable objects
+logger			:Logger interface
+system			:System core modules and object builder classes
+processor		:Processor provider interface and definition of objects provided
+protocol		:Base classes for implementing a protocol
+
+Base data types and serialization:
+types			:Data types defined in the wolframe core library
+utils			:Utility functions defined in the wolframe core library
+serialize		:Serialization interface (for DDL and C++ structure) and serialization base classes
+
+Bindings an application building blocks:
+module			:Base constructor class for application objects and builder templates for module implementations
+cmdbind			:Command handler base class and some command handler instances
+database		:Database interfaces and transaction definition
+filter			:Base classes for input/output filters and filter some function implementations
+langbind		:Base classes and types for processor language bindings
+prgbind			:Program library interface and base builder classes for program types that can be implemented
+prnt			:Interface to printing and base builder classes for printer implementaions
 

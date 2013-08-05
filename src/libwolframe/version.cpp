@@ -37,7 +37,7 @@
 #include <sstream>
 #include <limits>
 #include <stdexcept>
-#include "version.hpp"
+#include "system/version.hpp"
 
 namespace _Wolframe {
 

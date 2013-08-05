@@ -35,7 +35,7 @@
 ///  based on the postgres database module
 
 #include "PostgreSQLTest.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "logger/logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

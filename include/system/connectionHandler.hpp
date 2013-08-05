@@ -41,7 +41,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include "connectionEndpoint.hpp"
+#include "system/connectionEndpoint.hpp"
 
 #include <boost/noncopyable.hpp>
 

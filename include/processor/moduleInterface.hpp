@@ -42,7 +42,7 @@
 #include <list>
 #include <vector>
 #include "config/configurationBase.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace module {

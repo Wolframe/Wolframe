@@ -39,7 +39,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "wolfilterCommandLine.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/filesystem.hpp>
 

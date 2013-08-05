@@ -34,7 +34,7 @@
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"

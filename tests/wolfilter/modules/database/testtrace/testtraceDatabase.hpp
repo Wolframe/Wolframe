@@ -37,7 +37,7 @@
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 #include <list>
 #include <string>
 

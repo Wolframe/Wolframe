@@ -41,7 +41,7 @@
 #include "handlerConfig.hpp"
 
 #ifdef WITH_SSL
-#include "SSLcertificateInfo.hpp"
+#include "system/SSLcertificateInfo.hpp"
 #endif
 
 #include <string>

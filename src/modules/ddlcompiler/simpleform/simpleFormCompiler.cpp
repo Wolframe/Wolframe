@@ -93,11 +93,6 @@ public:
 			switch (st)
 			{
 				case ParseStart:
-					if (*ii == '^')
-					{
-						// parse over ignored new construct '^' for indirection
-						continue;
-					}
 					if (*ii == '@')
 					{
 						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be an attribute('@')");

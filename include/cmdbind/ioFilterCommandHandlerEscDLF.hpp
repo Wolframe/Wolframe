@@ -36,7 +36,7 @@
 #include "protocol/ioblocks.hpp"
 #include "filter/filter.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {

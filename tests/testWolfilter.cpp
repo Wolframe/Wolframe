@@ -38,7 +38,7 @@
 #include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "processor/procProvider.hpp"

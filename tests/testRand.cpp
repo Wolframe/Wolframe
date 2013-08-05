@@ -34,7 +34,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 
 TEST( Random, Randomness )
 {

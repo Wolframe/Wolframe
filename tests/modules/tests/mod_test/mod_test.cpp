@@ -34,7 +34,7 @@
 // a test module
 //
 
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "logger/logger-v1.hpp"
 #include "mod_test.hpp"
 

@@ -48,7 +48,7 @@
 #endif
 
 #include "logger/logger-v1.hpp"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 
 namespace _Wolframe	{
 

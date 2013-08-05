@@ -35,8 +35,8 @@
 //
 
 #include "logger/logger-v1.hpp"
-#include "moduleDirectory.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleDirectory.hpp"
+#include "processor/moduleInterface.hpp"
 #include "utils/fileUtils.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader

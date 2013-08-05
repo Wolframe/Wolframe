@@ -42,17 +42,16 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "appProperties.hpp"
-#include "version.hpp"
+#include "system/version.hpp"
 #include "wolframedCommandLine.hpp"
 #include "appconfig.hpp"
 #include "standardConfigs.hpp"
 #include "server.hpp"
-#include "ErrorCode.hpp"
+#include "system/errorCode.hpp"
 #include "logger/logger-v1.hpp"
 #include "appSingleton.hpp"
-#include "moduleDirectory.hpp"
-
-#include "connectionHandler.hpp"
+#include "processor/moduleDirectory.hpp"
+#include "system/connectionHandler.hpp"
 
 #if !defined(_WIN32)
 #error "This is the WIN32 main !"

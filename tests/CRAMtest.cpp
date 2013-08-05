@@ -36,7 +36,7 @@
 #include "gtest/gtest.h"
 #include <stdexcept>
 #include "AAAA/CRAM.hpp"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 
 TEST( CRAM, UninitializedRandomGenerator )
 {

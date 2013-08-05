@@ -36,7 +36,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 
 namespace _Wolframe {

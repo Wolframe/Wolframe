@@ -35,7 +35,7 @@
 /// Header file for the objects used for AAAA information.
 ///
 
-#include "connectionEndpoint.hpp"
+#include "system/connectionEndpoint.hpp"
 
 #ifndef _AAAA_OBJECTS_HPP_INCLUDED
 #define _AAAA_OBJECTS_HPP_INCLUDED

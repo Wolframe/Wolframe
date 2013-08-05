@@ -35,7 +35,7 @@
 
 #ifndef _Wolframe_iproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_iproc_HANDLER_HPP_INCLUDED
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "filter/filter.hpp"

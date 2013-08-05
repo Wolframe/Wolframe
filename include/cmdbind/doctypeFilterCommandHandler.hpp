@@ -35,7 +35,7 @@
 #define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {

@@ -34,8 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "langbind/ddlCompilerInterface.hpp"
-#include "moduleInterface.hpp"
-#include "constructor.hpp"
+#include "processor/moduleInterface.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace module {

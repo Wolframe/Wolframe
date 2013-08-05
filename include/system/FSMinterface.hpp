@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file FSMinterface.hpp
+/// \file system/FSMinterface.hpp
 /// Finite State Machine interface
 ///
 

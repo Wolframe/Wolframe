@@ -5,7 +5,7 @@
 #ifndef _ECHO_HANDLER_HPP_INCLUDED
 #define _ECHO_HANDLER_HPP_INCLUDED
 
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "handlerConfig.hpp"
 
 namespace _Wolframe {

@@ -4,7 +4,7 @@
 
 #include "luaHandler.hpp"
 #include "logger/logger-v1.hpp"
-#include "SSLcertificateInfo.hpp"
+#include "system/SSLcertificateInfo.hpp"
 
 #include <string>
 #include <cstring>

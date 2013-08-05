@@ -34,8 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "prnt/printFunction.hpp"
-#include "moduleInterface.hpp"
-#include "constructor.hpp"
+#include "processor/moduleInterface.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace module {

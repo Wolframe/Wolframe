@@ -44,7 +44,7 @@
 
 #include <list>
 #include "connectionBase.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
 
 namespace _Wolframe {

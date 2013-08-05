@@ -38,7 +38,7 @@
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
 #include "AAAA/authentication.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

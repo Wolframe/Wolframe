@@ -42,7 +42,7 @@
 #include "utils/fileUtils.hpp"
 #include "passwdFile.hpp"
 #include "AAAA/password.hpp"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 

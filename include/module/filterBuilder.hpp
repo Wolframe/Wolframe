@@ -34,9 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "types/countedReference.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 
 namespace _Wolframe {
 namespace module {

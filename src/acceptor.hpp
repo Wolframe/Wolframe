@@ -47,7 +47,7 @@
 #include <string>
 
 #include "connection.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 namespace _Wolframe {
 namespace net {

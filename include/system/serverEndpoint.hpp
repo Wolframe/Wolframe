@@ -35,7 +35,7 @@
 #define _SERVER_ENDPOINT_HPP_INCLUDED
 
 #include <string>
-#include "connectionEndpoint.hpp"
+#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe	{
 namespace net	{

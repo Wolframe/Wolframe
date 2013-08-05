@@ -38,7 +38,7 @@
 #define _APP_SINGLETON_HPP_INCLUDED
 
 #include "types/singleton.hpp"
-#include "version.hpp"
+#include "system/version.hpp"
 
 namespace _Wolframe	{
 

@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include "prgbind/programLibrary.hpp"
 #include "wolfwizardCommandLine.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -67,6 +67,15 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 	{
 		case types::VariantStruct::null_:
 			break;
+		case types::VariantStruct::unresolved_:
+		{
+			out << indent << "<element";
+			if (name) out << " name='" << name << "'";
+			out << " class='indirection'";
+			out << " type='" << types::VariantStruct::typeName(st.type()) << "'";
+			out << " symbol='" << st.unresolvedName() << "'/>" << std::endl;
+			break;
+		}
 		case types::VariantStruct::bool_:
 		case types::VariantStruct::double_:
 		case types::VariantStruct::int_:
@@ -77,6 +86,7 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 			if (name) out << " name='" << name << "'";
 			out << " class='atomic'";
 			out << " type='" << types::VariantStruct::typeName(st.type()) << "'";
+			out << " value='" << st.tostring() << "'";
 			out << addressing << status << "/>" << std::endl;
 			break;
 		}

@@ -37,7 +37,7 @@
 #ifndef _Wolframe_HANDLER_HPP_INCLUDED
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"

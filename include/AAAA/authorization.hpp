@@ -41,7 +41,7 @@
 #include <string>
 
 #include "AAAAinformation.hpp"
-#include "connectionEndpoint.hpp"
+#include "system/connectionEndpoint.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {

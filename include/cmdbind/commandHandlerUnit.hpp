@@ -35,8 +35,8 @@
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
-#include "constructor.hpp"
-#include "moduleInterface.hpp"
+#include "module/constructor.hpp"
+#include "processor/moduleInterface.hpp"
 #include <string>
 #include <list>
 

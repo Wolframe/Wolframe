@@ -39,7 +39,7 @@
 #include <cstdio>
 #include <ctime>
 
-#include "version.hpp"
+#include "system/version.hpp"
 #include "gtest/gtest.h"
 
 using namespace _Wolframe;

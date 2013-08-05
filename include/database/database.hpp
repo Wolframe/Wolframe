@@ -39,7 +39,7 @@
 #include "database/transaction.hpp"
 #include "database/databaseLanguage.hpp"
 #include "types/keymap.hpp"
-#include "UserInterface.hpp"
+#include "processor/userInterface.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>

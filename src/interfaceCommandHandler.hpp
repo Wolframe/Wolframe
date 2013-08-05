@@ -35,7 +35,7 @@
 #ifndef _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/lineCommandHandler.hpp"
-#include "UserInterface.hpp"
+#include "processor/userInterface.hpp"
 #include <list>
 #include <string>
 

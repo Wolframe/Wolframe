@@ -39,13 +39,13 @@
 
 #include "database/database.hpp"
 #include "database/transaction.hpp"
-#include "UserInterface.hpp"
+#include "processor/userInterface.hpp"
 #include "config/configurationBase.hpp"
 #include "types/keymap.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 #include "SQLiteProgram.hpp"
 #include <list>
-#include "objectPool.hpp"
+#include "system/objectPool.hpp"
 #include "sqlite3.h"
 
 #ifdef _WIN32

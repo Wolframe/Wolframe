@@ -5,7 +5,7 @@
 #ifndef _Wolframe_HANDLER_HPP_INCLUDED
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "handlerConfig.hpp"
 
 extern "C" {

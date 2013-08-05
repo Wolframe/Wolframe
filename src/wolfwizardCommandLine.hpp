@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "moduleDirectory.hpp"
+#include "processor/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/property_tree/ptree.hpp>
 

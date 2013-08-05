@@ -40,7 +40,7 @@
 #include "TextFileAuth.hpp"
 #include "types/sha2.h"
 #include "types/byte2hex.h"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;

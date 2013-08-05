@@ -37,10 +37,10 @@
 #include "connectionBase.hpp"
 #include "connection.hpp"
 #include "logger/logger-v1.hpp"
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 #ifdef WITH_SSL
-#include "SSLcertificateInfo.hpp"
+#include "system/SSLcertificateInfo.hpp"
 #endif
 
 #include <boost/bind.hpp>

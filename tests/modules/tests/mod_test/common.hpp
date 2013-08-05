@@ -34,7 +34,7 @@
 // common part which has to be known to Wolframe and the loadable module
 //
 
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {

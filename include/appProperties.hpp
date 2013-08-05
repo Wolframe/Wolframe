@@ -37,7 +37,7 @@
 #ifndef _APP_PROPERTIES_HPP_INCLUDED
 #define _APP_PROPERTIES_HPP_INCLUDED
 
-#include "version.hpp"
+#include "system/version.hpp"
 
 namespace _Wolframe	{
 

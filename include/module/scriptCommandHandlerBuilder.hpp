@@ -38,9 +38,9 @@ Project Wolframe.
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "logger/logger-v1.hpp"
-#include "moduleInterface.hpp"
+#include "processor/moduleInterface.hpp"
 #include "utils/fileUtils.hpp"
-#include "constructor.hpp"
+#include "module/constructor.hpp"
 #include <boost/type_traits.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/concept_check.hpp>

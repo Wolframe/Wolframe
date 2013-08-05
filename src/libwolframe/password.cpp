@@ -43,7 +43,7 @@
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "types/sha2.h"
-#include "globalRngGen.hpp"
+#include "system/globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>

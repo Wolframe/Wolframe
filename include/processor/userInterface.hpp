@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-// \file UserInterface.hpp
+// \file processor/userInterface.hpp
 ///
 
 #ifndef _USER_INTERFACE_HPP_INCLUDED
@@ -39,7 +39,7 @@
 
 #include <string>
 #include <list>
-#include "version.hpp"
+#include "system/version.hpp"
 
 namespace _Wolframe {
 namespace UI {

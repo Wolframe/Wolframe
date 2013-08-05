@@ -51,7 +51,7 @@
 #include <boost/asio/ssl/error.hpp>
 #endif // WITH_SSL
 
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 #include "logger/logger-v1.hpp"
 
 namespace _Wolframe {

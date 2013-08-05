@@ -42,17 +42,17 @@
 
 #include "appProperties.hpp"
 
-#include "version.hpp"
+#include "system/version.hpp"
 #include "wolframedCommandLine.hpp"
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
 #include "server.hpp"
-#include "ErrorCode.hpp"
+#include "system/errorCode.hpp"
 #include "logger/logger-v1.hpp"
 #include "appSingleton.hpp"
-#include "moduleDirectory.hpp"
+#include "processor/moduleDirectory.hpp"
 
-#include "connectionHandler.hpp"
+#include "system/connectionHandler.hpp"
 
 #include <libintl.h>
 #include <locale.h>

@@ -38,7 +38,7 @@
 #include <cassert>
 #include <boost/thread/thread.hpp>
 
-#include "objectPool.hpp"
+#include "system/objectPool.hpp"
 #include "gtest/gtest.h"
 
 class testObject	{
