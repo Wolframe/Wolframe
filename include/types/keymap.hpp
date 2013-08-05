@@ -67,12 +67,12 @@ struct keymap
 		:std::map<keystring,ValueType>(o){}
 	keymap( const std::map<std::string,ValueType>& o)
 	{
-		std::copy( o.begin(), o.end(), std::inserter( *this, Parent::end()));
+		std::copy( o.begin(), o.end(), std::inserter( *this, this->end()));
 	}
 
 	void insert( const keystring& key, const ValueType& value)
 	{
-		if (Parent::find( key) != Parent::end()) throw std::runtime_error( std::string( "duplicate definition of '") + key + "'");
+		if (Parent::find( key) != this->end()) throw std::runtime_error( std::string( "duplicate definition of '") + key + "'");
 		Parent::operator[](key) = value;
 	}
 
