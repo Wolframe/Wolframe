@@ -38,7 +38,7 @@
 #include <cstring>
 #include <ostream>
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "PAMAuth.hpp"
 
 namespace _Wolframe {

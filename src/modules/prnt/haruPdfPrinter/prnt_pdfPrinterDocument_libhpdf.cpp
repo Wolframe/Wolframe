@@ -34,7 +34,7 @@ Project Wolframe.
 #include "types/bcdArithmetic.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "hpdf.h"
 
 using namespace _Wolframe;

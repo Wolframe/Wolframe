@@ -36,7 +36,7 @@
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "DBauthz.hpp"
 
 namespace _Wolframe {

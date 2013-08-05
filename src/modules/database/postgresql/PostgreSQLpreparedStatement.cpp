@@ -35,7 +35,7 @@
 
 #include "PostgreSQLpreparedStatement.hpp"
 #include "PostgreSQL.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>

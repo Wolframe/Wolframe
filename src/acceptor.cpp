@@ -37,7 +37,7 @@
 #include "acceptor.hpp"
 #include "connection.hpp"
 #include "ErrorCode.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "utils/getPassword.hpp"
 
 #include <boost/thread.hpp>

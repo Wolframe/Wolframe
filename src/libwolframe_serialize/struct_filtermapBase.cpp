@@ -34,7 +34,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "filter/typingfilter.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <cstring>
 #include <stdexcept>
 

@@ -34,7 +34,7 @@
 ///\brief Module for libxml2 XML filters
 #include "module/filterBuilder.hpp"
 #include "libxml2_filter.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <cstring>
 
 _Wolframe::log::LogBackend* logBackendPtr;

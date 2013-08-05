@@ -34,7 +34,7 @@
 // file audit constructor
 //
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "TextFileAudit.hpp"
 
 namespace _Wolframe {

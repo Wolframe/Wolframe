@@ -40,7 +40,7 @@
 #include "utils/fileUtils.hpp"
 #include "wolframedCommandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
 

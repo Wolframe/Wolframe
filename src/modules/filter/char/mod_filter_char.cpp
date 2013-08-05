@@ -34,7 +34,7 @@
 ///\brief Module for char filters
 #include "module/filterBuilder.hpp"
 #include "char_filter.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <cstring>
 
 _Wolframe::log::LogBackend* logBackendPtr;

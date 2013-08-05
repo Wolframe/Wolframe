@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
 #define _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <stdexcept>
 #include <boost/type_traits.hpp>
 #include <boost/lexical_cast.hpp>

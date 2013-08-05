@@ -36,7 +36,7 @@ Project Wolframe.
 #include "types/variant.hpp"
 #include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>

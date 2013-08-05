@@ -34,7 +34,7 @@
 ///\brief Module for testing form functions
 #include "module/ddlcompilerBuilder.hpp"
 #include "simpleFormCompiler.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

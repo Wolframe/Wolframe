@@ -34,7 +34,7 @@
 // Database Authentification constructor
 //
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "DBauth.hpp"
 
 namespace _Wolframe {

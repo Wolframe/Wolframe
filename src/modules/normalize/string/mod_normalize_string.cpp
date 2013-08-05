@@ -33,7 +33,7 @@
 ///\file mod_normalize_string.cpp
 ///\brief Module for string normalization and validating functions without using ICU
 #include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "stringNormalize.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

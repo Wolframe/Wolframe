@@ -35,7 +35,7 @@
 #include "database/loadTransactionProgram.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
 
