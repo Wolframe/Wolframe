@@ -266,9 +266,7 @@ public:
 
 	std::vector<std::string> getFormNames() const
 	{
-		std::vector<std::string> rt;
-		m_formMap.getkeys( rt);
-		return rt;
+		return m_formMap.getkeys< std::vector<std::string> >();
 	}
 
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
