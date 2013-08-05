@@ -5,7 +5,7 @@
 // Postgresql to be installed with psql.exe (nmake and msdev build
 // only build libpq.dll)
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 
 // to make linking in this directory possible
 _Wolframe::log::LogBackend*	logBackendPtr;

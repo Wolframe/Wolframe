@@ -33,7 +33,7 @@
 ///\brief Implementation of processing prepared statements with sqlite3
 ///\file modules/database/sqlite3/SQLitePreparedStatement.cpp
 #include "SQLitePreparedStatement.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>

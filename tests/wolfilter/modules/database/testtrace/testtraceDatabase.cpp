@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/database/testtrace/testtraceDatabase.cpp
 ///\brief Fake database implementation for testing database processing engines
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
 #include "config/programBase.hpp"

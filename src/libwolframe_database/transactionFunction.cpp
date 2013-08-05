@@ -39,7 +39,7 @@
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 #include <iostream>

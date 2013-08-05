@@ -36,7 +36,7 @@
 
 #include "connectionBase.hpp"
 #include "connection.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "connectionHandler.hpp"
 
 #ifdef WITH_SSL

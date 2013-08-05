@@ -3,7 +3,7 @@
 //
 
 #include "luaHandler.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "SSLcertificateInfo.hpp"
 
 #include <string>

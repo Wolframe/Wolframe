@@ -33,7 +33,7 @@
 ///\file mod_lua_bcdnumber.cpp
 ///\brief Lua extension module for arbitrary precision bcd number arithmetic
 #include "module/luaExtensionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "luaBcdNumber.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

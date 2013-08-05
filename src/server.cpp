@@ -40,7 +40,7 @@
 
 #include "server.hpp"
 #include "acceptor.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "serverEndpoint.hpp"
 #include "connectionHandler.hpp"
 

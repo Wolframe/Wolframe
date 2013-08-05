@@ -34,7 +34,7 @@
 // paswword file manipulation tests
 //
 
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
 #include "globalRngGen.hpp"

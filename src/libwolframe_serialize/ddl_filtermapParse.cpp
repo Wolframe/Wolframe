@@ -35,7 +35,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 

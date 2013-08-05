@@ -35,7 +35,7 @@
 #include "cmdbind/contentBufferCommandHandlerEscDLF.hpp"
 #include "filter/outputfilter.hpp"
 #include "filter/inputfilter.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;

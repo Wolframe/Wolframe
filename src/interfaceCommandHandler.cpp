@@ -33,7 +33,7 @@
 ///\file interfaceCommandHandler.cpp
 #include "interfaceCommandHandler.hpp"
 #include "cmdbind/contentBufferCommandHandlerEscDLF.hpp"
-#include "logger-v1.hpp"
+#include "logger/logger-v1.hpp"
 #include "processor/procProvider.hpp"
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
