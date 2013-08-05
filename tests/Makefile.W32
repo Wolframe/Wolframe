@@ -131,8 +131,8 @@ TEST_CPP_BINS = \
 	testRand.exe \
 	testTimestamp.exe \
 	testWolfilter.exe \
-	testArrayDoublingAllocator.exe \
-	unitLibraryTest.exe
+	testArrayDoublingAllocator.exe
+#DISABLED (moved to .Attic) unitLibraryTest.exe
 
 #	stringNormalizationTest.exe \
 # DISABLED (only for memory corruption checks):	testTestAllocator.exe \
@@ -173,7 +173,7 @@ testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
 #stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe_functions\wolframe_functions.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
-unitLibraryTest.exe: unitLibraryTest.obj
+#DISABLED (moved to .Attic) unitLibraryTest.exe: unitLibraryTest.obj
 
 local_all:
 
@@ -214,7 +214,7 @@ local_test:
 	@-echo testVariantStruct >> test.bat
 	@-echo testWolfilter >> test.bat
 #	@-echo stringNormalizationTest >> test.bat
-	@-echo unitLibraryTest >> test.bat
+#DISABLED (moved to .Attic) 	@-echo unitLibraryTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 

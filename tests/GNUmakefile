@@ -160,8 +160,8 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
-	testWolfilter$(EXE) \
-	unitLibraryTest$(EXE)
+	testWolfilter$(EXE)
+# DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
@@ -260,7 +260,7 @@ ifeq ($(RUN_TESTS),1)
 #	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
+## DISABLED (moved to .Attic) @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
 	@echo
 	@echo
 endif
