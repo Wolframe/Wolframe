@@ -292,7 +292,7 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "' )";
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << types::Variant::typeName( value.type()) << " )";
 	}
 	else
 	{
@@ -346,6 +346,10 @@ bool PreparedStatementHandler_sqlite3::execute()
 	}
 	int rc = sqlite3_step( m_stm);
 	m_hasResult = (rc == SQLITE_ROW);
+	if (!m_hasResult )
+	{
+		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( m_conn) << ")";
+	}
 	return status( rc, Executed);
 }
 
