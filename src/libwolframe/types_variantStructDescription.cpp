@@ -407,6 +407,12 @@ std::string VariantStructDescription::names( const std::string& sep) const
 	return rt;
 }
 
+static void print_newitem( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level)
+{
+	out << newitem;
+	for (std::size_t ll=0; ll<level; ++ll) out << indent;
+}
+
 void VariantStructDescription::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
 {
 	static Variant default_bool( Variant::bool_);
@@ -418,8 +424,7 @@ void VariantStructDescription::print( std::ostream& out, const std::string& inde
 	const_iterator di = begin(), de = end();
 	for (; di!=de; ++di)
 	{
-		out << newitem;
-		for (std::size_t ll=0; ll<level; ++ll) out << indent;
+		print_newitem( out, indent, newitem, level);
 
 		if (di->substruct)
 		{
@@ -430,8 +435,7 @@ void VariantStructDescription::print( std::ostream& out, const std::string& inde
 			if (di->mandatory()) out << "!";
 			out << "{";
 			di->substruct->print( out, indent, newitem, level+1);
-			out << newitem;
-			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			print_newitem( out, indent, newitem, level);
 			out << "}";
 		}
 		else if (di->initvalue)

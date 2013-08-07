@@ -586,6 +586,12 @@ int VariantStruct::iterator::compare( const iterator& o) const
 	return 0;
 }
 
+static void print_newitem( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level)
+{
+	out << newitem;
+	for (std::size_t ll=0; ll<level; ++ll) out << indent;
+}
+
 void VariantStruct::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
 {
 	Type tt = type();
@@ -596,14 +602,12 @@ void VariantStruct::print( std::ostream& out, const std::string& indent, const s
 		for (; ii<nn; ++ii)
 		{
 			if (ii>0) out << ';';
-			out << newitem;
-			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			print_newitem( out, indent, newitem, level);
 			((VariantStruct*)m_data.value.ref_ + 1 + ii)->print( out, indent, newitem, level+1);
 		}
 		if (nn>0)
 		{
-			out << newitem;
-			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			print_newitem( out, indent, newitem, level);
 		}
 		out << '}';
 	}
@@ -616,8 +620,7 @@ void VariantStruct::print( std::ostream& out, const std::string& indent, const s
 		for (int idx=0; ii!=ee; ++ii,++di,++idx)
 		{
 			if (idx) out << "; ";
-			out << newitem;
-			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			print_newitem( out, indent, newitem, level);
 
 			out << di->name << '=';
 			ii->print( out, indent, newitem, level+1);

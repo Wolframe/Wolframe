@@ -229,7 +229,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				{
 					const char* xmlroot = m_outputform->description()->xmlRoot();
 					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
-
+					substructure->setInitialized();
 					serialize::DDLStructParser formparser( substructure);
 					formparser.init( m_functionclosure->result(), serialize::Context::None);
 					if (!formparser.call())
