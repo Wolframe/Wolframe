@@ -237,7 +237,7 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 {
 	if (value)
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << types::Variant::typeName( value.type()) << " )";
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "' )";
 	}
 	else
 	{
