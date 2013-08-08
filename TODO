@@ -1,58 +1,3 @@
-MBa:
-
-
-ABa:
-- Qt frontend
-  - qtclient cont.
-  - configurator
-    - categories + features, trees with add/delete/edit
-    - image picker
-    - associatiting features and categories
-    - see separate list in clients/qt/TODOS
-    
-- makefiles
-  - fix libchrono transitive dependency in boost in 1.50/1.51
-  - error checking after dependency generation, avoid funny mistakes
-
-- polish deployment
-  - Ubuntu/Debian:
-    - /etc/init/*.conf file for upstart missing
-    - init scripts don't work
-    - bad installed configuration (from src, take the one from redhat)
-  - template configuration wolframed.conf for all platforms, different
-    layouts at least for:
-    - ArchLinux: all in one, annotated, KISS
-    - Debian: includes and split
-    - Redhat: includes and split, other pathes than Debian
-  - local deployed boost libaries (1.48) for Debian and old Ubuntu have
-    to be bundled with wolframe-libclient too. They must be in a common
-    dependency like 'wolframe-boost-rt'
-    (the alternative of installing the OSC versions of boost libraries
-    is also an option)
-  - /usr/lib/x86_64-linux-gnu is a possible module loading place,
-    so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
-    process and to module loading code 
-  - wolframe depends on libicu48, this is wrong as boost-localization
-    should layer the functionality and icu is only a backend
-    (this is due to mistakes in debhelper shlibs detection on Debian/Ubuntu
-    only)
-  - use simple include for per-sub-package snippets for now till
-    we get a glob-include in configuration files,
-    apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
-    and 'include wolframe.d/*.conf'
-  - test module default dir, make 'directory' override the #ifdef-ed one,
-    test everywhere
-    also, don't give up after one guess, try to combine the package root (optional)
-    and then the server root (the location of the configuration)
-  - avoid building of things like mod_test in tests directory if not building
-    the tests (they are not deployed):
-    - split rules for building loadable modules and test loadable modules (mod_test)
-    - build TEST_XXX only if 'make test' is given, not in 'make all'
-  
-- documentation
-  - man pages
-
-
 PF:
 - high prio
   - Counter to check for loop forever in all filter STMs
@@ -71,6 +16,7 @@ PF:
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
   - .NET call
-  - The print form configuration can have an xslt script for preprocessing
+  - Printing with HPDF
+    - The print form configuration can have an xslt script for preprocessing
 
 
