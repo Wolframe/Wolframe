@@ -1,0 +1,12 @@
+tinypy: minimal interpreter, lua-like, but uses broken python scripts
+for code generation and compilation, lovely :-)
+=> ideas were integrated in Python 3 (reference: Mihai)
+
+http://wiki.python.org/moin/Tiny%20Python
+
+JIT support, pypy py3 branch
+
+easy module writting, ok, the question is, do we need it, but if:
+
+Boost.Python
+PyCXX
