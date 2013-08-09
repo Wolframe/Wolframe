@@ -19,7 +19,8 @@ make check-po           check sanity of gettext files
 Available optional features:
 
 WITH_SSL=1              use OpenSSL additionally for communication encryption
-WITH_LUA=1              build code using the Lua interpreter
+WITH_LUA=1              build bindings and modules for the Lua interpreter
+WITH_PYTHON=1           build bindings and modules for Python
 WITH_SASL=1             build authentication code with Cyrus SASL2
 WITH_PAM=1              build authentication code with PAM
 WITH_SYSTEM_SQLITE3=1   build AAAA and DB connectors for Sqlite3 (from system) 
@@ -48,7 +49,8 @@ WITH_EXPECT=1           use Expect/Tcl for system testing
 Example:
 make WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
      WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_SYSTEM_FREEIMAGE=1
+     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_SYSTEM_FREEIMAGE=1 \
+     WITH_PYTHON=1
 
 To build the documentation call:
 
