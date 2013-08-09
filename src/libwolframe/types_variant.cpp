@@ -15,7 +15,7 @@ void Variant::init()
 
 void Variant::release()
 {
-	if (m_type == string_ && m_data.value.string_)
+	if (type() == string_ && m_data.value.string_)
 	{
 		std::free( m_data.value.string_);
 	}
@@ -34,9 +34,10 @@ void Variant::initstring( const char* str_, std::size_t strsize_)
 
 void Variant::initcopy( Variant& dest, const Variant& orig)
 {
-	if (orig.m_type == string_)
+	if (orig.type() == string_)
 	{
 		dest.initstring( orig.m_data.value.string_, orig.m_data.dim.size);
+		dest.setInitialized( orig.initialized());
 	}
 	else
 	{
@@ -115,17 +116,19 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 
 int Variant::compare( const Variant& o) const
 {
-	if (m_type == o.m_type)
+	Type tt = type();
+	Type ot = o.type();
+	if (tt == ot)
 	{
-		return compare_type( m_type, m_data, o.m_data);
+		return compare_type( tt, m_data, o.m_data);
 	}
-	if ((int)m_type > (int)o.m_type)
+	if ((int)tt > (int)ot)
 	{
 		return -o.compare( *this);
 	}
 	try
 	{
-		switch (m_type)
+		switch (tt)
 		{
 			case Variant::double_:
 				return compare_double( variant_cast<double>( o), m_data.value.double_);

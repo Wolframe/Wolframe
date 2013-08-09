@@ -8,14 +8,14 @@ Links:
 
 How to use the repos:
 
-# Add to /etc/apt/sources.list
-deb http://download.opensuse.org/repositories/home:/andreas_baumann/xUbuntu_11.04 ./
+# Add to /etc/apt/sources.list (at the end!):
+deb http://download.opensuse.org/repositories/home:/andreas_baumann/xUbuntu_12.04 ./
 
 # get repmod key (Ubuntu have no keys!?)
-wget 'http://download.opensuse.org/repositories/home:/andreas_baumann/CentOS_CentOS-5/repodata/repomd.xml.key
-apt-key add repomd.xml.key
+wget -O obs-home:abaumann.pkey 'http://download.opensuse.org/repositories/home:/andreas_baumann/CentOS_CentOS-5/repodata/repomd.xml.key
+apt-key add obs-home:abaumann.pkey
 
-# add libboost1.48-dev
+# add libboost1.48-dev (only for Ubuntu 10.04 and Debian 6.0!)
 apt-get install libboost1.48-dev libboost-thread1.48-dev libboost-system1.48-dev libboost-program-options1.48-dev libboost-filesystem1.48-dev
 
 # add BOOST_DIR=/usr to the make in Wolframe
@@ -23,10 +23,7 @@ apt-get install libboost1.48-dev libboost-thread1.48-dev libboost-system1.48-dev
 How to build locally:
 
 # install osc and build (and all dependencies)
-osc build xUbuntu_11.04 i586 wolframe.dsc
-abort, use getlocal.pl on the .osc/_buildinfo* file, copy it back
-prepare the /var/tmp/osbuild-packagecache package cache (from CDs,
-mirrors, etc., Xubuntu version loads them directly from the mirrors))
+osc build xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 # careful:
 - local builds need perl-dom-xml and binutis (ar!)
 
@@ -34,9 +31,9 @@ mirrors, etc., Xubuntu version loads them directly from the mirrors))
 
 # local build with ccache
 cd home:andreas_baumann/Wolframe
-osc build --ccache wolframe.spec
+osc build --noinit --ccache xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 
-# boost backport
+# boost backport (for xUbuntu 10.04 and Debian 6.0)
 - debhelper is older on OSC ((>= 4.1.16))
 - no mpi, remove all stuff we don't need to build
 - debian/rules:

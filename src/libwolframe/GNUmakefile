@@ -54,6 +54,7 @@ ADT_OBJS = \
 	types_dateArithmetic.o \
 	types_doctype.o \
 	types_variant.o \
+	types_variantStructDescription.o \
 	types_variantStruct.o
 
 CPP_OBJS = \

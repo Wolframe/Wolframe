@@ -53,8 +53,10 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			    bool foreignKeys, bool profiling,
 			    unsigned short connections,
-			    const std::list<std::string>& programFiles_)
-	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_)
+			    const std::list<std::string>& programFiles_,
+			    const std::list<std::string>& extensionFiles_)
+	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_),
+	m_extensionFiles(extensionFiles_)
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
@@ -120,6 +122,34 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			if ( profiling )
 				sqlite3_profile( handle, profiling_callback, NULL );
 
+			// enable extensions in every connection
+			std::list<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
+			for( ; it != end; it++ ) {
+				MOD_LOG_DEBUG << "Loading extension '" << *it << "' for SQLite database unit '" << m_ID << "'";
+				// No extension file, do nothing
+				if( (*it).empty( ) ) continue;
+				
+				if( !boost::filesystem::exists( (*it) ) ) {
+					MOD_LOG_ALERT << "Extension file '" << (*it) << "' does not exist (SQLite database '" << m_ID << "')";
+					continue;
+				}
+
+				// turn loading of extensions on, we expect the administrator to know
+				// what he is doing if he puts an 'extension' directive in the code
+				sqlite3_enable_load_extension( handle, 1 );
+				
+				char *errmsg;
+				int rc = sqlite3_load_extension( handle, (*it).c_str( ), 0, &errmsg );
+				if( rc != SQLITE_OK ) {
+					MOD_LOG_ALERT << "Unable to load SQLite extension '" << (*it)
+						      << "': " << errmsg;
+					sqlite3_free( errmsg );
+					// Aba, TOOD: throw here?
+					continue;
+				}
+			}
+			MOD_LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
+			
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
@@ -166,7 +196,7 @@ void SQLiteDBunit::loadAllPrograms()
 	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
-		MOD_LOG_DEBUG << "Load Program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
+		MOD_LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
 		loadProgram( *pi);
 	}
 	MOD_LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";

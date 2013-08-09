@@ -94,6 +94,11 @@ public:
 			switch (st)
 			{
 				case ParseStart:
+					if (*ii == '^')
+					{
+						// parse over ignored new construct '^' for indirection
+						continue;
+					}
 					if (*ii == '@')
 					{
 						if (m_isAttribute) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '@'");

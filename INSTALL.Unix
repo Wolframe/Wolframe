@@ -15,6 +15,7 @@ Table of Contents
     RHEL/Centos/SL 6
     Fedora 17
     Fedora 18
+    Fedora 19
     Ubuntu 10.04.1 LTS
     Ubuntu 11.04
     Ubuntu 12.04 LTS
@@ -209,6 +210,44 @@ Optional packages: openssl-devel (1.0.1c)
                    pam-devel (1.1.6), cyrus-sasl-devel (2.1.23),
                    sqlite-devel (3.7.13), postgresql-devel (9.2.3),
                    libxml2-devel (2.9.0), libxslt-devel (1.1.27),
+                   libpng-devel (1.5.13), zlib-devel (1.2.7),
+                   libharu-devel (2.2.1)
+
+Use WITH_SYSTEM_LIBHPDF=1 for PDF support. Install libharu-devel (2.2.1) in
+this case.
+
+Use WITH_LOCAL_FREEIMAGE=1 for image manipulation support. The supplied
+version of freeimage-devel is too old.
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect' (5.45).
+
+For running some tests you need 'telnet' (0.17).
+
+For running the Postgresql tests you need a fully function 'postgresql-server'
+with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
+'wolframe'.
+
+postgresql-setup initdb
+systemctl start postgresql.service
+systemctl enable postgresql.service
+ 
+change auth method from 'ident' to 'md5' in pg_hba.conf
+
+Fedora 19
+---------
+
+No problems with the supplied packages at all, everything builds out of the box:
+
+Required pacakges: boost-devel (1.53.0)
+Optional packages: openssl-devel (1.0.1e)
+                   pam-devel (1.1.6), cyrus-sasl-devel (2.1.26),
+                   sqlite-devel (3.7.17), postgresql-devel (9.2.4),
+                   libxml2-devel (2.9.1), libxslt-devel (1.1.28),
                    libpng-devel (1.5.13), zlib-devel (1.2.7),
                    libharu-devel (2.2.1)
 
@@ -622,7 +661,7 @@ FreeBSD 9.1
 -----------
 
 Required packages: boost-libs (1.48.0)
-Optional packages: cyrus-sasl (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
+Optional packages: cyrus-sasl2 (2.1.25_1), sqlite3 (3.7.9), postgresql92-client (9.1.2),
                    libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
                    zlib (1.1.0), icu (4.8.1.1)
 
@@ -639,6 +678,8 @@ You need 'gmake' (3.82).
 So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For testing postgresql you also need 'postgresql92-server'.
 
 Solaris 10
 ----------

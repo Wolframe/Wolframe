@@ -72,6 +72,7 @@ END
 
 TRANSACTION DeleteCustomer
 BEGIN
+	DO DELETE FROM CustomerPicture WHERE customerid=$(id);
 	DO DELETE FROM Customer WHERE id=$(id);
 END
 

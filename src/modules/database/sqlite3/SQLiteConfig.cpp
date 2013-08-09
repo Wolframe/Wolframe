@@ -96,6 +96,14 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				m_programFiles.push_back( programFile );
 			}
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "extension" ))	{
+			std::string extensionFile;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, extensionFile ))
+				retVal = false;
+			else	{
+				m_extensionFiles.push_back( extensionFile );
+			}
+		}
 		else	{
 			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					<< L1it->first << "'";

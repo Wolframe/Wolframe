@@ -348,7 +348,7 @@ public:
 		{
 			if (m_itr != m_struct->m_ar.end())
 			{
-				m_content.value = (m_itr->type() == ResultElement::Value)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
+				m_content.value = (m_itr->type() != ResultElement::OpenTag)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
 				m_content.idx = m_itr->idx();
 				m_content.type = m_itr->type();
 			}
@@ -433,7 +433,18 @@ public:
 		const_iterator ri = begin(), re = end();
 		for (; ri != re; ++ri)
 		{
-			rt << ResultElement::typeName(ri->type) << " " << ri->idx<< " '" << (ri->value?ri->value:"") << "'" << std::endl;
+			if (ri->type == ResultElement::OpenTag)
+			{
+				rt << ResultElement::typeName(ri->type) << " '" << (ri->value?ri->value:"") << "'; ";
+			}
+			else if (ri->type == ResultElement::CloseTag)
+			{
+				rt << ResultElement::typeName(ri->type) << "; ";
+			}
+			else
+			{
+				rt << ResultElement::typeName(ri->type) << " " << ri->idx<< "; ";
+			}
 		}
 		return rt.str();
 	}
@@ -1111,6 +1122,7 @@ struct TransactionFunctionOutput::Impl
 	int m_colidx;
 	int m_colend;
 	bool m_endofoutput;
+	bool m_started;
 	ResultStructR m_resultstruct;
 	ResultStruct::const_iterator m_structitr;
 	ResultStruct::const_iterator m_structend;
@@ -1137,6 +1149,7 @@ struct TransactionFunctionOutput::Impl
 		,m_colidx(o.m_colidx)
 		,m_colend(o.m_colend)
 		,m_endofoutput(o.m_endofoutput)
+		,m_started(o.m_started)
 		,m_resultstruct(o.m_resultstruct)
 		,m_structitr(o.m_structitr)
 		,m_structend(o.m_structend)
@@ -1154,6 +1167,7 @@ struct TransactionFunctionOutput::Impl
 		m_colidx = 0;
 		m_colend = 0;
 		m_endofoutput = false;
+		m_started = false;
 		m_structitr = m_resultstruct->begin();
 		m_structend = m_resultstruct->end();
 		m_stack.clear();
@@ -1163,6 +1177,11 @@ struct TransactionFunctionOutput::Impl
 
 	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
 	{
+		if (!m_started)
+		{
+			LOG_DATA << "[transaction result structure] " << m_resultstruct->tostring();
+			m_started = true;
+		}
 		while (m_structitr != m_structend)
 		{
 			if (!doSerializeWithIndices)
@@ -1193,13 +1212,7 @@ struct TransactionFunctionOutput::Impl
 					continue;
 
 				case ResultElement::FunctionStart:
-					if (m_resitr == m_resend
-						/*PF:NOTE: Results of OPERATIONs
-						where ignored in final
-						result (I forgot why). I
-						reenabled them again:
-					||  m_resitr->functionidx() > m_structitr->idx*/
-					)
+					if (m_resitr == m_resend || m_resitr->functionidx() > m_structitr->idx)
 					{
 						for (++m_structitr; m_structitr != m_structend && m_structitr->type != ResultElement::FunctionEnd; ++m_structitr);
 						if (m_structitr == m_structend) throw std::logic_error("illegal stack in transaction result iterator");
@@ -1255,10 +1268,25 @@ struct TransactionFunctionOutput::Impl
 					continue;
 
 				case ResultElement::OperationEnd:
+					if (m_stack.back().m_type != m_structitr->type)
+					{
+						throw std::logic_error( "illegal state in transaction result construction (OperationEnd)");
+					}
+					if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+					{
+						m_structitr = m_stack.back().m_structitr;
+					}
+					else
+					{
+						m_stack.pop_back();
+					}
+					++m_structitr;
+					continue;
+
 				case ResultElement::FunctionEnd:
 					if (m_stack.back().m_type != m_structitr->type)
 					{
-						throw std::logic_error( "illegal state in transaction result construction");
+						throw std::logic_error( "illegal state in transaction result construction (FunctionEnd)");
 					}
 					if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
 					{
@@ -1430,15 +1458,16 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				FunctionCall cc( di->outputs, di->call.first, selector, param, di->nonempty, di->unique, 1, di->hints);
 				if (!di->outputs.empty())
 				{
-// this is just the wrapping structure, iteration is only done with the last tag (othwerwise
-// we get into definition problems :-))					
+					// this is just the wrapping structure, iteration is only done with the last tag (othwerwise
+					// we get into definition problems)
 					bool hasOutput = (di->outputs.size() > 1 || (di->outputs.size() == 1 && di->outputs[0] != "."));
-					for( std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++ ) {
+					for (std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++)
+					{
 						m_resultstruct->openTag( di->outputs[i] );
 					}
 					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
 					if (hasOutput) {
-						m_resultstruct->openTag( di->outputs[di->outputs.size()-1] );
+						m_resultstruct->openTag( di->outputs[di->outputs.size()-1]);
 					}
 					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
 					m_resultstruct->addValueReference( m_call.size());
@@ -1447,7 +1476,8 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 						m_resultstruct->closeTag( );
 					}
 					m_resultstruct->addMark( ResultElement::FunctionEnd, m_call.size());
-					for( std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++ ) {
+					for (std::vector<std::string>::size_type i = 0; i < di->outputs.size()-1; i++)
+					{
 						m_resultstruct->closeTag( );
 					}
 				}
@@ -1474,16 +1504,20 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 					m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
 
 					bool hasOutput = (di->outputs.size() > 1 || (di->outputs.size() == 1 && di->outputs[0] != "."));
-					if (hasOutput) {
+					if (hasOutput)
+					{
 						std::vector<std::string>::const_iterator it;
-						std::vector<std::string>::const_iterator end = di->outputs.end( );
-						for( it = di->outputs.begin( ); it != end; it++ ) {
+						std::vector<std::string>::const_iterator end = di->outputs.end();
+						for (it = di->outputs.begin( ); it != end; it++)
+						{
 							m_resultstruct->openTag( *it );
 						}
 					}
-					m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size());
-					if (hasOutput) {
-						for( std::vector<std::string>::size_type i = 0; i < di->outputs.size(); i++ ) {
+					m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
+					if (hasOutput)
+					{
+						for (std::vector<std::string>::size_type i = 0; i < di->outputs.size(); i++)
+						{
 							m_resultstruct->closeTag();
 						}
 					}
@@ -1499,9 +1533,9 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
 					for (; fai != fae; ++fai) fai->rewrite( rwtab);
-					std::vector<std::string> l;
-					l.push_back( resultname );
-					FunctionCall cc( l, fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
+					std::vector<std::string> rl;
+					rl.push_back( resultname );
+					FunctionCall cc( rl, fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
 				}
 				if (!di->outputs.empty() && !di->outputs[0].empty( ) )

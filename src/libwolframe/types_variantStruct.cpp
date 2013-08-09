@@ -1,124 +1,60 @@
 #include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include <limits>
 #include <stdexcept>
 #include <cstdlib>
+#include <sstream>
+#include <stdint.h>	//... for uintptr_t
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-StructDescription::StructDescription()
-		:m_size(0),m_namear(0),m_initvaluear(0){}
-
-StructDescription::StructDescription( const StructDescription& o)
-	:m_size(o.m_size),m_namear(0),m_initvaluear(0)
-{
-	std::size_t ii=0;
-	m_namear = (char**)std::calloc( m_size, sizeof(char*));
-	m_initvaluear = (VariantStruct**)std::calloc( m_size, sizeof(VariantStruct*));
-	if (!m_namear || !m_initvaluear) goto BAD_ALLOC;
-	for (; ii<m_size; ++ii)
-	{
-		m_namear[ ii] = (char*)std::malloc( std::strlen( o.m_namear[ ii])+1);
-		if (!m_namear[ ii]) goto BAD_ALLOC;
-		std::strcpy( m_namear[ ii], o.m_namear[ ii]);
-		try
-		{
-			m_initvaluear[ ii] = new VariantStruct( *o.m_initvaluear[ ii]);
-		}
-		catch (const std::bad_alloc&)
-		{
-			goto BAD_ALLOC;
-		}
-	}
-	BAD_ALLOC:
-		if (m_namear)
-		{
-			for (; ii>0; --ii) std::free( m_namear[ ii-1]);
-			std::free( m_namear);
-		}
-		if (m_initvaluear)
-		{
-			for (; ii>0; --ii) delete m_initvaluear[ ii-1];
-			std::free( m_initvaluear);
-		}
-		throw std::bad_alloc();
-}
-
-void StructDescription::add( const char* name, const VariantStruct& initvalue)
-{
-	if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
-	char** ptr = (char**)std::realloc( m_namear, m_size+1);
-	VariantStruct** valar = (VariantStruct**)std::realloc( m_initvaluear, m_size+1);
-	if (!ptr || !valar) throw std::bad_alloc();
-	m_namear = ptr;
-	m_namear[ m_size] = (char*)std::malloc( std::strlen( name)+1);
-	if (!m_namear[ m_size]) throw std::bad_alloc();
-	std::strcpy( m_namear[ m_size], name);
-	try
-	{
-		m_initvaluear[ m_size] = new VariantStruct( initvalue);
-	}
-	catch (const std::bad_alloc& e)
-	{
-		free( m_namear[ m_size]);
-		throw e;
-	}
-	m_size++;
-}
-
-int StructDescription::find( const char* name)
-{
-	std::size_t ii = 0;
-	for (; ii<m_size; ++ii) if (std::strcmp( name, m_namear[ii]) == 0) return (int)ii;
-	return -1;
-}
-
-int StructDescription::const_iterator::compare( const const_iterator& o) const
-{
-	int oidx = (o.m_visited && o.m_idx < o.m_visited->size())?o.m_idx:std::numeric_limits<int>::max();
-	int tidx = (m_visited && m_idx < m_visited->size())?m_idx:std::numeric_limits<int>::max();
-	return tidx - oidx;
-}
-
-void StructDescription::const_iterator::increment()
-{
-	if (m_idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::logic_error("array bound read");
-	++m_idx;
-}
-
 VariantStruct VariantStruct::array() const
 {
-	VariantStruct* prototype = (VariantStruct*)std::malloc( sizeof( VariantStruct));
-	if (!prototype) throw std::bad_alloc();
+	VariantStruct* prototype_ = (VariantStruct*)std::malloc( sizeof( VariantStruct));
+	if (!prototype_) throw std::bad_alloc();
 	try
 	{
-		VariantStruct::initcopy( *prototype, *this);
+		VariantStruct::initcopy( *prototype_, *this);
 	}
 	catch (const std::bad_alloc& e)
 	{
-		std::free( prototype);
+		std::free( prototype_);
 		throw e;
 	}
 	VariantStruct rt;
 	rt.setType( array_);
 	rt.m_data.dim.size = 0;
-	rt.m_data.value.ref_ = prototype;
+	rt.m_data.value.ref_ = prototype_;
 	return rt;
 }
 
-void VariantStruct::initstruct( const StructDescription* descr)
+void VariantStruct::initindirection( const VariantStructDescription* descr)
+{
+	setType( indirection_);
+	m_data.dim.metadata = (const void*)descr;
+	m_data.value.ref_ = 0;
+}
+
+void VariantStruct::expandIndirection()
+{
+	if (type() != indirection_) return;
+	initstruct( description());
+}
+
+void VariantStruct::initstruct( const VariantStructDescription* descr)
 {
 	setType( struct_);
 	m_data.dim.metadata = (const void*)descr;
 	m_data.value.ref_ = (VariantStruct*)std::malloc( descr->size() * sizeof( *this));
 	if (!m_data.value.ref_) throw std::bad_alloc();
-	StructDescription::const_iterator si = descr->begin(), se = descr->end();
+	VariantStructDescription::const_iterator si = descr->begin(), se = descr->end();
 	std::size_t idx=0;
 	try
 	{
 		for (; si!=se; ++si,++idx)
 		{
-			VariantStruct::initcopy( ((VariantStruct*)m_data.value.ref_)[idx], *si->prototype());
+			VariantStruct::initcopy( ((VariantStruct*)m_data.value.ref_)[idx], *si->initvalue);
 		}
 	}
 	catch (const std::bad_alloc& e)
@@ -141,6 +77,7 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 		case VariantStruct::string_:
 			Variant::initcopy( dest, orig);
 			break;
+
 		case VariantStruct::struct_:
 			dest.init();
 			dest.setType( struct_);
@@ -162,11 +99,12 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 				throw e;
 			}
 			break;
+
 		case VariantStruct::array_:
 			dest.init();
 			dest.setType( array_);
 			dest.m_data.dim.size = orig.m_data.dim.size;
-			dest.m_data.value.ref_ = std::malloc( (orig.m_data.dim.size+1) + sizeof( VariantStruct));
+			dest.m_data.value.ref_ = std::malloc( (orig.m_data.dim.size+1) * sizeof( VariantStruct));
 			if (!dest.m_data.value.ref_) throw std::bad_alloc();
 			ii=0; nn=orig.data().dim.size+1;
 			try
@@ -182,13 +120,47 @@ void VariantStruct::initcopy( VariantStruct& dest, const VariantStruct& orig)
 				std::free( dest.m_data.value.ref_);
 				throw e;
 			}
+			break;
+
+		case VariantStruct::indirection_:
+			dest.init();
+			dest.setType( indirection_);
+			dest.m_data.dim.metadata = orig.m_data.dim.metadata;
+			break;
 	}
+}
+
+void VariantStruct::push()
+{
+	if ((Type)type() != VariantStruct::array_) throw std::logic_error("illegal operation push on non array");
+	void* ref_ = std::realloc( m_data.value.ref_, (m_data.dim.size+2) * sizeof( VariantStruct));
+	if (!ref_) throw std::bad_alloc();
+	m_data.value.ref_ = ref_;
+	std::size_t idx = m_data.dim.size;
+
+	VariantStruct::initcopy( ((VariantStruct*)m_data.value.ref_)[ idx], ((VariantStruct*)m_data.value.ref_)[ 0]);
+	//... copy prototype as value of the new element pushed
+	++m_data.dim.size;
+}
+
+const VariantStruct& VariantStruct::back() const
+{
+	if ((Type)type() != VariantStruct::array_) throw std::logic_error("illegal operation push on non array");
+	if (!m_data.dim.size) throw std::runtime_error( "array bound read");
+	return ((VariantStruct*)m_data.value.ref_)[ m_data.dim.size];
+}
+
+VariantStruct& VariantStruct::back()
+{
+	if ((Type)type() != VariantStruct::array_) throw std::logic_error("illegal operation push on non array");
+	if (!m_data.dim.size) throw std::runtime_error( "array bound write");
+	return ((VariantStruct*)m_data.value.ref_)[ m_data.dim.size];
 }
 
 void VariantStruct::release()
 {
 	std::size_t ii, nn;
-	switch ((Type)m_type)
+	switch ((Type)type())
 	{
 		case VariantStruct::bool_:
 		case VariantStruct::double_:
@@ -197,6 +169,7 @@ void VariantStruct::release()
 		case VariantStruct::string_:
 			Variant::release();
 			break;
+
 		case VariantStruct::struct_:
 			ii=0; nn=description()->size();
 			for (; ii<nn; ++ii)
@@ -205,6 +178,7 @@ void VariantStruct::release()
 			}
 			std::free( m_data.value.ref_);
 			break;
+
 		case VariantStruct::array_:
 			ii=0; nn=m_data.dim.size+1;
 			for (; ii<nn; ++ii)
@@ -212,6 +186,9 @@ void VariantStruct::release()
 				((VariantStruct*)m_data.value.ref_)[ ii].release();
 			}
 			std::free( m_data.value.ref_);
+			break;
+
+		case VariantStruct::indirection_:
 			break;
 	}
 }
@@ -229,9 +206,11 @@ int VariantStruct::compare_array( std::size_t size, const VariantStruct* a1, con
 
 int VariantStruct::compare( const VariantStruct& o) const
 {
-	if ((Type)m_type == array_)
+	Type tt = type();
+	Type ot = o.type();
+	if (tt == array_)
 	{
-		if ((Type)o.m_type != array_) return -2;
+		if (o.type() != array_) return -2;
 		if (m_data.dim.size != o.m_data.dim.size)
 		{
 			return (int)(m_data.dim.size >= o.m_data.dim.size) + (int)(m_data.dim.size > o.m_data.dim.size) -1;
@@ -239,55 +218,184 @@ int VariantStruct::compare( const VariantStruct& o) const
 		return compare_array( m_data.dim.size, (const VariantStruct*)m_data.value.ref_ + 1, (const VariantStruct*)o.m_data.value.ref_ + 1);
 		//... ref +1, because prototype is not compared
 	}
-	else if ((Type)m_type == struct_)
+	else if (tt == struct_)
 	{
-		if ((Type)o.m_type != struct_) return -2;
+		if (o.type() != struct_) return -2;
 		int size1 = (int)(description()->size());
 		int size2 = (int)(o.description()->size());
 		if (size1 != size2) return size1 - size2;
 		return compare_array( size1, (const VariantStruct*)m_data.value.ref_, (const VariantStruct*)o.m_data.value.ref_);
 	}
-	else if ((Type)o.m_type == array_ || (Type)o.m_type == struct_)
+	else if (tt == indirection_)
 	{
-		return -2;
+		if (o.type() != indirection_) return -2;
+		const VariantStructDescription* dd = description();
+		const VariantStructDescription* od = o.description();
+		if (!dd) return 1;
+		if (!od) return -2;
+		return dd->compare( *od);
+	}
+	else if (ot == array_ || ot == struct_ || ot == indirection_)
+	{
+		return +2;
 	}
 	return Variant::compare( o);
 }
 
-const VariantStruct& VariantStruct::operator[]( std::size_t idx) const
+const VariantStruct* VariantStruct::at( std::size_t idx) const
 {
-	if ((Type)m_type == array_)
+	Type tt = type();
+	if (tt == array_)
 	{
 		if (idx >= m_data.dim.size) throw std::logic_error( "array bound read");
-		return *((const VariantStruct*)m_data.value.ref_ + 1 + idx);
+		return ((const VariantStruct*)m_data.value.ref_ + 1 + idx);
 	}
-	else if ((Type)m_type == struct_)
+	else if (tt == struct_)
 	{
 		if (idx >= description()->size()) throw std::logic_error( "array bound read");
-		return *((const VariantStruct*)m_data.value.ref_ + idx);
+		return ((const VariantStruct*)m_data.value.ref_ + idx);
 	}
 	else
 	{
-		throw std::logic_error( "random access not supported for atomic types");
+		return 0;
 	}
+}
+
+VariantStruct* VariantStruct::at( std::size_t idx)
+{
+	Type tt = type();
+	if (tt == array_)
+	{
+		if (idx >= m_data.dim.size) throw std::logic_error( "array bound read");
+		return ((VariantStruct*)m_data.value.ref_ + 1 + idx);
+	}
+	else if (tt == struct_)
+	{
+		if (idx >= description()->size()) throw std::logic_error( "array bound read");
+		return ((VariantStruct*)m_data.value.ref_ + idx);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+const VariantStruct& VariantStruct::operator[]( std::size_t idx) const
+{
+	const VariantStruct* rt = at( idx);
+	if (!rt)
+	{
+		throw std::logic_error( std::string("random access not supported for type ") + Variant::typeName( (Variant::Type)rt->type()));
+	}
+	return *rt;
 }
 
 VariantStruct& VariantStruct::operator[]( std::size_t idx)
 {
-	if ((Type)m_type == array_)
+	VariantStruct* rt = at( idx);
+	if (!rt)
 	{
-		if (idx >= m_data.dim.size) throw std::logic_error( "array bound read");
-		return *((VariantStruct*)m_data.value.ref_ + 1 + idx);
+		throw std::logic_error( std::string("random access not supported for type ") + Variant::typeName( (Variant::Type)rt->type()));
 	}
-	else if ((Type)m_type == struct_)
+	return *rt;
+}
+
+VariantStruct::const_iterator VariantStruct::find( const std::string& name_) const
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return const_iterator();
+	int findidx_ = descr->findidx( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::const_iterator( at( findidx_));
+}
+
+VariantStruct::iterator VariantStruct::find( const std::string& name_)
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return iterator();
+	int findidx_ = descr->findidx( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::iterator( at( findidx_));
+}
+
+std::size_t VariantStruct::nof_elements() const
+{
+	if ((Type)type()==array_) return m_data.dim.size;
+	if ((Type)type()==struct_) return description()->size();
+	return 0;
+}
+
+
+int VariantStruct::const_iterator::compare( const const_iterator& o) const
+{
+	if (!o.m_itr) return m_itr?-1:0;
+	if (!m_itr) return o.m_itr?+1:0;
+	if (m_itr > o.m_itr) return +1;
+	if (m_itr < o.m_itr) return -1;
+	return 0;
+}
+
+int VariantStruct::iterator::compare( const iterator& o) const
+{
+	if (!o.m_itr) return m_itr?-1:0;
+	if (!m_itr) return o.m_itr?+1:0;
+	if (m_itr > o.m_itr) return +1;
+	if (m_itr < o.m_itr) return -1;
+	return 0;
+}
+
+void VariantStruct::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
+{
+	Type tt = type();
+	if (tt == array_)
 	{
-		if (idx >= description()->size()) throw std::logic_error( "array bound read");
-		return *((VariantStruct*)m_data.value.ref_ + idx);
+		std::size_t ii=0, nn=m_data.dim.size;
+		out << '{';
+		for (; ii<nn; ++ii)
+		{
+			if (ii>0) out << ',';
+			out << newitem;
+			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+			((VariantStruct*)m_data.value.ref_ + 1 + ii)->print( out, indent, newitem, level+1);
+		}
+		if (nn>0)
+		{
+			out << newitem;
+			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+		}
+		out << '}';
+	}
+	else if (tt == struct_)
+	{
+		const VariantStructDescription* descr = description();
+		VariantStructDescription::const_iterator di = descr->begin();
+		const_iterator ii = begin(), ee = end();
+		for (; ii!=ee; ++ii,++di)
+		{
+			out << newitem;
+			for (std::size_t ll=0; ll<level; ++ll) out << indent;
+
+			out << di->name << '=';
+			ii->print( out, indent, newitem, level+1);
+			out << ';';
+		}
+	}
+	else if (tt == indirection_)
+	{
 	}
 	else
 	{
-		throw std::logic_error( "random access not supported for atomic types");
+		out << '\'';
+		out << Variant::tostring();
+		out << '\'';
 	}
+}
+
+std::string VariantStruct::tostring() const
+{
+	std::ostringstream buf;
+	print( buf, "", " ", 0);
+	return buf.str();
 }
 
 
