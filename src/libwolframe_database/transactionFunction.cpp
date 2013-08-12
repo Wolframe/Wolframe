@@ -496,6 +496,10 @@ static std::string normalizeTagName( const std::string& tagname)
 			}
 			--ti;
 		}
+		else
+		{
+			rt.push_back( *ti);
+		}
 	}
 	return rt;
 }
