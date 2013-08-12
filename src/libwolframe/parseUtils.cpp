@@ -41,6 +41,7 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
+using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
 CharTable::CharTable( const char* op, bool isInverse)
@@ -201,6 +202,29 @@ std::pair<unsigned int,unsigned int> _Wolframe::utils::getLineInfo( const std::s
 			continue;
 		}
 		++rt.second;
+	}
+	return rt;
+}
+
+std::string utils::parseLine( std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	std::string rt;
+	while (si != se && *si != '\n' && *si != '\r')
+	{
+		rt.push_back( *si);
+		++si;
+	}
+	if (si != se)
+	{
+		if (*si == '\r')
+		{
+			++si;
+			if (si != se && *si == '\n') ++si;
+		}
+		else
+		{
+			++si;
+		}
 	}
 	return rt;
 }

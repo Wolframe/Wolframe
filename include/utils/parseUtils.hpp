@@ -76,6 +76,11 @@ char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::st
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
 ///\brief Skip to next token (skip white spaces)
 char gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end);
+///\brief Parse the rest of the line starting
+///\param[in,out] si start of chunk to parse as input and first character after end of line if found or end of chunk to parse as output
+///\param[in] se end of chunk to parse
+///\return line parsed without end of line marker
+std::string parseLine( std::string::const_iterator& si, const std::string::const_iterator& se);
 
 ///\brief Parse a token assignement 'identifier = token'
 ///\return pair with assignement first = identifier, second = token

@@ -121,6 +121,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> > loadSource
 		{
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
+				case '#': utils::parseLine( si, se); continue; //... comment
 				case ';': throw ERROR( si, "empty statement");
 				case '\'':
 				case '\"': throw ERROR( si, "identifier expected instead of string at start of statement");

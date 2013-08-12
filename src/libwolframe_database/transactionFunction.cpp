@@ -36,9 +36,6 @@
 #include "utils/parseUtils.hpp"
 #include "database/transactionFunction.hpp"
 #include "database/transaction.hpp"
-#include "textwolf/xmlscanner.hpp"
-#include "textwolf/cstringiterator.hpp"
-#include "textwolf/charset.hpp"
 #include "logger/logger-v1.hpp"
 #include <cstring>
 #include <sstream>
@@ -467,12 +464,38 @@ struct TransactionFunction::Impl
 static std::string normalizeTagName( const std::string& tagname)
 {
 	std::string rt;
-	static textwolf::XMLScannerBase::IsTagCharMap isTagCharMap;
-	textwolf::CStringIterator itr( tagname.c_str(), tagname.size());
-	typedef textwolf::XMLScanner<textwolf::CStringIterator,textwolf::charset::UTF8,textwolf::charset::UTF8,std::string> T;
-	if (!T::parseStaticToken( isTagCharMap, itr, rt))
+	std::string::const_iterator ti = tagname.begin(), te = tagname.end();
+	for (; ti != te; ++ti)
 	{
-		throw std::runtime_error( "illegal tag name");
+		if (*ti == '\\')
+		{
+			++ti;
+			if (ti != te && *ti == 'u')
+			{
+				// Unicode (UTF-16) excoded character support with \uXXXX
+				unsigned short hexnum = 0;
+				int ci;
+				for (ci=0; ci<4 && ti != te; ++ti,++ci)
+				{
+					if (*ti >= '0' && *ti <= '9') hexnum = hexnum * 16 + (*ti - '0');
+					else if (*ti >= 'a' && *ti <= 'f') hexnum = hexnum * 16 + 10 + (*ti - 'a');
+					else if (*ti >= 'A' && *ti <= 'F') hexnum = hexnum * 16 + 10 + (*ti - 'A');
+					else break;
+				}
+				if (ci == 0) throw std::runtime_error( "illegal character in element name");
+				wchar_t wstr[2];
+				wstr[0] = hexnum;
+				wstr[1] = 0;
+				char buf[32];
+				sprintf( buf, "%ls", wstr);
+				rt.append( buf);
+			}
+			else
+			{
+				rt.push_back( '\\');
+			}
+			--ti;
+		}
 	}
 	return rt;
 }
