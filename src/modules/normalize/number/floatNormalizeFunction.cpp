@@ -32,12 +32,15 @@
 ************************************************************************/
 ///\file modules/normalize/number/floatNormalizeFunction.cpp
 #include "floatNormalizeFunction.hpp"
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
 
 types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {
+	if (inp.type() == types::Variant::int_) return inp;
+	if (inp.type() == types::Variant::uint_) return inp;
 	if (inp.type() == types::Variant::double_) return inp;
 	if (inp.type() != types::Variant::string_) return inp.todouble();
 	std::string str( inp.tostring());
@@ -58,8 +61,15 @@ types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 	}
 	if (ii != ee)
 	{
-		if (*ii >= '0' && *ii <= '9') std::runtime_error( "number out of range");
-		std::runtime_error( std::string("illegal token '") + *ii + "' in number");
+		if (*ii >= '0' && *ii <= '9') throw std::runtime_error( "number out of range");
+		throw std::runtime_error( std::string("illegal token '") + *ii + "' in number");
+	}
+	try
+	{
+		return types::Variant( boost::lexical_cast<double>( str));
+	}
+	catch (...)
+	{
 	}
 	return str;
 }

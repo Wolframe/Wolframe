@@ -34,11 +34,12 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
+#include "types/countedReference.hpp"
 #include <string>
 #include <cstring>
 #include <ostream>
 #include <stdexcept>
-#include "types/countedReference.hpp"
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -81,12 +82,14 @@ public:
 			const void* metadata;		//< unused by base variant type
 			std::size_t size;		//< size of a string
 		} dim;
+		typedef boost::int64_t Int_;
+		typedef boost::uint64_t UInt_;
 		union
 		{
 			bool bool_;
 			double double_;
-			int int_;
-			unsigned int uint_;
+			Int_ int_;
+			UInt_ uint_;
 			char* string_;
 			void* ref_;
 		} value;
@@ -98,7 +101,9 @@ public:
 	Variant( double o)				{init(double_); m_data.value.double_ = o;}
 	Variant( float o)				{init(double_); m_data.value.double_ = (double)o;}
 	Variant( int o)					{init(int_); m_data.value.int_ = o;}
+	Variant( Data::Int_ o)				{init(int_); m_data.value.int_ = o;}
 	Variant( unsigned int o)			{init(uint_); m_data.value.uint_ = o;}
+	Variant( Data::UInt_ o)				{init(int_); m_data.value.int_ = o;}
 	Variant( const char* o)				{initString( o, std::strlen(o));}
 	Variant( const char* o, std::size_t n)		{initString( o, n);}
 	Variant( const std::string& o)			{initString( o.c_str(), o.size());}
@@ -112,7 +117,9 @@ public:
 	Variant& operator=( double o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( float o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = (double)o; setInitialized(init_); return *this;}
 	Variant& operator=( int o)			{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( Data::Int_ o)			{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( unsigned int o)		{bool init_=initialized(); release(); init(uint_); m_data.value.uint_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( Data::UInt_ o)		{bool init_=initialized(); release(); init(uint_); m_data.value.uint_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
 	Variant& operator=( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
@@ -144,8 +151,8 @@ public:
 	double tonumber() const;
 	double todouble() const;
 	bool tobool() const;
-	int toint() const;
-	unsigned int touint() const;
+	Data::Int_ toint() const;
+	Data::UInt_ touint() const;
 
 	///\brief Get the size of a string
 	std::size_t size() const			{return (type() == string_)?m_data.dim.size:1;}

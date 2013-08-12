@@ -198,10 +198,10 @@ int Variant::compare( const Variant& o) const
 			case Variant::double_:
 				return compare_double( variant_cast<double>( o), m_data.value.double_);
 			case Variant::int_:
-				if (o.type() == uint_ && o.m_data.value.uint_ > (unsigned int)std::numeric_limits<int>::max()) return -1;
-				return compare_int( variant_cast<int>( o), m_data.value.int_);
+				if (o.type() == uint_ && o.m_data.value.uint_ > (Data::UInt_)std::numeric_limits<Data::Int_>::max()) return -1;
+				return compare_int( variant_cast<Data::Int_>( o), m_data.value.int_);
 			case Variant::uint_:
-				return compare_int( variant_cast<unsigned int>( o), m_data.value.uint_);
+				return compare_int( variant_cast<Data::UInt_>( o), m_data.value.uint_);
 			case Variant::bool_:
 				return compare_bool( variant_cast<bool>( o), m_data.value.bool_);
 			case Variant::string_:
@@ -238,14 +238,14 @@ bool Variant::tobool() const
 	return variant_cast<bool>( *this);
 }
 
-int Variant::toint() const
+Variant::Data::Int_ Variant::toint() const
 {
-	return variant_cast<int>( *this);
+	return variant_cast<Data::Int_>( *this);
 }
 
-unsigned int Variant::touint() const
+Variant::Data::UInt_ Variant::touint() const
 {
-	return variant_cast<unsigned int>( *this);
+	return variant_cast<Data::UInt_>( *this);
 }
 
 void Variant::convert( Type type_)

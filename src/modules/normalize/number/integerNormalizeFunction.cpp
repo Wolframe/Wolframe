@@ -32,12 +32,19 @@
 ************************************************************************/
 ///\file modules/normalize/number/integerNormalizeFunction.cpp
 #include "integerNormalizeFunction.hpp"
+#include <limits>
 
 using namespace _Wolframe;
 using namespace langbind;
 
 types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) const
 {
+	typedef types::Variant::Data::UInt_ UInt_;
+	typedef types::Variant::Data::Int_ Int_;
+	bool do_convert = true;
+	bool isSigned = false;
+
+	UInt_ val = 0, pval = 0;
 	if (inp.type() == types::Variant::int_) return inp;
 	if (inp.type() == types::Variant::uint_) return inp;
 	if (inp.type() == types::Variant::bool_) return inp.toint();
@@ -49,13 +56,40 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 	std::size_t cnt = m_size;
 	if (m_sign)
 	{
-		if (ii != ee && *ii == '-') ++ii;
+		if (ii != ee && *ii == '-')
+		{
+			++ii;
+			isSigned = true;
+		}
 	}
-	for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt);
+	for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt)
+	{
+		pval = val;
+		val = val * 10 + (*ii - '0');
+		if (pval > val) do_convert = false;
+	}
 	if (ii != ee)
 	{
-		if (cnt) std::runtime_error( "number out of range");
-		std::runtime_error( std::string("illegal token '") + *ii + "' in number");
+		if (cnt) throw std::runtime_error( "number out of range");
+		throw std::runtime_error( std::string("illegal token '") + *ii + "' in number");
+	}
+	if (do_convert)
+	{
+		if (isSigned)
+		{
+			if (val > (UInt_)std::numeric_limits<Int_>::max())
+			{
+				return str;
+			}
+			else
+			{
+				return types::Variant( (Int_)( val));
+			}
+		}
+		else
+		{
+			return types::Variant( val);
+		}
 	}
 	return str;
 }

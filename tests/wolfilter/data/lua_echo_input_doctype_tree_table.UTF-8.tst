@@ -6,27 +6,27 @@
 <root>
 <mtree id='1'>
 <name>eins</name>
-<node id='1.1'>
+<node id='11'>
 <name>Eins eins</name>
 </node>
-<node id='1.2'>
+<node id='12'>
 <name>Eins zwei</name>
-<node id='1.2.1'>
+<node id='121'>
 <name>Eins zwei eins</name>
 </node>
 </node>
-<node id='1.3'>
+<node id='13'>
 <name>Eins drei</name>
 </node>
 </mtree>
 <btree id='1'>
 <name>eins</name>
-<left id='1.1'>
+<left id='11'>
 <name>Eins eins</name>
 </left>
-<right id='1.2'>
+<right id='12'>
 <name>Eins zwei</name>
-<left id='1.2.1'>
+<left id='121'>
 <name>Eins zwei eins</name>
 </left>
 </right>
@@ -74,5 +74,5 @@ FORM trees
 
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE root SYSTEM "http://www.wolframe.org/example-doc/trees.dtd"><root><mtree><id>1</id><name>EINS</name><node><id>1.1</id><name>EINS EINS</name></node><node><id>1.2</id><name>EINS ZWEI</name><node><id>1.2.1</id><name>EINS ZWEI EINS</name></node></node><node><id>1.3</id><name>EINS DREI</name></node></mtree><btree><id>1</id><right><id>1.2</id><name>EINS ZWEI</name><left><id>1.2.1</id><name>EINS ZWEI EINS</name></left></right><name>EINS</name><left><id>1.1</id><name>EINS EINS</name></left></btree></root>
+<!DOCTYPE root SYSTEM "http://www.wolframe.org/example-doc/trees.dtd"><root><mtree><id>1</id><name>EINS</name><node><id>11</id><name>EINS EINS</name></node><node><id>12</id><name>EINS ZWEI</name><node><id>121</id><name>EINS ZWEI EINS</name></node></node><node><id>13</id><name>EINS DREI</name></node></mtree><btree><id>1</id><right><id>12</id><name>EINS ZWEI</name><left><id>121</id><name>EINS ZWEI EINS</name></left></right><name>EINS</name><left><id>11</id><name>EINS EINS</name></left></btree></root>
 **end
