@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html>
+<head>
+        
+    <title>Why do I need to explicitly add os.getcwd() to sys.path when importing Python scripts from a C application? - Stack Overflow</title>
+    <link rel="shortcut icon" href="http://cdn.sstatic.net/stackoverflow/img/favicon.ico">
+    <link rel="apple-touch-icon image_src" href="http://cdn.sstatic.net/stackoverflow/img/apple-touch-icon.png">
+    <link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href="/opensearch.xml">
+    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.sstatic.net/js/stub.js?v=78fa3e3bb4ec"></script>
+    <link rel="stylesheet" type="text/css" href="http://cdn.sstatic.net/stackoverflow/all.css?v=fb6a4c3e951f">
+    
+    <meta name="relativepagescore" content="116651">
+    <link rel="canonical" href="http://stackoverflow.com/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc">
+    <link rel="alternate" type="application/atom+xml" title="Feed for question 'Why do I need to explicitly add os.getcwd() to sys.path when importing Python scripts from a C application?'" href="/feeds/question/13078025">
+    <script type="text/javascript">
+        
+        StackExchange.ready(function () {
+            StackExchange.using("postValidation", function () {
+                StackExchange.postValidation.initOnBlurAndSubmit($('#post-form'), 2, 'answer');
+            });
+
+            
+            StackExchange.question.init({showAnswerHelp:true,totalCommentCount:0,shownCommentCount:0,highlightColor:'#F4A83D',backgroundColor:'#FFF',questionId:13078025});
+
+            styleCode();
+
+                StackExchange.realtime.subscribeToQuestion('1', '13078025');
+            
+                
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        StackExchange.init({"stackAuthUrl":"https://stackauth.com","serverTime":1364902300,"fullPostfix":"-c","styleCode":true,"enableUserHovercards":true,"site":{"name":"Stack Overflow","description":"Q&A for professional and enthusiast programmers","isNoticesTabEnabled":true,"recaptchaPublicKey":"6LdchgIAAAAAAJwGpIzRQSOFaO0pU6s44Xt8aTwc","useNewStyleFavoriteTagsEditor":true,"enableSocialMediaInSharePopup":true},"user":{"fkey":"8586d026220ac2a922472fb827c6c042","isAnonymous":true}});
+        StackExchange.using.setCacheBreakers({"js/prettify-full.js":"6c261bebf56a","js/moderator.js":"f96f7e4ee5dc","js/full-anon.js":"d94aa51f80ad","js/full.js":"c8fb259c6be5","js/wmd.js":"bb9dbf9364a2","js/third-party/jquery.autocomplete.min.js":"e5f01e97f7c3","js/mobile.js":"6eb68240242f","js/help.js":"fc9fb0517db2","js/tageditor.js":"450c9e8426fc","js/tageditornew.js":"b6c68ad4c7dd","js/inline-tag-editing.js":"8e84e8a137f7","js/revisions.js":"7273bb714bba","js/review.js":"51a50e83c754","js/tagsuggestions.js":"aa48ef6154df","js/post-validation.js":"cd619678f5d6"});
+        StackExchange.using.setCacheBreakers({"js/full-c.js":"ff3a7ddcc8dd","js/full-anon-c.js":"4f2911519a40"});
+    </script>
+
+
+    <script type="text/javascript">
+        StackExchange.using(
+            "gps",
+            function () {
+                StackExchange.gps.init(true);
+            }
+        );
+    </script>
+
+</head>
+<body class="question-page">
+    <noscript><div id="noscript-padding"></div></noscript>
+    <div id="notify-container"></div>
+    <div id="overlay-header"></div>
+    <div id="custom-header"></div>
+
+    <div class="container">
+        <div id="header">
+            <div id="portalLink">
+                <a class="genu" href="http://stackexchange.com" onclick="StackExchange.ready(function(){genuwine.click();});return false;">Stack Exchange</a>
+            </div>
+            <div id="topbar">
+                <div id="hlinks">
+                    
+
+
+
+
+
+
+
+
+
+<span id="hlinks-user">
+
+</span>
+<span id="hlinks-nav">
+                   <a href="/users/login?returnurl=%2fquestions%2f13078025%2fwhy-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc">log in</a>
+
+ <span class="lsep">|</span>
+                    <a href="http://careers.stackoverflow.com">careers 2.0</a>
+
+ <span class="lsep">|</span>
+
+</span>
+<span id="hlinks-custom">
+        <a href="http://chat.stackoverflow.com">chat</a>
+
+ <span class="lsep">|</span>
+            <a href="http://meta.stackoverflow.com">meta</a>
+
+ <span class="lsep">|</span>
+        <a href="/about">about</a>
+
+ <span class="lsep">|</span>
+    <a href="/faq">faq</a>
+
+</span>
+                </div>
+                <div id="hsearch">
+                    <form id="search" action="/search" method="get" autocomplete="off">
+                    <div>
+                        <input autocomplete="off" name="q" class="textbox" placeholder="search" tabindex="1" type="text" maxlength="240" size="28" value="">
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <br class="cbt">
+            <div id="hlogo">
+                <a href="/" >
+                    Stack Overflow
+                </a>
+            </div>
+            <div id="hmenus">
+                <div class="nav mainnavs">
+                    <ul>
+                        <li class="youarehere"><a id="nav-questions" href="/questions">Questions</a></li>
+                        <li><a id="nav-tags" href="/tags">Tags</a></li>
+                        <li><a id="nav-users" href="/users">Users</a></li>
+                        <li><a id="nav-badges" href="/badges">Badges</a></li>
+                        <li><a id="nav-unanswered" href="/unanswered">Unanswered</a></li>
+                    </ul>
+                </div>
+                <div class="nav askquestion">
+                    <ul>
+                        <li>
+                            <a id="nav-askquestion"  href="/questions/ask">Ask Question</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        
+
+
+
+        <div id="content">
+            
+
+<div itemscope itemtype="http://schema.org/Article">
+<link itemprop="image" href="http://cdn.sstatic.net/stackoverflow/img/apple-touch-icon.png">
+<div id="herobox-mini">
+    <div id="hero-content">
+        <span id="controls">
+            <input type="button" value="Tell me more" />
+            <span id="close"><a title="click to dismiss">&times;</a></span>
+        </span>
+        <div id="blurb">
+            <span id="site-name">Stack Overflow</span> is a question and answer site for 
+            professional and enthusiast programmers. It's 100% free, no registration required.
+        </div>        
+    </div>
+    <script>
+        $('#herobox-mini input').click(function () {
+            var clickSource = $("body").attr("class") + '-mini';
+            if ($("body").hasClass("questions-page")) {
+                clickSource = 'questionpagemini';
+            }
+            if ($("body").hasClass("home-page")) {
+                clickSource = 'homepagemini';
+            }
+
+            StackExchange.using("gps", function () {
+                StackExchange.gps.track("aboutpage.click", { aboutclick_location: clickSource } , true);
+            });
+            window.location.href = '/about';
+        });
+        $('#herobox-mini #close').click(function () {
+            $.cookie("hero", "none", { path: "/" });
+            var $hero = $("#herobox-mini");
+            $hero.slideUp('fast', function () { $hero.remove(); });
+            return false;
+        });
+    </script>
+</div>
+<div id="question-header">
+    <h1 itemprop="name"><a href="/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc" class="question-hyperlink">Why do I need to explicitly add os.getcwd() to sys.path when importing Python scripts from a C application?</a></h1>
+</div>
+<div id="mainbar">
+
+
+
+<div class="question" data-questionid="13078025"  id="question">
+    
+            <div class="everyonelovesstackoverflow" id="adzerk1">
+        </div>
+
+
+    <table>
+        <tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+    <input type="hidden" value="13078025">
+    <a class="vote-up-off" title="This question shows research effort; it is useful and clear (click again to undo)">up vote</a>
+    <span class="vote-count-post ">0</span>
+    <a class="vote-down-off" title="This question does not show any research effort; it is unclear or not useful (click again to undo)">down vote</a>
+    
+    <a class="star-off" href="#" title="This is a favorite question (click again to undo)">favorite</a>
+    <div class="favoritecount"><b></b></div>   
+
+ 
+</div>
+
+            </td>
+            
+<td class="postcell">
+<div>
+    <div class="post-text" itemprop="description">
+        <p>I was going through the Python documentation regarding <a href="http://docs.python.org/extending/extending.html" rel="nofollow">Extending Python with C/C++</a>, and I found a very interesting scenario.  Consider that I have the following, trivial Python script named <code>test_script.py</code> in my working directory:</p>
+
+<pre><code>import time
+def My_Python_Func():
+    print "My_Python_Func() Called: " + str(time.time())
+</code></pre>
+
+<p>In the same directory, I have a file called <code>another_test_script.py</code>, which has:</p>
+
+<pre><code>import test_script
+test_script.My_Python_Func()
+</code></pre>
+
+<p>Which works fine, when called as <code>python ./another_test_script.py</code>.  Now, I'm trying to call said function from a C environment linked with the Python libraries as follows:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;Python.h&gt;
+
+PyObject *pName, *pModule, *pDict, *pFunc, *pVal;
+
+int main()
+{
+    const char* script_name = "test_script";
+    const char* func_name   = "My_Python_Func";
+
+    Py_Initialize();
+
+    pName = PyString_FromString(script_name);
+
+    PyRun_SimpleString("import os");
+    PyRun_SimpleString("import sys");
+    /* * * * IF I COMMENT THE FOLLOWING LINE OUT, pModule IS ALWAYS SET TO NULL * * * */
+    PyRun_SimpleString("sys.path.insert(0, os.getcwd())");
+    pModule = PyImport_Import(pName);
+
+    Py_DECREF(pName);
+    if (pModule != NULL)
+    {
+        pFunc = PyObject_GetAttrString(pModule, func_name);
+    }
+    pDict = PyModule_GetDict(pModule);
+    pFunc = PyDict_GetItemString(pDict, func_name);
+    if (PyCallable_Check(pFunc))
+    {
+        PyObject_CallObject(pFunc, NULL);
+        Py_DECREF(pModule);
+        Py_DECREF(pName);
+    }
+    else
+    {
+        PyErr_Print();
+    }
+    Py_Finalize();
+    return 0;
+}
+</code></pre>
+
+<p>As noted in the comments in the above C program, commenting out the line containing <code>PyRun_SimpleString("sys.path.insert(0, os.getcwd())")</code> causes the call to <code>PyImport_Import</code> to fail (returning <code>NULL</code>).  Furthermore, calling <code>PyRun_SimpleString("import test_script")</code> appears to behave the same way.</p>
+
+<p>Why do  I need to manually add the current working directory to Python's <code>sys.path</code> list of strings, when simply importing it from another Python script in the same working directory?  Furthermore, why does Python not search the current working directory in the first place (as <code>os.getcwd()</code> returns the correct path)?  Is this an appropriate solution, if I wish to import functions from scripts bundled with my C application?</p>
+
+    </div>
+    <div class="post-taglist">
+        <a href="/questions/tagged/python" class="post-tag" title="show questions tagged 'python'" rel="tag">python</a> <a href="/questions/tagged/c" class="post-tag" title="show questions tagged 'c'" rel="tag">c</a> 
+    </div>
+    <table class="fw">
+    <tr>
+    <td class="vt">
+
+
+
+
+
+
+
+
+
+<div class="post-menu"><a href="/q/13078025" title="short permalink to this question" class="short-link" id="link-post-13078025">share</a><span class="lsep">|</span><a href="/posts/13078025/edit" class="suggest-edit-post" title="">improve this question</a></div>            </td>
+    <td class="post-signature owner">
+        
+
+    <div class="user-info ">
+        <div class="user-action-time">
+                                    asked
+ <span title="2012-10-25 22:04:13Z" class="relativetime">Oct 25 '12 at 22:04</span>
+        </div>
+        <div class="user-gravatar32">
+            <a href="/users/159447/breakthrough"><div class=""><img src="http://www.gravatar.com/avatar/480f7f998a2d4bdca2b2e86b685f367b?s=32&d=identicon&r=PG" alt="" width="32" height="32"></div></a>
+        </div>
+        <div class="user-details">
+            <a href="/users/159447/breakthrough">Breakthrough</a><br>
+            <span class="reputation-score" title="reputation score" dir="ltr">806</span><span title="6 silver badges"><span class="badge2"></span><span class="badgecount">6</span></span><span title="14 bronze badges"><span class="badge3"></span><span class="badgecount">14</span></span>
+        </div>
+    </div>
+
+    </td>
+    </tr>
+    </table>
+</div>
+</td>
+        </tr>
+
+
+<tr>
+<td class="votecell"></td>
+<td>
+    <div id="comments-13078025" class="comments dno">
+        <table>
+        <tbody>
+        
+            <tr><td></td><td></td></tr>
+        
+        </tbody>
+    
+        </table>
+    </div>
+    
+</td>
+</tr>            </table>    
+</div>
+
+
+<div id="answers">
+
+    <a name="tab-top"></a>
+    <div id="answers-header">
+        <div class="subheader answers-subheader">
+            <h2>
+                    1 Answer
+            </h2>
+            <div id="tabs">
+                <a href="/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc?answertab=active#tab-top" title="Answers with the latest activity first">active</a>
+<a href="/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc?answertab=oldest#tab-top" title="Answers in the order they were provided">oldest</a>
+<a class="youarehere" href="/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc?answertab=votes#tab-top" title="Answers with the highest score first">votes</a>
+
+            </div>
+        </div>    
+    </div>    
+
+
+
+
+  
+<a name="13078052"></a>
+<div id="answer-13078052" class="answer accepted-answer" data-answerid="13078052" >
+    <table>
+        <tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+    <input type="hidden" value="13078052">
+    <a class="vote-up-off" title="This answer is useful (click again to undo)">up vote</a>
+    <span class="vote-count-post ">3</span>
+    <a class="vote-down-off" title="This answer is not useful (click again to undo)">down vote</a>
+    
+
+            <span class="vote-accepted-on load-accepted-answer-date" title="loading when this answer was accepted...">accepted</span>
+ 
+</div>
+
+            </td>
+            
+
+
+<td class="answercell">
+    <div class="post-text"><p>Adding the script directory to <code>sys.path</code> is a peculiarity of the <code>python</code> executable; it is not done by default when the interpreter is initialized, since it is not always appropriate to do so in embedded applications.</p>
+</div>
+    <table class="fw">
+    <tr>
+    <td class="vt">
+
+
+
+
+
+
+
+
+
+<div class="post-menu"><a href="/a/13078052" title="short permalink to this answer" class="short-link" id="link-post-13078052">share</a><span class="lsep">|</span><a href="/posts/13078052/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+            
+
+
+    <td align="right" class="post-signature">   
+       
+
+    
+
+    <div class="user-info user-hover">
+        <div class="user-action-time">
+                                    answered
+ <span title="2012-10-25 22:06:39Z" class="relativetime">Oct 25 '12 at 22:06</span>
+        </div>
+        <div class="user-gravatar32">
+            <a href="/users/20862/ignacio-vazquez-abrams"><div class=""><img src="http://www.gravatar.com/avatar/2343ae368d3241278581ce6c87f62a25?s=32&d=identicon&r=PG" alt="" width="32" height="32"></div></a>
+        </div>
+        <div class="user-details">
+            <a href="/users/20862/ignacio-vazquez-abrams">Ignacio Vazquez-Abrams</a><br>
+            <span class="reputation-score" title="reputation score 228857" dir="ltr">229k</span><span title="18 gold badges"><span class="badge1"></span><span class="badgecount">18</span></span><span title="257 silver badges"><span class="badge2"></span><span class="badgecount">257</span></span><span title="455 bronze badges"><span class="badge3"></span><span class="badgecount">455</span></span>
+        </div>
+    </div>
+
+    </td>
+    </tr>
+    </table>
+</td>
+        </tr>
+
+
+
+<tr>
+<td class="votecell"></td>
+<td>
+    <div id="comments-13078052" class="comments">
+        <table>
+        <tbody>
+                    
+    <tr id="comment-17767369" class="comment">
+        <td></td>
+        <td class="comment-text"><div><span class="comment-copy">Thanks for the fast response.  Is this done primarily to prevent script names from interfering with the Python library itself?  Is this the proper method of calling Python functions from my C program (in which I assume the scripts are in the current working directory)?</span> &ndash;&nbsp;<a href="/users/159447/breakthrough" title="806 reputation" class="comment-user owner">Breakthrough</a> <span class="comment-date" dir="ltr"><span title="2012-10-25 22:11:26Z" class="relativetime-clean">Oct 25 '12 at 22:11</span></span></div></td>
+    </tr>
+            
+    <tr id="comment-17767414" class="comment">
+        <td></td>
+        <td class="comment-text"><div><span class="comment-copy">Sorry if my question was a bit ambiguous, I&#39;m experimenting with Python scripting instead of using Lua (which my application currently utilizes).  While the API&#39;s have some similarities, the import mechanisms are somewhat different, so I&#39;m trying determine which is the best right now for me.</span> &ndash;&nbsp;<a href="/users/159447/breakthrough" title="806 reputation" class="comment-user owner">Breakthrough</a> <span class="comment-date" dir="ltr"><span title="2012-10-25 22:13:56Z" class="relativetime-clean">Oct 25 '12 at 22:13</span></span><span class="edited-yes" title="this comment was edited"></span></div></td>
+    </tr>
+            
+    <tr id="comment-17767434" class="comment">
+        <td class="comment-actions"><table><tbody><tr>
+<td class="comment-score">
+<span title="number of 'useful comment' votes received" class="cool">1</span>
+</td>
+<td>
+&nbsp;
+</td></tr>
+</tbody></table></td>
+        <td class="comment-text"><div><span class="comment-copy">I normally use <code>PySys_SetPath()</code>, but this works too.</span> &ndash;&nbsp;<a href="/users/20862/ignacio-vazquez-abrams" title="228857 reputation" class="comment-user">Ignacio Vazquez-Abrams</a> <span class="comment-date" dir="ltr"><span title="2012-10-25 22:14:58Z" class="relativetime-clean">Oct 25 '12 at 22:14</span></span></div></td>
+    </tr>
+            
+    <tr id="comment-17767467" class="comment">
+        <td></td>
+        <td class="comment-text"><div><span class="comment-copy">Awesome, that seems to be exactly what I was looking for.  I&#39;ll do some more digging in the API documentation... Thank you so much for your help!  Looking forward to using Python in my applications going onwards...</span> &ndash;&nbsp;<a href="/users/159447/breakthrough" title="806 reputation" class="comment-user owner">Breakthrough</a> <span class="comment-date" dir="ltr"><span title="2012-10-25 22:17:07Z" class="relativetime-clean">Oct 25 '12 at 22:17</span></span><span class="edited-yes" title="this comment was edited"></span></div></td>
+    </tr>
+            
+    <tr id="comment-17767501" class="comment">
+        <td></td>
+        <td class="comment-text"><div><span class="comment-copy">Some of the C API unfortunately isn&#39;t well documented; don&#39;t be afraid to dig around in the header files (and source if necessary) for useful stuff.</span> &ndash;&nbsp;<a href="/users/20862/ignacio-vazquez-abrams" title="228857 reputation" class="comment-user">Ignacio Vazquez-Abrams</a> <span class="comment-date" dir="ltr"><span title="2012-10-25 22:19:10Z" class="relativetime-clean">Oct 25 '12 at 22:19</span></span></div></td>
+    </tr>
+
+        </tbody>
+    
+        </table>
+    </div>
+    
+</td>
+</tr>
+   
+    </table>
+</div>
+    <a name='new-answer'></a>
+    <form id="post-form" action="/questions/13078025/answer/submit" method="post"  class="post-form">
+        <input type="hidden" id="post-id" value="13078025" />
+        <h2 class="space">Your Answer</h2>
+
+
+
+    
+<script type="text/javascript">
+    StackExchange.ready(function() {
+        initTagRenderer("".split(" "), "".split(" "));
+         
+        prepareEditor({
+            heartbeatType: 'answer',
+            bindNavPrevention: true,
+            postfix: "",
+            onDemand: true,
+            discardSelector: ".discard-answer"
+            ,immediatelyShowMarkdownHelp:true
+        });
+        
+
+    });  
+</script>
+
+
+<div id="post-editor" class="post-editor">
+
+    <div style="position: relative;">     
+        <div class="wmd-container">
+            <div id="wmd-button-bar" class="wmd-button-bar"></div>
+            <textarea id="wmd-input" class="wmd-input" name="post-text" cols="92" rows="15" tabindex="101" data-min-length=""></textarea>
+        </div>
+    </div>
+
+    <div class="fl" style="margin-top: 8px; height:24px;">&nbsp;</div>
+    <div id="draft-saved" class="draft-saved community-option fl" style="margin-top: 8px; height:24px; display:none;">draft saved</div>
+
+    <div id="draft-discarded" class="draft-discarded community-option fl" style="margin-top: 8px; height:24px; display:none;">draft discarded</div>
+
+
+
+    <div id="wmd-preview" class="wmd-preview"></div>
+    <div></div>
+    <div class="edit-block">
+        <input id="fkey" name="fkey" type="hidden" value="8586d026220ac2a922472fb827c6c042">
+        <input id="author" name="author" type="text">
+    </div>
+</div>
+        <div style="position: relative;"> 
+            <div class="form-item dno new-post-login">
+        
+                <div class="new-login-form">
+                    <div class="new-login-left">
+                        <h3>Sign up or <a id="login-link" href="/users/login?returnurl=%2fquestions%2f13078025%2fwhy-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc%23new-answer">log in</a></h3>
+                        <script type="text/javascript">
+                            StackExchange.ready(function () {
+                                StackExchange.helpers.onClickDraftSave('#login-link');
+                            });
+                        </script>
+                        <div class="preferred-login google-login">
+                            <p><span class="icon"></span><span>Sign up using Google</span></p>
+                        </div>
+                        <div class="preferred-login facebook-login">
+                            <p><span class="icon"></span><span>Sign up using Facebook</span></p>
+                        </div>
+                        <div class="preferred-login stackexchange-login">
+                            <p><span class="icon"></span><span>Sign up using Stack Exchange</span></p>
+                        </div>
+                    </div>
+                    <input type="hidden" name="manual-openid" class="manual-openid" />
+                    <input type="hidden" name="use-facebook" class="use-facebook" value="false" />
+                    <input type="button" class="submit-openid" value="Submit" style="display:none" />
+                    <div class="new-login-right">
+                                <h3>Post as a guest</h3>
+    <div class="form-item">
+        <table>
+        <tr>
+                    <script type="text/javascript">
+                StackExchange.ready(function () {
+                    StackExchange.helpers.bindHelpOverlayEvents($('.vm input'));
+                });
+            </script>
+            <td class="vm">
+                <div>
+                    <label for="display-name">Name</label>
+                    <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105">
+                </div>
+                <div>
+                    <label for="m-address">Email</label>
+                    <input id="m-address" name="m-address" type="text" size="30" maxlength="100" value="" tabindex="106">
+                    <span class="edit-field-overlay">required, but not shown</span>
+                </div>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                StackExchange.ready(
+                    function () {
+                        StackExchange.openid.initPostLogin('.new-post-login', '%2fquestions%2f13078025%2fwhy-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc%23new-answer');
+                    }
+                );
+            </script>
+            <noscript>
+                        <h3>Post as a guest</h3>
+    <div class="form-item">
+        <table>
+        <tr>
+                    <script type="text/javascript">
+                StackExchange.ready(function () {
+                    StackExchange.helpers.bindHelpOverlayEvents($('.vm input'));
+                });
+            </script>
+            <td class="vm">
+                <div>
+                    <label for="display-name">Name</label>
+                    <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105">
+                </div>
+                <div>
+                    <label for="m-address">Email</label>
+                    <input id="m-address" name="m-address" type="text" size="30" maxlength="100" value="" tabindex="106">
+                    <span class="edit-field-overlay">required, but not shown</span>
+                </div>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+            </noscript>
+        </div>
+           
+            <div class="form-submit cbt">
+            <input id="submit-button" type="submit" value="Post Your Answer" tabindex="110">
+            <a href="#" class="discard-answer dno">discard</a>
+    <p class="privacy-policy-agreement">
+        By posting your answer, you agree to the 
+        <a href="http://stackexchange.com/legal/privacy-policy" target="_blank">privacy policy</a> and 
+        <a href="http://stackexchange.com/legal/terms-of-service" target="_blank">terms of service</a>.
+    </p>
+    <input type="hidden" name="legalLinksShown" value="1" />
+        </div>
+    </form>
+
+
+
+        <h2 class="bottom-notice">
+                Not the answer you're looking for? 
+            Browse other questions tagged <a href="/questions/tagged/python" class="post-tag" title="show questions tagged 'python'" rel="tag">python</a> <a href="/questions/tagged/c" class="post-tag" title="show questions tagged 'c'" rel="tag">c</a> 
+                or <a href="/questions/ask">ask your own question</a>.
+        </h2>
+</div>
+</div>
+<div id="sidebar" class=show-votes>
+        <div class="module question-stats">
+        <p class="label-key">tagged</p>
+        <div class="tagged"><a href="/questions/tagged/python" class="post-tag" title="show questions tagged 'python'" rel="tag">python</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">176031</span></span><br>
+<a href="/questions/tagged/c" class="post-tag" title="show questions tagged 'c'" rel="tag">c</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">90337</span></span><br>
+</div>
+        <table id="qinfo">
+            <tr>
+                <td><p class="label-key">asked</p></td>
+                <td style="padding-left:10px"><p class="label-key" title="2012-10-25 22:04:13Z"><b>5 months ago</b></p></td>
+            </tr>
+            <tr>
+                <td><p class="label-key">viewed</p></td>
+
+                <td style="padding-left:10px">
+                    <p class="label-key">
+                        <b>86 times</b>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td><p class="label-key">active</p></td>
+                <td style="padding-left:10px"><p class="label-key"><b><a href="?lastactivity" class="lastactivity-link" title="2012-10-25 22:06:39Z">5 months ago</a></b></p></td>
+            </tr>
+        </table>
+    </div>
+        
+                <script type="text/javascript">
+                var scriptSrc = "http://engine.adzerk.net/z/8277/adzerk1_2_4_43,adzerk2_2_17_45?keywords=python,c";
+                if (document.referrer) {
+                    if (/\?/.test(scriptSrc))
+                        scriptSrc += "&";
+                    else
+                        scriptSrc += "?";
+                    scriptSrc += "xReferrer=" + document.referrer;
+                }
+                StackExchange.ready(function () {
+                    var z = document.createElement("script");
+                    z.type = "text/javascript";
+                    z.async = "true";
+                    z.src = scriptSrc;
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(z, s);
+                });
+            </script>
+        <div class="everyonelovesstackoverflow" id="adzerk2">
+        </div>
+    <div id="hireme">
+        <script type="text/javascript">
+            var careers_adurl="http://careers.stackoverflow.com/gethired/js",careers_cssurl="//careerscdn.sstatic.net/careers/gethired/sidebar.css?fffffffff879eaa0",careers_leaderboardcssurl="//careerscdn.sstatic.net/careers/gethired/ninja.min.css?3afae8",careers_companycssurl="//careerscdn.sstatic.net/careers/gethired/company",careers_adselector="div.hireme, div#hireme";StackExchange.ready(function(){$.ajax({url:"//careerscdn.sstatic.net/careers/gethired/loader.min.js?3afae8",dataType:"script",cache:!0})})
+        </script>
+    </div>
+
+
+
+    
+  
+    
+    <div class="module sidebar-related">
+        <h4 id="h-related">Related</h4>
+        <div class="related" data-tracker="rq=1">
+            <div class="spacer">
+<a href="/q/1417473" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">5</div>
+</a>
+<a href="/questions/1417473/call-python-from-c" class="question-hyperlink">Call Python from C++</a>
+</div>
+<div class="spacer">
+<a href="/q/1469370" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">1</div>
+</a>
+<a href="/questions/1469370/why-cant-i-import-the-math-library-when-embedding-python-in-c" class="question-hyperlink">Why can&#39;t I import the &#39;math&#39; library when embedding python in c?</a>
+</div>
+<div class="spacer">
+<a href="/q/2845576" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes default">0</div>
+</a>
+<a href="/questions/2845576/swig-c-c-python-api-connected-segfault" class="question-hyperlink">SWIG &amp; C/C++ Python API connected - SEGFAULT</a>
+</div>
+<div class="spacer">
+<a href="/q/3101225" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">1</div>
+</a>
+<a href="/questions/3101225/problems-calling-python-from-c" class="question-hyperlink">Problems calling Python from C++</a>
+</div>
+<div class="spacer">
+<a href="/q/3789881" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">2</div>
+</a>
+<a href="/questions/3789881/create-and-call-python-function-from-string-via-c-api" class="question-hyperlink">Create and call python function from string via C API</a>
+</div>
+<div class="spacer">
+<a href="/q/3892961" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">1</div>
+</a>
+<a href="/questions/3892961/c-and-embedded-python-nul-terminated-strings" class="question-hyperlink">C++ and Embedded Python - NUL Terminated Strings</a>
+</div>
+<div class="spacer">
+<a href="/q/6157594" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes default">1</div>
+</a>
+<a href="/questions/6157594/how-to-sleep-in-an-embedded-python-in-a-qt-application" class="question-hyperlink">How to sleep in an embedded Python in a QT-application</a>
+</div>
+<div class="spacer">
+<a href="/q/6616398" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">2</div>
+</a>
+<a href="/questions/6616398/finding-python-function-parameters-from-c" class="question-hyperlink">Finding python function parameters from C++</a>
+</div>
+<div class="spacer">
+<a href="/q/7624529" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes default">1</div>
+</a>
+<a href="/questions/7624529/python-c-api-dont-load-module" class="question-hyperlink">Python C API don&#39;t load module</a>
+</div>
+<div class="spacer">
+<a href="/q/7676314" title="Vote score (upvotes - downvotes)">
+        <div class="answer-votes answered-accepted default">3</div>
+</a>
+<a href="/questions/7676314/py-initialize-py-finalize-not-working-twice-with-numpy" class="question-hyperlink">Py_initialize / Py_Finalize not working twice with numpy</a>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<div id="feed-link">
+    <div id="feed-link-text"><a href="/feeds/question/13078025" title="feed of this question and its answers"><span class="feed-icon"></span>question feed</a></div>
+</div>
+<script type="text/javascript">
+StackExchange.ready(function(){$.get('/posts/13078025/ivc/1910');});
+</script>
+<noscript>
+    <div><img src="/posts/13078025/ivc/1910" class="dno" alt="" width="0" height="0"></div>
+</noscript><div style="display:none" id="prettify-lang">lang-c</div></div>
+
+
+<script>
+        StackExchange.ready(function () { StackExchange.adviza.init(13078025, 20, 100, 0); });
+    </script>
+
+        </div>
+    </div>
+    <div id="footer">
+        <div class="footerwrap">
+            <div id="footer-menu">
+                    <a href="/about">about</a> |
+                <a href="/faq">faq</a> |
+                <a href="http://blog.stackexchange.com?blb=1">blog</a> |
+                    <a href="http://chat.stackoverflow.com">chat</a> |
+                <a href="http://data.stackexchange.com">data</a> |
+                <a href="http://stackexchange.com/legal">legal</a> |
+                <a href="http://stackexchange.com/legal/privacy-policy">privacy policy</a> |
+                <a href="http://stackexchange.com/about/hiring">jobs</a> |
+                <a href="http://engine.adzerk.net/redirect/0/2776/2751/0/4de3c60f719c4dfcb1a57531c7050090/0">advertising info</a> |
+
+                <a onclick='StackExchange.switchMobile("on", "/questions/13078025/why-do-i-need-to-explicitly-add-os-getcwd-to-sys-path-when-importing-python-sc")'>mobile</a> |
+
+                <b><a href="/help">contact us</a></b>
+                  | <b><a href="http://meta.stackoverflow.com">feedback</a></b>
+                <div id="footer-sites">
+                    <span style="color:#FE7A15;font-size:140%">&#9632;</span>&nbsp;<a href="http://stackoverflow.com">stackoverflow.com</a>&nbsp; 
+<span style="color:#FE7A15;font-size:140%">&#9632;</span>&nbsp;<a href="http://stackapps.com">api/apps</a>&nbsp; 
+<span style="color:#FE7A15;font-size:140%">&#9632;</span>&nbsp;<a href="http://careers.stackoverflow.com">careers&nbsp;2.0</a>&nbsp; 
+<span style="color:#E8272C;font-size:140%">&#9632;</span>&nbsp;<a href="http://serverfault.com">serverfault.com</a>&nbsp; 
+<span style="color:#00AFEF;font-size:140%">&#9632;</span>&nbsp;<a href="http://superuser.com">superuser.com</a>&nbsp; 
+<span style="color:#969696;font-size:140%">&#9632;</span>&nbsp;<a href="http://meta.stackoverflow.com">meta</a>&nbsp; 
+<span style="color:#46937D;font-size:140%">&#9632;</span>&nbsp;<a href="http://area51.stackexchange.com">area&nbsp;51</a>&nbsp; 
+<span style="color:#C0D0DC;font-size:140%">&#9632;</span>&nbsp;<a href="http://webapps.stackexchange.com">webapps</a>&nbsp; 
+<span style="color:#000000;font-size:140%">&#9632;</span>&nbsp;<a href="http://gaming.stackexchange.com">gaming</a>&nbsp; 
+<span style="color:#dd4814;font-size:140%">&#9632;</span>&nbsp;<a href="http://askubuntu.com">ubuntu</a>&nbsp; 
+<span style="color:#9ce4fe;font-size:140%">&#9632;</span>&nbsp;<a href="http://webmasters.stackexchange.com">webmasters</a>&nbsp; 
+<span style="color:#cf4d3f;font-size:140%">&#9632;</span>&nbsp;<a href="http://cooking.stackexchange.com">cooking</a>&nbsp; 
+<span style="color:#f4f28d;font-size:140%">&#9632;</span>&nbsp;<a href="http://gamedev.stackexchange.com">game development</a>&nbsp; 
+<span style="color:#0f3559;font-size:140%">&#9632;</span>&nbsp;<a href="http://math.stackexchange.com">math</a>&nbsp; 
+<span style="color:#f2f2f2;font-size:140%">&#9632;</span>&nbsp;<a href="http://photo.stackexchange.com">photography</a>&nbsp; 
+<span style="color:#037187;font-size:140%">&#9632;</span>&nbsp;<a href="http://stats.stackexchange.com">stats</a>&nbsp; 
+<span style="color:#f1e7cc;font-size:140%">&#9632;</span>&nbsp;<a href="http://tex.stackexchange.com">tex</a>&nbsp; 
+<span style="color:#e1cdae;font-size:140%">&#9632;</span>&nbsp;<a href="http://english.stackexchange.com">english</a>&nbsp; 
+<span style="color:#a2d9f6;font-size:140%">&#9632;</span>&nbsp;<a href="http://cstheory.stackexchange.com">theoretical cs</a>&nbsp; 
+<span style="color:#1b3e6c;font-size:140%">&#9632;</span>&nbsp;<a href="http://programmers.stackexchange.com">programmers</a>&nbsp; 
+<span style="color:#293a5d;font-size:140%">&#9632;</span>&nbsp;<a href="http://unix.stackexchange.com">unix</a>&nbsp;
+<span style="color:#bec0cb;font-size:140%">&#9632;</span>&nbsp;<a href="http://apple.stackexchange.com">apple</a>&nbsp;
+<span style="color:#939185;font-size:140%">&#9632;</span>&nbsp;<a href="http://wordpress.stackexchange.com">wordpress</a>&nbsp;
+<span style="color:#ebf5f5;font-size:140%">&#9632;</span>&nbsp;<a href="http://physics.stackexchange.com">physics</a>&nbsp;
+<span style="color:#4176ab;font-size:140%">&#9632;</span>&nbsp;<a href="http://diy.stackexchange.com">home&nbsp;improvement</a>&nbsp;
+<span style="color:#d1d8d7;font-size:140%">&#9632;</span>&nbsp;<a href="http://gis.stackexchange.com">gis</a>&nbsp;
+<span style="color:#e5e2d3;font-size:140%">&#9632;</span>&nbsp;<a href="http://electronics.stackexchange.com">electrical&nbsp;engineering</a>&nbsp;
+<span style="color:#a4c639;font-size:140%">&#9632;</span>&nbsp;<a href="http://android.stackexchange.com">android</a>&nbsp;
+<span style="color:#2e4e60;font-size:140%">&#9632;</span>&nbsp;<a href="http://security.stackexchange.com">security</a>&nbsp;
+<span style="color:#45bcb5;font-size:140%">&#9632;</span>&nbsp;<a href="http://bicycles.stackexchange.com">bicycles</a>&nbsp;
+<span style="color:#00adee;font-size:140%">&#9632;</span>&nbsp;<a href="http://dba.stackexchange.com">dba</a>&nbsp;
+<span style="color:#2edaf0;font-size:140%">&#9632;</span>&nbsp;<a href="http://drupal.stackexchange.com">drupal</a>&nbsp;
+<span style="color:#213951;font-size:140%">&#9632;</span>&nbsp;<a href="http://sharepoint.stackexchange.com">sharepoint</a>&nbsp;
+<span style="color:#73abb3;font-size:140%">&#9632;</span>&nbsp;<a href="http://scifi.stackexchange.com">scifi&nbsp;&amp;&nbsp;fantasy</a>&nbsp;
+<span style="color:#23629F;font-size:140%">&#9632;</span>&nbsp;<a href="http://ux.stackexchange.com">ux</a>&nbsp;
+<span style="color:#faff72;font-size:140%">&#9632;</span>&nbsp;<a href="http://skeptics.stackexchange.com">skeptics</a>&nbsp;
+<span style="color:#623121;font-size:140%">&#9632;</span>&nbsp;<a href="http://rpg.stackexchange.com">rpg</a>&nbsp;
+<span style="color:#e4be88;font-size:140%">&#9632;</span>&nbsp;<a href="http://judaism.stackexchange.com">judaism</a>&nbsp;
+<span style="color:#ffecb1;font-size:140%">&#9632;</span>&nbsp;<a href="http://mathematica.stackexchange.com">mathematica</a>&nbsp;
+<span style="color:#1b8598;font-size:140%">&#9632;</span>&nbsp;<a href="http://travel.stackexchange.com">travel</a>&nbsp;
+                </div>
+            </div>
+            <div id="footer-flair">
+                <a class="peer1" href="http://www.peer1.com/stackoverflow"></a>  
+	            <a href="http://creativecommons.org/licenses/by-sa/3.0/" class="cc-wiki-link"></a>
+                <div id="svnrev">rev 2013.4.1.598</div>
+                        </div>
+            <div id="copyright">
+                site design / logo &copy; 2013 stack exchange inc; 
+                user contributions licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/" rel="license">cc-wiki</a> with <a href="http://blog.stackoverflow.com/2009/06/attribution-required/" rel="license">attribution required</a>
+            </div>
+            
+
+        </div>
+    </div>
+    
+    <noscript>
+        <div id="noscript-warning">Stack Overflow works best with JavaScript enabled<img src="http://pixel.quantserve.com/pixel/p-c1rF4kxgLUzNc.gif" alt="" class="dno"></div>
+    </noscript>
+    <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-5620270-1']);
+        _gaq.push(['_setCustomVar', 1, 'tags', '|python|c|']); 
+_gaq.push(['_trackPageview']);
+    var _qevents = _qevents || [];
+    (function(){
+        var s=document.getElementsByTagName('script')[0];
+        var ga=document.createElement('script');
+        ga.type='text/javascript';
+        ga.async=true;
+        ga.src='http://www.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(ga,s);
+        var sc=document.createElement('script');
+        sc.type='text/javascript';
+        sc.async=true;
+        sc.src='http://edge.quantserve.com/quant.js'; 
+        s.parentNode.insertBefore(sc,s);
+    })();
+    </script>
+    <script type="text/javascript">
+        _qevents.push({ qacct: "p-c1rF4kxgLUzNc" });
+    </script>        
+    
+</body>
+</html>

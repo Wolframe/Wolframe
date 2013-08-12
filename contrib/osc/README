@@ -8,12 +8,12 @@ Links:
 
 How to use the repos:
 
-# Add to /etc/apt/sources.list
-deb http://download.opensuse.org/repositories/home:/andreas_baumann/xUbuntu_11.04 ./
+# Add to /etc/apt/sources.list (at the end!):
+deb http://download.opensuse.org/repositories/home:/andreas_baumann/xUbuntu_12.04 ./
 
 # get repmod key (Ubuntu have no keys!?)
-wget 'http://download.opensuse.org/repositories/home:/andreas_baumann/CentOS_CentOS-5/repodata/repomd.xml.key
-apt-key add repomd.xml.key
+wget -O obs-home:abaumann.pkey 'http://download.opensuse.org/repositories/home:/andreas_baumann/CentOS_CentOS-5/repodata/repomd.xml.key
+apt-key add obs-home:abaumann.pkey
 
 # add libboost1.48-dev (only for Ubuntu 10.04 and Debian 6.0!)
 apt-get install libboost1.48-dev libboost-thread1.48-dev libboost-system1.48-dev libboost-program-options1.48-dev libboost-filesystem1.48-dev
