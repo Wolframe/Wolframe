@@ -32,11 +32,14 @@ Project Wolframe.
 ///\file mylangFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for mylang scripts
 #include "mylangFunctionProgramType.hpp"
+#include "mylangFunctionCall.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "logger/logger-v1.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
+#include <vector>
+#include <string>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
@@ -76,15 +79,16 @@ public:
 class MyLangInstance
 {
 public:
-	MyLangInstance(){}
+	MyLangInstance()
+		:m_structptr(0){}
+
 	MyLangInstance( const MyLangInstance&){}
+
 
 	///\brief Methods to build the input structure native for the called language (pass parameters)
 	void init( const proc::ProcessorProvider* provider);
-	void open( const types::Variant& tag);
-	void close();
-	void setValue( const types::Variant& value);
-	void setValue( const types::Variant& tag, const types::Variant& value);
+	void setValue( StructPointer* obj, const types::Variant& value);
+	void setValue( StructPointer* obj, const types::Variant& tag, const types::Variant& value);
 
 	///\brief Function call with all parameters initialized
 	void call()
@@ -97,6 +101,14 @@ public:
 	{
 		return TypedInputFilterR( new MyLangResult( this));
 	}
+
+	StructReference inputdata() const
+	{
+		return StructReference( types::Variant(), m_structptr);
+	}
+
+private:
+	StructReference* m_structptr;	//< pointer to input structure
 };
 
 typedef types::CountedReference<MyLangInstance> MyLangInstanceR;
@@ -122,46 +134,65 @@ public:
 
 	virtual ~MylangFormFunctionClosure(){}
 
+	std::string currentElementPath()
+	{
+		std::string rt;
+		std::vector<StructReference>::const_iterator ci = m_initStmStack.begin(), ce = m_initStmStack.end();
+		for (; ci != ce; ++ci)
+		{
+			if (rt.size()) rt.append("/");
+			if (ci->id.defined()) rt.append( ci->id.tostring());
+		}
+	}
+
 	virtual bool call()
 	{
 		if (m_initialized)
 		{
-			InputFilter::ElementType type;
-			types::VariantConst elem;
-			while (!m_initialized && m_arg->getNext( type, elem))
+			try
 			{
-				switch (type)
+				InputFilter::ElementType type;
+				types::VariantConst elem;
+				while (!m_initialized && m_arg->getNext( type, elem))
 				{
-					case InputFilter::OpenTag:
-						++m_taglevel;
-						m_interp->open( elem);
-						break;
-					case InputFilter::Attribute:
-						m_tagbuf = elem;
-						break;
-					case InputFilter::Value:
-						if (m_tagbuf.defined())
+					switch (type)
+					{
+						case InputFilter::OpenTag:
 						{
-							m_interp->setValue( m_tagbuf, elem);
+							StructPointer* substruct = m_initStmStack.back().getSubstruct( elem);
+							if (!substruct) throw std::runtime_error( std::string("input element not defined '") + elem.tostring() + "'");
+							m_initStmStack.push_back( MyLangInstance::StructReference( elem, substruct));
+							break;
 						}
-						else
-						{
-							m_interp->setValue( elem);
-						}
-						m_tagbuf.clear();
-						break;
-					case InputFilter::CloseTag:
-						--m_taglevel;
-						if (m_taglevel < 0)
-						{
-							m_initialized = true;
-						}
-						else
-						{
-							m_interp->close();
-						}
-						break;
+						case InputFilter::Attribute:
+							m_tagbuf = elem;
+							break;
+
+						case InputFilter::Value:
+							if (m_tagbuf.defined())
+							{
+								m_interp->setValue( m_initStmStack.back().ptr, m_tagbuf, elem);
+							}
+							else
+							{
+								m_interp->setValue( m_initStmStack.back().ptr, elem);
+							}
+							m_tagbuf.clear();
+							break;
+
+						case InputFilter::CloseTag:
+							m_initStmStack.pop_back();
+							if (m_initStmStack.empty())
+							{
+								m_initialized = true;
+							}
+							break;
+					}
 				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string( "error in parameter at ") + currentElementPath() + ": " + e.what());
 			}
 			if (!m_initialized) return false;
 		}
@@ -177,7 +208,8 @@ public:
 		// m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
 		//... call this for languages that need arrays to be serialized with indices if available
 		m_initialized = false;
-		m_taglevel = 0;
+		m_initStmStack.clear();
+		m_initStmStack.push_back( m_interp->inputdata());
 	}
 
 	virtual TypedInputFilterR result() const
@@ -191,7 +223,7 @@ private:
 	std::string m_name;
 	TypedInputFilterR m_arg;
 	bool m_initialized;
-	int m_taglevel;
+	std::vector<StructReference> m_initStmStack;
 	types::Variant m_tagbuf;
 };
 
