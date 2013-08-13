@@ -1,0 +1,4 @@
+LIBRARY mod_command_mylang
+
+EXPORTS
+entryPoint	@1
