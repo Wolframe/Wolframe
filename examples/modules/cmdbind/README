@@ -1,0 +1,18 @@
+Special cases in bindings:
+
+1) Handling bindings without declaration of data structures (for example python):
+
+Scripting that do not know declaration of data cannot distinguish themselves between
+arrays containing one element and a single value. These languages can set the flag
+TypedInputFilter::SerializeWithIndices in their input to get the information needed,
+if available. Please note that some filters cannot provide this information and may
+throw an exception because of this. For example ordinary input filters throw
+"filter cannot serialize with indices". This error message is not very much user
+friendly and explaining the problem. So exception thrown should be catched by the
+language binding when calling setFlag and be translated into something more
+explicit like for example "the python binding cannot handle input without input form declaration".
+When TypedInputFilter::SerializeWithIndices is set then arrays are transfered with an
+open for the element name, a correspoding close and an open and close with an incremental
+index starting from 1 for every element.
+
+

@@ -90,6 +90,9 @@ void wrap_lua_gettable( lua_State* ls, int arg)				{std::cout << "lua_gettable" 
 void wrap_lua_settable( lua_State* ls, int arg)				{std::cout << "lua_settable" << "("  << arg << ")" << std::endl; ::lua_settable( ls, arg); print_luaStack( ls);}
 bool wrap_lua_next( lua_State* ls, int arg)				{std::cout << "lua_next" << "("  << arg << ")" << std::endl; int rt = ::lua_next( ls, arg); print_luaStack( ls); return rt;}
 const char* wrap_lua_tostring( lua_State* ls, int arg)			{std::cout << "lua_tostring" << "("  << arg << ")" << std::endl; return ::lua_tostring( ls, arg);}
+const char* wrap_lua_tolstring( lua_State* ls, int arg, size_t* size)	{std::cout << "lua_tolstring" << "("  << arg << ")" << std::endl; return ::lua_tolstring( ls, arg, size);}
+double wrap_lua_tonumber( lua_State* ls, int arg)			{std::cout << "lua_tonumber" << "("  << arg << ")" << std::endl; return ::lua_tonumber( ls, arg);}
+bool wrap_lua_toboolean( lua_State* ls, int arg)			{std::cout << "lua_toboolean" << "("  << arg << ")" << std::endl; return ::lua_toboolean( ls, arg);}
 #else
 #define wrap_lua_pushnil( ls)		lua_pushnil(ls)
 #define wrap_lua_pushvalue( ls,a)	lua_pushvalue(ls,a)
@@ -102,9 +105,11 @@ const char* wrap_lua_tostring( lua_State* ls, int arg)			{std::cout << "lua_tost
 #define wrap_lua_newtable( ls)		lua_newtable(ls)
 #define wrap_lua_gettable( ls,a)	lua_gettable(ls,a)
 #define wrap_lua_settable( ls,a)	lua_settable(ls,a)
-#define wrap_lua_settable( ls,a)	lua_settable(ls,a)
 #define wrap_lua_next( ls,a)		lua_next(ls,a)
 #define wrap_lua_tostring( ls,a)	lua_tostring(ls,a)
+#define wrap_lua_tolstring( ls,a,n)	lua_tolstring(ls,a,n)
+#define wrap_lua_tonumber( ls,a)	lua_tonumber(ls,a)
+#define wrap_lua_toboolean( ls,a)	lua_toboolean(ls,a)
 #endif
 
 static bool getElementValue( lua_State* ls, int idx, types::VariantConst& element, const char*& errelemtype)
@@ -117,15 +122,15 @@ static bool getElementValue( lua_State* ls, int idx, types::VariantConst& elemen
 			return false;
 
 		case LUA_TNUMBER:
-			element = (double)lua_tonumber(ls, idx);
+			element = (double)wrap_lua_tonumber(ls, idx);
 			return true;
 
 		case LUA_TBOOLEAN:
-			element = (bool)lua_toboolean(ls, idx);
+			element = (bool)wrap_lua_toboolean(ls, idx);
 			return true;
 
 		case LUA_TSTRING:
-			lstr = (const char*)lua_tolstring( ls, idx, &lstrlen);
+			lstr = (const char*)wrap_lua_tolstring( ls, idx, &lstrlen);
 			element.init( lstr, lstrlen);
 			return true;
 		default:
@@ -139,10 +144,7 @@ LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 {
-	FetchState fs;
-	fs.id = FetchState::Init;
-	fs.tag = 0;
-	fs.tagsize = 0;
+	FetchState fs( FetchState::Init);
 	m_stk.push_back( fs);
 }
 
@@ -166,9 +168,8 @@ bool LuaTableInputFilter::getValue( int idx, types::VariantConst& element)
 
 bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 {
-	FetchState fs;
-	lua_pushnil( m_ls);
-	if (!lua_next( m_ls, -2))
+	wrap_lua_pushnil( m_ls);
+	if (!wrap_lua_next( m_ls, -2))
 	{
 		return false;
 	}
@@ -176,32 +177,35 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 	{
 		case LUA_TNUMBER:
 		{
-			//... first key is number. we treat it as a vector
+			if (flag( SerializeWithIndices))
+			{
+				//... first key is number, but we have to serialize with indices, so we treat is as a simple table
+				FetchState fs( FetchState::TableIterOpen);
+				m_stk.push_back( fs);
+				return true;
+			}
+			//... first key is number and we do not need to serialize with indices, so we treat it as a vector with repeating open tag for vector elements
 			if (!tag)
 			{
 				setState( InputFilter::Error, "cannot build filter for an array because tag as string is missing");
-				lua_pop( m_ls, 2);
+				wrap_lua_pop( m_ls, 2);
 				return false;
 			}
-			fs.id = FetchState::VectorIterValue;
-			fs.tag = tag;
-			fs.tagsize = std::strlen( tag);
+			FetchState fs( FetchState::VectorIterValue, tag, std::strlen( tag));
 			m_stk.push_back( fs);
 			return true;
 		}
 		case LUA_TSTRING:
 		{
 			//... first key is string, we treat it as a struct
-			fs.id = FetchState::TableIterOpen;
-			fs.tag = 0;
-			fs.tagsize = 0;
+			FetchState fs( FetchState::TableIterOpen);
 			m_stk.push_back( fs);
 			return true;
 		}
 		default:
 		{
 			setState( InputFilter::Error, "cannot treat table as a struct nor an array");
-			lua_pop( m_ls, 2);
+			wrap_lua_pop( m_ls, 2);
 			return false;
 		}
 	}
@@ -209,12 +213,24 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 
 bool LuaTableInputFilter::nextTableElem()
 {
-	lua_pop( m_ls, 1);
-	if (!lua_next( m_ls, -2))
+	wrap_lua_pop( m_ls, 1);
+	if (!wrap_lua_next( m_ls, -2))
 	{
 		return false;
 	}
 	return true;
+}
+
+static const char* getTagName( lua_State* ls, int idx)
+{
+	if (lua_type( ls, idx) == LUA_TSTRING)
+	{
+		return lua_tostring( ls, idx);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& element)
@@ -293,7 +309,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				if (lua_istable( m_ls, -1))
 				{
 					m_stk.back().id = FetchState::TableIterClose;
-					const char* tag = lua_isstring(m_ls,-2)?lua_tostring( m_ls,-2):0;
+					const char* tag = getTagName( m_ls,-2);
 					if (!firstTableElem(tag) && state() == InputFilter::Error) return false;
 					continue;
 				}
@@ -308,7 +324,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				if (lua_istable( m_ls, -1))
 				{
 					m_stk.back().id = FetchState::TableIterNext;
-					const char* tag = lua_isstring(m_ls,-2)?lua_tostring( m_ls,-2):0;
+					const char* tag = (lua_type(m_ls,-2)==LUA_TSTRING)?lua_tostring( m_ls,-2):0;
 					if (!firstTableElem(tag) && state() == InputFilter::Error) return false;
 					continue;
 				}
@@ -383,13 +399,13 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 
 bool LuaTableOutputFilter::openTag( const types::VariantConst& element)
 {
-	if (!pushValue( element)) return false;		///... LUA STK: t k   (t=Table,k=Key)
-	wrap_lua_pushvalue( m_ls, -1);			///... LUA STK: t k k
-	wrap_lua_gettable( m_ls, -3);			///... LUA STK: t k t[k]
+	if (!pushValue( element)) return false;			///... LUA STK: t k   (t=Table,k=Key)
+	wrap_lua_pushvalue( m_ls, -1);				///... LUA STK: t k k
+	wrap_lua_gettable( m_ls, -3);				///... LUA STK: t k t[k]
 	if (lua_isnil( m_ls, -1))
 	{
 		///... element with this key not yet defined. so we define it
-		wrap_lua_pop( m_ls, 1);			///... LUA STK: t k
+		wrap_lua_pop( m_ls, 1);				///... LUA STK: t k
 		wrap_lua_newtable( m_ls);			///... LUA STK: t k NEWTABLE
 		m_statestk.push_back( Struct);
 		return true;
@@ -397,12 +413,12 @@ bool LuaTableOutputFilter::openTag( const types::VariantConst& element)
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
 	wrap_lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
-	wrap_lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
+	wrap_lua_gettable( m_ls, -2);				///... LUA STK: t k t[k] t[k][#t[k]]
 	bool isArray = !lua_isnil( m_ls, -1);
 	if (isArray)
 	{
 		///... the table is an array
-		wrap_lua_pop( m_ls, 1);			///... LUA STK: t k ar
+		wrap_lua_pop( m_ls, 1);				///... LUA STK: t k ar
 		wrap_lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
 		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
 		m_statestk.push_back( Vector);
@@ -410,13 +426,13 @@ bool LuaTableOutputFilter::openTag( const types::VariantConst& element)
 	else
 	{
 		///... the table is a structure. but the element is already defined. we create an array
-		wrap_lua_pop( m_ls, 2);			///... LUA STK: t k
+		wrap_lua_pop( m_ls, 2);				///... LUA STK: t k
 		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar
-		wrap_lua_pushinteger( m_ls, 1);		///... LUA STK: t k ar 1
-		wrap_lua_pushvalue( m_ls, -3);		///... LUA STK: t k ar 1 k
-		wrap_lua_gettable( m_ls, -5);		///... LUA STK: t k ar 1 t[k]
-		wrap_lua_settable( m_ls, -3);		///... LUA STK: t k ar             (ar[1]=t[k])
-		wrap_lua_pushinteger( m_ls, 2);		///... LUA STK: t k ar 2
+		wrap_lua_pushinteger( m_ls, 1);			///... LUA STK: t k ar 1
+		wrap_lua_pushvalue( m_ls, -3);			///... LUA STK: t k ar 1 k
+		wrap_lua_gettable( m_ls, -5);			///... LUA STK: t k ar 1 t[k]
+		wrap_lua_settable( m_ls, -3);			///... LUA STK: t k ar             (ar[1]=t[k])
+		wrap_lua_pushinteger( m_ls, 2);			///... LUA STK: t k ar 2
 		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
 		m_statestk.push_back( Vector);
 	}

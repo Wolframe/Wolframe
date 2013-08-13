@@ -56,6 +56,15 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 	return rt;
 }
 
+void TypingInputFilter::setFlags( Flags f)
+{
+	langbind::TypedInputFilter::setFlags( f);
+	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
+	{
+		throw std::runtime_error("filter cannot serialize with indices");
+	}
+}
+
 bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
 	bool rt = true;

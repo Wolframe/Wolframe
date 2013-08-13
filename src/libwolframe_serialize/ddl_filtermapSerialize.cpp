@@ -276,6 +276,15 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, type
 	return true;
 }
 
+void DDLStructSerializer::setFlags( Flags f)
+{
+	langbind::TypedInputFilter::setFlags( f);
+	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
+	{
+		m_ctx.setFlags( Context::SerializeWithIndices);
+	}
+}
+
 DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 	:types::TypeSignature("serialize::DDLStructSerializer", __LINE__)
 	,m_st(st)

@@ -174,6 +174,8 @@ public:
 	{
 		m_interp->init( provider);
 		m_arg = arg;
+		// m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
+		//... call this for languages that need arrays to be serialized with indices if available
 		m_initialized = false;
 		m_taglevel = 0;
 	}

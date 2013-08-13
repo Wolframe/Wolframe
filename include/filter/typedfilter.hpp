@@ -99,7 +99,7 @@ public:
 	};
 
 	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
-	void setFlags( Flags f)				{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
+	virtual void setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
 	void resetFlags()				{m_flags = None;}
 
 private:

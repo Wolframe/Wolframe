@@ -2028,7 +2028,7 @@ LuaScript::LuaScript( const std::string& path_)
 		lua_pushnil(ls);
 		while (lua_next( ls, -2))
 		{
-			if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
+			if (lua_isfunction( ls, -1) && lua_type( ls, -2) == LUA_TSTRING)
 			{
 				sysfuncmap[ lua_tostring( ls, -2)] = true;
 			}

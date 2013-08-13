@@ -114,6 +114,12 @@ private:
 			static const char* ar[] = {"Init","TableIterOpen","TableIterValue","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
 			return ar[ (int)i];
 		}
+
+		FetchState()							:id(Init),tag(0),tagsize(0){}
+		FetchState( const FetchState& o)				:id(o.id),tag(o.tag),tagsize(o.tagsize){}
+		FetchState( Id id_)						:id(id_),tag(0),tagsize(0){}
+		FetchState( Id id_, const char* tag_, std::size_t tagsize_)	:id(id_),tag(tag_),tagsize(tagsize_){}
+
 		Id id;				//< state identifier
 		const char* tag;		//< caller tag, used enclosing tag by arrays
 		std::size_t tagsize;		//< size of tag

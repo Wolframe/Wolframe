@@ -64,6 +64,7 @@ public:
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
+	virtual void setFlags( Flags f);
 
 private:
 	InputFilterR m_inputfilter;

@@ -208,6 +208,14 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::
 	return true;
 }
 
+void StructSerializer::setFlags( Flags f)
+{
+	langbind::TypedInputFilter::setFlags( f);
+	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
+	{
+		m_ctx.setFlags( Context::SerializeWithIndices);
+	}
+}
 
 class OneElementTypedInputFilter
 	:public langbind::TypedInputFilter
