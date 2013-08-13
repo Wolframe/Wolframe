@@ -56,12 +56,17 @@ struct StructReference
 	///\remark throws on error
 	StructPointer* addSubstruct( const types::Variant& elemid_);
 
+	void setValue( const types::Variant& value);
+	void setValue( const types::Variant& tag, const types::Variant& value);
+	const types::Variant& getValue() const;
+	const types::Variant& getValue( const types::Variant& tag) const;
+
 	types::Variant id;
 	StructPointer* ptr;
 };
 
 ///\brief Mylang function call
-StructPointer* callMylangFunction( const proc::ProcessorProvider* provider, const StructPointer& arg);
+StructPointer* callMylangFunction( const proc::ProcessorProvider* provider, const StructPointer* arg);
 
 }} //namespace
 #endif

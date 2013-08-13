@@ -1,4 +1,4 @@
-TOPDIR = ../../../..
+TOPDIR = ../../..
 
 SUBDIRS =
 
@@ -22,6 +22,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_mylang.so
 
 CPP_OBJS = \
+	mylangFunctionCall.o \
 	mylangFunctionProgramType.o \
 	mod_command_mylang.o
 

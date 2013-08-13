@@ -26,6 +26,7 @@ DYNAMIC_MODULE = \
 	mod_command_mylang.dll
 
 CPP_OBJS = \
+	mylangFunctionCall.obj \
 	mylangFunctionProgramType.obj \
 	mod_command_mylang.obj
 

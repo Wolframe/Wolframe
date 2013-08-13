@@ -93,22 +93,24 @@ public:
 	///\brief Function call with all parameters initialized
 	void call()
 	{
-		/// CALL INTERPRETER HERE WITH THE OBJECT CONSTRUCTED
+		m_output = callMylangFunction( m_provider, m_input);
 	}
 
 	///\brief Fetch the function call result object
 	TypedInputFilterR result()
 	{
-		return TypedInputFilterR( new MyLangResult( this));
+		return TypedInputFilterR( new MyLangResult( m_output));
 	}
 
 	StructReference inputdata() const
 	{
-		return StructReference( types::Variant(), m_structptr);
+		return StructReference( types::Variant(), m_input);
 	}
 
 private:
-	StructReference* m_structptr;	//< pointer to input structure
+	const proc::ProcessorProvider* m_provider;	//< pointer to provider
+	StructReference* m_input;			//< pointer to input structure
+	StructReference* m_output;			//< pointer to output structure
 };
 
 typedef types::CountedReference<MyLangInstance> MyLangInstanceR;
