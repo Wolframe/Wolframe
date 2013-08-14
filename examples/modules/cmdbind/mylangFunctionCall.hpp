@@ -33,40 +33,65 @@ Project Wolframe.
 ///\brief Function call for mylang scripts
 #ifndef _Wolframe_Mylang_FUNCTION_CALL_HPP_INCLUDED
 #define _Wolframe_Mylang_FUNCTION_CALL_HPP_INCLUDED
+#include <utility>
+#include <vector>
+#include "types/variant.hpp"
+#include "types/countedReference.hpp"
+#include "processor/procProvider.hpp"
 
 namespace _Wolframe {
 namespace langbind {
+namespace mylang {
 
-struct StructPointer;
-
-struct StructReference
+///\class Instance
+///\brief Interpreter instance for executing a function
+struct Instance
 {
-	StructReference()
-		:ptr(0){}
-	StructReference( const StructReference& o)
-		:id(o.id),ptr(o.ptr){}
-	StructReference( const types::Variant& id_, void* ptr_)
-		:id(id_),ptr(ptr_){}
+	Instance(){}
+};
 
-	///\brief Get a pointer to a substructure or 0 if not defined
-	///\remark throws on error
-	StructPointer* getSubstruct( const types::Variant& elemid_);
+typedef types::CountedReference<Instance> InstanceR;
+
+///\class Context
+///\brief Global interpreter context with all data structures needed to create interpreter instances addressed by function names
+struct Context
+{
+	Context();
+
+	std::vector<std::string> loadProgram( const std::string& name);
+	InstanceR getInstance( const std::string& name) const;
+};
+
+struct Structure
+{
+	explicit Structure( const InstanceR& instance_)
+		:m_instance(instance_){}
 
 	///\brief Create a substructure and get a pointer to it
 	///\remark throws on error
-	StructPointer* addSubstruct( const types::Variant& elemid_);
+	Structure* addSubstruct( const types::Variant& elemid_);
 
 	void setValue( const types::Variant& value);
-	void setValue( const types::Variant& tag, const types::Variant& value);
 	const types::Variant& getValue() const;
-	const types::Variant& getValue( const types::Variant& tag) const;
 
-	types::Variant id;
-	StructPointer* ptr;
+	bool atomic() const;
+
+	typedef std::vector<std::pair<types::Variant,Structure*> >::const_iterator const_iterator;
+	const_iterator begin() const;
+	const_iterator end() const;
+
+private:
+	InstanceR m_instance;
 };
 
+typedef types::CountedReference<Structure> StructureR;
+
 ///\brief Mylang function call
-StructPointer* callMylangFunction( const proc::ProcessorProvider* provider, const StructPointer* arg);
+StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
+
+}//namespace mylang
+
+
 
 }} //namespace
 #endif

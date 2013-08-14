@@ -3,9 +3,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-StructPointer* langbind::callMylangFunction( const proc::ProcessorProvider*, const StructPointer& )
+mylang::StructureR mylang::call( const proc::ProcessorProvider* provider, const mylang::StructureR& arg)
 {
 	// IMPLEMENT CALL HERE
-	return 0;
+	return StructureR();
 }
 

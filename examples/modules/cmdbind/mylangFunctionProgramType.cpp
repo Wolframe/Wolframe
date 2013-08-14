@@ -48,16 +48,20 @@ using namespace _Wolframe::langbind;
 
 namespace {
 
-class MyLangInstance;
-
 ///\class MyLangResult
 ///\brief Structure representing the result of a function call
 class MyLangResult
-	:public TypedInputFilterR
+	:public TypedInputFilter
 {
 public:
-	MyLangResult( const MyLangInstance* i);
-	MyLangResult( const MyLangResult& o);
+	MyLangResult( const mylang::StructureR& data_)
+		:types::TypeSignature("langbind::MyLangResult", __LINE__)
+		,m_data(data_){}
+
+	MyLangResult( const MyLangResult& o)
+		:types::TypeSignature("langbind::MyLangResult", __LINE__)
+		,TypedInputFilter(o)
+		,m_data(o.m_data){}
 
 	virtual TypedInputFilter* copy() const
 	{
@@ -68,61 +72,57 @@ public:
 	///\param [out] type element type parsed
 	///\param [out] element reference to element returned
 	///\return true, throws on error
-	virtual bool getNext( ElementType& type, types::VariantConst& element)
+	virtual bool getNext( TypedInputFilter::ElementType& type, types::VariantConst& element)
 	{
-		/// IMPLEMENT ITERATOR ON THE RESULT HERE
-	}
-};
-
-///\class MyLangResult
-///\brief Structure representing one instance of an intepreter built to execute one function call
-class MyLangInstance
-{
-public:
-	MyLangInstance()
-		:m_structptr(0){}
-
-	MyLangInstance( const MyLangInstance&){}
-
-
-	///\brief Methods to build the input structure native for the called language (pass parameters)
-	void init( const proc::ProcessorProvider* provider);
-	void setValue( StructPointer* obj, const types::Variant& value);
-	void setValue( StructPointer* obj, const types::Variant& tag, const types::Variant& value);
-
-	///\brief Function call with all parameters initialized
-	void call()
-	{
-		m_output = callMylangFunction( m_provider, m_input);
-	}
-
-	///\brief Fetch the function call result object
-	TypedInputFilterR result()
-	{
-		return TypedInputFilterR( new MyLangResult( m_output));
-	}
-
-	StructReference inputdata() const
-	{
-		return StructReference( types::Variant(), m_input);
+		if (!m_stk.empty() && m_stk.back().first == m_stk.back().second)
+		{
+			type = InputFilter::CloseTag;
+			element.clear();
+			m_stk.pop_back();
+			return true;
+		}
+		if (m_stk.empty())
+		{
+			type = InputFilter::CloseTag;
+			element.clear();
+			return true;
+		}
+		for (;;)
+		{
+			if (m_bufidx < m_buf.size())
+			{
+				type = m_buf.at( m_bufidx).first;
+				element = m_buf.at( m_bufidx).second;
+				++m_bufidx;
+			}
+			m_bufidx = 0;
+			m_buf.clear();
+			if (m_stk.back().first->second->atomic())
+			{
+				m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().first->first));
+				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().first->second->getValue()));
+				m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
+				m_stk.back().first++;
+			}
+			else
+			{
+				m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().first->first));
+				mylang::Structure::const_iterator citr = m_stk.back().first++;
+				m_stk.push_back( StackElem( citr, m_stk.back().first->second->end()));
+			}
+		}
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;	//< pointer to provider
-	StructReference* m_input;			//< pointer to input structure
-	StructReference* m_output;			//< pointer to output structure
+	const mylang::StructureR m_data;
+	typedef std::pair<TypedInputFilter::ElementType, types::Variant> BufElem;
+	std::vector<BufElem> m_buf;
+	std::size_t m_bufidx;
+	typedef std::pair<mylang::Structure::const_iterator,mylang::Structure::const_iterator> StackElem;
+	std::vector<StackElem> m_stk;
 };
 
-typedef types::CountedReference<MyLangInstance> MyLangInstanceR;
 
-///\class MyLangContext
-///\brief Global context with all data structures needed to create interpreter instances addressed by function names
-class MyLangContext
-{
-	MyLangContext();
-	std::vector<std::string> loadProgram( const std::string& name);
-	MyLangInstanceR getInstance( const std::string& name);
-};
 
 
 ///\class MylangFormFunctionClosure
@@ -131,20 +131,21 @@ class MylangFormFunctionClosure
 	:public langbind::FormFunctionClosure
 {
 public:
-	MylangFormFunctionClosure( const MyLangInstanceR& interp_, const std::string& name_)
-		:m_interp(interp_),m_name(name_),m_initialized(false),m_taglevel(0){}
+	MylangFormFunctionClosure( const std::string& name_, const mylang::InstanceR& interp_)
+		:m_name(name_),m_initialized(false),m_interp(interp_),m_provider(0){}
 
 	virtual ~MylangFormFunctionClosure(){}
 
 	std::string currentElementPath()
 	{
 		std::string rt;
-		std::vector<StructReference>::const_iterator ci = m_initStmStack.begin(), ce = m_initStmStack.end();
+		std::vector<InitStackElem>::const_iterator ci = m_initStmStack.begin(), ce = m_initStmStack.end();
 		for (; ci != ce; ++ci)
 		{
-			if (rt.size()) rt.append("/");
-			if (ci->id.defined()) rt.append( ci->id.tostring());
+			if (rt.size()) rt.append( "/");
+			if (ci->first.defined()) rt.append( ci->first.tostring());
 		}
+		return rt;
 	}
 
 	virtual bool call()
@@ -161,9 +162,8 @@ public:
 					{
 						case InputFilter::OpenTag:
 						{
-							StructPointer* substruct = m_initStmStack.back().getSubstruct( elem);
-							if (!substruct) throw std::runtime_error( std::string("input element not defined '") + elem.tostring() + "'");
-							m_initStmStack.push_back( MyLangInstance::StructReference( elem, substruct));
+							mylang::Structure* substruct = m_initStmStack.back().second->addSubstruct( elem);
+							m_initStmStack.push_back( InitStackElem( elem, substruct));
 							break;
 						}
 						case InputFilter::Attribute:
@@ -173,11 +173,12 @@ public:
 						case InputFilter::Value:
 							if (m_tagbuf.defined())
 							{
-								m_interp->setValue( m_initStmStack.back().ptr, m_tagbuf, elem);
+								mylang::Structure* substruct = m_initStmStack.back().second->addSubstruct( m_tagbuf);
+								substruct->setValue( elem);
 							}
 							else
 							{
-								m_interp->setValue( m_initStmStack.back().ptr, elem);
+								m_initStmStack.back().second->setValue( elem);
 							}
 							m_tagbuf.clear();
 							break;
@@ -194,24 +195,25 @@ public:
 			}
 			catch (const std::runtime_error& e)
 			{
-				throw std::runtime_error( std::string( "error in parameter at ") + currentElementPath() + ": " + e.what());
+				throw std::runtime_error( std::string( "error function call ") + m_name + " in parameter at " + currentElementPath() + ": " + e.what());
 			}
 			if (!m_initialized) return false;
 		}
-		m_interp->call();
-		m_result = m_interp->result();
+		m_output = mylang::call( m_provider, m_input);
+		m_result.reset( new MyLangResult( m_output));
 		return true;
 	}
 
 	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
 	{
-		m_interp->init( provider);
+		m_provider = provider;
 		m_arg = arg;
 		// m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
 		//... call this for languages that need arrays to be serialized with indices if available
 		m_initialized = false;
 		m_initStmStack.clear();
-		m_initStmStack.push_back( m_interp->inputdata());
+		m_input.reset( new mylang::Structure( m_interp));
+		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
 	}
 
 	virtual TypedInputFilterR result() const
@@ -220,13 +222,17 @@ public:
 	}
 
 private:
-	MyLangInstanceR m_interp;
-	TypedInputFilterR m_result;
-	std::string m_name;
-	TypedInputFilterR m_arg;
-	bool m_initialized;
-	std::vector<StructReference> m_initStmStack;
-	types::Variant m_tagbuf;
+	TypedInputFilterR m_result;			//< result of the function call
+	std::string m_name;				//< name of the function called for error messages
+	TypedInputFilterR m_arg;			//< call argument as input filter
+	bool m_initialized;				//< true, if the input has been initialized
+	typedef std::pair<types::Variant,mylang::Structure*> InitStackElem;
+	std::vector<InitStackElem> m_initStmStack;	//< Stack for substructure initialization
+	types::Variant m_tagbuf;			//< buffer for attribute name to handle Attribute,Value pair
+	mylang::StructureR m_input;			//< pointer to input structure
+	mylang::StructureR m_output;			//< pointer to output structure
+	mylang::InstanceR m_interp;			//< interpreter instance
+	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
 };
 
 
@@ -236,20 +242,20 @@ class MylangFormFunction
 	:public langbind::FormFunction
 {
 public:
-	MylangFormFunction( const MylangContext* context_, const std::string& name_)
+	MylangFormFunction( const mylang::Context* context_, const std::string& name_)
 		:m_context(context_),m_name(name_){}
 
 	virtual ~MylangFormFunction(){}
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		MyLangInstanceR interp = getInstance( m_name);
-		if (!interp->get()) return 0;
-		return new MylangFormFunctionClosure( interp, m_name);
+		mylang::InstanceR interp = m_context->getInstance( m_name);
+		if (!interp.get()) return 0;
+		return new MylangFormFunctionClosure( m_name, interp);
 	}
 
 private:
-	const MylangContext* m_context;
+	const mylang::Context* m_context;
 	std::string m_name;
 };
 
@@ -282,7 +288,7 @@ public:
 	}
 
 private:
-	MylangContext m_context;
+	mylang::Context m_context;
 };
 }//anonymous namespace
 
