@@ -320,7 +320,7 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 		case types::Variant::int_:
 			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), Prepared);
 		case types::Variant::uint_:
-			if (value.touint() < std::numeric_limits<int64_t>::max())
+			if (value.touint() < (unsigned)( std::numeric_limits<int64_t>::max() ))
 			{
 				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), Prepared);
 			}
