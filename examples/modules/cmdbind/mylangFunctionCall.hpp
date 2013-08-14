@@ -45,8 +45,9 @@ namespace mylang {
 
 ///\class Instance
 ///\brief Interpreter instance for executing a function
-struct Instance
+class Instance
 {
+public:
 	///\brief Constructor
 	Instance(){}
 	///\brief Destructor
@@ -61,8 +62,9 @@ typedef types::CountedReference<Instance> InstanceR;
 
 ///\class Context
 ///\brief Global interpreter context with all data structures needed to create interpreter instances addressed by function names
-struct Context
+class Context
 {
+public:
 	///\brief Constructor
 	Context();
 	///\brief Destructor
@@ -72,17 +74,24 @@ struct Context
 	InstanceR getInstance( const std::string& name) const;
 };
 
-struct Structure
+///\class Structure
+///\brief Data structure for input and output of a 'Mylang' function call
+class Structure
 {
+public:
+	///\brief Constructor
 	explicit Structure( const InstanceR& instance_)
 		:m_instance(instance_){}
+	virtual ~Structure(){}
 
 	///\brief Create a substructure and get a reference pointer to it
+	///\param[in] elemid_ Id of the created element
 	///\remark Throws on error
 	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
 	Structure* addSubstruct( const types::Variant& elemid_);
 
 	///\brief Setter for element value in case of an 'atomic' element or setter for content element in case of a structure
+	///\param[in] value value or content element of 'this'
 	void setValue( const types::Variant& value);
 	///\brief Getter for element value in case of an 'atomic' element or getter for content element in case of a structure
 	const types::Variant& getValue() const;
@@ -102,12 +111,13 @@ struct Structure
 	const_iterator end() const;
 
 private:
-	InstanceR m_instance;
+	InstanceR m_instance;		//< interpreter instance
 };
 
+///\brief Reference with ownership to a structure
 typedef types::CountedReference<Structure> StructureR;
 
-///\brief Mylang function call
+///\brief Call a function written in 'Mylang'
 StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
 
 }//namespace mylang
