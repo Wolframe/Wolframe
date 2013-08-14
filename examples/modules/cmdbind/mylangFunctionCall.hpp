@@ -47,7 +47,14 @@ namespace mylang {
 ///\brief Interpreter instance for executing a function
 struct Instance
 {
+	///\brief Constructor
 	Instance(){}
+	///\brief Destructor
+	virtual ~Instance(){}
+
+	///\brief Find out if the language binding needs indices (starting with '1') for array elements in the input to distinguish between single elements and arrays with one element
+	///\return true, if yes
+	bool needsArrayIndices() const		{return true;}
 };
 
 typedef types::CountedReference<Instance> InstanceR;
@@ -56,7 +63,10 @@ typedef types::CountedReference<Instance> InstanceR;
 ///\brief Global interpreter context with all data structures needed to create interpreter instances addressed by function names
 struct Context
 {
+	///\brief Constructor
 	Context();
+	///\brief Destructor
+	virtual ~Context(){}
 
 	std::vector<std::string> loadProgram( const std::string& name);
 	InstanceR getInstance( const std::string& name) const;
@@ -67,17 +77,28 @@ struct Structure
 	explicit Structure( const InstanceR& instance_)
 		:m_instance(instance_){}
 
-	///\brief Create a substructure and get a pointer to it
-	///\remark throws on error
+	///\brief Create a substructure and get a reference pointer to it
+	///\remark Throws on error
+	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
 	Structure* addSubstruct( const types::Variant& elemid_);
 
+	///\brief Setter for element value in case of an 'atomic' element or setter for content element in case of a structure
 	void setValue( const types::Variant& value);
+	///\brief Getter for element value in case of an 'atomic' element or getter for content element in case of a structure
 	const types::Variant& getValue() const;
 
+	///\brief Find out if 'this' represents an atomic value
+	///\return true, if 'this' represents an atomic value
 	bool atomic() const;
+	///\brief Find out if 'this' represents an array of 'Structure'
+	///\return true, if 'this' represents an array of 'Structure'
+	bool array() const;
 
+	///\brief Iterator on structure or array elements
 	typedef std::vector<std::pair<types::Variant,Structure*> >::const_iterator const_iterator;
+	///\brief Get the start iterator on structure or array elements
 	const_iterator begin() const;
+	///\brief Get the end marker for a structure or and array
 	const_iterator end() const;
 
 private:
@@ -90,7 +111,6 @@ typedef types::CountedReference<Structure> StructureR;
 StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
 
 }//namespace mylang
-
 
 
 }} //namespace
