@@ -1,5 +1,13 @@
-Function Call Implementation in mylangFunctionCall.cpp
-Wolframe Connector Implementations in mylangFunctionProgramType.cpp
+The example template 'mylang' binding:
+
+	The example implements a function call of a language binding with its input passed
+	as structure and the output returned as structure.
+		See mylang::StructureR mylang::call( const proc::ProcessorProvider*,Instance*,const StructureR&);
+
+	Besides the call you have to implement iterators on the data structure for the result
+	and setters and getters to build the structure that is passed as argument.
+
+	The implementation is in mylangFunctionCall.cpp
 
 
 Special cases in bindings:

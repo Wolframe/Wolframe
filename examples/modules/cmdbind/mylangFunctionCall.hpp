@@ -118,7 +118,7 @@ private:
 typedef types::CountedReference<Structure> StructureR;
 
 ///\brief Call a function written in 'Mylang'
-StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
+StructureR call( const proc::ProcessorProvider* provider, Instance* instance, const StructureR& arg);
 
 }//namespace mylang
 

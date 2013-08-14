@@ -242,7 +242,7 @@ public:
 			}
 			if (!m_initialized) return false;
 		}
-		m_output = mylang::call( m_provider, m_input);
+		m_output = mylang::call( m_provider, m_interp.get(), m_input);
 		m_result.reset( new MyLangResult( m_output));
 		return true;
 	}
