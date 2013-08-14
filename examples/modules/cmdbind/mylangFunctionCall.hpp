@@ -45,52 +45,82 @@ namespace mylang {
 
 ///\class Instance
 ///\brief Interpreter instance for executing a function
-struct Instance
+class Instance
 {
+public:
+	///\brief Constructor
 	Instance(){}
+	///\brief Destructor
+	virtual ~Instance(){}
+
+	///\brief Find out if the language binding needs indices (starting with '1') for array elements in the input to distinguish between single elements and arrays with one element
+	///\return true, if yes
+	bool needsArrayIndices() const		{return true;}
 };
 
 typedef types::CountedReference<Instance> InstanceR;
 
 ///\class Context
 ///\brief Global interpreter context with all data structures needed to create interpreter instances addressed by function names
-struct Context
+class Context
 {
+public:
+	///\brief Constructor
 	Context();
+	///\brief Destructor
+	virtual ~Context(){}
 
 	std::vector<std::string> loadProgram( const std::string& name);
 	InstanceR getInstance( const std::string& name) const;
 };
 
-struct Structure
+///\class Structure
+///\brief Data structure for input and output of a 'Mylang' function call
+class Structure
 {
+public:
+	///\brief Constructor
 	explicit Structure( const InstanceR& instance_)
 		:m_instance(instance_){}
+	virtual ~Structure(){}
 
-	///\brief Create a substructure and get a pointer to it
-	///\remark throws on error
+	///\brief Create a substructure and get a reference pointer to it
+	///\param[in] elemid_ Id of the created element
+	///\remark Throws on error
+	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
 	Structure* addSubstruct( const types::Variant& elemid_);
 
+	///\brief Setter for element value in case of an 'atomic' element or setter for content element in case of a structure
+	///\param[in] value value or content element of 'this'
 	void setValue( const types::Variant& value);
+	///\brief Getter for element value in case of an 'atomic' element or getter for content element in case of a structure
 	const types::Variant& getValue() const;
 
+	///\brief Find out if 'this' represents an atomic value
+	///\return true, if 'this' represents an atomic value
 	bool atomic() const;
+	///\brief Find out if 'this' represents an array of 'Structure'
+	///\return true, if 'this' represents an array of 'Structure'
+	bool array() const;
 
+	///\brief Iterator on structure or array elements
 	typedef std::vector<std::pair<types::Variant,Structure*> >::const_iterator const_iterator;
+	///\brief Get the start iterator on structure or array elements
 	const_iterator begin() const;
+	///\brief Get the end marker for a structure or and array
 	const_iterator end() const;
 
 private:
-	InstanceR m_instance;
+	InstanceR m_instance;		//< interpreter instance
 };
 
+///\brief Reference with ownership to a structure
 typedef types::CountedReference<Structure> StructureR;
 
-///\brief Mylang function call
-StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
+///\brief Call a function written in 'Mylang'
+StructureR call( const proc::ProcessorProvider* provider, Instance* instance, const StructureR& arg);
 
 }//namespace mylang
-
 
 
 }} //namespace

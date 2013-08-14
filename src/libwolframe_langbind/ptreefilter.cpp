@@ -39,6 +39,15 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+void PropertyTreeInputFilter::setFlags( Flags f)
+{
+	langbind::TypedInputFilter::setFlags( f);
+	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
+	{
+		throw std::runtime_error( "property tree filter cannot serialize with indices");
+	}
+}
+
 bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	while (m_stk.size())

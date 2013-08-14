@@ -74,11 +74,15 @@ public:
 	///\return true, throws on error
 	virtual bool getNext( TypedInputFilter::ElementType& type, types::VariantConst& element)
 	{
-		if (!m_stk.empty() && m_stk.back().first == m_stk.back().second)
+		if (!m_stk.empty() && m_stk.back().itr == m_stk.back().end)
 		{
-			type = InputFilter::CloseTag;
-			element.clear();
 			m_stk.pop_back();
+			if (!m_stk.back().tag.defined())
+			{
+				// ... if tag is defined then Open/Close was printed with every (array-) element
+				type = InputFilter::CloseTag;
+				element.clear();
+			}
 			return true;
 		}
 		if (m_stk.empty())
@@ -97,18 +101,48 @@ public:
 			}
 			m_bufidx = 0;
 			m_buf.clear();
-			if (m_stk.back().first->second->atomic())
+			if (m_stk.back().itr->second->atomic())
 			{
-				m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().first->first));
-				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().first->second->getValue()));
+				if (m_stk.back().tag.defined())
+				{
+					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().tag));
+				}
+				else
+				{
+					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+				}
+				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().itr->second->getValue()));
 				m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
-				m_stk.back().first++;
+				m_stk.back().itr++;
 			}
 			else
 			{
-				m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().first->first));
-				mylang::Structure::const_iterator citr = m_stk.back().first++;
-				m_stk.push_back( StackElem( citr, m_stk.back().first->second->end()));
+				types::Variant tag;
+				if (m_stk.back().itr->second->array() && !flag( TypedInputFilter::SerializeWithIndices))
+				{
+					if (m_stk.back().tag.defined())
+					{
+						throw std::runtime_error("illegal structure: array of array");
+					}
+					tag = m_stk.back().itr->first;
+					// ... if tag is defined then Open/Close will be printed with every (array-) element
+					//	and here we do not print an 'Open'
+				}
+				else
+				{
+					if (m_stk.back().tag.defined())
+					{
+						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().tag));
+					}
+					else
+					{
+						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+					}
+					// ... if tag is not defined then an 'Open' is printed
+					//	and a final 'Close' will be printed when the structure is popped from the stack.
+				}
+				mylang::Structure::const_iterator citr = m_stk.back().itr++;
+				m_stk.push_back( StackElem( citr, m_stk.back().itr->second->end(), tag));
 			}
 		}
 	}
@@ -118,11 +152,20 @@ private:
 	typedef std::pair<TypedInputFilter::ElementType, types::Variant> BufElem;
 	std::vector<BufElem> m_buf;
 	std::size_t m_bufidx;
-	typedef std::pair<mylang::Structure::const_iterator,mylang::Structure::const_iterator> StackElem;
+	struct StackElem
+	{
+		mylang::Structure::const_iterator itr;
+		mylang::Structure::const_iterator end;
+		types::Variant tag;
+
+		StackElem(){}
+		StackElem( const mylang::Structure::const_iterator& itr_, const mylang::Structure::const_iterator& end_, const types::Variant& tag_)
+			:itr(itr_),end(end_),tag(tag_){}
+		StackElem( const StackElem& o)
+			:itr(o.itr),end(o.end),tag(o.tag){}
+	};
 	std::vector<StackElem> m_stk;
 };
-
-
 
 
 ///\class MylangFormFunctionClosure
@@ -199,7 +242,7 @@ public:
 			}
 			if (!m_initialized) return false;
 		}
-		m_output = mylang::call( m_provider, m_input);
+		m_output = mylang::call( m_provider, m_interp.get(), m_input);
 		m_result.reset( new MyLangResult( m_output));
 		return true;
 	}
@@ -208,8 +251,11 @@ public:
 	{
 		m_provider = provider;
 		m_arg = arg;
-		// m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
-		//... call this for languages that need arrays to be serialized with indices if available
+		if (m_interp->needsArrayIndices())
+		{
+			m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
+			//... call this for languages that need arrays to be serialized with indices if available
+		}
 		m_initialized = false;
 		m_initStmStack.clear();
 		m_input.reset( new mylang::Structure( m_interp));

@@ -61,7 +61,7 @@ void TypingInputFilter::setFlags( Flags f)
 	langbind::TypedInputFilter::setFlags( f);
 	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
 	{
-		throw std::runtime_error("filter cannot serialize with indices");
+		throw std::runtime_error( "input filter cannot serialize with indices");
 	}
 }
 
