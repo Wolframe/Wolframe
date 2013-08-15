@@ -38,7 +38,7 @@
 			</tgroup>
 		</table>
 	</para>
-	<para>Element values are typed (represented as union of atomic types: int,double,[char*,size_t], etc.. ).
+	<para>Element values are typed (represented as union of atomic types: bool,uint,int,double,string, etc.. ).
 	</para>
 	</sect2>
 	<para></para>

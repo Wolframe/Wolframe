@@ -3,21 +3,17 @@
 	<sect2>
 		<title>Introduction</title>
 		<para><code>Wolframe</code> transactions are defined as functions in a transactional context.
-			The begin and the commit or abort are done automatically at the begin
+			The 'begin' and the 'commit' or 'abort' are done automatically at the begin
 			or at the end of a transaction function respectively,
-			if not explicitely defined otherwise in the scripting language.
+			if not explicitely defined otherwise by the caller script.
 			For the description of transactions <code>Wolframe</code> provides the definition language introduce here.
 			A transaction takes a structure as input and returns a structure as output.
 		</para>
 		<para>
-			The transaction definition language defines a transaction as a sequence of database operations.
-			A database operation is either a single database instruction (SELECT,UPDATE,etc.) or a name reference to
-			a prepared statement or a block of operations delared with OPERATION.
-			It adds some constructs to address input structure elements or database command results as arguments.
+			The transaction definition language defines a transaction as a sequence of database operations. A database operation is either a single database instruction (SELECT,UPDATE,etc.) or a name of a procedure declared in the database or a block of operations delared with OPERATION. It adds some constructs to address input structure elements or database command results as arguments.
 			Each database command result can be declared as being part of the transaction result structure.
 			The language has no control structures and is therefore not a general purpose programming language.
-			It just offers some direct mapping of input to commands and from commands results to output.
-			For programming <code>Wolframe</code> offers some scripting language bindings to use outside the transactional context.
+			It just offers some mapping of input to commands and from commands results to output.
 		</para>
 	</sect2>
 	<sect2>
@@ -39,7 +35,7 @@
 			<member>RESULT INTO</member><member>Followed by a name defining an outer tag in the result of the execution block.</member>
 			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
 			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes of the input. The operation is executed for each member of the selection. All relative path expressions in the operation arguments have the path of the selected element of the operation as base.</member>
-			<member>INTO</member><member>(outside embedded SQL statement) Followed by an identifier that declares the result tag for each result element of this operation</member>
+			<member>INTO</member><member>(outside embedded SQL statement) Followed by an identifier or a path that declares the result tag for each result element of this operation. Results of different statements with a common INTO path prefix or a common INTO path are not grouped together (e.g. two statements with INTO a/b and INTO a/c are not getting into the same parent path 'a' in the result).</member>
 			<member>DO</member><member>Starts the operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
 			<member>UNIQUE</member><member>constraint on operation result: Result must be unique, if it exists</member>
 			<member>NONEMPTY</member><member>constraint on operation result: Result must not be empty</member>
