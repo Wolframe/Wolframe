@@ -257,7 +257,7 @@ struct Operation
 	langbind::Authorization authorization;
 	std::string::const_iterator start;
 	bool isTransaction;
-	std::vector<TransactionDescription> descar;
+	std::vector<OperationStepDescription> descar;
 	std::string resultname;
 	std::vector<std::string::const_iterator> callstartar;
 	int embstm_index;
@@ -312,7 +312,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
-				TransactionDescription desc;
+				OperationStepDescription desc;
 				unsigned int mask = 0;
 
 				while (parseNextToken( langdescr, tok, si, se))
@@ -328,7 +328,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
 						}
-						if (ch == '.') operation.resultname.push_back(ch);
+						if (ch == '.' && operation.resultname.empty()) operation.resultname.push_back(ch);
 						if (operation.resultname.empty())
 						{
 							throw ERROR( si, "identifier or '.' expected after RESULT INTO");
@@ -453,7 +453,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 								operationmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
 							}
 						}
-						catch (const TransactionDescription::Error& err)
+						catch (const OperationStepDescription::Error& err)
 						{
 							throw ERROR( operation.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
 						}
@@ -479,7 +479,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						mask |= 0x1;
 
-						ch = utils::parseNextToken( desc.selector, si, se, utils::emptyCharTable(), utils::anyCharTable());
+						ch = utils::parseNextToken( desc.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 					}
 					else if (boost::algorithm::iequals( tok, "INTO"))
@@ -495,13 +495,13 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							std::string output;
 							ch = parseNextToken( langdescr, output, si, se);
 							if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
-							if (ch == '.') output.push_back(ch);
+							if (ch == '.' && output.empty()) output.push_back(ch);
 
 							if (output.empty())
 							{
 								throw ERROR( si, "identifier or '.' expected after INTO");
 							}
-							desc.outputs.push_back( output );
+							desc.path_INTO.push_back( output );
 							ch = gotoNextToken( langdescr, si, se);
 							if (ch != '/') break;
 							++si;

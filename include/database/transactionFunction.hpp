@@ -115,26 +115,26 @@ private:
 };
 
 
-struct TransactionDescription
+struct OperationStepDescription
 {
-	TransactionDescription()
+	OperationStepDescription()
 		:nonempty(false)
 		,unique(false){}
 
-	TransactionDescription( const TransactionDescription& o)
-		:selector(o.selector)
+	OperationStepDescription( const OperationStepDescription& o)
+		:selector_FOREACH(o.selector_FOREACH)
 		,call(o.call)
-		,outputs(o.outputs)
+		,path_INTO(o.path_INTO)
 		,nonempty(o.nonempty)
 		,unique(o.unique)
 		,hints(o.hints){}
 
 	void clear()
 	{
-		selector.clear();
+		selector_FOREACH.clear();
 		call.first.clear();
 		call.second.clear();
-		outputs.clear();
+		path_INTO.clear();
 		nonempty = false;
 		unique = false;
 		hints.clear();
@@ -152,10 +152,10 @@ struct TransactionDescription
 		std::string msg;
 	};
 
-	std::string selector;
+	std::string selector_FOREACH;
 	typedef std::vector<std::string> ParamList;
 	std::pair<std::string,ParamList> call;
-	std::vector<std::string> outputs;
+	std::vector<std::string> path_INTO;
 	bool nonempty;
 	bool unique;
 	types::keymap<std::string> hints;
@@ -171,7 +171,7 @@ class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_);
+	TransactionFunction( const std::string& name_, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_);
 	virtual ~TransactionFunction();
 
 	virtual TransactionFunctionInput* getInput() const;
@@ -204,11 +204,11 @@ private:
 
 ///\brief Creates a database transaction function from its description source
 ///\param[in] name name of  the transaction
-///\param[in] description transaction description source
+///\param[in] description description of the operation steps (Result of TDL parser)
 ///\param[in] resultname name of the result (RESULT INTO definition)
 ///\param[in] functionmap map op operations in the module context that can be referenced
 ///\param[in] auth authorization definition structure for this function
-TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth);
+TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth);
 
 }}//namespace
 #endif
