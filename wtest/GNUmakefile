@@ -77,7 +77,8 @@ CPP_OBJS = \
 	testModules.o
 
 CPP_BINS = \
-	wtestcheck$(EXE)
+	wtestcheck$(EXE) \
+	cleanInput$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
