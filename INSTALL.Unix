@@ -702,8 +702,17 @@ Make sure the build environment is always set as follows:
 PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
 export PATH
 
-Boost is too old (CSWboostdevel is 1.33) or it has no ICU locale
+Stable Boost is too old (CSWboostdevel is 1.33) or it has no ICU locale
 support (CSWboost-gcc-dev, 1.49).
+
+There is a boost 1.49 in the unstable repository at:
+http://mirror.opencsw.org/opencsw/unstable/sparc/5.10/
+Get 'CSWboost-gcc-dev' and install all 'libboost_*' packages
+before as prerequisites. Boost ends up in '/opt/csw/cxx' so
+make sure to set BOOST_DIR to /opt/csw/gxx/.
+Note, the CSW version 1.49 has no support for boost locale and ICU.
+If you need ICU support, build boost from scratch.
+
 It has to be compiled from scratch, use the version 1.48.0.
 
 Do not use boost 1.49.0, it has a missing function fchmodat, see
@@ -712,6 +721,8 @@ causing building of libboost_filesystem to fail!
 
 Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
 use those!
+
+Support for 1.52.0 and later is not guaranteed.
 
 SUNWicud/SUNWicu and CSW libicu_dev are both linked for the Forte C++
 compiler. It's better, to compile your own version compiled with the
@@ -777,7 +788,7 @@ Build Wolframe:
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
-	LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
+LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
 	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 WITH_LOCAL_SQLITE1=1 \
 	WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
