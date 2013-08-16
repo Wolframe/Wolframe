@@ -352,6 +352,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	{
 		output.addCommandResult( cmdres);
 	}
+	output.setCaseSensitive( isCaseSensitive());
 	LOG_DATA << "transaction function output structure:" << output.tostring();
 	return true;
 }

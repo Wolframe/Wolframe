@@ -14,9 +14,9 @@ using namespace mscorlib;
 comauto::CommonLanguageRuntime::~CommonLanguageRuntime()
 {
 	m_runtimehost->Stop();	///NOTE: CLR Runtime host cannot be created again in the same process after a Stop
-    if (m_metahost) m_metahost->Release();
-    if (m_runtimeinfo) m_runtimeinfo->Release();
-    if (m_runtimehost) m_runtimehost->Release();
+	if (m_metahost) m_metahost->Release();
+	if (m_runtimeinfo) m_runtimeinfo->Release();
+	if (m_runtimehost) m_runtimehost->Release();
 }
 
 comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& version)
@@ -42,7 +42,7 @@ comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& versio
 	{
 		if (m_metahost) m_metahost->Release();
 		if (m_runtimeinfo) m_runtimeinfo->Release();
-	    if (m_runtimehost) m_runtimehost->Release();
+		if (m_runtimehost) m_runtimehost->Release();
 		throw e;
 	}
 }
@@ -62,7 +62,7 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 		EXCEPINFO excepInfo;
 		VARIANT varResult; 
 		DISPPARAMS dispParams;
-		 IUnknownPtr spAppDomainThunk; 
+		IUnknownPtr spAppDomainThunk;
 		_AppDomainPtr spDefaultAppDomain; 
 		_AssemblyPtr spAssembly; 
 		_TypePtr spType;
@@ -104,7 +104,7 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	LPOLESTR bstrMethodName_ = bstrMethodName;
 	WRAP( dispatch->GetIDsOfNames( IID_NULL, &bstrMethodName_, 1, lcid, &gDispId))
 
-    // Call that method:
+	// Call that method:
 	UINT puArgErr;
 	HRESULT hr = dispatch->Invoke( gDispId, IID_NULL, lcid, DISPATCH_METHOD, &local.dispParams, &local.varResult, &local.excepInfo, &puArgErr);
 	if (hr != S_OK)

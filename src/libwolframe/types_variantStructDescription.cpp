@@ -351,6 +351,44 @@ VariantStructDescription::iterator VariantStructDescription::find( const std::st
 	return VariantStructDescription::iterator( m_ar+findidx_);
 }
 
+int VariantStructDescription::findidx_cis( const std::string& name_) const
+{
+	std::size_t ii = 0;
+	for (; ii<m_size; ++ii)
+	{
+		const char* aa = name_.c_str();
+		const char* bb = m_ar[ii].name;
+		std::size_t kk = 0;
+		for (; aa[kk]; kk++)
+		{
+			if ((unsigned char)aa[kk] <= 127)
+			{
+				if ((aa[kk]|32) != (bb[kk]|32)) break;
+			}
+			else
+			{
+				if (aa[kk] != bb[kk]) break;
+			}
+		}
+		if (!aa[kk] && !bb[kk]) return ii;
+	}
+	return -1;
+}
+
+VariantStructDescription::const_iterator VariantStructDescription::find_cis( const std::string& name_) const
+{
+	int findidx_ = findidx( name_);
+	if (findidx_ < 0) return VariantStructDescription::end();
+	return VariantStructDescription::const_iterator( m_ar+findidx_);
+}
+
+VariantStructDescription::iterator VariantStructDescription::find_cis( const std::string& name_)
+{
+	int findidx_ = findidx( name_);
+	if (findidx_ < 0) return VariantStructDescription::end();
+	return VariantStructDescription::iterator( m_ar+findidx_);
+}
+
 int VariantStructDescription::const_iterator::compare( const const_iterator& o) const
 {
 	if (m_itr > o.m_itr) return +1;

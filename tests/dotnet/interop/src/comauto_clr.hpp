@@ -24,9 +24,9 @@ public:
 	VARIANT call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv, LCID lcid=LOCALE_USER_DEFAULT) const;
 
 private:
-    ICLRMetaHost *m_metahost;
-    ICLRRuntimeInfo *m_runtimeinfo;
-    ICorRuntimeHost *m_runtimehost;
+	ICLRMetaHost *m_metahost;
+	ICLRRuntimeInfo *m_runtimeinfo;
+	ICorRuntimeHost *m_runtimehost;
 };
 
 }} //namespace

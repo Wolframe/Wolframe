@@ -217,6 +217,10 @@ public:
 	const_iterator find( const std::string& name_) const;
 	iterator find( const std::string& name_);
 
+	///\brief Find an element (direct child) with case insensitive comparison (of ascii A-Z)
+	const_iterator find_cis( const std::string& name_) const;
+	iterator find_cis( const std::string& name_);
+
 	///\brief Get the an iterator on the first element (direct child)
 	const_iterator begin() const						{return elementptr(0);}
 	iterator begin()							{return elementptr(0);}
@@ -268,7 +272,7 @@ public:
 
 
 ///\class VariantStructConst
-///\brief Variant value type that references another Variant
+///\brief Variant structure that represents a variant structure copy without content ownership
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
 class VariantStructConst :public VariantStruct
 {

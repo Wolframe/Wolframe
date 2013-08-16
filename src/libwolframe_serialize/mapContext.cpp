@@ -49,21 +49,6 @@ Context::Context( const Context& o)
 	,m_has_elem(o.m_has_elem)
 {}
 
-bool Context::getFlag( const char* name, Flags& flg)
-{
-	if (std::strcmp( name, "strict") == 0)
-	{
-		flg = ValidateAttributes;
-		return true;
-	}
-	if (std::strcmp( name, "arrayindices") == 0)
-	{
-		flg = SerializeWithIndices;
-		return true;
-	}
-	return false;
-}
-
 void Context::clear()
 {
 	m_has_elem = false;

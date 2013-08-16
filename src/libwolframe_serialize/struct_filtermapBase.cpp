@@ -83,6 +83,10 @@ void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags fl
 {
 	m_inp = i;
 	m_ctx.clear();
+	if (i->flag( langbind::TypedInputFilter::PropagateNoCase))
+	{
+		m_ctx.setFlags( Context::CaseInsensitiveCompare);
+	}
 	m_ctx.setFlags(flags);
 	m_stk.clear();
 	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
@@ -298,6 +302,37 @@ StructDescriptionBase::Map::const_iterator StructDescriptionBase::find( const st
 	for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
 	{
 		if (itr->first == name) return itr;
+	}
+	return m_elem.end();
+}
+
+static bool stringcmp_cis( const std::string& ths, const std::string& oth)
+{
+	std::size_t nn = ths.size();
+	if (nn != oth.size()) return false;
+
+	const char* aa = ths.c_str();
+	const char* bb = oth.c_str();
+	std::size_t kk = 0;
+	for (; kk<nn; kk++)
+	{
+		if ((unsigned char)aa[kk] <= 127)
+		{
+			if ((aa[kk]|32) != (bb[kk]|32)) break;
+		}
+		else
+		{
+			if (aa[kk] != bb[kk]) break;
+		}
+	}
+	return (kk == nn);
+}
+
+StructDescriptionBase::Map::const_iterator StructDescriptionBase::find_cis( const std::string& name) const
+{
+	for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+	{
+		if (stringcmp_cis( itr->first, name)) return itr;
 	}
 	return m_elem.end();
 }

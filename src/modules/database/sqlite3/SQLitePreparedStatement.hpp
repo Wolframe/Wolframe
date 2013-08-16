@@ -81,6 +81,8 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	virtual types::VariantConst get( std::size_t idx);
 	///\brief Skip to the next row of the last result
 	virtual bool next();
+	///\brief Find out if the database is case sensitive or not
+	virtual bool isCaseSensitive()	{return false;}
 
 private:
 	void clear();

@@ -72,9 +72,9 @@ public:
 		None=0x00,
 		ValidateAttributes=0x01,
 		SerializeWithIndices=0x02,
-		ValidateInitialization=0x04
+		ValidateInitialization=0x04,
+		CaseInsensitiveCompare=0x08
 	};
-	static bool getFlag( const char* name, Flags& flg);
 
 	Context( Flags f=None);
 	Context( const Context& o);

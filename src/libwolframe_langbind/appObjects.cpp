@@ -274,7 +274,14 @@ bool TransactionFunctionClosure::call()
 				if (hint) explain = explain + " " + hint;
 				throw std::runtime_error( std::string( "error in transaction ") + e.transaction + ":" + e.usermsg + explain);
 			}
-			m_result.reset( m_func->getOutput( trsr->getResult()));
+			const db::TransactionOutput& res = trsr->getResult();
+			m_result.reset( m_func->getOutput( res));
+			if (!res.isCaseSensitive())
+			{
+				//... If not case sensitive result then propagate this
+				//	to be respected in mapping to structures.
+				m_result->setFlags( TypedInputFilter::PropagateNoCase);
+			}
 			m_state = 3;
 			return true;
 		}

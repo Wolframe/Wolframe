@@ -73,6 +73,8 @@ public:
 	virtual bool hasResult()=0;
 	///\brief Get the last database error as structure
 	virtual const db::DatabaseError* getLastError()=0;
+	///\brief Find out if the database is case sensitive or not
+	virtual bool isCaseSensitive()=0;
 
 	///\brief Executes the transaction using the interface defined
 	virtual bool doTransaction( const TransactionInput& input, TransactionOutput& output);

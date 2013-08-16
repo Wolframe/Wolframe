@@ -203,7 +203,7 @@ protected:
 
 
 ///\class VariantConst
-///\brief Variant value type that references another Variant
+///\brief Variant value type that represents a variant copy without content ownership
 ///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
 struct VariantConst :public Variant
 {

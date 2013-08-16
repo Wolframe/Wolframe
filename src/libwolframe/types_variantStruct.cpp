@@ -564,6 +564,24 @@ VariantStruct::iterator VariantStruct::find( const std::string& name_)
 	return VariantStruct::iterator( at( findidx_));
 }
 
+VariantStruct::const_iterator VariantStruct::find_cis( const std::string& name_) const
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return end();
+	int findidx_ = descr->findidx_cis( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::const_iterator( at( findidx_));
+}
+
+VariantStruct::iterator VariantStruct::find_cis( const std::string& name_)
+{
+	const VariantStructDescription* descr = description();
+	if (!descr) return end();
+	int findidx_ = descr->findidx_cis( name_);
+	if (findidx_ < 0) return end();
+	return VariantStruct::iterator( at( findidx_));
+}
+
 std::size_t VariantStruct::nof_elements() const
 {
 	if ((Type)type()==array_) return m_data.dim.size;

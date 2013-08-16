@@ -432,7 +432,7 @@ VARIANT comauto::createVariantType( unsigned int val)
 {
 	VARIANT rt;
 	rt.vt = VT_UINT;
-    rt.uintVal = val;
+	rt.uintVal = val;
 	return rt;
 }
 
@@ -440,7 +440,7 @@ VARIANT comauto::createVariantType( short val)
 {
 	VARIANT rt;
 	rt.vt = VT_I2;
-    rt.iVal = val;
+	rt.iVal = val;
 	return rt;
 }
 
@@ -448,7 +448,7 @@ VARIANT comauto::createVariantType( unsigned short val)
 {
 	VARIANT rt;
 	rt.vt = VT_UI2;
-    rt.uiVal = val;
+	rt.uiVal = val;
 	return rt;
 }
 
@@ -456,7 +456,7 @@ VARIANT comauto::createVariantType( long val)
 {
 	VARIANT rt;
 	rt.vt = VT_I8;
-    rt.lVal = val;
+	rt.lVal = val;
 	return rt;
 }
 
@@ -464,7 +464,7 @@ VARIANT comauto::createVariantType( unsigned long val)
 {
 	VARIANT rt;
 	rt.vt = VT_UI4;
-    rt.ulVal = val;
+	rt.ulVal = val;
 	return rt;
 }
 
@@ -472,7 +472,7 @@ VARIANT comauto::createVariantType( float val)
 {
 	VARIANT rt;
 	rt.vt = VT_R4;
-    rt.fltVal = val;
+	rt.fltVal = val;
 	return rt;
 }
 
@@ -480,35 +480,35 @@ VARIANT comauto::createVariantType( double val)
 {
 	VARIANT rt;
 	rt.vt = VT_R8;
-    rt.dblVal = val;
+	rt.dblVal = val;
 	return rt;
 }
 
 VARIANT comauto::createVariantType( const std::wstring& val)
 {
-    VARIANT rt;
+	VARIANT rt;
 	rt.vt = VT_BSTR;
-    rt.bstrVal = ::SysAllocString( bstr_t( val.c_str()));
+	rt.bstrVal = ::SysAllocString( bstr_t( val.c_str()));
 	if (rt.bstrVal == NULL) throw std::bad_alloc();
 	return rt;
 }
 
 VARIANT comauto::createVariantType( const char* val, std::size_t valsize, VARTYPE stringtype)
 {
-    VARIANT rt;
+	VARIANT rt;
 	rt.vt = stringtype;
 	switch (stringtype)
 	{
 		case VT_BSTR:
 		{
 			std::wstring wstr( comauto::utf16string( val, valsize));
-		    rt.bstrVal = ::SysAllocString( bstr_t( wstr.c_str()));
+			rt.bstrVal = ::SysAllocString( bstr_t( wstr.c_str()));
 			if (rt.bstrVal == NULL) throw std::bad_alloc();
 			break;
 		}
 		case VT_LPSTR:
 		{
-		    rt.pcVal = (LPSTR)comauto::allocMem( valsize+1);
+			rt.pcVal = (LPSTR)comauto::allocMem( valsize+1);
 			if (rt.pcVal == NULL) throw std::bad_alloc();
 			::memcpy( rt.pcVal, val, valsize+1);
 			break;
@@ -517,7 +517,7 @@ VARIANT comauto::createVariantType( const char* val, std::size_t valsize, VARTYP
 		{
 			std::wstring wstr( comauto::utf16string( val, valsize));
 			std::size_t mm = (wstr.size()+1) * sizeof(wchar_t);
-		    rt.pcVal = (char*)(LPWSTR)comauto::allocMem( mm);
+			rt.pcVal = (char*)(LPWSTR)comauto::allocMem( mm);
 			if (rt.pcVal == NULL) throw std::bad_alloc();
 			::memcpy( rt.pcVal, wstr.c_str(), mm);
 			break;
@@ -667,7 +667,7 @@ HRESULT comauto::wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc)
 		case VT_LPSTR:
 			comauto::wrapVariantClear( pvargDest);
 			size = std::strlen(V_LPSTR( pvargSrc)) + 1;
-		    V_LPSTR( pvargDest) = (LPSTR)comauto::allocMem( size);
+			V_LPSTR( pvargDest) = (LPSTR)comauto::allocMem( size);
 			if (V_LPSTR( pvargDest) == NULL) throw std::bad_alloc();
 			::memcpy( V_LPSTR( pvargDest), V_LPSTR( pvargSrc), size);
 			return S_OK;
@@ -675,7 +675,7 @@ HRESULT comauto::wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc)
 		case VT_LPWSTR:
 			comauto::wrapVariantClear( pvargDest);
 			size = std::wcslen( V_LPWSTR( pvargSrc))+sizeof(wchar_t);
-		    V_LPWSTR( pvargDest) = (LPWSTR)comauto::allocMem( size);
+			V_LPWSTR( pvargDest) = (LPWSTR)comauto::allocMem( size);
 			if (V_LPWSTR( pvargDest) == NULL) throw std::bad_alloc();
 			::memcpy( V_LPWSTR( pvargDest), V_LPWSTR( pvargSrc), size);
 			return S_OK;
@@ -690,13 +690,13 @@ HRESULT comauto::wrapVariantClear( VARIANT* pvarg)
 	switch (pvarg->vt)
 	{
 		case VT_LPSTR:
-		    if (V_LPSTR( pvarg) != NULL) comauto::freeMem( V_LPSTR( pvarg));
+			if (V_LPSTR( pvarg) != NULL) comauto::freeMem( V_LPSTR( pvarg));
 			V_LPSTR( pvarg) = NULL;
 			pvarg->vt = VT_EMPTY;
 			return S_OK;
 
 		case VT_LPWSTR:
-		    if (V_LPWSTR( pvarg) != NULL) comauto::freeMem( V_LPWSTR( pvarg));
+			if (V_LPWSTR( pvarg) != NULL) comauto::freeMem( V_LPWSTR( pvarg));
 			V_LPWSTR( pvarg) = NULL;
 			pvarg->vt = VT_EMPTY;
 			return S_OK;

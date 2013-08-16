@@ -151,7 +151,15 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 	{
 		case langbind::InputFilter::OpenTag:
 		{
-			StructDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
+			StructDescriptionBase::Map::const_iterator itr;
+			if (ctx.flag( Context::CaseInsensitiveCompare))
+			{
+				itr = descr->find_cis( element.tostring());
+			}
+			else
+			{
+				itr = descr->find( element.tostring());
+			}
 			if (itr == descr->end())
 			{
 				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
@@ -182,7 +190,15 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 
 		case langbind::InputFilter::Attribute:
 		{
-			StructDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
+			StructDescriptionBase::Map::const_iterator itr;
+			if (ctx.flag( Context::CaseInsensitiveCompare))
+			{
+				itr = descr->find_cis( element.tostring());
+			}
+			else
+			{
+				itr = descr->find( element.tostring());
+			}
 			if (itr == descr->end())
 			{
 				throw SerializationErrorException( "unknown attribute", element.tostring(), StructParser::getElementPath( stk));

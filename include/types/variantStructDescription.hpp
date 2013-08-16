@@ -191,6 +191,11 @@ public:
 	const_iterator find( const std::string& name) const;
 	iterator find( const std::string& name);
 
+	///\brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
+	int findidx_cis( const std::string& name) const;
+	const_iterator find_cis( const std::string& name) const;
+	iterator find_cis( const std::string& name);
+
 	///\brief Get the number of elements in the structure description
 	std::size_t size() const						{return m_size;}
 

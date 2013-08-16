@@ -164,7 +164,15 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 	{
 		case langbind::InputFilter::OpenTag:
 		{
-			int idx = descr->findidx( element.tostring());
+			int idx;
+			if (ctx.flag( Context::CaseInsensitiveCompare))
+			{
+				idx = descr->findidx_cis( element.tostring());
+			}
+			else
+			{
+				idx = descr->findidx( element.tostring());
+			}
 			if (idx < 0)
 			{
 				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
@@ -197,13 +205,20 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 
 		case langbind::InputFilter::Attribute:
 		{
-			int idx = descr->findidx( element.tostring());
+			int idx;
+			if (ctx.flag( Context::CaseInsensitiveCompare))
+			{
+				idx = descr->findidx_cis( element.tostring());
+			}
+			else
+			{
+				idx = descr->findidx( element.tostring());
+			}
 			if (idx < 0)
 			{
 				throw SerializationErrorException( "unknown attribute ", element.tostring(), getElementPath( stk));
 			}
-			types::VariantStructDescription::const_iterator
-				ei = descr->begin() + idx;
+			types::VariantStructDescription::const_iterator ei = descr->begin() + idx;
 			if (!ei->attribute())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
@@ -377,6 +392,10 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 {
 	m_inp = i;
 	m_ctx.clear();
+	if (i->flag( langbind::TypedInputFilter::PropagateNoCase))
+	{
+		m_ctx.setFlags( Context::CaseInsensitiveCompare);
+	}
 	m_ctx.setFlags(flags);
 	m_stk.clear();
 	m_stk.push_back( FiltermapDDLParseState( 0, m_st, 0));

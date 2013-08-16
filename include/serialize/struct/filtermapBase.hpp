@@ -103,6 +103,7 @@ public:
 	}
 
 	Map::const_iterator find( const std::string& name) const;
+	Map::const_iterator find_cis( const std::string& name) const;
 	std::string names( const char* sep) const;
 
 	Map::const_iterator begin() const {return m_elem.begin();}

@@ -95,7 +95,8 @@ public:
 	enum Flags
 	{
 		None=0x00,
-		SerializeWithIndices=0x01		//< do serialization with array index elements, if implemented
+		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
+		PropagateNoCase=0x02			//< true, if the result is propagated to be case insensitive
 	};
 
 	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}

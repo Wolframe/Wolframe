@@ -49,9 +49,12 @@ class TransactionOutput
 {
 public:
 	///\brief Constructor
-	TransactionOutput(){}
+	TransactionOutput()
+		:m_isCaseSensitive(false){}
 	///\brief Copy constructor
-	TransactionOutput( const TransactionOutput& o)	:m_result(o.m_result){}
+	TransactionOutput( const TransactionOutput& o)
+		:m_result(o.m_result)
+		,m_isCaseSensitive(o.m_isCaseSensitive){}
 
 	///\class CommandResult
 	///\brief Structure representing the result of a command in the transaction
@@ -130,6 +133,8 @@ public:// interface for accessing the result and iterating on the result:
 	///\brief Return the result as readable serialization for logging output
 	std::string tostring() const;
 
+	bool isCaseSensitive() const						{return m_isCaseSensitive;}
+	void setCaseSensitive( bool v=true)					{m_isCaseSensitive = v;}
 
 public:// interface for constructing the result:
 	void openCommandResult( std::size_t functionidx, std::size_t level)	{m_result.push_back( CommandResult( functionidx, level));}
@@ -141,6 +146,7 @@ public:// interface for constructing the result:
 
 private:
 	std::vector<CommandResult> m_result;					//< List of command results
+	bool m_isCaseSensitive;							//< True if the element names in the result are case sensitive
 };
 
 typedef types::CountedReference<TransactionOutput> TransactionOutputR;

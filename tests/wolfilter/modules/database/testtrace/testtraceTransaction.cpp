@@ -232,6 +232,9 @@ public:
 		return 0;
 	}
 
+	///\brief Find out if the database is case sensitive or not
+	virtual bool isCaseSensitive()	{return false;}
+
 private:
 	std::vector<std::string> m_res;
 	std::vector<std::string>::const_iterator m_resitr;

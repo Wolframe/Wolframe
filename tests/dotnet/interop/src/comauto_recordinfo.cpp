@@ -28,16 +28,16 @@ comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 
 HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
 {
-    if (!ppvObj) return E_INVALIDARG;
-    *ppvObj = NULL;
+	if (!ppvObj) return E_INVALIDARG;
+	*ppvObj = NULL;
 
 	if (riid == IID_IUnknown || riid == IID_IRecordInfo)
-    {
-        *ppvObj = (LPVOID)this;
-        AddRef();
-        return S_OK;
-    }
-    return E_NOINTERFACE;
+	{
+		*ppvObj = (LPVOID)this;
+		AddRef();
+		return S_OK;
+	}
+	return E_NOINTERFACE;
 }
 
 HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitType initType, bool doThrow, PVOID pvOld)
