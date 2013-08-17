@@ -43,7 +43,43 @@ using namespace _Wolframe::db;
 
 #define ERRORCODE(E) (E+0x1000000)
 
-static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
+static types::VariantConst getResult( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t fidx, std::size_t cidx)
+{
+	types::VariantConst rt;
+	TransactionOutput::result_const_iterator fi = output.end();
+	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
+	for (; ri != re; ++ri)
+	{
+		if (fidx < ri->functionidx()) break;
+		fi = ri;
+	}
+	if (fi != output.end())
+	{
+		if (fi->nofColumns() > 1)
+		{
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "variable referencing a set of results", "internal logic error (transaction function variable reference)");
+			throw db::DatabaseErrorException( dberr);
+		}
+		std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = fi->begin(), we = fi->end();
+		for (; wi != we; ++wi)
+		{
+			if (cidx == 0)
+			{
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function variable reference)");
+				throw db::DatabaseErrorException( dberr);
+			}
+			if (cidx > wi->size())
+			{
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(42), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function variable reference)");
+				throw db::DatabaseErrorException( dberr);
+			}
+			rt = wi->at( cidx - 1);
+		}
+	}
+	return rt;
+}
+
+static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -52,6 +88,12 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 
 		switch (ai->type())
 		{
+			case TransactionInput::Command::Argument::ResultVariableReference:
+			{
+				TransactionInput::ResultVariableReference ref( ai->value());
+				val = getResult( output, cmditr, ref.functionidx(), ref.resultref());
+			}
+
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
 				unsigned int ref = ai->value().touint();
@@ -152,7 +194,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	return true;
 }
 
-static bool pushArguments( TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
+static bool pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
 	cmdres.openRow();
@@ -162,6 +204,11 @@ static bool pushArguments( TransactionOutput::CommandResult& cmdres, const std::
 
 		switch (ai->type())
 		{
+			case TransactionInput::Command::Argument::ResultVariableReference:
+			{
+				TransactionInput::ResultVariableReference ref( ai->value());
+				val = getResult( output, cmditr, ref.functionidx(), ref.resultref());
+			}
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
 				unsigned int ref = ai->value().touint();
@@ -241,7 +288,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 				if (loopstk.back().wi != loopstk.back().we)
 				{
 					ci = loopstk.back().ci;
-					if (!pushArguments( cmdres, loopstk.back().wi, ci)) return false;
+					if (!pushArguments( output, cmdres, loopstk.back().wi, ci)) return false;
 					++loopstk.back().wi;
 				}
 				else
@@ -291,7 +338,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 							wi = ri->begin(), we = ri->end();
 						if (wi != we)
 						{
-							if (!pushArguments( cmdres, wi, ci)) return false;
+							if (!pushArguments( output, cmdres, wi, ci)) return false;
 							loopstk.push_back( OperationLoop( ci, endOfOperation( ci, ce), ++wi, we));
 							break;
 						}
@@ -308,7 +355,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
 						for (; wi != we; ++wi)
 						{
-							if (!executeCommand( this, cmdres, wi, ci, nonempty, unique))
+							if (!executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
 							{
 								const DatabaseError* lasterr = getLastError();
 								if (lasterr)
@@ -330,10 +377,10 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			switch (optype)
 			{
 				case PushArguments:
-					if (!pushArguments( cmdres, wi, ci)) return false;
+					if (!pushArguments( output, cmdres, wi, ci)) return false;
 					break;
 				case DatabaseCall:
-					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique))
+					if (!executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
 					{
 						const DatabaseError* lasterr = getLastError();
 						if (lasterr)

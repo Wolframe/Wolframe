@@ -68,6 +68,7 @@ public:
 			enum Type
 			{
 				Value,
+				ResultVariableReference,
 				ResultColumn
 			};
 
@@ -203,6 +204,26 @@ public:
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
 		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant((unsigned int)resultref));
+	}
+
+	class ResultVariableReference
+		:public types::Variant
+	{
+	public:
+		ResultVariableReference( std::size_t functionidx_, std::size_t resultref_)
+			:types::Variant( (functionidx_<<16) + resultref_){}
+		ResultVariableReference( const types::Variant& o)
+			:types::Variant( o.touint()){}
+
+		std::size_t functionidx() const		{return touint() >> 16;}
+		std::size_t resultref() const		{return touint() & 0xFFFF;}
+	};
+
+	///\brief Bind parameter value on current command statement
+	void bindCommandArgAsResultVariableReference( std::size_t functionidx, std::size_t resultref)
+	{
+		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
+		m_cmd.back().bind( Command::Argument::ResultVariableReference, ResultVariableReference( functionidx, resultref));
 	}
 
 private:
