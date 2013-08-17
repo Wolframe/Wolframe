@@ -146,19 +146,21 @@ private:
 class Path
 {
 public:
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
 	enum ElementType
 	{
 		Root,
 		Next,
 		Find,
 		Up,
+		Variable,
 		Result,
 		Constant
 	};
 
 	static const char* elementTypeName( ElementType i)
 	{
-		static const char* ar[] ={"Root","Next","Find","Current","Up","Result","Constant"};
+		static const char* ar[] ={"Root","Next","Find","Current","Up","Variable","Result","Constant"};
 		return ar[(int)i];
 	}
 
@@ -169,12 +171,14 @@ public:
 	};
 
 	Path(){}
-	Path( const std::string& src, TransactionFunction::TagTable* tagmap);
+	Path( const std::string& selector, TransactionFunction::TagTable* tagmap);
+	Path( const Call::Param& param, TransactionFunction::TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 
 	std::size_t resultReference() const;
 	const char* constantReference() const;
+	const char* variableReference() const;
 	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
@@ -201,8 +205,11 @@ public:
 	}
 
 private:
+	void parseSelectorPath( const std::string& value, TransactionFunction::TagTable* tagmap);
+
+private:
 	std::vector<Element> m_path;
-	std::string m_constant;
+	std::string m_content;
 };
 
 class FunctionCall
@@ -769,41 +776,22 @@ const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node
 	return rt;
 }
 
-Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
+
+void Path::parseSelectorPath( const std::string& selector, TransactionFunction::TagTable* tagmap)
 {
 	Element elem;
-	std::string::const_iterator ii = pt.begin(), ee = pt.end();
+	std::string::const_iterator ii = selector.begin(), ee = selector.end();
+	for (; ii != ee && (unsigned char)*ii < 32; ++ii);
+	if (ii == ee) return;
+	if (*ii == '/')
+	{
+		elem.m_type = Root;
+		m_path.push_back( elem);
+	}
 	while (ii != ee)
 	{
-		if (*ii == '\'' || *ii == '\"')
+		if (*ii == '/')
 		{
-			std::string constant;
-			utils::parseNextToken( constant, ii, ee);
-			elem.m_type = Constant;
-			elem.m_tag = 0;
-			m_constant.append( constant);
-			if (!m_path.empty()) throw std::runtime_error( "unexpected string constant in path");
-			if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token after string constant argument");
-			m_path.push_back( elem);
-		}
-		else if (*ii == '$')
-		{
-			elem.m_type = Result;
-			std::string resno;
-			for (++ii; ii < ee && *ii >= '0' && *ii <= '9'; ++ii)
-			{
-				resno.push_back( *ii);
-			}
-			if (*ii == '(') throw std::runtime_error( "unexpected token '(' - result reference $ + number expected");
-			if (resno.size() == 0 || resno.size() > 999) throw std::runtime_error( "illegal result reference (only numbers between 1 and 999 allowed)");
-			elem.m_tag = std::atoi( resno.c_str());
-			if (elem.m_tag == 0) throw std::runtime_error( "referencing result with index 0");
-			m_path.push_back( elem);
-			continue;
-		}
-		else if (*ii == '/')
-		{
-			bool isRoot = (ii == pt.begin());
 			++ii;
 			if (ii == ee) break;
 			if (*ii == '/')
@@ -813,7 +801,7 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 			}
 			else
 			{
-				elem.m_type = isRoot?Root:Next;
+				elem.m_type = Next;
 			}
 		}
 		else
@@ -828,13 +816,13 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 		}
 		if (tagnam.empty())
 		{
-			throw std::runtime_error( std::string("empty tag in path '") + pt + "'" );
+			throw std::runtime_error( std::string("empty tag in path '") + selector + "'" );
 		}
 		else if (tagnam == "..")
 		{
 			if (elem.m_type == Find)
 			{
-				throw std::runtime_error( std::string("selection '//..' is illegal in path '") + pt + "'" );
+				throw std::runtime_error( std::string("selection '//..' is illegal in path '") + selector + "'" );
 			}
 			elem.m_type = Up;
 			elem.m_tag = 0;
@@ -843,7 +831,7 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 		{
 			if (elem.m_type == Find)
 			{
-				throw std::runtime_error( std::string("selection '//.' is illegal in path '") + pt + "'" );
+				throw std::runtime_error( std::string("selection '//.' is illegal in path '") + selector + "'" );
 			}
 			continue;
 		}
@@ -858,13 +846,34 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 		}
 		m_path.push_back( elem);
 	}
-	std::vector<Element>::const_iterator pi = m_path.begin(), pe = m_path.end();
-	for (; pi != pe; ++pi)
+}
+
+Path::Path( const std::string& selector, TransactionFunction::TagTable* tagmap
+	    )
+{
+	parseSelectorPath( selector, tagmap);
+}
+
+Path::Path( const Call::Param& param, TransactionFunction::TagTable* tagmap)
+{
+	typedef Call::Param Param;
+	Element elem;
+	switch (param.type)
 	{
-		if (pi->m_type == Result && m_path.size() > 1)
-		{
-			throw std::runtime_error( "referencing result variable in path");
-		}
+		case Param::VariableReference:
+			elem.m_type = Variable;
+			m_content = param.value;
+			m_path.push_back( elem);
+		case Param::ResultReference:
+			elem.m_type = Result;
+			elem.m_tag = boost::lexical_cast<unsigned short>( param.value);
+			m_path.push_back( elem);
+		case Param::Constant:
+			elem.m_type = Constant;
+			m_content = param.value;
+			m_path.push_back( elem);
+		case Param::InputSelectorPath:
+			parseSelectorPath( param.value, tagmap);
 	}
 }
 
@@ -882,13 +891,20 @@ std::size_t Path::resultReference() const
 
 const char* Path::constantReference() const
 {
-	if (m_path.size() && m_path[0].m_type == Constant) return m_constant.c_str();
+	if (m_path.size() && m_path[0].m_type == Constant) return m_content.c_str();
+	return 0;
+}
+
+const char* Path::variableReference() const
+{
+	if (m_path.size() && m_path[0].m_type == Variable) return m_content.c_str();
 	return 0;
 }
 
 std::string Path::tostring() const
 {
-	if (constantReference()) return m_constant;
+	if (constantReference()) return std::string("'") + m_content + std::string("'");
+	if (variableReference()) return m_content;
 
 	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
 	std::ostringstream rt;
@@ -916,6 +932,7 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 			switch (si->m_type)
 			{
 				case Result:
+				case Variable:
 				case Constant:
 					break;
 
@@ -924,7 +941,7 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 					break;
 
 				case Root:
-					st.next( st.root(), si->m_tag, ar2);
+					ar2.push_back( st.root());
 					break;
 
 				case Next:
@@ -1464,6 +1481,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	:m_resultstruct( new TransactionFunctionOutput::ResultStruct())
 {
 	typedef TransactionFunctionDescription::OperationStep::Error Error;
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
 
 	int blkidx;
 	std::vector<TransactionFunctionDescription::OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
@@ -1503,16 +1521,16 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				throw Error( eidx, "undefined: constant as selector");
 			}
 			std::vector<Path> param;
-			std::vector<std::string>::const_iterator ai = di->call.second.begin(), ae = di->call.second.end();
+			std::vector<Call::Param>::const_iterator ai = di->call.paramlist.begin(), ae = di->call.paramlist.end();
 			for (; ai != ae; ++ai)
 			{
 				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
-			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.first);
+			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
 			if (fui == functionmap.end())
 			{
-				FunctionCall cc( di->call.first, selector, param, di->nonempty, di->unique, 1, di->hints);
+				FunctionCall cc( di->call.funcname, selector, param, di->nonempty, di->unique, 1, di->hints);
 				if (!di->path_INTO.empty())
 				{
 					// this is just the wrapping structure, iteration is only done with the last tag (othwerwise

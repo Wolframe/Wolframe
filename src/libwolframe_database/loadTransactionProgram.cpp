@@ -140,62 +140,127 @@ static std::vector<std::string> parse_INTO_path( const LanguageDescription* lang
 	return rt;
 }
 
-static std::pair<std::string,std::vector<std::string> >
+static TransactionFunctionDescription::OperationStep::Call::Param
+	parseReferenceParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	char ch = utils::gotoNextToken( si, se);
+	if (ch == '(' || ch == '[')
+	{
+		char sb,eb;
+		Call::Param::Type type;
+		if (ch == '(')
+		{
+			sb = '('; eb = ')';
+			type = Call::Param::InputSelectorPath;
+		}
+		else
+		{
+			sb = '['; eb = ']';
+			type = Call::Param::VariableReference;
+		}
+		++si;
+		std::string::const_iterator argstart = si;
+		std::string tok;
+		ch = parseNextToken( langdescr, tok, si, se);
+		for (; ch && ch != sb && ch != eb; ch=parseNextToken( langdescr, tok, si, se));
+		if (ch == eb)
+		{
+			Call::Param param( type, std::string( argstart, si-1));
+			return param;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "missing close bracket for expression") + ((eb==')')?"')'":"']'"));
+		}
+	}
+	else if (ch >= '0' && ch <= '9')
+	{
+		std::string::const_iterator argstart = si;
+		for (; si!=se && *si>= '0' && *si<= '9'; ++si);
+		Call::Param::Type type = Call::Param::ResultReference;
+		Call::Param param( type, std::string( argstart, si));
+		return param;
+	}
+	else
+	{
+		throw std::runtime_error( "expected open bracket '(' '[' or digit");
+	}
+}
+
+static TransactionFunctionDescription::OperationStep::Call::Param
+	parsePathParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	std::string pp;
+	std::string tok;
+	char ch;
+	for (;;)
+	{
+		ch = gotoNextToken( langdescr, si, se);
+		if (ch == ',' || ch == ')') break;
+		if (!ch) throw std::runtime_error( "unexpected end of function call");
+
+		ch = parseNextToken( langdescr, tok, si, se);
+
+		if (ch == '/' || ch == '*' || ch == '.')
+		{
+			pp.push_back( ch);
+		}
+		else if (isAlphaNumeric( ch))
+		{
+			pp.append( tok);
+		}
+		else
+		{
+			throw std::runtime_error( "illegal token in path parameter of function call");
+		}
+	}
+	Call::Param param( Call::Param::InputSelectorPath, pp);
+	return param;
+}
+
+static TransactionFunctionDescription::OperationStep::Call
 	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
 {
-	std::pair<std::string,std::vector<std::string> > rt;
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	Call rt;
 	std::string stm;
 	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
 	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
 	std::string tok;
 
-	char ch = utils::parseNextToken( tok, si, se, g_optab);
-	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, g_optab))
+	char ch = parseNextToken( langdescr, tok, si, se);
+	for (; si != se && ch; ch = parseNextToken( langdescr, tok, si, se))
 	{
-		if (ch == '$')
+		if (ch == '$' && si != se)
 		{
-			stm.append( start, si - 1);
-			start = si - 1;
-			ch = utils::gotoNextToken( si, se);
-			if (ch == '(')
+			if ((*si >= '0' && *si <= '9') || *si == '(' || *si == '[')
 			{
-				++si;
-				std::string::const_iterator argstart = si;
-				ch = utils::parseNextToken( tok, si, se, g_optab);
-				for (; ch && ch != ')'; ch=utils::parseNextToken( tok, si, se, g_optab));
-				if (ch == ')')
-				{
-					rt.second.push_back( std::string( argstart, si-1));
-					start = si;
-					stm.append( langdescr->stm_argument_reference( rt.second.size()));
-				}
-			}
-			else if (ch >= '0' && ch <= '9')
-			{
-				std::string::const_iterator argstart = si;
-				for (; si!=se && *si>= '0' && *si<= '9'; ++si);
-				rt.second.push_back( std::string("$") + std::string( argstart, si));
+				stm.append( start, si - 1);
+				Call::Param param = parseReferenceParameter( langdescr, si, se);
+				rt.paramlist.push_back( param);
 				start = si;
-				stm.append( langdescr->stm_argument_reference( rt.second.size()));
+				stm.append( langdescr->stm_argument_reference( rt.paramlist.size()));
 			}
 		}
 	}
 	stm.append( start, si);
 
-	rt.first.append( "__");
-	rt.first.append( funcname);
-	rt.first.append( "_");
-	rt.first.append( boost::lexical_cast<std::string>( index));
-	embeddedStatementMap.insert( rt.first, stm);
+	rt.funcname.append( "__");
+	rt.funcname.append( funcname);
+	rt.funcname.append( "_");
+	rt.funcname.append( boost::lexical_cast<std::string>( index));
+	embeddedStatementMap.insert( rt.funcname, stm);
 	return rt;
 }
 
-static std::pair<std::string,std::vector<std::string> >
-	parseCallStatement( std::string::const_iterator& ci, std::string::const_iterator ce)
+static TransactionFunctionDescription::OperationStep::Call
+	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
 {
-	std::pair<std::string,std::vector<std::string> > rt;
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	Call rt;
 	std::string tok;
-	int brkcnt = 0;
 
 	if (!utils::gotoNextToken( ci, ce))
 	{
@@ -203,10 +268,10 @@ static std::pair<std::string,std::vector<std::string> >
 	}
 	while (ci < ce && isAlphaNumeric( *ci))
 	{
-		rt.first.push_back( *ci);
+		rt.funcname.push_back( *ci);
 		++ci;
 	}
-	if (rt.first.empty())
+	if (rt.funcname.empty())
 	{
 		throw std::runtime_error( "identifier expected for name of function");
 	}
@@ -225,43 +290,34 @@ static std::pair<std::string,std::vector<std::string> >
 	}
 	else
 	{
-		for (;;)
+		std::string pp;
+		char ch = ',';
+		while (ch == ',')
 		{
-			std::string pp;
-			while (ci < ce && *ci != ',')
-			{
-				char hh = *ci++;
-				if (hh == '(') ++brkcnt;
-				if (hh == ')' && --brkcnt < 0)
-				{
-					--ci;
-					brkcnt = 0;
-					break;
-				}
-				pp.push_back( hh);
-			}
-			if (brkcnt > 0)
-			{
-				throw std::runtime_error( "() brackets not balanced");
-			}
-			boost::trim( pp);
-			if (pp.empty())
-			{
-				throw std::runtime_error( "empty element in parameter list");
-			}
-			rt.second.push_back( pp);
-
-			utils::gotoNextToken( ci, ce);
-			if (*ci == ')')
+			ch = gotoNextToken( langdescr, ci, ce);
+			if (ch == '\'' || ch == '\"')
 			{
 				++ci;
-				break;
+				Call::Param::Type type = Call::Param::Constant;
+				Call::Param param( type, tok);
+				rt.paramlist.push_back( param);
 			}
-			else if (*ci == ',')
+			else if (ch == '$')
 			{
-				++ci; utils::gotoNextToken( ci, ce);
-				continue;
+				++ci;
+				Call::Param param = parseReferenceParameter( langdescr, ci, ce);
+				rt.paramlist.push_back( param);
 			}
+			else
+			{
+				Call::Param param = parsePathParameter( langdescr, ci, ce);
+				rt.paramlist.push_back( param);
+			}
+			ch = parseNextToken( langdescr, tok, ci, ce);
+		}
+		if (ch != ')')
+		{
+			throw std::runtime_error( "unexpected token in function call parameter. close bracket ')' or comma ',' expected after argument");
 		}
 	}
 	return rt;
@@ -578,7 +634,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						else
 						{
-							opstep.call = parseCallStatement( si, se);
+							opstep.call = parseCallStatement( langdescr, si, se);
 						}
 					}
 					else

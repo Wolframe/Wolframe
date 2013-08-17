@@ -136,9 +136,8 @@ public:
 		void clear()
 		{
 			selector_FOREACH.clear();
-			call.first.clear();
-			call.second.clear();
 			path_INTO.clear();
+			call.clear();
 			nonempty = false;
 			unique = false;
 			hints.clear();
@@ -156,9 +155,35 @@ public:
 			std::string msg;
 		};
 
+		struct Call
+		{
+			struct Param
+			{
+				enum Type {VariableReference,ResultReference,Constant,InputSelectorPath};
+				Type type;
+				std::string value;
+
+				Param(){}
+				Param( const Param& o)
+					:type(o.type),value(o.value){}
+				Param( Type type_, const std::string& value_)
+					:type(type_),value(value_){}
+			};
+
+			std::string funcname;
+			std::vector<Param> paramlist;
+
+			Call(){}
+			Call( const Call& o)
+				:funcname(o.funcname),paramlist(o.paramlist){}
+			Call( const std::string& funcname_, const std::vector<Param>& paramlist_)
+				:funcname(funcname_),paramlist(paramlist_){}
+
+			void clear()		{funcname.clear(); paramlist.clear();}
+		};
+
 		std::string selector_FOREACH;
-		typedef std::vector<std::string> ParamList;
-		std::pair<std::string,ParamList> call;
+		Call call;
 		std::vector<std::string> path_INTO;
 		bool nonempty;
 		bool unique;
