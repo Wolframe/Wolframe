@@ -118,6 +118,28 @@ static char parseNextToken( const LanguageDescription* langdescr, std::string& t
 	return utils::parseNextToken( tok, si, se, g_optab);
 }
 
+static std::vector<std::string> parse_INTO_path( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::vector<std::string> rt;
+	for (;;)
+	{
+		std::string output;
+		char ch = parseNextToken( langdescr, output, si, se);
+		if (!ch) throw std::runtime_error( "unexpected end of description. result tag path expected after INTO");
+		if (ch == '.' && output.empty()) output.push_back(ch);
+
+		if (output.empty())
+		{
+			throw std::runtime_error( "identifier or '.' expected after INTO");
+		}
+		rt.push_back( output);
+		ch = gotoNextToken( langdescr, si, se);
+		if (ch != '/') break;
+		++si;
+	}
+	return rt;
+}
+
 static std::pair<std::string,std::vector<std::string> >
 	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
 {
@@ -251,14 +273,12 @@ struct Operation
 	Operation( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
 		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
 	Operation( const Operation& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),descar(o.descar),resultname(o.resultname),callstartar(o.callstartar),embstm_index(o.embstm_index){}
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),description(o.description),callstartar(o.callstartar),embstm_index(o.embstm_index){}
 
 	std::string name;
-	langbind::Authorization authorization;
 	std::string::const_iterator start;
 	bool isTransaction;
-	std::vector<OperationStepDescription> descar;
-	std::string resultname;
+	TransactionFunctionDescription description;
 	std::vector<std::string::const_iterator> callstartar;
 	int embstm_index;
 };
@@ -301,6 +321,9 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 			}
 			if (enterDefinition)
 			{
+				std::vector<TransactionFunctionDescription::Block> blockstk;
+				std::vector<std::string> result_INTO;	//< RESULT INTO path
+
 				std::string::const_iterator dbe = lineStart( tokstart, source);
 				std::string transactionName;
 
@@ -312,7 +335,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
-				OperationStepDescription desc;
+				TransactionFunctionDescription::OperationStep opstep;
 				unsigned int mask = 0;
 
 				while (parseNextToken( langdescr, tok, si, se))
@@ -324,15 +347,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							throw ERROR( si, "INTO expected after RESULT");
 						}
-						if (0==(ch = parseNextToken( langdescr, operation.resultname, si, se)))
-						{
-							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
-						}
-						if (ch == '.' && operation.resultname.empty()) operation.resultname.push_back(ch);
-						if (operation.resultname.empty())
-						{
-							throw ERROR( si, "identifier or '.' expected after RESULT INTO");
-						}
+						result_INTO = parse_INTO_path( langdescr, si, se);
 					}
 					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
 					{
@@ -369,7 +384,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
 						}
 						++si;
-						operation.authorization.init( authfunction, authresource);
+						operation.description.auth.init( authfunction, authresource);
 					}
 					else
 					{
@@ -382,7 +397,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				}
 				while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 				{
-					while (operation.callstartar.size() <= operation.descar.size())
+					while (operation.callstartar.size() <= operation.description.steps.size())
 					{
 						operation.callstartar.push_back( si);
 					}
@@ -390,8 +405,8 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						if (mask)
 						{
-							operation.descar.push_back( desc);
-							desc.clear();
+							operation.description.steps.push_back( opstep);
+							opstep.clear();
 							mask = 0;
 						}
 					}
@@ -408,7 +423,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						if (parseNextToken( langdescr, tok, si, se)
 						&&  boost::algorithm::iequals( tok, "ERROR"))
 						{
-							if (operation.descar.empty())
+							if (operation.description.steps.empty())
 							{
 								throw ERROR( si, "ON ERROR declaration allowed only after a database call");
 							}
@@ -427,11 +442,11 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							{
 								throw ERROR( si, "hint message string expected after ON ERROR <errorclass> HINT");
 							}
-							if (operation.descar.back().hints.find( errclass) != operation.descar.back().hints.end())
+							if (operation.description.steps.back().hints.find( errclass) != operation.description.steps.back().hints.end())
 							{
 								throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
 							}
-							operation.descar.back().hints[  errclass] = errhint;
+							operation.description.steps.back().hints[  errclass] = errhint;
 						}
 						else
 						{
@@ -442,18 +457,31 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						try
 						{
-							if (operation.isTransaction)
+							if (blockstk.empty())
 							{
-								LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
-								TransactionFunctionR ff( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
-								rt.push_back( std::pair<std::string,TransactionFunctionR>( operation.name, ff));
+								if (!result_INTO.empty())
+								{
+									operation.description.blocks.insert( operation.description.blocks.begin(), TransactionFunctionDescription::Block( result_INTO, 0, operation.description.steps.size()));
+								}
+								if (operation.isTransaction)
+								{
+									LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
+									TransactionFunctionR ff( createTransactionFunction( operation.name, operation.description, operationmap));
+									rt.push_back( std::pair<std::string,TransactionFunctionR>( operation.name, ff));
+								}
+								else
+								{
+									operationmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.description, operationmap));
+								}
 							}
 							else
 							{
-								operationmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
+								blockstk.back().size = operation.description.steps.size() - blockstk.back().startidx;
+								operation.description.blocks.push_back( blockstk.back());
+								blockstk.pop_back();
 							}
 						}
-						catch (const OperationStepDescription::Error& err)
+						catch (const TransactionFunctionDescription::OperationStep::Error& err)
 						{
 							throw ERROR( operation.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
 						}
@@ -471,6 +499,28 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						break;
 					}
+					else if (boost::algorithm::iequals( tok, "RESULT"))
+					{
+						if (parseNextToken( langdescr, tok, si, se)
+						&&  boost::algorithm::iequals( tok, "INTO"))
+						{
+							std::vector<std::string> path = parse_INTO_path( langdescr, si, se);
+
+							if (parseNextToken( langdescr, tok, si, se)
+							&&  boost::algorithm::iequals( tok, "BEGIN"))
+							{
+								blockstk.push_back( TransactionFunctionDescription::Block( path, operation.description.steps.size(), 0));
+							}
+							else
+							{
+								throw ERROR( si, "keyword (BEGIN) expected after RESULT INTO <path>");
+							}
+						}
+						else
+						{
+							throw ERROR( si, "keyword (INTO) expected after RESULT");
+						}
+					}
 					else if (boost::algorithm::iequals( tok, "FOREACH"))
 					{
 						if (0 != (mask & 0x1))
@@ -479,7 +529,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						mask |= 0x1;
 
-						ch = utils::parseNextToken( desc.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
+						ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 					}
 					else if (boost::algorithm::iequals( tok, "INTO"))
@@ -490,22 +540,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						mask |= 0x2;
 
-						for (;;)
-						{
-							std::string output;
-							ch = parseNextToken( langdescr, output, si, se);
-							if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
-							if (ch == '.' && output.empty()) output.push_back(ch);
-
-							if (output.empty())
-							{
-								throw ERROR( si, "identifier or '.' expected after INTO");
-							}
-							desc.path_INTO.push_back( output );
-							ch = gotoNextToken( langdescr, si, se);
-							if (ch != '/') break;
-							++si;
-						}
+						opstep.path_INTO = parse_INTO_path( langdescr, si, se);
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
@@ -520,12 +555,12 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							if (boost::algorithm::iequals( tok, "NONEMPTY"))
 							{
-								desc.nonempty = true;
+								opstep.nonempty = true;
 								si = oi;
 							}
 							else if (boost::algorithm::iequals( tok, "UNIQUE"))
 							{
-								desc.unique = true;
+								opstep.unique = true;
 								si = oi;
 							}
 							else
@@ -539,11 +574,11 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						if (langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call = parseEmbeddedStatement( langdescr, transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
+							opstep.call = parseEmbeddedStatement( langdescr, transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
 						}
 						else
 						{
-							desc.call = parseCallStatement( si, se);
+							opstep.call = parseCallStatement( si, se);
 						}
 					}
 					else

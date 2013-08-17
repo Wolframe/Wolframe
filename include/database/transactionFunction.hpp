@@ -115,50 +115,75 @@ private:
 };
 
 
-struct OperationStepDescription
+class TransactionFunctionDescription
 {
-	OperationStepDescription()
-		:nonempty(false)
-		,unique(false){}
-
-	OperationStepDescription( const OperationStepDescription& o)
-		:selector_FOREACH(o.selector_FOREACH)
-		,call(o.call)
-		,path_INTO(o.path_INTO)
-		,nonempty(o.nonempty)
-		,unique(o.unique)
-		,hints(o.hints){}
-
-	void clear()
+public:
+	class OperationStep
 	{
-		selector_FOREACH.clear();
-		call.first.clear();
-		call.second.clear();
-		path_INTO.clear();
-		nonempty = false;
-		unique = false;
-		hints.clear();
-	}
+	public:
+		OperationStep()
+			:nonempty(false)
+			,unique(false){}
 
-	///\class Error
-	///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
-	struct Error
-	{
-		Error( std::size_t elemidx_, const std::string& msg_)
-			:elemidx(elemidx_)
-			,msg(msg_){}
+		OperationStep( const OperationStep& o)
+			:selector_FOREACH(o.selector_FOREACH)
+			,call(o.call)
+			,path_INTO(o.path_INTO)
+			,nonempty(o.nonempty)
+			,unique(o.unique)
+			,hints(o.hints){}
 
-		std::size_t elemidx;
-		std::string msg;
+		void clear()
+		{
+			selector_FOREACH.clear();
+			call.first.clear();
+			call.second.clear();
+			path_INTO.clear();
+			nonempty = false;
+			unique = false;
+			hints.clear();
+		}
+
+		///\class Error
+		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
+		struct Error
+		{
+			Error( std::size_t elemidx_, const std::string& msg_)
+				:elemidx(elemidx_)
+				,msg(msg_){}
+
+			std::size_t elemidx;
+			std::string msg;
+		};
+
+		std::string selector_FOREACH;
+		typedef std::vector<std::string> ParamList;
+		std::pair<std::string,ParamList> call;
+		std::vector<std::string> path_INTO;
+		bool nonempty;
+		bool unique;
+		types::keymap<std::string> hints;
 	};
+	struct Block
+	{
+		std::vector<std::string> path_INTO;
+		std::size_t startidx;
+		std::size_t size;
 
-	std::string selector_FOREACH;
-	typedef std::vector<std::string> ParamList;
-	std::pair<std::string,ParamList> call;
-	std::vector<std::string> path_INTO;
-	bool nonempty;
-	bool unique;
-	types::keymap<std::string> hints;
+		Block( const std::vector<std::string>& p, std::size_t i, std::size_t n)
+			:path_INTO(p),startidx(i),size(n){}
+		Block( const Block& o)
+			:path_INTO(o.path_INTO),startidx(o.startidx),size(o.size){}
+		Block()
+			:startidx(0),size(0){}
+	};
+	std::vector<OperationStep> steps;	//< list of database commands or operations
+	std::vector<Block> blocks;		//< substructures of the output
+	langbind::Authorization auth;		//< authorization definition structure for this function
+
+	TransactionFunctionDescription( const TransactionFunctionDescription& o)
+		:steps(o.steps),blocks(o.blocks),auth(o.auth){}
+	TransactionFunctionDescription(){}
 };
 
 ///\class TransactionFunctionR
@@ -171,7 +196,7 @@ class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& name_, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_);
+	TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	virtual ~TransactionFunction();
 
 	virtual TransactionFunctionInput* getInput() const;
@@ -204,11 +229,9 @@ private:
 
 ///\brief Creates a database transaction function from its description source
 ///\param[in] name name of  the transaction
-///\param[in] description description of the operation steps (Result of TDL parser)
-///\param[in] resultname name of the result (RESULT INTO definition)
+///\param[in] description description of the function
 ///\param[in] functionmap map op operations in the module context that can be referenced
-///\param[in] auth authorization definition structure for this function
-TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth);
+TransactionFunction* createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 
 }}//namespace
 #endif

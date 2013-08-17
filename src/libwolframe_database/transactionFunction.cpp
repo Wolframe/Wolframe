@@ -454,7 +454,7 @@ struct TransactionFunction::Impl
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 
-	Impl( const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap);
+	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
 };
 
@@ -1446,23 +1446,53 @@ void TransactionFunctionOutput::resetIterator()
 	m_impl->resetIterator();
 }
 
-TransactionFunction::Impl::Impl( const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap)
+static int hasOpenSubstruct( const std::vector<TransactionFunctionDescription::Block>& blocks, std::size_t idx)
+{
+	std::size_t ii = 0;
+	for (; ii<blocks.size(); ++ii) if (idx == blocks.at(ii).startidx) return ii;
+	return -1;
+}
+
+static int hasCloseSubstruct( const std::vector<TransactionFunctionDescription::Block>& blocks, std::size_t idx)
+{
+	std::size_t ii = 0;
+	for (; ii<blocks.size(); ++ii) if (idx == blocks.at(ii).startidx + blocks.at(ii).size && blocks.at(ii).size != 0) return ii;
+	return -1;
+}
+
+TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_resultstruct( new TransactionFunctionOutput::ResultStruct())
 {
-	typedef OperationStepDescription::Error Error;
+	typedef TransactionFunctionDescription::OperationStep::Error Error;
 
-	if (!resultname.empty())
-	{
-		m_resultstruct->openTag( resultname);
-	}
-	std::vector<OperationStepDescription>::const_iterator di = description.begin(), de = description.end();
+	int blkidx;
+	std::vector<TransactionFunctionDescription::OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
 	for (; di != de; ++di)
 	{
-		std::size_t eidx = di - description.begin();
-
-		// Build Function call object for parsed function:
+		std::size_t eidx = di - description.steps.begin();
 		try
 		{
+			// Create substructure context for RESULT INTO instructions:
+			if ((blkidx=hasCloseSubstruct( description.blocks, eidx)) >= 0)
+			{
+				const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
+				for (; pi != pe; ++pi)
+				{
+					m_resultstruct->closeTag();
+				}
+			}
+			if ((blkidx=hasOpenSubstruct( description.blocks, eidx)) >= 0)
+			{
+				const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
+				for (; pi != pe; ++pi)
+				{
+					m_resultstruct->openTag( *pi);
+				}
+			}
+
+			// Build Function call object for parsed function:
 			Path selector( di->selector_FOREACH, &m_tagmap);
 			if (selector.resultReference())
 			{
@@ -1574,9 +1604,15 @@ TransactionFunction::Impl::Impl( const std::vector<OperationStepDescription>& de
 			throw Error( eidx, e.what());
 		}
 	}
-	if (!resultname.empty())
+	// Create substructure context for RESULT INTO instructions:
+	if ((blkidx=hasCloseSubstruct( description.blocks, description.steps.size())) >= 0)
 	{
-		m_resultstruct->closeTag();
+		const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+		std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
+		for (; pi != pe; ++pi)
+		{
+			m_resultstruct->closeTag();
+		}
 	}
 }
 
@@ -1586,10 +1622,10 @@ TransactionFunction::Impl::Impl( const Impl& o)
 	,m_tagmap(o.m_tagmap){}
 
 
-TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_)
+TransactionFunction::TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_name(name_)
-	,m_authorization(authorization_)
-	,m_impl( new Impl( description, resultname, functionmap)){}
+	,m_authorization( description.auth)
+	,m_impl( new Impl( description, functionmap)){}
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	:m_name(o.m_name)
@@ -1622,9 +1658,9 @@ TransactionFunctionOutput* TransactionFunction::getOutput( const db::Transaction
 	return new TransactionFunctionOutput( m_impl->m_resultstruct, o);
 }
 
-TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<OperationStepDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth)
+TransactionFunction* db::createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 {
-	return new TransactionFunction( name, description, resultname, functionmap, auth);
+	return new TransactionFunction( name, description, functionmap);
 }
 
 
