@@ -206,11 +206,18 @@ public:
 		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant((unsigned int)resultref));
 	}
 
+	///\brief Bind parameter value on current command statement
+	void bindCommandArgAsResultReference( const std::string& resultsymbol)
+	{
+		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
+		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant( resultsymbol));
+	}
+
 	class ResultVariableReference
 		:public types::Variant
 	{
 	public:
-		ResultVariableReference( std::size_t functionidx_, std::size_t resultref_)
+		ResultVariableReference( unsigned int functionidx_, unsigned int resultref_)
 			:types::Variant( (functionidx_<<16) + resultref_){}
 		ResultVariableReference( const types::Variant& o)
 			:types::Variant( o.touint()){}

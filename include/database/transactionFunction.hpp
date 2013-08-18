@@ -159,7 +159,19 @@ public:
 		{
 			struct Param
 			{
-				enum Type {VariableReference,ResultReference,Constant,InputSelectorPath};
+				enum Type
+				{
+					VariableReference,
+					NumericResultReference,
+					SymbolicResultReference,
+					Constant,
+					InputSelectorPath
+				};
+				static const char* typeName( Type i)
+				{
+					static const char* ar[] = {"VariableReference","NumericResultReference","SymbolicResultReference","Constant","InputSelectorPath"};
+					return ar[(std::size_t)i];
+				}
 				Type type;
 				std::string value;
 

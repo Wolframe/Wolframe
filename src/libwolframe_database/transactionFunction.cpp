@@ -154,7 +154,8 @@ public:
 		Find,
 		Up,
 		Variable,
-		Result,
+		ResultSymbol,
+		ResultIndex,
 		Constant
 	};
 
@@ -176,9 +177,11 @@ public:
 	Path( const Path& o);
 	std::string tostring() const;
 
-	std::size_t resultReference() const;
-	const char* constantReference() const;
-	const char* variableReference() const;
+	ElementType referenceType() const;
+	std::size_t resultReferenceIndex() const;
+	const std::string& resultReferenceSymbol() const;
+	const std::string& constantReference() const;
+	const std::string& variableReference() const;
 	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
@@ -225,7 +228,6 @@ public:
 	const std::vector<Path>& arg() const				{return m_arg;}
 	const std::string& name() const					{return m_name;}
 
-	bool hasResultReference() const;
 	bool hasNonemptyResult() const					{return m_nonemptyResult;}
 	bool hasUniqueResult() const					{return m_uniqueResult;}
 	std::size_t level() const					{return m_level;}
@@ -848,8 +850,7 @@ void Path::parseSelectorPath( const std::string& selector, TransactionFunction::
 	}
 }
 
-Path::Path( const std::string& selector, TransactionFunction::TagTable* tagmap
-	    )
+Path::Path( const std::string& selector, TransactionFunction::TagTable* tagmap)
 {
 	parseSelectorPath( selector, tagmap);
 }
@@ -864,55 +865,92 @@ Path::Path( const Call::Param& param, TransactionFunction::TagTable* tagmap)
 			elem.m_type = Variable;
 			m_content = param.value;
 			m_path.push_back( elem);
-		case Param::ResultReference:
-			elem.m_type = Result;
+			break;
+		case Param::NumericResultReference:
+			elem.m_type = ResultIndex;
 			elem.m_tag = boost::lexical_cast<unsigned short>( param.value);
 			m_path.push_back( elem);
+			break;
+		case Param::SymbolicResultReference:
+			elem.m_type = ResultSymbol;
+			m_content = param.value;
+			m_path.push_back( elem);
+			break;
 		case Param::Constant:
 			elem.m_type = Constant;
 			m_content = param.value;
 			m_path.push_back( elem);
+			break;
 		case Param::InputSelectorPath:
 			parseSelectorPath( param.value, tagmap);
+			break;
 	}
 }
 
 Path::Path( const Path& o)
 	:m_path(o.m_path){}
 
-std::size_t Path::resultReference() const
+
+Path::ElementType Path::referenceType() const
 {
-	if (m_path.size() && m_path[0].m_type == Result)
+	if (m_path.size() == 1) return m_path[0].m_type;
+	return Root;
+}
+
+std::size_t Path::resultReferenceIndex() const
+{
+	if (m_path.size() == 1 && m_path[0].m_type == ResultIndex)
 	{
 		return m_path[0].m_tag;
 	}
 	return 0;
 }
 
-const char* Path::constantReference() const
+const std::string& Path::resultReferenceSymbol() const
 {
-	if (m_path.size() && m_path[0].m_type == Constant) return m_content.c_str();
-	return 0;
+	if (m_path.size() == 1 && m_path[0].m_type == ResultSymbol)
+	{
+		return m_content;
+	}
+	throw std::logic_error("internal: illegal call of Path::resultReferenceSymbol");
 }
 
-const char* Path::variableReference() const
+const std::string& Path::constantReference() const
 {
-	if (m_path.size() && m_path[0].m_type == Variable) return m_content.c_str();
-	return 0;
+	if (m_path.size() == 1 && m_path[0].m_type == Constant) return m_content;
+	throw std::logic_error("internal: illegal call of Path::constantReference");
+}
+
+const std::string& Path::variableReference() const
+{
+	if (m_path.size() == 1 && m_path[0].m_type == Variable) return m_content;
+	throw std::logic_error("internal: illegal call of Path::variableReference");
 }
 
 std::string Path::tostring() const
 {
-	if (constantReference()) return std::string("'") + m_content + std::string("'");
-	if (variableReference()) return m_content;
-
-	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
-	std::ostringstream rt;
-	for (; ii != ee; ++ii)
+	switch (referenceType())
 	{
-		rt << elementTypeName( ii->m_type) << " " << ii->m_tag << std::endl;
+		case ResultIndex: return std::string("$") + boost::lexical_cast<std::string>( resultReferenceIndex());
+		case ResultSymbol: return std::string("$") + resultReferenceSymbol();
+		case Variable: return variableReference();
+		case Constant: return std::string("'") + constantReference() + std::string("'");
+
+		case Find:
+		case Root:
+		case Next:
+		case Up:
+		{
+			std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
+			std::ostringstream rt;
+			for (; ii != ee; ++ii)
+			{
+				rt << elementTypeName( ii->m_type) << " " << ii->m_tag << std::endl;
+			}
+			return rt.str();
+		}
 	}
-	return rt.str();
+	throw std::logic_error( "internal: illegal state in Path::tostring()");
 }
 
 void Path::selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const
@@ -931,7 +969,8 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 		{
 			switch (si->m_type)
 			{
-				case Result:
+				case ResultIndex:
+				case ResultSymbol:
 				case Variable:
 				case Constant:
 					break;
@@ -975,16 +1014,6 @@ FunctionCall::FunctionCall( const FunctionCall& o)
 	,m_uniqueResult(o.m_uniqueResult)
 	,m_level(o.m_level)
 	,m_hints(o.m_hints){}
-
-bool FunctionCall::hasResultReference() const
-{
-	std::vector<Path>::const_iterator pi,pe;
-	for (pi=m_arg.begin(),pe=m_arg.end(); pi!=pe; ++pi)
-	{
-		if (pi->resultReference()) return true;
-	}
-	return false;
-}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
@@ -1034,39 +1063,48 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
 	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
 	{
-		std::size_t idx;
-		const char* cns;
-		if ((idx = pi->resultReference()) != 0)
+		switch (pi->referenceType())
 		{
-			ti.bindCommandArgAsResultReference( idx);
-		}
-		else if ((cns = pi->constantReference()) != 0)
-		{
-			ti.bindCommandArgAsValue( types::VariantConst( cns));
-		}
-		else
-		{
-			std::vector<Node> param;
-			pi->selectNodes( inputst->structure(), selectornode, param);
-			if (param.size() == 0)
+			case Path::ResultIndex:
+				ti.bindCommandArgAsResultReference( pi->resultReferenceIndex());
+				break;
+			case Path::ResultSymbol:
+				ti.bindCommandArgAsResultReference( pi->resultReferenceSymbol());
+				break;
+			case Path::Variable:
+				/*[-] TODO */
+				break;
+			case Path::Constant:
+				ti.bindCommandArgAsValue( pi->constantReference());
+				break;
+
+			case Path::Find:
+			case Path::Root:
+			case Path::Next:
+			case Path::Up:
 			{
-				ti.bindCommandArgAsNull();
-			}
-			else
-			{
-				std::vector<Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
-				for (; gi != ge; ++gi)
+				std::vector<Node> param;
+				pi->selectNodes( inputst->structure(), selectornode, param);
+				if (param.size() == 0)
 				{
-					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
-				}
-				const types::Variant* valref = inputst->structure().nodevalue( *gs);
-				if (valref)
-				{
-					ti.bindCommandArgAsValue( *valref);
+					ti.bindCommandArgAsNull();
 				}
 				else
 				{
-					ti.bindCommandArgAsNull();
+					std::vector<Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+					for (; gi != ge; ++gi)
+					{
+						if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
+					}
+					const types::Variant* valref = inputst->structure().nodevalue( *gs);
+					if (valref)
+					{
+						ti.bindCommandArgAsValue( *valref);
+					}
+					else
+					{
+						ti.bindCommandArgAsNull();
+					}
 				}
 			}
 		}
@@ -1512,14 +1550,6 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 
 			// Build Function call object for parsed function:
 			Path selector( di->selector_FOREACH, &m_tagmap);
-			if (selector.resultReference())
-			{
-				throw Error( eidx, "undefined: result variable reference in selector");
-			}
-			if (selector.constantReference())
-			{
-				throw Error( eidx, "undefined: constant as selector");
-			}
 			std::vector<Path> param;
 			std::vector<Call::Param>::const_iterator ai = di->call.paramlist.begin(), ae = di->call.paramlist.end();
 			for (; ai != ae; ++ai)

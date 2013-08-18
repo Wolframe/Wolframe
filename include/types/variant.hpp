@@ -99,11 +99,11 @@ public:
 	Variant()					{init();}
 	Variant( bool o)				{init(bool_); m_data.value.bool_ = o;}
 	Variant( double o)				{init(double_); m_data.value.double_ = o;}
-	Variant( float o)				{init(double_); m_data.value.double_ = (double)o;}
+	Variant( float o)				{init(double_); m_data.value.double_ = o;}
 	Variant( int o)					{init(int_); m_data.value.int_ = o;}
 	Variant( Data::Int_ o)				{init(int_); m_data.value.int_ = o;}
 	Variant( unsigned int o)			{init(uint_); m_data.value.uint_ = o;}
-	Variant( Data::UInt_ o)				{init(int_); m_data.value.int_ = o;}
+	Variant( Data::UInt_ o)				{init(uint_); m_data.value.uint_ = o;}
 	Variant( const char* o)				{initString( o, std::strlen(o));}
 	Variant( const char* o, std::size_t n)		{initString( o, n);}
 	Variant( const std::string& o)			{initString( o.c_str(), o.size());}
@@ -115,9 +115,9 @@ public:
 	Variant& operator=( const Variant& o)		{bool init_=initialized(); release(); initCopy( o); setInitialized(init_); return *this;}
 	Variant& operator=( bool o)			{bool init_=initialized(); release(); init(bool_); m_data.value.bool_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( double o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = o; setInitialized(init_); return *this;}
-	Variant& operator=( float o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = (double)o; setInitialized(init_); return *this;}
+	Variant& operator=( float o)			{bool init_=initialized(); release(); init(double_); m_data.value.double_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( int o)			{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
-	Variant& operator=( Data::Int_ o)			{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
+	Variant& operator=( Data::Int_ o)		{bool init_=initialized(); release(); init(int_); m_data.value.int_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( unsigned int o)		{bool init_=initialized(); release(); init(uint_); m_data.value.uint_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( Data::UInt_ o)		{bool init_=initialized(); release(); init(uint_); m_data.value.uint_ = o; setInitialized(init_); return *this;}
 	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
@@ -211,11 +211,13 @@ struct VariantConst :public Variant
 	VariantConst()					{init();}
 	VariantConst( const Variant& o)			:Variant(){initConstCopy( o);}
 	VariantConst( const VariantConst& o)		:Variant(){initConstCopy( o);}
-	VariantConst( bool o)				:Variant(bool_){m_data.value.bool_ = o; setConstant(); }
-	VariantConst( double o)				:Variant(double_){m_data.value.double_ = o; setConstant(); }
-	VariantConst( float o)				:Variant(double_){m_data.value.double_ = (double)o; setConstant();}
+	VariantConst( bool o)				:Variant(bool_){m_data.value.bool_ = o; setConstant();}
+	VariantConst( double o)				:Variant(double_){m_data.value.double_ = o; setConstant();}
+	VariantConst( float o)				:Variant(double_){m_data.value.double_ = o; setConstant();}
 	VariantConst( int o)				:Variant(int_){m_data.value.int_ = o; setConstant();}
+	VariantConst( Data::Int_ o)			:Variant(int_){m_data.value.int_ = o; setConstant();}
 	VariantConst( unsigned int o)			:Variant(uint_){m_data.value.uint_ = o; setConstant();}
+	VariantConst( Data::UInt_ o)			:Variant(uint_){m_data.value.uint_ = o; setConstant();}
 	VariantConst( const char* o)			:Variant(){initConstant( o, std::strlen(o));}
 	VariantConst( const char* o, std::size_t n)	:Variant(){initConstant( o, n);}
 	VariantConst( const std::string& o)		:Variant(){initConstant( o.c_str(), o.size());}
@@ -225,11 +227,13 @@ struct VariantConst :public Variant
 	///\brief Assignment operator, keeping the initialization flag of this
 	VariantConst& operator=( const Variant& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantConst& operator=( const VariantConst& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
-	VariantConst& operator=( bool o)		{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantConst& operator=( float o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
-	VariantConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantConst& operator=( unsigned int o)	{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( double o)			{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( float o)			{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( Data::Int_ o)		{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( unsigned int o)		{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
+	Variant& operator=( Data::UInt_ o)		{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 

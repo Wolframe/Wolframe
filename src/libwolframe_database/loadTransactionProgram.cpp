@@ -178,7 +178,15 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 	{
 		std::string::const_iterator argstart = si;
 		for (; si!=se && *si>= '0' && *si<= '9'; ++si);
-		Call::Param::Type type = Call::Param::ResultReference;
+		Call::Param::Type type = Call::Param::NumericResultReference;
+		Call::Param param( type, std::string( argstart, si));
+		return param;
+	}
+	else if (isAlphaNumeric(ch))
+	{
+		std::string::const_iterator argstart = si;
+		for (; si!=se && isAlphaNumeric(*si); ++si);
+		Call::Param::Type type = Call::Param::SymbolicResultReference;
 		Call::Param param( type, std::string( argstart, si));
 		return param;
 	}

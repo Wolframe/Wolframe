@@ -37,6 +37,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -79,6 +80,41 @@ static types::VariantConst getResult( const TransactionOutput& output, const Tra
 	return rt;
 }
 
+static types::VariantConst resolveResultReference( const TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const types::Variant& reference, const TransactionInput::cmd_const_iterator& cmditr)
+{
+	types::VariantConst rt;
+	if (reference.type() == types::Variant::uint_ || reference.type() == types::Variant::int_)
+	{
+		unsigned int ref = reference.touint();
+		if (ref == 0)
+		{
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+			throw db::DatabaseErrorException( dberr);
+		}
+		if (ref > resrow->size())
+		{
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+			throw db::DatabaseErrorException( dberr);
+		}
+		rt = resrow->at( ref - 1);
+	}
+	else
+	{
+		std::size_t ci = 0, ce = cmdres.nofColumns();
+		std::string ref = reference.tostring();
+		for (; ci != ce; ++ci)
+		{
+			if (boost::algorithm::iequals( cmdres.columnName( ci), ref))
+			{
+				rt = resrow->at( ci);
+				break;
+			}
+		}
+		if (ci == ce) throw std::runtime_error( std::string( "symbolic result reference '") + ref + "' could not be resolved");
+	}
+	return rt;
+}
+
 static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
@@ -96,18 +132,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				unsigned int ref = ai->value().touint();
-				if (ref == 0)
-				{
-					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
-					throw db::DatabaseErrorException( dberr);
-				}
-				if (ref > resrow->size())
-				{
-					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
-					throw db::DatabaseErrorException( dberr);
-				}
-				val = resrow->at( ref - 1);
+				val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
 				break;
 			}
 			case TransactionInput::Command::Argument::Value:
@@ -211,18 +236,7 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 			}
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				unsigned int ref = ai->value().touint();
-				if (ref == 0)
-				{
-					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
-					throw db::DatabaseErrorException( dberr);
-				}
-				if (ref > resrow->size())
-				{
-					db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
-					throw db::DatabaseErrorException( dberr);
-				}
-				val = resrow->at( ref - 1);
+				val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
 				break;
 			}
 			case TransactionInput::Command::Argument::Value:
