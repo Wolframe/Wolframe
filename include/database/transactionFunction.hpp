@@ -115,6 +115,41 @@ private:
 };
 
 
+class VariableValue
+{
+public:
+	VariableValue()
+		:m_scope_functionidx(-1),m_column_idx(-1){}
+	VariableValue( const VariableValue& o)
+		:m_scope_functionidx(o.m_scope_functionidx),m_column_idx(o.m_column_idx),m_name(o.m_name){}
+	VariableValue( const std::string& name_, int scope_functionidx_)
+		:m_scope_functionidx(scope_functionidx_),m_column_idx(-1),m_name(name_){}
+	VariableValue( int column_idx_, int scope_functionidx_)
+		:m_scope_functionidx(scope_functionidx_),m_column_idx(column_idx_){}
+
+	int scope_functionidx() const			{return m_scope_functionidx;}
+	int column_idx() const				{return m_column_idx;}
+	const std::string& name() const			{return m_name;}
+
+	bool isConstant() const				{return m_column_idx == 0;}
+	const std::string& value() const		{return m_name;}
+
+private:
+	friend class ConstantValue;
+	int m_scope_functionidx;
+	int m_column_idx;
+	std::string m_name;
+};
+
+struct ConstantValue :public VariableValue
+{
+	ConstantValue( const std::string& value_)
+		:VariableValue( value_, -1)		{m_scope_functionidx = 0;}
+};
+
+typedef types::keymap<VariableValue>	VariableTable;
+
+
 class TransactionFunctionDescription
 {
 public:
@@ -217,6 +252,7 @@ public:
 	std::vector<OperationStep> steps;	//< list of database commands or operations
 	std::vector<Block> blocks;		//< substructures of the output
 	langbind::Authorization auth;		//< authorization definition structure for this function
+	VariableTable variablemap;		//< variable definitions with LET a = ...;
 
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
 		:steps(o.steps),blocks(o.blocks),auth(o.auth){}

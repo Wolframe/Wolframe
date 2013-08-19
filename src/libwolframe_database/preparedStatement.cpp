@@ -64,7 +64,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput::Comm
 	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
 	for (; ri != re; ++ri)
 	{
-		if (scope_functionidx < ri->functionidx()) break;
+		if (scope_functionidx <= ri->functionidx()) break;
 		if (scope_level == ri->level()) fi = ri;
 	}
 	if (fi != output.end())

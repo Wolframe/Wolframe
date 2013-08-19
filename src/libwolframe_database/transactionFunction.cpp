@@ -75,24 +75,6 @@ private:
 	std::map< std::string, int> m_map;
 };
 
-struct VariableReference
-{
-	int scope_functionidx;
-	int column_idx;
-	std::string name;
-
-	VariableReference()
-		:scope_functionidx(-1),column_idx(-1){}
-	VariableReference( const VariableReference& o)
-		:scope_functionidx(o.scope_functionidx),column_idx(o.column_idx),name(o.name){}
-	VariableReference( const std::string& name_, int scope_functionidx_)
-		:scope_functionidx(scope_functionidx_),column_idx(-1),name(name_){}
-	VariableReference( int column_idx_, int scope_functionidx_)
-		:scope_functionidx(scope_functionidx_),column_idx(column_idx_){}
-};
-
-typedef std::map<std::string,VariableReference>	VariableTable;
-
 
 class TransactionFunctionInput::Structure
 {
@@ -207,11 +189,18 @@ public:
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
 
-	void rewrite( const std::map<int,int>& rwtab)
+	void rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
 	{
 		std::vector<Element>::iterator pi = m_path.begin(), pe = m_path.end();
 		for (; pi != pe; ++pi)
 		{
+			if (pi->m_type == ResultIndex || pi->m_type == ResultSymbol)
+			{
+				if (pi->m_scope_functionidx >= 0)
+				{
+					pi->m_scope_functionidx += scope_functionidx_incr;
+				}
+			}
 			if (pi->m_type == Next || pi->m_type == Find)
 			{
 				std::map<int,int>::const_iterator re = rwtab.find( pi->m_tag);
@@ -882,18 +871,23 @@ Path::Path( const Call::Param& param, const VariableTable* varmap, TagTable* tag
 		{
 			VariableTable::const_iterator vi = varmap->find( param.value);
 			if (vi == varmap->end()) throw std::runtime_error( std::string("variable not defined '") + param.value + "'");
-			if (vi->second.column_idx >= 0)
+			if (vi->second.column_idx() > 0)
 			{
 				elem.m_type = ResultIndex;
-				elem.m_tag = vi->second.column_idx;
-				elem.m_scope_functionidx = vi->second.scope_functionidx;
+				elem.m_tag = vi->second.column_idx();
+				elem.m_scope_functionidx = vi->second.scope_functionidx();
+			}
+			else if (vi->second.isConstant())
+			{
+				elem.m_type = Constant;
+				m_content = vi->second.value();
 			}
 			else
 			{
 				elem.m_type = ResultSymbol;
 				elem.m_tag = -1;
-				m_content = vi->second.name;
-				elem.m_scope_functionidx = vi->second.scope_functionidx;
+				m_content = vi->second.name();
+				elem.m_scope_functionidx = vi->second.scope_functionidx();
 			}
 			m_path.push_back( elem);
 			break;
@@ -1657,13 +1651,14 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				m_call.push_back( paramstk);
 
 				std::vector<FunctionCall>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
+				int scope_functionidx_incr = m_call.size();
 				for (; fsi != fse; ++fsi)
 				{
 					Path fselector = fsi->selector();
-					fselector.rewrite( rwtab);
+					fselector.rewrite( rwtab, scope_functionidx_incr);
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
-					for (; fai != fae; ++fai) fai->rewrite( rwtab);
+					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
 					FunctionCall cc( fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
 				}

@@ -305,7 +305,7 @@ static TransactionFunctionDescription::OperationStep::Call
 			ch = gotoNextToken( langdescr, ci, ce);
 			if (ch == '\'' || ch == '\"')
 			{
-				++ci;
+				ch = parseNextToken( langdescr, tok, ci, ce);
 				Call::Param::Type type = Call::Param::Constant;
 				Call::Param param( type, tok);
 				rt.paramlist.push_back( param);
@@ -329,6 +329,45 @@ static TransactionFunctionDescription::OperationStep::Call
 		}
 	}
 	return rt;
+}
+
+static VariableValue parseVariableValue( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, int scope_functionidx, const VariableTable& varmap)
+{
+	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	std::string tok;
+	char ch = gotoNextToken( langdescr, si, se);
+	if (ch == '\'' || ch == '\"')
+	{
+		ch = parseNextToken( langdescr, tok, si, se);
+		return ConstantValue( tok);
+	}
+	else if (ch == '$')
+	{
+		Call::Param param = parseReferenceParameter( langdescr, si, se);
+		switch (param.type)
+		{
+			case Call::Param::VariableReference:
+			{
+				VariableTable::const_iterator vi = varmap.find( param.value);
+				if (vi == varmap.end()) throw std::runtime_error( "undefined variable reference in variable value (LET definition)");
+				return VariableValue( vi->second);
+			}
+			case Call::Param::NumericResultReference:
+			{
+				unsigned short columnidx = boost::lexical_cast<unsigned short>( param.value);
+				if (columnidx == 0) std::runtime_error( "illegal result column reference (0) in variable value (LET definition)");
+				return VariableValue( columnidx, scope_functionidx);
+			}
+			case Call::Param::SymbolicResultReference:
+			{
+				return VariableValue( param.value, scope_functionidx);
+			}
+			case Call::Param::Constant:
+			case Call::Param::InputSelectorPath:
+				throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
+		}
+	}
+	throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
 }
 
 namespace {
@@ -476,7 +515,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else if (g_optab[ch])
 					{
-						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON) expected instead of operator '" << ch << "'");
+						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON,LET) expected instead of operator '" << ch << "'");
 					}
 					else if (ch == '\'' || ch == '\"')
 					{
@@ -511,11 +550,43 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 								throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
 							}
 							operation.description.steps.back().hints[  errclass] = errhint;
+
+							if (';' != gotoNextToken( langdescr, si, se))
+							{
+								throw ERROR( si, "';' expected after ON ERROR declaration");
+							}
+							++si;
 						}
 						else
 						{
 							throw ERROR( si, "keyword (ERROR) expected after ON");
 						}
+					}
+					else if (boost::algorithm::iequals( tok, "LET"))
+					{
+						std::string varname;
+						if (!parseNextToken( langdescr, varname, si, se))
+						{
+							throw ERROR( si, "variable name expected after LET");
+						}
+						if ('=' != parseNextToken( langdescr, tok, si, se))
+						{
+							throw ERROR( si, std::string("'=' expected after LET ") + varname);
+						}
+						int scope_functionidx = operation.description.steps.size();
+						VariableValue varvalue = parseVariableValue( langdescr, si, se, scope_functionidx, operation.description.variablemap);
+
+						VariableTable::const_iterator vi = operation.description.variablemap.find( varname);
+						if (vi != operation.description.variablemap.end())
+						{
+							throw ERROR( si, std::string("duplicate definition of variable '") + varname + "'");
+						}
+						operation.description.variablemap[ varname] = varvalue;
+						if (';' != gotoNextToken( langdescr, si, se))
+						{
+							throw ERROR( si, std::string("';' expected after LET ") + varname);
+						}
+						++si;
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{
