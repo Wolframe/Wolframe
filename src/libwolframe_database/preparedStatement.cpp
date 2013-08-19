@@ -44,37 +44,60 @@ using namespace _Wolframe::db;
 
 #define ERRORCODE(E) (E+0x1000000)
 
-static types::VariantConst getResult( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t fidx, std::size_t cidx)
+static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cmdres, const std::string& name)
+{
+	std::size_t ci = 0, ce = cmdres.nofColumns();
+	for (; ci != ce; ++ci)
+	{
+		if (boost::algorithm::iequals( cmdres.columnName( ci), name))
+		{
+			return ci;
+		}
+	}
+	throw std::runtime_error( std::string( "column name '") + name + "' not found in result");
+}
+
+static types::VariantConst resolveScopedReference( const TransactionOutput::CommandResult& cmdres, const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_level, std::size_t scope_functionidx, const types::Variant& reference)
 {
 	types::VariantConst rt;
 	TransactionOutput::result_const_iterator fi = output.end();
 	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
 	for (; ri != re; ++ri)
 	{
-		if (fidx < ri->functionidx()) break;
-		fi = ri;
+		if (scope_functionidx < ri->functionidx()) break;
+		if (scope_level == ri->level()) fi = ri;
 	}
 	if (fi != output.end())
 	{
-		if (fi->nofColumns() > 1)
+		std::size_t cidx;
+		if (reference.type() == types::Variant::string_)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "variable referencing a set of results", "internal logic error (transaction function variable reference)");
-			throw db::DatabaseErrorException( dberr);
+			cidx = resolveColumnName( cmdres, reference.tostring());
 		}
-		std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = fi->begin(), we = fi->end();
-		for (; wi != we; ++wi)
+		else
 		{
+			cidx = reference.touint();
 			if (cidx == 0)
 			{
 				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function variable reference)");
 				throw db::DatabaseErrorException( dberr);
 			}
-			if (cidx > wi->size())
+			if (cidx > fi->nofColumns())
 			{
 				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(42), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function variable reference)");
 				throw db::DatabaseErrorException( dberr);
 			}
-			rt = wi->at( cidx - 1);
+			cidx -= 1;
+		}
+		std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = fi->begin(), we = fi->end();
+		if (we - wi > 1)
+		{
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "variable referencing a set of results", "internal logic error (transaction function variable reference)");
+			throw db::DatabaseErrorException( dberr);
+		}
+		for (; wi != we; ++wi)
+		{
+			rt = wi->at( cidx);
 		}
 	}
 	return rt;
@@ -83,35 +106,27 @@ static types::VariantConst getResult( const TransactionOutput& output, const Tra
 static types::VariantConst resolveResultReference( const TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const types::Variant& reference, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	types::VariantConst rt;
-	if (reference.type() == types::Variant::uint_ || reference.type() == types::Variant::int_)
+	std::size_t cidx;
+	if (reference.type() == types::Variant::string_)
 	{
-		unsigned int ref = reference.touint();
-		if (ref == 0)
+		cidx = resolveColumnName( cmdres, reference.tostring());
+	}
+	else
+	{
+		cidx = reference.touint();
+		if (cidx == 0)
 		{
 			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
-		if (ref > resrow->size())
+		if (cidx > resrow->size())
 		{
 			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
-		rt = resrow->at( ref - 1);
+		cidx -= 1;
 	}
-	else
-	{
-		std::size_t ci = 0, ce = cmdres.nofColumns();
-		std::string ref = reference.tostring();
-		for (; ci != ce; ++ci)
-		{
-			if (boost::algorithm::iequals( cmdres.columnName( ci), ref))
-			{
-				rt = resrow->at( ci);
-				break;
-			}
-		}
-		if (ci == ce) throw std::runtime_error( std::string( "symbolic result reference '") + ref + "' could not be resolved");
-	}
+	rt = resrow->at( cidx);
 	return rt;
 }
 
@@ -124,15 +139,16 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 
 		switch (ai->type())
 		{
-			case TransactionInput::Command::Argument::ResultVariableReference:
-			{
-				TransactionInput::ResultVariableReference ref( ai->value());
-				val = getResult( output, cmditr, ref.functionidx(), ref.resultref());
-			}
-
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+				if (ai->scope_functionidx() >= 0)
+				{
+					val = resolveScopedReference( cmdres, output, cmditr, cmditr->level(), ai->scope_functionidx(), ai->value());
+				}
+				else
+				{
+					val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+				}
 				break;
 			}
 			case TransactionInput::Command::Argument::Value:
@@ -229,14 +245,16 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 
 		switch (ai->type())
 		{
-			case TransactionInput::Command::Argument::ResultVariableReference:
-			{
-				TransactionInput::ResultVariableReference ref( ai->value());
-				val = getResult( output, cmditr, ref.functionidx(), ref.resultref());
-			}
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+				if (ai->scope_functionidx() >= 0)
+				{
+					val = resolveScopedReference( cmdres, output, cmditr, cmditr->level(), ai->scope_functionidx(), ai->value());
+				}
+				else
+				{
+					val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+				}
 				break;
 			}
 			case TransactionInput::Command::Argument::Value:

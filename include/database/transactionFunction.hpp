@@ -242,9 +242,6 @@ public:
 	const std::string& name() const			{return m_name;}
 	void name( const std::string& name_)		{m_name = name_;}
 
-	class TagTable;
-	const TagTable* tagmap() const;
-
 	struct Impl;
 	const Impl& impl() const
 	{

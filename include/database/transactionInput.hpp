@@ -68,28 +68,27 @@ public:
 			enum Type
 			{
 				Value,
-				ResultVariableReference,
 				ResultColumn
 			};
 
 			///\brief Default constructor
 			Argument()
-				:m_type(Value){}
+				:m_type(Value),m_scope_functionidx(-1){}
 			///\brief Constructor
-			Argument( Type type_, const types::Variant& value_)
-				:m_type( type_)
-				,m_value(value_){}
+			Argument( Type type_, const types::Variant& value_, int scope_functionidx_=-1)
+				:m_type( type_),m_value(value_),m_scope_functionidx(scope_functionidx_){}
 			///\brief Copy constructor
 			Argument( const Argument& o)
-				:m_type(o.m_type)
-				,m_value(o.m_value){}
+				:m_type(o.m_type),m_value(o.m_value),m_scope_functionidx(o.m_scope_functionidx){}
 
 			Type type() const			{return m_type;}
+			int scope_functionidx() const		{return m_scope_functionidx;}
 			const types::Variant& value() const	{return m_value;}
 
 		private:
-			Type m_type;
-			types::Variant m_value;
+			Type m_type;				//< type of the argument value
+			types::Variant m_value;			//< value of the argument. interpretation depends on type
+			int m_scope_functionidx;		//< functionidx describing the scope in case of a result reference
 		};
 	public:
 		///\brief Default constructor
@@ -112,9 +111,9 @@ public:
 			,m_arg(o.m_arg){}
 
 		///\brief Bind value the the next argument of a command
-		void bind( Argument::Type type, const types::Variant& value)
+		void bind( Argument::Type type, const types::Variant& value, int scope_functionidx=-1)
 		{
-			m_arg.push_back( Argument( type, value));
+			m_arg.push_back( Argument( type, value, scope_functionidx));
 		}
 
 		///\brief Get the scope level of this command
@@ -199,38 +198,18 @@ public:
 		m_cmd.back().bind( Command::Argument::Value, types::Variant());
 	}
 
-	///\brief Bind parameter value on current command statement
-	void bindCommandArgAsResultReference( std::size_t resultref)
+	///\brief Bind parameter value on current or previous command result
+	void bindCommandArgAsResultReference( std::size_t resultref, int scope_functionidx=-1)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant((unsigned int)resultref));
+		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant((unsigned int)resultref), scope_functionidx);
 	}
 
-	///\brief Bind parameter value on current command statement
-	void bindCommandArgAsResultReference( const std::string& resultsymbol)
+	///\brief Bind parameter value on current or previous command result
+	void bindCommandArgAsResultReference( const std::string& resultsymbol, int scope_functionidx=-1)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant( resultsymbol));
-	}
-
-	class ResultVariableReference
-		:public types::Variant
-	{
-	public:
-		ResultVariableReference( unsigned int functionidx_, unsigned int resultref_)
-			:types::Variant( (functionidx_<<16) + resultref_){}
-		ResultVariableReference( const types::Variant& o)
-			:types::Variant( o.touint()){}
-
-		std::size_t functionidx() const		{return touint() >> 16;}
-		std::size_t resultref() const		{return touint() & 0xFFFF;}
-	};
-
-	///\brief Bind parameter value on current command statement
-	void bindCommandArgAsResultVariableReference( std::size_t functionidx, std::size_t resultref)
-	{
-		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Command::Argument::ResultVariableReference, ResultVariableReference( functionidx, resultref));
+		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant( resultsymbol), scope_functionidx);
 	}
 
 private:

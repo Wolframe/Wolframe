@@ -166,7 +166,7 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 		for (; ch && ch != sb && ch != eb; ch=parseNextToken( langdescr, tok, si, se));
 		if (ch == eb)
 		{
-			Call::Param param( type, std::string( argstart, si-1));
+			Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si-1)));
 			return param;
 		}
 		else
@@ -179,7 +179,7 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 		std::string::const_iterator argstart = si;
 		for (; si!=se && *si>= '0' && *si<= '9'; ++si);
 		Call::Param::Type type = Call::Param::NumericResultReference;
-		Call::Param param( type, std::string( argstart, si));
+		Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si)));
 		return param;
 	}
 	else if (isAlphaNumeric(ch))
@@ -187,7 +187,7 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 		std::string::const_iterator argstart = si;
 		for (; si!=se && isAlphaNumeric(*si); ++si);
 		Call::Param::Type type = Call::Param::SymbolicResultReference;
-		Call::Param param( type, std::string( argstart, si));
+		Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si)));
 		return param;
 	}
 	else
@@ -243,7 +243,7 @@ static TransactionFunctionDescription::OperationStep::Call
 	{
 		if (ch == '$' && si != se)
 		{
-			if ((*si >= '0' && *si <= '9') || *si == '(' || *si == '[')
+			if (*si == '(' || *si == '[' || isAlphaNumeric(*si))
 			{
 				stm.append( start, si - 1);
 				Call::Param param = parseReferenceParameter( langdescr, si, se);

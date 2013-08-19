@@ -46,7 +46,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-class TransactionFunction::TagTable
+class TagTable
 {
 public:
 	TagTable()
@@ -75,10 +75,29 @@ private:
 	std::map< std::string, int> m_map;
 };
 
+struct VariableReference
+{
+	int scope_functionidx;
+	int column_idx;
+	std::string name;
+
+	VariableReference()
+		:scope_functionidx(-1),column_idx(-1){}
+	VariableReference( const VariableReference& o)
+		:scope_functionidx(o.scope_functionidx),column_idx(o.column_idx),name(o.name){}
+	VariableReference( const std::string& name_, int scope_functionidx_)
+		:scope_functionidx(scope_functionidx_),column_idx(-1),name(name_){}
+	VariableReference( int column_idx_, int scope_functionidx_)
+		:scope_functionidx(scope_functionidx_),column_idx(column_idx_){}
+};
+
+typedef std::map<std::string,VariableReference>	VariableTable;
+
+
 class TransactionFunctionInput::Structure
 {
 public:
-	Structure( const TransactionFunction::TagTable* tagmap);
+	Structure( const TagTable* tagmap);
 	Structure( const Structure& o);
 
 	struct Node
@@ -136,7 +155,7 @@ public:
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
 	std::vector<types::Variant> m_content;
-	const TransactionFunction::TagTable* m_tagmap;
+	const TagTable* m_tagmap;
 	std::size_t m_rootidx;
 	std::size_t m_rootsize;
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
@@ -153,7 +172,6 @@ public:
 		Next,
 		Find,
 		Up,
-		Variable,
 		ResultSymbol,
 		ResultIndex,
 		Constant
@@ -169,19 +187,20 @@ public:
 	{
 		ElementType m_type;
 		int m_tag;
+		int m_scope_functionidx;
 	};
 
 	Path(){}
-	Path( const std::string& selector, TransactionFunction::TagTable* tagmap);
-	Path( const Call::Param& param, TransactionFunction::TagTable* tagmap);
+	Path( const std::string& selector, TagTable* tagmap);
+	Path( const Call::Param& param, const VariableTable* varmap, TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 
 	ElementType referenceType() const;
 	std::size_t resultReferenceIndex() const;
 	const std::string& resultReferenceSymbol() const;
+	int resultReferenceScope() const;
 	const std::string& constantReference() const;
-	const std::string& variableReference() const;
 	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
@@ -208,7 +227,7 @@ public:
 	}
 
 private:
-	void parseSelectorPath( const std::string& value, TransactionFunction::TagTable* tagmap);
+	void parseSelectorPath( const std::string& value, TagTable* tagmap);
 
 private:
 	std::vector<Element> m_path;
@@ -456,7 +475,6 @@ private:
 	std::string m_strings;
 };
 
-
 struct TransactionFunction::Impl
 {
 	TransactionFunctionOutput::ResultStructR m_resultstruct;
@@ -466,7 +484,6 @@ struct TransactionFunction::Impl
 	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
 };
-
 
 static std::string normalizeTagName( const std::string& tagname)
 {
@@ -479,7 +496,7 @@ static std::string normalizeTagName( const std::string& tagname)
 			++ti;
 			if (ti != te && *ti == 'u')
 			{
-				// Unicode (UTF-16) excoded character support with \uXXXX
+				// Unicode character support with \uXXXX
 				unsigned short hexnum = 0;
 				int ci;
 				for (ci=0; ci<4 && ti != te; ++ti,++ci)
@@ -511,20 +528,20 @@ static std::string normalizeTagName( const std::string& tagname)
 	return rt;
 }
 
-int TransactionFunction::TagTable::find( const char* tag, std::size_t tagsize) const
+int TagTable::find( const char* tag, std::size_t tagsize) const
 {
 	const std::string tagnam( tag, tagsize);
 	return find( tagnam);
 }
 
-int TransactionFunction::TagTable::find( const std::string& tagnam) const
+int TagTable::find( const std::string& tagnam) const
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end()) return 0;
 	return ii->second;
 }
 
-int TransactionFunction::TagTable::get( const std::string& tagnam)
+int TagTable::get( const std::string& tagnam)
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end())
@@ -538,13 +555,13 @@ int TransactionFunction::TagTable::get( const std::string& tagnam)
 	}
 }
 
-int TransactionFunction::TagTable::get( const char* tag, std::size_t tagsize)
+int TagTable::get( const char* tag, std::size_t tagsize)
 {
 	const std::string tagstr( tag, tagsize);
 	return get( tagstr);
 }
 
-int TransactionFunction::TagTable::unused() const
+int TagTable::unused() const
 {
 	return m_size +1;
 }
@@ -567,7 +584,7 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	,m_data(o.m_data)
 	{}
 
-TransactionFunctionInput::Structure::Structure( const TransactionFunction::TagTable* tagmap)
+TransactionFunctionInput::Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap)
 	,m_rootidx(0)
 	,m_rootsize(0)
@@ -779,7 +796,7 @@ const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node
 }
 
 
-void Path::parseSelectorPath( const std::string& selector, TransactionFunction::TagTable* tagmap)
+void Path::parseSelectorPath( const std::string& selector, TagTable* tagmap)
 {
 	Element elem;
 	std::string::const_iterator ii = selector.begin(), ee = selector.end();
@@ -850,22 +867,37 @@ void Path::parseSelectorPath( const std::string& selector, TransactionFunction::
 	}
 }
 
-Path::Path( const std::string& selector, TransactionFunction::TagTable* tagmap)
+Path::Path( const std::string& selector, TagTable* tagmap)
 {
 	parseSelectorPath( selector, tagmap);
 }
 
-Path::Path( const Call::Param& param, TransactionFunction::TagTable* tagmap)
+Path::Path( const Call::Param& param, const VariableTable* varmap, TagTable* tagmap)
 {
 	typedef Call::Param Param;
 	Element elem;
 	switch (param.type)
 	{
 		case Param::VariableReference:
-			elem.m_type = Variable;
-			m_content = param.value;
+		{
+			VariableTable::const_iterator vi = varmap->find( param.value);
+			if (vi == varmap->end()) throw std::runtime_error( std::string("variable not defined '") + param.value + "'");
+			if (vi->second.column_idx >= 0)
+			{
+				elem.m_type = ResultIndex;
+				elem.m_tag = vi->second.column_idx;
+				elem.m_scope_functionidx = vi->second.scope_functionidx;
+			}
+			else
+			{
+				elem.m_type = ResultSymbol;
+				elem.m_tag = -1;
+				m_content = vi->second.name;
+				elem.m_scope_functionidx = vi->second.scope_functionidx;
+			}
 			m_path.push_back( elem);
 			break;
+		}
 		case Param::NumericResultReference:
 			elem.m_type = ResultIndex;
 			elem.m_tag = boost::lexical_cast<unsigned short>( param.value);
@@ -897,21 +929,21 @@ Path::ElementType Path::referenceType() const
 	return Root;
 }
 
+int Path::resultReferenceScope() const
+{
+	if (m_path.size() == 1) return m_path[0].m_scope_functionidx;
+	return -1;
+}
+
 std::size_t Path::resultReferenceIndex() const
 {
-	if (m_path.size() == 1 && m_path[0].m_type == ResultIndex)
-	{
-		return m_path[0].m_tag;
-	}
-	return 0;
+	if (m_path.size() == 1 && m_path[0].m_type == ResultIndex) return m_path[0].m_tag;
+	throw std::logic_error("internal: illegal call of Path::resultReferenceIndex");
 }
 
 const std::string& Path::resultReferenceSymbol() const
 {
-	if (m_path.size() == 1 && m_path[0].m_type == ResultSymbol)
-	{
-		return m_content;
-	}
+	if (m_path.size() == 1 && m_path[0].m_type == ResultSymbol) return m_content;
 	throw std::logic_error("internal: illegal call of Path::resultReferenceSymbol");
 }
 
@@ -921,19 +953,16 @@ const std::string& Path::constantReference() const
 	throw std::logic_error("internal: illegal call of Path::constantReference");
 }
 
-const std::string& Path::variableReference() const
-{
-	if (m_path.size() == 1 && m_path[0].m_type == Variable) return m_content;
-	throw std::logic_error("internal: illegal call of Path::variableReference");
-}
-
 std::string Path::tostring() const
 {
 	switch (referenceType())
 	{
 		case ResultIndex: return std::string("$") + boost::lexical_cast<std::string>( resultReferenceIndex());
-		case ResultSymbol: return std::string("$") + resultReferenceSymbol();
-		case Variable: return variableReference();
+		case ResultSymbol:
+		{
+			std::string rt = std::string("$") + resultReferenceSymbol();
+			if (resultReferenceScope() >= 0) rt = rt + "{" + boost::lexical_cast<std::string>(resultReferenceScope()) + "}";
+		}
 		case Constant: return std::string("'") + constantReference() + std::string("'");
 
 		case Find:
@@ -971,7 +1000,6 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 			{
 				case ResultIndex:
 				case ResultSymbol:
-				case Variable:
 				case Constant:
 					break;
 
@@ -1017,7 +1045,7 @@ FunctionCall::FunctionCall( const FunctionCall& o)
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
-	,m_structure( new Structure( func_->tagmap()))
+	,m_structure( new Structure( &func_->impl().m_tagmap))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
 
@@ -1070,9 +1098,6 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 				break;
 			case Path::ResultSymbol:
 				ti.bindCommandArgAsResultReference( pi->resultReferenceSymbol());
-				break;
-			case Path::Variable:
-				/*[-] TODO */
 				break;
 			case Path::Constant:
 				ti.bindCommandArgAsValue( pi->constantReference());
@@ -1520,6 +1545,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 {
 	typedef TransactionFunctionDescription::OperationStep::Error Error;
 	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	VariableTable varmap;
 
 	int blkidx;
 	std::vector<TransactionFunctionDescription::OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
@@ -1554,7 +1580,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			std::vector<Call::Param>::const_iterator ai = di->call.paramlist.begin(), ae = di->call.paramlist.end();
 			for (; ai != ae; ++ai)
 			{
-				Path pp( *ai, &m_tagmap);
+				Path pp( *ai, &varmap, &m_tagmap);
 				param.push_back( pp);
 			}
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
@@ -1683,11 +1709,6 @@ TransactionFunction::TransactionFunction( const TransactionFunction& o)
 TransactionFunction::~TransactionFunction()
 {
 	delete m_impl;
-}
-
-const TransactionFunction::TagTable* TransactionFunction::tagmap() const
-{
-	return &m_impl->m_tagmap;
 }
 
 const char* TransactionFunction::getErrorHint( const std::string& errorclass, int functionidx) const
