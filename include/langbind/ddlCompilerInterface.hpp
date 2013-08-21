@@ -47,7 +47,8 @@ namespace langbind {
 ///\brief Interface for DDL compilers
 struct DDLCompiler
 {
-	explicit DDLCompiler( const std::string& n) :m_ddlname(n) {}
+	DDLCompiler( const std::string& n, const std::string& e)
+		:m_ddlname(n),m_fileext(e) {}
 	virtual ~DDLCompiler(){}
 
 	///\brief Compile a source from a string. Throws in case of error.
@@ -60,8 +61,11 @@ struct DDLCompiler
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}
 
+	///\brief Get the file extension for files implementing this DDL
+	const std::string& fileext() const		{return m_fileext;}
 private:
 	std::string m_ddlname;
+	std::string m_fileext;
 };
 
 ///\brief Reference to a DDL compiler

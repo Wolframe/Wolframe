@@ -36,6 +36,7 @@
 #include "prgbind/ddlProgram.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger/logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -46,7 +47,13 @@ bool DDLProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);
 	if (ext.empty()) return false;
-	return boost::iequals( m_constructor->ddlname(), ext.c_str()+1);
+	if (boost::iequals( m_constructor->ddlname(), ext.c_str()+1))
+	{
+		LOG_WARNING << "Using deprecated file extension for program '." << m_constructor->ddlname() << "' instead of '" << ext.c_str() << "'";
+		return true;
+	}
+	if (boost::iequals( m_constructor->fileext(), ext.c_str()+1)) return true;
+	return false;
 }
 
 void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)

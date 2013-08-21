@@ -37,6 +37,7 @@
 #include "langbind/normalizeFunction.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger/logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <string>
 
@@ -205,7 +206,14 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> > loadSource
 
 bool NormalizeProgram::is_mine( const std::string& filename) const
 {
-	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".normalize";
+	std::string ext = utils::getFileExtension( filename);
+	if (boost::algorithm::iequals( ext, ".normalize"))
+	{
+		LOG_WARNING << "Using deprecated file extension for program '.normalize' instead of '.nmap";
+		return true;
+	}
+	if (boost::algorithm::iequals( ext, ".nmap")) return true;
+	return false;
 }
 
 void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
