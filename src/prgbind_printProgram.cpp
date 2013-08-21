@@ -90,7 +90,13 @@ bool PrintProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);
 	if (ext.empty()) return false;
-	return boost::iequals( ext.c_str()+1, m_constructor->fileext());
+	if (boost::iequals( ext.c_str()+1, m_constructor->fileext())) return true;
+	if (boost::iequals( ext.c_str()+1, m_constructor->name()))
+	{
+		LOG_WARNING << "Using deprecated file extension for program '" << ext << "' instead of '." << m_constructor->fileext() << "'";
+		return true;
+	}
+	return false;
 }
 
 void PrintProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)

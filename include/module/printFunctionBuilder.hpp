@@ -43,9 +43,10 @@ namespace module {
 class PrintFunctionConstructor :public SimpleObjectConstructor< prnt::PrintFunction >
 {
 public:
-	PrintFunctionConstructor( const char* classname_, const char* name_, prnt::CreatePrintFunction createFunc_ )
+	PrintFunctionConstructor( const char* classname_, const char* name_, const char* fileext_, prnt::CreatePrintFunction createFunc_ )
 		:m_classname(classname_)
 		,m_name(name_)
+		,m_fileext( fileext_)
 		,m_createFunc(createFunc_) {}
 
 	virtual ~PrintFunctionConstructor(){}
@@ -70,10 +71,15 @@ public:
 	{
 		return m_name;
 	}
+	const std::string& fileext() const
+	{
+		return m_fileext;
+	}
 
 private:
 	std::string m_classname;
 	std::string m_name;
+	std::string m_fileext;
 	prnt::CreatePrintFunction m_createFunc;
 };
 
@@ -97,7 +103,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new PrintFunctionConstructor( m_className, m_name, m_createFunc);
+		return new PrintFunctionConstructor( m_className, m_name, m_fileext, m_createFunc);
 	}
 	const char* name() const
 	{
