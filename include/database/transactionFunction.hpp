@@ -115,6 +115,8 @@ private:
 };
 
 
+///\class VariableValue
+///\brief Variable value referencing a command result or a constant
 class VariableValue
 {
 public:
@@ -141,6 +143,8 @@ private:
 	std::string m_name;
 };
 
+///\class ConstantValue
+///\brief Constructor for a variable value representing a constant
 struct ConstantValue :public VariableValue
 {
 	ConstantValue( const std::string& value_)
@@ -150,6 +154,8 @@ struct ConstantValue :public VariableValue
 typedef types::keymap<VariableValue>	VariableTable;
 
 
+///\class TransactionFunctionDescription
+///\brief Description of a transaction function
 class TransactionFunctionDescription
 {
 public:
@@ -190,62 +196,81 @@ public:
 			std::string msg;
 		};
 
+		///\class Call
+		///\brief Database command call
 		struct Call
 		{
+			///\class Param
+			///\brief Database command call parameter
 			struct Param
 			{
+				///\class Type
+				///\brief Parameter type
 				enum Type
 				{
-					VariableReference,
-					NumericResultReference,
-					SymbolicResultReference,
-					Constant,
-					InputSelectorPath
+					VariableReference,		//< Parameter is a variable reference
+					NumericResultReference,		//< Parameter is a result reference by index
+					SymbolicResultReference,	//< Parameter is a result reference by column name
+					Constant,			//< Parameter is a contant value
+					InputSelectorPath		//< Parameter refers to a set of input values
 				};
+				///\brief Parameter type name
 				static const char* typeName( Type i)
 				{
 					static const char* ar[] = {"VariableReference","NumericResultReference","SymbolicResultReference","Constant","InputSelectorPath"};
 					return ar[(std::size_t)i];
 				}
-				Type type;
-				std::string value;
+				Type type;		//< type of the parameter
+				std::string value;	//< parsed value of the parameter
 
+				///\brief Default constructor
 				Param(){}
+				///\brief Copy constructor
 				Param( const Param& o)
 					:type(o.type),value(o.value){}
+				///\brief Constructor
 				Param( Type type_, const std::string& value_)
 					:type(type_),value(value_){}
 			};
 
-			std::string funcname;
-			std::vector<Param> paramlist;
+			std::string funcname;			//< function name
+			std::vector<Param> paramlist;		//< list of arguments
 
+			///\brief Default constructor
 			Call(){}
+			///\brief Copy constructor
 			Call( const Call& o)
 				:funcname(o.funcname),paramlist(o.paramlist){}
+			///\brief Constructor
 			Call( const std::string& funcname_, const std::vector<Param>& paramlist_)
 				:funcname(funcname_),paramlist(paramlist_){}
 
+			///\brief Reset call
 			void clear()		{funcname.clear(); paramlist.clear();}
 		};
 
-		std::string selector_FOREACH;
-		Call call;
-		std::vector<std::string> path_INTO;
-		bool nonempty;
-		bool unique;
-		types::keymap<std::string> hints;
+		std::string selector_FOREACH;		//< parsed argument of foreach
+		Call call;				//< called database function
+		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
+		bool nonempty;				//< true, if NONEMPTY is set
+		bool unique;				//< true, if UNIQUE is set
+		types::keymap<std::string> hints;	//< error messages to add to database errors depending on the error class
 	};
+	///\class Block
+	///\brief Result block declaration
 	struct Block
 	{
-		std::vector<std::string> path_INTO;
-		std::size_t startidx;
-		std::size_t size;
+		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
+		std::size_t startidx;			//< start of block declaration
+		std::size_t size;			//< number of command calls in block declaration
 
+		///\brief Constructor
 		Block( const std::vector<std::string>& p, std::size_t i, std::size_t n)
 			:path_INTO(p),startidx(i),size(n){}
+		///\brief Copy constructor
 		Block( const Block& o)
 			:path_INTO(o.path_INTO),startidx(o.startidx),size(o.size){}
+		///\brief Default constructor
 		Block()
 			:startidx(0),size(0){}
 	};
@@ -255,8 +280,10 @@ public:
 	VariableTable variablemap;		//< variable definitions with LET a = ...;
 	bool casesensitive;			//< true, is the database is case sensitive
 
+	///\brief Copy constructor
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
 		:steps(o.steps),blocks(o.blocks),auth(o.auth),variablemap(o.variablemap),casesensitive(o.casesensitive){}
+	///\brief Default constructor
 	TransactionFunctionDescription()
 		:casesensitive(false){}
 };
@@ -270,33 +297,43 @@ typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 class TransactionFunction
 {
 public:
+	///\brief Copy constructor
 	TransactionFunction( const TransactionFunction& o);
+	///\brief Constructor
 	TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
+	///\brief Destructor
 	virtual ~TransactionFunction();
 
+	///\brief Build the function input
 	virtual TransactionFunctionInput* getInput() const;
+	///\brief Build the function output
 	virtual TransactionFunctionOutput* getOutput( const db::TransactionOutput& o) const;
 
+	///\brief Get the name of the function
 	const std::string& name() const			{return m_name;}
+	///\brief Set the name of the function
 	void name( const std::string& name_)		{m_name = name_;}
 
+	///\brief Implementation structure
 	struct Impl;
 	const Impl& impl() const
 	{
 		return *m_impl;
 	}
 
+	///\brief Get the authorization structure
 	const langbind::Authorization& authorization() const
 	{
 		return m_authorization;
 	}
 
+	///\brief Get a hint for a given error class
 	const char* getErrorHint( const std::string& errorclass, int functionidx) const;
 
 private:
-	std::string m_name;
-	langbind::Authorization m_authorization;
-	Impl* m_impl;
+	std::string m_name;				//< transaction function name
+	langbind::Authorization m_authorization;	//< transaction function authorization structure
+	Impl* m_impl;					//< PIMPL reference
 };
 
 ///\brief Creates a database transaction function from its description source

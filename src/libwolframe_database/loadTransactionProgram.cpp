@@ -520,7 +520,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else if (ch == '\'' || ch == '\"')
 					{
-						throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON) expected instead string");
+						throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON,LET) expected instead string");
 					}
 					else if (boost::algorithm::iequals( tok, "ON"))
 					{
