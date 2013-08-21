@@ -253,10 +253,12 @@ public:
 	std::vector<Block> blocks;		//< substructures of the output
 	langbind::Authorization auth;		//< authorization definition structure for this function
 	VariableTable variablemap;		//< variable definitions with LET a = ...;
+	bool casesensitive;			//< true, is the database is case sensitive
 
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
-		:steps(o.steps),blocks(o.blocks),auth(o.auth){}
-	TransactionFunctionDescription(){}
+		:steps(o.steps),blocks(o.blocks),auth(o.auth),variablemap(o.variablemap),casesensitive(o.casesensitive){}
+	TransactionFunctionDescription()
+		:casesensitive(false){}
 };
 
 ///\class TransactionFunctionR

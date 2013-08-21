@@ -435,6 +435,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
 				Operation operation( transactionName, dbe, isTransaction);
+				operation.description.casesensitive = langdescr->isCaseSensitive();
 
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;

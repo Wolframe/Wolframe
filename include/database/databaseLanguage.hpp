@@ -64,6 +64,13 @@ struct LanguageDescription
 
 	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
 	virtual bool statementHasResult( const std::string& stm) const;
+
+	///\brief Define if a database is case-insensitive. This has influence on TDL parsing
+	// Default is according SQL standard 'false'
+	virtual bool isCaseSensitive() const
+	{
+		return false;
+	}
 };
 
 }} // namespace _Wolframe::db
