@@ -49,10 +49,10 @@ using namespace _Wolframe::db;
 class TagTable
 {
 public:
-	TagTable()
-		:m_size(0){}
+	explicit TagTable( bool case_sensitive_)
+		:m_case_sensitive(case_sensitive_),m_size(0){}
 	TagTable( const TagTable& o)
-		:m_size(o.m_size),m_map(o.m_map){}
+		:m_case_sensitive(o.m_case_sensitive),m_size(o.m_size),m_map(o.m_map){}
 
 	int find( const char* tag, std::size_t tagsize) const;
 	int find( const std::string& tagstr) const;
@@ -71,6 +71,7 @@ public:
 		return rt;
 	}
 private:
+	bool m_case_sensitive;
 	int m_size;
 	std::map< std::string, int> m_map;
 };
@@ -474,49 +475,6 @@ struct TransactionFunction::Impl
 	Impl( const Impl& o);
 };
 
-static std::string normalizeTagName( const std::string& tagname)
-{
-	std::string rt;
-	std::string::const_iterator ti = tagname.begin(), te = tagname.end();
-	for (; ti != te; ++ti)
-	{
-		if (*ti == '\\')
-		{
-			++ti;
-			if (ti != te && *ti == 'u')
-			{
-				// Unicode character support with \uXXXX
-				unsigned short hexnum = 0;
-				int ci;
-				for (ci=0; ci<4 && ti != te; ++ti,++ci)
-				{
-					if (*ti >= '0' && *ti <= '9') hexnum = hexnum * 16 + (*ti - '0');
-					else if (*ti >= 'a' && *ti <= 'f') hexnum = hexnum * 16 + 10 + (*ti - 'a');
-					else if (*ti >= 'A' && *ti <= 'F') hexnum = hexnum * 16 + 10 + (*ti - 'A');
-					else break;
-				}
-				if (ci == 0) throw std::runtime_error( "illegal character in element name");
-				wchar_t wstr[2];
-				wstr[0] = hexnum;
-				wstr[1] = 0;
-				char buf[32];
-				sprintf( buf, "%ls", wstr);
-				rt.append( buf);
-			}
-			else
-			{
-				rt.push_back( '\\');
-			}
-			--ti;
-		}
-		else
-		{
-			rt.push_back( *ti);
-		}
-	}
-	return rt;
-}
-
 int TagTable::find( const char* tag, std::size_t tagsize) const
 {
 	const std::string tagnam( tag, tagsize);
@@ -525,17 +483,19 @@ int TagTable::find( const char* tag, std::size_t tagsize) const
 
 int TagTable::find( const std::string& tagnam) const
 {
-	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
+	std::string key = m_case_sensitive?tagnam:boost::algorithm::to_lower_copy(tagnam);
+	std::map< std::string, int>::const_iterator ii = m_map.find( key);
 	if (ii == m_map.end()) return 0;
 	return ii->second;
 }
 
 int TagTable::get( const std::string& tagnam)
 {
-	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
+	std::string key = m_case_sensitive?tagnam:boost::algorithm::to_lower_copy(tagnam);
+	std::map< std::string, int>::const_iterator ii = m_map.find( key);
 	if (ii == m_map.end())
 	{
-		m_map[ tagnam] = ++m_size;
+		m_map[ key] = ++m_size;
 		return m_size;
 	}
 	else
@@ -849,7 +809,6 @@ void Path::parseSelectorPath( const std::string& selector, TagTable* tagmap)
 		}
 		else
 		{
-			tagnam = normalizeTagName( tagnam);
 			elem.m_tag = tagmap->get( tagnam);
 		}
 		m_path.push_back( elem);
@@ -1219,11 +1178,14 @@ struct TransactionFunctionOutput::Impl
 			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr){}
 	};
 
+	enum {StateColumnOpenTag=0, StateColumnValue=1, StateColumnCloseTag=2,StateColumnEndGroup=3};
+	enum {StateIndexCloseTag=0, StateIndexNext=1};
 	int m_valuestate;
 	int m_colidx;
 	int m_colend;
 	bool m_endofoutput;
 	bool m_started;
+	std::string m_group;
 	ResultStructR m_resultstruct;
 	ResultStruct::const_iterator m_structitr;
 	ResultStruct::const_iterator m_structend;
@@ -1274,6 +1236,38 @@ struct TransactionFunctionOutput::Impl
 		m_stack.clear();
 		m_resitr = m_data->begin();
 		m_resend = m_data->end();
+	}
+
+	static std::string getResultGroup( const std::string& columnName)
+	{
+		const char* cc = std::strchr( columnName.c_str(), '/');
+		if (cc != 0)
+		{
+			std::string rt( columnName.c_str(), cc-columnName.c_str()+1);
+			if (std::strchr( columnName.c_str()+rt.size(), '/') != 0)
+			{
+				throw std::runtime_error( "too complex grouping of result elements");
+			}
+			return rt;
+		}
+		return std::string();
+	}
+
+	static bool hasResultGroup( const std::string& columnName)
+	{
+		return (std::strchr( columnName.c_str(), '/') != 0);
+	}
+
+	bool endOfGroup()
+	{
+		if (!m_group.empty())
+		{
+			if (m_colidx == m_colend || !boost::algorithm::istarts_with( m_resitr->columnName( m_colidx), m_group))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	bool getNext( ElementType& type, types::VariantConst& element, bool doSerializeWithIndices)
@@ -1331,6 +1325,13 @@ struct TransactionFunctionOutput::Impl
 					m_rowend = m_resitr->end();
 					m_colidx = 0;
 					m_colend = m_resitr->nofColumns();
+					if (hasResultGroup( m_resitr->columnName( m_colidx)))
+					{
+						m_group = getResultGroup( m_resitr->columnName( m_colidx));
+						type = TypedInputFilter::OpenTag;
+						element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+						return true;
+					}
 					continue;
 
 				case ResultElement::IndexStart:
@@ -1341,14 +1342,14 @@ struct TransactionFunctionOutput::Impl
 					return true;
 
 				case ResultElement::IndexEnd:
-					if (m_valuestate == 0)
+					if (m_valuestate == StateIndexCloseTag)
 					{
-						m_valuestate = 1;
+						m_valuestate = StateIndexNext;
 						type = TypedInputFilter::CloseTag;
 						element.init();
 						return true;
 					}
-					m_valuestate = 0;
+					m_valuestate = StateIndexCloseTag;
 					if (m_stack.back().m_type != m_structitr->type)
 					{
 						throw std::logic_error( "illegal state in transaction result construction");
@@ -1401,7 +1402,15 @@ struct TransactionFunctionOutput::Impl
 					continue;
 
 				case ResultElement::Value:
-					if (m_valuestate == 0)
+					if (m_valuestate == StateColumnEndGroup)
+					{
+						m_group.clear();
+						type = TypedInputFilter::CloseTag;
+						element.init();
+						m_valuestate = StateColumnOpenTag;
+						return true;
+					}
+					if (m_valuestate == StateColumnOpenTag)
 					{
 						if (m_rowitr == m_rowend)
 						{
@@ -1413,6 +1422,14 @@ struct TransactionFunctionOutput::Impl
 								m_rowend = m_resitr->end();
 								m_colidx = 0;
 								m_colend = m_resitr->nofColumns();
+
+								if (hasResultGroup( m_resitr->columnName( m_colidx)))
+								{
+									m_group = getResultGroup( m_resitr->columnName( m_colidx));
+									type = TypedInputFilter::OpenTag;
+									element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+									return true;
+								}
 							}
 							continue;
 						}
@@ -1437,41 +1454,74 @@ struct TransactionFunctionOutput::Impl
 							}
 							continue;
 						}
+						if (m_group.empty() && hasResultGroup( m_resitr->columnName( m_colidx)))
+						{
+							m_group = getResultGroup( m_resitr->columnName( m_colidx));
+							type = TypedInputFilter::OpenTag;
+							element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+							return true;
+						}
 						if (!m_rowitr->at(m_colidx).defined())
 						{
 							++m_colidx;
+							if (endOfGroup())
+							{
+								m_group.clear();
+								type = TypedInputFilter::CloseTag;
+								element.init();
+								return true;
+							}
 							continue;
 						}
 						type = TypedInputFilter::OpenTag;
-						element = m_resitr->columnName( m_colidx);
+						if (m_group.empty())
+						{
+							element = m_resitr->columnName( m_colidx);
+						}
+						else
+						{
+							element = m_resitr->columnName( m_colidx).c_str() + m_group.size();
+						}
 						if (element.type() == types::Variant::string_ && element.charsize() == 0)
 						{
 							//... untagged content value (column name '_')
 							type = langbind::TypedInputFilter::Value;
 							element = m_rowitr->at(m_colidx);
-							m_valuestate = 0;
 							++m_colidx;
+							if (endOfGroup())
+							{
+								m_valuestate = StateColumnEndGroup;
+								return true;
+							}
+							m_valuestate = StateColumnOpenTag;
 							return true;
 						}
 						else
 						{
-							m_valuestate = 1;
+							m_valuestate = StateColumnValue;
 							return true;
 						}
 					}
-					if (m_valuestate == 1)
+					if (m_valuestate == StateColumnValue)
 					{
 						type = langbind::TypedInputFilter::Value;
 						element = m_rowitr->at(m_colidx);
-						m_valuestate = 2;
+						m_valuestate = StateColumnCloseTag;
 						return true;
 					}
-					if (m_valuestate == 2)
+					if (m_valuestate == StateColumnCloseTag)
 					{
 						type = langbind::TypedInputFilter::CloseTag;
 						element.init();
-						m_valuestate = 0;
 						++m_colidx;
+						if (endOfGroup())
+						{
+							m_valuestate = StateColumnEndGroup;
+						}
+						else
+						{
+							m_valuestate = StateColumnOpenTag;
+						}
 						return true;
 					}
 					throw std::logic_error( "illegal state (transaction result iterator)");
@@ -1536,6 +1586,7 @@ static int hasCloseSubstruct( const std::vector<TransactionFunctionDescription::
 
 TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_resultstruct( new TransactionFunctionOutput::ResultStruct())
+	,m_tagmap(description.casesensitive)
 {
 	typedef TransactionFunctionDescription::OperationStep::Error Error;
 	typedef TransactionFunctionDescription::OperationStep::Call Call;
