@@ -145,8 +145,9 @@ private:
 
 ///\class ConstantValue
 ///\brief Constructor for a variable value representing a constant
-struct ConstantValue :public VariableValue
+class ConstantValue :public VariableValue
 {
+public:
 	ConstantValue( const std::string& value_)
 		:VariableValue( value_, -1)		{m_scope_functionidx = 0;}
 };
