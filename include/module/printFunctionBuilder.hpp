@@ -83,9 +83,10 @@ typedef boost::shared_ptr<module::PrintFunctionConstructor> PrintFunctionConstru
 class PrintFunctionBuilder :public SimpleBuilder
 {
 public:
-	PrintFunctionBuilder( const char* classname_, const char* name_, prnt::CreatePrintFunction createFunc_)
+	PrintFunctionBuilder( const char* classname_, const char* name_, const char* fileext_, prnt::CreatePrintFunction createFunc_)
 		:SimpleBuilder( classname_)
 		,m_name( name_)
+		,m_fileext( fileext_)
 		,m_createFunc(createFunc_){}
 
 	virtual ~PrintFunctionBuilder(){}
@@ -102,9 +103,14 @@ public:
 	{
 		return m_name;
 	}
+	const char* fileext() const
+	{
+		return m_fileext;
+	}
 
 private:
 	const char* m_name;
+	const char* m_fileext;
 	prnt::CreatePrintFunction m_createFunc;
 };
 
