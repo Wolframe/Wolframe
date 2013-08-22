@@ -112,8 +112,9 @@ Path::Path( const std::string& selector, TagTable* tagmap)
 	parseSelectorPath( selector, tagmap);
 }
 
-Path::Path( const Call::Param& param, const VariableTable* varmap, TagTable* tagmap)
+Path::Path( const Call::Param& param, const TransactionFunctionDescription::VariableTable* varmap, TagTable* tagmap)
 {
+	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	typedef Call::Param Param;
 	Element elem;
 	switch (param.type)

@@ -34,7 +34,7 @@
 ///\file transactionfunction/Path.hpp
 #ifndef _DATABASE_TRANSACTION_FUNCTION_PATH_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_PATH_HPP_INCLUDED
-#include "database/transactionFunction.hpp"
+#include "transactionFunctionDescription.hpp"
 #include "transactionfunction/TagTable.hpp"
 #include "transactionfunction/InputStructure.hpp"
 #include <string>
@@ -74,7 +74,7 @@ public:
 
 	Path(){}
 	Path( const std::string& selector, TagTable* tagmap);
-	Path( const Call::Param& param, const VariableTable* varmap, TagTable* tagmap);
+	Path( const Call::Param& param, const TransactionFunctionDescription::VariableTable* varmap, TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 

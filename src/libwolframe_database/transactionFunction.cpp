@@ -35,6 +35,7 @@
 #include "types/allocators.hpp"
 #include "utils/parseUtils.hpp"
 #include "database/transactionFunction.hpp"
+#include "transactionFunctionDescription.hpp"
 #include "transactionfunction/InputStructure.hpp"
 #include "transactionfunction/OutputResultStructure.hpp"
 #include "transactionfunction/Path.hpp"
@@ -325,6 +326,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 {
 	typedef TransactionFunctionDescription::OperationStep::Error Error;
 	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	VariableTable varmap;
 
 	int blkidx;

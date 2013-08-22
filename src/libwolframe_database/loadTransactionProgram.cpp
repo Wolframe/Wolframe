@@ -33,6 +33,7 @@
 ///\brief Loading function for transaction definition programs
 ///\file loadTransactionProgram.cpp
 #include "database/loadTransactionProgram.hpp"
+#include "transactionFunctionDescription.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger/logger-v1.hpp"
@@ -331,9 +332,13 @@ static TransactionFunctionDescription::OperationStep::Call
 	return rt;
 }
 
-static VariableValue parseVariableValue( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, int scope_functionidx, const VariableTable& varmap)
+static TransactionFunctionDescription::VariableValue
+	parseVariableValue( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, int scope_functionidx, const TransactionFunctionDescription::VariableTable& varmap)
 {
 	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::VariableTable VariableTable;
+	typedef TransactionFunctionDescription::VariableValue VariableValue;
+	typedef TransactionFunctionDescription::ConstantValue ConstantValue;
 	std::string tok;
 	char ch = gotoNextToken( langdescr, si, se);
 	if (ch == '\'' || ch == '\"')
@@ -390,6 +395,8 @@ struct Operation
 static std::vector<std::pair<std::string,TransactionFunctionR> >
 	load( const std::string& source, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
+	typedef TransactionFunctionDescription::VariableValue VariableValue;
+	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
 	std::string tok;
