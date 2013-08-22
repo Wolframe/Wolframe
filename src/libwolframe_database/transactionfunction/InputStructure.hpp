@@ -37,6 +37,7 @@
 #include "database/transactionFunction.hpp"
 #include "transactionfunction/TagTable.hpp"
 #include "types/allocators.hpp"
+#include "filter/typedfilter.hpp"
 #include <string>
 #include <map>
 #include <vector>
@@ -47,9 +48,13 @@ namespace db {
 class TransactionFunctionInput::Structure
 {
 public:
-	Structure( const TagTable* tagmap);
+	///\brief Constructor
+	explicit Structure( const TagTable* tagmap);
+	///\brief Copy constructor
 	Structure( const Structure& o);
 
+	///\class Node
+	///\brief Node of the structure
 	struct Node
 	{
 		int m_parent;
@@ -86,14 +91,21 @@ public:
 		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
 	};
 
+public://visit structure:
 	Node root() const;
 	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void up( const Node& nd, std::vector<Node>& rt) const;
 	const types::Variant* nodevalue( const Node& nd) const;
 
+	///\brief Get structure as string
 	const std::string tostring() const;
 
+	typedef std::pair<std::string,std::string> NodeAssignment;
+	///\brief Create an input filter for a node to pass it to a function
+	langbind::TypedInputFilter* createFilter( const Node& nodeidx_, const std::vector<NodeAssignment>& noderenames_) const;
+
+public://create structure:
 	void setParentLinks( std::size_t mi);
 	void openTag( const char* tag, std::size_t tagsize);
 	void openTag( const std::string& tag);
@@ -103,13 +115,14 @@ public:
 	void check() const;
 
 private:
-	types::TypedArrayDoublingAllocator<Node> m_nodemem;
-	std::vector<types::Variant> m_content;
-	const TagTable* m_tagmap;
-	std::size_t m_rootidx;
-	std::size_t m_rootsize;
+	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
+	std::vector<types::Variant> m_content;			//< tree values
+	const TagTable* m_tagmap;				//< map names to node tag identifiers
+	std::size_t m_rootidx;					//< root index of the tree
+	std::size_t m_rootsize;					//< number of children of the root node
+
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
-	BuildNodeStruct m_data;
+	BuildNodeStruct m_data;					//< data structure for incomplete tree (under construction). empty when complete
 };
 
 }}//namespace

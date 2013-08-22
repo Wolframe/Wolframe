@@ -250,7 +250,7 @@ private:
 	bool m_consumed;
 };
 
-StructDescriptionBase::StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+StructDescriptionBase::StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement requirement_)
 	:m_constructor(c)
 	,m_destructor(d)
 	,m_typename(tn)
@@ -260,9 +260,9 @@ StructDescriptionBase::StructDescriptionBase( Constructor c, Destructor d, const
 	,m_type(t)
 	,m_parse(pa)
 	,m_fetch(pr)
-	,m_mandatory(mandatory_){}
+	,m_requirement(requirement_){}
 
-StructDescriptionBase::StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+StructDescriptionBase::StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement requirement_)
 	:m_constructor(0)
 	,m_destructor(0)
 	,m_typename(tn)
@@ -272,7 +272,7 @@ StructDescriptionBase::StructDescriptionBase( const char* tn, std::size_t os, st
 	,m_type(t)
 	,m_parse(pa)
 	,m_fetch(pr)
-	,m_mandatory(mandatory_){}
+	,m_requirement(requirement_){}
 
 StructDescriptionBase::StructDescriptionBase( const StructDescriptionBase& o)
 	:m_constructor(o.m_constructor)
@@ -285,7 +285,7 @@ StructDescriptionBase::StructDescriptionBase( const StructDescriptionBase& o)
 	,m_type(o.m_type)
 	,m_parse(o.m_parse)
 	,m_fetch(o.m_fetch)
-	,m_mandatory(o.m_mandatory){}
+	,m_requirement(o.m_requirement){}
 
 StructDescriptionBase::StructDescriptionBase()
 	:m_typename(0)
@@ -295,7 +295,7 @@ StructDescriptionBase::StructDescriptionBase()
 	,m_type(Atomic)
 	,m_parse(0)
 	,m_fetch(0)
-	,m_mandatory(false){}
+	,m_requirement(NoRequirement){}
 
 StructDescriptionBase::Map::const_iterator StructDescriptionBase::find( const std::string& name) const
 {

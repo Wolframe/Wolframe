@@ -66,8 +66,14 @@ public:
 	Parse parse() const		{return m_parse;}
 	Fetch fetch() const		{return m_fetch;}
 
-	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_);
-	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_);
+	enum ElementRequirement
+	{
+		NoRequirement,
+		Mandatory,
+		Optional
+	};
+	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement req_);
+	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement req_);
 	StructDescriptionBase( const StructDescriptionBase& o);
 	StructDescriptionBase();
 
@@ -144,7 +150,10 @@ public:
 
 	///\brief Find out if the element in the structure is mandatory
 	///\return true, if yes
-	bool mandatory() const				{return m_mandatory;}
+	bool mandatory() const				{return m_requirement == Mandatory;}
+	///\brief Find out if the element in the structure is optional
+	///\return true, if yes
+	bool optional() const				{return m_requirement == Optional;}
 
 private:
 	Constructor m_constructor;
@@ -157,7 +166,7 @@ private:
 	ElementType m_type;
 	Parse m_parse;
 	Fetch m_fetch;
-	bool m_mandatory;
+	ElementRequirement m_requirement;
 };
 
 

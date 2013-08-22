@@ -33,6 +33,7 @@
 ///\brief Implementation of input data structure for the transaction function
 ///\file transactionfunction/InputStructure.cpp
 #include "transactionfunction/InputStructure.hpp"
+#include "filter/typedfilter.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -265,5 +266,81 @@ const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node
 	}
 	return rt;
 }
+
+namespace {
+///\class Filter
+///\brief Input filter for calling preprocessing functions
+class Filter
+	:public langbind::TypedInputFilter
+{
+public:
+	typedef TransactionFunctionInput::Structure::NodeAssignment NodeAssignment;
+	typedef TransactionFunctionInput::Structure::Node Node;
+
+	Filter()
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+		,m_structure(0){}
+
+	Filter( const Filter& o)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+		,langbind::TypedInputFilter(o)
+		,m_structure(o.m_structure)
+		,m_noderenames(o.m_noderenames)
+		,m_stack(o.m_stack){}
+
+	Filter( const TransactionFunctionInput::Structure* structure_, const Node& node_, const std::vector<NodeAssignment>& noderenames_)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+		,m_structure(structure_)
+		,m_noderenames(noderenames_)
+	{
+		m_stack.push_back( node_);
+	}
+
+	virtual ~Filter(){}
+	virtual TypedInputFilter* copy() const		{return new Filter( *this);}
+
+	virtual bool getNext( ElementType& type, types::VariantConst& element)
+	{
+		if (m_stack.empty())
+		{
+			setState( langbind::InputFilter::Error, "internal: call of input filter after close");
+			return false;
+		}
+		if (m_stack.back().idx >= m_stack.back().node.m_elementsize)
+		{
+			m_stack.pop_back();
+			type = TypedInputFilter::CloseTag;
+			element.init();
+			return true;
+		}
+		return false;
+	}
+
+private:
+	struct StackElement
+	{
+		Node node;
+		int idx;
+		ElementType lasttype;
+
+		StackElement()
+			:idx(0),lasttype(TypedInputFilter::CloseTag){}
+		StackElement( const StackElement& o)
+			:node(o.node),idx(o.idx),lasttype(o.lasttype){}
+		StackElement( const Node& node_)
+			:node(node_),idx(0),lasttype(TypedInputFilter::CloseTag){}
+	};
+
+	const TransactionFunctionInput::Structure* m_structure;
+	std::vector<NodeAssignment> m_noderenames;
+	std::vector<StackElement> m_stack;
+};
+}//namespace
+
+langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const Node& node, const std::vector<NodeAssignment>& noderenames) const
+{
+	return new Filter( this, node, noderenames);
+}
+
 
 

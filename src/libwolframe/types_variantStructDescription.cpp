@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdint.h>	//... for uintptr_t
 
-#define _Wolframe_LOWLEVEL_DEBUG
+#undef _Wolframe_LOWLEVEL_DEBUG
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
@@ -126,7 +126,9 @@ VariantStructDescription::VariantStructDescription( const VariantStructDescripti
 			m_ar[ ii].flags = o.m_ar[ ii].flags;
 		}
 	}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return;
 	BAD_ALLOC:
 		if (m_ar)
@@ -206,7 +208,9 @@ int VariantStructDescription::addAtom( const std::string& name_, const Variant& 
 	m_ar[ m_size].normalizer = normalizer_;
 	m_ar[ m_size].substruct = 0;
 	m_ar[ m_size].flags = 0;
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return m_size++;
 }
 
@@ -260,7 +264,9 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	}
 	m_ar[ m_size].normalizer = 0;
 	m_ar[ m_size].flags = 0;
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return m_size++;
 }
 
@@ -268,7 +274,9 @@ int VariantStructDescription::addIndirection( const std::string& name_, const Va
 {
 	int rt = addAtom( name_, VariantIndirection( descr), 0);
 	back().setOptional();
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return rt;
 }
 
@@ -276,7 +284,9 @@ int VariantStructDescription::addUnresolved( const std::string& name_, const std
 {
 	int rt = addAtom( name_, VariantUnresolved( symbol_), 0);
 	back().setOptional();
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return rt;
 }
 
@@ -301,7 +311,9 @@ int VariantStructDescription::addElement( const Element& elem)
 		m_ar[ m_size].copy( elem);
 		rt = m_size++;
 	}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return rt;
 }
 
@@ -319,7 +331,9 @@ int VariantStructDescription::addAttribute( const std::string& name_, const Vari
 		std::memmove( &m_ar[ m_nofattributes], &m_ar[ m_nofattributes-1], mm);	//... shift elements up one position to get the slot to swap 'attr' with
 		std::memcpy( &m_ar[ m_nofattributes-1], &attr, sizeof( attr));		//... move 'attr' to the free slot
 	}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 	return rt;
 }
 
@@ -327,7 +341,9 @@ void VariantStructDescription::inherit( const VariantStructDescription& parent)
 {
 	const_iterator pi = parent.begin(), pe = parent.end();
 	for (; pi != pe; ++pi) addElement( *pi);
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
+#endif
 }
 
 int VariantStructDescription::findidx( const std::string& name_) const

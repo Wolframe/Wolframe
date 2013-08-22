@@ -54,7 +54,7 @@ struct StructDescription :public StructDescriptionBase
 {
 	///\brief Constructor
 	StructDescription()
-		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, false){}
+		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, NoRequirement){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
@@ -67,9 +67,12 @@ struct StructDescription :public StructDescriptionBase
 		StructDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
 		StructDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		bool mandatory_ = (tag[0]=='-');
-		const char* name = mandatory_?(tag+1):tag;
-		StructDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, mandatory_);
+		ElementRequirement requirement_ = NoRequirement;
+		if (tag[0]=='?') requirement_ = Optional;
+		if (tag[0]=='!') requirement_ = Mandatory;
+		const char* name = (requirement_ != NoRequirement)?(tag+1):tag;
+
+		StructDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, requirement_);
 		if (find( name) != end())
 		{
 			std::ostringstream err;

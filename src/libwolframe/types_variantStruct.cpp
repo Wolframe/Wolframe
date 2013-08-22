@@ -10,7 +10,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-#define _Wolframe_LOWLEVEL_DEBUG
+#undef _Wolframe_LOWLEVEL_DEBUG
 
 void VariantStruct::makeArray()
 {
@@ -89,6 +89,9 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 	{
 		m_data.value.ref_ = 0;
 	}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+	check();
+#endif
 }
 
 void VariantStruct::initUnresolved( const std::string& name_)
@@ -252,6 +255,9 @@ VariantStruct& VariantStruct::back()
 
 void VariantStruct::release()
 {
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+	check();
+#endif
 	if (constant()) return;
 	std::size_t ii, nn;
 

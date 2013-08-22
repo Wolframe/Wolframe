@@ -259,6 +259,16 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 					throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
 				}
 			}
+			if (ctx.flag( Context::ValidateInitialization))
+			{
+				for (;itr != end; ++itr)
+				{
+					if (!itr->second.optional() && !stk.back().initCount( itr-descr->begin()))
+					{
+						throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
+					}
+				}
+			}
 			stk.pop_back();
 			return true;
 		}

@@ -44,7 +44,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-
 ///\class TypedInputFilter
 ///\brief Input filter with atomic values having a type
 class TypedInputFilter :public FilterBase

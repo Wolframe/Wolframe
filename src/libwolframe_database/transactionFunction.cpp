@@ -38,6 +38,8 @@
 #include "transactionFunctionDescription.hpp"
 #include "transactionfunction/InputStructure.hpp"
 #include "transactionfunction/OutputResultStructure.hpp"
+#include "transactionfunction/DatabaseCommand.hpp"
+#include "transactionfunction/PreProcessCommand.hpp"
 #include "transactionfunction/Path.hpp"
 #include "transactionfunction/OutputImpl.hpp"
 #include "database/transaction.hpp"
@@ -51,96 +53,17 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-///\class FunctionCall
-///\brief Database instruction call
-class FunctionCall
-{
-public:
-	///\brief Default constructor
-	FunctionCall()
-		:m_nonemptyResult(false)
-		,m_uniqueResult(false){}
-	///\brief Copy constructor
-	FunctionCall( const FunctionCall& o);
-	///\brief Constructor
-	FunctionCall( const std::string& name_, const Path& selector_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
-
-	const Path& selector() const					{return m_selector;}
-	const std::vector<Path>& arg() const				{return m_arg;}
-	const std::string& name() const					{return m_name;}
-
-	bool hasNonemptyResult() const					{return m_nonemptyResult;}
-	bool hasUniqueResult() const					{return m_uniqueResult;}
-	std::size_t level() const					{return m_level;}
-
-	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
-
-private:
-	std::string m_name;
-	Path m_selector;
-	std::vector<Path> m_arg;
-	bool m_nonemptyResult;
-	bool m_uniqueResult;
-	std::size_t m_level;
-	types::keymap<std::string> m_hints;
-};
-
-///\class PreProcess
-///\brief Preprocessing step of input
-class PreProcessCall
-{
-public:
-	///\brief Default constructor
-	PreProcessCall(){}
-	///\brief Copy constructor
-	PreProcessCall( const PreProcessCall& o)
-		:m_name(o.m_name),m_resultnames(o.m_resultnames),m_selector(o.m_selector),m_arg(o.m_arg){}
-	///\brief Constructor
-	PreProcessCall( const std::string& name_, const std::vector<std::string>& resultnames_, const Path& selector_, const std::vector<Path>& arg_)
-		:m_name(name_),m_resultnames(resultnames_),m_selector(selector_),m_arg(arg_){}
-
-	const Path& selector() const					{return m_selector;}
-	const std::vector<Path>& arg() const				{return m_arg;}
-	const std::string& name() const					{return m_name;}
-	const std::vector<std::string>& resultnames() const		{return m_resultnames;}
-
-private:
-	std::string m_name;						//< name of the function (defined by the provider)
-	std::vector<std::string> m_resultnames;				//< sequence of result names in case of redefining the returned structure element names
-	Path m_selector;						//< FOREACH selector path
-	std::vector<Path> m_arg;					//< function arguments
-};
-
-
 struct TransactionFunction::Impl
 {
 	TransactionFunctionOutput::ResultStructureR m_resultstruct;
-	std::vector<FunctionCall> m_call;
+	std::vector<DatabaseCommand> m_call;
 	TagTable m_tagmap;
-	std::vector<PreProcessCall> m_preprocs;
+	std::vector<PreProcessCommand> m_preprocs;
 
 	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
 };
 
-
-FunctionCall::FunctionCall( const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u, std::size_t l, const types::keymap<std::string>& hints_)
-	:m_name(n)
-	,m_selector(s)
-	,m_arg(a)
-	,m_nonemptyResult(q)
-	,m_uniqueResult(u)
-	,m_level(l)
-	,m_hints(hints_){}
-
-FunctionCall::FunctionCall( const FunctionCall& o)
-	:m_name(o.m_name)
-	,m_selector(o.m_selector)
-	,m_arg(o.m_arg)
-	,m_nonemptyResult(o.m_nonemptyResult)
-	,m_uniqueResult(o.m_uniqueResult)
-	,m_level(o.m_level)
-	,m_hints(o.m_hints){}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
@@ -183,7 +106,7 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	return true;
 }
 
-static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode)
+static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 
@@ -235,7 +158,7 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 	}
 }
 
-static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<FunctionCall>::const_iterator ci, std::vector<FunctionCall>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::Node>& rootnodearray)
+static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::Node>& rootnodearray)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 	std::size_t fidx = startfidx;
@@ -264,9 +187,10 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		{
 			ci->selector().selectNodes( this_->structure(), *ni, nodearray);
 		}
-		std::vector<FunctionCall>::const_iterator ca = ci;
+		std::vector<DatabaseCommand>::const_iterator ca = ci;
 		if (ci->level() > level)
 		{
+			// call OPERATION (embedded): For each selected node execute all the database commands or OPERATIONs:
 			if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling OPERATION");
 			std::size_t nextfidx = fidx;
 			for (++ca; ca != ce; ++ca,++nextfidx)
@@ -288,7 +212,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		}
 		else
 		{
-			// For each selected node do expand the function call arguments:
+			// Call DatabaseCommand: For each selected node do expand the function call arguments:
 			std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
@@ -302,7 +226,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 TransactionInput TransactionFunctionInput::get() const
 {
 	TransactionInput rt;
-	std::vector<FunctionCall>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
+	std::vector<DatabaseCommand>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
 
 	std::vector<Structure::Node> nodearray;
 	nodearray.push_back( structure().root());
@@ -400,7 +324,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
 			if (fui == functionmap.end())
 			{
-				FunctionCall cc( di->call.funcname, selector, param, di->nonempty, di->unique, 1, di->hints);
+				DatabaseCommand cc( di->call.funcname, selector, param, di->nonempty, di->unique, 1, di->hints);
 				if (!di->path_INTO.empty())
 				{
 					// this is just the wrapping structure, iteration is only done with the last tag (othwerwise
@@ -467,10 +391,10 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 						}
 					}
 				}
-				FunctionCall paramstk( "", selector, param, false, false, 1 + 1/*level*/);
+				DatabaseCommand paramstk( "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
 
-				std::vector<FunctionCall>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
+				std::vector<DatabaseCommand>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
 				int scope_functionidx_incr = m_call.size();
 				for (; fsi != fse; ++fsi)
 				{
@@ -479,7 +403,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
 					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
-					FunctionCall cc( fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
+					DatabaseCommand cc( fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
 				}
 				if (!di->path_INTO.empty() && !di->path_INTO[0].empty( ) )

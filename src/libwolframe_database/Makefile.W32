@@ -26,6 +26,7 @@ CPP_OBJS = \
 	transactionFunction.obj \
 	transactionfunction/TagTable.obj \
 	transactionfunction/Path.obj \
+	transactionfunction/PreProcessCommand.obj \
 	transactionfunction/InputStructure.obj \
 	transactionfunction/OutputResultStructure.obj \
 	transactionfunction/OutputImpl.obj \
