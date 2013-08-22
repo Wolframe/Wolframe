@@ -537,7 +537,6 @@ Project Wolframe.
 					<ComponentRef Id="Wolframec"/>
 				</Feature>
 			</Feature>
-			</Feature>
 			
 			<Feature Id="Documentation" Title="Documentation" Description="The Wolframe documentation." Level="3">
 				<Feature Id="WolframeDocumentation" Title="Wolframe Documentation" Description="The Wolframe documentation." Level="3">
