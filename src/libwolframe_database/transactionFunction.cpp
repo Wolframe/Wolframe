@@ -51,14 +51,19 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+///\class FunctionCall
+///\brief Database instruction call
 class FunctionCall
 {
 public:
+	///\brief Default constructor
 	FunctionCall()
 		:m_nonemptyResult(false)
 		,m_uniqueResult(false){}
+	///\brief Copy constructor
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
+	///\brief Constructor
+	FunctionCall( const std::string& name_, const Path& selector_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
 
 	const Path& selector() const					{return m_selector;}
 	const std::vector<Path>& arg() const				{return m_arg;}
@@ -71,7 +76,6 @@ public:
 	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
 
 private:
-	std::vector<std::string> m_resultnames;
 	std::string m_name;
 	Path m_selector;
 	std::vector<Path> m_arg;
@@ -81,11 +85,39 @@ private:
 	types::keymap<std::string> m_hints;
 };
 
+///\class PreProcess
+///\brief Preprocessing step of input
+class PreProcessCall
+{
+public:
+	///\brief Default constructor
+	PreProcessCall(){}
+	///\brief Copy constructor
+	PreProcessCall( const PreProcessCall& o)
+		:m_name(o.m_name),m_resultnames(o.m_resultnames),m_selector(o.m_selector),m_arg(o.m_arg){}
+	///\brief Constructor
+	PreProcessCall( const std::string& name_, const std::vector<std::string>& resultnames_, const Path& selector_, const std::vector<Path>& arg_)
+		:m_name(name_),m_resultnames(resultnames_),m_selector(selector_),m_arg(arg_){}
+
+	const Path& selector() const					{return m_selector;}
+	const std::vector<Path>& arg() const				{return m_arg;}
+	const std::string& name() const					{return m_name;}
+	const std::vector<std::string>& resultnames() const		{return m_resultnames;}
+
+private:
+	std::string m_name;						//< name of the function (defined by the provider)
+	std::vector<std::string> m_resultnames;				//< sequence of result names in case of redefining the returned structure element names
+	Path m_selector;						//< FOREACH selector path
+	std::vector<Path> m_arg;					//< function arguments
+};
+
+
 struct TransactionFunction::Impl
 {
 	TransactionFunctionOutput::ResultStructureR m_resultstruct;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
+	std::vector<PreProcessCall> m_preprocs;
 
 	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
@@ -476,7 +508,8 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 TransactionFunction::Impl::Impl( const Impl& o)
 	:m_resultstruct(o.m_resultstruct)
 	,m_call(o.m_call)
-	,m_tagmap(o.m_tagmap){}
+	,m_tagmap(o.m_tagmap)
+	,m_preprocs(o.m_preprocs){}
 
 
 TransactionFunction::TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
