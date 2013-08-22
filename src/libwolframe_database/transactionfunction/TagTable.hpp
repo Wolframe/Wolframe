@@ -54,6 +54,8 @@ public:
 	int get( const char* tag, std::size_t tagsize);
 	int unused() const;
 
+	bool case_sensitive() const	{return m_case_sensitive;}
+
 	std::map<int,int> insert( const TagTable& o);
 
 private:

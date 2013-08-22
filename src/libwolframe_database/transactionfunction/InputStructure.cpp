@@ -34,6 +34,7 @@
 ///\file transactionfunction/InputStructure.cpp
 #include "transactionfunction/InputStructure.hpp"
 #include "filter/typedfilter.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -53,6 +54,7 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	,m_tagmap(o.m_tagmap)
 	,m_rootidx(o.m_rootidx)
 	,m_rootsize(o.m_rootsize)
+	,m_strings(o.m_strings)
 	,m_data(o.m_data)
 	{}
 
@@ -63,6 +65,7 @@ TransactionFunctionInput::Structure::Structure( const TagTable* tagmap)
 {
 	m_nodemem.alloc( 1);
 	m_content.push_back( types::Variant());
+	m_strings.push_back( '\0');
 	m_data.push_back( std::vector<Node>());
 }
 
@@ -137,7 +140,10 @@ void TransactionFunctionInput::Structure::openTag( const std::string& tagstr)
 	int mi = (int)m_tagmap->find( tagstr);
 	if (mi == 0) mi = (int)m_tagmap->unused();
 
-	m_data.back().push_back( Node( 0, mi, 0, 0));
+	int tagstr_ = m_strings.size();
+	m_strings.append( tagstr);
+	m_strings.push_back( '\0');
+	m_data.back().push_back( Node( 0, mi, tagstr_, 0, 0));
 	m_data.push_back( std::vector<Node>());
 }
 
@@ -184,7 +190,7 @@ void TransactionFunctionInput::Structure::pushValue( const types::VariantConst& 
 {
 	std::size_t mi = m_content.size();
 	m_content.push_back( val);
-	m_data.back().push_back( Node( 0, 0, 0, Node::val_element( mi)));
+	m_data.back().push_back( Node( 0, 0, 0, 0, Node::val_element( mi)));
 }
 
 void TransactionFunctionInput::Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
@@ -243,8 +249,25 @@ void TransactionFunctionInput::Structure::up( const Node& nd, std::vector<Node>&
 
 TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::root() const
 {
-	Node rt( 0, 0, m_rootsize, Node::ref_element(m_rootidx));
+	Node rt( 0, 0, 0, m_rootsize, Node::ref_element(m_rootidx));
 	return rt;
+}
+
+const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::child( const Node& nd, int idx) const
+{
+	if (idx >= nd.m_elementsize) return 0;
+	const Node* rt = &m_nodemem[ nd.childidx() + idx];
+	return rt;
+}
+
+const types::Variant* TransactionFunctionInput::Structure::contentvalue( const Node& nd) const
+{
+	if (!nd.m_tag)
+	{
+		std::size_t validx = nd.valueidx();
+		if (validx) return &m_content.at( validx);
+	}
+	return 0;
 }
 
 const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
@@ -266,6 +289,24 @@ const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node
 	}
 	return rt;
 }
+
+const char* TransactionFunctionInput::Structure::tagname( int tagstridx) const
+{
+	return (tagstridx>0) ? (m_strings.c_str() + tagstridx) : 0;
+}
+
+bool TransactionFunctionInput::Structure::isequalTag( const std::string& t1, const std::string& t2) const
+{
+	if (m_tagmap->case_sensitive())
+	{
+		return boost::algorithm::iequals( t1, t2);
+	}
+	else
+	{
+		return t1 == t2;
+	}
+}
+
 
 namespace {
 ///\class Filter
@@ -306,14 +347,51 @@ public:
 			setState( langbind::InputFilter::Error, "internal: call of input filter after close");
 			return false;
 		}
-		if (m_stack.back().idx >= m_stack.back().node.m_elementsize)
+		for (;;)
 		{
-			m_stack.pop_back();
-			type = TypedInputFilter::CloseTag;
-			element.init();
-			return true;
+			const Node* chld = m_structure->child( m_stack.back().node, m_stack.back().idx);
+			const char* tagnamestr;
+			if (chld)
+			{
+				m_stack.pop_back();
+				type = TypedInputFilter::CloseTag;
+				element.init();
+				return true;
+			}
+			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
+			{
+				++m_stack.back().idx;
+				m_stack.push_back( *chld);
+				type = TypedInputFilter::OpenTag;
+
+				if (m_stack.size() == 1 && !m_noderenames.empty())
+				{
+					std::vector<NodeAssignment>::const_iterator ti = m_noderenames.begin(), te = m_noderenames.end();
+					for (; ti != te; ++ti)
+					{
+						if (m_structure->isequalTag( ti->first, tagnamestr))
+						{
+							element = ti->second;
+							return true;
+						}
+					}
+				}
+				element = tagnamestr;
+				return true;
+			}
+			else
+			{
+				std::size_t validx = m_stack.back().node.valueidx();
+				if (validx)
+				{
+					++m_stack.back().idx;
+					type = TypedInputFilter::Value;
+					element = m_structure->contentvalue( m_stack.back().node);
+					return true;
+				}
+			}
+			++m_stack.back().idx;
 		}
-		return false;
 	}
 
 private:

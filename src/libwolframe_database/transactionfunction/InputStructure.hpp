@@ -59,47 +59,57 @@ public:
 	{
 		int m_parent;
 		int m_tag;
+		int m_tagstr;
 		int m_elementsize;
 		int m_element;
 
 		Node()
 			:m_parent(0)
 			,m_tag(0)
+			,m_tagstr(0)
 			,m_elementsize(0)
 			,m_element(0){}
 
 		Node( const Node& o)
 			:m_parent(o.m_parent)
 			,m_tag(o.m_tag)
+			,m_tagstr(o.m_tagstr)
 			,m_elementsize(o.m_elementsize)
 			,m_element(o.m_element){}
 
-		Node( int p, int t, int size, int e)
-			:m_parent(p)
-			,m_tag(t)
-			,m_elementsize(size)
-			,m_element(e){}
+		Node( int parent_, int tag_, int tagstr_, int size_, int element_)
+			:m_parent(parent_)
+			,m_tag(tag_)
+			,m_tagstr(tagstr_)
+			,m_elementsize(size_)
+			,m_element(element_){}
 
 		bool operator == (const Node& o) const;
-		bool operator != (const Node& o) const		{return !operator==(o);}
+		bool operator != (const Node& o) const			{return !operator==(o);}
 
-		static int ref_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
-		static int val_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
+		static int ref_element( std::size_t idx)		{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
+		static int val_element( std::size_t idx)		{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
 
-		std::size_t childidx() const			{return (m_element < 0)?(std::size_t)-m_element:0;}
-		std::size_t nofchild() const			{return (m_element < 0)?(std::size_t)m_elementsize:0;}
-		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
+		std::size_t childidx() const				{return (m_element < 0)?(std::size_t)-m_element:0;}
+		std::size_t nofchild() const				{return (m_element < 0)?(std::size_t)m_elementsize:0;}
+		std::size_t valueidx() const				{return (m_element > 0)?(std::size_t)m_element:0;}
 	};
 
 public://visit structure:
 	Node root() const;
+	const Node* child( const Node& nd, int idx) const;
 	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void up( const Node& nd, std::vector<Node>& rt) const;
 	const types::Variant* nodevalue( const Node& nd) const;
+	const types::Variant* contentvalue( const Node& nd) const;
 
 	///\brief Get structure as string
 	const std::string tostring() const;
+	///\brief Get the name of the tag by index
+	const char* tagname( int tagstridx) const;
+	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
+	bool isequalTag( const std::string& t1, const std::string& t2) const;
 
 	typedef std::pair<std::string,std::string> NodeAssignment;
 	///\brief Create an input filter for a node to pass it to a function
@@ -120,6 +130,7 @@ private:
 	const TagTable* m_tagmap;				//< map names to node tag identifiers
 	std::size_t m_rootidx;					//< root index of the tree
 	std::size_t m_rootsize;					//< number of children of the root node
+	std::string m_strings;
 
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
 	BuildNodeStruct m_data;					//< data structure for incomplete tree (under construction). empty when complete
