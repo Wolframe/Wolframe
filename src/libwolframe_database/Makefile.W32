@@ -24,6 +24,11 @@ LIBRARIES = \
 CPP_OBJS = \
 	transactionOutput.obj \
 	transactionFunction.obj \
+	transactionfunction/TagTable.obj \
+	transactionfunction/Path.obj \
+	transactionfunction/InputStructure.obj \
+	transactionfunction/OutputResultStructure.obj \
+	transactionfunction/OutputImpl.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	preparedStatement.obj \

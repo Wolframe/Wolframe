@@ -60,10 +60,10 @@ class TransactionFunctionOutput
 	:public langbind::TypedInputFilter
 {
 public:
-	class ResultStruct;
-	typedef types::CountedReference<ResultStruct> ResultStructR;
+	class ResultStructure;
+	typedef types::CountedReference<ResultStructure> ResultStructureR;
 
-	TransactionFunctionOutput( const ResultStructR& resultstruct_, const db::TransactionOutput& data_);
+	TransactionFunctionOutput( const ResultStructureR& resultstruct_, const db::TransactionOutput& data_);
 	TransactionFunctionOutput( const TransactionFunctionOutput& o);
 	virtual ~TransactionFunctionOutput();
 
@@ -120,27 +120,43 @@ private:
 class VariableValue
 {
 public:
+	///\brief Default constructor
 	VariableValue()
 		:m_scope_functionidx(-1),m_column_idx(-1){}
+	///\brief Copy constructor
 	VariableValue( const VariableValue& o)
 		:m_scope_functionidx(o.m_scope_functionidx),m_column_idx(o.m_column_idx),m_name(o.m_name){}
+	///\brief Symbolic reference constructor
 	VariableValue( const std::string& name_, int scope_functionidx_)
 		:m_scope_functionidx(scope_functionidx_),m_column_idx(-1),m_name(name_){}
+	///\brief Column Index reference constructor
 	VariableValue( int column_idx_, int scope_functionidx_)
 		:m_scope_functionidx(scope_functionidx_),m_column_idx(column_idx_){}
 
-	int scope_functionidx() const			{return m_scope_functionidx;}
-	int column_idx() const				{return m_column_idx;}
-	const std::string& name() const			{return m_name;}
-
+	///\brief Evaluate if the reference is by name
+	///\return true if yes
+	bool isSymbolic() const				{return m_column_idx < 0;}
+	///\brief Evaluate if the reference is by column index
+	///\return true if yes
+	bool isNumeric() const				{return m_column_idx > 0;}
+	///\brief Evaluate if the value is constant
+	///\return true if yes
 	bool isConstant() const				{return m_column_idx == 0;}
+
+	///\brief Get the scope of the referenced result
+	int scope_functionidx() const			{return m_scope_functionidx;}
+	///\brief Get the column index of the referenced result (if isNumeric)
+	int column_idx() const				{return m_column_idx;}
+	///\brief Get the name of the referenced result (if isSymbolic)
+	const std::string& name() const			{return m_name;}
+	///\brief Get the value of a constant (if isConstant)
 	const std::string& value() const		{return m_name;}
 
 private:
-	friend class ConstantValue;
-	int m_scope_functionidx;
-	int m_column_idx;
-	std::string m_name;
+	friend class ConstantValue;			//< constant value type
+	int m_scope_functionidx;			//< index of the last function defined +1 at the moment of variable definition. Used to defined the scope of this reference (to identify the referenced result.
+	int m_column_idx;				//< index of the result column referenced or -1, if reference is symbolic or 0, if reference is a constant (m_name)
+	std::string m_name;				//< symbolic reference name (m_column_idx < 0) or constant value (m_column_idx == 0)
 };
 
 ///\class ConstantValue
@@ -148,7 +164,8 @@ private:
 class ConstantValue :public VariableValue
 {
 public:
-	ConstantValue( const std::string& value_)
+	///\brief Constructor
+	explicit ConstantValue( const std::string& value_)
 		:VariableValue( value_, -1)		{m_scope_functionidx = 0;}
 };
 
@@ -160,13 +177,53 @@ typedef types::keymap<VariableValue>	VariableTable;
 class TransactionFunctionDescription
 {
 public:
+	class ProcessingStep
+	{
+	public:
+		class Argument
+		{
+		public:
+			enum Type {Constant,Selector};
+
+			///\brief Default constructor
+			Argument(){}
+			///\brief Copy constructor
+			Argument( const Argument& o)
+				:type(o.type),value(o.value){}
+			///\brief Constructor
+			Argument( Type t, const std::string& v)
+				:type(t),value(v){}
+
+			Type type;				//< type of the argument
+			std::string value;			//< value of the argument
+		};
+
+		///\brief Default constructor
+		ProcessingStep(){}
+		///\brief Copy constructor
+		ProcessingStep( const ProcessingStep& o)
+			:selector_FOREACH(o.selector_FOREACH)
+			,functionname(o.functionname)
+			,args(o.args)
+			,resultnodes(o.resultnodes){}
+
+		std::vector<std::string> selector_FOREACH;	//< selector of the nodes to process (FOREACH argument)
+		std::vector<std::string> functionname;		//< name of function to call
+		std::vector<Argument> args;			//< function call arguments
+		std::vector<std::string> resultnodes;		//< names of nodes in the processed input node
+	};
+
+	///\class OperationStep
+	///\brief Description of one step (database operation) of a transaction function
 	class OperationStep
 	{
 	public:
+		///\brief Default constructor
 		OperationStep()
 			:nonempty(false)
 			,unique(false){}
 
+		///\brief Copy constructor
 		OperationStep( const OperationStep& o)
 			:selector_FOREACH(o.selector_FOREACH)
 			,call(o.call)
@@ -175,6 +232,7 @@ public:
 			,unique(o.unique)
 			,hints(o.hints){}
 
+		///\brief Clear content (default constructor)
 		void clear()
 		{
 			selector_FOREACH.clear();
@@ -189,6 +247,7 @@ public:
 		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
 		struct Error
 		{
+			///\brief Constructor
 			Error( std::size_t elemidx_, const std::string& msg_)
 				:elemidx(elemidx_)
 				,msg(msg_){}
@@ -275,6 +334,7 @@ public:
 		Block()
 			:startidx(0),size(0){}
 	};
+	std::vector<ProcessingStep> preprocs;	//< preprocessing steps on input
 	std::vector<OperationStep> steps;	//< list of database commands or operations
 	std::vector<Block> blocks;		//< substructures of the output
 	langbind::Authorization auth;		//< authorization definition structure for this function

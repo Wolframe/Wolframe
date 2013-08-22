@@ -30,6 +30,11 @@ DYNAMIC_LIB_PATCH = 0
 CPP_OBJS = \
 	transactionOutput.o \
 	transactionFunction.o \
+	transactionfunction/TagTable.o \
+	transactionfunction/Path.o \
+	transactionfunction/InputStructure.o \
+	transactionfunction/OutputResultStructure.o \
+	transactionfunction/OutputImpl.o \
 	loadTransactionProgram.o \
 	databaseLanguage.o \
 	preparedStatement.o \
