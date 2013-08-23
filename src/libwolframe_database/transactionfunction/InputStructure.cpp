@@ -131,13 +131,57 @@ void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t 
 	openTag( tagstr);
 }
 
-void TransactionFunctionInput::Structure::openTag( const std::string& tagstr)
+void TransactionFunctionInput::Structure::openTag( const types::Variant& tag)
 {
-	int tag_ = (int)m_tagmap->find( tagstr);
-	if (tag_ == 0) tag_ = (int)m_tagmap->unused();
-	int tagstr_ = (int)m_privatetagmap.get( tagstr);
-	m_data.back().push_back( Node( 0, tag_, tagstr_, 0, 0));
-	m_data.push_back( std::vector<Node>());
+	///[+] TMP DISABLED: [-] std::cout << "OPEN TAG " << tag << std::endl;
+	if (tag.type() == types::Variant::string_)
+	{
+		std::string tagstr( tag.tostring());
+		int tag_ = (int)m_tagmap->find( tagstr);
+		if (tag_ == 0) tag_ = (int)m_tagmap->unused();
+		int tagstr_ = (int)m_privatetagmap.get( tagstr);
+		m_data.back().push_back( Node( 0, tag_, tagstr_, 0, 0));
+		m_data.push_back( std::vector<Node>());
+	}
+	else
+	{
+		int arrayindex;
+		try
+		{
+			arrayindex = (int)tag.toint();
+		}
+		catch (const std::runtime_error& e)
+		{
+			throw std::runtime_error( "array index cannot be converted to integer");
+		}
+		if (arrayindex < 0)
+		{
+			throw std::runtime_error( "array index is negative");
+		}
+		if (m_data.size() == 1)
+		{
+			m_data.back().push_back( Node( 0, 0, 0, 0, 0));
+		}
+		else
+		{
+			const Node& pred = m_data.at( m_data.size()-2).back();
+			m_data.back().push_back( Node( 0, pred.m_tag, pred.m_tagstr, 0, 0));
+		}
+		m_data.back().back().m_arrayindex = arrayindex;
+		m_data.push_back( std::vector<Node>());
+	}
+}
+
+bool TransactionFunctionInput::Structure::isArrayNode() const
+{
+	int arrayindex = -1;
+	std::vector<Node>::const_iterator ni = m_data.back().begin(), ne = m_data.back().end();
+	for (; ni != ne; ++ni)
+	{
+		if (ni->m_arrayindex <= arrayindex) return false;
+		arrayindex = ni->m_arrayindex;
+	}
+	return true;
 }
 
 void TransactionFunctionInput::Structure::createRootNode()
@@ -156,9 +200,20 @@ void TransactionFunctionInput::Structure::createRootNode()
 
 void TransactionFunctionInput::Structure::closeTag()
 {
+	///[+] TMP DISABLED: [-] std::cout << "CLOSE TAG (" << m_data.size() << ") " << std::endl;
 	if (m_data.size() == 1)
 	{
 		throw std::runtime_error( "tags in input not balanced");
+	}
+	if (isArrayNode() && m_data.size() >= 2)
+	{
+		// ... in case of an array the owner of the array takes over the elements of the array
+		std::vector<Node>& uu = m_data.at( m_data.size()-2);
+		std::vector<Node>& tt = m_data.at( m_data.size()-1);
+		std::vector<Node>::const_iterator ti = tt.begin(), te = tt.end();
+		for (; ti != te; ++ti) uu.push_back( *ti);
+		m_data.pop_back();
+		return;
 	}
 	if (m_data.back().size() == 0)
 	{
@@ -169,6 +224,7 @@ void TransactionFunctionInput::Structure::closeTag()
 	m_data.back().back().m_elementsize = m_root.m_elementsize;
 	m_data.back().back().m_element = m_root.m_element;
 
+	///[+] TMP DISABLED: [-] std::cout << "TREE:" << std::endl << tostring() << std::endl;
 	if (m_data.size() == 1)
 	{
 		// top level tag closed, assuming end of structure,

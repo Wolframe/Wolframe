@@ -77,6 +77,7 @@ public:
 	///\param [out] element reference to element returned
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
+	///\remark If type is OpenTag then element is either 1) a string (tag) or 2) a number convertible to an uint (array index counted from 1)
 	virtual bool getNext( ElementType& type, types::VariantConst& element)=0;
 
 	///\brief Get the current state
@@ -98,8 +99,14 @@ public:
 		PropagateNoCase=0x02			//< true, if the result is propagated to be case insensitive
 	};
 
+	///\brief Query a flag (or a set of flags)
+	///\return true if the flag (or all flags) are set
 	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
-	virtual void setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
+
+	///\brief Set a flag (or a set of flags)
+	///\return true on success, false if the (or one of) flag is not supported
+	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
+	///\brief Reset set all flags
 	void resetFlags()				{m_flags = None;}
 
 private:
