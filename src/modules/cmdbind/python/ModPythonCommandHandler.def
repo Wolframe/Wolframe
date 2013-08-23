@@ -1,0 +1,4 @@
+LIBRARY mod_command_python
+
+EXPORTS
+entryPoint	@1

@@ -15,3 +15,6 @@ embed: embed.o
 clean:
 	-rm *.o
 	-rm embed
+
+test: all
+	./embed my

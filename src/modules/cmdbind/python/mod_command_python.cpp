@@ -30,42 +30,53 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wtest/testModules.cpp
-///\brief Implements a function to get list of modules available for a test program
-#include "wtest/testModules.hpp"
-#include <boost/filesystem.hpp>
+///\file mod_command_python.cpp
+///\brief Module for command handler executing python code
+#include "module/scriptCommandHandlerBuilder.hpp"
+#include "module/programTypeBuilder.hpp"
+#include "pythonFunctionProgramType.hpp"
+#include "logger/logger-v1.hpp"
+
+_Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace _Wolframe::wtest;
- 
-std::list<std::string> _Wolframe::wtest::getTestModuleList( const std::string& topdir)
+using namespace _Wolframe::module;
+
+static void setModuleLogger( void* logger)
 {
-	std::list<std::string> rt;
-	static const char* ar[] = {
-		"filter/textwolf/mod_filter_textwolf",
-		"filter/char/mod_filter_char",
-		"filter/line/mod_filter_line",
-#if WITH_LIBXML2
-		"filter/libxml2/mod_filter_libxml2",
-#endif
-#if WITH_LUA
-		"cmdbind/lua/mod_command_lua",
-#endif
-#if WITH_PYTHON
-		"cmdbind/python/mod_command_python",
-#endif
-		"cmdbind/directmap/mod_command_directmap",
-		0};
-	std::size_t ii = 0;
-	while (ar[ii])
-	{
-		boost::filesystem::path pt( topdir);
-		pt /= "src";
-		pt /= "modules";
-		pt /= ar[ii++];
-		rt.push_back( pt.string());
-	}
-	return rt;
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
+
+/* LATER
+static ConfiguredBuilder* createPythonCommandHandler()
+{
+	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
+		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
+	return &mod;
+}
+*/
+
+static SimpleBuilder* createPythonProgramType()
+{
+	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "pythonformfunc", langbind::createPythonProgramType);
+}
+
+enum {NofConfiguredBuilder=0};
+/* LATER
+static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
+{
+	createPythonCommandHandler
+};
+*/
+enum {NofSimpleBuilder=1};
+static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
+{
+	createPythonProgramType
+};
+
+ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
+				setModuleLogger,
+				NofConfiguredBuilder, 0, /* configuredBuilder, */
+				NofSimpleBuilder, simpleBuilder);
 
 

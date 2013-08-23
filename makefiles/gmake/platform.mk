@@ -2970,6 +2970,9 @@ endif
 ifeq ($(WITH_PYTHON),1)
 
 ifeq "$(PLATFORM)" "LINUX"
+PYTHON_CFLAGS = -g -O0 $(shell python3-config --cflags)
+PYTHON_LDFLAGS = $(shell python3-config --ldflags)
+PYTHON_LIBS = $(shell python3-config --libs)
 endif
 
 endif

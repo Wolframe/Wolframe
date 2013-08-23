@@ -28,6 +28,12 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LUA
 endif
 
+# Python
+ifeq ($(WITH_PYTHON),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_PYTHON
+endif
+
 # libhpdf
 ifeq ($(WITH_LIBHPDF),1)
 INCLUDE_CXXFLAGS += \

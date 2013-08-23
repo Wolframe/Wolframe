@@ -6,9 +6,15 @@ SUBDIRS =
 
 SUBDIRS = \
 	$(SUBDIRS) directmap
+
 !IFDEF WITH_LUA
 SUBDIRS = \
 	$(SUBDIRS) lua
+!ENDIF
+
+!IFDEF WITH_PYTHON
+SUBDIRS = \
+	$(SUBDIRS) python
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
