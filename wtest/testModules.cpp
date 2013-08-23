@@ -51,6 +51,9 @@ std::list<std::string> _Wolframe::wtest::getTestModuleList( const std::string& t
 #if WITH_LUA
 		"cmdbind/lua/mod_command_lua",
 #endif
+#if WITH_PYTHON
+		"cmdbind/python/mod_command_python",
+#endif
 		"cmdbind/directmap/mod_command_directmap",
 		0};
 	std::size_t ii = 0;

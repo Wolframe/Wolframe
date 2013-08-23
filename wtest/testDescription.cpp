@@ -128,14 +128,14 @@ if (boost::starts_with( flag, "DISABLED "))
 #if !(WITH_LUA)
 	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
 #endif
+#if !(WITH_PYTHON)
+	if (boost::iequals( flag, "PYTHON")) return "WITH_PYTHON=1 ";
+#endif
 #if !(WITH_LIBHPDF)
 	if (boost::iequals( flag, "LIBHPDF")) return "WITH_LIBHPDF=1 ";
 #endif
 #if !(WITH_SSL)
 	if (boost::iequals( flag, "SSL")) return "WITH_SSL=1 ";
-#endif
-#if !(WITH_QT)
-	if (boost::iequals( flag, "QT")) return "WITH_QT=1 ";
 #endif
 #if !(WITH_PAM)
 	if (boost::iequals( flag, "PAM")) return "WITH_PAM=1 ";
