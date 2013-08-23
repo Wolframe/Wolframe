@@ -4,4 +4,3 @@ def func( ):
     print( 'Test' )
 
 print( 'Module initialized on ' , ctime( time( ) ) )
-

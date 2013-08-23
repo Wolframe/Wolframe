@@ -16,8 +16,11 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
+	// set name of program, this is used for resolving path names
+	// for libraries (TODO: set to what in wolframe?!)
 	Py_SetProgramName( (wchar_t *)argv[0] ); 
 
+	// initialize Python interpreter
 	Py_Initialize( );
 	
 	// needed to load module from current path, othwerwise python
@@ -29,11 +32,14 @@ int main( int argc, char *argv[] )
 	// configuration
 	PyRun_SimpleString( "sys.dont_write_bytecode = True" );
 
+	// Build the name object, use 'PyUnicode_FromString' not 'PyString_FromString'!
 	PyObject *name = PyUnicode_FromString( argv[1] );
 
+	// Load the module object
 	PyObject *module = PyImport_Import( name );
 	Py_DECREF( name );
 
+	// Check if the module could be loaded and if it is valid
 	if( module == NULL || !PyModule_Check( module ) ) {
 		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
 		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
@@ -61,10 +67,11 @@ int main( int argc, char *argv[] )
 	PyObject *value = PyObject_CallObject( f, NULL );
 	puts( pyGetReprStr( value ) );
 		
+	// clean up objects
 	Py_DECREF( f );
-
 	Py_DECREF( module );
 
+	// shut own Python interpreter
 	Py_Finalize( );
 
 	return 0;

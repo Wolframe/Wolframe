@@ -3,6 +3,23 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+python::Context::Context( )
+{
+}
+
+std::vector<std::string> python::Context::loadProgram( const std::string& prgfile)
+{
+	std::vector<std::string> rt;
+	//~ langbind::LuaScript script( prgfile);
+	//~ std::vector<std::string>::const_iterator ni = script.functions().begin(), ne = script.functions().end();
+	//~ for (; ni != ne; ++ni)
+	//~ {
+		//~ rt.push_back( *ni);
+		//~ funcmap.defineLuaFunction( *ni, script);
+	//~ }
+	return rt;
+}
+
 python::Structure* python::Structure::addSubstruct( const types::Variant& elemid_)
 {
 	return 0;
