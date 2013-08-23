@@ -52,17 +52,16 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_content(o.m_content)
 	,m_tagmap(o.m_tagmap)
+	,m_privatetagmap(o.m_privatetagmap)
 	,m_root(o.m_root)
-	,m_strings(o.m_strings)
 	,m_data(o.m_data)
 	{}
 
 TransactionFunctionInput::Structure::Structure( const TagTable* tagmap)
-	:m_tagmap(tagmap)
+	:m_tagmap(tagmap),m_privatetagmap(tagmap->case_sensitive())
 {
 	m_nodemem.alloc( 1);
 	m_content.push_back( types::Variant());
-	m_strings.push_back( '\0');
 	m_data.push_back( std::vector<Node>());
 }
 
@@ -134,13 +133,10 @@ void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t 
 
 void TransactionFunctionInput::Structure::openTag( const std::string& tagstr)
 {
-	int mi = (int)m_tagmap->find( tagstr);
-	if (mi == 0) mi = (int)m_tagmap->unused();
-
-	int tagstr_ = m_strings.size();
-	m_strings.append( tagstr);
-	m_strings.push_back( '\0');
-	m_data.back().push_back( Node( 0, mi, tagstr_, 0, 0));
+	int tag_ = (int)m_tagmap->find( tagstr);
+	if (tag_ == 0) tag_ = (int)m_tagmap->unused();
+	int tagstr_ = (int)m_privatetagmap.get( tagstr);
+	m_data.back().push_back( Node( 0, tag_, tagstr_, 0, 0));
 	m_data.push_back( std::vector<Node>());
 }
 
@@ -291,7 +287,7 @@ const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node
 
 const char* TransactionFunctionInput::Structure::tagname( int tagstridx) const
 {
-	return (tagstridx>0) ? (m_strings.c_str() + tagstridx) : 0;
+	return m_privatetagmap.getstr( tagstridx);
 }
 
 bool TransactionFunctionInput::Structure::isequalTag( const std::string& t1, const std::string& t2) const

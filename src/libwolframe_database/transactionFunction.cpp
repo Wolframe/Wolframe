@@ -106,7 +106,7 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	return true;
 }
 
-static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode)
+static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node* selectornode)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 
@@ -130,7 +130,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 			case Path::Next:
 			case Path::Up:
 			{
-				std::vector<Node> param;
+				std::vector<const Node*> param;
 				pi->selectNodes( inputst->structure(), selectornode, param);
 				if (param.size() == 0)
 				{
@@ -138,7 +138,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 				}
 				else
 				{
-					std::vector<Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+					std::vector<const Node*>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
 					for (; gi != ge; ++gi)
 					{
 						if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
@@ -158,7 +158,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 	}
 }
 
-static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::Node>& rootnodearray)
+static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<const TransactionFunctionInput::Structure::Node*>& rootnodearray)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 	std::size_t fidx = startfidx;
@@ -181,8 +181,8 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		}
 
 		// Select the nodes to execute the command with:
-		std::vector<Node> nodearray;
-		std::vector<Node>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
+		std::vector<const Node*> nodearray;
+		std::vector<const Node*>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			ci->selector().selectNodes( this_->structure(), *ni, nodearray);
@@ -197,12 +197,12 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 			{
 				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
 			}
-			std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<const Node*>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name());
 				bindArguments( rt, *ci, this_, *vi);
-				std::vector<Node> opnodearray;
+				std::vector<const Node*> opnodearray;
 				opnodearray.push_back( *vi);
 				getOperationInput( this_, rt, fidx+1, ci->level(), ci+1, ca, opnodearray);
 			}
@@ -213,7 +213,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		else
 		{
 			// Call DatabaseCommand: For each selected node do expand the function call arguments:
-			std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<const Node*>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name());
@@ -228,7 +228,7 @@ TransactionInput TransactionFunctionInput::get() const
 	TransactionInput rt;
 	std::vector<DatabaseCommand>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
 
-	std::vector<Structure::Node> nodearray;
+	std::vector<const Structure::Node*> nodearray;
 	nodearray.push_back( structure().root());
 	getOperationInput( this, rt, 0, 1, ci, ce, nodearray);
 	return rt;

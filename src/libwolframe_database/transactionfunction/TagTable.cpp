@@ -38,6 +38,20 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+TagTable::TagTable( bool case_sensitive_)
+	:m_case_sensitive(case_sensitive_),m_size(0)
+{
+	m_strings.push_back('\0');
+	m_strings.push_back( '\0');
+}
+
+TagTable::TagTable( const TagTable& o)
+	:m_case_sensitive(o.m_case_sensitive)
+	,m_size(o.m_size)
+	,m_map(o.m_map)
+	,m_strings(o.m_strings)
+{}
+
 int TagTable::find( const char* tag, std::size_t tagsize) const
 {
 	const std::string tagnam( tag, tagsize);
@@ -54,17 +68,20 @@ int TagTable::find( const std::string& tagnam) const
 
 int TagTable::get( const std::string& tagnam)
 {
+	int rt;
 	std::string key = m_case_sensitive?tagnam:boost::algorithm::to_lower_copy(tagnam);
 	std::map< std::string, int>::const_iterator ii = m_map.find( key);
 	if (ii == m_map.end())
 	{
-		m_map[ key] = ++m_size;
-		return m_size;
+		rt = m_map[ key] = m_strings.size();
+		m_strings.append( tagnam);
+		m_strings.push_back( '\0');
 	}
 	else
 	{
-		return ii->second;
+		rt = ii->second;
 	}
+	return rt;
 }
 
 int TagTable::get( const char* tag, std::size_t tagsize)
@@ -73,18 +90,14 @@ int TagTable::get( const char* tag, std::size_t tagsize)
 	return get( tagstr);
 }
 
-int TagTable::unused() const
-{
-	return m_size +1;
-}
-
 std::map<int,int> TagTable::insert( const TagTable& o)
 {
 	std::map<int,int> rt;
 	std::map< std::string, int>::const_iterator oi = o.m_map.begin(), oe = o.m_map.end();
 	for (; oi != oe; ++oi)
 	{
-		rt[ oi->second] = get( oi->first);
+		int ref = get( oi->first);
+		rt[ oi->second] = ref;
 	}
 	return rt;
 }

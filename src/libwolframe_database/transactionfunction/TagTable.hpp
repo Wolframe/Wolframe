@@ -43,25 +43,25 @@ namespace db {
 class TagTable
 {
 public:
-	explicit TagTable( bool case_sensitive_)
-		:m_case_sensitive(case_sensitive_),m_size(0){}
-	TagTable( const TagTable& o)
-		:m_case_sensitive(o.m_case_sensitive),m_size(o.m_size),m_map(o.m_map){}
+	explicit TagTable( bool case_sensitive_);
+	TagTable( const TagTable& o);
 
 	int find( const char* tag, std::size_t tagsize) const;
 	int find( const std::string& tagstr) const;
 	int get( const std::string& tagstr);
 	int get( const char* tag, std::size_t tagsize);
-	int unused() const;
 
-	bool case_sensitive() const	{return m_case_sensitive;}
+	const char* getstr( int tg) const	{return (tg<=0)?0:m_strings.c_str()+tg;}
+	bool case_sensitive() const		{return m_case_sensitive;}
 
 	std::map<int,int> insert( const TagTable& o);
+	int unused() const			{return 1;}
 
 private:
 	bool m_case_sensitive;
 	int m_size;
 	std::map< std::string, int> m_map;
+	std::string m_strings;
 };
 
 }}//namespace

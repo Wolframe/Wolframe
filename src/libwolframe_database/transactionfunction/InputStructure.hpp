@@ -127,9 +127,9 @@ public://create structure:
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
 	std::vector<types::Variant> m_content;			//< tree values
-	const TagTable* m_tagmap;				//< map names to node tag identifiers
+	const TagTable* m_tagmap;				//< map names used in selections to node tag identifiers
+	TagTable m_privatetagmap;				//< map unused names to node tag identifiers
 	Node m_root;						//< root node
-	std::string m_strings;					//< tags used in input
 
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
 	BuildNodeStruct m_data;					//< data structure for incomplete tree (under construction). empty when complete
