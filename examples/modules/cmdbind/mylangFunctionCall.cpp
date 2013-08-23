@@ -3,6 +3,18 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+mylang::Context::Context( )
+{
+}
+
+std::vector<std::string> mylang::Context::loadProgram( const std::string& name)
+{
+	std::vector<std::string> rt;
+	// TODO: myLang has sort of entry points which are added here to the list
+	// of entry points (functions)?
+	return rt;
+}
+
 mylang::Structure* mylang::Structure::addSubstruct( const types::Variant& elemid_)
 {
 	return 0;
