@@ -41,7 +41,7 @@ void PreProcessCommand::call( TransactionFunctionInput::Structure& structure)
 {
 	// Select the nodes to execute the command with:
 	typedef TransactionFunctionInput::Structure::Node Node;
-	std::vector<Node> nodearray;
+	std::vector<const Node*> nodearray;
 	m_selector.selectNodes( structure, structure.root(), nodearray);
 }
 

@@ -52,16 +52,13 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_content(o.m_content)
 	,m_tagmap(o.m_tagmap)
-	,m_rootidx(o.m_rootidx)
-	,m_rootsize(o.m_rootsize)
+	,m_root(o.m_root)
 	,m_strings(o.m_strings)
 	,m_data(o.m_data)
 	{}
 
 TransactionFunctionInput::Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap)
-	,m_rootidx(0)
-	,m_rootsize(0)
 {
 	m_nodemem.alloc( 1);
 	m_content.push_back( types::Variant());
@@ -96,7 +93,7 @@ const std::string TransactionFunctionInput::Structure::tostring() const
 {
 	std::vector <std::pair< std::size_t, std::size_t> > stk;
 	std::ostringstream rt;
-	stk.push_back( std::pair< std::size_t, std::size_t>( m_rootsize, m_rootidx));
+	stk.push_back( std::pair< std::size_t, std::size_t>( m_root.m_elementsize, m_root.childidx()));
 	while (stk.size())
 	{
 		std::size_t ii = stk.back().first;
@@ -149,9 +146,11 @@ void TransactionFunctionInput::Structure::openTag( const std::string& tagstr)
 
 void TransactionFunctionInput::Structure::createRootNode()
 {
-	m_rootsize = m_data.back().size();
-	m_rootidx = m_nodemem.alloc( m_rootsize);
-	Node* nd = &m_nodemem[ m_rootidx];
+	std::size_t rootsize = m_data.back().size();
+	std::size_t rootidx = m_nodemem.alloc( rootsize);
+	Node* nd = &m_nodemem[ rootidx];
+	m_root.m_elementsize = rootsize;
+	m_root.m_element = Node::ref_element(rootidx);
 	std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
 	for (; itr != end; ++itr, ++nd)
 	{
@@ -171,17 +170,18 @@ void TransactionFunctionInput::Structure::closeTag()
 	}
 	createRootNode();
 	m_data.pop_back();
-	m_data.back().back().m_elementsize = m_rootsize;
-	m_data.back().back().m_element = Node::ref_element( m_rootidx);
+	m_data.back().back().m_elementsize = m_root.m_elementsize;
+	m_data.back().back().m_element = m_root.m_element;
 
 	if (m_data.size() == 1)
 	{
 		// top level tag closed, assuming end of structure,
 		// creating root node and set all parent links:
 		createRootNode();
-		for (std::size_t ri=0; ri<m_rootsize; ++ri)
+		std::size_t rootidx = m_root.childidx();
+		for (int ri=0; ri<m_root.m_elementsize; ++ri)
 		{
-			setParentLinks( m_rootidx+ri);
+			setParentLinks( rootidx+ri);
 		}
 	}
 }
@@ -193,9 +193,9 @@ void TransactionFunctionInput::Structure::pushValue( const types::VariantConst& 
 	m_data.back().push_back( Node( 0, 0, 0, 0, Node::val_element( mi)));
 }
 
-void TransactionFunctionInput::Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
+void TransactionFunctionInput::Structure::next( const Node* nd, int tag, std::vector<const Node*>& nextnd) const
 {
-	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
+	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
 	if (nn)
 	{
 		const Node* cd = &m_nodemem[ idx];
@@ -205,16 +205,16 @@ void TransactionFunctionInput::Structure::next( const Node& nd, int tag, std::ve
 			{
 				if (!tag || cd[ii].m_tag == tag)
 				{
-					nextnd.push_back( cd[ii]);
+					nextnd.push_back( cd+ii);
 				}
 			}
 		}
 	}
 }
 
-void TransactionFunctionInput::Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
+void TransactionFunctionInput::Structure::find( const Node* nd, int tag, std::vector<const Node*>& findnd) const
 {
-	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
+	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
 	if (nn)
 	{
 		const Node* cd = &m_nodemem[ idx];
@@ -224,22 +224,22 @@ void TransactionFunctionInput::Structure::find( const Node& nd, int tag, std::ve
 			{
 				if (!tag || cd[ii].m_tag == tag)
 				{
-					findnd.push_back( cd[ii]);
+					findnd.push_back( cd+ii);
 				}
 			}
-			if (nd.childidx())
+			if (nd->childidx())
 			{
-				find( cd[ii], tag, findnd);
+				find( cd+ii, tag, findnd);
 			}
 		}
 	}
 }
 
-void TransactionFunctionInput::Structure::up( const Node& nd, std::vector<Node>& rt) const
+void TransactionFunctionInput::Structure::up( const Node* nd, std::vector<const Node*>& rt) const
 {
-	if (nd.m_parent != 0)
+	if (nd->m_parent != 0)
 	{
-		rt.push_back( m_nodemem[ nd.m_parent]);
+		rt.push_back( &m_nodemem[ nd->m_parent]);
 	}
 	else
 	{
@@ -247,33 +247,32 @@ void TransactionFunctionInput::Structure::up( const Node& nd, std::vector<Node>&
 	}
 }
 
-TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::root() const
+const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::root() const
 {
-	Node rt( 0, 0, 0, m_rootsize, Node::ref_element(m_rootidx));
+	return &m_root;
+}
+
+const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::child( const Node* nd, int idx) const
+{
+	if (idx >= nd->m_elementsize) return 0;
+	const Node* rt = &m_nodemem[ nd->childidx() + idx];
 	return rt;
 }
 
-const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::child( const Node& nd, int idx) const
+const types::Variant* TransactionFunctionInput::Structure::contentvalue( const Node* nd) const
 {
-	if (idx >= nd.m_elementsize) return 0;
-	const Node* rt = &m_nodemem[ nd.childidx() + idx];
-	return rt;
-}
-
-const types::Variant* TransactionFunctionInput::Structure::contentvalue( const Node& nd) const
-{
-	if (!nd.m_tag)
+	if (!nd->m_tag)
 	{
-		std::size_t validx = nd.valueidx();
+		std::size_t validx = nd->valueidx();
 		if (validx) return &m_content.at( validx);
 	}
 	return 0;
 }
 
-const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
+const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node* nd) const
 {
 	const types::Variant* rt = 0;
-	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
+	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
 	if (nn)
 	{
 		const Node* cd = &m_nodemem[ idx];
@@ -329,7 +328,7 @@ public:
 		,m_noderenames(o.m_noderenames)
 		,m_stack(o.m_stack){}
 
-	Filter( const TransactionFunctionInput::Structure* structure_, const Node& node_, const std::vector<NodeAssignment>& noderenames_)
+	Filter( const TransactionFunctionInput::Structure* structure_, const Node* node_, const std::vector<NodeAssignment>& noderenames_)
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
 		,m_structure(structure_)
 		,m_noderenames(noderenames_)
@@ -361,7 +360,7 @@ public:
 			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
 			{
 				++m_stack.back().idx;
-				m_stack.push_back( *chld);
+				m_stack.push_back( chld);
 				type = TypedInputFilter::OpenTag;
 
 				if (m_stack.size() == 1 && !m_noderenames.empty())
@@ -381,7 +380,7 @@ public:
 			}
 			else
 			{
-				std::size_t validx = m_stack.back().node.valueidx();
+				std::size_t validx = m_stack.back().node->valueidx();
 				if (validx)
 				{
 					++m_stack.back().idx;
@@ -397,7 +396,7 @@ public:
 private:
 	struct StackElement
 	{
-		Node node;
+		const Node* node;
 		int idx;
 		ElementType lasttype;
 
@@ -405,7 +404,7 @@ private:
 			:idx(0),lasttype(TypedInputFilter::CloseTag){}
 		StackElement( const StackElement& o)
 			:node(o.node),idx(o.idx),lasttype(o.lasttype){}
-		StackElement( const Node& node_)
+		StackElement( const Node* node_)
 			:node(node_),idx(0),lasttype(TypedInputFilter::CloseTag){}
 	};
 
@@ -415,9 +414,14 @@ private:
 };
 }//namespace
 
-langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const Node& node, const std::vector<NodeAssignment>& noderenames) const
+langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const Node* node, const std::vector<NodeAssignment>& noderenames) const
 {
-	return new Filter( this, node, noderenames);
+	langbind::TypedInputFilter* rt = new Filter( this, node, noderenames);
+	if (!m_tagmap->case_sensitive())
+	{
+		rt->setFlags( langbind::TypedInputFilter::PropagateNoCase);
+	}
+	return rt;
 }
 
 

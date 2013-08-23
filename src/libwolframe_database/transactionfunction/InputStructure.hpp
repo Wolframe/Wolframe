@@ -96,13 +96,13 @@ public:
 	};
 
 public://visit structure:
-	Node root() const;
-	const Node* child( const Node& nd, int idx) const;
-	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
-	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
-	void up( const Node& nd, std::vector<Node>& rt) const;
-	const types::Variant* nodevalue( const Node& nd) const;
-	const types::Variant* contentvalue( const Node& nd) const;
+	const Node* root() const;
+	const Node* child( const Node* nd, int idx) const;
+	void next( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	void find( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	void up( const Node* nd, std::vector<const Node*>& rt) const;
+	const types::Variant* nodevalue( const Node* nd) const;
+	const types::Variant* contentvalue( const Node* nd) const;
 
 	///\brief Get structure as string
 	const std::string tostring() const;
@@ -113,7 +113,7 @@ public://visit structure:
 
 	typedef std::pair<std::string,std::string> NodeAssignment;
 	///\brief Create an input filter for a node to pass it to a function
-	langbind::TypedInputFilter* createFilter( const Node& nodeidx_, const std::vector<NodeAssignment>& noderenames_) const;
+	langbind::TypedInputFilter* createFilter( const Node* node_, const std::vector<NodeAssignment>& noderenames_) const;
 
 public://create structure:
 	void setParentLinks( std::size_t mi);
@@ -128,9 +128,8 @@ private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
 	std::vector<types::Variant> m_content;			//< tree values
 	const TagTable* m_tagmap;				//< map names to node tag identifiers
-	std::size_t m_rootidx;					//< root index of the tree
-	std::size_t m_rootsize;					//< number of children of the root node
-	std::string m_strings;
+	Node m_root;						//< root node
+	std::string m_strings;					//< tags used in input
 
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
 	BuildNodeStruct m_data;					//< data structure for incomplete tree (under construction). empty when complete

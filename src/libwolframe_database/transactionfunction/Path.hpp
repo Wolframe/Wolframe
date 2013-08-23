@@ -83,7 +83,7 @@ public:
 	const std::string& resultReferenceSymbol() const;
 	int resultReferenceScope() const;
 	const std::string& constantReference() const;
-	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
+	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node* nd, std::vector<const TransactionFunctionInput::Structure::Node*>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}

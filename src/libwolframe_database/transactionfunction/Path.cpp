@@ -254,10 +254,10 @@ std::string Path::tostring() const
 	throw std::logic_error( "internal: illegal state in Path::tostring()");
 }
 
-void Path::selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const
+void Path::selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node* nd, std::vector<const TransactionFunctionInput::Structure::Node*>& ar) const
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
-	std::vector<Node> ar1,ar2;
+	std::vector<const Node*> ar1,ar2;
 	ar1.push_back( nd);
 
 	// [B.1] Find selected nodes:
@@ -265,7 +265,7 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 	for (; si != se; ++si)
 	{
 		ar2.clear();
-		std::vector<Node>::const_iterator ni = ar1.begin(), ne = ar1.end();
+		std::vector<const Node*>::const_iterator ni = ar1.begin(), ne = ar1.end();
 		for (; ni != ne; ++ni)
 		{
 			switch (si->m_type)
