@@ -186,7 +186,7 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			}
 			if (!cfgid_set)
 			{
-				throw std::runtime_error( std::string( "no command handler found for comman handler program (") + *gi + ")");
+				throw std::runtime_error( std::string( "no command handler found for command handler program (") + *gi + ")");
 			}
 		}
 		gi = m_programs.begin(), ge = m_programs.end();
