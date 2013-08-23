@@ -276,13 +276,15 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, type
 	return true;
 }
 
-void DDLStructSerializer::setFlags( Flags f)
+bool DDLStructSerializer::setFlags( Flags f)
 {
-	langbind::TypedInputFilter::setFlags( f);
+	bool rt = true;
+	rt &= langbind::TypedInputFilter::setFlags( f);
 	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
 	{
 		m_ctx.setFlags( Context::SerializeWithIndices);
 	}
+	return rt;
 }
 
 DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)

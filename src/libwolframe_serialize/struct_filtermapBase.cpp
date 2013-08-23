@@ -212,13 +212,15 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::
 	return true;
 }
 
-void StructSerializer::setFlags( Flags f)
+bool StructSerializer::setFlags( Flags f)
 {
-	langbind::TypedInputFilter::setFlags( f);
+	bool rt = true;
+	rt &= langbind::TypedInputFilter::setFlags( f);
 	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
 	{
 		m_ctx.setFlags( Context::SerializeWithIndices);
 	}
+	return rt;
 }
 
 class OneElementTypedInputFilter
