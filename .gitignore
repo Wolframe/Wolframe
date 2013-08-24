@@ -81,17 +81,10 @@ examples/pecho/tests/pechoHandlerTest
 examples/iproc/iprocd
 examples/tproc/tprocd
 tests/expect/primary.db
-clients/qt/qtclient
 clients/cmdline/wolframec
-moc_*.cpp
-clients/qt/ui_*.h
-clients/qt/qrc_*.cpp
-clients/qt/.history
 clients/Android/local.properties
 clients/Android/Wolframe.keystore
 clients/cli/wolfcli
-tests/db/sdsqliteTest
-tests/db/sqlite3ppTest
 lua/src/lua
 lua/src/luac
 docs/Tutorial.epub
@@ -101,7 +94,6 @@ docs/WolfBook.epub
 docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
-clients/wt/wtclient
 src/primary.db
 tests/libxslt/testlibxslt1
 tests/testMethodMemberPointerTemplate
@@ -173,10 +165,7 @@ tests/dotnet/interop/WolfCLR/ipch/
 sqlite3/sqlite3
 tests/boost-locale/boostLocaleTest
 tests/testArrayDoublingAllocator
-clients/qt/Makefile
-clients/qt/data.db
 geany.c++.tags
-clients/qtclient-build-desktop/
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal
 examples/demo/first/database/tree.db
@@ -189,7 +178,4 @@ examples/demo/lgtree/server/database/lgtree.db
 *.rcc
 *.gcno
 *.gcda
-clients/qt/qtclient.pro.user
-clients/qtSkeleton/qtSkeleton.pro.user*
-clients/qt/tests/functions/testDataTree
-clients/qtSkeleton/plugins/plugins.pro.user*
+tests/python/embed
