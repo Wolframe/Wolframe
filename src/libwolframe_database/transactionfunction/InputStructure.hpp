@@ -60,6 +60,7 @@ public:
 		int m_parent;
 		int m_tag;
 		int m_tagstr;
+		int m_arrayindex;
 		int m_elementsize;
 		int m_element;
 
@@ -67,6 +68,7 @@ public:
 			:m_parent(0)
 			,m_tag(0)
 			,m_tagstr(0)
+			,m_arrayindex(-1)
 			,m_elementsize(0)
 			,m_element(0){}
 
@@ -74,6 +76,7 @@ public:
 			:m_parent(o.m_parent)
 			,m_tag(o.m_tag)
 			,m_tagstr(o.m_tagstr)
+			,m_arrayindex(o.m_arrayindex)
 			,m_elementsize(o.m_elementsize)
 			,m_element(o.m_element){}
 
@@ -81,6 +84,7 @@ public:
 			:m_parent(parent_)
 			,m_tag(tag_)
 			,m_tagstr(tagstr_)
+			,m_arrayindex(-1)
 			,m_elementsize(size_)
 			,m_element(element_){}
 
@@ -117,12 +121,13 @@ public://visit structure:
 
 public://create structure:
 	void setParentLinks( std::size_t mi);
+	void openTag( const types::Variant& tag);
 	void openTag( const char* tag, std::size_t tagsize);
-	void openTag( const std::string& tag);
 	void closeTag();
 	void createRootNode();
 	void pushValue( const types::VariantConst& val);
 	void check() const;
+	bool isArrayNode() const;
 
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes

@@ -65,7 +65,7 @@ public:
 	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
 
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
-	virtual void setFlags( Flags f);
+	virtual bool setFlags( Flags f);
 
 private:
 	const types::VariantStruct* m_st;

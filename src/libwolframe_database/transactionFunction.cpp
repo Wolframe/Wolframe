@@ -86,16 +86,16 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	switch (type)
 	{
 		case langbind::TypedInputFilter::OpenTag:
-			m_structure->openTag( element.tostring());
+			m_structure->openTag( element);
 		break;
 		case langbind::TypedInputFilter::CloseTag:
 			m_structure->closeTag();
 		break;
 		case langbind::TypedInputFilter::Attribute:
-			m_structure->openTag( element.tostring());
+			m_structure->openTag( element);
 		break;
 		case langbind::TypedInputFilter::Value:
-			m_structure->pushValue( element.tostring());
+			m_structure->pushValue( element);
 			if (m_lasttype == langbind::TypedInputFilter::Attribute)
 			{
 				m_structure->closeTag();

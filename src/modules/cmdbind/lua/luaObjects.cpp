@@ -1001,8 +1001,10 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 		}
 		TypedInputFilterR obj = TypedInputFilterR( (*objref)->copy());
 		obj->resetIterator();
-		obj->setFlags( TypedInputFilter::SerializeWithIndices);
-
+		if (!obj->setFlags( TypedInputFilter::SerializeWithIndices))
+		{
+			throw std::runtime_error( "calling table() for object without input structure info");
+		}
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( obj, outp));
 		closure = LuaObject<RedirectFilterClosure>::get( ls, -1);

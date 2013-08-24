@@ -257,8 +257,10 @@ public:
 		m_arg = arg;
 		if (m_interp->needsArrayIndices())
 		{
-			m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
-			//... call this for languages that need arrays to be serialized with indices if available
+			if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
+			{
+				throw std::runtime_error( "calling python without input structure info");
+			}
 		}
 		m_initialized = false;
 		m_initStmStack.clear();

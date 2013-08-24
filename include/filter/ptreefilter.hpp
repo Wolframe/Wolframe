@@ -73,7 +73,7 @@ public:
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
-	virtual void setFlags( Flags f);
+	virtual bool setFlags( Flags f);
 
 private:
 	struct State

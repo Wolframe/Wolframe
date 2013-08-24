@@ -294,6 +294,7 @@ void TransactionFunctionClosure::init( const proc::ProcessorProvider* provider_,
 {
 	m_provider = provider_;
 	m_inputstruct.reset( m_inputstructptr = m_func->getInput());
+	//[+] TMP DISABLED: i->setFlags( TypedInputFilter::SerializeWithIndices);
 	m_input.init( i, m_inputstruct);
 	m_state = 1;
 }

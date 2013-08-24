@@ -194,7 +194,7 @@ public:
 
 	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
-	virtual void setFlags( Flags f);
+	virtual bool setFlags( Flags f);
 
 private:
 	const void* m_ptr;
