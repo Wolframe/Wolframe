@@ -75,7 +75,7 @@ public:
 };
 
 ///\class Structure
-///\brief Data structure for input and output of a 'Mylang' function call
+///\brief Data structure for input and output of a Python function call
 class Structure
 {
 public:

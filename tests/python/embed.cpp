@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#define FUNC_NAME "func"
+#define DIRECT_PARAMS
+
 static const char *pyGetReprStr( PyObject *o )
 {
 	PyObject *repr = PyObject_Repr( o );
@@ -51,7 +54,7 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
-	PyObject *f = PyObject_GetAttrString( module, "func" );
+	PyObject *f = PyObject_GetAttrString( module, FUNC_NAME );
 	if( !f || !PyCallable_Check( f ) ) {
 		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
 		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
@@ -64,10 +67,62 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
-	PyObject *value = PyObject_CallObject( f, NULL );
+	int argInt = 47;
+	double argDouble = 4.711;
+
+#ifdef DIRECT_PARAMS
+	
+	// build argument list (old style, but with 3.x functions)
+	// this may be better for the iterator style of structure we
+	// have in Wolframe
+
+	PyObject *args = PyTuple_New( 2 );
+	PyObject *arg1 = PyLong_FromLong( argInt );
+	PyObject *arg2 = PyFloat_FromDouble( argDouble );
+	PyTuple_SetItem( args, 0, arg1 );
+	PyTuple_SetItem( args, 1, arg2 );
+
+#else
+		
+	// build argument list (method style)
+	// more high-level
+
+	PyObject *args = Py_BuildValue("(if)", argInt, argDouble );
+	if( !args ) {
+		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
+		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
+		std::cerr << "Unable to build arguments for functions" << std::endl;
+		std::cerr << "Exception type: " << pyGetReprStr( exceptionType ) << std::endl;
+		std::cerr << "Exception value: " << pyGetReprStr( exceptionValue ) << std::endl;
+		std::cerr << "Exception traceback: " << pyGetReprStr( exceptionTraceBack ) << std::endl;
+		Py_DECREF( module );
+		Py_Finalize( );
+		return 1;
+	}
+
+#endif
+
+	// call function
+	PyObject *value = PyObject_CallObject( f, args );
+	if( !value ) {
+		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
+		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
+		std::cerr << "Unable to call function '" << FUNC_NAME << "'" << std::endl;
+		std::cerr << "Exception type: " << pyGetReprStr( exceptionType ) << std::endl;
+		std::cerr << "Exception value: " << pyGetReprStr( exceptionValue ) << std::endl;
+		std::cerr << "Exception traceback: " << pyGetReprStr( exceptionTraceBack ) << std::endl;
+		Py_DECREF( args );
+		Py_DECREF( f );
+		Py_DECREF( module );
+		Py_Finalize( );
+		return 1;
+	}
+	
+	// get result of function
 	puts( pyGetReprStr( value ) );
 		
 	// clean up objects
+	Py_DECREF( args );
 	Py_DECREF( f );
 	Py_DECREF( module );
 

@@ -10,6 +10,9 @@ python::Context::Context( )
 std::vector<std::string> python::Context::loadProgram( const std::string& prgfile)
 {
 	std::vector<std::string> rt;
+	// TODO: load all public functions from python module
+	// problem, what to do with methods of objects? where to
+	// create the objects?
 	//~ langbind::LuaScript script( prgfile);
 	//~ std::vector<std::string>::const_iterator ni = script.functions().begin(), ne = script.functions().end();
 	//~ for (; ni != ne; ++ni)

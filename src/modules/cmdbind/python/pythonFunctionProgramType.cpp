@@ -431,40 +431,6 @@ private:
 	std::string m_name;
 };
 
-class LuaProgramType
-	:public prgbind::Program
-{
-public:
-	LuaProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~LuaProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".lua";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_context.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new LuaFormFunction( &m_context, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	LuaScriptContext m_context;
-};
 }//anonymous namespace
-
-prgbind::Program* langbind::createLuaProgramType()
-{
-	return new LuaProgramType();
-}
 
 #endif
