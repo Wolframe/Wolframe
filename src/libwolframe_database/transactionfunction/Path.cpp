@@ -166,7 +166,7 @@ Path::Path( const Call::Param& param, const TransactionFunctionDescription::Vari
 }
 
 Path::Path( const Path& o)
-	:m_path(o.m_path){}
+	:m_path(o.m_path),m_content(o.m_content){}
 
 
 void Path::rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
@@ -295,6 +295,14 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 		ar1 = ar2;
 	}
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
+}
+
+ConstantReferencePath::ConstantReferencePath( const std::string& value)
+{
+	Element elem;
+	elem.m_type = Constant;
+	m_content = value;
+	m_path.push_back( elem);
 }
 
 

@@ -280,13 +280,46 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	:m_resultstruct( new TransactionFunctionOutput::ResultStructure())
 	,m_tagmap(description.casesensitive)
 {
-	typedef TransactionFunctionDescription::OperationStep::Error Error;
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::ProcessingStep ProcessingStep;
+	typedef TransactionFunctionDescription::OperationStep OperationStep;
+	typedef OperationStep::Call Call;
 	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	VariableTable varmap;
 
+	// Compile the preprocessing commands:
+	{
+		std::vector<ProcessingStep>::const_iterator pi = description.preprocs.begin(), pe = description.preprocs.end();
+		for (; pi != pe; ++pi)
+		{
+			std::size_t eidx = pi - description.preprocs.begin();
+			try
+			{
+				Path selector( pi->selector_FOREACH, &m_tagmap);
+				std::vector<PreProcessCommand::Argument> args;
+				std::vector<ProcessingStep::Argument>::const_iterator ai = pi->args.begin(), ae = pi->args.end();
+				for (; ai != ae; ++ai)
+				{
+					switch (ai->type)
+					{
+						case ProcessingStep::Argument::Selector:
+							args.push_back( PreProcessCommand::Argument( ai->name, Path( ai->value, &m_tagmap)));
+							break;
+						case ProcessingStep::Argument::Constant:
+							args.push_back( PreProcessCommand::Argument( ai->name, ConstantReferencePath( ai->value)));
+							break;
+					}
+				}
+				m_preprocs.push_back( PreProcessCommand( pi->functionname, selector, args, pi->path_INTO));
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw ProcessingStep::Error( eidx, e.what());
+			}
+		}
+	}
+	// Compile the database commands:
 	int blkidx;
-	std::vector<TransactionFunctionDescription::OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
+	std::vector<OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
 	for (; di != de; ++di)
 	{
 		std::size_t eidx = di - description.steps.begin();
@@ -358,15 +391,15 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
 				if (!di->hints.empty())
 				{
-					throw Error( eidx, "No ON ERROR hints supported for call of OPERATION");
+					throw OperationStep::Error( eidx, "No ON ERROR hints supported for call of OPERATION");
 				}
 				if (di->nonempty)
 				{
-					throw Error( eidx, "NONEMTY not supported for call of OPERATION");
+					throw OperationStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
 				}
 				if (di->unique)
 				{
-					throw Error( eidx, "UNIQUE not supported for call of OPERATION");
+					throw OperationStep::Error( eidx, "UNIQUE not supported for call of OPERATION");
 				}
 				if (!di->path_INTO.empty() && !di->path_INTO[0].empty( ) )
 				{
@@ -414,7 +447,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw Error( eidx, e.what());
+			throw OperationStep::Error( eidx, e.what());
 		}
 	}
 	// Create substructure context for RESULT INTO instructions:

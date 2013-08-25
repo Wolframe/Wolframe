@@ -375,6 +375,83 @@ static TransactionFunctionDescription::VariableValue
 	throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
 }
 
+static TransactionFunctionDescription::ProcessingStep::Argument
+	parseProcessingStepArgument( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	typedef TransactionFunctionDescription::ProcessingStep::Argument Argument;
+	Argument rt;
+	std::string tok;
+	char ch;
+	bool nameDefined = false;
+
+	ch = gotoNextToken( langdescr, si, se);
+	if (isAlphaNumeric( ch))
+	{
+		parseNextToken( langdescr, tok, si, se);
+		ch = gotoNextToken( langdescr, si, se);
+		if (ch == '=')
+		{
+			nameDefined = true;
+			rt.name = tok;
+			++si;
+			ch = gotoNextToken( langdescr, si, se);
+		}
+		else
+		{
+			rt.value.append( tok);
+		}
+	}
+	if (ch == '\'' || ch == '\"')
+	{
+		parseNextToken( langdescr, rt.value, si, se);
+		rt.type = Argument::Constant;
+	}
+	else
+	{
+		rt.type = Argument::Selector;
+		for (;;)
+		{
+			ch = gotoNextToken( langdescr, si, se);
+			if (ch == ',' || ch == ')') break;
+			if (!ch) throw std::runtime_error( "unexpected end of function call");
+
+			ch = parseNextToken( langdescr, tok, si, se);
+
+			if (ch == '/' || ch == '*' || ch == '.')
+			{
+				rt.type = Argument::Selector;
+				rt.value.push_back( ch);
+			}
+			else if (isAlphaNumeric( ch))
+			{
+				if (!nameDefined) rt.name = tok;
+				rt.value.append( tok);
+			}
+			else
+			{
+				throw std::runtime_error( "illegal token in path parameter of preprocesing command");
+			}
+		}
+	}
+	return rt;
+}
+
+static std::vector<TransactionFunctionDescription::ProcessingStep::Argument>
+	parseProcessingStepArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	typedef TransactionFunctionDescription::ProcessingStep::Argument Argument;
+	std::vector<Argument> rt;
+
+	for (;;)
+	{
+		char ch = gotoNextToken( langdescr, si, se);
+		if (ch == ')' || ch == '\0') break;
+
+		rt.push_back( parseProcessingStepArgument( langdescr, si, se));
+	}
+	return rt;
+}
+
 namespace {
 struct Operation
 {
@@ -388,6 +465,7 @@ struct Operation
 	bool isTransaction;
 	TransactionFunctionDescription description;
 	std::vector<std::string::const_iterator> callstartar;
+	std::vector<std::string::const_iterator> pprcstartar;
 	int embstm_index;
 };
 }// anonymous namespace
@@ -447,6 +525,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
 				TransactionFunctionDescription::OperationStep opstep;
+				TransactionFunctionDescription::ProcessingStep prcstep;
 				unsigned int mask = 0;
 
 				while (parseNextToken( langdescr, tok, si, se))
@@ -465,9 +544,9 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						std::string authfunction;
 						std::string authresource;
 
-						if (isTransaction)
+						if (!isTransaction)
 						{
-							throw ERROR( si, "Cannot define AUTHORIZE in operation. Only allowed as TRANSACTION definition attribute");
+							throw ERROR( si, "Cannot define AUTHORIZE in OPERATION. Only allowed as TRANSACTION definition attribute");
 						}
 						ch = gotoNextToken( langdescr, si, se);
 						if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
@@ -497,15 +576,118 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						++si;
 						operation.description.auth.init( authfunction, authresource);
 					}
+					else if (boost::algorithm::iequals( tok, "PREPROCESS"))
+					{
+						if (!isTransaction)
+						{
+							throw ERROR( si, "Cannot define PREPROCESS in OPERATION. Only allowed in TRANSACTION definition");
+						}
+						mask = 0;
+						prcstep.clear();
+
+						if (!parseNextToken( langdescr, tok, si, se)
+						||  !boost::algorithm::iequals( tok, "BEGIN"))
+						{
+							throw ERROR( si, "BEGIN expected after PREPROCESS");
+						}
+						while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
+						{
+							while (operation.pprcstartar.size() <= operation.description.preprocs.size())
+							{
+								operation.pprcstartar.push_back( si);
+							}
+							if (ch == ';')
+							{
+								if (mask)
+								{
+									operation.description.preprocs.push_back( prcstep);
+									prcstep.clear();
+									mask = 0;
+								}
+							}
+							else if (g_optab[ch])
+							{
+								throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
+							}
+							else if (ch == '\'' || ch == '\"')
+							{
+								throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead string");
+							}
+							if (boost::algorithm::iequals( tok, "END"))
+							{
+								if (mask != 0)
+								{
+									throw std::runtime_error( "preprocessing command not terminated with ';'");
+								}
+								break;
+							}
+							else if (boost::algorithm::iequals( tok, "FOREACH"))
+							{
+								if (0 != (mask & 0x1))
+								{
+									throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
+								}
+								mask |= 0x1;
+
+								ch = utils::parseNextToken( prcstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
+								if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
+							}
+							else if (boost::algorithm::iequals( tok, "INTO"))
+							{
+								if (0 != (mask & 0x2))
+								{
+									throw ERROR( si, "function result (INTO ..) specified twice in a command");
+								}
+								mask |= 0x2;
+
+								prcstep.path_INTO = parse_INTO_path( langdescr, si, se);
+							}
+							else if (boost::algorithm::iequals( tok, "DO"))
+							{
+								if (0 != (mask & 0x4))
+								{
+									throw ERROR( si, "function call (DO ..) specified twice in a command");
+								}
+								mask |= 0x4;
+
+								ch = parseNextToken( langdescr, prcstep.functionname, si, se);
+								if (!isAlphaNumeric( ch))
+								{
+									throw std::runtime_error( "identifier expected for preprocessing function name after DO");
+								}
+								ch = gotoNextToken( langdescr, si, se);
+								if (ch != '(')
+								{
+									throw std::runtime_error( "'(' expected after preprocessing function name");
+								}
+								++si;
+								prcstep.args = parseProcessingStepArguments( langdescr, si, se);
+								ch = gotoNextToken( langdescr, si, se);
+								if (ch != ')')
+								{
+									throw std::runtime_error( "')' expected after preprocessing function arguments");
+								}
+								++si;
+							}
+							else
+							{
+								throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
+							}
+						}
+						parseNextToken( langdescr, tok, si, se);
+					}
+					else if (!boost::algorithm::iequals( tok, "BEGIN"))
+					{
+						throw ERROR( si, "RESULT, AUTHORIZE, PREPROCESS or BEGIN expected");
+					}
 					else
 					{
 						break;
 					}
 				}
-				if (!boost::algorithm::iequals( tok, "BEGIN"))
-				{
-					throw ERROR( si, "BEGIN (transaction) expected");
-				}
+				mask = 0;
+				opstep.clear();
+
 				while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 				{
 					while (operation.callstartar.size() <= operation.description.steps.size())
@@ -598,6 +780,10 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{
+						if (mask != 0)
+						{
+							throw std::runtime_error( "database command not terminated with ';'");
+						}
 						try
 						{
 							if (blockstk.empty())
@@ -627,6 +813,10 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						catch (const TransactionFunctionDescription::OperationStep::Error& err)
 						{
 							throw ERROR( operation.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+						}
+						catch (const TransactionFunctionDescription::ProcessingStep::Error& err)
+						{
+							throw ERROR( operation.pprcstartar[ err.elemidx], MSG << "error in preprocessing step of transaction: " << err.msg);
 						}
 						catch (const std::runtime_error& err)
 						{
@@ -668,7 +858,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						if (0 != (mask & 0x1))
 						{
-							throw ERROR( si, "selector (FOREACH ..) specified twice in a transaction description");
+							throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
 						}
 						mask |= 0x1;
 
@@ -679,7 +869,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						if (0 != (mask & 0x2))
 						{
-							throw ERROR( si, "function result (INTO ..) specified twice in a transaction description");
+							throw ERROR( si, "function result (INTO ..) specified twice in a command");
 						}
 						mask |= 0x2;
 
@@ -689,7 +879,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						if (0 != (mask & 0x4))
 						{
-							throw ERROR( si, "function call (DO ..) specified twice in a transaction description");
+							throw ERROR( si, "function call (DO ..) specified twice in a command");
 						}
 						mask |= 0x4;
 

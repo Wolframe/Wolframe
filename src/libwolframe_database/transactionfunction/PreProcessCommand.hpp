@@ -46,27 +46,41 @@ namespace db {
 class PreProcessCommand
 {
 public:
+	class Argument
+	{
+	public:
+		Argument(){}
+		Argument( const Argument& o)
+			:name(o.name),selector(o.selector){}
+		Argument( const std::string& name_, const Path& selector_)
+			:name(name_),selector(selector_){}
+
+		std::string name;
+		Path selector;
+	};
+
 	///\brief Default constructor
 	PreProcessCommand(){}
 	///\brief Copy constructor
 	PreProcessCommand( const PreProcessCommand& o)
-		:m_name(o.m_name),m_resultnames(o.m_resultnames),m_selector(o.m_selector),m_arg(o.m_arg){}
+		:m_name(o.m_name),m_selector(o.m_selector),m_args(o.m_args),m_resultpath(o.m_resultpath){}
 	///\brief Constructor
-	PreProcessCommand( const std::string& name_, const std::vector<std::string>& resultnames_, const Path& selector_, const std::vector<Path>& arg_)
-		:m_name(name_),m_resultnames(resultnames_),m_selector(selector_),m_arg(arg_){}
+	PreProcessCommand( const std::string& name_, const Path& selector_, const std::vector<Argument>& args_, const std::vector<std::string>& resultpath_)
+		:m_name(name_),m_selector(selector_),m_args(args_),m_resultpath(resultpath_){}
 
 	const Path& selector() const					{return m_selector;}
-	const std::vector<Path>& arg() const				{return m_arg;}
+	const std::vector<Argument>& args() const			{return m_args;}
 	const std::string& name() const					{return m_name;}
-	const std::vector<std::string>& resultnames() const		{return m_resultnames;}
+	const std::vector<std::string>& resultpath() const		{return m_resultpath;}
 
+	///\brief Call the command on the input 'structure'
 	void call( TransactionFunctionInput::Structure& structure);
 
 private:
 	std::string m_name;						//< name of the function (defined by the provider)
-	std::vector<std::string> m_resultnames;				//< sequence of result names in case of redefining the returned structure element names
-	Path m_selector;						//< FOREACH selector path
-	std::vector<Path> m_arg;					//< function arguments
+	Path m_selector;						//< selector path (FOREACH)
+	std::vector<Argument> m_args;					//< function arguments
+	std::vector<std::string> m_resultpath;				//< path for the result in input (INTO)
 };
 
 }}//namespace

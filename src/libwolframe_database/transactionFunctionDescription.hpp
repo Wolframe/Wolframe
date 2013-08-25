@@ -125,6 +125,7 @@ public:
 				:type(t),value(v){}
 
 			Type type;				//< type of the argument
+			std::string name;			//< name of the argument (where it is mapped to)
 			std::string value;			//< value of the argument
 		};
 
@@ -133,14 +134,36 @@ public:
 		///\brief Copy constructor
 		ProcessingStep( const ProcessingStep& o)
 			:selector_FOREACH(o.selector_FOREACH)
+			,path_INTO(o.path_INTO)
 			,functionname(o.functionname)
-			,args(o.args)
-			,resultnodes(o.resultnodes){}
+			,args(o.args){}
 
-		std::vector<std::string> selector_FOREACH;	//< selector of the nodes to process (FOREACH argument)
-		std::vector<std::string> functionname;		//< name of function to call
+		///\brief Clear content (default constructor)
+		void clear()
+		{
+			selector_FOREACH.clear();
+			path_INTO.clear();
+			functionname.clear();
+			args.clear();
+		}
+
+		///\class Error
+		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
+		struct Error
+		{
+			///\brief Constructor
+			Error( std::size_t elemidx_, const std::string& msg_)
+				:elemidx(elemidx_)
+				,msg(msg_){}
+
+			std::size_t elemidx;
+			std::string msg;
+		};
+
+		std::string selector_FOREACH;			//< selector of the nodes to process (FOREACH argument)
+		std::vector<std::string> path_INTO;		//< parsed argument of INTO (splitted by '/')
+		std::string functionname;			//< name of function to call
 		std::vector<Argument> args;			//< function call arguments
-		std::vector<std::string> resultnodes;		//< names of nodes in the processed input node
 	};
 
 	///\class OperationStep

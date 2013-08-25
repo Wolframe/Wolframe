@@ -96,8 +96,15 @@ private:
 	void parseSelectorPath( const std::string& value, TagTable* tagmap);
 
 private:
+	friend class ConstantReferencePath;
 	std::vector<Element> m_path;
 	std::string m_content;
+};
+
+class ConstantReferencePath :public Path
+{
+public:
+	ConstantReferencePath( const std::string& value);
 };
 
 }}//namespace

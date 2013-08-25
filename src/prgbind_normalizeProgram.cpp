@@ -209,10 +209,10 @@ bool NormalizeProgram::is_mine( const std::string& filename) const
 	std::string ext = utils::getFileExtension( filename);
 	if (boost::algorithm::iequals( ext, ".normalize"))
 	{
-		LOG_WARNING << "Using deprecated file extension for program '.normalize' instead of '.nmap";
+		LOG_WARNING << "Using deprecated file extension for program '.normalize' instead of '.wnmp";
 		return true;
 	}
-	if (boost::algorithm::iequals( ext, ".nmap")) return true;
+	if (boost::algorithm::iequals( ext, ".wnmp")) return true;
 	return false;
 }
 
