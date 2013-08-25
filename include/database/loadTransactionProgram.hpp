@@ -47,7 +47,11 @@ namespace _Wolframe {
 namespace db {
 
 std::vector<std::pair<std::string,TransactionFunctionR> >
-	loadTransactionProgramFile( const std::string& filename, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
+	loadTransactionProgramFile(
+		const std::string& filename,
+		const LanguageDescription* langdescr,
+		std::string& dbsource,
+		types::keymap<std::string>& embeddedStatementMap);
 
 
 }}//namespace

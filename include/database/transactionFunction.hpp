@@ -41,6 +41,7 @@
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
 #include "langbind/authorization.hpp"
+#include "processor/procProvider.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -98,13 +99,14 @@ public:
 	virtual TypedOutputFilter* copy() const		{return new TransactionFunctionInput(*this);}
 
 	virtual bool print( ElementType type, const types::VariantConst& element);
-	void finalize();
+	void finalize( const proc::ProcessorProvider* provider);
 	virtual TransactionInput get() const;
 
 	const Structure& structure() const
 	{
 		return *m_structure.get();
 	}
+
 	const TransactionFunction* func() const
 	{
 		return m_func;

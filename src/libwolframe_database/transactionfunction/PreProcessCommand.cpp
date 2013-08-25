@@ -37,11 +37,41 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void PreProcessCommand::call( TransactionFunctionInput::Structure& structure) const
+void PreProcessCommand::call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const
 {
 	// Select the nodes to execute the command with:
 	typedef TransactionFunctionInput::Structure::Node Node;
+	typedef TransactionFunctionInput::Structure::NodeAssignment NodeAssignment;
 	std::vector<const Node*> nodearray;
 	m_selector.selectNodes( structure, structure.root(), nodearray);
+
+	std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+	for (; ni != ne; ++ni)
+	{
+		// Build the parameter structure:
+		std::vector<NodeAssignment> parameterassign;
+		std::vector<const Node*> parameter;
+		std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
+		std::size_t aidx = 0;
+		for (; ai != ae; ++ai,++aidx)
+		{
+			ai->selector.selectNodes( structure, *ni, parameter);
+			if (parameter.size() != aidx)
+			{
+				if (parameter.size() < aidx)
+				{
+					parameter.push_back( 0);
+				}
+				else
+				{
+					throw std::runtime_error( std::string( "referenced parameter in preprocessor call is not unique for parameter '") + ai->name + "' in call of '" + m_name +"'");
+				}
+			}
+			parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
+		}
+		langbind::TypedInputFilterR argfilter( structure.createFilter( parameterassign));
+
+		// Call the function:
+	}
 }
 

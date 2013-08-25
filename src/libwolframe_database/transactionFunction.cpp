@@ -106,14 +106,14 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	return true;
 }
 
-void TransactionFunctionInput::finalize()
+void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider)
 {
 	m_structure->finalize();
 
 	std::vector<PreProcessCommand>::const_iterator pi = m_func->impl().m_preprocs.begin(), pe = m_func->impl().m_preprocs.end();
 	for (; pi != pe; ++pi)
 	{
-		pi->call( *m_structure);
+		pi->call( provider, *m_structure);
 	}
 }
 

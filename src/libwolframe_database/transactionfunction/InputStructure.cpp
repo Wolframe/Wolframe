@@ -422,6 +422,11 @@ public:
 				setState( langbind::InputFilter::Error, "internal: illegal call of input filter");
 				return false;
 			}
+			while (m_nodeitr != m_nodelist.end() && !m_nodeitr->second)
+			{
+				//... skip empty nodes
+				++m_nodeitr;
+			}
 			if (m_nodeitr == m_nodelist.end())
 			{
 				// ... end of content marker
@@ -434,10 +439,18 @@ public:
 			{
 				// ... skip to next element in the node list
 				m_stack.push_back( m_nodeitr->second);
-				type = TypedInputFilter::OpenTag;
-				element = m_nodeitr->first;
-				++m_nodeitr;
-				return true;
+				if (m_nodeitr->first.size())
+				{
+					// ... only open non empty tags
+					type = TypedInputFilter::OpenTag;
+					element = m_nodeitr->first;
+					++m_nodeitr;
+					return true;
+				}
+				else
+				{
+					++m_nodeitr;
+				}
 			}
 		}
 		for (;;)
@@ -457,13 +470,34 @@ public:
 					}
 				}
 				m_stack.pop_back();
-				type = TypedInputFilter::CloseTag;
-				element.init();
+				if (m_nodeitr != m_nodelist.begin() && (m_nodeitr-1)->first.size())
+				{
+					// ... only close the tag if it was opened
+					type = TypedInputFilter::CloseTag;
+					element.init();
+				}
 				return true;
 			}
 			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
 			{
-				if (flag( SerializeWithIndices))
+				if (tagnamestr[0])
+				{
+					// .. content element (no tag)
+					if (m_structure->child( chld, 0))
+					{
+						// ... has children = structure: only atomic elements allowed as content elements
+						throw std::runtime_error( "structure as content, only atomic elements allowed as content elements");
+					}
+					std::size_t validx = chld->valueidx();
+					if (validx)
+					{
+						++m_stack.back().idx;
+						type = TypedInputFilter::Value;
+						element = m_structure->contentvalue( chld);
+						return true;
+					}
+				}
+				else if (flag( SerializeWithIndices))
 				{
 					// ... We have to add array indices to array element tags
 					if (chld->m_arrayindex >= 0)

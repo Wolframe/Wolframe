@@ -383,9 +383,10 @@ static TransactionFunctionDescription::ProcessingStep::Argument
 	std::string tok;
 	char ch;
 	bool nameDefined = false;
+	bool nameLegal = true;
 
 	ch = gotoNextToken( langdescr, si, se);
-	if (isAlphaNumeric( ch))
+	if (isAlphaNumeric( ch) || ch == '.')
 	{
 		parseNextToken( langdescr, tok, si, se);
 		ch = gotoNextToken( langdescr, si, se);
@@ -419,11 +420,19 @@ static TransactionFunctionDescription::ProcessingStep::Argument
 
 			if (ch == '/' || ch == '*' || ch == '.')
 			{
-				rt.type = Argument::Selector;
+				if (ch == '.' && !nameDefined)
+				{
+					rt.name = ".";
+				}
+				else
+				{
+					nameLegal = false;
+				}
 				rt.value.push_back( ch);
 			}
 			else if (isAlphaNumeric( ch))
 			{
+				nameLegal = true;
 				if (!nameDefined) rt.name = tok;
 				rt.value.append( tok);
 			}
@@ -431,6 +440,14 @@ static TransactionFunctionDescription::ProcessingStep::Argument
 			{
 				throw std::runtime_error( "illegal token in path parameter of preprocesing command");
 			}
+		}
+		if (!nameDefined && !nameLegal)
+		{
+			throw std::runtime_error( "illegal token in path parameter of preprocesing command");
+		}
+		if (rt.name == ".")
+		{
+			rt.name.clear();
 		}
 	}
 	return rt;
@@ -939,7 +956,11 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 
 std::vector<std::pair<std::string,TransactionFunctionR> >
-	_Wolframe::db::loadTransactionProgramFile( const std::string& filename, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+	_Wolframe::db::loadTransactionProgramFile(
+		const std::string& filename,
+		const LanguageDescription* langdescr,
+		std::string& dbsource,
+		types::keymap<std::string>& embeddedStatementMap)
 {
 	try
 	{

@@ -35,6 +35,7 @@
 #ifndef _DATABASE_TRANSACTION_FUNCTION_PRE_PROCESS_COMMAND_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_PRE_PROCESS_COMMAND_HPP_INCLUDED
 #include "transactionfunction/Path.hpp"
+#include "processor/procProvider.hpp"
 #include <string>
 #include <vector>
 
@@ -75,7 +76,7 @@ public:
 	const std::vector<std::string>& resultpath() const		{return m_resultpath;}
 
 	///\brief Call the command on the input 'structure'
-	void call( TransactionFunctionInput::Structure& structure) const;
+	void call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const;
 
 private:
 	std::string m_name;						//< name of the function (defined by the provider)
