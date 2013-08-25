@@ -475,29 +475,12 @@ public:
 					// ... only close the tag if it was opened
 					type = TypedInputFilter::CloseTag;
 					element.init();
+					return true;
 				}
-				return true;
 			}
 			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
 			{
-				if (tagnamestr[0])
-				{
-					// .. content element (no tag)
-					if (m_structure->child( chld, 0))
-					{
-						// ... has children = structure: only atomic elements allowed as content elements
-						throw std::runtime_error( "structure as content, only atomic elements allowed as content elements");
-					}
-					std::size_t validx = chld->valueidx();
-					if (validx)
-					{
-						++m_stack.back().idx;
-						type = TypedInputFilter::Value;
-						element = m_structure->contentvalue( chld);
-						return true;
-					}
-				}
-				else if (flag( SerializeWithIndices))
+				if (flag( SerializeWithIndices))
 				{
 					// ... We have to add array indices to array element tags
 					if (chld->m_arrayindex >= 0)
