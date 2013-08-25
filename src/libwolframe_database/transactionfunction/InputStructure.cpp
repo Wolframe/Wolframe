@@ -133,7 +133,6 @@ void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t 
 
 void TransactionFunctionInput::Structure::openTag( const types::Variant& tag)
 {
-	///[+] TMP DISABLED: [-] std::cout << "OPEN TAG " << tag << std::endl;
 	if (tag.type() == types::Variant::string_)
 	{
 		std::string tagstr( tag.tostring());
@@ -200,7 +199,6 @@ void TransactionFunctionInput::Structure::createRootNode()
 
 void TransactionFunctionInput::Structure::closeTag()
 {
-	///[+] TMP DISABLED: [-] std::cout << "CLOSE TAG (" << m_data.size() << ") " << std::endl;
 	if (m_data.size() == 1)
 	{
 		throw std::runtime_error( "tags in input not balanced");
@@ -213,18 +211,19 @@ void TransactionFunctionInput::Structure::closeTag()
 		std::vector<Node>::const_iterator ti = tt.begin(), te = tt.end();
 		for (; ti != te; ++ti) uu.push_back( *ti);
 		m_data.pop_back();
-		return;
 	}
-	if (m_data.back().size() == 0)
+	else
 	{
-		pushValue( types::Variant());
+		if (m_data.back().size() == 0)
+		{
+			pushValue( types::Variant());
+		}
+		createRootNode();
+		m_data.pop_back();
+		m_data.back().back().m_elementsize = m_root.m_elementsize;
+		m_data.back().back().m_element = m_root.m_element;
 	}
-	createRootNode();
-	m_data.pop_back();
-	m_data.back().back().m_elementsize = m_root.m_elementsize;
-	m_data.back().back().m_element = m_root.m_element;
 
-	///[+] TMP DISABLED: [-] std::cout << "TREE:" << std::endl << tostring() << std::endl;
 	if (m_data.size() == 1)
 	{
 		// top level tag closed, assuming end of structure,
@@ -377,15 +376,19 @@ public:
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_structure(o.m_structure)
-		,m_noderenames(o.m_noderenames)
-		,m_stack(o.m_stack){}
+		,m_nodelist(o.m_nodelist)
+		,m_stack(o.m_stack)
+		,m_elementBuf(o.m_elementBuf)
+	{
+		m_nodeitr = m_nodelist.begin() + (o.m_nodeitr - o.m_nodelist.begin());
+	}
 
-	Filter( const TransactionFunctionInput::Structure* structure_, const Node* node_, const std::vector<NodeAssignment>& noderenames_)
+	Filter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
 		,m_structure(structure_)
-		,m_noderenames(noderenames_)
+		,m_nodelist(nodelist_)
 	{
-		m_stack.push_back( node_);
+		m_nodeitr = m_nodelist.begin();
 	}
 
 	virtual ~Filter(){}
@@ -393,17 +396,55 @@ public:
 
 	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
+		if (!m_elementBuf.empty())
+		{
+			type = m_elementBuf.back().first;
+			element = m_elementBuf.back().second;
+			m_elementBuf.pop_back();
+			return true;
+		}
 		if (m_stack.empty())
 		{
-			setState( langbind::InputFilter::Error, "internal: call of input filter after close");
-			return false;
+			if (!m_structure)
+			{
+				// ... calling getNext after final CloseTag
+				setState( langbind::InputFilter::Error, "internal: illegal call of input filter");
+				return false;
+			}
+			if (m_nodeitr == m_nodelist.end())
+			{
+				// ... end of content marker
+				type = TypedInputFilter::CloseTag;
+				element.init();
+				m_structure = 0;
+				return true;
+			}
+			else
+			{
+				// ... skip to next element in the node list
+				m_stack.push_back( m_nodeitr->second);
+				type = TypedInputFilter::OpenTag;
+				element = m_nodeitr->first;
+				++m_nodeitr;
+				return true;
+			}
 		}
 		for (;;)
 		{
 			const Node* chld = m_structure->child( m_stack.back().node, m_stack.back().idx);
 			const char* tagnamestr;
-			if (chld)
+			if (!chld)
 			{
+				if (flag( SerializeWithIndices) && m_stack.back().idx > 0)
+				{
+					// ... We have to close additional array indices added to array element tags
+					const Node* prevchld = m_structure->child( m_stack.back().node, m_stack.back().idx-1);
+					if (prevchld && prevchld->m_arrayindex >= 0)
+					{
+						// ... after array element at end of structure add missing: Close <index>
+						m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+					}
+				}
 				m_stack.pop_back();
 				type = TypedInputFilter::CloseTag;
 				element.init();
@@ -411,24 +452,73 @@ public:
 			}
 			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
 			{
-				++m_stack.back().idx;
-				m_stack.push_back( chld);
-				type = TypedInputFilter::OpenTag;
-
-				if (m_stack.size() == 1 && !m_noderenames.empty())
+				if (flag( SerializeWithIndices))
 				{
-					std::vector<NodeAssignment>::const_iterator ti = m_noderenames.begin(), te = m_noderenames.end();
-					for (; ti != te; ++ti)
+					// ... We have to add array indices to array element tags
+					if (chld->m_arrayindex >= 0)
 					{
-						if (m_structure->isequalTag( ti->first, tagnamestr))
+						// ... [A] element of an array
+						if (chld->m_arrayindex > m_stack.back().lastarrayindex)
 						{
-							element = ti->second;
-							return true;
+							if (m_stack.back().lastarrayindex == -1)
+							{
+								// ... [A.1] new array -> Open <name>; Open <index>
+								m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
+								type = TypedInputFilter::OpenTag;
+								element = tagnamestr;
+							}
+							else
+							{
+								// ... [A.1] next array element of open array -> Close <index>; Open <index>
+								m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
+								type = TypedInputFilter::CloseTag;
+								element.init();
+							}
 						}
+						else
+						{
+							// ... [A.3] new array following array -> Close previous array before opening new one: Close <index>; Close <name>; Open <name>; Open <index>
+							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
+							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, tagnamestr));
+							m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+							type = TypedInputFilter::CloseTag;
+							element.init();
+						}
+						++m_stack.back().idx;
+						m_stack.back().lastarrayindex = chld->m_arrayindex;
+						m_stack.push_back( chld);
+						return true;
+					}
+					else
+					{
+						// ... [S] single element (not an array element)
+						if (m_stack.back().lastarrayindex >= 0)
+						{
+							// ... [S.1] last element belonged to an array: Close (2nd); Open <name>
+							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, tagnamestr));
+							m_stack.back().lastarrayindex = -1;
+							type = TypedInputFilter::CloseTag;
+							element.init();
+						}
+						else
+						{
+							// ... [S.2] last element was also a single element
+							type = TypedInputFilter::OpenTag;
+							element = tagnamestr;
+						}
+						++m_stack.back().idx;
+						m_stack.push_back( chld);
+						return true;
 					}
 				}
-				element = tagnamestr;
-				return true;
+				else
+				{
+					++m_stack.back().idx;
+					m_stack.push_back( chld);
+					type = TypedInputFilter::OpenTag;
+					element = tagnamestr;
+					return true;
+				}
 			}
 			else
 			{
@@ -450,25 +540,29 @@ private:
 	{
 		const Node* node;
 		int idx;
+		int lastarrayindex;
 		ElementType lasttype;
 
 		StackElement()
-			:idx(0),lasttype(TypedInputFilter::CloseTag){}
+			:idx(0),lastarrayindex(-1),lasttype(TypedInputFilter::CloseTag){}
 		StackElement( const StackElement& o)
-			:node(o.node),idx(o.idx),lasttype(o.lasttype){}
+			:node(o.node),idx(o.idx),lastarrayindex(o.lastarrayindex),lasttype(o.lasttype){}
 		StackElement( const Node* node_)
-			:node(node_),idx(0),lasttype(TypedInputFilter::CloseTag){}
+			:node(node_),idx(0),lastarrayindex(-1),lasttype(TypedInputFilter::CloseTag){}
 	};
 
 	const TransactionFunctionInput::Structure* m_structure;
-	std::vector<NodeAssignment> m_noderenames;
+	std::vector<NodeAssignment> m_nodelist;
+	std::vector<NodeAssignment>::const_iterator m_nodeitr;
 	std::vector<StackElement> m_stack;
+	typedef std::pair<ElementType, types::VariantConst> Element;
+	std::vector<Element> m_elementBuf;
 };
 }//namespace
 
-langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const Node* node, const std::vector<NodeAssignment>& noderenames) const
+langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const std::vector<NodeAssignment>& nodelist) const
 {
-	langbind::TypedInputFilter* rt = new Filter( this, node, noderenames);
+	langbind::TypedInputFilter* rt = new Filter( this, nodelist);
 	if (!m_tagmap->case_sensitive())
 	{
 		rt->setFlags( langbind::TypedInputFilter::PropagateNoCase);

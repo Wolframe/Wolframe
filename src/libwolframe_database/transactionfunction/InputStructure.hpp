@@ -115,9 +115,9 @@ public://visit structure:
 	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
 	bool isequalTag( const std::string& t1, const std::string& t2) const;
 
-	typedef std::pair<std::string,std::string> NodeAssignment;
-	///\brief Create an input filter for a node to pass it to a function
-	langbind::TypedInputFilter* createFilter( const Node* node_, const std::vector<NodeAssignment>& noderenames_) const;
+	typedef std::pair<std::string,const Node*> NodeAssignment;
+	///\brief Create an input filter for a list of nodes to pass to a function as parameters
+	langbind::TypedInputFilter* createFilter( const std::vector<NodeAssignment>& nodes_) const;
 
 public://create structure:
 	void setParentLinks( std::size_t mi);
