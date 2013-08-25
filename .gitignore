@@ -179,3 +179,4 @@ examples/demo/lgtree/server/database/lgtree.db
 *.gcno
 *.gcda
 tests/python/embed
+qtcreator.xml
