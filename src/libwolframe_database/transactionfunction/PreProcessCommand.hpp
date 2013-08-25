@@ -46,6 +46,7 @@ namespace db {
 class PreProcessCommand
 {
 public:
+	///\brief Argument of Preprocessing step
 	class Argument
 	{
 	public:
