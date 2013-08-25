@@ -98,6 +98,7 @@ public:
 	virtual TypedOutputFilter* copy() const		{return new TransactionFunctionInput(*this);}
 
 	virtual bool print( ElementType type, const types::VariantConst& element);
+	void finalize();
 	virtual TransactionInput get() const;
 
 	const Structure& structure() const

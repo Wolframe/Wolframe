@@ -75,7 +75,7 @@ public:
 	const std::vector<std::string>& resultpath() const		{return m_resultpath;}
 
 	///\brief Call the command on the input 'structure'
-	void call( TransactionFunctionInput::Structure& structure);
+	void call( TransactionFunctionInput::Structure& structure) const;
 
 private:
 	std::string m_name;						//< name of the function (defined by the provider)

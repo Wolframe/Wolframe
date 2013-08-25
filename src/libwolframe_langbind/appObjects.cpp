@@ -255,6 +255,8 @@ bool TransactionFunctionClosure::call()
 			m_state = 2;
 		case 2:
 		{
+			m_inputstructptr->finalize();
+
 			types::CountedReference<db::Transaction> trsr = m_transaction;
 			if (!trsr.get())
 			{

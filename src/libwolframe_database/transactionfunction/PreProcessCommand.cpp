@@ -37,7 +37,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void PreProcessCommand::call( TransactionFunctionInput::Structure& structure)
+void PreProcessCommand::call( TransactionFunctionInput::Structure& structure) const
 {
 	// Select the nodes to execute the command with:
 	typedef TransactionFunctionInput::Structure::Node Node;

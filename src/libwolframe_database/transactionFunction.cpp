@@ -106,6 +106,17 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	return true;
 }
 
+void TransactionFunctionInput::finalize()
+{
+	m_structure->finalize();
+
+	std::vector<PreProcessCommand>::const_iterator pi = m_func->impl().m_preprocs.begin(), pe = m_func->impl().m_preprocs.end();
+	for (; pi != pe; ++pi)
+	{
+		pi->call( *m_structure);
+	}
+}
+
 static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node* selectornode)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;

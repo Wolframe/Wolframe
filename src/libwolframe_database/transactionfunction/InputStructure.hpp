@@ -128,6 +128,7 @@ public://create structure:
 	void pushValue( const types::VariantConst& val);
 	void check() const;
 	bool isArrayNode() const;
+	void finalize();
 
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes

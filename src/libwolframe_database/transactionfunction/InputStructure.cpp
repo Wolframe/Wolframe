@@ -133,6 +133,8 @@ void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t 
 
 void TransactionFunctionInput::Structure::openTag( const types::Variant& tag)
 {
+	if (m_data.empty()) throw std::logic_error( "internal: illegal call of open tag");
+
 	if (tag.type() == types::Variant::string_)
 	{
 		std::string tagstr( tag.tostring());
@@ -185,6 +187,8 @@ bool TransactionFunctionInput::Structure::isArrayNode() const
 
 void TransactionFunctionInput::Structure::createRootNode()
 {
+	if (m_data.empty()) throw std::logic_error( "internal: illegal call of create root node");
+
 	std::size_t rootsize = m_data.back().size();
 	std::size_t rootidx = m_nodemem.alloc( rootsize);
 	Node* nd = &m_nodemem[ rootidx];
@@ -197,11 +201,28 @@ void TransactionFunctionInput::Structure::createRootNode()
 	}
 }
 
-void TransactionFunctionInput::Structure::closeTag()
+void TransactionFunctionInput::Structure::finalize()
 {
-	if (m_data.size() == 1)
+	if (m_data.size() != 1)
 	{
 		throw std::runtime_error( "tags in input not balanced");
+	}
+	// top level tag closed, assuming end of structure,
+	// creating root node and set all parent links:
+	createRootNode();
+	std::size_t rootidx = m_root.childidx();
+	for (int ri=0; ri<m_root.m_elementsize; ++ri)
+	{
+		setParentLinks( rootidx+ri);
+	}
+}
+
+void TransactionFunctionInput::Structure::closeTag()
+{
+	if (m_data.size() <= 1)
+	{
+		if (m_data.empty()) throw std::logic_error( "internal: illegal call of close tag");
+		throw std::runtime_error( "tags not balanced in input");
 	}
 	if (isArrayNode() && m_data.size() >= 2)
 	{
@@ -223,22 +244,12 @@ void TransactionFunctionInput::Structure::closeTag()
 		m_data.back().back().m_elementsize = m_root.m_elementsize;
 		m_data.back().back().m_element = m_root.m_element;
 	}
-
-	if (m_data.size() == 1)
-	{
-		// top level tag closed, assuming end of structure,
-		// creating root node and set all parent links:
-		createRootNode();
-		std::size_t rootidx = m_root.childidx();
-		for (int ri=0; ri<m_root.m_elementsize; ++ri)
-		{
-			setParentLinks( rootidx+ri);
-		}
-	}
 }
 
 void TransactionFunctionInput::Structure::pushValue( const types::VariantConst& val)
 {
+	if (m_data.empty()) throw std::logic_error( "internal: illegal call of push value");
+
 	std::size_t mi = m_content.size();
 	m_content.push_back( val);
 	m_data.back().push_back( Node( 0, 0, 0, 0, Node::val_element( mi)));
