@@ -1,6 +1,7 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler normalize prnt cmdbind functions
+SUBDIRS = database audit authentication authorization filter ddlcompiler \
+	normalize prnt cmdbind functions jobSchedule
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua

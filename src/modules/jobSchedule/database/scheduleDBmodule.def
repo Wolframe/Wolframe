@@ -1,0 +1,4 @@
+LIBRARY mod_job_schedule_DB
+
+EXPORTS
+entryPoint	@1

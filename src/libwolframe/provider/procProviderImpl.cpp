@@ -282,6 +282,11 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					  << "'' is marked as an AUTHORIZATION_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
+			case ObjectConstructorBase::JOB_SCHEDULE_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+					  << "'' is marked as an JOB_SCHEDULE_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
 			case ObjectConstructorBase::DATABASE_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
 					  << "'' is marked as a DATABASE_OBJECT but has a simple object constructor";
