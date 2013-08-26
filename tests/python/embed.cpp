@@ -23,8 +23,9 @@ int main( int argc, char *argv[] )
 	// for libraries (TODO: set to what in wolframe?!)
 	Py_SetProgramName( (wchar_t *)argv[0] ); 
 
-	// initialize Python interpreter
-	Py_Initialize( );
+	// initialize Python interpreter, avoid registration of signal handlers,
+	// let's Wolframe do this..
+	Py_InitializeEx( 0 );
 	
 	// needed to load module from current path, othwerwise python
 	// searches the default pathes only
