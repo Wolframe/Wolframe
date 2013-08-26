@@ -1,7 +1,7 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-formname="employee_assignment_print.simpleform"
-ddltypeprg="simpleform.normalize"
+formname="employee_assignment_print.sfrm"
+ddltypeprg="simpleform.wnmp"
 opt=""
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
@@ -17,7 +17,7 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
-opt="$opt --cmdprogram=test.directmap"
+opt="$opt --cmdprogram=test.dmap"
 opt="$opt --program $formname"				# form for invoice
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 testcmd="$opt run"					# command to execute by the test
@@ -27,7 +27,7 @@ docout=map_transaction					# output document name
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
-**file: test.directmap
+**file: test.dmap
 run = test_transaction( xml :employee_assignment_print);
 **file: DBRES
 #id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'

@@ -34,9 +34,9 @@
 </btree>
 </root>
 **config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_string.normalize --program trees.simpleform --cmdprogram echo_input_doctype_table.lua run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_string.wnmp --program trees.sfrm --cmdprogram echo_input_doctype_table.lua run
 
-**file:simpleform_string.normalize
+**file:simpleform_string.wnmp
 int=number:integer;
 uint=number:unsigned;
 float=number:float;
@@ -47,7 +47,7 @@ function run()
 	output:as( filter(), type)
 	output:print( input:table())
 end
-**file: trees.simpleform
+**file: trees.sfrm
 STRUCT MulTreeNode
 {
 	id		@int

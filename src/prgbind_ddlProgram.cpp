@@ -49,7 +49,7 @@ bool DDLProgram::is_mine( const std::string& filename) const
 	if (ext.empty()) return false;
 	if (boost::iequals( m_constructor->ddlname(), ext.c_str()+1))
 	{
-		LOG_WARNING << "Using deprecated file extension for program '." << m_constructor->ddlname() << "' instead of '" << ext << "'";
+		LOG_WARNING << "Using deprecated file extension for program '" << ext << "' instead of '." << m_constructor->fileext() << "'";
 		return true;
 	}
 	if (boost::iequals( m_constructor->fileext(), ext.c_str()+1)) return true;

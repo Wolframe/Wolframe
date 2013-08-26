@@ -1,7 +1,7 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//' | sed 's/_testtrace//'`.lua
-formname="invoice.simpleform"
+formname="invoice.sfrm"
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
@@ -19,13 +19,13 @@ opt="$opt --module $mod"
 modpath="../../src/modules/filter/"			# filter module directory relative from tests/temp
 mod="$modpath/blob/mod_filter_blob"			# blob filter module for output to load
 opt="$opt --module $mod"
-ddltypeprg="simpleform_range.normalize"
+ddltypeprg="simpleform_range.wnmp"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
-opt="$opt --program invoice.simplepdf"			# layout for printing invoice
+opt="$opt --program invoice.sprn"			# layout for printing invoice
 opt="$opt --program $formname"				# form for invoice
 opt="$opt --cmdprogram $luascript"			# script to execute
 testcmd="$opt run"					# command to execute by the test
-testscripts="$luascript $formname invoice.simplepdf"	# list of scripts of the test
+testscripts="$luascript $formname invoice.sprn"		# list of scripts of the test
 docin=invoice_example					# input document name
 docout=$testname					# output document name
 testdata="

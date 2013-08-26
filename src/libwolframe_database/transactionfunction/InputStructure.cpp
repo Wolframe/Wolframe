@@ -424,15 +424,19 @@ public:
 			}
 			while (m_nodeitr != m_nodelist.end() && !m_nodeitr->second)
 			{
-				//... skip empty nodes
+				//... skip empty nodes (null values)
 				++m_nodeitr;
 			}
 			if (m_nodeitr == m_nodelist.end())
 			{
-				// ... end of content marker
+				// ... end of content marker (only close the tag if it was opened)
+				m_structure = 0;
+				if (m_nodeitr != m_nodelist.begin() && m_nodelist.back().first.size())
+				{
+					m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+				}
 				type = TypedInputFilter::CloseTag;
 				element.init();
-				m_structure = 0;
 				return true;
 			}
 			else
@@ -497,7 +501,7 @@ public:
 							}
 							else
 							{
-								// ... [A.1] next array element of open array -> Close <index>; Open <index>
+								// ... [A.2] next array element of open array -> Close <index>; Open <index>
 								m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
 								type = TypedInputFilter::CloseTag;
 								element.init();

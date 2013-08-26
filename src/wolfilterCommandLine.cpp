@@ -164,7 +164,17 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			std::string extension = utils::getFileExtension( *gi);
 			if (!extension.empty())
 			{
-				std::string cmdhndname = std::string( extension.c_str() +1);
+				std::string cmdhndname;
+
+				/// PF:HACK: Hardcoded mapping of known program file extensions to handler names:
+				if (boost::algorithm::iequals( extension, ".dmap"))
+				{
+					cmdhndname = "directmap";
+				}
+				else
+				{
+					cmdhndname = std::string( extension.c_str() +1);
+				}
 				std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
 				for (; pi != pe; ++pi)
 				{

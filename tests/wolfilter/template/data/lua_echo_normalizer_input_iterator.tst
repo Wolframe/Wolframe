@@ -7,7 +7,7 @@ modpath="../../src/modules/normalize/"			# module directory for normalizers rela
 mod="$modpath/string/mod_normalize_string"		# module to load
 opt="$opt --module $mod"
 luascript=`echo $testname | sed 's/lua_//'`.lua
-ddltypeprg="types.normalize"
+ddltypeprg="types.wnmp"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 opt="$opt --cmdprogram $luascript"			# lua script to run
 testscripts=$luascript					# list of scripts of the test
@@ -15,7 +15,7 @@ testcmd="$opt run"					# command to execute by the test
 docin=$testname.in					# input document name
 docout=$testname.out					# output document name
 testdata="
-**file:types.normalize
+**file:$ddltypeprg
 name=string:ucname;
 "
 csetlist="UTF-8 UCS-2LE UCS-4LE"			# character set encodings to test

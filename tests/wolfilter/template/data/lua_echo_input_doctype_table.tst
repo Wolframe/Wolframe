@@ -1,7 +1,7 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
-formname="employee_assignment_print.simpleform"
+formname="employee_assignment_print.sfrm"
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
@@ -13,7 +13,7 @@ mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
 mod="$modpath/string/mod_normalize_string"		# module to load
 opt="$opt --module $mod"
-ddltypeprg="simpleform_range_trim.normalize"
+ddltypeprg="simpleform_range_trim.wnmp"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 opt="$opt --program $formname"
 opt="$opt --cmdprogram $luascript"

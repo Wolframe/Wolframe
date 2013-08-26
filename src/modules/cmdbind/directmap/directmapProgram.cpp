@@ -58,7 +58,7 @@ bool DirectmapProgram::is_mine( const std::string& filename) const
 	std::string ext( utils::getFileExtension( filename));
 	if (boost::iequals( ext, ".directmap"))
 	{
-		LOG_WARNING << "Using deprecated file extension for program '.directmap' instead of '.cmap'";
+		LOG_WARNING << "Using deprecated file extension for program '.directmap' instead of '.dmap'";
 		return true;
 	}
 	if (boost::iequals( ext, ".dmap")) return true;

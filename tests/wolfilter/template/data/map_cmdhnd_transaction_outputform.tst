@@ -1,9 +1,9 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
-formname_out="$testname.simpleform"			# output form
+formname_out="$testname.sfrm"				# output form
 opt="$opt --program $formname_out"
-formname_in="employee_assignment_print.simpleform"	# input form
+formname_in="employee_assignment_print.sfrm"		# input form
 opt="$opt --program $formname_in"
 modpath="../../src/modules/ddlcompiler/"		# module directory for DDL compilers relative from tests/temp
 mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
@@ -13,7 +13,7 @@ mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
 mod="$modpath/string/mod_normalize_string"		# module to load
 opt="$opt --module $mod"
-ddltypeprg="simpleform.normalize"
+ddltypeprg="simpleform.wnmp"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
@@ -21,13 +21,13 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
-opt="$opt --cmdprogram=test.directmap"
+opt="$opt --cmdprogram=test.dmap"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$formname_in $formname_out"		# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=map_cmdhnd_transaction_outputform		# output document name
 testdata="
-**file: test.directmap
+**file: test.dmap
 run = test_transaction( xml :employee_assignment_print) :$testname;
 **file:$ddltypeprg
 `cat program/$ddltypeprg`

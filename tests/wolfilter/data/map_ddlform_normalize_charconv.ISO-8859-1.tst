@@ -56,9 +56,9 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.normalize --program typed_invoice.simpleform typed_invoice
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.wnmp --program typed_invoice.sfrm typed_invoice
 
-**file:simpleform_complex.normalize
+**file:simpleform_complex.wnmp
 int= number: integEr( 10 );
 f_int= string :trim  ,numbeR:integer( 10);
 uint =number:uNsigned(10 );
@@ -67,7 +67,7 @@ float = number:float(12,12);
 f_floAt = string:trim ,Number:float(12,12);
 text_Ascii_de =  localeConv :latinword, ascii_de
 text_ascii_eu=localeconv :  latinword ,ascii_eu ;
-**file: typed_invoice.simpleform
+**file: typed_invoice.sfrm
 FORM typed_invoice
 {
 	invoice

@@ -104,9 +104,9 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.normalize --program invoice.simplepdf --program invoice.simpleform --cmdprogram print_table.lua run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table.lua run
 
-**file:simpleform_range.normalize
+**file:simpleform_range.wnmp
 iNt=number:integer(10);
 uint=numbeR:unsigned(10);
 float=number:fLoat(10,10);
@@ -122,7 +122,7 @@ function run()
 	output:print( f( t):table())
 end
 
-**file: invoice.simpleform
+**file: invoice.sfrm
 FORM invoice
 {
 	invoice
@@ -177,7 +177,7 @@ FORM invoice
 		}
 	}
 }
-**file: invoice.simplepdf
+**file: invoice.sprn
 !NAME=print_invoice
 /invoice: {Text="invoice"} PrintText()
 //name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()

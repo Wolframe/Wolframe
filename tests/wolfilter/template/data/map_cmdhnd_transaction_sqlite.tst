@@ -1,9 +1,9 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
-formname="schema_select_task_by_id.simpleform"
+formname="schema_select_task_by_id.sfrm"
 opt="$opt --program $formname"
-ddltypeprg="simpleform.normalize"
+ddltypeprg="simpleform.wnmp"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 modpath="../../src/modules/ddlcompiler/"		# module directory for DDL compilers relative from tests/temp
 mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
@@ -19,14 +19,14 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
-opt="$opt --cmdprogram=test.directmap"
+opt="$opt --cmdprogram=test.dmap"
 testscripts="$formname"					# list of scripts of the test
 testcmd="$opt run"					# command to execute by the test
 docin=schema_select_task_by_id				# input document name
 docout=output_schema_select_task_by_id			# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
-**file: test.directmap
+**file: test.dmap
 run = test_transaction( xml :schema_select_task_by_id);
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
