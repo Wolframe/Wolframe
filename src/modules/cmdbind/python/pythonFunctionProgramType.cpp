@@ -29,6 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+
+#include <Python.h>
+
 ///\file pythonFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for Python scripts
 #include "pythonFunctionProgramType.hpp"
@@ -44,8 +47,6 @@ Project Wolframe.
 #include <string>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-
-#include <Python.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

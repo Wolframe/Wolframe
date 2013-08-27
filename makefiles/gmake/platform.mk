@@ -2070,18 +2070,18 @@ ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
 LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include  
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib  
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
 LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
 ifeq "$(LINUX_REV)" "7"
 LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include  
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib  
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
 LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
@@ -2970,7 +2970,8 @@ endif
 ifeq ($(WITH_PYTHON),1)
 
 ifeq "$(PLATFORM)" "LINUX"
-PYTHON_CFLAGS = -g -O0 $(shell python3-config --cflags)
+PYTHON_COMPILATION_FLAGS = $(shell python3-config --cflags | sed 's|\-Wstrict\-prototypes||')
+PYTHON_CFLAGS = -g -O0 $(PYTHON_COMPILATION_FLAGS)
 PYTHON_LDFLAGS = $(shell python3-config --ldflags)
 PYTHON_LIBS = $(shell python3-config --libs)
 endif

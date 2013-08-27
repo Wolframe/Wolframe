@@ -7,7 +7,7 @@ python::Context::Context( )
 {
 }
 
-std::vector<std::string> python::Context::loadProgram( const std::string& prgfile)
+std::vector<std::string> python::Context::loadProgram( const std::string& /*prgfile*/)
 {
 	std::vector<std::string> rt;
 	// TODO: load all public functions from python module
@@ -23,12 +23,12 @@ std::vector<std::string> python::Context::loadProgram( const std::string& prgfil
 	return rt;
 }
 
-python::Structure* python::Structure::addSubstruct( const types::Variant& elemid_)
+python::Structure* python::Structure::addSubstruct( const types::Variant& /*elemid_*/)
 {
 	return 0;
 }
 
-void python::Structure::setValue( const types::Variant& value)
+void python::Structure::setValue( const types::Variant& /*value*/)
 {
 }
 
@@ -48,7 +48,7 @@ bool python::Structure::array() const
 	return false;
 }
 
-python::StructureR python::call( const proc::ProcessorProvider* provider, Instance* instance, const python::StructureR& arg)
+python::StructureR python::call( const proc::ProcessorProvider* /*provider*/, Instance* /*instance*/, const python::StructureR& /*arg*/)
 {
 	// IMPLEMENT CALL HERE
 	return StructureR();
