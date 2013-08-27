@@ -128,6 +128,8 @@ public://visit structure:
 	const char* tagname( const Node* nd) const;
 	///\brief Get the absolute path of a node as string with '/' as path element delimiter
 	std::string nodepath( const NodeVisitor& nv) const;
+	///\brief Get the absolute path of a node as string with '/' as path element delimiter
+	std::string nodepath( const Node* nd) const;
 
 	///\brief Get structure as string
 	const std::string tostring( const NodeVisitor& nv = NodeVisitor()) const;
@@ -139,7 +141,7 @@ public://visit structure:
 	///\brief Create an input filter for a list of nodes to pass to a function as parameters
 	langbind::TypedInputFilter* createInputFilter( const std::vector<NodeAssignment>& nodes_) const;
 	///\brief Create an output filter for the output of a preprocessing command
-	langbind::TypedOutputFilter* createOutputFilter( const NodeVisitor& nv);
+	langbind::TypedOutputFilter* createOutputFilter( const NodeVisitor& nv, const std::map<int, bool>& sourccetagmap);
 
 public://create structure without explicit visitor context:
 	void openTag( const types::Variant& tag)		{m_visitor = openTag( m_visitor, tag);}
@@ -148,11 +150,13 @@ public://create structure without explicit visitor context:
 
 public://create structure with explicit visitor context:
 	NodeVisitor visitTag( const NodeVisitor& nv, const std::string& tag) const;
+	NodeVisitor visitOrOpenUniqTag( const NodeVisitor& nv, const std::string& tag);
 	NodeVisitor openTag( const NodeVisitor& nv, const types::Variant& tag);
 	NodeVisitor closeTag( const NodeVisitor& nv);
 	void pushValue( const NodeVisitor& nv, const types::VariantConst& val);
 
 private://create structure:
+	NodeVisitor openUniqTag( const NodeVisitor& nv, const std::string& tag);
 	NodeVisitor createChildNode( const NodeVisitor& nv);
 	NodeVisitor createSiblingNode( const NodeVisitor& nv);
 	bool isArrayNode( const NodeVisitor& nv) const;

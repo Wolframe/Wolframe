@@ -34,6 +34,8 @@
 ///\file transactionfunction/PreProcessCommand.cpp
 #include "transactionfunction/PreProcessCommand.hpp"
 #include "langbind/appObjects.hpp"
+#include "logger/logger-v1.hpp"
+#include <map>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -56,6 +58,35 @@ static types::VariantConst
 	return iv;
 }
 
+static void mapResult( langbind::TypedInputFilter* in, langbind::TypedOutputFilter* out)
+{
+	int taglevel = 0;
+	langbind::InputFilter::ElementType et;
+	types::VariantConst ev;
+
+	for (;;)
+	{
+		if (!in->getNext( et, ev))
+		{
+			const char* err = in->getError();
+			throw std::runtime_error( err?err:"unexpected end of message in result");
+		}
+		if (et == langbind::InputFilter::OpenTag)
+		{
+			++taglevel;
+		}
+		else if (et == langbind::InputFilter::CloseTag)
+		{
+			--taglevel;
+			if (taglevel < 0) return;
+		}
+		if (!out->print( et, ev))
+		{
+			const char* err = out->getError();
+			throw std::runtime_error( err?err:"unknown error in print result");
+		}
+	}
+}
 
 void PreProcessCommand::call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const
 {
@@ -64,6 +95,8 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 	typedef Structure::Node Node;
 	typedef Structure::NodeAssignment NodeAssignment;
 	typedef Structure::NodeVisitor NodeVisitor;
+	std::map<const Node*, int> selectmap;
+	std::map<int, bool> sourccetagmap;
 
 	const types::NormalizeFunction* nf = 0;
 	const langbind::FormFunction* ff = 0;
@@ -78,7 +111,11 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 		std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
 		for (; ni != ne; ++ni)
 		{
-			// [1] Create the destination node for the result:
+			if (selectmap[*ni]++ > 0)
+			{
+				LOG_WARNING << "duplicate selection of node '" << structure.nodepath( *ni) << "' (processing only first selection)";
+			}
+			// [1A] Create the destination node for the result:
 			NodeVisitor resultnode = structure.visitor( *ni);
 			if (!m_resultpath.empty())
 			{
@@ -89,7 +126,19 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					{
 						resultnode = structure.visitTag( resultnode, *ri);
 					}
-					resultnode = structure.openTag( resultnode, *ri);
+					resultnode = structure.visitOrOpenUniqTag( resultnode, *ri);
+				}
+			}
+			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
+			const Node* rn = structure.node( resultnode);
+			if (rn->m_firstchild)
+			{
+				rn = structure.node( rn->m_firstchild);
+				for (;;)
+				{
+					sourccetagmap[ rn->m_tagstr] = true;
+					if (!rn->m_next) break;
+					rn = structure.node( rn->m_next);
 				}
 			}
 			// [2] Build the parameter structure:
@@ -169,22 +218,14 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					if (!err) throw std::logic_error( "internal: incomplete input");
 					throw std::runtime_error( err);
 				}
-
 				// assign form function result to destination in input structure for further processing:
-				langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode));
+				langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode, sourccetagmap));
 				langbind::TypedInputFilterR result = fc->result();
 
 				result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
 				// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 
-				langbind::RedirectFilterClosure resultassign( result, resfilter);
-				if (!resultassign.call())
-				{
-					const char* err = argfilter->getError();
-					if (!err) err = resfilter->getError();
-					if (!err) throw std::logic_error( "internal: incomplete result");
-					throw std::runtime_error( err);
-				}
+				mapResult( result.get(), resfilter.get());
 			}
 			else
 			{

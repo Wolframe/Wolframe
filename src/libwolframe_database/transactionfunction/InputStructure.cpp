@@ -134,6 +134,11 @@ std::string TransactionFunctionInput::Structure::nodepath( const NodeVisitor& nv
 	return rt;
 }
 
+std::string TransactionFunctionInput::Structure::nodepath( const Node* nd) const
+{
+	return nodepath( visitor( nd));
+}
+
 TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::createChildNode( const NodeVisitor& nv)
 {
@@ -187,6 +192,40 @@ TransactionFunctionInput::Structure::NodeVisitor
 	return rt;
 }
 
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::visitOrOpenUniqTag( const NodeVisitor& nv, const std::string& tag)
+{
+	Node* nd = node( nv);
+	if (!nd->m_firstchild) return openUniqTag( nv, tag);
+	int tgs = (int)m_privatetagmap.get( tag);
+	if (!tgs) return openUniqTag( nv, tag);
+	Node* cd = node( nd->m_firstchild);
+	NodeVisitor rt;
+	for (;;)
+	{
+		if (cd->m_tagstr == tgs)
+		{
+			if (rt.m_nodeidx) throw std::runtime_error( std::string( "cannot make unique selection of node with name '") + tag + "' in structure at '" + nodepath(nv) + "' (it exists more than once)");
+			rt = visitor( cd);
+		}
+		if (!cd->m_next) break;
+		cd = node( cd->m_next);
+	}
+	if (!rt.m_nodeidx) return openUniqTag( nv, tag);
+	return rt;
+}
+
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::openUniqTag( const NodeVisitor& nv, const std::string& tag)
+{
+	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( nv);
+	Node* nd = node( rt);
+
+	nd->m_tag = (int)m_tagmap->find( tag);
+	if (nd->m_tag == 0) nd->m_tag = (int)m_tagmap->unused();
+	nd->m_tagstr = (int)m_privatetagmap.get( tag);
+	return rt;
+}
 
 TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::openTag( const NodeVisitor& nv, const types::Variant& tag)
@@ -636,6 +675,7 @@ public:
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
 		,m_structure(0)
 		,m_lasttype( langbind::TypedInputFilter::Value)
+		,m_taglevel(0)
 	{}
 
 	///\brief Copy constructor
@@ -645,14 +685,18 @@ public:
 		,m_structure(o.m_structure)
 		,m_visitor(o.m_visitor)
 		,m_lasttype(o.m_lasttype)
+		,m_taglevel(o.m_taglevel)
+		,m_sourccetagmap(o.m_sourccetagmap)
 	{}
 
 	///\brief Constructor
-	OutputFilter( TransactionFunctionInput::Structure* structure_, const NodeVisitor& visitor_)
+	OutputFilter( TransactionFunctionInput::Structure* structure_, const NodeVisitor& visitor_, const std::map<int, bool>& sourccetagmap_)
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
 		,m_structure(structure_)
 		,m_visitor(visitor_)
 		,m_lasttype( langbind::TypedInputFilter::Value)
+		,m_taglevel(0)
+		,m_sourccetagmap(sourccetagmap_)
 	{}
 
 	///\brief Destructor
@@ -668,19 +712,25 @@ public:
 		switch (type)
 		{
 			case langbind::TypedInputFilter::OpenTag:
-				m_structure->openTag( m_visitor, element);
+				++ m_taglevel;
+				m_visitor = m_structure->openTag( m_visitor, element);
+				if (m_taglevel == 0 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
+				{
+					throw std::runtime_error( "assigned result to tag that already exists in input. This is forbidden due to causing annomalies");
+				}
 			break;
 			case langbind::TypedInputFilter::CloseTag:
-				m_structure->closeTag( m_visitor);
+				-- m_taglevel;
+				m_visitor = m_structure->closeTag( m_visitor);
 			break;
 			case langbind::TypedInputFilter::Attribute:
-				m_structure->openTag( m_visitor, element);
+				m_visitor = m_structure->openTag( m_visitor, element);
 			break;
 			case langbind::TypedInputFilter::Value:
 				m_structure->pushValue( m_visitor, element);
 				if (m_lasttype == langbind::TypedInputFilter::Attribute)
 				{
-					m_structure->closeTag( m_visitor);
+					m_visitor = m_structure->closeTag( m_visitor);
 				}
 			break;
 		}
@@ -692,6 +742,8 @@ private:
 	TransactionFunctionInput::Structure* m_structure;	//< structure to print the elements to
 	NodeVisitor m_visitor;
 	ElementType m_lasttype;
+	int m_taglevel;
+	const std::map<int, bool> m_sourccetagmap;
 };
 
 }//namespace
@@ -708,9 +760,9 @@ langbind::TypedInputFilter*
 }
 
 langbind::TypedOutputFilter*
-	TransactionFunctionInput::Structure::createOutputFilter( const NodeVisitor& nv)
+	TransactionFunctionInput::Structure::createOutputFilter( const NodeVisitor& nv, const std::map<int, bool>& sourccetagmap)
 {
-	langbind::TypedOutputFilter* rt = new OutputFilter( this, nv);
+	langbind::TypedOutputFilter* rt = new OutputFilter( this, nv, sourccetagmap);
 	return rt;
 }
 
