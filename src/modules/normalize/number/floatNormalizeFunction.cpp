@@ -39,10 +39,37 @@ using namespace langbind;
 
 types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {
-	if (inp.type() == types::Variant::int_) return inp;
-	if (inp.type() == types::Variant::uint_) return inp;
-	if (inp.type() == types::Variant::double_) return inp;
-	if (inp.type() != types::Variant::string_) return inp.todouble();
+	if (inp.type() == types::Variant::int_)
+	{
+		types::Variant::Data::Int_ val = inp.toint();
+		if (val < 0)
+		{
+			if ((double)-val > m_max) throw std::runtime_error( "number out of range");
+		}
+		else
+		{
+			if ((double)val > m_max) throw std::runtime_error( "number out of range");
+		}
+		return inp;
+	}
+	if (inp.type() == types::Variant::uint_)
+	{
+		types::Variant::Data::UInt_ val = inp.touint();
+		if ((double)val > m_max) throw std::runtime_error( "number out of range");
+		return inp;
+	}
+	if (inp.type() == types::Variant::double_)
+	{
+		double val = inp.todouble();
+		if (val > m_max) throw std::runtime_error( "number out of range");
+		return inp;
+	}
+	if (inp.type() != types::Variant::string_)
+	{
+		double val = inp.todouble();
+		if (val > m_max) throw std::runtime_error( "number out of range");
+		return val;
+	}
 	std::string str( inp.tostring());
 
 	std::string::const_iterator ii = str.begin(), ee = str.end();

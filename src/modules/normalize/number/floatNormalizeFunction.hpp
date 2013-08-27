@@ -43,9 +43,10 @@ namespace langbind {
 class FloatNormalizeFunction :public types::NormalizeFunction
 {
 public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_)
+	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, double max_)
 		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_){}
+		,m_sizeF(sizeF_)
+		,m_max(max_){}
 
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "float";}
@@ -53,6 +54,7 @@ public:
 private:
 	std::size_t m_sizeG;
 	std::size_t m_sizeF;
+	double m_max;
 };
 
 }}

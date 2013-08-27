@@ -35,6 +35,7 @@
 #include "numberNormalize.hpp"
 #include "integerNormalizeFunction.hpp"
 #include "floatNormalizeFunction.hpp"
+#include "types/variant.hpp"
 #include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -91,6 +92,27 @@ static std::size_t parseIntegerDescription( std::string::const_iterator& ii, con
 	return rt;
 }
 
+static types::Variant::Data::UInt_ getMax( std::size_t digits)
+{
+	typedef types::Variant::Data::UInt_ UInt_;
+	UInt_ mm = 1, pp = 1;
+	std::size_t dd = 0;
+	for (; dd < digits; ++dd)
+	{
+		mm *= 10;
+		if (mm < pp) break;
+		pp = mm;
+	}
+	if (dd == digits)
+	{
+		return mm;
+	}
+	else
+	{
+		return std::numeric_limits<UInt_>::max();
+	}
+}
+
 types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
 {
 	try
@@ -99,21 +121,56 @@ types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( Re
 		std::string type = boost::algorithm::to_lower_copy( name);
 		if (boost::algorithm::iequals( type, "integer"))
 		{
-			std::size_t dim = std::numeric_limits<std::size_t>::max();
-			if (utils::gotoNextToken( ii, ee)) dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( true, dim);
+			typedef types::Variant::Data::UInt_ UInt_;
+			std::size_t dim;
+			types::Variant::Data::UInt_ maxval;
+
+			if (utils::gotoNextToken( ii, ee))
+			{
+				dim = parseIntegerDescription( ii, ee);
+				maxval = getMax( dim)-1;
+			}
+			else
+			{
+				dim = std::numeric_limits<std::size_t>::max();
+				maxval = std::numeric_limits<UInt_>::max();
+			}
+			return new IntegerNormalizeFunction( true, dim, maxval);
 		}
 		else if (boost::algorithm::iequals( type, "unsigned"))
 		{
-			std::size_t dim = std::numeric_limits<std::size_t>::max();
-			if (utils::gotoNextToken( ii, ee)) dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( false, dim);
+			typedef types::Variant::Data::UInt_ UInt_;
+			std::size_t dim;
+			types::Variant::Data::UInt_ maxval;
+
+			if (utils::gotoNextToken( ii, ee))
+			{
+				dim = parseIntegerDescription( ii, ee);
+				maxval = getMax( dim)-1;
+			}
+			else
+			{
+				dim = std::numeric_limits<std::size_t>::max();
+				maxval = std::numeric_limits<UInt_>::max();
+			}
+			return new IntegerNormalizeFunction( false, dim, maxval);
 		}
 		else if (boost::algorithm::iequals( type, "float"))
 		{
-			std::pair<std::size_t,std::size_t> dim( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
-			if (utils::gotoNextToken( ii, ee)) dim = parseFloatDescription( ii, ee);
-			return new FloatNormalizeFunction( dim.first, dim.second);
+			std::pair<std::size_t,std::size_t> dim;
+			double maxval;
+
+			if (utils::gotoNextToken( ii, ee))
+			{
+				dim = parseFloatDescription( ii, ee);
+				maxval = (double)getMax( dim.first);
+			}
+			else
+			{
+				dim = std::pair<std::size_t,std::size_t>( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
+				maxval = std::numeric_limits<double>::max();
+			}
+			return new FloatNormalizeFunction( dim.first, dim.second, maxval);
 		}
 		else
 		{
