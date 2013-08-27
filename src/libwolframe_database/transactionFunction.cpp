@@ -108,8 +108,6 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 
 void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider)
 {
-	m_structure->finalize();
-
 	std::vector<PreProcessCommand>::const_iterator pi = m_func->impl().m_preprocs.begin(), pe = m_func->impl().m_preprocs.end();
 	for (; pi != pe; ++pi)
 	{
@@ -154,7 +152,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 					{
 						if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 					}
-					const types::Variant* valref = inputst->structure().nodevalue( *gs);
+					const types::Variant* valref = inputst->structure().contentvalue( *gs);
 					if (valref)
 					{
 						ti.bindCommandArgAsValue( *valref);

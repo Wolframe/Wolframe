@@ -34,274 +34,267 @@
 ///\file transactionfunction/InputStructure.cpp
 #include "transactionfunction/InputStructure.hpp"
 #include "filter/typedfilter.hpp"
+#include "logger/logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
-
-bool TransactionFunctionInput::Structure::Node::operator == (const Node& o) const
-{
-	if (m_parent != o.m_parent) return false;
-	if (m_tag != o.m_tag) return false;
-	if (m_element != o.m_element) return false;
-	if (m_elementsize != o.m_elementsize) return false;
-	return true;
-}
 
 TransactionFunctionInput::Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_content(o.m_content)
 	,m_tagmap(o.m_tagmap)
 	,m_privatetagmap(o.m_privatetagmap)
-	,m_root(o.m_root)
-	,m_data(o.m_data)
+	,m_visitor(o.m_visitor)
 	{}
 
 TransactionFunctionInput::Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap),m_privatetagmap(tagmap->case_sensitive())
 {
 	m_nodemem.alloc( 1);
+	Node* nd = m_nodemem.base();
+	nd->m_arrayindex = -1;
+	nd->m_parent = -1;
 	m_content.push_back( types::Variant());
-	m_data.push_back( std::vector<Node>());
 }
 
-void TransactionFunctionInput::Structure::check() const
+const TransactionFunctionInput::Structure::Node*
+	TransactionFunctionInput::Structure::node( const NodeVisitor& nv) const
 {
-	if (m_data.size() != 1)
-	{
-		throw std::runtime_error( "tags not balanced in structure");
-	}
+	return &m_nodemem[ nv.m_nodeidx];
 }
 
-void TransactionFunctionInput::Structure::setParentLinks( std::size_t mi)
+TransactionFunctionInput::Structure::Node*
+	TransactionFunctionInput::Structure::node( const NodeVisitor& nv)
 {
-	Node* nd = &m_nodemem[mi];
-	std::size_t ii = 0, nn = nd->nofchild(), ci = nd->childidx();
-	for (; ii<nn; ++ii)
-	{
-		Node* cd = &m_nodemem[ ci + ii];
-		if (cd->m_parent != (int)mi)
-		{
-			cd->m_parent = (int)mi;
-			setParentLinks( ci + ii);
-		}
-	}
+	return &m_nodemem[ nv.m_nodeidx];
 }
 
-const std::string TransactionFunctionInput::Structure::tostring() const
+
+const std::string TransactionFunctionInput::Structure::tostring( const NodeVisitor& nv) const
 {
-	std::vector <std::pair< std::size_t, std::size_t> > stk;
+	std::vector <int> stk;
 	std::ostringstream rt;
-	stk.push_back( std::pair< std::size_t, std::size_t>( m_root.m_elementsize, m_root.childidx()));
+	stk.push_back( nv.m_nodeidx);
+
 	while (stk.size())
 	{
-		std::size_t ii = stk.back().first;
-		std::size_t mi = stk.back().second;
-		--stk.back().first;
-		if (ii>0)
+		std::size_t ni = stk.back();
+		if (!ni)
 		{
-			const Node* cd = &m_nodemem[ mi + ii - 1];
-			if (cd->valueidx())
-			{
-				std::size_t indent = stk.size() -1;
-				const types::Variant* val = &m_content.at( cd->m_element);
-				while (indent--) rt << '\t';
-				if (cd->m_tag) rt << cd->m_tag << ": ";
-				rt << "'" << val->tostring() << "'" << std::endl;
-			}
-			else
-			{
-				std::size_t indent = stk.size() -1;
-				while (indent--) rt << '\t';
-				rt << cd->m_tag << ":" << std::endl;
-				stk.push_back( std::pair< std::size_t, std::size_t>( cd->nofchild(), cd->childidx()));
-			}
+			stk.pop_back();
+			continue;
+		}
+		const Node* nd = node( ni);
+		std::size_t indent = stk.size() -1;
+
+		stk.back() = nd->m_next;
+		if (nd->m_value)
+		{
+			const types::Variant* val = &m_content.at( nd->m_value);
+			while (indent--) rt << '\t';
+			if (nd->m_tag) rt << nd->m_tag << " ";
+			if (nd->m_tagstr) rt << tagname( nd) << ": ";
+			rt << "'" << val->tostring() << "'" << std::endl;
 		}
 		else
 		{
-			stk.pop_back();
+			while (indent--) rt << '\t';
+			if (nd->m_tag) rt << nd->m_tag << " ";
+			if (nd->m_tagstr) rt << tagname(nd) << ": ";
+			rt << std::endl;
+			stk.back() = nd->m_next;
+			if (nd->m_firstchild)
+			{
+				stk.push_back( nd->m_firstchild);
+			}
 		}
 	}
 	return rt.str();
 }
 
-void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t tagsize)
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::createChildNode( const NodeVisitor& visitor)
 {
-	const std::string tagstr( tag, tagsize);
-	openTag( tagstr);
+	Node* nd = node( visitor);
+	int idx = (int)m_nodemem.alloc( 1);
+	if (!nd->m_lastchild)
+	{
+		nd->m_lastchild = nd->m_firstchild = idx;
+	}
+	else
+	{
+		Node* lc = node( nd->m_lastchild);
+		lc->m_next = nd->m_lastchild = idx;
+	}
+	Node* chld = node( idx);
+	chld->m_arrayindex = -1;
+	chld->m_parent = visitor.m_nodeidx;
+	return NodeVisitor(idx);
 }
 
-void TransactionFunctionInput::Structure::openTag( const types::Variant& tag)
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::createSiblingNode( const NodeVisitor& visitor)
 {
-	if (m_data.empty()) throw std::logic_error( "internal: illegal call of open tag");
+	if (!visitor.m_nodeidx) throw std::runtime_error( "try to create sibling node of root");
+	return createChildNode( NodeVisitor( node( visitor.m_nodeidx)->m_parent));
+}
+
+
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::openTag( const NodeVisitor& visitor, const types::Variant& tag)
+{
+	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( visitor);
+	Node* nd = node( rt);
 
 	if (tag.type() == types::Variant::string_)
 	{
 		std::string tagstr( tag.tostring());
-		int tag_ = (int)m_tagmap->find( tagstr);
-		if (tag_ == 0) tag_ = (int)m_tagmap->unused();
-		int tagstr_ = (int)m_privatetagmap.get( tagstr);
-		m_data.back().push_back( Node( 0, tag_, tagstr_, 0, 0));
-		m_data.push_back( std::vector<Node>());
+		nd->m_tag = (int)m_tagmap->find( tagstr);
+		if (nd->m_tag == 0) nd->m_tag = (int)m_tagmap->unused();
+		nd->m_tagstr = (int)m_privatetagmap.get( tagstr);
 	}
 	else
 	{
-		int arrayindex;
 		try
 		{
-			arrayindex = (int)tag.toint();
+			nd->m_arrayindex = (int)tag.toint();
 		}
 		catch (const std::runtime_error& e)
 		{
 			throw std::runtime_error( "array index cannot be converted to integer");
 		}
-		if (arrayindex < 0)
+		if (nd->m_arrayindex < 0)
 		{
 			throw std::runtime_error( "array index is negative");
 		}
-		if (m_data.size() == 1)
+		if (nd->m_parent)
 		{
-			m_data.back().push_back( Node( 0, 0, 0, 0, 0));
+			Node* pd = node( nd->m_parent);
+			nd->m_tag = pd->m_tag;
+			nd->m_tagstr = pd->m_tagstr;
 		}
-		else
-		{
-			const Node& pred = m_data.at( m_data.size()-2).back();
-			m_data.back().push_back( Node( 0, pred.m_tag, pred.m_tagstr, 0, 0));
-		}
-		m_data.back().back().m_arrayindex = arrayindex;
-		m_data.push_back( std::vector<Node>());
 	}
+	return rt;
 }
 
-bool TransactionFunctionInput::Structure::isArrayNode() const
+bool TransactionFunctionInput::Structure::isArrayNode( const NodeVisitor& visitor) const
 {
+	const Node* nd = node( visitor);
+	if (!nd->m_firstchild) return false;
+	const Node* cd = node( nd->m_firstchild);
 	int arrayindex = -1;
-	std::vector<Node>::const_iterator ni = m_data.back().begin(), ne = m_data.back().end();
-	for (; ni != ne; ++ni)
+	for (;;)
 	{
-		if (ni->m_arrayindex <= arrayindex) return false;
-		arrayindex = ni->m_arrayindex;
+		if (cd->m_arrayindex <= arrayindex) return false;
+		arrayindex = cd->m_arrayindex;
+
+		if (!cd->m_next) break;
+		cd = node( cd->m_next);
 	}
 	return true;
 }
 
-void TransactionFunctionInput::Structure::createRootNode()
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::closeTag( const NodeVisitor& visitor)
 {
-	if (m_data.empty()) throw std::logic_error( "internal: illegal call of create root node");
+	Node* nd = node( visitor);
+	if (nd->m_parent < 0) throw std::runtime_error( "tags not balanced in input (close tag)");
 
-	std::size_t rootsize = m_data.back().size();
-	std::size_t rootidx = m_nodemem.alloc( rootsize);
-	Node* nd = &m_nodemem[ rootidx];
-	m_root.m_elementsize = rootsize;
-	m_root.m_element = Node::ref_element(rootidx);
-	std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
-	for (; itr != end; ++itr, ++nd)
+	NodeVisitor rt( nd->m_parent);
+	if (isArrayNode( visitor) && nd->m_parent != 0)
 	{
-		*nd = *itr;
-	}
-}
-
-void TransactionFunctionInput::Structure::finalize()
-{
-	if (m_data.size() != 1)
-	{
-		throw std::runtime_error( "tags in input not balanced");
-	}
-	// top level tag closed, assuming end of structure,
-	// creating root node and set all parent links:
-	createRootNode();
-	std::size_t rootidx = m_root.childidx();
-	for (int ri=0; ri<m_root.m_elementsize; ++ri)
-	{
-		setParentLinks( rootidx+ri);
-	}
-}
-
-void TransactionFunctionInput::Structure::closeTag()
-{
-	if (m_data.size() <= 1)
-	{
-		if (m_data.empty()) throw std::logic_error( "internal: illegal call of close tag");
-		throw std::runtime_error( "tags not balanced in input");
-	}
-	if (isArrayNode() && m_data.size() >= 2)
-	{
-		// ... in case of an array the owner of the array takes over the elements of the array
-		std::vector<Node>& uu = m_data.at( m_data.size()-2);
-		std::vector<Node>& tt = m_data.at( m_data.size()-1);
-		std::vector<Node>::const_iterator ti = tt.begin(), te = tt.end();
-		for (; ti != te; ++ti) uu.push_back( *ti);
-		m_data.pop_back();
-	}
-	else
-	{
-		if (m_data.back().size() == 0)
+		// In case of an array the granparent of the array parent takes over the children of the array
+		// and the parent is deleted from the tree:
+		Node* cd = node( nd->m_firstchild);
+		for (;;)
 		{
-			pushValue( types::Variant());
+			cd->m_tag = nd->m_tag;
+			cd->m_tagstr = nd->m_tagstr;	//... tag names taken from father that will disappear
+			if (!cd->m_next) break;
+			cd = node( cd->m_next);
 		}
-		createRootNode();
-		m_data.pop_back();
-		m_data.back().back().m_elementsize = m_root.m_elementsize;
-		m_data.back().back().m_element = m_root.m_element;
+		Node* pn = node( nd->m_parent);
+
+		if (visitor.m_nodeidx != pn->m_lastchild)
+		{
+			throw std::logic_error("internal: illegal call of closeTag");
+		}
+		if (pn->m_firstchild == pn->m_lastchild)
+		{
+			pn->m_firstchild = visitor.m_nodeidx;
+		}
+		pn->m_lastchild = nd->m_lastchild;
+		*nd = *node( nd->m_firstchild);		// ... first child gets joined to granparent children and father disappears
 	}
+	return rt;
 }
 
-void TransactionFunctionInput::Structure::pushValue( const types::VariantConst& val)
+void TransactionFunctionInput::Structure::pushValue( const NodeVisitor& visitor, const types::VariantConst& val)
 {
-	if (m_data.empty()) throw std::logic_error( "internal: illegal call of push value");
+	Node* nd = node( visitor);
+	if (nd->m_value) throw std::runtime_error( "multiple values assigned to one node in the data tree");
 
-	std::size_t mi = m_content.size();
+	nd->m_value = m_content.size();
 	m_content.push_back( val);
-	m_data.back().push_back( Node( 0, 0, 0, 0, Node::val_element( mi)));
 }
+
 
 void TransactionFunctionInput::Structure::next( const Node* nd, int tag, std::vector<const Node*>& nextnd) const
 {
-	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
-	if (nn)
+	if (!nd->m_firstchild) return;
+	const Node* cd = node( nd->m_firstchild);
+	if (!tag)
 	{
-		const Node* cd = &m_nodemem[ idx];
-		for (; ii<nn; ++ii)
+		for (;;)
 		{
-			if (cd[ii].m_tag)
-			{
-				if (!tag || cd[ii].m_tag == tag)
-				{
-					nextnd.push_back( cd+ii);
-				}
-			}
+			nextnd.push_back( cd);
+			if (!cd->m_next) break;
+			cd = node( cd->m_next);
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (cd->m_tag == tag) nextnd.push_back( cd);
+			if (!cd->m_next) break;
+			cd = node( cd->m_next);
 		}
 	}
 }
 
 void TransactionFunctionInput::Structure::find( const Node* nd, int tag, std::vector<const Node*>& findnd) const
 {
-	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
-	if (nn)
+	if (!nd->m_firstchild) return;
+	const Node* cd = node( nd->m_firstchild);
+	if (!tag)
 	{
-		const Node* cd = &m_nodemem[ idx];
-		for (; ii<nn; ++ii)
+		for (;;)
 		{
-			if (cd[ii].m_tag)
-			{
-				if (!tag || cd[ii].m_tag == tag)
-				{
-					findnd.push_back( cd+ii);
-				}
-			}
-			if (nd->childidx())
-			{
-				find( cd+ii, tag, findnd);
-			}
+			findnd.push_back( cd);
+			if (cd->m_firstchild) find( cd, tag, findnd);
+			if (!cd->m_next) break;
+			cd = node( cd->m_next);
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (cd->m_tag == tag) findnd.push_back( cd);
+			if (cd->m_firstchild) find( cd, tag, findnd);
+			if (!cd->m_next) break;
+			cd = node( cd->m_next);
 		}
 	}
 }
 
 void TransactionFunctionInput::Structure::up( const Node* nd, std::vector<const Node*>& rt) const
 {
-	if (nd->m_parent != 0)
+	if (nd->m_parent != -1)
 	{
-		rt.push_back( &m_nodemem[ nd->m_parent]);
+		rt.push_back( node( nd->m_parent));
 	}
 	else
 	{
@@ -309,51 +302,24 @@ void TransactionFunctionInput::Structure::up( const Node* nd, std::vector<const 
 	}
 }
 
-const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::root() const
+const TransactionFunctionInput::Structure::Node*
+	TransactionFunctionInput::Structure::root() const
 {
-	return &m_root;
-}
-
-const TransactionFunctionInput::Structure::Node* TransactionFunctionInput::Structure::child( const Node* nd, int idx) const
-{
-	if (idx >= nd->m_elementsize) return 0;
-	const Node* rt = &m_nodemem[ nd->childidx() + idx];
-	return rt;
+	return node(0);
 }
 
 const types::Variant* TransactionFunctionInput::Structure::contentvalue( const Node* nd) const
 {
-	if (!nd->m_tag)
+	if (nd->m_value)
 	{
-		std::size_t validx = nd->valueidx();
-		if (validx) return &m_content.at( validx);
+		return &m_content.at( nd->m_value);
 	}
 	return 0;
 }
 
-const types::Variant* TransactionFunctionInput::Structure::nodevalue( const Node* nd) const
+const char* TransactionFunctionInput::Structure::tagname( const Node* nd) const
 {
-	const types::Variant* rt = 0;
-	std::size_t ii = 0, nn = nd->nofchild(), idx = nd->childidx();
-	if (nn)
-	{
-		const Node* cd = &m_nodemem[ idx];
-		for (; ii<nn; ++ii)
-		{
-			if (!cd[ii].m_tag)
-			{
-				if (rt) throw std::runtime_error( "node selected has more than one value");
-				std::size_t validx = cd[ii].valueidx();
-				if (validx) rt = &m_content.at( validx);
-			}
-		}
-	}
-	return rt;
-}
-
-const char* TransactionFunctionInput::Structure::tagname( int tagstridx) const
-{
-	return m_privatetagmap.getstr( tagstridx);
+	return m_privatetagmap.getstr( nd->m_tagstr);
 }
 
 bool TransactionFunctionInput::Structure::isequalTag( const std::string& t1, const std::string& t2) const
@@ -379,191 +345,207 @@ public:
 	typedef TransactionFunctionInput::Structure::NodeAssignment NodeAssignment;
 	typedef TransactionFunctionInput::Structure::Node Node;
 
+	///\brief Default constructor
 	Filter()
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
-		,m_structure(0){}
+		,m_structure(0)
+		,m_elementitr(0)
+	{
+		m_nodeitr = m_nodelist.begin();
+	}
 
+	///\brief Copy constructor
 	Filter( const Filter& o)
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_structure(o.m_structure)
 		,m_nodelist(o.m_nodelist)
 		,m_stack(o.m_stack)
-		,m_elementBuf(o.m_elementBuf)
+		,m_elementbuf(o.m_elementbuf)
+		,m_elementitr(o.m_elementitr)
 	{
 		m_nodeitr = m_nodelist.begin() + (o.m_nodeitr - o.m_nodelist.begin());
 	}
 
+	///\brief Constructor
 	Filter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
 		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
 		,m_structure(structure_)
 		,m_nodelist(nodelist_)
+		,m_elementitr(0)
 	{
 		m_nodeitr = m_nodelist.begin();
 	}
 
 	virtual ~Filter(){}
+
+	///\brief Implementation of TypedInputFilter::copy()
 	virtual TypedInputFilter* copy() const		{return new Filter( *this);}
 
+	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
-		if (!m_elementBuf.empty())
-		{
-			type = m_elementBuf.back().first;
-			element = m_elementBuf.back().second;
-			m_elementBuf.pop_back();
-			return true;
-		}
-		if (m_stack.empty())
-		{
-			if (!m_structure)
-			{
-				// ... calling getNext after final CloseTag
-				setState( langbind::InputFilter::Error, "internal: illegal call of input filter");
-				return false;
-			}
-			while (m_nodeitr != m_nodelist.end() && !m_nodeitr->second)
-			{
-				//... skip empty nodes (null values)
-				++m_nodeitr;
-			}
-			if (m_nodeitr == m_nodelist.end())
-			{
-				// ... end of content marker (only close the tag if it was opened)
-				m_structure = 0;
-				if (m_nodeitr != m_nodelist.begin() && m_nodelist.back().first.size())
-				{
-					m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
-				}
-				type = TypedInputFilter::CloseTag;
-				element.init();
-				return true;
-			}
-			else
-			{
-				// ... skip to next element in the node list
-				m_stack.push_back( m_nodeitr->second);
-				if (m_nodeitr->first.size())
-				{
-					// ... only open non empty tags
-					type = TypedInputFilter::OpenTag;
-					element = m_nodeitr->first;
-					++m_nodeitr;
-					return true;
-				}
-				else
-				{
-					++m_nodeitr;
-				}
-			}
-		}
 		for (;;)
 		{
-			const Node* chld = m_structure->child( m_stack.back().node, m_stack.back().idx);
-			const char* tagnamestr;
-			if (!chld)
+			// return buffered elements first:
+			if (m_elementitr < m_elementbuf.size())
 			{
-				if (flag( SerializeWithIndices) && m_stack.back().idx > 0)
+				std::pair<ElementType, types::VariantConst>& ee = m_elementbuf.at( m_elementitr++);
+				type = ee.first;
+				element = ee.second;
+				if (m_elementitr == m_elementbuf.size())
 				{
-					// ... We have to close additional array indices added to array element tags
-					const Node* prevchld = m_structure->child( m_stack.back().node, m_stack.back().idx-1);
-					if (prevchld && prevchld->m_arrayindex >= 0)
-					{
-						// ... after array element at end of structure add missing: Close <index>
-						m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
-					}
+					m_elementbuf.clear();
 				}
-				m_stack.pop_back();
-				if (m_nodeitr != m_nodelist.begin() && (m_nodeitr-1)->first.size())
+				return true;
+			}
+			// fetch new parameter node if the current one is finished:
+			if (m_stack.empty())
+			{
+				if (!m_structure)
 				{
-					// ... only close the tag if it was opened
+					// ... calling getNext after final CloseTag
+					setState( langbind::InputFilter::Error, "internal: illegal call of input filter");
+					return false;
+				}
+				while (m_nodeitr != m_nodelist.end() && !m_nodeitr->second)
+				{
+					//... skip empty nodes (null values)
+					++m_nodeitr;
+				}
+				if (m_nodeitr == m_nodelist.end())
+				{
+					// ... end of content marker (final close- EoD)
+					m_structure = 0;
 					type = TypedInputFilter::CloseTag;
 					element.init();
 					return true;
 				}
-			}
-			else if ((tagnamestr = m_structure->tagname( chld->m_tagstr)) != 0)
-			{
-				if (flag( SerializeWithIndices))
+				// ... push the next node in the list to process
+				m_stack.push_back( StackElement( m_nodeitr->second, false));
+				if (!m_nodeitr->first.empty())
 				{
-					// ... We have to add array indices to array element tags
-					if (chld->m_arrayindex >= 0)
-					{
-						// ... [A] element of an array
-						if (chld->m_arrayindex > m_stack.back().lastarrayindex)
-						{
-							if (m_stack.back().lastarrayindex == -1)
-							{
-								// ... [A.1] new array -> Open <name>; Open <index>
-								m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
-								type = TypedInputFilter::OpenTag;
-								element = tagnamestr;
-							}
-							else
-							{
-								// ... [A.2] next array element of open array -> Close <index>; Open <index>
-								m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
-								type = TypedInputFilter::CloseTag;
-								element.init();
-							}
-						}
-						else
-						{
-							// ... [A.3] new array following array -> Close previous array before opening new one: Close <index>; Close <name>; Open <name>; Open <index>
-							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, chld->m_arrayindex));
-							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, tagnamestr));
-							m_elementBuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
-							type = TypedInputFilter::CloseTag;
-							element.init();
-						}
-						++m_stack.back().idx;
-						m_stack.back().lastarrayindex = chld->m_arrayindex;
-						m_stack.push_back( chld);
-						return true;
-					}
-					else
-					{
-						// ... [S] single element (not an array element)
-						if (m_stack.back().lastarrayindex >= 0)
-						{
-							// ... [S.1] last element belonged to an array: Close (2nd); Open <name>
-							m_elementBuf.push_back( Element( TypedInputFilter::OpenTag, tagnamestr));
-							m_stack.back().lastarrayindex = -1;
-							type = TypedInputFilter::CloseTag;
-							element.init();
-						}
-						else
-						{
-							// ... [S.2] last element was also a single element
-							type = TypedInputFilter::OpenTag;
-							element = tagnamestr;
-						}
-						++m_stack.back().idx;
-						m_stack.push_back( chld);
-						return true;
-					}
+					// ... only open non empty tags
+					type = TypedInputFilter::OpenTag;
+					element = m_nodeitr->first;
+					++ m_stack.back().closetagcnt;
+					++ m_nodeitr;
+					return true;
 				}
 				else
 				{
-					++m_stack.back().idx;
-					m_stack.push_back( chld);
-					type = TypedInputFilter::OpenTag;
-					element = tagnamestr;
-					return true;
+					// ... empty tag = embedded content, do not open anclosing tag
+					++m_nodeitr;
 				}
+				// ! The case that the parameter node is an array node (m_arrayindex) is not respected.
+				//	It is treated as a single node.
 			}
-			else
+			// Structure fetching statemachine:
+			if (m_stack.back().node)
 			{
-				std::size_t validx = m_stack.back().node->valueidx();
-				if (validx)
+				if (!m_stack.back().childrenvisited && m_stack.back().node->m_firstchild)
 				{
-					++m_stack.back().idx;
+					// mark children as visited:
+					m_stack.back().childrenvisited = true;
+
+					// push children (first child node) on the stack:
+					const Node* cnod = m_structure->node( m_stack.back().node->m_firstchild);
+					type = TypedInputFilter::OpenTag;
+					element = m_structure->tagname( cnod);
+					m_stack.push_back( StackElement( cnod, true));
+					++ m_stack.back().closetagcnt;
+
+					if (cnod->m_arrayindex >= 0)
+					{
+						++ m_stack.back().closetagcnt;
+						m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, cnod->m_arrayindex));
+					}
+					return true;
+				}
+				if (m_stack.back().node->m_next && m_stack.back().visitnext)
+				{
+					// replace current node on the stack by its next neighbour
+					const Node* snod = m_structure->node( m_stack.back().node->m_next);
+					if (flag( SerializeWithIndices))
+					{
+						const Node* tnod = m_stack.back().node;
+						if (snod->m_arrayindex >= 0)
+						{
+							// ... element is in array
+							if (snod->m_arrayindex > tnod->m_arrayindex
+								&&  snod->m_tag == tnod->m_tag
+								&&  snod->m_tagstr == tnod->m_tagstr)
+							{
+								// ... next element is in same array than element before: close <index>; open <index>
+								type = TypedInputFilter::CloseTag; element.init();
+								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, snod->m_arrayindex));
+							}
+							else if (tnod->m_arrayindex == -1)
+							{
+								// ... new array after single element: close <tag>; open <tag>; open <index>
+								type = TypedInputFilter::CloseTag; element.init();
+								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
+								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, snod->m_arrayindex));
+								++ m_stack.back().closetagcnt;
+							}
+							else
+							{
+								// ... new array after array element of previous array: close <index>; close <tag>; open <tag>; open <index>
+								type = TypedInputFilter::CloseTag; element.init();
+								m_elementbuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
+								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, snod->m_arrayindex));
+							}
+						}
+						else if (tnod->m_arrayindex >= 0)
+						{
+							// ... new single element after array: close <index>; close <tag>; open <tag>
+							type = TypedInputFilter::CloseTag; element.init();
+							m_elementbuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+							m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
+							-- m_stack.back().closetagcnt;
+						}
+						else
+						{
+							// ... new single element after single element: close <tag>; open <tag>
+							type = TypedInputFilter::CloseTag; element.init();
+							m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
+						}
+					}
+					else//if (!flag( SerializeWithIndices))
+					{
+						// ... any case is the same: close <tag>; open <tag>
+						type = TypedInputFilter::CloseTag; element.init();
+						m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
+					}
+					m_stack.back().node = snod;			//... skip to next element
+					m_stack.back().childrenvisited = false;		//... and its children
+					return true;
+				}
+				if (m_stack.back().closetagcnt > 1)
+				{
+					// close element related tag (e.g. index tag):
+					type = TypedInputFilter::CloseTag; element.init();
+					-- m_stack.back().closetagcnt;
+					return true;
+				}
+				const types::Variant* val = m_structure->contentvalue( m_stack.back().node);
+				if (val)
+				{
+					// fetch content value after all children and neighbour nodes
+					element = *val;
 					type = TypedInputFilter::Value;
-					element = m_structure->contentvalue( m_stack.back().node);
 					return true;
 				}
 			}
-			++m_stack.back().idx;
+			while (m_stack.back().closetagcnt > 0)
+			{
+				// close element enclosing tags:
+				m_elementbuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
+				-- m_stack.back().closetagcnt;
+			}
+			m_stack.pop_back();
+			continue;
 		}
 	}
 
@@ -571,24 +553,25 @@ private:
 	struct StackElement
 	{
 		const Node* node;
-		int idx;
-		int lastarrayindex;
-		ElementType lasttype;
+		bool childrenvisited;
+		bool visitnext;
+		int closetagcnt;
 
 		StackElement()
-			:idx(0),lastarrayindex(-1),lasttype(TypedInputFilter::CloseTag){}
+			:node(0),childrenvisited(false),visitnext(false),closetagcnt(0){}
 		StackElement( const StackElement& o)
-			:node(o.node),idx(o.idx),lastarrayindex(o.lastarrayindex),lasttype(o.lasttype){}
-		StackElement( const Node* node_)
-			:node(node_),idx(0),lastarrayindex(-1),lasttype(TypedInputFilter::CloseTag){}
+			:node(o.node),childrenvisited(o.childrenvisited),visitnext(o.visitnext),closetagcnt(o.closetagcnt){}
+		StackElement( const Node* node_, bool visitnext_)
+			:node(node_),childrenvisited(false),visitnext(visitnext_),closetagcnt(0){}
 	};
 
-	const TransactionFunctionInput::Structure* m_structure;
-	std::vector<NodeAssignment> m_nodelist;
-	std::vector<NodeAssignment>::const_iterator m_nodeitr;
-	std::vector<StackElement> m_stack;
-	typedef std::pair<ElementType, types::VariantConst> Element;
-	std::vector<Element> m_elementBuf;
+	const TransactionFunctionInput::Structure* m_structure;		//< structure to get the elements from
+	std::vector<NodeAssignment> m_nodelist;				//< list of element nodes in the structure
+	std::vector<NodeAssignment>::const_iterator m_nodeitr;		//< iterator on elements nodes of the structure
+	std::vector<StackElement> m_stack;				//< visit tree hierarchy stack
+	typedef std::pair<ElementType, types::VariantConst> Element;	//< element for buffer
+	std::vector<Element> m_elementbuf;				//< buffer for elements in states producing more than one element
+	std::size_t m_elementitr;					//< iterator on elements in buffer
 };
 }//namespace
 

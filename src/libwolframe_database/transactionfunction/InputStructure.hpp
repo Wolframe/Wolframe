@@ -61,84 +61,97 @@ public:
 		int m_tag;
 		int m_tagstr;
 		int m_arrayindex;
-		int m_elementsize;
-		int m_element;
+		int m_next;
+		int m_value;
+		int m_firstchild;
+		int m_lastchild;
 
 		Node()
 			:m_parent(0)
 			,m_tag(0)
 			,m_tagstr(0)
 			,m_arrayindex(-1)
-			,m_elementsize(0)
-			,m_element(0){}
+			,m_next(0)
+			,m_value(0)
+			,m_firstchild(0)
+			,m_lastchild(0){}
 
 		Node( const Node& o)
 			:m_parent(o.m_parent)
 			,m_tag(o.m_tag)
 			,m_tagstr(o.m_tagstr)
 			,m_arrayindex(o.m_arrayindex)
-			,m_elementsize(o.m_elementsize)
-			,m_element(o.m_element){}
+			,m_next(o.m_next)
+			,m_value(o.m_value)
+			,m_firstchild(o.m_firstchild)
+			,m_lastchild(o.m_lastchild){}
+	};
 
-		Node( int parent_, int tag_, int tagstr_, int size_, int element_)
-			:m_parent(parent_)
-			,m_tag(tag_)
-			,m_tagstr(tagstr_)
-			,m_arrayindex(-1)
-			,m_elementsize(size_)
-			,m_element(element_){}
+	///\class NodeVisitor
+	///\brief Tree node reference for tree building and traversal
+	class NodeVisitor
+	{
+	public:
+		///\brief Constructor
+		NodeVisitor( int nodeidx_=0)		:m_nodeidx(nodeidx_){}
+		///\brief Copy constructor
+		NodeVisitor( const NodeVisitor& o)	:m_nodeidx(o.m_nodeidx){}
 
-		bool operator == (const Node& o) const;
-		bool operator != (const Node& o) const			{return !operator==(o);}
-
-		static int ref_element( std::size_t idx)		{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
-		static int val_element( std::size_t idx)		{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
-
-		std::size_t childidx() const				{return (m_element < 0)?(std::size_t)-m_element:0;}
-		std::size_t nofchild() const				{return (m_element < 0)?(std::size_t)m_elementsize:0;}
-		std::size_t valueidx() const				{return (m_element > 0)?(std::size_t)m_element:0;}
+		int m_nodeidx;				//< index of the visited node
 	};
 
 public://visit structure:
+	///\brief Get the node pointer from a visitor reference
+	const Node* node( const NodeVisitor& nv) const;
+	Node* node( const NodeVisitor& nv);
+
+	///\brief Get the root node of the tree
 	const Node* root() const;
-	const Node* child( const Node* nd, int idx) const;
+	///\brief Get all children of a node having a tag matching to tag or all children if tag is 0.
+	///\param[out] rt where to append the result nodes
 	void next( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	///\brief Get all children (transitive, e.g. also children of children) of a node having a tag matching to tag or all children if tag is 0.
+	///\param[out] rt where to append the result nodes
 	void find( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	///\brief Append parent of a node to a node list
+	///\param[out] rt where to append the result node
 	void up( const Node* nd, std::vector<const Node*>& rt) const;
-	const types::Variant* nodevalue( const Node* nd) const;
+	///\brief Get the value of a node or null, if not defined
 	const types::Variant* contentvalue( const Node* nd) const;
+	///\brief Get the name of the tag of a node
+	const char* tagname( const Node* nd) const;
 
 	///\brief Get structure as string
-	const std::string tostring() const;
-	///\brief Get the name of the tag by index
-	const char* tagname( int tagstridx) const;
+	const std::string tostring( const NodeVisitor& nv = NodeVisitor()) const;
 	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
 	bool isequalTag( const std::string& t1, const std::string& t2) const;
 
+	///\brief Declaration of an element (element name plus node reference) of a structure
 	typedef std::pair<std::string,const Node*> NodeAssignment;
 	///\brief Create an input filter for a list of nodes to pass to a function as parameters
 	langbind::TypedInputFilter* createFilter( const std::vector<NodeAssignment>& nodes_) const;
 
-public://create structure:
-	void setParentLinks( std::size_t mi);
-	void openTag( const types::Variant& tag);
-	void openTag( const char* tag, std::size_t tagsize);
-	void closeTag();
-	void createRootNode();
-	void pushValue( const types::VariantConst& val);
-	void check() const;
-	bool isArrayNode() const;
-	void finalize();
+public://create structure without explicit visitor context:
+	void openTag( const types::Variant& tag)		{m_visitor = openTag( m_visitor, tag);}
+	void closeTag()						{m_visitor = closeTag( m_visitor);}
+	void pushValue( const types::VariantConst& val)		{pushValue( m_visitor, val);}
 
-private:
+public://create structure with explicit visitor context:
+	NodeVisitor openTag( const NodeVisitor& visitor, const types::Variant& tag);
+	NodeVisitor closeTag( const NodeVisitor& visitor);
+	void pushValue( const NodeVisitor& visitor, const types::VariantConst& val);
+
+private://create structure:
+	NodeVisitor createChildNode( const NodeVisitor& visitor);
+	NodeVisitor createSiblingNode( const NodeVisitor& visitor);
+	bool isArrayNode( const NodeVisitor& visitor) const;
+
+private://data:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
 	std::vector<types::Variant> m_content;			//< tree values
 	const TagTable* m_tagmap;				//< map names used in selections to node tag identifiers
 	TagTable m_privatetagmap;				//< map unused names to node tag identifiers
-	Node m_root;						//< root node
-
-	typedef std::vector< std::vector<Node> > BuildNodeStruct;
-	BuildNodeStruct m_data;					//< data structure for incomplete tree (under construction). empty when complete
+	NodeVisitor m_visitor;					//< context for building the tree without visitor
 };
 
 }}//namespace
