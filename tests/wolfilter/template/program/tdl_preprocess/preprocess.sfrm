@@ -1,0 +1,23 @@
+FORM PersonRef
+{
+ prename TEXT,
+ surname TEXT
+}
+
+FORM AddressRef
+{
+ prename TEXT,
+ surname TEXT
+}
+
+FORM Person
+{
+ id int
+ parent string
+ children PersonRef
+ prename string
+ surname string
+ location AddressRef
+);
+
+
