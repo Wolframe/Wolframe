@@ -375,6 +375,7 @@ Optional packages: libssl-dev (1.0.1c),
                    libsqlite3-dev (3.7.13), libpq-dev (9.1.6),
                    libxml2-dev (2.8.0), libxslt1-dev (1.1.26)
                    libpng12-dev (1.2.49), libfreeimage-dev (3.15.1)
+                   python3-dev (3.2)
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
@@ -395,6 +396,8 @@ For running the Sqlite3 database tests you need 'sqlite3'.
 For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 Ubuntu 13.04
 ------------

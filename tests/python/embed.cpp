@@ -8,7 +8,12 @@
 static const char *pyGetReprStr( PyObject *o )
 {
 	PyObject *repr = PyObject_Repr( o );
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
 	const char *s = PyUnicode_AsUTF8( repr );
+#else
+	PyObject *pstr = PyUnicode_AsUTF8String( repr );
+	const char *s = PyBytes_AsString( pstr );
+#endif
 	return s;
 }
 

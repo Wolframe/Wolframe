@@ -10,7 +10,7 @@ embed.o: embed.cpp
 	$(CXX) -c -o embed.o $(CXXFLAGS) embed.cpp
 
 embed: embed.o
-	$(CXX) -o embed $(LDFLAGS) $(LIBS) embed.o
+	$(CXX) -o embed $(LDFLAGS) embed.o $(LIBS)
 
 clean:
 	-rm *.o
