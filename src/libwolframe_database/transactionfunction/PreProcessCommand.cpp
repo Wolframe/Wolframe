@@ -172,7 +172,12 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 
 				// assign form function result to destination in input structure for further processing:
 				langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode));
-				langbind::RedirectFilterClosure resultassign( fc->result(), resfilter);
+				langbind::TypedInputFilterR result = fc->result();
+
+				result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
+				// ... result should provide indices of arrays is possible (for further preprocessing function calls)
+
+				langbind::RedirectFilterClosure resultassign( result, resfilter);
 				if (!resultassign.call())
 				{
 					const char* err = argfilter->getError();
