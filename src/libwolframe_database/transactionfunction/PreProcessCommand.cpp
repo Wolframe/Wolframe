@@ -33,45 +33,163 @@
 ///\brief Implementation of preprocessing function calls
 ///\file transactionfunction/PreProcessCommand.cpp
 #include "transactionfunction/PreProcessCommand.hpp"
+#include "langbind/appObjects.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+static types::VariantConst
+	expectArg( langbind::TypedInputFilter* i, langbind::InputFilter::ElementType et, const char* errmsg)
+{
+	langbind::InputFilter::ElementType it;
+	types::VariantConst iv;
+
+	if (i->getNext( it, iv))
+	{
+		if (it != et) throw std::runtime_error( errmsg);
+	}
+	else
+	{
+		const char* err = i->getError();
+		throw std::runtime_error( err?err:"unexpected end of input");
+	}
+	return iv;
+}
+
+
 void PreProcessCommand::call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const
 {
 	// Select the nodes to execute the command with:
-	typedef TransactionFunctionInput::Structure::Node Node;
-	typedef TransactionFunctionInput::Structure::NodeAssignment NodeAssignment;
-	std::vector<const Node*> nodearray;
-	m_selector.selectNodes( structure, structure.root(), nodearray);
+	typedef TransactionFunctionInput::Structure Structure;
+	typedef Structure::Node Node;
+	typedef Structure::NodeAssignment NodeAssignment;
+	typedef Structure::NodeVisitor NodeVisitor;
 
-	std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
-	for (; ni != ne; ++ni)
+	const types::NormalizeFunction* nf = 0;
+	const langbind::FormFunction* ff = 0;
+	try
 	{
-		// Build the parameter structure:
-		std::vector<NodeAssignment> parameterassign;
-		std::vector<const Node*> parameter;
-		std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
-		std::size_t aidx = 0;
-		for (; ai != ae; ++ai,++aidx)
+		nf = provider->normalizeFunction( m_name);
+		if (!nf) ff = provider->formFunction( m_name);
+
+		std::vector<const Node*> nodearray;
+		m_selector.selectNodes( structure, structure.root(), nodearray);
+
+		std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+		for (; ni != ne; ++ni)
 		{
-			ai->selector.selectNodes( structure, *ni, parameter);
-			if (parameter.size() != aidx)
+			// [1] Create the destination node for the result:
+			NodeVisitor resultnode = structure.visitor( *ni);
+			if (!m_resultpath.empty())
 			{
-				if (parameter.size() < aidx)
+				if (m_resultpath.size() > 1)
 				{
-					parameter.push_back( 0);
-				}
-				else
-				{
-					throw std::runtime_error( std::string( "referenced parameter in preprocessor call is not unique for parameter '") + ai->name + "' in call of '" + m_name +"'");
+					std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.begin() + (m_resultpath.size() - 1);
+					for (; ri != re; ++ri)
+					{
+						resultnode = structure.visitTag( resultnode, *ri);
+					}
+					resultnode = structure.openTag( resultnode, *ri);
 				}
 			}
-			parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
-		}
-		langbind::TypedInputFilterR argfilter( structure.createFilter( parameterassign));
+			// [2] Build the parameter structure:
+			std::vector<NodeAssignment> parameterassign;
+			std::vector<const Node*> parameter;
+			std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
+			std::size_t aidx = 0;
+			for (; ai != ae; ++ai,++aidx)
+			{
+				ai->selector.selectNodes( structure, *ni, parameter);
+				if (parameter.size() != aidx)
+				{
+					if (parameter.size() < aidx)
+					{
+						parameter.push_back( 0);
+					}
+					else
+					{
+						throw std::runtime_error( std::string( "referenced parameter '") + ai->name + "' is not unique");
+					}
+				}
+				parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
+			}
+			langbind::TypedInputFilterR argfilter( structure.createInputFilter( parameterassign));
 
-		// Call the function:
+			// [3] Call the function:
+			if (nf)
+			{
+				// call normalize function:
+				langbind::InputFilter::ElementType et;
+				types::VariantConst ev;
+				bool haveInput = true;
+				const char* errmsg = "atomic value (pure or with single tag) expected as input of normalization function (got structure instead)";
+
+				if (argfilter->getNext( et, ev))
+				{
+					if (et == langbind::InputFilter::OpenTag)
+					{
+						// we have a structure with one tag with content value, so we run the function with the value as argument:
+						ev = expectArg( argfilter.get(), langbind::InputFilter::Value, errmsg);
+						expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
+					}
+					else if (et == langbind::InputFilter::Attribute)
+					{
+						// we have a structure with one attribute, so we run the function with the value as argument:
+						ev = expectArg( argfilter.get(), langbind::InputFilter::Value, errmsg);
+					}
+					else if (et == langbind::InputFilter::Value)
+					{
+						// we have an atomic value ....
+					}
+					else if (et == langbind::InputFilter::CloseTag)
+					{
+						// we have a NULL value, so we do not execute the function:
+						haveInput = false;
+					}
+				}
+				if (haveInput)
+				{
+					expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
+					structure.pushValue( resultnode, nf->execute( ev));
+				}
+			}
+			else if (ff)
+			{
+				// call form function:
+				langbind::FormFunctionClosureR fc( ff->createClosure());
+				serialize::Context::Flags f = serialize::Context::None;
+				if (!structure.case_sensitive())
+				{
+					f = (serialize::Context::Flags)((int)f | (int)serialize::Context::CaseInsensitiveCompare);
+				}
+				fc->init( provider, argfilter, f);
+				if (!fc->call())
+				{
+					const char* err = argfilter->getError();
+					if (!err) throw std::logic_error( "internal: incomplete input");
+					throw std::runtime_error( err);
+				}
+
+				// assign form function result to destination in input structure for further processing:
+				langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode));
+				langbind::RedirectFilterClosure resultassign( fc->result(), resfilter);
+				if (!resultassign.call())
+				{
+					const char* err = argfilter->getError();
+					if (!err) err = resfilter->getError();
+					if (!err) throw std::logic_error( "internal: incomplete result");
+					throw std::runtime_error( err);
+				}
+			}
+			else
+			{
+				throw std::runtime_error( "function not defined");
+			}
+		}
+	}
+	catch (std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "failed to call transaction preprocessing function '") + m_name +"': " + e.what());
 	}
 }
 

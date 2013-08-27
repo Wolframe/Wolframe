@@ -113,10 +113,31 @@ const std::string TransactionFunctionInput::Structure::tostring( const NodeVisit
 	return rt.str();
 }
 
-TransactionFunctionInput::Structure::NodeVisitor
-	TransactionFunctionInput::Structure::createChildNode( const NodeVisitor& visitor)
+std::string TransactionFunctionInput::Structure::nodepath( const NodeVisitor& nv) const
 {
-	Node* nd = node( visitor);
+	std::vector<const char*> pt;
+	int ni = nv.m_nodeidx;
+	while (ni)
+	{
+		const Node* nd = node( ni);
+		const char* tn = tagname( nd);
+		if (tn) pt.push_back( tn);
+		ni = nd->m_parent;
+	}
+	std::string rt;
+	while (pt.size())
+	{
+		if (rt.size()) rt.push_back('/');
+		rt.append( pt.back());
+		pt.pop_back();
+	}
+	return rt;
+}
+
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::createChildNode( const NodeVisitor& nv)
+{
+	Node* nd = node( nv);
 	int idx = (int)m_nodemem.alloc( 1);
 	if (!nd->m_lastchild)
 	{
@@ -129,22 +150,48 @@ TransactionFunctionInput::Structure::NodeVisitor
 	}
 	Node* chld = node( idx);
 	chld->m_arrayindex = -1;
-	chld->m_parent = visitor.m_nodeidx;
+	chld->m_parent = nv.m_nodeidx;
 	return NodeVisitor(idx);
 }
 
 TransactionFunctionInput::Structure::NodeVisitor
-	TransactionFunctionInput::Structure::createSiblingNode( const NodeVisitor& visitor)
+	TransactionFunctionInput::Structure::createSiblingNode( const NodeVisitor& nv)
 {
-	if (!visitor.m_nodeidx) throw std::runtime_error( "try to create sibling node of root");
-	return createChildNode( NodeVisitor( node( visitor.m_nodeidx)->m_parent));
+	if (!nv.m_nodeidx) throw std::runtime_error( "try to create sibling node of root");
+	return createChildNode( NodeVisitor( node( nv.m_nodeidx)->m_parent));
+}
+
+TransactionFunctionInput::Structure::NodeVisitor
+	TransactionFunctionInput::Structure::visitTag( const NodeVisitor& nv, const std::string& tag) const
+{
+	const Node* nd = node( nv);
+	if (!nd->m_firstchild) throw std::runtime_error( std::string( "node with name '") + tag + "' does not exist in structure at '" + nodepath(nv) + "' (node is empty)");
+	int tgs = (int)m_privatetagmap.find( tag);
+	if (!tgs) throw std::runtime_error( std::string( "node with name '") + tag + "' does not exist in structure (at all) at '" + nodepath(nv) + "'");
+	const Node* cd = node( nd->m_firstchild);
+	NodeVisitor rt;
+	for (;;)
+	{
+		if (cd->m_tagstr == tgs)
+		{
+			if (rt.m_nodeidx) throw std::runtime_error( std::string( "cannot make unique selection of node with name '") + tag + "' in structure at '" + nodepath(nv) + "' (it exists more than once)");
+			rt = visitor( cd);
+		}
+		if (!cd->m_next) break;
+		cd = node( cd->m_next);
+	}
+	if (!rt.m_nodeidx)
+	{
+		throw std::runtime_error( std::string( "node with name '") + tag + "' does not exist in structure at '" + nodepath(nv) + "' (no node name matched)");
+	}
+	return rt;
 }
 
 
 TransactionFunctionInput::Structure::NodeVisitor
-	TransactionFunctionInput::Structure::openTag( const NodeVisitor& visitor, const types::Variant& tag)
+	TransactionFunctionInput::Structure::openTag( const NodeVisitor& nv, const types::Variant& tag)
 {
-	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( visitor);
+	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( nv);
 	Node* nd = node( rt);
 
 	if (tag.type() == types::Variant::string_)
@@ -162,11 +209,11 @@ TransactionFunctionInput::Structure::NodeVisitor
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw std::runtime_error( "array index cannot be converted to integer");
+			throw std::runtime_error( std::string("array index cannot be converted to integer at '") + nodepath(nv) + "'");
 		}
 		if (nd->m_arrayindex < 0)
 		{
-			throw std::runtime_error( "array index is negative");
+			throw std::runtime_error( std::string( "array index is negative at '") + nodepath(nv) + "'");
 		}
 		if (nd->m_parent)
 		{
@@ -178,9 +225,9 @@ TransactionFunctionInput::Structure::NodeVisitor
 	return rt;
 }
 
-bool TransactionFunctionInput::Structure::isArrayNode( const NodeVisitor& visitor) const
+bool TransactionFunctionInput::Structure::isArrayNode( const NodeVisitor& nv) const
 {
-	const Node* nd = node( visitor);
+	const Node* nd = node( nv);
 	if (!nd->m_firstchild) return false;
 	const Node* cd = node( nd->m_firstchild);
 	int arrayindex = -1;
@@ -196,13 +243,13 @@ bool TransactionFunctionInput::Structure::isArrayNode( const NodeVisitor& visito
 }
 
 TransactionFunctionInput::Structure::NodeVisitor
-	TransactionFunctionInput::Structure::closeTag( const NodeVisitor& visitor)
+	TransactionFunctionInput::Structure::closeTag( const NodeVisitor& nv)
 {
-	Node* nd = node( visitor);
+	Node* nd = node( nv);
 	if (nd->m_parent < 0) throw std::runtime_error( "tags not balanced in input (close tag)");
 
 	NodeVisitor rt( nd->m_parent);
-	if (isArrayNode( visitor) && nd->m_parent != 0)
+	if (isArrayNode( nv) && nd->m_parent != 0)
 	{
 		// In case of an array the granparent of the array parent takes over the children of the array
 		// and the parent is deleted from the tree:
@@ -216,13 +263,13 @@ TransactionFunctionInput::Structure::NodeVisitor
 		}
 		Node* pn = node( nd->m_parent);
 
-		if (visitor.m_nodeidx != pn->m_lastchild)
+		if (nv.m_nodeidx != pn->m_lastchild)
 		{
 			throw std::logic_error("internal: illegal call of closeTag");
 		}
 		if (pn->m_firstchild == pn->m_lastchild)
 		{
-			pn->m_firstchild = visitor.m_nodeidx;
+			pn->m_firstchild = nv.m_nodeidx;
 		}
 		pn->m_lastchild = nd->m_lastchild;
 		*nd = *node( nd->m_firstchild);		// ... first child gets joined to granparent children and father disappears
@@ -230,10 +277,10 @@ TransactionFunctionInput::Structure::NodeVisitor
 	return rt;
 }
 
-void TransactionFunctionInput::Structure::pushValue( const NodeVisitor& visitor, const types::VariantConst& val)
+void TransactionFunctionInput::Structure::pushValue( const NodeVisitor& nv, const types::VariantConst& val)
 {
-	Node* nd = node( visitor);
-	if (nd->m_value) throw std::runtime_error( "multiple values assigned to one node in the data tree");
+	Node* nd = node( nv);
+	if (nd->m_value) throw std::runtime_error( std::string( "multiple values assigned to one node in the data tree at '") + nodepath(nv) + "'");
 
 	nd->m_value = m_content.size();
 	m_content.push_back( val);
@@ -336,9 +383,9 @@ bool TransactionFunctionInput::Structure::isequalTag( const std::string& t1, con
 
 
 namespace {
-///\class Filter
-///\brief Input filter for calling preprocessing functions
-class Filter
+///\class InputFilter
+///\brief Input InputFilter for calling preprocessing functions
+class InputFilter
 	:public langbind::TypedInputFilter
 {
 public:
@@ -346,8 +393,8 @@ public:
 	typedef TransactionFunctionInput::Structure::Node Node;
 
 	///\brief Default constructor
-	Filter()
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+	InputFilter()
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,m_structure(0)
 		,m_elementitr(0)
 	{
@@ -355,8 +402,8 @@ public:
 	}
 
 	///\brief Copy constructor
-	Filter( const Filter& o)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+	InputFilter( const InputFilter& o)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_structure(o.m_structure)
 		,m_nodelist(o.m_nodelist)
@@ -368,8 +415,8 @@ public:
 	}
 
 	///\brief Constructor
-	Filter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::Filter", __LINE__)
+	InputFilter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,m_structure(structure_)
 		,m_nodelist(nodelist_)
 		,m_elementitr(0)
@@ -377,10 +424,11 @@ public:
 		m_nodeitr = m_nodelist.begin();
 	}
 
-	virtual ~Filter(){}
+	///\brief Destructor
+	virtual ~InputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::copy()
-	virtual TypedInputFilter* copy() const		{return new Filter( *this);}
+	virtual TypedInputFilter* copy() const		{return new InputFilter( *this);}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element)
@@ -573,11 +621,85 @@ private:
 	std::vector<Element> m_elementbuf;				//< buffer for elements in states producing more than one element
 	std::size_t m_elementitr;					//< iterator on elements in buffer
 };
+
+
+///\class OutputFilter
+///\brief Input OutputFilter for calling preprocessing functions
+class OutputFilter
+	:public langbind::TypedOutputFilter
+{
+public:
+	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
+
+	///\brief Default constructor
+	OutputFilter()
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		,m_structure(0)
+		,m_lasttype( langbind::TypedInputFilter::Value)
+	{}
+
+	///\brief Copy constructor
+	OutputFilter( const OutputFilter& o)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		,langbind::TypedOutputFilter(o)
+		,m_structure(o.m_structure)
+		,m_visitor(o.m_visitor)
+		,m_lasttype(o.m_lasttype)
+	{}
+
+	///\brief Constructor
+	OutputFilter( TransactionFunctionInput::Structure* structure_, const NodeVisitor& visitor_)
+		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		,m_structure(structure_)
+		,m_visitor(visitor_)
+		,m_lasttype( langbind::TypedInputFilter::Value)
+	{}
+
+	///\brief Destructor
+	virtual ~OutputFilter(){}
+
+	///\brief Implementation of TypedOutputFilter::copy()
+	virtual TypedOutputFilter* copy() const		{return new OutputFilter( *this);}
+
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	virtual bool print( ElementType type, const types::VariantConst& element)
+	{
+		LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
+		switch (type)
+		{
+			case langbind::TypedInputFilter::OpenTag:
+				m_structure->openTag( m_visitor, element);
+			break;
+			case langbind::TypedInputFilter::CloseTag:
+				m_structure->closeTag( m_visitor);
+			break;
+			case langbind::TypedInputFilter::Attribute:
+				m_structure->openTag( m_visitor, element);
+			break;
+			case langbind::TypedInputFilter::Value:
+				m_structure->pushValue( m_visitor, element);
+				if (m_lasttype == langbind::TypedInputFilter::Attribute)
+				{
+					m_structure->closeTag( m_visitor);
+				}
+			break;
+		}
+		m_lasttype = type;
+		return true;
+	}
+
+private:
+	TransactionFunctionInput::Structure* m_structure;	//< structure to print the elements to
+	NodeVisitor m_visitor;
+	ElementType m_lasttype;
+};
+
 }//namespace
 
-langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( const std::vector<NodeAssignment>& nodelist) const
+langbind::TypedInputFilter*
+	TransactionFunctionInput::Structure::createInputFilter( const std::vector<NodeAssignment>& nodelist) const
 {
-	langbind::TypedInputFilter* rt = new Filter( this, nodelist);
+	langbind::TypedInputFilter* rt = new InputFilter( this, nodelist);
 	if (!m_tagmap->case_sensitive())
 	{
 		rt->setFlags( langbind::TypedInputFilter::PropagateNoCase);
@@ -585,5 +707,11 @@ langbind::TypedInputFilter* TransactionFunctionInput::Structure::createFilter( c
 	return rt;
 }
 
+langbind::TypedOutputFilter*
+	TransactionFunctionInput::Structure::createOutputFilter( const NodeVisitor& nv)
+{
+	langbind::TypedOutputFilter* rt = new OutputFilter( this, nv);
+	return rt;
+}
 
 

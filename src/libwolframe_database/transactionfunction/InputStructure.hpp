@@ -101,9 +101,15 @@ public:
 	};
 
 public://visit structure:
+	bool case_sensitive() const					{return m_tagmap->case_sensitive();}
+
 	///\brief Get the node pointer from a visitor reference
 	const Node* node( const NodeVisitor& nv) const;
 	Node* node( const NodeVisitor& nv);
+
+	///\brief Get the visitor from a node pointer
+	NodeVisitor visitor( const Node* nd) const			{return NodeVisitor( nd-m_nodemem.base());}
+	NodeVisitor visitor( Node* nd)					{return NodeVisitor( nd-m_nodemem.base());}
 
 	///\brief Get the root node of the tree
 	const Node* root() const;
@@ -120,6 +126,8 @@ public://visit structure:
 	const types::Variant* contentvalue( const Node* nd) const;
 	///\brief Get the name of the tag of a node
 	const char* tagname( const Node* nd) const;
+	///\brief Get the absolute path of a node as string with '/' as path element delimiter
+	std::string nodepath( const NodeVisitor& nv) const;
 
 	///\brief Get structure as string
 	const std::string tostring( const NodeVisitor& nv = NodeVisitor()) const;
@@ -129,7 +137,9 @@ public://visit structure:
 	///\brief Declaration of an element (element name plus node reference) of a structure
 	typedef std::pair<std::string,const Node*> NodeAssignment;
 	///\brief Create an input filter for a list of nodes to pass to a function as parameters
-	langbind::TypedInputFilter* createFilter( const std::vector<NodeAssignment>& nodes_) const;
+	langbind::TypedInputFilter* createInputFilter( const std::vector<NodeAssignment>& nodes_) const;
+	///\brief Create an output filter for the output of a preprocessing command
+	langbind::TypedOutputFilter* createOutputFilter( const NodeVisitor& nv);
 
 public://create structure without explicit visitor context:
 	void openTag( const types::Variant& tag)		{m_visitor = openTag( m_visitor, tag);}
@@ -137,14 +147,15 @@ public://create structure without explicit visitor context:
 	void pushValue( const types::VariantConst& val)		{pushValue( m_visitor, val);}
 
 public://create structure with explicit visitor context:
-	NodeVisitor openTag( const NodeVisitor& visitor, const types::Variant& tag);
-	NodeVisitor closeTag( const NodeVisitor& visitor);
-	void pushValue( const NodeVisitor& visitor, const types::VariantConst& val);
+	NodeVisitor visitTag( const NodeVisitor& nv, const std::string& tag) const;
+	NodeVisitor openTag( const NodeVisitor& nv, const types::Variant& tag);
+	NodeVisitor closeTag( const NodeVisitor& nv);
+	void pushValue( const NodeVisitor& nv, const types::VariantConst& val);
 
 private://create structure:
-	NodeVisitor createChildNode( const NodeVisitor& visitor);
-	NodeVisitor createSiblingNode( const NodeVisitor& visitor);
-	bool isArrayNode( const NodeVisitor& visitor) const;
+	NodeVisitor createChildNode( const NodeVisitor& nv);
+	NodeVisitor createSiblingNode( const NodeVisitor& nv);
+	bool isArrayNode( const NodeVisitor& nv) const;
 
 private://data:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes

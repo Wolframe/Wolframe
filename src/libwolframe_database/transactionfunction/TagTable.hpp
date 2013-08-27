@@ -46,15 +46,28 @@ public:
 	explicit TagTable( bool case_sensitive_);
 	TagTable( const TagTable& o);
 
+	///\brief Get the index of a tag
+	///\return index of the tag or 0, if not found
 	int find( const char* tag, std::size_t tagsize) const;
+	///\brief Get the index of a tag
+	///\return index of the tag or 0, if not found
 	int find( const std::string& tagstr) const;
+	///\brief Get the index of a tag. Create it if not found
+	///\return index of the tag
 	int get( const std::string& tagstr);
+	///\brief Get the index of a tag. Create it if not found
+	///\return index of the tag
 	int get( const char* tag, std::size_t tagsize);
 
+	///\brief Get the name of the tag as inserted as first
 	const char* getstr( int tg) const	{return (tg<=0)?0:m_strings.c_str()+tg;}
+	///\brief Find out if the map is case sensitive in search
+	///\return true if yes
 	bool case_sensitive() const		{return m_case_sensitive;}
 
+	///\brief Insert a tag table into another and return the map for rewriting references to tag indices from the old to the new tag map
 	std::map<int,int> insert( const TagTable& o);
+	///\brief Get the special tag index used for an unused value
 	int unused() const			{return 1;}
 
 private:
