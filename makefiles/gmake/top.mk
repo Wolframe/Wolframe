@@ -219,6 +219,14 @@ ifeq ($(WITH_LOCAL_FREEIMAGE),1)
 	@echo "using local FreeImage for image manipulation module.."
 endif
 endif
+ifeq ($(WITH_PYTHON),1)
+	@echo
+	@echo "enabled Python bindings"
+	@echo
+	@echo "PYTHON_CFLAGS: $(PYTHON_CFLAGS)"
+	@echo "PYTHON_LDFLAGS: $(PYTHON_LDFLAGS)"
+	@echo "PYTHON_LIBS: $(PYTHON_LIBS)"
+endif
 	@echo
 	@echo "Installation directories"
 	@echo
