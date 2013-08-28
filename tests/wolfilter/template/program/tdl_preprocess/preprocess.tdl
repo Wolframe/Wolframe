@@ -1,0 +1,28 @@
+
+OPERATION getPerson
+RESULT INTO person
+BEGIN
+	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
+		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $(id);
+
+	INTO . DO SELECT id,prename,surname FROM Person
+		WHERE Person.ID = $(id);
+
+	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
+		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $(id);
+
+	INTO location DO SELECT Address.street,Address.town FROM Person,PersonAddressRel
+		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $(id);
+
+	INTO tag DO SELECT childid FROM PersonChildRel WHERE PersonChildRel.ID = $(id);
+	INTO tag DO SELECT adressid FROM PersonAddressRel WHERE PersonAddressRel.ID = $(id);
+	INTO tag DO SELECT companyid FROM PersonCompanyRel WHERE PersonCompanyRel.ID = $(id);
+END
+
+TRANSACTION getData
+RESULT INTO data
+BEGIN
+	DO SELECT ID FROM Person;
+	INTO . DO getPerson( $1);
+END
+

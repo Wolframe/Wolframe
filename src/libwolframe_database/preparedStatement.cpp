@@ -238,8 +238,18 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 static bool pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
+	int argidx;
+	if (!cmdres.nofColumns())
+	{
+		for (argidx=1; ai != ae; ++ai,++argidx)
+		{
+			std::ostringstream colname;
+			colname << "_" << argidx;
+			cmdres.addColumn( colname.str());
+		}
+	}
 	cmdres.openRow();
-	for (int argidx=1; ai != ae; ++ai,++argidx)
+	for (argidx=1,ai=cmditr->begin(); ai != ae; ++ai,++argidx)
 	{
 		types::VariantConst val;
 
@@ -261,10 +271,6 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 				val = ai->value();
 				break;
 		}
-		std::ostringstream colname;
-		colname << "_" << argidx;
-		cmdres.addColumn( colname.str());
-
 		if (val.defined())
 		{
 			cmdres.addValue( val);

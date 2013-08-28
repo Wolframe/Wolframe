@@ -56,9 +56,9 @@ public:
 
 	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
-		static IntegerNormalizeFunction int_( true, 10);
-		static IntegerNormalizeFunction uint_( false, 10);
-		static FloatNormalizeFunction float_( 10, 10);
+		static IntegerNormalizeFunction int_( true, 8, 1000000000);
+		static IntegerNormalizeFunction uint_( false, 8, 1000000000);
+		static FloatNormalizeFunction float_( 8, 8, 1000000000.0);
 		if (boost::algorithm::iequals( name, "int")) return &int_;
 		if (boost::algorithm::iequals( name, "uint")) return &uint_;
 		if (boost::algorithm::iequals( name, "float")) return &float_;

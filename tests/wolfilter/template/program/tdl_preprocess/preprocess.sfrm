@@ -1,23 +1,56 @@
 FORM PersonRef
 {
- prename TEXT,
- surname TEXT
+	prename string
+	surname string
 }
 
 FORM AddressRef
 {
- prename TEXT,
- surname TEXT
+	street string
+	town string
+}
+
+FORM CompanyRef
+{
+	name string
 }
 
 FORM Person
 {
- id int
- parent string
- children PersonRef
- prename string
- surname string
- location AddressRef
-);
+	company CompanyRef[]
+	id int
+	parent string
+	children PersonRef[]
+	prename string
+	surname string
+	location AddressRef[]
+	tag int[]
+}
+
+FORM Company
+{
+	id int
+	parent string
+	name string
+	location AddressRef[]
+	children CompanyRef[]
+	tag int[]
+}
+
+FORM Data
+{
+	data
+	{
+		person Person[]
+	}
+}
+
+FORM AllDataRequest
+{
+	data
+	{
+	}
+}
+
 
 
