@@ -833,6 +833,12 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 PAM is available natively, just add WITH_PAM=1
 
+For Python scripting you have to compile Python3 by hand:
+
+./configure --prefix=/opt/csw/python-3.3.2/
+gmake
+gmake install
+
 Build Wolframe:
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -843,5 +849,7 @@ LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
 	WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
 	WITH_LOCAL_FREEIMAGE=1 \
+	WITH_PYTHON=1 \
 	gmake \
-		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
+		CC='ccache gcc' CXX='ccache g++' CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
+
