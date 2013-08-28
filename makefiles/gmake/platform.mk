@@ -2970,21 +2970,21 @@ endif
 ifeq ($(WITH_PYTHON),1)
 
 ifeq "$(PLATFORM)" "LINUX"
-PYTHON3_CONFIG=python3-config
+PYTHON3_CONFIG ?= python3-config
 PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
 PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
 PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-PYTHON3_CONFIG=/usr/local/bin/python3-config
+PYTHON3_CONFIG ?= /usr/local/bin/python3-config
 PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
 PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
 PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
-PYTHON3_CONFIG=/opt/csw/python-3.3.2/bin/python3-config
+PYTHON3_CONFIG ?= /opt/csw/python-3.3.2/bin/python3-config
 PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
 PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
 PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)

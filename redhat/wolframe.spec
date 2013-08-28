@@ -56,28 +56,22 @@
 %endif
 
 %define suse 0
-%define osu114 0
-%define osu121 0
 %define osu122 0
+%define osu123 0
 %define osu131 0
-%if 0%{?suse_version} == 1140
-%define dist osu114
-%define osu114 1
-%define suse 1
-%endif
-%if 0%{?suse_version} == 1210
-%define dist osu121
-%define osu121 1
-%define suse 1
-%endif
 %if 0%{?suse_version} >= 1220
 %define dist osu122
 %define osu122 1
 %define suse 1
 %endif
+%if 0%{?suse_version} >= 1230
+%define dist osu123
+%define osu123 1
+%define suse 1
+%endif
 %if 0%{?suse_version} >= 1310
 %define dist osu131
-%define osu122 1
+%define osu131 1
 %define suse 1
 %endif
 
@@ -94,6 +88,7 @@
 %define with_sqlite	1
 %define with_pgsql	1
 %define with_lua	1
+%define with_python	1
 %define with_pam	1
 %define with_sasl	1
 %define with_libxml2	1
@@ -121,13 +116,6 @@
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
 %endif
-%if %{suse}
-%if %{osu114} || %{osu121}
-%define build_boost 1
-%define boost_version 1.48.0
-%define boost_underscore_version 1_48_0
-%endif
-%endif
 
 # icu for boost-locale is available natively only on a few platforms,
 # enable it there. If we build our own boost, try hard to enable ICU
@@ -141,7 +129,7 @@
 %endif
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 %define with_icu	1
 %endif
 %endif
@@ -176,12 +164,34 @@
 %endif
 %endif
 
+# Build local Python 3 for distributions which have no packages yet
+
+%if %{with_python}
+%define build_python 0
+%if %{rhel}
+%if %{rhel5} || %{rhel6}
+%define build_python 1
+%define python_version 3.3.2
+%endif
+%endif
+%if %{centos}
+%if %{centos5} || %{centos6}
+%define build_python 1
+%define python_version 3.3.2
+%endif
+%endif
+%if %{sles}
+%define build_python 1
+%define python_version 3.3.2
+%endif
+%endif
+
 # init script to start the daemon
 
 %if %{rhel} || %{centos} || %{fedora}
 %define initscript	wolframed.initd.RHEL
 %endif
-%if %{suse} || %{sles}
+%if %{sles}
 %define initscript	wolframed.initd.SuSE
 %endif
 
@@ -207,6 +217,9 @@ Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 %endif
 %if %{build_libxml2}
 Source2: libxml2-sources-%{libxml2_version}.tar.gz
+%endif
+%if %{build_python}
+Source3: Python-%{python_version}.tar.bz2
 %endif
 
 URL: http://www.wolframe.net/
@@ -247,7 +260,7 @@ BuildRequires: systemd
 %endif
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 BuildRequires: systemd
 %{?systemd_requires}
 %endif
@@ -281,7 +294,7 @@ Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
@@ -308,6 +321,12 @@ BuildRequires: cyrus-sasl-devel >= 2.1.19
 %if %{with_libxml2}
 %if !%{build_libxml2}
 BuildRequires: libxml2-devel >= 2.6
+%endif
+%endif
+
+%if %{with_python}
+%if !%{build_python}
+BuildRequires: python3-devel >= 3.0
 %endif
 %endif
 
@@ -502,6 +521,20 @@ Requires: cyrus-sasl >= 2.1.22
 
 %endif
 
+%if %{with_python}
+%package python
+Summary: Wolframe Python language bindins
+Group: Application/Business
+
+%description python
+Allows writing business application code in Python 3.
+
+Requires: %{name} >= %{version}-%{release}
+%if !%{build_python}
+Requires: python3 >= 0.0
+%endif
+%endif
+
 %if %{with_libxml2}
 %package libxml2
 Summary: Wolframe XML filtering module using libxml2
@@ -571,7 +604,7 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
@@ -603,8 +636,14 @@ Command line client to access the Wolframe server.
 
 %prep
 
-%if %{build_boost} && %{build_libxml2}
-%setup -T -D -b 0 -b 1 -b 2
+%if %{build_boost} && %{build_python} && %{build_libxml2}
+%setup -T -D -b 0 -b 1 -b 2 -b 3
+cd ../boost_%{boost_underscore_version}
+%patch -P 0 -p1
+cd ../%{name}-%{version}
+%else
+%if %{build_boost} && %{build_python}
+%setup -T -D -b 0 -b 1 -b 3
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
@@ -615,7 +654,15 @@ cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
+%if %{build_python}
+%setup -T -D -b 0 -b 3
+cd ../boost_%{boost_underscore_version}
+%patch -P 0 -p1
+cd ../%{name}-%{version}
+%else
 %setup
+%endif
+%endif
 %endif
 %endif
 
@@ -626,6 +673,13 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 ./bootstrap.sh --prefix=/tmp/boost-%{boost_version} \
 	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
 ./bjam %{?_smp_mflags} -d1 install
+%endif
+
+%if %{build_python}
+cd %{_builddir}/Python-%{python_version}
+./configure --prefix=/tmp/Python-%{python_version}
+make %{?_smp_mflags}
+make install
 %endif
 
 %if %{build_libxml2}
@@ -644,6 +698,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -677,6 +735,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+%endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %else
@@ -708,6 +770,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -741,6 +807,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -781,6 +851,10 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -826,13 +900,14 @@ cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_
 ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
 %endif
 
+#TODO: What exactly do we need? Do we have to probe it?
+# copy local python library to local library directory for platform which need it
+%if %{build_python}
+cp /tmp/Python-%{python_version}/lib/libpython*.so.*.* $RPM_BUILD_ROOT%{_libdir}/wolframe
+%endif
+
 %if %{rhel} || %{centos} || %{sles}
 install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
-%endif
-%if %{suse}
-%if %{osu114}
-install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
-%endif
 %endif
 
 %if %{fedora}
@@ -842,7 +917,7 @@ install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wo
 %endif
 
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
 %endif
 %endif
@@ -893,7 +968,7 @@ echo
 %endif
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
@@ -920,11 +995,7 @@ systemctl stop wolframed.service
 systemctl disable wolframed.service
 %endif
 %if %{suse}
-%if %{osu114}
-    /etc/init.d/wolframed stop > /dev/null 2>&1
-    /sbin/chkconfig --del wolframed
-%endif
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 systemctl stop wolframed.service
 systemctl disable wolframed.service
 %endif
@@ -945,9 +1016,6 @@ fi
 %attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %if %{suse}
-%if %{osu114}
-%attr( 554, root, root) %{_initrddir}/%{name}d
-%endif
 %endif
 
 %if %{fedora}
@@ -957,7 +1025,7 @@ fi
 %endif
 %endif
 %if %{suse}
-%if %{osu122} || %{osu131}
+%if %{osu122} || %{osu123} || %{osu131}
 %{_unitdir}/wolframed.service
 %endif
 %endif
@@ -1031,6 +1099,8 @@ fi
 
 %{_libdir}/wolframe/modules/mod_command_directmap.so
 %{_libdir}/wolframe/modules/mod_ddlcompiler_simpleform.so
+
+%{_libdir}/wolframe/modules/mod_job_schedule_db.so
 
 %if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
@@ -1166,6 +1236,17 @@ fi
 %if %{build_libxml2}
 %{_libdir}/wolframe/libxml2.so.%{libxml2_version}
 %{_libdir}/wolframe/libxml2.so.2
+%endif
+%endif
+
+%if %{with_python}
+%files python
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_command_python.so
+%if %{build_python}
+%{_libdir}/wolframe/libpython*.so.*.*
 %endif
 %endif
 
