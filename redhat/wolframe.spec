@@ -219,7 +219,7 @@ Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 Source2: libxml2-sources-%{libxml2_version}.tar.gz
 %endif
 %if %{build_python}
-Source2: Python-%{python_version}.tar.bz2
+Source3: Python-%{python_version}.tar.bz2
 %endif
 
 URL: http://www.wolframe.net/
