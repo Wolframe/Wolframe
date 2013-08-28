@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 4.1.16),
  libboost-program-options-dev, libboost-filesystem-dev,
  libboost-locale-dev, libboost-regex-dev,
  libssl-dev, libpam-dev, libsasl2-dev,
- libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev
+ libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev,
+ python3-dev
 Standards-Version: 3.8.3
 Homepage: http://www.wolframe.net
 
@@ -46,6 +47,12 @@ Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
  The Wolframe authentication module using Cyrus SASL.
+
+Package: wolframe-python
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe Python 3 bindings.
+ The Wolframe Python 3 bindings.
 
 Package: wolframe-libxml2
 Architecture: any
