@@ -57,6 +57,7 @@ nofColumns(); returns 1
 columnName( 1); returns offen
 get( 1 ); returns 1
 next(); returns 0
+start( 'exec' );
 bind( 1, '2' );
 bind( 2, 'miriam' );
 bind( 3, 'zum gems weg 3' );
@@ -64,6 +65,7 @@ execute();
 nofColumns(); returns 1
 get( 1 ); returns 2
 next(); returns 0
+start( 'exec' );
 bind( 1, '3' );
 bind( 2, 'sara' );
 bind( 3, 'tannen steig 12' );

@@ -342,7 +342,6 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		else
 		{
 			optype = DatabaseCall;
-			if (!start( ci->name())) return false;
 		}
 		bool nonempty = ci->nonemptyResult();
 		bool unique = ci->uniqueResult();
@@ -393,7 +392,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
 						for (; wi != we; ++wi)
 						{
-							if (!executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
+							if (!start( ci->name())
+							||  !executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
 							{
 								const DatabaseError* lasterr = getLastError();
 								if (lasterr)
@@ -418,7 +418,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					if (!pushArguments( output, cmdres, wi, ci)) return false;
 					break;
 				case DatabaseCall:
-					if (!executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
+					if (!start( ci->name())
+					||  !executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
 					{
 						const DatabaseError* lasterr = getLastError();
 						if (lasterr)

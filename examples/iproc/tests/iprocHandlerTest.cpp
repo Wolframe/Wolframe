@@ -369,8 +369,6 @@ TYPED_TEST( IProcHandlerTest, ExpectedResult )
 	std::string output;
 	EXPECT_EQ( 0, test::runTestIO( this->m_input, output, *this->m_connection));
 
-#define _Wolframe_LOWLEVEL_DEBUG
-#ifdef _Wolframe_LOWLEVEL_DEBUG
 	unsigned int ii=0,nn=output.size();
 	for (;ii<nn && output[ii]==this->m_expected[ii]; ii++);
 	if (ii != nn)
@@ -381,7 +379,7 @@ TYPED_TEST( IProcHandlerTest, ExpectedResult )
 			this->m_expected[ii-2],this->m_expected[ii-1],this->m_expected[ii-0],this->m_expected[ii+1]);
 		boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 	}
-#endif
+
 #ifndef _WIN32
 	EXPECT_EQ( this->m_expected, output);
 #else

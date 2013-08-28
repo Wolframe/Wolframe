@@ -24,7 +24,7 @@ FORM Person
 	prename string
 	surname string
 	location AddressRef[]
-	tag int[]
+	tag int
 }
 
 FORM Company

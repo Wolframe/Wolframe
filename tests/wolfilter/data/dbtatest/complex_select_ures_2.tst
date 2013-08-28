@@ -69,11 +69,13 @@ nofColumns(); returns 1
 columnName( 1); returns res
 get( 1 ); returns a
 next(); returns 0
+start( 'get' );
 bind( 1, '2' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns b
 next(); returns 0
+start( 'get' );
 bind( 1, '3' );
 execute();
 nofColumns(); returns 1
@@ -86,11 +88,13 @@ nofColumns(); returns 1
 columnName( 1); returns res
 get( 1 ); returns 111
 next(); returns 0
+start( 'run' );
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns 222
 next(); returns 0
+start( 'run' );
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 1
@@ -100,9 +104,11 @@ start( 'run' );
 bind( 1, 'a' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0
@@ -110,9 +116,11 @@ start( 'run' );
 bind( 1, 'a' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0
@@ -120,9 +128,11 @@ start( 'run' );
 bind( 1, 'a' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0

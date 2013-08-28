@@ -48,58 +48,48 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-#undef WOLFRAME_LOWLEVEL_DEBUG
-#ifdef WOLFRAME_LOWLEVEL_DEBUG
-int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_stmt** stm, const char** t)
+static int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_stmt** stm, const char** t)
 {
 	LOG_DATA << "call sqlite3_prepare_v2 '" << ((n<0)?std::string(s):std::string(s,n)) << "'";
 	return sqlite3_prepare_v2( c, s, n, stm, t);
 }
-std::size_t wrap_sqlite3_bind_parameter_count( sqlite3_stmt* stm)
+static std::size_t wrap_sqlite3_bind_parameter_count( sqlite3_stmt* stm)
 {
 	std::size_t rt = sqlite3_bind_parameter_count(stm);
 	LOG_DATA << "call sqlite3_bind_parameter_count returns " << rt;
 	return rt;
 }
-int wrap_sqlite3_bind_text( sqlite3_stmt* stm, int idx, const char* s, int n, void(*f)(void*))
+static int wrap_sqlite3_bind_text( sqlite3_stmt* stm, int idx, const char* s, int n, void(*f)(void*))
 {
 	int rt = sqlite3_bind_text( stm, idx, s, n, f);
 	LOG_DATA << "call sqlite3_bind_text " << idx << " '" << ((n<0)?std::string(s):std::string(s,n)) << "' returns " << rt;
 	return rt;
 }
-int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
+static int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
 {
 	int rt = sqlite3_bind_int( stm, idx, val);
 	LOG_DATA << "call sqlite3_bind_int " << idx << " " << val << " returns " << rt;
 	return rt;
 }
-int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, boost::int64_t val)
+static int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, boost::int64_t val)
 {
 	int rt = sqlite3_bind_int64( stm, idx, val);
 	LOG_DATA << "call sqlite3_bind_int64 " << idx << " " << val << " returns " << rt;
 	return rt;
 }
-int wrap_sqlite3_bind_double( sqlite3_stmt* stm, int idx, double val)
+static int wrap_sqlite3_bind_double( sqlite3_stmt* stm, int idx, double val)
 {
 	int rt = sqlite3_bind_double( stm, idx, val);
 	LOG_DATA << "call sqlite3_bind_double " << idx << " " << val << " returns " << rt;
 	return rt;
 }
-int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
+static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
 {
 	int rt = sqlite3_bind_null( stm, idx);
 	LOG_DATA << "call sqlite3_bind_null " << idx << " returns " << rt;
 	return rt;
 }
-#else
-#define wrap_sqlite3_prepare_v2			sqlite3_prepare_v2
-#define wrap_sqlite3_bind_parameter_count	sqlite3_bind_parameter_count
-#define wrap_sqlite3_bind_text			sqlite3_bind_text
-#define wrap_sqlite3_bind_null			sqlite3_bind_null
-#define wrap_sqlite3_bind_int			sqlite3_bind_int
-#define wrap_sqlite3_bind_int64			sqlite3_bind_int64
-#define wrap_sqlite3_bind_double		sqlite3_bind_double
-#endif
+
 
 PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
@@ -345,8 +335,8 @@ bool PreparedStatementHandler_sqlite3::execute()
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
 	int rc = sqlite3_step( m_stm);
-	m_hasResult = (rc == SQLITE_ROW);
-	if (!m_hasResult )
+	m_hasResult = (rc == SQLITE_ROW || rc == SQLITE_DONE);
+	if (!m_hasResult)
 	{
 		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( m_conn) << ")";
 	}
@@ -372,7 +362,7 @@ const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
 {
 	if (m_state != Executed)
 	{
-		errorStatus( std::string( "number of columns not available in state '") + stateName(m_state) + "'");
+		errorStatus( std::string( "name of columns not available in state '") + stateName(m_state) + "'");
 		return 0;
 	}
 	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
@@ -398,25 +388,51 @@ types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
 	LOG_TRACE << "[sqlite3 statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
-		errorStatus( std::string( "number of columns not available in state '") + stateName(m_state) + "'");
+		errorStatus( std::string( "data of result columns not available in state '") + stateName(m_state) + "'");
 		return types::VariantConst();
 	}
-	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
+	if (idx == 0 || idx > (std::size_t)sqlite3_column_count( m_stm))
 	{
 		errorStatus( std::string( "column index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 		return types::VariantConst();
 	}
-	if (sqlite3_column_type( m_stm, (int)idx-1) == SQLITE_NULL)
+	int restype = sqlite3_column_type( m_stm, (int)idx-1);
+	if (restype == SQLITE_INTEGER)
 	{
+		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
+		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_INTEGER " << resval;
+		return types::VariantConst( (types::Variant::Data::Int_)resval);
+	}
+	else if (restype == SQLITE_FLOAT)
+	{
+		double resval = sqlite3_column_double( m_stm, (int)idx-1);
+		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_FLOAT " << resval;
+		return types::VariantConst( resval);
+	}
+	else if (restype == SQLITE_TEXT)
+	{
+		const char* resval = (const char*)sqlite3_column_text( m_stm, (int)idx-1);
+		if (!resval) resval = "";
+		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_TEXT " << resval;
+		return types::VariantConst( resval);
+	}
+	else  if (restype == SQLITE_BLOB)
+	{
+		const char* resval = (const char*)sqlite3_column_blob( m_stm, (int)idx-1);
+		int ressize = resval?sqlite3_column_bytes( m_stm, (int)idx-1):0;
+		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_BLOB -binary data-";
+		return types::VariantConst( resval, ressize);
+	}
+	else  if (restype == SQLITE_NULL)
+	{
+		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_NULL";
 		return types::VariantConst();
 	}
-	const char* rt = (const char*)sqlite3_column_text( m_stm, (int)idx-1);
-	if (!rt && idx <= (std::size_t)sqlite3_column_count( m_stm))
+	else
 	{
-		errorStatus( std::string( "cannot convert result value to string for column (") + boost::lexical_cast<std::string>(idx) + ")");
+		errorStatus( std::string( "cannot handle result of this type (SQLITE type ") + boost::lexical_cast<std::string>(restype) + "'");
 		return types::VariantConst();
 	}
-	return types::VariantConst( rt);
 }
 
 bool PreparedStatementHandler_sqlite3::next()

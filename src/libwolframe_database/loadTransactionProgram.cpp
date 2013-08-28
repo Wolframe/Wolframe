@@ -469,6 +469,54 @@ static std::vector<TransactionFunctionDescription::ProcessingStep::Argument>
 	return rt;
 }
 
+static void parseOperationArguments( TransactionFunctionDescription::VariableTable& variablemap, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	typedef TransactionFunctionDescription::VariableValue VariableValue;
+	typedef TransactionFunctionDescription::VariableTable VariableTable;
+
+	std::string varname;
+	char ch;
+	int column_idx = 0;
+	ch = parseNextToken( langdescr, varname, si, se);
+	if (ch == ')') return;
+
+	if (isAlphaNumeric(ch))
+	{
+		VariableTable::const_iterator vi = variablemap.find( varname);
+		if (vi != variablemap.end())
+		{
+			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "'");
+		}
+		variablemap[ varname] = VariableValue( ++column_idx, 0);
+	}
+	else
+	{
+		throw std::runtime_error( "variable name expected (itentifier in OPERATION argument list)");
+	}
+	while (0!=(ch=gotoNextToken( langdescr, si, se)))
+	{
+		if (ch != ',') break;
+		ch = parseNextToken( langdescr, varname, si, se);
+		if (isAlphaNumeric(ch))
+		{
+			variablemap[ varname] = VariableValue( ++column_idx, 0);
+		}
+		else
+		{
+			throw std::runtime_error( "variable name expected (itentifier in OPERATION argument list)");
+		}
+	}
+	if (ch == ')')
+	{
+		++si;
+	}
+	else
+	{
+		throw std::runtime_error( "syntax error in in OPERATION argument list: expected ')'");
+	}
+}
+
+
 namespace {
 struct Operation
 {
@@ -545,7 +593,14 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				TransactionFunctionDescription::ProcessingStep prcstep;
 				unsigned int mask = 0;
 
-				while (parseNextToken( langdescr, tok, si, se))
+				if (gotoNextToken( langdescr, si, se) == '(')
+				{
+					// ... operation argument list
+					parseNextToken( langdescr, tok, si, se);
+					if (isTransaction) throw ERROR( si, "unexpected token '(': no positional arguments allowed positional transaction function");
+					parseOperationArguments( operation.description.variablemap, langdescr, si, se);
+				}
+				while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 				{
 					if (boost::algorithm::iequals( tok, "RESULT"))
 					{

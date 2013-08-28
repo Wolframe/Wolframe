@@ -15,8 +15,7 @@ CREATE TABLE Address
 CREATE TABLE Company
 (
  ID INTEGER PRIMARY KEY AUTOINCREMENT,
- name TEXT,
- locationid INT REFERENCES Adress( ID )
+ name TEXT
 );
 
 CREATE TABLE PersonChildRel

@@ -50,6 +50,7 @@ get( 1 ); returns karin
 get( 2 ); returns fischer
 get( 3 ); returns beamte
 next(); returns 0
+start( 'call' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
@@ -68,6 +69,7 @@ nofColumns(); returns 1
 columnName( 1); returns alter
 get( 1 ); returns 42
 next(); returns 0
+start( 'get' );
 bind( 1, '1' );
 bind( 2, 'peter' );
 bind( 3, 'mueller' );

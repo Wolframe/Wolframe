@@ -82,7 +82,7 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInp
 
 bool TransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
 {
-	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
+	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "' :" << element.typeName( element.type());
 	switch (type)
 	{
 		case langbind::TypedInputFilter::OpenTag:
@@ -125,10 +125,10 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 		switch (pi->referenceType())
 		{
 			case Path::ResultIndex:
-				ti.bindCommandArgAsResultReference( pi->resultReferenceIndex());
+				ti.bindCommandArgAsResultReference( pi->resultReferenceIndex(), pi->resultReferenceScope());
 				break;
 			case Path::ResultSymbol:
-				ti.bindCommandArgAsResultReference( pi->resultReferenceSymbol());
+				ti.bindCommandArgAsResultReference( pi->resultReferenceSymbol(), pi->resultReferenceScope());
 				break;
 			case Path::Constant:
 				ti.bindCommandArgAsValue( pi->constantReference());
@@ -263,6 +263,7 @@ TransactionFunctionOutput::~TransactionFunctionOutput()
 bool TransactionFunctionOutput::getNext( ElementType& type, types::VariantConst& element)
 {
 	bool rt = m_impl->getNext( type, element, flag( SerializeWithIndices));
+	LOG_DATA << "[transaction output] get next " << langbind::OutputFilter::elementTypeName( type) << " '" << element.tostring() << "' :" << element.typeName( element.type());
 	return rt;
 }
 
@@ -293,7 +294,6 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	typedef TransactionFunctionDescription::OperationStep OperationStep;
 	typedef OperationStep::Call Call;
 	typedef TransactionFunctionDescription::VariableTable VariableTable;
-	VariableTable varmap;
 
 	// Compile the preprocessing commands:
 	{
@@ -360,7 +360,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			std::vector<Call::Param>::const_iterator ai = di->call.paramlist.begin(), ae = di->call.paramlist.end();
 			for (; ai != ae; ++ai)
 			{
-				Path pp( *ai, &varmap, &m_tagmap);
+				Path pp( *ai, &description.variablemap, &m_tagmap);
 				param.push_back( pp);
 			}
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
@@ -369,22 +369,33 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				DatabaseCommand cc( di->call.funcname, selector, param, di->nonempty, di->unique, 1, di->hints);
 				if (!di->path_INTO.empty())
 				{
-					// this is just the wrapping structure, iteration is only done with the last tag (othwerwise
-					// we get into definition problems)
-					bool hasOutput = (di->path_INTO.size() > 1 || (di->path_INTO.size() == 1 && di->path_INTO[0] != "."));
+					// this is just the wrapping structure, iteration is only done with the last tag
+					// (othwerwise we get into definition problems)
+					std::string iteratingTag = di->path_INTO.back();
+					bool hasOutput = (iteratingTag != ".");
+
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
 					{
 						m_resultstruct->openTag( di->path_INTO[i] );
 					}
 					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
-					if (hasOutput) {
-						m_resultstruct->openTag( di->path_INTO[di->path_INTO.size()-1]);
+					if (hasOutput)
+					{
+						m_resultstruct->openTag( iteratingTag);
 					}
-					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
+					if (!di->unique)
+					{
+						m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
+					}
 					m_resultstruct->addValueReference( m_call.size());
-					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
-					if (hasOutput) {
-						m_resultstruct->closeTag( );
+
+					if (!di->unique)
+					{
+						m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
+					}
+					if (hasOutput)
+					{
+						m_resultstruct->closeTag();
 					}
 					m_resultstruct->addMark( ResultElement::FunctionEnd, m_call.size());
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)

@@ -70,6 +70,13 @@ public:
 		ElementType m_type;
 		int m_tag;
 		int m_scope_functionidx;
+
+		Element()
+			:m_type(Root),m_tag(0),m_scope_functionidx(-1){}
+		Element( ElementType type_, int tag_, int scope_functionidx_)
+			:m_type(type_),m_tag(tag_),m_scope_functionidx(scope_functionidx_){}
+		Element( const Element& o)
+			:m_type(o.m_type),m_tag(o.m_tag),m_scope_functionidx(o.m_scope_functionidx){}
 	};
 
 	Path(){}

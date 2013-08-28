@@ -43,6 +43,7 @@ bind( 1, '1' );
 bind( 2, 'hugo' );
 execute();
 nofColumns(); returns 0
+start( 'exec' );
 bind( 1, '2' );
 bind( 2, 'barbara' );
 execute();

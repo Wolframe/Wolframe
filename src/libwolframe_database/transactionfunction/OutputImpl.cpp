@@ -129,6 +129,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				continue;
 			}
 		}
+		LOG_DATA << "[transaction result stm] State " << ResultElement::typeName( m_structitr->type) << " " << m_structitr->idx << " '" << (m_structitr->value?m_structitr->value:"") << "'";
 		switch (m_structitr->type)
 		{
 			case ResultElement::OpenTag:

@@ -187,7 +187,7 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 			//... first key is number and we do not need to serialize with indices, so we treat it as a vector with repeating open tag for vector elements
 			if (!tag)
 			{
-				setState( InputFilter::Error, "cannot build filter for an array because tag as string is missing");
+				setState( InputFilter::Error, "Cannot build filter for array (numeric indices) content mixed with ordinary table (symbolic indices)");
 				wrap_lua_pop( m_ls, 2);
 				return false;
 			}
@@ -250,7 +250,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				if (lua_istable( m_ls, -1))
 				{
 					m_stk.back().id = FetchState::Done;
-					if (!firstTableElem()) return false;
+					if (!firstTableElem() && state() == InputFilter::Error) return false;
 					continue;
 				}
 				else
@@ -410,32 +410,36 @@ bool LuaTableOutputFilter::openTag( const types::VariantConst& element)
 		m_statestk.push_back( Struct);
 		return true;
 	}
-	// check for t[k][#t[k]] exists -> it is an array:
-	std::size_t len = lua_rawlen( m_ls, -1);
-	wrap_lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
-	wrap_lua_gettable( m_ls, -2);				///... LUA STK: t k t[k] t[k][#t[k]]
-	bool isArray = !lua_isnil( m_ls, -1);
-	if (isArray)
+	// check for t[k] beeing table and t[k][#t[k]] exists -> t[k] is an array:
+	if (lua_istable( m_ls, -1))					///... LUA STK: t k t[k]
 	{
-		///... the table is an array
-		wrap_lua_pop( m_ls, 1);				///... LUA STK: t k ar
-		wrap_lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
-		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
-		m_statestk.push_back( Vector);
+		std::size_t len = lua_rawlen( m_ls, -1);
+		wrap_lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
+		wrap_lua_gettable( m_ls, -2);				///... LUA STK: t k t[k] t[k][#t[k]]
+		if (!lua_isnil( m_ls, -1))
+		{
+			///... the table is an array
+			wrap_lua_pop( m_ls, 1);				///... LUA STK: t k t[k]
+			wrap_lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
+			wrap_lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
+			m_statestk.push_back( Vector);
+			return true;
+		}
+		else
+		{
+			wrap_lua_pop( m_ls, 1);				///... LUA STK: t k t[k]
+		}
 	}
-	else
-	{
-		///... the table is a structure. but the element is already defined. we create an array
-		wrap_lua_pop( m_ls, 2);				///... LUA STK: t k
-		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar
-		wrap_lua_pushinteger( m_ls, 1);			///... LUA STK: t k ar 1
-		wrap_lua_pushvalue( m_ls, -3);			///... LUA STK: t k ar 1 k
-		wrap_lua_gettable( m_ls, -5);			///... LUA STK: t k ar 1 t[k]
-		wrap_lua_settable( m_ls, -3);			///... LUA STK: t k ar             (ar[1]=t[k])
-		wrap_lua_pushinteger( m_ls, 2);			///... LUA STK: t k ar 2
-		wrap_lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
-		m_statestk.push_back( Vector);
-	}
+	///... the element is a structure or atomic element already defined. we create an array
+	wrap_lua_pop( m_ls, 1);				///... LUA STK: t k
+	wrap_lua_newtable( m_ls);			///... LUA STK: t k ar
+	wrap_lua_pushinteger( m_ls, 1);			///... LUA STK: t k ar 1
+	wrap_lua_pushvalue( m_ls, -3);			///... LUA STK: t k ar 1 k
+	wrap_lua_gettable( m_ls, -5);			///... LUA STK: t k ar 1 t[k]
+	wrap_lua_settable( m_ls, -3);			///... LUA STK: t k ar             (ar[1]=t[k])
+	wrap_lua_pushinteger( m_ls, 2);			///... LUA STK: t k ar 2
+	wrap_lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
+	m_statestk.push_back( Vector);
 	return true;
 }
 
