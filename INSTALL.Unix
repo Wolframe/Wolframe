@@ -145,6 +145,10 @@ Qt (4.2.1) is too old, compile your own one.
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).
 
+For scripting in Python you have to set WITH_PYTHON=1. There are no
+official Python 3 packages for this platform, so build your own python there.
+Make sure 'python3-config' is in your path.
+
 RHEL/Centos/SL 6
 ----------------
 
@@ -173,6 +177,7 @@ For building the documentation you need 'libxslt', 'doxygen' and
 
 For scripting in Python you have to set WITH_PYTHON=1. There are no
 official Python 3 packages for this platform, so build your own python there.
+Make sure 'python3-config' is in your path.
 
 Fedora 17
 ---------
@@ -851,5 +856,4 @@ LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 \
 	gmake \
-		CC='ccache gcc' CXX='ccache g++' CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
-
+		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
