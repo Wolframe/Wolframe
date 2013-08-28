@@ -1,6 +1,7 @@
 #include <Python.h>
 
 #include <iostream>
+#include <cstdlib>
 
 #define FUNC_NAME "func"
 #define DIRECT_PARAMS
@@ -26,7 +27,9 @@ int main( int argc, char *argv[] )
 
 	// set name of program, this is used for resolving path names
 	// for libraries (TODO: set to what in wolframe?!)
-	Py_SetProgramName( (wchar_t *)argv[0] ); 
+	wchar_t progname[FILENAME_MAX + 1];
+	mbstowcs( progname, argv[0], strlen( argv[0] ) + 1 );
+	Py_SetProgramName( progname ); 
 
 	// initialize Python interpreter, avoid registration of signal handlers,
 	// let's Wolframe do this..

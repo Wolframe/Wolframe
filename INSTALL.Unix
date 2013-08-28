@@ -181,7 +181,8 @@ Optional packages: openssl-devel (1.0.0j)
                    pam-devel (1.1.5), cyrus-sasl-devel (2.1.23),
                    sqlite-devel (3.7.11), postgresql-devel (9.1.5),
                    libxml2-devel (2.7.8), libxslt-devel (1.1.26),
-                   libpng-devel (1.2.48), zlib-devel (1.2.5)
+                   libpng-devel (1.2.48), zlib-devel (1.2.5),
+                   python3-devel (3.2.3)
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
@@ -199,6 +200,8 @@ For running the Postgresql database tests you need 'postgresql-client'.
 For running the Sqlite3 database tests you need 'sqlite3'.
 
 For running some tests you need 'telnet' (0.17).
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 Fedora 18
 ---------
@@ -449,7 +452,7 @@ Optional packages: libpam-dev (1.1.1),
                    libsasl2-dev (2.1.23), libsqlite3-dev (3.7.3),
                    libpq-dev (8.4.7), libxml2-dev (2.7.8),
                    libxslt1-dev (1.1.26), libpng12-dev (1.2.44),
-                   zlib1g-dev (1.2.3.4)
+                   zlib1g-dev (1.2.3.4), python3-dev (3.1.3)
 
 libboost-dev is 1.42, slightly too old. Compile your own version.
 
@@ -466,6 +469,8 @@ For running the Sqlite3 database tests you need 'sqlite3'.
 For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 Debian 7.0
 ----------
