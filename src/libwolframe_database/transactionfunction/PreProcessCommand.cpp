@@ -102,8 +102,8 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 	const langbind::FormFunction* ff = 0;
 	try
 	{
-		nf = provider->normalizeFunction( m_name);
-		if (!nf) ff = provider->formFunction( m_name);
+		ff = provider->formFunction( m_name);
+		if (!ff) nf = provider->normalizeFunction( m_name);
 
 		std::vector<const Node*> nodearray;
 		m_selector.selectNodes( structure, structure.root(), nodearray);
@@ -114,6 +114,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 			if (selectmap[*ni]++ > 0)
 			{
 				LOG_WARNING << "duplicate selection of node '" << structure.nodepath( *ni) << "' (processing only first selection)";
+				continue;
 			}
 			// [1A] Create the destination node for the result:
 			NodeVisitor resultnode = structure.visitor( *ni);
@@ -207,6 +208,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				// call form function:
 				langbind::FormFunctionClosureR fc( ff->createClosure());
 				serialize::Context::Flags f = serialize::Context::None;
+
 				if (!structure.case_sensitive())
 				{
 					f = (serialize::Context::Flags)((int)f | (int)serialize::Context::CaseInsensitiveCompare);

@@ -716,7 +716,7 @@ public:
 				m_visitor = m_structure->openTag( m_visitor, element);
 				if (m_taglevel == 0 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
 				{
-					throw std::runtime_error( "assigned result to tag that already exists in input. This is forbidden due to causing annomalies");
+					throw std::runtime_error( "assigned result to tag that already exists in input. This is forbidden because it may cause annomalies");
 				}
 			break;
 			case langbind::TypedInputFilter::CloseTag:
