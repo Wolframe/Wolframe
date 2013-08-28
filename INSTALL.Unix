@@ -292,7 +292,8 @@ Ubuntu 10.04.1 LTS
 Optional packages: libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.6.22), libpq-dev (8.4.7),
                    libxml2-dev (2.7.6), libpng-dev (1.2.42),
-                   zlib1g-dev (1.2.3.3.dfsg-15ubuntu1)
+                   zlib1g-dev (1.2.3.3.dfsg-15ubuntu1),
+                   python3-dev (3.1.2)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -314,6 +315,8 @@ For running the Sqlite3 database tests you need 'sqlite3'.
 For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 Ubuntu 11.04
 ------------
@@ -342,6 +345,8 @@ For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
+For scripting in Python you have to set WITH_PYTHON=1.
+
 Ubuntu 12.04
 ------------
 
@@ -353,7 +358,7 @@ Optional packages: libssl-dev (1.0.1),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
                    libsqlite3-dev (3.7.9), libpq-dev (9.1.3),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
-                   libpng-dev (1.2.46)
+                   libpng-dev (1.2.46), python3-dev (3.2.3)
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
@@ -372,6 +377,8 @@ For running the Sqlite3 database tests you need 'sqlite3'.
 For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 Ubuntu 12.10
 ------------
@@ -516,7 +523,7 @@ OpenSuSE 11.4
 Optional packages: pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.5), postgresql-devel (9.0.3), libxml2-devel (2.7.8),
                    libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.4),
-                   libicu-devel (4.4.2)
+                   libicu-devel (4.4.2), python3-devel (3.1.3)
 
 Boost 1.44 is too old, compile your own.
 
@@ -526,6 +533,8 @@ For building the PDF wolfbook install 'fop'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 OpenSuSE 12.1
 -------------
@@ -533,7 +542,7 @@ OpenSuSE 12.1
 Optional packages: pam-devel (1.1.4), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.8), postgresql-devel (9.1.1), libxml2-devel (2.7.8),
                    libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.8),
-                   lilicu-devel (4.6.1)
+                   lilicu-devel (4.6.1), python3-devel (3.2.1)
 
 Boost 1.44 is too old, compile your own.
 
@@ -543,6 +552,8 @@ For building the PDF wolfbook install 'fop'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For scripting in Python you have to set WITH_PYTHON=1.
 
 OpenSuSE 12.2
 -------------
@@ -640,6 +651,14 @@ add PGSQL_DIR=/usr/local/pgsql to Wolframe 'make'
 
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1.
 
+For Python support enable it with WITH_PYTHON=1 and install Python3 from
+scratch. Make sure 'python3-config' is in your path:
+
+Install Python 3 with:
+./configure
+make
+make install
+
 Archlinux
 ---------
 
@@ -647,7 +666,7 @@ Required packages: boost and boost-libs
 Optional packages: openssl, pam, libsasl,
                    sqlite, postgresql-libs,
                    libxml2, libxslt, libharu,
-                   icu, freeimage
+                   icu, freeimage, python
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'
 and 'fop'. Newest versions run only with the SVN version of
