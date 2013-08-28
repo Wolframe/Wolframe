@@ -2976,6 +2976,13 @@ PYTHON_LDFLAGS = $(shell python3-config --ldflags)
 PYTHON_LIBS = $(shell python3-config --libs)
 endif
 
+ifeq "$(PLATFORM)" "FREEBSD"
+PYTHON3_CONFIG=/usr/local/bin/python3-config
+PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags)
+PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
+endif
+
 endif
 
 # Expect (for testing)
