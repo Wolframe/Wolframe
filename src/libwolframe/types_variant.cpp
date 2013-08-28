@@ -4,6 +4,7 @@
 #include <limits>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
 
 using namespace _Wolframe;
