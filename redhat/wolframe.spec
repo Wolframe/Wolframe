@@ -216,7 +216,7 @@ Source1: boost_%{boost_underscore_version}.tar.gz
 Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 %endif
 %if %{build_python}
-Source2: Python-${python_version}.tar.bz2
+Source2: Python-%{python_version}.tar.bz2
 %endif
 %if %{build_libxml2}
 Source3: libxml2-sources-%{libxml2_version}.tar.gz
