@@ -1,0 +1,37 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I . /I"$(PYTHON_DIR)\include"
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS =
+
+INCLUDE_LIBS = \
+	"$(PYTHON_DIR)\lib\libpython3.lib"
+
+TEST_CPP_BINS = \
+	embed.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+embed.exe: embed.obj
+
+local_all:
+
+local_clean:
+	@-erase test.RES 2>NUL
+
+local_distclean:
+
+local_test:
+	@-copy "$(PYTHON3)\lib\python3.dll" .
+	@-embed my > test.RES

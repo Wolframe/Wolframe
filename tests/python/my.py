@@ -4,4 +4,5 @@ def func( i, f ):
     print( 'func', i, f )
     return i * f
 
-print( 'Module initialized on ' , ctime( time( ) ) )
+time = 1377677003.4642606
+print( 'Module initialized on ' , ctime( time ) )
