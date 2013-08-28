@@ -180,6 +180,10 @@
 %define python_version 3.3.2
 %endif
 %endif
+%if %{sles}
+%define build_python 1
+%define python_version 3.3.2
+%endif
 %endif
 
 # init script to start the daemon
@@ -633,10 +637,11 @@ Command line client to access the Wolframe server.
 %prep
 
 %if %{build_boost} && %{build_python} && %{build_libxml2}
-%setup -T -D -b 0 -b 1 -b 2 -b3
+%setup -T -D -b 0 -b 1 -b 2 -b 3
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
+%else
 %if %{build_boost} && %{build_libxml2}
 %setup -T -D -b 0 -b 1 -b 2
 cd ../boost_%{boost_underscore_version}
@@ -687,6 +692,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
@@ -722,6 +728,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
@@ -757,6 +764,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
@@ -793,6 +801,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
@@ -836,6 +845,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
 %endif
