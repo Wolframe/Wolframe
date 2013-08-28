@@ -215,11 +215,11 @@ Source: %{name}_%{version}.tar.gz
 Source1: boost_%{boost_underscore_version}.tar.gz
 Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 %endif
+%if %{build_libxml2}
+Source2: libxml2-sources-%{libxml2_version}.tar.gz
+%endif
 %if %{build_python}
 Source2: Python-%{python_version}.tar.bz2
-%endif
-%if %{build_libxml2}
-Source3: libxml2-sources-%{libxml2_version}.tar.gz
 %endif
 
 URL: http://www.wolframe.net/
@@ -642,8 +642,8 @@ cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
-%if %{build_boost} && %{build_libxml2}
-%setup -T -D -b 0 -b 1 -b 2
+%if %{build_boost} && %{build_python}
+%setup -T -D -b 0 -b 1 -b 3
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
@@ -654,7 +654,14 @@ cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
+%if %{build_python}
+%setup -T -D -b 0 -b 3
+cd ../boost_%{boost_underscore_version}
+%patch -P 0 -p1
+cd ../%{name}-%{version}
+%else
 %setup
+%endif
 %endif
 %endif
 %endif
