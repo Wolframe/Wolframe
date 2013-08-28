@@ -171,6 +171,9 @@ Qt (4.2.1) is too old, compile your own one.
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).
 
+For scripting in Python you have to set WITH_PYTHON=1. There are no
+official Python 3 packages for this platform, so build your own python there.
+
 Fedora 17
 ---------
 
@@ -678,6 +681,9 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
 
+For scripting in Python you have to set WITH_PYTHON=1. Use the BSD
+ports package for python33 as there is no binary Python 3 package.
+
 FreeBSD 9.1
 -----------
 
@@ -701,6 +707,9 @@ So far no PAM support.
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 For testing postgresql you also need 'postgresql92-server'.
+
+For scripting in Python you have to set WITH_PYTHON=1. Use the BSD
+ports package for python33 as there is no binary Python 3 package.
 
 Solaris 10
 ----------
