@@ -1093,6 +1093,8 @@ fi
 %{_libdir}/wolframe/modules/mod_command_directmap.so
 %{_libdir}/wolframe/modules/mod_ddlcompiler_simpleform.so
 
+%{_libdir}/wolframe/modules/mod_job_schedule_db.so
+
 %if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
