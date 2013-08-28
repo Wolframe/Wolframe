@@ -71,6 +71,8 @@ Prerequisites
   using the system version of FreeImage, specify
   WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
   the 'freeimage' subdirectory.
+- optionally (WITH_PYTHON): build Python 3 module for
+  scripting Wolframe in Python
 
 Configuration of the build
 --------------------------
