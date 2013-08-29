@@ -9,7 +9,7 @@ répertoire = "/tmp/records.log"
 print( 'repertoire: ', répertoire )
 
 # output Unicode string
-funny = 'Ѧηḓґℯα﹩ ℬ@üмαηη αт ℯʊґøṧ℘їḓ℮ґ▣ḉ◎м'
+funny = 'α♭αʊмαᾔᾔ αт ⑂α♄øø ∂◎т ¢☺м'
 print( funny.encode('ascii', 'backslashreplace') )
 
 time = 1377677003.4642606
