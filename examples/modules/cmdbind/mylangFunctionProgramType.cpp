@@ -35,7 +35,7 @@ Project Wolframe.
 #include "mylangFunctionCall.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <vector>

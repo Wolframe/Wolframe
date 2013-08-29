@@ -36,7 +36,7 @@
 
 #include "wolframeHandler.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
 

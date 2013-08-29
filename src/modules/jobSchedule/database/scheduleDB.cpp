@@ -38,7 +38,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "scheduleDB.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 namespace _Wolframe {
 namespace processor {

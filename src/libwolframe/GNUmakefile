@@ -70,6 +70,7 @@ CPP_OBJS = \
 	parseUtils.o \
 	fileUtils.o \
 	types_allocators.o \
+	typeSignature.o \
 	password.o \
 	globalRndGen.o \
 	HMAC.o \

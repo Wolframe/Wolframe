@@ -33,7 +33,7 @@
 ///\file modules/normalize/locale/mod_normalize_locale.hpp
 ///\brief Module for normalization functions based on boost locale (ICU)
 #include "module/normalizeFunctionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

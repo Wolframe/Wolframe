@@ -34,7 +34,7 @@
 ///\brief Module for line filters
 #include "module/filterBuilder.hpp"
 #include "line_filter.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 
 _Wolframe::log::LogBackend* logBackendPtr;

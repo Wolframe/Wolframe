@@ -29,15 +29,18 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+
 #ifndef _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
 #define _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
+
 ///\file types/typeSignature.hpp
 ///\brief Signature for structures to detect memory problems
+
 #include "types/malloc.hpp"
 #include <cstddef>
 #include <cstring>
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
+// #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -72,13 +75,14 @@ public:
 	}
 
 private:
-	void verify() const
-	{
-		if (m_objid != m_objid || m_objinvid != getStmp(m_objid) || m_chk != chk())
-		{
-			throw std::runtime_error( std::string( "internal: memory curruption detected for object ") + m_objname + " line:" + boost::lexical_cast<std::string>(m_objid) + ")");
-		}
-	}
+	void verify() const;
+//	{
+//		if (m_objid != m_objid || m_objinvid != getStmp(m_objid) || m_chk != chk())
+//		{
+//			throw std::runtime_error( std::string( "internal: memory curruption detected for object ") + m_objname + " line:" + boost::lexical_cast<std::string>(m_objid) + ")");
+//		}
+//	}
+
 	unsigned int chk() const
 	{
 		unsigned int xx = 123,ii=0;

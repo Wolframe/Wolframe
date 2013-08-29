@@ -33,7 +33,7 @@
 //
 // Wolframe PostgreSQL test client implementation
 //
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "PostgreSQLTest.hpp"
 #include "utils/fileUtils.hpp"
 #include <boost/system/error_code.hpp>

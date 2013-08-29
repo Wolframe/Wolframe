@@ -33,7 +33,7 @@
 ///\file modules/normalize/number/mod_normalize_number.hpp
 ///\brief Module for number normalization and validating functions
 #include "module/normalizeFunctionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "base64Normalize.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

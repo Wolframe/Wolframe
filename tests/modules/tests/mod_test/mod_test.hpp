@@ -34,7 +34,7 @@
 // a test module
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "common.hpp"
 
 namespace _Wolframe {

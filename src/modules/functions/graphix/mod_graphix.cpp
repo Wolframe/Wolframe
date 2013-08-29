@@ -33,7 +33,7 @@
 ///\file mod_graphix.cpp
 ///\brief Module for graphic functions with FreeImage
 #include "module/builtInFunctionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "graphix.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

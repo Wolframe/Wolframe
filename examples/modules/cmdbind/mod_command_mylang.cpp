@@ -35,7 +35,7 @@
 #include "module/scriptCommandHandlerBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "mylangFunctionProgramType.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

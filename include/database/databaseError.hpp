@@ -35,7 +35,7 @@
 //
 #ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
 #define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>

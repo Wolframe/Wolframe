@@ -43,7 +43,7 @@
 #include "transactionfunction/Path.hpp"
 #include "transactionfunction/OutputImpl.hpp"
 #include "database/transaction.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 #include <iostream>

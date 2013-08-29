@@ -35,7 +35,7 @@
 //
 
 #include "processor/moduleInterface.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "mod_test.hpp"
 
 _Wolframe::log::LogBackend*	logBackendPtr;

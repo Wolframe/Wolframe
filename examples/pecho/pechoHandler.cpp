@@ -34,7 +34,7 @@ Project Wolframe.
 #include "protocol/parser.hpp"
 #include "protocol/ioblocks.hpp"
 #include "pechoHandler.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::pecho;

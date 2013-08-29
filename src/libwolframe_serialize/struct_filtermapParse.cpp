@@ -34,7 +34,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapParse.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapParseValue.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;

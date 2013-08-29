@@ -33,7 +33,7 @@
 ///\brief Implementation of transaction function output filter
 ///\file transactionfunction/OutputImpl.cpp
 #include "transactionfunction/OutputImpl.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

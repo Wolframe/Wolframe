@@ -48,7 +48,7 @@
 #include "standardConfigs.hpp"
 #include "server.hpp"
 #include "system/errorCode.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "appSingleton.hpp"
 #include "processor/moduleDirectory.hpp"
 

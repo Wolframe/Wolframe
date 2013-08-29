@@ -36,7 +36,7 @@
 
 #include "SQLite.hpp"
 #include "processor/moduleInterface.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend*	logBackendPtr;
 

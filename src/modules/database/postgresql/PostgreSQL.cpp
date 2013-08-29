@@ -34,7 +34,7 @@
 // Wolframe PostgreSQL client view implementation
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "logger/logObject.hpp"
 #include "PostgreSQL.hpp"
 #include "utils/fileUtils.hpp"

@@ -36,7 +36,7 @@ Project Wolframe.
 #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
 #include "luaObjects.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 extern "C"

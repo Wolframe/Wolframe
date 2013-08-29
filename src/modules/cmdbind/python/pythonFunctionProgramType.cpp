@@ -40,7 +40,7 @@ Project Wolframe.
 //~ #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
 //~ #include "luaObjects.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <vector>
