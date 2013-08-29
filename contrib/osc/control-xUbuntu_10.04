@@ -48,17 +48,17 @@ Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
  The Wolframe authentication module using Cyrus SASL.
 
-Package: wolframe-libxml2
-Architecture: any
-Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
-Description: The Wolframe XML parsing module using libxml2.
- The Wolframe XML parsing module using libxml2.
-
 Package: wolframe-python
 Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe Python 3 bindings.
  The Wolframe Python 3 bindings.
+
+Package: wolframe-libxml2
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using libxml2.
+ The Wolframe XML parsing module using libxml2.
 
 Package: wolframe-libxslt
 Architecture: any
