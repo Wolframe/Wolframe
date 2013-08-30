@@ -12,6 +12,10 @@ endif
 endif
 endif
 
+ifeq ($(WITH_PYTHON),1)
+SUBDIRS += python
+endif
+
 ifeq ($(WITH_LIBXML2),1)
 SUBDIRS += libxml2
 endif

@@ -33,7 +33,7 @@
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
 #include "langbind/iostreamfilter.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"

@@ -39,7 +39,7 @@
 #include "protocol/parser.hpp"
 #include "system/connectionHandler.hpp"
 #include "types/countedReference.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <vector>
 #include <string>
 #include <iostream>

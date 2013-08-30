@@ -100,12 +100,10 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 
-	# python 3 cmdbind module
-	cd src/modules/cmdbind/python; $(MAKE) install $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-python; \
+	# the Python3 cmdbind module depends onm Python libraries, separate package
+	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	mkdir /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
-	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 
 	# libxslt
 	
@@ -153,6 +151,13 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
+
+	# python 3 cmdbind module
+	cd src/modules/cmdbind/python; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-python; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	
 	# filter module libxslt
 

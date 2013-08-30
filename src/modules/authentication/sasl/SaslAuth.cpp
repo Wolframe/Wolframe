@@ -37,7 +37,7 @@
 #include <string>
 #include <ostream>
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "SaslAuth.hpp"
 #include "utils/fileUtils.hpp"
 

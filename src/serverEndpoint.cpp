@@ -37,7 +37,7 @@
 #include <string>
 #include "system/serverEndpoint.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"

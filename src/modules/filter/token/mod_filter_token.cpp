@@ -34,7 +34,7 @@
 ///\brief Module for token filters (one line for every xml element with one character prefix indicating the type)
 #include "module/filterBuilder.hpp"
 #include "token_filter.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 
 _Wolframe::log::LogBackend* logBackendPtr;

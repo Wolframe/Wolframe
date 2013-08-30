@@ -34,7 +34,7 @@
 ///\file directmapProgram.cpp
 #include "directmapProgram.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>

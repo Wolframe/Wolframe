@@ -35,7 +35,7 @@
 #include "types/countedReference.hpp"
 #include "iprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "langbind/appObjects.hpp"
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"

@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Implementation of lua filters (serialization/deserialization of lua tables)
 #include "luafilter.hpp"
 #include "luaDebug.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>

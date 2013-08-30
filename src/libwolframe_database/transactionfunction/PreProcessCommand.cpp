@@ -34,7 +34,7 @@
 ///\file transactionfunction/PreProcessCommand.cpp
 #include "transactionfunction/PreProcessCommand.hpp"
 #include "langbind/appObjects.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <map>
 
 using namespace _Wolframe;

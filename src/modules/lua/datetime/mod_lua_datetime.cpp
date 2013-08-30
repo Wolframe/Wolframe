@@ -33,7 +33,7 @@
 ///\file mod_lua_datetime.cpp
 ///\brief Lua extension module for date and time arithmetic
 #include "module/luaExtensionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "luaDateTime.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

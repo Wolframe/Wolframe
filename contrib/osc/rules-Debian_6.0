@@ -104,7 +104,7 @@ install: build
 	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	
+
 	# libxslt
 	
 	# the libhpdf printing module depends on libhpdf, put it in a separate package

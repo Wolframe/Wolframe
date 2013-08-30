@@ -470,6 +470,12 @@ examples/tproc/appProperties.cpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
+examples/tproc/tests/temp/echo.lua
+examples/tproc/tests/temp/example_1.lua
+examples/tproc/tests/temp/example_2.lua
+examples/tproc/tests/temp/example_3.lua
+examples/tproc/tests/temp/example_4.lua
+examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/template/expand.sh
 examples/tproc/tests/template/output_provider_cfg.sh
@@ -1342,10 +1348,10 @@ include/langbind/luaException.hpp
 include/langbind/normalizeFunction.hpp
 include/logger/logBackend.hpp
 include/logger/logError.hpp
-include/logger/logger-v1.hpp
 include/logger/logLevel.hpp
 include/logger/logObject.hpp
 include/logger/logSyslogFacility.hpp
+include/logger-v1.hpp
 include/module/builtInFunctionBuilder.hpp
 include/module/constructor.hpp
 include/module/ddlcompilerBuilder.hpp
@@ -2176,6 +2182,8 @@ tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
 tests/python/doc/README.Python
 tests/python/embed.cpp
+tests/python/GNUmakefile
+tests/python/Makefile.W32
 tests/resolvePathTest.cpp
 tests/simpleFormCompiler/data/test1.simpleform
 tests/simpleFormCompiler/GNUmakefile
@@ -2814,6 +2822,7 @@ tests/wolfilter/template/data/lua_transaction_sqlite_dbexception.tst
 tests/wolfilter/template/data/lua_transaction_sqlite_demo_ig_lang_cat.tst
 tests/wolfilter/template/data/lua_transaction_sqlite_demo_tree.tst
 tests/wolfilter/template/data/lua_transaction_table.tst
+tests/wolfilter/template/data/map_cmdhnd_tdl_preprocess_sqlite.tst
 tests/wolfilter/template/data/map_cmdhnd_transaction_inputdoctype.tst
 tests/wolfilter/template/data/map_cmdhnd_transaction_inputform.tst
 tests/wolfilter/template/data/map_cmdhnd_transaction_outputform.tst
@@ -2872,6 +2881,8 @@ tests/wolfilter/template/doc/map_transaction.UTF-8.xml
 tests/wolfilter/template/doc/multilingual.UTF-8.xml
 tests/wolfilter/template/doc/output_schema_select_task_by_id.UTF-8.xml
 tests/wolfilter/template/doc/schema_select_task_by_id.UTF-8.xml
+tests/wolfilter/template/doc/tdl_preprocess.in.UTF-8.xml
+tests/wolfilter/template/doc/tdl_preprocess.out.UTF-8.xml
 tests/wolfilter/template/doc/trees.UTF-8.xml
 tests/wolfilter/template/expand.sh
 tests/wolfilter/template/output_tst_all_isolatin.sh
@@ -2894,6 +2905,10 @@ tests/wolfilter/template/program/first/tree_transactions.tdl
 tests/wolfilter/template/program/schema_select_task_by_id.sql
 tests/wolfilter/template/program/schema_select_task_by_id.tdl
 tests/wolfilter/template/program/sqlite_demo_tree_data.sql
+tests/wolfilter/template/program/tdl_preprocess/preprocess.lua
+tests/wolfilter/template/program/tdl_preprocess/preprocess.tdl
+tests/wolfilter/template/program/tdl_preprocess/schema_postgresql.sql
+tests/wolfilter/template/program/tdl_preprocess/schema_sqlite.sql
 textwolf/char.hpp
 textwolf/charset.hpp
 textwolf/charset_interface.hpp
@@ -2966,3 +2981,4 @@ zlib/zconf.h
 zlib/zlib.h
 zlib/zutil.c
 zlib/zutil.h
+src/libwolframe/typeSignature.cpp

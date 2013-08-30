@@ -34,7 +34,7 @@
 ///\file transactionfunction/InputStructure.cpp
 #include "transactionfunction/InputStructure.hpp"
 #include "filter/typedfilter.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

@@ -34,7 +34,7 @@
 ///\brief Implementation of the options of a wolfwizard call
 #include "wolfwizardCommandLine.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>

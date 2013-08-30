@@ -33,7 +33,7 @@
 ///\file modules/prnt/mod_haru_pdf_printer.cpp
 ///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
 #include "module/printFunctionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "prnt/pdfPrinter.hpp"
 #include "prnt/pdfPrinter_libhpdf.hpp"
 

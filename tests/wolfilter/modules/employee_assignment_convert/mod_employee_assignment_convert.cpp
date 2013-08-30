@@ -34,7 +34,7 @@
 ///\brief Module for testing form functions
 #include "module/builtInFunctionBuilder.hpp"
 #include "employee_assignment_convert.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

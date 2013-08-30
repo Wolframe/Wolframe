@@ -37,7 +37,7 @@ Project Wolframe.
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 extern "C" {
 	#include <lualib.h>

@@ -33,7 +33,7 @@
 ///\file modules/prnt/mod_test_pdf_printer.cpp
 ///\brief Module for testing the printing of PDFs with a simple command interpreter logging a trace of called functions and states
 #include "module/printFunctionBuilder.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "prnt/pdfPrinter.hpp"
 #include "prnt/pdfPrinter_testtrace.hpp"
 

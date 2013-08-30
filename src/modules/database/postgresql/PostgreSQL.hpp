@@ -37,7 +37,7 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <libpq-fe.h>
 #include <list>
 #include "database/database.hpp"

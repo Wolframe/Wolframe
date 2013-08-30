@@ -37,7 +37,7 @@
 #include "langbind/normalizeFunction.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <string>
 

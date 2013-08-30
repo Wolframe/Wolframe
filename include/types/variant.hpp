@@ -34,7 +34,10 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
-#include "types/countedReference.hpp"
+
+// MBa -- unused
+//#include "types/countedReference.hpp"
+
 #include <string>
 #include <cstring>
 #include <ostream>

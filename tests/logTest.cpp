@@ -2,7 +2,7 @@
 // testing the Logging library
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "gtest/gtest.h"
 
 #if !defined( _WIN32 )

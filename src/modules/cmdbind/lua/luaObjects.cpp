@@ -43,7 +43,7 @@ Project Wolframe.
 #include "filter/tostringfilter.hpp"
 #include "types/doctype.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <limits>
 #include <fstream>
 #include <iostream>

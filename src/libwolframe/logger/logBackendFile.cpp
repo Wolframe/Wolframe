@@ -35,7 +35,7 @@
 /// \brief implementation of the logger which logs to a simple logfile
 ///
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "logBackendFile.hpp"
 
 #if defined( _WIN32 )

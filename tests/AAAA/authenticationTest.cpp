@@ -2,7 +2,7 @@
 // testing the various authenticators
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "gtest/gtest.h"
 
 // Aba: avoiding module loader here on purpose, so we include the things to

@@ -45,7 +45,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <algorithm>
 
 using namespace _Wolframe;

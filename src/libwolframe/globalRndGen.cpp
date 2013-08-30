@@ -47,7 +47,7 @@
 #include <wincrypt.h>
 #endif
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "system/globalRngGen.hpp"
 
 namespace _Wolframe	{

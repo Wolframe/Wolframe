@@ -34,7 +34,7 @@
 // Wolframe SQLite client view implementation
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "SQLiteTest.hpp"
 #include "utils/fileUtils.hpp"
 #include "sqlite3.h"

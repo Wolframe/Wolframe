@@ -37,7 +37,7 @@ Project Wolframe.
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "processor/moduleInterface.hpp"
 #include "utils/fileUtils.hpp"
 #include "module/constructor.hpp"

@@ -35,7 +35,7 @@ Project Wolframe.
 #include "luaDebug.hpp"
 #include "langbind/appObjects.hpp"
 #include "luaObjects.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>

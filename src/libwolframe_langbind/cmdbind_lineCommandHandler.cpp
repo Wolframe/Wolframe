@@ -32,7 +32,7 @@
 ************************************************************************/
 #include "cmdbind/lineCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;

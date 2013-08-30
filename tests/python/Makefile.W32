@@ -4,8 +4,9 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+# C4430 happens only with ccache? why, I don't know..
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504
+	/D_WIN32_WINNT=0x504 /wd4430
 
 INCLUDE_DIRS = \
 	/I . /I"$(PYTHON_DIR)\include"
@@ -14,7 +15,7 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS = \
-	"$(PYTHON_DIR)\lib\libpython3.lib"
+	"$(PYTHON_DIR)\libs\python33.lib"
 
 TEST_CPP_BINS = \
 	embed.exe
@@ -33,5 +34,5 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-copy "$(PYTHON3)\lib\python3.dll" .
+#	@-copy "$(PYTHON3)\lib\python3.dll" .
 	@-embed my > test.RES

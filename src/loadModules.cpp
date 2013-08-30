@@ -34,7 +34,7 @@
 // loadModules.cpp
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "processor/moduleDirectory.hpp"
 #include "processor/moduleInterface.hpp"
 #include "utils/fileUtils.hpp"

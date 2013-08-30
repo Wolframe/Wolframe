@@ -34,7 +34,7 @@
 // Text file authentication configuration
 //
 
-#include "logger/logger-v1.hpp"
+#include "logger-v1.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
 
