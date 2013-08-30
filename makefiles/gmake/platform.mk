@@ -77,6 +77,10 @@ ifeq "$(PLATFORM)" "FREEBSD"
 LIBDIR=lib
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+LIBDIR=lib
+endif
+
 # Sparc or Intel, always 'lib'
 ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
@@ -134,6 +138,9 @@ endif
 ifeq "$(PLATFORM)" "FREEBSD"
 LDFLAGS_DL = -Wl,-E
 endif
+ifeq "$(PLATFORM)" "NETBSD"
+LDFLAGS_DL = -Wl,-E
+endif
 
 # i18n, gettext/libintl
 #######################
@@ -162,8 +169,16 @@ LIBS_LT = -lintl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-INCLUDE_FLAGS_LT = -I/usr/local/include
-LDFLAGS_LT = -L/usr/local/lib
+LIBLT_DIR ?= /usr/local
+INCLUDE_FLAGS_LT = -I$(LIBLT_DIR)/include
+LDFLAGS_LT = -L$(LIBLT_DIR)/lib
+LIBS_LT = -lintl
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+LIBLT_DIR ?= /usr
+INCLUDE_FLAGS_LT = -I$(LIBLT_DIR)/include
+LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
 endif
 
@@ -190,6 +205,12 @@ LIBS_NET = -lsocket -lnsl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
+INCLUDE_FLAGS_NET =
+LDFLAGS_NET =
+LIBS_NET =
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
 INCLUDE_FLAGS_NET =
 LDFLAGS_NET =
 LIBS_NET =
@@ -517,6 +538,8 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 BOOST_DIR ?= /usr/local
@@ -531,6 +554,19 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
 endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+BOOST_DIR ?= /usr/pkg
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
+# SunOS
 
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
@@ -637,16 +673,7 @@ endif
 
 endif
 
-
-
-ifeq "$(PLATFORM)" "SUNOS"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ifeq "$(OS_MINOR_VERSION)" "10"
-OPENSSL_DIR ?= /usr/local/ssl
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-endif
-endif
+# FreeBSD
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
@@ -654,6 +681,25 @@ OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+endif
+
+# SunOS
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+OPENSSL_DIR ?= /usr/local/ssl
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
 endif
 endif
 
@@ -676,6 +722,12 @@ LUA_PLATFORM_LDFLAGS = -ldl -lm
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
+LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS = -lm
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
 LUA_PLATFORM_LIBS = -lm
@@ -851,6 +903,13 @@ PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= $(PAM_DIR)/lib
+PAM_LIBS ?= -lpam
+endif
+
 endif
 
 # Cyrus SASL2
@@ -1021,6 +1080,15 @@ SASL_LIBS ?= -lsasl2
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+SASL_DIR ?= /usr/pkg
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
+
 endif
 
 # Sqlite3
@@ -1176,6 +1244,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -1187,6 +1257,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 SQLITE3_DIR ?= /usr/local
@@ -1196,6 +1268,16 @@ SQLITE3_LIBS ?= -lsqlite3
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+
+# NetBSD
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+SQLITE3_DIR ?= /usr/pkg
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
@@ -1393,6 +1475,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -1406,6 +1490,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 PGSQL_DIR ?= /usr/local
@@ -1418,6 +1504,19 @@ endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 PGSQL_DIR ?= /usr/local
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+PGSQL_DIR ?= /usr/pkg
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
@@ -1601,6 +1700,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -1614,6 +1715,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBXML2_DIR ?= /usr/local
@@ -1625,6 +1728,19 @@ LIBXML2_LIBS ?= -lxml2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+LIBXML2_DIR ?= /usr/pkg
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
@@ -1809,6 +1925,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -1822,6 +1940,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBXSLT_DIR ?= /usr/local
@@ -1833,6 +1953,19 @@ LIBXSLT_LIBS ?= -lxslt
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+LIBXSLT_DIR ?= /usr/pkg
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
 LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
@@ -1996,6 +2129,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -2009,6 +2144,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -2019,6 +2156,19 @@ LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
+LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
+LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
@@ -2237,6 +2387,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -2249,6 +2401,8 @@ LIBPNG_LIBS ?= -lpng
 endif
 endif
 endif
+
+# FreeBSD
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
@@ -2266,6 +2420,19 @@ LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
 LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
 LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+LIBPNG_DIR ?= /usr/pkg
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng16
 endif
 endif
 
@@ -2451,6 +2618,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -2464,6 +2633,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBZ_DIR ?= /usr/local
@@ -2475,6 +2646,19 @@ LIBZ_LIBS ?= -lz
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBZ_DIR ?= /usr/local
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
 LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
@@ -2665,6 +2849,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -2687,6 +2873,8 @@ endif
 endif
 endif
 
+# FreeBSD
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 ICU_DIR ?= /usr/local
@@ -2698,6 +2886,18 @@ ICU_LIBS ?=
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 ICU_DIR ?= /usr/local
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+endif
+
+# NetBSD
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+ICU_DIR ?= /usr/pkg
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
 ICU_LIB_DIR ?= $(ICU_DIR)/lib
@@ -2914,6 +3114,8 @@ endif
 
 endif
 
+# SunOS
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -2926,6 +3128,8 @@ FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 endif
 endif
+
+# FreeBSD
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
@@ -2942,6 +3146,19 @@ FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGEPLUS_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGEPLUS_INCLUDE_DIRS =? NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+# NetBSD
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "6"
+FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
@@ -2971,23 +3188,39 @@ ifeq ($(WITH_PYTHON),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 PYTHON3_CONFIG ?= python3-config
+PYTHON_DIR ?= /usr
 PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
 PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
 PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 PYTHON3_CONFIG ?= /usr/local/bin/python3-config
-PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_DIR ?= /usr/local
+PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
+PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+PYTHON3_CONFIG ?= /usr/pkg/bin/python3.3-config
+PYTHON_DIR ?= /usr/pkg
+PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags)
+PYTHON_LDFLAGS_WRONG := $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_LDFLAGS := -L/usr/pkg/lib $(PYTHON_LDFLAGS_WRONG)
+PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 PYTHON3_CONFIG ?= /opt/csw/python-3.3.2/bin/python3-config
-PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_DIR ?= /opt/csw/python-3.3.2
+PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
+PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 endif
@@ -3003,6 +3236,10 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 EXPECT = /usr/local/bin/expect
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+EXPECT = /usr/pkg/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"

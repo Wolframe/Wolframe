@@ -185,6 +185,11 @@ PTHREADS_CFLAGS = -D_REENTRANT -pthread
 PTHREADS_LDFLAGS = -pthread
 PTHREADS_LIBS =
 endif
+ifeq "$(PLATFORM)" "NETBSD"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
 
 endif
 
@@ -198,6 +203,9 @@ ifeq "$(PLATFORM)" "SUNOS"
 SO_COMPILE_FLAGS = -fPIC
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "NETBSD"
 SO_COMPILE_FLAGS = -fPIC
 endif
 endif

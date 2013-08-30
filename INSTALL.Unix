@@ -32,6 +32,7 @@ Table of Contents
   Instructions for other Unixes
     FreeBSD 8.2
     FreeBSD 9.1
+    NetBSD 6.1
     Solaris 10
       Solaris 10 (CSW toolchain)
 
@@ -736,6 +737,31 @@ For testing postgresql you also need 'postgresql92-server'.
 
 For scripting in Python you have to set WITH_PYTHON=1. Use the BSD
 ports package for python33 as there is no binary Python 3 package.
+
+NetBSD 6.1
+----------
+
+Packages are all installed via 'pkgin'.
+
+Required packages: boost (1.53.0)
+Optional packages: cyrus-sasl (2.1.26), sqlite3 (3.7.17), postgresql92-client (9.2.4),
+                   libxml2 (2.9.1), libxslt (1.1.28), png (1.6.2), 
+                   zlib (1.2.8), python33 (3.3.2), icu (51.2)
+
+You need 'gmake' (3.82).
+
+Make sure '/usr/pkg/bin' is part of your PATH.
+
+NetBSD contains SSL libraries per default no packages needed.
+Also PAM modules.
+
+For testing you need 'tcl-expect' (8.5.14).
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For freeimage support build the local version with WITH_LOCAL_FREEIMAGE=1.
+
+For testing postgresql you also need 'postgresql92-server'.
 
 Solaris 10
 ----------

@@ -35,6 +35,10 @@ ifeq "$(PLATFORM)" "FREEBSD"
 SONAME_FLAGS=-Wl,-x,-soname,$(SONAME)
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+SONAME_FLAGS=-Wl,-x,-soname,$(SONAME)
+endif
+
 # no soname and versioning for loadable modules, just dynamic linking
 ifneq "$(DYNAMIC_MODULE)" ""
 SONAME_FLAGS=
