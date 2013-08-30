@@ -15,6 +15,11 @@ std::vector<std::string> mylang::Context::loadProgram( const std::string& name)
 	return rt;
 }
 
+mylang::InstanceR mylang::Context::getInstance( const std::string& name) const
+{
+	return mylang::InstanceR( 0 );
+}
+
 mylang::Structure* mylang::Structure::addSubstruct( const types::Variant& elemid_)
 {
 	return 0;
@@ -38,6 +43,18 @@ bool mylang::Structure::atomic() const
 bool mylang::Structure::array() const
 {
 	return false;
+}
+
+mylang::Structure::const_iterator mylang::Structure::begin() const
+{
+	mylang::Structure::const_iterator it;
+	return it;
+}
+
+mylang::Structure::const_iterator mylang::Structure::end() const
+{
+	mylang::Structure::const_iterator it;
+	return it;
 }
 
 mylang::StructureR mylang::call( const proc::ProcessorProvider* provider, Instance* instance, const mylang::StructureR& arg)

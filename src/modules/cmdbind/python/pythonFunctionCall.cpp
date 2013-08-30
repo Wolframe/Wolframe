@@ -23,6 +23,11 @@ std::vector<std::string> python::Context::loadProgram( const std::string& /*prgf
 	return rt;
 }
 
+python::InstanceR python::Context::getInstance( const std::string& name) const
+{
+	return python::InstanceR( 0 );
+}
+
 python::Structure* python::Structure::addSubstruct( const types::Variant& /*elemid_*/)
 {
 	return 0;
@@ -46,6 +51,18 @@ bool python::Structure::atomic() const
 bool python::Structure::array() const
 {
 	return false;
+}
+
+python::Structure::const_iterator python::Structure::begin() const
+{
+	python::Structure::const_iterator it;
+	return it;
+}
+
+python::Structure::const_iterator python::Structure::end() const
+{
+	python::Structure::const_iterator it;
+	return it;
 }
 
 python::StructureR python::call( const proc::ProcessorProvider* /*provider*/, Instance* /*instance*/, const python::StructureR& /*arg*/)

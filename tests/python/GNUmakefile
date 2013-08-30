@@ -29,7 +29,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@LD_LIBRARY_PATH=$(LIBXSLT_LIB_DIR) ./embed my > test.RES
+	@./embed my > test.RES
 	@diff test.RES test.MUST
 	@echo
 

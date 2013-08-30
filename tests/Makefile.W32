@@ -195,7 +195,18 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-	@-echo mkdir temp
+	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_PGSQL
+	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
+!IFDEF PGDLL_WITH_I18N
+	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
+!ENDIF
+!ENDIF
 	@-echo testNamedRetVal >> test.bat
 	@-echo testVirtualInheritance >> test.bat
 	@-echo testArrayDoublingAllocator >> test.bat
@@ -206,7 +217,7 @@ local_test:
 	@-echo resolvePathTest >> test.bat
 	@-echo testBoostPath >> test.bat
 	@-echo singletonTest >> test.bat
-	@-echo testSHA> test.bat
+	@-echo testSHA >> test.bat
 	@-echo testMD5 >> test.bat
 	@-echo byte2hexTest >> test.bat
 	@-echo base64Test >> test.bat
