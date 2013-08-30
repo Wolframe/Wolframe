@@ -8,6 +8,11 @@ SUBDIRS = modules database AAAA wolfilter
 #	$(SUBDIRS) expect
 #!ENDIF
 
+!IFDEF WITH_PYTHON
+SUBDIRS = \
+	$(SUBDIRS) python
+!ENDIF
+
 !IFDEF WITH_LIBXML2
 SUBDIRS = \
 	$(SUBDIRS) libxml2

@@ -4,28 +4,33 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+# C4430 happens only with ccache? why, I don't know..
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504 /DWITH_PYTHON
+	/D_WIN32_WINNT=0x504 /DWITH_PYTHON /wd4430
 
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR) \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(PYTHON_DIR)\include"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	"$(PYTHON_DIR)\libs\python33.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_command_python.dll
 
-CPP_OBJS =
+CPP_OBJS = \
+	pythonFunctionCall.obj \
+	pythonFunctionProgramType.obj \
+	mod_command_python.obj
 
 all: $(DYNAMIC_MODULE)
 

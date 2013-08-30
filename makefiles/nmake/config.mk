@@ -106,6 +106,11 @@ LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
 
 LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
 
+# Python 3
+##########
+
+PYTHON_DIR = C:\Python33
+
 # Tcl 8.5 and Expect
 ####################
 

@@ -19,6 +19,7 @@ Table of Contents
       Notes for 32-bit dependencies
     LibXML2
     LibXSLT
+    Python 3
     Install Tcl and Expect
   Documentation
   Using ccache with MSVC
@@ -36,6 +37,7 @@ Prerequisites
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
+- optionally (WITH_PYTHON) Python 3 scripting
 - for database support
   - optionally (WITH_SQLITE3): using the sources i n 'sqlite3'
   - optionally (WITH_PGSQL)
@@ -360,6 +362,13 @@ mt -nologo -manifest xsltproc.exe.manifest -outputresource:xsltproc.exe;1
 nmake /nologo /f Makefile.msvc install
 
 Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
+
+Python 3
+--------
+
+Install 'python-3.3.2.msi' to C:\Python33.
+
+Adapt PYTHON_DIR in 'makefiles\nmake\config.mk'.
 
 Install Tcl and Expect
 ----------------------
