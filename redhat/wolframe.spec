@@ -677,6 +677,9 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 
 %if %{build_python}
 cd %{_builddir}/Python-%{python_version}
+# make directory for rpath, otherwise you get
+# 'configure: error: C compiler cannot create executables'
+mkdir -p %{_libdir}/wolframe
 ./configure --prefix=/tmp/Python-%{python_version} \
 	--enable-shared LDFLAGS="-Wl,-rpath %{_libdir}/wolframe"
 make %{?_smp_mflags}
