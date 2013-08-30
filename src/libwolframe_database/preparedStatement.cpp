@@ -293,15 +293,17 @@ static TransactionInput::cmd_const_iterator endOfOperation( TransactionInput::cm
 namespace {
 struct OperationLoop
 {
-	std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi,we;
+	std::size_t residx;
+	std::size_t rowidx;
 	TransactionInput::cmd_const_iterator ci,ce;
 
-	OperationLoop( TransactionInput::cmd_const_iterator ci_, TransactionInput::cmd_const_iterator ce_, std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi_, std::vector<TransactionOutput::CommandResult::Row>::const_iterator we_)
-		:wi(wi_),we(we_),ci(ci_),ce(ce_){}
+	OperationLoop( TransactionInput::cmd_const_iterator ci_, TransactionInput::cmd_const_iterator ce_, std::size_t residx_, std::size_t rowidx_)
+		:residx(residx_),rowidx(rowidx_),ci(ci_),ce(ce_){}
 	OperationLoop( const OperationLoop& o)
-		:wi(o.wi),we(o.we),ci(o.ci),ce(o.ce){}
+		:residx(o.residx),rowidx(o.rowidx),ci(o.ci),ce(o.ce){}
 };
 }//namespace
+
 
 bool PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
@@ -317,24 +319,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
 
-	for (; ci != ce; ++ci)
+	do
 	{
-		if (!loopstk.empty())
-		{
-			if (ci == loopstk.back().ce)
-			{
-				if (loopstk.back().wi != loopstk.back().we)
-				{
-					ci = loopstk.back().ci;
-					if (!pushArguments( output, cmdres, loopstk.back().wi, ci)) return false;
-					++loopstk.back().wi;
-				}
-				else
-				{
-					loopstk.pop_back();
-				}
-			}
-		}
 		if (ci->name().empty())
 		{
 			optype = PushArguments;
@@ -359,10 +345,14 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		}
 		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
 
-		for (; ai != ae && ai->type() != TransactionInput::Command::Argument::ResultColumn; ++ai);
+		for (; ai != ae; ++ai)
+		{
+			if (ai->type() == TransactionInput::Command::Argument::ResultColumn
+				&& ai->scope_functionidx() == -1) break;
+		}
 		if (ai != ae)
 		{
-			// ... command has result reference, then we call it for every result row
+			// ... command contains a last result column reference, then we call it for every result row
 			TransactionOutput::result_const_iterator ri;
 			switch (optype)
 			{
@@ -371,14 +361,21 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					ri = output.last( ci->level()-1);
 					if (ri != output.end())
 					{
-						std::vector<TransactionOutput::CommandResult::Row>::const_iterator
-							wi = ri->begin(), we = ri->end();
-						if (wi != we)
+						std::size_t residx = ri - output.begin(); //< start of result referenced by pushArguments
+						if (ri->nofRows())
 						{
-							if (!pushArguments( output, cmdres, wi, ci)) return false;
-							loopstk.push_back( OperationLoop( ci, endOfOperation( ci, ce), ++wi, we));
+							LOG_DATA << "start of loop on result for calling an OPERATION";
+							// ... result non empty, then push arguments of first row
+							if (!pushArguments( output, cmdres, ri->begin(), ci)) return false;
+							// ... put on the loop stack the following row
+							loopstk.push_back(
+								OperationLoop( ci,//...push parameters instruction of operation
+										endOfOperation( ci, ce),//...next instruction after operation
+										residx, 1//...next row index after first
+									));
 							break;
 						}
+						// ... result non empty = no result
 					}
 					//... no result, so we have to skip all operation steps, not only the parameter passing
 					ci = endOfOperation( ci, ce);
@@ -433,13 +430,42 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					break;
 			}
 		}
+
+		// Fetch next instrucution:
+		++ci;
+		if (!loopstk.empty())
+		{
+			if (ci == loopstk.back().ce)
+			{
+				// ... we reached the end of a loop on result executing an operation sub block
+				TransactionOutput::result_const_iterator ri = output.begin() + loopstk.back().residx;
+				std::size_t rowidx = loopstk.back().rowidx++; // ... skip to the next row of the result to process by the operation
+				if (rowidx < ri->nofRows())
+				{
+					// ... there are still results left to process
+					std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin() + rowidx;
+					LOG_DATA << "skip to element " << (rowidx+1) << " of loop on result for calling an OPERATION";
+					ci = loopstk.back().ci; //... jump back to parameter pass instruction of the operation
+					cmdres = TransactionOutput::CommandResult( ci->functionidx(), ci->level());
+					if (!pushArguments( output, cmdres, wi, ci)) return false;
+					++ci;//... skip to first instruction of the operation
+				}
+				else
+				{
+					LOG_DATA << "end of loop on result for calling an OPERATION";
+					loopstk.pop_back();
+				}
+			}
+		}
+
 	}
+	while (ci != ce);
+
 	if (cmdres.functionidx() != null_functionidx)
 	{
 		output.addCommandResult( cmdres);
 	}
 	output.setCaseSensitive( isCaseSensitive());
-	LOG_DATA << "transaction function output structure:" << output.tostring();
 	return true;
 }
 

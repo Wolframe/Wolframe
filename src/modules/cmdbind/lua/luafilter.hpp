@@ -97,7 +97,8 @@ private:
 	{
 		enum Id
 		{
-			Init,			//< init state. The element is without key the top level element on the lua stack
+			Init,			//< init state (TopLevel first time)
+			TopLevel,		//< the element is without key the top level element on the lua stack
 			TableIterOpen,		//< the lua table iterator is on an key value pair and did not return yet the opening tag
 			TableIterValue,		//< the opening tag has been fetched and the value is to fetch next or a new iterator has to be opened and pushed on the stack
 			TableIterValueNoTag,	//< same as TableIterValue but for content value without tag ('_')
@@ -111,13 +112,12 @@ private:
 
 		static const char* idName( Id i)
 		{
-			static const char* ar[] = {"Init","TableIterOpen","TableIterValue","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
+			static const char* ar[] = {"Init","TopLevel","TableIterOpen","TableIterValue","TableIterValueNoTag","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
 			return ar[ (int)i];
 		}
 
-		FetchState()							:id(Init),tag(0),tagsize(0){}
 		FetchState( const FetchState& o)				:id(o.id),tag(o.tag),tagsize(o.tagsize){}
-		FetchState( Id id_)						:id(id_),tag(0),tagsize(0){}
+		explicit FetchState( Id id_)					:id(id_),tag(0),tagsize(0){}
 		FetchState( Id id_, const char* tag_, std::size_t tagsize_)	:id(id_),tag(tag_),tagsize(tagsize_){}
 
 		Id id;				//< state identifier

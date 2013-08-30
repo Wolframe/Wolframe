@@ -50,11 +50,12 @@ struct TransactionFunctionOutput::Impl
 		ResultElement::Type m_type;
 		std::size_t m_cnt;
 		ResultStructure::const_iterator m_structitr;
+		std::size_t m_functionidx;
 
-		StackElement( ResultElement::Type type_, ResultStructure::const_iterator structitr_)
-			:m_type(type_),m_cnt(0),m_structitr(structitr_){}
+		StackElement( ResultElement::Type type_, ResultStructure::const_iterator structitr_, std::size_t functionidx_)
+			:m_type(type_),m_cnt(0),m_structitr(structitr_),m_functionidx(functionidx_){}
 		StackElement( const StackElement& o)
-			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr){}
+			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr),m_functionidx(o.m_functionidx){}
 	};
 
 	enum {StateColumnOpenTag=0, StateColumnValue=1, StateColumnCloseTag=2,StateColumnEndGroup=3};

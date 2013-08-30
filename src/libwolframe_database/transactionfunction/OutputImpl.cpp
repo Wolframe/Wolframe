@@ -145,11 +145,12 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				return true;
 
 			case ResultElement::OperationStart:
-				m_stack.push_back( StackElement( ResultElement::OperationEnd, m_structitr));
+				m_stack.push_back( StackElement( ResultElement::OperationEnd, m_structitr, m_resitr->functionidx()));
 				++m_structitr;
 				continue;
 
 			case ResultElement::FunctionStart:
+				LOG_DATA << "[transaction result stm] Function start " << m_resitr->functionidx();
 				if (m_resitr == m_resend || m_resitr->functionidx() > m_structitr->idx)
 				{
 					for (++m_structitr; m_structitr != m_structend && m_structitr->type != ResultElement::FunctionEnd; ++m_structitr);
@@ -162,7 +163,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 					++m_resitr;
 					continue;
 				}
-				m_stack.push_back( StackElement( ResultElement::FunctionEnd, m_structitr));
+				m_stack.push_back( StackElement( ResultElement::FunctionEnd, m_structitr, m_resitr->functionidx()));
 				++m_structitr;
 				m_rowitr = m_resitr->begin();
 				m_rowend = m_resitr->end();
@@ -178,7 +179,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				continue;
 
 			case ResultElement::IndexStart:
-				m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr));
+				m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr, m_resitr->functionidx()));
 				++m_structitr;
 				type = TypedInputFilter::OpenTag;
 				element = types::VariantConst( (unsigned int)++m_stack.back().m_cnt);
@@ -197,7 +198,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				{
 					throw std::logic_error( "illegal state in transaction result construction");
 				}
-				if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+				if (m_resitr != m_resend && m_resitr->functionidx() == m_stack.back().m_functionidx)
 				{
 					m_structitr = m_stack.back().m_structitr;
 					type = TypedInputFilter::OpenTag;
@@ -217,7 +218,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				{
 					throw std::logic_error( "illegal state in transaction result construction (OperationEnd)");
 				}
-				if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+				if (m_resitr != m_resend && m_resitr->functionidx() == m_stack.back().m_functionidx)
 				{
 					m_structitr = m_stack.back().m_structitr;
 				}
@@ -233,7 +234,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				{
 					throw std::logic_error( "illegal state in transaction result construction (FunctionEnd)");
 				}
-				if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+				if (m_resitr != m_resend && m_resitr->functionidx() == m_stack.back().m_functionidx)
 				{
 					m_structitr = m_stack.back().m_structitr;
 				}
@@ -255,6 +256,11 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				}
 				if (m_valuestate == StateColumnOpenTag)
 				{
+					LOG_DATA << "[transaction result stm] Value " << m_resitr->functionidx();
+					if (m_stack.back().m_structitr->idx != m_resitr->functionidx())
+					{
+						throw std::runtime_error("internal error in result building statemachine");
+					}
 					if (m_rowitr == m_rowend)
 					{
 						++m_structitr;
