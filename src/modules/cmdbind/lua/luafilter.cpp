@@ -185,13 +185,13 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 				return true;
 			}
 			//... first key is number and we do not need to serialize with indices, so we treat it as a vector with repeating open tag for vector elements
-			if (!tag)
-			{
-				setState( InputFilter::Error, "Cannot build filter for array (numeric indices) content mixed with ordinary table (symbolic indices)");
-				wrap_lua_pop( m_ls, 2);
-				return false;
-			}
-			FetchState fs( FetchState::VectorIterValue, tag, std::strlen( tag));
+			//[+]if (!tag)
+			//[+]{
+			//[+]	setState( InputFilter::Error, "Cannot build filter for array (numeric indices) content mixed with ordinary table (symbolic indices)");
+			//[+]	wrap_lua_pop( m_ls, 2);
+			//[+]	return false;
+			//[+]}
+			FetchState fs( FetchState::VectorIterValue, tag, tag?std::strlen( tag):0);
 			m_stk.push_back( fs);
 			return true;
 		}
@@ -247,6 +247,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 		switch (m_stk.back().id)
 		{
 			case FetchState::Init:
+			case FetchState::TopLevel:
 				if (lua_istable( m_ls, -1))
 				{
 					m_stk.back().id = FetchState::Done;
@@ -278,6 +279,8 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				if (nextTableElem())
 				{
 					m_stk.back().id = FetchState::VectorIterReopen;
+					if (!m_stk.back().tag) continue;
+
 					m_stk.back().getTagElement( element);
 					type = CloseTag;
 					return true;
@@ -290,6 +293,8 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 			case FetchState::VectorIterReopen:
 				m_stk.back().id = FetchState::VectorIterValue;
+				if (!m_stk.back().tag) continue;
+
 				m_stk.back().getTagElement( element);
 				type = OpenTag;
 				return true;

@@ -417,33 +417,35 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				{
 					throw OperationStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
 				}
-				if (di->unique)
-				{
-					throw OperationStep::Error( eidx, "UNIQUE not supported for call of OPERATION");
-				}
-				if (!di->path_INTO.empty() && !di->path_INTO[0].empty( ) )
-				{
-					m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
+				std::string iteratingTag = di->path_INTO.back();
+				bool hasOutput = (iteratingTag != ".");
 
-					bool hasOutput = (di->path_INTO.size() > 1 || (di->path_INTO.size() == 1 && di->path_INTO[0] != "."));
-					if (hasOutput)
-					{
-						std::vector<std::string>::const_iterator it;
-						std::vector<std::string>::const_iterator end = di->path_INTO.end();
-						for (it = di->path_INTO.begin( ); it != end; it++)
-						{
-							m_resultstruct->openTag( *it );
-						}
-					}
-					m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
-					if (hasOutput)
-					{
-						for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size(); i++)
-						{
-							m_resultstruct->closeTag();
-						}
-					}
+				for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
+				{
+					m_resultstruct->openTag( di->path_INTO[i] );
 				}
+				m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
+				if (hasOutput)
+				{
+					m_resultstruct->openTag( iteratingTag);
+				}
+
+				if (!di->unique)
+				{
+					m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
+				}
+				m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
+
+				if (!di->unique)
+				{
+					m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
+				}
+				if (hasOutput)
+				{
+					m_resultstruct->closeTag();
+				}
+				m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
+
 				DatabaseCommand paramstk( "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
 
@@ -458,10 +460,6 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
 					DatabaseCommand cc( fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
-				}
-				if (!di->path_INTO.empty() && !di->path_INTO[0].empty( ) )
-				{
-					m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
 				}
 			}
 		}

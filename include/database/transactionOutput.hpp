@@ -94,6 +94,7 @@ public:
 
 		std::size_t functionidx() const					{return m_functionidx;}
 		std::size_t level() const					{return m_level;}
+		std::size_t nofRows() const					{return m_row.size();}
 		std::size_t nofColumns() const					{return m_columnName.size();}
 		const std::string& columnName( std::size_t i) const		{return m_columnName[i];}
 

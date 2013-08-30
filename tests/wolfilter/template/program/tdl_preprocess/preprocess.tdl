@@ -8,16 +8,16 @@ BEGIN
 	INTO . DO UNIQUE SELECT id AS "id",prename,surname FROM Person
 		WHERE Person.ID = $[id];
 
---	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
---		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
+	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
+		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
 
---	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
---		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
+	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
+		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
 END
 
 TRANSACTION getData
 BEGIN
-	DO SELECT ID FROM Person WHERE ID = '1';
+	DO SELECT ID FROM Person;
 	INTO . DO getPerson( $1);
 END
 
