@@ -2971,9 +2971,9 @@ ifeq ($(WITH_PYTHON),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 PYTHON3_CONFIG ?= python3-config
-PYTHON_CFLAGS = $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS = $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS = $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
+PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"

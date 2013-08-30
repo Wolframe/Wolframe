@@ -677,7 +677,8 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 
 %if %{build_python}
 cd %{_builddir}/Python-%{python_version}
-./configure --prefix=/tmp/Python-%{python_version}
+./configure --prefix=/tmp/Python-%{python_version} \
+	--enable-shared LDFLAGS="-Wl,-rpath %{_libdir}/wolframe"
 make %{?_smp_mflags}
 make install
 %endif
@@ -690,6 +691,10 @@ make install
 %endif
 
 cd %{_builddir}/%{name}-%{version}
+%if %{build_python}
+LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
+MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
+%endif
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make help \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -702,6 +707,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -726,6 +733,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
+%if %{build_python}
+LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
+MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
+%endif
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make config \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -738,6 +749,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -762,6 +775,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
+%if %{build_python}
+LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
+MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
+%endif
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make depend \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -774,6 +791,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -798,6 +817,10 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
+%if %{build_python}
+LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
+MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
+%endif
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
@@ -811,6 +834,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -855,6 +880,8 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -903,7 +930,7 @@ ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.s
 #TODO: What exactly do we need? Do we have to probe it?
 # copy local python library to local library directory for platform which need it
 %if %{build_python}
-cp /tmp/Python-%{python_version}/lib/libpython*.so.*.* $RPM_BUILD_ROOT%{_libdir}/wolframe
+cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wolframe
 %endif
 
 %if %{rhel} || %{centos} || %{sles}
@@ -1246,7 +1273,7 @@ fi
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_command_python.so
 %if %{build_python}
-%{_libdir}/wolframe/libpython*.so.*.*
+%{_libdir}/wolframe/libpython*
 %endif
 %endif
 

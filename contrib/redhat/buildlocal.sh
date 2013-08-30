@@ -14,7 +14,8 @@ RPMBUILD=$HOME/rpmbuild
 #OSB_PLATFORM=
 
 rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
-	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log
+	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log \
+	/tmp/boost-1.48.0 /tmp/libxml2-2.7.8 /tmp/Python-3.3.2
 touch $RPMBUILD/SPECS/log
 
 rm -f wolframe-$VERSION.tar.gz
@@ -33,7 +34,7 @@ if test ! -f $RPMBUILD/SOURCES/boost_1_48_0.tar.gz; then
 		http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.48.0%2F&ts=1353483626&use_mirror=ignum
 fi
  
-cp contrib/osc/boost/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
+cp contrib/osc/boost1.48/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
 
 cd $RPMBUILD/SPECS
 
