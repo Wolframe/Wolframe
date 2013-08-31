@@ -35,6 +35,12 @@ fi
 testname="$TESTNAME""_libxml2"
 for cset in $csetlist
 do
+	if test "x$cset" = "xUCS-4BE"; then
+		# Aba: because UCS-4BE is broken in libxml2 on NetBSD
+		testdata="$testdata
+**requires:DISABLED NETBSD
+"
+	fi
 	inputfilter="$filter"
 	outputfilter="$filter"
 	. ./output_tst.sh
