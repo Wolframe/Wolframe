@@ -222,7 +222,7 @@ Source2: libxml2-sources-%{libxml2_version}.tar.gz
 Source3: Python-%{python_version}.tar.bz2
 %endif
 %if %{suse} || %{sles}
-Source4: perl-rpmlintrc
+Source4: %{name}-rpmlintrc
 %endif
 
 URL: http://www.wolframe.net/
