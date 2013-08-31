@@ -18,7 +18,7 @@ cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
 cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
 
 # the rpmlint file
-cp redhat/perl-rpmlintrc $OSC_HOME/perl-rpmlintrc
+cp redhat/wolframe-rpmlintrc $OSC_HOME/wolframe-rpmlintrc
 
 # patches
 cp contrib/osc/boost1.48/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
