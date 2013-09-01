@@ -1,1 +1,3 @@
-addFilter( "implicit-fortify-decl .*" )
+addFilter( ".* implicit-fortify-decl" )
+setBadness( 'implicit-fortify-decl', 0 )
+
