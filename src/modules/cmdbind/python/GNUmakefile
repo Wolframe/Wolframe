@@ -27,6 +27,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_python.so
 
 CPP_OBJS = \
+	pythonInterpreter.o \
 	pythonFunctionCall.o \
 	pythonFunctionProgramType.o \
 	mod_command_python.o

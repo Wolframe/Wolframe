@@ -1,4 +1,6 @@
 #include "pythonFunctionCall.hpp"
+#include "pythonInterpreter.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -7,9 +9,13 @@ python::Context::Context( )
 {
 }
 
-std::vector<std::string> python::Context::loadProgram( const std::string& /*prgfile*/)
+std::vector<std::string> python::Context::loadProgram( const std::string& prgfile )
 {
 	std::vector<std::string> rt;
+	python::Interpreter i( prgfile );
+	
+	MOD_LOG_TRACE << "[python] Loading Python program " << prgfile;	
+	
 	// TODO: load all public functions from python module
 	// problem, what to do with methods of objects? where to
 	// create the objects?
