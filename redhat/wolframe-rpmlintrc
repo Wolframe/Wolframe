@@ -1,1 +1,1 @@
-setBadness( 'implicit-fortify-decl ', 0 )
+addFilter( "implicit-fortify-decl .*/freeimage/Source/ZLib/.*" )
