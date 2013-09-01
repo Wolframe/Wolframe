@@ -1,1 +1,1 @@
-addFilter( "implicit-fortify-decl .*/freeimage/Source/ZLib/.*" )
+addFilter( "implicit-fortify-decl .*" )
