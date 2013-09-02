@@ -234,7 +234,8 @@ OPERATION getPerson( id)
 RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
-		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
+		WHERE PersonCompanyRel.companyid = Company.ID
+		AND PersonCompanyRel.ID = $[id];
 
 	INTO tag PRINT "1001";							-- print constant
 
@@ -244,10 +245,12 @@ BEGIN
 	INTO id PRINT $[id];							-- print variable
 
 	INTO child DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
-		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
+		WHERE PersonChildRel.childid = Person.ID
+		AND PersonChildRel.ID = $[id];
 
 	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
-		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
+		WHERE PersonAddressRel.addressid = Address.ID
+		AND PersonAddressRel.ID = $[id];
 END
 
 TRANSACTION getData
@@ -257,12 +260,12 @@ BEGIN
 END
 
 TRANSACTION findPerson
--- PREPROCESS
--- BEGIN
--- 	INTO norm_location FOREACH location DO normname( street);
--- 	INTO norm_address FOREACH location DO normname( address);
--- 	INTO norm_person FOREACH person DO luanorm( . );
--- END
+PREPROCESS
+BEGIN
+	INTO norm_location FOREACH location DO normname( street);
+	INTO norm_address FOREACH location DO normname( address);
+	INTO norm_person FOREACH person DO luanorm( . );
+END
 BEGIN
 	DO SELECT ID FROM Person;
 	INTO . DO getPerson( $1);

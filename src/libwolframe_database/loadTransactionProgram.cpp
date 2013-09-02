@@ -692,7 +692,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							{
 								throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead string");
 							}
-							if (boost::algorithm::iequals( tok, "END"))
+							else if (boost::algorithm::iequals( tok, "END"))
 							{
 								if (mask != 0)
 								{
@@ -753,7 +753,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 								throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
 							}
 						}
-						parseNextToken( langdescr, tok, si, se);
 					}
 					else if (!boost::algorithm::iequals( tok, "BEGIN"))
 					{
