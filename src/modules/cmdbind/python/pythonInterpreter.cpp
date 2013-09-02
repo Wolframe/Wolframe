@@ -38,13 +38,22 @@ python::Interpreter::Interpreter( const std::string prgfile )
 	}
 
 	PyObject *symbols = PyModule_GetDict( module );
-	PyObject *keyList = PyDict_Keys( symbols );
+
+	PyObject *key, *value;
+	Py_ssize_t pos = 0;
+	while( PyDict_Next( symbols, &pos, &key, &value ) ) {
+		MOD_LOG_TRACE 	<< "[python] module dictionary entry "
+				<< pyGetReprStr( key ) << ": "
+				<< pyGetReprStr( value );
+	}
+
+/*	PyObject *keyList = PyDict_Keys( symbols );
 	for( int i = 0; i < PyList_Size( keyList ); i++ ) {
 		PyObject *object = PyList_GetItem( keyList, i );
 		if( PyCallable_Check( object ) ) {
 		}
 	}
-	
+*/	
 	Py_DECREF( module );
 
 		//~ lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
