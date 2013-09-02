@@ -287,16 +287,31 @@ public:
 		Block()
 			:startidx(0),size(0){}
 	};
-	std::vector<ProcessingStep> preprocs;	//< preprocessing steps on input
-	std::vector<OperationStep> steps;	//< list of database commands or operations
-	std::vector<Block> blocks;		//< substructures of the output
-	langbind::Authorization auth;		//< authorization definition structure for this function
-	VariableTable variablemap;		//< variable definitions with LET a = ...;
-	bool casesensitive;			//< true, is the database is case sensitive
+	///\class Block
+	///\brief Print instruction declaration
+	struct PrintStep
+	{
+		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
+		VariableValue argument;			//< printed value
+
+		PrintStep(){}
+		PrintStep( const std::vector<std::string>& p, const VariableValue& a)
+			:path_INTO(p),argument(a){}
+		PrintStep( const PrintStep& o)
+			:path_INTO(o.path_INTO),argument(o.argument){}
+	};
+
+	std::map<std::size_t,PrintStep> printsteps;	//< Print variable instruction
+	std::vector<ProcessingStep> preprocs;		//< preprocessing steps on input
+	std::vector<OperationStep> steps;		//< list of database commands or operations
+	std::vector<Block> blocks;			//< substructures of the output
+	langbind::Authorization auth;			//< authorization definition structure for this function
+	VariableTable variablemap;			//< variable definitions with LET a = ...;
+	bool casesensitive;				//< true, is the database is case sensitive
 
 	///\brief Copy constructor
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
-		:steps(o.steps),blocks(o.blocks),auth(o.auth),variablemap(o.variablemap),casesensitive(o.casesensitive){}
+		:printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),variablemap(o.variablemap),casesensitive(o.casesensitive){}
 	///\brief Default constructor
 	TransactionFunctionDescription()
 		:casesensitive(false){}

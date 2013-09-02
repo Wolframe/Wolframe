@@ -348,6 +348,7 @@ static TransactionFunctionDescription::VariableValue
 	}
 	else if (ch == '$')
 	{
+		++si;
 		Call::Param param = parseReferenceParameter( langdescr, si, se);
 		switch (param.type)
 		{
@@ -485,7 +486,7 @@ static void parseOperationArguments( TransactionFunctionDescription::VariableTab
 		VariableTable::const_iterator vi = variablemap.find( varname);
 		if (vi != variablemap.end())
 		{
-			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "'");
+			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as operation argument)");
 		}
 		variablemap[ varname] = VariableValue( ++column_idx, 0);
 	}
@@ -496,9 +497,15 @@ static void parseOperationArguments( TransactionFunctionDescription::VariableTab
 	while (0!=(ch=gotoNextToken( langdescr, si, se)))
 	{
 		if (ch != ',') break;
+		++si;
 		ch = parseNextToken( langdescr, varname, si, se);
 		if (isAlphaNumeric(ch))
 		{
+			VariableTable::const_iterator vi = variablemap.find( varname);
+			if (vi != variablemap.end())
+			{
+				throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as operation argument)");
+			}
 			variablemap[ varname] = VariableValue( ++column_idx, 0);
 		}
 		else
@@ -904,8 +911,71 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						break;
 					}
+					else if (boost::algorithm::iequals( tok, "PRINT"))
+					{
+						std::vector<std::string> pt;
+						if (mask == 0x0)
+						{
+							ch = gotoNextToken( langdescr, si, se);
+							if (isAlphaNumeric(ch))
+							{
+								if (parseNextToken( langdescr, tok, si, se)
+								&&  boost::algorithm::iequals( tok, "INTO"))
+								{
+									pt = parse_INTO_path( langdescr, si, se);
+								}
+								else
+								{
+									throw std::runtime_error( "unexpected token after 'PRINT'");
+								}
+								mask = 0x2;
+							}
+						}
+						else if (mask == 0x2)
+						{
+							pt = opstep.path_INTO;
+						}
+						else if (mask == 0x1)
+						{
+							throw std::runtime_error( "FOREACH not allowed for PRINT instruction");
+						}
+						else
+						{
+							throw std::runtime_error( "unexpected token 'PRINT'");
+						}
+						TransactionFunctionDescription::VariableValue
+							varval = parseVariableValue( langdescr, si, se, operation.description.steps.size(), operation.description.variablemap);
+						if (mask == 0x0)
+						{
+							ch = gotoNextToken( langdescr, si, se);
+							if (isAlphaNumeric(ch))
+							{
+								if (parseNextToken( langdescr, tok, si, se)
+								&&  boost::algorithm::iequals( tok, "INTO"))
+								{
+									pt = parse_INTO_path( langdescr, si, se);
+								}
+								else
+								{
+									throw std::runtime_error( "unexpected token after 'PRINT' and argument");
+								}
+							}
+						}
+						ch = gotoNextToken( langdescr, si, se);
+						if (ch != ';')
+						{
+							throw std::runtime_error( "unexpected token as end of print expression (';' expected)");
+						}
+						operation.description.printsteps[ operation.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, varval);
+						opstep.clear();
+						mask = 0x0;
+					}
 					else if (boost::algorithm::iequals( tok, "RESULT"))
 					{
+						if (mask != 0)
+						{
+							throw std::runtime_error( "unexpected token RESULT in middle of database command");
+						}
 						if (parseNextToken( langdescr, tok, si, se)
 						&&  boost::algorithm::iequals( tok, "INTO"))
 						{
@@ -986,9 +1056,13 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							opstep.call = parseCallStatement( langdescr, si, se);
 						}
 					}
+					else if (mask == 0x0)
+					{
+						throw ERROR( si, MSG << "keyword (RESULT,PRINT,LET,END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
+					}
 					else
 					{
-						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
+						throw ERROR( si, MSG << "keyword (FOREACH,INTO,DO) expected instead of '" << tok << "'");
 					}
 				}
 				// append empty lines to keep line info for the dbsource:

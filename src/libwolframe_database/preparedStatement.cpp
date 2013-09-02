@@ -57,17 +57,28 @@ static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cm
 	throw std::runtime_error( std::string( "column name '") + name + "' not found in result");
 }
 
-static types::VariantConst resolveScopedReference( const TransactionOutput::CommandResult& cmdres, const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_level, std::size_t scope_functionidx, const types::Variant& reference)
+static types::VariantConst resolveScopedReference( const TransactionOutput::CommandResult& cmdres, const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_functionidx, const types::Variant& reference)
 {
 	types::VariantConst rt;
 	TransactionOutput::result_const_iterator fi = output.end();
-	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
-	for (; ri != re; ++ri)
+	std::size_t prev_functionidx = scope_functionidx;
+	bool found = false;
+
+	TransactionOutput::result_const_iterator ri = output.begin() + output.size();
+	while (ri != output.begin())
 	{
-		if (scope_functionidx <= ri->functionidx()) break;
-		if (scope_level == ri->level()) fi = ri;
+		-- ri;
+		if (prev_functionidx < ri->functionidx()) break; //... crossing operation scope border
+		prev_functionidx = ri->functionidx();
+
+		if (scope_functionidx > ri->functionidx())
+		{
+			fi = ri;
+			found = true;
+			break;
+		}
 	}
-	if (fi != output.end())
+	if (found)
 	{
 		std::size_t cidx;
 		if (reference.type() == types::Variant::string_)
@@ -89,15 +100,14 @@ static types::VariantConst resolveScopedReference( const TransactionOutput::Comm
 			}
 			cidx -= 1;
 		}
-		std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = fi->begin(), we = fi->end();
-		if (we - wi > 1)
+		if (fi->nofRows() > 1)
 		{
 			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "variable referencing a set of results", "internal logic error (transaction function variable reference)");
 			throw db::DatabaseErrorException( dberr);
 		}
-		for (; wi != we; ++wi)
+		if (fi->nofRows() > 0)
 		{
-			rt = wi->at( cidx);
+			rt = fi->begin()->at( cidx);
 		}
 	}
 	return rt;
@@ -130,7 +140,7 @@ static types::VariantConst resolveResultReference( const TransactionOutput::Comm
 	return rt;
 }
 
-static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
+static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -143,11 +153,13 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( cmdres, output, cmditr, cmditr->level(), ai->scope_functionidx(), ai->value());
+					val = resolveScopedReference( cmdres, output, cmditr, ai->scope_functionidx(), ai->value());
 				}
-				else
+				else if (residx < output.size())
 				{
-					val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+					TransactionOutput::result_const_iterator resitr = output.begin() + residx;
+					std::vector<TransactionOutput::CommandResult::Row>::const_iterator rowitr = resitr->begin() + rowidx;
+					val = resolveResultReference( cmdres, rowitr, ai->value(), cmditr);
 				}
 				break;
 			}
@@ -235,7 +247,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 	return true;
 }
 
-static bool pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const TransactionInput::cmd_const_iterator& cmditr)
+static bool pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
 	int argidx;
@@ -259,11 +271,13 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( cmdres, output, cmditr, cmditr->level(), ai->scope_functionidx(), ai->value());
+					val = resolveScopedReference( cmdres, output, cmditr, ai->scope_functionidx(), ai->value());
 				}
-				else
+				else if (residx < output.size())
 				{
-					val = resolveResultReference( cmdres, resrow, ai->value(), cmditr);
+					TransactionOutput::result_const_iterator resitr = output.begin() + residx;
+					std::vector<TransactionOutput::CommandResult::Row>::const_iterator rowitr = resitr->begin() + rowidx;
+					val = resolveResultReference( cmdres, rowitr, ai->value(), cmditr);
 				}
 				break;
 			}
@@ -366,7 +380,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 						{
 							LOG_DATA << "start of loop on result for calling an OPERATION";
 							// ... result non empty, then push arguments of first row
-							if (!pushArguments( output, cmdres, ri->begin(), ci)) return false;
+							if (!pushArguments( output, cmdres, residx, 0/*rowidx*/, ci)) return false;
 							// ... put on the loop stack the following row
 							loopstk.push_back(
 								OperationLoop( ci,//...push parameters instruction of operation
@@ -386,11 +400,12 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					ri = output.last( ci->level());
 					if (ri != output.end())
 					{
+						std::size_t residx = ri - output.begin();
 						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
-						for (; wi != we; ++wi)
+						for (std::size_t rowidx=0; wi != we; ++wi,++rowidx)
 						{
 							if (!start( ci->name())
-							||  !executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
+							||  !executeCommand( this, output, cmdres, residx, rowidx, ci, nonempty, unique))
 							{
 								const DatabaseError* lasterr = getLastError();
 								if (lasterr)
@@ -408,15 +423,15 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		else
 		{
 			// ... command has no result reference, then we call it once
-			std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi;
+			std::size_t residx = output.size();
 			switch (optype)
 			{
 				case PushArguments:
-					if (!pushArguments( output, cmdres, wi, ci)) return false;
+					if (!pushArguments( output, cmdres, residx, 0/*rowidx*/, ci)) return false;
 					break;
 				case DatabaseCall:
 					if (!start( ci->name())
-					||  !executeCommand( this, output, cmdres, wi, ci, nonempty, unique))
+					||  !executeCommand( this, output, cmdres, residx, 0/*rowidx*/, ci, nonempty, unique))
 					{
 						const DatabaseError* lasterr = getLastError();
 						if (lasterr)
@@ -438,16 +453,19 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			if (ci == loopstk.back().ce)
 			{
 				// ... we reached the end of a loop on result executing an operation sub block
-				TransactionOutput::result_const_iterator ri = output.begin() + loopstk.back().residx;
+				std::size_t residx = loopstk.back().residx;
 				std::size_t rowidx = loopstk.back().rowidx++; // ... skip to the next row of the result to process by the operation
-				if (rowidx < ri->nofRows())
+				if (rowidx < output.at(residx).nofRows())
 				{
 					// ... there are still results left to process
-					std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin() + rowidx;
 					LOG_DATA << "skip to element " << (rowidx+1) << " of loop on result for calling an OPERATION";
 					ci = loopstk.back().ci; //... jump back to parameter pass instruction of the operation
+					if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
+					{
+						output.addCommandResult( cmdres);//... add command result
+					}
 					cmdres = TransactionOutput::CommandResult( ci->functionidx(), ci->level());
-					if (!pushArguments( output, cmdres, wi, ci)) return false;
+					if (!pushArguments( output, cmdres, residx, rowidx, ci)) return false;
 					++ci;//... skip to first instruction of the operation
 				}
 				else

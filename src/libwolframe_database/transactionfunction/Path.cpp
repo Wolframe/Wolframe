@@ -181,7 +181,7 @@ void Path::rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
 				pi->m_scope_functionidx += scope_functionidx_incr;
 			}
 		}
-		if (pi->m_type == Next || pi->m_type == Find)
+		else if (pi->m_type == Next || pi->m_type == Find)
 		{
 			std::map<int,int>::const_iterator re = rwtab.find( pi->m_tag);
 			if (re == rwtab.end()) throw std::logic_error( "rewrite table not complete");
@@ -229,11 +229,17 @@ std::string Path::tostring() const
 {
 	switch (referenceType())
 	{
-		case ResultIndex: return std::string("$") + boost::lexical_cast<std::string>( resultReferenceIndex());
+		case ResultIndex:
+		{
+			std::string rt = std::string("$") + boost::lexical_cast<std::string>( resultReferenceIndex());
+			if (resultReferenceScope() >= 0) rt = rt + ":" + boost::lexical_cast<std::string>( resultReferenceScope());
+			return rt;
+		}
 		case ResultSymbol:
 		{
 			std::string rt = std::string("$") + resultReferenceSymbol();
-			if (resultReferenceScope() >= 0) rt = rt + "{" + boost::lexical_cast<std::string>(resultReferenceScope()) + "}";
+			if (resultReferenceScope() >= 0) rt = rt + ":" + boost::lexical_cast<std::string>( resultReferenceScope());
+			return rt;
 		}
 		case Constant: return std::string("'") + constantReference() + std::string("'");
 

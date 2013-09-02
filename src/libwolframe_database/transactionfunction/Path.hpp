@@ -61,7 +61,7 @@ public:
 
 	static const char* elementTypeName( ElementType i)
 	{
-		static const char* ar[] ={"Root","Next","Find","Current","Up","Variable","Result","Constant"};
+		static const char* ar[] ={"Root","Next","Find","Up","ResultSymbol","ResultIndex","Constant"};
 		return ar[(int)i];
 	}
 

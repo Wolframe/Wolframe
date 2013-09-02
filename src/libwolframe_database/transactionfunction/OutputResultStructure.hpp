@@ -45,10 +45,10 @@ namespace db {
 class ResultElement
 {
 public:
-	enum Type {OpenTag,CloseTag,Value,FunctionStart,FunctionEnd,IndexStart,IndexEnd,OperationStart,OperationEnd};
+	enum Type {IgnoreResult,OpenTag,CloseTag,Value,FunctionStart,FunctionEnd,IndexStart,IndexEnd,OperationStart,OperationEnd,SelectResultFunction,SelectResultColumn,SelectResultColumnName};
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"OpenTag","CloseTag","Value","FunctionStart","FunctionEnd","IndexStart","IndexEnd","OperationStart","OperationEnd"};
+		static const char* ar[] = {"IgnoreResult","OpenTag","CloseTag","Value","FunctionStart","FunctionEnd","IndexStart","IndexEnd","OperationStart","OperationEnd","SelectResultFunction","SelectResultColumn","SelectResultColumnName"};
 		return ar[ (int)i];
 	}
 
@@ -77,7 +77,7 @@ public:
 	{
 		const char* value;
 		ResultElement::Type type;
-		std::size_t idx;
+		int idx;
 
 		ContentElement();
 		ContentElement( const ContentElement& o);
@@ -112,12 +112,15 @@ public:
 	const_iterator end() const	{return const_iterator();}
 
 	void openTag( const std::string& name);
+	void resultColumnName( const std::string& name);
 	void closeTag();
 
+	void addIgnoreResult( std::size_t functionidx);
 	void addValueReference( std::size_t functionidx);
 	void addMark( ResultElement::Type mrk, std::size_t functionidx);
 	void addEmbeddedResult( const ResultStructure& o, std::size_t functionidx);
 	std::string tostring() const;
+	std::size_t size() const	{return m_ar.size();}
 
 private:
 	std::vector<ResultElement> m_ar;

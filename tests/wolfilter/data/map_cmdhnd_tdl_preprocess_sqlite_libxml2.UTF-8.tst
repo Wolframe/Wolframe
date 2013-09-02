@@ -225,20 +225,26 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (2,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
 **file:preprocess.tdl
 
+OPERATION getPersonPrename( id)
+BEGIN
+	INTO . DO UNIQUE SELECT prename FROM Person WHERE Person.ID = $[id];
+END
+
 OPERATION getPerson( id)
 RESULT INTO person
 BEGIN
-	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
-		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
+--	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
+--		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
 
-	INTO . DO UNIQUE SELECT id AS "id",prename,surname FROM Person
-		WHERE Person.ID = $[id];
+	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];
+	INTO . DO UNIQUE getPersonPrename( $[id]);
+	INTO id PRINT $[id];
 
-	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
-		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
+--	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
+--		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
 
-	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
-		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
+--	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
+--		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
 END
 
 TRANSACTION getData
@@ -251,18 +257,15 @@ run( xml:AllDataRequest) :Data;
 **file:preprocess.lua
 function run( inp )
 	it = inp:table()
-	logger.printc( "INPUT ", it)
 	getData = formfunction("getData")
 	res = getData( it)
-	logger.printc( "RESULT ", res)
 	rt = res:table()
-	logger.printc( "OUTPUT ", rt)
 	return rt
 end
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><children><prename>Beno</prename><surname>Beret</surname></children><children><prename>Carla</prename><surname>Carlson</surname></children><children><prename>Dorothe</prename><surname>Dubi</surname></children><children><prename>Hubert</prename><surname>Hauer</surname></children><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location></person></data>
+<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><id>1</id><prename>Aufru</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert</prename><surname>Hauer</surname></person></data>
 Person:
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'
