@@ -564,6 +564,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			m_resultstruct->addCloseTag();
 		}
 	}
+	/*[-]*/LOG_DATA << "CLOSE STRUCTURE: " << tostring();
 }
 
 TransactionFunction::Impl::Impl( const Impl& o)

@@ -40,33 +40,40 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+std::string TransactionOutput::CommandResult::tostring() const
+{
+	std::ostringstream rt;
+	std::size_t ci = 0,ce = nofColumns();
+	rt << " COLUMNS " << ce << ":";
+	for (; ci<ce; ++ci) rt << " " << columnName( ci);
+	rt << std::endl;
+	std::vector<CommandResult::Row>::const_iterator wi = begin(), we = end();
+	for (;wi != we; ++wi)
+	{
+		rt << ">";
+		for (ci=0; ci<ce; ++ci)
+		{
+			if (wi->at(ci).defined())
+			{
+				rt << " '" << wi->at(ci).tostring() << "'";
+			}
+			else
+			{
+				rt << " NULL";
+			}
+		}
+	}
+	return rt.str();
+}
+
 std::string TransactionOutput::tostring() const
 {
 	std::ostringstream rt;
 	result_const_iterator ri = begin(), re = end();
 	for (; ri != re; ++ri)
 	{
-		std::size_t ci = 0,ce = ri->nofColumns();
-		rt << "RESULT " << ri->functionidx() << " COLUMNS " << ce << ":";
-		for (; ci<ce; ++ci) rt << " " << ri->columnName( ci);
+		rt << "RESULT " << ri->functionidx() << " " << ri->tostring();
 		rt << std::endl;
-		std::vector<CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
-		for (;wi != we; ++wi)
-		{
-			rt << ">";
-			for (ci=0; ci<ce; ++ci)
-			{
-				if (wi->at(ci).defined())
-				{
-					rt << " '" << wi->at(ci).tostring() << "'";
-				}
-				else
-				{
-					rt << " NULL";
-				}
-			}
-			rt << std::endl;
-		}
 	}
 	return rt.str();
 }

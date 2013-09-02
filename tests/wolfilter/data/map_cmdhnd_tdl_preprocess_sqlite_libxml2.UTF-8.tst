@@ -30,7 +30,7 @@ FORM Person
 	company CompanyRef[]
 	id int
 	parent string
-	children PersonRef[]
+	child PersonRef[]
 	prename string
 	surname string
 	location AddressRef[]
@@ -43,7 +43,7 @@ FORM Company
 	parent string
 	name string
 	location AddressRef[]
-	children CompanyRef[]
+	child CompanyRef[]
 	tag int[]
 }
 
@@ -233,19 +233,21 @@ END
 OPERATION getPerson( id)
 RESULT INTO person
 BEGIN
---	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
---		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
+	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
+		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
 
-	INTO tag PRINT "1001";
-	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];
-	INTO . DO UNIQUE getPersonPrename( $[id]);
-	INTO id PRINT $[id];
+	INTO tag PRINT "1001";							-- print constant
 
---	INTO children DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
---		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
+	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];	-- embedded command with variable as argument
+	INTO . DO UNIQUE getPersonPrename( $[id]);				-- operation with variable as argument
 
---	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
---		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
+	INTO id PRINT $[id];							-- print variable
+
+	INTO child DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
+		WHERE PersonChildRel.childid = Person.ID AND PersonChildRel.ID = $[id];
+
+	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
+		WHERE PersonAddressRel.addressid = Address.ID AND PersonAddressRel.ID = $[id];
 END
 
 TRANSACTION getData
@@ -266,7 +268,7 @@ end
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><id>1</id><prename>Aufru</prename><surname>Alano</surname><tag>1001</tag></person><person><id>2</id><prename>Beno</prename><surname>Beret</surname><tag>1001</tag></person><person><id>3</id><prename>Carla</prename><surname>Carlson</surname><tag>1001</tag></person><person><id>4</id><prename>Dorothe</prename><surname>Dubi</surname><tag>1001</tag></person><person><id>5</id><prename>Erik</prename><surname>Ertki</surname><tag>1001</tag></person><person><id>6</id><prename>Fran</prename><surname>Fuioko</surname><tag>1001</tag></person><person><id>7</id><prename>Gerd</prename><surname>Golto</surname><tag>1001</tag></person><person><id>8</id><prename>Hubert</prename><surname>Hauer</surname><tag>1001</tag></person></data>
+<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company/><id>6</id><child/><prename>Fran</prename><surname>Fuioko</surname><location/><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company/><id>8</id><child/><prename>Hubert</prename><surname>Hauer</surname><location/><tag>1001</tag></person></data>
 Person:
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'

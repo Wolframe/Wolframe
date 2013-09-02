@@ -57,17 +57,20 @@ static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cm
 	throw std::runtime_error( std::string( "column name '") + name + "' not found in result");
 }
 
-static types::VariantConst resolveScopedReference( const TransactionOutput::CommandResult& cmdres, const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_functionidx, const types::Variant& reference)
+static types::VariantConst resolveScopedReference( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_functionidx, const types::Variant& reference)
 {
 	types::VariantConst rt;
 	TransactionOutput::result_const_iterator fi = output.end();
-	std::size_t prev_functionidx = scope_functionidx;
+	std::size_t prev_functionidx = std::numeric_limits<std::size_t>::max();
 	bool found = false;
+	/*[-]*/LOG_DATA << "RESOLVE REFERENCE " << scope_functionidx << " IN";
+	/*[-]*/LOG_DATA << output.tostring();
 
 	TransactionOutput::result_const_iterator ri = output.begin() + output.size();
 	while (ri != output.begin())
 	{
 		-- ri;
+		/*[-]*/LOG_DATA << "VISIT " << ri->functionidx();
 		if (prev_functionidx < ri->functionidx()) break; //... crossing operation scope border
 		prev_functionidx = ri->functionidx();
 
@@ -83,7 +86,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput::Comm
 		std::size_t cidx;
 		if (reference.type() == types::Variant::string_)
 		{
-			cidx = resolveColumnName( cmdres, reference.tostring());
+			cidx = resolveColumnName( *fi, reference.tostring());
 		}
 		else
 		{
@@ -110,6 +113,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput::Comm
 			rt = fi->begin()->at( cidx);
 		}
 	}
+	/*[-]*/if (found) LOG_DATA << "RETURN " << rt.typeName() << " " << rt.tostring(); else LOG_DATA << "NOT FOUND";
 	return rt;
 }
 
@@ -153,7 +157,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( cmdres, output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveScopedReference( output, cmditr, ai->scope_functionidx(), ai->value());
 				}
 				else if (residx < output.size())
 				{
@@ -271,7 +275,7 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( cmdres, output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveScopedReference( output, cmditr, ai->scope_functionidx(), ai->value());
 				}
 				else if (residx < output.size())
 				{
