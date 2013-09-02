@@ -2013,6 +2013,14 @@ static const luaL_Reg form_methodtable[ 6] =
 	{0,0}
 };
 
+static const luaL_Reg provider_methodtable[ 5] =
+{
+	{"filter",&function_filter},
+	{"form",&function_form},
+	{"formfunction",&function_formfunction},
+	{"normalizer",&function_normalizer},
+	{0,0}
+};
 
 LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
@@ -2183,6 +2191,11 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 		lua_setglobal( m_ls, "scope");
 		lua_pushcfunction( m_ls, &function_normalizer);
 		lua_setglobal( m_ls, "normalizer");
+
+		//Register provider context:
+		lua_newtable( m_ls);
+		luaL_setfuncs( m_ls, provider_methodtable, 0);
+		lua_setglobal( m_ls, "provider");
 	}
 }
 

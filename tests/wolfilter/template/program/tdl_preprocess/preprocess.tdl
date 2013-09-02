@@ -30,3 +30,15 @@ BEGIN
 	INTO . DO getPerson( $1);
 END
 
+TRANSACTION findPerson
+-- PREPROCESS
+-- BEGIN
+-- 	INTO norm_location FOREACH location DO normname( street);
+-- 	INTO norm_address FOREACH location DO normname( address);
+-- 	INTO norm_person FOREACH person DO luanorm( . );
+-- END
+BEGIN
+	DO SELECT ID FROM Person;
+	INTO . DO getPerson( $1);
+END
+

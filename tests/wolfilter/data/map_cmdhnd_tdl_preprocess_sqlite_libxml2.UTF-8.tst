@@ -255,15 +255,39 @@ BEGIN
 	DO SELECT ID FROM Person;
 	INTO . DO getPerson( $1);
 END
+
+TRANSACTION findPerson
+-- PREPROCESS
+-- BEGIN
+-- 	INTO norm_location FOREACH location DO normname( street);
+-- 	INTO norm_address FOREACH location DO normname( address);
+-- 	INTO norm_person FOREACH person DO luanorm( . );
+-- END
+BEGIN
+	DO SELECT ID FROM Person;
+	INTO . DO getPerson( $1);
+END
 **file:preprocess.dmap
 run( xml:AllDataRequest) :Data;
 **file:preprocess.lua
 function run( inp )
 	it = inp:table()
-	getData = formfunction("getData")
+	getData = provider.formfunction("getData")
 	res = getData( it)
 	rt = res:table()
 	return rt
+end
+
+function luanorm( tb)
+	rt = {}
+	nf = provider.normalizer( "normname")
+	for k,v in pairs(tb) do
+		if type(v) == "table" then
+			rt[ k] = luanorm( v)
+		else
+			rt[ k] = nf( v)
+		end
+	end
 end
 **outputfile:DBDUMP
 **output
