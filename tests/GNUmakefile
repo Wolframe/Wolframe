@@ -6,8 +6,10 @@ SUBDIRS = modules database AAAA simpleFormCompiler wolfilter
 
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "FREEBSD"
+ifneq "$(PLATFORM)" "NETBSD"
 ifneq "$(PLATFORM)" "SUNOS"
 SUBDIRS += expect config
+endif
 endif
 endif
 endif

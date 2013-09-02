@@ -22,3 +22,15 @@ local changes and fixes:
     'Source/Wrapper/FreeImagePlus/FreeImagePlus.h'
 - 'Source/FreeImage/PluginHDR.cpp:76'
   error: comma at end of enumerator list
+- tamed some errors from rpmlint (openSuse build service):
+    I: Program is using implicit definitions of special functions.
+    these functions need to use their correct prototypes to allow
+    the lightweight buffer overflow checking to work.
+      - Implicit memory/string functions need #include <string.h>.
+      - Implicit *printf functions need #include <stdio.h>.
+      - Implicit *printf functions need #include <stdio.h>.
+      - Implicit *read* functions need #include <unistd.h>.
+      - Implicit *recv* functions need #include <sys/socket.h>.
+     E: wolframe implicit-fortify-decl Source/ZLib/gzread.c:30
+     E: wolframe implicit-fortify-decl hpdf_image_png.c:284
+  => gzguts.h: added include <unistd.h> for !defined _WIN32

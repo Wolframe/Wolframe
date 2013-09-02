@@ -29,7 +29,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@./embed my > test.RES
+	@LD_LIBRARY_PATH=$(PYTHON_LIB_DIR) ./embed my > test.RES
 	@diff test.RES test.MUST
 	@echo
 

@@ -5,8 +5,8 @@ def func( i, f ):
     print( 'func', i, f )
     return i * f
 
-# this is 'ANSI_X3.4-1968' on Linux
-print( sys.stdout.encoding )
+# this is 'ANSI_X3.4-1968' on Linux, 646 on NetBSD/Solaris
+#print( sys.stdout.encoding )
 
 # test UTF-8 identifiers (especially important for function names to work
 répertoire = "/tmp/records.log"

@@ -6,7 +6,10 @@
 from time import time, ctime
 
 def func( ):
-    print( 'Hello Python' )
+	print( 'Hello Python' )
+    
+def func2( i ):
+	return i * i
 
 print( 'Module initialized on ' , ctime( time( ) ) )
 
