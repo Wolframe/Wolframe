@@ -117,6 +117,7 @@ public:// interface for accessing the result and iterating on the result:
 
 	result_const_iterator begin() const					{return m_result.begin();}
 	result_const_iterator end() const					{return m_result.end();}
+	const CommandResult& at( std::size_t ii) const				{return m_result.at(ii);}
 
 	result_const_iterator last( std::size_t level) const
 	{

@@ -64,7 +64,7 @@ bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, s
 		|| keyword == "drop")
 		{
 			while (si != se && (*si > 0 && *si <= 32)) ++si;
-			return (si != se && ((*si >= 'a' && *si <= 'z') || (*si >= 'A' && *si <= 'Z') || *si == '_' || *si == '$'  || *si == '*' || (*si >= '0' && *si <= '9')));
+			return (si != se && (*si == '"' || *si == '\'' || (*si >= 'a' && *si <= 'z') || (*si >= 'A' && *si <= 'Z') || *si == '_' || *si == '$'  || *si == '*' || (*si >= '0' && *si <= '9')));
 		}
 	}
 	return false;

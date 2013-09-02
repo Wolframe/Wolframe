@@ -160,7 +160,7 @@ void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 		case SQLITE_NOTADB: errtype = "SYSTEM"; break;
 	}
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), m_curstm->second.c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), (m_curstm == m_stmmap->end())?"":m_curstm->second.c_str(), errtype, errmsg, errmsg));
 }
 
 bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, State newstate)
@@ -235,7 +235,7 @@ bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_curstm->second.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), (m_curstm == m_stmmap->end())?"":m_curstm->second.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
 		m_state = Error;
 	}
 	return false;

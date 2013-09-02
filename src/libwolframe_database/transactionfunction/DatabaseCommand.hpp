@@ -38,6 +38,8 @@
 #include "types/keymap.hpp"
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iostream>
 
 namespace _Wolframe {
 namespace db {
@@ -68,7 +70,8 @@ public:
 		,m_nonemptyResult(setNonemptyResult_)
 		,m_uniqueResult(setUniqueResult_)
 		,m_level(level_)
-		,m_hints(hints_){}
+		,m_hints(hints_)
+	{}
 
 	const Path& selector() const					{return m_selector;}
 	const std::vector<Path>& arg() const				{return m_arg;}
@@ -80,6 +83,20 @@ public:
 
 	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
 
+	std::string tostring() const
+	{
+		std::ostringstream rt;
+		rt << "FOREACH "<< m_selector.tostring() << " CALL '" << m_name << "'( ";
+		std::vector<Path>::const_iterator ai = m_arg.begin(), ae = m_arg.end();
+		int ii = 0;
+		for (; ai != ae; ++ai,++ii)
+		{
+			if (ii) rt << ", ";
+			rt << ai->tostring();
+		}
+		rt << " )";
+		return rt.str();
+	}
 private:
 	std::string m_name;
 	Path m_selector;

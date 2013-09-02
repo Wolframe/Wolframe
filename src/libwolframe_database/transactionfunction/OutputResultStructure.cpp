@@ -89,7 +89,7 @@ void TransactionFunctionOutput::ResultStructure::const_iterator::init()
 {
 	if (m_itr != m_struct->m_ar.end())
 	{
-		m_content.value = (m_itr->type() != ResultElement::OpenTag)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
+		m_content.value = (m_itr->type() != ResultElement::OpenTag && m_itr->type() != ResultElement::OpenTag)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
 		m_content.idx = m_itr->idx();
 		m_content.type = m_itr->type();
 	}
@@ -108,9 +108,21 @@ void TransactionFunctionOutput::ResultStructure::openTag( const std::string& nam
 	m_strings.push_back( '\0');
 }
 
+void TransactionFunctionOutput::ResultStructure::resultColumnName( const std::string& name)
+{
+	m_ar.push_back( ResultElement( ResultElement::SelectResultColumnName, m_strings.size()));
+	m_strings.append( name);
+	m_strings.push_back( '\0');
+}
+
 void TransactionFunctionOutput::ResultStructure::closeTag()
 {
 	m_ar.push_back( ResultElement( ResultElement::CloseTag, 0));
+}
+
+void TransactionFunctionOutput::ResultStructure::addIgnoreResult( std::size_t functionidx)
+{
+	m_ar.push_back( ResultElement( ResultElement::IgnoreResult, functionidx));
 }
 
 void TransactionFunctionOutput::ResultStructure::addValueReference( std::size_t functionidx)
@@ -130,6 +142,9 @@ void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const Result
 	{
 		switch (ri->type)
 		{
+			case ResultElement::IgnoreResult:
+				addIgnoreResult( functionidx + ri->idx);
+				break;
 			case ResultElement::Value:
 				addValueReference( functionidx + ri->idx);
 				break;
@@ -145,7 +160,14 @@ void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const Result
 			case ResultElement::IndexEnd:
 			case ResultElement::OperationStart:
 			case ResultElement::OperationEnd:
+			case ResultElement::SelectResultFunction:
 				addMark( ri->type, functionidx + ri->idx);
+				break;
+			case ResultElement::SelectResultColumn:
+				addMark( ri->type, ri->idx);
+				break;
+			case ResultElement::SelectResultColumnName:
+				resultColumnName( ri->value);
 				break;
 		}
 	}

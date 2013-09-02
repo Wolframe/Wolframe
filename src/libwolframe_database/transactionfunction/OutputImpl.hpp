@@ -47,36 +47,37 @@ struct TransactionFunctionOutput::Impl
 {
 	struct StackElement
 	{
-		ResultElement::Type m_type;
-		std::size_t m_cnt;
-		ResultStructure::const_iterator m_structitr;
-		std::size_t m_functionidx;
+		ResultElement::Type m_type;				//< type of element expected in end of the section marked by this
+		std::size_t m_cnt;					//< count of elements in this section (loop)
+		ResultStructure::const_iterator m_structitr;		//< start of the structure of this section (for jump back in loop)
+		std::size_t m_functionidx;				//< functionidx of current element that has to match for jumping back
+		TransactionOutput::result_const_iterator m_resitr;	//< m_resitr at loop begin
 
-		StackElement( ResultElement::Type type_, ResultStructure::const_iterator structitr_, std::size_t functionidx_)
-			:m_type(type_),m_cnt(0),m_structitr(structitr_),m_functionidx(functionidx_){}
+		StackElement( ResultElement::Type type_, ResultStructure::const_iterator structitr_, std::size_t functionidx_, TransactionOutput::result_const_iterator resitr_)
+			:m_type(type_),m_cnt(0),m_structitr(structitr_),m_functionidx(functionidx_),m_resitr(resitr_){}
 		StackElement( const StackElement& o)
-			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr),m_functionidx(o.m_functionidx){}
+			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr),m_functionidx(o.m_functionidx),m_resitr(o.m_resitr){}
 	};
 
 	enum {StateColumnOpenTag=0, StateColumnValue=1, StateColumnCloseTag=2,StateColumnEndGroup=3};
 	enum {StateIndexCloseTag=0, StateIndexNext=1};
-	int m_valuestate;
-	int m_colidx;
-	int m_colend;
-	bool m_endofoutput;
-	bool m_started;
-	std::string m_group;
-	ResultStructureR m_resultstruct;
-	ResultStructure::const_iterator m_structitr;
-	ResultStructure::const_iterator m_structend;
-	std::vector<StackElement> m_stack;
-	db::TransactionOutput::result_const_iterator m_resitr;
-	db::TransactionOutput::result_const_iterator m_resend;
-	std::vector<db::TransactionOutput::CommandResult::Row>::const_iterator m_rowitr;
-	std::vector<db::TransactionOutput::CommandResult::Row>::const_iterator m_rowend;
-	db::TransactionOutputR m_data;
+	int m_valuestate;								//< sub statemachine state for StateColumn and StateIndex
+	int m_colidx;									//< iterator on current result columns
+	int m_colend;									//< end of result columns (nof columns)
+	bool m_endofoutput;								//< flag set when final Close has been emited by last call of 'getNext'
+	bool m_started;									//< getNext called at least once (flag for logging things on first call of get next)
+	std::string m_group;								//< group tag for output AS with one slash
+	ResultStructureR m_resultstruct;						//< result structure
+	ResultStructure::const_iterator m_structitr;					//< iterator on output structure
+	ResultStructure::const_iterator m_structend;					//< end of output structure
+	std::vector<StackElement> m_stack;						//< stack for loop on nested structures
+	TransactionOutput::result_const_iterator m_resitr;				//< currently visited result
+	TransactionOutput::result_const_iterator m_resend;				//< end of results
+	std::vector<TransactionOutput::CommandResult::Row>::const_iterator m_rowitr;	//< currently visited result row
+	std::vector<TransactionOutput::CommandResult::Row>::const_iterator m_rowend;	//< end of currently visited result
+	TransactionOutputR m_data;
 
-	Impl( const ResultStructureR& resultstruct_, const db::TransactionOutputR& data_);
+	Impl( const ResultStructureR& resultstruct_, const TransactionOutputR& data_);
 	Impl( const Impl& o);
 
 	void resetIterator();
@@ -85,6 +86,7 @@ struct TransactionFunctionOutput::Impl
 	static bool hasResultGroup( const std::string& columnName);
 
 	bool endOfGroup();
+	TransactionOutput::result_const_iterator endOfOperation();
 
 	bool getNext( ElementType& type, types::VariantConst& element, bool doSerializeWithIndices);
 };

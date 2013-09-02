@@ -48,6 +48,8 @@
 #include <sstream>
 #include <iostream>
 #include <locale>
+#include <sstream>
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -55,6 +57,8 @@ using namespace _Wolframe::db;
 
 struct TransactionFunction::Impl
 {
+	typedef TransactionFunctionDescription::PrintStep PrintStep;
+
 	TransactionFunctionOutput::ResultStructureR m_resultstruct;
 	std::vector<DatabaseCommand> m_call;
 	TagTable m_tagmap;
@@ -62,6 +66,19 @@ struct TransactionFunction::Impl
 
 	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
+
+	void handlePrintStep( const PrintStep& printstep);
+
+	std::string tostring() const
+	{
+		std::ostringstream rt;
+		std::vector<DatabaseCommand>::const_iterator ci = m_call.begin(), ce = m_call.end();
+		for (; ci != ce; ++ci)
+		{
+			rt << ci->tostring() << "; ";
+		}
+		return rt.str();
+	}
 };
 
 
@@ -286,13 +303,55 @@ static int hasCloseSubstruct( const std::vector<TransactionFunctionDescription::
 	return -1;
 }
 
+void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
+{
+	std::vector<std::string>::const_iterator pi = printstep.path_INTO.begin(), pe = printstep.path_INTO.end();
+	for (; pi != pe; ++pi)
+	{
+		m_resultstruct->openTag( *pi);
+	}
+	if (printstep.argument.isConstant())
+	{
+		throw std::runtime_error( "constants not allowed as argument of PRINT command");
+	}
+	else if (printstep.argument.isNumeric())
+	{
+		int scope_fidx = printstep.argument.scope_functionidx();
+		if (scope_fidx>=0)
+		{
+			m_resultstruct->addMark( ResultElement::SelectResultFunction, scope_fidx);
+		}
+		m_resultstruct->addMark( ResultElement::SelectResultColumn, printstep.argument.column_idx());
+	}
+	else if (printstep.argument.isSymbolic())
+	{
+		int scope_fidx = printstep.argument.scope_functionidx();
+		if (scope_fidx>=0)
+		{
+			m_resultstruct->addMark( ResultElement::SelectResultFunction, scope_fidx);
+		}
+		m_resultstruct->resultColumnName( printstep.argument.name());
+	}
+	else
+	{
+		throw std::logic_error( "internal: cannot handle type of argument of PRINT command");
+	}
+	pi = printstep.path_INTO.begin(), pe = printstep.path_INTO.end();
+	for (; pi != pe; ++pi)
+	{
+		m_resultstruct->closeTag();
+	}
+}
+
 TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_resultstruct( new TransactionFunctionOutput::ResultStructure())
 	,m_tagmap(description.casesensitive)
 {
 	typedef TransactionFunctionDescription::ProcessingStep ProcessingStep;
+	typedef TransactionFunctionDescription::PrintStep PrintStep;
 	typedef TransactionFunctionDescription::OperationStep OperationStep;
 	typedef OperationStep::Call Call;
+	typedef TransactionFunctionDescription::VariableValue VariableValue;
 	typedef TransactionFunctionDescription::VariableTable VariableTable;
 
 	// Compile the preprocessing commands:
@@ -354,20 +413,31 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				}
 			}
 
+			// Handle PRINT instructions:
+			std::map<std::size_t,PrintStep>::const_iterator pp = description.printsteps.find( eidx);
+			if (pp != description.printsteps.end())
+			{
+				handlePrintStep( pp->second);
+			}
+
 			// Build Function call object for parsed function:
 			Path selector( di->selector_FOREACH, &m_tagmap);
 			std::vector<Path> param;
 			std::vector<Call::Param>::const_iterator ai = di->call.paramlist.begin(), ae = di->call.paramlist.end();
 			for (; ai != ae; ++ai)
 			{
-				Path pp( *ai, &description.variablemap, &m_tagmap);
-				param.push_back( pp);
+				Path pa( *ai, &description.variablemap, &m_tagmap);
+				param.push_back( pa);
 			}
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
 			if (fui == functionmap.end())
 			{
 				DatabaseCommand cc( di->call.funcname, selector, param, di->nonempty, di->unique, 1, di->hints);
-				if (!di->path_INTO.empty())
+				if (di->path_INTO.empty())
+				{
+					m_resultstruct->addIgnoreResult( m_call.size());
+				}
+				else
 				{
 					// this is just the wrapping structure, iteration is only done with the last tag
 					// (othwerwise we get into definition problems)
@@ -417,40 +487,50 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				{
 					throw OperationStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
 				}
-				std::string iteratingTag = di->path_INTO.back();
-				bool hasOutput = (iteratingTag != ".");
-
-				for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
+				std::string iteratingTag;
+				bool hasOutput = false;
+				if (!di->path_INTO.empty())
 				{
-					m_resultstruct->openTag( di->path_INTO[i] );
+					iteratingTag = di->path_INTO.back();
+					hasOutput = (iteratingTag != ".");
+
+					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
+					{
+						m_resultstruct->openTag( di->path_INTO[i] );
+					}
 				}
 				m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
 				if (hasOutput)
 				{
 					m_resultstruct->openTag( iteratingTag);
 				}
-
 				if (!di->unique)
 				{
-					m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
+					m_resultstruct->addMark( ResultElement::IndexStart, m_call.size()+1);
 				}
 				m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
-
 				if (!di->unique)
 				{
-					m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
+					m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size()+1);
 				}
 				if (hasOutput)
 				{
 					m_resultstruct->closeTag();
 				}
 				m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
+				if (!di->path_INTO.empty())
+				{
+					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
+					{
+						m_resultstruct->closeTag();
+					}
+				}
 
 				DatabaseCommand paramstk( "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
+				int scope_functionidx_incr = m_call.size();
 
 				std::vector<DatabaseCommand>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
-				int scope_functionidx_incr = m_call.size();
 				for (; fsi != fse; ++fsi)
 				{
 					Path fselector = fsi->selector();
@@ -467,6 +547,12 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 		{
 			throw OperationStep::Error( eidx, e.what());
 		}
+	}
+	// Handle PRINT instructions:
+	std::map<std::size_t,PrintStep>::const_iterator pp = description.printsteps.find( description.steps.size());
+	if (pp != description.printsteps.end())
+	{
+		handlePrintStep( pp->second);
 	}
 	// Create substructure context for RESULT INTO instructions:
 	if ((blkidx=hasCloseSubstruct( description.blocks, description.steps.size())) >= 0)

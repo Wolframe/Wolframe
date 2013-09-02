@@ -75,6 +75,11 @@ public:
 		static const char* ar[] = {"null","int","uint","bool","double","string","array","struct","indirection","unresolved"};
 		return ar[ (int)i];
 	}
+	///\brief Get the type name of 'this' as string constant for logging
+	const char* typeName() const
+	{
+		return typeName( (Type)m_type);
+	}
 
 	///\class Data
 	///\brief Internal representation of this value
