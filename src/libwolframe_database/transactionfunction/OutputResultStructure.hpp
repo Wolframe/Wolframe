@@ -45,10 +45,10 @@ namespace db {
 class ResultElement
 {
 public:
-	enum Type {IgnoreResult,OpenTag,CloseTag,Value,FunctionStart,FunctionEnd,IndexStart,IndexEnd,OperationStart,OperationEnd,SelectResultFunction,SelectResultColumn,SelectResultColumnName};
+	enum Type {IgnoreResult,OpenTag,CloseTag,Value,Constant,FunctionStart,FunctionEnd,IndexStart,IndexEnd,OperationStart,OperationEnd,SelectResultFunction,SelectResultColumn,SelectResultColumnName};
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"IgnoreResult","OpenTag","CloseTag","Value","FunctionStart","FunctionEnd","IndexStart","IndexEnd","OperationStart","OperationEnd","SelectResultFunction","SelectResultColumn","SelectResultColumnName"};
+		static const char* ar[] = {"IgnoreResult","OpenTag","CloseTag","Value","Constant","FunctionStart","FunctionEnd","IndexStart","IndexEnd","OperationStart","OperationEnd","SelectResultFunction","SelectResultColumn","SelectResultColumnName"};
 		return ar[ (int)i];
 	}
 
@@ -111,9 +111,10 @@ public:
 	const_iterator begin() const	{return const_iterator(this);}
 	const_iterator end() const	{return const_iterator();}
 
-	void openTag( const std::string& name);
-	void resultColumnName( const std::string& name);
-	void closeTag();
+	void addOpenTag( const std::string& name);
+	void addResultColumnName( const std::string& name);
+	void addConstant( const std::string& value);
+	void addCloseTag();
 
 	void addIgnoreResult( std::size_t functionidx);
 	void addValueReference( std::size_t functionidx);

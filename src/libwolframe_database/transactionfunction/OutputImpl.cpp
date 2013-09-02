@@ -382,6 +382,12 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				++m_structitr;
 				continue;
 
+			case ResultElement::Constant:
+				element = types::VariantConst( m_structitr->value);
+				type = TypedInputFilter::Value;
+				++m_structitr;
+				return true;
+
 			case ResultElement::Value:
 				if (m_valuestate == StateColumnEndGroup)
 				{

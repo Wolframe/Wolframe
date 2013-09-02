@@ -308,11 +308,11 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 	std::vector<std::string>::const_iterator pi = printstep.path_INTO.begin(), pe = printstep.path_INTO.end();
 	for (; pi != pe; ++pi)
 	{
-		m_resultstruct->openTag( *pi);
+		m_resultstruct->addOpenTag( *pi);
 	}
 	if (printstep.argument.isConstant())
 	{
-		throw std::runtime_error( "constants not allowed as argument of PRINT command");
+		m_resultstruct->addConstant( printstep.argument.value());
 	}
 	else if (printstep.argument.isNumeric())
 	{
@@ -330,7 +330,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 		{
 			m_resultstruct->addMark( ResultElement::SelectResultFunction, scope_fidx);
 		}
-		m_resultstruct->resultColumnName( printstep.argument.name());
+		m_resultstruct->addResultColumnName( printstep.argument.name());
 	}
 	else
 	{
@@ -339,7 +339,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 	pi = printstep.path_INTO.begin(), pe = printstep.path_INTO.end();
 	for (; pi != pe; ++pi)
 	{
-		m_resultstruct->closeTag();
+		m_resultstruct->addCloseTag();
 	}
 }
 
@@ -400,7 +400,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 				for (; pi != pe; ++pi)
 				{
-					m_resultstruct->closeTag();
+					m_resultstruct->addCloseTag();
 				}
 			}
 			if ((blkidx=hasOpenSubstruct( description.blocks, eidx)) >= 0)
@@ -409,7 +409,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 				for (; pi != pe; ++pi)
 				{
-					m_resultstruct->openTag( *pi);
+					m_resultstruct->addOpenTag( *pi);
 				}
 			}
 
@@ -446,12 +446,12 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
 					{
-						m_resultstruct->openTag( di->path_INTO[i] );
+						m_resultstruct->addOpenTag( di->path_INTO[i] );
 					}
 					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
 					if (hasOutput)
 					{
-						m_resultstruct->openTag( iteratingTag);
+						m_resultstruct->addOpenTag( iteratingTag);
 					}
 					if (!di->unique)
 					{
@@ -465,12 +465,12 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					}
 					if (hasOutput)
 					{
-						m_resultstruct->closeTag();
+						m_resultstruct->addCloseTag();
 					}
 					m_resultstruct->addMark( ResultElement::FunctionEnd, m_call.size());
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
 					{
-						m_resultstruct->closeTag( );
+						m_resultstruct->addCloseTag( );
 					}
 				}
 				m_call.push_back( cc);
@@ -496,13 +496,13 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
 					{
-						m_resultstruct->openTag( di->path_INTO[i] );
+						m_resultstruct->addOpenTag( di->path_INTO[i] );
 					}
 				}
 				m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
 				if (hasOutput)
 				{
-					m_resultstruct->openTag( iteratingTag);
+					m_resultstruct->addOpenTag( iteratingTag);
 				}
 				if (!di->unique)
 				{
@@ -515,14 +515,14 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				}
 				if (hasOutput)
 				{
-					m_resultstruct->closeTag();
+					m_resultstruct->addCloseTag();
 				}
 				m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
 				if (!di->path_INTO.empty())
 				{
 					for (std::vector<std::string>::size_type i = 0; i < di->path_INTO.size()-1; i++)
 					{
-						m_resultstruct->closeTag();
+						m_resultstruct->addCloseTag();
 					}
 				}
 
@@ -561,7 +561,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 		std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 		for (; pi != pe; ++pi)
 		{
-			m_resultstruct->closeTag();
+			m_resultstruct->addCloseTag();
 		}
 	}
 }

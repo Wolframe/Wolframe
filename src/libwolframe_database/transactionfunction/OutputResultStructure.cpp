@@ -89,7 +89,16 @@ void TransactionFunctionOutput::ResultStructure::const_iterator::init()
 {
 	if (m_itr != m_struct->m_ar.end())
 	{
-		m_content.value = (m_itr->type() != ResultElement::OpenTag && m_itr->type() != ResultElement::OpenTag)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
+		if (m_itr->type() == ResultElement::OpenTag
+		||  m_itr->type() == ResultElement::Constant
+		||  m_itr->type() == ResultElement::SelectResultColumnName)
+		{
+			m_content.value = m_struct->m_strings.c_str() + m_itr->idx();
+		}
+		else
+		{
+			m_content.value = 0;
+		}
 		m_content.idx = m_itr->idx();
 		m_content.type = m_itr->type();
 	}
@@ -101,21 +110,28 @@ void TransactionFunctionOutput::ResultStructure::const_iterator::init()
 	}
 }
 
-void TransactionFunctionOutput::ResultStructure::openTag( const std::string& name)
+void TransactionFunctionOutput::ResultStructure::addOpenTag( const std::string& name)
 {
 	m_ar.push_back( ResultElement( ResultElement::OpenTag, m_strings.size()));
 	m_strings.append( name);
 	m_strings.push_back( '\0');
 }
 
-void TransactionFunctionOutput::ResultStructure::resultColumnName( const std::string& name)
+void TransactionFunctionOutput::ResultStructure::addResultColumnName( const std::string& name)
 {
 	m_ar.push_back( ResultElement( ResultElement::SelectResultColumnName, m_strings.size()));
 	m_strings.append( name);
 	m_strings.push_back( '\0');
 }
 
-void TransactionFunctionOutput::ResultStructure::closeTag()
+void TransactionFunctionOutput::ResultStructure::addConstant( const std::string& value)
+{
+	m_ar.push_back( ResultElement( ResultElement::Constant, m_strings.size()));
+	m_strings.append( value);
+	m_strings.push_back( '\0');
+}
+
+void TransactionFunctionOutput::ResultStructure::addCloseTag()
 {
 	m_ar.push_back( ResultElement( ResultElement::CloseTag, 0));
 }
@@ -149,10 +165,10 @@ void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const Result
 				addValueReference( functionidx + ri->idx);
 				break;
 			case ResultElement::OpenTag:
-				openTag( ri->value);
+				addOpenTag( ri->value);
 				break;
 			case ResultElement::CloseTag:
-				closeTag();
+				addCloseTag();
 				break;
 			case ResultElement::FunctionStart:
 			case ResultElement::FunctionEnd:
@@ -167,8 +183,12 @@ void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const Result
 				addMark( ri->type, ri->idx);
 				break;
 			case ResultElement::SelectResultColumnName:
-				resultColumnName( ri->value);
+				addResultColumnName( ri->value);
 				break;
+			case ResultElement::Constant:
+				addConstant( ri->value);
+				break;
+
 		}
 	}
 }

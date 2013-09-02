@@ -235,6 +235,7 @@ BEGIN
 --	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
 --		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
 
+	INTO tag PRINT "1001";
 	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];
 	INTO . DO UNIQUE getPersonPrename( $[id]);
 	INTO id PRINT $[id];
@@ -264,7 +265,7 @@ end
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><id>1</id><prename>Aufru</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert</prename><surname>Hauer</surname></person></data>
+<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><id>1</id><prename>Aufru</prename><surname>Alano</surname><tag>1001</tag></person><person><id>2</id><prename>Beno</prename><surname>Beret</surname><tag>1001</tag></person><person><id>3</id><prename>Carla</prename><surname>Carlson</surname><tag>1001</tag></person><person><id>4</id><prename>Dorothe</prename><surname>Dubi</surname><tag>1001</tag></person><person><id>5</id><prename>Erik</prename><surname>Ertki</surname><tag>1001</tag></person><person><id>6</id><prename>Fran</prename><surname>Fuioko</surname><tag>1001</tag></person><person><id>7</id><prename>Gerd</prename><surname>Golto</surname><tag>1001</tag></person><person><id>8</id><prename>Hubert</prename><surname>Hauer</surname><tag>1001</tag></person></data>
 Person:
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'

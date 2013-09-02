@@ -10,6 +10,7 @@ BEGIN
 --	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
 --		WHERE PersonCompanyRel.companyid = Company.ID AND PersonCompanyRel.ID = $[id];
 
+	INTO tag PRINT "1001";
 	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];
 	INTO . DO UNIQUE getPersonPrename( $[id]);
 	INTO id PRINT $[id];
