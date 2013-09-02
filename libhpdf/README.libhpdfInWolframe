@@ -1,0 +1,5 @@
+This is version 2.3.0RC2.
+
+* changed to run through OSC build service (rpmlint on OpenSuse):
+
+  E: wolframe implicit-fortify-decl hpdf_image_png.c:284
