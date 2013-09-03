@@ -66,6 +66,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	prgbind_ddlProgram.obj \
 	prgbind_programLibrary.obj \
 	langbind_iostreamfilter.obj \
+	jobScheduler.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \

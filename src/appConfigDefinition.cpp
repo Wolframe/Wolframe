@@ -49,6 +49,8 @@ ApplicationConfiguration::ApplicationConfiguration()
 	serviceCfg = new _Wolframe::config::ServiceConfiguration();
 	// network server
 	serverCfg = new _Wolframe::net::Configuration();
+	// job scheduler configuration
+//	jobSchedulerCfg = new _Wolframe::JobSchedulerConfiguration();
 	// logging
 	loggerCfg = new _Wolframe::log::LoggerConfiguration();
 
@@ -63,6 +65,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "ServerSignature", handlerCfg->bannerCfg );
 
 	addConfig( "listen", serverCfg );
+//	addConfig( "JobScheduler", jobSchedulerCfg );
 	addConfig( "logging", loggerCfg );
 	addConfig( "database", handlerCfg->databaseCfg );
 	addConfig( "aaaa", handlerCfg->aaaaCfg );
