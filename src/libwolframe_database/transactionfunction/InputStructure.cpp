@@ -149,13 +149,9 @@ std::string TransactionFunctionInput::Structure::nodepath( const NodeVisitor& nv
 		ni = nd->m_parent;
 	}
 	std::string rt;
-	if (nv.m_nodeidx == 0/*root*/)
-	{
-		rt.push_back('/');
-	}
 	while (pt.size())
 	{
-		if (rt.size()) rt.push_back('/');
+		rt.push_back('/');
 		rt.append( pt.back());
 		pt.pop_back();
 	}

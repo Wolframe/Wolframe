@@ -268,22 +268,22 @@ END
 TRANSACTION insertWords
 PREPROCESS
 BEGIN
+	INTO norm FOREACH /data/person DO luanorm( . );
+
 	INTO norm_street FOREACH /data/person/location DO normname( street);
 	INTO norm_town FOREACH /data/person/location DO normname( town);
-
-	INTO norm_person FOREACH /data/person DO luanorm( . );
 END
 BEGIN
 	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));
 	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select town", $(norm_town));
 
-	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct street", $(street));
-	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct town", $(town));
-	FOREACH /data/norm_person/surname DO INSERT INTO WordTable (name,word) VALUES ("struct surname", $(.));
-	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct prename", $(prename));
-	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct tag", $(tag));
-	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct id", $(id));
-	FOREACH /data/norm_person/company DO INSERT INTO WordTable (name,word) VALUES ("company name", $(name));
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ("struct street", $(street));
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ("struct town", $(town));
+	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ("struct surname", $(.));
+	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct prename", $(prename));
+	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct tag", $(tag));
+	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct id", $(id));
+	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ("company name", $(name));
 END
 **file:preprocess.dmap
 run( xml:AllDataRequest) :Data;
@@ -302,22 +302,24 @@ function luanorm( inp )
 	local function luanorm_table( tb )
 		local rt = {}
 		for k,v in pairs( tb) do
-			if k ~= "child" and k ~= "location" and k ~= "company" then
-				if type(v) == "table" then
-					rt[ k] = luanorm_table( v)
+			if type(v) == "table" then
+				rt[ k] = luanorm_table( v)
+			else
+				if k == "id" or k == "tag" then
+					rt[ k] = tonumber(v) + 100
 				else
-					if k == "id" or k == "tag" then
-						rt[ k] = tonumber(v) + 100
-					else
-						local nf = provider.normalizer( "normname")
-						rt[ k] = nf( v)
-					end
+					local nf = provider.normalizer( "normname")
+					rt[ k] = nf( v)
 				end
 			end
 		end
 		return rt
 	end
-	return luanorm_table( inp:table())
+	local intb = inp:table()
+	logger.printc( "INPUT ", intb)
+	local outtb = luanorm_table( intb)
+	logger.printc( "OUTPUT ", outtb)
+	return outtb
 end
 **outputfile:DBDUMP
 **output
@@ -472,5 +474,56 @@ WordTable:
 'select town', 'hof'
 'select town', NULL
 'select town', NULL
+'struct street', 'butterweg 23'
+'struct street', 'camelstreet 34'
+'struct street', 'demotastrasse 45'
+'struct street', 'hurtika 89'
+'struct street', 'camelstreet 34'
+'struct street', 'demotastrasse 45'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'hurtika 89'
+'struct street', 'demotastrasse 45'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'fabelweg 67'
+'struct street', 'hurtika 89'
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'company name', 'baluba inc'
+'company name', 'carimba inc'
+'company name', 'dereno inc'
+'company name', 'huratz inc'
+'company name', 'carimba inc'
+'company name', 'dereno inc'
+'company name', 'etungo inc'
+'company name', 'huratz inc'
+'company name', 'dereno inc'
+'company name', 'etungo inc'
+'company name', 'figaji inc'
+'company name', 'huratz inc'
 
 **end

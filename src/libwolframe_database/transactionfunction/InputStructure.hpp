@@ -113,6 +113,9 @@ public://visit structure:
 
 	///\brief Get the root node of the tree
 	const Node* root() const;
+	///\brief Get the root node visitor of the tree
+	NodeVisitor rootvisitor() const					{return NodeVisitor(0);}
+
 	///\brief Get all children of a node having a tag matching to tag or all children if tag is 0.
 	///\param[out] rt where to append the result nodes
 	void next( const Node* nd, int tag, std::vector<const Node*>& rt) const;

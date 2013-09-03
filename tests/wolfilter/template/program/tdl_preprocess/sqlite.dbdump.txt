@@ -147,4 +147,55 @@ WordTable:
 'select town', 'hof'
 'select town', NULL
 'select town', NULL
+'struct street', 'butterweg 23'
+'struct street', 'camelstreet 34'
+'struct street', 'demotastrasse 45'
+'struct street', 'hurtika 89'
+'struct street', 'camelstreet 34'
+'struct street', 'demotastrasse 45'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'hurtika 89'
+'struct street', 'demotastrasse 45'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'fabelweg 67'
+'struct street', 'hurtika 89'
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct town', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct prename', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct tag', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'struct id', NULL
+'company name', 'baluba inc'
+'company name', 'carimba inc'
+'company name', 'dereno inc'
+'company name', 'huratz inc'
+'company name', 'carimba inc'
+'company name', 'dereno inc'
+'company name', 'etungo inc'
+'company name', 'huratz inc'
+'company name', 'dereno inc'
+'company name', 'etungo inc'
+'company name', 'figaji inc'
+'company name', 'huratz inc'
 

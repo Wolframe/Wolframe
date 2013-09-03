@@ -107,6 +107,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 
 		std::vector<const Node*> nodearray;
 		m_selector.selectNodes( structure, structure.root(), nodearray);
+		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), " ", "", true);
 		if (nodearray.size())
 		{
 			LOG_DATA << "[transaction preprocess] execute function " << m_name << " on " << nodearray.size() << " nodes of selection '" << structure.nodepath( *nodearray.begin()) << "'";

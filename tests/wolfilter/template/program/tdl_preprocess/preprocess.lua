@@ -12,21 +12,23 @@ function luanorm( inp )
 	local function luanorm_table( tb )
 		local rt = {}
 		for k,v in pairs( tb) do
-			if k ~= "child" and k ~= "location" and k ~= "company" then
-				if type(v) == "table" then
-					rt[ k] = luanorm_table( v)
+			if type(v) == "table" then
+				rt[ k] = luanorm_table( v)
+			else
+				if k == "id" or k == "tag" then
+					rt[ k] = tonumber(v) + 100
 				else
-					if k == "id" or k == "tag" then
-						rt[ k] = tonumber(v) + 100
-					else
-						local nf = provider.normalizer( "normname")
-						rt[ k] = nf( v)
-					end
+					local nf = provider.normalizer( "normname")
+					rt[ k] = nf( v)
 				end
 			end
 		end
 		return rt
 	end
-	return luanorm_table( inp:table())
+	local intb = inp:table()
+	logger.printc( "INPUT ", intb)
+	local outtb = luanorm_table( intb)
+	logger.printc( "OUTPUT ", outtb)
+	return outtb
 end
 
