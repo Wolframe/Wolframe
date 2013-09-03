@@ -132,7 +132,7 @@ public://visit structure:
 	std::string nodepath( const Node* nd) const;
 
 	///\brief Get structure as string
-	const std::string tostring( const NodeVisitor& nv = NodeVisitor()) const;
+	const std::string tostring( const NodeVisitor& nv = NodeVisitor(), const std::string& newprefix="\n", const std::string& indentprefix="\t", bool withbrk=false) const;
 	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
 	bool isequalTag( const std::string& t1, const std::string& t2) const;
 
@@ -156,7 +156,7 @@ public://create structure with explicit visitor context:
 	void pushValue( const NodeVisitor& nv, const types::VariantConst& val);
 
 private://create structure:
-	NodeVisitor openUniqTag( const NodeVisitor& nv, const std::string& tag);
+	NodeVisitor openTag( const NodeVisitor& nv, const std::string& tag);
 	NodeVisitor createChildNode( const NodeVisitor& nv);
 	NodeVisitor createSiblingNode( const NodeVisitor& nv);
 	bool isArrayNode( const NodeVisitor& nv) const;

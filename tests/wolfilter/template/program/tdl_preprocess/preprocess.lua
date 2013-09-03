@@ -3,18 +3,30 @@ function run( inp )
 	getData = provider.formfunction("getData")
 	res = getData( it)
 	rt = res:table()
+	insertWords = provider.formfunction("insertWords")
+	insertWords( { data = rt } )
 	return rt
 end
 
-function luanorm( tb)
-	rt = {}
-	nf = provider.normalizer( "normname")
-	for k,v in pairs(tb) do
-		if type(v) == "table" then
-			rt[ k] = luanorm( v)
-		else
-			rt[ k] = nf( v)
+function luanorm( inp )
+	local function luanorm_table( tb )
+		local rt = {}
+		for k,v in pairs( tb) do
+			if k ~= "child" and k ~= "location" and k ~= "company" then
+				if type(v) == "table" then
+					rt[ k] = luanorm_table( v)
+				else
+					if k == "id" or k == "tag" then
+						rt[ k] = tonumber(v) + 100
+					else
+						local nf = provider.normalizer( "normname")
+						rt[ k] = nf( v)
+					end
+				end
+			end
 		end
+		return rt
 	end
+	return luanorm_table( inp:table())
 end
 

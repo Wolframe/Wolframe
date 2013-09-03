@@ -116,6 +116,12 @@ CREATE TABLE PersonCompanyRel
  companyid  INT
 );
 
+CREATE TABLE WordTable
+(
+ name string,
+ word string
+);
+
 INSERT INTO Address (street,town) VALUES ("Amselstrasse 12","Aulach");
 INSERT INTO Address (street,town) VALUES ("Butterweg 23","Bendorf");
 INSERT INTO Address (street,town) VALUES ("Camelstreet 34","Carassa");
@@ -258,16 +264,25 @@ BEGIN
 	INTO . DO getPerson( $1);
 END
 
-TRANSACTION findPerson
+TRANSACTION insertWords
 PREPROCESS
 BEGIN
-	INTO norm_location FOREACH location DO normname( street);
-	INTO norm_address FOREACH location DO normname( address);
-	INTO norm_person FOREACH person DO luanorm( . );
+	INTO norm_street FOREACH /data/person/location DO normname( street);
+	INTO norm_town FOREACH /data/person/location DO normname( town);
+
+	INTO norm_person FOREACH /data/person DO luanorm( . );
 END
 BEGIN
-	DO SELECT ID FROM Person;
-	INTO . DO getPerson( $1);
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select town", $(norm_town));
+
+	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct street", $(street));
+	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct town", $(town));
+	FOREACH /data/norm_person/surname DO INSERT INTO WordTable (name,word) VALUES ("struct surname", $(.));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct prename", $(prename));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct tag", $(tag));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct id", $(id));
+	FOREACH /data/norm_person/company DO INSERT INTO WordTable (name,word) VALUES ("company name", $(name));
 END
 **file:preprocess.dmap
 run( xml:AllDataRequest) :Data;
@@ -277,19 +292,31 @@ function run( inp )
 	getData = provider.formfunction("getData")
 	res = getData( it)
 	rt = res:table()
+	insertWords = provider.formfunction("insertWords")
+	insertWords( { data = rt } )
 	return rt
 end
 
-function luanorm( tb)
-	rt = {}
-	nf = provider.normalizer( "normname")
-	for k,v in pairs(tb) do
-		if type(v) == "table" then
-			rt[ k] = luanorm( v)
-		else
-			rt[ k] = nf( v)
+function luanorm( inp )
+	local function luanorm_table( tb )
+		local rt = {}
+		for k,v in pairs( tb) do
+			if k ~= "child" and k ~= "location" and k ~= "company" then
+				if type(v) == "table" then
+					rt[ k] = luanorm_table( v)
+				else
+					if k == "id" or k == "tag" then
+						rt[ k] = tonumber(v) + 100
+					else
+						local nf = provider.normalizer( "normname")
+						rt[ k] = nf( v)
+					end
+				end
+			end
 		end
+		return rt
 	end
+	return luanorm_table( inp:table())
 end
 **outputfile:DBDUMP
 **output
@@ -414,5 +441,35 @@ PersonCompanyRel:
 '1', '8'
 '2', '8'
 '3', '8'
+
+WordTable:
+'select street', 'butterweg 23'
+'select street', 'camelstreet 34'
+'select street', 'demotastrasse 45'
+'select street', 'hurtika 89'
+'select street', 'camelstreet 34'
+'select street', 'demotastrasse 45'
+'select street', 'erakimolstrasse 56'
+'select street', 'hurtika 89'
+'select street', 'demotastrasse 45'
+'select street', 'erakimolstrasse 56'
+'select street', 'fabelweg 67'
+'select street', 'hurtika 89'
+'select street', NULL
+'select street', NULL
+'select town', 'bendorf'
+'select town', 'carassa'
+'select town', 'durnfo'
+'select town', 'hof'
+'select town', 'carassa'
+'select town', 'durnfo'
+'select town', 'enden'
+'select town', 'hof'
+'select town', 'durnfo'
+'select town', 'enden'
+'select town', 'formkon'
+'select town', 'hof'
+'select town', NULL
+'select town', NULL
 
 **end

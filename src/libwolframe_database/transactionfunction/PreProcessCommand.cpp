@@ -107,7 +107,14 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 
 		std::vector<const Node*> nodearray;
 		m_selector.selectNodes( structure, structure.root(), nodearray);
-
+		if (nodearray.size())
+		{
+			LOG_DATA << "[transaction preprocess] execute function " << m_name << " on " << nodearray.size() << " nodes of selection '" << structure.nodepath( *nodearray.begin()) << "'";
+		}
+		else
+		{
+			LOG_DATA << "[transaction preprocess] empty selection (no execution) for function " << m_name;
+		}
 		std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
 		for (; ni != ne; ++ni)
 		{
@@ -127,8 +134,8 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					{
 						resultnode = structure.visitTag( resultnode, *ri);
 					}
-					resultnode = structure.visitOrOpenUniqTag( resultnode, *ri);
 				}
+				resultnode = structure.visitOrOpenUniqTag( resultnode, m_resultpath.back());
 			}
 			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
 			const Node* rn = structure.node( resultnode);
@@ -146,7 +153,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 			std::vector<NodeAssignment> parameterassign;
 			std::vector<const Node*> parameter;
 			std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
-			std::size_t aidx = 0;
+			std::size_t aidx = 1;
 			for (; ai != ae; ++ai,++aidx)
 			{
 				ai->selector.selectNodes( structure, *ni, parameter);
@@ -154,6 +161,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				{
 					if (parameter.size() < aidx)
 					{
+						LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' = NULL";
 						parameter.push_back( 0);
 					}
 					else
@@ -161,7 +169,11 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 						throw std::runtime_error( std::string( "referenced parameter '") + ai->name + "' is not unique");
 					}
 				}
-				parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
+				else
+				{
+					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( structure.visitor( parameter.back()), " ", "", true);
+					parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
+				}
 			}
 			langbind::TypedInputFilterR argfilter( structure.createInputFilter( parameterassign));
 
@@ -200,7 +212,9 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				if (haveInput)
 				{
 					expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
-					structure.pushValue( resultnode, nf->execute( ev));
+					const types::Variant res = nf->execute( ev);
+					LOG_DATA << "[transaction preprocess] call normalizer '" << m_name << "' into '" << structure.nodepath( resultnode) << "' => " << res.typeName() << " '" << res.tostring() << "'";
+					structure.pushValue( resultnode, res);
 				}
 			}
 			else if (ff)
@@ -228,6 +242,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 
 				mapResult( result.get(), resfilter.get());
+				LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, " ", "", true);
 			}
 			else
 			{

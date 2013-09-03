@@ -185,12 +185,6 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 				return true;
 			}
 			//... first key is number and we do not need to serialize with indices, so we treat it as a vector with repeating open tag for vector elements
-			//[+]if (!tag)
-			//[+]{
-			//[+]	setState( InputFilter::Error, "Cannot build filter for array (numeric indices) content mixed with ordinary table (symbolic indices)");
-			//[+]	wrap_lua_pop( m_ls, 2);
-			//[+]	return false;
-			//[+]}
 			FetchState fs( FetchState::VectorIterValue, tag, tag?std::strlen( tag):0);
 			m_stk.push_back( fs);
 			return true;
@@ -213,6 +207,11 @@ bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 
 bool LuaTableInputFilter::nextTableElem()
 {
+	if (!lua_istable( m_ls, -3))
+	{
+		setState( InputFilter::Error, "illegal state (internal): nextTableElem called on non table");
+		return false;
+	}
 	wrap_lua_pop( m_ls, 1);
 	if (!wrap_lua_next( m_ls, -2))
 	{
@@ -285,6 +284,10 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 					type = CloseTag;
 					return true;
 				}
+				else if (state() == InputFilter::Error)
+				{
+					return false;
+				}
 				else
 				{
 					m_stk.pop_back();
@@ -350,6 +353,10 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				if (nextTableElem())
 				{
 					m_stk.back().id = FetchState::TableIterOpen;
+				}
+				else if (state() == InputFilter::Error)
+				{
+					return false;
 				}
 				else
 				{
@@ -474,6 +481,11 @@ bool LuaTableOutputFilter::closeTag()
 
 bool LuaTableOutputFilter::closeAttribute( const types::VariantConst& element)
 {
+	if (!lua_istable( m_ls, -1))
+	{
+		setState( OutputFilter::Error, "illegal state (internal): closeAttribute called on non table");
+		return false;
+	}
 	wrap_lua_pushnil( m_ls);			//... LUA STK: t a t nil
 	if (wrap_lua_next( m_ls, -2))
 	{
@@ -544,8 +556,11 @@ bool LuaTableOutputFilter::print( ElementType type, const types::VariantConst& e
 					m_type = OpenTag;
 					//... back to open tag
 					return closeAttribute( element) && closeTag();
-				case OpenTag:
 				case Value:
+					setState( OutputFilter::Error, "got two subsequent values without enclosing tag (without vector index or table element name)");
+					return false;
+
+				case OpenTag:
 				case CloseTag:
 					m_type = type;
 					return closeAttribute( element);

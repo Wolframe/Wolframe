@@ -63,14 +63,11 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 	TransactionOutput::result_const_iterator fi = output.end();
 	std::size_t prev_functionidx = std::numeric_limits<std::size_t>::max();
 	bool found = false;
-	/*[-]*/LOG_DATA << "RESOLVE REFERENCE " << scope_functionidx << " IN";
-	/*[-]*/LOG_DATA << output.tostring();
 
 	TransactionOutput::result_const_iterator ri = output.begin() + output.size();
 	while (ri != output.begin())
 	{
 		-- ri;
-		/*[-]*/LOG_DATA << "VISIT " << ri->functionidx();
 		if (prev_functionidx < ri->functionidx()) break; //... crossing operation scope border
 		prev_functionidx = ri->functionidx();
 
@@ -113,7 +110,6 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 			rt = fi->begin()->at( cidx);
 		}
 	}
-	/*[-]*/if (found) LOG_DATA << "RETURN " << rt.typeName() << " " << rt.tostring(); else LOG_DATA << "NOT FOUND";
 	return rt;
 }
 
@@ -336,8 +332,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	std::vector<OperationLoop> loopstk;
 
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
-
-	do
+	while (ci != ce)
 	{
 		if (ci->name().empty())
 		{
@@ -481,8 +476,6 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		}
 
 	}
-	while (ci != ce);
-
 	if (cmdres.functionidx() != null_functionidx)
 	{
 		output.addCommandResult( cmdres);

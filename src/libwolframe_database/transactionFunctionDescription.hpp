@@ -119,10 +119,10 @@ public:
 			Argument(){}
 			///\brief Copy constructor
 			Argument( const Argument& o)
-				:type(o.type),value(o.value){}
+				:type(o.type),name(o.name),value(o.value){}
 			///\brief Constructor
-			Argument( Type t, const std::string& v)
-				:type(t),value(v){}
+			Argument( Type t, const std::string& n, const std::string& v)
+				:type(t),name(n),value(v){}
 
 			Type type;				//< type of the argument
 			std::string name;			//< name of the argument (where it is mapped to)

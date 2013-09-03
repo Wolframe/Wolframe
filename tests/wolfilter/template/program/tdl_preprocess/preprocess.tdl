@@ -33,15 +33,24 @@ BEGIN
 	INTO . DO getPerson( $1);
 END
 
-TRANSACTION findPerson
+TRANSACTION insertWords
 PREPROCESS
 BEGIN
-	INTO norm_location FOREACH location DO normname( street);
-	INTO norm_address FOREACH location DO normname( address);
-	INTO norm_person FOREACH person DO luanorm( . );
+	INTO norm_street FOREACH /data/person/location DO normname( street);
+	INTO norm_town FOREACH /data/person/location DO normname( town);
+
+	INTO norm_person FOREACH /data/person DO luanorm( . );
 END
 BEGIN
-	DO SELECT ID FROM Person;
-	INTO . DO getPerson( $1);
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select town", $(norm_town));
+
+	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct street", $(street));
+	FOREACH /data/norm_person/location DO INSERT INTO WordTable (name,word) VALUES ("struct town", $(town));
+	FOREACH /data/norm_person/surname DO INSERT INTO WordTable (name,word) VALUES ("struct surname", $(.));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct prename", $(prename));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct tag", $(tag));
+	FOREACH /data/norm_person DO INSERT INTO WordTable (name,word) VALUES ("struct id", $(id));
+	FOREACH /data/norm_person/company DO INSERT INTO WordTable (name,word) VALUES ("company name", $(name));
 END
 

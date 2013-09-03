@@ -401,6 +401,7 @@ static TransactionFunctionDescription::ProcessingStep::Argument
 		else
 		{
 			rt.value.append( tok);
+			rt.name = tok;
 		}
 	}
 	if (ch == '\'' || ch == '\"')

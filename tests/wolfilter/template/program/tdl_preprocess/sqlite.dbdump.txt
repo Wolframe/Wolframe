@@ -118,3 +118,33 @@ PersonCompanyRel:
 '2', '8'
 '3', '8'
 
+WordTable:
+'select street', 'butterweg 23'
+'select street', 'camelstreet 34'
+'select street', 'demotastrasse 45'
+'select street', 'hurtika 89'
+'select street', 'camelstreet 34'
+'select street', 'demotastrasse 45'
+'select street', 'erakimolstrasse 56'
+'select street', 'hurtika 89'
+'select street', 'demotastrasse 45'
+'select street', 'erakimolstrasse 56'
+'select street', 'fabelweg 67'
+'select street', 'hurtika 89'
+'select street', NULL
+'select street', NULL
+'select town', 'bendorf'
+'select town', 'carassa'
+'select town', 'durnfo'
+'select town', 'hof'
+'select town', 'carassa'
+'select town', 'durnfo'
+'select town', 'enden'
+'select town', 'hof'
+'select town', 'durnfo'
+'select town', 'enden'
+'select town', 'formkon'
+'select town', 'hof'
+'select town', NULL
+'select town', NULL
+

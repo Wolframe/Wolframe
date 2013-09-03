@@ -88,13 +88,19 @@ struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 
 	const Type& operator[]( std::size_t idx) const
 	{
-		if (idx > size()/sizeof(Type)) throw std::logic_error( "Array bounds access");
+		if (idx > size()/sizeof(Type))
+		{
+			throw std::logic_error( "Array bounds access");
+		}
 		return ((const Type*)types::ArrayDoublingAllocator::base())[ idx];
 	}
 
 	Type& operator[]( std::size_t idx)
 	{
-		if (idx > size()/sizeof(Type)) throw std::logic_error( "Array bounds access");
+		if (idx > size()/sizeof(Type))
+		{
+			throw std::logic_error( "Array bounds access");
+		}
 		return ((Type*)types::ArrayDoublingAllocator::base())[ idx];
 	}
 

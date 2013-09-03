@@ -48,6 +48,12 @@ CREATE TABLE PersonCompanyRel
  companyid  INT
 );
 
+CREATE TABLE WordTable
+(
+ name string,
+ word string
+);
+
 INSERT INTO Address (street,town) VALUES ("Amselstrasse 12","Aulach");
 INSERT INTO Address (street,town) VALUES ("Butterweg 23","Bendorf");
 INSERT INTO Address (street,town) VALUES ("Camelstreet 34","Carassa");

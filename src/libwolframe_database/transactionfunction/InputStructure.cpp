@@ -70,44 +70,68 @@ TransactionFunctionInput::Structure::Node*
 	return &m_nodemem[ nv.m_nodeidx];
 }
 
-
-const std::string TransactionFunctionInput::Structure::tostring( const NodeVisitor& nv) const
+namespace {
+struct StackElement
 {
-	std::vector <int> stk;
+	int nodeidx;
+	bool childrenvisited;
+	bool headerprinted;
+	bool printsiblings;
+	StackElement()
+		:nodeidx(0),childrenvisited(false),headerprinted(false),printsiblings(true){}
+	StackElement( int nodeidx_)
+		:nodeidx(nodeidx_),childrenvisited(false),headerprinted(false),printsiblings(true){}
+	StackElement( const StackElement& o)
+		:nodeidx(o.nodeidx),childrenvisited(o.childrenvisited),headerprinted(o.headerprinted),printsiblings(o.printsiblings){}
+};
+}//anonymous namespace
+
+const std::string TransactionFunctionInput::Structure::tostring( const NodeVisitor& nv, const std::string& newprefix, const std::string& indentprefix, bool withbrk) const
+{
+	std::vector <StackElement> stk;
 	std::ostringstream rt;
 	stk.push_back( nv.m_nodeidx);
+	stk.back().headerprinted = true;
+	stk.back().printsiblings = false;
 
 	while (stk.size())
 	{
-		std::size_t ni = stk.back();
-		if (!ni)
+		const Node* nd = node( stk.back().nodeidx);
+		if (!stk.back().headerprinted)
 		{
-			stk.pop_back();
+			rt << newprefix;
+			std::size_t indent = stk.size() -1;
+			while (indent--) rt << indentprefix;
+
+			if (nd->m_tagstr) rt << tagname(nd) << ": ";
+			stk.back().headerprinted = true;
+		}
+		if (nd->m_firstchild && !stk.back().childrenvisited)
+		{
+			stk.back().childrenvisited = true;
+			if (withbrk) rt << '{';
+			stk.push_back( nd->m_firstchild);
 			continue;
 		}
-		const Node* nd = node( ni);
-		std::size_t indent = stk.size() -1;
-
-		stk.back() = nd->m_next;
 		if (nd->m_value)
 		{
+			rt << newprefix;
+			std::size_t indent = stk.size() -1;
+			while (indent--) rt << indentprefix;
+
 			const types::Variant* val = &m_content.at( nd->m_value);
-			while (indent--) rt << '\t';
-			if (nd->m_tag) rt << nd->m_tag << " ";
-			if (nd->m_tagstr) rt << tagname( nd) << ": ";
-			rt << "'" << val->tostring() << "'" << std::endl;
+			rt << val->typeName() << " '" << val->tostring() << "'";
+		}
+		if (stk.back().printsiblings && nd->m_next)
+		{
+			stk.back().nodeidx = nd->m_next;
+			stk.back().childrenvisited = false;
+			stk.back().headerprinted = false;
 		}
 		else
 		{
-			while (indent--) rt << '\t';
-			if (nd->m_tag) rt << nd->m_tag << " ";
-			if (nd->m_tagstr) rt << tagname(nd) << ": ";
-			rt << std::endl;
-			stk.back() = nd->m_next;
-			if (nd->m_firstchild)
-			{
-				stk.push_back( nd->m_firstchild);
-			}
+			if (withbrk && !stk.empty()) rt << '}';
+			stk.pop_back();
 		}
 	}
 	return rt.str();
@@ -125,6 +149,10 @@ std::string TransactionFunctionInput::Structure::nodepath( const NodeVisitor& nv
 		ni = nd->m_parent;
 	}
 	std::string rt;
+	if (nv.m_nodeidx == 0/*root*/)
+	{
+		rt.push_back('/');
+	}
 	while (pt.size())
 	{
 		if (rt.size()) rt.push_back('/');
@@ -196,9 +224,9 @@ TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::visitOrOpenUniqTag( const NodeVisitor& nv, const std::string& tag)
 {
 	Node* nd = node( nv);
-	if (!nd->m_firstchild) return openUniqTag( nv, tag);
+	if (!nd->m_firstchild) return openTag( nv, tag);
 	int tgs = (int)m_privatetagmap.get( tag);
-	if (!tgs) return openUniqTag( nv, tag);
+	if (!tgs) return openTag( nv, tag);
 	Node* cd = node( nd->m_firstchild);
 	NodeVisitor rt;
 	for (;;)
@@ -211,12 +239,12 @@ TransactionFunctionInput::Structure::NodeVisitor
 		if (!cd->m_next) break;
 		cd = node( cd->m_next);
 	}
-	if (!rt.m_nodeidx) return openUniqTag( nv, tag);
+	if (!rt.m_nodeidx) return openTag( nv, tag);
 	return rt;
 }
 
 TransactionFunctionInput::Structure::NodeVisitor
-	TransactionFunctionInput::Structure::openUniqTag( const NodeVisitor& nv, const std::string& tag)
+	TransactionFunctionInput::Structure::openTag( const NodeVisitor& nv, const std::string& tag)
 {
 	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( nv);
 	Node* nd = node( rt);
@@ -254,12 +282,6 @@ TransactionFunctionInput::Structure::NodeVisitor
 		{
 			throw std::runtime_error( std::string( "array index is negative at '") + nodepath(nv) + "'");
 		}
-		if (nd->m_parent)
-		{
-			Node* pd = node( nd->m_parent);
-			nd->m_tag = pd->m_tag;
-			nd->m_tagstr = pd->m_tagstr;
-		}
 	}
 	return rt;
 }
@@ -286,9 +308,8 @@ TransactionFunctionInput::Structure::NodeVisitor
 {
 	Node* nd = node( nv);
 	if (nd->m_parent < 0) throw std::runtime_error( "tags not balanced in input (close tag)");
-
 	NodeVisitor rt( nd->m_parent);
-	if (isArrayNode( nv) && nd->m_parent != 0)
+	if (isArrayNode( nv))
 	{
 		// In case of an array the granparent of the array parent takes over the children of the array
 		// and the parent is deleted from the tree:
@@ -297,6 +318,7 @@ TransactionFunctionInput::Structure::NodeVisitor
 		{
 			cd->m_tag = nd->m_tag;
 			cd->m_tagstr = nd->m_tagstr;	//... tag names taken from father that will disappear
+			cd->m_parent = nd->m_parent;	//... parent line to granparent from father that will disappear
 			if (!cd->m_next) break;
 			cd = node( cd->m_next);
 		}
@@ -319,8 +341,10 @@ TransactionFunctionInput::Structure::NodeVisitor
 void TransactionFunctionInput::Structure::pushValue( const NodeVisitor& nv, const types::VariantConst& val)
 {
 	Node* nd = node( nv);
-	if (nd->m_value) throw std::runtime_error( std::string( "multiple values assigned to one node in the data tree at '") + nodepath(nv) + "'");
-
+	if (nd->m_value)
+	{
+		throw std::runtime_error( std::string( "multiple values assigned to one node in the data tree at '") + nodepath(nv) + "'");
+	}
 	nd->m_value = m_content.size();
 	m_content.push_back( val);
 }
@@ -474,7 +498,7 @@ public:
 	{
 		for (;;)
 		{
-			// return buffered elements first:
+			// [1] return buffered elements first:
 			if (m_elementitr < m_elementbuf.size())
 			{
 				std::pair<ElementType, types::VariantConst>& ee = m_elementbuf.at( m_elementitr++);
@@ -483,10 +507,11 @@ public:
 				if (m_elementitr == m_elementbuf.size())
 				{
 					m_elementbuf.clear();
+					m_elementitr = 0;
 				}
 				return true;
 			}
-			// fetch new parameter node if the current one is finished:
+			// [2] fetch new parameter node if the current one is finished:
 			if (m_stack.empty())
 			{
 				if (!m_structure)
@@ -527,7 +552,7 @@ public:
 				// ! The case that the parameter node is an array node (m_arrayindex) is not respected.
 				//	It is treated as a single node.
 			}
-			// Structure fetching statemachine:
+			// [3] structure element fetching statemachine:
 			if (m_stack.back().node)
 			{
 				if (!m_stack.back().childrenvisited && m_stack.back().node->m_firstchild)
@@ -609,20 +634,19 @@ public:
 					m_stack.back().childrenvisited = false;		//... and its children
 					return true;
 				}
-				if (m_stack.back().closetagcnt > 1)
+				// ... from here on we push all elements to return on the element buffer for the top stack element
+				while (m_stack.back().closetagcnt > 1)
 				{
 					// close element related tag (e.g. index tag):
-					type = TypedInputFilter::CloseTag; element.init();
+					m_elementbuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
 					-- m_stack.back().closetagcnt;
-					return true;
 				}
 				const types::Variant* val = m_structure->contentvalue( m_stack.back().node);
 				if (val)
 				{
-					// fetch content value after all children and neighbour nodes
-					element = *val;
-					type = TypedInputFilter::Value;
-					return true;
+					// fetch content value after all children and neighbour nodes:
+					// (we push it on the element buffer because we do not want another if to mark values consumed)
+					m_elementbuf.push_back( Element( TypedInputFilter::Value, *val));
 				}
 			}
 			while (m_stack.back().closetagcnt > 0)
@@ -714,9 +738,9 @@ public:
 			case langbind::TypedInputFilter::OpenTag:
 				++ m_taglevel;
 				m_visitor = m_structure->openTag( m_visitor, element);
-				if (m_taglevel == 0 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
+				if (m_taglevel == 1 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
 				{
-					throw std::runtime_error( "assigned result to tag that already exists in input. This is forbidden because it may cause annomalies");
+					throw std::runtime_error( "forbidden assignment ot result to tag that already exists in input");
 				}
 			break;
 			case langbind::TypedInputFilter::CloseTag:
@@ -725,6 +749,10 @@ public:
 			break;
 			case langbind::TypedInputFilter::Attribute:
 				m_visitor = m_structure->openTag( m_visitor, element);
+				if (m_taglevel == 0 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
+				{
+					throw std::runtime_error( "forbidden assignment ot result to tag that already exists in input");
+				}
 			break;
 			case langbind::TypedInputFilter::Value:
 				m_structure->pushValue( m_visitor, element);
