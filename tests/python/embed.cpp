@@ -80,17 +80,16 @@ int main( int argc, char *argv[] )
 	PyObject *key, *val;
 	Py_ssize_t pos = 0;
 	while( PyDict_Next( symbols, &pos, &key, &val ) ) {
-		if( PyCallable_Check( val ) ) {
+		if( PyFunction_Check( val ) ) {
 			std::cerr	<< "Function: "
 					<< pyGetReprStr( key ) << ": "
-					<< pyGetReprStr( val )
+					<< pyGetReprStr( val ) << " "
 					<< std::endl;
 		}
 	}
-	
 
 	PyObject *f = PyObject_GetAttrString( module, FUNC_NAME );
-	if( !f || !PyCallable_Check( f ) ) {
+	if( !f || !PyFunction_Check( f ) ) {
 		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
 		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
 		std::cerr << "Unable to find function 'func' in module" << std::endl;

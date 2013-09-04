@@ -11,6 +11,9 @@ def func( ):
 def func2( i ):
 	return i * i
 
+def func3( f ):
+	return f * f
+
 print( 'Module initialized on ' , ctime( time( ) ) )
 
 

@@ -47,7 +47,7 @@ python::Interpreter::Interpreter( const std::string prgfile )
 	PyObject *key, *value;
 	Py_ssize_t pos = 0;
 	while( PyDict_Next( symbols, &pos, &key, &value ) ) {
-		if( PyCallable_Check( value ) ) {
+		if( PyFunction_Check( value ) ) {
 			MOD_LOG_TRACE 	<< "[python] function found "
 					<< pyGetReprStr( key ) << ": "
 					<< pyGetReprStr( value );
