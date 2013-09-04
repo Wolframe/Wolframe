@@ -33,6 +33,10 @@ clean:
 	  (set -e; $(MAKE) -C $$d clean || exit 1); done)
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.mk.vars && rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.vars || rm $(TOPDIR)/makefiles/gmake/platform.vars
+ifeq ($(WITH_PYTHON),1)
+	@-test ! -f $(TOPDIR)/makefiles/gmake/python.mk.vars && rm $(TOPDIR)/makefiles/gmake/python.mk.vars
+	@-test ! -f $(TOPDIR)/makefiles/gmake/python.vars || rm $(TOPDIR)/makefiles/gmake/python.vars
+endif
 
 .PHONY: distclean
 distclean:
@@ -40,6 +44,10 @@ distclean:
 	  (set -e; $(MAKE) -C $$d distclean || exit 1); done)
 	@-test ! -f  $(TOPDIR)/makefiles/gmake/platform.mk.vars || rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.vars || rm $(TOPDIR)/makefiles/gmake/platform.vars
+ifeq ($(WITH_PYTHON),1)
+	@-test ! -f $(TOPDIR)/makefiles/gmake/python.mk.vars && rm $(TOPDIR)/makefiles/gmake/python.mk.vars
+	@-test ! -f $(TOPDIR)/makefiles/gmake/python.vars || rm $(TOPDIR)/makefiles/gmake/python.vars
+endif
 
 .PHONY: install
 install:

@@ -3186,40 +3186,42 @@ endif
 
 ifeq ($(WITH_PYTHON),1)
 
+-include $(TOPDIR)/makefiles/gmake/python.mk.vars
+
 ifeq "$(PLATFORM)" "LINUX"
 PYTHON3_CONFIG ?= python3-config
 PYTHON_DIR ?= /usr
-PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 PYTHON3_CONFIG ?= /usr/local/bin/python3-config
 PYTHON_DIR ?= /usr/local
-PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 PYTHON3_CONFIG ?= /usr/pkg/bin/python3.3-config
 PYTHON_DIR ?= /usr/pkg
-PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags)
-PYTHON_LDFLAGS_WRONG := $(shell $(PYTHON3_CONFIG) --ldflags)
+PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LDFLAGS_WRONG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS := -L/usr/pkg/lib $(PYTHON_LDFLAGS_WRONG)
-PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 PYTHON3_CONFIG ?= /opt/csw/python-3.3.2/bin/python3-config
 PYTHON_DIR ?= /opt/csw/python-3.3.2
-PYTHON_CFLAGS := $(shell $(PYTHON3_CONFIG) --cflags | sed 's|\-Wstrict\-prototypes||')
-PYTHON_LDFLAGS := $(shell $(PYTHON3_CONFIG) --ldflags)
-PYTHON_LIBS := $(shell $(PYTHON3_CONFIG) --libs)
+PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
+PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 

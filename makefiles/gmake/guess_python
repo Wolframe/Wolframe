@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# either --cflags, --ldflags or --libs 
+FLAG=$1
+
+# the location of python3-config
+PYTHON3_CONFIG=$2
+
+# bail out fast if we already have a cache file, otherwise building is far too slow!
+MAKEFILE_DIR="$3/$4"
+if test -f "${MAKEFILE_DIR}/makefiles/gmake/python.vars"; then
+	. "${MAKEFILE_DIR}/makefiles/gmake/python.vars"
+else
+
+	PYTHON_CFLAGS=`$PYTHON3_CONFIG --cflags | sed 's|\-Wstrict\-prototypes||'`	
+	PYTHON_LDFLAGS=`$PYTHON3_CONFIG --ldflags`
+	PYTHON_LIBS=`$PYTHON3_CONFIG --libs`
+
+	# generate the makefile snippet with conditional variables
+	# (conditional, so that users can overwrite them
+	cat >"${MAKEFILE_DIR}/makefiles/gmake/python.mk.vars" <<EOF
+PYTHON_CFLAGS?=$PYTHON_CFLAGS
+PYTHON_LDFLAGS?=$PYTHON_LDFLAGS
+PYTHON_LIBS?=$PYTHON_LIBS
+EOF
+
+	# write the cache file (to protect against constant recomputations!)
+	cat >"${MAKEFILE_DIR}/makefiles/gmake/python.vars" <<EOF
+PYTHON_CFLAGS=$PYTHON_CFLAGS
+PYTHON_LDFLAGS=$PYTHON_LDFLAGS
+PYTHON_LIBS=$PYTHON_LIBS
+EOF
+
+fi
+
+case "$FLAG" in
+	--cflags)		echo $PYTHON_CFLAGS
+				;;
+
+	--ldflags)		echo $PYTHON_LDFLAGS
+				;;
+
+	--libs)			echo $PYTHON_LIBS
+				;;
+
+	*)			echo "unkown flag '$FLAG' requested!"
+				exit 1
+esac
