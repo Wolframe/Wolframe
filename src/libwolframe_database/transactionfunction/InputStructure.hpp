@@ -141,7 +141,7 @@ public://visit structure:
 
 	///\brief Declaration of an element (element name plus node reference) of a structure
 	typedef std::pair<std::string,const Node*> NodeAssignment;
-	///\brief Create an input filter for a list of nodes to pass to a function as parameters
+	///\brief Create an input filter for a list of nodes and their content structures to pass to a function as parameters
 	langbind::TypedInputFilter* createInputFilter( const std::vector<NodeAssignment>& nodes_) const;
 	///\brief Create an output filter for the output of a preprocessing command
 	langbind::TypedOutputFilter* createOutputFilter( const NodeVisitor& nv, const std::map<int, bool>& sourccetagmap);

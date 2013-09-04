@@ -36,10 +36,10 @@ END
 TRANSACTION insertWords
 PREPROCESS
 BEGIN
-	INTO norm FOREACH /data/person DO luanorm( . );
+	FOREACH /data/person DO luanorm( . ) INTO norm;
 
-	INTO norm_street FOREACH /data/person/location DO normname( street);
-	INTO norm_town FOREACH /data/person/location DO normname( town);
+	FOREACH /data/person/location DO normname( street) INTO norm_street;
+	FOREACH /data/person/location DO normname( town) INTO norm_town;
 END
 BEGIN
 	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));

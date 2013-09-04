@@ -267,10 +267,10 @@ END
 TRANSACTION insertWords
 PREPROCESS
 BEGIN
-	INTO norm FOREACH /data/person DO luanorm( . );
+	FOREACH /data/person DO luanorm( . ) INTO norm;
 
-	INTO norm_street FOREACH /data/person/location DO normname( street);
-	INTO norm_town FOREACH /data/person/location DO normname( town);
+	FOREACH /data/person/location DO normname( street) INTO norm_street;
+	FOREACH /data/person/location DO normname( town) INTO norm_town;
 END
 BEGIN
 	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));
@@ -315,9 +315,7 @@ function luanorm( inp )
 		return rt
 	end
 	local intb = inp:table()
-	logger.printc( "INPUT ", intb)
 	local outtb = luanorm_table( intb)
-	logger.printc( "OUTPUT ", outtb)
 	return outtb
 end
 **outputfile:DBDUMP
@@ -485,33 +483,38 @@ WordTable:
 'struct street', 'erakimolstrasse 56'
 'struct street', 'fabelweg 67'
 'struct street', 'hurtika 89'
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct town', NULL
-'struct prename', NULL
-'struct prename', NULL
-'struct prename', NULL
-'struct prename', NULL
-'struct prename', NULL
-'struct tag', NULL
-'struct tag', NULL
-'struct tag', NULL
-'struct tag', NULL
-'struct tag', NULL
-'struct id', NULL
-'struct id', NULL
-'struct id', NULL
-'struct id', NULL
-'struct id', NULL
+'struct town', 'bendorf'
+'struct town', 'carassa'
+'struct town', 'durnfo'
+'struct town', 'hof'
+'struct town', 'carassa'
+'struct town', 'durnfo'
+'struct town', 'enden'
+'struct town', 'hof'
+'struct town', 'durnfo'
+'struct town', 'enden'
+'struct town', 'formkon'
+'struct town', 'hof'
+'struct surname', 'alano'
+'struct surname', 'beret'
+'struct surname', 'carlson'
+'struct surname', 'fuioko'
+'struct surname', 'hauer'
+'struct prename', 'aufru'
+'struct prename', 'beno'
+'struct prename', 'carla'
+'struct prename', 'fran'
+'struct prename', 'hubert'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct id', '101'
+'struct id', '102'
+'struct id', '103'
+'struct id', '106'
+'struct id', '108'
 'company name', 'baluba inc'
 'company name', 'carimba inc'
 'company name', 'dereno inc'

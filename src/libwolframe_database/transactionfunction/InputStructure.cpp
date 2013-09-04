@@ -536,8 +536,8 @@ public:
 					// ... only open non empty tags
 					type = TypedInputFilter::OpenTag;
 					element = m_nodeitr->first;
-					++ m_stack.back().closetagcnt;
-					++ m_nodeitr;
+					++m_stack.back().closetagcnt;
+					++m_nodeitr;
 					return true;
 				}
 				else
@@ -551,6 +551,8 @@ public:
 			// [3] structure element fetching statemachine:
 			if (m_stack.back().node)
 			{
+				/*[-]*/LOG_INFO << "+++++ VISIT" << m_structure->tagname( m_stack.back().node);
+
 				if (!m_stack.back().childrenvisited && m_stack.back().node->m_firstchild)
 				{
 					// mark children as visited:
@@ -561,14 +563,28 @@ public:
 					type = TypedInputFilter::OpenTag;
 					element = m_structure->tagname( cnod);
 					m_stack.push_back( StackElement( cnod, true));
-					++ m_stack.back().closetagcnt;
+					++m_stack.back().closetagcnt;
 
 					if (cnod->m_arrayindex >= 0)
 					{
-						++ m_stack.back().closetagcnt;
+						++m_stack.back().closetagcnt;
 						m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, cnod->m_arrayindex));
 					}
 					return true;
+				}
+				if (!m_stack.back().valuevisited)
+				{
+					// mark children as visited:
+					m_stack.back().valuevisited = true;
+
+					// return value:
+					const types::Variant* val = m_structure->contentvalue( m_stack.back().node);
+					if (val)
+					{
+						type = TypedInputFilter::Value;
+						element = *val;
+						return true;
+					}
 				}
 				if (m_stack.back().node->m_next && m_stack.back().visitnext)
 				{
@@ -594,7 +610,7 @@ public:
 								type = TypedInputFilter::CloseTag; element.init();
 								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, m_structure->tagname( snod)));
 								m_elementbuf.push_back( Element( TypedInputFilter::OpenTag, snod->m_arrayindex));
-								++ m_stack.back().closetagcnt;
+								++m_stack.back().closetagcnt;
 							}
 							else
 							{
@@ -628,6 +644,7 @@ public:
 					}
 					m_stack.back().node = snod;			//... skip to next element
 					m_stack.back().childrenvisited = false;		//... and its children
+					m_stack.back().valuevisited = false;		//... and its value
 					return true;
 				}
 				// ... from here on we push all elements to return on the element buffer for the top stack element
@@ -636,13 +653,6 @@ public:
 					// close element related tag (e.g. index tag):
 					m_elementbuf.push_back( Element( TypedInputFilter::CloseTag, types::Variant()));
 					-- m_stack.back().closetagcnt;
-				}
-				const types::Variant* val = m_structure->contentvalue( m_stack.back().node);
-				if (val)
-				{
-					// fetch content value after all children and neighbour nodes:
-					// (we push it on the element buffer because we do not want another if to mark values consumed)
-					m_elementbuf.push_back( Element( TypedInputFilter::Value, *val));
 				}
 			}
 			while (m_stack.back().closetagcnt > 0)
@@ -661,15 +671,16 @@ private:
 	{
 		const Node* node;
 		bool childrenvisited;
+		bool valuevisited;
 		bool visitnext;
 		int closetagcnt;
 
 		StackElement()
-			:node(0),childrenvisited(false),visitnext(false),closetagcnt(0){}
+			:node(0),childrenvisited(false),valuevisited(false),visitnext(false),closetagcnt(0){}
 		StackElement( const StackElement& o)
-			:node(o.node),childrenvisited(o.childrenvisited),visitnext(o.visitnext),closetagcnt(o.closetagcnt){}
+			:node(o.node),childrenvisited(o.childrenvisited),valuevisited(o.valuevisited),visitnext(o.visitnext),closetagcnt(o.closetagcnt){}
 		StackElement( const Node* node_, bool visitnext_)
-			:node(node_),childrenvisited(false),visitnext(visitnext_),closetagcnt(0){}
+			:node(node_),childrenvisited(false),valuevisited(false),visitnext(visitnext_),closetagcnt(0){}
 	};
 
 	const TransactionFunctionInput::Structure* m_structure;		//< structure to get the elements from
@@ -732,7 +743,7 @@ public:
 		switch (type)
 		{
 			case langbind::TypedInputFilter::OpenTag:
-				++ m_taglevel;
+				++m_taglevel;
 				m_visitor = m_structure->openTag( m_visitor, element);
 				if (m_taglevel == 1 && m_sourccetagmap.find( m_structure->node(m_visitor)->m_tagstr) != m_sourccetagmap.end())
 				{

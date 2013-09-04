@@ -26,9 +26,7 @@ function luanorm( inp )
 		return rt
 	end
 	local intb = inp:table()
-	logger.printc( "INPUT ", intb)
 	local outtb = luanorm_table( intb)
-	logger.printc( "OUTPUT ", outtb)
 	return outtb
 end
 
