@@ -15,13 +15,18 @@ python::Interpreter::Interpreter( const std::string prgfile )
 	std::string modulePath = utils::getParentPath( prgfile, 1 );
 	MOD_LOG_TRACE << "[python] Primary Python load path '" << modulePath << "'";
 
-	wchar_t progname[FILENAME_MAX + 1];
-	mbstowcs( progname, modulePath.c_str( ), modulePath.size( ) + 1 );
-	Py_SetProgramName( progname ); 
+	// should be set to what? 'python' sets it to itself, setting it
+	// to modulePath or wolframe leads to introspection problems later!
+	//~ wchar_t progname[FILENAME_MAX + 1];
+	//~ mbstowcs( progname, modulePath.c_str( ), modulePath.size( ) + 1 );
+	//~ Py_SetProgramName( progname ); 
 	
 	Py_InitializeEx( 0 );
 	
-	PyRun_SimpleString( "import sys, os; sys.path.insert( 0, os.getcwd( ) )" );
+	PyRun_SimpleString( "import sys, os; sys.path.insert( 1, os.getcwd( ) )" );
+	std::ostringstream s;
+	s << "sys.path.insert( 1, '" << modulePath << "' )";
+	PyRun_SimpleString( s.str( ).c_str( ) );
 
 	PyRun_SimpleString( "sys.dont_write_bytecode = True" );
 	
@@ -42,36 +47,15 @@ python::Interpreter::Interpreter( const std::string prgfile )
 	PyObject *key, *value;
 	Py_ssize_t pos = 0;
 	while( PyDict_Next( symbols, &pos, &key, &value ) ) {
-		MOD_LOG_TRACE 	<< "[python] module dictionary entry "
-				<< pyGetReprStr( key ) << ": "
-				<< pyGetReprStr( value );
-	}
-
-/*	PyObject *keyList = PyDict_Keys( symbols );
-	for( int i = 0; i < PyList_Size( keyList ); i++ ) {
-		PyObject *object = PyList_GetItem( keyList, i );
-		if( PyCallable_Check( object ) ) {
+		if( PyCallable_Check( value ) ) {
+			MOD_LOG_TRACE 	<< "[python] function found "
+					<< pyGetReprStr( key ) << ": "
+					<< pyGetReprStr( value );
+			m_functions.push_back( pyGetReprStr( value ) );
 		}
 	}
-*/	
+
 	Py_DECREF( module );
-
-		//~ lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-		//~ lua_pushnil(ls);
-		//~ while (lua_next( ls, -2))
-		//~ {
-			//~ if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
-			//~ {
-				//~ std::string funcname( lua_tostring( ls, -2));
-				//~ std::map<std::string,bool>::const_iterator fi = sysfuncmap.find( funcname);
-				//~ if (fi == sysfuncmap.end() || fi->second == false)
-				//~ {
-					//~ m_functions.push_back( funcname);
-				//~ }
-			//~ }
-			//~ lua_pop( ls, 1);
-		//~ }
-
 }
 
 python::Interpreter::~Interpreter( )
