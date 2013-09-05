@@ -39,11 +39,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 TransactionFunctionOutput::Impl::Impl( const ResultStructureR& resultstruct_, const db::TransactionOutputR& data_)
-	:m_valuestate(0)
-	,m_colidx(0)
-	,m_colend(0)
-	,m_endofoutput(false)
-	,m_resultstruct(resultstruct_)
+	:m_resultstruct(resultstruct_)
 	,m_data(data_)
 {
 	resetIterator();
@@ -55,6 +51,7 @@ TransactionFunctionOutput::Impl::Impl( const Impl& o)
 	,m_colend(o.m_colend)
 	,m_endofoutput(o.m_endofoutput)
 	,m_started(o.m_started)
+	,m_nextresult(o.m_nextresult)
 	,m_resultstruct(o.m_resultstruct)
 	,m_structitr(o.m_structitr)
 	,m_structend(o.m_structend)
@@ -73,6 +70,7 @@ void TransactionFunctionOutput::Impl::resetIterator()
 	m_colend = 0;
 	m_endofoutput = false;
 	m_started = false;
+	m_nextresult = false;
 	m_structitr = m_resultstruct->begin();
 	m_structend = m_resultstruct->end();
 	m_stack.clear();
@@ -194,6 +192,54 @@ TransactionOutput::result_const_iterator TransactionFunctionOutput::Impl::endOfO
 	return m_resend;
 }
 
+bool TransactionFunctionOutput::Impl::skipStruct( int start, int end)
+{
+	bool doSkip;
+	if (m_resitr == m_resend)
+	{
+		doSkip = true;
+	}
+	else if (m_nextresult)
+	{
+		doSkip = (int)m_resitr->functionidx() < m_structitr->idx;
+	}
+	else
+	{
+		doSkip = (int)m_resitr->functionidx() > m_structitr->idx;
+	}
+	if (doSkip)
+	{
+		int taglevel = 1;
+		for (++m_structitr; m_structitr != m_structend && taglevel; ++m_structitr)
+		{
+			if (m_structitr->type == (ResultElement::Type)start) taglevel++;
+			if (m_structitr->type == (ResultElement::Type)  end) taglevel--;
+		}
+		if (taglevel) throw std::runtime_error("illegal stack in transaction result iterator (operation)");
+		return true;
+	}
+	return false;
+}
+
+void TransactionFunctionOutput::Impl::nextResult()
+{
+	std::size_t prevfidx = m_resitr->functionidx();
+	++m_resitr;
+	m_nextresult |= prevfidx > m_resitr->functionidx();
+}
+
+bool TransactionFunctionOutput::Impl::skipResult()
+{
+	if (m_resitr == m_resend) return false;
+	if (m_nextresult) throw std::logic_error("illegal state in transaction function result building statemachine");
+	if ((int)m_resitr->functionidx() < m_structitr->idx)
+	{
+		nextResult();
+		return true;
+	}
+	return false;
+}
+
 bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::VariantConst& element, bool doSerializeWithIndices)
 {
 	if (!m_started)
@@ -212,7 +258,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				continue;
 			}
 		}
-		LOG_DATA << "[transaction result stm] State " << ResultElement::typeName( m_structitr->type) << " " << m_structitr->idx << " '" << (m_structitr->value?m_structitr->value:"") << "'";
+		LOG_DATA << "[transaction result stm] State " << ResultElement::typeName( m_structitr->type) << " " << m_structitr->idx << " '" << (m_structitr->value?m_structitr->value:"") << "' f=" << ((m_resitr==m_resend)?-1:m_resitr->functionidx()) << " s=" << m_structitr->idx;
 		switch (m_structitr->type)
 		{
 			case ResultElement::OpenTag:
@@ -229,81 +275,69 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 
 			case ResultElement::OperationStart:
 				LOG_DATA << "[transaction result stm] Operation start instruction index:" << m_structitr->idx << " result index:" << m_resitr->functionidx();
-				if (m_resitr == m_resend || (int)m_resitr->functionidx() > m_structitr->idx)
+				if (skipStruct( ResultElement::OperationStart, ResultElement::OperationEnd)) continue;
+				if (skipResult()) continue;
+				if (m_resitr != m_resend && (int)m_resitr->functionidx() == m_structitr->idx)
 				{
-					int taglevel = 1;
-					for (++m_structitr; m_structitr != m_structend && taglevel; ++m_structitr)
-					{
-						if (m_structitr->type == ResultElement::OperationStart) taglevel++;
-						if (m_structitr->type == ResultElement::OperationEnd) taglevel--;
-					}
-					if (taglevel) throw std::logic_error("illegal stack in transaction result iterator (operation)");
+					m_nextresult = false;
+					m_stack.push_back( StackElement( ResultElement::OperationEnd, m_structitr, m_resitr->functionidx(), m_resitr));
+					++m_structitr;
 					continue;
 				}
-				else if (m_resitr != m_resend && ((int)m_resitr->functionidx() < m_structitr->idx || m_resitr->begin() == m_resitr->end()))
+				else
 				{
-					++m_resitr;
-					continue;
+					throw std::logic_error( "error in transaction function result building statemachine (OperationStart)");
 				}
-				m_stack.push_back( StackElement( ResultElement::OperationEnd, m_structitr, m_resitr->functionidx(), m_resitr));
-				++m_structitr;
-				continue;
 
 			case ResultElement::FunctionStart:
 				LOG_DATA << "[transaction result stm] Function start instruction index:" << m_structitr->idx << " result index:" << m_resitr->functionidx();
-				if (m_resitr == m_resend || (int)m_resitr->functionidx() > m_structitr->idx)
+				if (skipStruct( ResultElement::FunctionStart, ResultElement::FunctionEnd)) continue;
+				if (skipResult()) continue;
+				if (m_resitr != m_resend && (int)m_resitr->functionidx() == m_structitr->idx)
 				{
-					int taglevel = 1;
-					for (++m_structitr; m_structitr != m_structend && taglevel; ++m_structitr)
+					if (m_resitr->begin() == m_resitr->end())
 					{
-						if (m_structitr->type == ResultElement::FunctionStart) taglevel++;
-						if (m_structitr->type == ResultElement::FunctionEnd) taglevel--;
+						nextResult();
+						continue;
 					}
-					if (taglevel) throw std::logic_error("illegal stack in transaction result iterator (function)");
+					m_nextresult = false;
+					m_stack.push_back( StackElement( ResultElement::FunctionEnd, m_structitr, m_resitr->functionidx(), m_resitr));
+					++m_structitr;
+
+					m_rowitr = m_resitr->begin();
+					m_rowend = m_resitr->end();
+					m_colidx = 0;
+					m_colend = m_resitr->nofColumns();
+					if (hasResultGroup( m_resitr->columnName( m_colidx)))
+					{
+						m_group = getResultGroup( m_resitr->columnName( m_colidx));
+						type = TypedInputFilter::OpenTag;
+						element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+						return true;
+					}
 					continue;
 				}
-				else if (m_resitr != m_resend && ((int)m_resitr->functionidx() < m_structitr->idx || m_resitr->begin() == m_resitr->end()))
+				else
 				{
-					++m_resitr;
-					continue;
+					throw std::logic_error( "error in transaction function result building statemachine (FunctionStart)");
 				}
-				m_stack.push_back( StackElement( ResultElement::FunctionEnd, m_structitr, m_resitr->functionidx(), m_resitr));
-				++m_structitr;
-				m_rowitr = m_resitr->begin();
-				m_rowend = m_resitr->end();
-				m_colidx = 0;
-				m_colend = m_resitr->nofColumns();
-				if (hasResultGroup( m_resitr->columnName( m_colidx)))
-				{
-					m_group = getResultGroup( m_resitr->columnName( m_colidx));
-					type = TypedInputFilter::OpenTag;
-					element = types::VariantConst( m_group.c_str(), m_group.size()-1);
-					return true;
-				}
-				continue;
 
 			case ResultElement::IndexStart:
-				if (m_resitr == m_resend || (int)m_resitr->functionidx() > m_structitr->idx)
+				if (skipStruct( ResultElement::IndexStart, ResultElement::IndexEnd)) continue;
+				if (skipResult()) continue;
+				m_nextresult = false;
+				if (m_resitr != m_resend && (int)m_resitr->functionidx() == m_structitr->idx)
 				{
-					int taglevel = 1;
-					for (++m_structitr; m_structitr != m_structend && taglevel; ++m_structitr)
-					{
-						if (m_structitr->type == ResultElement::IndexStart) taglevel++;
-						if (m_structitr->type == ResultElement::IndexEnd) taglevel--;
-					}
-					if (taglevel) throw std::logic_error("illegal stack in transaction result iterator (index)");
-					continue;
+					type = TypedInputFilter::OpenTag;
+					element = types::VariantConst( (unsigned int)++m_stack.back().m_cnt);
+					m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr, m_resitr->functionidx(), m_resitr));
+					++m_structitr;
+					return true;
 				}
-				else if (m_resitr != m_resend && ((int)m_resitr->functionidx() < m_structitr->idx || m_resitr->begin() == m_resitr->end()))
+				else
 				{
-					++m_resitr;
-					continue;
+					throw std::logic_error( "error in transaction function result building statemachine (IndexStart)");
 				}
-				type = TypedInputFilter::OpenTag;
-				element = types::VariantConst( (unsigned int)++m_stack.back().m_cnt);
-				m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr, m_resitr->functionidx(), m_resitr));
-				++m_structitr;
-				return true;
 
 			case ResultElement::IndexEnd:
 				if (m_valuestate == StateIndexCloseTag)
@@ -323,6 +357,10 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 					unsigned int indexcnt = ++m_stack.at( m_stack.size()-2).m_cnt;
 					m_structitr = m_stack.back().m_structitr;
 					m_stack.back().m_resitr = m_resitr;
+					if (m_nextresult && m_structitr->idx <= (int)m_resitr->functionidx())
+					{
+						m_nextresult = false;
+					}
 					type = TypedInputFilter::OpenTag;
 					element = types::VariantConst( indexcnt);
 					++m_structitr;
@@ -331,9 +369,9 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				else
 				{
 					m_stack.pop_back();
+					++m_structitr;
+					continue;
 				}
-				++m_structitr;
-				continue;
 
 			case ResultElement::OperationEnd:
 				if (m_stack.back().m_type != m_structitr->type)
@@ -344,6 +382,10 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				{
 					m_structitr = m_stack.back().m_structitr;
 					m_stack.back().m_resitr = m_resitr;
+					if (m_nextresult && m_structitr->idx <= (int)m_resitr->functionidx())
+					{
+						m_nextresult = false;
+					}
 				}
 				else
 				{
@@ -361,6 +403,10 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				{
 					m_structitr = m_stack.back().m_structitr;
 					m_stack.back().m_resitr = m_resitr;
+					if (m_nextresult && m_structitr->idx <= (int)m_resitr->functionidx())
+					{
+						m_nextresult = false;
+					}
 				}
 				else
 				{
@@ -370,16 +416,23 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				continue;
 
 			case ResultElement::IgnoreResult:
-				if (m_resitr != m_resend && ((int)m_resitr->functionidx() <= m_structitr->idx || m_resitr->begin() == m_resitr->end()))
+				if (skipResult()) continue;
+				if (m_resitr != m_resend)
 				{
-					++m_resitr;
-					if ((int)m_resitr->functionidx() < m_structitr->idx)
+					while (m_resitr != m_resend && (int)m_resitr->functionidx() == m_structitr->idx)
+					{
+						nextResult();
+					}
+					if (m_nextresult || m_resitr == m_resend || (int)m_resitr->functionidx() > m_structitr->idx)
 					{
 						++m_structitr;
+						continue;
 					}
-					continue;
 				}
-				++m_structitr;
+				else
+				{
+					throw std::logic_error( "illegal state in transaction result construction (IgnoreResult)");
+				}
 				continue;
 
 			case ResultElement::Constant:
@@ -399,99 +452,111 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				}
 				if (m_valuestate == StateColumnOpenTag)
 				{
-					LOG_DATA << "[transaction result stm] Value " << m_resitr->functionidx();
-					if (m_stack.back().m_structitr->idx != (int)m_resitr->functionidx())
+					if (m_resitr != m_resend && (int)m_resitr->functionidx() == m_structitr->idx)
 					{
-						throw std::runtime_error("internal error in result building statemachine");
-					}
-					if (m_rowitr == m_rowend)
-					{
-						++m_structitr;
-						++m_resitr;
-						if (m_resitr != m_resend)
+						LOG_DATA << "[transaction result stm] Value " << m_resitr->functionidx();
+						if (m_stack.back().m_structitr->idx != (int)m_resitr->functionidx())
 						{
-							m_rowitr = m_resitr->begin();
-							m_rowend = m_resitr->end();
-							m_colidx = 0;
-							m_colend = m_resitr->nofColumns();
-
-							if (hasResultGroup( m_resitr->columnName( m_colidx)))
-							{
-								m_group = getResultGroup( m_resitr->columnName( m_colidx));
-								type = TypedInputFilter::OpenTag;
-								element = types::VariantConst( m_group.c_str(), m_group.size()-1);
-								return true;
-							}
+							throw std::runtime_error("internal error in transaction function result building statemachine");
 						}
-						continue;
-					}
-					if (m_colidx == m_colend)
-					{
-						++m_structitr;
-						++m_rowitr;
 						if (m_rowitr == m_rowend)
 						{
-							++m_resitr;
+							++m_structitr;
+							nextResult();
 							if (m_resitr != m_resend)
 							{
 								m_rowitr = m_resitr->begin();
 								m_rowend = m_resitr->end();
 								m_colidx = 0;
 								m_colend = m_resitr->nofColumns();
+
+								if (hasResultGroup( m_resitr->columnName( m_colidx)))
+								{
+									m_group = getResultGroup( m_resitr->columnName( m_colidx));
+									type = TypedInputFilter::OpenTag;
+									element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+									return true;
+								}
 							}
+							continue;
+						}
+						if (m_colidx == m_colend)
+						{
+							++m_structitr;
+							++m_rowitr;
+							if (m_rowitr == m_rowend)
+							{
+								nextResult();
+								if (m_resitr != m_resend)
+								{
+									m_rowitr = m_resitr->begin();
+									m_rowend = m_resitr->end();
+									m_colidx = 0;
+									m_colend = m_resitr->nofColumns();
+								}
+							}
+							else
+							{
+								m_colidx = 0;
+							}
+							continue;
+						}
+						if (m_group.empty() && hasResultGroup( m_resitr->columnName( m_colidx)))
+						{
+							m_group = getResultGroup( m_resitr->columnName( m_colidx));
+							type = TypedInputFilter::OpenTag;
+							element = types::VariantConst( m_group.c_str(), m_group.size()-1);
+							return true;
+						}
+						if (!m_rowitr->at(m_colidx).defined())
+						{
+							++m_colidx;
+							if (endOfGroup())
+							{
+								m_group.clear();
+								type = TypedInputFilter::CloseTag;
+								element.init();
+								return true;
+							}
+							continue;
+						}
+						type = TypedInputFilter::OpenTag;
+						if (m_group.empty())
+						{
+							element = m_resitr->columnName( m_colidx);
 						}
 						else
 						{
-							m_colidx = 0;
+							element = m_resitr->columnName( m_colidx).c_str() + m_group.size();
 						}
-						continue;
-					}
-					if (m_group.empty() && hasResultGroup( m_resitr->columnName( m_colidx)))
-					{
-						m_group = getResultGroup( m_resitr->columnName( m_colidx));
-						type = TypedInputFilter::OpenTag;
-						element = types::VariantConst( m_group.c_str(), m_group.size()-1);
-						return true;
-					}
-					if (!m_rowitr->at(m_colidx).defined())
-					{
-						++m_colidx;
-						if (endOfGroup())
+						if (element.type() == types::Variant::string_ && element.charsize() == 0)
 						{
-							m_group.clear();
-							type = TypedInputFilter::CloseTag;
-							element.init();
+							//... untagged content value (column name '_')
+							type = langbind::TypedInputFilter::Value;
+							element = m_rowitr->at(m_colidx);
+							++m_colidx;
+							if (endOfGroup())
+							{
+								m_valuestate = StateColumnEndGroup;
+								return true;
+							}
+							m_valuestate = StateColumnOpenTag;
 							return true;
 						}
-						continue;
+						else
+						{
+							m_valuestate = StateColumnValue;
+							return true;
+						}
 					}
-					type = TypedInputFilter::OpenTag;
-					if (m_group.empty())
+					else if (m_nextresult)
 					{
-						element = m_resitr->columnName( m_colidx);
+						++m_structitr;
+						continue;
 					}
 					else
 					{
-						element = m_resitr->columnName( m_colidx).c_str() + m_group.size();
-					}
-					if (element.type() == types::Variant::string_ && element.charsize() == 0)
-					{
-						//... untagged content value (column name '_')
-						type = langbind::TypedInputFilter::Value;
-						element = m_rowitr->at(m_colidx);
-						++m_colidx;
-						if (endOfGroup())
-						{
-							m_valuestate = StateColumnEndGroup;
-							return true;
-						}
-						m_valuestate = StateColumnOpenTag;
-						return true;
-					}
-					else
-					{
-						m_valuestate = StateColumnValue;
-						return true;
+						throw std::runtime_error( "illegal state in transaction function result building statemachine (Value)");
 					}
 				}
 				if (m_valuestate == StateColumnValue)

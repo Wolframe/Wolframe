@@ -551,8 +551,6 @@ public:
 			// [3] structure element fetching statemachine:
 			if (m_stack.back().node)
 			{
-				/*[-]*/LOG_INFO << "+++++ VISIT" << m_structure->tagname( m_stack.back().node);
-
 				if (!m_stack.back().childrenvisited && m_stack.back().node->m_firstchild)
 				{
 					// mark children as visited:

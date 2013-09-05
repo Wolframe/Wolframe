@@ -50,36 +50,42 @@ CREATE TABLE PersonCompanyRel
 
 CREATE TABLE WordTable
 (
- name string,
- word string
+ name TEXT,
+ word TEXT
 );
 
-INSERT INTO Address (street,town) VALUES ("Amselstrasse 12","Aulach");
-INSERT INTO Address (street,town) VALUES ("Butterweg 23","Bendorf");
-INSERT INTO Address (street,town) VALUES ("Camelstreet 34","Carassa");
-INSERT INTO Address (street,town) VALUES ("Demotastrasse 45","Durnfo");
-INSERT INTO Address (street,town) VALUES ("Erakimolstrasse 56","Enden");
-INSERT INTO Address (street,town) VALUES ("Fabelweg 67","Formkon");
-INSERT INTO Address (street,town) VALUES ("Geranienstrasse 78","Ganaus");
-INSERT INTO Address (street,town) VALUES ("Hurtika 89","Hof");
+CREATE TABLE NumberTable
+(
+ name TEXT,
+ number INT
+);
 
-INSERT INTO Person (prename,surname) VALUES ("Aufru","Alano");
-INSERT INTO Person (prename,surname) VALUES ("Beno","Beret");
-INSERT INTO Person (prename,surname) VALUES ("Carla","Carlson");
-INSERT INTO Person (prename,surname) VALUES ("Dorothe","Dubi");
-INSERT INTO Person (prename,surname) VALUES ("Erik","Ertki");
-INSERT INTO Person (prename,surname) VALUES ("Fran","Fuioko");
-INSERT INTO Person (prename,surname) VALUES ("Gerd","Golto");
-INSERT INTO Person (prename,surname) VALUES ("Hubert","Hauer");
+INSERT INTO Address (street,town) VALUES ('Amselstrasse 12','Aulach');
+INSERT INTO Address (street,town) VALUES ('Butterweg 23','Bendorf');
+INSERT INTO Address (street,town) VALUES ('Camelstreet 34','Carassa');
+INSERT INTO Address (street,town) VALUES ('Demotastrasse 45','Durnfo');
+INSERT INTO Address (street,town) VALUES ('Erakimolstrasse 56','Enden');
+INSERT INTO Address (street,town) VALUES ('Fabelweg 67','Formkon');
+INSERT INTO Address (street,town) VALUES ('Geranienstrasse 78','Ganaus');
+INSERT INTO Address (street,town) VALUES ('Hurtika 89','Hof');
 
-INSERT INTO Company (name) VALUES ("Arindo Inc.");
-INSERT INTO Company (name) VALUES ("Baluba Inc.");
-INSERT INTO Company (name) VALUES ("Carimba Inc.");
-INSERT INTO Company (name) VALUES ("Dereno Inc.");
-INSERT INTO Company (name) VALUES ("Etungo Inc.");
-INSERT INTO Company (name) VALUES ("Figaji Inc.");
-INSERT INTO Company (name) VALUES ("Gaurami Inc.");
-INSERT INTO Company (name) VALUES ("Huratz Inc.");
+INSERT INTO Person (prename,surname) VALUES ('Aufru','Alano');
+INSERT INTO Person (prename,surname) VALUES ('Beno','Beret');
+INSERT INTO Person (prename,surname) VALUES ('Carla','Carlson');
+INSERT INTO Person (prename,surname) VALUES ('Dorothe','Dubi');
+INSERT INTO Person (prename,surname) VALUES ('Erik','Ertki');
+INSERT INTO Person (prename,surname) VALUES ('Fran','Fuioko');
+INSERT INTO Person (prename,surname) VALUES ('Gerd','Golto');
+INSERT INTO Person (prename,surname) VALUES ('Hubert','Hauer');
+
+INSERT INTO Company (name) VALUES ('Arindo Inc.');
+INSERT INTO Company (name) VALUES ('Baluba Inc.');
+INSERT INTO Company (name) VALUES ('Carimba Inc.');
+INSERT INTO Company (name) VALUES ('Dereno Inc.');
+INSERT INTO Company (name) VALUES ('Etungo Inc.');
+INSERT INTO Company (name) VALUES ('Figaji Inc.');
+INSERT INTO Company (name) VALUES ('Gaurami Inc.');
+INSERT INTO Company (name) VALUES ('Huratz Inc.');
 
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,2);
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,3);

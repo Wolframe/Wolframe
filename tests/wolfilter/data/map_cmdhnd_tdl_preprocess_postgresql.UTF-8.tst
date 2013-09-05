@@ -1,10 +1,10 @@
 **
-**requires:SQLITE3
+**requires:PGSQL
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE data SYSTEM "AllDataRequest">
 <data/>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --cmdprogram=preprocess.dmap --program=preprocess.sfrm --program=preprocess.tdl --program=preprocess.wnmp --program=preprocess.lua --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --cmdprogram=preprocess.dmap --program=preprocess.sfrm --program=preprocess.tdl --program=preprocess.wnmp --program=preprocess.lua --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA' run
 
 **file:preprocess.sfrm
 FORM PersonRef
@@ -68,21 +68,21 @@ normname=string:convdia,lcname;
 **file: DBDATA
 CREATE TABLE Person
 (
- ID INTEGER PRIMARY KEY AUTOINCREMENT,
+ ID SERIAL NOT NULL PRIMARY KEY,
  prename TEXT,
  surname TEXT
 );
 
 CREATE TABLE Address
 (
- ID INTEGER PRIMARY KEY AUTOINCREMENT,
+ ID SERIAL NOT NULL PRIMARY KEY,
  street TEXT,
  town TEXT
 );
 
 CREATE TABLE Company
 (
- ID INTEGER PRIMARY KEY AUTOINCREMENT,
+ ID SERIAL NOT NULL PRIMARY KEY,
  name TEXT
 );
 
@@ -298,6 +298,7 @@ function run( inp )
 	getData = provider.formfunction("getData")
 	res = getData( it)
 	rt = res:table()
+	logger.printc( "RESULT ", rt)
 	insertWords = provider.formfunction("insertWords")
 	insertWords( { data = rt } )
 	return rt
@@ -327,23 +328,9 @@ end
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company/><id>6</id><child/><prename>Fran</prename><surname>Fuioko</surname><location/><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company/><id>8</id><child/><prename>Hubert</prename><surname>Hauer</surname><location/><tag>1001</tag></person></data>
-Person:
-'1', 'Aufru', 'Alano'
-'2', 'Beno', 'Beret'
-'3', 'Carla', 'Carlson'
-'4', 'Dorothe', 'Dubi'
-'5', 'Erik', 'Ertki'
-'6', 'Fran', 'Fuioko'
-'7', 'Gerd', 'Golto'
-'8', 'Hubert', 'Hauer'
-
-sqlite_sequence:
-'Address', '8'
-'Person', '8'
-'Company', '8'
-
-Address:
+<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><id>6</id><prename>Fran</prename><surname>Fuioko</surname><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><id>8</id><prename>Hubert</prename><surname>Hauer</surname><tag>1001</tag></person></data>
+address:
+id, street, town
 '1', 'Amselstrasse 12', 'Aulach'
 '2', 'Butterweg 23', 'Bendorf'
 '3', 'Camelstreet 34', 'Carassa'
@@ -352,8 +339,8 @@ Address:
 '6', 'Fabelweg 67', 'Formkon'
 '7', 'Geranienstrasse 78', 'Ganaus'
 '8', 'Hurtika 89', 'Hof'
-
-Company:
+company:
+id, name
 '1', 'Arindo Inc.'
 '2', 'Baluba Inc.'
 '3', 'Carimba Inc.'
@@ -362,178 +349,183 @@ Company:
 '6', 'Figaji Inc.'
 '7', 'Gaurami Inc.'
 '8', 'Huratz Inc.'
-
-PersonChildRel:
+companyaddressrel:
+id, addressid
 '1', '2'
 '1', '3'
 '1', '4'
+'1', '8'
 '2', '3'
 '2', '4'
 '2', '5'
+'2', '8'
 '3', '4'
 '3', '5'
 '3', '6'
+'3', '8'
 '4', '5'
 '5', '6'
 '7', '8'
-'1', '8'
-'2', '8'
-'3', '8'
-
-PersonAddressRel:
+companychildrel:
+id, childid
 '1', '2'
 '1', '3'
 '1', '4'
+'1', '8'
 '2', '3'
 '2', '4'
 '2', '5'
+'2', '8'
 '3', '4'
 '3', '5'
 '3', '6'
+'3', '8'
 '4', '5'
 '5', '6'
 '7', '8'
-'1', '8'
-'2', '8'
-'3', '8'
-
-CompanyChildRel:
-'1', '2'
-'1', '3'
-'1', '4'
-'2', '3'
-'2', '4'
-'2', '5'
-'3', '4'
-'3', '5'
-'3', '6'
-'4', '5'
-'5', '6'
-'7', '8'
-'1', '8'
-'2', '8'
-'3', '8'
-
-CompanyAddressRel:
-'1', '2'
-'1', '3'
-'1', '4'
-'2', '3'
-'2', '4'
-'2', '5'
-'3', '4'
-'3', '5'
-'3', '6'
-'4', '5'
-'5', '6'
-'7', '8'
-'1', '8'
-'2', '8'
-'3', '8'
-
-PersonCompanyRel:
-'1', '2'
-'1', '3'
-'1', '4'
-'2', '3'
-'2', '4'
-'2', '5'
-'3', '4'
-'3', '5'
-'3', '6'
-'4', '5'
-'5', '6'
-'7', '8'
-'1', '8'
-'2', '8'
-'3', '8'
-
-WordTable:
-'select street', 'butterweg 23'
-'select street', 'camelstreet 34'
-'select street', 'demotastrasse 45'
-'select street', 'hurtika 89'
-'select street', 'camelstreet 34'
-'select street', 'demotastrasse 45'
-'select street', 'erakimolstrasse 56'
-'select street', 'hurtika 89'
-'select street', 'demotastrasse 45'
-'select street', 'erakimolstrasse 56'
-'select street', 'fabelweg 67'
-'select street', 'hurtika 89'
-'select street', NULL
-'select street', NULL
-'select town', 'bendorf'
-'select town', 'carassa'
-'select town', 'durnfo'
-'select town', 'hof'
-'select town', 'carassa'
-'select town', 'durnfo'
-'select town', 'enden'
-'select town', 'hof'
-'select town', 'durnfo'
-'select town', 'enden'
-'select town', 'formkon'
-'select town', 'hof'
-'select town', NULL
-'select town', NULL
-'struct street', 'butterweg 23'
-'struct street', 'camelstreet 34'
-'struct street', 'demotastrasse 45'
-'struct street', 'hurtika 89'
-'struct street', 'camelstreet 34'
-'struct street', 'demotastrasse 45'
-'struct street', 'erakimolstrasse 56'
-'struct street', 'hurtika 89'
-'struct street', 'demotastrasse 45'
-'struct street', 'erakimolstrasse 56'
-'struct street', 'fabelweg 67'
-'struct street', 'hurtika 89'
-'struct town', 'bendorf'
-'struct town', 'carassa'
-'struct town', 'durnfo'
-'struct town', 'hof'
-'struct town', 'carassa'
-'struct town', 'durnfo'
-'struct town', 'enden'
-'struct town', 'hof'
-'struct town', 'durnfo'
-'struct town', 'enden'
-'struct town', 'formkon'
-'struct town', 'hof'
-'struct surname', 'alano'
-'struct surname', 'beret'
-'struct surname', 'carlson'
-'struct surname', 'fuioko'
-'struct surname', 'hauer'
-'struct prename', 'aufru'
-'struct prename', 'beno'
-'struct prename', 'carla'
-'struct prename', 'fran'
-'struct prename', 'hubert'
-'company name', 'baluba inc'
-'company name', 'carimba inc'
-'company name', 'dereno inc'
-'company name', 'huratz inc'
-'company name', 'carimba inc'
-'company name', 'dereno inc'
-'company name', 'etungo inc'
-'company name', 'huratz inc'
-'company name', 'dereno inc'
-'company name', 'etungo inc'
-'company name', 'figaji inc'
-'company name', 'huratz inc'
-
-NumberTable:
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
+numbertable:
+name, number
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'
 'struct id', '106'
 'struct id', '108'
-
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+person:
+id, prename, surname
+'1', 'Aufru', 'Alano'
+'2', 'Beno', 'Beret'
+'3', 'Carla', 'Carlson'
+'4', 'Dorothe', 'Dubi'
+'5', 'Erik', 'Ertki'
+'6', 'Fran', 'Fuioko'
+'7', 'Gerd', 'Golto'
+'8', 'Hubert', 'Hauer'
+personaddressrel:
+id, addressid
+'1', '2'
+'1', '3'
+'1', '4'
+'1', '8'
+'2', '3'
+'2', '4'
+'2', '5'
+'2', '8'
+'3', '4'
+'3', '5'
+'3', '6'
+'3', '8'
+'4', '5'
+'5', '6'
+'7', '8'
+personchildrel:
+id, childid
+'1', '2'
+'1', '3'
+'1', '4'
+'1', '8'
+'2', '3'
+'2', '4'
+'2', '5'
+'2', '8'
+'3', '4'
+'3', '5'
+'3', '6'
+'3', '8'
+'4', '5'
+'5', '6'
+'7', '8'
+personcompanyrel:
+id, companyid
+'1', '2'
+'1', '3'
+'1', '4'
+'1', '8'
+'2', '3'
+'2', '4'
+'2', '5'
+'2', '8'
+'3', '4'
+'3', '5'
+'3', '6'
+'3', '8'
+'4', '5'
+'5', '6'
+'7', '8'
+wordtable:
+name, word
+'company name', 'baluba inc'
+'company name', 'carimba inc'
+'company name', 'carimba inc'
+'company name', 'dereno inc'
+'company name', 'dereno inc'
+'company name', 'dereno inc'
+'company name', 'etungo inc'
+'company name', 'etungo inc'
+'company name', 'figaji inc'
+'company name', 'huratz inc'
+'company name', 'huratz inc'
+'company name', 'huratz inc'
+'select street', 'butterweg 23'
+'select street', 'camelstreet 34'
+'select street', 'camelstreet 34'
+'select street', 'demotastrasse 45'
+'select street', 'demotastrasse 45'
+'select street', 'demotastrasse 45'
+'select street', 'erakimolstrasse 56'
+'select street', 'erakimolstrasse 56'
+'select street', 'fabelweg 67'
+'select street', 'hurtika 89'
+'select street', 'hurtika 89'
+'select street', 'hurtika 89'
+'select town', 'bendorf'
+'select town', 'carassa'
+'select town', 'carassa'
+'select town', 'durnfo'
+'select town', 'durnfo'
+'select town', 'durnfo'
+'select town', 'enden'
+'select town', 'enden'
+'select town', 'formkon'
+'select town', 'hof'
+'select town', 'hof'
+'select town', 'hof'
+'struct prename', 'aufru'
+'struct prename', 'beno'
+'struct prename', 'carla'
+'struct prename', 'fran'
+'struct prename', 'hubert'
+'struct street', 'butterweg 23'
+'struct street', 'camelstreet 34'
+'struct street', 'camelstreet 34'
+'struct street', 'demotastrasse 45'
+'struct street', 'demotastrasse 45'
+'struct street', 'demotastrasse 45'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'erakimolstrasse 56'
+'struct street', 'fabelweg 67'
+'struct street', 'hurtika 89'
+'struct street', 'hurtika 89'
+'struct street', 'hurtika 89'
+'struct surname', 'alano'
+'struct surname', 'beret'
+'struct surname', 'carlson'
+'struct surname', 'fuioko'
+'struct surname', 'hauer'
+'struct town', 'bendorf'
+'struct town', 'carassa'
+'struct town', 'carassa'
+'struct town', 'durnfo'
+'struct town', 'durnfo'
+'struct town', 'durnfo'
+'struct town', 'enden'
+'struct town', 'enden'
+'struct town', 'formkon'
+'struct town', 'hof'
+'struct town', 'hof'
+'struct town', 'hof'
 **end

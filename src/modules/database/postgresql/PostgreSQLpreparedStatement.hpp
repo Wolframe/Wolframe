@@ -117,6 +117,7 @@ private:
 	Statement m_statement;
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;
+	bool m_hasResult;
 };
 
 }}//namespace

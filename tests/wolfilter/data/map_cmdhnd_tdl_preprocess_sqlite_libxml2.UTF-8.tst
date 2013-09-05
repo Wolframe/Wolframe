@@ -119,36 +119,42 @@ CREATE TABLE PersonCompanyRel
 
 CREATE TABLE WordTable
 (
- name string,
- word string
+ name TEXT,
+ word TEXT
 );
 
-INSERT INTO Address (street,town) VALUES ("Amselstrasse 12","Aulach");
-INSERT INTO Address (street,town) VALUES ("Butterweg 23","Bendorf");
-INSERT INTO Address (street,town) VALUES ("Camelstreet 34","Carassa");
-INSERT INTO Address (street,town) VALUES ("Demotastrasse 45","Durnfo");
-INSERT INTO Address (street,town) VALUES ("Erakimolstrasse 56","Enden");
-INSERT INTO Address (street,town) VALUES ("Fabelweg 67","Formkon");
-INSERT INTO Address (street,town) VALUES ("Geranienstrasse 78","Ganaus");
-INSERT INTO Address (street,town) VALUES ("Hurtika 89","Hof");
+CREATE TABLE NumberTable
+(
+ name TEXT,
+ number INT
+);
 
-INSERT INTO Person (prename,surname) VALUES ("Aufru","Alano");
-INSERT INTO Person (prename,surname) VALUES ("Beno","Beret");
-INSERT INTO Person (prename,surname) VALUES ("Carla","Carlson");
-INSERT INTO Person (prename,surname) VALUES ("Dorothe","Dubi");
-INSERT INTO Person (prename,surname) VALUES ("Erik","Ertki");
-INSERT INTO Person (prename,surname) VALUES ("Fran","Fuioko");
-INSERT INTO Person (prename,surname) VALUES ("Gerd","Golto");
-INSERT INTO Person (prename,surname) VALUES ("Hubert","Hauer");
+INSERT INTO Address (street,town) VALUES ('Amselstrasse 12','Aulach');
+INSERT INTO Address (street,town) VALUES ('Butterweg 23','Bendorf');
+INSERT INTO Address (street,town) VALUES ('Camelstreet 34','Carassa');
+INSERT INTO Address (street,town) VALUES ('Demotastrasse 45','Durnfo');
+INSERT INTO Address (street,town) VALUES ('Erakimolstrasse 56','Enden');
+INSERT INTO Address (street,town) VALUES ('Fabelweg 67','Formkon');
+INSERT INTO Address (street,town) VALUES ('Geranienstrasse 78','Ganaus');
+INSERT INTO Address (street,town) VALUES ('Hurtika 89','Hof');
 
-INSERT INTO Company (name) VALUES ("Arindo Inc.");
-INSERT INTO Company (name) VALUES ("Baluba Inc.");
-INSERT INTO Company (name) VALUES ("Carimba Inc.");
-INSERT INTO Company (name) VALUES ("Dereno Inc.");
-INSERT INTO Company (name) VALUES ("Etungo Inc.");
-INSERT INTO Company (name) VALUES ("Figaji Inc.");
-INSERT INTO Company (name) VALUES ("Gaurami Inc.");
-INSERT INTO Company (name) VALUES ("Huratz Inc.");
+INSERT INTO Person (prename,surname) VALUES ('Aufru','Alano');
+INSERT INTO Person (prename,surname) VALUES ('Beno','Beret');
+INSERT INTO Person (prename,surname) VALUES ('Carla','Carlson');
+INSERT INTO Person (prename,surname) VALUES ('Dorothe','Dubi');
+INSERT INTO Person (prename,surname) VALUES ('Erik','Ertki');
+INSERT INTO Person (prename,surname) VALUES ('Fran','Fuioko');
+INSERT INTO Person (prename,surname) VALUES ('Gerd','Golto');
+INSERT INTO Person (prename,surname) VALUES ('Hubert','Hauer');
+
+INSERT INTO Company (name) VALUES ('Arindo Inc.');
+INSERT INTO Company (name) VALUES ('Baluba Inc.');
+INSERT INTO Company (name) VALUES ('Carimba Inc.');
+INSERT INTO Company (name) VALUES ('Dereno Inc.');
+INSERT INTO Company (name) VALUES ('Etungo Inc.');
+INSERT INTO Company (name) VALUES ('Figaji Inc.');
+INSERT INTO Company (name) VALUES ('Gaurami Inc.');
+INSERT INTO Company (name) VALUES ('Huratz Inc.');
 
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,2);
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,3);
@@ -274,16 +280,16 @@ BEGIN
 	FOREACH /data/person/location DO normname( town) INTO norm_town;
 END
 BEGIN
-	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select street", $(norm_street));
-	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ("select town", $(norm_town));
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ('select street', $(norm_street));
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ('select town', $(norm_town));
 
-	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ("struct street", $(street));
-	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ("struct town", $(town));
-	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ("struct surname", $(.));
-	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct prename", $(prename));
-	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct tag", $(tag));
-	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ("struct id", $(id));
-	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ("company name", $(name));
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct street', $(street));
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct town', $(town));
+	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ('struct surname', $(.));
+	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ('struct prename', $(prename));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct tag', $(tag));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct id', $(id));
+	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
 END
 **file:preprocess.dmap
 run( xml:AllDataRequest) :Data;
@@ -506,16 +512,6 @@ WordTable:
 'struct prename', 'carla'
 'struct prename', 'fran'
 'struct prename', 'hubert'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
-'struct id', '101'
-'struct id', '102'
-'struct id', '103'
-'struct id', '106'
-'struct id', '108'
 'company name', 'baluba inc'
 'company name', 'carimba inc'
 'company name', 'dereno inc'
@@ -528,5 +524,17 @@ WordTable:
 'company name', 'etungo inc'
 'company name', 'figaji inc'
 'company name', 'huratz inc'
+
+NumberTable:
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct tag', '1101'
+'struct id', '101'
+'struct id', '102'
+'struct id', '103'
+'struct id', '106'
+'struct id', '108'
 
 **end

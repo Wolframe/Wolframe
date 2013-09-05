@@ -54,7 +54,8 @@ PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* co
 	,m_stmmap(stmmap_)
 	,m_lastresult(0)
 	,m_nof_rows(0)
-	,m_idx_row(0){}
+	,m_idx_row(0)
+	,m_hasResult(false){}
 
 PreparedStatementHandler_postgres::~PreparedStatementHandler_postgres()
 {
@@ -73,6 +74,7 @@ void PreparedStatementHandler_postgres::clear()
 	m_state = Init;
 	m_nof_rows = 0;
 	m_idx_row = 0;
+	m_hasResult = false;
 }
 
 static const char* getErrorType( const char* tp)
@@ -168,16 +170,23 @@ bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
 	bool rt;
 	ExecStatusType es = PQresultStatus( res);
 
-	if (es != PGRES_COMMAND_OK && es != PGRES_TUPLES_OK)
+	if (es == PGRES_COMMAND_OK)
+	{
+		m_hasResult = false;
+		m_state = newstate;
+		rt = true;
+	}
+	else if (es == PGRES_TUPLES_OK)
+	{
+		m_hasResult = true;
+		m_state = newstate;
+		rt = true;
+	}
+	else
 	{
 		setDatabaseErrorMessage();
 		m_state = Error;
 		rt = false;
-	}
-	else
-	{
-		m_state = newstate;
-		rt = true;
 	}
 	if (res != m_lastresult)
 	{
@@ -310,15 +319,23 @@ bool PreparedStatementHandler_postgres::execute()
 	bool rt = status( m_lastresult, Executed);
 	if (rt)
 	{
-		m_nof_rows = (std::size_t)PQntuples( m_lastresult);
-		m_idx_row = 0;
+		if (m_hasResult)
+		{
+			m_nof_rows = (std::size_t)PQntuples( m_lastresult);
+			m_idx_row = 0;
+		}
+		else
+		{
+			m_nof_rows = 0;
+			m_idx_row = 0;
+		}
 	}
 	return rt;
 }
 
 bool PreparedStatementHandler_postgres::hasResult()
 {
-	return (m_nof_rows > 0);
+	return m_hasResult && m_nof_rows > 0;
 }
 
 std::size_t PreparedStatementHandler_postgres::nofColumns()

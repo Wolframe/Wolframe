@@ -66,6 +66,7 @@ struct TransactionFunctionOutput::Impl
 	int m_colend;									//< end of result columns (nof columns)
 	bool m_endofoutput;								//< flag set when final Close has been emited by last call of 'getNext'
 	bool m_started;									//< getNext called at least once (flag for logging things on first call of get next)
+	bool m_nextresult;								//< result iterator got to the following result
 	std::string m_group;								//< group tag for output AS with one slash
 	ResultStructureR m_resultstruct;						//< result structure
 	ResultStructure::const_iterator m_structitr;					//< iterator on output structure
@@ -89,6 +90,11 @@ struct TransactionFunctionOutput::Impl
 	TransactionOutput::result_const_iterator endOfOperation();
 
 	bool getNext( ElementType& type, types::VariantConst& element, bool doSerializeWithIndices);
+
+private:
+	void nextResult();
+	bool skipResult();
+	bool skipStruct( int start, int end);
 };
 
 }}//namespace
