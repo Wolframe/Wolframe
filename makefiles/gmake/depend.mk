@@ -17,13 +17,17 @@ ifeq "$(COMPILER)" "gcc"
 %.d : %.c
 	@echo Generating dependencies for $<
 	@$(CC) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CFLAGS) $< | \
-		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
+		tr -d '\n' | \
+		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
+		tr -s '&' "\n" | sed 's,\\,\\\n,g' > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
 	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
-		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
-
+		tr -d '\n' | \
+		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
+		tr -s '&' "\n" | sed 's,\\,\\\n,g' > $@
+	  
 endif
 
 ifneq ($(MAKECMDGOALS),clean)
