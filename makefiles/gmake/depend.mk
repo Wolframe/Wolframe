@@ -17,14 +17,14 @@ ifeq "$(COMPILER)" "gcc"
 %.d : %.c
 	@echo Generating dependencies for $<
 	@$(CC) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CFLAGS) $< | \
-		tr '\n' '\&' | \
+		tr -d "\n" | tr -d  '\' | \
 		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
 		tr -s '&' "\n" > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
 	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
-		tr '\n' '\&' | \
+		tr -d "\n" | tr -d  '\' | \
 		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
 		tr -s '&' "\n" > $@
 	  
