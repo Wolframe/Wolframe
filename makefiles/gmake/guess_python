@@ -26,9 +26,9 @@ EOF
 
 	# write the cache file (to protect against constant recomputations!)
 	cat >"${MAKEFILE_DIR}/makefiles/gmake/python.vars" <<EOF
-PYTHON_CFLAGS=$PYTHON_CFLAGS
-PYTHON_LDFLAGS=$PYTHON_LDFLAGS
-PYTHON_LIBS=$PYTHON_LIBS
+PYTHON_CFLAGS="$PYTHON_CFLAGS"
+PYTHON_LDFLAGS="$PYTHON_LDFLAGS"
+PYTHON_LIBS="$PYTHON_LIBS"
 EOF
 
 fi
