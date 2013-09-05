@@ -8,7 +8,8 @@ PYTHON3_CONFIG=$2
 
 # bail out fast if we already have a cache file, otherwise building is far too slow!
 MAKEFILE_DIR="$3/$4"
-if test -f "${MAKEFILE_DIR}/makefiles/gmake/python.vars"; then
+if test -f "${MAKEFILE_DIR}/makefiles/gmake/python.vars" &&
+   test -f "${MAKEFILE_DIR}/makefiles/gmake/python.mk.vars"; then
 	. "${MAKEFILE_DIR}/makefiles/gmake/python.vars"
 else
 

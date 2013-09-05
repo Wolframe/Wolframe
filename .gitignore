@@ -1,5 +1,7 @@
 makefiles/gmake/platform.mk.vars
 makefiles/gmake/platform.vars
+makefiles/gmake/python.mk.vars
+makefiles/gmake/python.vars
 Wolframe.creator.user*
 Wolframe.suo
 Wolframe.sdf
