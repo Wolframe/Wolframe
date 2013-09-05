@@ -63,8 +63,33 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
+	// get the modules symbol table
+	PyObject *symbols = PyModule_GetDict( module );
+	if( symbols == NULL || !PyDict_Check( symbols ) ) {
+		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
+		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
+		std::cerr << "Unable to get module dictionary" << std::endl;
+		std::cerr << "Exception type: " << pyGetReprStr( exceptionType ) << std::endl;
+		std::cerr << "Exception value: " << pyGetReprStr( exceptionValue ) << std::endl;
+		std::cerr << "Exception traceback: " << pyGetReprStr( exceptionTraceBack ) << std::endl;
+		Py_Finalize( );
+		return 1;
+	}
+
+	// show all data in the dictionary of the module
+	PyObject *key, *val;
+	Py_ssize_t pos = 0;
+	while( PyDict_Next( symbols, &pos, &key, &val ) ) {
+		if( PyFunction_Check( val ) ) {
+			std::cerr	<< "Function: "
+					<< pyGetReprStr( key ) << ": "
+					<< pyGetReprStr( val ) << " "
+					<< std::endl;
+		}
+	}
+
 	PyObject *f = PyObject_GetAttrString( module, FUNC_NAME );
-	if( !f || !PyCallable_Check( f ) ) {
+	if( !f || !PyFunction_Check( f ) ) {
 		PyObject *exceptionType, *exceptionValue, *exceptionTraceBack;
 		PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );	
 		std::cerr << "Unable to find function 'func' in module" << std::endl;

@@ -11,10 +11,13 @@ def func( ):
 def func2( i ):
 	return i * i
 
+def func3( f ):
+	return f * f
+
 print( 'Module initialized on ' , ctime( time( ) ) )
 
 
 **config
 --module ../../src/modules/cmdbind/python/mod_command_python
---program test.py run
+--program test.py func
 **end

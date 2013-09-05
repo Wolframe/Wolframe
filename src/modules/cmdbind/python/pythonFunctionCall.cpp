@@ -12,20 +12,16 @@ python::Context::Context( )
 std::vector<std::string> python::Context::loadProgram( const std::string& prgfile )
 {
 	std::vector<std::string> rt;
-	python::Interpreter i( prgfile );
 
 	MOD_LOG_TRACE << "[python] Loading Python program " << prgfile;
 
-	// TODO: load all public functions from python module
-	// problem, what to do with methods of objects? where to
-	// create the objects?
-	//~ langbind::LuaScript script( prgfile);
-	//~ std::vector<std::string>::const_iterator ni = script.functions().begin(), ne = script.functions().end();
-	//~ for (; ni != ne; ++ni)
-	//~ {
-		//~ rt.push_back( *ni);
-		//~ funcmap.defineLuaFunction( *ni, script);
-	//~ }
+	python::Interpreter interpreter( prgfile );
+	std::vector<std::string>::const_iterator ni = interpreter.functions( ).begin( ), ne = interpreter.functions( ).end( );
+	for( ; ni != ne; ++ni ) {
+		rt.push_back( *ni );
+		//~ funcmap.defineLuaFunction( *ni, interpreter );
+	}
+	
 	return rt;
 }
 
