@@ -294,14 +294,21 @@ class PythonFormFunction
 {
 public:
 	PythonFormFunction( const python::Context* context_, const std::string& name_)
-		:m_context(context_),m_name(name_){}
+		:m_context(context_),m_name(name_)
+	{
+		MOD_LOG_TRACE << "[python] creating form function '" << m_name << "'";
+	}
 
 	virtual ~PythonFormFunction(){}
 
 	virtual FormFunctionClosure* createClosure() const
 	{
 		python::InstanceR interp = m_context->getInstance( m_name);
-		if (!interp.get()) return 0;
+		if (!interp.get()) {
+			MOD_LOG_ERROR << "[python] got no interpreter when defining closure for form function '" << m_name << "'";
+			return 0;
+		}
+		MOD_LOG_TRACE << "[python] created form function closure for form function '" << m_name << "'";
 		return new PythonFormFunctionClosure( m_name, interp);
 	}
 
@@ -329,6 +336,7 @@ public:
 
 	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
 	{
+		MOD_LOG_TRACE << "[python] PythonProgramType::loadProgram '" << filename << "'";
 		std::vector<std::string> funcs = m_context.loadProgram( filename);
 		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		for (; fi != fe; ++fi)
@@ -347,91 +355,3 @@ prgbind::Program* langbind::createPythonProgramType()
 {
 	return new PythonProgramType();
 }
-
-
-
-#if 0
-namespace {
-
-class LuaFormFunctionClosure
-	:public langbind::FormFunctionClosure
-{
-public:
-	LuaFormFunctionClosure( const langbind::LuaScriptInstanceR& interp_, const std::string& name_)
-		:m_interp(interp_),m_name(name_),m_firstcall(false){}
-
-	virtual ~LuaFormFunctionClosure(){}
-
-	virtual bool call()
-	{
-		if (m_firstcall)
-		{
-			lua_getglobal( m_interp->thread(), m_name.c_str());
-			if (!m_arg.get())
-			{
-				LOG_ERROR << "lua function got no valid argument";
-			}
-			m_interp->pushObject( m_arg);
-			m_firstcall = false;
-		}
-		// call the lua form function (subsequently until termination)
-		int rt = lua_resume( m_interp->thread(), NULL, 1);
-		if (rt == LUA_YIELD) return false;
-		if (rt != 0)
-		{
-			LOG_ERROR << "error calling lua form function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
-			throw std::runtime_error( m_interp->luaUserErrorMessage( m_interp->thread()));
-		}
-		m_result = m_interp->getObject( -1);
-		if (!m_result.get())
-		{
-			LOG_ERROR << "lua function returned no result or nil (structure expected)";
-			throw std::runtime_error( "called lua function without result");
-		}
-		return true;
-	}
-
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
-	{
-		m_interp->init( provider);
-		m_arg = arg;
-		m_firstcall = true;
-	}
-
-	virtual TypedInputFilterR result() const
-	{
-		return m_result;
-	}
-
-private:
-	langbind::LuaScriptInstanceR m_interp;
-	TypedInputFilterR m_result;
-	std::string m_name;
-	TypedInputFilterR m_arg;
-	bool m_firstcall;
-};
-
-class LuaFormFunction
-	:public langbind::FormFunction
-{
-public:
-	LuaFormFunction( const LuaScriptContext* context_, const std::string& name_)
-		:m_context(context_),m_name(name_){}
-
-	virtual ~LuaFormFunction(){}
-
-	virtual FormFunctionClosure* createClosure() const
-	{
-		langbind::LuaScriptInstanceR interp;
-		if (!m_context->funcmap.getLuaScriptInstance( m_name, interp)) return 0;
-		return new LuaFormFunctionClosure( interp, m_name);
-	}
-
-private:
-	const LuaScriptContext* m_context;
-	std::string m_name;
-};
-
-}//anonymous namespace
-
-#endif

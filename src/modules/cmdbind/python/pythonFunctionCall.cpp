@@ -27,7 +27,7 @@ std::vector<std::string> python::Context::loadProgram( const std::string& prgfil
 
 python::InstanceR python::Context::getInstance( const std::string& /*name*/) const
 {
-	return python::InstanceR( 0 );
+	return python::InstanceR( new python::Instance( ) );
 }
 
 python::Structure* python::Structure::addSubstruct( const types::Variant& /*elemid_*/)

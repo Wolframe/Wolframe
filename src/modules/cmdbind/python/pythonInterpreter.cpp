@@ -49,9 +49,9 @@ python::Interpreter::Interpreter( const std::string prgfile )
 	while( PyDict_Next( symbols, &pos, &key, &value ) ) {
 		if( PyFunction_Check( value ) ) {
 			MOD_LOG_TRACE 	<< "[python] function found "
-					<< pyGetReprStr( key ) << ": "
-					<< pyGetReprStr( value );
-			m_functions.push_back( pyGetReprStr( value ) );
+					<< pyGetRepr( key ) << ": "
+					<< pyGetRepr( value );
+			m_functions.push_back( pyGetStr( key ) );
 		}
 	}
 
@@ -69,19 +69,31 @@ std::string python::Interpreter::lastErrorMsg( const std::string& str )
 	PyErr_Fetch( &exceptionType, &exceptionValue, &exceptionTraceBack );
 	std::ostringstream msg;
 	msg << str << ": ";
-	msg << ", exception type: " << pyGetReprStr( exceptionType );
-	msg << ", exception value: " << pyGetReprStr( exceptionValue );
-	msg << ", exception traceback: " << pyGetReprStr( exceptionTraceBack );
+	msg << ", exception type: " << pyGetRepr( exceptionType );
+	msg << ", exception value: " << pyGetRepr( exceptionValue );
+	msg << ", exception traceback: " << pyGetRepr( exceptionTraceBack );
 	return msg.str( );
 }
 
-const char *python::Interpreter::pyGetReprStr( PyObject *o )
+const char *python::Interpreter::pyGetRepr( PyObject *o )
 {
 	PyObject *repr = PyObject_Repr( o );
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
 	const char *s = PyUnicode_AsUTF8( repr );
 #else
 	PyObject *pstr = PyUnicode_AsUTF8String( repr );
+	const char *s = PyBytes_AsString( pstr );
+#endif
+	return s;
+}
+
+const char *python::Interpreter::pyGetStr( PyObject *o )
+{
+	PyObject *str = PyObject_Str( o );
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	const char *s = PyUnicode_AsUTF8( str );
+#else
+	PyObject *pstr = PyUnicode_AsUTF8String( str );
 	const char *s = PyBytes_AsString( pstr );
 #endif
 	return s;

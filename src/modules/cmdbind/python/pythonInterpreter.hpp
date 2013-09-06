@@ -57,7 +57,8 @@ public:
 private:
 	std::vector<std::string> m_functions;
 
-	const char *pyGetReprStr( PyObject *o );
+	const char *pyGetRepr( PyObject *o );
+	const char *pyGetStr( PyObject *o );
 };
 
 }//namespace python
