@@ -19,7 +19,6 @@ std::vector<std::string> python::Context::loadProgram( const std::string& prgfil
 	std::vector<std::string>::const_iterator ni = interpreter.functions( ).begin( ), ne = interpreter.functions( ).end( );
 	for( ; ni != ne; ++ni ) {
 		rt.push_back( *ni );
-		//~ funcmap.defineLuaFunction( *ni, interpreter );
 	}
 	
 	return rt;
