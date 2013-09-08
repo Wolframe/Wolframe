@@ -13,6 +13,12 @@ if test -f "${MAKEFILE_DIR}/makefiles/gmake/python.vars" &&
 	. "${MAKEFILE_DIR}/makefiles/gmake/python.vars"
 else
 
+	if test ! -x "$PYTHON3_CONFIG"; then
+		echo "ERROR: no '$PYTHON3_CONFIG' executable found!" >&2
+		exit 1
+	fi
+		
+
 	PYTHON_CFLAGS=`$PYTHON3_CONFIG --cflags`
 	PYTHON_LDFLAGS=`$PYTHON3_CONFIG --ldflags`
 	PYTHON_LIBS=`$PYTHON3_CONFIG --libs`
@@ -21,9 +27,16 @@ else
 	UNAME_SYSTEM=`(uname -s) 2>/dev/null`
 	UNAME_RELEASE=`(uname -r) 2>/dev/null`
 	case "$UNAME_SYSTEM.$UNAME_RELEASE" in
-		Linux*|SunOS*)
+		Linux*)
 			# Wstrict\-prototypes is not valid for C++ code
 			PYTHON_CFLAGS=`echo $PYTHON_CFLAGS | sed 's|\-Wstrict\-prototypes||'`
+			;;
+		
+		SunOS*)
+			# Wstrict\-prototypes is not valid for C++ code
+			PYTHON_CFLAGS=`echo $PYTHON_CFLAGS | sed 's|\-Wstrict\-prototypes||'`
+			# Solaris misses a library path?!
+			PYTHON_LDFLAGS="$PYTHON_LDFLAGS -L/opt/csw/python-3.3.2/lib"
 			;;
 
 		FreeBSD*9.1*)
