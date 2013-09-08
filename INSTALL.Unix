@@ -855,20 +855,21 @@ Optional packages to install from CSW for Wolframe:
   CSWlibxml2-dev (2-2.7.8)
   CSWlibxslt-dev (1.1.26)
   CSWlibz-dev (1.2.5)
+  CSWlibsqlite3-0 and CSWlibsqlite3-dev (3.7.8)
 
 SUNWlxml is too old, use CSWlibxml2.
 SUNWlxsl is too old, use CSWlibxslt.
 SUNWzlib is missing 64-bit support, use CSWlibz instead!
 
-CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
-
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 PAM is available natively, just add WITH_PAM=1
 
-For Python scripting you have to compile Python3 by hand:
+For Python scripting you have to compile Python3 by hand, the CSW
+packages (CSWpython31 and  CSWpython31-dev) show Forte cflags, so
+the packages were build with the Sun compiler.
 
-./configure --prefix=/opt/csw/python-3.3.2/
+./configure --prefix=/opt/csw/python-3.3.2/ --enable-shared
 gmake
 gmake install
 
@@ -877,9 +878,8 @@ Build Wolframe:
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
 LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
-	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 WITH_LOCAL_SQLITE1=1 \
-	WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
+	WITH_EXPECT=1 WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
+	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
 	WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
 	WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 \
