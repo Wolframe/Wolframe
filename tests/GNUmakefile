@@ -137,6 +137,14 @@ INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif
 
+# Python
+ifeq ($(WITH_PYTHON),1)
+INCLUDE_LDFLAGS += \
+	$(PYTHON_LDFLAGS)
+INCLUDE_LIBS += \
+	$(PYTHON_LIBS)
+endif
+
 TEST_OBJS =
 
 TEST_CPP_BINS = \
