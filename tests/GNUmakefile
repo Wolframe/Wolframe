@@ -166,7 +166,8 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
-	testWolfilter$(EXE)
+	testWolfilter$(EXE) \
+	testVariantTypes$(EXE)
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 
 #	stringNormalizationTest$(EXE) \
@@ -190,6 +191,7 @@ testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwo
 testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
+testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
 
 local_all:
 
@@ -261,6 +263,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
 	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 #	@echo
