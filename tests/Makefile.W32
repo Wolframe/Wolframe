@@ -136,7 +136,7 @@ TEST_CPP_BINS = \
 	testRand.exe \
 	testTimestamp.exe \
 	testWolfilter.exe \
-	testVarantTypes.exe \
+	testVariantTypes.exe \
 	testArrayDoublingAllocator.exe
 #DISABLED (moved to .Attic) unitLibraryTest.exe
 
