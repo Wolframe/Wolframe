@@ -3198,7 +3198,7 @@ PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-PYTHON3_CONFIG ?= /usr/local/bin/python3-config
+PYTHON3_CONFIG ?= /usr/local/bin/python3.3-config
 PYTHON_DIR ?= /usr/local
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
