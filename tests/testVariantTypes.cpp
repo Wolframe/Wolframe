@@ -55,6 +55,16 @@ TEST( variantTypeFixture, prerequisites )
 #endif
 }
 
+TEST( variantTypeFixture, casts )
+{
+	string s = "47";
+	Variant v( s );
+	v.convert( Variant::string_ );
+	ASSERT_EQ( "47", v.tostring( ) );
+	v.convert( Variant::uint_ );
+	ASSERT_EQ( 47, v.touint( ) );
+}
+
 TEST( variantTypeFixture, uint32 )
 {
 	unsigned int i = 47;
