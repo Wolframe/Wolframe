@@ -35,6 +35,8 @@ Table of Contents
     NetBSD 6.1
     Solaris 10
       Solaris 10 (CSW toolchain)
+    OpenIndiana 151a8
+      OpenIndiana 151a8 (CSW toolchain)
 
 Prerequisites
 -------------
@@ -807,7 +809,7 @@ use those!
 Support for 1.52.0 and later is not guaranteed.
 
 SUNWicud/SUNWicu and CSW libicu_dev are both linked for the Forte C++
-compiler. It's better, to compile your own version compiled with the
+compiler. You have to compile your own version compiled with the
 gcc compiler from CSW:
 
 gtar zxf icu4c-49_1_2-src.tgz
@@ -819,7 +821,7 @@ gmake install
 
 First apply the following patch to 'boost/cstdint.ppp' for boost
 (https://svn.boost.org/trac/boost/ticket/6158, see also
-'contrib/Solaris/' for patch files):
+'contrib/Solaris/boost-1.48.0' for patch files):
 
 ...
 namespace boost
@@ -885,3 +887,70 @@ LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_PYTHON=1 \
 	gmake \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
+
+OpenIndiana 151a8
+-----------------
+
+OpenIndiana 151a8 (CSW toolchain)
+---------------------------------
+
+Install CSW toolchain (http://www.opencsw.org) and basic development tools:
+
+pkgadd -d http://get.opencsw.org/now
+
+pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
+
+You also need the system files:
+
+pkg install pkg:/system/header
+pkg install pkg:/developer/library/lint
+pkg install system/library/math/header-math
+
+Make sure the build environment is always set as follows:
+
+Make sure /opt/csw/bin is part of your PATH.
+
+Install packages via 'pkgutil'.
+
+Required packages: boost (1.53.0)
+Optional packages: CSWlibssl-dev (0.9.8w), CSWsasl and CSWsasl-dev (2.1.25),
+                   CSWlibsqlite3-0 and  CSWlibsqlite3-dev (3.7.8),
+                   CSWpostgresql-dev (9.1.2), CSWlibxml2-dev (2.7.8),
+                   CSWlibxslt-dev1.1.26), CSWlibz-dev (1.2.5)
+
+For testing you need: CSWexpect (5.41.1), CSWpostgresql91-server (9.1.2)
+
+For building boost you need 'CSWlibicu-dev'.
+
+SUNWicud/SUNWicu and CSW libicu_dev are both linked for the Forte C++
+compiler. You have to compile your own version compiled with the
+gcc compiler from CSW:
+
+gtar zxf icu4c-51_2-src.tgz
+
+apply the solaris XOPEN patch (icu_source_common_uposixdefs_h.patch), then build:
+
+cd source/icu
+./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-51.2
+gmake
+gmake install
+
+Boost itself is not available, so build your own one (use 1.54, I didn't test other
+versions so far!):
+
+First apply all patches in 'contrib/Solaris/1.54.0'.
+Then build boost with:
+
+./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+	--with-icu=/opt/csw/icu4c-51.2 \
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
+
+./b2 -a -sICU_PATH=/opt/csw/icu4c-51.2 -d2 install
+
+For Python scripting you need Python 3. 'CSWpython31-dev' is build with Forte, so
+you have to build your own Python:
+
+./configure --prefix=/opt/csw/python-3.3.2/ --enable-shared
+gmake
+gmake install
+
