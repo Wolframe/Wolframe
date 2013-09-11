@@ -51,6 +51,16 @@ SO_LIB_FLAGS = -shared $(SONAME_FLAGS)
 SO_MOD_FLAGS = -shared
 endif
 
+ifeq "$(COMPILER)" "clang"
+SO_LIB_FLAGS = -shared $(SONAME_FLAGS)
+SO_MOD_FLAGS = -shared
+endif
+
+ifeq "$(COMPILER)" "icc"
+SO_LIB_FLAGS = -shared $(SONAME_FLAGS)
+SO_MOD_FLAGS = -shared
+endif
+
 ifneq "$(STATIC_LIB)" ""
 $(STATIC_LIB) : $(OBJS) $(CPP_OBJS)
 	$(AR) cr $@ $(OBJS) $(CPP_OBJS)

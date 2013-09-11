@@ -193,9 +193,51 @@ endif
 
 endif
 
+ifeq "$(COMPILER)" "clang"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+
+ifeq "$(COMPILER)" "icc"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+
 # set flags for position independend code (as required for shared libraries
 # on some platforms)
 ifeq "$(COMPILER)" "gcc"
+ifeq "$(PLATFORM)" "LINUX"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "NETBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+endif
+
+ifeq "$(COMPILER)" "clang"
+ifeq "$(PLATFORM)" "LINUX"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "NETBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+endif
+
+ifeq "$(COMPILER)" "icc"
 ifeq "$(PLATFORM)" "LINUX"
 SO_COMPILE_FLAGS = -fPIC
 endif

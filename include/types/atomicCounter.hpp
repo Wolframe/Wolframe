@@ -82,7 +82,12 @@ public:
 	/// Assign counter value to the counter
 	inline AtomicCounter<T>& operator = ( const AtomicCounter<T>& counter )	{
 		boost::lock_guard<boost::mutex>	lock( m_mtx );
-		m_val = value.m_val;
+		// Aba: was m_val = value.m_val;
+		// clang croaks with: ../include/types/atomicCounter.hpp:85:11: 
+		// error: reference to non-static member function must be called
+		// did you mean to call it with no arguments?
+		// was used in counterTest.cpp only, no clue why gcc and msvc allow this!
+		m_val = counter.value( );
 		return *this;
 	}
 
