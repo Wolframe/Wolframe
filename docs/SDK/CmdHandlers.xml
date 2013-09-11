@@ -1,0 +1,9 @@
+<chapter>
+<title>Logic Tier Command Handler</title>
+<para>This chapter introduces the command handlers of the logic tier.
+</para>
+	&SDKcmdhandlerDirectmap;
+	&SDKcmdhandlerLua;
+</chapter>
+
+

@@ -1,0 +1,337 @@
+<sect1>
+<title>Defining Command Handlers in Lua</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>You can write command handlers for the logic tier of Wolframe in Lua.
+		Command handlers written in Lua allow you to script the processessing of the
+		input without an intermediate data structure. It gives you full control on
+		input and output. This can be useful if you have to deal with legacy data
+		where the structure of the input or output is not well defined or if you
+		have to implement and own embedded protocol. In other cases you should
+		use Lua in programs of the main layer as structure in/structure out functions.
+		The Lua layer on command handler layer differs only in the handling of input
+		and output. In this chapter we describe only these structures and
+		filter objects that are used to access input and output.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Filters</title>
+	<para>The application input and output can be of different kind.
+		For different input and output Wolframe provides
+		filters. The provider library has a function
+			<code>provider.filter( )</code>
+		with the name of the filter as string as parameter. If you for example want to process data
+		as XML with 'libxml2' and libxml2 is not loaded as primary XML filter on your system,
+		then you need to get a filter by calling
+			<code>provider.filter( "XML:libxml2" )</code>
+		The object returned by this function call can be attached to input or output. It uses the
+		library libxml2 for parsing the XML. The default filter attached to input and output is
+		"XML" that refers to the first filter module of category "XML" listed in the configuration of modules to load.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Input</title>
+	<para>Input is a accessed over a global variable input. This object has the following methods:
+			<code>input:as( f )</code>
+		attaches a filter f to the input.
+			<code>input:get( )</code>
+		returns an iterator on the input that fetches one or two values per step depending on the filter.
+			<code>input:table( )</code>
+		returns the input structure as a lua table. If the document has a document type, the document is validated
+		by the associated data form. If the document is standalone, then the returned table may not have the expected
+		structure because without schema there is no mean to distinguish between a single element array and a unique element.
+	</para>
+	<para>
+		For Lua users processing the input via a table would be the most straightforward way of processing. An example
+		program could look like this:
+			<programlisting language='lua'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/input_table.lua" parse="text" />
+			</programlisting>
+
+	</para>
+	</sect2>
+	<sect2>
+	<title>Iterators</title>
+	<para>
+	The iterator closure returned by <code>input:get()</code> has the following properties:
+	Unstructured input fetches one value, the input element. Structured input fetches one
+	pair of elements per iteration: the element content as first value and the attribute or
+	tag as second value. The interpretation of the values follows the following schema:
+		<table frame="all" width="100%">
+			<title>Iterator element (pair)</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Value   (1st element)</entry>
+					<entry>Tag     (2nd element)</entry>
+					<entry>Interpretation</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry><code>false</code></entry>
+					<entry>string</entry>
+					<entry>open tag with name [Tag]</entry>
+				</row>
+				<row>
+					<entry><code>false</code></entry>
+					<entry><code>false</code> or <code>nil</code></entry>
+					<entry>close last opened tag</entry>
+				</row>
+				<row>
+					<entry>string</entry>
+					<entry>string</entry>
+					<entry>declaration of attribute [Tag] with value [Value]</entry>
+				</row>
+				<row>
+					<entry>string</entry>
+					<entry><code>false</code> or <code>nil</code></entry>
+					<entry>content element value [Value]</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+	The reason for using <code>false</code>, instead of <code>nil</code>, is the special treatment of <code>nil</code> in a Lua for loop.
+	<code>nil</code> is always terminating the iteration in Lua, no matter what follows this <code>nil</code>.
+	<code>nil</code> is returned at the end of the data or, if the iteration started in a
+	subsection of the content, as the last tag of context the iteration has started closes.
+	The later construct is used for delegating the processing of subsections (iterator scope).
+	</para>
+	</sect2>
+	<sect2>
+	<title>Output</title>
+	<para>Output is a accessed by a global variable output. This object has the following methods:
+			<code>output:as( arg)</code>
+		In case of arg being a string or a table it defines the document type of the output.
+		In case of arg being a filter it attaches this filter to the output.
+		Subsequent calls of <code>output:print()</code> will apply this filter <code>arg</code> to print
+		the output elements returned as content to the client.
+			<code>output:print(c,t)</code>
+		or
+			<code>output:print(c)</code>.
+		prints an element to the output. The print function is defined symmetrically to the input iterator.
+		This means that the loop
+			<programlisting language='lua'>
+			for c,t in input:get() do
+				output:print(c,t)
+			end
+			</programlisting>
+		echoes the input.
+		Omitting the second argument <code>t</code> means that an untagged content element is printed.
+		The same happens when you call print with <code>nil</code> or <code>false</code> as second parameter <code>t</code>. With <code>c</code> passed
+		as <code>nil</code> or <code>false</code> with <code>t</code>, you print a open tag or close tag, depending on <code>t</code>. <code>t</code> is a tag name for
+		open tag and <code>nil</code> or <code>false</code> for a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you
+		print an attribute value assignement.
+	</para>
+	<para>For convenience there are also the functions
+			<code>output:opentag(t)</code> - equivalent to <code>output:print(false,t)</code>,
+			<code>output:closetag(t)</code> - equivalent to <code>output:print(false,false)</code>
+		defined. When explicitely defining an XML structure output in Lua these functions are more readable.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Examples</title>
+		<sect3>
+		<title>Example 1: A character by character echo program</title>
+		<para>This example echoes the input character by character in UTF-16.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_1.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 2: An line by line echo program</title>
+		<para>This example echoes the input line by line in UTF-8.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_2.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 3: An XML echo program</title>
+		<para>This is a program echoing input as XML using textwolf as filter.
+			Filters are objects that are processing the data of the objects they are attached to.
+			For this they store the current state of processing and an iterator on the data they process.
+			When you attach the same filter object to input and output, then the output filter
+			will share some information like the character set encoding of the input. So if you want to
+			output the document in the same character set encoding as the input is read you have to bind
+			the input as the output to the same filter object. Calling
+				<code>input:as(filter( "XML:textwolf"))</code>
+			and
+				<code>output:as(filter( "XML:textwolf"))</code>
+			instead in the following example would lead to an echo reading any input in
+			XML and output an XML in the default encoding which is depending on the
+			platform. So it you want to output the XML in the same encoding as the input you have to call
+			input:as and output:as with the same filter object as follows:
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_3.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 4: An XML echo program</title>
+		<para>This example does the same as example3 but treats the content of the tag "content" in
+			its own procedure.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_4.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 5: Load XML into a table</title>
+		<para>
+			This example procedure loads the contents of the XML document into a table and prints the
+			elements 'name' and 'country'.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_5.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+	</sect2>
+	<para></para>
+
+
+	<sect2>
+	<title>List of new Lua Objects for the Lua Command Handler</title>
+	<para>This is a list of all objects and functions that were not yet introduced
+		in the lua program description section:</para>
+		<table frame="all" width="100%">
+			<title>Input</title>
+			<tgroup cols="4">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Returns</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>get</entry>
+					<entry></entry>
+					<entry>iterator</entry>
+					<entry>Returns an iterator on the input elements (*)
+					</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry></entry>
+					<entry>lua table</entry>
+					<entry>Returns the input structure as lua table and validates non standalone documents with the associated form.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter</entry>
+					<entry></entry>
+					<entry>Attaches a filter to input.
+					</entry>
+				</row>
+				<row>
+					<entry>doctype</entry>
+					<entry></entry>
+					<entry>lua table</entry>
+					<entry>Returns the input document type as structure
+					</entry>
+				</row>
+				<row>
+					<entry>doctypeid</entry>
+					<entry></entry>
+					<entry>string</entry>
+					<entry>Returns the name of the form associated with the input document type.
+					</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>(*) Can only be called once. Only one of input:table(), input:get() can be called.
+		</para>
+		<table frame="all" width="100%">
+			<title>Output</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>print</entry>
+					<entry>pair value,tag</entry>
+					<entry>Prints one element to the output.
+					</entry>
+				</row>
+				<row>
+					<entry>opentag</entry>
+					<entry>tagname</entry>
+					<entry>Synonym for print( false, tagname )
+					</entry>
+				</row>
+				<row>
+					<entry>closetag</entry>
+					<entry>tag name</entry>
+					<entry>Synonym for print( false, false )
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter</entry>
+					<entry>Attaches a filter to output.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>string (formname)</entry>
+					<entry>Attaches the document type of the form with name formname to the output.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>table (doctype)</entry>
+					<entry>Attaches the document type defined in the structure doctype (*).
+					</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>
+			(*) The interpretation depends on filter attached to output. For XML the structure defines the elements 'root' (root element in XML !DOCTYPE declaration), 'public' (PUBLIC element in XML !DOCTYPE declaration), 'system' (SYSTEM element in XML !DOCTYPE declaration).
+		</para>
+
+		<table frame="all" width="100%">
+			<title>Filter object member variables and flags</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Member Name</entry>
+					<entry>Restriction</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>tokenize</entry>
+					<entry>XML filters only</entry>
+					<entry>Flag: Set to true => elements are tokenized by whitespaces, false (default W3C) no tokenization</entry>
+				</row>
+				<row>
+					<entry>empty</entry>
+					<entry>XML filters only</entry>
+					<entry>Flag: Set to false => filter out whitespace only elements, true (default W3C) all elements returned</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+</sect2>
+
+</sect1>
+<beginpage/>
+

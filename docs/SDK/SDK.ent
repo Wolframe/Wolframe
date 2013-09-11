@@ -4,11 +4,14 @@
 
 <!ENTITY SDKintroduction		SYSTEM "Introduction.xml">
 
+<!ENTITY SDKcmdhandlers			SYSTEM "CmdHandlers.xml">
+<!ENTITY SDKcmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">
+<!ENTITY SDKcmdhandlerLua		SYSTEM "CmdHandlerLua.xml">
+
 <!ENTITY SDKprograms			SYSTEM "Programs.xml">
 <!ENTITY SDKprogramForms		SYSTEM "ProgramForms.xml">
 <!ENTITY SDKprogramFormDataTypes	SYSTEM "ProgramFormDataTypes.xml">
 <!ENTITY SDKprogramTransactions		SYSTEM "ProgramTransactions.xml">
-<!ENTITY SDKprogramDirectmap		SYSTEM "ProgramDirectmap.xml">
 <!ENTITY SDKprogramLua			SYSTEM "ProgramLua.xml">
 <!ENTITY SDKmodelTypedFilter	SYSTEM "ModelTypedFilter.xml">
 

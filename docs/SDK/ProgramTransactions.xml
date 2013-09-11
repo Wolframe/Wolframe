@@ -2,16 +2,14 @@
 <title>Defining Database Transactions</title>
 	<sect2>
 		<title>Introduction</title>
-		<para><code>Wolframe</code> transactions are defined as functions in a transactional context.
-			The 'begin' and the 'commit' or 'abort' are done automatically at the begin
-			or at the end of a transaction function respectively,
-			if not explicitely defined otherwise by the caller script.
-			For the description of transactions <code>Wolframe</code> provides the definition
-			language (TDL) introduce here.
-			A transaction takes a structure as input and returns a structure as output.
-		</para>
 		<para>
-			The transaction definition language defines a transaction as a sequence of database operations. A database operation is either a single database instruction (SELECT,UPDATE,etc.) or a name of a procedure declared in the database or a block of operations delared with OPERATION. It adds some constructs to address input structure elements or database command results as arguments.
+			For the description of transactions <code>Wolframe</code> provides the definition language (TDL) introduced here.
+			<code>Wolframe</code> transactions in TDL are defined as functions in a transactional context.
+			This means that whatever is executed in a transaction function belongs by default to a transaction with an auto-commit on function completion if not explicitely defined otherwise by the caller.
+			A TDL transaction function takes a structure as input and returns a structure as output.
+			The <code>Wolframe</code> database interface defines a transaction as context where input is passed as structure and the output is fetched from as structure.
+			The TDL is a programming language to describe the building of transaction input and the building of the result structure from the database output.
+			It defines a transaction as a sequence of database operations. A database operation is either a single embedded database instruction in the language of the underlaying database, a name of a procedure declared in the database or a block of operations delared with OPERATION. It adds some constructs to address input structure elements or database command results as arguments.
 			Each database command result can be declared as being part of the transaction result structure.
 			The language has no control structures and is therefore not a general purpose programming language.
 			It just offers some mapping of input to commands and from commands results to output.
@@ -19,6 +17,9 @@
 		<para>
 			For input data conversion the transaction definition language lets you define a
 			preprocessing section where wolframe functions defined can be called for selected input.
+		</para>
+		<para>
+			The TDL is case insensitive. For clearness and better readability TDL keywords are written in uppercase here.
 		</para>
 	</sect2>
 	<sect2>
@@ -30,6 +31,30 @@
 		</para>
 	</sect2>
 	<sect2>
+		<title>Example with pre-processing input</title>
+		<para>The example selects are id's depending on a normalized name. The normalization is done in a preprocessing step
+		<programlisting language='sql'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/preprocess_example.tdl" parse="text" />
+		</programlisting>
+		</para>
+	</sect2>
+	<sect2>
+		<title>Example with pre-processing input and using variables in database commands</title>
+		<para>The example returns the 'id' of a country depending on a normalized name. The normalization is done in a preprocessing step. The result is printed into a structure country/code;
+		<programlisting language='sql'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/variable_example.tdl" parse="text" />
+		</programlisting>
+		</para>
+	</sect2>
+	<sect2>
+		<title>Example calling operations</title>
+		<para>The example calls an operation with one argument to map the output.
+		<programlisting language='sql'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/operation_example.tdl" parse="text" />
+		</programlisting>
+		</para>
+	</sect2>
+	<sect2>
 		<title>Description of keywords</title>
 		<para>
 			<simplelist type="horiz" columns="2">
@@ -37,15 +62,15 @@
 			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
 			<member>OPERATION</member><member>Defines a block of statements in the following BEGIN ... END block as single operation.</member>
 			<member>PREPROCESS</member><member>Defines a block of preprocessing statements for processing selected input and writing into the input structure for further processing.</member>
-			<member>BEGIN</member><member>Marks the start of an execution block defined as TRANSACTION or OPERATION or PREPROCESS</member>
+			<member>BEGIN</member><member>Marks the start of an execution block (terminated by END) of a TRANSACTION or OPERATION or PREPROCESS or RESULT INTO block.</member>
 			<member>END</member><member>Marks the end of an execution block.</member>
-			<member>RESULT</member><member>Followed by a INTO name defining a relative path in result where the following block marked with BEGIN .. END is mapped to</member>
+			<member>RESULT</member><member>Defines subsection of the result built. It is followed by a INTO and an identifier defining a relative path in result where the following block marked with BEGIN .. END is mapped to</member>
 			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes as input of the associated command. The associated command is executed for each member of the selection. All relative path expressions in the associated command arguments have the path of a selected element of the operation as base.</member>
 			<member>INTO</member><member>Followed by an identifier or a path that declares the result tag for each result element of the associated command</member>
-			<member>DO</member><member>Starts the operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
-			<member>UNIQUE</member><member>constraint on operation result: Result must be unique, if it exists</member>
-			<member>NONEMPTY</member><member>constraint on operation result: Result must not be empty</member>
-			<member>LET</member><member>Starts a variable declaration for the current scope</member>
+			<member>DO</member><member>Starts a database command or execute operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
+			<member>UNIQUE</member><member>constraint on a database command or operation result: Result must be unique, if it exists</member>
+			<member>NONEMPTY</member><member>constraint on a database command result: Result must not be empty</member>
+			<member>LET</member><member>Starts a variable declaration for the current scope. Variables can refer to single database command results.</member>
 			<member>ON ERROR</member><member>Starts a declaration for a hint for a certain error class to enrich error messages with context information of the current operation</member>
 			<member>HINT</member><member>Declares an error message in an ON ERROR &lt;errclass&gt; HINT declaration</member>
 			<member>PRINT</member><member>Declares a print of an argument into the result context of the print declaration scope. The argument can be a variable or result reference but cannot refer to input. The print instruction can use an INTO path as well to declare a target path in the result</member>
@@ -60,7 +85,7 @@
 			<member>Element</member><member>Example</member><member>Description</member>
 			<member>$NNN</member><member>$1</member><member>Column of a row of the last result addressed by index (counted from 1 for the first column). A command containing any result reference is executed for each row of the last result</member>
 			<member>$columname</member><member>$id</member><member>Column of a row of last result addressed by name. A command containing any result reference is executed for each row of the last result</member>
-			<member>$(path)</member><member>$(persone/id)</member><member>Single element addressed by relative path from the current input selection</member>
+			<member>$(path)</member><member>$(person/id)</member><member>Single element addressed by relative path from the current input selection</member>
 			<member>$[varname]</member><member>$[id]</member><member>Variable reference refering to a single result or NULL (not a set!) previously in the same scope declared with LET varname = &lt;result column reference&gt;;</member>
 			</simplelist>
 		</para>
@@ -85,6 +110,14 @@
 		</rhs>
 		</production>
 
+		<production xml:id="String">
+		<lhs>String</lhs>
+		<rhs>
+			  ( ['\'']([^'\''])+['\'']+ )
+			| ( ['\"']([^'\"'])+['\"']+ )
+		</rhs>
+		</production>
+
 		<production xml:id="Selection">
 		<lhs>Selection</lhs>
 		<rhs>
@@ -96,12 +129,36 @@
 		</rhs>
 		</production>
 
-		<production xml:id="Argument">
-		<lhs>Argument</lhs>
+		<production xml:id="EmbeddedArg">
+		<lhs>EmbeddedArg</lhs>
 		<rhs>
-			'$'
-			( <nonterminal def="#Number">Number</nonterminal>
-			| '(' <nonterminal def="#Selection">Selection</nonterminal> ')'
+			( <nonterminal def="#String">String</nonterminal>
+			|
+				'$'
+				( <nonterminal def="#Number">Number</nonterminal>
+				| ( <nonterminal def="#Identifier">Identifier</nonterminal>
+				| '(' <nonterminal def="#Selection">Selection</nonterminal> ')'
+				| '[' <nonterminal def="#Identifier">Identifier</nonterminal> ']'
+				)
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="FuncArg">
+		<lhs>FuncArg</lhs>
+		<rhs>
+			( <nonterminal def="#String">String</nonterminal>
+			| <nonterminal def="#Selection">Selection</nonterminal>
+			| <nonterminal def="#EmbeddedArg">EmbeddedArg</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="PreprcArg">
+		<lhs>PreprcArg</lhs>
+		<rhs>
+			( <nonterminal def="#String">String</nonterminal>
+			| <nonterminal def="#Selection">Selection</nonterminal>
 			)
 		</rhs>
 		</production>
@@ -133,13 +190,13 @@
 		</rhs>
 		</production>
 
-		<production xml:id="ArgumentLst">
-		<lhs>ArgumentLst</lhs>
+		<production xml:id="FuncArgLst">
+		<lhs>FuncArgLst</lhs>
 		<rhs>
-			( <nonterminal def="#Argument">Argument</nonterminal> ','
-			  <nonterminal def="#ArgumentLst">ArgumentLst</nonterminal>
+			( <nonterminal def="#FuncArg">FuncArg</nonterminal> ','
+				<nonterminal def="#FuncArgLst">FuncArgLst</nonterminal>
 			|
-			  <nonterminal def="#Argument">Argument</nonterminal>
+				<nonterminal def="#FuncArg">FuncArg</nonterminal>
 			)
 		</rhs>
 		</production>
@@ -149,7 +206,7 @@
 		<rhs>
 			<nonterminal def="#Identifier">Identifier</nonterminal>
 			'('
-				( <nonterminal def="#ArgumentLst">ArgumentLst</nonterminal> | )
+				( <nonterminal def="#FuncArgLst">FuncArgLst</nonterminal> | )
 			')'
 		</rhs>
 		</production>
@@ -177,14 +234,78 @@
 		</productionset>
 
 		<productionset>
+		<title>Pre-Processing Commands</title>
+
+		<production xml:id="PreprcArgLst">
+		<lhs>PreprcArgLst</lhs>
+		<rhs>
+			( <nonterminal def="#PreprcArg">PreprcArg</nonterminal> ','
+				<nonterminal def="#PreprcArgLst">PreprcArgLst</nonterminal>
+			|
+				<nonterminal def="#PreprcArg">PreprcArg</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="PreprcOp">
+		<lhs>PreprcOp</lhs>
+		<rhs>
+			<nonterminal def="#Identifier">Identifier</nonterminal>
+			'('
+				( <nonterminal def="#PreprcArgLst">PreprcArgLst</nonterminal> | )
+			')'
+		</rhs>
+		</production>
+
+		<production xml:id="PreprcCall">
+		<lhs>PreprcCall</lhs>
+		<rhs>
+			'DO'
+				(
+					<nonterminal def="#PreprcOp">PreprcOp</nonterminal>
+				)
+		</rhs>
+		</production>
+
+		<production xml:id="PreprcStm">
+		<lhs>PreprcStm</lhs>
+		<rhs>
+			( <nonterminal def="#Destination">Destination</nonterminal> | )
+			( <nonterminal def="#Foreach">Foreach</nonterminal> | )
+			<nonterminal def="#PreprcCall">PreprcCall</nonterminal>
+			';'
+		</rhs>
+		</production>
+		</productionset>
+
+		<productionset>
 		<title>Transactions</title>
+
+		<production xml:id="PreprcStmLst">
+		<lhs>PreprcStmLst</lhs>
+		<rhs>
+			( <nonterminal def="#PreprcStm">PreprcStm</nonterminal>
+			| <nonterminal def="#PreprcStm">PreprcStm</nonterminal>
+			  <nonterminal def="#PreprcStmLst">PreprcStmLst</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="PreprcBody">
+		<lhs>PreprcBody</lhs>
+		<rhs>
+			'BEGIN'
+			<nonterminal def="#PreprcStmLst">PreprcStmLst</nonterminal>
+			'END'
+		</rhs>
+		</production>
 
 		<production xml:id="StatementLst">
 		<lhs>StatementLst</lhs>
 		<rhs>
 			( <nonterminal def="#Statement">Statement</nonterminal>
-			|  <nonterminal def="#Statement">Statement</nonterminal>
-			   <nonterminal def="#StatementLst">StatementLst</nonterminal>
+			| <nonterminal def="#Statement">Statement</nonterminal>
+			  <nonterminal def="#StatementLst">StatementLst</nonterminal>
 			)
 		</rhs>
 		</production>
@@ -211,10 +332,16 @@
 		<lhs>Transaction</lhs>
 		<rhs>
 			'TRANSACTION' <nonterminal def="#Identifier">Identifier</nonterminal>
-			( 'RESULT' 'INTO' <nonterminal def="#Identifier">Identifier</nonterminal>
-			| 'AUTHORIZE' '(' <nonterminal def="#Identifier">Identifier</nonterminal> ','
-					<nonterminal def="#Identifier">Identifier</nonterminal> ')'
-			| )
+			[
+				'AUTHORIZE' '(' <nonterminal def="#Identifier">Identifier</nonterminal> ','
+						<nonterminal def="#Identifier">Identifier</nonterminal> ')'
+			]
+			[	'PREPROCESS'
+				<nonterminal def="#PreprcBody">PreprcBody</nonterminal>
+			]
+			[
+				'RESULT' 'INTO' <nonterminal def="#Identifier">Identifier</nonterminal>
+			]
 			<nonterminal def="#OpBody">OpBody</nonterminal>
 		</rhs>
 		</production>

@@ -2,7 +2,11 @@
 TRANSACTION insertItem
 AUTHORIZE (data,user)
 BEGIN
-	INTO user DO UNIQUE NONEMPTY SELECT id FROM UserTable WHERE name = $(name);
-	FOREACH item DO INSERT INTO ItemTable (ownerid,name) VALUES ($1,$(name));
+	INTO user
+		DO UNIQUE NONEMPTY SELECT id FROM UserTable
+			WHERE name = $(name);
+	FOREACH item
+		DO INSERT INTO ItemTable (ownerid,name)
+			VALUES ($1,$(name));
 END
 

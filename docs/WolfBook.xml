@@ -4,7 +4,7 @@
 
 	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
 	%xinclude;
-	
+
 	<!ENTITY % AppSrvEntities	SYSTEM	"AppServer/AppServer.ent">
 	%AppSrvEntities;
 
@@ -69,7 +69,7 @@
 			<title>Index</title>
 		</index>
 	</book>
-	
+
 	<book id="book_Client" lang="en">
 		<title>Wolframe Clients</title>
 		<subtitle>Clients to access Wolframe</subtitle>
@@ -117,10 +117,11 @@
 		</bookinfo>
 
 		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
-		&SDKpreface;
+		&SDKpreface;-->
+
 		&SDKintroduction;
-		-->
 		&SDKprograms;
+		&SDKcmdhandlers;
 		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
 		&SDKappendix;
 		-->

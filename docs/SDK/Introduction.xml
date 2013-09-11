@@ -4,7 +4,12 @@
 
 	<sect1>
 		<title>Introduction to Service Development</title>
-		<para>
+		<para>A call of the <code>Wolframe</code> logic tier gets to a command handler
+			that calls functions in the logic tier to perform the transaction
+			requested. The following chapter how to write programs with functions
+			of the <code>Wolframe</code> logic tier. It also describes how command
+			handlers are configured to call these functions depending on the
+			input.
 		</para>
 	</sect1>
 </chapter>

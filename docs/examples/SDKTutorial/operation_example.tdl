@@ -1,0 +1,13 @@
+
+OPERATION selectFamilyMembers( id)
+BEGIN
+	INTO member
+		DO SELECT surname,prename FROM PersonTable
+			WHERE id = $[id];
+END
+
+TRANSACTION getFamilyMembers
+BEGIN
+	FOREACH person INTO . DO selectFamilyMembers( id);
+END
+

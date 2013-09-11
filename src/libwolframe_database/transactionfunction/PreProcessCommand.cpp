@@ -136,7 +136,10 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 						resultnode = structure.visitTag( resultnode, *ri);
 					}
 				}
-				resultnode = structure.visitOrOpenUniqTag( resultnode, m_resultpath.back());
+				if (m_resultpath.back() != ".")
+				{
+					resultnode = structure.visitOrOpenUniqTag( resultnode, m_resultpath.back());
+				}
 			}
 			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
 			const Node* rn = structure.node( resultnode);
@@ -214,8 +217,15 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				{
 					expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
 					const types::Variant res = nf->execute( ev);
-					LOG_DATA << "[transaction preprocess] call normalizer '" << m_name << "' into '" << structure.nodepath( resultnode) << "' => " << res.typeName() << " '" << res.tostring() << "'";
-					structure.pushValue( resultnode, res);
+					if (m_resultpath.empty())
+					{
+						LOG_DATA << "[transaction preprocess] call validator '" << m_name << "'";
+					}
+					else
+					{
+						LOG_DATA << "[transaction preprocess] call normalizer '" << m_name << "' into '" << structure.nodepath( resultnode) << "' => " << res.typeName() << " '" << res.tostring() << "'";
+						structure.pushValue( resultnode, res);
+					}
 				}
 			}
 			else if (ff)
@@ -235,15 +245,22 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					if (!err) throw std::logic_error( "internal: incomplete input");
 					throw std::runtime_error( err);
 				}
-				// assign form function result to destination in input structure for further processing:
-				langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode, sourccetagmap));
-				langbind::TypedInputFilterR result = fc->result();
+				if (m_resultpath.empty())
+				{
+					LOG_DATA << "[transaction preprocess] call function " << m_name << " ignoring the result (no INTO declaration)";
+				}
+				else
+				{
+					// assign form function result to destination in input structure for further processing:
+					langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode, sourccetagmap));
+					langbind::TypedInputFilterR result = fc->result();
 
-				result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
-				// ... result should provide indices of arrays is possible (for further preprocessing function calls)
+					result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
+					// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 
-				mapResult( result.get(), resfilter.get());
-				LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, " ", "", true);
+					mapResult( result.get(), resfilter.get());
+					LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, " ", "", true);
+				}
 			}
 			else
 			{

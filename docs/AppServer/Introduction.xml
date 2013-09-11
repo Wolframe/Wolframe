@@ -30,10 +30,10 @@
 		<title>Logic tier</title>
 			<para>The logic tier of <code>Wolframe</code> describes the transformation of input of the presentation tier to a set of instructions
 			for the data tier. It also describes the transformation of the output of the data tier to a result structure returned back to the presentation tier.
-			The logic tier support scripting languages and direct mapping. <code>Wolframe</code> introduces three concepts as fundamental building blocks of the logic tier:
+			The logic tier supports scripting languages to define the mapping. <code>Wolframe</code> introduces three concepts as fundamental building blocks of the logic tier:
 				<itemizedlist>
-					<listitem><para>Filters: Filters are transforming serialized input data (XML,CSV,etc.) to a unified serialization of hierarchical structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2) or as scripts (XSLT filter script for rewriting input or output)</para></listitem>
-					<listitem><para>Forms: Forms a data structures defined in a data definition language (DDL) or as structures in <code>C++</code> as loadable modules. Forms are used to validate and normalize input (XML validation, token normalization) and as API for functions loaded from modules written in <code>C++</code>.</para></listitem>
+					<listitem><para>Filters: Filters are transforming serialized input data (XML,Jason,CSV,etc.) to a unified serialization of hierarchical structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2) or as scripts (XSLT filter script for rewriting input or output)</para></listitem>
+					<listitem><para>Forms: Forms a data structures defined in a data definition language (DDL) or as structures in native <code>C++</code> as loadable modules. Forms are used to validate and normalize input (XML validation, token normalization) and as API for functions loaded from modules written in <code>C++</code>.</para></listitem>
 					<listitem><para>Functions: Functions delegate processing to the data tier (transactions) or serve as interface to integrate with other environments (e.g. <code>.NET</code>). Functions have a unique name and are called with a structure as argument and a structure as result.
 							Where and in what context they are executed has no influence on their semantics.</para></listitem>
 				</itemizedlist>

@@ -51,6 +51,7 @@
 		<simplelist type="horiz" columns="3">
 		<member>@</member><member>prefix of data type</member><member>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</member>
 		<member>?</member><member>prefix of data type</member><member>Expresses that the element is optional also in strict validation</member>
+		<member>^</member><member>prefix of form name</member><member>Expresses that the element is optional and refers to a structure defined in the same module that is expanded only if the element is present. With this construct it is possible to define recursive structures like trees.</member>
 		<member>!</member><member>prefix of data type</member><member>Expresses that the element is always mandatory (also in non strict validation)</member>
 		<member>[]</member><member>postfix of data type</member><member>Expresses that the element is an array of this type</member>
 		<member>[]</member><member>without data type</member><member>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</member>

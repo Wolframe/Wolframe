@@ -1,14 +1,16 @@
 <sect1>
-<title>Defining Programs with Direct Map</title>
+<title>Direct Map Command Handler</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can write programs for the logic tier of Wolframe as so called direct map instructions.
-		Direct map means that you call a transaction or built-in function directly with the
-		input structure that is created from the input deserialization by a filter.
-		The result of a direct map is the serialization of the function output.
+	<para>You can call programs of the logic tier of Wolframe with a mechanism called direct map.
+		Direct map means that you call a function directly with the
+		input structure that is a one to one representation of the input.
+		The result of a direct map is a structure that can be represented
+		one to one in the output.
 	</para>
-	<para>Direct map commands are specified in a program source file with the extension .directmap
-		and the file is specified as processor program in the configuration.
+	<para>Direct map instructions are specified in a program source file with the extension '.dmap'
+		and the file is specified as program of the direct map command handler
+		in the configuration.
 	</para>
 	</sect2>
 
