@@ -30,6 +30,24 @@ ifeq "$(COMPILER)" "gcc"
 	  
 endif
 
+ifeq "$(COMPILER)" "clang"
+
+%.d : %.c
+	@echo Generating dependencies for $<
+	@$(CC) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CFLAGS) $< | \
+		( tr -d "\n"; echo "" ) | tr -d  '\\' | \
+		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
+		tr -s '&' "\n" > $@
+
+%.d : %.cpp
+	@echo Generating dependencies for $<
+	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
+		( tr -d "\n"; echo "" ) | tr -d  '\\' | \
+		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
+		tr -s '&' "\n" > $@
+	  
+endif
+
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
 -include $(OBJS:.o=.d)
