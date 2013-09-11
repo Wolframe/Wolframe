@@ -135,8 +135,10 @@ else
 	# get last line, old 'tail' syntax and POSIX syntax, both exist out there
 	if test "x${PLATFORM}" = "xSUNOS"; then
 		TAIL1='tail -1'
+		HEAD1='head -1'
 	else
 		TAIL1='tail -n 1'
+		HEAD1='head -n 1'
 	fi
 
 	# the compiler and version
@@ -146,15 +148,20 @@ else
 	CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
 
 	# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
-	(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i GCC ) 2>/dev/null 1>/dev/null
+	(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i intel ) 2>/dev/null 1>/dev/null
 	if test $? = 0; then
-		COMPILER='gcc'
+		COMPILER='icc'
 	else
-		( $CC --version 2>&1 | head -n 1 | grep 'clang' ) >/dev/null
+		(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i GCC ) 2>/dev/null 1>/dev/null
 		if test $? = 0; then
-			COMPILER='clang'
+			COMPILER='gcc'
 		else
-			COMPILER='unknown'
+			( $CC --version 2>&1 | $HEAD1 | grep 'clang' ) >/dev/null
+			if test $? = 0; then
+				COMPILER='clang'
+			else
+				COMPILER='unknown'
+			fi
 		fi
 	fi
 
@@ -174,6 +181,14 @@ else
 		CLANG_MINOR_VERSION=`echo $CLANG_VERSION | cut -d . -f 2`
 	fi
 
+	# version of icc (Intel C compiler)
+
+	if test $COMPILER = "icc"; then
+		ICC_VERSION=`$CC -dumpversion`
+		ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
+		ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
+	fi
+
 	# generate the makefile snippet with conditional variables
 	# (conditional, so that users can overwrite them for instance
 	# for cross-compilation)
@@ -187,6 +202,8 @@ GCC_MAJOR_VERSION?=$GCC_MAJOR_VERSION
 GCC_MINOR_VERSION?=$GCC_MINOR_VERSION
 CLANG_MAJOR_VERSION?=$CLANG_MAJOR_VERSION
 CLANG_MINOR_VERSION?=$CLANG_MINOR_VERSION
+ICC_MAJOR_VERSION?=$ICC_MAJOR_VERSION
+ICC_MINOR_VERSION?=$ICC_MINOR_VERSION
 LINUX_DIST?=$LINUX_DIST
 LINUX_REV?=$LINUX_REV
 EOF
@@ -202,6 +219,8 @@ GCC_MAJOR_VERSION=$GCC_MAJOR_VERSION
 GCC_MINOR_VERSION=$GCC_MINOR_VERSION
 CLANG_MAJOR_VERSION=$CLANG_MAJOR_VERSION
 CLANG_MINOR_VERSION=$CLANG_MINOR_VERSION
+ICC_MAJOR_VERSION=$ICC_MAJOR_VERSION
+ICC_MINOR_VERSION=$ICC_MINOR_VERSION
 LINUX_DIST=$LINUX_DIST
 LINUX_REV=$LINUX_REV
 EOF
@@ -242,7 +261,12 @@ case "$1" in
 	--clang-minor-version)	echo $CLANG_MINOR_VERSION
 				;;
 
+	--icc-major-version)	echo $ICC_MAJOR_VERSION
+				;;
+
+	--icc-minor-version)	echo $ICC_MINOR_VERSION
+				;;
+
 	*)			echo "unkown flag '$1' requested!"
 				exit 1
 esac
-
