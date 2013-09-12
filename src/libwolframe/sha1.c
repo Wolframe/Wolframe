@@ -20,21 +20,11 @@
 
 
 #include <string.h>
-#ifndef _WIN32
 
-#ifdef SUNOS
-#include <sys/isa_defs.h>
-#define LITLE_ENDIAN 1234
-#define BIG_ENDIAN 4321
-#ifdef _LITTLE_ENDIAN
-#define BYTE_ORDER LITLE_ENDIAN
-#endif /* _LITTLE_ENDIAN */
-#ifdef _BIG_ENDIAN
-#define BYTE_ORDER BIG_ENDIAN
-#endif /* _BIG_ENDIAN */
-#else /* SUNOS */
+#ifndef _WIN32
 #include <sys/param.h>
-#endif /* SUNOS */
+#else
+
 #endif /* _WIN32 */
 
 #include "types/sha1.h"
@@ -43,12 +33,17 @@
 
 /* blk0() and blk() perform the initial expand. */
 /* I got the idea of expanding during the round function from SSLeay */
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 #define blk0(i) (block.l[i] = (rol(block.l[i],24)&0xFF00FF00) \
 	|(rol(block.l[i],8)&0x00FF00FF))
 #else
+#if __BYTE_ORDER == __BIG_ENDIAN
 #define blk0(i) block.l[i]
+#else
+#error unknown byte order __BYTE_ORDER
 #endif
+#endif
+
 #define blk(i) (block.l[i&15] = rol(block.l[(i+13)&15]^block.l[(i+8)&15] \
 	^block.l[(i+2)&15]^block.l[i&15],1))
 
