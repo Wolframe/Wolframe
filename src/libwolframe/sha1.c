@@ -22,7 +22,27 @@
 #include <string.h>
 
 #ifndef _WIN32
+
+/* all modern Unix, they usually include 'endian.h', but we should
+ * not include endian.h directly..
+ */
 #include <sys/param.h>
+
+/* older Solaris */
+#ifdef SUNOS
+#if OS_MAJOR_VERSION == 5 && OS_MINOR_VERSION <= 10
+#include <sys/isa_defs.h>
+#define __LITLE_ENDIAN 1234
+#define __BIG_ENDIAN 4321
+#ifdef _LITTLE_ENDIAN
+#define __BYTE_ORDER __LITLE_ENDIAN
+#endif
+#ifdef _BIG_ENDIAN
+#define __BYTE_ORDER __BIG_ENDIAN
+#endif
+#endif /* OS_MAJOR_VERSION == 5 && OS_MINOR_VERSION <= 10 */
+#endif /* SUNOS */
+
 #else
 
 #endif /* _WIN32 */
