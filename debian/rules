@@ -39,6 +39,8 @@ build-stamp:
 		$(WOLFRAME_PARAMS) depend
 	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
 		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) all
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) test
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling

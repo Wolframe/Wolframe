@@ -20,4 +20,4 @@ print( funny.encode( 'ascii', 'backslashreplace') )
 #print( funny )
 
 time = 1377677003.4642606
-print( 'Module initialized on ' , ctime( time ) )
+x = ctime( time )

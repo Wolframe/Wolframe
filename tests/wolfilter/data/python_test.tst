@@ -1,5 +1,6 @@
 **
 **requires:PYTHON
+**requires:DISABLED
 **input
 **output
 **file:test.py
