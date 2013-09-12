@@ -862,8 +862,51 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 
 cd docs; make doc-doxygen
 
+%check
+
 echo ======================= TESTING ==============================
-# make test
+%if %{build_python}
+LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
+MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
+%endif
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make test \
+	%{?_smp_mflags} \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
+%if %{build_boost}
+	BOOST_DIR=/tmp/boost-%{boost_version} \
+	%{boost_library_tag} \
+%endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+	WITH_PYTHON=%{with_python} \
+%if %{build_python}
+	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
+	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
+%endif
+	WITH_SSL=%{with_ssl} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
+	sysconfdir=/etc libdir=%{_libdir}
 echo ===================== END OF TESTING =========================
 
 
