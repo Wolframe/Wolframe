@@ -461,13 +461,13 @@ std::string VariantStructDescription::names( const std::string& sep) const
 	return rt;
 }
 
-static void print_newitem( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level)
+static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level)
 {
-	out << newitem;
-	for (std::size_t ll=0; ll<level; ++ll) out << indent;
+	out << pformat->newitem;
+	for (std::size_t ll=0; ll<level; ++ll) out << pformat->indent;
 }
 
-void VariantStructDescription::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
+void VariantStructDescription::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
 {
 	static Variant default_bool( Variant::bool_);
 	static Variant default_int( Variant::int_);
@@ -478,25 +478,25 @@ void VariantStructDescription::print( std::ostream& out, const std::string& inde
 	const_iterator di = begin(), de = end();
 	for (; di!=de; ++di)
 	{
-		print_newitem( out, indent, newitem, level);
+		print_newitem( out, pformat, level);
 
 		if (di->substruct)
 		{
 			out << di->name;
 			if (di->array()) out << "[]";
-			out << " ";
+			out << pformat->itemdelimiter;
 			if (di->optional()) out << "?";
 			if (di->mandatory()) out << "!";
-			out << "{";
-			di->substruct->print( out, indent, newitem, level+1);
-			print_newitem( out, indent, newitem, level);
-			out << "}";
+			out << pformat->openstruct;
+			di->substruct->print( out, pformat, level+1);
+			print_newitem( out, pformat, level);
+			out << pformat->openstruct;
 		}
 		else if (di->initvalue)
 		{
 			out << di->name;
 			if (di->array()) out << "[]";
-			out << " ";
+			out << pformat->itemdelimiter;
 			if (di->optional()) out << "?";
 			if (di->mandatory()) out << "!";
 			if (di->attribute()) out << "@";
@@ -520,16 +520,16 @@ void VariantStructDescription::print( std::ostream& out, const std::string& inde
 				}
 			}
 		}
-		out << ';';
+		out << pformat->decldelimiter;
 	}
 }
 
-std::string VariantStructDescription::tostring() const
+std::string VariantStructDescription::tostring( const utils::PrintFormat* pformat) const
 {
 	std::stringstream out;
-	out << "{";
-	print( out, "\t", "\n", 0);
-	out << "}";
+	out << pformat->openstruct;
+	print( out, pformat, 0);
+	out << pformat->closestruct;
 	return out.str();
 }
 

@@ -86,10 +86,9 @@ struct StackElement
 };
 }//anonymous namespace
 
-const std::string TransactionFunctionInput::Structure::tostring( const NodeVisitor& nv, const std::string& newprefix, const std::string& indentprefix, bool withbrk) const
+void TransactionFunctionInput::Structure::print( std::ostream& out, const utils::PrintFormat* pformat, const NodeVisitor& nv) const
 {
 	std::vector <StackElement> stk;
-	std::ostringstream rt;
 	stk.push_back( nv.m_nodeidx);
 	stk.back().headerprinted = true;
 	stk.back().printsiblings = false;
@@ -99,28 +98,28 @@ const std::string TransactionFunctionInput::Structure::tostring( const NodeVisit
 		const Node* nd = node( stk.back().nodeidx);
 		if (!stk.back().headerprinted)
 		{
-			rt << newprefix;
+			out << pformat->newitem;
 			std::size_t indent = stk.size() -1;
-			while (indent--) rt << indentprefix;
+			while (indent--) out << pformat->indent;
 
-			if (nd->m_tagstr) rt << tagname(nd) << ": ";
+			if (nd->m_tagstr) out << tagname(nd) << pformat->endheader;
 			stk.back().headerprinted = true;
 		}
 		if (nd->m_firstchild && !stk.back().childrenvisited)
 		{
 			stk.back().childrenvisited = true;
-			if (withbrk) rt << '{';
+			out << pformat->openstruct;
 			stk.push_back( nd->m_firstchild);
 			continue;
 		}
 		if (nd->m_value)
 		{
-			rt << newprefix;
+			out << pformat->newitem;
 			std::size_t indent = stk.size() -1;
-			while (indent--) rt << indentprefix;
+			while (indent--) out << pformat->indent;
 
 			const types::Variant* val = &m_content.at( nd->m_value);
-			rt << val->typeName() << " '" << val->tostring() << "'";
+			out << val->typeName() << pformat->itemdelimiter << pformat->startvalue << val->tostring() << pformat->endvalue;
 		}
 		if (stk.back().printsiblings && nd->m_next)
 		{
@@ -130,10 +129,16 @@ const std::string TransactionFunctionInput::Structure::tostring( const NodeVisit
 		}
 		else
 		{
-			if (withbrk && !stk.empty()) rt << '}';
+			if (!stk.empty()) out << pformat->closestruct;
 			stk.pop_back();
 		}
 	}
+}
+
+const std::string TransactionFunctionInput::Structure::tostring( const NodeVisitor& nv, const utils::PrintFormat* pformat) const
+{
+	std::ostringstream rt;
+	TransactionFunctionInput::Structure::print( (std::ostream&)rt, pformat, nv);
 	return rt.str();
 }
 

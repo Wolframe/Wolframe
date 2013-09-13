@@ -41,6 +41,7 @@ Project Wolframe.
 #include <stdexcept>
 #include "types/variant.hpp"
 #include "types/normalizeFunction.hpp"
+#include "utils/printFormats.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -205,10 +206,10 @@ public:
 	std::string names( const std::string& sep) const;
 
 	///\brief Print the contents of a structure description (structures in curly brackets as in the simpleform language)
-	void print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const;
+	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
 
 	///\brief Return the contents of a structure description as string (format as in print with no indent and newlines)
-	std::string tostring() const;
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 	void check() const;
 

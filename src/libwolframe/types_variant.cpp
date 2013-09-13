@@ -1,5 +1,6 @@
 #include "types/variant.hpp"
 #include "types/malloc.hpp"
+#include "utils/conversions.hpp"
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
@@ -138,6 +139,48 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 	return -2;
 }
 
+static boost::uint64_t variant2uint_cast( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::null_:
+			throw boost::bad_lexical_cast();
+		case Variant::bool_:
+			return o.data().value.bool_?1:0;
+		case Variant::double_:
+			return boost::numeric_cast<double>( o.data().value.double_);
+		case Variant::int_:
+			if (o.data().value.int_ < 0) throw boost::bad_lexical_cast();
+			return o.data().value.int_;
+		case Variant::uint_:
+			return o.data().value.uint_;
+		case Variant::string_:
+			return utils::touint_cast( std::string( o.data().value.string_));
+	}
+	throw boost::bad_lexical_cast();
+}
+
+static boost::int64_t variant2int_cast( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::null_:
+			throw boost::bad_lexical_cast();
+		case Variant::bool_:
+			return o.data().value.bool_?1:0;
+		case Variant::double_:
+			return boost::numeric_cast<double>( o.data().value.double_);
+		case Variant::int_:
+			return o.data().value.int_;
+		case Variant::uint_:
+			if (o.data().value.uint_ > (Variant::Data::UInt_)std::numeric_limits<Variant::Data::Int_>::max()) throw boost::bad_lexical_cast();
+			return o.data().value.uint_;
+		case Variant::string_:
+			return utils::toint_cast( std::string( o.data().value.string_));
+	}
+	throw boost::bad_lexical_cast();
+}
+
 template <typename TYPE>
 static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type variant_cast( const Variant& o)
 {
@@ -167,13 +210,13 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 		case Variant::null_:
 			return std::string();
 		case Variant::bool_:
-			return boost::lexical_cast<std::string>( o.data().value.bool_);
+			return o.data().value.bool_?"true":"false";
 		case Variant::double_:
 			return boost::lexical_cast<std::string>( o.data().value.double_);
 		case Variant::int_:
-			return boost::lexical_cast<std::string>( o.data().value.int_);
+			return utils::tostring_cast( o.data().value.int_);
 		case Variant::uint_:
-			return boost::lexical_cast<std::string>( o.data().value.uint_);
+			return utils::tostring_cast( o.data().value.uint_);
 		case Variant::string_:
 			return std::string( o.data().value.string_, o.data().dim.size);
 	}
@@ -241,12 +284,12 @@ bool Variant::tobool() const
 
 Variant::Data::Int_ Variant::toint() const
 {
-	return variant_cast<Data::Int_>( *this);
+	return variant2int_cast( *this);
 }
 
 Variant::Data::UInt_ Variant::touint() const
 {
-	return variant_cast<Data::UInt_>( *this);
+	return variant2uint_cast( *this);
 }
 
 void Variant::convert( Type type_)

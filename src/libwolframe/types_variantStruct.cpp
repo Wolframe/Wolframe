@@ -610,46 +610,46 @@ int VariantStruct::iterator::compare( const iterator& o) const
 	return 0;
 }
 
-static void print_newitem( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level)
+static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level)
 {
-	out << newitem;
-	for (std::size_t ll=0; ll<level; ++ll) out << indent;
+	out << pformat->newitem;
+	for (std::size_t ll=0; ll<level; ++ll) out << pformat->indent;
 }
 
-void VariantStruct::print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level) const
+void VariantStruct::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
 {
 	Type tt = type();
 	if (tt == array_)
 	{
 		std::size_t ii=0, nn=m_data.dim.size;
-		out << '{';
+		out << pformat->openstruct;
 		for (; ii<nn; ++ii)
 		{
-			if (ii>0) out << ';';
-			print_newitem( out, indent, newitem, level);
-			((VariantStruct*)m_data.value.ref_ + 1 + ii)->print( out, indent, newitem, level+1);
+			if (ii>0) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
+			((VariantStruct*)m_data.value.ref_ + 1 + ii)->print( out, pformat, level+1);
 		}
 		if (nn>0)
 		{
-			print_newitem( out, indent, newitem, level);
+			print_newitem( out, pformat, level);
 		}
-		out << '}';
+		out << pformat->closestruct;
 	}
 	else if (tt == struct_)
 	{
-		out << '{';
+		out << pformat->openstruct;
 		const VariantStructDescription* descr = description();
 		VariantStructDescription::const_iterator di = descr->begin();
 		const_iterator ii = begin(), ee = end();
 		for (int idx=0; ii!=ee; ++ii,++di,++idx)
 		{
-			if (idx) out << "; ";
-			print_newitem( out, indent, newitem, level);
+			if (idx) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
 
-			out << di->name << '=';
-			ii->print( out, indent, newitem, level+1);
+			out << di->name << pformat->assign;
+			ii->print( out, pformat, level+1);
 		}
-		out << '}';
+		out << pformat->closestruct;
 	}
 	else if (tt == indirection_)
 	{
@@ -661,16 +661,16 @@ void VariantStruct::print( std::ostream& out, const std::string& indent, const s
 	}
 	else
 	{
-		out << '\'';
+		out << pformat->startvalue;
 		out << Variant::tostring();
-		out << '\'';
+		out << pformat->endvalue;
 	}
 }
 
-std::string VariantStruct::tostring() const
+std::string VariantStruct::tostring( const utils::PrintFormat* pformat) const
 {
 	std::ostringstream buf;
-	print( buf, "", " ", 0);
+	print( buf, pformat, 0);
 	return buf.str();
 }
 

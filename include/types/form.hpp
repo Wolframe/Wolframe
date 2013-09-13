@@ -41,6 +41,7 @@ Project Wolframe.
 #include "types/countedReference.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
+#include "utils/printFormats.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -129,11 +130,11 @@ public:
 		return m_description;
 	}
 
-	void print( std::ostream& out, size_t level=0) const
+	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const
 	{
 		std::string indent( level, '\t');
-		out << indent << "FORM " << m_description->name() << std::endl;
-		types::VariantStruct::print( out, "\t", "\n", level);
+		out << indent << "FORM " << m_description->name() << pformat->newitem;
+		types::VariantStruct::print( out, pformat, level);
 	}
 
 private:
