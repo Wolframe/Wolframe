@@ -383,13 +383,19 @@ BuildRequires: postgresql-devel >= 8.3
 %if %{rhel}
 %if %{rhel5} || %{rhel6}
 BuildRequires: sqlite-devel >= 3.0
+# for testing only
+BuildRequires: sqlite >= 3.0
 %endif
 %else
 BuildRequires: sqlite-devel >= 3.0
+# for testing only
+BuildRequires: sqlite >= 3.0
 %endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
+# for testing only
+BuildRequires: sqlite3 >= 3.0
 %endif
 %endif
 %endif
