@@ -107,7 +107,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 
 		std::vector<const Node*> nodearray;
 		m_selector.selectNodes( structure, structure.root(), nodearray);
-		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), " ", "", true);
+		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), utils::logPrintFormat());
 		if (nodearray.size())
 		{
 			LOG_DATA << "[transaction preprocess] execute function " << m_name << " on " << nodearray.size() << " nodes of selection '" << structure.nodepath( *nodearray.begin()) << "'";
@@ -175,7 +175,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				}
 				else
 				{
-					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( structure.visitor( parameter.back()), " ", "", true);
+					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( structure.visitor( parameter.back()), utils::logPrintFormat());
 					parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
 				}
 			}
@@ -259,7 +259,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 
 					mapResult( result.get(), resfilter.get());
-					LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, " ", "", true);
+					LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, utils::ptreePrintFormat());
 				}
 			}
 			else

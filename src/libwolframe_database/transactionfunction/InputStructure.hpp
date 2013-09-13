@@ -38,6 +38,7 @@
 #include "transactionfunction/TagTable.hpp"
 #include "types/allocators.hpp"
 #include "filter/typedfilter.hpp"
+#include "utils/printFormats.hpp"
 #include <string>
 #include <map>
 #include <vector>
@@ -134,8 +135,10 @@ public://visit structure:
 	///\brief Get the absolute path of a node as string with '/' as path element delimiter
 	std::string nodepath( const Node* nd) const;
 
+	///\brief Print a structure in a specified format to an output stream
+	void print( std::ostream& out, const utils::PrintFormat* pformat, const NodeVisitor& nv = NodeVisitor()) const;
 	///\brief Get structure as string
-	const std::string tostring( const NodeVisitor& nv = NodeVisitor(), const std::string& newprefix="\n", const std::string& indentprefix="\t", bool withbrk=false) const;
+	const std::string tostring( const NodeVisitor& nv = NodeVisitor(), const utils::PrintFormat* pformat=utils::ptreePrintFormat()) const;
 	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
 	bool isequalTag( const std::string& t1, const std::string& t2) const;
 

@@ -66,6 +66,8 @@ CPP_OBJS = \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
+	utils_printFormats.o \
+	utils_conversions.o \
 	stringUtils.o \
 	parseUtils.o \
 	fileUtils.o \

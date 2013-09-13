@@ -39,6 +39,7 @@ Project Wolframe.
 #include <iostream>
 #include <utility>
 #include "types/variant.hpp"
+#include "utils/printFormats.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -132,7 +133,7 @@ public:
 	void push();
 
 	///\brief Gets the value of the structure as string
-	std::string tostring() const;
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 	///\brief Random access (throws logic error on ABR/ABW)
 	const VariantStruct& operator[]( std::size_t idx) const;
@@ -211,7 +212,7 @@ public:
 
 public:
 	///\brief Print the value of a structure as string (curly bracket syntax)
-	void print( std::ostream& out, const std::string& indent, const std::string& newitem, std::size_t level=0) const;
+	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level=0) const;
 
 	///\brief Find an element (direct child)
 	const_iterator find( const std::string& name_) const;
