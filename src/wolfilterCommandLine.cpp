@@ -248,6 +248,7 @@ struct WolfilterOptionStruct
 			( "version,v", "print version" )
 			( "help,h", "print help message" )
 			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
+			( "logfile", po::value<std::string>(), "specify a file for the log output" )
 			( "verbosity,t", po::value< std::vector<std::string> >()->multitoken()->zero_tokens(), "variant of option --loglevel: Raise verbosity level with (-t,-tt,-ttt,..)" )
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
@@ -268,6 +269,7 @@ struct WolfilterOptionStruct
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath)
 	:m_printhelp(false)
 	,m_printversion(false)
+	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
 	,m_inbufsize(8<<10)
 	,m_outbufsize(8<<10)
 	,m_referencePath(referencePath_)
@@ -294,16 +296,22 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 	if (loglevel_set)
 	{
-		m_loglevel = vmap["loglevel"].as<std::string>();
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( log::LogLevel::strToLogLevel( m_loglevel));
+		m_loglevel = log::LogLevel::strToLogLevel( vmap["loglevel"].as<std::string>());
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( m_loglevel);
 	}
 	if (tracelevel)
 	{
-		m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
-		if (tracelevel >= 2) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
-		if (tracelevel >= 3) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
-		if (tracelevel >= 4) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
-		if (tracelevel >= 5) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+		if (tracelevel >= 1) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+		if (tracelevel >= 2) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+		if (tracelevel >= 3) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+		if (tracelevel >= 4) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( m_loglevel);
+	}
+	if (vmap.count( "logfile"))
+	{
+		m_logfile = vmap["logfile"].as<std::string>();
+		_Wolframe::log::LogBackend::instance().setLogfileName( m_logfile);
+		_Wolframe::log::LogBackend::instance().setLogfileLevel( m_loglevel);
 	}
 	if (vmap.count( "config"))
 	{

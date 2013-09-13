@@ -258,7 +258,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 				continue;
 			}
 		}
-		LOG_DATA << "[transaction result stm] State " << ResultElement::typeName( m_structitr->type) << " " << m_structitr->idx << " '" << (m_structitr->value?m_structitr->value:"") << "' f=" << ((m_resitr==m_resend)?-1:m_resitr->functionidx()) << " s=" << m_structitr->idx;
+		LOG_DATA << "[transaction result stm] State " << ResultElement::typeName( m_structitr->type) << " " << m_structitr->idx << " '" << (m_structitr->value?m_structitr->value:"") << "' f=" << ((m_resitr==m_resend)?std::string("NULL"):boost::lexical_cast<std::string>(m_resitr->functionidx())) << " s=" << m_structitr->idx;
 		switch (m_structitr->type)
 		{
 			case ResultElement::OpenTag:

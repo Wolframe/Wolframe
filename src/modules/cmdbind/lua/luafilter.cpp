@@ -38,6 +38,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstring>
 #include <string>
+#include <cmath>
 
 extern "C" {
 	#include <lualib.h>
@@ -122,9 +123,19 @@ static bool getElementValue( lua_State* ls, int idx, types::VariantConst& elemen
 			return false;
 
 		case LUA_TNUMBER:
-			element = (double)wrap_lua_tonumber(ls, idx);
+		{
+			double num = (double)wrap_lua_tonumber(ls, idx);
+			double flo = std::floor( num);
+			if (num - flo <= std::numeric_limits<double>::epsilon())
+			{
+				element = boost::numeric_cast<types::Variant::Data::Int_>(num);
+			}
+			else
+			{
+				element = num;
+			}
 			return true;
-
+		}
 		case LUA_TBOOLEAN:
 			element = (bool)wrap_lua_toboolean(ls, idx);
 			return true;

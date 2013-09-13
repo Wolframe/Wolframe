@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "logger-v1.hpp"
 #include "processor/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/property_tree/ptree.hpp>
@@ -75,7 +76,8 @@ private:
 private:
 	bool m_printhelp;
 	bool m_printversion;
-	std::string m_loglevel;
+	log::LogLevel::Level m_loglevel;
+	std::string m_logfile;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	std::vector<std::string> m_programs;
