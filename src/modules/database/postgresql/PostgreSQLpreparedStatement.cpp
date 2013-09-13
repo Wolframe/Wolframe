@@ -273,12 +273,12 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::Vari
 	}
 	if (idx == 0 || idx > m_statement.maxparam())
 	{
-		errorStatus( std::string( "index of parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
+		errorStatus( std::string( "index of parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
 		return false;
 	}
 	if (idx == 0 || idx > m_statement.maxparam())
 	{
-		errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
+		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
 		return false;
 	}
 	if (value.defined())
