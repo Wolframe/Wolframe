@@ -298,7 +298,6 @@ function run( inp )
 	getData = provider.formfunction("getData")
 	res = getData( it)
 	rt = res:table()
-	logger.printc( "RESULT ", rt)
 	insertWords = provider.formfunction("insertWords")
 	insertWords( { data = rt } )
 	return rt
