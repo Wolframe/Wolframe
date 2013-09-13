@@ -137,12 +137,19 @@ INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif
 
-# Python
+# Python (missing symbols on FreeBSD only, should
+# be investigated as we want to keep all python
+# dependencies strictly to the modules), otherwise
+# we also have to link 'wolframed' against -lpython
+# which is not acceptable. Keep the hackaround for
+# now to make FreeBSD happy..
+ifeq "$(PLATFORM)" "FREEBSD"
 ifeq ($(WITH_PYTHON),1)
 INCLUDE_LDFLAGS += \
 	$(PYTHON_LDFLAGS)
 INCLUDE_LIBS += \
 	$(PYTHON_LIBS)
+endif
 endif
 
 TEST_OBJS =
