@@ -68,6 +68,11 @@ public:
 		m_filter = filter_;
 	}
 
+	const std::string& filter() const
+	{
+		return m_filter;
+	}
+
 private:
 	langbind::DirectmapProgram m_program;
 	std::string m_filter;

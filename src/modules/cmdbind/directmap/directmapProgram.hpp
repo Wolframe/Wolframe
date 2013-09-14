@@ -44,13 +44,17 @@ struct DirectmapCommandDescription
 {
 	DirectmapCommandDescription(){}
 	DirectmapCommandDescription( const DirectmapCommandDescription& o)
-		:call(o.call)
-		,filter(o.filter)
+		:name(o.name)
+		,call(o.call)
+		,inputfilter(o.inputfilter)
+		,outputfilter(o.outputfilter)
 		,inputform(o.inputform)
 		,outputform(o.outputform){}
 
+	std::string name;						//< name of program
 	std::string call;						//< name of the transaction or form function
-	std::string filter;						//< name of the input/ouput filter
+	std::string inputfilter;					//< name of the input filter
+	std::string outputfilter;					//< name of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
 

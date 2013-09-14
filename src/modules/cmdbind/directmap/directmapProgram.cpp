@@ -46,7 +46,8 @@ std::string DirectmapCommandDescription::tostring() const
 {
 	std::ostringstream rt;
 	rt << "call='" << call << "'";
-	rt << ", filter='" << filter << "'";
+	rt << ", input filter='" << inputfilter << "'";
+	rt << ", output filter='" << outputfilter << "'";
 	rt << ", input form='" << inputform << "'";
 	rt << ", output form='" << outputform << "'";
 	return rt.str();
@@ -81,6 +82,193 @@ void DirectmapProgram::loadProgram( const std::string& filename)
 	}
 }
 
+static DirectmapCommandDescription parseCommandDescription( std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	DirectmapCommandDescription rt;
+	static const utils::CharTable optab( ";");
+	std::string tok;
+	std::string cmdname;
+	std::string in_doctype;
+	std::string out_doctype;
+	std::string call_arg;
+	std::string return_arg;
+	bool validate = true;
+	bool call_arg_set = false;
+	bool return_arg_set = false;
+	bool input_filter_set = false;
+	bool output_filter_set = false;
+	enum Lexem {PASS,RETURN,CALL,IDENTIFIER,FILTER,INPUT,OUTPUT};
+	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseCallArg,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
+	State state = ParseCommand;
+	char ch;
+
+	ch = utils::parseNextToken( tok, si, se, optab);
+	for (; ch != ';' && ch; ch = utils::parseNextToken( tok, si, se, optab))
+	{
+		Lexem lexem = IDENTIFIER;
+		if (ch != '\'' && ch != '"')
+		{
+			if (boost::iequals( tok, "PASS"))
+			{
+				if (!validate) throw std::runtime_error("duplicate definition of PASS");
+				lexem = PASS;
+			}
+			else if (boost::iequals( tok, "RETURN"))
+			{
+				if (return_arg_set) throw std::runtime_error("duplicate definition of RETURN");
+				lexem = RETURN;
+			}
+			else if (boost::iequals( tok, "CALL"))
+			{
+				if (call_arg_set) throw std::runtime_error("duplicate definition of CALL");
+				lexem = CALL;
+			}
+			else if (boost::iequals( tok, "FILTER"))
+			{
+				lexem = FILTER;
+			}
+			else if (boost::iequals( tok, "INPUT"))
+			{
+				lexem = INPUT;
+			}
+			else if (boost::iequals( tok, "OUTPUT"))
+			{
+				lexem = OUTPUT;
+			}
+		}
+		switch (state)
+		{
+			case ParseCommand:
+				if (lexem != IDENTIFIER) throw std::runtime_error( std::string("expected identifier after command and got keyword '") + tok + "'");
+				cmdname = tok;
+				state = ParseInputDoctype;
+				break;
+
+			case ParseInputDoctype:
+				if (lexem != IDENTIFIER)
+				{
+					in_doctype = cmdname;
+					cmdname.clear();
+					state = ParseAttribute;
+					/*no break here!*/
+				}
+				else
+				{
+					in_doctype = tok;
+					state = ParseAttribute;
+					break;
+				}
+
+			case ParseAttributeFilter:
+				if (lexem == INPUT)
+				{
+					state = ParseInputFilter;
+					continue;
+				}
+				if (lexem == OUTPUT)
+				{
+					state = ParseOutputFilter;
+					continue;
+				}
+				state = ParseAttribute;
+				/*no break here!*/
+
+			case ParseAttribute:
+				switch (lexem)
+				{
+					case PASS:
+						validate = false;
+						state = ParseAttribute;
+						continue;
+					case RETURN:
+						state = ParseReturnArg;
+						continue;
+					case CALL:
+						state = ParseCallArg;
+						continue;
+					case IDENTIFIER:
+					case INPUT:
+					case OUTPUT:
+						break;
+					case FILTER:
+						state = ParseFilter;
+						continue;
+				}
+				throw std::runtime_error("PASS,FILTER,CALL or RETURN expected instead of token");
+
+			case ParseReturnArg:
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of RETURN");
+				return_arg_set = true;
+				return_arg = tok;
+				state = ParseAttribute;
+				continue;
+
+			case ParseCallArg:
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of CALL");
+				call_arg_set = true;
+				call_arg = tok;
+				state = ParseAttribute;
+				continue;
+
+			case ParseFilter:
+				if (lexem == INPUT)
+				{
+					state = ParseInputFilter;
+					continue;
+				}
+				if (lexem == OUTPUT)
+				{
+					state = ParseOutputFilter;
+					continue;
+				}
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of CALL");
+				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER");
+				if (output_filter_set) throw std::runtime_error("duplicate definition of FILTER");
+				input_filter_set = true;
+				rt.inputfilter = tok;
+				output_filter_set = true;
+				rt.outputfilter = tok;
+				state = ParseAttribute;
+				continue;
+
+			case ParseInputFilter:
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER INPUT");
+				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER");
+				input_filter_set = true;
+				rt.inputfilter = tok;
+				state = ParseAttributeFilter;
+				continue;
+
+			case ParseOutputFilter:
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER OUTPUT");
+				output_filter_set = true;
+				rt.outputfilter = tok;
+				state = ParseAttributeFilter;
+				continue;
+		}
+	}
+	if (state != ParseAttribute) throw std::runtime_error( "unexpected end of command");
+
+	rt.name = cmdname + in_doctype;
+	if (call_arg_set)
+	{
+		rt.call = call_arg;
+	}
+	else
+	{
+		rt.call = rt.name;
+	}
+	if (validate)
+	{
+		rt.inputform = in_doctype;
+	}
+	if (return_arg_set)
+	{
+		rt.outputform = return_arg;
+	}
+	return rt;
+}
+
 void DirectmapProgram::addProgram( const std::string& source)
 {
 	static const utils::CharTable optab( "=;:)(,");
@@ -103,7 +291,6 @@ void DirectmapProgram::addProgram( const std::string& source)
 				continue;
 			}
 
-			DirectmapCommandDescription cmd_descr;
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
 				case ';': throw ERROR( si, "empty statement");
@@ -111,6 +298,15 @@ void DirectmapProgram::addProgram( const std::string& source)
 				case '\"': throw ERROR( si, "identifier expected instead of string at start of statement");
 				default:
 					if (optab[ ch]) throw ERROR( si, MSG << "identifier expected at start of statement instead of '" << ch << "'");
+			}
+			DirectmapCommandDescription cmd_descr;
+
+			if (boost::iequals( prgname, "COMMAND"))
+			{
+				cmd_descr = parseCommandDescription( si, se);
+				LOG_TRACE << "Loading direct map function " << cmd_descr.name << " as " << cmd_descr.tostring();
+				Parent::insert( cmd_descr.name, cmd_descr);
+				continue;
 			}
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
@@ -151,7 +347,7 @@ void DirectmapProgram::addProgram( const std::string& source)
 						throw ERROR( si, MSG << "'(' expected instead of '" << tok << "'");
 				}
 			}
-			switch ((ch=utils::parseNextToken( cmd_descr.filter, si, se, optab)))
+			switch ((ch=utils::parseNextToken( cmd_descr.inputfilter, si, se, optab)))
 			{
 				case '\0': throw ERROR( si, "unexpected end of program");
 				case '\'': break;
@@ -159,6 +355,7 @@ void DirectmapProgram::addProgram( const std::string& source)
 				default:
 					if (optab[ ch]) throw ERROR( si, MSG << "filter name identifier expected instead of '" << ch << "'");
 			}
+			cmd_descr.outputfilter = cmd_descr.inputfilter;
 			if ((ch=utils::gotoNextToken( si, se)) == ':')
 			{
 				++si;

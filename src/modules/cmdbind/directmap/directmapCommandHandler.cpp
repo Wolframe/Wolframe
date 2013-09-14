@@ -73,49 +73,83 @@ void DirectmapCommandHandler::initcall()
 		}
 		m_outputform.reset( new types::Form( df));
 	}
-	std::string filtername;
-	if (m_cmd->filter.empty())
+	std::string input_filtername;
+	if (m_cmd->inputfilter.empty())
 	{
-		throw std::runtime_error( "empty filter definition in command");
+		input_filtername = m_ctx->filter();
 	}
 	else
 	{
-		filtername = m_cmd->filter;
+		input_filtername = m_cmd->inputfilter;
+	}
+	std::string output_filtername;
+	if (m_cmd->outputfilter.empty())
+	{
+		output_filtername = m_ctx->filter();
+	}
+	else
+	{
+		output_filtername = m_cmd->outputfilter;
 	}
 	m_function = m_provider->formFunction( m_cmd->call);
 	if (!m_function)
 	{
 		throw std::runtime_error( std::string( "function not defined '") + m_cmd->call + "'");
 	}
-	types::CountedReference<langbind::Filter> filter( m_provider->filter( filtername, ""));
-	if (!filter.get())
+	langbind::InputFilterR l_inputfilter;
+	langbind::OutputFilterR l_outputfilter;
+
+	if (input_filtername == output_filtername)
 	{
-		throw std::runtime_error( std::string( "filter not defined '") + filtername + "'");
+		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, ""));
+		if (!filter.get())
+		{
+			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
+		}
+		l_inputfilter = filter->inputfilter();
+		l_outputfilter = filter->outputfilter();
 	}
-	if (!filter->inputfilter().get())
+	else
 	{
-		throw std::runtime_error( std::string( "input filter not defined '") + filtername + "'");
+		types::CountedReference<langbind::Filter> filter_i( m_provider->filter( input_filtername, ""));
+		if (!filter_i.get())
+		{
+			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
+		}
+		types::CountedReference<langbind::Filter> filter_o( m_provider->filter( output_filtername, ""));
+		if (!filter_o.get())
+		{
+			throw std::runtime_error( std::string( "filter not defined '") + output_filtername + "'");
+		}
+		l_inputfilter = filter_i->inputfilter();
+		l_outputfilter = filter_o->outputfilter();
+	}
+	if (!l_inputfilter.get())
+	{
+		throw std::runtime_error( std::string( "input filter not defined '") + input_filtername + "'");
 	}
 	if (m_inputfilter.get())
 	{
-		setFilterAs( filter->inputfilter());
+		//... filter already defined: we change it but take its data
+		setFilterAs( l_inputfilter);
 		m_inputfilter->setValue( "empty", "false");
 	}
 	else
 	{
-		m_inputfilter = filter->inputfilter();
+		m_inputfilter = l_inputfilter;
 	}
-	if (!filter->outputfilter().get())
+	if (!l_outputfilter.get())
 	{
-		throw std::runtime_error( std::string( "output filter not defined '") + filtername + "'");
+		throw std::runtime_error( std::string( "output filter not defined '") + output_filtername + "'");
 	}
 	if (m_outputfilter.get())
 	{
-		setFilterAs( filter->outputfilter());
+		//... filter already defined: we change it but take its data
+		setFilterAs( l_outputfilter);
 	}
 	else
 	{
-		m_outputfilter = filter->outputfilter();
+		m_outputfilter = l_outputfilter;
 	}
 	if (m_outputform.get())
 	{
