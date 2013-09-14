@@ -49,9 +49,6 @@ class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
 public:
 	typedef IOFilterCommandHandlerEscDLF Parent;
 
-	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
-	typedef langbind::LuaScriptContext ContextStruct;
-
 public:
 	///\brief Constructor
 	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)

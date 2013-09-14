@@ -32,8 +32,7 @@
 ************************************************************************/
 ///\file mod_command_directmap.cpp
 ///\brief Module for command handler executing direct mappings to transactions or functions
-#include "module/scriptCommandHandlerBuilder.hpp"
-#include "directmapCommandHandler.hpp"
+#include "directmapCommandHandlerBuilder.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -49,7 +48,7 @@ static void setModuleLogger( void* logger)
 namespace {
 static ConfiguredBuilder* createDirectmapCommandHandlerModule()
 {
-	static ScriptCommandHandlerBuilder<cmdbind::DirectmapCommandHandler>
+	static DirectmapCommandHandlerBuilder
 		mod( "DirectmapCommandHandler", "command handler for direct mappings", "cmdhandler", "directmap", "DirectmapCommandHandler");
 	return &mod;
 }

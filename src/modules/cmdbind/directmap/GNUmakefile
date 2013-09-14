@@ -26,6 +26,7 @@ DYNAMIC_MODULE = mod_command_directmap.so
 CPP_OBJS = \
 	directmapProgram.o \
 	directmapCommandHandler.o \
+	directmapCommandHandlerBuilder.o \
 	mod_command_directmap.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

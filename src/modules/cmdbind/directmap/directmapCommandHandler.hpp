@@ -50,7 +50,7 @@ public:
 	DirectmapContext(){}
 	~DirectmapContext(){}
 
-	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* mdir);
+	void loadPrograms( const std::vector<std::string>& prgfiles_);
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const
@@ -63,8 +63,14 @@ public:
 		return m_program.get( name);
 	}
 
+	void setFilter( const std::string& filter_)
+	{
+		m_filter = filter_;
+	}
+
 private:
 	langbind::DirectmapProgram m_program;
+	std::string m_filter;
 };
 
 ///\class DirectmapCommandHandler
@@ -72,9 +78,6 @@ private:
 class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
-	///\brief Declaration for cmdbind::ScriptCommandHandlerConstructor
-	typedef DirectmapContext ContextStruct;
-
 	///\brief Constructor
 	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
 		:m_ctx(ctx_)
@@ -89,12 +92,6 @@ public:
 	///\param[out] err error code in case of error
 	///\return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
-
-	///\brief Get the identifier of this command handler type
-	static const char* identifier()
-	{
-		return "DirectmapCommandHandler";
-	}
 
 private:
 	void initcall();

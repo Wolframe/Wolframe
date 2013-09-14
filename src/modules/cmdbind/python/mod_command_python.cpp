@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file mod_command_python.cpp
 ///\brief Module for command handler executing python code
-#include "module/scriptCommandHandlerBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "logger-v1.hpp"

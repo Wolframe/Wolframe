@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaScriptContext.hpp
+///\file luaScriptContext.hpp
 ///\brief Objects defined by a command handler processing lua scripts
 #ifndef _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
@@ -50,7 +50,7 @@ struct LuaScriptContext
 	LuaScriptContext() :funcmap(&modulemap){}
 	~LuaScriptContext();
 
-	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
+	void loadPrograms( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
 	std::vector<std::string> loadProgram( const std::string& prgfile);
 
 	void setDefaultFilter( const std::string& defaultfilter_)

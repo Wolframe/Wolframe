@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file mod_command_mylang.cpp
 ///\brief Example module for a new language binding
-#include "module/scriptCommandHandlerBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "mylangFunctionProgramType.hpp"
 #include "logger-v1.hpp"

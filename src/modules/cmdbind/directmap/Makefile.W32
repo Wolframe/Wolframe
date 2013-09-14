@@ -15,7 +15,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
@@ -29,6 +29,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
+	directmapCommandHandlerBuilder.obj \
 	mod_command_directmap.obj
 
 all: $(DYNAMIC_MODULE)

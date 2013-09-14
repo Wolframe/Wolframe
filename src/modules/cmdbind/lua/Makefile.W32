@@ -17,7 +17,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
@@ -39,6 +39,7 @@ LUA_CPP_OBJS = \
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	luaCommandHandler.obj \
+	luaCommandHandlerBuilder.obj \
 	mod_command_lua.obj
 
 all: $(DYNAMIC_MODULE)
