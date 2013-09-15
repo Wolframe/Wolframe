@@ -52,7 +52,7 @@ static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 	FiltermapDDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
-		if (itr->value() && itr->value()->type() != types::VariantStruct::array_)
+		if (itr->value() && itr->value()->type() != types::VariantStruct::Array)
 		{
 			std::string tag = itr->tag().tostring();
 			if (tag.size())
@@ -123,7 +123,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			}
 			else
 			{
-				if (itr->type() == types::VariantStruct::array_ && !ctx.flag( Context::SerializeWithIndices))
+				if (itr->type() == types::VariantStruct::Array && !ctx.flag( Context::SerializeWithIndices))
 				{
 					types::VariantConst elem( di->name);
 					stk.back().state( ++idx);
@@ -204,28 +204,28 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	{
 		switch (stk.back().value()->type())
 		{
-			case types::VariantStruct::null_:
-			case types::VariantStruct::bool_:
-			case types::VariantStruct::double_:
-			case types::VariantStruct::int_:
-			case types::VariantStruct::uint_:
-			case types::VariantStruct::string_:
+			case types::VariantStruct::Null:
+			case types::VariantStruct::Bool:
+			case types::VariantStruct::Double:
+			case types::VariantStruct::Int:
+			case types::VariantStruct::UInt:
+			case types::VariantStruct::String:
 			{
 				return fetchAtom( ctx, stk);
 			}
-			case types::VariantStruct::struct_:
+			case types::VariantStruct::Struct:
 			{
 				return fetchStruct( ctx, stk);
 			}
-			case types::VariantStruct::indirection_:
+			case types::VariantStruct::Indirection:
 			{
 				return false;
 			}
-			case types::VariantStruct::unresolved_:
+			case types::VariantStruct::Unresolved:
 			{
 				return false;
 			}
-			case types::VariantStruct::array_:
+			case types::VariantStruct::Array:
 			{
 				return fetchVector( ctx, stk);
 			}

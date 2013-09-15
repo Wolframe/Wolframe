@@ -39,9 +39,9 @@ using namespace langbind;
 
 types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {
-	if (inp.type() == types::Variant::int_)
+	if (inp.type() == types::Variant::Int)
 	{
-		types::Variant::Data::Int_ val = inp.toint();
+		types::Variant::Data::Int val = inp.toint();
 		if (val < 0)
 		{
 			if ((double)-val > m_max) throw std::runtime_error( "number out of range");
@@ -52,19 +52,19 @@ types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 		}
 		return inp;
 	}
-	if (inp.type() == types::Variant::uint_)
+	if (inp.type() == types::Variant::UInt)
 	{
-		types::Variant::Data::UInt_ val = inp.touint();
+		types::Variant::Data::UInt val = inp.touint();
 		if ((double)val > m_max) throw std::runtime_error( "number out of range");
 		return inp;
 	}
-	if (inp.type() == types::Variant::double_)
+	if (inp.type() == types::Variant::Double)
 	{
 		double val = inp.todouble();
 		if (val > m_max) throw std::runtime_error( "number out of range");
 		return inp;
 	}
-	if (inp.type() != types::Variant::string_)
+	if (inp.type() != types::Variant::String)
 	{
 		double val = inp.todouble();
 		if (val > m_max) throw std::runtime_error( "number out of range");

@@ -584,19 +584,19 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 	unsigned int val_uint;
 	switch (val.type())
 	{
-		case types::Variant::null_:
+		case types::Variant::Null:
 			lua_pushnil( ls);
 			break;
 
-		case types::Variant::bool_:
+		case types::Variant::Bool:
 			lua_pushboolean( ls, val.tobool());
 			break;
 
-		case types::Variant::int_:
+		case types::Variant::Int:
 			lua_pushinteger( ls, val.toint());
 			break;
 
-		case types::Variant::uint_:
+		case types::Variant::UInt:
 			val_uint = val.touint();
 			if (val_uint > (unsigned int)std::numeric_limits<int>::max())
 			{
@@ -608,11 +608,11 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 			}
 			break;
 
-		case types::Variant::double_:
+		case types::Variant::Double:
 			lua_pushnumber( ls, val.todouble());
 			break;
 
-		case types::Variant::string_:
+		case types::Variant::String:
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{

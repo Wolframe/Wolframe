@@ -124,22 +124,22 @@ static void push_element( lua_State* ls, const types::VariantConst& element)
 {
 	switch (element.type())
 	{
-		case types::Variant::null_:
+		case types::Variant::Null:
 			lua_pushnil( ls);
 			break;
-		case types::Variant::bool_:
+		case types::Variant::Bool:
 			lua_pushboolean( ls, element.tobool());
 			break;
-		case types::Variant::double_:
+		case types::Variant::Double:
 			lua_pushnumber( ls, (lua_Number)element.todouble());
 			break;
-		case types::Variant::int_:
+		case types::Variant::Int:
 			lua_pushinteger( ls, (lua_Integer)element.toint());
 			break;
-		case types::Variant::uint_:
+		case types::Variant::UInt:
 			lua_pushinteger( ls, (lua_Integer)element.touint());
 			break;
-		case types::Variant::string_:
+		case types::Variant::String:
 			lua_pushlstring( ls, element.charptr(), element.charsize());
 			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			break;

@@ -59,9 +59,9 @@ TEST( variantTypeFixture, casts )
 {
 	string s = "47";
 	Variant v( s );
-	v.convert( Variant::string_ );
+	v.convert( Variant::String );
 	ASSERT_EQ( "47", v.tostring( ) );
-	v.convert( Variant::uint_ );
+	v.convert( Variant::UInt );
 	ASSERT_EQ( 47, v.touint( ) );
 }
 
@@ -70,7 +70,7 @@ TEST( variantTypeFixture, uint32 )
 	unsigned int i = 47;
 	Variant v( i );
 	ASSERT_EQ( i, v.toint( ) );
-	v.convert( Variant::string_ );
+	v.convert( Variant::String );
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
@@ -79,8 +79,8 @@ TEST( variantTypeFixture, uint64 )
 	boost::uint64_t i = UINT64_C( 18446744073709551615 ); // 2^64-1
 	Variant v( i );
 	ASSERT_EQ( i, v.touint( ) );
-	v.convert( Variant::string_ );
-	ASSERT_EQ( "18446744073709551615", v.tostring( ) );	
+	v.convert( Variant::String );
+	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
 }
 
 TEST( variantTypeFixture, initialized )

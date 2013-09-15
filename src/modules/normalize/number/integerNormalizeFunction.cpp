@@ -39,58 +39,58 @@ using namespace langbind;
 
 types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) const
 {
-	typedef types::Variant::Data::UInt_ UInt_;
-	typedef types::Variant::Data::Int_ Int_;
+	typedef types::Variant::Data::UInt UInt;
+	typedef types::Variant::Data::Int Int;
 	bool do_convert = true;
 	bool isSigned = false;
 
-	if (inp.type() == types::Variant::int_)
+	if (inp.type() == types::Variant::Int)
 	{
-		Int_ val = inp.toint();
+		Int val = inp.toint();
 		if (val < 0)
 		{
-			if ((types::Variant::Data::UInt_)-val > m_max) throw std::runtime_error( "number out of range");
+			if ((UInt)-val > m_max) throw std::runtime_error( "number out of range");
 		}
 		else
 		{
-			if ((types::Variant::Data::UInt_)val > m_max) throw std::runtime_error( "number out of range");
+			if ((UInt)val > m_max) throw std::runtime_error( "number out of range");
 		}
 		return inp;
 	}
-	if (inp.type() == types::Variant::uint_)
+	if (inp.type() == types::Variant::UInt)
 	{
-		UInt_ val = inp.touint();
+		UInt val = inp.touint();
 		if (val > m_max) throw std::runtime_error( "number out of range");
 		return inp;
 	}
-	if (inp.type() == types::Variant::bool_)
+	if (inp.type() == types::Variant::Bool)
 	{
-		UInt_ val = inp.touint();
+		UInt val = inp.touint();
 		if (val > m_max) throw std::runtime_error( "number out of range");
 		return inp;
 	}
-	if (inp.type() == types::Variant::double_)
+	if (inp.type() == types::Variant::Double)
 	{
-		Int_ val = inp.toint();
+		Int val = inp.toint();
 		if (val < 0)
 		{
-			if ((types::Variant::Data::UInt_)-val >= m_max) throw std::runtime_error( "number out of range");
+			if ((UInt)-val >= m_max) throw std::runtime_error( "number out of range");
 		}
 		else
 		{
-			if ((types::Variant::Data::UInt_)val >= m_max) throw std::runtime_error( "number out of range");
+			if ((UInt)val >= m_max) throw std::runtime_error( "number out of range");
 		}
 		return inp;
 	}
-	if (inp.type() != types::Variant::string_)
+	if (inp.type() != types::Variant::String)
 	{
-		UInt_ val = inp.touint();
+		UInt val = inp.touint();
 		if (val >= m_max) throw std::runtime_error( "number out of range");
 		return val;
 	}
 	std::string str( inp.tostring());
 
-	UInt_ val = 0, pval = 0;
+	UInt val = 0, pval = 0;
 	std::string::const_iterator ii = str.begin(), ee = str.end();
 	std::size_t cnt = m_size;
 	if (m_sign)
@@ -116,13 +116,13 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 	{
 		if (isSigned)
 		{
-			if (val > (UInt_)std::numeric_limits<Int_>::max())
+			if (val > (UInt)std::numeric_limits<Int>::max())
 			{
 				return str;
 			}
 			else
 			{
-				return types::Variant( (Int_)( val));
+				return types::Variant( (Int)( val));
 			}
 		}
 		else

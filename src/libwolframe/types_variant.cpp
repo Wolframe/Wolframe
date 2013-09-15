@@ -18,12 +18,12 @@ void Variant::init( Type type_)
 	m_type = type_;
 	switch (m_type)
 	{
-		case null_:
-		case int_:
-		case uint_:
-		case bool_: return;
-		case double_: m_data.value.double_ = 0.0; return;
-		case string_: m_data.value.string_ = strinit; setConstant(); return;
+		case Null:
+		case Int:
+		case UInt:
+		case Bool: return;
+		case Double: m_data.value.Double = 0.0; return;
+		case String: m_data.value.String = strinit; setConstant(); return;
 	}
 	throw std::logic_error( "invalid initialzation of atomic type (from structure)");
 }
@@ -37,9 +37,9 @@ void Variant::release()
 {
 	if (!constant())
 	{
-		if (m_type == string_ && m_data.value.string_)
+		if (m_type == String && m_data.value.String)
 		{
-			wolframe_free( m_data.value.string_);
+			wolframe_free( m_data.value.String);
 			std::memset( this, 0, sizeof( *this));
 		}
 		else if (!atomic())
@@ -53,9 +53,9 @@ void Variant::initConstant( const char* o, std::size_t l)
 {
 	bool init_ = initialized();
 	release();
-	init( string_);
+	init( String);
 	m_data.dim.size = l;
-	m_data.value.string_ = const_cast<char*>(o);
+	m_data.value.String = const_cast<char*>(o);
 	setInitialized(init_);
 	setConstant();
 }
@@ -63,19 +63,19 @@ void Variant::initConstant( const char* o, std::size_t l)
 void Variant::initString( const char* str_, std::size_t strsize_)
 {
 	std::memset( this, 0, sizeof( *this));
-	m_type = string_;
+	m_type = String;
 	m_data.dim.size = strsize_;
-	m_data.value.string_ = (char*)wolframe_malloc( strsize_+1);
-	if (!m_data.value.string_) throw std::bad_alloc();
-	std::memcpy( m_data.value.string_, str_, strsize_);
-	m_data.value.string_[ strsize_] = 0;
+	m_data.value.String = (char*)wolframe_malloc( strsize_+1);
+	if (!m_data.value.String) throw std::bad_alloc();
+	std::memcpy( m_data.value.String, str_, strsize_);
+	m_data.value.String[ strsize_] = 0;
 }
 
 void Variant::initCopy( const Variant& o)
 {
-	if (o.m_type == string_)
+	if (o.m_type == String)
 	{
-		initString( o.m_data.value.string_, o.m_data.dim.size);
+		initString( o.m_data.value.String, o.m_data.dim.size);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())
@@ -117,23 +117,23 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 {
 	switch (type)
 	{
-		case Variant::null_:
+		case Variant::Null:
 		{
 			int cmp = std::memcmp( &d1, &d2, sizeof(d1));
 			return (cmp < 0)?-1:((cmp==0)?0:+1);
 		}
-		case Variant::bool_:	return compare_int( (int)d1.value.bool_, (int)d2.value.bool_);
-		case Variant::double_:	return compare_double( d1.value.double_, d2.value.double_);
-		case Variant::int_:	return compare_int( d1.value.int_, d2.value.int_);
-		case Variant::uint_:	return compare_int( d1.value.uint_, d2.value.uint_);
-		case Variant::string_:
+		case Variant::Bool:	return compare_int( (int)d1.value.Bool, (int)d2.value.Bool);
+		case Variant::Double:	return compare_double( d1.value.Double, d2.value.Double);
+		case Variant::Int:	return compare_int( d1.value.Int, d2.value.Int);
+		case Variant::UInt:	return compare_int( d1.value.UInt, d2.value.UInt);
+		case Variant::String:
 			if (d1.dim.size != d2.dim.size)
 			{
 				return (d1.dim.size < d2.dim.size)?-1:+1;
 			}
 			else
 			{
-				return std::memcmp( d1.value.string_, d2.value.string_, d2.dim.size);
+				return std::memcmp( d1.value.String, d2.value.String, d2.dim.size);
 			}
 	}
 	return -2;
@@ -143,19 +143,19 @@ static boost::uint64_t variant2uint_cast( const Variant& o)
 {
 	switch (o.type())
 	{
-		case Variant::null_:
+		case Variant::Null:
 			throw boost::bad_lexical_cast();
-		case Variant::bool_:
-			return o.data().value.bool_?1:0;
-		case Variant::double_:
-			return boost::numeric_cast<double>( o.data().value.double_);
-		case Variant::int_:
-			if (o.data().value.int_ < 0) throw boost::bad_lexical_cast();
-			return o.data().value.int_;
-		case Variant::uint_:
-			return o.data().value.uint_;
-		case Variant::string_:
-			return utils::touint_cast( std::string( o.data().value.string_));
+		case Variant::Bool:
+			return o.data().value.Bool?1:0;
+		case Variant::Double:
+			return boost::numeric_cast<double>( o.data().value.Double);
+		case Variant::Int:
+			if (o.data().value.Int < 0) throw boost::bad_lexical_cast();
+			return o.data().value.Int;
+		case Variant::UInt:
+			return o.data().value.UInt;
+		case Variant::String:
+			return utils::touint_cast( std::string( o.data().value.String));
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -164,19 +164,19 @@ static boost::int64_t variant2int_cast( const Variant& o)
 {
 	switch (o.type())
 	{
-		case Variant::null_:
+		case Variant::Null:
 			throw boost::bad_lexical_cast();
-		case Variant::bool_:
-			return o.data().value.bool_?1:0;
-		case Variant::double_:
-			return boost::numeric_cast<double>( o.data().value.double_);
-		case Variant::int_:
-			return o.data().value.int_;
-		case Variant::uint_:
-			if (o.data().value.uint_ > (Variant::Data::UInt_)std::numeric_limits<Variant::Data::Int_>::max()) throw boost::bad_lexical_cast();
-			return o.data().value.uint_;
-		case Variant::string_:
-			return utils::toint_cast( std::string( o.data().value.string_));
+		case Variant::Bool:
+			return o.data().value.Bool?1:0;
+		case Variant::Double:
+			return boost::numeric_cast<double>( o.data().value.Double);
+		case Variant::Int:
+			return o.data().value.Int;
+		case Variant::UInt:
+			if (o.data().value.UInt > (Variant::Data::UInt)std::numeric_limits<Variant::Data::Int>::max()) throw boost::bad_lexical_cast();
+			return o.data().value.UInt;
+		case Variant::String:
+			return utils::toint_cast( std::string( o.data().value.String));
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -186,18 +186,18 @@ static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type
 {
 	switch (o.type())
 	{
-		case Variant::null_:
+		case Variant::Null:
 			throw boost::bad_lexical_cast();
-		case Variant::bool_:
-			return boost::numeric_cast<TYPE>( o.data().value.bool_);
-		case Variant::double_:
-			return boost::numeric_cast<TYPE>( o.data().value.double_);
-		case Variant::int_:
-			return boost::numeric_cast<TYPE>( o.data().value.int_);
-		case Variant::uint_:
-			return boost::numeric_cast<TYPE>( o.data().value.uint_);
-		case Variant::string_:
-			return boost::lexical_cast<TYPE>( std::string( o.data().value.string_));
+		case Variant::Bool:
+			return boost::numeric_cast<TYPE>( o.data().value.Bool);
+		case Variant::Double:
+			return boost::numeric_cast<TYPE>( o.data().value.Double);
+		case Variant::Int:
+			return boost::numeric_cast<TYPE>( o.data().value.Int);
+		case Variant::UInt:
+			return boost::numeric_cast<TYPE>( o.data().value.UInt);
+		case Variant::String:
+			return boost::lexical_cast<TYPE>( std::string( o.data().value.String));
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -207,18 +207,18 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 {
 	switch (o.type())
 	{
-		case Variant::null_:
+		case Variant::Null:
 			return std::string();
-		case Variant::bool_:
-			return o.data().value.bool_?"true":"false";
-		case Variant::double_:
-			return boost::lexical_cast<std::string>( o.data().value.double_);
-		case Variant::int_:
-			return utils::tostring_cast( o.data().value.int_);
-		case Variant::uint_:
-			return utils::tostring_cast( o.data().value.uint_);
-		case Variant::string_:
-			return std::string( o.data().value.string_, o.data().dim.size);
+		case Variant::Bool:
+			return o.data().value.Bool?"true":"false";
+		case Variant::Double:
+			return boost::lexical_cast<std::string>( o.data().value.Double);
+		case Variant::Int:
+			return utils::tostring_cast( o.data().value.Int);
+		case Variant::UInt:
+			return utils::tostring_cast( o.data().value.UInt);
+		case Variant::String:
+			return std::string( o.data().value.String, o.data().dim.size);
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -237,18 +237,18 @@ int Variant::compare( const Variant& o) const
 	{
 		switch (m_type)
 		{
-			case Variant::null_:
+			case Variant::Null:
 				return -1;
-			case Variant::double_:
-				return compare_double( variant_cast<double>( o), m_data.value.double_);
-			case Variant::int_:
-				if (o.type() == uint_ && o.m_data.value.uint_ > (Data::UInt_)std::numeric_limits<Data::Int_>::max()) return -1;
-				return compare_int( variant_cast<Data::Int_>( o), m_data.value.int_);
-			case Variant::uint_:
-				return compare_int( variant_cast<Data::UInt_>( o), m_data.value.uint_);
-			case Variant::bool_:
-				return compare_bool( variant_cast<bool>( o), m_data.value.bool_);
-			case Variant::string_:
+			case Variant::Double:
+				return compare_double( variant_cast<double>( o), m_data.value.Double);
+			case Variant::Int:
+				if (o.type() == UInt && o.m_data.value.UInt > (Data::UInt)std::numeric_limits<Data::Int>::max()) return -1;
+				return compare_int( variant_cast<Data::Int>( o), m_data.value.Int);
+			case Variant::UInt:
+				return compare_int( variant_cast<Data::UInt>( o), m_data.value.UInt);
+			case Variant::Bool:
+				return compare_bool( variant_cast<bool>( o), m_data.value.Bool);
+			case Variant::String:
 				throw std::logic_error("illegal state in Variant::compare (string has lowest order)");
 		}
 	}
@@ -282,12 +282,12 @@ bool Variant::tobool() const
 	return variant_cast<bool>( *this);
 }
 
-Variant::Data::Int_ Variant::toint() const
+Variant::Data::Int Variant::toint() const
 {
 	return variant2int_cast( *this);
 }
 
-Variant::Data::UInt_ Variant::touint() const
+Variant::Data::UInt Variant::touint() const
 {
 	return variant2uint_cast( *this);
 }
@@ -297,12 +297,12 @@ void Variant::convert( Type type_)
 	if (m_type == type_) return;
 	switch (type_)
 	{
-		case null_: release(); init(); return;
-		case bool_: *this = tobool(); return;
-		case int_: *this = toint(); return;
-		case uint_: *this = touint(); return;
-		case double_: *this = todouble(); return;
-		case string_: *this = tostring(); return;
+		case Null: release(); init(); return;
+		case Bool: *this = tobool(); return;
+		case Int: *this = toint(); return;
+		case UInt: *this = touint(); return;
+		case Double: *this = todouble(); return;
+		case String: *this = tostring(); return;
 	}
 	throw std::runtime_error( "illegal conversion of atomic type");
 }

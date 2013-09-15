@@ -262,7 +262,7 @@ TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::NodeVisitor rt = createChildNode( nv);
 	Node* nd = node( rt);
 
-	if (tag.type() == types::Variant::string_)
+	if (tag.type() == types::Variant::String)
 	{
 		std::string tagstr( tag.tostring());
 		nd->m_tag = (int)m_tagmap->find( tagstr);

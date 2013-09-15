@@ -147,7 +147,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 	if (found)
 	{
 		std::size_t colidx;
-		if (reference.type() == types::Variant::string_)
+		if (reference.type() == types::Variant::String)
 		{
 			colidx = resolveColumnName( *fi, reference.tostring());
 		}
@@ -529,7 +529,7 @@ bool TransactionFunctionOutput::Impl::getNext( ElementType& type, types::Variant
 						{
 							element = m_resitr->columnName( m_colidx).c_str() + m_group.size();
 						}
-						if (element.type() == types::Variant::string_ && element.charsize() == 0)
+						if (element.type() == types::Variant::String && element.charsize() == 0)
 						{
 							//... untagged content value (column name '_')
 							type = langbind::TypedInputFilter::Value;

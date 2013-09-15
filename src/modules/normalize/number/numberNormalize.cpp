@@ -92,10 +92,10 @@ static std::size_t parseIntegerDescription( std::string::const_iterator& ii, con
 	return rt;
 }
 
-static types::Variant::Data::UInt_ getMax( std::size_t digits)
+static types::Variant::Data::UInt getMax( std::size_t digits)
 {
-	typedef types::Variant::Data::UInt_ UInt_;
-	UInt_ mm = 1, pp = 1;
+	typedef types::Variant::Data::UInt UInt;
+	UInt mm = 1, pp = 1;
 	std::size_t dd = 0;
 	for (; dd < digits; ++dd)
 	{
@@ -109,7 +109,7 @@ static types::Variant::Data::UInt_ getMax( std::size_t digits)
 	}
 	else
 	{
-		return std::numeric_limits<UInt_>::max();
+		return std::numeric_limits<UInt>::max();
 	}
 }
 
@@ -121,9 +121,9 @@ types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( Re
 		std::string type = boost::algorithm::to_lower_copy( name);
 		if (boost::algorithm::iequals( type, "integer"))
 		{
-			typedef types::Variant::Data::UInt_ UInt_;
+			typedef types::Variant::Data::UInt UInt;
 			std::size_t dim;
-			types::Variant::Data::UInt_ maxval;
+			UInt maxval;
 
 			if (utils::gotoNextToken( ii, ee))
 			{
@@ -133,15 +133,15 @@ types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( Re
 			else
 			{
 				dim = std::numeric_limits<std::size_t>::max();
-				maxval = std::numeric_limits<UInt_>::max();
+				maxval = std::numeric_limits<UInt>::max();
 			}
 			return new IntegerNormalizeFunction( true, dim, maxval);
 		}
 		else if (boost::algorithm::iequals( type, "unsigned"))
 		{
-			typedef types::Variant::Data::UInt_ UInt_;
+			typedef types::Variant::Data::UInt UInt;
 			std::size_t dim;
-			types::Variant::Data::UInt_ maxval;
+			UInt maxval;
 
 			if (utils::gotoNextToken( ii, ee))
 			{
@@ -151,7 +151,7 @@ types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( Re
 			else
 			{
 				dim = std::numeric_limits<std::size_t>::max();
-				maxval = std::numeric_limits<UInt_>::max();
+				maxval = std::numeric_limits<UInt>::max();
 			}
 			return new IntegerNormalizeFunction( false, dim, maxval);
 		}

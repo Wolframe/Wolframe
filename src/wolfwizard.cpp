@@ -65,9 +65,9 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 
 	switch (st.type())
 	{
-		case types::VariantStruct::null_:
+		case types::VariantStruct::Null:
 			break;
-		case types::VariantStruct::unresolved_:
+		case types::VariantStruct::Unresolved:
 		{
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
@@ -76,11 +76,11 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 			out << " symbol='" << st.unresolvedName() << "'/>" << std::endl;
 			break;
 		}
-		case types::VariantStruct::bool_:
-		case types::VariantStruct::double_:
-		case types::VariantStruct::int_:
-		case types::VariantStruct::uint_:
-		case types::VariantStruct::string_:
+		case types::VariantStruct::Bool:
+		case types::VariantStruct::Double:
+		case types::VariantStruct::Int:
+		case types::VariantStruct::UInt:
+		case types::VariantStruct::String:
 		{
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
@@ -90,7 +90,7 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 			out << addressing << status << "/>" << std::endl;
 			break;
 		}
-		case types::VariantStruct::array_:
+		case types::VariantStruct::Array:
 		{
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
@@ -100,7 +100,7 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 			out << indent << "</element>" << std::endl;
 			break;
 		}
-		case types::VariantStruct::struct_:
+		case types::VariantStruct::Struct:
 		{
 			if (name)
 			{
@@ -119,7 +119,7 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 			if (name) out << indent << "</element>" << std::endl;
 			break;
 		}
-		case types::VariantStruct::indirection_:
+		case types::VariantStruct::Indirection:
 			out << indent << "<element";
 			if (name) out << " name='" << name << "'";
 			out << " class='indirection'";

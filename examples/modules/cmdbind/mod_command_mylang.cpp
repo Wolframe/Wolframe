@@ -58,7 +58,7 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 	createMylangProgramType
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for mylang",
+ModuleEntryPoint entryPoint( 0, "form function handler for mylang",
 				setModuleLogger,
 				NofConfiguredBuilder, 0,
 				NofSimpleBuilder, simpleBuilder);

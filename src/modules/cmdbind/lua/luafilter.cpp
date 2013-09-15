@@ -128,7 +128,7 @@ static bool getElementValue( lua_State* ls, int idx, types::VariantConst& elemen
 			double flo = std::floor( num);
 			if (num - flo <= std::numeric_limits<double>::epsilon())
 			{
-				element = boost::numeric_cast<types::Variant::Data::Int_>(num);
+				element = boost::numeric_cast<types::Variant::Data::Int>(num);
 			}
 			else
 			{
@@ -315,7 +315,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 			case FetchState::TableIterOpen:
 				if (!getValue( -2, element)) return false;
-				if (element.type() == types::Variant::string_ && element.charsize() == 0)
+				if (element.type() == types::Variant::String && element.charsize() == 0)
 				{
 					m_stk.back().id = FetchState::TableIterValueNoTag;
 					continue;
@@ -396,22 +396,22 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 {
 	switch (element.type())
 	{
-		case types::Variant::null_:
+		case types::Variant::Null:
 			wrap_lua_pushnil( m_ls);
 			return true;
-		case types::Variant::bool_:
+		case types::Variant::Bool:
 			wrap_lua_pushboolean( m_ls, element.tobool());
 			return true;
-		case types::Variant::double_:
+		case types::Variant::Double:
 			wrap_lua_pushnumber( m_ls, (lua_Number)element.todouble());
 			return true;
-		case types::Variant::int_:
+		case types::Variant::Int:
 			wrap_lua_pushinteger( m_ls, (lua_Integer)element.toint());
 			return true;
-		case types::Variant::uint_:
+		case types::Variant::UInt:
 			wrap_lua_pushinteger( m_ls, (lua_Integer)element.touint());
 			return true;
-		case types::Variant::string_:
+		case types::Variant::String:
 			wrap_lua_pushlstring( m_ls, element.charptr(), element.charsize());
 			wrap_lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;

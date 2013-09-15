@@ -44,7 +44,7 @@ using namespace serialize;
 
 static bool emptycontent( const types::VariantConst& val)
 {
-	if (val.type() != types::Variant::string_) return false;
+	if (val.type() != types::Variant::String) return false;
 	std::size_t ii = 0, nn = val.charsize();
 	const char* cc = val.charptr();
 
@@ -190,7 +190,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			types::VariantStruct* elem = st.at( idx);
 			types::VariantStruct::Type type = elem->type();
 
-			if (type != types::VariantStruct::array_ && elem->initialized())
+			if (type != types::VariantStruct::Array && elem->initialized())
 			{
 				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
@@ -260,23 +260,23 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 
 			switch (elem->type())
 			{
-				case types::VariantStruct::null_:
+				case types::VariantStruct::Null:
 					throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
 
-				case types::VariantStruct::bool_:
-				case types::VariantStruct::double_:
-				case types::VariantStruct::int_:
-				case types::VariantStruct::uint_:
-				case types::VariantStruct::string_:
+				case types::VariantStruct::Bool:
+				case types::VariantStruct::Double:
+				case types::VariantStruct::Int:
+				case types::VariantStruct::UInt:
+				case types::VariantStruct::String:
 					setAtomValue( *elem, element, stk.back().normalizer());
 					return true;
 
-				case types::VariantStruct::struct_:
-				case types::VariantStruct::indirection_:
-				case types::VariantStruct::unresolved_:
+				case types::VariantStruct::Struct:
+				case types::VariantStruct::Indirection:
+				case types::VariantStruct::Unresolved:
 					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 
-				case types::VariantStruct::array_:
+				case types::VariantStruct::Array:
 					if (elem->prototype()->atomic())
 					{
 						elem->push();
@@ -323,36 +323,36 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 	types::VariantStruct* elem = stk.back().value();
 	switch (elem->type())
 	{
-		case types::VariantStruct::null_:
+		case types::VariantStruct::Null:
 			throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
 
-		case types::VariantStruct::bool_:
-		case types::VariantStruct::double_:
-		case types::VariantStruct::int_:
-		case types::VariantStruct::uint_:
-		case types::VariantStruct::string_:
+		case types::VariantStruct::Bool:
+		case types::VariantStruct::Double:
+		case types::VariantStruct::Int:
+		case types::VariantStruct::UInt:
+		case types::VariantStruct::String:
 		{
 			return parseAtom( *stk.back().value(), inp, ctx, stk);
 		}
-		case types::VariantStruct::struct_:
+		case types::VariantStruct::Struct:
 		{
 			return parseStruct( *stk.back().value(), inp, ctx, stk);
 		}
-		case types::VariantStruct::unresolved_:
+		case types::VariantStruct::Unresolved:
 		{
 			throw SerializationErrorException( "incomplete structure definition (unresolved indirection)", getElementPath( stk));
 		}
-		case types::VariantStruct::indirection_:
+		case types::VariantStruct::Indirection:
 		{
 			types::VariantStruct* st = stk.back().value();
 			st->expandIndirection();
-			if (st->type() == types::VariantStruct::indirection_)
+			if (st->type() == types::VariantStruct::Indirection)
 			{
 				throw SerializationErrorException( "indirection expanding to indirection", getElementPath( stk));
 			}
 			return parseObject( inp, ctx, stk);
 		}
-		case types::VariantStruct::array_:
+		case types::VariantStruct::Array:
 		{
 			stk.back().value()->push();
 			types::VariantStruct* velem = &stk.back().value()->back();

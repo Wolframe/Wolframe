@@ -81,7 +81,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 	if (found)
 	{
 		std::size_t cidx;
-		if (reference.type() == types::Variant::string_)
+		if (reference.type() == types::Variant::String)
 		{
 			cidx = resolveColumnName( *fi, reference.tostring());
 		}
@@ -117,7 +117,7 @@ static types::VariantConst resolveResultReference( const TransactionOutput::Comm
 {
 	types::VariantConst rt;
 	std::size_t cidx;
-	if (reference.type() == types::Variant::string_)
+	if (reference.type() == types::Variant::String)
 	{
 		cidx = resolveColumnName( cmdres, reference.tostring());
 	}

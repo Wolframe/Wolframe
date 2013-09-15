@@ -46,30 +46,30 @@ namespace serialize {
 ///\brief type traits for parse value types
 struct ParseValueType
 {
-	struct string_ {};		//< atomic type category tag for string value to parse
-	struct bool_ {};		//< atomic type category tag for a boolean value to parse
-	struct arithmetic_ {};		//< atomic type category tag for arithmertic value to parse
+	struct String {};		//< atomic type category tag for string value to parse
+	struct Bool {};			//< atomic type category tag for a boolean value to parse
+	struct Arithmetic {};		//< atomic type category tag for arithmertic value to parse
 
-	///\brief get category string_ for a type
-	///\return string_ if T is a std:string
+	///\brief get category String for a type
+	///\return String if T is a std:string
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,std::string>::value
-		,const string_&>::type get( const T&) { static string_ rt; return rt;}
+		,const String&>::type get( const T&) { static String rt; return rt;}
 
-	///\brief get category bool_ for a type
-	///\return bool_ if T is a bool
+	///\brief get category Bool for a type
+	///\return Bool if T is a bool
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,bool>::value
-		,const bool_&>::type get( const T&) { static bool_ rt; return rt;}
+		,const Bool&>::type get( const T&) { static Bool rt; return rt;}
 
-	///\brief get category arithmetic_ for a type
-	///\return bool_ if T is a arithmetic but not a bool
+	///\brief get category Arithmetic for a type
+	///\return Bool if T is a arithmetic but not a bool
 	template <typename T>
 	static typename boost::enable_if_c<
 		(boost::is_arithmetic<T>::value && !boost::is_same<T,bool>::value && !boost::is_same<T,std::string>::value)
-		,const arithmetic_&>::type get( const T&) { static arithmetic_ rt; return rt;}
+		,const Arithmetic&>::type get( const T&) { static Arithmetic rt; return rt;}
 };
 
 
@@ -89,32 +89,32 @@ static bool getBool( bool& val, int boolnum)
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::string_&, const types::VariantConst& element)
+static bool parseValue_( ValueType& val, const ParseValueType::String&, const types::VariantConst& element)
 {
 	try
 	{
 		switch (element.type())
 		{
-			case types::Variant::null_:
+			case types::Variant::Null:
 				return false;
 
-			case types::Variant::bool_:
+			case types::Variant::Bool:
 				val = (element.tobool())?"true":"false";
 				return true;
 
-			case types::Variant::double_:
+			case types::Variant::Double:
 				val = boost::lexical_cast<ValueType>( element.todouble());
 				return true;
 
-			case types::Variant::int_:
+			case types::Variant::Int:
 				val = boost::lexical_cast<ValueType>( element.toint());
 				return true;
 
-			case types::Variant::uint_:
+			case types::Variant::UInt:
 				val = boost::lexical_cast<ValueType>( element.touint());
 				return true;
 
-			case types::Variant::string_:
+			case types::Variant::String:
 				val.clear();
 				val.append( element.charptr(), element.charsize());
 				return true;
@@ -128,29 +128,29 @@ static bool parseValue_( ValueType& val, const ParseValueType::string_&, const t
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const types::VariantConst& element)
+static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const types::VariantConst& element)
 {
 	try
 	{
 		switch (element.type())
 		{
-			case types::Variant::null_:
+			case types::Variant::Null:
 				return false;
 
-			case types::Variant::bool_:
+			case types::Variant::Bool:
 				val = element.tobool();
 				return true;
 
-			case types::Variant::double_:
+			case types::Variant::Double:
 				return getBool( val, boost::numeric_cast<int>( element.todouble()));
 
-			case types::Variant::int_:
+			case types::Variant::Int:
 				return getBool( val, boost::numeric_cast<ValueType>( element.toint()));
 
-			case types::Variant::uint_:
+			case types::Variant::UInt:
 				return getBool( val, boost::numeric_cast<ValueType>( element.touint()));
 
-			case types::Variant::string_:
+			case types::Variant::String:
 				if (element.charsize() == 4 && std::memcmp( element.charptr(), "true", 4) == 0)
 				{
 					val = true;
@@ -171,32 +171,32 @@ static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const typ
 }
 
 template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, const types::VariantConst& element)
+static bool parseValue_( ValueType& val, const ParseValueType::Arithmetic&, const types::VariantConst& element)
 {
 	try
 	{
 		switch (element.type())
 		{
-			case types::Variant::null_:
+			case types::Variant::Null:
 				return false;
 
-			case types::Variant::bool_:
+			case types::Variant::Bool:
 				val = boost::numeric_cast<ValueType>( element.tobool());
 				return true;
 
-			case types::Variant::double_:
+			case types::Variant::Double:
 				val = boost::numeric_cast<ValueType>( element.todouble());
 				return true;
 
-			case types::Variant::int_:
+			case types::Variant::Int:
 				val = boost::numeric_cast<ValueType>( element.toint());
 				return true;
 
-			case types::Variant::uint_:
+			case types::Variant::UInt:
 				val = boost::numeric_cast<ValueType>( element.touint());
 				return true;
 
-			case types::Variant::string_:
+			case types::Variant::String:
 				val = boost::lexical_cast<ValueType>( element.tostring());
 				return true;
 		}

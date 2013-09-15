@@ -303,14 +303,14 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 	}
 	switch (value.type())
 	{
-		case types::Variant::null_:
+		case types::Variant::Null:
 			return status( wrap_sqlite3_bind_null( m_stm, (int)idx), Prepared);
-		case types::Variant::bool_:
+		case types::Variant::Bool:
 			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool()), Prepared);
-		case types::Variant::int_:
+		case types::Variant::Int:
 			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), Prepared);
-		case types::Variant::uint_:
-			if (value.touint() < (types::Variant::Data::UInt_)( std::numeric_limits<int64_t>::max() ))
+		case types::Variant::UInt:
+			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
 			{
 				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), Prepared);
 			}
@@ -319,9 +319,9 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 				std::string strval( value.tostring());
 				return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), Prepared);
 			}
-		case types::Variant::double_:
+		case types::Variant::Double:
 			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), Prepared);
-		case types::Variant::string_:
+		case types::Variant::String:
 			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), Prepared);
 	}
 	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
@@ -401,7 +401,7 @@ types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
 	{
 		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
 		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_INTEGER " << resval;
-		return types::VariantConst( (types::Variant::Data::Int_)resval);
+		return types::VariantConst( (types::Variant::Data::Int)resval);
 	}
 	else if (restype == SQLITE_FLOAT)
 	{

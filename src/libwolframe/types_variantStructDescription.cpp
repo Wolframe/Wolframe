@@ -469,11 +469,11 @@ static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat,
 
 void VariantStructDescription::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
 {
-	static Variant default_bool( Variant::bool_);
-	static Variant default_int( Variant::int_);
-	static Variant default_uint( Variant::uint_);
-	static Variant default_double( Variant::double_);
-	static Variant default_string( Variant::string_);
+	static Variant default_bool( Variant::Bool);
+	static Variant default_int( Variant::Int);
+	static Variant default_uint( Variant::UInt);
+	static Variant default_double( Variant::Double);
+	static Variant default_string( Variant::String);
 
 	const_iterator di = begin(), de = end();
 	for (; di!=de; ++di)
@@ -507,12 +507,12 @@ void VariantStructDescription::print( std::ostream& out, const utils::PrintForma
 				Variant::Type tp = (Variant::Type)di->initvalue->type();
 				switch (tp)
 				{
-					case Variant::null_: cmp = 0; break;
-					case Variant::bool_: cmp = di->initvalue->compare( default_bool); break;
-					case Variant::int_: cmp = di->initvalue->compare( default_int); break;
-					case Variant::uint_: cmp = di->initvalue->compare( default_uint); break;
-					case Variant::double_: cmp = di->initvalue->compare( default_double); break;
-					case Variant::string_: cmp = di->initvalue->compare( default_string); break;
+					case Variant::Null: cmp = 0; break;
+					case Variant::Bool: cmp = di->initvalue->compare( default_bool); break;
+					case Variant::Int: cmp = di->initvalue->compare( default_int); break;
+					case Variant::UInt: cmp = di->initvalue->compare( default_uint); break;
+					case Variant::Double: cmp = di->initvalue->compare( default_double); break;
+					case Variant::String: cmp = di->initvalue->compare( default_string); break;
 				}
 				if (cmp != 0)
 				{

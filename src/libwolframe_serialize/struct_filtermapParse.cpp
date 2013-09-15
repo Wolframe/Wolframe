@@ -41,7 +41,7 @@ using namespace _Wolframe::serialize;
 
 static bool emptycontent( const types::VariantConst& val)
 {
-	if (val.type() != types::Variant::string_) return false;
+	if (val.type() != types::Variant::String) return false;
 	std::size_t ii = 0, nn = val.charsize();
 	const char* cc = val.charptr();
 

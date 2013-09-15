@@ -76,11 +76,11 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 		std::string castelement;
 		switch (element.type())
 		{
-			case types::Variant::null_:
+			case types::Variant::Null:
 				rt = m_outputfilter->print( type, 0, 0);
 				break;
 
-			case types::Variant::bool_:
+			case types::Variant::Bool:
 				if (element.tobool())
 				{
 					rt = m_outputfilter->print( type, "true", 4);
@@ -92,22 +92,22 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 					break;
 				}
 
-			case types::Variant::double_:
+			case types::Variant::Double:
 				castelement = boost::lexical_cast<std::string>( element.todouble());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case types::Variant::int_:
+			case types::Variant::Int:
 				castelement = boost::lexical_cast<std::string>( element.toint());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case types::Variant::uint_:
+			case types::Variant::UInt:
 				castelement = boost::lexical_cast<std::string>( element.touint());
 				rt = m_outputfilter->print( type, castelement);
 				break;
 
-			case types::Variant::string_:
+			case types::Variant::String:
 				rt = m_outputfilter->print( type, element.charptr(), element.charsize());
 				break;
 		}

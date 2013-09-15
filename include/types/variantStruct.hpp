@@ -59,16 +59,16 @@ public:
 	///\brief Typed filter element type
 	enum Type
 	{
-		null_=Variant::null_,		//< undefined value
-		int_=Variant::int_,		//< atomic signed int
-		uint_=Variant::uint_,		//< atomic unsigned int
-		bool_=Variant::bool_,		//< atomic boolean
-		double_=Variant::double_,	//< atomic double
-		string_=Variant::string_,	//< atomic string
-		array_,				//< array of VariantStruct
-		struct_,			//< content of structure
-		indirection_,			//< pointer to structure
-		unresolved_			//< unresolved indirection
+		Null = Variant::Null,		//< undefined value
+		Int = Variant::Int,		//< atomic signed int
+		UInt = Variant::UInt,		//< atomic unsigned int
+		Bool = Variant::Bool,		//< atomic boolean
+		Double = Variant::Double,	//< atomic double
+		String = Variant::String,	//< atomic string
+		Array,				//< array of VariantStruct
+		Struct,				//< content of structure
+		Indirection,			//< pointer to structure
+		Unresolved			//< unresolved indirection
 	};
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)				{return Variant::typeName( (Variant::Type)i);}
@@ -107,29 +107,29 @@ public:
 	///\brief Get the type of the structure
 	Type type() const						{return (Type)m_type;}
 
-	///\brief Get the number of elements defined (throws for other types than struct_ or array_)
+	///\brief Get the number of elements defined (throws for other types than 'Struct' or 'Array')
 	std::size_t nof_elements() const;
 
-	///\brief Get the description of a structure (throws for other types than struct_)
-	const VariantStructDescription* description() const		{return ((Type)m_type == struct_ || (Type)m_type == indirection_) ? (const VariantStructDescription*)m_data.dim.metadata:0;}
+	///\brief Get the description of a structure (throws for other types than 'Struct')
+	const VariantStructDescription* description() const		{return ((Type)m_type == Struct || (Type)m_type == Indirection) ? (const VariantStructDescription*)m_data.dim.metadata:0;}
 	void setDescription( const VariantStructDescription* descr);
 
 	typedef std::map< const VariantStructDescription*, const VariantStructDescription*> DescriptionAssignmentMap;
 	void setIndirectionDescription( const DescriptionAssignmentMap& assignmentmap);
 
-	///\brief Return the prototype element (initialization of new element) of an array (throws for other types than array_)
-	const VariantStruct* prototype() const				{return ((Type)m_type == array_)?(const VariantStruct*)m_data.value.ref_:0;}
-	VariantStruct* prototype()					{return ((Type)m_type == array_)?(VariantStruct*)m_data.value.ref_:0;}
+	///\brief Return the prototype element (initialization of new element) of an array (throws for other types than 'Array')
+	const VariantStruct* prototype() const				{return ((Type)m_type == Array)?(const VariantStruct*)m_data.value.Ref:0;}
+	VariantStruct* prototype()					{return ((Type)m_type == Array)?(VariantStruct*)m_data.value.Ref:0;}
 
 	///\brief Return the referenced name in case of an unresolved external
-	const std::string unresolvedName() const			{if ((Type)m_type != unresolved_) throw std::logic_error("undefined access of unresolved name"); return std::string( (const char*)m_data.value.ref_, m_data.dim.size);}
+	const std::string unresolvedName() const			{if ((Type)m_type != Unresolved) throw std::logic_error("undefined access of unresolved name"); return std::string( (const char*)m_data.value.Ref, m_data.dim.size);}
 	///\brief Resolve all unresolved externals according to the given map. Throws, if not all unresolved symbols could be resolved !
 	void resolve( const ResolveMap& rmap);
 
-	///\brief Expands an Indirection (throws for other types than indirection_)
+	///\brief Expands an Indirection (throws for other types than 'Indirection')
 	void expandIndirection();
 
-	///\brief Add a new element to an array (throws for other types than array_)
+	///\brief Add a new element to an array (throws for other types than 'Array')
 	void push();
 
 	///\brief Gets the value of the structure as string
@@ -283,11 +283,11 @@ class VariantStructConst :public VariantStruct
 	VariantStructConst( const Variant& o)			:VariantStruct(){Variant::initConstCopy( o);}
 	VariantStructConst( const VariantStruct& o)		:VariantStruct(){initConstCopy( o);}
 	VariantStructConst( const VariantStructConst& o)	:VariantStruct(){initConstCopy( o);}
-	VariantStructConst( bool o)				:VariantStruct(bool_){m_data.value.bool_ = o; setConstant(); }
-	VariantStructConst( double o)				:VariantStruct(double_){m_data.value.double_ = o; setConstant(); }
-	VariantStructConst( float o)				:VariantStruct(double_){m_data.value.double_ = (double)o; setConstant();}
-	VariantStructConst( int o)				:VariantStruct(int_){m_data.value.int_ = o; setConstant();}
-	VariantStructConst( unsigned int o)			:VariantStruct(uint_){m_data.value.uint_ = o; setConstant();}
+	VariantStructConst( bool o)				:VariantStruct(Bool){m_data.value.Bool = o; setConstant(); }
+	VariantStructConst( double o)				:VariantStruct(Double){m_data.value.Double = o; setConstant(); }
+	VariantStructConst( float o)				:VariantStruct(Double){m_data.value.Double = (double)o; setConstant();}
+	VariantStructConst( int o)				:VariantStruct(Int){m_data.value.Int = o; setConstant();}
+	VariantStructConst( unsigned int o)			:VariantStruct(UInt){m_data.value.UInt = o; setConstant();}
 	VariantStructConst( const char* o)			{initConstant( o, std::strlen(o));}
 	VariantStructConst( const char* o, std::size_t n)	{initConstant( o, n);}
 	VariantStructConst( const std::string& o)		{initConstant( o.c_str(), o.size());}
@@ -297,11 +297,11 @@ class VariantStructConst :public VariantStruct
 	///\brief Assignment operator, keeping the initialization flag of this
 	VariantStructConst& operator=( const Variant& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantStructConst& operator=( const VariantConst& o)	{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
-	VariantStructConst& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::bool_); m_data.value.bool_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantStructConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantStructConst& operator=( float o)			{bool init_=initialized(); Variant::init(Variant::double_); m_data.value.double_ = (double)o; setInitialized(init_); setConstant(); return *this;}
-	VariantStructConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::int_); m_data.value.int_ = o; setInitialized(init_); setConstant(); return *this;}
-	VariantStructConst& operator=( unsigned int o)		{bool init_=initialized(); Variant::init(Variant::uint_); m_data.value.uint_ = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::Bool); m_data.value.Bool = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::Double); m_data.value.Double = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( float o)			{bool init_=initialized(); Variant::init(Variant::Double); m_data.value.Double = (double)o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::Int); m_data.value.Int = o; setInitialized(init_); setConstant(); return *this;}
+	VariantStructConst& operator=( unsigned int o)		{bool init_=initialized(); Variant::init(Variant::UInt); m_data.value.UInt = o; setInitialized(init_); setConstant(); return *this;}
 	VariantStructConst& operator=( const char* o)		{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantStructConst& operator=( const std::string& o)	{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
