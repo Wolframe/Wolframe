@@ -22,7 +22,9 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_mylang.so
 
 CPP_OBJS = \
-	mylangFunctionCall.o \
+	mylangInterpreterInstance.o \
+	mylangInterpreter.o \
+	mylangStructure.o \
 	mylangFunctionProgramType.o \
 	mod_command_mylang.o
 

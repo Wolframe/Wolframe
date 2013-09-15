@@ -29,50 +29,21 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mylangFunctionProgramType.hpp
-///\brief Function call for mylang scripts
-#ifndef _Wolframe_Mylang_FUNCTION_CALL_HPP_INCLUDED
-#define _Wolframe_Mylang_FUNCTION_CALL_HPP_INCLUDED
-#include <utility>
-#include <vector>
+///\file mylangStructure.hpp
+///\brief Interface to mylang data structure representing input/output of a mylang form function
+#ifndef _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
+#define _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
 #include "types/variant.hpp"
 #include "types/countedReference.hpp"
-#include "processor/procProvider.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 namespace mylang {
 
-///\class Instance
-///\brief Interpreter instance for executing a function
-class Instance
-{
-public:
-	///\brief Constructor
-	Instance(){}
-	///\brief Destructor
-	virtual ~Instance(){}
-
-	///\brief Find out if the language binding needs indices (starting with '1') for array elements in the input to distinguish between single elements and arrays with one element
-	///\return true, if yes
-	bool needsArrayIndices() const		{return true;}
-};
-
-typedef types::CountedReference<Instance> InstanceR;
-
-///\class Context
-///\brief Global interpreter context with all data structures needed to create interpreter instances addressed by function names
-class Context
-{
-public:
-	///\brief Constructor
-	Context();
-	///\brief Destructor
-	virtual ~Context(){}
-
-	std::vector<std::string> loadProgram( const std::string& name);
-	InstanceR getInstance( const std::string& name) const;
-};
+///\brief Formward declaration
+class InterpreterInstance;
 
 ///\class Structure
 ///\brief Data structure for input and output of a 'Mylang' function call
@@ -80,20 +51,26 @@ class Structure
 {
 public:
 	///\brief Constructor
-	explicit Structure( const InstanceR& instance_)
-		:m_instance(instance_){}
+	explicit Structure( InterpreterInstance* instance_)
+		:m_instance(instance_),m_array(false){}
 	virtual ~Structure(){}
 
-	///\brief Create a substructure and get a reference pointer to it
+	///\brief Create an element in a structure and get a reference pointer to it
 	///\param[in] elemid_ Id of the created element
 	///\remark Throws on error
 	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
-	Structure* addSubstruct( const types::Variant& elemid_);
+	Structure* addStructElement( const std::string& elemid_);
 
-	///\brief Setter for element value in case of an 'atomic' element or setter for content element in case of a structure
+	///\brief Create an element in an array and get a reference pointer to it
+	///\param[in] elemid_ Id of the array
+	///\remark Throws on error
+	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
+	Structure* addArrayElement();
+
+	///\brief Setter for element value in case of this representing an atom
 	///\param[in] value value or content element of 'this'
-	void setValue( const types::Variant& value);
-	///\brief Getter for element value in case of an 'atomic' element or getter for content element in case of a structure
+	void setValue( const types::Variant& value_);
+	///\brief Getter for element value in case of this representing an atom
 	const types::Variant& getValue() const;
 
 	///\brief Find out if 'this' represents an atomic value
@@ -104,26 +81,23 @@ public:
 	bool array() const;
 
 	///\brief Iterator on structure or array elements
-	typedef std::vector<std::pair<types::Variant,Structure*> >::const_iterator const_iterator;
+	typedef std::pair<types::Variant,Structure*> KeyValuePair;
+	typedef std::vector<KeyValuePair>::const_iterator const_iterator;
 	///\brief Get the start iterator on structure or array elements
 	const_iterator begin() const;
 	///\brief Get the end marker for a structure or and array
 	const_iterator end() const;
 
 private:
-	InstanceR m_instance;		//< interpreter instance
+	InterpreterInstance* m_instance;	//< interpreter instance
+	std::vector<KeyValuePair> m_struct;	//< mimic language structure
+	types::Variant m_value;			//< value for atomic element
+	bool m_array;				//< true, if this represents an array
 };
 
 ///\brief Reference with ownership to a structure
 typedef types::CountedReference<Structure> StructureR;
 
-///\brief Call a function written in 'Mylang'
-StructureR call( const proc::ProcessorProvider* provider, Instance* instance, const StructureR& arg);
-
-}//namespace mylang
-
-
-}} //namespace
+}}}//namespace
 #endif
-
 

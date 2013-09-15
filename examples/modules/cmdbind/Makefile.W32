@@ -15,7 +15,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
@@ -26,7 +26,9 @@ DYNAMIC_MODULE = \
 	mod_command_mylang.dll
 
 CPP_OBJS = \
-	mylangFunctionCall.obj \
+	mylangInterpreterInstance.obj \
+	mylangInterpreter.obj \
+	mylangStructure.obj \
 	mylangFunctionProgramType.obj \
 	mod_command_mylang.obj
 

@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file mylangFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for mylang scripts
 #include "mylangFunctionProgramType.hpp"
-#include "mylangFunctionCall.hpp"
+#include "mylangInterpreter.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
@@ -174,8 +174,8 @@ class MylangFormFunctionClosure
 	:public langbind::FormFunctionClosure
 {
 public:
-	MylangFormFunctionClosure( const std::string& name_, const mylang::InstanceR& interp_)
-		:m_name(name_),m_initialized(false),m_interp(interp_),m_provider(0){}
+	MylangFormFunctionClosure( const std::string& name_, const mylang::InterpreterInstanceR& instance_)
+		:m_name(name_),m_initialized(false),m_instance(instance_),m_provider(0){}
 
 	virtual ~MylangFormFunctionClosure(){}
 
@@ -242,7 +242,7 @@ public:
 			}
 			if (!m_initialized) return false;
 		}
-		m_output = mylang::call( m_provider, m_interp.get(), m_input);
+		m_output = m_instance->call( m_provider, m_input);
 		m_result.reset( new MyLangResult( m_output));
 		return true;
 	}
@@ -251,7 +251,7 @@ public:
 	{
 		m_provider = provider;
 		m_arg = arg;
-		if (m_interp->needsArrayIndices())
+		if (m_instance->needsArrayIndices())
 		{
 			if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 			{
@@ -260,7 +260,7 @@ public:
 		}
 		m_initialized = false;
 		m_initStmStack.clear();
-		m_input.reset( new mylang::Structure( m_interp));
+		m_input.reset( new mylang::Structure( m_instance.get()));
 		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
 	}
 
@@ -279,7 +279,7 @@ private:
 	types::Variant m_tagbuf;			//< buffer for attribute name to handle Attribute,Value pair
 	mylang::StructureR m_input;			//< pointer to input structure
 	mylang::StructureR m_output;			//< pointer to output structure
-	mylang::InstanceR m_interp;			//< interpreter instance
+	mylang::InterpreterInstanceR m_instance;		//< interpreter instance
 	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
 };
 
@@ -290,20 +290,20 @@ class MylangFormFunction
 	:public langbind::FormFunction
 {
 public:
-	MylangFormFunction( const mylang::Context* context_, const std::string& name_)
-		:m_context(context_),m_name(name_){}
+	MylangFormFunction( const mylang::Interpreter* interpreter_, const std::string& name_)
+		:m_interpreter(interpreter_),m_name(name_){}
 
 	virtual ~MylangFormFunction(){}
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		mylang::InstanceR interp = m_context->getInstance( m_name);
-		if (!interp.get()) return 0;
-		return new MylangFormFunctionClosure( m_name, interp);
+		mylang::InterpreterInstanceR instance = m_interpreter->getInstance( m_name);
+		if (!instance.get()) return 0;
+		return new MylangFormFunctionClosure( m_name, instance);
 	}
 
 private:
-	const mylang::Context* m_context;
+	const mylang::Interpreter* m_interpreter;
 	std::string m_name;
 };
 
@@ -326,17 +326,17 @@ public:
 
 	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
 	{
-		std::vector<std::string> funcs = m_context.loadProgram( filename);
+		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
 		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		for (; fi != fe; ++fi)
 		{
-			langbind::FormFunctionR ff( new MylangFormFunction( &m_context, *fi));
+			langbind::FormFunctionR ff( new MylangFormFunction( &m_interpreter, *fi));
 			library.defineFormFunction( *fi, ff);
 		}
 	}
 
 private:
-	mylang::Context m_context;
+	mylang::Interpreter m_interpreter;
 };
 }//anonymous namespace
 
