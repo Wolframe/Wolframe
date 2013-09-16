@@ -188,6 +188,9 @@ public:
 	///\brief Converting the value of this to a defined type
 	void convert( Type type_);
 
+	///\brief Move value from 'o' to this
+	void move( Variant& o);
+
 protected:
 	bool flags( Flags flags_) const			{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
 	void setFlags( Flags flags_, bool v=true)	{if (v) m_flags = (Flags)((unsigned char)m_flags | (unsigned char)flags_); else m_flags = (Flags)((unsigned char)m_flags - ((unsigned char)m_flags & (unsigned char)flags_));}

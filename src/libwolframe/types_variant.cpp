@@ -292,6 +292,13 @@ Variant::Data::UInt Variant::touint() const
 	return variant2uint_cast( *this);
 }
 
+void Variant::move( Variant& o)
+{
+	release();
+	std::memcpy( this, &o, sizeof(o));
+	o.init();
+}
+
 void Variant::convert( Type type_)
 {
 	if (m_type == type_) return;
