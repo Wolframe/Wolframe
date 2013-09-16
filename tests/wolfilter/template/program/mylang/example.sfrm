@@ -1,0 +1,19 @@
+FORM CDCatalog
+{
+	CATALOG
+	{
+		CD []
+		{
+			TITLE string
+			ARTIST string
+			RELEASE
+			{
+				COUNTRY string
+				COMPANY string
+				PRICE string
+				YEAR int
+			}
+		}
+	}
+}
+

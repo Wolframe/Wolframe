@@ -85,11 +85,6 @@ public:
 	///\brief Internal representation of this value
 	struct Data
 	{
-		union
-		{
-			const void* metadata;		//< unused by base variant type
-			std::size_t size;		//< size of a string
-		} dim;
 		typedef boost::int64_t Int;
 		typedef boost::uint64_t UInt;
 		union
@@ -101,6 +96,11 @@ public:
 			char* String;
 			void* Ref;
 		} value;
+		union
+		{
+			const void* metadata;		//< unused by base variant type
+			std::size_t size;		//< size of a string
+		} dim;
 	};
 	///\brief Constructor
 	Variant( Type type_)				{init(type_);}

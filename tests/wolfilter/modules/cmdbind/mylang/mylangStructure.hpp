@@ -35,8 +35,10 @@ Project Wolframe.
 #define _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
 #include "types/variant.hpp"
 #include "types/countedReference.hpp"
+#include "utils/printFormats.hpp"
 #include <vector>
 #include <string>
+#include <ostream>
 
 namespace _Wolframe {
 namespace langbind {
@@ -74,11 +76,16 @@ public:
 	const types::Variant& getValue() const;
 
 	///\brief Find out if 'this' represents an atomic value
-	///\return true, if 'this' represents an atomic value
+	///\return true, if yes
 	bool atomic() const;
 	///\brief Find out if 'this' represents an array of 'Structure'
-	///\return true, if 'this' represents an array of 'Structure'
+	///\return true, if yes
 	bool array() const;
+	///\brief Find out how many elements are defined in this structure
+	///\return the count
+
+	///\brief Get the index of the last element in case of an array
+	unsigned int lastArrayIndex() const;
 
 	///\brief Iterator on structure or array elements
 	typedef std::pair<types::Variant,Structure*> KeyValuePair;
@@ -87,6 +94,11 @@ public:
 	const_iterator begin() const;
 	///\brief Get the end marker for a structure or and array
 	const_iterator end() const;
+
+	///\brief Print the structure serialized as string to out
+	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
+	///\brief Get the structure serialized as string for output
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 private:
 	InterpreterInstance* m_instance;	//< interpreter instance

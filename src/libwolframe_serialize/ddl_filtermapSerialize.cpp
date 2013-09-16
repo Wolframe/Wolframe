@@ -238,7 +238,7 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 bool DDLStructSerializer::call()
 {
 	if (!m_out.get()) throw std::runtime_error( "no output for serialize");
-	while (m_stk.size())
+	for (;;)
 	{
 		const Context::ElementBuffer* elem = m_ctx.getElem();
 		if (elem)
@@ -253,27 +253,32 @@ bool DDLStructSerializer::call()
 				return false;
 			}
 			LOG_DATA << "[DDL structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+			continue;
 		}
 		fetchObject( m_ctx, m_stk);
+		if (m_stk.empty()) return true;
+		//REMARK: Check for stack empty after the last fetch, because the last close tag is not printed
 	}
-	return true;
 }
 
 
 bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value)
 {
-	const Context::ElementBuffer* elem;
-	while (m_stk.size() && (elem = m_ctx.getElem()) == 0)
+	for (;;)
 	{
+		const Context::ElementBuffer* elem = m_ctx.getElem();
+		if (elem)
+		{
+			type = elem->m_type;
+			value = elem->m_value;
+			setState( langbind::InputFilter::Open);
+			LOG_DATA << "[DDL structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+			return true;
+		}
+		if (m_stk.empty()) return false;
 		fetchObject( m_ctx, m_stk);
+		//REMARK: The last close tag is returned (different to DDLStructSerializer::call())
 	}
-	if (!m_stk.size()) return false;
-
-	type = elem->m_type;
-	value = elem->m_value;
-	setState( langbind::InputFilter::Open);
-	LOG_DATA << "[DDL structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
-	return true;
 }
 
 bool DDLStructSerializer::setFlags( Flags f)

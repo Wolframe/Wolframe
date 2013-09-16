@@ -1,6 +1,8 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
-SUBDIRS = employee_assignment_convert database functions cmdbind
+SUBDIRS = mylang
+
+-include $(TOPDIR)/makefiles/gmake/platform.mk
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -56,12 +56,19 @@ class MyLangResult
 public:
 	MyLangResult( const mylang::StructureR& data_)
 		:types::TypeSignature("langbind::MyLangResult", __LINE__)
-		,m_data(data_){}
+		,m_data(data_)
+		,m_bufidx(0)
+	{
+		m_stk.push_back( StackElem( m_data.get(), types::Variant()));
+	}
 
 	MyLangResult( const MyLangResult& o)
 		:types::TypeSignature("langbind::MyLangResult", __LINE__)
 		,TypedInputFilter(o)
-		,m_data(o.m_data){}
+		,m_data(o.m_data)
+		,m_buf(o.m_buf)
+		,m_bufidx(o.m_bufidx)
+		,m_stk(o.m_stk){}
 
 	virtual TypedInputFilter* copy() const
 	{
@@ -74,23 +81,6 @@ public:
 	///\return true, throws on error
 	virtual bool getNext( TypedInputFilter::ElementType& type, types::VariantConst& element)
 	{
-		if (!m_stk.empty() && m_stk.back().itr == m_stk.back().end)
-		{
-			m_stk.pop_back();
-			if (!m_stk.back().tag.defined())
-			{
-				// ... if tag is defined then Open/Close was printed with every (array-) element
-				type = InputFilter::CloseTag;
-				element.clear();
-			}
-			return true;
-		}
-		if (m_stk.empty())
-		{
-			type = InputFilter::CloseTag;
-			element.clear();
-			return true;
-		}
 		for (;;)
 		{
 			if (m_bufidx < m_buf.size())
@@ -98,9 +88,28 @@ public:
 				type = m_buf.at( m_bufidx).first;
 				element = m_buf.at( m_bufidx).second;
 				++m_bufidx;
+				if (m_bufidx == m_buf.size())
+				{
+					m_bufidx = 0;
+					m_buf.clear();
+				}
+				return true;
 			}
-			m_bufidx = 0;
-			m_buf.clear();
+			if (m_stk.empty())
+			{
+				return false;
+			}
+			if (m_stk.back().itr == m_stk.back().end)
+			{
+				m_stk.pop_back();
+				if (m_stk.empty() || !m_stk.back().tag.defined())
+				{
+					// ... if tag is defined then Open/Close was printed with every (array-) element
+					type = InputFilter::CloseTag;
+					element.clear();
+				}
+				return true;
+			}
 			if (m_stk.back().itr->second->atomic())
 			{
 				if (m_stk.back().tag.defined())
@@ -141,8 +150,8 @@ public:
 					// ... if tag is not defined then an 'Open' is printed
 					//	and a final 'Close' will be printed when the structure is popped from the stack.
 				}
-				mylang::Structure::const_iterator citr = m_stk.back().itr++;
-				m_stk.push_back( StackElem( citr, m_stk.back().itr->second->end(), tag));
+				m_stk.push_back( StackElem( m_stk.back().itr->second, tag));
+				++m_stk[ m_stk.size()-2].itr;
 			}
 		}
 	}
@@ -159,8 +168,8 @@ private:
 		types::Variant tag;
 
 		StackElem(){}
-		StackElem( const mylang::Structure::const_iterator& itr_, const mylang::Structure::const_iterator& end_, const types::Variant& tag_)
-			:itr(itr_),end(end_),tag(tag_){}
+		StackElem( const mylang::Structure* st, const types::Variant& tag_)
+			:itr(st->begin()),end(st->end()),tag(tag_){}
 		StackElem( const StackElem& o)
 			:itr(o.itr),end(o.end),tag(o.tag){}
 	};
@@ -193,7 +202,7 @@ public:
 
 	virtual bool call()
 	{
-		if (m_initialized)
+		if (!m_initialized)
 		{
 			try
 			{
@@ -205,23 +214,50 @@ public:
 					{
 						case InputFilter::OpenTag:
 						{
-							mylang::Structure* substruct = m_initStmStack.back().second->addSubstruct( elem);
+							mylang::Structure* substruct;
+							if (elem.type() == types::Variant::UInt || elem.type() == types::Variant::Int)
+							{
+								unsigned int idx = elem.touint();
+								unsigned int lastidx = m_initStmStack.back().second->lastArrayIndex();
+								if (lastidx == 0 && idx != 1) throw std::runtime_error( "elements in array not starting from 1");
+								if (idx <= lastidx) throw std::runtime_error( "elements in array not ascending");
+								for (++lastidx; lastidx < idx; ++lastidx)
+								{
+									// add elements for holes in the array
+									m_initStmStack.back().second->addArrayElement();
+								}
+								substruct = m_initStmStack.back().second->addArrayElement();
+							}
+							else
+							{
+								substruct = m_initStmStack.back().second->addStructElement( elem.tostring());
+							}
 							m_initStmStack.push_back( InitStackElem( elem, substruct));
 							break;
 						}
 						case InputFilter::Attribute:
-							m_tagbuf = elem;
+							m_tagbuf = elem.tostring();
+							if (m_tagbuf.empty()) throw std::runtime_error( "illegal attribute name ''");
 							break;
 
 						case InputFilter::Value:
-							if (m_tagbuf.defined())
+							if (!m_tagbuf.empty())
 							{
-								mylang::Structure* substruct = m_initStmStack.back().second->addSubstruct( m_tagbuf);
+								mylang::Structure* substruct = m_initStmStack.back().second->addStructElement( m_tagbuf);
 								substruct->setValue( elem);
+							}
+							else if (m_initStmStack.back().second->atomic())
+							{
+								m_initStmStack.back().second->setValue( elem);
+							}
+							else if (m_initStmStack.back().second->array())
+							{
+								throw std::runtime_error("missing array index for array element");
 							}
 							else
 							{
-								m_initStmStack.back().second->setValue( elem);
+								mylang::Structure* substruct = m_initStmStack.back().second->addStructElement( "");
+								substruct->setValue( elem);
 							}
 							m_tagbuf.clear();
 							break;
@@ -242,8 +278,16 @@ public:
 			}
 			if (!m_initialized) return false;
 		}
-		m_output = m_instance->call( m_provider, m_input);
-		m_result.reset( new MyLangResult( m_output));
+		try
+		{
+			m_output = m_instance->call( m_provider, m_input);
+			LOG_TRACE << "Calling function '" << m_name << "' with argument: " << m_input->tostring() << "returns " << m_output->tostring();
+			m_result.reset( new MyLangResult( m_output));
+		}
+		catch (const std::runtime_error& e)
+		{
+			throw std::runtime_error( std::string( "error calling function '") + m_name + "': " + e.what());
+		}
 		return true;
 	}
 
@@ -276,7 +320,7 @@ private:
 	bool m_initialized;				//< true, if the input has been initialized
 	typedef std::pair<types::Variant,mylang::Structure*> InitStackElem;
 	std::vector<InitStackElem> m_initStmStack;	//< Stack for substructure initialization
-	types::Variant m_tagbuf;			//< buffer for attribute name to handle Attribute,Value pair
+	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
 	mylang::StructureR m_input;			//< pointer to input structure
 	mylang::StructureR m_output;			//< pointer to output structure
 	mylang::InterpreterInstanceR m_instance;		//< interpreter instance

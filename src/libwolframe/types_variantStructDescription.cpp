@@ -488,9 +488,12 @@ void VariantStructDescription::print( std::ostream& out, const utils::PrintForma
 			if (di->optional()) out << "?";
 			if (di->mandatory()) out << "!";
 			out << pformat->openstruct;
-			di->substruct->print( out, pformat, level+1);
-			print_newitem( out, pformat, level);
-			out << pformat->openstruct;
+			if (di->substruct->size())
+			{
+				di->substruct->print( out, pformat, level+1);
+				print_newitem( out, pformat, level);
+			}
+			out << pformat->closestruct;
 		}
 		else if (di->initvalue)
 		{
@@ -519,8 +522,8 @@ void VariantStructDescription::print( std::ostream& out, const utils::PrintForma
 					out << " (" << di->initvalue->tostring() << ")";
 				}
 			}
+			out << pformat->decldelimiter;
 		}
-		out << pformat->decldelimiter;
 	}
 }
 

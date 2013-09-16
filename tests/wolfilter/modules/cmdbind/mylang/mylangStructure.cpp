@@ -1,4 +1,5 @@
 #include "mylangStructure.hpp"
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -49,12 +50,18 @@ const types::Variant& Structure::getValue() const
 
 bool Structure::atomic() const
 {
-	return (m_struct.empty() && m_value.defined());
+	return (m_struct.empty() || m_value.defined());
 }
 
 bool Structure::array() const
 {
 	return m_array;
+}
+
+unsigned int Structure::lastArrayIndex() const
+{
+	if (!m_array) return 0;
+	return m_struct.size();
 }
 
 Structure::const_iterator Structure::begin() const
@@ -67,4 +74,62 @@ Structure::const_iterator Structure::end() const
 	return m_struct.end();
 }
 
+static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level)
+{
+	out << pformat->newitem;
+	for (std::size_t ll=0; ll<level; ++ll) out << pformat->indent;
+}
+
+void Structure::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
+{
+	if (array())
+	{
+		std::vector<KeyValuePair>::const_iterator si = m_struct.begin(), se = m_struct.end();
+		out << pformat->openstruct;
+		int idx = 0;
+		for (; si != se; ++si,++idx)
+		{
+			if (idx) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
+			si->second->print( out, pformat, level+1);
+		}
+		if (idx>0)
+		{
+			print_newitem( out, pformat, level);
+		}
+		out << pformat->closestruct;
+	}
+	else if (atomic())
+	{
+		out << pformat->startvalue;
+		out << m_value.tostring();
+		out << pformat->endvalue;
+	}
+	else
+	{
+		std::vector<KeyValuePair>::const_iterator si = m_struct.begin(), se = m_struct.end();
+		out << pformat->openstruct;
+
+		int idx = 0;
+		for (; si != se; ++si,++idx)
+		{
+			if (idx) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
+
+			out << si->first.tostring() << pformat->assign;
+			si->second->print( out, pformat, level+1);
+		}
+		out << pformat->closestruct;
+	}
+}
+
+std::string Structure::tostring( const utils::PrintFormat* pformat) const
+{
+	std::ostringstream buf;
+	/*[-]*/	std::cout << "CALL Structure::tostring -> ";
+	/*[-]*/	print( std::cout, utils::ptreePrintFormat(), 0);
+	/*[-]*/	std::cout << std::endl;
+	print( buf, pformat, 0);
+	return buf.str();
+}
 

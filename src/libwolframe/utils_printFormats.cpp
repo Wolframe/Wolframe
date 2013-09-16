@@ -47,7 +47,7 @@ const PrintFormat* utils::logPrintFormat()
 		""  /*endheader*/,
 		"'" /*startvalue*/,
 		"'" /*endvalue*/,
-		";" /*decldelimiter*/
+		";" /*decldelimiter*/,
 		" " /*itemdelimiter*/,
 		"=" /*assign*/
 	};
@@ -64,7 +64,7 @@ const PrintFormat* utils::ptreePrintFormat()
 		""    /*endheader*/,
 		"'"   /*startvalue*/,
 		"'"   /*endvalue*/,
-		";"   /*decldelimiter*/
+		";"   /*decldelimiter*/,
 		" "   /*itemdelimiter*/,
 		"="   /*assign*/
 	};
