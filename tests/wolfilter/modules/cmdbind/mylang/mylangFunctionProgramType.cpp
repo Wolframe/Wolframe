@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file mylangFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for mylang scripts
 #include "mylangFunctionProgramType.hpp"
+#include "mylangStructureBuilder.hpp"
 #include "mylangInterpreter.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
@@ -188,18 +189,6 @@ public:
 
 	virtual ~MylangFormFunctionClosure(){}
 
-	std::string currentElementPath()
-	{
-		std::string rt;
-		std::vector<InitStackElem>::const_iterator ci = m_initStmStack.begin(), ce = m_initStmStack.end();
-		for (; ci != ce; ++ci)
-		{
-			if (rt.size()) rt.append( "/");
-			if (ci->first.defined()) rt.append( ci->first.tostring());
-		}
-		return rt;
-	}
-
 	virtual bool call()
 	{
 		if (!m_initialized)
@@ -214,25 +203,25 @@ public:
 					{
 						case InputFilter::OpenTag:
 						{
-							mylang::Structure* substruct;
 							if (elem.type() == types::Variant::UInt || elem.type() == types::Variant::Int)
 							{
 								unsigned int idx = elem.touint();
-								unsigned int lastidx = m_initStmStack.back().second->lastArrayIndex();
+								unsigned int lastidx = m_inputbuilder.lastArrayIndex();
 								if (lastidx == 0 && idx != 1) throw std::runtime_error( "elements in array not starting from 1");
 								if (idx <= lastidx) throw std::runtime_error( "elements in array not ascending");
 								for (++lastidx; lastidx < idx; ++lastidx)
 								{
 									// add elements for holes in the array
-									m_initStmStack.back().second->addArrayElement();
+									m_inputbuilder.openArrayElement();
+									m_inputbuilder.setValue( types::Variant());
+									m_inputbuilder.closeElement();
 								}
-								substruct = m_initStmStack.back().second->addArrayElement();
+								m_inputbuilder.openArrayElement();
 							}
 							else
 							{
-								substruct = m_initStmStack.back().second->addStructElement( elem.tostring());
+								m_inputbuilder.openElement( elem.tostring());
 							}
-							m_initStmStack.push_back( InitStackElem( elem, substruct));
 							break;
 						}
 						case InputFilter::Attribute:
@@ -243,30 +232,32 @@ public:
 						case InputFilter::Value:
 							if (!m_tagbuf.empty())
 							{
-								mylang::Structure* substruct = m_initStmStack.back().second->addStructElement( m_tagbuf);
-								substruct->setValue( elem);
+								m_inputbuilder.openElement( m_tagbuf);
+								m_inputbuilder.setValue( elem);
+								m_inputbuilder.closeElement();
 							}
-							else if (m_initStmStack.back().second->atomic())
+							else if (m_inputbuilder.atomic())
 							{
-								m_initStmStack.back().second->setValue( elem);
-							}
-							else if (m_initStmStack.back().second->array())
-							{
-								throw std::runtime_error("missing array index for array element");
+								m_inputbuilder.setValue( elem);
 							}
 							else
 							{
-								mylang::Structure* substruct = m_initStmStack.back().second->addStructElement( "");
-								substruct->setValue( elem);
+								m_inputbuilder.openElement( "");
+								m_inputbuilder.setValue( elem);
+								m_inputbuilder.closeElement();
 							}
 							m_tagbuf.clear();
 							break;
 
 						case InputFilter::CloseTag:
-							m_initStmStack.pop_back();
-							if (m_initStmStack.empty())
+							if (m_inputbuilder.taglevel() == 0)
 							{
+								m_input = m_inputbuilder.get();
 								m_initialized = true;
+							}
+							else
+							{
+								m_inputbuilder.closeElement();
 							}
 							break;
 					}
@@ -274,7 +265,7 @@ public:
 			}
 			catch (const std::runtime_error& e)
 			{
-				throw std::runtime_error( std::string( "error function call ") + m_name + " in parameter at " + currentElementPath() + ": " + e.what());
+				throw std::runtime_error( std::string( "error function call ") + m_name + " in parameter at " + m_inputbuilder.currentElementPath() + ": " + e.what());
 			}
 			if (!m_initialized) return false;
 		}
@@ -300,9 +291,8 @@ public:
 			throw std::runtime_error( "calling mylang without input structure info");
 		}
 		m_initialized = false;
-		m_initStmStack.clear();
-		m_input.reset( new mylang::Structure());
-		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
+		m_inputbuilder.clear();
+		m_input.reset();
 	}
 
 	virtual TypedInputFilterR result() const
@@ -315,9 +305,8 @@ private:
 	std::string m_name;				//< name of the function called for error messages
 	TypedInputFilterR m_arg;			//< call argument as input filter
 	bool m_initialized;				//< true, if the input has been initialized
-	typedef std::pair<types::Variant,mylang::Structure*> InitStackElem;
-	std::vector<InitStackElem> m_initStmStack;	//< Stack for substructure initialization
 	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
+	mylang::StructureBuilder m_inputbuilder;	//< structure input builder object
 	mylang::StructureR m_input;			//< pointer to input structure
 	mylang::StructureR m_output;			//< pointer to output structure
 	mylang::InterpreterInstanceR m_instance;	//< interpreter instance

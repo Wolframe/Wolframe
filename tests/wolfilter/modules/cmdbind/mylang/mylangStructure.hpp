@@ -44,6 +44,10 @@ namespace _Wolframe {
 namespace langbind {
 namespace mylang {
 
+///\brief Reference with ownership to a structure
+class Structure;
+typedef types::CountedReference<Structure> StructureR;
+
 ///\class Structure
 ///\brief Data structure for input and output of a 'Mylang' function call
 class Structure
@@ -52,23 +56,8 @@ public:
 	///\brief Constructor
 	explicit Structure()
 		:m_array(false){}
-	virtual ~Structure(){}
+	virtual ~Structure();
 
-	///\brief Create an element in a structure and get a reference pointer to it
-	///\param[in] elemid_ Id of the created element
-	///\remark Throws on error
-	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
-	Structure* addStructElement( const std::string& elemid_);
-
-	///\brief Create an element in an array and get a reference pointer to it
-	///\param[in] elemid_ Id of the array
-	///\remark Throws on error
-	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
-	Structure* addArrayElement();
-
-	///\brief Setter for element value in case of this representing an atom
-	///\param[in] value value or content element of 'this'
-	void setValue( const types::Variant& value_);
 	///\brief Getter for element value in case of this representing an atom
 	types::Variant getValue() const;
 
@@ -81,10 +70,7 @@ public:
 	///\brief Find out how many elements are defined in this structure
 	///\return the count
 
-	///\brief Get the index of the last element in case of an array
-	unsigned int lastArrayIndex() const;
-
-	typedef std::pair<types::Variant,Structure*> KeyValuePair;
+	typedef std::pair<types::Variant,StructureR> KeyValuePair;
 
 	///\brief Iterator on structure or array elements
 	class const_iterator
@@ -141,13 +127,11 @@ public:
 
 private:
 	friend class Structure::const_iterator;
+	friend class StructureBuilder;
 	std::vector<KeyValuePair> m_struct;	//< mimic language structure
 	types::Variant m_value;			//< value for atomic element
 	bool m_array;				//< true, if this represents an array
 };
-
-///\brief Reference with ownership to a structure
-typedef types::CountedReference<Structure> StructureR;
 
 }}}//namespace
 #endif

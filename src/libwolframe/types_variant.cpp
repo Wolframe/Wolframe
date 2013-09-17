@@ -294,8 +294,10 @@ Variant::Data::UInt Variant::touint() const
 
 void Variant::move( Variant& o)
 {
+	bool init_ = initialized();
 	release();
 	std::memcpy( this, &o, sizeof(o));
+	setInitialized( init_);
 	o.init();
 }
 
