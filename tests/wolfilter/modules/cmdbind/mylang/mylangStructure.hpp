@@ -56,7 +56,7 @@ public:
 	///\brief Constructor
 	explicit Structure()
 		:m_array(false){}
-	virtual ~Structure();
+	virtual ~Structure(){}
 
 	///\brief Getter for element value in case of this representing an atom
 	types::Variant getValue() const;

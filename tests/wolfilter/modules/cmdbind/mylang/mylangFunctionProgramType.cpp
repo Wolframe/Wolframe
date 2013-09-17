@@ -236,7 +236,7 @@ public:
 								m_inputbuilder.setValue( elem);
 								m_inputbuilder.closeElement();
 							}
-							else if (m_inputbuilder.atomic())
+							else if (!m_inputbuilder.defined() || m_inputbuilder.atomic())
 							{
 								m_inputbuilder.setValue( elem);
 							}

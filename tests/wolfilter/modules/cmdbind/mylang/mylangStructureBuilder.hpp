@@ -52,6 +52,8 @@ class StructureBuilder
 public:
 	///\brief Constructor
 	StructureBuilder();
+	StructureBuilder( const StructureBuilder& o)
+		:m_stk(o.m_stk){}
 	virtual ~StructureBuilder(){}
 
 	///\brief Create an element in a structure and puts the focus on it

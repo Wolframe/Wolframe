@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file mylangStructureBuilder.cpp
 ///\brief Implementation of mylang data structure building
 #include "mylangStructureBuilder.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -44,6 +45,7 @@ StructureBuilder::StructureBuilder()
 
 void StructureBuilder::openElement( const std::string& elemid_)
 {
+	LOG_DATA << "[mylang structure builder] open structure element '" << elemid_ << "'";
 	if (!m_stk.back().get())
 	{
 		m_stk.back().reset( new Structure());
@@ -78,12 +80,16 @@ void StructureBuilder::openArrayElement()
 	}
 	// add element at end of array:
 	unsigned int aridx = m_stk.back()->m_struct.size()+1;
+	LOG_DATA << "[mylang structure builder] open array element " << aridx;
+
 	m_stk.back()->m_struct.push_back( Structure::KeyValuePair( aridx, StructureR()));
 	m_stk.push_back( StructureR());
 }
 
 void StructureBuilder::closeElement()
 {
+	LOG_DATA << "[mylang structure builder] close element";
+
 	if (m_stk.size() <= 1) throw std::runtime_error("element tags not balanced (close)");
 	StructureR elem = m_stk.back();
 	m_stk.pop_back();
@@ -99,6 +105,7 @@ void StructureBuilder::closeElement()
 
 void StructureBuilder::setValue( const types::Variant& value_)
 {
+	LOG_DATA << "[mylang structure builder] set value '" << value_.tostring() << "'";
 	if (!m_stk.back().get())
 	{
 		m_stk.back().reset( new Structure());
@@ -113,7 +120,13 @@ unsigned int StructureBuilder::lastArrayIndex() const
 {
 	if (!m_stk.back().get()) return 0;
 	if (!m_stk.back()->m_array) return 0;
-	return m_stk.back()->m_struct.size()?m_stk.back()->m_struct.back().second->m_value.touint():0;
+	if (m_stk.back()->m_struct.empty()) return 0;
+	const types::Variant& idxval = m_stk.back()->m_struct.back().first;
+	if (idxval.type() == types::Variant::UInt || idxval.type() == types::Variant::Int)
+	{
+		return idxval.touint();
+	}
+	throw std::runtime_error( "mixing array with structure content");
 }
 
 StructureR StructureBuilder::get() const
@@ -152,6 +165,7 @@ std::string StructureBuilder::currentElementPath() const
 void StructureBuilder::clear()
 {
 	m_stk.clear();
+	m_stk.push_back( StructureR());
 }
 
 
