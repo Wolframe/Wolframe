@@ -33,18 +33,22 @@ Project Wolframe.
 ///\brief Implementation of mylang data structure building
 #include "mylangStructureBuilder.hpp"
 
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
+using namespace _Wolframe::langbind::mylang;
+
 StructureBuilder::StructureBuilder()
 {
 	m_stk.push_back( StructureR());
 }
 
-void Structure::openElement( const std::string& elemid_)
+void StructureBuilder::openElement( const std::string& elemid_)
 {
 	if (!m_stk.back().get())
 	{
 		m_stk.back().reset( new Structure());
 	}
-	std::vector<KeyValuePair>::const_iterator si = m_stk.back()->m_struct.begin(), se = m_stk.back()->m_struct.end();
+	std::vector<Structure::KeyValuePair>::const_iterator si = m_stk.back()->m_struct.begin(), se = m_stk.back()->m_struct.end();
 	for (; si != se; ++si)
 	{
 		if (si->first.type() != types::Variant::String) continue;
@@ -53,17 +57,17 @@ void Structure::openElement( const std::string& elemid_)
 			throw std::runtime_error( std::string("duplicate definition of element '") + elemid_ + "'");
 		}
 	}
-	m_stk.back()->m_struct.push_back( KeyValuePair( elemid_, StructureR()));
+	m_stk.back()->m_struct.push_back( Structure::KeyValuePair( elemid_, StructureR()));
 	m_stk.push_back( StructureR());
 }
 
-void Structure::openArrayElement()
+void StructureBuilder::openArrayElement()
 {
 	if (!m_stk.back().get())
 	{
 		m_stk.back().reset( new Structure());
 	}
-	std::vector<KeyValuePair>::const_iterator si = m_stk.back()->m_struct.begin(), se = m_stk.back()->m_struct.end();
+	std::vector<Structure::KeyValuePair>::const_iterator si = m_stk.back()->m_struct.begin(), se = m_stk.back()->m_struct.end();
 	if (!m_stk.back()->m_array)
 	{
 		for (; si != se; ++si)
@@ -74,11 +78,11 @@ void Structure::openArrayElement()
 	}
 	// add element at end of array:
 	unsigned int aridx = m_stk.back()->m_struct.size()+1;
-	m_stk.back()->m_struct.push_back( KeyValuePair( aridx, StructureR()));
+	m_stk.back()->m_struct.push_back( Structure::KeyValuePair( aridx, StructureR()));
 	m_stk.push_back( StructureR());
 }
 
-void Structure::closeElement()
+void StructureBuilder::closeElement()
 {
 	if (m_stk.size() <= 1) throw std::runtime_error("element tags not balanced (close)");
 	StructureR elem = m_stk.back();
@@ -109,7 +113,7 @@ unsigned int StructureBuilder::lastArrayIndex() const
 {
 	if (!m_stk.back().get()) return 0;
 	if (!m_stk.back()->m_array) return 0;
-	return m_stk.back()->m_struct.size()?m_stk.back()->m_struct.back().key.touint():0;
+	return m_stk.back()->m_struct.size()?m_stk.back()->m_struct.back().second->m_value.touint():0;
 }
 
 StructureR StructureBuilder::get() const
@@ -140,7 +144,7 @@ std::string StructureBuilder::currentElementPath() const
 	for (; ci != ce; ++ci)
 	{
 		if (rt.size()) rt.append( "/");
-		if (ci->m_struct.size()) rt.append( ci->m_struct.back().first);
+		if ((*ci)->m_struct.size()) rt.append( (*ci)->m_struct.back().first.tostring());
 	}
 	return rt;
 }

@@ -25,6 +25,7 @@ CPP_OBJS = \
 	mylangInterpreterInstance.o \
 	mylangInterpreter.o \
 	mylangStructure.o \
+	mylangStructureBuilder.o \
 	mylangFunctionProgramType.o \
 	mod_command_mylang.o
 
