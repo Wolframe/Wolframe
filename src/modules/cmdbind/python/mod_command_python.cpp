@@ -55,7 +55,7 @@ static ConfiguredBuilder* createPythonCommandHandler()
 }
 */
 
-static SimpleBuilder* createPythonProgramType()
+static SimpleBuilder* pythonProgramTypeBuilder()
 {
 	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "pythonformfunc", langbind::createPythonProgramType);
 }
@@ -70,7 +70,7 @@ static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
 enum {NofSimpleBuilder=1};
 static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 {
-	createPythonProgramType
+	pythonProgramTypeBuilder
 };
 
 ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",

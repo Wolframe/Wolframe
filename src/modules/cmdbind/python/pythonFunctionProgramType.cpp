@@ -29,15 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-
 ///\file pythonFunctionProgramType.cpp
-///\brief Implementation of the function to create a form function program type object for Python scripts
+///\brief Implementation of the function to create a form function program type object for python scripts
 #include "pythonFunctionProgramType.hpp"
-#include "pythonFunctionCall.hpp"
+#include "pythonInterpreter.hpp"
 #include "langbind/formFunction.hpp"
-//~ #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
-//~ #include "luaObjects.hpp"
 #include "logger-v1.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
@@ -58,13 +55,28 @@ class PythonResult
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:types::TypeSignature("langbind::PythonResult", __LINE__)
-		,m_data(data_){}
+		:types::TypeSignature("langbind::pythonResult", __LINE__)
+		,m_data(data_)
+		,m_bufidx(0)
+	{
+		if (!m_data.get())
+		{
+			// ... empty structure (NULL)
+			m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
+		}
+		else
+		{
+			m_stk.push_back( StackElem( *m_data.get(), types::Variant()));
+		}
+	}
 
 	PythonResult( const PythonResult& o)
 		:types::TypeSignature("langbind::PythonResult", __LINE__)
 		,TypedInputFilter(o)
-		,m_data(o.m_data){}
+		,m_data(o.m_data)
+		,m_buf(o.m_buf)
+		,m_bufidx(o.m_bufidx)
+		,m_stk(o.m_stk){}
 
 	virtual TypedInputFilter* copy() const
 	{
@@ -77,23 +89,6 @@ public:
 	///\return true, throws on error
 	virtual bool getNext( TypedInputFilter::ElementType& type, types::VariantConst& element)
 	{
-		if (!m_stk.empty() && m_stk.back().itr == m_stk.back().end)
-		{
-			m_stk.pop_back();
-			if (!m_stk.back().tag.defined())
-			{
-				// ... if tag is defined then Open/Close was printed with every (array-) element
-				type = InputFilter::CloseTag;
-				element.clear();
-			}
-			return true;
-		}
-		if (m_stk.empty())
-		{
-			type = InputFilter::CloseTag;
-			element.clear();
-			return true;
-		}
 		for (;;)
 		{
 			if (m_bufidx < m_buf.size())
@@ -101,10 +96,29 @@ public:
 				type = m_buf.at( m_bufidx).first;
 				element = m_buf.at( m_bufidx).second;
 				++m_bufidx;
+				if (m_bufidx == m_buf.size())
+				{
+					m_bufidx = 0;
+					m_buf.clear();
+				}
+				return true;
 			}
-			m_bufidx = 0;
-			m_buf.clear();
-			if (m_stk.back().itr->second->atomic())
+			if (m_stk.empty())
+			{
+				return false;
+			}
+			if (m_stk.back().itr == m_stk.back().end)
+			{
+				m_stk.pop_back();
+				if (m_stk.empty() || !m_stk.back().tag.defined())
+				{
+					// ... if tag is defined then Open/Close was printed with every (array-) element
+					type = InputFilter::CloseTag;
+					element.clear();
+				}
+				return true;
+			}
+			if (m_stk.back().itr->atomic())
 			{
 				if (m_stk.back().tag.defined())
 				{
@@ -112,22 +126,22 @@ public:
 				}
 				else
 				{
-					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
 				}
-				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().itr->second->getValue()));
+				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().itr->getValue()));
 				m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
 				m_stk.back().itr++;
 			}
 			else
 			{
 				types::Variant tag;
-				if (m_stk.back().itr->second->array() && !flag( TypedInputFilter::SerializeWithIndices))
+				if (m_stk.back().itr->array() && !flag( TypedInputFilter::SerializeWithIndices))
 				{
 					if (m_stk.back().tag.defined())
 					{
 						throw std::runtime_error("illegal structure: array of array");
 					}
-					tag = m_stk.back().itr->first;
+					tag = m_stk.back().itr->key;
 					// ... if tag is defined then Open/Close will be printed with every (array-) element
 					//	and here we do not print an 'Open'
 				}
@@ -139,13 +153,13 @@ public:
 					}
 					else
 					{
-						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
 					}
 					// ... if tag is not defined then an 'Open' is printed
 					//	and a final 'Close' will be printed when the structure is popped from the stack.
 				}
-				python::Structure::const_iterator citr = m_stk.back().itr++;
-				m_stk.push_back( StackElem( citr, m_stk.back().itr->second->end(), tag));
+				m_stk.push_back( StackElem( python::Structure( m_stk.back().itr->val), tag));
+				++m_stk[ m_stk.size()-2].itr;
 			}
 		}
 	}
@@ -160,10 +174,11 @@ private:
 		python::Structure::const_iterator itr;
 		python::Structure::const_iterator end;
 		types::Variant tag;
+		python::Structure structure;
 
 		StackElem(){}
-		StackElem( const python::Structure::const_iterator& itr_, const python::Structure::const_iterator& end_, const types::Variant& tag_)
-			:itr(itr_),end(end_),tag(tag_){}
+		StackElem( const python::Structure& st, const types::Variant& tag_)
+			:itr(st.begin()),end(st.end()),tag(tag_),structure(st){}
 		StackElem( const StackElem& o)
 			:itr(o.itr),end(o.end),tag(o.tag){}
 	};
@@ -177,8 +192,8 @@ class PythonFormFunctionClosure
 	:public langbind::FormFunctionClosure
 {
 public:
-	PythonFormFunctionClosure( const std::string& name_, const python::InstanceR& interp_)
-		:m_name(name_),m_initialized(false),m_interp(interp_),m_provider(0){}
+	PythonFormFunctionClosure( const std::string& name_, const python::InterpreterInstanceR& instance_)
+		:m_name(name_),m_initialized(false),m_instance(instance_),m_provider(0){}
 
 	virtual ~PythonFormFunctionClosure(){}
 
@@ -196,7 +211,7 @@ public:
 
 	virtual bool call()
 	{
-		if (m_initialized)
+		if (!m_initialized)
 		{
 			try
 			{
@@ -208,23 +223,50 @@ public:
 					{
 						case InputFilter::OpenTag:
 						{
-							python::Structure* substruct = m_initStmStack.back().second->addSubstruct( elem);
+							python::Structure* substruct;
+							if (elem.type() == types::Variant::UInt || elem.type() == types::Variant::Int)
+							{
+								unsigned int idx = elem.touint();
+								unsigned int lastidx = m_initStmStack.back().second->lastArrayIndex();
+								if (lastidx == 0 && idx != 1) throw std::runtime_error( "elements in array not starting from 1");
+								if (idx <= lastidx) throw std::runtime_error( "elements in array not ascending");
+								for (++lastidx; lastidx < idx; ++lastidx)
+								{
+									// add elements for holes in the array
+									m_initStmStack.back().second->addArrayElement();
+								}
+								substruct = m_initStmStack.back().second->addArrayElement();
+							}
+							else
+							{
+								substruct = m_initStmStack.back().second->addStructElement( elem.tostring());
+							}
 							m_initStmStack.push_back( InitStackElem( elem, substruct));
 							break;
 						}
 						case InputFilter::Attribute:
-							m_tagbuf = elem;
+							m_tagbuf = elem.tostring();
+							if (m_tagbuf.empty()) throw std::runtime_error( "illegal attribute name ''");
 							break;
 
 						case InputFilter::Value:
-							if (m_tagbuf.defined())
+							if (!m_tagbuf.empty())
 							{
-								python::Structure* substruct = m_initStmStack.back().second->addSubstruct( m_tagbuf);
+								python::Structure* substruct = m_initStmStack.back().second->addStructElement( m_tagbuf);
 								substruct->setValue( elem);
+							}
+							else if (m_initStmStack.back().second->atomic())
+							{
+								m_initStmStack.back().second->setValue( elem);
+							}
+							else if (m_initStmStack.back().second->array())
+							{
+								throw std::runtime_error("missing array index for array element");
 							}
 							else
 							{
-								m_initStmStack.back().second->setValue( elem);
+								python::Structure* substruct = m_initStmStack.back().second->addStructElement( "");
+								substruct->setValue( elem);
 							}
 							m_tagbuf.clear();
 							break;
@@ -245,8 +287,16 @@ public:
 			}
 			if (!m_initialized) return false;
 		}
-		m_output = python::call( m_provider, m_interp.get(), m_input);
-		m_result.reset( new PythonResult( m_output));
+		try
+		{
+			m_output = m_instance->call( m_provider, m_input);
+			LOG_TRACE << "Calling function '" << m_name << "' with argument: " << m_input->tostring() << "returns " << m_output->tostring();
+			m_result.reset( new PythonResult( m_output));
+		}
+		catch (const std::runtime_error& e)
+		{
+			throw std::runtime_error( std::string( "error calling function '") + m_name + "': " + e.what());
+		}
 		return true;
 	}
 
@@ -254,16 +304,14 @@ public:
 	{
 		m_provider = provider;
 		m_arg = arg;
-		if (m_interp->needsArrayIndices())
+
+		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
-			if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
-			{
-				throw std::runtime_error( "calling python without input structure info");
-			}
+			throw std::runtime_error( "calling python without input structure info");
 		}
 		m_initialized = false;
 		m_initStmStack.clear();
-		m_input.reset( new python::Structure( m_interp));
+		m_input.reset( new python::Structure());
 		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
 	}
 
@@ -279,10 +327,10 @@ private:
 	bool m_initialized;				//< true, if the input has been initialized
 	typedef std::pair<types::Variant,python::Structure*> InitStackElem;
 	std::vector<InitStackElem> m_initStmStack;	//< Stack for substructure initialization
-	types::Variant m_tagbuf;			//< buffer for attribute name to handle Attribute,Value pair
+	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
 	python::StructureR m_input;			//< pointer to input structure
 	python::StructureR m_output;			//< pointer to output structure
-	python::InstanceR m_interp;			//< interpreter instance
+	python::InterpreterInstanceR m_instance;	//< interpreter instance
 	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
 };
 
@@ -293,27 +341,20 @@ class PythonFormFunction
 	:public langbind::FormFunction
 {
 public:
-	PythonFormFunction( const python::Context* context_, const std::string& name_)
-		:m_context(context_),m_name(name_)
-	{
-		MOD_LOG_TRACE << "[python] creating form function '" << m_name << "'";
-	}
+	PythonFormFunction( const python::Interpreter* interpreter_, const std::string& name_)
+		:m_interpreter(interpreter_),m_name(name_){}
 
 	virtual ~PythonFormFunction(){}
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		python::InstanceR interp = m_context->getInstance( m_name);
-		if (!interp.get()) {
-			MOD_LOG_ERROR << "[python] got no interpreter when defining closure for form function '" << m_name << "'";
-			return 0;
-		}
-		MOD_LOG_TRACE << "[python] created form function closure for form function '" << m_name << "'";
-		return new PythonFormFunctionClosure( m_name, interp);
+		python::InterpreterInstanceR instance = m_interpreter->getInstance( m_name);
+		if (!instance.get()) return 0;
+		return new PythonFormFunctionClosure( m_name, instance);
 	}
 
 private:
-	const python::Context* m_context;
+	const python::Interpreter* m_interpreter;
 	std::string m_name;
 };
 
@@ -331,23 +372,22 @@ public:
 	virtual bool is_mine( const std::string& filename) const
 	{
 		boost::filesystem::path p( filename);
-		return p.extension().string() == ".py";
+		return p.extension().string() == ".mlg";
 	}
 
 	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
 	{
-		MOD_LOG_TRACE << "[python] PythonProgramType::loadProgram '" << filename << "'";
-		std::vector<std::string> funcs = m_context.loadProgram( filename);
+		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
 		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		for (; fi != fe; ++fi)
 		{
-			langbind::FormFunctionR ff( new PythonFormFunction( &m_context, *fi));
+			langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
 			library.defineFormFunction( *fi, ff);
 		}
 	}
 
 private:
-	python::Context m_context;
+	python::Interpreter m_interpreter;
 };
 }//anonymous namespace
 
@@ -355,3 +395,5 @@ prgbind::Program* langbind::createPythonProgramType()
 {
 	return new PythonProgramType();
 }
+
+

@@ -33,9 +33,7 @@ Project Wolframe.
 ///\brief Helper functions for Python interpreter
 #ifndef _Wolframe_PYTHON_INTERPRETER_HPP_INCLUDED
 #define _Wolframe_PYTHON_INTERPRETER_HPP_INCLUDED
-
-#include <Python.h>
-
+#include "pythonInterpreterInstance.hpp"
 #include <string>
 #include <vector>
 
@@ -46,15 +44,19 @@ namespace python {
 class Interpreter
 {
 public:
-	Interpreter( const std::string prgfile );
+	Interpreter();
 
 	virtual ~Interpreter( );
 
 	const std::vector<std::string>& functions( ) const { return m_functions; }
-	
+
 	std::string lastErrorMsg( const std::string& str );
 
+	std::vector<std::string> loadProgram( const std::string& name);
+	InterpreterInstanceR getInstance( const std::string& name) const;
+
 private:
+	std::string m_modulePath;
 	std::vector<std::string> m_functions;
 
 	const char *pyGetRepr( PyObject *o );

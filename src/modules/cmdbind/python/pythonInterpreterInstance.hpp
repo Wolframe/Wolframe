@@ -29,25 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mylangInterpreterInstance.hpp
-///\brief Function call for mylang scripts
-#ifndef _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
-#define _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
-#include "mylangStructure.hpp"
+///\file pythonInterpreterInstance.hpp
+///\brief Function call for Python scripts
+#ifndef _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
+#define _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
+#include "pythonStructure.hpp"
+#include "types/variant.hpp"
 #include "types/countedReference.hpp"
 #include "processor/procProvider.hpp"
+#include <utility>
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
-namespace mylang {
+namespace python {
 
-///\class InterpreterInstance
+///\class Instance
 ///\brief Interpreter instance for executing a function
 class InterpreterInstance
 {
 public:
 	///\brief Constructor
-	InterpreterInstance(){}
+	InterpreterInstance();
 	///\brief Destructor
 	virtual ~InterpreterInstance(){}
 
@@ -57,7 +60,7 @@ public:
 
 typedef types::CountedReference<InterpreterInstance> InterpreterInstanceR;
 
-}}}//namespace
+}}} //namespace
 #endif
 
 

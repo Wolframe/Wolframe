@@ -309,7 +309,7 @@ void Variant::convert( Type type_)
 		case Int: *this = toint(); return;
 		case UInt: *this = touint(); return;
 		case Double: *this = todouble(); return;
-		case String: *this = tostring(); return;
+		case String: {Variant rt = tostring(); move(rt); return;}
 	}
 	throw std::runtime_error( "illegal conversion of atomic type");
 }

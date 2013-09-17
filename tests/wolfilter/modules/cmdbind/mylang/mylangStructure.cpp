@@ -5,6 +5,68 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 using namespace _Wolframe::langbind::mylang;
 
+int Structure::const_iterator::compare( const const_iterator& o) const
+{
+	if (!m_st || !o.m_st) throw std::logic_error( "comparing null iterator");
+	return m_itr - o.m_itr;
+}
+
+Structure::const_iterator::const_iterator()
+	:m_st(0)
+{
+	m_elem.key = types::VariantConst();
+	m_elem.val = 0;
+}
+
+Structure::const_iterator::const_iterator( const Structure* st_, std::size_t pos_)
+	:m_st(st_)
+{
+	m_itr = m_st->m_struct.begin() + pos_;
+	m_end = m_st->m_struct.end();
+	m_elem.key = types::VariantConst();
+	m_elem.val = 0;
+}
+
+Structure::const_iterator::const_iterator( const Structure* st_)
+	:m_st(st_)
+{
+	m_itr = m_st->m_struct.begin();
+	m_end = m_st->m_struct.end();
+	if (m_itr == m_end)
+	{
+		m_elem.key = types::VariantConst();
+		m_elem.val = 0;
+	}
+	else
+	{
+		m_elem.key = m_itr->first;
+		m_elem.val = m_itr->second;
+	}
+}
+
+Structure::const_iterator::const_iterator( const const_iterator& o)
+	:m_st(o.m_st),m_itr(o.m_itr),m_end(o.m_end)
+{
+	m_elem.key = o.m_elem.key;
+	m_elem.val = o.m_elem.val;
+}
+
+void Structure::const_iterator::fetch_next()
+{
+	++m_itr;
+	if (m_itr >= m_end)
+	{
+		m_elem.key = types::VariantConst();
+		m_elem.val = 0;
+	}
+	else
+	{
+		m_elem.key = m_itr->first;
+		m_elem.val = m_itr->second;
+	}
+}
+
+
 Structure* Structure::addStructElement( const std::string& elemid_)
 {
 	std::vector<KeyValuePair>::const_iterator si = m_struct.begin(), se = m_struct.end();
@@ -17,7 +79,7 @@ Structure* Structure::addStructElement( const std::string& elemid_)
 		}
 	}
 	m_struct.push_back( KeyValuePair( elemid_, 0));
-	return m_struct.back().second = new Structure( m_instance);
+	return m_struct.back().second = new Structure();
 }
 
 Structure* Structure::addArrayElement()
@@ -31,7 +93,7 @@ Structure* Structure::addArrayElement()
 	// add element at end of array:
 	unsigned int aridx = m_struct.size()+1;
 	m_struct.push_back( KeyValuePair( aridx, 0));
-	return m_struct.back().second = new Structure( m_instance);
+	return m_struct.back().second = new Structure();
 }
 
 void Structure::setValue( const types::Variant& value_)
@@ -42,7 +104,7 @@ void Structure::setValue( const types::Variant& value_)
 	m_value = value_;
 }
 
-const types::Variant& Structure::getValue() const
+types::Variant Structure::getValue() const
 {
 	if (!m_struct.empty()) throw std::runtime_error("setValue for atomic value called for a structure");
 	return m_value;
@@ -62,16 +124,6 @@ unsigned int Structure::lastArrayIndex() const
 {
 	if (!m_array) return 0;
 	return m_struct.size();
-}
-
-Structure::const_iterator Structure::begin() const
-{
-	return m_struct.begin();
-}
-
-Structure::const_iterator Structure::end() const
-{
-	return m_struct.end();
 }
 
 static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level)
@@ -126,9 +178,6 @@ void Structure::print( std::ostream& out, const utils::PrintFormat* pformat, std
 std::string Structure::tostring( const utils::PrintFormat* pformat) const
 {
 	std::ostringstream buf;
-	/*[-]*/	std::cout << "CALL Structure::tostring -> ";
-	/*[-]*/	print( std::cout, utils::ptreePrintFormat(), 0);
-	/*[-]*/	std::cout << std::endl;
 	print( buf, pformat, 0);
 	return buf.str();
 }

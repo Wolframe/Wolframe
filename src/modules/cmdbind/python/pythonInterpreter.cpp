@@ -1,39 +1,31 @@
 #include "pythonInterpreter.hpp"
 #include "logger-v1.hpp"
 #include "utils/fileUtils.hpp"
-
 #include <stdexcept>
 #include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+using namespace _Wolframe::langbind::python;
 
-python::Interpreter::Interpreter( const std::string prgfile )
+InterpreterInstanceR python::Interpreter::getInstance( const std::string&) const
 {
-	MOD_LOG_TRACE << "[python] Creating Python interpreter with module " << prgfile;
+	return InterpreterInstanceR();
+}
 
-	std::string modulePath = utils::getParentPath( prgfile, 1 );
-	MOD_LOG_TRACE << "[python] Primary Python load path '" << modulePath << "'";
-
-	// should be set to what? 'python' sets it to itself, setting it
-	// to modulePath or wolframe leads to introspection problems later!
-	//~ wchar_t progname[FILENAME_MAX + 1];
-	//~ mbstowcs( progname, modulePath.c_str( ), modulePath.size( ) + 1 );
-	//~ Py_SetProgramName( progname ); 
-	
-	Py_InitializeEx( 0 );
-	
-	PyRun_SimpleString( "import sys, os; sys.path.insert( 1, os.getcwd( ) )" );
-	std::ostringstream s;
-	s << "sys.path.insert( 1, '" << modulePath << "' )";
-	PyRun_SimpleString( s.str( ).c_str( ) );
-
-	PyRun_SimpleString( "sys.dont_write_bytecode = True" );
-	
+std::vector<std::string> python::Interpreter::loadProgram( const std::string& prgfile )
+{
+	MOD_LOG_TRACE << "[python] Loading module in file " << prgfile;
+	if (m_modulePath.empty())
+	{
+		m_modulePath = utils::getParentPath( prgfile, 1 );
+		MOD_LOG_TRACE << "[python] Primary Python load path '" << m_modulePath << "'";
+	}
+	std::vector<std::string> rt;
 	std::string moduleName = utils::getFileStem( prgfile );
-	MOD_LOG_TRACE << "[python] Python module name '" << moduleName << "'";
+	MOD_LOG_TRACE << "[python] module name '" << moduleName << "'";
 	PyObject *name = PyUnicode_FromString( moduleName.c_str( ) );
-	
+
 	PyObject *module = PyImport_Import( name );
 
 	Py_DECREF( name );
@@ -52,10 +44,36 @@ python::Interpreter::Interpreter( const std::string prgfile )
 					<< pyGetRepr( key ) << ": "
 					<< pyGetRepr( value );
 			m_functions.push_back( pyGetStr( key ) );
+			rt.push_back( m_functions.back());
 		}
 	}
 
 	Py_DECREF( module );
+	return rt;
+}
+
+python::Interpreter::Interpreter()
+{
+	MOD_LOG_TRACE << "[python] Creating interpreter";
+
+	// should be set to what? 'python' sets it to itself, setting it
+	// to modulePath or wolframe leads to introspection problems later!
+	//~ wchar_t progname[FILENAME_MAX + 1];
+	//~ mbstowcs( progname, modulePath.c_str( ), modulePath.size( ) + 1 );
+	//~ Py_SetProgramName( progname );
+
+	Py_InitializeEx( 0 );
+
+	PyRun_SimpleString( "import sys, os; sys.path.insert( 1, os.getcwd( ) )" );
+	std::ostringstream s;
+
+	//PF:NOTE: Do not know how to get the module path. There is no configuration avalable and no module path can be passed.
+	//	The original source create the interpreter with one source file but this is obsolete. Open discussion how to proceed here.
+
+	s << "sys.path.insert( 1, '" << m_modulePath << "' )";
+	PyRun_SimpleString( s.str( ).c_str( ) );
+
+	PyRun_SimpleString( "sys.dont_write_bytecode = True" );
 }
 
 python::Interpreter::~Interpreter( )

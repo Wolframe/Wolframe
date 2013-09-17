@@ -17,7 +17,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
@@ -29,7 +29,8 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	pythonInterpreter.obj \
-	pythonFunctionCall.obj \
+	pythonInterpreterInstance.obj \
+	pythonStructure.obj \
 	pythonFunctionProgramType.obj \
 	mod_command_python.obj
 

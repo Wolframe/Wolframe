@@ -27,7 +27,7 @@ std::vector<std::string> Interpreter::loadProgram( const std::string& name)
 	return rt;
 }
 
-InterpreterInstanceR Interpreter::getInstance( const std::string& funcname) const
+InterpreterInstanceR Interpreter::getInstance( const std::string&) const
 {
 	return InterpreterInstanceR( new InterpreterInstance());
 }

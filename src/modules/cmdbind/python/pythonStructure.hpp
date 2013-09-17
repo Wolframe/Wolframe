@@ -29,30 +29,32 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mylangStructure.hpp
-///\brief Interface to mylang data structure representing input/output of a mylang form function
-#ifndef _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
-#define _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
-#include "types/variant.hpp"
+///\file pythonStructure.hpp
+///\brief Interface to python data structure representing input/output of a python form function
+#ifndef _Wolframe_python_STRUCTURE_HPP_INCLUDED
+#define _Wolframe_python_STRUCTURE_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/variant.hpp"
 #include "utils/printFormats.hpp"
 #include <vector>
 #include <string>
 #include <ostream>
+#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {
-namespace mylang {
+namespace python {
 
 ///\class Structure
-///\brief Data structure for input and output of a 'Mylang' function call
+///\brief Data structure for input and output of a 'python' function call
 class Structure
 {
 public:
 	///\brief Constructor
-	explicit Structure()
-		:m_array(false){}
-	virtual ~Structure(){}
+	Structure();
+	explicit Structure( PyObject* obj_);
+	Structure( const Structure& o);
+	virtual ~Structure();
 
 	///\brief Create an element in a structure and get a reference pointer to it
 	///\param[in] elemid_ Id of the created element
@@ -70,7 +72,7 @@ public:
 	///\param[in] value value or content element of 'this'
 	void setValue( const types::Variant& value_);
 	///\brief Getter for element value in case of this representing an atom
-	types::Variant getValue() const;
+	const types::Variant& getValue() const;
 
 	///\brief Find out if 'this' represents an atomic value
 	///\return true, if yes
@@ -84,19 +86,16 @@ public:
 	///\brief Get the index of the last element in case of an array
 	unsigned int lastArrayIndex() const;
 
-	typedef std::pair<types::Variant,Structure*> KeyValuePair;
-
 	///\brief Iterator on structure or array elements
 	class const_iterator
 	{
 	public:
 		const_iterator();
-		const_iterator( const Structure* st_, std::size_t pos_);
 		explicit const_iterator( const Structure* st_);
 		const_iterator( const const_iterator& o);
-		~const_iterator(){}
+		~const_iterator();
 
-		int compare( const const_iterator& o) const;
+		int compare( const const_iterator& o) const			{return (int)m_pos - (int)o.m_pos;}
 
 		bool operator==( const const_iterator& o) const			{return compare(o) == 0;}
 		bool operator!=( const const_iterator& o) const			{return compare(o) != 0;}
@@ -110,12 +109,12 @@ public:
 
 		struct Element
 		{
-			types::VariantConst key;
-			Structure* val;
+			PyObject* key;
+			PyObject* val;
 
-			bool atomic() const					{return val->atomic();}
-			bool array() const					{return val->array();}
-			types::Variant getValue() const				{return val->getValue();}
+			bool atomic() const;
+			bool array() const;
+			types::Variant getValue() const;
 		};
 		const Element* operator->() const				{return &m_elem;}
 		const Element& operator*() const				{return m_elem;}
@@ -124,26 +123,35 @@ public:
 		void fetch_next();
 
 		const Structure* m_st;
-		std::vector<KeyValuePair>::const_iterator m_itr;
-		std::vector<KeyValuePair>::const_iterator m_end;
+		PyObject* m_itr;
+		Py_ssize_t m_pos;
 		Element m_elem;
 	};
 
 	///\brief Get the start iterator on structure or array elements
 	const_iterator begin() const						{return const_iterator(this);}
 	///\brief Get the end marker for a structure or and array
-	const_iterator end() const						{return const_iterator(this, m_struct.size());}
+	const_iterator end() const						{return const_iterator();}
 
 	///\brief Print the structure serialized as string to out
 	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
 	///\brief Get the structure serialized as string for output
 	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
+	enum Type
+	{	Nil,
+		Array,
+		Map,
+		Atomic
+	};
+	Type type() const;
+	PyObject* obj() const							{return m_obj;}
+
+	void clear();
+
 private:
 	friend class Structure::const_iterator;
-	std::vector<KeyValuePair> m_struct;	//< mimic language structure
-	types::Variant m_value;			//< value for atomic element
-	bool m_array;				//< true, if this represents an array
+	PyObject* m_obj;			//< python data structure representation
 };
 
 ///\brief Reference with ownership to a structure

@@ -46,7 +46,7 @@ static void setModuleLogger( void* logger)
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static SimpleBuilder* createMylangProgramType()
+static SimpleBuilder* mylangProgramTypeBuilder()
 {
 	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "mylang", langbind::createMylangProgramType);
 }
@@ -55,7 +55,7 @@ enum {NofConfiguredBuilder=0};
 enum {NofSimpleBuilder=1};
 static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 {
-	createMylangProgramType
+	mylangProgramTypeBuilder
 };
 
 ModuleEntryPoint entryPoint( 0, "form function handler for mylang",

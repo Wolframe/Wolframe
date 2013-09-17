@@ -110,7 +110,7 @@ public:
 				}
 				return true;
 			}
-			if (m_stk.back().itr->second->atomic())
+			if (m_stk.back().itr->atomic())
 			{
 				if (m_stk.back().tag.defined())
 				{
@@ -118,22 +118,22 @@ public:
 				}
 				else
 				{
-					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
 				}
-				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().itr->second->getValue()));
+				m_buf.push_back( BufElem( InputFilter::Value, m_stk.back().itr->getValue()));
 				m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
 				m_stk.back().itr++;
 			}
 			else
 			{
 				types::Variant tag;
-				if (m_stk.back().itr->second->array() && !flag( TypedInputFilter::SerializeWithIndices))
+				if (m_stk.back().itr->array() && !flag( TypedInputFilter::SerializeWithIndices))
 				{
 					if (m_stk.back().tag.defined())
 					{
 						throw std::runtime_error("illegal structure: array of array");
 					}
-					tag = m_stk.back().itr->first;
+					tag = m_stk.back().itr->key;
 					// ... if tag is defined then Open/Close will be printed with every (array-) element
 					//	and here we do not print an 'Open'
 				}
@@ -145,12 +145,12 @@ public:
 					}
 					else
 					{
-						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->first));
+						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
 					}
 					// ... if tag is not defined then an 'Open' is printed
 					//	and a final 'Close' will be printed when the structure is popped from the stack.
 				}
-				m_stk.push_back( StackElem( m_stk.back().itr->second, tag));
+				m_stk.push_back( StackElem( m_stk.back().itr->val, tag));
 				++m_stk[ m_stk.size()-2].itr;
 			}
 		}
@@ -295,16 +295,13 @@ public:
 	{
 		m_provider = provider;
 		m_arg = arg;
-		if (m_instance->needsArrayIndices())
+		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
-			if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
-			{
-				throw std::runtime_error( "calling mylang without input structure info");
-			}
+			throw std::runtime_error( "calling mylang without input structure info");
 		}
 		m_initialized = false;
 		m_initStmStack.clear();
-		m_input.reset( new mylang::Structure( m_instance.get()));
+		m_input.reset( new mylang::Structure());
 		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
 	}
 
@@ -323,7 +320,7 @@ private:
 	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
 	mylang::StructureR m_input;			//< pointer to input structure
 	mylang::StructureR m_output;			//< pointer to output structure
-	mylang::InterpreterInstanceR m_instance;		//< interpreter instance
+	mylang::InterpreterInstanceR m_instance;	//< interpreter instance
 	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
 };
 
