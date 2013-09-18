@@ -32,7 +32,9 @@ Project Wolframe.
 ///\file pythonFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for python scripts
 #include "pythonFunctionProgramType.hpp"
+#include "pythonStructureBuilder.hpp"
 #include "pythonInterpreter.hpp"
+#include "pythonObject.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
@@ -55,18 +57,17 @@ class PythonResult
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:types::TypeSignature("langbind::pythonResult", __LINE__)
+		:types::TypeSignature("langbind::PythonResult", __LINE__)
 		,m_data(data_)
 		,m_bufidx(0)
 	{
-		if (!m_data.get())
+		if (m_data.get())
 		{
-			// ... empty structure (NULL)
-			m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
+			m_stk.push_back( StackElem( *m_data));
 		}
 		else
 		{
-			m_stk.push_back( StackElem( *m_data.get(), types::Variant()));
+			m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
 		}
 	}
 
@@ -158,7 +159,7 @@ public:
 					// ... if tag is not defined then an 'Open' is printed
 					//	and a final 'Close' will be printed when the structure is popped from the stack.
 				}
-				m_stk.push_back( StackElem( python::Structure( m_stk.back().itr->val), tag));
+				m_stk.push_back( StackElem( m_stk.back().itr->val, tag));
 				++m_stk[ m_stk.size()-2].itr;
 			}
 		}
@@ -174,13 +175,21 @@ private:
 		python::Structure::const_iterator itr;
 		python::Structure::const_iterator end;
 		types::Variant tag;
-		python::Structure structure;
+		python::Structure obj;
 
 		StackElem(){}
-		StackElem( const python::Structure& st, const types::Variant& tag_)
-			:itr(st.begin()),end(st.end()),tag(tag_),structure(st){}
+		StackElem( const python::Structure& obj_)
+			:obj(obj_)
+		{
+			itr = obj.begin(); end = obj.end();
+		}
+		StackElem( const PyObject* obj_, const types::Variant& tag_)
+			:tag(tag_),obj(python::Object(obj_))
+		{
+			itr = obj.begin(); end = obj.end();
+		}
 		StackElem( const StackElem& o)
-			:itr(o.itr),end(o.end),tag(o.tag){}
+			:itr(o.itr),end(o.end),tag(o.tag),obj(o.obj){}
 	};
 	std::vector<StackElem> m_stk;
 };
@@ -197,18 +206,6 @@ public:
 
 	virtual ~PythonFormFunctionClosure(){}
 
-	std::string currentElementPath()
-	{
-		std::string rt;
-		std::vector<InitStackElem>::const_iterator ci = m_initStmStack.begin(), ce = m_initStmStack.end();
-		for (; ci != ce; ++ci)
-		{
-			if (rt.size()) rt.append( "/");
-			if (ci->first.defined()) rt.append( ci->first.tostring());
-		}
-		return rt;
-	}
-
 	virtual bool call()
 	{
 		if (!m_initialized)
@@ -223,25 +220,25 @@ public:
 					{
 						case InputFilter::OpenTag:
 						{
-							python::Structure* substruct;
 							if (elem.type() == types::Variant::UInt || elem.type() == types::Variant::Int)
 							{
 								unsigned int idx = elem.touint();
-								unsigned int lastidx = m_initStmStack.back().second->lastArrayIndex();
+								unsigned int lastidx = m_inputbuilder.lastArrayIndex();
 								if (lastidx == 0 && idx != 1) throw std::runtime_error( "elements in array not starting from 1");
 								if (idx <= lastidx) throw std::runtime_error( "elements in array not ascending");
 								for (++lastidx; lastidx < idx; ++lastidx)
 								{
 									// add elements for holes in the array
-									m_initStmStack.back().second->addArrayElement();
+									m_inputbuilder.openArrayElement();
+									m_inputbuilder.setValue( types::Variant());
+									m_inputbuilder.closeElement();
 								}
-								substruct = m_initStmStack.back().second->addArrayElement();
+								m_inputbuilder.openArrayElement();
 							}
 							else
 							{
-								substruct = m_initStmStack.back().second->addStructElement( elem.tostring());
+								m_inputbuilder.openElement( elem.tostring());
 							}
-							m_initStmStack.push_back( InitStackElem( elem, substruct));
 							break;
 						}
 						case InputFilter::Attribute:
@@ -252,30 +249,32 @@ public:
 						case InputFilter::Value:
 							if (!m_tagbuf.empty())
 							{
-								python::Structure* substruct = m_initStmStack.back().second->addStructElement( m_tagbuf);
-								substruct->setValue( elem);
+								m_inputbuilder.openElement( m_tagbuf);
+								m_inputbuilder.setValue( elem);
+								m_inputbuilder.closeElement();
 							}
-							else if (m_initStmStack.back().second->atomic())
+							else if (!m_inputbuilder.defined() || m_inputbuilder.atomic())
 							{
-								m_initStmStack.back().second->setValue( elem);
-							}
-							else if (m_initStmStack.back().second->array())
-							{
-								throw std::runtime_error("missing array index for array element");
+								m_inputbuilder.setValue( elem);
 							}
 							else
 							{
-								python::Structure* substruct = m_initStmStack.back().second->addStructElement( "");
-								substruct->setValue( elem);
+								m_inputbuilder.openElement( "");
+								m_inputbuilder.setValue( elem);
+								m_inputbuilder.closeElement();
 							}
 							m_tagbuf.clear();
 							break;
 
 						case InputFilter::CloseTag:
-							m_initStmStack.pop_back();
-							if (m_initStmStack.empty())
+							if (m_inputbuilder.taglevel() == 0)
 							{
+								m_input = m_inputbuilder.get();
 								m_initialized = true;
+							}
+							else
+							{
+								m_inputbuilder.closeElement();
 							}
 							break;
 					}
@@ -283,7 +282,7 @@ public:
 			}
 			catch (const std::runtime_error& e)
 			{
-				throw std::runtime_error( std::string( "error function call ") + m_name + " in parameter at " + currentElementPath() + ": " + e.what());
+				throw std::runtime_error( std::string( "error function call ") + m_name + " in parameter at " + m_inputbuilder.currentElementPath() + ": " + e.what());
 			}
 			if (!m_initialized) return false;
 		}
@@ -304,15 +303,13 @@ public:
 	{
 		m_provider = provider;
 		m_arg = arg;
-
 		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
 			throw std::runtime_error( "calling python without input structure info");
 		}
 		m_initialized = false;
-		m_initStmStack.clear();
-		m_input.reset( new python::Structure());
-		m_initStmStack.push_back( InitStackElem( types::Variant(), m_input.get()));
+		m_inputbuilder.clear();
+		m_input.reset();
 	}
 
 	virtual TypedInputFilterR result() const
@@ -325,9 +322,8 @@ private:
 	std::string m_name;				//< name of the function called for error messages
 	TypedInputFilterR m_arg;			//< call argument as input filter
 	bool m_initialized;				//< true, if the input has been initialized
-	typedef std::pair<types::Variant,python::Structure*> InitStackElem;
-	std::vector<InitStackElem> m_initStmStack;	//< Stack for substructure initialization
 	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
+	python::StructureBuilder m_inputbuilder;	//< structure input builder object
 	python::StructureR m_input;			//< pointer to input structure
 	python::StructureR m_output;			//< pointer to output structure
 	python::InterpreterInstanceR m_instance;	//< interpreter instance

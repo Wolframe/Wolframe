@@ -29,19 +29,17 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonFunctionProgramType.hpp
-///\brief Function to create a form function program type object for python scripts
-#ifndef _Wolframe_python_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
-#define _Wolframe_python_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
-#include "prgbind/program.hpp"
+///\file pythonException.hpp
+///\brief Interface for Translating Python Exception to C++/Wolframe Exceptions
+#ifndef _Wolframe_python_EXCEPTION_HPP_INCLUDED
+#define _Wolframe_python_EXCEPTION_HPP_INCLUDED
+#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {
+namespace python {
 
-///\brief Program type constructor
-prgbind::Program* createPythonProgramType();
+void THROW_ON_ERROR( const char* usrmsg);
 
-}} //namespace
+}}}//namespace
 #endif
-
-

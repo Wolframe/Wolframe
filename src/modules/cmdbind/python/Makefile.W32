@@ -28,9 +28,13 @@ DYNAMIC_MODULE = \
 	mod_command_python.dll
 
 CPP_OBJS = \
+	pythonException.obj \
+	pythonObject.obj \
+	pythonObjectIterator.obj \
 	pythonInterpreter.obj \
 	pythonInterpreterInstance.obj \
 	pythonStructure.obj \
+	pythonStructureBuilder.obj \
 	pythonFunctionProgramType.obj \
 	mod_command_python.obj
 

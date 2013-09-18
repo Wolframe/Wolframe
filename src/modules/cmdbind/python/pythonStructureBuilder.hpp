@@ -29,21 +29,21 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mylangStructureBuilder.hpp
-///\brief Interface to mylang data structure building
-#ifndef _Wolframe_Mylang_STRUCTURE_BUILDER_HPP_INCLUDED
-#define _Wolframe_Mylang_STRUCTURE_BUILDER_HPP_INCLUDED
-#include "mylangStructure.hpp"
+///\file pythonStructureBuilder.hpp
+///\brief Interface to python data structure building
+#ifndef _Wolframe_python_STRUCTURE_BUILDER_HPP_INCLUDED
+#define _Wolframe_python_STRUCTURE_BUILDER_HPP_INCLUDED
+#include "pythonStructure.hpp"
 #include "types/variant.hpp"
 #include "types/countedReference.hpp"
 #include "utils/printFormats.hpp"
+#include <utility>
 #include <vector>
 #include <string>
-#include <ostream>
 
 namespace _Wolframe {
 namespace langbind {
-namespace mylang {
+namespace python {
 
 ///\class StructureBuilder
 ///\brief Data structure builder
@@ -75,7 +75,7 @@ public:
 	void setValue( const types::Variant& value_);
 
 	///\brief Get the index of the last element in case of an array
-	unsigned int lastArrayIndex() const;
+	Py_ssize_t lastArrayIndex() const;
 
 	///\brief Get a reference to the structure build
 	StructureR get() const;
@@ -95,7 +95,20 @@ public:
 	void clear();
 
 private:
-	std::vector<StructureR> m_stk;			//< builder stack
+	struct StackElement
+	{
+		bool m_arrayelem;
+		std::string m_key;
+		Object m_value;
+
+		StackElement( const StackElement& o)
+			:m_arrayelem(o.m_arrayelem),m_key(o.m_key),m_value(o.m_value){}
+		StackElement()
+			:m_arrayelem(true){}
+		StackElement( const std::string& key_)
+			:m_arrayelem(false),m_key(key_){}
+	};
+	std::vector<StackElement> m_stk;	//< builder stack
 };
 
 }}}//namespace

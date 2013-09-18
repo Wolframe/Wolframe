@@ -33,6 +33,8 @@ Project Wolframe.
 ///\brief Interface to python data structure representing input/output of a python form function
 #ifndef _Wolframe_python_STRUCTURE_HPP_INCLUDED
 #define _Wolframe_python_STRUCTURE_HPP_INCLUDED
+#include "pythonObject.hpp"
+#include "pythonObjectIterator.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include "utils/printFormats.hpp"
@@ -48,110 +50,25 @@ namespace python {
 ///\class Structure
 ///\brief Data structure for input and output of a 'python' function call
 class Structure
+	:public Object
 {
 public:
 	///\brief Constructor
-	Structure();
-	explicit Structure( PyObject* obj_);
-	Structure( const Structure& o);
-	virtual ~Structure();
+	Structure(){}
+	Structure( const Structure& o)	:Object(o){}
+	Structure( const Object& o)	:Object(o){}
 
-	///\brief Create an element in a structure and get a reference pointer to it
-	///\param[in] elemid_ Id of the created element
-	///\remark Throws on error
-	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
-	Structure* addStructElement( const std::string& elemid_);
-
-	///\brief Create an element in an array and get a reference pointer to it
-	///\param[in] elemid_ Id of the array
-	///\remark Throws on error
-	///\remark Only a reference is returned; the disposal of the structure (ownership) is up to 'this'
-	Structure* addArrayElement();
-
-	///\brief Setter for element value in case of this representing an atom
-	///\param[in] value value or content element of 'this'
-	void setValue( const types::Variant& value_);
-	///\brief Getter for element value in case of this representing an atom
-	const types::Variant& getValue() const;
-
-	///\brief Find out if 'this' represents an atomic value
-	///\return true, if yes
-	bool atomic() const;
-	///\brief Find out if 'this' represents an array of 'Structure'
-	///\return true, if yes
-	bool array() const;
-	///\brief Find out how many elements are defined in this structure
-	///\return the count
-
-	///\brief Get the index of the last element in case of an array
-	unsigned int lastArrayIndex() const;
-
-	///\brief Iterator on structure or array elements
-	class const_iterator
-	{
-	public:
-		const_iterator();
-		explicit const_iterator( const Structure* st_);
-		const_iterator( const const_iterator& o);
-		~const_iterator();
-
-		int compare( const const_iterator& o) const			{return (int)m_pos - (int)o.m_pos;}
-
-		bool operator==( const const_iterator& o) const			{return compare(o) == 0;}
-		bool operator!=( const const_iterator& o) const			{return compare(o) != 0;}
-		bool operator<( const const_iterator& o) const			{return compare(o) < 0;}
-		bool operator<=( const const_iterator& o) const			{return compare(o) <= 0;}
-		bool operator>( const const_iterator& o) const			{return compare(o) > 0;}
-		bool operator>=( const const_iterator& o) const			{return compare(o) >= 0;}
-
-		const_iterator& operator++()					{fetch_next(); return *this;}
-		const_iterator operator++(int)					{const_iterator rt(*this); fetch_next(); return rt;}
-
-		struct Element
-		{
-			PyObject* key;
-			PyObject* val;
-
-			bool atomic() const;
-			bool array() const;
-			types::Variant getValue() const;
-		};
-		const Element* operator->() const				{return &m_elem;}
-		const Element& operator*() const				{return m_elem;}
-
-	private:
-		void fetch_next();
-
-		const Structure* m_st;
-		PyObject* m_itr;
-		Py_ssize_t m_pos;
-		Element m_elem;
-	};
+	typedef ObjectIterator const_iterator;
 
 	///\brief Get the start iterator on structure or array elements
-	const_iterator begin() const						{return const_iterator(this);}
+	const_iterator begin() const	{return const_iterator( *this);}
 	///\brief Get the end marker for a structure or and array
-	const_iterator end() const						{return const_iterator();}
+	const_iterator end() const	{return const_iterator();}
 
 	///\brief Print the structure serialized as string to out
 	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
 	///\brief Get the structure serialized as string for output
 	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
-
-	enum Type
-	{	Nil,
-		Array,
-		Map,
-		Atomic
-	};
-	Type type() const;
-	PyObject* obj() const							{return m_obj;}
-
-	void clear();
-
-private:
-	friend class Structure::const_iterator;
-	PyObject* m_obj;			//< python data structure representation
 };
 
 ///\brief Reference with ownership to a structure
