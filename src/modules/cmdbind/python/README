@@ -5,7 +5,7 @@ pythonObject.hpp/cpp			:Interface to python object for using python reference co
 pythonObjectIterator.hpp/cpp		:Iterator on python objects representing lists or associative arrays
 pythonStructureBuilder.hpp/cpp		:Object providing the building of a complex python object
 pythonStructure.hpp/cpp			:Object representing a complex object in python
-pythonInterpreter.hpp/cpp		:Interpreter interface. The interpreter is the object collecting all resources and data shared in the interpreter context and it creates the instances doing the job.
+pythonInterpreter.hpp/cpp		:Interpreter interface. The object collecting all resources and data shared in the interpreter context. It creates or borrows the instances doing the job on demand.
 pythonInterpreterInstance.hpp/cpp	:Interface to interpreter instances created for running one form function call to python
 pythonFunctionProgramType.hpp/cpp	:Function to create a form function program type object for python scripts
 
