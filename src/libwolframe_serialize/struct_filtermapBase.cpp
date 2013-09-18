@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapBase.cpp
+///\file struct_filtermapBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapBase.hpp"

@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.cpp
+///\file mapContext.cpp
 ///\brief Defines the error handling of serialization/deserialization functions and some other common stuff
 
 #include "serialize/mapContext.hpp"

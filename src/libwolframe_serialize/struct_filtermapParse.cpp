@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_struct_filtermapParse.cpp
+///\file struct_filtermapParse.cpp
 ///\brief Implements some shared helpers of the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
 #include "serialize/struct/filtermapParse.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"

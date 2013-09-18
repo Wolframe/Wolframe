@@ -29,6 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+///\file luaObjects.cpp
 #include "luaObjects.hpp"
 #include "luaDebug.hpp"
 #include "luafilter.hpp"

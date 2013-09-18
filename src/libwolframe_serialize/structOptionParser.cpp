@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_structOptionParser.cpp
+///\file structOptionParser.cpp
 ///\brief Implements uniform handling of structures in program command line options
 #include "serialize/structOptionParser.hpp"
 #include "utils/parseUtils.hpp"

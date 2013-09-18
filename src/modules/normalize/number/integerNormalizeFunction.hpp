@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/integerNormalizeFunction.hpp
+///\file integerNormalizeFunction.hpp
 ///\brief Normalizer for signed or unsigned integer numbers
 #ifndef _LANGBIND_INTEGER_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_INTEGER_NORMALIZE_FUNCTION_HPP_INCLUDED

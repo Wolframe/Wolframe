@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/floatNormalizeFunction.cpp
+///\file floatNormalizeFunction.cpp
 #include "floatNormalizeFunction.hpp"
 #include <boost/lexical_cast.hpp>
 

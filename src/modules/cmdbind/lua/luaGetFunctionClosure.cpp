@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaGetFunctionClosure.cpp
+///\file luaGetFunctionClosure.cpp
 ///\brief Interface to the Closure of the :get int the lua binding
 
 #include "luaGetFunctionClosure.hpp"

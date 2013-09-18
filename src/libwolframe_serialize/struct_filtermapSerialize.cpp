@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_struct_filtermapSerialize.cpp
+///\file struct_filtermapSerialize.cpp
 ///\brief Helper function for the serialization of structures
 #include "serialize/struct/filtermapSerialize.hpp"
 #include "serialize/struct/filtermapPrintValue.hpp"

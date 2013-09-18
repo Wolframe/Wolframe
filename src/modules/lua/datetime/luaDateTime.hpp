@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaDateTime.hpp
+///\file luaDateTime.hpp
 ///\brief Defines the "date" type for Lua
 #ifndef _Wolframe_LANGBIND_LUA_DATETIME_HPP_INCLUDED
 #define _Wolframe_LANGBIND_LUA_DATETIME_HPP_INCLUDED

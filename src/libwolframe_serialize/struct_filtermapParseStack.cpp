@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_struct_filtermapParseStack.cpp
+///\file struct_filtermapParseStack.cpp
 ///\brief Implements the parsing stack for deserialization
 #include "serialize/struct/filtermapParseStack.hpp"
 

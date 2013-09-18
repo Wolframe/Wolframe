@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/integerNormalizeFunction.cpp
+///\file integerNormalizeFunction.cpp
 #include "integerNormalizeFunction.hpp"
 #include <limits>
 

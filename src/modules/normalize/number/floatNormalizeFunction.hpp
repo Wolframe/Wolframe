@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/floatNormalizeFunction.hpp
+///\file floatNormalizeFunction.hpp
 ///\brief Normalizer for floating point numbers
 #ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED

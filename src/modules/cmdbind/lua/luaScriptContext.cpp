@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file luaScriptConfig.cpp
+///\file luaScriptContext.cpp
 ///\brief Implementation of the lua script objects configuration
 #include "luaScriptContext.hpp"
 #include "processor/moduleInterface.hpp"
