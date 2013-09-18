@@ -351,8 +351,6 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	typedef TransactionFunctionDescription::PrintStep PrintStep;
 	typedef TransactionFunctionDescription::OperationStep OperationStep;
 	typedef OperationStep::Call Call;
-	typedef TransactionFunctionDescription::VariableValue VariableValue;
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
 
 	// Compile the preprocessing commands:
 	{

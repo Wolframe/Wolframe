@@ -52,14 +52,14 @@ types::Variant Object::value() const
 	}
 	else if (PyBool_Check( obj))
 	{
-		if (obj == Py_False)
+		if (PyObject_IsTrue( obj))
 		{
-			return types::Variant( false);
+			return types::Variant( true);
 		}
 		else
 		{
-			return types::Variant( true);
-
+			THROW_ON_ERROR( "failed to check boolean");
+			return types::Variant( false);
 		}
 	}
 	else if (PyBytes_Check( obj))
@@ -122,16 +122,7 @@ Object::Object( const types::Variant& val)
 			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unsigned long integer");
 		break;
 		case types::Variant::Bool:
-			if (val.tobool())
-			{
-				m_obj = Py_True;
-				Py_INCREF( m_obj);
-			}
-			else
-			{
-				m_obj = Py_False;
-				Py_INCREF( m_obj);
-			}
+			m_obj = PyBool_FromLong( val.tobool()?1:0);
 		break;
 		case types::Variant::Double:
 			m_obj = PyFloat_FromDouble( val.todouble());
