@@ -263,6 +263,7 @@ Object& Object::operator=( const Object& o)
 	clear();
 	m_obj = o.m_obj;
 	if (m_obj) Py_INCREF( m_obj);
+	return *this;
 }
 
 
