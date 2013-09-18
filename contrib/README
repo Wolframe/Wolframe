@@ -13,3 +13,5 @@ redhat                          - local build script for RHEL
 FreeBSD                         - FreeBSD ports and patches
 Solaris                         - Solaris ports and patches
 Windows                         - Windows patches
+
+build				- shell/xslt-based build pages
