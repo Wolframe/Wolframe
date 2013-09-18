@@ -37,9 +37,19 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 using namespace _Wolframe::langbind::python;
 
-types::Variant Object::value() const
+std::string Object::tostring( PyObject* obj)
 {
-	PyObject* obj = const_cast<PyObject*>(m_obj);
+	PyObject* serialization = PyObject_Str( obj);
+	if (!serialization) THROW_ON_ERROR( "failed to convert atomic type to string (no serialization to string available)");
+	const char* str = PyBytes_AsString( serialization);
+	Py_ssize_t size = PyBytes_Size( serialization);
+	std::string rt = std::string( str, size);
+	Py_DECREF( serialization);
+	return rt;
+}
+
+types::Variant Object::value( PyObject* obj)
+{
 	if (!obj) throw std::runtime_error( "accessing undefined object");
 
 	if (PyLong_Check( obj))
@@ -103,6 +113,16 @@ types::Variant Object::value() const
 		Py_DECREF( serialization);
 		return rt;
 	}
+}
+
+types::Variant Object::value() const
+{
+	return Object::value( const_cast<PyObject*>(m_obj));
+}
+
+std::string Object::tostring() const
+{
+	return Object::tostring( const_cast<PyObject*>(m_obj));
 }
 
 Object::Object( const types::Variant& val)

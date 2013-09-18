@@ -183,8 +183,8 @@ private:
 		{
 			itr = obj.begin(); end = obj.end();
 		}
-		StackElem( const PyObject* obj_, const types::Variant& tag_)
-			:tag(tag_),obj(python::Object(obj_))
+		StackElem( PyObject* obj_, const types::Variant& tag_)
+			:tag(tag_),obj(obj_)
 		{
 			itr = obj.begin(); end = obj.end();
 		}

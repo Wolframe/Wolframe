@@ -13,6 +13,48 @@ static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat,
 
 void Structure::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
 {
+	if (array())
+	{
+		Structure::const_iterator si = begin(), se = end();
+		out << pformat->openstruct;
+		int idx = 0;
+		for (; si != se; ++si,++idx)
+		{
+			if (idx) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
+			Structure elem( si->val);
+			elem.print( out, pformat, level+1);
+		}
+		if (idx>0)
+		{
+			print_newitem( out, pformat, level);
+		}
+		out << pformat->closestruct;
+	}
+	else if (atomic())
+	{
+		out << pformat->startvalue;
+		out << value().tostring();
+		out << pformat->endvalue;
+	}
+	else
+	{
+		Structure::const_iterator si = begin(), se = end();
+		out << pformat->openstruct;
+
+		int idx = 0;
+		for (; si != se; ++si,++idx)
+		{
+			if (idx) out << pformat->decldelimiter;
+			print_newitem( out, pformat, level);
+
+			out << Object::tostring(si->key) << pformat->assign;
+
+			Structure val( si->val);
+			val.print( out, pformat, level+1);
+		}
+		out << pformat->closestruct;
+	}
 }
 
 std::string Structure::tostring( const utils::PrintFormat* pformat) const

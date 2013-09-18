@@ -56,9 +56,11 @@ public:
 	///\brief Constructor
 	Structure(){}
 	///\brief Copy constructor
-	Structure( const Structure& o)	:Object(o){}
+	Structure( const Structure& o)			:Object(o){}
 	///\brief Copy constructor
-	Structure( const Object& o)	:Object(o){}
+	Structure( const Object& o)			:Object(o){}
+	///\brief Constructor
+	Structure( PyObject* o, bool isborrowed=true)	:Object(o,isborrowed){}
 
 	typedef ObjectIterator const_iterator;
 

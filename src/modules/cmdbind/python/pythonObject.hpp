@@ -78,6 +78,15 @@ public:
 	///\brief Get the object value as variant
 	types::Variant value() const;
 
+	///\brief Get the object value of 'obj' as variant
+	static types::Variant value( PyObject* obj);
+
+	///\brief Get the object value as std::string
+	std::string tostring() const;
+
+	///\brief Get the object value of 'obj' as std::string
+	static std::string tostring( PyObject* obj);
+
 	///\brief Find out if 'this' represents an atomic value
 	///\return true, if yes
 	bool atomic() const		{return type() == Object::Atomic;}
