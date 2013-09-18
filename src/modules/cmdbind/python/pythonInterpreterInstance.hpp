@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file pythonInterpreterInstance.hpp
-///\brief Function call for Python scripts
+///\brief Interface to interpreter instances created for running one form function call to python
 #ifndef _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
 #define _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
 #include "pythonStructure.hpp"

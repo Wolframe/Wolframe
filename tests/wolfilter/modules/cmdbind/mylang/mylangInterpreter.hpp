@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file mylangInterpreter.hpp
-///\brief Interpreter interface
+///\brief Interpreter interface. The interpreter is the object collecting all resources and data shared in the interpreter context and it creates the instances doing the job.
 #ifndef _Wolframe_Mylang_INTERPRETER_HPP_INCLUDED
 #define _Wolframe_Mylang_INTERPRETER_HPP_INCLUDED
 #include "mylangInterpreterInstance.hpp"

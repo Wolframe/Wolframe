@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file mylangInterpreterInstance.hpp
-///\brief Function call for mylang scripts
+///\brief Interface to interpreter instances created for running one form function call to python
 #ifndef _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
 #define _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
 #include "mylangStructure.hpp"

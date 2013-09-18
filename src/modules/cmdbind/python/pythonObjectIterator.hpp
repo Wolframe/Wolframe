@@ -44,13 +44,20 @@ namespace python {
 class ObjectIterator
 {
 public:
+	///\brief Default constructor
 	ObjectIterator();
+	///\brief Constructor
 	explicit ObjectIterator( const Object& obj_);
+	///\brief Copy constructor
 	ObjectIterator( const ObjectIterator& o);
+	///\brief Destructor
 	~ObjectIterator();
 
+	///\brief Compare objects
+	///\return -1 if 'this' is smaller than 'o', +1 if 'this' is bigger than 'o', 0 if 'this' and 'o' are equal
 	int compare( const ObjectIterator& o) const			{return (int)m_pos - (int)o.m_pos;}
 
+	///\brief Compare operators
 	bool operator==( const ObjectIterator& o) const			{return compare(o) == 0;}
 	bool operator!=( const ObjectIterator& o) const			{return compare(o) != 0;}
 	bool operator<( const ObjectIterator& o) const			{return compare(o) < 0;}
@@ -58,28 +65,30 @@ public:
 	bool operator>( const ObjectIterator& o) const			{return compare(o) > 0;}
 	bool operator>=( const ObjectIterator& o) const			{return compare(o) >= 0;}
 
+	///\brief Increment
 	ObjectIterator& operator++()					{fetch_next(); return *this;}
 	ObjectIterator operator++(int)					{ObjectIterator rt(*this); fetch_next(); return rt;}
 
 	struct Element
 	{
-		PyObject* key;
-		PyObject* val;
+		PyObject* key;			//< key if iterating on a python dictionary
+		PyObject* val;			//< element value
 
 		bool atomic() const;
 		bool array() const;
 		types::Variant getValue() const;
 	};
+	///\brief Accessor
 	const Element* operator->() const				{return &m_elem;}
 	const Element& operator*() const				{return m_elem;}
 
 private:
 	void fetch_next();
 
-	Object m_obj;
-	PyObject* m_itr;
-	Py_ssize_t m_pos;
-	Element m_elem;
+	Object m_obj;				//< object iterated on
+	PyObject* m_itr;			//< iterator in case of iterating on a python list
+	Py_ssize_t m_pos;			//< iterator in case of iterating on a python dictionary
+	Element m_elem;				//< currently visited element
 };
 
 }}}//namespace

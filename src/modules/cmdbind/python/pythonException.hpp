@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file pythonException.hpp
-///\brief Interface for Translating Python Exception to C++/Wolframe Exceptions
+///\brief Interface for Translating Python Exception to C++/Wolframe exceptions
 #ifndef _Wolframe_python_EXCEPTION_HPP_INCLUDED
 #define _Wolframe_python_EXCEPTION_HPP_INCLUDED
 #include <Python.h>

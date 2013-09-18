@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file pythonObject.hpp
-///\brief Interface to python object for using python reference counting with C++ scope
+///\brief Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
 #ifndef _Wolframe_python_OBJECT_HPP_INCLUDED
 #define _Wolframe_python_OBJECT_HPP_INCLUDED
 #include <Python.h>

@@ -1,0 +1,11 @@
+Module file descriptions:
+
+pythonException.hpp/cpp			:Function to translate python exceptions to C++/Wolframe exceptions
+pythonObject.hpp/cpp			:Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
+pythonObjectIterator.hpp/cpp		:Iterator on python objects representing lists or associative arrays
+pythonStructureBuilder.hpp/cpp		:Object providing the building of a complex python object
+pythonStructure.hpp/cpp			:Object representing a complex object in python
+pythonInterpreter.hpp/cpp		:Interpreter interface. The interpreter is the object collecting all resources and data shared in the interpreter context and it creates the instances doing the job.
+pythonInterpreterInstance.hpp/cpp	:Interface to interpreter instances created for running one form function call to python
+pythonFunctionProgramType.hpp/cpp	:Function to create a form function program type object for python scripts
+
