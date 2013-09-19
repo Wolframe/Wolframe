@@ -15,8 +15,8 @@ TMPDIR ?= /tmp
 dist:
 	-@rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 	-@rm -rf $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	mkdir $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	cp -r * $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)/.
+	@mkdir $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+	@cp -r * $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)/.
 	-@cd $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION) ; \
 		$(MAKE) distclean ; \
 		rm -f makefiles/gmake/platform.mk.vars; \
