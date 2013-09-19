@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///\brief Implementation of output data structure for transaction function
-///\file transactionfunction/OutputResultStructure.hpp
-#include "transactionfunction/OutputResultStructure.hpp"
+///\file transactionfunction/ResultStructure.hpp
+#include "transactionfunction/ResultStructure.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

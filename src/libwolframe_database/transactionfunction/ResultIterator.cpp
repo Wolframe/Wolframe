@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///\brief Implementation of iterator on transaction function result
-///\file transactionfunction/OutputResultIterator.cpp
-#include "transactionfunction/OutputResultIterator.hpp"
+///\file transactionfunction/ResultIterator.cpp
+#include "transactionfunction/ResultIterator.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;

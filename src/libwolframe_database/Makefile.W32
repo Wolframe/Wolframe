@@ -28,8 +28,8 @@ CPP_OBJS = \
 	transactionfunction/Path.obj \
 	transactionfunction/PreProcessCommand.obj \
 	transactionfunction/InputStructure.obj \
-	transactionfunction/OutputResultStructure.obj \
-	transactionfunction/OutputResultIterator.obj \
+	transactionfunction/ResultStructure.obj \
+	transactionfunction/ResultIterator.obj \
 	transactionfunction/ResultFilter.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \

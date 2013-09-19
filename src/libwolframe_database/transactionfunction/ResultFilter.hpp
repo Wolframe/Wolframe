@@ -35,7 +35,7 @@
 #ifndef _DATABASE_TRANSACTION_FUNCTION_RESULT_FILTER_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_RESULT_FILTER_HPP_INCLUDED
 #include "langbind/formFunction.hpp"
-#include "transactionfunction/OutputResultIterator.hpp"
+#include "transactionfunction/ResultIterator.hpp"
 #include "processor/procProvider.hpp"
 #include <string>
 #include <vector>

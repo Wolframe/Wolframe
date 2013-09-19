@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Internal interface for output data structure of transaction function
-///\file transactionfunction/OutputResultStructure.hpp
+///\file transactionfunction/ResultStructure.hpp
 #ifndef _DATABASE_TRANSACTION_FUNCTION_OUTPUT_RESULT_STRUCTURE_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_OUTPUT_RESULT_STRUCTURE_HPP_INCLUDED
 #include "database/transactionFunction.hpp"

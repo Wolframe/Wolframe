@@ -31,11 +31,11 @@
 
 ************************************************************************/
 ///\brief Internal interface for iterator on transaction function result
-///\file transactionfunction/OutputResultIterator.hpp
+///\file transactionfunction/ResultIterator.hpp
 #ifndef _Wolframe__DATABASE_TRANSACTION_FUNCTION_OUTPUT_RESULT_ITERATOR_HPP_INCLUDED
 #define _Wolframe__DATABASE_TRANSACTION_FUNCTION_OUTPUT_RESULT_ITERATOR_HPP_INCLUDED
 #include "database/transactionFunction.hpp"
-#include "transactionfunction/OutputResultStructure.hpp"
+#include "transactionfunction/ResultStructure.hpp"
 #include <string>
 #include <map>
 #include <vector>
