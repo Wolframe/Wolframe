@@ -810,6 +810,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					{
 						if (mask)
 						{
+							opstep.finalize();
 							operation.description.steps.push_back( opstep);
 							opstep.clear();
 							mask = 0;

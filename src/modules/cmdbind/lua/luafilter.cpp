@@ -70,7 +70,9 @@ static std::string get_lua_elem( lua_State* ls, int idx)
 static void print_luaStack( lua_State* ls)
 {
 	std::string stk;
-	for (int ii=-5; ii<=-1; ++ii)
+	int nn = lua_gettop(ls);
+
+	for (int ii=-nn; ii<=-1; ++ii)
 	{
 		stk.push_back(' ');
 		stk.append( get_lua_elem( ls, ii));
@@ -507,8 +509,7 @@ bool LuaTableOutputFilter::closeAttribute( const types::VariantConst& element)
 	else
 	{
 		// ... table empty. replace it by value 'element'
-		wrap_lua_pop( m_ls, 1);			//... LUA STK: t a t
-		m_statestk.back() = Atomic;		//... LUA STK: t a
+		wrap_lua_pop( m_ls, 1);			//... LUA STK: t a
 		return pushValue( element);		//... LUA STK: t a v
 	}
 }

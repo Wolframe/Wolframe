@@ -52,6 +52,8 @@ ResultIteratorImpl::ResultIteratorImpl( const ResultIteratorImpl& o)
 	,m_endofoutput(o.m_endofoutput)
 	,m_started(o.m_started)
 	,m_nextresult(o.m_nextresult)
+	,m_serializeWithIndices(o.m_serializeWithIndices)
+	,m_group(o.m_group)
 	,m_resultstruct(o.m_resultstruct)
 	,m_structitr(o.m_structitr)
 	,m_structend(o.m_structend)
@@ -71,6 +73,8 @@ void ResultIteratorImpl::reset()
 	m_endofoutput = false;
 	m_started = false;
 	m_nextresult = false;
+	m_serializeWithIndices = false;
+	m_group.clear();
 	m_structitr = m_resultstruct->begin();
 	m_structend = m_resultstruct->end();
 	m_stack.clear();
@@ -641,6 +645,29 @@ bool ResultIteratorImpl::getNext( langbind::TypedInputFilter::ElementType& type,
 		return true;
 	}
 	return false;
+}
+
+langbind::TypedInputFilter* ResultIterator::copy() const
+{
+	return new ResultIterator( *this);
+}
+
+bool ResultIterator::getNext( langbind::TypedInputFilter::ElementType& type, types::VariantConst& element)
+{
+	return m_resitr.getNext( type, element);
+}
+
+void ResultIterator::resetIterator()
+{
+	m_resitr.reset();
+}
+
+bool ResultIterator::setFlags( Flags f)
+{
+	bool rt = true;
+	rt &= langbind::TypedInputFilter::setFlags( f);
+	if (rt) m_resitr.doSerializeWithIndices( flag( SerializeWithIndices));
+	return rt;
 }
 
 
