@@ -37,20 +37,20 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionFunctionOutput::ResultStructure::ResultStructure()
+ResultStructure::ResultStructure()
 {
 	m_strings.push_back( '\0');
 }
-TransactionFunctionOutput::ResultStructure::ResultStructure( const ResultStructure& o)
+ResultStructure::ResultStructure( const ResultStructure& o)
 	:m_ar(o.m_ar),m_strings(o.m_strings){}
 
-TransactionFunctionOutput::ResultStructure::ContentElement::ContentElement()
+ResultStructure::ContentElement::ContentElement()
 	:value(0),type(ResultElement::CloseTag),idx(0){}
 
-TransactionFunctionOutput::ResultStructure::ContentElement::ContentElement( const ContentElement& o)
+ResultStructure::ContentElement::ContentElement( const ContentElement& o)
 	:value(o.value),type(o.type),idx(o.idx){}
 
-TransactionFunctionOutput::ResultStructure::const_iterator::const_iterator( const ResultStructure* struct_)
+ResultStructure::const_iterator::const_iterator( const ResultStructure* struct_)
 	:m_struct(struct_)
 {
 	if (m_struct)
@@ -60,12 +60,12 @@ TransactionFunctionOutput::ResultStructure::const_iterator::const_iterator( cons
 	}
 }
 
-TransactionFunctionOutput::ResultStructure::const_iterator::const_iterator( const const_iterator& o)
+ResultStructure::const_iterator::const_iterator( const const_iterator& o)
 	:m_content(o.m_content)
 	,m_itr(o.m_itr)
 	,m_struct(o.m_struct){}
 
-bool TransactionFunctionOutput::ResultStructure::const_iterator::operator==(const const_iterator& o) const
+bool ResultStructure::const_iterator::operator==(const const_iterator& o) const
 {
 	if (!o.m_struct)
 	{
@@ -85,7 +85,7 @@ bool TransactionFunctionOutput::ResultStructure::const_iterator::operator==(cons
 }
 
 
-void TransactionFunctionOutput::ResultStructure::const_iterator::init()
+void ResultStructure::const_iterator::init()
 {
 	if (m_itr != m_struct->m_ar.end())
 	{
@@ -110,48 +110,48 @@ void TransactionFunctionOutput::ResultStructure::const_iterator::init()
 	}
 }
 
-void TransactionFunctionOutput::ResultStructure::addOpenTag( const std::string& name)
+void ResultStructure::addOpenTag( const std::string& name)
 {
 	m_ar.push_back( ResultElement( ResultElement::OpenTag, m_strings.size()));
 	m_strings.append( name);
 	m_strings.push_back( '\0');
 }
 
-void TransactionFunctionOutput::ResultStructure::addResultColumnName( const std::string& name)
+void ResultStructure::addResultColumnName( const std::string& name)
 {
 	m_ar.push_back( ResultElement( ResultElement::SelectResultColumnName, m_strings.size()));
 	m_strings.append( name);
 	m_strings.push_back( '\0');
 }
 
-void TransactionFunctionOutput::ResultStructure::addConstant( const std::string& value)
+void ResultStructure::addConstant( const std::string& value)
 {
 	m_ar.push_back( ResultElement( ResultElement::Constant, m_strings.size()));
 	m_strings.append( value);
 	m_strings.push_back( '\0');
 }
 
-void TransactionFunctionOutput::ResultStructure::addCloseTag()
+void ResultStructure::addCloseTag()
 {
 	m_ar.push_back( ResultElement( ResultElement::CloseTag, 0));
 }
 
-void TransactionFunctionOutput::ResultStructure::addIgnoreResult( std::size_t functionidx)
+void ResultStructure::addIgnoreResult( std::size_t functionidx)
 {
 	m_ar.push_back( ResultElement( ResultElement::IgnoreResult, functionidx));
 }
 
-void TransactionFunctionOutput::ResultStructure::addValueReference( std::size_t functionidx)
+void ResultStructure::addValueReference( std::size_t functionidx)
 {
 	m_ar.push_back( ResultElement( ResultElement::Value, functionidx));
 }
 
-void TransactionFunctionOutput::ResultStructure::addMark( ResultElement::Type mrk, std::size_t functionidx)
+void ResultStructure::addMark( ResultElement::Type mrk, std::size_t functionidx)
 {
 	m_ar.push_back( ResultElement( mrk, functionidx));
 }
 
-void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const ResultStructure& o, std::size_t functionidx)
+void ResultStructure::addEmbeddedResult( const ResultStructure& o, std::size_t functionidx)
 {
 	const_iterator ri = o.begin(), re = o.end();
 	for (; ri != re; ++ri)
@@ -193,7 +193,7 @@ void TransactionFunctionOutput::ResultStructure::addEmbeddedResult( const Result
 	}
 }
 
-std::string TransactionFunctionOutput::ResultStructure::tostring() const
+std::string ResultStructure::tostring() const
 {
 	std::ostringstream rt;
 	const_iterator ri = begin(), re = end();

@@ -555,6 +555,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
 	types::keymap<TransactionFunctionR> operationmap;
+	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4};
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
@@ -600,6 +601,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				TransactionFunctionDescription::OperationStep opstep;
 				TransactionFunctionDescription::ProcessingStep prcstep;
 				unsigned int mask = 0;
+				unsigned int sectionMask = 0;
 
 				if (gotoNextToken( langdescr, si, se) == '(')
 				{
@@ -612,15 +614,43 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				{
 					if (boost::algorithm::iequals( tok, "RESULT"))
 					{
-						if (!parseNextToken( langdescr, tok, si, se)
-						||  !boost::algorithm::iequals( tok, "INTO"))
+						if ((sectionMask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction");
+						sectionMask |= (unsigned int)Result;
+
+						int rf = 0;
+						while (parseNextToken( langdescr, tok, si, se))
 						{
-							throw ERROR( si, "INTO expected after RESULT");
+							if (boost::algorithm::iequals( tok, "INTO"))
+							{
+								if ((rf & 0x1) != 0) throw ERROR( si, "duplicate INTO definition after RESULT");
+								rf |= 0x1;
+								result_INTO = parse_INTO_path( langdescr, si, se);
+							}
+							else if (boost::algorithm::iequals( tok, "FILTER"))
+							{
+								if (!isTransaction)
+								{
+									throw ERROR( si, "Cannot define RESULT FILTER in OPERATION. Only allowed as in TRANSACTION definition");
+								}
+								if ((rf & 0x2) != 0) throw ERROR( si, "duplicate FILTER definition after RESULT");
+								rf |= 0x2;
+								if (!isAlphaNumeric( parseNextToken( langdescr, operation.description.resultfilter, si, se))) throw ERROR( si, "identifier expected after RESULT FILTER");
+							}
+							else if (rf)
+							{
+								break;
+							}
+							else
+							{
+								throw ERROR( si, "INTO or FILTER expected after RESULT");
+							}
 						}
-						result_INTO = parse_INTO_path( langdescr, si, se);
 					}
-					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
+					if (boost::algorithm::iequals( tok, "AUTHORIZE"))
 					{
+						if ((sectionMask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction");
+						sectionMask |= (unsigned int)Authorize;
+
 						std::string authfunction;
 						std::string authresource;
 
@@ -658,6 +688,9 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else if (boost::algorithm::iequals( tok, "PREPROCESS"))
 					{
+						if ((sectionMask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROCESS definition in transaction");
+						sectionMask |= (unsigned int)Preprocess;
+
 						if (!isTransaction)
 						{
 							throw ERROR( si, "Cannot define PREPROCESS in OPERATION. Only allowed in TRANSACTION definition");
@@ -834,7 +867,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					else if (boost::algorithm::iequals( tok, "LET"))
 					{
 						std::string varname;
-						if (!parseNextToken( langdescr, varname, si, se))
+						if (!isAlphaNumeric( parseNextToken( langdescr, varname, si, se)))
 						{
 							throw ERROR( si, "variable name expected after LET");
 						}

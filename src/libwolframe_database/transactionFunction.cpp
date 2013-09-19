@@ -41,7 +41,8 @@
 #include "transactionfunction/DatabaseCommand.hpp"
 #include "transactionfunction/PreProcessCommand.hpp"
 #include "transactionfunction/Path.hpp"
-#include "transactionfunction/OutputImpl.hpp"
+#include "transactionfunction/OutputResultIterator.hpp"
+#include "transactionfunction/ResultFilter.hpp"
 #include "database/transaction.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
@@ -59,10 +60,11 @@ struct TransactionFunction::Impl
 {
 	typedef TransactionFunctionDescription::PrintStep PrintStep;
 
-	TransactionFunctionOutput::ResultStructureR m_resultstruct;
+	ResultStructureR m_resultstruct;
 	std::vector<DatabaseCommand> m_call;
 	TagTable m_tagmap;
 	std::vector<PreProcessCommand> m_preprocs;
+	std::string m_resultfilter;
 
 	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
@@ -261,34 +263,6 @@ TransactionInput TransactionFunctionInput::get() const
 }
 
 
-TransactionFunctionOutput::TransactionFunctionOutput( const ResultStructureR& resultstruct_, const db::TransactionOutput& data_)
-	:types::TypeSignature("database::TransactionFunctionOutput", __LINE__)
-	,m_impl( new Impl( resultstruct_, db::TransactionOutputR( new db::TransactionOutput( data_))))
-{}
-
-TransactionFunctionOutput::TransactionFunctionOutput( const TransactionFunctionOutput& o)
-	:types::TypeSignature("database::TransactionFunctionOutput", __LINE__)
-	,langbind::TypedInputFilter(o)
-	,m_impl( new Impl( *o.m_impl))
-{}
-
-TransactionFunctionOutput::~TransactionFunctionOutput()
-{
-	delete m_impl;
-}
-
-bool TransactionFunctionOutput::getNext( ElementType& type, types::VariantConst& element)
-{
-	bool rt = m_impl->getNext( type, element, flag( SerializeWithIndices));
-	LOG_DATA << "[transaction output] get next " << langbind::OutputFilter::elementTypeName( type) << " '" << element.tostring() << "' :" << element.typeName( element.type());
-	return rt;
-}
-
-void TransactionFunctionOutput::resetIterator()
-{
-	m_impl->resetIterator();
-}
-
 static int hasOpenSubstruct( const std::vector<TransactionFunctionDescription::Block>& blocks, std::size_t idx)
 {
 	std::size_t ii = 0;
@@ -344,8 +318,9 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 }
 
 TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
-	:m_resultstruct( new TransactionFunctionOutput::ResultStructure())
+	:m_resultstruct( new ResultStructure())
 	,m_tagmap(description.casesensitive)
+	,m_resultfilter(description.resultfilter)
 {
 	typedef TransactionFunctionDescription::ProcessingStep ProcessingStep;
 	typedef TransactionFunctionDescription::PrintStep PrintStep;
@@ -597,9 +572,18 @@ TransactionFunctionInput* TransactionFunction::getInput() const
 	return new TransactionFunctionInput( this);
 }
 
-TransactionFunctionOutput* TransactionFunction::getOutput( const db::TransactionOutput& o) const
+langbind::TypedInputFilterR TransactionFunction::getOutput( const proc::ProcessorProvider* provider, const db::TransactionOutputR& o) const
 {
-	return new TransactionFunctionOutput( m_impl->m_resultstruct, o);
+	if (m_impl->m_resultfilter.empty())
+	{
+		ResultIterator* ri = new ResultIterator( m_impl->m_resultstruct, o);
+		return langbind::TypedInputFilterR( ri);
+	}
+	else
+	{
+		ResultFilter resultFilter( provider, m_impl->m_resultfilter, m_impl->m_resultstruct, o);
+		return resultFilter.getOutput();
+	}
 }
 
 TransactionFunction* db::createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)

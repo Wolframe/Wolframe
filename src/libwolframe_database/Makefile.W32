@@ -29,7 +29,8 @@ CPP_OBJS = \
 	transactionfunction/PreProcessCommand.obj \
 	transactionfunction/InputStructure.obj \
 	transactionfunction/OutputResultStructure.obj \
-	transactionfunction/OutputImpl.obj \
+	transactionfunction/OutputResultIterator.obj \
+	transactionfunction/ResultFilter.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	preparedStatement.obj \

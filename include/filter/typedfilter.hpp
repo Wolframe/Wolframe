@@ -103,6 +103,10 @@ public:
 	///\return true if the flag (or all flags) are set
 	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
 
+	///\brief Get all flags
+	///\return the flags as bitfield
+	Flags flags() const				{return m_flags;}
+
 	///\brief Set a flag (or a set of flags)
 	///\return true on success, false if the (or one of) flag is not supported
 	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}

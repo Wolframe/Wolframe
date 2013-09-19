@@ -56,31 +56,6 @@ class TransactionFunctionDescription;
 ///\brief Forward Declaration
 class TransactionFunction;
 
-///\class TransactionFunctionOutput
-///\brief Output structure of transaction for language bindings
-class TransactionFunctionOutput
-	:public langbind::TypedInputFilter
-{
-public:
-	class ResultStructure;
-	typedef types::CountedReference<ResultStructure> ResultStructureR;
-
-	TransactionFunctionOutput( const ResultStructureR& resultstruct_, const db::TransactionOutput& data_);
-	TransactionFunctionOutput( const TransactionFunctionOutput& o);
-	virtual ~TransactionFunctionOutput();
-
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
-	virtual TypedInputFilter* copy() const		{return new TransactionFunctionOutput(*this);}
-
-	virtual bool getNext( ElementType& type, types::VariantConst& element);
-	virtual void resetIterator();
-
-private:
-	struct Impl;
-	Impl* m_impl;
-};
-
 ///\class TransactionFunctionInput
 ///\brief Input structure of transaction for language bindings
 class TransactionFunctionInput
@@ -138,7 +113,7 @@ public:
 	///\brief Build the function input
 	virtual TransactionFunctionInput* getInput() const;
 	///\brief Build the function output
-	virtual TransactionFunctionOutput* getOutput( const db::TransactionOutput& o) const;
+	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProvider* provider, const db::TransactionOutputR& o) const;
 
 	///\brief Get the name of the function
 	const std::string& name() const			{return m_name;}

@@ -67,7 +67,7 @@ private:
 	std::size_t m_idx;
 };
 
-class TransactionFunctionOutput::ResultStructure
+class ResultStructure
 {
 public:
 	ResultStructure();
@@ -128,6 +128,7 @@ private:
 	std::string m_strings;
 };
 
+typedef types::CountedReference<ResultStructure> ResultStructureR;
 
 }}//namespace
 #endif

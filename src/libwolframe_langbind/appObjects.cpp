@@ -276,9 +276,9 @@ bool TransactionFunctionClosure::call()
 				if (hint) explain = explain + " " + hint;
 				throw std::runtime_error( std::string( "error in transaction ") + e.transaction + ":" + e.usermsg + explain);
 			}
-			const db::TransactionOutput& res = trsr->getResult();
-			m_result.reset( m_func->getOutput( res));
-			if (!res.isCaseSensitive())
+			db::TransactionOutputR res( new db::TransactionOutput( trsr->getResult()));
+			m_result = m_func->getOutput( m_provider, res);
+			if (!res->isCaseSensitive())
 			{
 				//... If not case sensitive result then propagate this
 				//	to be respected in mapping to structures.

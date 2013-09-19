@@ -303,6 +303,7 @@ public:
 
 	std::map<std::size_t,PrintStep> printsteps;	//< Print variable instruction
 	std::vector<ProcessingStep> preprocs;		//< preprocessing steps on input
+	std::string resultfilter;			//< result filter function for post processing
 	std::vector<OperationStep> steps;		//< list of database commands or operations
 	std::vector<Block> blocks;			//< substructures of the output
 	langbind::Authorization auth;			//< authorization definition structure for this function

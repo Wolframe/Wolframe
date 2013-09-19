@@ -35,7 +35,8 @@ CPP_OBJS = \
 	transactionfunction/PreProcessCommand.o \
 	transactionfunction/InputStructure.o \
 	transactionfunction/OutputResultStructure.o \
-	transactionfunction/OutputImpl.o \
+	transactionfunction/OutputResultIterator.o \
+	transactionfunction/ResultFilter.o \
 	loadTransactionProgram.o \
 	databaseLanguage.o \
 	preparedStatement.o \
