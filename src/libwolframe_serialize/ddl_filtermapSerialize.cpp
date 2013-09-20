@@ -319,10 +319,10 @@ DDLStructSerializer& DDLStructSerializer::operator =( const DDLStructSerializer&
 	return *this;
 }
 
-void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags)
+void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags_ )
 {
 	m_ctx.clear();
-	m_ctx.setFlags(flags);
+	m_ctx.setFlags(flags_);
 	m_stk.clear();
 	m_stk.push_back( FiltermapDDLSerializeState( m_st));
 	m_out = out;

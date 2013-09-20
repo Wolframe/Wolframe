@@ -136,10 +136,10 @@ StructSerializer::StructSerializer( const StructSerializer& o)
 	,m_out(o.m_out)
 	,m_stk(o.m_stk){}
 
-void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags)
+void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags_)
 {
 	m_ctx.clear();
-	m_ctx.setFlags(flags);
+	m_ctx.setFlags(flags_);
 	m_stk.clear();
 	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
 	m_out = out;
