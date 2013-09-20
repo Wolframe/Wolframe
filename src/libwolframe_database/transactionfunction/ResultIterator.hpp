@@ -116,25 +116,10 @@ public:
 		,langbind::TypedInputFilter(o)
 		,m_resitr( o.m_resitr){}
 
-	virtual langbind::TypedInputFilter* copy() const
-	{
-		return new ResultIterator( *this);
-	}
-	virtual bool getNext( langbind::TypedInputFilter::ElementType& type, types::VariantConst& element)
-	{
-		return m_resitr.getNext( type, element);
-	}
-	virtual void resetIterator()
-	{
-		m_resitr.reset();
-	}
-	virtual bool setFlags( Flags f)
-	{
-		bool rt = true;
-		rt &= langbind::TypedInputFilter::setFlags( f);
-		if (rt) m_resitr.doSerializeWithIndices( flag( SerializeWithIndices));
-		return rt;
-	}
+	virtual langbind::TypedInputFilter* copy() const;
+	virtual bool getNext( langbind::TypedInputFilter::ElementType& type, types::VariantConst& element);
+	virtual void resetIterator();
+	virtual bool setFlags( Flags f);
 
 private:
 	ResultIteratorImpl m_resitr;

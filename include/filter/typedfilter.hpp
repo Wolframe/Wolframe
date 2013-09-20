@@ -50,12 +50,19 @@ class TypedInputFilter :public FilterBase
 {
 public:
 	typedef InputFilter::State State;
+	struct Data
+	{
+		Data(){}
+		virtual Data* copy() const=0;
+		virtual ~Data(){}
+	};
 
 	///\brief Constructor
 	TypedInputFilter()
 		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,m_state(InputFilter::Open)
-		,m_flags(None){}
+		,m_flags(None)
+		,m_data(0){}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
@@ -63,10 +70,11 @@ public:
 		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(o)
 		,m_state(o.m_state)
-		,m_flags(o.m_flags){}
+		,m_flags(o.m_flags)
+		,m_data(o.m_data?o.m_data->copy():0){}
 
 	///\brief Destructor
-	virtual ~TypedInputFilter(){}
+	virtual ~TypedInputFilter()			{if (m_data) delete m_data;}
 
 	///\brief Get a self copy
 	///\return allocated pointer to copy of this
@@ -113,9 +121,13 @@ public:
 	///\brief Reset set all flags
 	void resetFlags()				{m_flags = None;}
 
+	///\brief Set data that belongs to filter scope
+	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
+
 private:
 	State m_state;					//< state
 	Flags m_flags;					//< flags
+	Data* m_data;
 };
 
 ///\typedef TypedInputFilterR

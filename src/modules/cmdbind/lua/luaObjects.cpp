@@ -971,6 +971,7 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 	}
 	TypedInputFilterR obj = TypedInputFilterR( (*objref)->copy());
 	obj->resetIterator();
+	obj->setFlags( TypedInputFilter::SerializeWithIndices);
 
 	ToStringFilter* flt = new ToStringFilter();
 	TypedOutputFilterR out( flt);

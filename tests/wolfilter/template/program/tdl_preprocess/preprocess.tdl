@@ -33,6 +33,13 @@ BEGIN
 	INTO . DO getPerson( $1);
 END
 
+TRANSACTION getDataFiltered
+RESULT FILTER addSuffixToName
+BEGIN
+	DO SELECT ID FROM Person;
+	INTO person DO UNIQUE SELECT Person.ID as id,prename,surname FROM Person WHERE Person.ID = $1;
+END
+
 TRANSACTION insertWords
 PREPROCESS
 BEGIN

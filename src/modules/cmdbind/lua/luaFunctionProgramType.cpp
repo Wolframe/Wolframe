@@ -89,10 +89,13 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
+	///\remark Flags ignored because lua has no strict typing does not validate input parameter structure on its own
+	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags)
 	{
 		m_interp->init( provider);
 		m_arg = arg;
+		m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
+		//... SerializeWithIndices because lua has no strict typing and needs arrays to be delivered with indices to make single element arrays to appear as arrays too
 		m_firstcall = true;
 	}
 

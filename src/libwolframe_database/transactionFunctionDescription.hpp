@@ -174,7 +174,8 @@ public:
 		///\brief Default constructor
 		OperationStep()
 			:nonempty(false)
-			,unique(false){}
+			,unique(false)
+			,resultref(false){}
 
 		///\brief Copy constructor
 		OperationStep( const OperationStep& o)
@@ -183,6 +184,7 @@ public:
 			,path_INTO(o.path_INTO)
 			,nonempty(o.nonempty)
 			,unique(o.unique)
+			,resultref(o.resultref)
 			,hints(o.hints){}
 
 		///\brief Clear content (default constructor)
@@ -193,7 +195,17 @@ public:
 			call.clear();
 			nonempty = false;
 			unique = false;
+			resultref = false;
 			hints.clear();
+		}
+
+		void finalize()
+		{
+			if (!resultref)
+			{
+				std::vector<Call::Param>::const_iterator pi = call.paramlist.begin(), pe = call.paramlist.end();
+				for (; pi != pe; ++pi) resultref |= (pi->type == Call::Param::NumericResultReference || pi->type == Call::Param::SymbolicResultReference);
+			}
 		}
 
 		///\class Error
@@ -256,7 +268,8 @@ public:
 				:funcname(o.funcname),paramlist(o.paramlist){}
 			///\brief Constructor
 			Call( const std::string& funcname_, const std::vector<Param>& paramlist_)
-				:funcname(funcname_),paramlist(paramlist_){}
+				:funcname(funcname_),paramlist(paramlist_)
+			{}
 
 			///\brief Reset call
 			void clear()		{funcname.clear(); paramlist.clear();}
@@ -267,6 +280,7 @@ public:
 		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
 		bool nonempty;				//< true, if NONEMPTY is set
 		bool unique;				//< true, if UNIQUE is set
+		bool resultref;			//< true, if the operation is possibly called more than once, either because it has result references or is in a foreach clause
 		types::keymap<std::string> hints;	//< error messages to add to database errors depending on the error class
 	};
 	///\class Block

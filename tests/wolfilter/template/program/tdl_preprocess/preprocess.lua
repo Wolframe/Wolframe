@@ -5,6 +5,10 @@ function run( inp )
 	rt = res:table()
 	insertWords = provider.formfunction("insertWords")
 	insertWords( { data = rt } )
+	getDataFiltered = provider.formfunction("getDataFiltered")
+	resfiltered = getDataFiltered( it)
+	resfilteredtab = resfiltered:table()
+	table.insert( rt, resfilteredtab)
 	return rt
 end
 
@@ -29,4 +33,13 @@ function luanorm( inp )
 	local outtb = luanorm_table( intb)
 	return outtb
 end
+
+function addSuffixToName( inp)
+	rec = inp:table()
+	for i,v in ipairs( rec["person"]) do
+		v[ "prename"] = v[ "prename"] .. v[ "id"]
+	end
+	return rec
+end
+
 

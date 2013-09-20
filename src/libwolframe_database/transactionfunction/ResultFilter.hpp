@@ -34,6 +34,7 @@
 ///\file transactionfunction/ResultFilter.hpp
 #ifndef _DATABASE_TRANSACTION_FUNCTION_RESULT_FILTER_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_RESULT_FILTER_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
 #include "transactionfunction/ResultIterator.hpp"
 #include "processor/procProvider.hpp"

@@ -59,7 +59,7 @@ struct FormFunctionClosure
 	///\brief Initialization of call context for a new call
 	///\param[in] p processor provider
 	///\param[in] i call input
-	///\param[in] f serialization flags depending on context (directmap "strict",lua relaxed)
+	///\param[in] f serialization flags for validating form functions depending on caller context (directmap "strict",lua relaxed)
 	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None)=0;
 
 	///\brief Get the iterator for the function result
