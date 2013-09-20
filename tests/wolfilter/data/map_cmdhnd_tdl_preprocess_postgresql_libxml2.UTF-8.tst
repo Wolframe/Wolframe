@@ -29,12 +29,12 @@ FORM Person
 {
 	company CompanyRef[]
 	id int
-	parent string
+	parent ?string
 	child PersonRef[]
 	prename string
 	surname string
 	location AddressRef[]
-	tag int
+	tag ?int
 }
 
 FORM Company
@@ -311,7 +311,8 @@ function run( inp )
 	getDataFiltered = provider.formfunction("getDataFiltered")
 	resfiltered = getDataFiltered( it)
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	-- table.insert( rt, resfilteredtab)
+	rt[ "XXX"] = resfilteredtab
 	return rt
 end
 

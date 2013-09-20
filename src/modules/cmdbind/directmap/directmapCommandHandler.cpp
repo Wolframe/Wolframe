@@ -195,7 +195,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						{
 							m_inputform.reset( new types::Form( df));
 							m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
-							m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
+							serialize::Context::Flags flg = serialize::Context::Flags((int)serialize::Context::ValidateInitialization | (int)serialize::Context::ValidateAttributes);
+							m_inputform_parser->init( m_input, flg);
 							m_state = 2;
 						}
 						else
@@ -265,7 +266,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
 					substructure->setInitialized();
 					serialize::DDLStructParser formparser( substructure);
-					formparser.init( m_functionclosure->result(), serialize::Context::None);
+					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
 					if (!formparser.call())
 					{
 						throw std::logic_error( "output form serialization not complete");

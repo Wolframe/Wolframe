@@ -263,7 +263,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 			{
 				for (;itr != end; ++itr)
 				{
-					if (!itr->second.optional() && !stk.back().initCount( itr-descr->begin()))
+					if (!itr->second.optional() && itr->second.type() != StructDescriptionBase::Vector && !stk.back().initCount( itr-descr->begin()))
 					{
 						throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
 					}

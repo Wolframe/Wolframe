@@ -45,10 +45,12 @@ PersonChildRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 PersonAddressRel:
 '1', '2'
@@ -62,10 +64,12 @@ PersonAddressRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 CompanyChildRel:
 '1', '2'
@@ -79,10 +83,12 @@ CompanyChildRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 CompanyAddressRel:
 '1', '2'
@@ -96,10 +102,12 @@ CompanyAddressRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 PersonCompanyRel:
 '1', '2'
@@ -113,10 +121,12 @@ PersonCompanyRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 WordTable:
 'select street', 'butterweg 23'
@@ -131,8 +141,6 @@ WordTable:
 'select street', 'erakimolstrasse 56'
 'select street', 'fabelweg 67'
 'select street', 'hurtika 89'
-'select street', NULL
-'select street', NULL
 'select town', 'bendorf'
 'select town', 'carassa'
 'select town', 'durnfo'
@@ -145,8 +153,6 @@ WordTable:
 'select town', 'enden'
 'select town', 'formkon'
 'select town', 'hof'
-'select town', NULL
-'select town', NULL
 'struct street', 'butterweg 23'
 'struct street', 'camelstreet 34'
 'struct street', 'demotastrasse 45'
@@ -174,13 +180,9 @@ WordTable:
 'struct surname', 'alano'
 'struct surname', 'beret'
 'struct surname', 'carlson'
-'struct surname', 'fuioko'
-'struct surname', 'hauer'
 'struct prename', 'aufru'
 'struct prename', 'beno'
 'struct prename', 'carla'
-'struct prename', 'fran'
-'struct prename', 'hubert'
 'company name', 'baluba inc'
 'company name', 'carimba inc'
 'company name', 'dereno inc'
@@ -198,11 +200,7 @@ NumberTable:
 'struct tag', '1101'
 'struct tag', '1101'
 'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'
-'struct id', '106'
-'struct id', '108'
 

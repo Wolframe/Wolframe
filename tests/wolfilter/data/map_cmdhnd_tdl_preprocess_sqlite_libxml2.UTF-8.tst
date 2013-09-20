@@ -29,12 +29,12 @@ FORM Person
 {
 	company CompanyRef[]
 	id int
-	parent string
+	parent ?string
 	child PersonRef[]
 	prename string
 	surname string
 	location AddressRef[]
-	tag int
+	tag ?int
 }
 
 FORM Company
@@ -89,32 +89,32 @@ CREATE TABLE Company
 
 CREATE TABLE PersonChildRel
 (
- ID INT,
- childid  INT
+ ID INT NOT NULL,
+ childid INT NOT NULL
 );
 
 CREATE TABLE PersonAddressRel
 (
- ID INT,
- addressid  INT
+ ID INT NOT NULL,
+ addressid  INT NOT NULL
 );
 
 CREATE TABLE CompanyChildRel
 (
- ID INT,
- childid  INT
+ ID INT NOT NULL,
+ childid  INT NOT NULL
 );
 
 CREATE TABLE CompanyAddressRel
 (
- ID INT,
- addressid  INT
+ ID INT NOT NULL,
+ addressid  INT NOT NULL
 );
 
 CREATE TABLE PersonCompanyRel
 (
- ID INT,
- companyid  INT
+ ID INT NOT NULL,
+ companyid  INT NOT NULL
 );
 
 CREATE TABLE WordTable
@@ -167,10 +167,12 @@ INSERT INTO PersonChildRel (ID,childid) VALUES (3,5);
 INSERT INTO PersonChildRel (ID,childid) VALUES (3,6);
 INSERT INTO PersonChildRel (ID,childid) VALUES (4,5);
 INSERT INTO PersonChildRel (ID,childid) VALUES (5,6);
+INSERT INTO PersonChildRel (ID,childid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonChildRel (ID,childid) VALUES (7,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (2,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (3,8);
+INSERT INTO PersonChildRel (ID,childid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,2);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,3);
@@ -183,10 +185,12 @@ INSERT INTO CompanyChildRel (ID,childid) VALUES (3,5);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (3,6);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (4,5);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (5,6);
+INSERT INTO CompanyChildRel (ID,childid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO CompanyChildRel (ID,childid) VALUES (7,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (2,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (3,8);
+INSERT INTO CompanyChildRel (ID,childid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,2);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,3);
@@ -199,10 +203,12 @@ INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,5);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,6);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (4,5);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (5,6);
+INSERT INTO PersonAddressRel (ID,addressid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (7,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (2,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,8);
+INSERT INTO PersonAddressRel (ID,addressid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,2);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,3);
@@ -215,10 +221,12 @@ INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,5);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,6);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (4,5);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (5,6);
+INSERT INTO CompanyAddressRel (ID,addressid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (7,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (2,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,8);
+INSERT INTO CompanyAddressRel (ID,addressid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,2);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,3);
@@ -231,10 +239,12 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,5);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,6);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (4,5);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (5,6);
+INSERT INTO PersonCompanyRel (ID,companyid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (7,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (2,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
+INSERT INTO PersonCompanyRel (ID,companyid) VALUES (8,8); -- fake for SQLITE
 **file:preprocess.tdl
 
 OPERATION getPersonPrename( id)
@@ -311,7 +321,8 @@ function run( inp )
 	getDataFiltered = provider.formfunction("getDataFiltered")
 	resfiltered = getDataFiltered( it)
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	-- table.insert( rt, resfilteredtab)
+	rt[ "XXX"] = resfilteredtab
 	return rt
 end
 
@@ -347,7 +358,7 @@ end
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company/><id>6</id><child/><prename>Fran</prename><surname>Fuioko</surname><location/><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company/><id>8</id><child/><prename>Hubert</prename><surname>Hauer</surname><location/><tag>1001</tag></person><person><id>1</id><prename>Aufru1</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno2</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla3</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe4</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik5</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran6</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd7</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert8</prename><surname>Hauer</surname></person></data>
+<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>6</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Fran</prename><surname>Fuioko</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>8</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Hubert</prename><surname>Hauer</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><id>1</id><prename>Aufru1</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno2</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla3</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe4</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik5</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran6</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd7</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert8</prename><surname>Hauer</surname></person></data>
 Person:
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'
@@ -395,10 +406,12 @@ PersonChildRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 PersonAddressRel:
 '1', '2'
@@ -412,10 +425,12 @@ PersonAddressRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 CompanyChildRel:
 '1', '2'
@@ -429,10 +444,12 @@ CompanyChildRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 CompanyAddressRel:
 '1', '2'
@@ -446,10 +463,12 @@ CompanyAddressRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 PersonCompanyRel:
 '1', '2'
@@ -463,10 +482,12 @@ PersonCompanyRel:
 '3', '6'
 '4', '5'
 '5', '6'
+'6', '6'
 '7', '8'
 '1', '8'
 '2', '8'
 '3', '8'
+'8', '8'
 
 WordTable:
 'select street', 'butterweg 23'
@@ -481,8 +502,6 @@ WordTable:
 'select street', 'erakimolstrasse 56'
 'select street', 'fabelweg 67'
 'select street', 'hurtika 89'
-'select street', NULL
-'select street', NULL
 'select town', 'bendorf'
 'select town', 'carassa'
 'select town', 'durnfo'
@@ -495,8 +514,6 @@ WordTable:
 'select town', 'enden'
 'select town', 'formkon'
 'select town', 'hof'
-'select town', NULL
-'select town', NULL
 'struct street', 'butterweg 23'
 'struct street', 'camelstreet 34'
 'struct street', 'demotastrasse 45'
@@ -524,13 +541,9 @@ WordTable:
 'struct surname', 'alano'
 'struct surname', 'beret'
 'struct surname', 'carlson'
-'struct surname', 'fuioko'
-'struct surname', 'hauer'
 'struct prename', 'aufru'
 'struct prename', 'beno'
 'struct prename', 'carla'
-'struct prename', 'fran'
-'struct prename', 'hubert'
 'company name', 'baluba inc'
 'company name', 'carimba inc'
 'company name', 'dereno inc'
@@ -548,12 +561,8 @@ NumberTable:
 'struct tag', '1101'
 'struct tag', '1101'
 'struct tag', '1101'
-'struct tag', '1101'
-'struct tag', '1101'
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'
-'struct id', '106'
-'struct id', '108'
 
 **end

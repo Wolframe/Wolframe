@@ -8,7 +8,8 @@ function run( inp )
 	getDataFiltered = provider.formfunction("getDataFiltered")
 	resfiltered = getDataFiltered( it)
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	-- table.insert( rt, resfilteredtab)
+	rt[ "XXX"] = resfilteredtab
 	return rt
 end
 

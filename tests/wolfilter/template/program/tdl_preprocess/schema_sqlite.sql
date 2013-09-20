@@ -20,32 +20,32 @@ CREATE TABLE Company
 
 CREATE TABLE PersonChildRel
 (
- ID INT,
- childid  INT
+ ID INT NOT NULL,
+ childid INT NOT NULL
 );
 
 CREATE TABLE PersonAddressRel
 (
- ID INT,
- addressid  INT
+ ID INT NOT NULL,
+ addressid  INT NOT NULL
 );
 
 CREATE TABLE CompanyChildRel
 (
- ID INT,
- childid  INT
+ ID INT NOT NULL,
+ childid  INT NOT NULL
 );
 
 CREATE TABLE CompanyAddressRel
 (
- ID INT,
- addressid  INT
+ ID INT NOT NULL,
+ addressid  INT NOT NULL
 );
 
 CREATE TABLE PersonCompanyRel
 (
- ID INT,
- companyid  INT
+ ID INT NOT NULL,
+ companyid  INT NOT NULL
 );
 
 CREATE TABLE WordTable
@@ -98,10 +98,12 @@ INSERT INTO PersonChildRel (ID,childid) VALUES (3,5);
 INSERT INTO PersonChildRel (ID,childid) VALUES (3,6);
 INSERT INTO PersonChildRel (ID,childid) VALUES (4,5);
 INSERT INTO PersonChildRel (ID,childid) VALUES (5,6);
+INSERT INTO PersonChildRel (ID,childid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonChildRel (ID,childid) VALUES (7,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (1,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (2,8);
 INSERT INTO PersonChildRel (ID,childid) VALUES (3,8);
+INSERT INTO PersonChildRel (ID,childid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,2);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,3);
@@ -114,10 +116,12 @@ INSERT INTO CompanyChildRel (ID,childid) VALUES (3,5);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (3,6);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (4,5);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (5,6);
+INSERT INTO CompanyChildRel (ID,childid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO CompanyChildRel (ID,childid) VALUES (7,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (1,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (2,8);
 INSERT INTO CompanyChildRel (ID,childid) VALUES (3,8);
+INSERT INTO CompanyChildRel (ID,childid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,2);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,3);
@@ -130,10 +134,12 @@ INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,5);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,6);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (4,5);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (5,6);
+INSERT INTO PersonAddressRel (ID,addressid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (7,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (1,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (2,8);
 INSERT INTO PersonAddressRel (ID,addressid) VALUES (3,8);
+INSERT INTO PersonAddressRel (ID,addressid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,2);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,3);
@@ -146,10 +152,12 @@ INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,5);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,6);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (4,5);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (5,6);
+INSERT INTO CompanyAddressRel (ID,addressid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (7,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (1,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (2,8);
 INSERT INTO CompanyAddressRel (ID,addressid) VALUES (3,8);
+INSERT INTO CompanyAddressRel (ID,addressid) VALUES (8,8); -- fake for SQLITE
 
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,2);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,3);
@@ -162,9 +170,11 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,5);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,6);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (4,5);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (5,6);
+INSERT INTO PersonCompanyRel (ID,companyid) VALUES (6,6); -- fake for SQLITE
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (7,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (2,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
+INSERT INTO PersonCompanyRel (ID,companyid) VALUES (8,8); -- fake for SQLITE
 
 

@@ -259,7 +259,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 					// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 
 					mapResult( result.get(), resfilter.get());
-					LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, utils::ptreePrintFormat());
+					LOG_DATA << "[transaction preprocess] call function " << m_name << " => " << structure.tostring( resultnode, utils::logPrintFormat());
 				}
 			}
 			else

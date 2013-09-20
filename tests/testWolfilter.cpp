@@ -289,8 +289,8 @@ int main( int argc, char **argv)
 			}
 			else
 			{
-				logfilename = argv[argstart];
 				argstart++;
+				logfilename = argv[argstart];
 			}
 			argstart += 1;
 			if (!logfilename || !*logfilename)

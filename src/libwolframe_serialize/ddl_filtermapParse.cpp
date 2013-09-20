@@ -304,7 +304,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				}
 				if (ctx.flag( Context::ValidateInitialization))
 				{
-					if (!di->optional() && !itr->initialized())
+					if (!di->optional() && !di->array() && !itr->initialized())
 					{
 						throw SerializationErrorException( "schema validation failed: undefined non optional structure element", di->name, getElementPath( stk));
 					}
