@@ -35,6 +35,7 @@
 #ifndef _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #include "types/keymap.hpp"
+#include "processor/procProvider.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -79,6 +80,9 @@ public:
 	bool is_mine( const std::string& filename) const;
 	void addProgram( const std::string& source);
 	void loadProgram( const std::string& filename);
+
+	///\brief Check that all functions configured exists
+	bool check( const proc::ProcessorProvider* provider) const;
 
 	const DirectmapCommandDescription* get( const std::string& name) const
 	{

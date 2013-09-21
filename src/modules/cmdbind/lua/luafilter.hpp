@@ -62,21 +62,7 @@ public:
 
 	///\brief Copy constructor
 	///\param[in] o lua table input filter to copy
-	LuaTableInputFilter( const LuaTableInputFilter& o)
-		:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
-		,TypedInputFilter(o)
-		,LuaExceptionHandlerScope(o)
-		,m_ls(o.m_ls)
-		,m_stk(o.m_stk)
-	{
-		if (m_stk.size() > 0)
-		{
-			if (m_stk.size() > 1 || m_stk.back().id != FetchState::Init)
-			{
-				throw std::runtime_error( "copy of lua input filter not allowed in this state");
-			}
-		}
-	}
+	LuaTableInputFilter( const LuaTableInputFilter& o);
 
 	///\brief Destructor
 	///\remark Leaves the iterated table as top element (-1) on the lua stack
@@ -116,24 +102,28 @@ private:
 			return ar[ (int)i];
 		}
 
-		FetchState( const FetchState& o)				:id(o.id),tag(o.tag),tagsize(o.tagsize){}
-		explicit FetchState( Id id_)					:id(id_),tag(0),tagsize(0){}
-		FetchState( Id id_, const char* tag_, std::size_t tagsize_)	:id(id_),tag(tag_),tagsize(tagsize_){}
+		FetchState( const FetchState& o)				:id(o.id),tag(o.tag),tagsize(o.tagsize),idx(o.idx){}
+		explicit FetchState( Id id_)					:id(id_),tag(0),tagsize(0),idx(0){}
+		FetchState( Id id_, const char* tag_, std::size_t tagsize_)	:id(id_),tag(tag_),tagsize(tagsize_),idx(0){}
 
 		Id id;				//< state identifier
 		const char* tag;		//< caller tag, used enclosing tag by arrays
 		std::size_t tagsize;		//< size of tag
+		int idx;			//< array index
 
 		void getTagElement( types::VariantConst& e);
 	};
 
-	bool getValue( int idx, types::VariantConst& e);//< fetch the element with index 'idx' as atomic value
-	bool firstTableElem( const char* tag);	//< opens a new table iterator on an array or lua table
-	bool nextTableElem();			//< fetches the next element of the currently iterated array or lua table
+	bool getValue( int idx, types::VariantConst& e);	//< fetch the element with index 'idx' as atomic value
+	bool firstTableElem( const char* tag);			//< opens a new table iterator on an array or lua table
+	bool nextTableElem();					//< fetches the next element of the currently iterated associative (non array) lua table
+	bool nextVectorElem();					//< fetches the next element of the currently iterated lua array (table with numbers as indices)
+	bool getElementValue( int idx, types::VariantConst& element, const char*& errelemtype);
 
 private:
 	lua_State* m_ls;			//< lua state
 	std::vector<FetchState> m_stk;		//< stack of iterator states
+	bool m_logtrace;			//< true, if logging of stack trace is enabled
 };
 
 
@@ -144,26 +134,11 @@ class LuaTableOutputFilter :public TypedOutputFilter, public LuaExceptionHandler
 public:
 	///\brief Constructor
 	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableOutputFilter::print(ElementType,const types::VariantConst&)
-	explicit LuaTableOutputFilter( lua_State* ls)
-		:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
-		,LuaExceptionHandlerScope(ls)
-		,m_ls(ls)
-		,m_type(OpenTag)
-		,m_hasElement(false){}
+	explicit LuaTableOutputFilter( lua_State* ls);
 
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
-	LuaTableOutputFilter( const LuaTableOutputFilter& o)
-		:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
-		,TypedOutputFilter(o)
-		,LuaExceptionHandlerScope(o)
-		,m_ls(o.m_ls)
-		,m_type(o.m_type)
-		,m_hasElement(o.m_hasElement)
-		,m_statestk(o.m_statestk)
-	{
-		if (m_statestk.size() > 0) throw std::runtime_error( "copy of lua output filter not allowed in this state");
-	}
+	LuaTableOutputFilter( const LuaTableOutputFilter& o);
 
 	///\brief Destructor
 	virtual ~LuaTableOutputFilter(){}
@@ -192,6 +167,7 @@ private:
 	lua_State* m_ls;
 	ElementType m_type;
 	bool m_hasElement;
+	bool m_logtrace;				//< true, if logging of stack trace is enabled
 	std::vector<ContentType> m_statestk;
 };
 

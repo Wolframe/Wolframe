@@ -54,6 +54,22 @@ std::string DirectmapCommandDescription::tostring() const
 }
 
 
+bool DirectmapProgram::check( const proc::ProcessorProvider* provider) const
+{
+	bool rt = true;
+	types::keymap<DirectmapCommandDescription>::const_iterator di = begin(), de = end();
+	for (; di != de; ++di)
+	{
+		const langbind::FormFunction* func = provider->formFunction( di->second.call);
+		if (!func)
+		{
+			LOG_ERROR << "configured non existing form function call in directmap for '" << di->second.name << "': '" << di->second.call << "'";
+			rt = false;
+		}
+	}
+	return rt;
+}
+
 bool DirectmapProgram::is_mine( const std::string& filename) const
 {
 	std::string ext( utils::getFileExtension( filename));

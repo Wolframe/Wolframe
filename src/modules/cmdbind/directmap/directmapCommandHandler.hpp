@@ -73,6 +73,11 @@ public:
 		return m_filter;
 	}
 
+	bool checkReferences( const proc::ProcessorProvider* provider) const
+	{
+		return m_program.check( provider);
+	}
+
 private:
 	langbind::DirectmapProgram m_program;
 	std::string m_filter;
@@ -83,6 +88,7 @@ private:
 class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
+	typedef IOFilterCommandHandlerEscDLF Parent;
 	///\brief Constructor
 	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
 		:m_ctx(ctx_)
@@ -112,7 +118,7 @@ private:
 	langbind::TypedOutputFilterR m_output;					//< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction
 	langbind::TypedInputFilterR m_outputform_serialize;			//< serializer of the data in the output form
-	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;					//< parser to map the input to the input form
+	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
 };

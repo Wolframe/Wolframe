@@ -70,6 +70,11 @@ bool DirectmapCommandHandlerConfig::check() const
 	return rt;
 }
 
+bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProvider* provider) const
+{
+	return m_context.checkReferences( provider);
+}
+
 void DirectmapCommandHandlerConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indentstr( indent*3, ' ');

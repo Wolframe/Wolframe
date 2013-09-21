@@ -68,6 +68,8 @@ public:
 
 	virtual bool check() const;
 
+	virtual bool checkReferences( const proc::ProcessorProvider* provider) const;
+
 	virtual void print( std::ostream& os, size_t indent ) const;
 
 	const cmdbind::DirectmapContext* context() const
