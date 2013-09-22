@@ -444,6 +444,9 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 	int typ = lua_type( ls, idx);
 	switch (typ)
 	{
+		case LUA_TBOOLEAN:
+		case LUA_TNUMBER:
+		case LUA_TSTRING:
 		case LUA_TTABLE:
 			lua_pushvalue( ls, idx);
 			rt.reset( new LuaTableInputFilter( ls));
@@ -478,7 +481,7 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 		{
 			const char* typnam = typ>0?lua_typename( ls, typ):"NIL";
 			std::ostringstream msg;
-			msg << "expected table, form or generator function and got '" << typnam << "' as argument";
+			msg << "expected atomic value, table, form or generator function and got '" << typnam << "' as argument";
 			throw std::runtime_error( msg.str());
 		}
 	}
@@ -814,7 +817,7 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		form = LuaObject<types::FormR>::getSelf( ls, "form", "table");
+		form = LuaObject<types::FormR>::getSelf( ls, "form", "value");
 
 		types::VariantStruct* substruct = form->get();
 		int nn = lua_gettop( ls);
@@ -922,7 +925,7 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_struct_table)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "table");
+		obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "value");
 		check_parameters( ls, 1, 0);
 		LuaObject<serialize::StructSerializer>::push_luastack( ls, *obj);
 		obj = LuaObject<serialize::StructSerializer>::get( ls, -1);
@@ -995,7 +998,7 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		TypedInputFilterR* objref = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "table");
+		TypedInputFilterR* objref = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "value");
 		if (!objref->get())
 		{
 			lua_pushnil( ls);
@@ -1848,7 +1851,7 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		input = LuaObject<Input>::getSelf( ls, "input", "table");
+		input = LuaObject<Input>::getSelf( ls, "input", "value");
 		check_parameters( ls, 1, 0);
 	}
 	else
@@ -1962,10 +1965,11 @@ static const luaL_Reg logger_methodtable[ 3] =
 	{0,0}
 };
 
-static const luaL_Reg input_methodtable[ 7] =
+static const luaL_Reg input_methodtable[ 8] =
 {
 	{"as",&function_input_as},
 	{"form",&function_input_form},
+	{"value",&function_input_table},
 	{"table",&function_input_table},
 	{"doctype",function_input_doctype},
 	{"doctypeid",function_input_doctypeid},
@@ -1989,25 +1993,28 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
-static const luaL_Reg typedinputfilter_methodtable[ 4] =
+static const luaL_Reg typedinputfilter_methodtable[ 5] =
 {
+	{"value",&function_typedinputfilter_table},
 	{"table",&function_typedinputfilter_table},
 	{"get", &function_typedinputfilter_get},
 	{"__tostring",&function_typedinputfilter_tostring},
 	{0,0}
 };
 
-static const luaL_Reg struct_methodtable[ 4] =
+static const luaL_Reg struct_methodtable[ 5] =
 {
+	{"value",&function_struct_table},
 	{"table",&function_struct_table},
 	{"get", &function_struct_get},
 	{"__tostring",&function_struct_tostring},
 	{0,0}
 };
 
-static const luaL_Reg form_methodtable[ 6] =
+static const luaL_Reg form_methodtable[ 7] =
 {
 	{"name",&function_form_name},
+	{"value",&function_form_table},
 	{"table",&function_form_table},
 	{"get",&function_form_get},
 	{"fill",&function_form_fill},
@@ -2313,7 +2320,7 @@ TypedInputFilterR LuaScriptInstance::getObject( int idx)
 {
 	TypedInputFilterR rt;
 	int typ = lua_type( thread(), idx);
-	if (typ == LUA_TTABLE || typ == LUA_TFUNCTION)
+	if (typ != LUA_TUSERDATA && typ != LUA_TLIGHTUSERDATA)
 	{
 		rt = get_operand_TypedInputFilter( thread(), idx);
 	}
@@ -2334,6 +2341,7 @@ TypedInputFilterR LuaScriptInstance::getObject( int idx)
 		{
 			return TypedInputFilterR( obj->copy());
 		}
+		throw std::runtime_error( "cannot handle this object type");
 	}
 	return rt;
 }

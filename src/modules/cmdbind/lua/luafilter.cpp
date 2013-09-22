@@ -312,7 +312,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				}
 				else
 				{
-					m_stk.pop_back();
+					m_stk.back().id = FetchState::Done;
 					type = FilterBase::Value;
 					return getValue( -1, element);
 				}
