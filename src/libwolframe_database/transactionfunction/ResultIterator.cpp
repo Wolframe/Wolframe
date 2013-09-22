@@ -435,7 +435,7 @@ bool ResultIteratorImpl::getNext( langbind::TypedInputFilter::ElementType& type,
 				}
 				else
 				{
-					throw std::logic_error( "illegal state in transaction result construction (IgnoreResult)");
+					++m_structitr;
 				}
 				continue;
 

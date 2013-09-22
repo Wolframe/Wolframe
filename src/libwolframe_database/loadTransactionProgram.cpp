@@ -622,6 +622,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							if (boost::algorithm::iequals( tok, "INTO"))
 							{
+								if ((rf & 0x2) != 0) throw ERROR( si, "wrong order of definition in RESULT: INTO defined after FILTER");
 								if ((rf & 0x1) != 0) throw ERROR( si, "duplicate INTO definition after RESULT");
 								rf |= 0x1;
 								result_INTO = parse_INTO_path( langdescr, si, se);

@@ -212,6 +212,13 @@ public:
 				resolveType( m_symbol, typemap, formmap);
 			}
 		}
+		else if (st == ParseStart)
+		{
+			if (!m_isIndirection)
+			{
+				resolveType( "", typemap, formmap);
+			}
+		}
 		else if (st != ParseEnd)
 		{
 			throw std::runtime_error( "Syntax error in Simple Form Attribute: Incomplete attribute");
