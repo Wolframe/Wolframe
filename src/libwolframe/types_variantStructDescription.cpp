@@ -5,6 +5,7 @@
 #include <limits>
 #include <stdexcept>
 #include <sstream>
+#include <vector>
 #include <stdint.h>	//... for uintptr_t
 
 #undef _Wolframe_LOWLEVEL_DEBUG
@@ -171,6 +172,7 @@ void VariantStructDescription::resolve( const ResolveMap& rmap)
 	{
 		Element* ee = m_ar+ii;
 		if (ee->initvalue) ee->initvalue->resolve( rmap);
+		if (ee->substruct) ee->substruct->resolve( rmap);
 	}
 }
 
@@ -300,6 +302,7 @@ int VariantStructDescription::addElement( const Element& elem)
 	{
 		if (!elem.initvalue) throw std::runtime_error( "try to add incomplete element (null value)");
 		rt = addAttribute( elem.name, *elem.initvalue, elem.normalizer);
+		m_ar[ rt].flags = elem.flags;
 	}
 	else
 	{
@@ -334,7 +337,7 @@ int VariantStructDescription::addAttribute( const std::string& name_, const Vari
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 	check();
 #endif
-	return rt;
+	return m_nofattributes-1;
 }
 
 void VariantStructDescription::inherit( const VariantStructDescription& parent)
@@ -467,7 +470,7 @@ static void print_newitem( std::ostream& out, const utils::PrintFormat* pformat,
 	for (std::size_t ll=0; ll<level; ++ll) out << pformat->indent;
 }
 
-void VariantStructDescription::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
+static void print_( const VariantStructDescription* this_, std::ostream& out, const utils::PrintFormat* pformat, std::size_t level, std::vector<const VariantStructDescription*>& stk)
 {
 	static Variant default_bool( Variant::Bool);
 	static Variant default_int( Variant::Int);
@@ -475,56 +478,119 @@ void VariantStructDescription::print( std::ostream& out, const utils::PrintForma
 	static Variant default_double( Variant::Double);
 	static Variant default_string( Variant::String);
 
-	const_iterator di = begin(), de = end();
+	VariantStructDescription::const_iterator di = this_->begin(), de = this_->end();
 	for (; di!=de; ++di)
 	{
 		print_newitem( out, pformat, level);
+		const VariantStruct* value = di->initvalue;
+		enum ElemType {ET_Atomic,ET_Struct,ET_VisitedIndirection,ET_ExpandedIndirection};
+		ElemType elemType = ET_Atomic;
+		bool isArray = false;
 
-		if (di->substruct)
+		// [A] Get the visited element value and type:
+		if (value)
 		{
-			out << di->name;
-			if (di->array()) out << "[]";
-			out << pformat->itemdelimiter;
-			if (di->optional()) out << "?";
-			if (di->mandatory()) out << "!";
-			out << pformat->openstruct;
-			if (di->substruct->size())
+			if (di->array())
 			{
-				di->substruct->print( out, pformat, level+1);
-				print_newitem( out, pformat, level);
+				isArray = true;
+				value = value->prototype();
+
 			}
-			out << pformat->closestruct;
-		}
-		else if (di->initvalue)
-		{
-			out << di->name;
-			if (di->array()) out << "[]";
-			out << pformat->itemdelimiter;
-			if (di->optional()) out << "?";
-			if (di->mandatory()) out << "!";
-			if (di->attribute()) out << "@";
-			out << Variant::typeName( (Variant::Type)(di->initvalue->type()));
-			int cmp = 0;
-			if (di->initvalue->atomic())
+			if (value->type() == VariantStruct::Indirection)
 			{
-				Variant::Type tp = (Variant::Type)di->initvalue->type();
+				const VariantStructDescription* descr = value->description();
+				if (!descr) throw std::runtime_error("internal: corrupt variant data type (indirection)");
+
+				std::vector<const VariantStructDescription*>::const_iterator si = stk.begin(), se = stk.end();
+				for (; si != se && descr != *si; ++si){}
+				if (si == se)
+				{
+					elemType = ET_ExpandedIndirection;
+					stk.push_back( descr);
+				}
+				else
+				{
+					elemType = ET_VisitedIndirection;
+				}
+			}
+			else if (value->atomic())
+			{
+				elemType = ET_Atomic;
+			}
+			else
+			{
+				elemType = ET_Struct;
+			}
+		}
+		// [B] Print the visited element:
+		switch (elemType)
+		{
+			case ET_Atomic:
+			{
+				if (!value) throw std::runtime_error("internal: corrupt variant data type (atomic value)");
+				out << di->name;
+				out << pformat->itemdelimiter;
+				if (di->optional() && !di->array()) out << "?";
+				if (di->mandatory()) out << "!";
+				if (di->attribute()) out << "@";
+
+				int cmp = 0;
+				Variant::Type tp = (Variant::Type)value->type();
+				out << Variant::typeName( tp);
+				if (isArray) out << "[]";
+
 				switch (tp)
 				{
 					case Variant::Null: cmp = 0; break;
-					case Variant::Bool: cmp = di->initvalue->compare( default_bool); break;
-					case Variant::Int: cmp = di->initvalue->compare( default_int); break;
-					case Variant::UInt: cmp = di->initvalue->compare( default_uint); break;
-					case Variant::Double: cmp = di->initvalue->compare( default_double); break;
-					case Variant::String: cmp = di->initvalue->compare( default_string); break;
+					case Variant::Bool: cmp = value->compare( default_bool); break;
+					case Variant::Int: cmp = value->compare( default_int); break;
+					case Variant::UInt: cmp = value->compare( default_uint); break;
+					case Variant::Double: cmp = value->compare( default_double); break;
+					case Variant::String: cmp = value->compare( default_string); break;
 				}
 				if (cmp != 0)
 				{
-					out << " (" << di->initvalue->tostring() << ")";
+					out << " (" << value->tostring() << ")";
 				}
+				out << pformat->decldelimiter;
+				break;
 			}
-			out << pformat->decldelimiter;
+			case ET_Struct:
+			case ET_ExpandedIndirection:
+			{
+				const VariantStructDescription* descr = value->description();
+				if (!descr) throw std::runtime_error("internal: corrupt variant data type (structure)");
+				out << di->name;
+				out << pformat->itemdelimiter;
+				if (di->optional() && !di->array()) out << "?";
+				if (di->mandatory()) out << "!";
+				if (di->array()) out << "[]";
+				if (elemType == ET_ExpandedIndirection) out << "->";
+				out << pformat->openstruct;
+				if (descr->size())
+				{
+					print_( descr, out, pformat, level+1, stk);
+					print_newitem( out, pformat, level);
+				}
+				out << pformat->closestruct;
+				out << pformat->decldelimiter;
+				if (elemType == ET_ExpandedIndirection)
+				{
+					stk.pop_back();
+				}
+				break;
+			}
+			case ET_VisitedIndirection:
+				out << "^" << di->name;
+				out << pformat->decldelimiter;
 		}
 	}
+}
+
+void VariantStructDescription::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
+{
+	std::vector<const VariantStructDescription*> stk;
+	print_( this, out, pformat, level, stk);
 }
 
 std::string VariantStructDescription::tostring( const utils::PrintFormat* pformat) const

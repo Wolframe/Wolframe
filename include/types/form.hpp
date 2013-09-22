@@ -38,6 +38,7 @@ Project Wolframe.
 #include <cstddef>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 #include "types/countedReference.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -89,6 +90,20 @@ public:
 		return m_ddlname;
 	}
 
+	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const
+	{
+		out << m_name << pformat->assign;
+		types::VariantStructDescription::print( out, pformat, level);
+	}
+
+	///\brief Gets the form as string
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const
+	{
+		std::ostringstream rt;
+		print( rt, pformat);
+		return rt.str();
+	}
+
 private:
 	std::string m_name;
 	std::string m_ddlname;
@@ -132,9 +147,16 @@ public:
 
 	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const
 	{
-		std::string indent( level, '\t');
-		out << indent << "FORM " << m_description->name() << pformat->newitem;
+		out << m_description->name() << pformat->assign;
 		types::VariantStruct::print( out, pformat, level);
+	}
+
+	///\brief Gets the form as string
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const
+	{
+		std::ostringstream rt;
+		print( rt, pformat);
+		return rt.str();
 	}
 
 private:

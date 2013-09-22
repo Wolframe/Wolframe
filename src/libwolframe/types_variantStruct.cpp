@@ -127,6 +127,10 @@ void VariantStruct::resolve( const ResolveMap& rmap)
 		VariantStruct::iterator vi = begin(), ve = end();
 		for (; vi != ve; ++vi) vi->resolve( rmap);
 	}
+	else if (type() == Indirection)
+	{
+		prototype()->resolve( rmap);
+	}
 }
 
 void VariantStruct::initConstCopy( const VariantStruct& o)

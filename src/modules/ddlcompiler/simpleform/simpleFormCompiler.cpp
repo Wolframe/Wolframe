@@ -366,33 +366,34 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 			else
 			{
 				types::Variant val( fa.value());
+				int epos = -1;
 				if (fa.isAttribute())
 				{
 					if (first == "_") throw std::runtime_error( "empty attribute name is illegal");
-					result.addAttribute( first, val, fa.type());
+					epos = result.addAttribute( first, val, fa.type());
 				}
 				else
 				{
 					if (first == "_")
 					{
-						result.addAtom( "", val, fa.type());
+						epos = result.addAtom( "", val, fa.type());
 					}
 					else
 					{
-						result.addAtom( first, val, fa.type());
+						epos = result.addAtom( first, val, fa.type());
 					}
 				}
 				if (fa.isVector())
 				{
-					result.back().makeArray();
+					result.at( epos)->makeArray();
 				}
 				if (fa.isOptional())
 				{
-					result.back().setOptional();
+					result.at( epos)->setOptional();
 				}
 				if (fa.isMandatory())
 				{
-					result.back().setMandatory();
+					result.at( epos)->setMandatory();
 				}
 			}
 		}
