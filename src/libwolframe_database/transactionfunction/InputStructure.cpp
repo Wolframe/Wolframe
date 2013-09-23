@@ -182,20 +182,9 @@ TransactionFunctionInput::Structure::NodeVisitor
 		Node* lc = node( nd->m_lastchild);
 		lc->m_next = nd->m_lastchild = idx;
 	}
-	/*[-]*/if (nd->m_lastchild == 9)
-	/*[-]*/{
-		/*[-]*/	std::cout << "GALLY" << std::endl;
-	/*[-]*/}
 	Node* chld = node( idx);
 	chld->m_arrayindex = -1;
 	chld->m_parent = nv.m_nodeidx;
-	/*[-]*/Node* cn = node( nd->m_firstchild);
-	/*[-]*/int ci = nd->m_firstchild;
-	/*[-]*/for (; ci != 0 && ci != nd->m_lastchild; ci = cn->m_next, cn = node( ci)){}
-	/*[-]*/if (ci != nd->m_lastchild)
-	/*[-]*/{
-		/*[-]*/	std::cout << "HALLY GALLY" << std::endl;
-	/*[-]*/}
 	return NodeVisitor(idx);
 }
 
