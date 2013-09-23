@@ -74,7 +74,8 @@
 		</para>
 		<para>
 		To access the data in a form there are two form methods available. <code>get()</code> returns an iterator on the form data similar
-		to the iterator on input. Same as for input there is a method <code>table()</code> that returns the form data as lua table.
+		to the iterator on input. Same as for input there is a method <code>value()</code> that returns the form data as lua data structure
+		(a lua table or atomic value).
 		</para>
 	</sect2>
 	<sect2>
@@ -84,8 +85,8 @@
 		concept of functions. The provider function <code>provider.formfunction</code> with the name of the function
 		as argument returns a lua function. This function takes a table or an iterator as argument
 		and returns a data form structure. The data in the returned form data structure can be
-		accessed with <code>get()</code> that returns an iterator on the content and <code>table()</code>
-		that returns a Lua table.
+		accessed with <code>get()</code> that returns an iterator on the content and <code>value()</code>
+		that returns a Lua table or atomic value.
 		</para>
 		<para>
 		If you for example have a transaction called "insertEmployee" defined in a transaction description program
@@ -97,7 +98,7 @@
 		</para>
 		<para>
 		The first line creates the function called "insertEmployee" as lua function.
-		The second calls the transaction, the third creates a lua table out of the result
+		The second calls the transaction, the third creates a Lua table out of the result
 		and the fourth selects and prints the "id" element in the table.
 	</para>
 	</sect2>
@@ -126,10 +127,10 @@
 					<entry>Returns an iterator on the form elements</entry>
 				</row>
 				<row>
-					<entry>table</entry>
+					<entry>value</entry>
 					<entry></entry>
 					<entry>lua table</entry>
-					<entry>Returns the contents of the data form as lua table</entry>
+					<entry>Returns the contents of the data form as Lua table or atomic value</entry>
 				</row>
 				<row>
 					<entry>__tostring</entry>
@@ -178,9 +179,9 @@
 					<entry>Returns an iterator on the form elements</entry>
 				</row>
 				<row>
-					<entry>table</entry>
-					<entry>lua table</entry>
-					<entry>Returns the contents of the data form as lua table</entry>
+					<entry>value</entry>
+					<entry>Lua table or atomic value</entry>
+					<entry>Returns the contents of the data form as lua table or atomic value</entry>
 				</row>
 				<row>
 					<entry>__tostring</entry>

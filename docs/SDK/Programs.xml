@@ -1,6 +1,7 @@
 <chapter>
 <title>Logic Tier Programs</title>
-<para>This chapter introduces the programs of the logic tier.
+<para>This chapter introduces the programs of the logic tier defining the form functions
+that are provided to perform the calls of the command handler.
 </para>
 	&SDKprogramTransactions;
 	&SDKprogramForms;
