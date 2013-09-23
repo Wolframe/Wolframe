@@ -182,9 +182,20 @@ TransactionFunctionInput::Structure::NodeVisitor
 		Node* lc = node( nd->m_lastchild);
 		lc->m_next = nd->m_lastchild = idx;
 	}
+	/*[-]*/if (nd->m_lastchild == 9)
+	/*[-]*/{
+		/*[-]*/	std::cout << "GALLY" << std::endl;
+	/*[-]*/}
 	Node* chld = node( idx);
 	chld->m_arrayindex = -1;
 	chld->m_parent = nv.m_nodeidx;
+	/*[-]*/Node* cn = node( nd->m_firstchild);
+	/*[-]*/int ci = nd->m_firstchild;
+	/*[-]*/for (; ci != 0 && ci != nd->m_lastchild; ci = cn->m_next, cn = node( ci)){}
+	/*[-]*/if (ci != nd->m_lastchild)
+	/*[-]*/{
+		/*[-]*/	std::cout << "HALLY GALLY" << std::endl;
+	/*[-]*/}
 	return NodeVisitor(idx);
 }
 
@@ -308,33 +319,65 @@ TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::closeTag( const NodeVisitor& nv)
 {
 	Node* nd = node( nv);
-	if (nd->m_parent < 0) throw std::runtime_error( "tags not balanced in input (close tag)");
 	NodeVisitor rt( nd->m_parent);
+
+	if (nd->m_parent < 0)
+	{
+		throw std::runtime_error( "tags not balanced in input (close tag)");
+	}
+	Node* pn = node( nd->m_parent);
+	if (nv.m_nodeidx != pn->m_lastchild)
+	{
+		throw std::logic_error("internal: illegal call of closeTag");
+	}
+
 	if (isArrayNode( nv))
 	{
 		// In case of an array the granparent of the array parent takes over the children of the array
-		// and the parent is deleted from the tree:
-		Node* cd = node( nd->m_firstchild);
-		for (;;)
+		// and the parent is deleted from the tree.
+		if (!nd->m_firstchild)
 		{
-			cd->m_tag = nd->m_tag;
-			cd->m_tagstr = nd->m_tagstr;	//... tag names taken from father that will disappear
-			cd->m_parent = nd->m_parent;	//... parent line to granparent from father that will disappear
-			if (!cd->m_next) break;
-			cd = node( cd->m_next);
+			//... if there are no children then the empty array reference is deleted:
+			if (pn->m_lastchild == pn->m_firstchild)
+			{
+				pn->m_lastchild = pn->m_firstchild = 0;
+			}
+			else
+			{
+				int ni = pn->m_firstchild;
+				Node* cd = node(ni);
+				while (cd->m_next && cd->m_next != nv.m_nodeidx)
+				{
+					cd = node( ni=cd->m_next);
+				}
+				if (!cd->m_next) throw std::logic_error("internal: corrupt tree");
+				cd->m_next = 0;
+				pn->m_lastchild = ni;
+			}
 		}
-		Node* pn = node( nd->m_parent);
-
-		if (nv.m_nodeidx != pn->m_lastchild)
+		else
 		{
-			throw std::logic_error("internal: illegal call of closeTag");
+			// ... there are children, so they inherit parent attributes and get added as granparents children
+			Node* cd = node( nd->m_firstchild);
+			for (;;)
+			{
+				cd->m_tag = nd->m_tag;
+				cd->m_tagstr = nd->m_tagstr;	//... tag names taken from father that will disappear
+				cd->m_parent = nd->m_parent;	//... parent line to granparent from father that will disappear
+				if (!cd->m_next) break;
+				cd = node( cd->m_next);
+			}
+			if (nd->m_lastchild == nd->m_firstchild)
+			{
+				*nd = *node( nd->m_firstchild);
+			}
+			else
+			{
+				int lastchild = nd->m_lastchild;
+				*nd = *node( nd->m_firstchild);
+				pn->m_lastchild = lastchild;
+			}
 		}
-		if (pn->m_firstchild == pn->m_lastchild)
-		{
-			pn->m_firstchild = nv.m_nodeidx;
-		}
-		pn->m_lastchild = nd->m_lastchild;
-		*nd = *node( nd->m_firstchild);		// ... first child gets joined to granparent children and father disappears
 	}
 	return rt;
 }

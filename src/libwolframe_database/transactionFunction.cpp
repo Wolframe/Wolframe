@@ -132,6 +132,7 @@ void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider
 	{
 		pi->call( provider, *m_structure);
 	}
+	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
 static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node* selectornode)
