@@ -368,9 +368,15 @@ BuildRequires: postgresql-devel >= 8.3
 %if %{rhel5}
 %define build_sqlite 1
 %endif
+%if %{rhel6}
+%define build_sqlite 1
+%endif
 %endif
 %if %{centos}
 %if %{centos5}
+%define build_sqlite 1
+%endif
+%if %{centos6}
 %define build_sqlite 1
 %endif
 %endif
