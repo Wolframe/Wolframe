@@ -111,7 +111,14 @@ void Structure::print( std::ostream& out, const utils::PrintFormat* pformat, std
 	else if (atomic())
 	{
 		out << pformat->startvalue;
-		out << m_value.tostring();
+		if (pformat->maxitemsize)
+		{
+			out << utils::getLogString( m_value, pformat->maxitemsize);
+		}
+		else
+		{
+			out << m_value.tostring();
+		}
 		out << pformat->endvalue;
 	}
 	else

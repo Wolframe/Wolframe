@@ -34,6 +34,7 @@
 ///\file transactionfunction/InputStructure.cpp
 #include "transactionfunction/InputStructure.hpp"
 #include "filter/typedfilter.hpp"
+#include "utils/printFormats.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -119,7 +120,16 @@ void TransactionFunctionInput::Structure::print( std::ostream& out, const utils:
 			while (indent--) out << pformat->indent;
 
 			const types::Variant* val = &m_content.at( nd->m_value);
-			out << val->typeName() << pformat->itemdelimiter << pformat->startvalue << val->tostring() << pformat->endvalue;
+			out << val->typeName() << pformat->itemdelimiter << pformat->startvalue;
+			if (pformat->maxitemsize)
+			{
+				out << utils::getLogString( *val, pformat->maxitemsize);
+			}
+			else
+			{
+				out << val->tostring();
+			}
+			out << pformat->endvalue;
 		}
 		if (stk.back().printsiblings && nd->m_next)
 		{
@@ -774,7 +784,7 @@ public:
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element)
 	{
-		LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
+		LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'";
 		switch (type)
 		{
 			case langbind::TypedInputFilter::OpenTag:

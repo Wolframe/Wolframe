@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Helper function for the serialization of structures
 #include "serialize/struct/filtermapSerialize.hpp"
 #include "serialize/struct/filtermapPrintValue.hpp"
-#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;

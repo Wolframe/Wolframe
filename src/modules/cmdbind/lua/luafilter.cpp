@@ -34,6 +34,7 @@ Project Wolframe.
 #include "luafilter.hpp"
 #include "luaDebug.hpp"
 #include "logger-v1.hpp"
+#include "utils/printFormats.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>
@@ -77,22 +78,22 @@ static void logLuaStack( lua_State* ls)
 	LOG_DATA << "[lua stack] " << out.str();
 }
 
-void wrap_lua_pushnil( lua_State* ls)					{LOG_DATA << "[lua operation] lua_pushnil()"; ::lua_pushnil( ls); logLuaStack( ls);}
-void wrap_lua_pushvalue( lua_State* ls, int arg)			{LOG_DATA << "[lua operation] lua_pushvalue" << "(" << arg << ")"; ::lua_pushvalue( ls, arg); logLuaStack( ls);}
-void wrap_lua_pushboolean( lua_State* ls, bool arg)			{LOG_DATA << "[lua operation] lua_pushboolean" << "(" << arg << ")"; ::lua_pushboolean( ls, arg); logLuaStack( ls);}
-void wrap_lua_pushinteger( lua_State* ls, int arg)			{LOG_DATA << "[lua operation] lua_pushinteger" << "(" << arg << ")"; ::lua_pushinteger( ls, arg); logLuaStack( ls);}
-void wrap_lua_pushnumber( lua_State* ls, double arg)			{LOG_DATA << "[lua operation] lua_pushnumber" << "(" << arg << ")"; ::lua_pushnumber( ls, arg); logLuaStack( ls);}
-void wrap_lua_pushlstring( lua_State* ls, const char* arg, int n)	{LOG_DATA << "[lua operation] lua_pushlstring" << "(" << arg << "," << n << ")"; ::lua_pushlstring( ls, arg, n); logLuaStack( ls);}
-void wrap_lua_pushstring( lua_State* ls, const char* arg)		{LOG_DATA << "[lua operation] lua_pushstring" << "(" << arg << ")"; ::lua_pushstring( ls, arg); logLuaStack( ls);}
-void wrap_lua_pop( lua_State* ls, int arg)				{LOG_DATA << "[lua operation] lua_pop" << "(" << arg << ")"; ::lua_pop( ls, arg); logLuaStack( ls);}
-void wrap_lua_newtable( lua_State* ls)					{LOG_DATA << "[lua operation] lua_newtable" << "()"; ::lua_newtable( ls); logLuaStack( ls);}
-void wrap_lua_gettable( lua_State* ls, int arg)				{LOG_DATA << "[lua operation] lua_gettable" << "(" << arg << ")"; lua_gettable( ls, arg); logLuaStack( ls);}
-void wrap_lua_settable( lua_State* ls, int arg)				{LOG_DATA << "[lua operation] lua_settable" << "(" << arg << ")"; ::lua_settable( ls, arg); logLuaStack( ls);}
-bool wrap_lua_next( lua_State* ls, int arg)				{LOG_DATA << "[lua operation] lua_next" << "("  << arg << ")"; int rt = ::lua_next( ls, arg); logLuaStack( ls); return rt;}
-const char* wrap_lua_tostring( lua_State* ls, int arg)			{LOG_DATA << "[lua operation] lua_tostring" << "("  << arg << ")"; return ::lua_tostring( ls, arg);}
-const char* wrap_lua_tolstring( lua_State* ls, int arg, size_t* size)	{LOG_DATA << "[lua operation] lua_tolstring" << "("  << arg << ")"; return ::lua_tolstring( ls, arg, size);}
-double wrap_lua_tonumber( lua_State* ls, int arg)			{LOG_DATA << "[lua operation] lua_tonumber" << "("  << arg << ")"; return ::lua_tonumber( ls, arg);}
-bool wrap_lua_toboolean( lua_State* ls, int arg)			{LOG_DATA << "[lua operation] lua_toboolean" << "("  << arg << ")"; return ::lua_toboolean( ls, arg);}
+void wrap_lua_pushnil( lua_State* ls)					{LOG_DATA2 << "[lua operation] lua_pushnil()"; ::lua_pushnil( ls); logLuaStack( ls);}
+void wrap_lua_pushvalue( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation] lua_pushvalue" << "(" << arg << ")"; ::lua_pushvalue( ls, arg); logLuaStack( ls);}
+void wrap_lua_pushboolean( lua_State* ls, bool arg)			{LOG_DATA2 << "[lua operation] lua_pushboolean" << "(" << arg << ")"; ::lua_pushboolean( ls, arg); logLuaStack( ls);}
+void wrap_lua_pushinteger( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation] lua_pushinteger" << "(" << arg << ")"; ::lua_pushinteger( ls, arg); logLuaStack( ls);}
+void wrap_lua_pushnumber( lua_State* ls, double arg)			{LOG_DATA2 << "[lua operation] lua_pushnumber" << "(" << arg << ")"; ::lua_pushnumber( ls, arg); logLuaStack( ls);}
+void wrap_lua_pushlstring( lua_State* ls, const char* arg, int n)	{LOG_DATA2 << "[lua operation] lua_pushlstring" << "(" << arg << "," << n << ")"; ::lua_pushlstring( ls, arg, n); logLuaStack( ls);}
+void wrap_lua_pushstring( lua_State* ls, const char* arg)		{LOG_DATA2 << "[lua operation] lua_pushstring" << "(" << arg << ")"; ::lua_pushstring( ls, arg); logLuaStack( ls);}
+void wrap_lua_pop( lua_State* ls, int arg)				{LOG_DATA2 << "[lua operation] lua_pop" << "(" << arg << ")"; ::lua_pop( ls, arg); logLuaStack( ls);}
+void wrap_lua_newtable( lua_State* ls)					{LOG_DATA2 << "[lua operation] lua_newtable" << "()"; ::lua_newtable( ls); logLuaStack( ls);}
+void wrap_lua_gettable( lua_State* ls, int arg)				{LOG_DATA2 << "[lua operation] lua_gettable" << "(" << arg << ")"; lua_gettable( ls, arg); logLuaStack( ls);}
+void wrap_lua_settable( lua_State* ls, int arg)				{LOG_DATA2 << "[lua operation] lua_settable" << "(" << arg << ")"; ::lua_settable( ls, arg); logLuaStack( ls);}
+bool wrap_lua_next( lua_State* ls, int arg)				{LOG_DATA2 << "[lua operation] lua_next" << "("  << arg << ")"; int rt = ::lua_next( ls, arg); logLuaStack( ls); return rt;}
+const char* wrap_lua_tostring( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation] lua_tostring" << "("  << arg << ")"; return ::lua_tostring( ls, arg);}
+const char* wrap_lua_tolstring( lua_State* ls, int arg, size_t* size)	{LOG_DATA2 << "[lua operation] lua_tolstring" << "("  << arg << ")"; return ::lua_tolstring( ls, arg, size);}
+double wrap_lua_tonumber( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation] lua_tonumber" << "("  << arg << ")"; return ::lua_tonumber( ls, arg);}
+bool wrap_lua_toboolean( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation] lua_toboolean" << "("  << arg << ")"; return ::lua_toboolean( ls, arg);}
 
 #define _wrap_lua_pushnil( ls)		if (m_logtrace) wrap_lua_pushnil( ls); else lua_pushnil(ls);
 #define _wrap_lua_pushvalue( ls,a)	if (m_logtrace) wrap_lua_pushvalue(ls,a); else lua_pushvalue(ls,a);
@@ -133,7 +134,7 @@ LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
-	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA)
+	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
 {
 	FetchState fs( FetchState::Init);
 	m_stk.push_back( fs);
@@ -444,7 +445,7 @@ LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
 	,m_ls(ls)
 	,m_type(OpenTag)
 	,m_hasElement(false)
-	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA){}
+	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2){}
 
 LuaTableOutputFilter::LuaTableOutputFilter( const LuaTableOutputFilter& o)
 	:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
@@ -581,7 +582,7 @@ bool LuaTableOutputFilter::closeAttribute( const types::VariantConst& element)
 
 bool LuaTableOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
-	LOG_DATA << "[lua table] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
+	LOG_DATA << "[lua table] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'";
 	if (!lua_checkstack( m_ls, 16))
 	{
 		setState( OutputFilter::Error, "lua stack overflow");

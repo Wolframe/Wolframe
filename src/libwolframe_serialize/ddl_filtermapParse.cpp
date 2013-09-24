@@ -36,11 +36,12 @@ Project Wolframe.
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
+#include "utils/printFormats.hpp"
 #include <cstring>
 #include <sstream>
 
 using namespace _Wolframe;
-using namespace serialize;
+using namespace _Wolframe::serialize;
 
 static bool emptycontent( const types::VariantConst& val)
 {
@@ -104,7 +105,7 @@ static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Con
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
-	LOG_DATA << "[DDL structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+	LOG_DATA << "[DDL structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << utils::getLogString( element) << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
@@ -159,7 +160,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
 
-	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " " << utils::getLogString( element);
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

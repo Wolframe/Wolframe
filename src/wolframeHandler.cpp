@@ -187,38 +187,59 @@ static void logNetwork( const char* title, const void* ptr, std::size_t size)
 	static const char hex[17] = "0123456789abcdef";
 	std::size_t ii,blkidx;
 
-	for (ii=0,blkidx=0; ii<size; ii+=16,++blkidx)
+	if (_Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
 	{
-		std::string hexblk;
-		std::string chrblk;
-		std::size_t ci,ce;
-		for (ci = 0, ce = ((size-ii) >= 16)?16:(size-ii); ci < ce; ++ci)
+		for (ii=0,blkidx=0; ii<size; ii+=16,++blkidx)
 		{
-			unsigned char ch = *((const unsigned char*)ptr + ii + ci);
+			std::string hexblk;
+			std::string chrblk;
+			std::size_t ci,ce;
+			for (ci = 0, ce = ((size-ii) >= 16)?16:(size-ii); ci < ce; ++ci)
+			{
+				unsigned char ch = *((const unsigned char*)ptr + ii + ci);
+				if (ch >= ' ' && ch <= 127)
+				{
+					chrblk.push_back( ch);
+				}
+				else
+				{
+					chrblk.push_back( '.');
+				}
+				hexblk.push_back( hex[ ch / 16]);
+				hexblk.push_back( hex[ ch % 16]);
+				hexblk.push_back( ' ');
+			}
+			for(; ci < 16; ++ci)
+			{
+				chrblk.push_back( ' ');
+				hexblk.push_back( ' ');
+				hexblk.push_back( ' ');
+				hexblk.push_back( ' ');
+			}
+			std::string idxstr;
+			idxstr.push_back( hex[ (blkidx % 256) / 16]);
+			idxstr.push_back( hex[ (blkidx % 256) % 16]);
+
+			LOG_DATA2 << "[" << title << " " << idxstr << "] " << chrblk << " - " << hexblk;
+		}
+	}
+	else
+	{
+		std::size_t nn = size>80?80:size;
+		std::string str;
+		for (ii=0; ii<nn; ++ii)
+		{
+			unsigned char ch = ((const unsigned char*)ptr)[ii];
 			if (ch >= ' ' && ch <= 127)
 			{
-				chrblk.push_back( ch);
+				str.push_back( ch);
 			}
 			else
 			{
-				chrblk.push_back( '.');
+				str.push_back( '.');
 			}
-			hexblk.push_back( hex[ ch / 16]);
-			hexblk.push_back( hex[ ch % 16]);
-			hexblk.push_back( ' ');
 		}
-		for(; ci < 16; ++ci)
-		{
-			chrblk.push_back( ' ');
-			hexblk.push_back( ' ');
-			hexblk.push_back( ' ');
-			hexblk.push_back( ' ');
-		}
-		std::string idxstr;
-		idxstr.push_back( hex[ (blkidx % 256) / 16]);
-		idxstr.push_back( hex[ (blkidx % 256) % 16]);
-
-		LOG_DATA << "[" << title << " " << idxstr << "] " << chrblk << " - " << hexblk;
+		LOG_DATA << "[" << title << "] " << str << ((size>nn)?"...":"");
 	}
 }
 
@@ -309,7 +330,7 @@ void wolframeConnection::networkInput( const void* begin, std::size_t bytesTrans
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 	if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 	{
-		logNetwork( "conn read", begin, bytesTransferred);
+//[+]		logNetwork( "conn read", begin, bytesTransferred);
 	}
 	if ( m_state == COMMAND_HANDLER )	{
 		m_cmdHandler.putInput( begin, bytesTransferred );

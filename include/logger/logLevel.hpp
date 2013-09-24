@@ -48,6 +48,7 @@ class LogLevel
 {
 public:
 	enum Level	{
+		LOGLEVEL_DATA2,		///< log everything, including lowlevel data traffic (network messages, interpreter stack traces, etc.)
 		LOGLEVEL_DATA,		///< log everything, including data
 		LOGLEVEL_TRACE,		///< trace functions calls
 		LOGLEVEL_DEBUG,		///< log operations
@@ -73,7 +74,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 							  LogLevel::Level l )
 {
 	static const CharT *const str[] = {
-		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING",
+		"DATA2", "DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING",
 		"ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL" };
 	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) )	{
 		s << str[l];

@@ -328,6 +328,7 @@ int main( int argc, char **argv)
 	if (tracelevel >= 2) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
 	if (tracelevel >= 3) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
 	if (tracelevel >= 4) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+	if (tracelevel >= 5) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA2;
 	if (logfilename)
 	{
 		_Wolframe::log::LogBackend::instance().setLogfileName( logfilename);

@@ -92,6 +92,8 @@ Logger& operator<<( Logger& logger, T t )
 }} // namespace _Wolframe::log
 
 // shortcut macros
+#define LOG_DATA2	if ( _Wolframe::log::LogBackend::instance().minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA2 ) ; \
+			else _Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA2 )
 #define LOG_DATA	if ( _Wolframe::log::LogBackend::instance().minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA ) ; \
 			else _Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
 #define LOG_TRACE	if ( _Wolframe::log::LogBackend::instance().minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_TRACE ) ; \
@@ -117,6 +119,8 @@ Logger& operator<<( Logger& logger, T t )
 
 // temporary modules hack
 extern _Wolframe::log::LogBackend*	logBackendPtr;
+#define MOD_LOG_DATA2	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA2 ) ; \
+			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA2 )
 #define MOD_LOG_DATA	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA ) ; \
 			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
 #define MOD_LOG_TRACE	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_TRACE ) ; \

@@ -49,7 +49,8 @@ const PrintFormat* utils::logPrintFormat()
 		"'" /*endvalue*/,
 		";" /*decldelimiter*/,
 		" " /*itemdelimiter*/,
-		"=" /*assign*/
+		"=" /*assign*/,
+		60  /*maxitemsize*/
 	};
 	return &rt;
 }
@@ -66,10 +67,22 @@ const PrintFormat* utils::ptreePrintFormat()
 		"'"   /*endvalue*/,
 		";"   /*decldelimiter*/,
 		" "   /*itemdelimiter*/,
-		"="   /*assign*/
+		"="   /*assign*/,
+		0     /*maxitemsize*/
 	};
 	return &rt;
 }
 
+std::string utils::getLogString( const types::Variant& val, std::size_t maxsize)
+{
+	std::string rt;
+	rt.append( val.tostring());
+	if (rt.size() > maxsize)
+	{
+		rt.resize( maxsize);
+		rt.append( "...");
+	}
+	return rt;
+}
 
 

@@ -34,6 +34,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "filter/typingfilter.hpp"
+#include "utils/printFormats.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 #include <stdexcept>
@@ -189,7 +190,7 @@ bool StructSerializer::call()
 				m_ctx.setElementUnconsumed();
 				return false;
 			}
-			LOG_DATA << "[C++ structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+			LOG_DATA << "[C++ structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << utils::getLogString( elem->m_value) << "'";
 		}
 		m_stk.back().fetch()( m_ctx, m_stk);
 	}
@@ -208,7 +209,7 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::
 	type = elem->m_type;
 	value = elem->m_value;
 	setState( langbind::InputFilter::Open);
-	LOG_DATA << "[C++ structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+	LOG_DATA << "[C++ structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " " << utils::getLogString( elem->m_value);
 	return true;
 }
 

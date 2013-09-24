@@ -36,6 +36,7 @@
 #define _DATABASE_TRANSACTION_OUTPUT_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
+#include "utils/printFormats.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -97,7 +98,7 @@ public:
 		std::size_t nofRows() const					{return m_row.size();}
 		std::size_t nofColumns() const					{return m_columnName.size();}
 		const std::string& columnName( std::size_t i) const		{return m_columnName[i];}
-		std::string tostring() const;
+		std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 	public://interface for constructing the result:
 		void addColumn( const std::string& name)			{m_columnName.push_back( name);}
@@ -134,7 +135,7 @@ public:// interface for accessing the result and iterating on the result:
 	std::size_t size() const						{return m_result.size();}
 
 	///\brief Return the result as readable serialization for logging output
-	std::string tostring() const;
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 	bool isCaseSensitive() const						{return m_isCaseSensitive;}
 	void setCaseSensitive( bool v=true)					{m_isCaseSensitive = v;}

@@ -34,6 +34,7 @@
 ///\file transactionFunction.cpp
 #include "types/allocators.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/printFormats.hpp"
 #include "database/transactionFunction.hpp"
 #include "transactionFunctionDescription.hpp"
 #include "transactionfunction/InputStructure.hpp"
@@ -101,7 +102,7 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInp
 
 bool TransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
 {
-	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "' :" << element.typeName( element.type());
+	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'' :" << element.typeName( element.type());
 	switch (type)
 	{
 		case langbind::TypedInputFilter::OpenTag:

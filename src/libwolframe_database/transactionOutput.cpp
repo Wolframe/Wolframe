@@ -40,40 +40,49 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-std::string TransactionOutput::CommandResult::tostring() const
+std::string TransactionOutput::CommandResult::tostring( const utils::PrintFormat* pformat) const
 {
 	std::ostringstream rt;
 	std::size_t ci = 0,ce = nofColumns();
-	rt << " COLUMNS " << ce << ":";
-	for (; ci<ce; ++ci) rt << " " << columnName( ci);
-	rt << std::endl;
+	rt << "columns" << pformat->itemdelimiter << ce << pformat->assign;
+	for (; ci<ce; ++ci) rt << pformat->itemdelimiter << columnName( ci);
 	std::vector<CommandResult::Row>::const_iterator wi = begin(), we = end();
 	for (;wi != we; ++wi)
 	{
-		rt << ">";
+		rt << pformat->newitem;
 		for (ci=0; ci<ce; ++ci)
 		{
 			if (wi->at(ci).defined())
 			{
-				rt << " '" << wi->at(ci).tostring() << "'";
+				rt << pformat->itemdelimiter << pformat->startvalue;
+				if (pformat->maxitemsize)
+				{
+					rt << utils::getLogString( wi->at(ci), pformat->maxitemsize);
+				}
+				else
+				{
+					rt << wi->at(ci).tostring();
+				}
+				rt << pformat->endvalue;
 			}
 			else
 			{
-				rt << " NULL";
+				rt << pformat->itemdelimiter << "NULL";
 			}
 		}
+		rt << pformat->decldelimiter;
 	}
 	return rt.str();
 }
 
-std::string TransactionOutput::tostring() const
+std::string TransactionOutput::tostring( const utils::PrintFormat* pformat) const
 {
 	std::ostringstream rt;
 	result_const_iterator ri = begin(), re = end();
 	for (; ri != re; ++ri)
 	{
-		rt << "RESULT " << ri->functionidx() << " " << ri->tostring();
-		rt << std::endl;
+		rt << "function" << pformat->itemdelimiter << ri->functionidx() << pformat->itemdelimiter << ri->tostring( pformat);
 	}
 	return rt.str();
 }
+

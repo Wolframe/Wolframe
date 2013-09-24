@@ -34,6 +34,8 @@
 ///\file utils/printFormats.hpp
 #ifndef _Wolframe_PRINT_FORMATS_HPP_INCLUDED
 #define _Wolframe_PRINT_FORMATS_HPP_INCLUDED
+#include <string>
+#include "types/variant.hpp"
 
 namespace _Wolframe {
 namespace utils {
@@ -50,10 +52,13 @@ struct PrintFormat
 	const char* decldelimiter;	//< string to print as delimiter of declarations
 	const char* itemdelimiter;	//< string to print as delimiter of values
 	const char* assign;		//< assignment operator for attributes
+	std::size_t maxitemsize;	//< maximum size of printed items
 };
 
 const PrintFormat* logPrintFormat();
 const PrintFormat* ptreePrintFormat();
+
+std::string getLogString( const types::Variant& val, std::size_t maxsize=60);
 
 }}
 #endif

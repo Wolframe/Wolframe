@@ -41,6 +41,7 @@
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
+#undef LOG_DATA2
 #undef LOG_DATA
 #undef LOG_TRACE
 #undef LOG_DEBUG
@@ -54,6 +55,7 @@
 #undef LOG_FATAL
 
 // our private shortcut macros
+#define _LOG_DATA2	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA2 )
 #define _LOG_DATA	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
 #define _LOG_TRACE	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_TRACE )
 #define _LOG_DEBUG	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DEBUG )
@@ -94,6 +96,7 @@ SyslogBackend::~SyslogBackend( )
 static int levelToSyslogLevel( const LogLevel::Level level )
 {
 	switch( level )	{
+		case LogLevel::LOGLEVEL_DATA2:
 		case LogLevel::LOGLEVEL_DATA:
 		case LogLevel::LOGLEVEL_TRACE:
 		case LogLevel::LOGLEVEL_DEBUG:		return LOG_DEBUG;

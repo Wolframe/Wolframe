@@ -37,6 +37,7 @@ Project Wolframe.
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
+#include "utils/printFormats.hpp"
 #include <cstring>
 #include <sstream>
 
@@ -252,7 +253,7 @@ bool DDLStructSerializer::call()
 				m_ctx.setElementUnconsumed();
 				return false;
 			}
-			LOG_DATA << "[DDL structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+			LOG_DATA << "[DDL structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << utils::getLogString( elem->m_value) << "'";
 			continue;
 		}
 		fetchObject( m_ctx, m_stk);
@@ -272,7 +273,7 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, type
 			type = elem->m_type;
 			value = elem->m_value;
 			setState( langbind::InputFilter::Open);
-			LOG_DATA << "[DDL structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << elem->m_value.tostring() << "'";
+			LOG_DATA << "[DDL structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " " << utils::getLogString( elem->m_value);
 			return true;
 		}
 		if (m_stk.empty()) return false;

@@ -666,7 +666,14 @@ void VariantStruct::print( std::ostream& out, const utils::PrintFormat* pformat,
 	else
 	{
 		out << pformat->startvalue;
-		out << Variant::tostring();
+		if (pformat->maxitemsize)
+		{
+			out << utils::getLogString( *this, pformat->maxitemsize);
+		}
+		else
+		{
+			out << Variant::tostring();
+		}
 		out << pformat->endvalue;
 	}
 }

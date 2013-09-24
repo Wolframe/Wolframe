@@ -35,6 +35,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapParseValue.hpp"
 #include "logger-v1.hpp"
+#include "utils/printFormats.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
@@ -117,7 +118,7 @@ bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Conte
 		if (inp.state() == langbind::InputFilter::EndOfMessage) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
-	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << utils::getLogString( element) << "'";
 
 	if (typ == langbind::InputFilter::Value)
 	{
@@ -146,7 +147,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
 
-	LOG_DATA << "[C++ structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+	LOG_DATA << "[C++ structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " " << utils::getLogString( element);
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
@@ -292,7 +293,7 @@ bool serialize::parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilt
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
-	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " " << utils::getLogString( element);
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

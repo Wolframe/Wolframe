@@ -305,6 +305,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		if (tracelevel >= 2) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
 		if (tracelevel >= 3) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
 		if (tracelevel >= 4) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+		if (tracelevel >= 5) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA2;
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( m_loglevel);
 	}
 	if (vmap.count( "logfile"))
