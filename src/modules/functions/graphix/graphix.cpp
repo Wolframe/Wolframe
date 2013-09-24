@@ -39,14 +39,17 @@
 #include <vector>
 #include <sstream>
 
-#include "types/base64.hpp"	
+#include "types/base64.hpp"
 
 #ifdef _WIN32
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #endif
+extern "C"
+{
 #include "FreeImage.h"
 #include "FreeImagePlus.h"
+}
 
 using namespace _Wolframe;
 using namespace graphix;
@@ -152,7 +155,7 @@ std::string ImageImpl::encode( const std::string &data )
 
 int ImageImpl::info( ImageInfo &res, const Image &param )
 {
-// decode	
+// decode
 	std::string raw;
 	raw = decode( param.data );
 
@@ -170,7 +173,7 @@ int ImageImpl::info( ImageInfo &res, const Image &param )
 // get info about the image
 	res.width = image.getWidth( );
 	res.height = image.getHeight( );
-	
+
 	return 0;
 }
 
@@ -200,12 +203,12 @@ int ImageImpl::thumb( Image &res, const ImageThumb &param )
 
 // write thumb into the buffer
 	thumb.saveToMemory( FIF_PNG, outIO );
-	
+
 // get buffer
 	BYTE *thumbData = NULL;
 	DWORD thumbSize = 0;
 	outIO.acquire( &thumbData, &thumbSize );
-	
+
 // encode
 	std::string rawRes( (char *)thumbData, thumbSize );
 	res.data = encode( rawRes );
@@ -239,12 +242,12 @@ int ImageImpl::rescale( Image &res, const ImageRescale &param )
 
 // write thumb into the buffer
 	thumb.saveToMemory( FIF_PNG, outIO );
-	
+
 // get buffer
 	BYTE *thumbData = NULL;
 	DWORD thumbSize = 0;
 	outIO.acquire( &thumbData, &thumbSize );
-	
+
 // encode
 	std::string rawRes( (char *)thumbData, thumbSize );
 	res.data = encode( rawRes );

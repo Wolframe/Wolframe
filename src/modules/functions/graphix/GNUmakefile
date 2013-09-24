@@ -20,9 +20,9 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe_serialize \
-	$(FREEIMAGE_LIBS) \
-	$(FREEIMAGEPLUS_LIBS)
-	
+	$(FREEIMAGEPLUS_LIBS) \
+	$(FREEIMAGE_LIBS)
+
 DYNAMIC_MODULE = mod_graphix.so
 
 CPP_OBJS = \
