@@ -59,7 +59,7 @@ public:
 		} tab;
 	};
 
-	const char* getNumberString( boost::uint64_t val, Number64& str) const
+	const char* getNumberString( types::Variant::Data::UInt val, Number64& str) const
 	{
 		std::size_t ii=0;
 		if (val == 0) return "0";
@@ -85,31 +85,31 @@ private:
 };
 }//anonymous namespace
 
-static void get_number_string( std::string& rt, boost::uint64_t val)
+static void get_number_string( std::string& rt, types::Variant::Data::UInt val)
 {
 	static const NumTable tab;
 	NumTable::Number64 numstrbuf;
 	rt.append( tab.getNumberString( val, numstrbuf));
 }
 
-static void get_number_string( std::string& rt, boost::int64_t val)
+static void get_number_string( std::string& rt, types::Variant::Data::Int val)
 {
 	static const NumTable tab;
 	NumTable::Number64 numstrbuf;
 	if (val < 0)
 	{
 		rt.push_back( '-');
-		rt.append( tab.getNumberString( (boost::uint64_t)-val, numstrbuf));
+		rt.append( tab.getNumberString( (types::Variant::Data::UInt)-val, numstrbuf));
 	}
 	else
 	{
-		rt.append( tab.getNumberString( (boost::uint64_t)val, numstrbuf));
+		rt.append( tab.getNumberString( (types::Variant::Data::UInt)val, numstrbuf));
 	}
 }
 
-static boost::uint64_t string2uint( const char *pp)
+static types::Variant::Data::UInt string2uint( const char *pp)
 {
-	boost::uint64_t rt = 0, prev = 0;
+	types::Variant::Data::UInt rt = 0, prev = 0;
 	while (*pp >= '0' && *pp <= '9')
 	{
 		prev = rt;
@@ -121,38 +121,38 @@ static boost::uint64_t string2uint( const char *pp)
 	return rt;
 }
 
-std::string utils::tostring_cast( boost::uint64_t val)
+std::string utils::tostring_cast( types::Variant::Data::UInt val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-std::string utils::tostring_cast( boost::int64_t val)
+std::string utils::tostring_cast( types::Variant::Data::Int val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-boost::uint64_t utils::touint_cast( const std::string& val)
+types::Variant::Data::UInt utils::touint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	return string2uint( val.c_str());
 }
 
-boost::int64_t utils::toint_cast( const std::string& val)
+types::Variant::Data::Int utils::toint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	if (val.at(0) == '-')
 	{
-		boost::int64_t rt = (boost::int64_t)string2uint( val.c_str()+1);
+		types::Variant::Data::Int rt = (types::Variant::Data::Int)string2uint( val.c_str()+1);
 		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
 		return -rt;
 	}
 	else
 	{
-		boost::int64_t rt = (boost::int64_t)string2uint( val.c_str());
+		types::Variant::Data::UInt rt = (types::Variant::Data::Int)string2uint( val.c_str());
 		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
 		return rt;
 	}

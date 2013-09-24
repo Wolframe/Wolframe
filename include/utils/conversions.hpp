@@ -35,15 +35,15 @@ Project Wolframe.
 #ifndef _Wolframe_UTILS_CONVERSIONS_HPP_INCLUDED
 #define _Wolframe_UTILS_CONVERSIONS_HPP_INCLUDED
 #include <string>
-#include <boost/cstdint.hpp>
+#include "types/variant.hpp"
 
 namespace _Wolframe {
 namespace utils {
 
-std::string tostring_cast( boost::uint64_t val);
-std::string tostring_cast( boost::int64_t val);
-boost::uint64_t touint_cast( const std::string& val);
-boost::int64_t toint_cast( const std::string& val);
+std::string tostring_cast( types::Variant::Data::UInt val);
+std::string tostring_cast( types::Variant::Data::Int val);
+types::Variant::Data::UInt touint_cast( const std::string& val);
+types::Variant::Data::Int toint_cast( const std::string& val);
 
 }}//namespace
 #endif

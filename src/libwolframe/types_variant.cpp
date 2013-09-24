@@ -139,7 +139,7 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 	return -2;
 }
 
-static boost::uint64_t variant2uint_cast( const Variant& o)
+static Variant::Data::UInt variant2uint_cast( const Variant& o)
 {
 	switch (o.type())
 	{
@@ -160,7 +160,7 @@ static boost::uint64_t variant2uint_cast( const Variant& o)
 	throw boost::bad_lexical_cast();
 }
 
-static boost::int64_t variant2int_cast( const Variant& o)
+static Variant::Data::Int variant2int_cast( const Variant& o)
 {
 	switch (o.type())
 	{

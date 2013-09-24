@@ -71,7 +71,7 @@ static int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
 	LOG_DATA << "call sqlite3_bind_int " << idx << " " << val << " returns " << rt;
 	return rt;
 }
-static int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, boost::int64_t val)
+static int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, types::Variant::Data::Int val)
 {
 	int rt = sqlite3_bind_int64( stm, idx, val);
 	LOG_DATA << "call sqlite3_bind_int64 " << idx << " " << val << " returns " << rt;

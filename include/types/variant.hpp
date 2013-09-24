@@ -85,14 +85,20 @@ public:
 	///\brief Internal representation of this value
 	struct Data
 	{
+#define _Wolframe_TYPES_VARIANT_USE_64BIT
+#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
 		typedef boost::int64_t Int;
 		typedef boost::uint64_t UInt;
+#else
+		typedef int Int;
+		typedef unsigned int UInt;
+#endif
 		union
 		{
 			bool Bool;
 			double Double;
-			boost::int64_t Int;
-			boost::uint64_t UInt;
+			Data::Int Int;
+			Data::UInt UInt;
 			char* String;
 			void* Ref;
 		} value;
