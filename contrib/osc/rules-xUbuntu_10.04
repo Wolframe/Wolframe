@@ -41,6 +41,8 @@ build-stamp:
 		$(WOLFRAME_PARAMS) depend
 	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
 		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) all
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) test
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling
@@ -111,11 +113,17 @@ install: build
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
+	cd libhpdf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
 	
 	# the graphix module depends on freeimage, put it in a separate package
 	cd src/modules/functions/graphix; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
+	cd freeimage; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
 
 	# module database sqlite3
 	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -165,6 +173,9 @@ install: build
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
 		cd ../../../..
+	cd libhpdf; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
+		cd ..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 
@@ -172,6 +183,9 @@ install: build
 	cd src/modules/functions/graphix; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
 		cd ../../../..
+	cd freeimage; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
+		cd ..
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
