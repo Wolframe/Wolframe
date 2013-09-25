@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file utils_conversions.cpp
 ///\brief Implementation of conversions of atomic types
+
 #include <stdexcept>
 #include "utils/conversions.hpp"
 
@@ -152,7 +153,7 @@ types::Variant::Data::Int utils::toint_cast( const std::string& val)
 	}
 	else
 	{
-		types::Variant::Data::UInt rt = (types::Variant::Data::Int)string2uint( val.c_str());
+		types::Variant::Data::Int rt = (types::Variant::Data::Int)string2uint( val.c_str());
 		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
 		return rt;
 	}

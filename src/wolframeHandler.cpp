@@ -187,6 +187,24 @@ static void logNetwork( const char* title, const void* ptr, std::size_t size)
 	static const char hex[17] = "0123456789abcdef";
 	std::size_t ii,blkidx;
 
+	if (_Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
+	{
+		std::size_t nn = size>60?60:size;
+		std::string str;
+		for (ii=0; ii<nn; ++ii)
+		{
+			unsigned char ch = ((const unsigned char*)ptr)[ii];
+			if (ch >= ' ' && ch <= 127)
+			{
+				str.push_back( ch);
+			}
+			else
+			{
+				str.push_back( '.');
+			}
+		}
+		LOG_DATA << "[" << title << "] " << str << ((size>nn)?"...":"");
+	}
 	if (_Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
 	{
 		for (ii=0,blkidx=0; ii<size; ii+=16,++blkidx)
@@ -222,24 +240,6 @@ static void logNetwork( const char* title, const void* ptr, std::size_t size)
 
 			LOG_DATA2 << "[" << title << " " << idxstr << "] " << chrblk << " - " << hexblk;
 		}
-	}
-	else
-	{
-		std::size_t nn = size>80?80:size;
-		std::string str;
-		for (ii=0; ii<nn; ++ii)
-		{
-			unsigned char ch = ((const unsigned char*)ptr)[ii];
-			if (ch >= ' ' && ch <= 127)
-			{
-				str.push_back( ch);
-			}
-			else
-			{
-				str.push_back( '.');
-			}
-		}
-		LOG_DATA << "[" << title << "] " << str << ((size>nn)?"...":"");
 	}
 }
 
@@ -330,7 +330,7 @@ void wolframeConnection::networkInput( const void* begin, std::size_t bytesTrans
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 	if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 	{
-//[+]		logNetwork( "conn read", begin, bytesTransferred);
+		logNetwork( "conn read", begin, bytesTransferred);
 	}
 	if ( m_state == COMMAND_HANDLER )	{
 		m_cmdHandler.putInput( begin, bytesTransferred );
