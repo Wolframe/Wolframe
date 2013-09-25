@@ -368,9 +368,15 @@ BuildRequires: postgresql-devel >= 8.3
 %if %{rhel5}
 %define build_sqlite 1
 %endif
+%if %{rhel6}
+%define build_sqlite 1
+%endif
 %endif
 %if %{centos}
 %if %{centos5}
+%define build_sqlite 1
+%endif
+%if %{centos6}
 %define build_sqlite 1
 %endif
 %endif
@@ -713,6 +719,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
@@ -755,6 +762,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
@@ -797,6 +805,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
@@ -840,6 +849,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
@@ -888,6 +898,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif
@@ -929,6 +940,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
+	PYTHON_DIR=/tmp/Python-%{python_version} \
 	PYTHON_LDFLAGS="`LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ \
 	/tmp/Python-%{python_version}/bin/python3-config --ldflags` -L/tmp/Python-%{python_version}/lib" \
 %endif

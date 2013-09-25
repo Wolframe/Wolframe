@@ -45,11 +45,8 @@
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #endif
-extern "C"
-{
 #include "FreeImage.h"
 #include "FreeImagePlus.h"
-}
 
 using namespace _Wolframe;
 using namespace graphix;
