@@ -305,6 +305,7 @@ bool TransactionFunctionInput::Structure::isArrayNode( const NodeVisitor& nv) co
 	int arrayindex = -1;
 	for (;;)
 	{
+		if (cd->m_tagstr) return false;
 		if (cd->m_arrayindex <= arrayindex) return false;
 		arrayindex = cd->m_arrayindex;
 
