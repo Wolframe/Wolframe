@@ -43,6 +43,10 @@ ifeq ($(WITH_LIBXML2),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
 endif
 
+ifeq ($(WITH_PYTHON),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PYTHON_LIB_DIR)"
+endif
+
 # openssl
 
 ifeq ($(WITH_SSL),1)

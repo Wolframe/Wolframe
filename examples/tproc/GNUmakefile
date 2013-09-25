@@ -79,6 +79,10 @@ ifeq ($(WITH_LIBXML2),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
 endif
 
+ifeq ($(WITH_PYTHON),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PYTHON_LIB_DIR)"
+endif
+
 tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
