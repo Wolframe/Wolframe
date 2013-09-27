@@ -687,7 +687,7 @@ For Python support enable it with WITH_PYTHON=1 and install Python3 from
 scratch. Make sure 'python3-config' is in your path:
 
 Install Python 3 with:
-./configure
+./configure --enable-shared
 make
 make install
 
