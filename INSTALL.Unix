@@ -678,6 +678,8 @@ chmod 0775 /etc/rc.d/rc.postgresql
 
 add PGSQL_DIR=/usr/local/pgsql to Wolframe 'make'
 
+You can of course also take the Postgresql version from SlackBuilds.
+
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1.
 
 For Python support enable it with WITH_PYTHON=1 and install Python3 from
