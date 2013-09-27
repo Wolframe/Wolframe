@@ -675,6 +675,7 @@ esac
 exit 0
 (ctrl-D)
 chmod 0775 /etc/rc.d/rc.postgresql 
+usermod -d /usr/local/pgsql postgres
 
 add PGSQL_DIR=/usr/local/pgsql to Wolframe 'make'
 

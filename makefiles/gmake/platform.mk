@@ -3290,7 +3290,12 @@ ifeq ($(WITH_PYTHON),1)
 -include $(TOPDIR)/makefiles/gmake/python.mk.vars
 
 ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "slackware"
+PYTHON3_CONFIG ?= /usr/local/bin/python3-config
+else
 PYTHON3_CONFIG ?= /usr/bin/python3-config
+endif
 PYTHON_DIR ?= /usr
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
