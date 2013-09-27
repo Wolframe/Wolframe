@@ -148,7 +148,7 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 		case Variant::Bool:
 			return o.data().value.Bool?1:0;
 		case Variant::Double:
-			return boost::numeric_cast<double>( o.data().value.Double);
+			return boost::numeric_cast<Variant::Data::UInt>( o.data().value.Double);
 		case Variant::Int:
 			if (o.data().value.Int < 0) throw boost::bad_lexical_cast();
 			return o.data().value.Int;
@@ -169,7 +169,7 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 		case Variant::Bool:
 			return o.data().value.Bool?1:0;
 		case Variant::Double:
-			return boost::numeric_cast<double>( o.data().value.Double);
+			return boost::numeric_cast<Variant::Data::Int>( o.data().value.Double);
 		case Variant::Int:
 			return o.data().value.Int;
 		case Variant::UInt:
