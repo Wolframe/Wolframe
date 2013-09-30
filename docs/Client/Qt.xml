@@ -1,24 +1,27 @@
 <!-- Qt Client -->
 
 <sect1>
-	<title>Qt client</title>
+	<title>Wolframe Standard Client (wolfclient)</title>
 	<sect2>
 	<title>Architecture</title>
 	<para>
-		The Qt client is a thin client which executes XML requests
-		via the Wolframe protocol and presents XML answers. It shows
-		a set of forms using standard Qt widgets. It is cross-platform.
-		Qt is currently available on
+		The <code>Wolframe</code> standard client <code>wolfclient</code>
+		is a thin client which executes XML requests
+		via the Wolframe protocol and presents XML answers. It is written with
+		Qt and is cross-platform. Qt is currently available on
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
+		Userinterfaces for <code>wolfclient</code> are defined as a set of forms
+		using standard Qt widgets and are if ever possible defined using the
+		<code>Qt&nbsp;Interface&nbsp;Designer</code> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
 	</para>
 	</sect2>
-	
+
 	<sect2>
 	<title>Artifacts</title>
 	<para>
-		The qtclient renders user interface forms dynamically, this means no
-		code generation or compilation is involved when creating user interfaces
-		for Wolframe.
+		The <code>wolfclient</code> renders user interface forms dynamically,
+		this means no code generation or compilation is involved when creating
+		user interfaces for Wolframe.
 	</para>
 	<sect3>
 		<title>UI forms</title>
@@ -28,17 +31,16 @@
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/designer-ui-file-format.html">http://doc.qt.digia.com/qt/designer-ui-file-format.html</link>.
 			The UI files have the extension <emphasis>.ui</emphasis>
 		</para>
-		
+
 		<para>
-			UI files can be generated with the Qt designer, see
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>.
+			UI files are created and edited with the Qt designer.
 		</para>
 	</sect3>
-		
+
 	<sect3>
 		<title>UI form translations</title>
 		<para>
-			The Qt client uses the Qt translation format, version 2.0 for form translations
+			The <code>wolfclient</code> uses the Qt translation format, version 2.0 for form translations
 			as described in
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-ts-file-format.html">http://doc.qt.digia.com/qt/linguist-ts-file-format.html</link>.
 			Those are the files with extension <emphasis>.ts</emphasis>.
@@ -59,20 +61,20 @@
 	</sect3>
 
 	<sect3>
-		<title>Resources</title>		
+		<title>Resources</title>
 		<para>
 			Binary resource files contain images for the user interface.
 		</para>
-		
+
 		<para>
 			Binary resource files (extension <emphasis>.rss</emphasis>) are compiled from
 			a XML file (extension <emphasis>.qrc</emphasis>) with the <emphasis>rcc</emphasis>
 			message compiler.
 		</para>
 	</sect3>
-			
+
 	</sect2>
-	
+
 	<sect2>
 		<title>"Programming" the interface</title>
 		<para>
@@ -97,91 +99,128 @@
 				</listitem>
 			</itemizedlist>
 		</para>
-		
 		<sect3>
-			<title>Mapping XML data</title>
-			<para>
-				Every widget in the Qt class hierarchy has a default way how data
-				is serialized into the request XML and how it is deserialized from
-				the answer XML. For instance a <classname>QLineEdit</classname> 
-				element of the form will output its currently visible text to the
-				XML or set it from there:
-			</para>
-			
-			<screenshot>
-				<screeninfo>Simple Qt data input form</screeninfo>
-				<mediaobject>
-					<imageobject role="html"> 
-						<imagedata fileref="images/clients/simple_form.png" format="PNG"/>
-					</imageobject> 
-					<imageobject role="fo"> 
-						<imagedata fileref="images/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
-					</imageobject> 
-				</mediaobject>
-			</screenshot>
+			<title>Mapping XML Data</title>
+			<sect4>
+				<title>Starting Position</title>
+				<para>For mapping data structures from the user interface elements to the
+				data description needed to fulfill an interface for a server request we need
+				some kind of translation. An implicit mapping would only be able to describe
+				very trivial data mappings. After drawing the user interface this translation
+				has to be defined. On the other hand the requests answer returned by the server
+				has to be mapped to be shown in the user interface elements view. Here applies
+				the same: Some kind of translation is needed to map a server data structure
+				to the userinterface elements.
+				</para>
+			</sect4>
+			<sect4>
+				<title>First Example</title>
+				<para>
+					Lets have a look at a <classname>QLineEdit</classname>
+					element of a form and a possible XML representation of the
+					data used for a request.
+				</para>
 
-			<programlisting language='xml'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
-			</programlisting>
-			
-			<para>
-				Some elements are more complicated than that: they present the user
-				a list of options or items the user to pick from, e.g. a list of cities.
-			</para>
-			
-			<screenshot>
-				<screeninfo>More complex Qt data input form with city list to pick from</screeninfo>
-				<mediaobject>
-					<imageobject role="html"> 
-						<imagedata fileref="images/clients/complex_form.png" format="PNG"/>
-					</imageobject> 
-					<imageobject role="fo"> 
-						<imagedata fileref="images/clients/complex_form.png" format="PNG" width="100%" scalefit="1"/>
-					</imageobject> 
-				</mediaobject>
-			</screenshot>
-			
-			<para>
-				When the form is saved, the currently selected element is written into
-				the resulting XML:
-			</para>
+				<screenshot>
+					<screeninfo>Simple Qt data input form</screeninfo>
+					<mediaobject>
+						<imageobject role="html">
+							<imagedata fileref="images/clients/simple_form.png" format="PNG"/>
+						</imageobject>
+						<imageobject role="fo">
+							<imagedata fileref="images/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
+						</imageobject>
+					</mediaobject>
+				</screenshot>
 
-			<programlisting language='xml'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.xml" parse="text" />
-			</programlisting>
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
+				</programlisting>
 
-			<para>
-				In this case the widget can load its own domain data as a separate
-				XML request:
-			</para>
+				<para>
+					For an insert or update request that transmits all data of the form to the
+					server we have to fill the name field and the address field into the request
+					data structure XML.
+					The translation is defined as dynamic property "action" or "action." plus a suffix for the action identifier
+					if needed. We will explain this naming of actions later. The
+					value of the property is describing the request and could look as follows:
+				</para>
 
-			<programlisting language='xml'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_request.xml" parse="text" />
-			</programlisting>
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.request.txt" parse="text" />
+				</programlisting>
 
-			<para>
-				The answer contains all possible values in the domain, in our case
-				a list of all cities:
-			</para>
-			
-			<programlisting language='xml'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_extract.xml" parse="text" />
-			</programlisting>
+				<para>
+					For the initial filling of the form with data we submit a
+					request that just sends an id to the server.
+					The answer that is returned by the server has then to be
+					translated to fill the name field and the address field
+					of the form.
+					The translation is defined as dynamic property "answer"
+					or "answer." plus a suffix for the action identifier.
+					As in the request example we postpone a detailed explanation
+					of this action naming semantics.
+					The value of the property is describing the answer
+					in the same language as a request and could look as follows:
+				</para>
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.answer.txt" parse="text" />
+				</programlisting>
+			</sect4>
+			<sect4>
+				<title>Another Example</title>
+				<para>
+					Some elements are more complicated than that.
+					They present the user a list of options or items the user to pick from, e.g. a list of cities.
+				</para>
 
-			<para>
-				Per default the name of the widget will be matched against the XML
-				element with the same name.
-			</para>
-			<para>
-				Per default the root element of the XML request is the name of the
-				form. This can be overloaded with the dynamic property <code>rootelement</code>.
-			</para>
-			<para>
-				Widgets like <classname>QTreeWidget</classname> and 
-				<classname>QTableWidget</classname> have a substructure, there
-				the names of headers serve as name for the tags when serializing
-				or deserializing the XML.
-			</para>
+				<screenshot>
+					<screeninfo>More complex Qt data input form with city list to pick from</screeninfo>
+					<mediaobject>
+						<imageobject role="html">
+							<imagedata fileref="images/clients/complex_form.png" format="PNG"/>
+						</imageobject>
+						<imageobject role="fo">
+							<imagedata fileref="images/clients/complex_form.png" format="PNG" width="100%" scalefit="1"/>
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+
+				<para>
+					When the form is saved, the currently selected element is written into
+					the resulting XML:
+				</para>
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.xml" parse="text" />
+				</programlisting>
+
+				<para>
+					In this case the widget with the city list can load its own domain data as a separate
+					XML request:
+				</para>
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_request.xml" parse="text" />
+				</programlisting>
+
+				<para>
+					and the corresponding domain load request answer definition in the dynamic property "answer"
+					could look like follows:
+				</para>
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.domainload_answer.txt" parse="text" />
+				</programlisting>
+
+				<para>
+					The answer contains all possible values in the domain, in our case
+					a list of all cities and their internal id.
+				</para>
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_extract.xml" parse="text" />
+				</programlisting>
+			</sect4>
 		</sect3>
 
 		<sect3>
@@ -189,246 +228,41 @@
 			<para>
 				A UI form contains a set of widgets, the dynamic property
 				<code>form</code> contains the name of a widget (without
-				extension <emphasis>.ui</emphasis>) to load. Currently only
-				a <classname>QPushButton</classname> can have a
-				<code>form</code> property which loads the given form when
-				the user clicks the button.
+				extension <emphasis>.ui</emphasis>) to load.
 			</para>
-			
+
 			<para>
-				In the Qt designer you have to attach a dynamic property
+				For linking a push <classname>QPushButton</classname> click in the Qt designer
+				to the switching of the form you have to attach a dynamic property
 				named <code>form</code>	of type <code>string</code> to the corresponding
 				widget of type <classname>QPushButton</classname>:
-				
+
 				<screenshot>
 					<screeninfo>Attach form dynamic property to a push button</screeninfo>
 					<mediaobject>
-						<imageobject role="html"> 
+						<imageobject role="html">
 							<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
+						</imageobject>
+						<imageobject role="fo">
 							<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
+						</imageobject>
 					</mediaobject>
 				</screenshot>
 
 			</para>
-			
+
 			<para>
 				Before loading the next form the client terminates all current
 				requests, for instance a save request of the form data.
+				In case of an error in an action any defined switching of the form is canceled.
 			</para>
-		</sect3>
-
-		<sect3>
-			<title>Composing XML requests</title>
-			<para>
-				There are four dynamic properties which influence the way the
-				XML request is put together:
-				<simplelist type="horiz" columns="2">
-				<member>action</member><member>Defines the kind of the request being generated when a widget is executed.
-				Is one of <code>create</code>, <code>update</code>, <code>delete</code> or <code>read</code>.</member>
-				<member>initAction</member><member>Defines the kind of the request which should be executed when the form is loaded.
-				It has the same values as <code>action</code>, but usually only <code>read</code> makes sense.</member>
-				<member>doctype</member><member>The document type of the XML request, usually it references a form in one of the Data Definition Languages (for input validation).</member>
-				<member>rootelement</member><member>The root element of the XML document being sent, default is the name of the form.</member>
-				</simplelist>
-			</para>
-			
-			<sect4>
-				<title>action property</title>
-				
-			<para>
-				The <code>action</code> parameter can currently only be attached to a <classname>QPushButton</classname>
-				and denotes the action to be taken when the user presses the button.
-			</para>
-			
-			<para>
-				The <code>create</code> and <code>update</code> actions create a XML request with all the data composed
-				from the widgets, as explained earlier:
-
-				<screenshot>
-					<screeninfo>Attach form dynamic property to a push button</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/action_add.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/action_add.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-			
-				The form above would produce the following XML when the <emphasis>Add</emphasis> button is pressed:
-
-				<programlisting language='xml'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
-				</programlisting>
-				
-			</para>
-			
-			<para>
-				The <code>delete</code> and <code>read</code> actions take only explicit parameters which are
-				encoded as attributes of the root element:
-
-				<screenshot>
-					<screeninfo>A push button with deletes a customer</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/action_delete.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/action_delete.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-				
-				The form above reads the <code>text</code> property of the widget with name <code>id</code>
-				(in this case <code>77</code>) and adds it as <code>id</code> property:
-
-				<programlisting language='xml'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form_delete.xml" parse="text" />
-				</programlisting>
-				
-				The <code>delete</code> is not part of the XML, put part of the protocol. We also see that we can evaluate
-				expressions in the value of a dynamic property as in <code>{id.text}</code>. Usually we would not ask
-				the user to enter a customer ID but instead pass the variable around, see global variables.
-			</para>
-			
-			</sect4>
-			
-			<sect4>
-				<title>initAction property</title>
-			
-			<para>
-				The <code>initAction</code> property does exactly the same thing as <code>action</code>, but not when
-				the user clicks a button, but when the form gets first loaded. This is handy to load the form with
-				some initial values, so it's mainly used together with the <code>read</code> value.
-			</para>
-			
-			</sect4>
-			
-			<sect4>
-				<title>domain reads</title>
-				
-			<para>
-				There is a special kind of request which happens automatically in parallel to the form/button requests
-				when loading the form. Large sets of values could be stored in the UI form itself, but
-				as domains are actually linked to the data and business layer they should be loaded always from
-				there. The following widgets execute a domain load request: 
-				<simplelist type="inline">
-					<member><classname>QComboBox</classname></member>
-					<member><classname>QListWidget</classname></member>
-					<member><classname>QTreeWidget</classname></member>
-					<member><classname>QTableWidget</classname></member>
-				</simplelist>.
-			</para>	
-			
-			<para>
-				In the following form the properties <code>doctype</code>, <code>rootelement</code>
-				make sure that the list of cities is always loaded when the form is loaded. The
-				action is an implied <code>read</code>:
-
-				<screenshot>
-					<screeninfo>A push button with deletes a customer</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/domain_load.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/domain_load.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-
-				Additional parameters (like a search restriction) can be attached:
-
-				<screenshot>
-					<screeninfo>A push button with deletes a customer</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/domain_load_search.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/domain_load_search.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-				
-				The text field above the list is called <code>search</code>. The dynamic property <code>search</code>
-				is set to the text value of the <code>search</code> widget. The resulting XML domain request would
-				look like:
-
-				<programlisting language='xml'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/domain_load_search.xml" parse="text" />
-				</programlisting>
-				
-				The business layer would apply a <code>LIKE</code> to filter the data. but the client doesn't care.				
-			</para>	
-			
-			</sect4>
-			
-			<sect4>
-				<title>reload domain data</title>
-
-				
-			<para>
-				The value of the <code>action</code> property can contain the name of a widget, a dot followed by the
-				keyword <code>reload</code>, e.g. <code>city.reload</code>. This causes the widget to reload its domain
-				data without changing the status of the form. This is handy to implement adhoc searching and filtering.			
-			</para>
-			
-			<para>
-				In the following form there are three widgets:
-
-				<simplelist type="horiz" columns="2">
-				<member>search</member><member>A text field containing a search pattern.</member>
-				<member>city</member><member>A list which shows filtered cities (and has a domain load attached as described above).</member>
-				<member>searchButton</member><member>A push button which has a <code>city.reload</code> action attached.</member>
-				</simplelist>
-
-				When clicking the search button the list of cities (and only the list of cities!) gets reloaded from
-				the Wolframe server.
-
-				<screenshot>
-					<screeninfo>A searchable list with domain reload</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/domain_reload.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/domain_reload.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-
-				We can also play with Qt signals, to make the list change when the user changes the filter:
-				
-				<screenshot>
-					<screeninfo>Signals of the searchable list with domain reload</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/domain_reload_signals.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/domain_reload_signals.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-
-			</para>
-
-			</sect4>
-				
 		</sect3>
 
 		<sect3>
 			<title>States and properties of widgets</title>
-			
+
 			<para>
-				We can make widgets read and set properties so that they
-				communicate values without the server noticing. Currently
-				those are:
+				Some properties are reserved for states stearing the behaviour of the userinterface:
 
 				<itemizedlist>
 				<listitem>
@@ -438,491 +272,23 @@
 					get the initial keyboard focus.
 					</para>
 				</listitem>
-				
-				<listitem>
-					<para><code>state</code>:
-					The state of widget. Many widgets don't have any state, but
-					for instance a <classname>QListWidget</classname> has a current
-					selection. Complicated widgets like <classname>QTableWidget</classname>
-					or <classname>QTreeWidget</classname> have a whole load of states
-					like the current selection (which can be multiple items), the sorting
-					of the data, which tree branches are currently expanded or collapsed, etc.
-					</para>
-				</listitem>
-
 				</itemizedlist>
 			</para>
 		</sect3>
 
 		<sect3>
 			<title>Widget properties as dynamic property values</title>
-			
+
 			<para>
-				Dynamic properties can have either fixed values as in <code>property = constant_string</code>
-				or they can reference properties of widgets like <code>property = {variable expression}</code>.
+				Dynamic properties can reference properties of widgets
+				like for example <code>property = {variable expression}</code>.
 			</para>
-			
 			<para>
-				The expression can reference widgets and their properties. Every Qt class has
-				its very own set of properties it understands. We make a few examples here.
-				A detailed list of properties per Qt class is avaiable in a separate chapter.
-				
-				<itemizedlist>
-				<listitem>
-				<para><classname>QLineEdit</classname>, <code>{widget.text}</code>:
-				Returns the currently visible text in the widget with name <code>widget</code>.
-				</para>
-				</listitem>
-				<listitem>
-				<para><classname>QTreeWidget</classname>, <code>{widget.id}</code>:
-				Returns the currently selected tree element (it's internal id).
-				</para>
-				</listitem>
-				</itemizedlist>
-												
+				The expression can reference adressable widgets and their properties.
+				Every Qt class has its very own set of properties it understands.
 			</para>
-			
+
 		</sect3>
-
-		<sect3>			
-			<title>Global variables</title>
-			
-			<para>
-				If we switch the form, all states and data of the form widgets get lost.
-				If we want to propagate some values from one form to another or if we
-				want to keep the state of some widgets, we have to store those in a
-				"global widget". This is a widget with name <code>global</code>.
-			</para>
-			
-			<para>
-				For instance we can have a list of customers with their ids, if
-				the user chooses one and presses edit, we propagate the value of
-				the currently selected item to the next form as <code>global.id</code>:
-
-				<screenshot>
-					<screeninfo>A list of customers with global.id</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/customers.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/customers.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-				
-				The "edit customer" form can then use this value in an <code>initAction</code>
-				property attached to the whole form in order
-				to read the values of the customer to be edited:
-				
-				<screenshot>
-					<screeninfo>global.id in edit form</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/customer_edit_initaction.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/customer_edit_initaction.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-				
-				We also add it to the "Save" button, so that the XML request for the update
-				operation gets the id attribute attached to the root element:
-				
-				<screenshot>
-					<screeninfo>A searchable list with domain reload</screeninfo>
-					<mediaobject>
-						<imageobject role="html"> 
-							<imagedata fileref="images/clients/customer_edit_save.png" format="PNG"/>
-						</imageobject> 
-						<imageobject role="fo"> 
-							<imagedata fileref="images/clients/customer_edit_save.png" format="PNG" width="100%" scalefit="1"/>
-						</imageobject> 
-					</mediaobject>
-				</screenshot>
-								
-			</para>
-		</sect3>
-
-		<sect3>
-			<title>Properties and mapping per Qt class</title>
-
-		<sect4>
-			<title>QLineEdit</title>
-			<para>
-
-				<sect5>
-					<title>properties</title>
-				
-					<para>
-					
-					<itemizedlist>
-					
-					<listitem>
-					<para><code>text</code>:
-					Returns the currently visible text (read-only).
-					</para>
-					</listitem>
-					
-					<listitem>
-					<para><code>state</code>:
-					Returns the currently visible text (same as <code>text</code>, but read-writeable).
-					</para>
-					</listitem>
-					
-					</itemizedlist>
-
-					</para>
-									
-				</sect5>
-
-			</para>
-		</sect4>
-
-		<sect4>
-			<title>QPlainTextEdit</title>
-			<para>
-
-				<sect5>
-					<title>properties</title>
-				
-					<para>
-					
-					<itemizedlist>
-					
-					<listitem>
-					<para><code>text</code>:
-					Returns the currently visible text (read-only, with line breaks and tabs, etc.).
-					</para>
-					</listitem>
-					
-					<listitem>
-					<para><code>state</code>:
-					Returns the currently visible text (same as <code>text</code>, but read-writeable).
-					</para>
-					</listitem>
-					
-					</itemizedlist>
-
-					</para>
-									
-				</sect5>
-
-			</para>
-		</sect4>
-
-		<sect4>
-			<title>QTextEdit</title>
-			<para>
-
-				<sect5>
-					<title>properties</title>
-				
-					<para>
-					
-					<itemizedlist>
-					
-					<listitem>
-					<para><code>text</code>:
-					Returns the currently visible text (read-only, plain text only).
-					</para>
-					</listitem>
-
-					<listitem>
-					<para><code>html</code>:
-					Returns the currently visible text (read-only, in HTML).
-					</para>
-					</listitem>
-					
-					<listitem>
-					<para><code>state</code>:
-					Returns the currently visible text (same as <code>html</code>, but read-writeable).
-					</para>
-					</listitem>
-					
-					</itemizedlist>
-
-					</para>
-									
-				</sect5>
-
-			</para>
-		</sect4>
-
-		<sect4>
-			<title>QTableWidget</title>
-			<para>
-
-				<sect5>
-					<title>properties</title>
-
-					<para>
-
-					<itemizedlist>
-
-					<listitem>
-					<para><code>id</code>:
-						The attribute id of the first XML element in the table row which the
-						user selected. Supports only single selection for now. (read-only)
-					</para>
-					</listitem>
-					
-					<listitem>
-					<para><code>state</code>:
-					Selection and sorting order and column.
-					Supports only single selection for now. (read-write)
-					</para>
-					</listitem>
-
-					</itemizedlist>
-
-					</para>
-					
-				</sect5>
-				
-			</para>
-		</sect4>
-
-		<sect4>
-			<title>QTreeWidget</title>
-			<para>
-
-				<sect5>
-					<title>properties</title>
-					<para>
-
-					<itemizedlist>
-
-					<listitem>
-					<para><code>id</code>:
-						The attribute id of the first XML element in the node which the
-						user selected. Supports only single selection for now. (read-only)
-					</para>
-					</listitem>
-					
-					<listitem>
-					<para><code>state</code>:
-					expanded/collapsed subtrees and selection in a internal string represenation.
-					Supports only single selection for now. (read-write)
-					</para>
-					</listitem>
-
-					</itemizedlist>
-
-					</para>
-				
-				</sect5>
-			</para>
-		</sect4>
-		
-		</sect3>
-		
-		<sect3>
-			<title>Inventory of all supported dynamic properties</title>
-			<para>
-				The following table shows all supported dynamic properties
-				and a short description what they are good for:
-			</para>
-
-			<para>
-
-			<table frame="all" width="100%">
-				<title>Dynamic properties</title>
-				<tgroup cols="4">
-				<thead>
-					<row>
-						<entry>Property</entry>	
-						<entry>Type</entry>
-						<entry>Qt widgets</entry>
-						<entry>Purpose</entry>
-					</row>
-				</thead>
-
-				<tbody>
-					<row>
-						<entry>form</entry>
-						<entry>String</entry>
-						<entry><classname>QPushButton</classname></entry>
-						<entry>next form to load</entry>
-					</row>
-					<row>
-						<entry>action (deprecated)</entry>
-						<entry>String</entry>
-						<entry><classname>QPushButton</classname></entry>
-						<entry>
-							Is deprecated, use doctype/rootelement and dataelement instead!
-							one of <code>create</code>, <code>delete</code>,
-							<code>update</code> or <code>read</code>,
-							controls what gets sent along in the XML request.
-						</entry>
-					</row>
-
-					<row>
-						<entry>action</entry>
-						<entry>String</entry>
-						<entry><classname>QPushButton</classname></entry>
-						<entry>
-							special value <code>widget.reload</code>, causes
-							the widget with that name to reload its domain data.
-						</entry>
-					</row>
-
-					<row>
-						<entry>initAction (deprecated)</entry>
-						<entry>String</entry>
-						<entry>main form widget</entry>
-						<entry>
-							Is deprecated, use doctype/rootelement and dataelement on the top-level widget instead!
-							one of <code>create</code>, <code>delete</code>,
-							<code>update</code> or <code>read</code>,
-							controls what gets sent along in the XML request
-							when the form is loaded.
-						</entry>
-					</row>
-					<row>
-						<entry>doctype</entry>
-						<entry>String</entry>
-						<entry>
-							<simplelist type="inline">
-							<member>main form widget</member>
-							<member><classname>QPushButton</classname></member>
-							<member><classname>QComboBox</classname></member>
-							<member><classname>QListWidget</classname></member>
-							<member><classname>QTreeWidget</classname></member>
-							<member><classname>QTableWidget</classname></member>
-							</simplelist>	
-						</entry>
-						<entry>
-							the document attached to the generated XML (in the DOCTYPE
-							section)
-						</entry>
-					</row>
-					<row>
-						<entry>rootelement</entry>
-						<entry>String</entry>
-						<entry>
-							<simplelist type="inline">
-							<member>main form widget</member>
-							<member><classname>QPushButton</classname></member>
-							<member><classname>QComboBox</classname></member>
-							<member><classname>QListWidget</classname></member>
-							<member><classname>QTreeWidget</classname></member>
-							<member><classname>QTableWidget</classname></member>
-							</simplelist>	
-						</entry>
-						<entry>
-							the root element of the generated XML request (the
-							root element declaration in DOCTYPE and the name
-							of the root element)
-						</entry>
-					</row>
-
-					<row>
-						<entry>dataelement</entry>
-						<entry>String</entry>
-						<entry>List of widget names, separated by comma</entry>
-						<entry>
-							If absent, all data of all visible elements are
-							mapped into the XML request. If the <code>dataelement</code>
-							property is present, only those widgets with the names
-							appearing in the list of widgets map their data into
-							the XML request.
-						</entry>
-					</row>											
-
-					<row>
-						<entry>initialFocus</entry>
-						<entry>Bool</entry>
-						<entry>all widgets with can take a focus</entry>
-						<entry>
-							The element should take focus when the form is loaded.
-						</entry>
-					</row>
-					<row>
-						<entry>state</entry>
-						<entry>String</entry>
-						<entry>all widgets which have a state, e.g. not push buttons</entry>
-						<entry>
-							some widgets support restoring the state, usually
-							from the global variables, e.g. state {global.widgetState}
-						</entry>
-					</row>											
-
-					<row>
-						<entry>global.XXXX</entry>
-						<entry>String</entry>
-						<entry>Usually on buttons with switch the form</entry>
-						<entry>
-							Stores something into the global varable XXXX.
-							This value can be reference in all forms from now 
-							on.
-						</entry>
-					</row>											
-				</tbody>
-
-				</tgroup>
-			</table>
-
-			</para>
-		</sect3>
-		
 	</sect2>
 </sect1>
 
-	<!--
-
-Domain data
-
-Domain data gets choosen based on the current interface language.
-
-The tree are encoded as in:
-
-<domain>
-   <form>form1</form>
-   <widget>widget1</widget>
-   <language>de_CH</language>
-   <tree>
-     <item id="language_independent_key">
-        <value>translated value</value>
-        <description>translated value</value>
-        ...
-        <tree>
-          <item id="language_independent_key">
-            <value>translated value</value>
-            <description>translated value</value>
-            ...
-        </tree>
-     </item>
-   </tree>
-</domain>
-
-Items in a tree can have a tuple of (key,value) at the moment
-(correspond to the columns in the tree view).
-
-Missing here: table, make a list of every widget and how it is mapped
-
-Should not be cached on the client.
-
-Current data
-
-<xml version="1.0" encoding="UTF-8"?>
-<form1>
-  <first>Jon</first>
-  <last>Doe</last>
-  <working>true</working>
- ..
-  <vegetable>
-    <value>language_independent_key</value>
-    ...
-    <value>language_independent_key</value>
-  </vegetable>
-</form1>
-
-Values are the contents of the UI fields (e.g. text field).
-For lists, drop-downs and groups of checkboxes those are the
-language-independent keys in the values of the domain or the
-ids in the nodes in the tree.
-					
--->	
-	

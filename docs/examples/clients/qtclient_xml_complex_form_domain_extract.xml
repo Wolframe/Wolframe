@@ -1,10 +1,11 @@
 
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<city>
-  <value>Tokyo</value>
-  <value>Lima</value>
-  <value>Beijing</value>
-  <value>Cairo</value>
-  <value>Tehran</value>
-  <value>London</value>
-</city>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE "cities" SYSTEM "CityList">
+<cities>
+<city id='1'>Tokyo</city>
+<city id='2'>Lima</city>
+<city id='3'>Beijing</city>
+<city id='4'>Cairo</city>
+<city id='5'>Tehran</city>
+<city id='6'>London</city>
+</cities>
