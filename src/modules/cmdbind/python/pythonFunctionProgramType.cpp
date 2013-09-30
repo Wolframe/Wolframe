@@ -167,7 +167,24 @@ public:
 
 private:
 	const python::StructureR m_data;
-	typedef std::pair<TypedInputFilter::ElementType, types::Variant> BufElem;
+	struct BufElem
+	{
+		TypedInputFilter::ElementType first;
+		types::Variant second;
+		
+		BufElem( ) {
+			first = TypedInputFilter::Value;
+		}
+		BufElem( const TypedInputFilter::ElementType& first_, const types::Variant& second_ ) {
+			first = first_;
+			second = second_;
+		}
+		BufElem( const BufElem& o ) {
+			first = o.first;
+			second = o.second;
+		}
+	};
+	//typedef std::pair<TypedInputFilter::ElementType, types::Variant> BufElem;
 	std::vector<BufElem> m_buf;
 	std::size_t m_bufidx;
 	struct StackElem
