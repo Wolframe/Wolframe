@@ -3,7 +3,9 @@
 <para>This chapter introduces the command handlers of the logic tier.
 </para>
 	&SDKcmdhandlerDirectmap;
+	<!-- PF: Temporarily excluded (Lua command handler should not be presented in the main documentation. It leads to confusion for non experienced Wolframe developpers )
 	&SDKcmdhandlerLua;
+	-->
 </chapter>
 
 
