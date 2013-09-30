@@ -94,8 +94,8 @@ public:
 		{
 			if (m_bufidx < m_buf.size())
 			{
-				type = m_buf.at( m_bufidx).first;
-				element = m_buf.at( m_bufidx).second;
+				type = m_buf.at( m_bufidx).type;
+				element = m_buf.at( m_bufidx).value;
 				++m_bufidx;
 				if (m_bufidx == m_buf.size())
 				{
@@ -169,22 +169,18 @@ private:
 	const python::StructureR m_data;
 	struct BufElem
 	{
-		TypedInputFilter::ElementType first;
-		types::Variant second;
-		
-		BufElem( ) {
-			first = TypedInputFilter::Value;
-		}
-		BufElem( const TypedInputFilter::ElementType& first_, const types::Variant& second_ ) {
-			first = first_;
-			second = second_;
-		}
-		BufElem( const BufElem& o ) {
-			first = o.first;
-			second = o.second;
-		}
+		TypedInputFilter::ElementType type;
+		types::Variant value;
+
+		BufElem()
+			:type(TypedInputFilter::Value){}
+		BufElem( const TypedInputFilter::ElementType& type_, const types::Variant& value_)
+			:type(type_)
+			,value(value_){}
+		BufElem( const BufElem& o)
+			:type(o.type)
+			,value(o.value){}
 	};
-	//typedef std::pair<TypedInputFilter::ElementType, types::Variant> BufElem;
 	std::vector<BufElem> m_buf;
 	std::size_t m_bufidx;
 	struct StackElem

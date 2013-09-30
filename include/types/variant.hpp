@@ -34,15 +34,11 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
-
-// MBa -- unused
-//#include "types/countedReference.hpp"
-
+#include "types/integer.hpp"
 #include <string>
 #include <cstring>
 #include <ostream>
 #include <stdexcept>
-#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -85,14 +81,8 @@ public:
 	///\brief Internal representation of this value
 	struct Data
 	{
-#define _Wolframe_TYPES_VARIANT_USE_64BIT
-#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
-		typedef boost::int64_t Int;
-		typedef boost::uint64_t UInt;
-#else
-		typedef int Int;
-		typedef unsigned int UInt;
-#endif
+		typedef _WOLFRAME_INTEGER Int;
+		typedef _WOLFRAME_UINTEGER UInt;
 		union
 		{
 			bool Bool;
@@ -114,7 +104,7 @@ public:
 	Variant( bool o)				{init(Bool); m_data.value.Bool = o;}
 	Variant( double o)				{init(Double); m_data.value.Double = o;}
 	Variant( float o)				{init(Double); m_data.value.Double = o;}
-#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
+#if !_WOLFRAME_INTEGER_IS_INT
 	Variant( int o)					{init(Int); m_data.value.Int = o;}
 	Variant( unsigned int o)			{init(UInt); m_data.value.UInt = o;}
 #endif
@@ -132,7 +122,7 @@ public:
 	Variant& operator=( bool o)			{bool init_=initialized(); release(); init(Bool); m_data.value.Bool = o; setInitialized(init_); return *this;}
 	Variant& operator=( double o)			{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
 	Variant& operator=( float o)			{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
-#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
+#if !_WOLFRAME_INTEGER_IS_INT
 	Variant& operator=( int o)			{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
 	Variant& operator=( unsigned int o)		{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
 #endif
@@ -235,7 +225,7 @@ struct VariantConst :public Variant
 	VariantConst( bool o)				:Variant(Bool){m_data.value.Bool = o; setConstant();}
 	VariantConst( double o)				:Variant(Double){m_data.value.Double = o; setConstant();}
 	VariantConst( float o)				:Variant(Double){m_data.value.Double = o; setConstant();}
-#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
+#if !_WOLFRAME_INTEGER_IS_INT
 	VariantConst( int o)				:Variant(Int){m_data.value.Int = o; setConstant();}
 	VariantConst( unsigned int o)			:Variant(UInt){m_data.value.UInt = o; setConstant();}
 #endif
@@ -253,7 +243,7 @@ struct VariantConst :public Variant
 	VariantConst& operator=( bool o)		{bool init_=initialized(); Variant::init(Variant::Bool); m_data.value.Bool = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( double o)		{bool init_=initialized(); Variant::init(Variant::Double); m_data.value.Double = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( float o)		{bool init_=initialized(); Variant::init(Variant::Double); m_data.value.Double = o; setInitialized(init_); setConstant(); return *this;}
-#ifdef _Wolframe_TYPES_VARIANT_USE_64BIT
+#if !_WOLFRAME_INTEGER_IS_INT
 	VariantConst& operator=( int o)			{bool init_=initialized(); Variant::init(Variant::Int); m_data.value.Int = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( unsigned int o)	{bool init_=initialized(); Variant::init(Variant::UInt); m_data.value.UInt = o; setInitialized(init_); setConstant(); return *this;}
 #endif
