@@ -132,6 +132,10 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 		}
 		else if (itr->first.empty())
 		{
+			if (itr->second.type() == StructDescriptionBase::Vector)
+			{
+				throw SerializationErrorException( "non array element expected for content element", StructSerializer::getElementPath( stk));
+			}
 			stk.push_back( FiltermapSerializeState( "", itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
 		else
@@ -140,11 +144,6 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 			{
 				stk.back().state( idx+1);
 				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
-			}
-			else if (itr->first.empty())
-			{
-				stk.back().state( idx+1);
-				stk.push_back( FiltermapSerializeState( 0, itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 			}
 			else
 			{

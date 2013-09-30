@@ -119,6 +119,10 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		{
 			if (!*di->name)
 			{
+				if (itr->type() == types::VariantStruct::Array)
+				{
+					throw SerializationErrorException( "non array element expected for content element", getElementPath( stk));
+				}
 				stk.back().state( ++idx);
 				stk.push_back( FiltermapDDLSerializeState( &*itr));
 			}
