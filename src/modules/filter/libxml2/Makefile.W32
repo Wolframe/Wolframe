@@ -28,6 +28,12 @@ DYNAMIC_MODULE = \
 	mod_filter_libxml2.dll
 
 CPP_OBJS = \
+	documentReader.obj \
+	documentWriter.obj \
+	inputfilterImpl.obj \
+	outputfilterImpl.obj \
+	xsltMapper.obj \
+	xsltProgramType.obj \
 	libxml2_filter.obj \
 	mod_filter_libxml2.obj
 

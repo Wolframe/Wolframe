@@ -33,7 +33,9 @@
 ///\file modules/filter/libxml2/mod_filter_libxml2.cpp
 ///\brief Module for libxml2 XML filters
 #include "module/filterBuilder.hpp"
+#include "module/programTypeBuilder.hpp"
 #include "libxml2_filter.hpp"
+#include "xsltProgramType.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 
@@ -49,20 +51,21 @@ static void setModuleLogger( void* logger )
 }
 
 namespace {
-
 struct Libxml2FilterObject
 {
-	static SimpleBuilder* builder()
+	static SimpleBuilder* xmlfilter_builder()
 		{return new FilterBuilder( "Libxml2Filter", "xml:libxml2", "xml", lb::createLibxml2FilterPtr);}
+	static SimpleBuilder* xsltfilter_builder()
+		{return new ProgramTypeBuilder( "XsltProgramType", "xslt", langbind::createXsltProgramType);}
 };
-
 }//anonymous namespace
 
 
-enum {NofObjects=1};
+enum {NofObjects=2};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	Libxml2FilterObject::builder
+	Libxml2FilterObject::xmlfilter_builder,
+	Libxml2FilterObject::xsltfilter_builder
 };
 
 

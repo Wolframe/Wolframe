@@ -24,6 +24,12 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_filter_libxml2.so
 
 CPP_OBJS = \
+	documentReader.o \
+	documentWriter.o \
+	inputfilterImpl.o \
+	outputfilterImpl.o \
+	xsltMapper.o \
+	xsltProgramType.o \
 	libxml2_filter.o \
 	mod_filter_libxml2.o
 

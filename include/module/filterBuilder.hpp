@@ -75,7 +75,6 @@ public:
 private:
 	std::string m_name;
 	std::string m_category;
-	const std::string m_arg;
 	langbind::CreateFilterPtrFunc m_function;
 };
 
