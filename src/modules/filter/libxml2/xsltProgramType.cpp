@@ -44,7 +44,7 @@ public:
 			xmlError* err = xmlGetLastError();
 			throw std::runtime_error( std::string("error loading XSLT program '") + sourcefile_ + "': '" + (err?err->message:"unspecified XSLT error") + "'");
 		}
-		m_ptr.reset( pp);
+		m_ptr = boost::shared_ptr<xsltStylesheet>( pp, xsltFreeStylesheet);
 	}
 
 	virtual ~XsltFilterConstructor(){}

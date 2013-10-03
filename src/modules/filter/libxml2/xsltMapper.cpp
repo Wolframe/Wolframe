@@ -87,11 +87,25 @@ DocumentReader XsltMapper::apply( const DocumentReader& o) const
 		xsltStylesheet l_stylesheet;
 		std::memcpy( &l_stylesheet, m_stylesheet, sizeof(l_stylesheet));
 		l_stylesheet.encoding = const_cast<xmlChar*>(o.encoding());
+		if (l_stylesheet.standalone < 0)
+		{
+			l_stylesheet.standalone = 1;
+		}
 		res = xsltApplyStylesheet( &l_stylesheet, o.get(), m_stylesheet_params.get());
+		res->standalone = l_stylesheet.standalone;
+	}
+	else if (m_stylesheet->standalone < 0)
+	{
+		xsltStylesheet l_stylesheet;
+		std::memcpy( &l_stylesheet, m_stylesheet, sizeof(l_stylesheet));
+		l_stylesheet.standalone = 1;
+		res = xsltApplyStylesheet( &l_stylesheet, o.get(), m_stylesheet_params.get());
+		res->standalone = l_stylesheet.standalone;
 	}
 	else
 	{
 		res = xsltApplyStylesheet( m_stylesheet, o.get(), m_stylesheet_params.get());
+		res->standalone = m_stylesheet->standalone;
 	}
 	if (!res) return DocumentReader();
 	return DocumentReader( res);
