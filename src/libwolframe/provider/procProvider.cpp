@@ -265,7 +265,7 @@ const types::FormDescription* ProcessorProvider::formDescription( const std::str
 	return m_impl->formDescription( name);
 }
 
-langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg) const
+langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 {
 	return m_impl->filter( name, arg);
 }

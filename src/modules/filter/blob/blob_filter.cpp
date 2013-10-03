@@ -36,6 +36,7 @@ Project Wolframe.
 #include <cstring>
 #include <cstddef>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -197,7 +198,7 @@ struct BlobFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createBlobFilter( const std::string& name, const std::string& arg)
+Filter _Wolframe::langbind::createBlobFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	enum {namelen=4};
 	if (arg.size()) throw std::runtime_error( "filter does not have arguments");
@@ -207,7 +208,7 @@ Filter _Wolframe::langbind::createBlobFilter( const std::string& name, const std
 	return BlobFilter();
 }
 
-Filter* _Wolframe::langbind::createBlobFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createBlobFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	return new Filter( createBlobFilter( name, arg));
 }

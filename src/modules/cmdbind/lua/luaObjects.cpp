@@ -1380,11 +1380,22 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 	return 0;
 }
 
+static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
+{
+	std::ostringstream out;
+	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != arg.begin()) out << ", ";
+		out << ai->first << "='" << ai->second << "'";
+	}
+	return out.str();
+}
 
 LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 {
 	const char* name = "";
-	std::string param;
+	std::vector<FilterArgument> arg;
 	switch (lua_gettop( ls))
 	{
 		case 0:
@@ -1405,31 +1416,31 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 				lua_pushnil( ls);
 				while (lua_next( ls, -2))
 				{
-					if (param.size()) param.push_back(',');
 					if (lua_type( ls, -2) == LUA_TSTRING)
 					{
-						param.append( lua_tostring( ls, -2));
-						param.push_back('=');
+						const char* val = lua_tostring( ls, -1);
+						if (!val) throw std::runtime_error( "illegal filter argument value");
+						arg.push_back( FilterArgument( lua_tostring( ls, -2), val));
 					}
-					else if (lua_type( ls, -2) != LUA_TNUMBER)
+					else if (lua_type( ls, -2) == LUA_TNUMBER)
+					{
+						const char* val = lua_tostring( ls, -1);
+						if (!val) throw std::runtime_error("illegal filter argument value");
+						arg.push_back( FilterArgument( "", val));
+					}
+					else
 					{
 						throw std::runtime_error("illegal filter argument");
 					}
-					std::size_t plen;
-					const char* pp = lua_tolstring( ls, -1, &plen);
-					if (!pp || std::strchr( pp, '"')) throw std::runtime_error("illegal filter argument");
-					param.push_back('"');
-					param.append( pp, plen);
-					param.push_back('"');
 					lua_pop( ls, 1);
 				}
 				lua_pop( ls, 1);
 			}
 			else
 			{
-				const char* pp = lua_tostring( ls, 2);
-				if (!pp || std::strchr( pp, '"')) throw std::runtime_error( "filter argument is not a table or convertible to a string without double quotes");
-				param = pp;
+				const char* val = lua_tostring( ls, -1);
+				if (!val) throw std::runtime_error("illegal filter argument value");
+				arg.push_back( FilterArgument( "", val));
 			}
 		case 1:
 		{
@@ -1437,12 +1448,12 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
 			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-			types::CountedReference<Filter> flt( ctx->filter( name, param));
+			types::CountedReference<Filter> flt( ctx->filter( name, arg));
 			if (!flt.get())
 			{
-				if (!param.empty())
+				if (!arg.empty())
 				{
-					throw std::runtime_error( std::string( "filter '") + name + "(" + param + ")' is not defined");
+					throw std::runtime_error( std::string( "filter '") + name + "(" + filterargAsString(arg) + ")' is not defined");
 				}
 				else
 				{

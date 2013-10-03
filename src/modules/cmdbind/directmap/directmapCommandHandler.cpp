@@ -74,7 +74,7 @@ void DirectmapCommandHandler::initcall()
 		m_outputform.reset( new types::Form( df));
 	}
 	std::string input_filtername;
-	std::string input_filterarg;
+	std::vector<langbind::FilterArgument> input_filterarg;
 	if (m_cmd->inputfilter.empty())
 	{
 		input_filtername = m_ctx->filter();
@@ -85,7 +85,7 @@ void DirectmapCommandHandler::initcall()
 		input_filterarg = m_cmd->inputfilterarg;
 	}
 	std::string output_filtername;
-	std::string output_filterarg;
+	std::vector<langbind::FilterArgument> output_filterarg;
 	if (m_cmd->outputfilter.empty())
 	{
 		output_filtername = m_ctx->filter();

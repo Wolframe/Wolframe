@@ -369,9 +369,21 @@ const types::FormDescription* ProcessorProvider::ProcessorProvider_Impl::formDes
 	return m_programs->getFormDescription( name);
 }
 
-langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg) const
+static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
 {
-	LOG_TRACE << "[provider] get filter '" << name << "(" << arg << ")'";
+	std::ostringstream out;
+	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != arg.begin()) out << ", ";
+		out << ai->first << "='" << ai->second << "'";
+	}
+	return out.str();
+}
+
+langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+{
+	LOG_TRACE << "[provider] get filter '" << name << "(" << filterargAsString(arg) << ")'";
 	return m_programs->createFilter( name, arg);
 }
 

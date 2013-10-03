@@ -98,39 +98,59 @@ void DirectmapProgram::loadProgram( const std::string& filename)
 	}
 }
 
-static std::string parseFilterArguments( std::string::const_iterator& si, const std::string::const_iterator& se)
+static std::vector<langbind::FilterArgument> parseFilterArguments( std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	static const utils::CharTable optab( "(),");
-	std::string rt;
-	std::string tok;
-	int taglevel = 1;
+	static const utils::CharTable optab( "(),=");
+	std::vector<langbind::FilterArgument> rt;
 	char ch;
+	std::string tok;
+	std::string val;
+
 	for (;;)
 	{
+		// parse argument identifier or value:
 		ch = utils::parseNextToken( tok, si, se, optab);
 		if (!ch) throw std::runtime_error("brackets not balanced in filter arguments");
 		if (ch == ')')
 		{
-			--taglevel;
-			if (taglevel == 0) return rt;
+			return rt;
 		}
-		else if (ch == '(')
+		else if (ch == '(' || ch == ',' || ch == '=')
 		{
-			++taglevel;
+			throw std::runtime_error( std::string( "syntax error in filter arguments: token expected instead of comma (") + (char)ch + ")");
 		}
-		else if (ch == ',')
+
+		// check for assignment:
+		ch = utils::parseNextToken( val, si, se, optab);
+		if (ch == ',')
 		{
-			rt.push_back( ch);
+			rt.push_back( langbind::FilterArgument( "", tok));
+			continue;
 		}
-		else if (ch == '"' || ch == '\'')
+		else if (ch == ')')
 		{
-			rt.push_back( ch);
-			rt.append( tok);
-			rt.push_back( ch);
+			rt.push_back( langbind::FilterArgument( "", tok));
+			return rt;
 		}
-		else
+		else if (ch == '=')
 		{
-			rt.append( tok);
+			// for assignment get value:
+			ch = utils::parseNextToken( val, si, se, optab);
+			if (ch == ')' || ch == '(' || ch == ',' || ch == '=')
+			{
+				throw std::runtime_error( "syntax error in filter arguments: unexpected operator");
+			}
+			rt.push_back( langbind::FilterArgument( tok, val));
+
+			ch = utils::parseNextToken( val, si, se, optab);
+			if (ch == ',')
+			{
+				continue;
+			}
+			else if (ch == ')')
+			{
+				return rt;
+			}
 		}
 	}
 }

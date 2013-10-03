@@ -112,7 +112,7 @@ public:
 	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
-	langbind::Filter* filter( const std::string& name, const std::string& arg) const;
+	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
 
 private:
 	class ProcessorProvider_Impl;

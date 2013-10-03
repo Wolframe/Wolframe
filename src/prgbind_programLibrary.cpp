@@ -286,7 +286,7 @@ public:
 		return &m_normalizeFunctionMap;
 	}
 
-	langbind::Filter* createFilter( const std::string& name, const std::string& arg) const
+	langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 	{
 		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
 		return (fi == m_filterMap.end())?0:fi->second->object( arg);
@@ -429,7 +429,7 @@ const types::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std:
 	return m_impl->getNormalizeFunction( name);
 }
 
-langbind::Filter* ProgramLibrary::createFilter( const std::string& name, const std::string& arg) const
+langbind::Filter* ProgramLibrary::createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 {
 	return m_impl->createFilter( name, arg);
 }

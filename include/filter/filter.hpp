@@ -38,6 +38,8 @@ Project Wolframe.
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
 #include <string>
+#include <vector>
+#include <utility>
 
 namespace _Wolframe {
 namespace langbind {
@@ -87,8 +89,9 @@ protected:
 	OutputFilterR m_outputfilter;
 };
 
-typedef Filter (*CreateFilterFunc)( const std::string& name, const std::string& arg);
-typedef Filter* (*CreateFilterPtrFunc)( const std::string& name, const std::string& arg);
+typedef std::pair<std::string,std::string> FilterArgument;
+typedef Filter (*CreateFilterFunc)( const std::string& name, const std::vector<FilterArgument>& arg);
+typedef Filter* (*CreateFilterPtrFunc)( const std::string& name, const std::vector<FilterArgument>& arg);
 
 
 }}//namespace

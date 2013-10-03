@@ -40,6 +40,7 @@ Project Wolframe.
 #include <cstring>
 #include <cstddef>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -329,18 +330,27 @@ struct CharFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createCharFilter( const std::string& name, const std::string& arg)
+Filter _Wolframe::langbind::createCharFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	const char* filterbasename = "char";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	if (nam != filterbasename) throw std::runtime_error( "char filter name does not match");
 	if (arg.empty()) return CharFilter();
-	const char* encoding = arg.c_str();
-	return CharFilter( encoding);
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			encoding = ai->second.c_str();
+			break;
+		}
+	}
+	return encoding?CharFilter( encoding):CharFilter();
 }
 
-Filter* _Wolframe::langbind::createCharFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createCharFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	return new Filter( createCharFilter( name, arg));
 }

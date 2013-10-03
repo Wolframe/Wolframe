@@ -10,73 +10,38 @@ using namespace _Wolframe::langbind;
 
 static const utils::CharTable g_op( ",=");
 
-static boost::shared_ptr<const char*> stylesheetParams( std::vector<std::string> arg)
+static boost::shared_ptr<const char*> stylesheetParams( std::vector<langbind::FilterArgument>& arg)
 {
-	char const** cc = (char const**)std::malloc( (arg.size()+1) * sizeof( char*));
+	char const** cc = (char const**)std::malloc( (arg.size()*2+1) * sizeof( char*));
 	if (!cc) throw std::bad_alloc();
 	boost::shared_ptr<const char*> rt( cc, std::free);
-	std::vector<std::string>::const_iterator gi = arg.begin(), ge = arg.end();
-	for (; gi != ge; ++gi,++cc)
+	std::vector<langbind::FilterArgument>::iterator gi = arg.begin(), ge = arg.end();
+	int idx = 0;
+	for (; gi != ge; ++gi)
 	{
-		*cc = gi->c_str();
+		if (gi->first.empty())
+		{
+			gi->first = std::string("_") + boost::lexical_cast<std::string>( ++idx);
+		}
+		*cc++ = gi->first.c_str();
+		*cc++ = gi->second.c_str();
 	}
 	*cc = 0;
 	return rt;
 }
 
-XsltMapper::XsltMapper( const xsltStylesheetPtr stylesheet_, const std::string& arg)
+XsltMapper::XsltMapper( const xsltStylesheetPtr stylesheet_, const std::vector<langbind::FilterArgument>& arg)
 	:m_stylesheet(stylesheet_)
+	,m_stylesheet_params_ar(arg)
 {
-	std::string tok;
-	int idx;
-
-	std::string::const_iterator ai = arg.begin(), ae = arg.end();
-	char ch;
-	while ((ch=utils::parseNextToken( tok, ai, ae, g_op)) != 0)
-	{
-		if (ch == ',' || ch == '=')
-		{
-			throw std::runtime_error( std::string("argument expected instead of '") + ch + "'");
-		}
-		else
-		{
-			std::string val;
-			ch = utils::parseNextToken( val, ai, ae, g_op);
-			if (ch == '=')
-			{
-				m_stylesheet_params_mem.push_back( tok);
-				ch = utils::parseNextToken( val, ai, ae, g_op);
-				if (ch == ',' || ch == '=')
-				{
-					throw std::runtime_error( std::string("argument expected instead of '") + ch + "'");
-				}
-				m_stylesheet_params_mem.push_back( val);
-				ch = utils::parseNextToken( val, ai, ae, g_op);
-			}
-			else if (ch == ',')
-			{
-				val = tok;
-				tok = std::string("_") + boost::lexical_cast<std::string>( ++idx);
-				m_stylesheet_params_mem.push_back( tok);
-				m_stylesheet_params_mem.push_back( val);
-			}
-			else
-			{
-				throw std::runtime_error( "comma (',') or equal ('=') expected");
-			}
-			if (ch == ',') continue;
-			if (ch == '\0') break;
-			throw std::runtime_error( "comma expected as token separator in XSLT filter argument list");
-		}
-	}
-	m_stylesheet_params = stylesheetParams( m_stylesheet_params_mem);
+	m_stylesheet_params = stylesheetParams( m_stylesheet_params_ar);
 }
 
 XsltMapper::XsltMapper( const XsltMapper& o)
 	:m_stylesheet(o.m_stylesheet)
-	,m_stylesheet_params_mem(o.m_stylesheet_params_mem)
+	,m_stylesheet_params_ar(o.m_stylesheet_params_ar)
 {
-	m_stylesheet_params = stylesheetParams( m_stylesheet_params_mem);
+	m_stylesheet_params = stylesheetParams( m_stylesheet_params_ar);
 }
 
 DocumentReader XsltMapper::apply( const DocumentReader& o) const

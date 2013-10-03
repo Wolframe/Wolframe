@@ -39,6 +39,7 @@
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
+#include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <fstream>
@@ -47,20 +48,69 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-std::pair<std::string,std::string> filterIdentifier( const std::string& id)
+std::pair<std::string, std::vector<langbind::FilterArgument> > filterIdentifier( const std::string& id)
 {
+	std::pair<std::string, std::vector<langbind::FilterArgument> > rt;
 	const char* cc = id.c_str();
 	const char* ee = cc;
+	const char* end = id.c_str() + id.size();
+	std::string argstr;
 
-	while (*ee && *ee != ',') ++ee;
-	if (*ee)
+	while (*ee && *ee != ',' && *ee != '(') ++ee;
+	if (*ee == '(')
 	{
-		return std::pair<std::string,std::string>( std::string( cc, ee-cc), ee + 1);
+		while (end != ee)
+		{
+			--end;
+			if ((unsigned char)*end == ')') break;
+			if ((unsigned char)*end > 32) throw std::runtime_error(std::string("syntax error in filter expression '") + id + "'");
+		}
+		if (end == ee) throw std::runtime_error(std::string("syntax error in filter expression '") + id + "'");
+		argstr = std::string( ee+1, end-ee-1);
+		rt.first = std::string( cc, ee-cc);
+	}
+	else if (!*ee)
+	{
+		rt.first = std::string( id);
 	}
 	else
 	{
-		return std::pair<std::string,std::string>( cc, "");
+		argstr = std::string( ee+1);
+		rt.first = std::string( cc, ee-cc);
 	}
+	std::vector<std::string> spl;
+	utils::splitString( spl, argstr, ",");
+	std::vector<std::string>::const_iterator ai = spl.begin(), ae = spl.end();
+	for (; ai != ae; ++ai)
+	{
+		std::vector<std::string> asg;
+		utils::splitString( asg, *ai, "=");
+		if (asg.size() == 1)
+		{
+			rt.second.push_back( langbind::FilterArgument("",*ai));
+		}
+		else if (asg.size() == 2)
+		{
+			rt.second.push_back( langbind::FilterArgument( asg.at(0), asg.at(1)));
+		}
+		else
+		{
+			throw std::runtime_error( "syntax error in filter arguments");
+		}
+	}
+	return rt;
+}
+
+static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
+{
+	std::ostringstream out;
+	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != arg.begin()) out << ", ";
+		out << ai->first << "='" << ai->second << "'";
+	}
+	return out.str();
 }
 
 static Filter getFilter( proc::ProcessorProvider* provider, const std::string& ifl_, const std::string& ofl_)
@@ -70,15 +120,15 @@ static Filter getFilter( proc::ProcessorProvider* provider, const std::string& i
 	{
 		return langbind::createNullFilter( "", "");
 	}
-	std::pair<std::string,std::string> ifl = filterIdentifier( ifl_);
-	std::pair<std::string,std::string> ofl = filterIdentifier( ofl_);
+	std::pair<std::string,std::vector<langbind::FilterArgument> > ifl = filterIdentifier( ifl_);
+	std::pair<std::string,std::vector<langbind::FilterArgument> > ofl = filterIdentifier( ofl_);
 	if (boost::iequals( ofl_, ifl_))
 	{
 		Filter* fp = provider->filter( ifl.first, ifl.second);
 		if (!fp)
 		{
 			std::ostringstream msg;
-			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << ofl.second << "'";
+			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << filterargAsString(ofl.second) << "'";
 			throw std::runtime_error( msg.str());
 		}
 		else
@@ -94,14 +144,14 @@ static Filter getFilter( proc::ProcessorProvider* provider, const std::string& i
 		if (!in)
 		{
 			std::ostringstream msg;
-			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << ifl.second << "'";
+			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << filterargAsString( ifl.second) << "'";
 			throw std::runtime_error( msg.str());
 		}
 		if (!out)
 		{
 			delete in;
 			std::ostringstream msg;
-			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << ofl.second << "'";
+			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << filterargAsString( ofl.second) << "'";
 			throw std::runtime_error( msg.str());
 		}
 		rt = Filter( in->inputfilter(), out->outputfilter());

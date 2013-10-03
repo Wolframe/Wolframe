@@ -40,9 +40,10 @@ Project Wolframe.
 #include <cstring>
 #include <cstddef>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace langbind;
+using namespace _Wolframe::langbind;
 
 namespace {
 
@@ -463,18 +464,26 @@ public:
 	}
 };
 
-Filter _Wolframe::langbind::createTokenFilter( const std::string& name, const std::string& arg)
+Filter _Wolframe::langbind::createTokenFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	const char* filterbasename = "token";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	if (nam != filterbasename) throw std::runtime_error( "token filter name does not match");
-	if (arg.empty()) return TokenFilter();
-	const char* encoding = arg.c_str();
-	return TokenFilter( encoding);
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			encoding = ai->second.c_str();
+			break;
+		}
+	}
+	return encoding?TokenFilter( encoding):TokenFilter();
 }
 
-Filter* _Wolframe::langbind::createTokenFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createTokenFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	return new Filter( createTokenFilter( name, arg));
 }

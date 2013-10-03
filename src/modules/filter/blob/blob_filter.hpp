@@ -40,8 +40,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-Filter createBlobFilter( const std::string& name, const std::string& arg);
-Filter* createBlobFilterPtr( const std::string& name, const std::string& arg);
+Filter createBlobFilter( const std::string& name, const std::vector<FilterArgument>& arg);
+Filter* createBlobFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
 
 }}//namespace
 #endif

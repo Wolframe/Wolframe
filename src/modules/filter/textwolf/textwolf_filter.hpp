@@ -40,8 +40,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-Filter createTextwolfXmlFilter( const std::string& name, const std::string& arg);
-Filter* createTextwolfXmlFilterPtr( const std::string& name, const std::string& arg);
+Filter createTextwolfXmlFilter( const std::string& name, const std::vector<FilterArgument>& arg);
+Filter* createTextwolfXmlFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
 
 
 }}//namespace

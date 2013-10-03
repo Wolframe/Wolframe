@@ -59,7 +59,7 @@ public:
 	{
 		return m_name.c_str();
 	}
-	virtual langbind::Filter* object( const std::string& arg) const
+	virtual langbind::Filter* object( const std::vector<langbind::FilterArgument>& arg) const
 	{
 		return m_function( m_name, arg );
 	}

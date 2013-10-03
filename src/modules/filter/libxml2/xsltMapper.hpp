@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_LIBXML2_XSLT_MAPPER_HPP_INCLUDED
 #define _Wolframe_LIBXML2_XSLT_MAPPER_HPP_INCLUDED
 #include "documentReader.hpp"
+#include "filter/filter.hpp"
 #include <string>
 #include <vector>
 #include <libxslt/xslt.h>
@@ -50,7 +51,7 @@ class XsltMapper
 public:
 	XsltMapper()
 		:m_stylesheet(0){}
-	XsltMapper( const xsltStylesheetPtr stylesheet_, const std::string& arg);
+	XsltMapper( const xsltStylesheetPtr stylesheet_, const std::vector<langbind::FilterArgument>& arg);
 	XsltMapper( const XsltMapper& o);
 
 	DocumentReader apply( const DocumentReader& o) const;
@@ -60,9 +61,9 @@ public:
 		{return m_stylesheet != 0;}
 
 private:
-	const xsltStylesheetPtr m_stylesheet;			//< optional XSLT mapper
-	boost::shared_ptr<const char*> m_stylesheet_params;	//< parameter for XSLT mapper
-	std::vector<std::string> m_stylesheet_params_mem;	//< memory for parameter for XSLT mapper
+	const xsltStylesheetPtr m_stylesheet;				//< optional XSLT mapper
+	boost::shared_ptr<const char*> m_stylesheet_params;		//< parameter for XSLT mapper
+	std::vector<langbind::FilterArgument> m_stylesheet_params_ar;	//< memory for parameter for XSLT mapper
 };
 
 }}//namespace

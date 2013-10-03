@@ -230,7 +230,7 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "io filter command handler not found for '" << procname << "'";
 								return net::CloseConnection();
 							}
-							langbind::Filter* flt = m_provider->filter( "char", "");
+							langbind::Filter* flt = m_provider->filter( "char");
 							m_inputfilter = flt->inputfilter();
 							m_outputfilter = flt->outputfilter();
 							if (!flt)

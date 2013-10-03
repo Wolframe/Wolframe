@@ -21,7 +21,7 @@ namespace {
 
 struct XsltFilter :public Filter
 {
-	XsltFilter( const xsltStylesheetPtr stylesheet_, const std::string& arg)
+	XsltFilter( const xsltStylesheetPtr stylesheet_, const std::vector<langbind::FilterArgument>& arg)
 	{
 		XsltMapper xsltmapper( stylesheet_, arg);
 		InputFilterImpl impl( xsltmapper);
@@ -49,7 +49,7 @@ public:
 
 	virtual ~XsltFilterConstructor(){}
 
-	virtual langbind::Filter* object( const std::string& arg) const
+	virtual langbind::Filter* object( const std::vector<langbind::FilterArgument>& arg) const
 	{
 		return new XsltFilter( m_ptr.get(), arg);
 	}

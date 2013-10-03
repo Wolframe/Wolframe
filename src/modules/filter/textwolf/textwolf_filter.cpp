@@ -41,6 +41,7 @@ Project Wolframe.
 #include <string>
 #include <cstddef>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -479,18 +480,27 @@ public:
 	}
 };
 
-Filter _Wolframe::langbind::createTextwolfXmlFilter( const std::string& name, const std::string& arg)
+Filter _Wolframe::langbind::createTextwolfXmlFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	const char* filterbasename = "xml:textwolf";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	if (nam != filterbasename) throw std::runtime_error( "textwolf xml filter name does not match");
 	if (arg.empty()) return TextwolfXmlFilter();
-	const char* encoding = arg.c_str();
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			encoding = ai->second.c_str();
+			break;
+		}
+	}
 	return TextwolfXmlFilter( encoding);
 }
 
-Filter* _Wolframe::langbind::createTextwolfXmlFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createTextwolfXmlFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
 {
 	return new Filter( createTextwolfXmlFilter( name, arg));
 }

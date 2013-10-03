@@ -57,9 +57,9 @@ struct DirectmapCommandDescription
 	std::string name;						//< name of program
 	std::string call;						//< name of the transaction or form function
 	std::string inputfilter;					//< name of the input filter
-	std::string inputfilterarg;					//< arguments of the input filter
+	std::vector<langbind::FilterArgument> inputfilterarg;		//< arguments of the input filter
 	std::string outputfilter;					//< name of the output filter
-	std::string outputfilterarg;					//< arguments of the output filter
+	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
 

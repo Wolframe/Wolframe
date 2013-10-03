@@ -61,7 +61,7 @@ void LuaCommandHandler::initcall()
 
 	if (!m_ctx->defaultfilter().empty())
 	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( m_ctx->defaultfilter(), ""));
+		types::CountedReference<langbind::Filter> filter( m_provider->filter( m_ctx->defaultfilter()));
 		if (!filter.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + m_ctx->defaultfilter() + "'");
