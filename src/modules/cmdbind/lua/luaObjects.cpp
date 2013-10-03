@@ -1384,7 +1384,7 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 {
 	const char* name = "";
-	const char* encoding = "";
+	std::string param;
 	switch (lua_gettop( ls))
 	{
 		case 0:
@@ -1399,20 +1399,50 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			}
 		}
 		case 2:
-			encoding = lua_tostring( ls, 2);
-			if (!encoding) throw std::runtime_error( "encoding name is not a string");
+			if (lua_type( ls, 2) == LUA_TTABLE)
+			{
+				lua_pushvalue( ls, 2);
+				lua_pushnil( ls);
+				while (lua_next( ls, -2))
+				{
+					if (param.size()) param.push_back(',');
+					if (lua_type( ls, -2) == LUA_TSTRING)
+					{
+						param.append( lua_tostring( ls, -2));
+						param.push_back('=');
+					}
+					else if (lua_type( ls, -2) != LUA_TNUMBER)
+					{
+						throw std::runtime_error("illegal filter argument");
+					}
+					std::size_t plen;
+					const char* pp = lua_tolstring( ls, -1, &plen);
+					if (!pp || std::strchr( pp, '"')) throw std::runtime_error("illegal filter argument");
+					param.push_back('"');
+					param.append( pp, plen);
+					param.push_back('"');
+					lua_pop( ls, 1);
+				}
+				lua_pop( ls, 1);
+			}
+			else
+			{
+				const char* pp = lua_tostring( ls, 2);
+				if (!pp || std::strchr( pp, '"')) throw std::runtime_error( "filter argument is not a table or convertible to a string without double quotes");
+				param = pp;
+			}
 		case 1:
 		{
 			name = lua_tostring( ls, 1);
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
 			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-			types::CountedReference<Filter> flt( ctx->filter( name, encoding));
+			types::CountedReference<Filter> flt( ctx->filter( name, param));
 			if (!flt.get())
 			{
-				if (encoding[0])
+				if (!param.empty())
 				{
-					throw std::runtime_error( std::string( "filter '") + name + "'" + " with encoding '" + encoding + "' is not defined");
+					throw std::runtime_error( std::string( "filter '") + name + "(" + param + ")' is not defined");
 				}
 				else
 				{
@@ -1451,6 +1481,11 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 			ff->putInput( chunk, chunksize, chunkend);
 		}
 		input->inputfilter().reset( ff);
+		Output* output = LuaObject<Output>::getGlobal( ls, "output");
+		if (output && output->outputfilter().get())
+		{
+			output->outputfilter()->setAttributes( ff);
+		}
 	}
 	else
 	{
@@ -1672,6 +1707,8 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			ff = filter->outputfilter()->copy();
 			if (output->outputfilter().get())
 			{
+				Input* input = LuaObject<Input>::getGlobal( ls, "input");
+				ff->setAttributes( input?input->inputfilter().get():0);
 				ff->assignState( *output->outputfilter());
 			}
 			output->outputfilter().reset( ff);

@@ -73,13 +73,18 @@ public:
 
 	void setFilterAs( const langbind::InputFilterR& in)
 	{
-		// assign the rest of the input to the new filter attached
+		// assign the rest of the input to the new filter attached:
 		const void* chunk;
 		std::size_t chunksize;
 		bool chunkend;
 		m_inputfilter->getRest( chunk, chunksize, chunkend);
 		m_inputfilter.reset( in->copy());
 		m_inputfilter->putInput( chunk, chunksize, chunkend);
+		// synchronize attributes:
+		if (m_outputfilter.get())
+		{
+			m_outputfilter->setAttributes( m_inputfilter.get());
+		}
 	}
 
 	void setFilterAs( const langbind::OutputFilterR& out)
@@ -87,6 +92,8 @@ public:
 		langbind::OutputFilter* of = out->copy();
 		of->assignState( *m_outputfilter);
 		m_outputfilter.reset( of);;
+		// synchronize attributes:
+		m_outputfilter->setAttributes( m_inputfilter.get());
 	}
 
 	///\enum CallResult

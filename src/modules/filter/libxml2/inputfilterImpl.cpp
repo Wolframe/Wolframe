@@ -71,10 +71,17 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		m_node = xmlDocGetRootElement( m_doc.get());
 
 		const xmlChar* ec = m_doc.get()->encoding;
-		m_encoding.reset( new std::string);
-		for (int ii=0; ec[ii]!=0; ii++)
+		if (!ec)
 		{
-			m_encoding->push_back((unsigned char)ec[ii]);
+			m_encoding = "UTF-8";
+		}
+		else
+		{
+			m_encoding.clear();
+			for (int ii=0; ec[ii]!=0; ii++)
+			{
+				m_encoding.push_back((unsigned char)ec[ii]);
+			}
 		}
 	}
 }

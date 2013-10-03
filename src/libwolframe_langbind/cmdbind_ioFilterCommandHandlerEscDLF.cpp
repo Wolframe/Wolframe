@@ -132,6 +132,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				}
 				if (m_input.gotEoD())
 				{
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 					if (m_writedata_chkpos != m_outputfilter->chkpos())
 					{
 						throw std::runtime_error( "output byte sum check failed");
@@ -140,6 +141,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 					{
 						throw std::runtime_error( "output checksum check failed");
 					}
+#endif
 					m_outputfilter.reset();
 					m_writedata = "\r\n.\r\n";
 					m_writedatasize = std::strlen("\r\n.\r\n");

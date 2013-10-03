@@ -35,14 +35,14 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 	if (!xmlout)
 	{
-		const char* ec = m_encoding.get()?m_encoding.get()->c_str():"UTF-8";
+		const char* ec = encoding();
 		if (m_doctype_root.size())
 		{
-			m_doc = DocumentWriter( ec, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0);
+			m_doc = DocumentWriter( ec?ec:"UTF-8", m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0);
 		}
 		else
 		{
-			m_doc = DocumentWriter( ec);
+			m_doc = DocumentWriter( ec?ec:"UTF-8");
 		}
 		xmlout = m_doc.get();
 		if (!xmlout)
@@ -157,5 +157,46 @@ void OutputFilterImpl::setDocType( const std::string& value)
 		if (doctype.publicid) m_doctype_public = doctype.publicid;
 		if (doctype.systemid) m_doctype_system = doctype.systemid;
 	}
+}
+
+const char* OutputFilterImpl::encoding() const
+{
+	if (m_encoding.empty())
+	{
+		if (attributes())
+		{
+			return attributes()->getEncoding();
+		}
+		return 0;
+	}
+	else
+	{
+		return m_encoding.c_str();
+	}
+}
+
+bool OutputFilterImpl::getValue( const char* name, std::string& val)
+{
+	if (std::strcmp( name, "encoding") == 0)
+	{
+		const char* ee = encoding();
+		if (ee)
+		{
+			val = ee;
+			return true;
+		}
+		return false;
+	}
+	return Parent::getValue( name, val);
+}
+
+bool OutputFilterImpl::setValue( const char* name, const std::string& value)
+{
+	if (std::strcmp( name, "encoding") == 0)
+	{
+		m_encoding = value;
+		return true;
+	}
+	return Parent::setValue( name, value);
 }
 

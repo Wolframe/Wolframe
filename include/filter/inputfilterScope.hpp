@@ -84,6 +84,11 @@ public:
 		throw std::logic_error( "put input to an input filter scope");
 	}
 
+	virtual const char* getEncoding() const
+	{
+		return m_inputfilter->getEncoding();
+	}
+
 	///\brief Get next element
 	///\param [out] type element type parsed
 	///\param [out] element reference to element returned

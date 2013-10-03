@@ -41,7 +41,6 @@
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlhdriterator.hpp"
-#include "textwolf/xmlattributes.hpp"
 #include <cstring>
 #include <cstdlib>
 
@@ -162,11 +161,11 @@ struct XMLParserObject
 ///\brief Class for XML parsing independent of the character set
 ///\tparam BufferType type to use as buffer (STL back insertion interface)
 ///\tparam XMLAttributes setter/getter class for document attributes
-template <class BufferType=std::string, class XMLAttributes=DefaultXMLAttributes>
+template <class BufferType=std::string>
 class XMLParser :public XMLParserBase
 {
 public:
-	XMLParser( const XMLAttributes& a)
+	XMLParser()
 		:m_state(ParseHeader)
 		,m_src(0)
 		,m_srcsize(0)
@@ -177,7 +176,6 @@ public:
 		,m_withEmpty(true)
 		,m_doTokenize(false)
 		,m_standalone(false)
-		,m_attributes(a)
 		,m_doctype_state(0)
 	{
 		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt, charset::UTF8());
@@ -195,7 +193,6 @@ public:
 		,m_withEmpty(o.m_withEmpty)
 		,m_doTokenize(o.m_doTokenize)
 		,m_standalone(o.m_standalone)
-		,m_attributes(o.m_attributes)
 		,m_doctype_state(o.m_doctype_state)
 		,m_doctype_root(o.m_doctype_root)
 		,m_doctype_public(o.m_doctype_public)
@@ -237,6 +234,19 @@ public:
 	const std::string& getDoctypeSystem() const
 	{
 		return m_doctype_system;
+	}
+
+	const char* getEncoding() const
+	{
+		if (m_encoding.empty())
+		{
+			if (m_state != ParseSource)
+			{
+				throw std::runtime_error("character set encoding not defined yet in input");
+			}
+			return 0;
+		}
+		return m_encoding.c_str();
 	}
 
 	enum State
@@ -286,12 +296,21 @@ public:
 		return m_obj?(m_mt.m_getPosition( m_obj)+m_srcofs):0;
 	}
 
-	XMLScannerBase::ElementType getNext( const char*& elemptr, std::size_t& elemsize)
+	bool parseHeader( const char*& err)
 	{
+		err = 0;
 		if (!m_obj) return XMLScannerBase::ErrorOccurred;
+		if (m_state == ParseSource) return true;
 		for(;;)
 		{
+			const char* elemptr;
+			std::size_t elemsize;
 			XMLScannerBase::ElementType elemtype = m_mt.m_getNext( m_obj, elemptr, elemsize);
+			if ((int)elemtype > (int)XMLScannerBase::DocAttribEnd)
+			{
+				err = "xml header not complete";
+				return false;
+			}
 			switch (m_state)
 			{
 				case ParseHeader:
@@ -323,7 +342,10 @@ public:
 					{
 						switch (m_headerAttrType)
 						{
-							case None: throw std::runtime_error( "unknown attribute name in xml header");
+							case None:
+								err = "unknown attribute name in xml header";
+								return false;
+
 							case Standalone:
 								if (elemsize == 3 && std::memcmp( elemptr, "yes", 3) == 0)
 								{
@@ -338,7 +360,7 @@ public:
 							case Version:
 								continue;
 							case Encoding:
-								m_attributes.setEncoding( std::string( elemptr, elemsize));
+								m_encoding = std::string( elemptr, elemsize);
 								continue;
 						}
 						continue;
@@ -347,23 +369,24 @@ public:
 					{
 						if (!createParser())
 						{
-							elemptr = "unknown charset encoding";
-							elemsize = std::strlen( elemptr);
-							elemtype = XMLScannerBase::ErrorOccurred;
-							break;
+							err = "unknown charset encoding";
+							return false;
 						}
 						else
 						{
-							m_state = m_standalone?ParseSource:ParseDoctype;
-							break;
+							if (m_standalone)
+							{
+								m_state = ParseSource;
+								return true;
+							}
+							m_state = ParseDoctype;
+							continue;
 						}
 					}
 					else
 					{
-						elemptr = "unexpected element in xml header";
-						elemsize = std::strlen( elemptr);
-						elemtype = XMLScannerBase::ErrorOccurred;
-						break;
+						err = "unexpected element in xml header";
+						return false;
 					}
 
 				case ParseDoctype:
@@ -406,10 +429,8 @@ public:
 							}
 							else
 							{
-								elemptr = "error in xml <!DOCTYPE definition: SYSTEM or PUBLIC expected";
-								elemsize = std::strlen( elemptr);
-								elemtype = XMLScannerBase::ErrorOccurred;
-								break;
+								err = "error in xml <!DOCTYPE definition: SYSTEM or PUBLIC expected";
+								return false;
 							}
 						}
 						else if (m_doctype_state == 3)
@@ -429,33 +450,48 @@ public:
 					{
 						if (m_doctype_state < 5)
 						{
-							elemptr = "error in xml <!DOCTYPE definition";
-							elemsize = std::strlen( elemptr);
-							elemtype = XMLScannerBase::ErrorOccurred;
-							break;
+							err = "error in xml <!DOCTYPE definition";
+							return false;
 						}
 						m_state = ParseSource;
 						m_doctype_state = 0;
-						elemtype = XMLScannerBase::DocAttribEnd;
-						elemptr = "";
-						elemsize = 0;
-						break;
+						return true;
 					}
 					else
 					{
 						m_state = ParseSource;
 						m_doctype_state = 0;
+						return true;
 					}
-					/* no break here */
 				case ParseSource:
-					if (elemtype == XMLScannerBase::Content && !m_withEmpty)
-					{
-						std::size_t ii=0;
-						const unsigned char* cc = (const unsigned char*)elemptr;
-						for (;ii<elemsize && cc[ii] <= ' '; ++ii);
-						if (ii==elemsize) continue;
-					}
-					break;
+					err = "illegal state in xml header parser";
+					return false;
+			}
+		}
+	}
+
+	XMLScannerBase::ElementType getNext( const char*& elemptr, std::size_t& elemsize)
+	{
+		if (!m_obj) return XMLScannerBase::ErrorOccurred;
+		if (m_state != ParseSource)
+		{
+			const char* err = 0;
+			if (!parseHeader( err) || m_state != ParseSource)
+			{
+				elemptr = err?err:"unknown error";
+				elemsize = std::strlen( elemptr);
+				return XMLScannerBase::ErrorOccurred;
+			}
+		}
+		for (;;)
+		{
+			XMLScannerBase::ElementType elemtype = m_mt.m_getNext( m_obj, elemptr, elemsize);
+			if (elemtype == XMLScannerBase::Content && !m_withEmpty)
+			{
+				std::size_t ii=0;
+				const unsigned char* cc = (const unsigned char*)elemptr;
+				for (;ii<elemsize && cc[ii] <= ' '; ++ii);
+				if (ii==elemsize) continue;
 			}
 			return elemtype;
 		}
@@ -465,7 +501,7 @@ private:
 	bool createParser()
 	{
 		std::string enc;
-		parseEncoding( enc, m_attributes.getEncoding());
+		parseEncoding( enc, m_encoding);
 
 		if (m_obj)
 		{
@@ -540,7 +576,7 @@ private:
 	bool m_withEmpty;			//< do produce empty tokens (containing only spaces)
 	bool m_doTokenize;			//< do tokenize (whitespace sequences as delimiters)
 	bool m_standalone;			//< true if there is no document scema defintion
-	XMLAttributes m_attributes;		//< defines a method to call when the XML encoding has been detected
+	std::string m_encoding;			//< defines the XML encoding detected in input
 	int m_doctype_state;			//< parser doctype section parsing state
 	std::string m_doctype_root;		//< document type definition root element
 	std::string m_doctype_public;		//< document type public identifier

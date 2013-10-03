@@ -108,6 +108,11 @@ public:
 		}
 	}
 
+	virtual const char* getEncoding() const
+	{
+		return m_ref->getEncoding();
+	}
+
 	///\brief Implements FilterBase::getValue(const char*,std::string&)
 	virtual bool getValue( const char* name, std::string& val) const
 	{

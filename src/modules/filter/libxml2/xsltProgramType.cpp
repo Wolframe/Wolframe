@@ -23,11 +23,10 @@ struct XsltFilter :public Filter
 {
 	XsltFilter( const xsltStylesheetPtr stylesheet_, const std::string& arg)
 	{
-		types::CountedReference<std::string> enc;
 		XsltMapper xsltmapper( stylesheet_, arg);
-		InputFilterImpl impl( enc, xsltmapper);
+		InputFilterImpl impl( xsltmapper);
 		m_inputfilter.reset( new BufferingInputFilter( &impl));
-		m_outputfilter.reset( new OutputFilterImpl( enc, xsltmapper));
+		m_outputfilter.reset( new OutputFilterImpl( xsltmapper));
 	}
 };
 

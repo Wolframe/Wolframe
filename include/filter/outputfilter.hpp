@@ -36,16 +36,18 @@ Project Wolframe.
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "filter/filterbase.hpp"
+#include "filter/contentfilterAttributes.hpp"
 #include <string>
 #include <cstring>
-#define WOLFRAME_OUTPUT_WITH_CHECKSUM
+#undef WOLFRAME_OUTPUT_WITH_CHECKSUM
 
 namespace _Wolframe {
 namespace langbind {
 
 ///\class OutputFilter
 ///\brief Output filter
-class OutputFilter :public FilterBase
+class OutputFilter
+	:public FilterBase
 {
 public:
 	///\enum State
@@ -58,12 +60,13 @@ public:
 	};
 
 	///\brief Default constructor
-	OutputFilter()
+	explicit OutputFilter( const ContentFilterAttributes* attr_=0)
 		:types::TypeSignature("langbind::OutputFilter", __LINE__)
 		,m_state(Open)
 		,m_buf(0)
 		,m_size(0)
 		,m_pos(0)
+		,m_attr(attr_)
 #ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 		,m_chksum(0)
 		,m_chkpos(0)
@@ -79,6 +82,7 @@ public:
 		,m_buf(o.m_buf)
 		,m_size(o.m_size)
 		,m_pos(o.m_pos)
+		,m_attr(o.m_attr)
 #ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 		,m_chksum(o.m_chksum)
 		,m_chkpos(o.m_chkpos)
@@ -135,12 +139,12 @@ public:
 
 	///\brief Get the current state
 	///\return the current state
-	State state() const				{return m_state;}
+	State state() const					{return m_state;}
 
 	///\brief Set output filter state with error message
 	///\param [in] s new state
 	///\param [in] msg (optional) error to set
-	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
+	void setState( State s, const char* msg=0)		{m_state=s; setError(msg);}
 
 	///\brief Assigns the output filter state of another output filter
 	///\param [in] o the output filter to get the state from
@@ -151,6 +155,9 @@ public:
 		m_size = o.m_size;
 		m_pos = o.m_pos;
 	}
+
+	const ContentFilterAttributes* attributes() const	{return m_attr;}
+	void setAttributes( const ContentFilterAttributes* a)	{m_attr = a;}
 
 #ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 	unsigned int chksum() const
@@ -165,7 +172,6 @@ public:
 	{
 		std::size_t ii = 0;
 		for (; ii < bufsize_; ++ii) chksum_ += ((unsigned char)buf_[ pos_+ii] + 1U);
-//		chksum_ += bufsize_;
 	}
 #else
 	static void calculateCheckSum( unsigned int&, std::size_t, const char* , std::size_t ){}
@@ -198,6 +204,7 @@ private:
 	char* m_buf;				//< buffer base pointer
 	std::size_t m_size;			//< buffer size in bytes
 	std::size_t m_pos;			//< write byte position
+	const ContentFilterAttributes* m_attr;	//< reference to attributes shared from input
 #ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 	unsigned int m_chksum;			//< check sum for error detection
 	unsigned int m_chkpos;			//< check bytes written for error detection

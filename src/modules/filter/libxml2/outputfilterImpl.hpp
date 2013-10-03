@@ -52,28 +52,32 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-class OutputFilterImpl :public OutputFilter
+class OutputFilterImpl
+	:public OutputFilter
 {
 public:
-	OutputFilterImpl( const types::CountedReference<std::string>& enc, const XsltMapper& xsltMapper_)
+	typedef OutputFilter Parent;
+
+	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
 		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,m_encoding(enc)
+		,OutputFilter(attr)
 		,m_xsltMapper(xsltMapper_)
 		,m_nofroot(0)
 		,m_taglevel(0)
-		,m_elemitr(0){}
+		,m_elemitr(0)
+		{}
 
-	OutputFilterImpl( const types::CountedReference<std::string>& enc)
+	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,m_encoding(enc)
+		,OutputFilter(attr)
 		,m_nofroot(0)
 		,m_taglevel(0)
-		,m_elemitr(0){}
+		,m_elemitr(0)
+		{}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 		,OutputFilter(o)
-		,m_encoding(o.m_encoding)
 		,m_doc(o.m_doc)
 		,m_xsltMapper(o.m_xsltMapper)
 		,m_nofroot(o.m_nofroot)
@@ -81,7 +85,8 @@ public:
 		,m_attribname(o.m_attribname)
 		,m_valuestrbuf(o.m_valuestrbuf)
 		,m_elembuf(o.m_elembuf)
-		,m_elemitr(o.m_elemitr){}
+		,m_elemitr(o.m_elemitr)
+		,m_encoding(o.m_encoding){}
 
 	virtual ~OutputFilterImpl(){}
 
@@ -96,6 +101,19 @@ public:
 
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
+
+	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	virtual bool getValue( const char* name, std::string& val);
+
+	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	virtual bool setValue( const char* name, const std::string& value);
+
+	void setEncoding( const std::string& value)
+	{
+		m_encoding = value;
+	}
+
+	const char* encoding() const;
 
 private:
 	static const xmlChar* getXmlString( const std::string& aa)
@@ -113,7 +131,6 @@ private:
 	bool flushBuffer();
 
 private:
-	types::CountedReference<std::string> m_encoding;	//< character set encoding
 	DocumentWriter m_doc;					//< document writer structure
 	XsltMapper m_xsltMapper;				//< optional XSLT mapper
 	int m_nofroot;						//< number of root elements parsed
@@ -125,6 +142,7 @@ private:
 	std::string m_doctype_root;				//< !DOCTYPE root element (1)
 	std::string m_doctype_public;				//< !DOCTYPE public element (2)
 	std::string m_doctype_system;				//< !DOCTYPE system element (3)
+	std::string m_encoding;					//< character set encoding
 };
 
 }}//namespace

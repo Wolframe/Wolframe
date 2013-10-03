@@ -54,7 +54,7 @@ namespace langbind {
 
 struct InputFilterImpl :public InputFilter
 {
-	InputFilterImpl( const types::CountedReference<std::string>& e, const XsltMapper& xsltMapper_)
+	InputFilterImpl( const XsltMapper& xsltMapper_)
 		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,m_xsltMapper(xsltMapper_)
 		,m_node(0)
@@ -62,18 +62,16 @@ struct InputFilterImpl :public InputFilter
 		,m_prop(0)
 		,m_propvalues(0)
 		,m_taglevel(0)
-		,m_withEmpty(false)
-		,m_encoding(e){}
+		,m_withEmpty(false){}
 
-	explicit InputFilterImpl( const types::CountedReference<std::string>& e)
+	explicit InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
 		,m_taglevel(0)
-		,m_withEmpty(false)
-		,m_encoding(e){}
+		,m_withEmpty(false){}
 
 	InputFilterImpl( const InputFilterImpl& o)
 		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
@@ -118,22 +116,27 @@ struct InputFilterImpl :public InputFilter
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
+	virtual const char* getEncoding() const
+	{
+		return m_encoding.empty()?0:m_encoding.c_str();
+	}
+
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);
 
 private:
-	DocumentReader m_doc;					//< document reader structure
-	XsltMapper m_xsltMapper;				//< optional XSLT mapper
-	xmlNode* m_node;					//< current node value
-	xmlChar* m_value;					//< current node value
+	DocumentReader m_doc;			//< document reader structure
+	XsltMapper m_xsltMapper;		//< optional XSLT mapper
+	xmlNode* m_node;			//< current node value
+	xmlChar* m_value;			//< current node value
 	xmlAttr* m_prop;
 	xmlNode* m_propvalues;
-	int m_taglevel;						//< tag hierarchy level
-	std::vector<xmlNode*> m_nodestk;			//< stack of nodes
-	bool m_withEmpty;					//< return empty tokens as W3C requires too
-	std::string m_elembuf;					//< buffer for current element
-	types::CountedReference<std::string> m_encoding;	//< character set encoding
+	int m_taglevel;				//< tag hierarchy level
+	std::vector<xmlNode*> m_nodestk;	//< stack of nodes
+	bool m_withEmpty;			//< return empty tokens as W3C requires too
+	std::string m_elembuf;			//< buffer for current element
+	std::string m_encoding;			//< character set encoding
 };
 
 }}//namespace

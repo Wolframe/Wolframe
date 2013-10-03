@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "filter/filterbase.hpp"
+#include "filter/contentfilterAttributes.hpp"
 #include <string>
 #include <stdexcept>
 
@@ -44,7 +45,8 @@ namespace langbind {
 
 ///\class InputFilter
 ///\brief Input filter
-class InputFilter :public FilterBase
+class InputFilter
+	:public FilterBase, public ContentFilterAttributes
 {
 public:
 	///\enum State
@@ -90,6 +92,25 @@ public:
 		ptr = 0;
 		size = 0;
 		end = false;
+	}
+
+	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	virtual bool getValue( const char* name, std::string& val)
+	{
+		if (std::strcmp( name, "encoding") == 0)
+		{
+			const char* ee = getEncoding();
+			if (ee)
+			{
+				val = ee;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return FilterBase::getValue( name, val);
 	}
 
 	///\brief Get next element

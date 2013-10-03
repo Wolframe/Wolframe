@@ -29,48 +29,24 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file documentReader.hpp
-///\brief Document reader abstraction for the libxml2 library
+///\file filter/contentfilterAttributes.hpp
+///\brief Interface for attributes synchronized between by inputfilter/outputfilter
 
-#ifndef _Wolframe_LIBXML2_DOCUMENT_READER_HPP_INCLUDED
-#define _Wolframe_LIBXML2_DOCUMENT_READER_HPP_INCLUDED
-#include "libxml/parser.h"
-#include "libxml/tree.h"
-#include "libxml/encoding.h"
-#include "libxml/xmlwriter.h"
-#include "libxml/xmlsave.h"
-#include <cstdlib>
-#include <boost/shared_ptr.hpp>
+#ifndef _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
+#define _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-class DocumentReader
+class ContentFilterAttributes
 {
 public:
-	DocumentReader(){}
-
-	DocumentReader( xmlDocPtr doc);
-	DocumentReader( const DocumentReader& o)
-		:m_ptr(o.m_ptr){}
-
-	DocumentReader( const char* content, std::size_t contentsize);
-
-	xmlDocPtr get() const
-	{
-		return m_ptr.get();
-	}
-
-	std::string getContent() const;
-	const xmlChar* encoding() const
-	{
-		return m_ptr->encoding;
-	}
-
-private:
-	boost::shared_ptr<xmlDoc> m_ptr;
+	virtual const char* getEncoding() const=0;
 };
 
-}}
+typedef types::CountedReference<ContentFilterAttributes> ContentFilterAttributesR;
+
+}}//namespace
 #endif
 

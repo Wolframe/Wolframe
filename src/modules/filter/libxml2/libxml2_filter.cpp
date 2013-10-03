@@ -42,14 +42,14 @@ struct Libxml2Filter :public Filter
 {
 	Libxml2Filter( const char* encoding=0)
 	{
-		types::CountedReference<std::string> enc;
+		InputFilterImpl impl;
+		m_inputfilter.reset( new BufferingInputFilter( &impl));
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
+		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			enc.reset( new std::string( encoding));
+			oo->setEncoding( encoding);
 		}
-		InputFilterImpl impl( enc);
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
-		m_outputfilter.reset( new OutputFilterImpl( enc));
 	}
 };
 

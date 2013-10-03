@@ -102,6 +102,12 @@ struct InputFilterImpl :public InputFilter
 		}
 		return false;
 	}
+
+	virtual const char* getEncoding() const
+	{
+		return 0;
+	}
+
 private:
 	std::string m_elembuf;
 	bool m_end;				//< true if we got EoD

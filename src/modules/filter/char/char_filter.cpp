@@ -54,14 +54,15 @@ struct InputFilterImpl :public InputFilter
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
 	///\brief Constructor
-	InputFilterImpl( const IOCharset& iocharset_=IOCharset())
+	explicit InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
 		:types::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,m_itr( iocharset_)
 		,m_output(AppCharset())
 		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
 		,m_src(0)
 		,m_srcsize(0)
-		,m_srcend(false){}
+		,m_srcend(false)
+		,m_encoding(encoding_?encoding_:"UTF-8"){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -74,6 +75,7 @@ struct InputFilterImpl :public InputFilter
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
+		,m_encoding(o.m_encoding)
 	{
 		m_elembuf.resize( o.m_elembuf.size());
 		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
@@ -127,6 +129,12 @@ struct InputFilterImpl :public InputFilter
 		}
 		return false;
 	}
+
+	virtual const char* getEncoding() const
+	{
+		return m_encoding.empty()?0:m_encoding.c_str();
+	}
+
 private:
 	TextScanner m_itr;			//< iterator on input
 	AppCharset m_output;			//< output
@@ -135,6 +143,7 @@ private:
 	const char* m_src;			//< pointer to current chunk parsed
 	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
 	bool m_srcend;				//< true if end of message is in current chunk parsed
+	std::string m_encoding;			//< character set encoding
 };
 
 ///\class OutputFilterImpl
@@ -237,7 +246,7 @@ struct CharFilter :public Filter
 	{
 		if (!encoding)
 		{
-			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>( encoding));
 			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 		}
 		else
@@ -255,48 +264,48 @@ struct CharFilter :public Filter
 				}
 				if (codepage[0] == '1')
 				{
-					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>());
+					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( encoding));
 					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>());
 				}
 				else
 				{
-					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( textwolf::charset::IsoLatin( codepage[0] - '0')));
+					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( encoding, textwolf::charset::IsoLatin( codepage[0] - '0')));
 					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>( textwolf::charset::IsoLatin( codepage[0] - '0')));
 				}
 			}
 			else if (enc.size() == 0 || enc == "utf8")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 			}
 			else if (enc == "utf16" || enc == "utf16be")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
 			}
 			else if (enc == "utf16le")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
 			}
 			else if (enc == "ucs2" || enc == "ucs2be")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
 			}
 			else if (enc == "ucs2le")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
 			}
 			else if (enc == "ucs4" || enc == "ucs4be")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
 			}
 			else if (enc == "ucs4le")
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
 			}
 			else

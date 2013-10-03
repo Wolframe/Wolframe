@@ -37,22 +37,7 @@
 
 #ifndef __TEXTWOLF_XML_ATTRIBUTES_HPP__
 #define __TEXTWOLF_XML_ATTRIBUTES_HPP__
-#include <string>
-
-///\namespace textwolf
-///\brief Toplevel namespace of the library
-namespace textwolf {
-
-class DefaultXMLAttributes
-{
-public:
-	void setEncoding( const std::string& e)		{m_encoding = e;}
-	const std::string& getEncoding() const		{return m_encoding;}
-private:
-	std::string m_encoding;
-};
-
-}//namespace
+#error DEPRECATED
 #endif
 
 

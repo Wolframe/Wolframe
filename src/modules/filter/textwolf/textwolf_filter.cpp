@@ -47,36 +47,18 @@ using namespace langbind;
 
 namespace {
 
-typedef textwolf::XMLParser<textwolf::CStringIterator,std::string>  XMLParser;
-
-struct XMLFilterAttributes
-{
-	types::CountedReference<std::string> m_encoding;
-
-	void setEncoding( const std::string& encoding)
-	{
-		m_encoding.reset( new std::string( encoding));
-	}
-	const std::string& getEncoding()
-	{
-		static std::string empty;
-		return m_encoding.get()?(*m_encoding.get()):empty;
-	}
-	XMLFilterAttributes(){}
-	XMLFilterAttributes( const XMLFilterAttributes& o) :m_encoding(o.m_encoding){}
-};
+typedef textwolf::XMLParser<std::string>  XMLParser;
 
 ///\class InputFilterImpl
 ///\brief input filter for XML using textwolf
-struct InputFilterImpl:public InputFilter
+struct InputFilterImpl
+	:public InputFilter
 {
 	typedef InputFilter Parent;
 
 	///\brief Constructor
-	InputFilterImpl( const XMLFilterAttributes& attr)
+	InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
-		,m_attributes(attr)
-		,m_parser( attr)
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
@@ -86,7 +68,6 @@ struct InputFilterImpl:public InputFilter
 	InputFilterImpl( const InputFilterImpl& o)
 		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
 		,InputFilter( o)
-		,m_attributes( o.m_attributes)
 		,m_parser( o.m_parser)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
@@ -267,35 +248,23 @@ private:
 	{
 		try
 		{
-			const char* ee;
-			std::size_t eesize;
-			for (;;) switch (m_parser.state())
+			const char* err;
+			if (m_parser.state() != XMLParser::ParseSource)
 			{
-				case XMLParser::ParseHeader:
-					if (m_parser.getNext( ee, eesize) == textwolf::XMLScannerBase::ErrorOccurred)
-					{
-						setState( Error, ee);
-						return false;
-					}
-					if (m_parser.isStandalone()) return true;
-					continue;
-
-				case XMLParser::ParseDoctype:
-					if (m_parser.getNext( ee, eesize) == textwolf::XMLScannerBase::ErrorOccurred)
-					{
-						setState( Error, ee);
-						return false;
-					}
-					continue;
-
-				case XMLParser::ParseSource:
+				if (!m_parser.parseHeader( err))
 				{
-					doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
-					doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
-					doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
+					setState( Error, err);
+					return false;
+				}
+				if (m_parser.isStandalone())
+				{
 					return true;
 				}
 			}
+			doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
+			doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
+			doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
+			return true;
 		}
 		catch (textwolf::SrcIterator::EoM)
 		{
@@ -304,10 +273,13 @@ private:
 		};
 	}
 
-private:
-	typedef textwolf::XMLParser<std::string,XMLFilterAttributes> XMLParser;
+	virtual const char* getEncoding() const
+	{
+		return m_parser.getEncoding();
+	}
 
-	XMLFilterAttributes m_attributes;	//< common attributes of input and output filter
+private:
+	typedef textwolf::XMLParser<std::string> XMLParser;
 	XMLParser m_parser;			//< XML parser
 	const char* m_src;			//< pointer to current chunk parsed
 	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
@@ -322,11 +294,11 @@ struct OutputFilterImpl :public OutputFilter
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	OutputFilterImpl( const XMLFilterAttributes& attr)
+	OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:types::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
+		,OutputFilter(attr)
 		,m_elemitr(0)
-		,m_attributes(attr)
-		,m_printer(attr){}
+		,m_encodingSet(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -335,7 +307,8 @@ struct OutputFilterImpl :public OutputFilter
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_attributes(o.m_attributes)
+		,m_encoding(o.m_encoding)
+		,m_encodingSet(o.m_encodingSet)
 		,m_printer(o.m_printer){}
 
 	virtual ~OutputFilterImpl(){}
@@ -367,6 +340,11 @@ struct OutputFilterImpl :public OutputFilter
 		m_printer.setDocumentType( doctype.rootid, doctype.publicid, doctype.systemid);
 	}
 
+	void setEncoding( const std::string& value)
+	{
+		m_encoding = value;
+	}
+
 	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
@@ -389,6 +367,12 @@ struct OutputFilterImpl :public OutputFilter
 		switch (type)
 		{
 			case OutputFilter::OpenTag:
+				if (!m_encodingSet)
+				{
+					const char* enc = encoding();
+					m_printer.setEncoding( enc?enc:"UTF-8", m_elembuf);
+					m_encodingSet = true;
+				}
 				if (!m_printer.printOpenTag( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (open tag)");
@@ -425,13 +409,34 @@ struct OutputFilterImpl :public OutputFilter
 		return true;
 	}
 
+	const char* encoding() const
+	{
+		if (m_encoding.empty())
+		{
+			if (attributes())
+			{
+				return attributes()->getEncoding();
+			}
+			return 0;
+		}
+		else
+		{
+			return m_encoding.c_str();
+		}
+	}
+
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* name, std::string& val)
 	{
 		if (std::strcmp( name, "encoding") == 0)
 		{
-			val = m_attributes.getEncoding();
-			return true;
+			const char* ee = encoding();
+			if (ee)
+			{
+				val = ee;
+				return true;
+			}
+			return false;
 		}
 		return Parent::getValue( name, val);
 	}
@@ -441,18 +446,19 @@ struct OutputFilterImpl :public OutputFilter
 	{
 		if (std::strcmp( name, "encoding") == 0)
 		{
-			m_attributes.setEncoding( value);
+			m_encoding = value;
 			return true;
 		}
 		return Parent::setValue( name, value);
 	}
 
 private:
-	typedef textwolf::XMLPrinter<std::string,XMLFilterAttributes> XMLPrinter;
+	typedef textwolf::XMLPrinter<std::string> XMLPrinter;
 
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output
-	XMLFilterAttributes m_attributes;		//< common attributes of input and output filter
+	std::string m_encoding;				//< common attributes of input and output filter
+	bool m_encodingSet;				//< true, if the output character set encoding has been defined
 	XMLPrinter m_printer;				//< xml printer object
 };
 
@@ -463,13 +469,13 @@ class TextwolfXmlFilter :public Filter
 public:
 	TextwolfXmlFilter( const char* encoding=0)
 	{
-		XMLFilterAttributes attr;
+		m_inputfilter.reset( new InputFilterImpl());
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
+		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			attr.setEncoding( encoding);
+			oo->setEncoding( encoding);
 		}
-		m_inputfilter.reset( new InputFilterImpl( attr));
-		m_outputfilter.reset( new OutputFilterImpl( attr));
 	}
 };
 

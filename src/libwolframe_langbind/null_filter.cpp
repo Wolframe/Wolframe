@@ -80,6 +80,11 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
+	virtual const char* getEncoding() const
+	{
+		return 0;
+	}
+
 	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType&, const void*&, std::size_t&)
 	{

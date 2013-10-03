@@ -98,6 +98,43 @@ void DirectmapProgram::loadProgram( const std::string& filename)
 	}
 }
 
+static std::string parseFilterArguments( std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	static const utils::CharTable optab( "(),");
+	std::string rt;
+	std::string tok;
+	int taglevel = 1;
+	char ch;
+	for (;;)
+	{
+		ch = utils::parseNextToken( tok, si, se, optab);
+		if (!ch) throw std::runtime_error("brackets not balanced in filter arguments");
+		if (ch == ')')
+		{
+			--taglevel;
+			if (taglevel == 0) return rt;
+		}
+		else if (ch == '(')
+		{
+			++taglevel;
+		}
+		else if (ch == ',')
+		{
+			rt.push_back( ch);
+		}
+		else if (ch == '"' || ch == '\'')
+		{
+			rt.push_back( ch);
+			rt.append( tok);
+			rt.push_back( ch);
+		}
+		else
+		{
+			rt.append( tok);
+		}
+	}
+}
+
 static DirectmapCommandDescription parseCommandDescription( std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	DirectmapCommandDescription rt;
@@ -253,6 +290,12 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				input_filter_set = true;
 				rt.inputfilter = tok;
 				state = ParseAttributeFilter;
+				ch = utils::gotoNextToken( si, se);
+				if (ch == '(')
+				{
+					++si;
+					rt.inputfilterarg = parseFilterArguments( si, se);
+				}
 				continue;
 
 			case ParseOutputFilter:
@@ -260,6 +303,12 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				output_filter_set = true;
 				rt.outputfilter = tok;
 				state = ParseAttributeFilter;
+				ch = utils::gotoNextToken( si, se);
+				if (ch == '(')
+				{
+					++si;
+					rt.inputfilterarg = parseFilterArguments( si, se);
+				}
 				continue;
 		}
 	}

@@ -23,6 +23,8 @@
 #
 TESTCMD="$testcmd"
 TESTNAME="$testname"
+INPUTFILTER="$inputfilter"
+OUTPUTFILTER="$outputfilter"
 PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
@@ -36,3 +38,6 @@ do
 done
 testcmd="$TESTCMD"
 testname="$TESTNAME"
+inputfilter="$INPUTFILTER"
+outputfilter="$OUTPUTFILTER"
+

@@ -19,8 +19,14 @@
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too
 # - testdata		(optional) additionaly defined test data
+# - inputfilter		(optional) explicitely defined inputfilter
+# - outputfilter	(optional) explicitely defined outputfilter
 #
+TESTCMD="$testcmd"
+TESTNAME="$testname"
 CSETLIST=$csetlist
+INPUTFILTER="$inputfilter"
+OUTPUTFILTER="$outputfilter"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	if [ x"$csetlist" = x ]; then
 		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
@@ -39,3 +45,7 @@ else
 	. ./output_tst_nofilter.sh
 	csetlist="$CSETLIST"
 fi
+testcmd="$TESTCMD"
+testname="$TESTNAME"
+inputfilter="$INPUTFILTER"
+outputfilter="$OUTPUTFILTER"

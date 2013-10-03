@@ -14,15 +14,21 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
 	/I"$(WIN_ICONV_DIR)" \
+	/I"$(LIBXSLT_INCLUDE_DIRS)" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
+
+!IFDEF WITH_LIBXSLT
+INCLUDE_XSLT_LIBS="$(LIBXSLT_DIR)\lib\libxslt.lib"
+!ENDIF
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	"$(LIBXML2_DIR)\lib\libxml2.lib"
+	"$(LIBXML2_DIR)\lib\libxml2.lib" $(INCLUDE_XSLT_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_filter_libxml2.dll

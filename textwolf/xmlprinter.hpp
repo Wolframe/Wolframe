@@ -41,7 +41,6 @@
 #include "textwolf/textscanner.hpp"
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmltagstack.hpp"
-#include "textwolf/xmlattributes.hpp"
 #include <cstring>
 #include <cstdlib>
 
@@ -53,7 +52,7 @@ template <class BufferType>
 struct XMLPrinterBase
 {
 	typedef void (*PrintDoctype)( void* obj, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
-	typedef void (*PrintHeader)( void* obj, bool standalone, BufferType& buf);
+	typedef void (*PrintHeader)( void* obj, const char* encoding, bool standalone, BufferType& buf);
 	typedef bool (*PrintProc)( void* obj, const char* elemptr, std::size_t elemsize, BufferType& buf);
 	typedef bool (*PrintProcEmpty)( void* obj, BufferType& buf);
 	typedef void* (*CopyObj)( void* obj);
@@ -93,7 +92,7 @@ struct XMLPrinterBase
 ///\tparam IOCharset Character set encoding of input and output
 ///\tparam AppCharset Character set encoding of the application processor
 ///\tparam BufferType STL back insertion sequence to use for printing output
-template <class BufferType, class IOCharset, class AppCharset, class XMLAttributes>
+template <class BufferType, class IOCharset, class AppCharset>
 class XMLPrinterObject
 {
 private:
@@ -102,14 +101,14 @@ private:
 	///\class This
 	struct This
 	{
-		This( const XMLAttributes& a)
-			:m_state(Init),m_attributes(a){}
+		This()
+			:m_state(Init){}
 
-		This( const XMLAttributes& a, const IOCharset& output_)
-			:m_state(Init),m_attributes(a),m_output(output_){}
+		This( const IOCharset& output_)
+			:m_state(Init),m_output(output_){}
 
 		This( const This& o)
-			:m_state(o.m_state),m_buf(o.m_buf),m_tagstack(o.m_tagstack),m_attributes(o.m_attributes){}
+			:m_state(o.m_state),m_buf(o.m_buf),m_tagstack(o.m_tagstack){}
 
 
 		///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
@@ -209,11 +208,10 @@ private:
 			m_output.print( (textwolf::UChar)(unsigned char)ch, buf);
 		}
 
-		void printHeader( bool standalone, BufferType& buf)
+		void printHeader( const char* encoding, bool standalone, BufferType& buf)
 		{
 			if (m_state != Init) throw std::logic_error( "printing document not starting with xml header");
-			std::string enc = m_attributes.getEncoding();
-			if (enc.empty()) enc = "UTF-8";
+			std::string enc = encoding?encoding:"UTF-8";
 			printToBuffer( "<?xml version=\"1.0\" encoding=\"", 30, buf);
 			printToBuffer( enc.c_str(), enc.size(), buf);
 			if (standalone)
@@ -358,14 +356,13 @@ private:
 		State m_state;					//< output state
 		BufferType m_buf;				//< element output  buffer
 		TagStack m_tagstack;				//< tag name stack of open tags
-		XMLAttributes m_attributes;			//< xml encoding
 		IOCharset m_output;				//< output character set encoding
 	};
 
 public:
-	static void* createObj( const XMLAttributes& a)
+	static void* createObj()
 	{
-		return new This( a);
+		return new This();
 	}
 
 	static void* copyObj( void* obj_)
@@ -375,10 +372,10 @@ public:
 		return rt;
 	}
 
-	static void printHeader( void* obj_, bool standalone, BufferType& buf)
+	static void printHeader( void* obj_, const char* encoding, bool standalone, BufferType& buf)
 	{
 		This* obj = (This*)obj_;
-		obj->printHeader( standalone, buf);
+		obj->printHeader( encoding, standalone, buf);
 	}
 
 	static void printDoctype( void* obj_, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
@@ -416,7 +413,7 @@ public:
 		delete (This*)obj;
 	}
 
-	static void* create( MethodTable& mt, const XMLAttributes& a)
+	static void* create( MethodTable& mt)
 	{
 		mt.m_printDoctype = printDoctype;
 		mt.m_printHeader = printHeader;
@@ -426,7 +423,7 @@ public:
 		mt.m_printValue = printValue;
 		mt.m_copy = copyObj;
 		mt.m_del = deleteObj;
-		return createObj( a);
+		return createObj();
 	}
 
 	static void* copy( MethodTable& mt, void* obj)
@@ -446,17 +443,16 @@ public:
 
 ///\brief Class for XML printing to a buffer
 ///\tparam BufferType type to use as buffer (STL back insertion interface)
-template <class BufferType, class XMLAttributes=DefaultXMLAttributes>
+template <class BufferType>
 class XMLPrinter :public XMLPrinterBase<BufferType>
 {
 public:
-	XMLPrinter( const XMLAttributes& a)
-		:m_obj(0),m_attributes(a){}
+	XMLPrinter()
+		:m_obj(0){}
 
 	XMLPrinter( const XMLPrinter& o)
 		:m_mt(o.m_mt)
 		,m_obj(0)
-		,m_attributes(o.m_attributes)
 		,m_doctype_root(o.m_doctype_root)
 		,m_doctype_public(o.m_doctype_public)
 		,m_doctype_system(o.m_doctype_system)
@@ -481,49 +477,48 @@ public:
 
 	bool printOpenTag( const char* src, std::size_t srcsize, BufferType& buf)
 	{
-		if (!m_obj)
-		{
-			if (!createPrinter()) return false;
-			if (m_doctype_root.size())
-			{
-				if (srcsize != m_doctype_root.size() || std::memcmp( m_doctype_root.c_str(), src, srcsize) != 0)
-				{
-					throw std::runtime_error( "printed document root does not match to DOCTYPE");
-				}
-				m_mt.m_printHeader( m_obj, false, buf);
-				m_mt.m_printDoctype( m_obj, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0, buf);
-			}
-			else
-			{
-				m_mt.m_printHeader( m_obj, true, buf);
-			}
-		}
+		if (!m_obj) return false;
 		return m_mt.m_printOpenTag( m_obj, src, srcsize, buf);
 	}
 
 	bool printCloseTag( BufferType& buf)
 	{
-		if (!m_obj) if (!createPrinter()) return false;
+		if (!m_obj) return false;
 		return m_mt.m_printCloseTag( m_obj, buf);
 	}
 
 	bool printAttribute( const char* src, std::size_t srcsize, BufferType& buf)
 	{
-		if (!m_obj) if (!createPrinter()) return false;
+		if (!m_obj) return false;
 		return m_mt.m_printAttribute( m_obj, src, srcsize, buf);
 	}
 
 	bool printValue( const char* src, std::size_t srcsize, BufferType& buf)
 	{
-		if (!m_obj) if (!createPrinter()) return false;
+		if (!m_obj) return false;
 		return m_mt.m_printValue( m_obj, src, srcsize, buf);
 	}
 
+	void setEncoding( const char* encoding, BufferType& buf)
+	{
+		if (m_obj) throw std::logic_error( "set encoding not possible in this state");
+		if (!createPrinter( encoding)) throw std::logic_error( "cannot create XML output for this character set encoding");
+		if (m_doctype_root.size())
+		{
+			m_mt.m_printHeader( m_obj, encoding, false, buf);
+			m_mt.m_printDoctype( m_obj, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0, buf);
+		}
+		else
+		{
+			m_mt.m_printHeader( m_obj, encoding, true, buf);
+		}
+	}
+
 private:
-	bool createPrinter()
+	bool createPrinter( const char* encoding)
 	{
 		std::string enc;
-		XMLPrinterBase<BufferType>::parseEncoding( enc, m_attributes.getEncoding());
+		XMLPrinterBase<BufferType>::parseEncoding( enc, encoding);
 
 		if (m_obj)
 		{
@@ -534,35 +529,35 @@ private:
 		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
 		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin, charset::UTF8>::create( m_mt);
 		}
 		else if (enc.size() == 0 || enc == "utf8")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF8, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UTF8, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "utf16" || enc == "utf16be")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF16BE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UTF16BE, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "utf16le")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF16LE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UTF16LE, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "ucs2" || enc == "ucs2be")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS2BE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UCS2BE, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "ucs2le")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS2LE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UCS2LE, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "ucs4" || enc == "ucs4be")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS4BE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UCS4BE, charset::UTF8>::create( m_mt);
 		}
 		else if (enc == "ucs4le")
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS4LE, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::UCS4LE, charset::UTF8>::create( m_mt);
 		}
 		return m_obj;
 	}
@@ -572,7 +567,6 @@ private:
 
 	MethodTable m_mt;			//< method table of m_obj
 	void* m_obj;				//< pointer to parser objecct
-	XMLAttributes m_attributes;		//< xml encoding
 	std::string m_doctype_root;		//< document type definition root element
 	std::string m_doctype_public;		//< document type public identifier
 	std::string m_doctype_system;		//< document type system URI of validation schema

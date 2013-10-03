@@ -74,6 +74,7 @@ void DirectmapCommandHandler::initcall()
 		m_outputform.reset( new types::Form( df));
 	}
 	std::string input_filtername;
+	std::string input_filterarg;
 	if (m_cmd->inputfilter.empty())
 	{
 		input_filtername = m_ctx->filter();
@@ -81,8 +82,10 @@ void DirectmapCommandHandler::initcall()
 	else
 	{
 		input_filtername = m_cmd->inputfilter;
+		input_filterarg = m_cmd->inputfilterarg;
 	}
 	std::string output_filtername;
+	std::string output_filterarg;
 	if (m_cmd->outputfilter.empty())
 	{
 		output_filtername = m_ctx->filter();
@@ -90,6 +93,7 @@ void DirectmapCommandHandler::initcall()
 	else
 	{
 		output_filtername = m_cmd->outputfilter;
+		output_filterarg = m_cmd->outputfilterarg;
 	}
 	m_function = m_provider->formFunction( m_cmd->call);
 	if (!m_function)
@@ -101,7 +105,7 @@ void DirectmapCommandHandler::initcall()
 
 	if (input_filtername == output_filtername)
 	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, ""));
+		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, input_filterarg));
 		if (!filter.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
@@ -111,12 +115,12 @@ void DirectmapCommandHandler::initcall()
 	}
 	else
 	{
-		types::CountedReference<langbind::Filter> filter_i( m_provider->filter( input_filtername, ""));
+		types::CountedReference<langbind::Filter> filter_i( m_provider->filter( input_filtername, input_filterarg));
 		if (!filter_i.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
 		}
-		types::CountedReference<langbind::Filter> filter_o( m_provider->filter( output_filtername, ""));
+		types::CountedReference<langbind::Filter> filter_o( m_provider->filter( output_filtername, output_filterarg));
 		if (!filter_o.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + output_filtername + "'");
@@ -151,6 +155,7 @@ void DirectmapCommandHandler::initcall()
 	{
 		m_outputfilter = l_outputfilter;
 	}
+
 	if (m_outputform.get())
 	{
 		const char* xmlroot = m_outputform->description()->xmlRoot();
@@ -160,6 +165,9 @@ void DirectmapCommandHandler::initcall()
 			m_outputfilter->setDocType( xmlDoctype);
 		}
 	}
+	// synchronize attributes:
+	m_outputfilter->setAttributes( m_inputfilter.get());
+
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
 }

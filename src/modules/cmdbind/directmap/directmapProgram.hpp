@@ -48,14 +48,18 @@ struct DirectmapCommandDescription
 		:name(o.name)
 		,call(o.call)
 		,inputfilter(o.inputfilter)
+		,inputfilterarg(o.inputfilterarg)
 		,outputfilter(o.outputfilter)
+		,outputfilterarg(o.outputfilterarg)
 		,inputform(o.inputform)
 		,outputform(o.outputform){}
 
 	std::string name;						//< name of program
 	std::string call;						//< name of the transaction or form function
 	std::string inputfilter;					//< name of the input filter
+	std::string inputfilterarg;					//< arguments of the input filter
 	std::string outputfilter;					//< name of the output filter
+	std::string outputfilterarg;					//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
 
