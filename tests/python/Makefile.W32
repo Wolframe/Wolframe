@@ -14,8 +14,13 @@ INCLUDE_DIRS = \
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS =
 
-INCLUDE_LIBS = \
+!IFNDEF DEBUG
+INCLUDE_LIBS = $(INCLUDE_LIBS) \
 	"$(PYTHON_DIR)\libs\python33.lib"
+!ELSE
+INCLUDE_LIBS = $(INCLUDE_LIBS) \
+	"$(PYTHON_DIR)\libs\python33_d.lib"
+!ENDIF
 
 TEST_CPP_BINS = \
 	embed.exe
@@ -34,5 +39,9 @@ local_clean:
 local_distclean:
 
 local_test:
-#	@-copy "$(PYTHON3)\lib\python3.dll" .
+!IFNDEF DEBUG
+	@-copy "$(PYTHON_DIR)\libs\python33.dll" .
+!ELSE
+	@-copy "$(PYTHON_DIR)\libs\python33_d.dll" .
+!ENDIF
 	@-embed my > test.RES

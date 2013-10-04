@@ -364,6 +364,12 @@ your own:
 cd PCBuild
 pcbuild.sln
 build the Debug version
+(Read PCBuild/readme.txt!)
+
+(Careful: Evil mean shortcut, build the solution till it breaks,
+copy python33_d.exp python33_d.lib and python33_d.dll to
+c:\Python33\libs of the release installation, make sure you
+take EXACTLY the same version!)
 
 Adapt PYTHON_DIR in 'makefiles\nmake\config.mk'.
 
