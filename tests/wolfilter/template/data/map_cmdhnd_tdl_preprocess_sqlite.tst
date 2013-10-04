@@ -26,7 +26,7 @@ opt="$opt --program=preprocess.wnmp"			# normalization for DDL types
 opt="$opt --program=preprocess.lua"			# Lua commands
 
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
-testcmd="$opt run"					# command to execute by the test
+testcmd="$opt AllDataRequest"				# command to execute by the test
 testscripts=""						# list of scripts of the test
 docin=tdl_preprocess.in					# input document name
 docout=tdl_preprocess_sqlite.out			# output document name

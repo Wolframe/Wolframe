@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE data SYSTEM "AllDataRequest">
 <data/>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --cmdprogram=preprocess.dmap --program=preprocess.sfrm --program=preprocess.tdl --program=preprocess.wnmp --program=preprocess.lua --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --cmdprogram=preprocess.dmap --program=preprocess.sfrm --program=preprocess.tdl --program=preprocess.wnmp --program=preprocess.lua --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' AllDataRequest
 
 **file:preprocess.sfrm
 FORM PersonRef
@@ -308,7 +308,7 @@ BEGIN
 	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
 END
 **file:preprocess.dmap
-run( xml:AllDataRequest) :Data;
+COMMAND (AllDataRequest) CALL(run) RETURN(Data);
 **file:preprocess.lua
 function run( inp )
 	it = inp:table()

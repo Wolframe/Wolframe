@@ -28,7 +28,7 @@ OUTPUTFILTER="$outputfilter"
 PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
-filter="xml:textwolf"
+filter="textwolf"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
 	testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"

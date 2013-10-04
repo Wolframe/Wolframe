@@ -158,8 +158,9 @@ static std::vector<langbind::FilterArgument> parseFilterArguments( std::string::
 static DirectmapCommandDescription parseCommandDescription( std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	DirectmapCommandDescription rt;
-	static const utils::CharTable optab( ";");
+	static const utils::CharTable optab( ";()");
 	std::string tok;
+	std::vector<std::string> toklist;
 	std::string cmdname;
 	std::string in_doctype;
 	std::string out_doctype;
@@ -179,6 +180,26 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	for (; ch != ';' && ch; ch = utils::parseNextToken( tok, si, se, optab))
 	{
 		Lexem lexem = IDENTIFIER;
+		toklist.clear();
+		if (ch == '(')
+		{
+			for (;;)
+			{
+				ch = utils::parseNextToken( tok, si, se, optab);
+				if (ch == ')') break;
+				if (!ch) throw std::runtime_error( "unexpected end of expression: argument list not closed with ')'");
+				if (optab[ch]) throw std::runtime_error("expected identifier or string as argument of COMMAND");
+				toklist.push_back( tok);
+			}
+			if (toklist.size())
+			{
+				tok = toklist.at(0);
+			}
+			else
+			{
+				tok.clear();
+			}
+		}
 		if (ch != '\'' && ch != '"')
 		{
 			if (boost::iequals( tok, "PASS"))
@@ -213,8 +234,23 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 		{
 			case ParseCommand:
 				if (lexem != IDENTIFIER) throw std::runtime_error( std::string("expected identifier after command and got keyword '") + tok + "'");
-				cmdname = tok;
-				state = ParseInputDoctype;
+				if (toklist.size() > 2) throw std::runtime_error( "to many arguments for COMMAND");
+				if (toklist.size() == 2)
+				{
+					cmdname = toklist.at(0);
+					in_doctype = toklist.at(1);
+					state = ParseAttribute;
+					break;
+				}
+				else if (tok.empty())
+				{
+					throw std::runtime_error( "expected nonempty argument for COMMAND");
+				}
+				else
+				{
+					cmdname = tok;
+					state = ParseInputDoctype;
+				}
 				break;
 
 			case ParseInputDoctype:
@@ -225,8 +261,14 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					state = ParseAttribute;
 					/*no break here!*/
 				}
+				else if (tok.empty())
+				{
+					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for COMMAND");
+					throw std::runtime_error( "expected nonempty argument for document type of command");
+				}
 				else
 				{
+					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for COMMAND");
 					in_doctype = tok;
 					state = ParseAttribute;
 					break;
@@ -271,6 +313,8 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 
 			case ParseReturnArg:
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of RETURN");
+				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
+				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for RETURN");
 				return_arg_set = true;
 				return_arg = tok;
 				state = ParseAttribute;
@@ -278,6 +322,8 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 
 			case ParseCallArg:
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of CALL");
+				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for CALL");
+				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for CALL");
 				call_arg_set = true;
 				call_arg = tok;
 				state = ParseAttribute;
@@ -294,9 +340,11 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					state = ParseOutputFilter;
 					continue;
 				}
-				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of CALL");
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER");
+				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER");
 				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER");
 				if (output_filter_set) throw std::runtime_error("duplicate definition of FILTER");
+				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER");
 				input_filter_set = true;
 				rt.inputfilter = tok;
 				output_filter_set = true;
@@ -306,7 +354,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 
 			case ParseInputFilter:
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER INPUT");
-				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER");
+				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER INPUT");
+				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER INPUT");
+				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER INPUT");
 				input_filter_set = true;
 				rt.inputfilter = tok;
 				state = ParseAttributeFilter;
@@ -320,6 +370,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 
 			case ParseOutputFilter:
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER OUTPUT");
+				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER OUTPUT");
+				if (output_filter_set) throw std::runtime_error("duplicate definition of FILTER OUTPUT");
+				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER OUTPUT");
 				output_filter_set = true;
 				rt.outputfilter = tok;
 				state = ParseAttributeFilter;

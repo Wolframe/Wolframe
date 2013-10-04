@@ -132,13 +132,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					try
 					{
-						std::string comment;
-						if (!fltr->category().empty() && !m_programs->existsFilter( fltr->category()))
-						{
-							comment = std::string( " as default '") + fltr->category() + "' filter";
-						}
 						m_programs->defineFilterConstructor( fltr);
-						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ") " << comment;
+						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ")";
 					}
 					catch (const std::runtime_error& e)
 					{

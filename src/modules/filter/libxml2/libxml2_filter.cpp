@@ -56,7 +56,7 @@ struct Libxml2Filter :public Filter
 
 Filter _Wolframe::langbind::createLibxml2Filter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
-	const char* filterbasename = "xml:libxml2";
+	const char* filterbasename = "libxml2";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	if (nam != filterbasename) throw std::runtime_error( "libxml2 filter name does not match");

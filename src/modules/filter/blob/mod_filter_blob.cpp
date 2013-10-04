@@ -53,7 +53,7 @@ namespace {
 struct BlobFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "BlobFilter", "blob", "", lb::createBlobFilterPtr);}
+		{return new FilterBuilder( "BlobFilter", "blob", lb::createBlobFilterPtr);}
 };
 
 }//anonymous namespace

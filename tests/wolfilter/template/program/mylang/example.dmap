@@ -1,1 +1,1 @@
-run( xml:CDCatalog) :CDCatalog;
+COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);

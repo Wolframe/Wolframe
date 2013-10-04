@@ -22,13 +22,13 @@ opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
 opt="$opt --cmdprogram=test.dmap"
-testcmd="$opt run"					# command to execute by the test
+testcmd="$opt employee_assignment_print"		# command to execute by the test
 testscripts="$formname_in $formname_out"		# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=map_cmdhnd_transaction_outputform		# output document name
 testdata="
 **file: test.dmap
-run = test_transaction( xml :employee_assignment_print) :$testname;
+COMMAND(employee_assignment_print) CALL(test_transaction) RETURN ($testname);
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBRES

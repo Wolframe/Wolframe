@@ -5,7 +5,7 @@
 **config
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
---filter 'xml:textwolf'
+--filter 'textwolf'
 --database 'identifier=testdb,outfile=DBOUT,file=DBRES'
 --program=DBIN.tdl
 testcall

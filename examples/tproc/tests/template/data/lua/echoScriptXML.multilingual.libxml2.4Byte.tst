@@ -21,7 +21,7 @@ recode lat1..ibmpc >> $output <<!TEST
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "xml:libxml2")
+	f = filter( "libxml2")
 	f.empty = false
 
 	input:as( f)

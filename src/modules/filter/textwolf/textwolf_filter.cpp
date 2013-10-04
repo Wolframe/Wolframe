@@ -482,7 +482,7 @@ public:
 
 Filter _Wolframe::langbind::createTextwolfXmlFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
-	const char* filterbasename = "xml:textwolf";
+	const char* filterbasename = "textwolf";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	if (nam != filterbasename) throw std::runtime_error( "textwolf xml filter name does not match");

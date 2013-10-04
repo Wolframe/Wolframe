@@ -1,10 +1,10 @@
 #!/bin/sh
-testname=`basename $0 ".tst"`				# name of the test
+testname=`basename $0 ".tst"`					# name of the test
 opt=""
-testcmd="--config wolframe.conf run"			# command to execute by the test
-docin=schema_select_task_by_id				# input document name
-docout=output_schema_select_task_by_id			# output document name
-dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
+testcmd="--config wolframe.conf schema_select_task_by_id"	# command to execute by the test
+docin=schema_select_task_by_id					# input document name
+docout=output_schema_select_task_by_id				# output document name
+dumpout="program/schema_select_task_by_id.dbdump.txt"		# resource dump to add to expected test output
 testdata="
 **requires:DISABLED WIN32
 **file: schema_select_task_by_id.sfrm

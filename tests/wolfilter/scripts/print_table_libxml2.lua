@@ -1,6 +1,6 @@
 
 function run()
-	f = filter( "xml")
+	f = filter( "libxml2")
 	f.empty = false
 	input:as( f)
 	output:as( filter( "blob"))

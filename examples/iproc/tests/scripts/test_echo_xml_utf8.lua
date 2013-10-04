@@ -1,6 +1,6 @@
 function run( )
-	inpf = filter( "XML:textwolf")
-	outf = filter( "XML:textwolf", "UTF-8")
+	inpf = filter( "textwolf")
+	outf = filter( "textwolf", "UTF-8")
 	inpf.empty = false
 
 	-- parsing and echoing the content as defined

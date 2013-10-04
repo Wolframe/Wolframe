@@ -105,16 +105,16 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table.lua run
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table_libxml2.lua run
 
 **file:simpleform_range.wnmp
 iNt=number:integer(10);
 uint=numbeR:unsigned(10);
 float=number:fLoat(10,10);
-**file: print_table.lua
+**file: print_table_libxml2.lua
 
 function run()
-	f = filter( "xml")
+	f = filter( "libxml2")
 	f.empty = false
 	input:as( f)
 	output:as( filter( "blob"))

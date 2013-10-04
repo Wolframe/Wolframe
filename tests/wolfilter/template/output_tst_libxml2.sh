@@ -28,7 +28,7 @@ OUTPUTFILTER="$outputfilter"
 PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
-filter="xml:libxml2"
+filter="libxml2"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
 	testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 $testcmd"

@@ -36,7 +36,7 @@ class XsltFilterConstructor
 {
 public:
 	XsltFilterConstructor( const std::string& sourcefile_)
-		:module::FilterConstructor( utils::getFileStem(sourcefile_), "", 0)
+		:module::FilterConstructor( utils::getFileStem(sourcefile_), 0)
 	{
 		xsltStylesheetPtr pp = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
 		if (!pp)

@@ -53,7 +53,7 @@ namespace {
 struct LineFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "LineFilter", "line", "", lb::createLineFilterPtr);}
+		{return new FilterBuilder( "LineFilter", "line", lb::createLineFilterPtr);}
 };
 
 }//anonymous namespace

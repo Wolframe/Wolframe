@@ -52,6 +52,17 @@ void DirectmapContext::loadPrograms( const std::vector<std::string>& prgfiles_)
 	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
 }
 
+const std::string& DirectmapContext::filter( const std::string& docformat) const
+{
+	types::keymap<std::string>::const_iterator ki = m_filtermap.find( docformat);
+	if (ki == m_filtermap.end())
+	{
+		ki = m_filtermap.find( std::string());
+		if (ki == m_filtermap.end()) throw std::runtime_error( "document format not defined");
+	}
+	return ki->second;
+}
+
 void DirectmapCommandHandler::initcall( const std::string& docformat)
 {
 	m_cmd = m_ctx->command( m_name);

@@ -53,7 +53,7 @@ namespace {
 struct TokenFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "TokenFilter", "token", "", lb::createTokenFilterPtr);}
+		{return new FilterBuilder( "TokenFilter", "token", lb::createTokenFilterPtr);}
 };
 
 }//anonymous namespace

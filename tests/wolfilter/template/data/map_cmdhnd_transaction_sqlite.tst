@@ -21,13 +21,13 @@ opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=D
 opt="$opt --program=DBPRG.tdl"
 opt="$opt --cmdprogram=test.dmap"
 testscripts="$formname"					# list of scripts of the test
-testcmd="$opt run"					# command to execute by the test
+testcmd="$opt schema_select_task_by_id"			# command to execute by the test
 docin=schema_select_task_by_id				# input document name
 docout=output_schema_select_task_by_id			# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
 **file: test.dmap
-run = test_transaction( xml :schema_select_task_by_id);
+COMMAND schema_select_task_by_id CALL test_transaction;
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA

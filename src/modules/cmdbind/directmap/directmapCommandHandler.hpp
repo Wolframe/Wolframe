@@ -68,16 +68,7 @@ public:
 		m_filtermap[ docformat] = filter_;
 	}
 
-	const std::string& filter( const std::string& docformat) const
-	{
-		types::keymap<std::string>::const_iterator ki = m_filtermap.find( docformat);
-		if (ki == m_filtermap.end())
-		{
-			ki = m_filtermap.find( std::string());
-			if (ki == m_filtermap.end()) throw std::runtime_error( "document format not defined");
-		}
-		return ki->second;
-	}
+	const std::string& filter( const std::string& docformat) const;
 
 	bool checkReferences( const proc::ProcessorProvider* provider) const
 	{

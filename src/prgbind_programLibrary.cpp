@@ -247,14 +247,6 @@ public:
 			throw std::runtime_error( std::string("duplicate definition of filter '") + f->name() + "'");
 		}
 		m_filterMap.insert( f->name(), f);
-		if (!f->category().empty())
-		{
-			types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( f->category());
-			if (fi == m_filterMap.end())
-			{
-				m_filterMap.insert( f->category(), f);
-			}
-		}
 	}
 
 	const types::FormDescription* getFormDescription( const std::string& name) const

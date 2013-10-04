@@ -48,7 +48,7 @@ namespace {
 struct CharFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "CharFilter", "char", "", lb::createCharFilterPtr);}
+		{return new FilterBuilder( "CharFilter", "char", lb::createCharFilterPtr);}
 };
 
 }//anonymous namespace

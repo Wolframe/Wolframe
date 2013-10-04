@@ -1,6 +1,6 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-luascript=`echo $testname | sed 's/lua_//' | sed 's/_testtrace//'`.lua
+luascript=print_table_libxml2.lua
 formname="invoice.sfrm"
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
@@ -27,8 +27,9 @@ opt="$opt --cmdprogram $luascript"			# script to execute
 testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript $formname invoice.sprn"		# list of scripts of the test
 docin=invoice_example					# input document name
-docout=$testname					# output document name
+docout=lua_print_table_testtrace			# output document name
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`"
-. ./output_tst_all.sh
+csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
+. ./output_tst_libxml2.sh

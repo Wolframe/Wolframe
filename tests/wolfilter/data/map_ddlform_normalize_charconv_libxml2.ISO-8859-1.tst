@@ -57,7 +57,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.wnmp --program typed_invoice.sfrm typed_invoice
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.wnmp --program typed_invoice.sfrm typed_invoice
 
 **file:simpleform_complex.wnmp
 int= number: integEr( 10 );

@@ -1,6 +1,6 @@
 
 function run()
-	f = filter( "XML:textwolf")
+	f = filter( "textwolf")
 	-- filter out tokens containing only spaces:
 	f.empty = false
 	input:as( f)

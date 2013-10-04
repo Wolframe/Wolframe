@@ -23,7 +23,7 @@ opt="$opt --program=example.sfrm"			# DDL
 opt="$opt --program=example.wnmp"			# normalization for DDL types
 opt="$opt --program=example.mlg"			# Lua commands
 
-testcmd="$opt run"					# command to execute by the test
+testcmd="$opt getCDCatalog"				# command to execute by the test
 testscripts=""						# list of scripts of the test
 docin=cdcatalog.in					# input document name
 docout=cdcatalog.out					# output document name

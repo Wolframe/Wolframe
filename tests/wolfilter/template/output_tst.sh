@@ -49,7 +49,13 @@ fi
 echo '**input' >> $output
 cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output
-echo "--input-filter $inputfilter --output-filter $outputfilter $testcmd" >> $output
+if [ x"$inputfilter$outputfilter" = "x" ]; then
+	echo "$testcmd" >> $output
+elif [ x"$inputfilter" = "x" ]; then
+	echo "--output-filter $outputfilter $testcmd" >> $output
+else
+	echo "--input-filter $inputfilter --output-filter $outputfilter $testcmd" >> $output
+fi
 if [ x"$testdata" != x ]; then
 	echo "$testdata" >> $output
 fi

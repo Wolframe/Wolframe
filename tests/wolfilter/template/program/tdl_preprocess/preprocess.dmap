@@ -1,1 +1,2 @@
-run( xml:AllDataRequest) :Data;
+COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+

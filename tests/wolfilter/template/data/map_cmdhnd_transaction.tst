@@ -20,7 +20,7 @@ opt="$opt --program=DBIN.tdl"
 opt="$opt --cmdprogram=test.dmap"
 opt="$opt --program $formname"				# form for invoice
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
-testcmd="$opt run"					# command to execute by the test
+testcmd="$opt employee_assignment_print"		# command to execute by the test
 testscripts="$formname"					# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=map_transaction					# output document name
@@ -28,7 +28,7 @@ testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: test.dmap
-run = test_transaction( xml :employee_assignment_print);
+COMMAND(employee_assignment_print) CALL(test_transaction);
 **file: DBRES
 #id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'
 #id task start end#21 'gardening' '09:24:28 1/3/2012' '11:11:07 1/3/2012'#22 'helo' '11:31:01 1/3/2012' '12:07:55 1/3/2012'

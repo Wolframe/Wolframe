@@ -169,7 +169,7 @@ RUN
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "xml:textwolf")
+	f = filter( "textwolf")
 	f.empty = false
 	input:as( f)
 	output:as( f)
