@@ -1,6 +1,7 @@
 #include "luaCommandHandlerBuilder.hpp"
 #include "logger-v1.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -8,7 +9,6 @@ using namespace _Wolframe::module;
 
 bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory* modules)
 {
-	int filterDefied = 0;
 	m_modules = modules;
 	try
 	{
@@ -18,10 +18,20 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const 
 			// optional configuration parameters:
 			if (boost::iequals( pi->first, "filter"))
 			{
-				if (filterDefied++) throw std::runtime_error( "duplicate default filter definition in configuration");
-				std::string filtername = pi->second.get_value<std::string>();
-				if (filtername.empty()) throw std::runtime_error( "expected non empty default filter definition");
-				m_context.setDefaultFilter( filtername);
+				std::vector<std::string> filterdef;
+				utils::splitString( filterdef, pi->second.get_value<std::string>(), "=");
+				if (filterdef.size() == 1)
+				{
+					m_context.setDefaultFilter( "", filterdef.at(0));
+				}
+				else if (filterdef.size() == 2)
+				{
+					m_context.setDefaultFilter( filterdef.at(0), filterdef.at(1));
+				}
+				else
+				{
+					throw std::runtime_error( "illegal value for filter declaration. expected two items separated by a '='");
+				}
 			}
 			// required configuration parameters:
 			else if (boost::iequals( pi->first, "program"))

@@ -77,6 +77,9 @@ public:
 	///\brief See Get the document type of the document
 	std::string doctypeid() const;
 
+	///\brief See Get the document format class of the document (XML,JSON,etc..)
+	std::string docformatid() const;
+
 	///\brief Get all input consumed (buffered)
 	void getInputBuffer( void*& begin, std::size_t& nofBytes);
 
@@ -123,6 +126,7 @@ private:
 	std::string m_itembuf;				//< item parsed (value depending on state)
 	std::string m_doctype;				//< document type extracted
 	std::string m_doctypeid;			//< document type identifier extracted
+	std::string m_docformatid;			//< document format type identifier
 };
 }}
 #endif

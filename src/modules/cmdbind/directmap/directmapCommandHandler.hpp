@@ -63,14 +63,20 @@ public:
 		return m_program.get( name);
 	}
 
-	void setFilter( const std::string& filter_)
+	void setFilter( const std::string& docformat, const std::string& filter_)
 	{
-		m_filter = filter_;
+		m_filtermap[ docformat] = filter_;
 	}
 
-	const std::string& filter() const
+	const std::string& filter( const std::string& docformat) const
 	{
-		return m_filter;
+		types::keymap<std::string>::const_iterator ki = m_filtermap.find( docformat);
+		if (ki == m_filtermap.end())
+		{
+			ki = m_filtermap.find( std::string());
+			if (ki == m_filtermap.end()) throw std::runtime_error( "document format not defined");
+		}
+		return ki->second;
 	}
 
 	bool checkReferences( const proc::ProcessorProvider* provider) const
@@ -80,7 +86,7 @@ public:
 
 private:
 	langbind::DirectmapProgram m_program;
-	std::string m_filter;
+	types::keymap<std::string> m_filtermap;
 };
 
 ///\class DirectmapCommandHandler
@@ -105,7 +111,7 @@ public:
 	virtual CallResult call( const char*& err);
 
 private:
-	void initcall();
+	void initcall( const std::string& docformat);
 
 private:
 	const DirectmapContext* m_ctx;						//< execution context of the command handler

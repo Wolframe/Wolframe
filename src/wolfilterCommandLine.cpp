@@ -222,6 +222,10 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 					programpath = makeAbsoluteFromRelativePath( programpath).string();
 				}
 				programcfg.add_child( "program", boost::property_tree::ptree( programpath));
+				if (!m_inputfilter.empty())
+				{
+					programcfg.add_child( "filter", boost::property_tree::ptree( m_inputfilter));
+				}
 			}
 			cmdhlcfg.add_child( mi->first, programcfg);
 			proccfg.add_child( "cmdhandler", cmdhlcfg);

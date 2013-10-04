@@ -37,6 +37,7 @@
 #include "processor/procProvider.hpp"
 #include "luaObjects.hpp"
 #include "module/luaExtensionBuilder.hpp"
+#include "types/keymap.hpp"
 #include <vector>
 
 namespace _Wolframe {
@@ -53,9 +54,21 @@ struct LuaScriptContext
 	void loadPrograms( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
 	std::vector<std::string> loadProgram( const std::string& prgfile);
 
-	void setDefaultFilter( const std::string& defaultfilter_)
+	void setDefaultFilter( const std::string& docformat, const std::string& filter_)
 	{
-		m_defaultfilter = defaultfilter_;
+		m_defaultfiltermap[ docformat] = filter_;
+	}
+
+	const std::string& defaultFilter( const std::string& docformat) const
+	{
+		static const std::string empty;
+		types::keymap<std::string>::const_iterator ki = m_defaultfiltermap.find( docformat);
+		if (ki == m_defaultfiltermap.end())
+		{
+			ki = m_defaultfiltermap.find( std::string());
+			if (ki == m_defaultfiltermap.end()) return empty;
+		}
+		return ki->second;
 	}
 
 	///\brief Get the list of commands
@@ -64,14 +77,9 @@ struct LuaScriptContext
 		return funcmap.commands();
 	}
 
-	const std::string& defaultfilter() const
-	{
-		return m_defaultfilter;
-	}
-
 private:
 	std::vector<module::LuaExtensionConstructor*> m_objects;
-	std::string m_defaultfilter;
+	types::keymap<std::string> m_defaultfiltermap;
 
 private:
 	LuaScriptContext( const LuaScriptContext&) :funcmap(&modulemap){}	//non copyable

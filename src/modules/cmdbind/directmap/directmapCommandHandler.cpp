@@ -52,7 +52,7 @@ void DirectmapContext::loadPrograms( const std::vector<std::string>& prgfiles_)
 	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
 }
 
-void DirectmapCommandHandler::initcall()
+void DirectmapCommandHandler::initcall( const std::string& docformat)
 {
 	m_cmd = m_ctx->command( m_name);
 	if (!m_cmd->inputform.empty())
@@ -77,7 +77,7 @@ void DirectmapCommandHandler::initcall()
 	std::vector<langbind::FilterArgument> input_filterarg;
 	if (m_cmd->inputfilter.empty())
 	{
-		input_filtername = m_ctx->filter();
+		input_filtername = m_ctx->filter( docformat);
 	}
 	else
 	{
@@ -88,7 +88,7 @@ void DirectmapCommandHandler::initcall()
 	std::vector<langbind::FilterArgument> output_filterarg;
 	if (m_cmd->outputfilter.empty())
 	{
-		output_filtername = m_ctx->filter();
+		output_filtername = m_ctx->filter( docformat);
 	}
 	else
 	{
@@ -180,7 +180,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 		{
 			case 0:
 				m_state = 1;
-				initcall();
+				initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
 				/* no break here ! */
 			case 1:
 				if (m_inputform.get())

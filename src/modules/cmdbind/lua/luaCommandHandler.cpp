@@ -51,24 +51,25 @@ using namespace _Wolframe;
 using namespace langbind;
 using namespace cmdbind;
 
-void LuaCommandHandler::initcall()
+void LuaCommandHandler::initcall( const std::string& docformat)
 {
 	if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
 	{
 		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
 	}
-	m_interp->init( Input(m_inputfilter), Output(m_outputfilter), m_provider);
+	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), m_provider);
+	std::string defaultfilter = m_ctx->defaultFilter( docformat);
 
-	if (!m_ctx->defaultfilter().empty())
+	if (!defaultfilter.empty())
 	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( m_ctx->defaultfilter()));
+		types::CountedReference<langbind::Filter> filter( m_provider->filter( defaultfilter));
 		if (!filter.get())
 		{
-			throw std::runtime_error( std::string( "filter not defined '") + m_ctx->defaultfilter() + "'");
+			throw std::runtime_error( std::string( "filter not defined '") + defaultfilter + "'");
 		}
 		if (!filter->inputfilter().get())
 		{
-			throw std::runtime_error( std::string( "input filter not defined '") + m_ctx->defaultfilter() + "'");
+			throw std::runtime_error( std::string( "input filter not defined '") + defaultfilter + "'");
 		}
 		if (m_inputfilter.get())
 		{
@@ -80,7 +81,7 @@ void LuaCommandHandler::initcall()
 		}
 		if (!filter->outputfilter().get())
 		{
-			throw std::runtime_error( std::string( "output filter not defined '") + m_ctx->defaultfilter() + "'");
+			throw std::runtime_error( std::string( "output filter not defined '") + defaultfilter + "'");
 		}
 		if (m_outputfilter.get())
 		{
@@ -103,7 +104,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	{
 		try
 		{
-			initcall();
+			initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
 		}
 		catch (const std::exception& e)
 		{

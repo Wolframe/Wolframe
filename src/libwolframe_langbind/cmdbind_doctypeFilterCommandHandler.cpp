@@ -64,6 +64,12 @@ std::string DoctypeFilterCommandHandler::doctypeid() const
 	return m_doctypeid;
 }
 
+std::string DoctypeFilterCommandHandler::docformatid() const
+{
+	if (m_state != Done) throw std::logic_error( "illegal call of get doctypeid in this state");
+	return m_docformatid;
+}
+
 CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 {
 	if (m_state == Done) return CLOSE;
@@ -121,6 +127,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 					case Init:
 						if (inp[m_inputidx] == '<')
 						{
+							m_docformatid = "xml";
 							setState( ParseHeader0);
 						}
 						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)

@@ -229,6 +229,9 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
 	std::string doctype = chnd->doctypeid();
+	std::string docformat = chnd->docformatid();
+	const char* docformatptr = docformat.c_str();
+
 	const char* error = ch->lastError();
 	if (error)
 	{
@@ -292,7 +295,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	}
 	else
 	{
-		execch->passParameters( m_command, 0, 0);
+		execch->passParameters( m_command, 1, &docformatptr);
 		execch->setProcProvider( m_provider);
 		if (m_commandtag.empty())
 		{

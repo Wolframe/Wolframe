@@ -69,7 +69,7 @@ public:
 	}
 
 private:
-	void initcall();
+	void initcall( const std::string& docformat);
 
 private:
 	const langbind::LuaScriptContext* m_ctx;

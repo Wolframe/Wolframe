@@ -125,26 +125,30 @@ public:
 	Input( const Input& o)
 		:types::TypeSignature(o)
 		,m_used(o.m_used)
-		,m_inputfilter(o.m_inputfilter){}
+		,m_inputfilter(o.m_inputfilter)
+		,m_docformat(o.m_docformat){}
 
 	///\brief Constructor by input filter
 	///\param[in] flt input filter reference
-	explicit Input( const InputFilterR& flt)
+	Input( const InputFilterR& flt, const std::string& docformat_)
 		:types::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false)
-		,m_inputfilter(flt){}
+		,m_inputfilter(flt)
+		,m_docformat(docformat_){}
 
 	///\brief Destructor
 	~Input(){}
 
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
 	InputFilterR& inputfilter()			{return m_inputfilter;}
+	const std::string& docformat() const		{return m_docformat;}
 
 	InputFilterR& getIterator();
 
 private:
 	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
+	std::string m_docformat;
 };
 
 class DDLFormParser

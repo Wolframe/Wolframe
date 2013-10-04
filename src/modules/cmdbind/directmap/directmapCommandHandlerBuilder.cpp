@@ -1,6 +1,7 @@
 #include "directmapCommandHandlerBuilder.hpp"
 #include "logger-v1.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -17,10 +18,22 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationTree& pt, 
 			// optional configuration parameters:
 			if (boost::iequals( pi->first, "filter"))
 			{
-				if (filterDefied++) throw std::runtime_error( "duplicate filter definition in configuration");
-				std::string filtername = pi->second.get_value<std::string>();
-				if (filtername.empty()) throw std::runtime_error( "expected non empty filter definition");
-				m_context.setFilter( filtername);
+				++filterDefied;
+
+				std::vector<std::string> filterdef;
+				utils::splitString( filterdef, pi->second.get_value<std::string>(), "=");
+				if (filterdef.size() == 1)
+				{
+					m_context.setFilter( "", filterdef.at(0));
+				}
+				else if (filterdef.size() == 2)
+				{
+					m_context.setFilter( filterdef.at(0), filterdef.at(1));
+				}
+				else
+				{
+					throw std::runtime_error( "illegal value for filter declaration. expected two items separated by a '='");
+				}
 			}
 			// required configuration parameters:
 			else if (boost::iequals( pi->first, "program"))
@@ -34,7 +47,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationTree& pt, 
 		}
 		if (!filterDefied)
 		{
-			m_context.setFilter( "xml");
+			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything";
 		}
 	}
 	catch (std::runtime_error& e)
