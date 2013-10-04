@@ -39,6 +39,8 @@
 #include <string>
 #include <sstream>
 #include <boost/cstdint.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cfloat>
 
 using namespace _Wolframe;
 using namespace types;
@@ -120,6 +122,15 @@ TEST( variantTypeFixture, const_ )
 
 	ASSERT_EQ( v1.tostring( ), "hello" );
 	ASSERT_EQ( v2.tostring( ), "hello" );
+}
+
+TEST( variantTypeFixture, illegal_values )
+{
+	Variant v1( -23 );
+	EXPECT_THROW( v1.touint( ), boost::bad_lexical_cast );
+	
+	Variant v2( DBL_MAX );
+	EXPECT_THROW( v2.touint( ), boost::numeric::bad_numeric_cast );
 }
 
 int main( int argc, char **argv )

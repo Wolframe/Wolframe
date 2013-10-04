@@ -99,12 +99,12 @@ WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
+LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.9.1-win32-debug
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
+LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.28-win32-debug
 
 # Python 3
 ##########
