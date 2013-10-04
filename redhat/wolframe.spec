@@ -720,7 +720,7 @@ make %{?_smp_mflags}
 make install
 %endif
 
-%if ${build_libxslt}
+%if %{build_libxslt}
 cd %{_builddir}/libxslt-%{libxslt_version}
 ./configure --prefix=/tmp/libxslt-%{libxslt_version}
 make %{?_smp_mflags}
@@ -1447,7 +1447,7 @@ fi
 %{_bindir}/wolframec
 
 %changelog
-* Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
+* Mon Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
 - more splitting into sub-packages for modules
 - builds on OpenSuse Build Service (osc)
 
