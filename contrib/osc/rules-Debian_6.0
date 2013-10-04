@@ -97,7 +97,8 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
-	# the libxml2 filter module depends on libxml, put it in a separate package
+	# the libxml2/libxslt filter module depends on libxml2 and 
+	# optionally on libxslt, put it in a separate package
 	cd src/modules/filter/libxml2; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
@@ -106,8 +107,6 @@ install: build
 	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-
-	# libxslt
 	
 	# the libhpdf printing module depends on libhpdf, put it in a separate package
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -167,8 +166,6 @@ install: build
 	mkdir /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	
-	# filter module libxslt
-
 	# printing module for libhpdf
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \

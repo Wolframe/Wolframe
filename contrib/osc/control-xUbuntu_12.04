@@ -7,8 +7,8 @@ Build-Depends: debhelper (>= 4.1.16),
  libboost-program-options1.48-dev, libboost-filesystem1.48-dev,
  libboost-locale1.48-dev, libboost-regex1.48-dev,
  libssl-dev, libpam-dev, libsasl2-dev,
- libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev,
- python3-dev,
+ libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
+ zlib1g-dev, libpng-dev, python3-dev,
  sqlite3, sasl2-bin, expect, telnet
 Standards-Version: 3.8.3
 Homepage: http://www.wolframe.net
@@ -60,12 +60,7 @@ Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe XML parsing module using libxml2.
  The Wolframe XML parsing module using libxml2.
-
-Package: wolframe-libxslt
-Architecture: any
-Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
-Description: The Wolframe filter module using libxslt.
- The Wolframe filter module using libxslt.
+ Contains also an XSLT filter using libxslt.
 
 Package: wolframe-libhpdf
 Architecture: any

@@ -153,13 +153,32 @@
 %if %{rhel}
 %if %{rhel5}
 %define build_libxml2 1
-%define libxml2_version 2.7.8
+%define libxml2_version 2.9.1
 %endif
 %endif
 %if %{centos}
 %if %{centos5}
 %define build_libxml2 1
-%define libxml2_version 2.7.8
+%define libxml2_version 2.9.1
+%endif
+%endif
+%endif
+
+# Build local libxslt for distributions for platforms building libxml2
+# due to charset problems (make sure we use the local version in this case!)
+
+%if %{with_libxslt}
+%define build_libxslt 0
+%if %{rhel}
+%if %{rhel5}
+%define build_libxslt 1
+%define libxslt_version 1.1.28
+%endif
+%endif
+%if %{centos}
+%if %{centos5}
+%define build_libxslt 1
+%define libxslt_version 1.1.28
 %endif
 %endif
 %endif
@@ -216,10 +235,13 @@ Source1: boost_%{boost_underscore_version}.tar.gz
 Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 %endif
 %if %{build_libxml2}
-Source2: libxml2-sources-%{libxml2_version}.tar.gz
+Source2: libxml2-%{libxml2_version}.tar.gz
+%endif
+%if %{build_libxslt}
+Source3: libxslt-%{libxslt_version}.tar.gz
 %endif
 %if %{build_python}
-Source3: Python-%{python_version}.tar.bz2
+Source4: Python-%{python_version}.tar.bz2
 %endif
 
 URL: http://www.wolframe.net/
@@ -331,7 +353,9 @@ BuildRequires: python3-devel >= 3.0
 %endif
 
 %if %{with_libxslt}
+%if !%{build_libxslt}
 BuildRequires: libxslt-devel >= 1.0
+%endif
 %endif
 
 BuildRequires: gcc-c++
@@ -554,23 +578,17 @@ Group: Application/Business
 
 %description libxml2
 The Wolframe XML parsing module using libxml2.
+Contains also an XSLT filter using libxslt.
 
 Requires: %{name} >= %{version}-%{release}
 %if !%{build_libxml2}
 Requires: libxml2 >= 2.6
 %endif
-%endif
-
 %if %{with_libxslt}
-%package libxslt
-Summary: The Wolframe filter module using libxslt
-Group: Application/Business
-
-%description libxslt
-The Wolframe filter module using libxslt.
-
-Requires: %{name} >= %{version}-%{release}
+%if !%{build_libxslt}
 Requires: libxslt >= 1.0
+%endif
+%endif
 %endif
 
 %if %{with_libhpdf}
@@ -648,14 +666,14 @@ Command line client to access the Wolframe server.
 
 %prep
 
-%if %{build_boost} && %{build_python} && %{build_libxml2}
-%setup -T -D -b 0 -b 1 -b 2 -b 3
+%if %{build_boost} && %{build_python} && %{build_libxml2} && %{build_libxslt}
+%setup -T -D -b 0 -b 1 -b 2 -b 3 -b 4
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
 %if %{build_boost} && %{build_python}
-%setup -T -D -b 0 -b 1 -b 3
+%setup -T -D -b 0 -b 1 -b 4
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
@@ -667,7 +685,7 @@ cd ../boost_%{boost_underscore_version}
 cd ../%{name}-%{version}
 %else
 %if %{build_python}
-%setup -T -D -b 0 -b 3
+%setup -T -D -b 0 -b 4
 cd ../boost_%{boost_underscore_version}
 %patch -P 0 -p1
 cd ../%{name}-%{version}
@@ -702,6 +720,13 @@ make %{?_smp_mflags}
 make install
 %endif
 
+%if ${build_libxslt}
+cd %{_builddir}/libxslt-%{libxslt_version}
+./configure --prefix=/tmp/libxslt-%{libxslt_version}
+make %{?_smp_mflags}
+make install
+%endif
+
 cd %{_builddir}/%{name}-%{version}
 %if %{build_python}
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
@@ -715,6 +740,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
 %endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
@@ -759,6 +787,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
+%endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
@@ -801,6 +832,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
 %endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
@@ -845,6 +879,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
 %endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
@@ -895,6 +932,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
+%endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
 	PYTHON3_CONFIG=/tmp/Python-%{python_version}/bin/python3-config \
@@ -936,6 +976,9 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+%if %{build_libxslt}
+	LIBXSLT_DIR=/tmp/libxslt-%{libxslt_version} \
 %endif
 	WITH_PYTHON=%{with_python} \
 %if %{build_python}
@@ -986,6 +1029,12 @@ done
 %if %{build_libxml2}
 cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/
 ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
+%endif
+
+# dito for local version of libxslt
+%if %{build_libxslt}
+cp /tmp/libxslt-%{libxslt_version}/lib/libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/
+ln -s libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxslt.so.1
 %endif
 
 #TODO: What exactly do we need? Do we have to probe it?
@@ -1325,6 +1374,10 @@ fi
 %{_libdir}/wolframe/libxml2.so.%{libxml2_version}
 %{_libdir}/wolframe/libxml2.so.2
 %endif
+%if %{build_libxslt}
+%{_libdir}/wolframe/libxslt.so.%{libxslt_version}
+%{_libdir}/wolframe/libxslt.so.1
+%endif
 %endif
 
 %if %{with_python}
@@ -1336,15 +1389,6 @@ fi
 %if %{build_python}
 %{_libdir}/wolframe/libpython*
 %endif
-%endif
-
-%if %{with_libxslt}
-%files libxslt
-%defattr( -, root, root )
-%dir %{_libdir}/wolframe
-%dir %{_libdir}/wolframe/modules
-# later:
-#%{_libdir}/wolframe/modules/mod_filter_libxslt.so
 %endif
 
 %if %{with_libhpdf}
