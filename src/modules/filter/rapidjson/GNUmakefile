@@ -15,7 +15,6 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	$(RAPIDJSON_LIB_DIRS) \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \

@@ -6,15 +6,13 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504 \
-	/DWITH_LIBXML2
+	/DWITH_RAPIDJSON
 
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I"$(RAPIDJSON_DIR)\include" /I"$(RAPIDJSON_DIR)\include\libxml" \
-	/I"$(WIN_ICONV_DIR)" \
-	/I"$(LIBXSLT_INCLUDE_DIRS)" \
+	/I"$(RAPIDJSON_DIR)\include" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \

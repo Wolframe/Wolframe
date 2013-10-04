@@ -69,3 +69,11 @@ SQLITE3 = $(TOPDIR)\sqlite3\sqlite3
 
 # FreeImage (always embedded)
 #############################
+
+
+# RapidJSON (always embedded)
+#############################
+
+RAPIDJSON_DIR = $(TOPDIR)\rapidjson
+
+

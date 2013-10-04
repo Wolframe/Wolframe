@@ -31,6 +31,7 @@ WITH_LOCAL_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
 WITH_LIBXML2 ?= 0
 WITH_LIBXSLT ?= 0
+WITH_RAPIDJSON ?= 0
 WITH_SYSTEM_LIBHPDF ?= 0
 WITH_LOCAL_LIBHPDF ?= 0
 WITH_SYSTEM_FREEIMAGE ?= 0
@@ -3336,6 +3337,19 @@ PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
 endif
+
+
+# Rapid JSON 0.11
+#################
+
+ifeq ($(WITH_RAPIDJSON),1)
+RAPIDJSON_DIR = $(TOPDIR)/rapidjson
+RAPIDJSON_INCLUDE_DIR ?= $(RAPIDJSON_DIR)/include
+RAPIDJSON_INCLUDE_DIRS = -I$(RAPIDJSON_INCLUDE_DIR)
+endif
+
+
+
 
 # Expect (for testing)
 ######################

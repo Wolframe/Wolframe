@@ -52,11 +52,6 @@ class OutputFilterImpl
 public:
 	typedef OutputFilter Parent;
 
-	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
-		,OutputFilter(attr)
-		{}
-
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
 		,OutputFilter(attr)
@@ -65,7 +60,6 @@ public:
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
 		,OutputFilter(o)
-		,m_doc(o.m_doc)
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)

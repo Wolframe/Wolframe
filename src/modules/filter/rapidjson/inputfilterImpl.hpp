@@ -52,10 +52,6 @@ struct InputFilterImpl :public InputFilter
 		:types::TypeSignature("langbind::InputFilterImpl (rapidjson)", __LINE__)
 		{}
 
-	explicit InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (rapidjson)", __LINE__)
-		{}
-
 	InputFilterImpl( const InputFilterImpl& o)
 		:types::TypeSignature("langbind::InputFilterImpl (rapidjson)", __LINE__)
 		,InputFilter(o)
@@ -82,7 +78,7 @@ struct InputFilterImpl :public InputFilter
 
 	virtual bool getMetadata()
 	{
-		return (m_doc.get());
+		return false;
 	}
 
 	bool getDocType( types::DocType& doctype);

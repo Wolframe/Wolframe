@@ -62,7 +62,6 @@ static createBuilderFunc objdef[ NofObjects] =
 {
 	RapidJsonFilterObject::filter_builder
 };
-#endif
 
 ModuleEntryPoint entryPoint( 0, "JSON (rapidjson) filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
