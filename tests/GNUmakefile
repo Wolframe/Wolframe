@@ -23,9 +23,7 @@ SUBDIRS += libxml2
 endif
 
 ifeq ($(WITH_LIBXSLT),1)
-ifeq ($(WITH_LIBXML2),1)
 SUBDIRS += libxslt
-endif
 endif
 
 ifeq ($(WITH_LIBHPDF),1)

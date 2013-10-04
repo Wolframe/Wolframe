@@ -1800,6 +1800,10 @@ endif
 
 ifeq ($(WITH_LIBXSLT),1)
 
+ifneq ($(WITH_LIBXML2),1)
+$(error Building with WITH_LIBXSLT also requires WITH_LIBXML2!)
+endif
+
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
