@@ -43,10 +43,8 @@ Prerequisites
   - optionally (WITH_PGSQL)
 - for XML support
   - optionally (WITH_LIBXML2): libxml2 (with iconv support)
-  - note, that this may not work with Express
-    editions as ATL is missing from those editions
 - for XSLT processing
-  - optionally (WITH_LIBXSLT): libxslt
+  - optionally (WITH_LIBXSLT): libxslt, requires also libxml2
 - optionally (WITH_LIBHPDF): for PDF creation,
   using the provided version in 'libhpdf'
 - optionally (WITH_ICU): ICU (icu4c, version 49)
@@ -309,11 +307,11 @@ There are some + where they don't belong:
 Configure libxml2, set location of win-iconv:
 
 cd win32
-cscript configure.js compiler=msvc ^
-	prefix="C:\cygwin\home\Andreas\libxml2-2.7.8-win32" ^
-	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3" ^
-	include="C:\cygwin\home\Andreas\win-iconv-0.0.3" ^
- 	zlib=no iconv=yes
+cscript configure.js compiler=msvc
+	prefix="C:\cygwin\home\Andreas\libxml2-2.9.1"
+	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3"
+	include="C:\cygwin\home\Andreas\win-iconv-0.0.3"
+ 	zlib=no iconv=yes vcmanifest=yes
 
 For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 
@@ -337,10 +335,11 @@ Best is to compile your own libraries
 Get sources from: ftp://xmlsoft.org/libxslt/
 
 cd win32
-cscript configure.js compiler=msvc ^
-	prefix="C:\cygwin\home\Andreas\libxslt-1.1.26-win32" zlib=no iconv=yes
-	lib="C:\cygwin\home\Andreas\libxml2-2.7.8-win32\lib;C:\cygwin\home\Andreas\win-iconv-win32" ^
-	include="C:\cygwin\home\Andreas\libxml2-2.7.8-win32\include;C:\cygwin\home\Andreas\win-iconv-win32"
+cscript configure.js compiler=msvc
+	prefix="C:\cygwin\home\Andreas\libxslt-1.1.28-win32"
+	lib="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\lib;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
+	include="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\include\libxml2;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
+ 	zlib=no iconv=yes vcmanifest=yes
 
 For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 
@@ -353,20 +352,18 @@ nmake /nologo /f Makefile.msvc all
 
 For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
 
-In the debug version: the xsltproc.exe binary is missing a manifest treatment,
-so manually execute:
-
-cd win32\bin.msvc
-mt -nologo -manifest xsltproc.exe.manifest -outputresource:xsltproc.exe;1
-
-nmake /nologo /f Makefile.msvc install
-
 Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
 
 Python 3
 --------
 
-Install 'python-3.3.2.msi' to C:\Python33.
+Install 'python-3.3.2.msi' to C:\Python33. This is a release
+version, if you need the debugging version, compile one on
+your own:
+
+cd PCBuild
+pcbuild.sln
+build the Debug version
 
 Adapt PYTHON_DIR in 'makefiles\nmake\config.mk'.
 
