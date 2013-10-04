@@ -715,14 +715,14 @@ make install
 
 %if %{build_libxml2}
 cd %{_builddir}/libxml2-%{libxml2_version}
-./configure --prefix=/tmp/libxml2-%{libxml2_version}
+./configure --prefix=/tmp/libxml2-%{libxml2_version} --without-python
 make %{?_smp_mflags}
 make install
 %endif
 
 %if %{build_libxslt}
 cd %{_builddir}/libxslt-%{libxslt_version}
-./configure --prefix=/tmp/libxslt-%{libxslt_version}
+./configure --prefix=/tmp/libxslt-%{libxslt_version} --without-python
 make %{?_smp_mflags}
 make install
 %endif
