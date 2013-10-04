@@ -30,14 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_filter_libxml2.cpp
-///\brief Module for libxml2 XML filters
+///\file mod_filter_rapidjson.cpp
+///\brief Module for JSON filters based on the rapidjson library
 #include "module/filterBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
-#include "libxml2_filter.hpp"
-#if WITH_LIBXSLT
-#include "xsltProgramType.hpp"
-#endif
+#include "rapidjson_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 
@@ -53,33 +50,20 @@ static void setModuleLogger( void* logger )
 }
 
 namespace {
-struct Libxml2FilterObject
+struct RapidJsonFilterObject
 {
-	static SimpleBuilder* xmlfilter_builder()
-		{return new FilterBuilder( "Libxml2Filter", "libxml2", lb::createLibxml2FilterPtr);}
-#if WITH_LIBXSLT
-	static SimpleBuilder* xsltfilter_builder()
-		{return new ProgramTypeBuilder( "XsltProgramType", "xslt", langbind::createXsltProgramType);}
-#endif
+	static SimpleBuilder* filter_builder()
+		{return new FilterBuilder( "RapidJsonFilter", "rapidjson", lb::createRapidJsonFilterPtr);}
 };
 }//anonymous namespace
 
-
-#if WITH_LIBXSLT
-enum {NofObjects=2};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	Libxml2FilterObject::xmlfilter_builder,
-	Libxml2FilterObject::xsltfilter_builder
-};
-#else
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	Libxml2FilterObject::xmlfilter_builder
+	RapidJsonFilterObject::filter_builder
 };
 #endif
 
-ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "JSON (rapidjson) filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

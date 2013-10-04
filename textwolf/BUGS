@@ -1,0 +1,13 @@
+NUMBER	DATE	TYPE(ISSUE,BUG)	STATUS(FIXED,OPEN,WONTFIX,CLOSED)	Description
+1  11/6/13	BUG  WONTFIX	XML named entity defintions in the document are ignored. Only named entities passed in the read only table are mapped.
+2  11/6/13	BUG  OPEN  UTF-8 characters beyond 2147483649 are not parsed correctly
+3  11/6/13	BUG  OPEN  End of output buffer print exception fall back does not work anymore. Workaround use buffers not throwing end of buffer reached exceptions (std::string,std::vector) will be fixed soon because Wolframe needs it.
+4  11/6/13	BUG  FIXED	UTF-8 parsing error appearing when characters where skipped.
+5  11/6/13	BUG  FIXED	std::string or std::vector as buffer template argument for parsers are not working yet for unknown reasons.
+6  11/6/13	ISSUE  OPEN  BOM character sequences (Byte Order Mark U+FEFF in UTF-16) are ignored (interpretation is let to the caller).
+7  11/6/13	ISSUE  WONTFIX	Entity map supports only single character substitution entities. Named entities in XML are defined as sustitutes for strings (UChar*).
+8  11/9/14  BUG  FIXED  content elements returned were not defined by default as required by W3C (without white space tokenization). Fix: White space tokenization is now optional and can be switched during processing.
+9  11/9/14  BUG  FIXED  buffers were not reset for new tokens. This a bug that came in some time ago and was not recognized because textwolf was developed in the context of Wolframe that had a compensating bug. Now the tests run again.
+10  11/9/14  BUG  OPEN  DOCTYPE dtd or other format definitions are not skipped correctly
+11  12/2/28  BUG FIXED  UTF-16 was notparsed correctly. Now it runs. 
+12  12/2/28  ISSUE  FIXED  Characterset encoding interface changed. Was strange before.

@@ -29,39 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file documentReader.hpp
-///\brief Implementation of document reader abstraction for the libxml2 library
-#include "documentReader.hpp"
-#include <stdexcept>
+///\file inputfilterImpl.cpp
+///\brief Implementation of input filter abstraction for the rapidjson library
+#include "inputfilterImpl.hpp"
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-DocumentReader::DocumentReader( const char* content, std::size_t contentsize)
+bool InputFilterImpl::getValue( const char* name, std::string& val)
 {
-	int options = XML_PARSE_NOENT | XML_PARSE_COMPACT | XML_PARSE_NONET | XML_PARSE_NODICT;
-	xmlDocPtr pp = xmlReadMemory( content, contentsize, "noname.xml", NULL, options);
-	if (pp)
-	{
-		m_ptr = boost::shared_ptr<xmlDoc>( pp, xmlFreeDoc);
-	}
 }
 
-DocumentReader::DocumentReader( xmlDocPtr doc)
-	:m_ptr(doc){}
-
-
-std::string DocumentReader::getContent() const
+bool InputFilterImpl::getDocType( std::string& val)
 {
-	xmlChar* mem;
-	int memsize;
-	xmlDocDumpMemory( m_ptr.get(), &mem, &memsize);
-	if (!mem)
-	{
-		xmlError* err = xmlGetLastError();
-		throw std::runtime_error( "failed to dump XML document content");
-	}
-	boost::shared_ptr<xmlChar> contentref( mem, xmlFree);
-	return std::string( (char*)mem, memsize);
 }
+
+bool InputFilterImpl::setValue( const char* name, const std::string& value)
+{
+}
+
+void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
+{
+	if (!end) throw std::logic_error( "internal: need buffering input filter");
+}
+
+bool InputFilterImpl::getDocType( types::DocType& doctype)
+{
+}
+
+bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+{
+}
+
+
 

@@ -10,6 +10,12 @@ SUBDIRS = \
 	$(SUBDIRS) libxml2
 !ENDIF
 
+# rapidjson
+!IFDEF WITH_RAPIDJSON
+SUBDIRS = \
+	$(SUBDIRS) rapidjson
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

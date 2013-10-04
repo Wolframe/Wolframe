@@ -9,6 +9,11 @@ ifeq ($(WITH_LIBXML2),1)
 SUBDIRS += libxml2
 endif
 
+# rapidjson
+ifeq ($(WITH_RAPIDJSON),1)
+SUBDIRS += rapidjson
+endif
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

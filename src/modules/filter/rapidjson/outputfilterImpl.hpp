@@ -30,20 +30,14 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file outputfilterImpl.hpp
-///\brief Output filter abstraction for the libxml2 library
+///\brief Output filter abstraction for the rapidjson library
 
-#ifndef _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
-#define _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
-#include "documentWriter.hpp"
-#include "xsltMapper.hpp"
+#ifndef _Wolframe_RAPIDJSON_OUTPUT_FILTER_HPP_INCLUDED
+#define _Wolframe_RAPIDJSON_OUTPUT_FILTER_HPP_INCLUDED
+#include "filter/outputfilter.hpp"
 #include "types/countedReference.hpp"
 #include "types/doctype.hpp"
-#include "filter/outputfilter.hpp"
-#include "libxml/parser.h"
-#include "libxml/tree.h"
-#include "libxml/encoding.h"
-#include "libxml/xmlwriter.h"
-#include "libxml/xmlsave.h"
+#include "rapidjson/document.h"
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -59,35 +53,23 @@ public:
 	typedef OutputFilter Parent;
 
 	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
 		,OutputFilter(attr)
-		,m_xsltMapper(xsltMapper_)
-		,m_nofroot(0)
-		,m_taglevel(0)
-		,m_elemitr(0)
 		{}
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
 		,OutputFilter(attr)
-		,m_nofroot(0)
-		,m_taglevel(0)
-		,m_elemitr(0)
 		{}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
 		,OutputFilter(o)
 		,m_doc(o.m_doc)
-		,m_xsltMapper(o.m_xsltMapper)
-		,m_nofroot(o.m_nofroot)
-		,m_taglevel(o.m_taglevel)
 		,m_attribname(o.m_attribname)
-		,m_valuestrbuf(o.m_valuestrbuf)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
 		,m_doctype_root(o.m_doctype_root)
-		,m_doctype_public(o.m_doctype_public)
 		,m_doctype_system(o.m_doctype_system)
 		,m_encoding(o.m_encoding){}
 
@@ -119,31 +101,13 @@ public:
 	const char* encoding() const;
 
 private:
-	static const xmlChar* getXmlString( const std::string& aa)
-	{
-		return (const xmlChar*)aa.c_str();
-	}
-
-	const xmlChar* getElement( const void* element, std::size_t elementsize)
-	{
-		m_valuestrbuf.clear();
-		m_valuestrbuf.append( (const char*)element, elementsize);
-		return (const xmlChar*)m_valuestrbuf.c_str();
-	}
-
 	bool flushBuffer();
 
 private:
-	DocumentWriter m_doc;					//< document writer structure
-	XsltMapper m_xsltMapper;				//< optional XSLT mapper
-	int m_nofroot;						//< number of root elements parsed
-	int m_taglevel;						//< tag hierarchy level
 	std::string m_attribname;				//< attribute name buffer
-	std::string m_valuestrbuf;				//< value buffer
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
 	std::string m_doctype_root;				//< !DOCTYPE root element (1)
-	std::string m_doctype_public;				//< !DOCTYPE public element (2)
 	std::string m_doctype_system;				//< !DOCTYPE system element (3)
 	std::string m_encoding;					//< character set encoding
 };

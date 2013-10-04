@@ -1,0 +1,28 @@
+Documentation
+* For using textwolf just include "include/textwolf.hpp".
+* The textwolf home is at at http://textwolf.net
+* A textwolf tutorial can be found at http://textwolf.net/tutorial.html
+* A doxygen interface documentation is at http://patrickfrey.github.com/textwolf/html/index.html
+
+Examples
+* See the examples in tests:
+** readStdinIterator.cpp     :Echoing stdin for all character sets
+** test_TextReader.cpp       :Iterating on a set of generated characters and test if read/write works for all characters
+** test_XMLPathSelect.cpp    :Iterating on the XML Path selected elements
+** test_XMLScanner.cpp       :Iterating on the XML elements
+
+Projects using textwolf
+* textwolf is used in the wolframe project (see http://wolframe.net or http://github.com/mbarbos/Wolframe)
+
+Bugreports
+* textwolf bug reports are for the time beeing collected as CSV file in BUGS.
+
+Project Schedule
+* 2013/08/01
+	Planned Version 0.2.0
+	* Native handling of wchar_t iterators
+	* XML grep like shell program as demo application
+	* BOM character support
+
+
+
