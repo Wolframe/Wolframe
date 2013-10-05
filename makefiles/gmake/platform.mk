@@ -3349,8 +3349,6 @@ RAPIDJSON_INCLUDE_DIRS = -I$(RAPIDJSON_INCLUDE_DIR)
 endif
 
 
-
-
 # Expect (for testing)
 ######################
 

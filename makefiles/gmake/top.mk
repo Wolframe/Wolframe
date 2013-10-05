@@ -231,6 +231,10 @@ ifeq ($(WITH_PYTHON),1)
 	@echo "PYTHON_LDFLAGS: $(PYTHON_LDFLAGS)"
 	@echo "PYTHON_LIBS: $(PYTHON_LIBS)"
 endif
+ifeq ($(WITH_RAPIDJSON),1)
+	@echo
+	@echo "using local Rapid JSON library for JSON filtering module.."
+endif
 	@echo
 	@echo "Installation directories"
 	@echo
