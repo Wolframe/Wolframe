@@ -53,6 +53,7 @@ struct InputFilterImpl :public InputFilter
 {
 	InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+		,m_state(Buffering)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -62,6 +63,7 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter(o)
 		,m_content(o.m_content)
 		,m_encoding(o.m_encoding)
+		,m_state(o.m_state)
 		{}
 
 	///\brief Implements InputFilter::copy()
@@ -84,7 +86,7 @@ struct InputFilterImpl :public InputFilter
 
 	virtual bool getMetadata()
 	{
-		return false;
+		return (m_state == Processing);
 	}
 
 	bool getDocType( types::DocType& doctype);
@@ -102,6 +104,10 @@ struct InputFilterImpl :public InputFilter
 private:
 	std::string m_content;
 	std::string m_encoding;
+	enum State {Buffering,Processing};
+	State m_state;
+	cJSON* m_root;
+	std::vector<cJSON*> m_stk;
 };
 
 }}//namespace

@@ -32,12 +32,19 @@ Project Wolframe.
 ///\file inputfilterImpl.cpp
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
+#include "langbind/charsetEncodings.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 bool InputFilterImpl::getValue( const char* name, std::string& val)
 {
+	if (std::strcmp(name,"encoding") == 0 && m_state == Processing)
+	{
+		val = m_encoding;
+		return true;
+	}
+	return false;
 }
 
 bool InputFilterImpl::getDocType( std::string& val)
@@ -50,8 +57,23 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
-	if (!end) throw std::logic_error( "internal: need buffering input filter");
 	m_content.append( (const char*)content, contentsize);
+	if (end)
+	{
+		if (m_root) throw std::logic_error(" bad operation on JSON input filter: put input after end");
+		CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
+		std::string m_encoding = "UTF-";
+		if ((int)cl & (CharsetClass::U1) != 0) m_encoding += "8";
+		if ((int)cl & (CharsetClass::U2) != 0) m_encoding += "16";
+		if ((int)cl & (CharsetClass::U4) != 0) m_encoding += "32";
+		if ((int)cl & (CharsetClass::BE) != 0) m_encoding += "BE";
+		if ((int)cl & (CharsetClass::LE) != 0) m_encoding += "LE";
+		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
+		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
+		m_state = Processing;
+		m_root = cJSON_Parse( m_content.c_str());
+		m_stk.push_back( m_root);
+	}
 }
 
 bool InputFilterImpl::getDocType( types::DocType& doctype)

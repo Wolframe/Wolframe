@@ -39,6 +39,7 @@ CPP_OBJS = \
 	inputfilterScope.o \
 	tostringfilter.o \
 	ptreefilter.o \
+	charsetEncodings.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
