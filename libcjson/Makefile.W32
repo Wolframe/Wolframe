@@ -1,0 +1,33 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I..\include
+
+INCLUDE_LIBS =
+
+OBJS = \
+	cJSON.obj
+
+LIBRARIES = \
+	cjson.lib
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+cjson.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LIBRARIES)
+
+local_clean:
+
+local_distclean:
+
+local_test:

@@ -1,16 +1,16 @@
 /*
   Copyright (c) 2009 Dave Gamble
- 
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
- 
+
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
- 
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ extern "C"
 #define cJSON_String 4
 #define cJSON_Array 5
 #define cJSON_Object 6
-	
+
 #define cJSON_IsReference 256
 
 /* The cJSON structure: */
@@ -61,9 +61,12 @@ typedef struct cJSON_Hooks {
 /* Supply malloc, realloc and free functions to cJSON */
 extern void cJSON_InitHooks(cJSON_Hooks* hooks);
 
+typedef struct cJSON_Context {
+	const char* errorptr;
+} cJSON_Context;
 
 /* Supply a block of JSON, and this returns a cJSON object you can interrogate. Call cJSON_Delete when finished. */
-extern cJSON *cJSON_Parse(const char *value);
+extern cJSON *cJSON_Parse( cJSON_Context* ctx, const char *value);
 /* Render a cJSON entity to text for transfer/storage. Free the char* when finished. */
 extern char  *cJSON_Print(cJSON *item);
 /* Render a cJSON entity to text for transfer/storage without any formatting. Free the char* when finished. */
@@ -78,9 +81,6 @@ extern cJSON *cJSON_GetArrayItem(cJSON *array,int item);
 /* Get item "string" from object. Case insensitive. */
 extern cJSON *cJSON_GetObjectItem(cJSON *object,const char *string);
 
-/* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
-extern const char *cJSON_GetErrorPtr(void);
-	
 /* These calls create a cJSON item of the appropriate type. */
 extern cJSON *cJSON_CreateNull(void);
 extern cJSON *cJSON_CreateTrue(void);
@@ -109,7 +109,7 @@ extern cJSON *cJSON_DetachItemFromArray(cJSON *array,int which);
 extern void   cJSON_DeleteItemFromArray(cJSON *array,int which);
 extern cJSON *cJSON_DetachItemFromObject(cJSON *object,const char *string);
 extern void   cJSON_DeleteItemFromObject(cJSON *object,const char *string);
-	
+
 /* Update array items. */
 extern void cJSON_ReplaceItemInArray(cJSON *array,int which,cJSON *newitem);
 extern void cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem);
@@ -121,7 +121,7 @@ need to be released. With recurse!=0, it will duplicate any children connected t
 The item->next and ->prev pointers are always zero on return from Duplicate. */
 
 /* ParseWithOpts allows you to require (and check) that the JSON is null terminated, and to retrieve the pointer to the final byte parsed. */
-extern cJSON *cJSON_ParseWithOpts(const char *value,const char **return_parse_end,int require_null_terminated);
+extern cJSON *cJSON_ParseWithOpts(cJSON_Context* ctx, const char *value,const char **return_parse_end,int require_null_terminated);
 
 extern void cJSON_Minify(char *json);
 

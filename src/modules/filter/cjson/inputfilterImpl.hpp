@@ -107,6 +107,16 @@ private:
 	enum State {Buffering,Processing};
 	State m_state;
 	cJSON* m_root;
+
+	class StackElement
+	{
+		StackElement( const cJSON* node_)
+			:m_node(node_){}
+		StackElement( const StackElement& o)
+			:m_node(o.m_node){}
+	private:
+		const cJSON* m_node;
+	};
 	std::vector<cJSON*> m_stk;
 };
 
