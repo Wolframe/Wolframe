@@ -29,42 +29,20 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file inputfilterImpl.cpp
-///\brief Implementation of input filter abstraction for the rapidjson library
-#include "inputfilterImpl.hpp"
-#include "rapidjson/document.h"
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
+///\file cjson_filter.hpp
+///\brief Filter using the cjson library for input and output
 
-using namespace _Wolframe;
-using namespace _Wolframe::langbind;
+#ifndef _Wolframe_CJSON_FILTER_HPP_INCLUDED
+#define _Wolframe_CJSON_FILTER_HPP_INCLUDED
+#include "filter/filter.hpp"
 
-bool InputFilterImpl::getValue( const char* name, std::string& val)
-{
-}
+namespace _Wolframe {
+namespace langbind {
 
-bool InputFilterImpl::getDocType( std::string& val)
-{
-}
-
-bool InputFilterImpl::setValue( const char* name, const std::string& value)
-{
-}
-
-void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
-{
-	if (!end) throw std::logic_error( "internal: need buffering input filter");
-}
-
-bool InputFilterImpl::getDocType( types::DocType& doctype)
-{
-}
-
-bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
-{
-}
+Filter createCJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg);
+Filter* createCJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
 
 
+}}//namespace
+#endif
 

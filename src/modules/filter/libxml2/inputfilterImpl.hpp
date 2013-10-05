@@ -121,6 +121,8 @@ struct InputFilterImpl :public InputFilter
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	virtual bool setFlags( Flags f);
+
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);

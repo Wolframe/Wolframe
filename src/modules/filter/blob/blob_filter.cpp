@@ -109,6 +109,15 @@ struct InputFilterImpl :public InputFilter
 		return 0;
 	}
 
+	virtual bool setFlags( Flags f)
+	{
+		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
+		{
+			return false;
+		}
+		return InputFilter::setFlags( f);
+	}
+
 private:
 	std::string m_elembuf;
 	bool m_end;				//< true if we got EoD

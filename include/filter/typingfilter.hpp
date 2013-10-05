@@ -46,7 +46,10 @@ public:
 	///\brief Constructor
 	explicit TypingInputFilter( const InputFilterR& inp)
 		:types::TypeSignature("langbind::TypingInputFilter", __LINE__)
-		,m_inputfilter(inp){}
+		,m_inputfilter(inp)
+	{
+		setFlags( inp->flags());
+	}
 
 	///\brief Copy constructor
 	///\param[in] o input filter to copy

@@ -393,11 +393,15 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 {
 	m_inp = i;
 	m_ctx.clear();
-	if (i->flag( langbind::TypedInputFilter::PropagateNoCase))
+	if (i->flag( langbind::FilterBase::PropagateNoCase))
 	{
 		m_ctx.setFlags( Context::CaseInsensitiveCompare);
 	}
 	m_ctx.setFlags(flags);
+	if (i->flag( langbind::FilterBase::PropagateNoAttr))
+	{
+		m_ctx.unsetFlags( Context::ValidateAttributes);
+	}
 	m_stk.clear();
 	m_stk.push_back( FiltermapDDLParseState( 0, m_st, 0));
 	LOG_DATA << "[DDL structure serialization parse] init structure" << "[" << (m_st->description()?m_st->description()->tostring():m_st->tostring()) << "]";

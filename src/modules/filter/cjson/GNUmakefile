@@ -7,26 +7,26 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
 	-I$(TOPDIR) \
-	$(RAPIDJSON_INCLUDE_DIRS) \
+	$(CJSON_INCLUDE_DIRS) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_CXXFLAGS += \
-	-DWITH_RAPIDJSON
+	-DWITH_CJSON
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(RAPIDJSON_LIBS)
+	$(CJSON_LIBS)
 
-DYNAMIC_MODULE = mod_filter_rapidjson.so
+DYNAMIC_MODULE = mod_filter_cjson.so
 
 CPP_OBJS = \
 	inputfilterImpl.o \
 	outputfilterImpl.o \
-	rapidjson_filter.o \
-	mod_filter_rapidjson.o
+	cjson_filter.o \
+	mod_filter_cjson.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

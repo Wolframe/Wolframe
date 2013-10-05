@@ -1,4 +1,0 @@
-LIBRARY mod_filter_libxml2
-
-EXPORTS
-entryPoint	@1

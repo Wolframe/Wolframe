@@ -61,7 +61,6 @@ public:
 	TypedInputFilter()
 		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,m_state(InputFilter::Open)
-		,m_flags(None)
 		,m_data(0){}
 
 	///\brief Copy constructor
@@ -70,7 +69,6 @@ public:
 		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(o)
 		,m_state(o.m_state)
-		,m_flags(o.m_flags)
 		,m_data(o.m_data?o.m_data->copy():0){}
 
 	///\brief Destructor
@@ -100,33 +98,11 @@ public:
 	///\brief Set the iterator to the start (if implemented)
 	virtual void resetIterator(){}
 
-	enum Flags
-	{
-		None=0x00,
-		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
-		PropagateNoCase=0x02			//< true, if the result is propagated to be case insensitive
-	};
-
-	///\brief Query a flag (or a set of flags)
-	///\return true if the flag (or all flags) are set
-	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
-
-	///\brief Get all flags
-	///\return the flags as bitfield
-	Flags flags() const				{return m_flags;}
-
-	///\brief Set a flag (or a set of flags)
-	///\return true on success, false if the (or one of) flag is not supported
-	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
-	///\brief Reset set all flags
-	void resetFlags()				{m_flags = None;}
-
 	///\brief Set data that belongs to filter scope
 	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
 
 private:
 	State m_state;					//< state
-	Flags m_flags;					//< flags
 	Data* m_data;
 };
 

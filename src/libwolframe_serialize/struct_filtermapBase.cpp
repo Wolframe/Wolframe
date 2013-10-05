@@ -84,11 +84,15 @@ void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags fl
 {
 	m_inp = i;
 	m_ctx.clear();
-	if (i->flag( langbind::TypedInputFilter::PropagateNoCase))
+	if (i->flag( langbind::FilterBase::PropagateNoCase))
 	{
 		m_ctx.setFlags( Context::CaseInsensitiveCompare);
 	}
 	m_ctx.setFlags(flags);
+	if (i->flag( langbind::FilterBase::PropagateNoAttr))
+	{
+		m_ctx.unsetFlags( Context::ValidateAttributes);
+	}
 	m_stk.clear();
 	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
 }

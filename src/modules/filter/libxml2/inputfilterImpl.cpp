@@ -278,3 +278,12 @@ void InputFilterImpl::getElement( const void*& element, std::size_t& elementsize
 	}
 }
 
+bool InputFilterImpl::setFlags( Flags f)
+{
+	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
+	{
+		return false;
+	}
+	return InputFilter::setFlags( f);
+}
+

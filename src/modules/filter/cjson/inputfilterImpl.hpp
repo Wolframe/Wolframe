@@ -30,14 +30,17 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file inputfilterImpl.hpp
-///\brief Input filter abstraction for the rapidjson library
+///\brief Input filter abstraction for the cJSON library
 
-#ifndef _Wolframe_RAPIDJSON_INPUT_FILTER_HPP_INCLUDED
-#define _Wolframe_RAPIDJSON_INPUT_FILTER_HPP_INCLUDED
+#ifndef _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
+#define _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
 #include "filter/inputfilter.hpp"
 #include "types/countedReference.hpp"
 #include "types/doctype.hpp"
-#include "rapidjson/document.h"
+extern "C"
+{
+#include "cjson/cJSON.h"
+}
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -49,12 +52,15 @@ namespace langbind {
 struct InputFilterImpl :public InputFilter
 {
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (rapidjson)", __LINE__)
-		{}
+		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+	{
+		setFlags( langbind::FilterBase::PropagateNoAttr);
+	}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (rapidjson)", __LINE__)
+		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,InputFilter(o)
+		,m_content(o.m_content)
 		,m_encoding(o.m_encoding)
 		{}
 
@@ -91,7 +97,10 @@ struct InputFilterImpl :public InputFilter
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	virtual bool setFlags( Flags f);
+
 private:
+	std::string m_content;
 	std::string m_encoding;
 };
 

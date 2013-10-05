@@ -49,12 +49,14 @@ class FilterBase
 public:
 	FilterBase()
 		:types::TypeSignature("langbind::FilterBase", __LINE__)
+		,m_flags(None)
 	{
 		m_errorbuf[0] = '\0';
 	}
 
 	FilterBase( const FilterBase& o)
 		:types::TypeSignature("langbind::FilterBase", __LINE__)
+		,m_flags(o.m_flags)
 	{
 		setError( o.m_errorbuf);
 	}
@@ -121,9 +123,32 @@ public:
 		return false;
 	}
 
+	enum Flags
+	{
+		None=0x00,
+		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
+		PropagateNoCase=0x02,			//< true, if the result is propagated to be case insensitive
+		PropagateNoAttr=0x04			//< true, if the result is propagated to have no attribute support (only open/close tag and value)
+	};
+
+	///\brief Query a flag (or a set of flags)
+	///\return true if the flag (or all flags) are set
+	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
+
+	///\brief Get all flags
+	///\return the flags as bitfield
+	Flags flags() const				{return m_flags;}
+
+	///\brief Set a flag (or a set of flags)
+	///\return true on success, false if the (or one of) flag is not supported
+	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
+	///\brief Reset set all flags
+	void resetFlags()				{m_flags = None;}
+
 private:
 	enum {ErrorBufSize=128};		//< maximum size of error string
 	char m_errorbuf[ ErrorBufSize];		//< error string
+	Flags m_flags;				//< flags
 };
 
 }}//namespace

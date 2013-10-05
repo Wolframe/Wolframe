@@ -30,13 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file outputfilterImpl.hpp
-///\brief Implementation of output filter abstraction for the rapidjson library
+///\brief Implementation of output filter abstraction for the cjson library
 #include "outputfilterImpl.hpp"
-#include "rapidjson/document.h"
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -56,7 +51,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		case OutputFilter::Attribute:
 			if (m_attribname.size())
 			{
-				setState( Error, "rapidjson filter: illegal operation");
+				setState( Error, "cjson filter: illegal operation");
 				return false;
 			}
 			m_attribname.clear();
@@ -78,7 +73,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			break;
 
 		default:
-			setState( Error, "rapidjson filter: illegal state");
+			setState( Error, "cjson filter: illegal state");
 			return false;
 	}
 	return true;

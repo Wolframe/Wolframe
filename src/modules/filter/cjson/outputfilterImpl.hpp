@@ -30,14 +30,17 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file outputfilterImpl.hpp
-///\brief Output filter abstraction for the rapidjson library
+///\brief Output filter abstraction for the cjson library
 
-#ifndef _Wolframe_RAPIDJSON_OUTPUT_FILTER_HPP_INCLUDED
-#define _Wolframe_RAPIDJSON_OUTPUT_FILTER_HPP_INCLUDED
+#ifndef _Wolframe_CJSON_OUTPUT_FILTER_HPP_INCLUDED
+#define _Wolframe_CJSON_OUTPUT_FILTER_HPP_INCLUDED
 #include "filter/outputfilter.hpp"
 #include "types/countedReference.hpp"
 #include "types/doctype.hpp"
-#include "rapidjson/document.h"
+extern "C"
+{
+#include "cjson/cJSON.h"
+}
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -53,12 +56,12 @@ public:
 	typedef OutputFilter Parent;
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
+		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(attr)
 		{}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (rapidjson)", __LINE__)
+		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(o)
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)

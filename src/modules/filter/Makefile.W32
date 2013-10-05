@@ -11,9 +11,9 @@ SUBDIRS = \
 !ENDIF
 
 # rapidjson
-!IFDEF WITH_RAPIDJSON
+!IFDEF WITH_CJSON
 SUBDIRS = \
-	$(SUBDIRS) rapidjson
+	$(SUBDIRS) cjson
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

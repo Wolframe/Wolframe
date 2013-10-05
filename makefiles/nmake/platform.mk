@@ -71,9 +71,9 @@ SQLITE3 = $(TOPDIR)\sqlite3\sqlite3
 #############################
 
 
-# RapidJSON (always embedded)
+# cJSON (always embedded)
 #############################
 
-RAPIDJSON_DIR = $(TOPDIR)\rapidjson
+CJSON_DIR = $(TOPDIR)\cjson
 
 

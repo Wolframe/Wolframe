@@ -6,13 +6,13 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504 \
-	/DWITH_RAPIDJSON
+	/DWITH_CJSON
 
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I"$(RAPIDJSON_DIR)\include" \
+	/I"$(CJSON_DIR)\include" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -21,23 +21,23 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	"$(RAPIDJSON_DIR)\lib\rapidjson.lib" $(INCLUDE_XSLT_LIBS)
+	"$(CJSON_DIR)\lib\cjson.lib" $(INCLUDE_XSLT_LIBS)
 
 DYNAMIC_MODULE = \
-	mod_filter_rapidjson.dll
+	mod_filter_cjson.dll
 
 CPP_OBJS = \
 	inputfilterImpl.obj \
 	outputfilterImpl.obj \
-	rapidjson_filter.obj \
-	mod_filter_rapidjson.obj
+	cjson_filter.obj \
+	mod_filter_cjson.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:RapidJsonFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:CJsonFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

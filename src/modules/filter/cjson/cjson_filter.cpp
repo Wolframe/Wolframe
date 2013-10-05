@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file rapidjson_filter.cpp
-///\brief Implementation of a filter using the rapidjson library for input and output
-#include "rapidjson_filter.hpp"
+///\file cjson_filter.cpp
+///\brief Implementation of a filter using the cjson library for input and output
+#include "cjson_filter.hpp"
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
 #include "filter/bufferingfilter.hpp"
@@ -49,9 +49,9 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-struct RapidJsonFilter :public Filter
+struct CJsonFilter :public Filter
 {
-	RapidJsonFilter( const char* encoding=0)
+	CJsonFilter( const char* encoding=0)
 	{
 		InputFilterImpl impl;
 		m_inputfilter.reset( new BufferingInputFilter( &impl));
@@ -64,13 +64,13 @@ struct RapidJsonFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createRapidJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg)
+Filter _Wolframe::langbind::createCJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg)
 {
-	const char* filterbasename = "rapidjson";
+	const char* filterbasename = "cjson";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != filterbasename) throw std::runtime_error( "Rapid JSON filter name does not match");
-	if (arg.empty()) return RapidJsonFilter();
+	if (nam != filterbasename) throw std::runtime_error( "cjson filter name does not match");
+	if (arg.empty()) return CJsonFilter();
 	const char* encoding = 0;
 	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
 	for (; ai != ae; ++ai)
@@ -81,11 +81,11 @@ Filter _Wolframe::langbind::createRapidJsonFilter( const std::string& name, cons
 			break;
 		}
 	}
-	return encoding?RapidJsonFilter( encoding):RapidJsonFilter();
+	return encoding?CJsonFilter( encoding):CJsonFilter();
 }
 
-Filter* _Wolframe::langbind::createRapidJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
+Filter* _Wolframe::langbind::createCJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
 {
-	return new Filter( createRapidJsonFilter( name, arg));
+	return new Filter( createCJsonFilter( name, arg));
 }
 

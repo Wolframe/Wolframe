@@ -10,8 +10,8 @@ SUBDIRS += libxml2
 endif
 
 # rapidjson
-ifeq ($(WITH_RAPIDJSON),1)
-SUBDIRS += rapidjson
+ifeq ($(WITH_CJSON),1)
+SUBDIRS += cjson
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

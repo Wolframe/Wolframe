@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_filter_rapidjson.cpp
-///\brief Module for JSON filters based on the rapidjson library
+///\file mod_filter_cjson.cpp
+///\brief Module for JSON filters based on the cJSON library
 #include "module/filterBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
-#include "rapidjson_filter.hpp"
+#include "cjson_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 
@@ -50,19 +50,19 @@ static void setModuleLogger( void* logger )
 }
 
 namespace {
-struct RapidJsonFilterObject
+struct CJsonFilterObject
 {
 	static SimpleBuilder* filter_builder()
-		{return new FilterBuilder( "RapidJsonFilter", "rapidjson", lb::createRapidJsonFilterPtr);}
+		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterPtr);}
 };
 }//anonymous namespace
 
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	RapidJsonFilterObject::filter_builder
+	CJsonFilterObject::filter_builder
 };
 
-ModuleEntryPoint entryPoint( 0, "JSON (rapidjson) filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

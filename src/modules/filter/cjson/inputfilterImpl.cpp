@@ -29,20 +29,46 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file rapidjson_filter.hpp
-///\brief Filter using the rapidjson library for input and output
+///\file inputfilterImpl.cpp
+///\brief Implementation of input filter abstraction for the cjson library
+#include "inputfilterImpl.hpp"
 
-#ifndef _Wolframe_RAPIDJSON_FILTER_HPP_INCLUDED
-#define _Wolframe_RAPIDJSON_FILTER_HPP_INCLUDED
-#include "filter/filter.hpp"
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
 
-namespace _Wolframe {
-namespace langbind {
+bool InputFilterImpl::getValue( const char* name, std::string& val)
+{
+}
 
-Filter createRapidJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg);
-Filter* createRapidJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
+bool InputFilterImpl::getDocType( std::string& val)
+{
+}
 
+bool InputFilterImpl::setValue( const char* name, const std::string& value)
+{
+}
 
-}}//namespace
-#endif
+void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
+{
+	if (!end) throw std::logic_error( "internal: need buffering input filter");
+	m_content.append( (const char*)content, contentsize);
+}
+
+bool InputFilterImpl::getDocType( types::DocType& doctype)
+{
+}
+
+bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+{
+}
+
+bool InputFilterImpl::setFlags( Flags f)
+{
+	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
+	{
+		return false;
+	}
+	return InputFilter::setFlags( f);
+}
+
 

@@ -84,6 +84,7 @@ public:
 
 	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
 	void setFlags( Flags f)						{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
+	void unsetFlags( Flags f)					{int ff=(int)m_flags - ((int)m_flags & (int)f); m_flags=(Flags)ff;}
 
 	void setElem( const ElementBuffer& e)
 	{

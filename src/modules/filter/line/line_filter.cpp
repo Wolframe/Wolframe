@@ -259,6 +259,15 @@ struct InputFilterImpl :public InputFilter
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	virtual bool setFlags( Flags f)
+	{
+		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
+		{
+			return false;
+		}
+		return InputFilter::setFlags( f);
+	}
+
 private:
 	TextScanner m_itr;		//< iterator on source
 	AppCharset m_output;		//< output

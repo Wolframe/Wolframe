@@ -58,12 +58,11 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 
 bool TypingInputFilter::setFlags( Flags f)
 {
-	langbind::TypedInputFilter::setFlags( f);
-	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
+	if (m_inputfilter.get()->setFlags( f))
 	{
-		return false;
+		return langbind::TypedInputFilter::setFlags( f);
 	}
-	return true;
+	return false;
 }
 
 bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)

@@ -279,6 +279,15 @@ private:
 		return m_parser.getEncoding();
 	}
 
+	virtual bool setFlags( Flags f)
+	{
+		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
+		{
+			return false;
+		}
+		return InputFilter::setFlags( f);
+	}
+
 private:
 	typedef textwolf::XMLParser<std::string> XMLParser;
 	XMLParser m_parser;			//< XML parser
