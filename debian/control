@@ -75,12 +75,12 @@ Description: Wolframe image manipulation function module.
  Wolframe image manipulation function module implemented with
  the FreeImage library.
 
-Package: wolframe-rapidjson
+Package: wolframe-cjson
 Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
-Description: Wolframe JSON filter module with Rapid JSON
+Description: Wolframe JSON filter module with cjson
  Wolframe filter JSON filtering module implemented with
- the Rapid JSON library.
+ the cjson library.
 
 Package: wolframe-libclient
 Architecture: any

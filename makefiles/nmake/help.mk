@@ -23,7 +23,7 @@ WITH_EXAMPLES=1        build and test the examples
 WITH_LIBHPDF=1         build code for creating PDFs with LibHpdf
 WITH_ICU=1             build code using ICU (icu4c)
 WITH_FREEIMAGE=1       build modules using FreeImage
-WITH_RAPIDJSON =1      build filtering module for JSON with rapid JSON
+WITH_CJSON =1          build filtering module for JSON with cjson
 
 Avaliable optional features during testing only:
 
@@ -35,5 +35,5 @@ nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1
                               WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1
                               WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
                               WITH_ICU=1 WITH_FREEIMAGE=1 WITH_PYTHON=1
-                              WITH_RAPIDJSON=1
+                              WITH_CJSON=1
                               
