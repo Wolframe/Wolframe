@@ -63,8 +63,8 @@ Prerequisites
   - dia: to convert images to svg
 - optionally (WITH_LIBXML2)
 - optionally (WITH_LIBXSLT), needs LIBXML2 too
-- optionally (WITH_RAPIDJSON): build JSON filtering module
-  implemented with Rapid JSON
+- optionally (WITH_CJSON): build JSON filtering module
+  implemented with cjson
 - optionally (WITH_SYSTEM_LIBHPDF): for PDF creation
   using the system version of libhpdf, specify
   WITH_LOCAL_LIBHPDF=1 to use the supplied version in

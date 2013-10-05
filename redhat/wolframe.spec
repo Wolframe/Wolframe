@@ -95,7 +95,7 @@
 %define with_libxslt	1
 %define with_libhpdf	1
 %define with_freeimage	1
-%define with_rapidjson	1
+%define with_cjson	1
 %define with_examples	1
 
 # Per package decisions
@@ -617,14 +617,14 @@ the FreeImage library.
 Requires: %{name} >= %{version}-%{release}
 %endif
 
-%if %{with_rapidjson}
-%package rapidjson
-Summary: Wolframe JSON filter module with Rapid JSON
+%if %{with_cjson}
+%package cjson
+Summary: Wolframe JSON filter module with cjson
 Group: Application/Business
 
-%description rapidjson
+%description cjson
 Wolframe filter JSON filtering module implemented with
-the Rapid JSON library.
+the cjson library.
 
 Requires: %{name} >= %{version}-%{release}
 %endif
@@ -786,8 +786,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -835,8 +835,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -884,8 +884,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -934,8 +934,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -989,8 +989,8 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 echo ===================== END OF TESTING =========================
@@ -1037,8 +1037,8 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
-%if %{with_rapidjson}
-	WITH_RAPIDJSON=1 \
+%if %{with_cjson}
+	WITH_CJSON=1 \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -1448,12 +1448,12 @@ fi
 %endif
 %endif
 
-%if %{with_rapidjson}
-%files rapidjson
+%if %{with_cjson}
+%files cjson
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/mod_filter_rapidjson.so
+%{_libdir}/wolframe/modules/mod_filter_cjson.so
 %endif
 
 %endif
