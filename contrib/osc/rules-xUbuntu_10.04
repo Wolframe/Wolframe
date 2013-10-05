@@ -124,7 +124,7 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
-	# filtering with Rapid JSON
+	# filtering with cjson
 	cd src/modules/filter/cjson; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
@@ -189,7 +189,7 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
 		cd ..
 
-	# filtering with Rapid JSON
+	# filtering with cjson
 	cd src/modules/filter/cjson; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-cjson; \
 		cd ../../../..
