@@ -45,6 +45,8 @@ Prerequisites
   - optionally (WITH_LIBXML2): libxml2 (with iconv support)
 - for XSLT processing
   - optionally (WITH_LIBXSLT): libxslt, requires also libxml2
+- optionally (WITH_RAPIDJSON): build JSON filtering module
+  implemented with Rapid JSON
 - optionally (WITH_LIBHPDF): for PDF creation,
   using the provided version in 'libhpdf'
 - optionally (WITH_ICU): ICU (icu4c, version 49)

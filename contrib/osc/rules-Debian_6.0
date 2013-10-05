@@ -21,7 +21,7 @@ export DH_OPTIONS
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
+export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_RAPIDJSON=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
 
 export BOOST_VERSION=1.48.0
 
@@ -124,6 +124,11 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
+	# filtering with Rapid JSON
+	cd src/modules/filter/rapidjson; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+
 	# module database sqlite3
 	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-sqlite3; \
@@ -184,6 +189,11 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
 		cd ..
 
+	# filtering with Rapid JSON
+	cd src/modules/filter/rapidjson; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-rapidjson; \
+		cd ../../../..
+	
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
