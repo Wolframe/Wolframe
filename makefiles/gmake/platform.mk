@@ -3349,8 +3349,6 @@ CJSON_INCLUDE_DIRS = -I$(CJSON_INCLUDE_DIR)
 endif
 
 
-
-
 # Expect (for testing)
 ######################
 
