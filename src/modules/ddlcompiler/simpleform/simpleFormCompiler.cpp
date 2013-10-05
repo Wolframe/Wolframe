@@ -301,7 +301,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, types::Variant
 		std::string second;
 		for (; si != se; ++si)
 		{
-			if (*si == '[' || *si == '(' || *si == '@') break;
+			if (*si == '[' || *si == '(' || *si == '@' || *si == '?' || *si == '!' || *si == '^') break;
 		}
 		if (si == se)
 		{
