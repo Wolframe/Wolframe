@@ -122,14 +122,15 @@ private:
 
 	struct StackElement
 	{
-		StackElement( const cJSON* node_)
-			:m_state(StateOpen),m_node(node_){}
+		explicit StackElement( const cJSON* node_, const char* tag_=0)
+			:m_state(StateOpen),m_node(node_),m_tag(tag_){}
 		StackElement( const StackElement& o)
-			:m_state(o.m_state),m_node(o.m_node){}
+			:m_state(o.m_state),m_node(o.m_node),m_tag(o.m_tag){}
 
-		enum State {StateOpen,StateChild,StateValue};
+		enum State {StateOpen,StateChild,StateValue,StateNext,StateCheckEnd,StateReopen};
 		State m_state;
 		const cJSON* m_node;
+		const char* m_tag;
 	};
 	std::vector<StackElement> m_stk;
 };
