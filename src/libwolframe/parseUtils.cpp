@@ -184,24 +184,25 @@ std::pair<std::string,std::string> _Wolframe::utils::parseTokenAssignement( std:
 	return rt;
 }
 
-std::pair<std::string,std::string> _Wolframe::utils::parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end)
+std::pair<std::string,std::string> utils::parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end)
 {
 	return parseTokenAssignement( itr, end, identifierCharTable());
 }
 
-std::pair<unsigned int,unsigned int> _Wolframe::utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
+LineInfo utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
 {
-	std::pair<unsigned int,unsigned int> rt(1,1);
+	LineInfo rt;
 	std::string::const_iterator ii = start;
 	for (; ii!=pos; ++ii)
 	{
 		if (*ii == '\n')
 		{
-			rt.second = 0;
-			rt.first += 1;
-			continue;
+			rt.incrementLine();
 		}
-		++rt.second;
+		else if (*ii != '\r')
+		{
+			rt.incrementColumn();
+		}
 	}
 	return rt;
 }

@@ -120,13 +120,15 @@ private:
 	cJSON* m_root;
 	cJSON* m_first;
 
-	class StackElement
+	struct StackElement
 	{
 		StackElement( const cJSON* node_)
-			:m_node(node_){}
+			:m_state(StateOpen),m_node(node_){}
 		StackElement( const StackElement& o)
-			:m_node(o.m_node){}
-	private:
+			:m_state(o.m_state),m_node(o.m_node){}
+
+		enum State {StateOpen,StateChild,StateValue};
+		State m_state;
 		const cJSON* m_node;
 	};
 	std::vector<cJSON*> m_stk;

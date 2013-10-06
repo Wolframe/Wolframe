@@ -49,24 +49,19 @@ namespace _Wolframe {
 namespace config {
 
 struct LineInfo
+	:public utils::LineInfo
 {
 	LineInfo( const LineInfo& o)
-		:line(o.line),col(o.col){}
+		:utils::LineInfo(o){}
 	LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-	{
-		std::pair<unsigned int,unsigned int> info = utils::getLineInfo( start, pos);
-		line = info.first;
-		col = info.second;
-	}
-
-	unsigned int line;
-	unsigned int col;
+		:utils::LineInfo( utils::getLineInfo( start, pos))
+	{}
 
 	static const log::LogObjectDescriptionBase* getLogObjectDescription()
 	{
-		struct Description :public log::LogObjectDescription<LineInfo>
+		struct Description :public log::LogObjectDescription<utils::LineInfo>
 		{
-			Description():log::LogObjectDescription<LineInfo>( "on line $1 column $2"){(*this)(&LineInfo::line)(&LineInfo::col);}
+			Description():log::LogObjectDescription<utils::LineInfo>( "on line $1 column $2"){(*this)(&utils::LineInfo::line)(&utils::LineInfo::column);}
 		};
 		static Description rt;
 		return &rt;
@@ -76,19 +71,19 @@ struct LineInfo
 struct PositionalError
 {
 	PositionalError( const PositionalError& o)
-		:line(o.line),col(o.col),msg(o.msg){}
+		:line(o.line),column(o.column),msg(o.msg){}
 	PositionalError( const LineInfo& o, const std::string& msg_)
-		:line(o.line),col(o.col),msg(msg_){}
+		:line(o.line),column(o.column),msg(msg_){}
 
 	unsigned int line;
-	unsigned int col;
+	unsigned int column;
 	std::string msg;
 
 	static const log::LogObjectDescriptionBase* getLogObjectDescription()
 	{
 		struct Description :public log::LogObjectDescription<PositionalError>
 		{
-			Description():log::LogObjectDescription<PositionalError>( "error on line $1 column $2: $3"){(*this)(&PositionalError::line)(&PositionalError::col)(&PositionalError::msg);}
+			Description():log::LogObjectDescription<PositionalError>( "error on line $1 column $2: $3"){(*this)(&PositionalError::line)(&PositionalError::column)(&PositionalError::msg);}
 		};
 		static Description rt;
 		return &rt;
@@ -98,14 +93,14 @@ struct PositionalError
 struct PositionalFileError
 {
 	PositionalFileError( const PositionalFileError& o)
-		:line(o.line),col(o.col),msg(o.msg),filename(o.filename){}
+		:line(o.line),column(o.column),msg(o.msg),filename(o.filename){}
 	PositionalFileError( const PositionalError& o, const std::string& filename_)
-		:line(o.line),col(o.col),msg(o.msg),filename(filename_){}
+		:line(o.line),column(o.column),msg(o.msg),filename(filename_){}
 	PositionalFileError( const LineInfo& o, const std::string& msg_, const std::string& filename_)
-		:line(o.line),col(o.col),msg(msg_),filename(filename_){}
+		:line(o.line),column(o.column),msg(msg_),filename(filename_){}
 
 	unsigned int line;
-	unsigned int col;
+	unsigned int column;
 	std::string msg;
 	std::string filename;
 
@@ -113,7 +108,7 @@ struct PositionalFileError
 	{
 		struct Description :public log::LogObjectDescription<PositionalFileError>
 		{
-			Description():log::LogObjectDescription<PositionalFileError>( "error in file $4 on line $1 column $2: $3"){(*this)(&PositionalFileError::line)(&PositionalFileError::col)(&PositionalFileError::msg)(&PositionalFileError::filename);}
+			Description():log::LogObjectDescription<PositionalFileError>( "error in file $4 on line $1 column $2: $3"){(*this)(&PositionalFileError::line)(&PositionalFileError::column)(&PositionalFileError::msg)(&PositionalFileError::filename);}
 		};
 		static Description rt;
 		return &rt;

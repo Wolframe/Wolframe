@@ -120,8 +120,8 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			std::pair<unsigned int,unsigned int> pos = utils::getLineInfo( src.begin(), itr);
-			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.first) + " of PDF printer layout description source (" + e.what() + ")");
+			utils::LineInfo pos = utils::getLineInfo( src.begin(), itr);
+			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line) + " of PDF printer layout description source (" + e.what() + ")");
 		}
 	}
 

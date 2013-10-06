@@ -94,7 +94,23 @@ std::pair<std::string,std::string> parseTokenAssignement( std::string::const_ite
 std::string parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end);
 
 ///\brief Get the line/column info from a source iterator
-std::pair<unsigned int,unsigned int> getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
+struct LineInfo
+{
+	unsigned int line;
+	unsigned int column;
+
+	LineInfo()
+		:line(1),column(1){}
+	LineInfo( unsigned int line_, unsigned int column_)
+		:line(line_),column(column_){}
+	LineInfo( const LineInfo& o)
+		:line(o.line),column(o.column){}
+
+	void incrementLine()	{column=1; ++line;}
+	void incrementColumn()	{++column;}
+};
+
+LineInfo getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
 
 }} //namespace _Wolframe::utils
 

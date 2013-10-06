@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file inputfilterImpl.cpp
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
+#include "utils/parseUtils.hpp"
 #include "langbind/charsetEncodings.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -64,7 +65,7 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 	return Parent::setValue( name, value);
 }
 
-static std::string getCharsetEncoding( const void* content, std::size_t contentsize)
+static std::string getCharsetEncodingName( const void* content, std::size_t contentsize)
 {
 	CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
 	std::string rt = "UTF-";
@@ -82,7 +83,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	if (end)
 	{
 		if (m_root) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encoding = getCharsetEncoding( content, contentsize);
+		m_encoding = getCharsetEncodingName( content, contentsize);
 		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
 		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
 		m_state = Processing;
@@ -91,27 +92,15 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		if (!m_root)
 		{
 			if (!ctx.errorptr) throw std::bad_alloc();
-			std::size_t ii=0,ofs=0,ln=1,nn=ctx.errorptr - m_content.c_str();
-			const char* cc = m_content.c_str();
-			for (; ii<nn && cc[ii]; ++ii)
-			{
-				if (cc[ii] == '\n')
-				{
-					++ln;
-					ofs = 0;
-				}
-				else if (cc[ii] != '\r')
-				{
-					++ofs;
-				}
-			}
+			utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
+
 			std::string err( ctx.errorptr);
 			if (err.size() > 80)
 			{
 				err.resize( 80);
 				err.append( "...");
 			}
-			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(ln) + " column " + boost::lexical_cast<std::string>(ofs) + " at '" + err + "'");
+			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
 		}
 		m_first = m_root;
 		for (;;)
@@ -136,6 +125,37 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 {
+	while (!m_stk.empty())
+	{
+		const cJSON* nd = m_stk.back().m_node;
+		if (!nd) throw std::runtime_error( "internal: invalid node in JSON structure");
+
+		for (;;) switch (m_stk.back().m_state)
+		{
+			case StateOpen:
+				if (nd->string)
+				{
+					type = InputFilter::OpenTag;
+					element = nd->string;
+					elementsize = std::strlen( nd->string);
+					m_stk.back().m_state = StateChild;
+					return true;
+				}
+				m_stk.back().m_state = StateChild;
+				continue;
+
+			case StateChild:
+				if (nd->child)
+				{
+
+				}
+				break;
+
+			case StateValue:
+				break;
+		}
+	}
+	return false;
 }
 
 bool InputFilterImpl::setFlags( Flags f)
