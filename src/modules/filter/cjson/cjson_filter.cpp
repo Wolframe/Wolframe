@@ -53,8 +53,7 @@ struct CJsonFilter :public Filter
 {
 	CJsonFilter( const char* encoding=0)
 	{
-		InputFilterImpl impl;
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
+		m_inputfilter.reset( new InputFilterImpl());
 		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
 		m_outputfilter.reset( oo);
 		if (encoding)

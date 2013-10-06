@@ -32,6 +32,9 @@ Project Wolframe.
 ///\file outputfilterImpl.hpp
 ///\brief Implementation of output filter abstraction for the cjson library
 #include "outputfilterImpl.hpp"
+#include "outputfilterImpl.hpp"
+#include "langbind/charsetEncodings.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -108,6 +111,20 @@ void OutputFilterImpl::closeElement()
 		{
 			cJSON_Delete( contentval);
 			throw std::bad_alloc();
+		}
+	}
+	if (m_stk.size() == 1)
+	{
+		char* content = cJSON_Print( m_stk.back().m_node);
+		if (!content) throw std::bad_alloc();
+		const char* enc = encoding();
+		if (!enc || boost::algorithm::iequals( enc, "UTF-8"))
+		{
+			m_elembuf.append( content);
+		}
+		else
+		{
+			//TODO conversion
 		}
 	}
 }
