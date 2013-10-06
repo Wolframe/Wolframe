@@ -32,6 +32,10 @@
 #include <ctype.h>
 #include "cJSON.h"
 
+static const char *ep;
+
+const char *cJSON_GetErrorPtr(void) {return ep;}
+
 static int cJSON_strcasecmp(const char *s1,const char *s2)
 {
 	if (!s1) return (s1==s2)?0:1;if (!s2) return 1;
@@ -118,13 +122,11 @@ static char *print_number(cJSON *item)
 	if (fabs(((double)item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN)
 	{
 		str=(char*)cJSON_malloc(21);	/* 2^64+1 can be represented in 21 chars. */
-		if (!str) return 0;
 		if (str) sprintf(str,"%d",item->valueint);
 	}
 	else
 	{
 		str=(char*)cJSON_malloc(64);	/* This is a nice tradeoff. */
-		if (!str) return 0;
 		if (str)
 		{
 			if (fabs(floor(d)-d)<=DBL_EPSILON && fabs(d)<1.0e60)sprintf(str,"%.0f",d);
@@ -150,10 +152,10 @@ static unsigned parse_hex4(const char *str)
 
 /* Parse the input text into an unescaped cstring, and populate item. */
 static const unsigned char firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
-static const char *parse_string(cJSON_Context* ctx, cJSON *item,const char *str)
+static const char *parse_string(cJSON *item,const char *str)
 {
 	const char *ptr=str+1;char *ptr2;char *out;int len=0;unsigned uc,uc2;
-	if (*str!='\"') {ctx->errorptr=str;return 0;}	/* not a string! */
+	if (*str!='\"') {ep=str;return 0;}	/* not a string! */
 	
 	while (*ptr!='\"' && *ptr && ++len) if (*ptr++ == '\\') ptr++;	/* Skip escaped quotes. */
 	
@@ -248,52 +250,52 @@ static char *print_string_ptr(const char *str)
 static char *print_string(cJSON *item)	{return print_string_ptr(item->valuestring);}
 
 /* Predeclare these prototypes. */
-static const char *parse_value(cJSON_Context* ctx, cJSON *item,const char *value);
+static const char *parse_value(cJSON *item,const char *value);
 static char *print_value(cJSON *item,int depth,int fmt);
-static const char *parse_array(cJSON_Context* ctx, cJSON *item,const char *value);
+static const char *parse_array(cJSON *item,const char *value);
 static char *print_array(cJSON *item,int depth,int fmt);
-static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *value);
+static const char *parse_object(cJSON *item,const char *value);
 static char *print_object(cJSON *item,int depth,int fmt);
 
 /* Utility to jump whitespace and cr/lf */
 static const char *skip(const char *in) {while (in && *in && (unsigned char)*in<=32) in++; return in;}
 
 /* Parse an object - create a new root, and populate. */
-cJSON *cJSON_ParseWithOpts(cJSON_Context* ctx, const char *value,const char **return_parse_end,int require_null_terminated)
+cJSON *cJSON_ParseWithOpts(const char *value,const char **return_parse_end,int require_null_terminated)
 {
 	const char *end=0;
 	cJSON *c=cJSON_New_Item();
-	ctx->errorptr=0;
+	ep=0;
 	if (!c) return 0;       /* memory fail */
 
-	end=parse_value(ctx,c,skip(value));
+	end=parse_value(c,skip(value));
 	if (!end)	{cJSON_Delete(c);return 0;}	/* parse failure. ep is set. */
 
 	/* if we require null-terminated JSON without appended garbage, skip and then check for a null terminator */
-	if (require_null_terminated) {end=skip(end);if (*end) {cJSON_Delete(c);ctx->errorptr=end;return 0;}}
+	if (require_null_terminated) {end=skip(end);if (*end) {cJSON_Delete(c);ep=end;return 0;}}
 	if (return_parse_end) *return_parse_end=end;
 	return c;
 }
 /* Default options for cJSON_Parse */
-cJSON *cJSON_Parse(cJSON_Context* ctx, const char *value) {return cJSON_ParseWithOpts(ctx,value,0,0);}
+cJSON *cJSON_Parse(const char *value) {return cJSON_ParseWithOpts(value,0,0);}
 
 /* Render a cJSON item/entity/structure to text. */
 char *cJSON_Print(cJSON *item)				{return print_value(item,0,1);}
 char *cJSON_PrintUnformatted(cJSON *item)	{return print_value(item,0,0);}
 
 /* Parser core - when encountering text, process appropriately. */
-static const char *parse_value(cJSON_Context* ctx, cJSON *item,const char *value)
+static const char *parse_value(cJSON *item,const char *value)
 {
 	if (!value)						return 0;	/* Fail on null. */
 	if (!strncmp(value,"null",4))	{ item->type=cJSON_NULL;  return value+4; }
 	if (!strncmp(value,"false",5))	{ item->type=cJSON_False; return value+5; }
 	if (!strncmp(value,"true",4))	{ item->type=cJSON_True; item->valueint=1;	return value+4; }
-	if (*value=='\"')				{ return parse_string(ctx,item,value); }
+	if (*value=='\"')				{ return parse_string(item,value); }
 	if (*value=='-' || (*value>='0' && *value<='9'))	{ return parse_number(item,value); }
-	if (*value=='[')				{ return parse_array(ctx,item,value); }
-	if (*value=='{')				{ return parse_object(ctx,item,value); }
+	if (*value=='[')				{ return parse_array(item,value); }
+	if (*value=='{')				{ return parse_object(item,value); }
 
-	ctx->errorptr=value;return 0;	/* failure. */
+	ep=value;return 0;	/* failure. */
 }
 
 /* Render a value to text. */
@@ -315,10 +317,10 @@ static char *print_value(cJSON *item,int depth,int fmt)
 }
 
 /* Build an array from input text. */
-static const char *parse_array(cJSON_Context* ctx, cJSON *item,const char *value)
+static const char *parse_array(cJSON *item,const char *value)
 {
 	cJSON *child;
-	if (*value!='[')	{ctx->errorptr=value;return 0;}	/* not an array! */
+	if (*value!='[')	{ep=value;return 0;}	/* not an array! */
 
 	item->type=cJSON_Array;
 	value=skip(value+1);
@@ -326,7 +328,7 @@ static const char *parse_array(cJSON_Context* ctx, cJSON *item,const char *value
 
 	item->child=child=cJSON_New_Item();
 	if (!item->child) return 0;		 /* memory fail */
-	value=skip(parse_value(ctx,child,skip(value)));	/* skip any spacing, get the value. */
+	value=skip(parse_value(child,skip(value)));	/* skip any spacing, get the value. */
 	if (!value) return 0;
 
 	while (*value==',')
@@ -334,12 +336,12 @@ static const char *parse_array(cJSON_Context* ctx, cJSON *item,const char *value
 		cJSON *new_item;
 		if (!(new_item=cJSON_New_Item())) return 0; 	/* memory fail */
 		child->next=new_item;new_item->prev=child;child=new_item;
-		value=skip(parse_value(ctx,child,skip(value+1)));
+		value=skip(parse_value(child,skip(value+1)));
 		if (!value) return 0;	/* memory fail */
 	}
 
 	if (*value==']') return value+1;	/* end of array */
-	ctx->errorptr=value;return 0;	/* malformed. */
+	ep=value;return 0;	/* malformed. */
 }
 
 /* Render an array to text */
@@ -401,10 +403,10 @@ static char *print_array(cJSON *item,int depth,int fmt)
 }
 
 /* Build an object from the text. */
-static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *value)
+static const char *parse_object(cJSON *item,const char *value)
 {
 	cJSON *child;
-	if (*value!='{')	{ctx->errorptr=value;return 0;}	/* not an object! */
+	if (*value!='{')	{ep=value;return 0;}	/* not an object! */
 	
 	item->type=cJSON_Object;
 	value=skip(value+1);
@@ -412,11 +414,11 @@ static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *valu
 	
 	item->child=child=cJSON_New_Item();
 	if (!item->child) return 0;
-	value=skip(parse_string(ctx,child,skip(value)));
+	value=skip(parse_string(child,skip(value)));
 	if (!value) return 0;
 	child->string=child->valuestring;child->valuestring=0;
-	if (*value!=':') {ctx->errorptr=value;return 0;}	/* fail! */
-	value=skip(parse_value(ctx,child,skip(value+1)));	/* skip any spacing, get the value. */
+	if (*value!=':') {ep=value;return 0;}	/* fail! */
+	value=skip(parse_value(child,skip(value+1)));	/* skip any spacing, get the value. */
 	if (!value) return 0;
 	
 	while (*value==',')
@@ -424,16 +426,16 @@ static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *valu
 		cJSON *new_item;
 		if (!(new_item=cJSON_New_Item()))	return 0; /* memory fail */
 		child->next=new_item;new_item->prev=child;child=new_item;
-		value=skip(parse_string(ctx,child,skip(value+1)));
+		value=skip(parse_string(child,skip(value+1)));
 		if (!value) return 0;
 		child->string=child->valuestring;child->valuestring=0;
-		if (*value!=':') {ctx->errorptr=value;return 0;}	/* fail! */
-		value=skip(parse_value(ctx,child,skip(value+1)));	/* skip any spacing, get the value. */
+		if (*value!=':') {ep=value;return 0;}	/* fail! */
+		value=skip(parse_value(child,skip(value+1)));	/* skip any spacing, get the value. */
 		if (!value) return 0;
 	}
 	
 	if (*value=='}') return value+1;	/* end of array */
-	ctx->errorptr=value;return 0;	/* malformed. */
+	ep=value;return 0;	/* malformed. */
 }
 
 /* Render an object to text. */

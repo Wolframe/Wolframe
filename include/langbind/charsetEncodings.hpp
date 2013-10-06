@@ -53,6 +53,10 @@ std::string convertStringCharsetToUTF8( const CharsetEncoding& encoding, const s
 struct CharsetClass
 {
 	enum Id {NONE=0x00,U1=0x01,U2=0x02,U4=0x04,BE=0x08,LE=0x10,FAIL=0x80};
+
+	///\brief Guess the character set of a source file containing ASCII operators
+	///\remark Does not yet distinguish between UTF and UCS
+	///\return A bitset of matches (e.g. U2|BE for UTF16BE)
 	static CharsetClass::Id guess( const char* content, std::size_t size);
 };
 

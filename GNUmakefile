@@ -16,6 +16,10 @@ ifeq ($(WITH_LOCAL_SQLITE3),1)
 SUBDIRS := sqlite3 $(SUBDIRS)
 endif
 
+ifeq ($(WITH_CJSON),1)
+SUBDIRS := cjson $(SUBDIRS)
+endif
+
 ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
 endif

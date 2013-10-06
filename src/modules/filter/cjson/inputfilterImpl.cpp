@@ -64,19 +64,25 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 	return Parent::setValue( name, value);
 }
 
+static std::string getCharsetEncoding( const void* content, std::size_t contentsize)
+{
+	CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
+	std::string rt = "UTF-";
+	if ((int)cl & (CharsetClass::U1) != 0) rt += "8";
+	if ((int)cl & (CharsetClass::U2) != 0) rt += "16";
+	if ((int)cl & (CharsetClass::U4) != 0) rt += "32";
+	if ((int)cl & (CharsetClass::BE) != 0) rt += "BE";
+	if ((int)cl & (CharsetClass::LE) != 0) rt += "LE";
+	return rt;
+}
+
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
 	m_content.append( (const char*)content, contentsize);
 	if (end)
 	{
 		if (m_root) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
-		std::string m_encoding = "UTF-";
-		if ((int)cl & (CharsetClass::U1) != 0) m_encoding += "8";
-		if ((int)cl & (CharsetClass::U2) != 0) m_encoding += "16";
-		if ((int)cl & (CharsetClass::U4) != 0) m_encoding += "32";
-		if ((int)cl & (CharsetClass::BE) != 0) m_encoding += "BE";
-		if ((int)cl & (CharsetClass::LE) != 0) m_encoding += "LE";
+		m_encoding = getCharsetEncoding( content, contentsize);
 		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
 		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
 		m_state = Processing;
@@ -108,12 +114,20 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(ln) + " column " + boost::lexical_cast<std::string>(ofs) + " at '" + err + "'");
 		}
 		m_first = m_root;
-		if (m_root->string && m_root->valuestring)
+		for (;;)
 		{
-			if (boost::iequals("doctype",m_root->string))
+			if (m_first->string && m_first->valuestring)
 			{
-				m_doctype = m_root->valuestring;
-				m_first = m_root->next;
+				if (boost::iequals("doctype",m_first->string))
+				{
+					if (!m_doctype.empty()) throw std::runtime_error("duplicate 'doctype' definition");
+					m_doctype = m_first->valuestring;
+					m_first = m_first->next;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 		m_stk.push_back( m_first);

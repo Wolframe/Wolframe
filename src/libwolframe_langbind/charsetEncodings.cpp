@@ -147,13 +147,12 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 {
 	CharsetClass::Id rt = NONE;
 	int maxll = 0;
-	int ll;
+	int ll = 0;			//< number of zeroes in a row
 	int idx = 0;
-	const char* ci = content;
-	const char* ce = ci + size;
+
 	for (; idx < size; ++idx)
 	{
-		if (ci[idx] != '\0')
+		if (content[idx] != '\0')
 		{
 			ll = 0;
 		}
@@ -179,40 +178,51 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 	{
 		rt = (Id)((int)rt | (int)U1);
 	}
-	for (idx=0; idx < size; ++idx)
+	if (size > 2 && maxll == 1)
 	{
-		if (ci[idx] == '\0')
+		// ... UTF16 check BOM
+		if (content[0] == 0xFE && content[1] == 0xFF) rt = (Id)((int)rt | (int)BE);
+		if (content[0] == 0xFF && content[1] == 0xFE) rt = (Id)((int)rt | (int)LE);
+	}
+	if ((int)rt & ((int)LE | (int)BE) == 0)
+	{
+		// ... indians not set
+		for (idx=0; idx < size; ++idx)
 		{
-			if (maxll == 3)
+			if (content[idx] == '\0')
 			{
-				if (idx % 4 == 0)
+				if (maxll == 3)
 				{
-					//... zero at the beginning, means allways BE
-					rt = (Id)((int)rt | (int)BE);
+					if (idx % 4 == 0)
+					{
+						//... zero at the start of a character, means allways BE
+						rt = (Id)((int)rt | (int)BE);
+					}
+					else if (idx % 4 == 3)
+					{
+						//... zero at the end of a character, means allways LE
+						rt = (Id)((int)rt | (int)LE);
+					}
 				}
-				else if (idx % 4 == 3)
+				if (maxll == 1)
 				{
-					//... zero at the end, means allways LE
-					rt = (Id)((int)rt | (int)LE);
-				}
-			}
-			if (maxll == 1)
-			{
-				if (idx % 2 == 0)
-				{
-					//... zero at the beginning, means allways BE
-					rt = (Id)((int)rt | (int)BE);
-				}
-				else if (idx % 2 == 1)
-				{
-					//... zero at the end, means allways LE
-					rt = (Id)((int)rt | (int)LE);
+					if (idx % 2 == 0)
+					{
+						//... zero at the start of a character, means allways BE
+						rt = (Id)((int)rt | (int)BE);
+					}
+					else if (idx % 2 == 1)
+					{
+						//... zero at the end of a character, means allways LE
+						rt = (Id)((int)rt | (int)LE);
+					}
 				}
 			}
 		}
 	}
 	if ((int)rt & ((int)LE | (int)BE) == ((int)LE | (int)BE))
 	{
+		// ... indians contradicting
 		return NONE;
 	}
 	return rt;
