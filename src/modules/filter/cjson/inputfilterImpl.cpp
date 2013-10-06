@@ -132,26 +132,26 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 
 		for (;;) switch (m_stk.back().m_state)
 		{
-			case StateOpen:
+			case StackElement::StateOpen:
 				if (nd->string)
 				{
 					type = InputFilter::OpenTag;
 					element = nd->string;
 					elementsize = std::strlen( nd->string);
-					m_stk.back().m_state = StateChild;
+					m_stk.back().m_state = StackElement::StateChild;
 					return true;
 				}
-				m_stk.back().m_state = StateChild;
+				m_stk.back().m_state = StackElement::StateChild;
 				continue;
 
-			case StateChild:
+			case StackElement::StateChild:
 				if (nd->child)
 				{
 
 				}
 				break;
 
-			case StateValue:
+			case StackElement::StateValue:
 				break;
 		}
 	}

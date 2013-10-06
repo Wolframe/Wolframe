@@ -131,7 +131,7 @@ private:
 		State m_state;
 		const cJSON* m_node;
 	};
-	std::vector<cJSON*> m_stk;
+	std::vector<StackElement> m_stk;
 };
 
 }}//namespace
