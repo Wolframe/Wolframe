@@ -97,13 +97,29 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 				break;
 
 			case types::Variant::Int:
-				castelement = boost::lexical_cast<std::string>( element.toint());
-				rt = m_outputfilter->print( type, castelement);
+				if (type == OutputFilter::OpenTag && flag( FilterBase::SerializeWithIndices))
+				{
+					// array element marker:
+					rt = m_outputfilter->print( type, "");
+				}
+				else
+				{
+					castelement = boost::lexical_cast<std::string>( element.toint());
+					rt = m_outputfilter->print( type, castelement);
+				}
 				break;
 
 			case types::Variant::UInt:
-				castelement = boost::lexical_cast<std::string>( element.touint());
-				rt = m_outputfilter->print( type, castelement);
+				if (type == OutputFilter::OpenTag && flag( FilterBase::SerializeWithIndices))
+				{
+					// array element marker:
+					rt = m_outputfilter->print( type, "");
+				}
+				else
+				{
+					castelement = boost::lexical_cast<std::string>( element.touint());
+					rt = m_outputfilter->print( type, castelement);
+				}
 				break;
 
 			case types::Variant::String:

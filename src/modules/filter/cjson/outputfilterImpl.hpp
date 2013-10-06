@@ -62,6 +62,7 @@ public:
 		,m_headerPrinted(false)
 	{
 		m_stk.push_back( StackElement(""));
+		setFlags( FilterBase::SerializeWithIndices);
 	}
 
 	OutputFilterImpl( const OutputFilterImpl& o)

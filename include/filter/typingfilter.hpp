@@ -83,7 +83,10 @@ public:
 	///\brief Constructor
 	explicit TypingOutputFilter( const OutputFilterR& outp)
 		:types::TypeSignature("langbind::TypingOutputFilter", __LINE__)
-		,m_outputfilter(outp){}
+		,m_outputfilter(outp)
+	{
+		setFlags( outp->flags());
+	}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy

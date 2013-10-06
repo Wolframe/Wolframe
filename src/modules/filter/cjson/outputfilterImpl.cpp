@@ -47,12 +47,41 @@ void OutputFilterImpl::closeElement()
 	m_stk.back().m_node = 0;
 	m_stk.pop_back();
 
+	if (!m_stk.back().m_node)
+	{
+		if (name.empty())
+		{
+			m_stk.back().m_node = cJSON_CreateArray();
+			if (!m_stk.back().m_node)
+			{
+				cJSON_Delete( val);
+				throw std::bad_alloc();
+			}
+		}
+		else
+		{
+			m_stk.back().m_node = cJSON_CreateObject();
+			if (!m_stk.back().m_node)
+			{
+				cJSON_Delete( val);
+				throw std::bad_alloc();
+			}
+		}
+	}
 	if (m_stk.back().m_node->type == cJSON_Array)
 	{
 		cJSON_AddItemToArray( m_stk.back().m_node, val);
 	}
-	else if (m_stk.back().m_node->type != cJSON_Object)
+	else if (m_stk.back().m_node->type == cJSON_Object)
 	{
+		cJSON* arobj = cJSON_DetachItemFromObject( m_stk.back().m_node, name.c_str());
+		if (arobj)
+		{
+			cJSON* ar = cJSON_CreateArray();
+			cJSON_AddItemToArray( ar, arobj);
+			cJSON_AddItemToArray( ar, val);
+			val = ar;
+		}
 		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
 		{
 			cJSON_Delete( val);
@@ -94,17 +123,28 @@ void OutputFilterImpl::addStructItem( const std::string name, const std::string&
 	{
 		throw std::runtime_error( "mixing structure with array content in output");
 	}
-	else if (m_stk.back().m_node->type != cJSON_Object)
+	else if (m_stk.back().m_node->type == cJSON_Object)
+	{
+		cJSON* val = cJSON_CreateString( value.c_str());
+		if (!val) throw std::bad_alloc();
+
+		cJSON* arobj = cJSON_DetachItemFromObject( m_stk.back().m_node, name.c_str());
+		if (arobj)
+		{
+			cJSON* ar = cJSON_CreateArray();
+			cJSON_AddItemToArray( ar, arobj);
+			cJSON_AddItemToArray( ar, val);
+			val = ar;
+		}
+		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+		{
+			cJSON_Delete( val);
+			throw std::bad_alloc();
+		}
+	}
+	else
 	{
 		throw std::runtime_error( "try to add item to non structure");
-	}
-	cJSON* val = cJSON_CreateString( value.c_str());
-	if (!val) throw std::bad_alloc();
-
-	if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
-	{
-		cJSON_Delete( val);
-		throw std::bad_alloc();
 	}
 }
 
