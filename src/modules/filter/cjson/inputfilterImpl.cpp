@@ -82,13 +82,13 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	m_content.append( (const char*)content, contentsize);
 	if (end)
 	{
-		if (m_root) throw std::logic_error( "bad operation on JSON input filter: put input after end");
+		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
 		m_encoding = getCharsetEncodingName( content, contentsize);
 		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
 		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
 		cJSON_Context ctx;
-		m_root = cJSON_Parse( &ctx, m_content.c_str());
-		if (!m_root)
+		cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
+		if (!pp)
 		{
 			if (!ctx.errorptr) throw std::bad_alloc();
 			utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
@@ -101,16 +101,18 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			}
 			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
 		}
-		m_first = m_root;
+		m_root = boost::shared_ptr<cJSON>( pp, cJSON_Delete);
+
+		const cJSON* first = m_root.get();
 		for (;;)
 		{
-			if (m_first->string && m_first->valuestring)
+			if (first->string && first->valuestring)
 			{
-				if (boost::iequals("doctype",m_first->string))
+				if (boost::iequals("doctype",first->string))
 				{
 					if (!m_doctype.empty()) throw std::runtime_error("duplicate 'doctype' definition");
-					m_doctype = m_first->valuestring;
-					m_first = m_first->next;
+					m_doctype = first->valuestring;
+					first = first->next;
 				}
 				else
 				{
@@ -118,7 +120,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				}
 			}
 		}
-		m_stk.push_back( StackElement( m_first));
+		m_stk.push_back( StackElement( first));
 	}
 }
 
@@ -164,7 +166,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 				continue;
 
 			case StackElement::StateValue:
-				switch (nd->type)
+				switch (nd->type & 0x7F)
 				{
 					case cJSON_False:
 						type = InputFilter::Value;
@@ -197,9 +199,6 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						m_stk.back().m_state = StackElement::StateNext;
 						break;
 					case cJSON_Object:
-						m_stk.back().m_state = StackElement::StateNext;
-						break;
-					case cJSON_IsReference:
 						m_stk.back().m_state = StackElement::StateNext;
 						break;
 					default:
@@ -244,6 +243,14 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 				else
 				{
 					m_stk.pop_back();
+					if (m_stk.empty())
+					{
+						// final close:
+						type = InputFilter::CloseTag;
+						element = 0;
+						elementsize = 0;
+						return true;
+					}
 				}
 				continue;
 

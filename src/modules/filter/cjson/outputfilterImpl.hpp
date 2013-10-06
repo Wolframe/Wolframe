@@ -58,7 +58,11 @@ public:
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(attr)
-		{}
+		,m_elemitr(0)
+		,m_headerPrinted(false)
+	{
+		m_stk.push_back( StackElement(""));
+	}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
@@ -66,9 +70,11 @@ public:
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_doctype_root(o.m_doctype_root)
-		,m_doctype_system(o.m_doctype_system)
-		,m_encoding(o.m_encoding){}
+		,m_doctype(o.m_doctype)
+		,m_encoding(o.m_encoding)
+		,m_headerPrinted(o.m_headerPrinted)
+		,m_stk(o.m_stk)
+		{}
 
 	virtual ~OutputFilterImpl(){}
 
@@ -98,15 +104,35 @@ public:
 	const char* encoding() const;
 
 private:
-	bool flushBuffer();
+	void addStructItem( const std::string name, const std::string& value);
+	void setContentValue( const std::string& value);
+	void closeElement();
 
 private:
 	std::string m_attribname;				//< attribute name buffer
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
-	std::string m_doctype_root;				//< !DOCTYPE root element (1)
-	std::string m_doctype_system;				//< !DOCTYPE system element (3)
+	std::string m_doctype;					//< document type
 	std::string m_encoding;					//< character set encoding
+	bool m_headerPrinted;
+
+	struct StackElement
+	{
+		explicit StackElement( const std::string& name_)
+			:m_state(Init),m_node(0),m_name(name_){}
+		StackElement( const StackElement& o)
+			:m_state(o.m_state),m_node(o.m_node?cJSON_Duplicate(o.m_node,1):0),m_name(o.m_name){}
+		~StackElement()
+		{
+			if (m_node) cJSON_Delete( m_node);
+		}
+
+		enum State {Init};
+		State m_state;
+		cJSON* m_node;
+		std::string m_name;
+	};
+	std::vector<StackElement> m_stk;
 };
 
 }}//namespace

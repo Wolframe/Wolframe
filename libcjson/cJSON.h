@@ -1,16 +1,16 @@
 /*
   Copyright (c) 2009 Dave Gamble
- 
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
- 
+
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
- 
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ extern "C"
 #define cJSON_String 4
 #define cJSON_Array 5
 #define cJSON_Object 6
-	
+
 #define cJSON_IsReference 256
 
 /* The cJSON structure: */
@@ -99,17 +99,17 @@ extern cJSON *cJSON_CreateStringArray(const char **strings,int count);
 
 /* Append item to the specified array/object. */
 extern void cJSON_AddItemToArray(cJSON *array, cJSON *item);
-extern void	cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item);
+extern int cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item);
 /* Append reference to item to the specified array/object. Use this when you want to add an existing cJSON to a new cJSON, but don't want to corrupt your existing cJSON. */
-extern void cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
-extern void	cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item);
+extern int cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
+extern int cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item);
 
 /* Remove/Detatch items from Arrays/Objects. */
 extern cJSON *cJSON_DetachItemFromArray(cJSON *array,int which);
 extern void   cJSON_DeleteItemFromArray(cJSON *array,int which);
 extern cJSON *cJSON_DetachItemFromObject(cJSON *object,const char *string);
 extern void   cJSON_DeleteItemFromObject(cJSON *object,const char *string);
-	
+
 /* Update array items. */
 extern void cJSON_ReplaceItemInArray(cJSON *array,int which,cJSON *newitem);
 extern void cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem);

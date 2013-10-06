@@ -56,9 +56,9 @@ static char* cJSON_strdup(const char* str)
 void cJSON_InitHooks(cJSON_Hooks* hooks)
 {
     if (!hooks) { /* Reset hooks */
-        cJSON_malloc = malloc;
-        cJSON_free = free;
-        return;
+	cJSON_malloc = malloc;
+	cJSON_free = free;
+	return;
     }
 
 	cJSON_malloc = (hooks->malloc_fn)?hooks->malloc_fn:malloc;
@@ -103,7 +103,7 @@ static const char *parse_number(cJSON *item,const char *num)
 	}
 
 	n=sign*n*pow(10.0,(scale+subscale*signsubscale));	/* number = +/- number.fraction * 10^+/- exponent */
-	
+
 	item->valuedouble=n;
 	item->valueint=(int)n;
 	item->type=cJSON_Number;
@@ -154,12 +154,12 @@ static const char *parse_string(cJSON_Context* ctx, cJSON *item,const char *str)
 {
 	const char *ptr=str+1;char *ptr2;char *out;int len=0;unsigned uc,uc2;
 	if (*str!='\"') {ctx->errorptr=str;return 0;}	/* not a string! */
-	
+
 	while (*ptr!='\"' && *ptr && ++len) if (*ptr++ == '\\') ptr++;	/* Skip escaped quotes. */
-	
+
 	out=(char*)cJSON_malloc(len+1);	/* This is how long we need for the string, roughly. */
 	if (!out) return 0;
-	
+
 	ptr=str+1;ptr2=out;
 	while (*ptr!='\"' && *ptr)
 	{
@@ -188,7 +188,7 @@ static const char *parse_string(cJSON_Context* ctx, cJSON *item,const char *str)
 					}
 
 					len=4;if (uc<0x80) len=1;else if (uc<0x800) len=2;else if (uc<0x10000) len=3; ptr2+=len;
-					
+
 					switch (len) {
 						case 4: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
 						case 3: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
@@ -213,10 +213,10 @@ static const char *parse_string(cJSON_Context* ctx, cJSON *item,const char *str)
 static char *print_string_ptr(const char *str)
 {
 	const char *ptr;char *ptr2,*out;int len=0;unsigned char token;
-	
+
 	if (!str) return cJSON_strdup("");
 	ptr=str;while ((token=*ptr) && ++len) {if (strchr("\"\\\b\f\n\r\t",token)) len++; else if (token<32) len+=5;ptr++;}
-	
+
 	out=(char*)cJSON_malloc(len+3);
 	if (!out) return 0;
 
@@ -349,7 +349,7 @@ static char *print_array(cJSON *item,int depth,int fmt)
 	char *out=0,*ptr,*ret;int len=5;
 	cJSON *child=item->child;
 	int numentries=0,i=0,fail=0;
-	
+
 	/* How many entries in the array? */
 	while (child) numentries++,child=child->next;
 	/* Explicitly handle numentries==0 */
@@ -372,7 +372,7 @@ static char *print_array(cJSON *item,int depth,int fmt)
 		if (ret) len+=strlen(ret)+2+(fmt?1:0); else fail=1;
 		child=child->next;
 	}
-	
+
 	/* If we didn't fail, try to malloc the output string */
 	if (!fail) out=(char*)cJSON_malloc(len);
 	/* If that fails, we fail. */
@@ -385,7 +385,7 @@ static char *print_array(cJSON *item,int depth,int fmt)
 		cJSON_free(entries);
 		return 0;
 	}
-	
+
 	/* Compose the output array. */
 	*out='[';
 	ptr=out+1;*ptr=0;
@@ -397,7 +397,7 @@ static char *print_array(cJSON *item,int depth,int fmt)
 	}
 	cJSON_free(entries);
 	*ptr++=']';*ptr++=0;
-	return out;	
+	return out;
 }
 
 /* Build an object from the text. */
@@ -405,11 +405,11 @@ static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *valu
 {
 	cJSON *child;
 	if (*value!='{')	{ctx->errorptr=value;return 0;}	/* not an object! */
-	
+
 	item->type=cJSON_Object;
 	value=skip(value+1);
 	if (*value=='}') return value+1;	/* empty array. */
-	
+
 	item->child=child=cJSON_New_Item();
 	if (!item->child) return 0;
 	value=skip(parse_string(ctx,child,skip(value)));
@@ -418,7 +418,7 @@ static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *valu
 	if (*value!=':') {ctx->errorptr=value;return 0;}	/* fail! */
 	value=skip(parse_value(ctx,child,skip(value+1)));	/* skip any spacing, get the value. */
 	if (!value) return 0;
-	
+
 	while (*value==',')
 	{
 		cJSON *new_item;
@@ -431,7 +431,7 @@ static const char *parse_object(cJSON_Context* ctx, cJSON *item,const char *valu
 		value=skip(parse_value(ctx,child,skip(value+1)));	/* skip any spacing, get the value. */
 		if (!value) return 0;
 	}
-	
+
 	if (*value=='}') return value+1;	/* end of array */
 	ctx->errorptr=value;return 0;	/* malformed. */
 }
@@ -472,7 +472,7 @@ static char *print_object(cJSON *item,int depth,int fmt)
 		if (str && ret) len+=strlen(ret)+strlen(str)+2+(fmt?2+depth:0); else fail=1;
 		child=child->next;
 	}
-	
+
 	/* Try to allocate the output string */
 	if (!fail) out=(char*)cJSON_malloc(len);
 	if (!out) fail=1;
@@ -484,7 +484,7 @@ static char *print_object(cJSON *item,int depth,int fmt)
 		cJSON_free(names);cJSON_free(entries);
 		return 0;
 	}
-	
+
 	/* Compose the output: */
 	*out='{';ptr=out+1;if (fmt)*ptr++='\n';*ptr=0;
 	for (i=0;i<numentries;i++)
@@ -497,11 +497,11 @@ static char *print_object(cJSON *item,int depth,int fmt)
 		if (fmt) *ptr++='\n';*ptr=0;
 		cJSON_free(names[i]);cJSON_free(entries[i]);
 	}
-	
+
 	cJSON_free(names);cJSON_free(entries);
 	if (fmt) for (i=0;i<depth-1;i++) *ptr++='\t';
 	*ptr++='}';*ptr++=0;
-	return out;	
+	return out;
 }
 
 /* Get Array size/item / object item. */
@@ -515,10 +515,10 @@ static void suffix_object(cJSON *prev,cJSON *item) {prev->next=item;item->prev=p
 static cJSON *create_reference(cJSON *item) {cJSON *ref=cJSON_New_Item();if (!ref) return 0;memcpy(ref,item,sizeof(cJSON));ref->string=0;ref->type|=cJSON_IsReference;ref->next=ref->prev=0;return ref;}
 
 /* Add item to array/object. */
-void   cJSON_AddItemToArray(cJSON *array, cJSON *item)						{cJSON *c=array->child;if (!item) return; if (!c) {array->child=item;} else {while (c && c->next) c=c->next; suffix_object(c,item);}}
-void   cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item)	{if (!item) return; if (item->string) cJSON_free(item->string);item->string=cJSON_strdup(string);cJSON_AddItemToArray(object,item);}
-void	cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item)						{cJSON_AddItemToArray(array,create_reference(item));}
-void	cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item)	{cJSON_AddItemToObject(object,string,create_reference(item));}
+void   cJSON_AddItemToArray(cJSON *array, cJSON *item)					{cJSON *c=array->child;if (!item) return; if (!c) {array->child=item;} else {while (c && c->next) c=c->next; suffix_object(c,item);}}
+int   cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item)		{if (!item) return 0; if (item->string) cJSON_free(item->string);item->string=cJSON_strdup(string);if(!item->string) return 0;cJSON_AddItemToArray(object,item);return 1;}
+int   cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item)				{cJSON* ref=create_reference(item); if (!ref) return 0; cJSON_AddItemToArray(array,ref); return 1;}
+int   cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item)	{cJSON* ref=create_reference(item); if (!ref) return 0; if (!cJSON_AddItemToObject(object,string,ref)) {cJSON_Delete(ref);return 0;} else return 1;}
 
 cJSON *cJSON_DetachItemFromArray(cJSON *array,int which)			{cJSON *c=array->child;while (c && which>0) c=c->next,which--;if (!c) return 0;
 	if (c->prev) c->prev->next=c->next;if (c->next) c->next->prev=c->prev;if (c==array->child) array->child=c->next;c->prev=c->next=0;return c;}

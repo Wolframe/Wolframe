@@ -55,7 +55,6 @@ struct InputFilterImpl :public InputFilter
 
 	InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
-		,m_root(0)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -66,13 +65,11 @@ struct InputFilterImpl :public InputFilter
 		,m_content(o.m_content)
 		,m_encoding(o.m_encoding)
 		,m_doctype(o.m_doctype)
-		,m_root(o.m_root?cJSON_Duplicate(o.m_root,1):0)
+		,m_root(o.m_root)
+		,m_stk(o.m_stk)
 		{}
 
-	~InputFilterImpl()
-	{
-		if (m_root) cJSON_Delete( m_root);
-	}
+	virtual ~InputFilterImpl(){}
 
 	///\brief Implements InputFilter::copy()
 	virtual InputFilter* copy() const
@@ -94,7 +91,7 @@ struct InputFilterImpl :public InputFilter
 
 	virtual bool getMetadata()
 	{
-		return (m_root != 0);
+		return (m_root.get());
 	}
 
 	bool getDocType( types::DocType& doctype);
@@ -113,8 +110,7 @@ private:
 	std::string m_content;
 	std::string m_encoding;
 	std::string m_doctype;
-	cJSON* m_root;
-	cJSON* m_first;
+	boost::shared_ptr<cJSON> m_root;
 
 	struct StackElement
 	{

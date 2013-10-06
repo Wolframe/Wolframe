@@ -36,8 +36,107 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool OutputFilterImpl::flushBuffer()
+void OutputFilterImpl::closeElement()
 {
+	if (m_stk.size() == 1)
+	{
+		throw std::runtime_error( "tags not balanced in input");
+	}
+	std::string name = m_stk.back().m_name;
+	cJSON* val = m_stk.back().m_node;
+	m_stk.back().m_node = 0;
+	m_stk.pop_back();
+
+	if (m_stk.back().m_node->type == cJSON_Array)
+	{
+		cJSON_AddItemToArray( m_stk.back().m_node, val);
+	}
+	else if (m_stk.back().m_node->type != cJSON_Object)
+	{
+		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+		{
+			cJSON_Delete( val);
+			throw std::bad_alloc();
+		}
+	}
+	else
+	{
+		cJSON* contentval = m_stk.back().m_node;
+		m_stk.back().m_node = cJSON_CreateObject();
+		if (!m_stk.back().m_node)
+		{
+			cJSON_Delete( val);
+			cJSON_Delete( contentval);
+			throw std::bad_alloc();
+		}
+		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+		{
+			cJSON_Delete( val);
+			cJSON_Delete( contentval);
+			throw std::bad_alloc();
+		}
+		if (!cJSON_AddItemToObject(m_stk.back().m_node,"",contentval))
+		{
+			cJSON_Delete( contentval);
+			throw std::bad_alloc();
+		}
+	}
+}
+
+void OutputFilterImpl::addStructItem( const std::string name, const std::string& value)
+{
+	if (!m_stk.back().m_node)
+	{
+		m_stk.back().m_node = cJSON_CreateObject();
+		if (!m_stk.back().m_node) throw std::bad_alloc();
+	}
+	else if (m_stk.back().m_node->type == cJSON_Array)
+	{
+		throw std::runtime_error( "mixing structure with array content in output");
+	}
+	else if (m_stk.back().m_node->type != cJSON_Object)
+	{
+		throw std::runtime_error( "try to add item to non structure");
+	}
+	cJSON* val = cJSON_CreateString( value.c_str());
+	if (!val) throw std::bad_alloc();
+
+	if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+	{
+		cJSON_Delete( val);
+		throw std::bad_alloc();
+	}
+}
+
+void OutputFilterImpl::setContentValue( const std::string& value)
+{
+	cJSON* val = cJSON_CreateString( value.c_str());
+	if (!val) throw std::bad_alloc();
+	if (!m_stk.back().m_node)
+	{
+		m_stk.back().m_node = val;
+		if (!val)
+		{
+			cJSON_Delete( val);
+			throw std::bad_alloc();
+		}
+	}
+	else if (m_stk.back().m_node->type == cJSON_Array)
+	{
+		cJSON_AddItemToArray( m_stk.back().m_node, val);
+	}
+	else if (m_stk.back().m_node->type == cJSON_Object)
+	{
+		if (!cJSON_AddItemToObject( m_stk.back().m_node,"",val))
+		{
+			cJSON_Delete( val);
+			throw std::bad_alloc();
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "try to add content value to non structure or array");
+	}
 }
 
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
@@ -45,31 +144,37 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	switch (type)
 	{
 		case OutputFilter::OpenTag:
-			m_attribname.clear();
+			if (!m_headerPrinted)
+			{
+				if (!m_doctype.empty()) addStructItem( "doctype", m_doctype);
+				m_headerPrinted = true;
+			}
+			m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
 			break;
 
 		case OutputFilter::Attribute:
-			if (m_attribname.size())
+			if (!m_attribname.empty())
 			{
-				setState( Error, "cjson filter: illegal operation");
+				setState( Error, "cjson filter illegal operation: printing subsequent attributes");
 				return false;
 			}
-			m_attribname.clear();
 			m_attribname.append( (const char*)element, elementsize);
 			break;
 
 		case OutputFilter::Value:
 			if (m_attribname.empty())
 			{
+				setContentValue( std::string( (const char*)element, elementsize));
 			}
 			else
 			{
+				addStructItem( m_attribname, std::string( (const char*)element, elementsize));
 				m_attribname.clear();
 			}
 			break;
 
 		case OutputFilter::CloseTag:
-			m_attribname.clear();
+			closeElement();
 			break;
 
 		default:
@@ -81,11 +186,14 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 void OutputFilterImpl::setDocType( const std::string& value)
 {
+	if (m_headerPrinted)
+	{
+		throw std::runtime_error( "cannot set doctype anymore after elements printed");
+	}
 	types::DocType doctype( value);
 	if (doctype.rootid)
 	{
-		m_doctype_root = doctype.rootid;
-		if (doctype.systemid) m_doctype_system = doctype.systemid;
+		m_doctype = doctype.systemid;
 	}
 }
 
