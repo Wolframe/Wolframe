@@ -13,7 +13,7 @@ SUBDIRS := sqlite3 $(SUBDIRS)
 endif
 
 ifeq ($(WITH_CJSON),1)
-SUBDIRS := cjson $(SUBDIRS)
+SUBDIRS := libcjson $(SUBDIRS)
 endif
 
 ifeq ($(WITH_LUA),1)

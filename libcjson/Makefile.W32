@@ -1,24 +1,26 @@
-TOPDIR = ..\..
+TOPDIR = ..
 
 SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-INCLUDE_CXXFLAGS = \
+INCLUDE_CFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I. \
-	/I..\include
+	/I.
 
 INCLUDE_LIBS =
 
 OBJS = \
 	cJSON.obj
 
-LIBRARIES = \
+STATIC_LIB = \
 	cjson.lib
 
+LIBRARIES = \
+	$(STATIC_LIB)
+	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 cjson.lib: $(OBJS)
