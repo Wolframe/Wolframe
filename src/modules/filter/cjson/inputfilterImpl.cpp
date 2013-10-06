@@ -42,7 +42,7 @@ using namespace _Wolframe::langbind;
 
 bool InputFilterImpl::getValue( const char* name, std::string& val)
 {
-	if (std::strcmp(name,"encoding") == 0 && m_state == Processing)
+	if (std::strcmp(name,"encoding") == 0 && !m_encoding.empty())
 	{
 		val = m_encoding;
 		return true;
@@ -86,7 +86,6 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		m_encoding = getCharsetEncodingName( content, contentsize);
 		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
 		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
-		m_state = Processing;
 		cJSON_Context ctx;
 		m_root = cJSON_Parse( &ctx, m_content.c_str());
 		if (!m_root)
