@@ -42,6 +42,6 @@ local_uninstall:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
-	@-./testit > test.RES
-	@diff test.RES test.MUST
+	@-./testit > testit.RES
+	@diff testit.RES testit.MUST
 endif

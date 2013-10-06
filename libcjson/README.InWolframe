@@ -1,6 +1,7 @@
 Local changes for cJSON in Wolframe
 -----------------------------------
 
-- renamed test.c to testit.c (avoid collision with 'test' phony target)
+- renamed test.c to testit.c (avoid collision with 'test' phony target),
+  heavily fixed to pass a C compiler, reactivated file-based tests
 - added a cJSON_Context to make the library thread-safe
 - removed GetErrorPtr (??)
