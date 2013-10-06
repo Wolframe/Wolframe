@@ -95,7 +95,7 @@
 %define with_libxslt	1
 %define with_libhpdf	1
 %define with_freeimage	1
-%define with_cjson	1
+%define with_cjson	0
 %define with_examples	1
 
 # Per package decisions
@@ -558,9 +558,30 @@ Requires: cyrus-sasl >= 2.1.22
 
 %endif
 
+%if %{with_lua}
+%package lua
+Summary: Wolframe Lua language bindings
+Group: Application/Business
+
+%description lua
+Allows writing business application code in Lua.
+
+Requires: %{name} >= %{version}-%{release}
+
+%package lua-devel
+Summary: Development header files and libraries for the Wolframe Lua language binding
+Group: Application/Business
+
+%description lua-devel
+Development files for the Wolframe Lua language bindings.
+
+Requires: %{name}-lua >= %{version}-%{release}
+
+%endif
+
 %if %{with_python}
 %package python
-Summary: Wolframe Python language bindins
+Summary: Wolframe Python language bindings
 Group: Application/Business
 
 %description python
@@ -1070,7 +1091,7 @@ ln -s libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxslt.s
 %endif
 
 #TODO: What exactly do we need? Do we have to probe it?
-# copy local python library to local library directory for platform which need it
+# copy local python library to local library directory for platforms which need it
 %if %{build_python}
 cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wolframe
 %endif
@@ -1245,11 +1266,6 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0
 
-%if %{with_lua}
-%{_libdir}/wolframe/liblua.so.5.2.0
-%{_libdir}/wolframe/liblua.so.5
-%endif
-
 %dir %{_libdir}/wolframe/modules
 
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
@@ -1270,12 +1286,6 @@ fi
 %{_libdir}/wolframe/modules/mod_ddlcompiler_simpleform.so
 
 %{_libdir}/wolframe/modules/mod_job_schedule_db.so
-
-%if %{with_lua}
-%{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
-%{_libdir}/wolframe/modules/mod_lua_datetime.so
-%{_libdir}/wolframe/modules/mod_command_lua.so
-%endif
 
 %{_libdir}/wolframe/modules/mod_normalize_number.so
 %{_libdir}/wolframe/modules/mod_normalize_base64.so
@@ -1307,13 +1317,6 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
 %{_libdir}/wolframe/libwolframe_prnt.a
-%if %{with_lua}
-%{_libdir}/wolframe/liblua.so
-%{_libdir}/wolframe/liblua.a
-%dir %{_includedir}/wolframe/lua
-%{_includedir}/wolframe/lua/*.h
-%{_includedir}/wolframe/lua/*.hpp
-%endif
 %if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so
 %{_libdir}/wolframe/libhpdf.a
@@ -1410,6 +1413,29 @@ fi
 %{_libdir}/wolframe/libxslt.so.%{libxslt_version}
 %{_libdir}/wolframe/libxslt.so.1
 %endif
+%endif
+
+%if %{with_lua}
+
+%files lua
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
+%{_libdir}/wolframe/modules/mod_lua_datetime.so
+%{_libdir}/wolframe/modules/mod_command_lua.so
+%{_libdir}/wolframe/liblua.so.5.2.0
+%{_libdir}/wolframe/liblua.so.5
+
+%files lua-devel
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/liblua.so
+%{_libdir}/wolframe/liblua.a
+%dir %{_includedir}/wolframe/lua
+%{_includedir}/wolframe/lua/*.h
+%{_includedir}/wolframe/lua/*.hpp
+
 %endif
 
 %if %{with_python}
