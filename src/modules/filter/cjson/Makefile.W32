@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I"$(CJSON_DIR)\include" \
+	/I"$(CJSON_DIR)" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	"$(CJSON_DIR)\lib\cjson.lib" $(INCLUDE_XSLT_LIBS)
+	"$(CJSON_DIR)\cjson.lib" $(INCLUDE_XSLT_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_filter_cjson.dll
