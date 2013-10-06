@@ -183,3 +183,4 @@ examples/demo/lgtree/server/database/lgtree.db
 *.gcda
 tests/python/embed
 qtcreator.xml
+libcjson/testit

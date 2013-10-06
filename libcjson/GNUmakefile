@@ -2,7 +2,6 @@ TOPDIR = ..
 
 SUBDIRS =
 
-PACKAGE_NAME = wolframe
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -14,26 +13,35 @@ INCLUDE_LIBS =
 
 STATIC_LIB = libcjson.a
 
-DYNAMIC_LIB = libcjson.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 11
-DYNAMIC_LIB_PATCH = 0
-
 OBJS = \
 	cJSON.o
 
+TEST_BINS = \
+	testit$(EXE)
+	
 -include $(TOPDIR)/makefiles/gmake/sub.mk
-
-ALL_CFLAGS = $(OPTFLAGS) -Wall -I. -I../include $(INCLUDE_DIRS) $(INCLUDE_CFLAGS)
 
 local_all:
 
 local_clean:
+	@-rm -rf *.RES
 
 local_distclean:
 
+DIST_HEADERS = \
+	cJSON.h
+
 local_install:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/wolframe/cjson
+	$(INSTALL) -m 644 $(DIST_HEADERS) $(DESTDIR)$(includedir)/wolframe/cjson
 
 local_uninstall:
+	-rm -rf $(DESTDIR)$(includedir)/wolframe/cjson/*
+	-rmdir $(DESTDIR)$(includedir)/wolframe/cjson
+	-rmdir $(DESTDIR)$(includedir)/wolframe
 
-local_test:
+local_test: $(TEST_BINS)
+ifeq ($(RUN_TESTS),1)
+	@-./testit > testit.RES
+	@diff testit.RES testit.MUST
+endif

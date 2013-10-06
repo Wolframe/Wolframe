@@ -25,12 +25,13 @@
 #include "cJSON.h"
 
 /* Parse text to JSON, then render back to text, and print! */
-void doit(char *text)
+static void doit(char *text)
 {
+	cJSON_Context ctx;
 	char *out;cJSON *json;
 	
-	json=cJSON_Parse(text);
-	if (!json) {printf("Error before: [%s]\n",cJSON_GetErrorPtr());}
+	json=cJSON_Parse(&ctx,text);
+	if (!json) {printf("Error before: [%s]\n",ctx.errorptr);}
 	else
 	{
 		out=cJSON_Print(json);
@@ -41,10 +42,13 @@ void doit(char *text)
 }
 
 /* Read a file, parse, render back, etc. */
-void dofile(char *filename)
+static void dofile(const char *filename)
 {
-	FILE *f=fopen(filename,"rb");fseek(f,0,SEEK_END);long len=ftell(f);fseek(f,0,SEEK_SET);
-	char *data=(char*)malloc(len+1);fread(data,1,len,f);fclose(f);
+	FILE *f;
+	char *data;
+	long len;
+	f=fopen(filename,"rb");fseek(f,0,SEEK_END);len=ftell(f);fseek(f,0,SEEK_SET);
+	data=(char*)malloc(len+1);fread(data,1,len,f);fclose(f);
 	doit(data);
 	free(data);
 }
@@ -53,9 +57,19 @@ void dofile(char *filename)
 struct record {const char *precision;double lat,lon;const char *address,*city,*state,*zip,*country; };
 
 /* Create a bunch of objects as demonstration. */
-void create_objects()
+static void create_objects(void)
 {
 	cJSON *root,*fmt,*img,*thm,*fld;char *out;int i;	/* declare a few. */
+	/* Our "days of the week" array: */
+	const char *strings[7]={"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+	/* Our matrix: */
+	int numbers[3][3]={{0,-1,0},{1,0,0},{0,0,1}};
+	/* Our "gallery" item: */
+	int ids[4]={116,943,234,38793};
+	/* Our array of "records": */
+	struct record fields[2]={
+		{"zip",37.7668,-1.223959e+2,"","SAN FRANCISCO","CA","94107","US"},
+		{"zip",37.371991,-1.22026e+2,"","SUNNYVALE","CA","94085","US"}};
 
 	/* Here we construct some JSON standards, from the JSON site. */
 	
@@ -71,14 +85,10 @@ void create_objects()
 	
 	out=cJSON_Print(root);	cJSON_Delete(root);	printf("%s\n",out);	free(out);	/* Print to text, Delete the cJSON, print it, release the string. */
 
-	/* Our "days of the week" array: */
-	const char *strings[7]={"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
 	root=cJSON_CreateStringArray(strings,7);
 
 	out=cJSON_Print(root);	cJSON_Delete(root);	printf("%s\n",out);	free(out);
 
-	/* Our matrix: */
-	int numbers[3][3]={{0,-1,0},{1,0,0},{0,0,1}};
 	root=cJSON_CreateArray();
 	for (i=0;i<3;i++) cJSON_AddItemToArray(root,cJSON_CreateIntArray(numbers[i],3));
 
@@ -87,8 +97,6 @@ void create_objects()
 	out=cJSON_Print(root);	cJSON_Delete(root);	printf("%s\n",out);	free(out);
 
 
-	/* Our "gallery" item: */
-	int ids[4]={116,943,234,38793};
 	root=cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "Image", img=cJSON_CreateObject());
 	cJSON_AddNumberToObject(img,"Width",800);
@@ -101,11 +109,6 @@ void create_objects()
 	cJSON_AddItemToObject(img,"IDs", cJSON_CreateIntArray(ids,4));
 
 	out=cJSON_Print(root);	cJSON_Delete(root);	printf("%s\n",out);	free(out);
-
-	/* Our array of "records": */
-	struct record fields[2]={
-		{"zip",37.7668,-1.223959e+2,"","SAN FRANCISCO","CA","94107","US"},
-		{"zip",37.371991,-1.22026e+2,"","SUNNYVALE","CA","94085","US"}};
 
 	root=cJSON_CreateArray();
 	for (i=0;i<2;i++)
@@ -127,7 +130,7 @@ void create_objects()
 
 }
 
-int main (int argc, const char * argv[]) {
+int main (void) {
 	/* a bunch of json: */
 	char text1[]="{\n\"name\": \"Jack (\\\"Bee\\\") Nimble\", \n\"format\": {\"type\":       \"rect\", \n\"width\":      1920, \n\"height\":     1080, \n\"interlace\":  false,\"frame rate\": 24\n}\n}";	
 	char text2[]="[\"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\"]";
@@ -143,11 +146,11 @@ int main (int argc, const char * argv[]) {
 	doit(text5);
 
 	/* Parse standard testfiles: */
-/*	dofile("../../tests/test1"); */
-/*	dofile("../../tests/test2"); */
-/*	dofile("../../tests/test3"); */
-/*	dofile("../../tests/test4"); */
-/*	dofile("../../tests/test5"); */
+	dofile("./tests/test1");
+	dofile("./tests/test2");
+	dofile("./tests/test3");
+	dofile("./tests/test4");
+	dofile("./tests/test5");
 
 	/* Now some samplecode for building objects concisely: */
 	create_objects();
