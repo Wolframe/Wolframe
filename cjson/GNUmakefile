@@ -17,6 +17,9 @@ STATIC_LIB = libcjson.a
 OBJS = \
 	cJSON.o
 
+TEST_BINS = \
+	testit$(EXE)
+	
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
@@ -37,4 +40,8 @@ local_uninstall:
 	-rmdir $(DESTDIR)$(includedir)/wolframe/cjson
 	-rmdir $(DESTDIR)$(includedir)/wolframe
 
-local_test:
+local_test: $(TEST_BINS)
+ifeq ($(RUN_TESTS),1)
+	@-./testit > test.RES
+	@diff test.RES test.MUST
+endif
