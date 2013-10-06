@@ -70,7 +70,9 @@ RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const 
 	,m_inputfilter(i)
 	,m_outputfilter(o)
 	,m_elemtype(InputFilter::Value)
-	{}
+	{
+		m_inputfilter->setFlags( m_outputfilter->flags());
+	}
 
 RedirectFilterClosure::RedirectFilterClosure( const RedirectFilterClosure& o)
 	:types::TypeSignature(o)
@@ -89,6 +91,7 @@ void RedirectFilterClosure::init( const TypedInputFilterR& i, const TypedOutputF
 	m_state = 0;
 	m_taglevel = 0;
 	m_elemtype = InputFilter::Value;
+	m_inputfilter->setFlags( m_outputfilter->flags());
 }
 
 
