@@ -24,6 +24,7 @@ TEST_BINS = \
 local_all:
 
 local_clean:
+	@-rm -rf *.RES
 
 local_distclean:
 

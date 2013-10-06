@@ -20,16 +20,23 @@ STATIC_LIB = \
 
 LIBRARIES = \
 	$(STATIC_LIB)
+
+TEST_BINS = \
+	testit.exe
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 cjson.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
+testit.exe: testit.obj
+
 local_all: $(LIBRARIES)
 
 local_clean:
+	@-erase test.RES 2>NUL
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_BINS)
+	@-testit > test.RES
