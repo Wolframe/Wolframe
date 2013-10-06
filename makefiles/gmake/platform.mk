@@ -3343,8 +3343,8 @@ endif
 #################
 
 ifeq ($(WITH_CJSON),1)
-CJSON_DIR = $(TOPDIR)/cjson
-CJSON_INCLUDE_DIR ?= $(CJSON_DIR)/include
+CJSON_DIR = $(TOPDIR)/libcjson
+CJSON_INCLUDE_DIR ?= $(CJSON_DIR)
 CJSON_INCLUDE_DIRS = -I$(CJSON_INCLUDE_DIR)
 endif
 

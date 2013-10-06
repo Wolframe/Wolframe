@@ -39,7 +39,7 @@ Project Wolframe.
 #include "types/doctype.hpp"
 extern "C"
 {
-#include "cjson/cJSON.h"
+#include "cJSON.h"
 }
 #include <cstdlib>
 #include <vector>
@@ -51,9 +51,12 @@ namespace langbind {
 
 struct InputFilterImpl :public InputFilter
 {
+	typedef InputFilter Parent;
+
 	InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,m_state(Buffering)
+		,m_root(0)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -63,8 +66,15 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter(o)
 		,m_content(o.m_content)
 		,m_encoding(o.m_encoding)
+		,m_doctype(o.m_doctype)
 		,m_state(o.m_state)
+		,m_root(o.m_root?cJSON_Duplicate(o.m_root,1):0)
 		{}
+
+	~InputFilterImpl()
+	{
+		if (m_root) cJSON_Delete( m_root);
+	}
 
 	///\brief Implements InputFilter::copy()
 	virtual InputFilter* copy() const
@@ -104,9 +114,11 @@ struct InputFilterImpl :public InputFilter
 private:
 	std::string m_content;
 	std::string m_encoding;
+	std::string m_doctype;
 	enum State {Buffering,Processing};
 	State m_state;
 	cJSON* m_root;
+	cJSON* m_first;
 
 	class StackElement
 	{

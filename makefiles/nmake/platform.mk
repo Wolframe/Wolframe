@@ -74,6 +74,6 @@ SQLITE3 = $(TOPDIR)\sqlite3\sqlite3
 # cJSON (always embedded)
 #############################
 
-CJSON_DIR = $(TOPDIR)\cjson
+CJSON_DIR = $(TOPDIR)\libcjson
 
 

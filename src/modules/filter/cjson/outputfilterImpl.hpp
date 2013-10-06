@@ -39,7 +39,7 @@ Project Wolframe.
 #include "types/doctype.hpp"
 extern "C"
 {
-#include "cjson/cJSON.h"
+#include "cJSON.h"
 }
 #include <cstdlib>
 #include <vector>

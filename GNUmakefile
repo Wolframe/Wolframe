@@ -8,6 +8,10 @@ ifeq ($(WITH_LOCAL_LIBHPDF),1)
 SUBDIRS := libhpdf $(SUBDIRS)
 endif
 
+ifeq ($(WITH_CJSON),1)
+SUBDIRS := libcjson $(SUBDIRS)
+endif
+
 ifeq ($(WITH_LOCAL_SQLITE3),1)
 SUBDIRS := sqlite3 $(SUBDIRS)
 endif

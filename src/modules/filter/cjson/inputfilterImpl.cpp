@@ -33,6 +33,8 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "langbind/charsetEncodings.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -49,10 +51,17 @@ bool InputFilterImpl::getValue( const char* name, std::string& val)
 
 bool InputFilterImpl::getDocType( std::string& val)
 {
+	if (!m_doctype.empty())
+	{
+		val = m_doctype;
+		return true;
+	}
+	return false;
 }
 
 bool InputFilterImpl::setValue( const char* name, const std::string& value)
 {
+	return Parent::setValue( name, value);
 }
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
@@ -60,7 +69,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	m_content.append( (const char*)content, contentsize);
 	if (end)
 	{
-		if (m_root) throw std::logic_error(" bad operation on JSON input filter: put input after end");
+		if (m_root) throw std::logic_error( "bad operation on JSON input filter: put input after end");
 		CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
 		std::string m_encoding = "UTF-";
 		if ((int)cl & (CharsetClass::U1) != 0) m_encoding += "8";
@@ -71,13 +80,44 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
 		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
 		m_state = Processing;
-		m_root = cJSON_Parse( m_content.c_str());
-		m_stk.push_back( m_root);
+		cJSON_Context ctx;
+		m_root = cJSON_Parse( &ctx, m_content.c_str());
+		if (!m_root)
+		{
+			if (!ctx.errorptr) throw std::bad_alloc();
+			std::size_t ii=0,ofs=0,ln=1,nn=ctx.errorptr - m_content.c_str();
+			const char* cc = m_content.c_str();
+			for (; ii<nn && cc[ii]; ++ii)
+			{
+				if (cc[ii] == '\n')
+				{
+					++ln;
+					ofs = 0;
+				}
+				else if (cc[ii] != '\r')
+				{
+					++ofs;
+				}
+			}
+			std::string err( ctx.errorptr);
+			if (err.size() > 80)
+			{
+				err.resize( 80);
+				err.append( "...");
+			}
+			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(ln) + " column " + boost::lexical_cast<std::string>(ofs) + " at '" + err + "'");
+		}
+		m_first = m_root;
+		if (m_root->string && m_root->valuestring)
+		{
+			if (boost::iequals("doctype",m_root->string))
+			{
+				m_doctype = m_root->valuestring;
+				m_first = m_root->next;
+			}
+		}
+		m_stk.push_back( m_first);
 	}
-}
-
-bool InputFilterImpl::getDocType( types::DocType& doctype)
-{
 }
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
