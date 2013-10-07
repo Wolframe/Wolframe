@@ -88,8 +88,7 @@ clients/cmdline/wolframec
 clients/Android/local.properties
 clients/Android/Wolframe.keystore
 clients/cli/wolfcli
-lua/src/lua
-lua/src/luac
+3rdParty/lua/src/lua
 docs/Tutorial.epub
 docs/Tutorial.html
 docs/Tutorial.pdf
@@ -165,7 +164,7 @@ tests/dotnet/interop/WolfCLR/WolfCLR/WolfCLR.vcxproj.filters
 tests/dotnet/interop/WolfCLR/WolfCLR/WolfCLR.vcxproj.user
 tests/dotnet/interop/WolfCLR/ipch/
 *.qm
-sqlite3/sqlite3
+3rdParty/sqlite3/sqlite3
 tests/boost-locale/boostLocaleTest
 tests/testArrayDoublingAllocator
 geany.c++.tags
@@ -183,4 +182,4 @@ examples/demo/lgtree/server/database/lgtree.db
 *.gcda
 tests/python/embed
 qtcreator.xml
-libcjson/testit
+3rdParty/libcjson/testit

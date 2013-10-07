@@ -10,7 +10,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
-	/I$(TOPDIR)\lua\src \
+	/I$(TOPDIR)\3rdParty\lua\src \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 # Note: libraries are picked automatically on Windows!
@@ -18,7 +18,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib $(TOPDIR)\lua\src\lua_static.lib
+	Advapi32.lib $(TOPDIR)\3rdParty\lua\src\lua_static.lib
 
 # openssl
 

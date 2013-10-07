@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = FreeImagePlus
+SUBDIRS = src
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

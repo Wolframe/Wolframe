@@ -1,8 +1,8 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
 SUBDIRS = src
 
--include $(TOPDIR)/makefiles/gmake/sub.mk
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:
 
@@ -13,5 +13,3 @@ local_distclean:
 local_install:
 
 local_test:
-
-local_longtest:

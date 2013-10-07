@@ -20,7 +20,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_langbind \
-	$(TOPDIR)/lua/src/liblua.a \
+	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 
 

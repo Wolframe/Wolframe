@@ -2,31 +2,7 @@ TOPDIR = .
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS = src gtest wtest tests clients include docs
-
-ifeq ($(WITH_LOCAL_LIBHPDF),1)
-SUBDIRS := libhpdf $(SUBDIRS)
-endif
-
-ifeq ($(WITH_CJSON),1)
-SUBDIRS := libcjson $(SUBDIRS)
-endif
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-SUBDIRS := sqlite3 $(SUBDIRS)
-endif
-
-ifeq ($(WITH_CJSON),1)
-SUBDIRS := libcjson $(SUBDIRS)
-endif
-
-ifeq ($(WITH_LUA),1)
-SUBDIRS := lua $(SUBDIRS)
-endif
-
-ifeq ($(WITH_LOCAL_FREEIMAGE),1)
-SUBDIRS := freeimage $(SUBDIRS)
-endif
+SUBDIRS = 3rdParty src gtest wtest tests clients include docs
 
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples

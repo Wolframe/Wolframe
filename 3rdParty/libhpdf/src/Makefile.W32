@@ -1,4 +1,4 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..
 
 SUBDIRS =
 
@@ -10,8 +10,8 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I..\include \
-	/I$(TOPDIR)\zlib \
-	/I$(TOPDIR)\libpng
+	/I$(TOPDIR)\3rdParty\zlib \
+	/I$(TOPDIR)\3rdParty\libpng
 
 INCLUDE_LIBS =
 

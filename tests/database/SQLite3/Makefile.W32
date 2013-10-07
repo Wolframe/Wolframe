@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\src\modules\database\sqlite3 \
 	/I$(TOPDIR)\gtest\include \
-	/I"$(TOPDIR)\sqlite3"
+	/I"$(TOPDIR)\3rdParty\sqlite3"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\sqlite3\sqlite3.lib \
+	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 CPP_OBJS = \
@@ -47,7 +47,7 @@ local_distclean:
 local_test: $(TEST_CPP_BINS)
 	@-erase test.db garbage.db 2>NUL
 	@-copy Makefile.W32 garbage.db
-	@$(SQLITE3) test.db < testDB.sql
+	@$(TOPDIR)\3rdParty\sqlite3\sqlite3.exe test.db < testDB.sql
 	@-sqliteUnit
 
 # Aba: on Windows?

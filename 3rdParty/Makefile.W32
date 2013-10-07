@@ -1,0 +1,27 @@
+TOPDIR = .
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+SUBDIRS =
+
+!IFDEF WITH_LIBHPDF
+SUBDIRS = zlib libpng libhpdf $(SUBDIRS)
+!ENDIF
+
+!IFDEF WITH_FREEIMAGE
+SUBDIRS = freeimage $(SUBDIRS)
+!ENDIF
+
+!IFDEF WITH_CJSON
+SUBDIRS = libcjson $(SUBDIRS)
+!ENDIF
+
+!IFDEF WITH_SQLITE3
+SUBDIRS = sqlite3 $(SUBDIRS)
+!ENDIF
+
+!IFDEF WITH_LUA
+SUBDIRS = lua $(SUBDIRS)
+!ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\top.mk

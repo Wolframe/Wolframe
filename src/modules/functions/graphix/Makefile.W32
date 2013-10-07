@@ -11,8 +11,8 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\freeimage\Source \
-	/I$(TOPDIR)\freeimage\Wrapper\FreeImagePlus
+	/I$(TOPDIR)\3rdParty\freeimage\Source \
+	/I$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -20,8 +20,8 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
-	$(TOPDIR)\freeimage\freeimage3.lib \
-	$(TOPDIR)\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib \
+	$(TOPDIR)\3rdParty\freeimage\freeimage3.lib \
+	$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib \
 	Ws2_32.lib kernel32.lib advapi32.lib
 
 DYNAMIC_MODULE = \

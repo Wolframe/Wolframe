@@ -99,10 +99,10 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LUA
 
 INCLUDE_DIRS += \
-	-I$(TOPDIR)/lua/src
+	-I$(TOPDIR)/3rdParty/lua/src
 
 INCLUDE_LIBS += \
-	$(TOPDIR)/lua/src/liblua.a \
+	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 endif
 

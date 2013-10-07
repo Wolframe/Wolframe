@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ..\..\..
 
-SUBDIRS = src
+SUBDIRS = FreeImagePlus
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

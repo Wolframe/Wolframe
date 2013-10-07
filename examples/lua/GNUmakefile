@@ -8,7 +8,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	-I$(TOPDIR)/lua/src \
+	-I$(TOPDIR)/3rdParty/lua/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/lua/src/liblua.a \
+	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 
 # openssl

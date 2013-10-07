@@ -1,4 +1,4 @@
-TOPDIR = ../..
+TOPDIR = ../../..
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR)\lua\src \
+	/I$(TOPDIR)\3rdParty\lua\src \
 	/I$(TOPDIR) \
 	/I"$(BOOST_INCLUDE_DIR)"
 
@@ -23,7 +23,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\lua\src\lua_static.lib
+	$(TOPDIR)\3rdParty\lua\src\lua_static.lib
 
 DYNAMIC_MODULE = \
 	mod_command_lua.dll

@@ -12,16 +12,16 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\gtest\include \
-	/I$(TOPDIR)\freeimage\Source \
-	/I$(TOPDIR)\freeimage\Wrapper\FreeImagePlus
+	/I$(TOPDIR)\3rdParty\freeimage\Source \
+	/I$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus
 
 INCLUDE_LDFLAGS = \
 
 # TODO: static linking for now, something is fishy with the DLL
 INCLUDE_LIBS = \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\freeimage\freeimage3.lib \
-	$(TOPDIR)\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib
+	$(TOPDIR)\3rdParty\freeimage\freeimage3.lib \
+	$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib
 	
 TEST_CPP_BINS = \
 	freeimageTest.exe \
@@ -44,8 +44,8 @@ local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\freeimage\freeimage3.dll" . >> test.bat
-	@-echo copy "$(TOPDIR)\freeimage\Wrapper\FreeImagePlus\freeimageplus3.dll" . >> test.bat
+	@-echo copy "$(TOPDIR)\3rdParty\freeimage\freeimage3.dll" . >> test.bat
+	@-echo copy "$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.dll" . >> test.bat
 	@-echo freeimageTest >> test.bat
 	@-echo freeimageTestCpp >> test.bat
 	@-echo echo off >> test.bat

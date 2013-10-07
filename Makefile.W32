@@ -2,31 +2,7 @@ TOPDIR = .
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-SUBDIRS = src gtest wtest tests clients
-
-!IFDEF WITH_LIBHPDF
-SUBDIRS = zlib libpng libhpdf $(SUBDIRS)
-!ENDIF
-
-!IFDEF WITH_CJSON
-SUBDIRS = libcjson $(SUBDIRS)
-!ENDIF
-
-!IFDEF WITH_SQLITE3
-SUBDIRS = sqlite3 $(SUBDIRS)
-!ENDIF
-
-!IFDEF WITH_CJSON
-SUBDIRS = libcjson $(SUBDIRS)
-!ENDIF
-
-!IFDEF WITH_LUA
-SUBDIRS = lua $(SUBDIRS)
-!ENDIF
-
-!IFDEF WITH_FREEIMAGE
-SUBDIRS = freeimage $(SUBDIRS)
-!ENDIF
+SUBDIRS = 3rdParty src gtest wtest tests clients
 
 !IFDEF WITH_EXAMPLES
 SUBDIRS = $(SUBDIRS) examples

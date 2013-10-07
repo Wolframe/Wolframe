@@ -71,9 +71,9 @@ INCLUDE_LIBS = \
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_LUA
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
+	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\lua\src
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua_static.lib
+	$(INCLUDE_LIBS) $(TOPDIR)\3rdParty\lua\src\lua_static.lib
 !ENDIF
 
 # libxml2
@@ -106,7 +106,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib" \
-	"$(TOPDIR)\zlib\zlib.lib" "$(TOPDIR)\libpng\libpng.lib"
+	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib"
 !ENDIF
 
 TEST_CPP_BINS = \

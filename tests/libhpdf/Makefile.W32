@@ -8,11 +8,11 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR)\libhpdf\include
+	/I$(TOPDIR)\3rdParty\libhpdf\include
 
 INCLUDE_LIBS = \
-	$(TOPDIR)\libhpdf\src\hpdf.lib \
-	$(TOPDIR)\zlib\zlib.lib
+	$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib \
+	$(TOPDIR)\3rdParty\zlib\zlib.lib
 	
 TEST_CPP_BINS = \
 	testlibhpdf.exe

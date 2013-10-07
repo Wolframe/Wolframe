@@ -1,8 +1,8 @@
-TOPDIR = ..\..
+TOPDIR = ../../..
 
 SUBDIRS = FreeImagePlus
 
-!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+-include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
 
@@ -13,3 +13,5 @@ local_distclean:
 local_install:
 
 local_test:
+
+local_longtest:
