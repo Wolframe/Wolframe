@@ -39,6 +39,55 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+bool OutputFilterImpl::flushBuffer()
+{
+	bool rt = true;
+	// if we have the whole document, then we start to print it and return an error, as long as we still have data:
+	if (m_elemitr < m_elembuf.size())
+	{
+		m_elemitr += write( m_elembuf.c_str() + m_elemitr, m_elembuf.size() - m_elemitr);
+		if (m_elemitr == m_elembuf.size())
+		{
+			setState( OutputFilter::Open);
+			rt = true;
+		}
+		else
+		{
+			setState( OutputFilter::EndOfBuffer);
+			rt = false;
+		}
+	}
+	else
+	{
+		setState( OutputFilter::Open);
+	}
+	return rt;
+}
+
+void OutputFilterImpl::printStructToBuffer()
+{
+	if (m_stk.size() != 1) throw std::logic_error( "internal: illegal call of 'printStructToBuffer()'");
+
+	char* content = cJSON_Print( m_stk.back().m_node);
+	if (!content) throw std::bad_alloc();
+
+	boost::shared_ptr<char> contentref( content, std::free);
+
+	const char* encstr = encoding();
+	if (!encstr || boost::algorithm::iequals( encstr, "UTF-8"))
+	{
+		m_elembuf.append( content);
+	}
+	else
+	{
+		CharsetEncoding enc = langbind::getCharsetEncoding( encstr);
+		m_elembuf.append( langbind::convertStringUTF8ToCharset( enc, content));
+	}
+	m_stk.clear();
+	m_stk.push_back( StackElement(""));
+}
+
+
 void OutputFilterImpl::closeElement()
 {
 	if (m_stk.size() == 1)
@@ -115,17 +164,8 @@ void OutputFilterImpl::closeElement()
 	}
 	if (m_stk.size() == 1)
 	{
-		char* content = cJSON_Print( m_stk.back().m_node);
-		if (!content) throw std::bad_alloc();
-		const char* enc = encoding();
-		if (!enc || boost::algorithm::iequals( enc, "UTF-8"))
-		{
-			m_elembuf.append( content);
-		}
-		else
-		{
-			//TODO conversion
-		}
+		// close of a root element -> we print the document content to output
+		printStructToBuffer();
 	}
 }
 
@@ -194,6 +234,11 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 	{
 		throw std::runtime_error( "try to add content value to non structure or array");
 	}
+	if (m_stk.size() == 1)
+	{
+		// set of a root element -> we print the document content to output
+		printStructToBuffer();
+	}
 }
 
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
@@ -238,7 +283,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			setState( Error, "cjson filter: illegal state");
 			return false;
 	}
-	return true;
+	return flushBuffer();
 }
 
 void OutputFilterImpl::setDocType( const std::string& value)
@@ -289,6 +334,11 @@ bool OutputFilterImpl::setValue( const char* name, const std::string& value)
 {
 	if (std::strcmp( name, "encoding") == 0)
 	{
+		if (m_headerPrinted)
+		{
+			setState( Error, "setting of the encoding not allowed after first print operation");
+			return false;
+		}
 		m_encoding = value;
 		return true;
 	}

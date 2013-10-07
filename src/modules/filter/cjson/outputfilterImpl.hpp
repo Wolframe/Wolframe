@@ -108,6 +108,8 @@ private:
 	void addStructItem( const std::string name, const std::string& value);
 	void setContentValue( const std::string& value);
 	void closeElement();
+	void printStructToBuffer();
+	bool flushBuffer();
 
 private:
 	std::string m_attribname;				//< attribute name buffer

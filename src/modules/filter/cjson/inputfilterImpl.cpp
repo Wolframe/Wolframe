@@ -65,7 +65,7 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 	return Parent::setValue( name, value);
 }
 
-static std::string getCharsetEncodingName( const void* content, std::size_t contentsize)
+static std::string guessCharsetEncoding( const void* content, std::size_t contentsize)
 {
 	CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
 	std::string rt = "UTF-";
@@ -77,42 +77,65 @@ static std::string getCharsetEncodingName( const void* content, std::size_t cont
 	return rt;
 }
 
+boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
+{
+	CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
+	m_content = langbind::convertStringCharsetToUTF8( enc, content);
+	cJSON_Context ctx;
+	cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
+	if (!pp)
+	{
+		if (!ctx.errorptr) throw std::bad_alloc();
+		utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
+
+		std::string err( ctx.errorptr);
+		if (err.size() > 80)
+		{
+			err.resize( 80);
+			err.append( "...");
+		}
+		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
+	}
+	return boost::shared_ptr<cJSON>( pp, cJSON_Delete);
+}
+
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
 	m_content.append( (const char*)content, contentsize);
 	if (end)
 	{
+		std::string origcontent( m_content);
 		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encoding = getCharsetEncodingName( content, contentsize);
-		CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
-		m_content = langbind::convertStringCharsetToUTF8( enc, m_content);
-		cJSON_Context ctx;
-		cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
-		if (!pp)
-		{
-			if (!ctx.errorptr) throw std::bad_alloc();
-			utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
-
-			std::string err( ctx.errorptr);
-			if (err.size() > 80)
-			{
-				err.resize( 80);
-				err.append( "...");
-			}
-			throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
-		}
-		m_root = boost::shared_ptr<cJSON>( pp, cJSON_Delete);
+		m_encoding = guessCharsetEncoding( content, contentsize);
+		m_root = parse( origcontent);
 
 		const cJSON* first = m_root.get();
+		int nof_docattributes = 0;
+		bool encodingParsed = false;
 		for (;;)
 		{
 			if (first->string && first->valuestring)
 			{
 				if (boost::iequals("doctype",first->string))
 				{
+					++nof_docattributes;
 					if (!m_doctype.empty()) throw std::runtime_error("duplicate 'doctype' definition");
 					m_doctype = first->valuestring;
 					first = first->next;
+				}
+				else if (boost::iequals("encoding", first->string))
+				{
+					++nof_docattributes;
+					if (!boost::iequals( m_encoding, first->valuestring))
+					{
+						// ... encoding different than guessed. Parse again
+						if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
+						encodingParsed = true;
+						m_encoding = first->valuestring;
+						m_root = parse( origcontent);
+						first = m_root.get();
+						while (first && nof_docattributes--) first = first->next;
+					}
 				}
 				else
 				{

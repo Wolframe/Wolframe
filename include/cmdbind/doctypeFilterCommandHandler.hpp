@@ -87,28 +87,42 @@ private:
 	enum State
 	{
 		Init,
-		ParseHeader0,
-		ParseHeader,
-		SearchDoctypeTag,
-		ParseDoctype0,
-		ParseDoctype1,
-		ParseDoctype2,
-		ParseDoctype,
-		SkipComment,
+		ParseJSONHeaderStart,
+		ParseJSONHeaderStringKey,
+		ParseJSONHeaderSeekAssign,
+		ParseJSONHeaderAssign,
+		ParseJSONHeaderIdentKey,
+		ParseJSONHeaderIdentValue,
+		ParseJSONHeaderStringValue,
+		ParseXMLHeader0,
+		ParseXMLHeader,
+		SearchXMLDoctypeTag,
+		ParseXMLDoctype0,
+		ParseXMLDoctype1,
+		ParseXMLDoctype2,
+		ParseXMLDoctype,
+		SkipXMLComment,
 		Done
 	};
 	static const char* stateName( State st)
 	{
 		static const char* ar[] = {
 			"Init",
-			"ParseHeader0",
-			"ParseHeader",
-			"SearchDoctypeTag",
-			"ParseDoctype0",
-			"ParseDoctype1",
-			"ParseDoctype2",
-			"ParseDoctype",
-			"SkipComment",
+			"ParseJSONHeaderStart",
+			"ParseJSONHeaderStringKey",
+			"ParseJSONHeaderSeekAssign",
+			"ParseJSONHeaderAssign",
+			"ParseJSONHeaderIdentKey",
+			"ParseJSONHeaderIdentValue",
+			"ParseJSONHeaderStringValue",
+			"ParseXMLHeader0",
+			"ParseXMLHeader",
+			"SearchXMLDoctypeTag",
+			"ParseXMLDoctype0",
+			"ParseXMLDoctype1",
+			"ParseXMLDoctype2",
+			"ParseXMLDoctype",
+			"SkipXMLComment",
 			"Done"};
 		return ar[ (int)st];
 	}
@@ -117,13 +131,21 @@ private:
 	void setState( State state_);
 
 private:
+	enum KeyType
+	{
+		KeyNone, KeyDoctype, KeyEncoding
+	};
 	State m_state;					//< processing state machine state
+	KeyType m_keytype;				//< type of key parsed (JSON)
 	char m_lastchar;				//< last character parsed
+	char m_endbrk;					//< end character of a parsed token (string)
+	bool m_escapestate;				//< substate for escaping (value depending on state)
 	unsigned char m_nullcnt;			//< number of null characters parsed in a row
 	protocol::InputBlock m_input;			//< input buffer
 	std::size_t m_inputidx;				//< index in input buffer
 	protocol::CharBuffer m_inputbuffer;		//< buffer for consumed input (is returned to caller because this is a preprocessing command handler)
-	std::string m_itembuf;				//< item parsed (value depending on state)
+	std::string m_itembuf;				//< value item parsed (value depending on state)
+	std::string m_keybuf;				//< key item parsed (value depending on state)
 	std::string m_doctype;				//< document type extracted
 	std::string m_doctypeid;			//< document type identifier extracted
 	std::string m_docformatid;			//< document format type identifier

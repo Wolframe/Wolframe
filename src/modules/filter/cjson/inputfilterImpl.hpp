@@ -107,6 +107,9 @@ struct InputFilterImpl :public InputFilter
 	virtual bool setFlags( Flags f);
 
 private:
+	boost::shared_ptr<cJSON> parse( const std::string& content);
+
+private:
 	std::string m_content;
 	std::string m_encoding;
 	std::string m_doctype;

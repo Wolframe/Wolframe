@@ -36,13 +36,17 @@
 #include "logger-v1.hpp"
 #include "types/doctype.hpp"
 #include <cstring>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
 DoctypeFilterCommandHandler::DoctypeFilterCommandHandler()
 	:m_state(Init)
+	,m_keytype(KeyNone)
 	,m_lastchar('\n')
+	,m_endbrk(0)
+	,m_escapestate(false)
 	,m_nullcnt(0)
 	,m_inputidx(0)
 {}
@@ -90,6 +94,21 @@ void DoctypeFilterCommandHandler::setState( State state_)
 	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state);
 }
 
+static bool isAlpha( char ch)
+{
+	return (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_');
+}
+
+static bool isAlphaNum( char ch)
+{
+	return (((ch|32) >= 'a' && (ch|32) <= 'z') || ch >= '0' && ch <= '9' || ch == '_');
+}
+
+static bool isSpace( char ch)
+{
+	return ((unsigned char)ch <= 32);
+}
+
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	const char* inp = m_input.charptr();
@@ -128,18 +147,194 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						if (inp[m_inputidx] == '<')
 						{
 							m_docformatid = "xml";
-							setState( ParseHeader0);
+							setState( ParseXMLHeader0);
 						}
-						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)
+						else if (inp[m_inputidx] == '{')
 						{
-							throw_error( "expected '<?'");
+							m_docformatid = "json";
+							setState( ParseJSONHeaderStart);
+						}
+						else if (!isSpace( inp[m_inputidx]))
+						{
+							throw_error( "expected '<?' (XML) or '{' (JSON) as first character");
 						}
 						break;
 
-					case ParseHeader0:
+					case ParseJSONHeaderStart:
+						if (isSpace( inp[m_inputidx]))
+						{}
+						else if (inp[m_inputidx] == '"' || inp[m_inputidx] == '\'')
+						{
+							m_endbrk = inp[m_inputidx];
+							setState( ParseJSONHeaderStringKey);
+						}
+						else if (isAlpha(inp[m_inputidx]))
+						{
+							m_keybuf.push_back( inp[m_inputidx]|32);
+							setState( ParseJSONHeaderIdentKey);
+						}
+						else
+						{
+							throw_error( "identifier or string exprected for JSON element key");
+						}
+						break;
+
+					case ParseJSONHeaderStringKey:
+						if (m_escapestate)
+						{
+							m_keybuf.push_back( inp[m_inputidx]);
+							m_escapestate = false;
+							continue;
+						}
+						if (inp[m_inputidx] == m_endbrk)
+						{
+							m_endbrk = 0;
+							setState( ParseJSONHeaderAssign);
+						}
+						else if (inp[m_inputidx] == '\\')
+						{
+							m_escapestate = true;
+							continue;
+						}
+						else
+						{
+							m_keybuf.push_back( inp[m_inputidx]);
+							continue;
+						}
+						break;
+
+					case ParseJSONHeaderIdentKey:
+						if (isAlphaNum(inp[m_inputidx]))
+						{
+							m_keybuf.push_back( inp[m_inputidx]|32);
+						}
+						else if (isSpace( inp[m_inputidx]))
+						{
+							setState( ParseJSONHeaderSeekAssign);
+						}
+						else if ((unsigned char)inp[m_inputidx] == ':')
+						{
+							setState( ParseJSONHeaderAssign);
+						}
+						else
+						{
+							throw_error( "identifier or string followed by ':' expected as JSON element assignment header");
+						}
+						break;
+
+					case ParseJSONHeaderSeekAssign:
+						if (isSpace( inp[m_inputidx]))
+						{}
+						else if ((unsigned char)inp[m_inputidx] == ':')
+						{
+							if (boost::algorithm::iequals( m_keybuf, "doctype"))
+							{
+								m_keytype = KeyDoctype;
+								setState( ParseJSONHeaderAssign);
+							}
+							else if (boost::algorithm::iequals( m_keybuf, "encoding"))
+							{
+								m_keytype = KeyEncoding;
+								setState( ParseJSONHeaderAssign);
+							}
+							else
+							{
+								m_keytype = KeyNone;
+								setState( Done);
+							}
+						}
+						else
+						{
+							throw_error( "identifier or string followed by ':' expected as JSON element assignment header");
+						}
+						break;
+
+					case ParseJSONHeaderAssign:
+						if (isSpace( inp[m_inputidx]))
+						{}
+						if (inp[m_inputidx] == '"' || inp[m_inputidx] == '\'')
+						{
+							m_endbrk = inp[m_inputidx];
+							setState( ParseJSONHeaderStringValue);
+						}
+						else if (isAlphaNum(inp[m_inputidx]))
+						{
+							m_keybuf.push_back( inp[m_inputidx]|32);
+							setState( ParseJSONHeaderIdentValue);
+						}
+						else
+						{
+							throw_error( "identifier or string exprected for JSON element key");
+						}
+						break;
+
+					case ParseJSONHeaderStringValue:
+						if (m_escapestate)
+						{
+							m_itembuf.push_back( inp[m_inputidx]);
+							m_escapestate = false;
+							continue;
+						}
+						if (inp[m_inputidx] == m_endbrk)
+						{
+							m_endbrk = 0;
+							switch (m_keytype)
+							{
+								case KeyNone:
+									throw std::logic_error("illegal state in JSON document type recognition");
+								case KeyDoctype:
+									m_doctypeid = m_itembuf;
+									m_keytype = KeyNone;
+									setState( Done);
+									break;
+								case KeyEncoding:
+									setState( ParseJSONHeaderStart);
+									break;
+							}
+							m_itembuf.clear();
+							m_keybuf.clear();
+						}
+						else if (inp[m_inputidx] == '\\')
+						{
+							m_escapestate = true;
+							continue;
+						}
+						else
+						{
+							m_itembuf.push_back( inp[m_inputidx]);
+							continue;
+						}
+						break;
+
+					case ParseJSONHeaderIdentValue:
+						if (isSpace( inp[m_inputidx]))
+						{
+							switch (m_keytype)
+							{
+								case KeyNone:
+									throw std::logic_error("illegal state in JSON document type recognition");
+								case KeyDoctype:
+									m_doctypeid = m_itembuf;
+									m_keytype = KeyNone;
+									setState( Done);
+									break;
+								case KeyEncoding:
+									setState( ParseJSONHeaderStart);
+									break;
+							}
+							m_itembuf.clear();
+							m_keybuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( inp[m_inputidx]|32);
+						}
+						break;
+
+					case ParseXMLHeader0:
 						if (inp[m_inputidx] == '?')
 						{
-							setState( ParseHeader);
+							setState( ParseXMLHeader);
 						}
 						else
 						{
@@ -147,7 +342,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case ParseHeader:
+					case ParseXMLHeader:
 						if (inp[m_inputidx] == '>')
 						{
 							const char* cc = std::strstr( m_itembuf.c_str(), "standalone");
@@ -161,7 +356,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 									break;
 								}
 							}
-							setState( SearchDoctypeTag);
+							setState( SearchXMLDoctypeTag);
 							m_itembuf.clear();
 						}
 						else
@@ -174,10 +369,10 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case SearchDoctypeTag:
+					case SearchXMLDoctypeTag:
 						if (inp[m_inputidx] == '<')
 						{
-							setState( ParseDoctype0);
+							setState( ParseXMLDoctype0);
 						}
 						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)
 						{
@@ -185,10 +380,10 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case ParseDoctype0:
+					case ParseXMLDoctype0:
 						if (inp[m_inputidx] == '!')
 						{
-							setState( ParseDoctype1);
+							setState( ParseXMLDoctype1);
 						}
 						else
 						{
@@ -196,15 +391,15 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case ParseDoctype1:
+					case ParseXMLDoctype1:
 						if (inp[m_inputidx] == '-')
 						{
-							setState( SkipComment);
+							setState( SkipXMLComment);
 						}
 						else if (inp[m_inputidx] == 'D')
 						{
 							m_itembuf.push_back( inp[m_inputidx]);
-							setState( ParseDoctype2);
+							setState( ParseXMLDoctype2);
 						}
 						else
 						{
@@ -212,21 +407,21 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case SkipComment:
+					case SkipXMLComment:
 						if (inp[m_inputidx] == '>')
 						{
-							setState( SearchDoctypeTag);
+							setState( SearchXMLDoctypeTag);
 						}
 						break;
 
-					case ParseDoctype2:
+					case ParseXMLDoctype2:
 						if (inp[m_inputidx] <= ' ' && inp[m_inputidx] > 0)
 						{
 							if (m_itembuf != "DOCTYPE")
 							{
 								throw_error( "expected '<!DOCTYPE'");
 							}
-							setState( ParseDoctype);
+							setState( ParseXMLDoctype);
 							m_itembuf.clear();
 						}
 						else
@@ -239,7 +434,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						break;
 
-					case ParseDoctype:
+					case ParseXMLDoctype:
 						if (inp[m_inputidx] <= ' ' && inp[m_inputidx] > 0)
 						{
 							m_doctype.push_back( ' ');

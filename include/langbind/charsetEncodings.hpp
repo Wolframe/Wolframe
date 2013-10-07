@@ -43,12 +43,15 @@ namespace langbind {
 struct CharsetEncodingStruct
 {
 	virtual ~CharsetEncodingStruct(){}
-	virtual std::string translate( const std::string& name) const=0;
+	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const=0;
+	virtual void convertFromUTF8( std::string& dest, const char* content, std::size_t contentsize) const=0;
 };
 typedef boost::shared_ptr<CharsetEncodingStruct> CharsetEncoding;
 
 CharsetEncoding getCharsetEncoding( const std::string& name);
+
 std::string convertStringCharsetToUTF8( const CharsetEncoding& encoding, const std::string& content);
+std::string convertStringUTF8ToCharset( const CharsetEncoding& encoding, const std::string& content);
 
 struct CharsetClass
 {

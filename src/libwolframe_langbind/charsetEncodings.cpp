@@ -42,27 +42,99 @@ using namespace _Wolframe::langbind;
 
 namespace {
 template <class ENC>
-struct CharsetEncodingInstance
+struct CharsetEncodingInstanceBase
 	:public CharsetEncodingStruct
 {
-	CharsetEncodingInstance( const ENC& encoding_=ENC())
+	CharsetEncodingInstanceBase( const ENC& encoding_=ENC())
 		:m_encoding(encoding_){}
-	virtual ~CharsetEncodingInstance(){}
+	virtual ~CharsetEncodingInstanceBase(){}
 
-	virtual std::string translate( const std::string& content) const
+	virtual void convertFromUTF8( std::string& dest, const char* content, std::size_t contentsize) const
 	{
-		textwolf::CStringIterator itr( content.c_str(), content.size());
+		textwolf::CStringIterator itr( content, contentsize);
 		textwolf::TextScanner<textwolf::CStringIterator,textwolf::charset::UTF8> ts( itr);
-		std::string buf;
 		textwolf::UChar ch;
 		for (; (ch = ts.chr()) != 0; ++ts)
 		{
-			m_encoding.print( ch, buf);
+			m_encoding.print( ch, dest);
 		}
-		return buf;
+	}
+	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const
+	{
+		textwolf::CStringIterator itr( content, contentsize);
+		textwolf::TextScanner<textwolf::CStringIterator,ENC> ts( m_encoding, itr);
+		textwolf::UChar ch;
+		textwolf::charset::UTF8 utf8;
+		for (; (ch = ts.chr()) != 0; ++ts)
+		{
+			utf8.print( ch, dest);
+		}
 	}
 private:
 	ENC m_encoding;
+};
+
+template <class ENC>
+struct CharsetEncodingInstance
+	:public CharsetEncodingInstanceBase<ENC>
+{
+	CharsetEncodingInstance( const ENC& encoding_=ENC())
+		:CharsetEncodingInstanceBase<ENC>(encoding_){}
+	virtual ~CharsetEncodingInstance(){}
+};
+
+template <>
+struct CharsetEncodingInstance<textwolf::charset::UTF16BE>
+	:public CharsetEncodingInstanceBase<textwolf::charset::UTF16BE>
+{
+	CharsetEncodingInstance( const textwolf::charset::UTF16BE& encoding_=textwolf::charset::UTF16BE())
+		:CharsetEncodingInstanceBase<textwolf::charset::UTF16BE>(encoding_){}
+
+	typedef CharsetEncodingInstanceBase<textwolf::charset::UTF16BE> Parent;
+
+	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const
+	{
+		std::size_t BOMofs = 0;
+		if (contentsize >= 2)
+		{
+			if ((unsigned char)content[0] == 0xFF)
+			{
+				if ((unsigned char)content[1] == 0xFE) BOMofs = 2;
+			}
+			else if ((unsigned char)content[0] == 0xFE)
+			{
+				if ((unsigned char)content[1] == 0xFF) BOMofs = 2;
+			}
+		}
+		Parent::convertToUTF8( dest, content+BOMofs, contentsize-BOMofs);
+	}
+};
+
+template <>
+struct CharsetEncodingInstance<textwolf::charset::UTF16LE>
+	:public CharsetEncodingInstanceBase<textwolf::charset::UTF16LE>
+{
+	CharsetEncodingInstance( const textwolf::charset::UTF16LE& encoding_=textwolf::charset::UTF16LE())
+		:CharsetEncodingInstanceBase<textwolf::charset::UTF16LE>(encoding_){}
+
+	typedef CharsetEncodingInstanceBase<textwolf::charset::UTF16LE> Parent;
+
+	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const
+	{
+		std::size_t BOMofs = 0;
+		if (contentsize >= 2)
+		{
+			if ((unsigned char)content[0] == 0xFF)
+			{
+				if ((unsigned char)content[1] == 0xFE) BOMofs = 2;
+			}
+			else if ((unsigned char)content[0] == 0xFE)
+			{
+				if ((unsigned char)content[1] == 0xFF) BOMofs = 2;
+			}
+		}
+		Parent::convertToUTF8( dest, content+BOMofs, contentsize-BOMofs);
+	}
 };
 }//anonymous namespace
 
@@ -140,7 +212,16 @@ CharsetEncoding langbind::getCharsetEncoding( const std::string& name)
 
 std::string langbind::convertStringCharsetToUTF8( const CharsetEncoding& encoding, const std::string& content)
 {
-	return encoding->translate( content);
+	std::string rt;
+	encoding->convertToUTF8( rt, content.c_str(), content.size());
+	return rt;
+}
+
+std::string langbind::convertStringUTF8ToCharset( const CharsetEncoding& encoding, const std::string& content)
+{
+	std::string rt;
+	encoding->convertFromUTF8( rt, content.c_str(), content.size());
+	return rt;
 }
 
 CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
@@ -148,7 +229,7 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 	CharsetClass::Id rt = NONE;
 	int maxll = 0;
 	int ll = 0;			//< number of zeroes in a row
-	int idx = 0;
+	std::size_t idx = 0;
 
 	for (; idx < size; ++idx)
 	{
@@ -181,10 +262,10 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 	if (size > 2 && maxll == 1)
 	{
 		// ... UTF16 check BOM
-		if (content[0] == 0xFE && content[1] == 0xFF) rt = (Id)((int)rt | (int)BE);
-		if (content[0] == 0xFF && content[1] == 0xFE) rt = (Id)((int)rt | (int)LE);
+		if ((unsigned char)content[0] == 0xFE && (unsigned char)content[1] == 0xFF) rt = (Id)((int)rt | (int)BE);
+		if ((unsigned char)content[0] == 0xFF && (unsigned char)content[1] == 0xFE) rt = (Id)((int)rt | (int)LE);
 	}
-	if ((int)rt & ((int)LE | (int)BE) == 0)
+	if (((int)rt & ((int)LE | (int)BE)) == 0)
 	{
 		// ... indians not set
 		for (idx=0; idx < size; ++idx)
@@ -220,7 +301,7 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 			}
 		}
 	}
-	if ((int)rt & ((int)LE | (int)BE) == ((int)LE | (int)BE))
+	if (((int)rt & ((int)LE | (int)BE)) == ((int)LE | (int)BE))
 	{
 		// ... indians contradicting
 		return NONE;

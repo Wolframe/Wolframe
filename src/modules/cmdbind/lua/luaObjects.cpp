@@ -1505,6 +1505,31 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 	return 0;
 }
 
+LUA_FUNCTION_THROWS( "input:docformat()", function_input_docformat)
+{
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "docformat");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!input->docformat().empty())
+	{
+		lua_pushnil( ls);
+		return 1;
+	}
+	else
+	{
+		lua_pushlstring( ls, input->docformat().c_str(), input->docformat().size());
+		return 1;
+	}
+}
 
 LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 {
@@ -2013,7 +2038,7 @@ static const luaL_Reg logger_methodtable[ 3] =
 	{0,0}
 };
 
-static const luaL_Reg input_methodtable[ 8] =
+static const luaL_Reg input_methodtable[ 9] =
 {
 	{"as",&function_input_as},
 	{"form",&function_input_form},
@@ -2021,6 +2046,7 @@ static const luaL_Reg input_methodtable[ 8] =
 	{"table",&function_input_table},
 	{"doctype",function_input_doctype},
 	{"doctypeid",function_input_doctypeid},
+	{"docformat",function_input_docformat},
 	{"get",&function_input_get},
 	{0,0}
 };
