@@ -12,16 +12,19 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I"$(CJSON_DIR)" \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty\libcjson
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
+# Aba: the dependency on langbind doesn't seem right, but
+# is needed to make the module link..
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	"$(CJSON_DIR)\cjson.lib" $(INCLUDE_XSLT_LIBS)
+	$(TOPDIR)\3rdParty\libcjson\cjson.lib
 
 DYNAMIC_MODULE = \
 	mod_filter_cjson.dll

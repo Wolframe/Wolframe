@@ -1,4 +1,4 @@
-TOPDIR = .
+TOPDIR = ..
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
