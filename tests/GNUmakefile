@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules database AAAA simpleFormCompiler wolfilter
+SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -12,30 +12,6 @@ SUBDIRS += expect config
 endif
 endif
 endif
-endif
-
-ifeq ($(WITH_PYTHON),1)
-SUBDIRS += python
-endif
-
-ifeq ($(WITH_LIBXML2),1)
-SUBDIRS += libxml2
-endif
-
-ifeq ($(WITH_LIBXSLT),1)
-SUBDIRS += libxslt
-endif
-
-ifeq ($(WITH_LIBHPDF),1)
-SUBDIRS += libhpdf
-endif
-
-ifeq ($(WITH_ICU),1)
-SUBDIRS += boost-locale
-endif
-
-ifeq ($(WITH_FREEIMAGE),1)
-SUBDIRS += freeimage
 endif
 
 INCLUDE_CXXFLAGS = \

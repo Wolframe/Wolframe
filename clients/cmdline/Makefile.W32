@@ -11,7 +11,8 @@ INCLUDE_DIRS = \
 	/I. \
 	/I"$(TOPDIR)" \
 	/I"$(TOPDIR)\clients\lib" \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \

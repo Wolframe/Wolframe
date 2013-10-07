@@ -10,7 +10,8 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/clients/lib \
 	-I$(TOPDIR) \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/3rdParty
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
