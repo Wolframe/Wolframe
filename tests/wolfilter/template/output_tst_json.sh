@@ -18,33 +18,35 @@
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too
+# - csetlist		list of character set encodings
 # - testdata		(optional) additionaly defined test data
-# - inputfilter		(optional) explicitely defined inputfilter
-# - outputfilter	(optional) explicitely defined outputfilter
 #
 TESTCMD="$testcmd"
 TESTNAME="$testname"
-CSETLIST=$csetlist
 INPUTFILTER="$inputfilter"
 OUTPUTFILTER="$outputfilter"
+PWD=`pwd`
+topdir=`dirname $PWD/$0`"/../../../../"
+
+filter="cjson"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
-	if [ x"$csetlist" = x ]; then
-		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
-	fi
-	. ./output_tst_textwolf.sh
-	csetlist="$CSETLIST"
-	if [ x"$csetlist" = x ]; then
-		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
-	fi
-	. ./output_tst_libxml2.sh
-	csetlist="$CSETLIST"
-else
-	if [ x"$csetlist" = x ]; then
-		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
-	fi
-	. ./output_tst_nofilter.sh
-	csetlist="$CSETLIST"
+	modpath="../../src/modules"
+	testcmd="--module $modpath/filter/libxml2/mod_filter_cjson $testcmd"
 fi
+
+testname="$TESTNAME""_cjson"
+for cset in $csetlist
+do
+	if test x"$inputfilter" = "x"; then
+		inputfilter="$filter"
+	fi
+	if test x"$outputfilter" = "x"; then
+		outputfilter="$filter"
+	fi
+	. ./output_tst.sh
+	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
+	echo "cat $topdir/tests/wolfilter/template/doc/$docin.UTF-8.json | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | $topdir/wtest/cleanInput BOM EOLN | $topdir/src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed "s@--form @--form $topdir/tests/wolfilter/scripts/@" | sed "s@--script @--script $topdir/tests/wolfilter/scripts/@" | sed "s@--module @--module $topdir/tests/wolfilter/modules/../@"` > temp/$docout.$cset.json" >> ../../testWolfilter.sh
+done
 testcmd="$TESTCMD"
 testname="$TESTNAME"
 inputfilter="$INPUTFILTER"

@@ -18,7 +18,7 @@ opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
 opt="$opt --cmdprogram=test.dmap"
-opt="$opt --program $formname"				# form for invoice
+opt="$opt --program $formname"				# form employee assignment
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 testcmd="$opt employee_assignment_print"		# command to execute by the test
 testscripts="$formname"					# list of scripts of the test
