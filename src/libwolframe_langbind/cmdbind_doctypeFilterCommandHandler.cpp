@@ -101,7 +101,7 @@ static bool isAlpha( char ch)
 
 static bool isAlphaNum( char ch)
 {
-	return (((ch|32) >= 'a' && (ch|32) <= 'z') || ch >= '0' && ch <= '9' || ch == '_');
+	return (((ch|32) >= 'a' && (ch|32) <= 'z') || (ch >= '0' && ch <= '9') || ch == '_');
 }
 
 static bool isSpace( char ch)
