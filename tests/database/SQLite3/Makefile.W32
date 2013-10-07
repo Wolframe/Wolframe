@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\src\modules\database\sqlite3 \
-	/I$(TOPDIR)\gtest\include \
+	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I"$(TOPDIR)\3rdParty\sqlite3"
 
 INCLUDE_LDFLAGS = \
@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
-	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 

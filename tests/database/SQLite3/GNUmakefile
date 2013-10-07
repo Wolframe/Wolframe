@@ -10,7 +10,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(SQLITE3_INCLUDE_DIRS) \
 	-I$(TOPDIR)/src/modules/database/sqlite3 \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem

@@ -9,7 +9,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
@@ -30,7 +30,7 @@ INCLUDE_LIBS = \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolftest \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(LIBS_DL)
 
 LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/wtest"

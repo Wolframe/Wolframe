@@ -10,7 +10,7 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	-I. \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	$(FREEIMAGE_INCLUDE_DIRS) \
 	$(FREEIMAGEPLUS_INCLUDE_DIRS)
 
@@ -19,7 +19,7 @@ INCLUDE_LDFLAGS = \
 	$(FREEIMAGEPLUS_LIB_DIRS)
 	
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(FREEIMAGEPLUS_LIBS) \
 	$(FREEIMAGE_LIBS)
 

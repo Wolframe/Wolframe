@@ -21,7 +21,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
@@ -34,7 +34,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	-lwolftest \
 	-lwolframe \
