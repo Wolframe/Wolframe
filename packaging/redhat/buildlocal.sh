@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# Note: put dot_home_rpmmacros to ~/.rpmmacros to set number of CPUs for
-# parallel building
+# Note: Create a ~/.rpmmacros to set number of CPUs for
+# parallel building like this:
+# %_smp_mflags -j24
 
 # Of course you need build toold and rpm-build, also a ~/rpmbuild directory
 # set up
@@ -24,7 +25,8 @@ rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 make \
 	WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
-	WITH_ICU=1 dist-gz >/dev/null 2>&1
+	WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+	dist-gz >/dev/null 2>&1
 
 cp wolframe-$VERSION.tar.gz $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 cp redhat/wolframe.spec $RPMBUILD/SPECS/wolframe.spec

@@ -14,4 +14,5 @@ export OSB_PLATFORM="fedora_version 18"
 
 contrib/redhat/buildlocal.sh 
 
-# parallel builds with ~/.rpmmacros as in 'dot_home_rpmmacros'
+# parallel builds with ~/.rpmmacros as in 'dot_home_rpmmacros':
+# %_smp_mflags -j24
