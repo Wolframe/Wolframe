@@ -1,4 +1,8 @@
 #!/bin/sh
 
-find ../scripts ../template/program -name "*$1" | sed 's@^../@../wolfilter/@' | head -n1 -   # Result
+res=`find ../scripts ../template/program -name "*$1" | sed 's@^../@../wolfilter/@' | head -n1 -`
+if [ x"$res" = "x" ]; then
+	res="NOTFOUND:$1"
+fi
+echo $res
 

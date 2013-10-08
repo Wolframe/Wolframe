@@ -662,12 +662,5 @@ void ResultIterator::resetIterator()
 	m_resitr.reset();
 }
 
-bool ResultIterator::setFlags( Flags f)
-{
-	bool rt = true;
-	rt &= langbind::FilterBase::setFlags( f);
-	if (rt) m_resitr.doSerializeWithIndices( flag( SerializeWithIndices));
-	return rt;
-}
 
 
