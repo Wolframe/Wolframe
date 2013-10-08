@@ -135,7 +135,7 @@ Notes for Boost 1.50, 1.51
 
 Boost thread depends on non-header-only libraries without including the
 auto-link-pragmas for MSBC. Apply the 'boost-7045_2.patch' from
-'contrib\Windows\boost', see also:
+'packaging/patches\Windows\boost', see also:
 
 https://svn.boost.org/trac/boost/ticket/7045
 
@@ -251,7 +251,7 @@ with VS2010:
 
 http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
 
-(in Wolframe, see contrib\Windows\Postgresql\VS2010v2.patch)
+(in Wolframe, see 'contrib\Windows\Postgresql\VS2010v2.patch')
 
 The patch has some hard coded library names:
 

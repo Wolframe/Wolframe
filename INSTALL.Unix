@@ -722,7 +722,7 @@ Optional packages: cyrus-sasl (2.1.23)
                    png (1.4.8)
 
 Boost ist too old (1.45), compile your own version from the ports
-directory. See 'contrib/FreeBSD' for patches and the ports files.
+directory. See 'packaging/patches/FreeBSD' for patches and the ports files.
 
 FreeImage doesn't build due to a bug in Gcc and big double number
 handling.
@@ -749,7 +749,7 @@ Optional packages: cyrus-sasl2 (2.1.25_1), sqlite3 (3.7.9), postgresql92-client 
 
 If you need boost with ICU support, compile your own boost from the
 ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.
-See 'contrib/FreeBSD' for patches and the ports files.
+See 'packaging/patches/FreeBSD' for patches and the ports files.
 
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
@@ -847,7 +847,7 @@ gmake install
 
 First apply the following patch to 'boost/cstdint.ppp' for boost
 (https://svn.boost.org/trac/boost/ticket/6158, see also
-'contrib/Solaris/boost-1.48.0' for patch files):
+'packaging/patches/Solaris/boost-1.48.0' for patch files):
 
 ...
 namespace boost
@@ -865,7 +865,7 @@ is also very old) in 'tools/build/v2/user-config.jam':
 
 using gcc : 4.6.3 : g++ : <compileflags>-mcpu=v9 ; 
 
-Apply all compilation patches from 'contrib/Solaris/' now.
+Apply all compilation patches from 'packaging/patches/Solaris/' now.
 
 Build and install normally:
 
@@ -964,7 +964,7 @@ gmake install
 Boost itself is not available, so build your own one (use 1.54, I didn't test other
 versions so far!):
 
-First apply all patches in 'contrib/Solaris/1.54.0'.
+First apply all patches in 'packaging/patches/Solaris/1.54.0'.
 Then build boost with:
 
 ./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
