@@ -41,6 +41,7 @@
 #include "processor/moduleInterface.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include "processor/procProvider.hpp"
 #include "prnt/pdfPrinter.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -173,7 +174,18 @@ TEST_F( WolfilterTest, tests)
 			{
 				if (!td.exception.empty())
 				{
-					if (td.exception != e.what())
+					std::vector<std::string> pattern;
+					utils::splitString( pattern, td.exception, "*");
+
+					const char* ap = e.what();
+					std::vector<std::string>::const_iterator pi = pattern.begin(), pe = pattern.end();
+					for (; pi != pe; ++pi)
+					{
+						ap = std::strstr( ap, pi->c_str());
+						if (ap == 0) break;
+						ap = ap + pi->size();
+					}
+					if (pi != pe)
 					{
 						// [2.6] Dump exception message to file in case of expected exception
 						boost::filesystem::path EXCEPTION( g_testdir / "temp" / "EXCEPTION");
@@ -189,7 +201,7 @@ TEST_F( WolfilterTest, tests)
 						ee.close();
 
 						boost::this_thread::sleep( boost::posix_time::seconds( 3));
-						EXPECT_EQ( td.exception, e.what());
+						EXPECT_EQ( pi, pe);
 					}
 				}
 				else

@@ -3,7 +3,7 @@
 **requires:LIBXML2
 **requires:SQLITE3
 **exception
-error in transaction insertCustomer:column name is not unique . Customers must have a unique name.
+error in transaction insertCustomer:*Customers must have a unique name.
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <customers><customer><name>Hugo</name></customer><customer><name>Hugo</name></customer></customers>**config
