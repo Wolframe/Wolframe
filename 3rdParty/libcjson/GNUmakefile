@@ -22,7 +22,8 @@ TEST_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 # override all flags here, not just CFLAGS, compiler.mk
-# is geared towards C++ compatibility, Sqlite is strict C
+# cjson doesn't compile cleany, and we need -fPIC to have
+# the possibility to link the code into a dynamic module
 ALL_CFLAGS = $(OPTFLAGS) -I. $(SO_COMPILE_FLAGS)
 
 local_all:
