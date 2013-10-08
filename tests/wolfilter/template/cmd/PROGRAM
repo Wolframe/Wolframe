@@ -1,0 +1,4 @@
+#!/bin/sh
+
+find ../scripts ../template/program -name "*$1" | sed 's@^../@../wolfilter/@' | head -n1 -   # Result
+

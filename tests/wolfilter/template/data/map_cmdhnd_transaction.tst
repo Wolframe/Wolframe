@@ -1,32 +1,22 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-formname="employee_assignment_print.sfrm"
-ddltypeprg="simpleform.wnmp"
 opt=""
-modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
-opt="$opt --module $modpath/mod_command_directmap"
-modpath="../../src/modules/ddlcompiler/"		# module directory for DDL compilerds relative from tests/temp
-mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
-opt="$opt --module $mod"
-modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
-mod="$modpath/number/mod_normalize_number"		# module to load
-opt="$opt --module $mod"
-mod="$modpath/string/mod_normalize_string"		# module to load
-opt="$opt --module $mod"
-modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
-opt="$opt --module $modpath/testtrace/mod_db_testtrace"
+opt="$opt --module `cmd/MODULE command_directmap`"
+opt="$opt --module `cmd/MODULE ddlcompiler_simpleform`"
+opt="$opt --module `cmd/MODULE normalize_number`"
+opt="$opt --module `cmd/MODULE normalize_string`"
+opt="$opt --module `cmd/MODULE db_testtrace`"
+opt="$opt --program `cmd/PROGRAM employee_assignment_print.sfrm`"
+opt="$opt --program `cmd/PROGRAM simpleform.wnmp`"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
 opt="$opt --cmdprogram=test.dmap"
-opt="$opt --program $formname"				# form employee assignment
-opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
-testcmd="$opt employee_assignment_print"		# command to execute by the test
-testscripts="$formname"					# list of scripts of the test
-docin=employee_assignment_print				# input document name
-docout=map_transaction					# output document name
+testcmd="$opt employee_assignment_print"
+
+docin=employee_assignment_print
+docout=map_transaction
+
 testdata="
-**file:$ddltypeprg
-`cat program/$ddltypeprg`
 **file: test.dmap
 COMMAND(employee_assignment_print) CALL(test_transaction);
 **file: DBRES

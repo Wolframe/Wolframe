@@ -71,9 +71,9 @@ static std::string configurationTree_tostring( const boost::property_tree::ptree
 	return res->content();
 }
 
-boost::filesystem::path makeAbsoluteFromRelativePath( const boost::filesystem::path& pt)
+static boost::filesystem::path makeAbsoluteFromRelativePath( const boost::filesystem::path& pt, const std::string& referencePath_)
 {
-	return _Wolframe::utils::getCanonicalPath( pt.string(), boost::filesystem::current_path().string());
+	return _Wolframe::utils::getCanonicalPath( pt.string(), referencePath_);
 }
 
 static boost::property_tree::ptree getTreeNode( const boost::property_tree::ptree& tree, const std::string& name)
@@ -205,7 +205,7 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			std::string programpath = *gi;
 			if (programpath.size() && programpath.at(0) == '.')
 			{
-				programpath = makeAbsoluteFromRelativePath( programpath).string();
+				programpath = makeAbsoluteFromRelativePath( programpath, m_referencePath).string();
 			}
 			proccfg.add_child( "program", boost::property_tree::ptree( programpath));
 		}
@@ -219,7 +219,7 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 				std::string programpath = *ri;
 				if (programpath.size() && programpath.at(0) == '.')
 				{
-					programpath = makeAbsoluteFromRelativePath( programpath).string();
+					programpath = makeAbsoluteFromRelativePath( programpath, m_referencePath).string();
 				}
 				programcfg.add_child( "program", boost::property_tree::ptree( programpath));
 				if (!m_inputfilter.empty())
