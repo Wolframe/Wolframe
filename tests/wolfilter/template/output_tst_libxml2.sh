@@ -35,7 +35,15 @@ if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 fi
 
 testname="$TESTNAME""_libxml2"
-for cset in $csetlist
+
+cc=`echo $csetlist | sed 's/UTF-8//'`
+if [ x"$cc" != x"$csetlist" ]; then
+	csetselect="UTF-8 `cmd/SELECTS $testname 2 $cc`"
+else
+	csetselect=`cmd/SELECTS $testname 2 $cc`
+fi
+
+for cset in $csetselect
 do
 	if test "x$cset" = "xUCS-4BE"; then
 		# Aba: because UCS-4BE is broken in libxml2 on NetBSD

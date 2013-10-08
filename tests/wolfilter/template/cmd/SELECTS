@@ -1,0 +1,26 @@
+#!/bin/bash
+
+name=$1
+nof=$2
+nn=0
+result=''
+idx=0
+orignof=$nof
+
+if [ `expr $nof + 2` -gt $# ]; then
+	nof=`expr $# - 2`
+fi
+while [ $nn -lt $nof ]
+do
+	idx=`expr $idx + 1`
+	sel=`cmd/SELECT $idx$@`
+	if [ x"$sel" != x"$orignof" ]; then
+		result=`echo $result $sel | xargs -n1 | sort | uniq`
+		nn=`echo $result | xargs -n1 | wc -l`
+	fi
+done
+for rr in $result; do
+	echo $rr
+done
+
+

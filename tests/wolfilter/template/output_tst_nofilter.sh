@@ -28,7 +28,14 @@ OUTPUTFILTER="$outputfilter"
 PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
-for cset in $csetlist
+cc=`echo $csetlist | sed 's/UTF-8//'`
+if [ x"$cc" != x"$csetlist" ]; then
+	csetselect="UTF-8 `cmd/SELECTS $testname 2 $cc`"
+else
+	csetselect="`cmd/SELECTS $testname 2 $cc`"
+fi
+
+for cset in $csetselect
 do
 	. ./output_tst.sh
 	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh

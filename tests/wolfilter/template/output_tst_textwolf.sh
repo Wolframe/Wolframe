@@ -34,7 +34,14 @@ if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"
 fi
 
-for cset in $csetlist
+cc=`echo $csetlist | sed 's/UTF-8//'`
+if [ x"$cc" != x"$csetlist" ]; then
+	csetselect="UTF-8 `cmd/SELECTS $testname 2 $cc`"
+else
+	csetselect=`cmd/SELECTS $testname 2 $cc`
+fi
+
+for cset in $csetselect
 do
 	inputfilter="$filter"
 	outputfilter="$filter"

@@ -2,13 +2,11 @@
 
 rnd=`echo $1 | md5sum - | sed 's/[Aa]/111/g' | sed 's/[Bb]/1111/g' | sed 's/[Cc]/11111/g' | sed 's/[Dd]/111111/g' | sed 's/[Ee]/1111111/g' | sed 's/[Ff]/11111111/g' | sed 's/2/11/g' | sed 's/3/111/g' | sed 's/4/1111/g' | sed 's/5/11111/g' | sed 's/6/111111/g' | sed 's/7/1111111/g' | sed 's/8/11111111/g' | sed 's/9/111111111/g' | wc -c`
 
-idx=$2
-size=`expr $# - 2`
+size=`expr $# - 1`
 
 if [ ${size} -gt 0 ]; then
 	residx=`echo ${rnd} % ${size} | bc`
-	echo "RESULT INDEX ${residx}"
-	echo $@ | cut -d' ' -f `expr ${residx} + 3`
+	echo $@ | cut -d' ' -f `expr ${residx} + 2`
 fi
 
 
