@@ -163,6 +163,11 @@ tests/dotnet/interop/WolfCLR/WolfCLR/Release/
 tests/dotnet/interop/WolfCLR/WolfCLR/WolfCLR.vcxproj.filters
 tests/dotnet/interop/WolfCLR/WolfCLR/WolfCLR.vcxproj.user
 tests/dotnet/interop/WolfCLR/ipch/
+tests/boost-locale/
+tests/freeimage/
+tests/libxml2/
+tests/libxslt/
+tests/python/
 *.qm
 3rdParty/sqlite3/sqlite3
 tests/3rdParty/boost-locale/boostLocaleTest
