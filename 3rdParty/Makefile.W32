@@ -1,8 +1,8 @@
-TOPDIR = .
+TOPDIR = ..
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-SUBDIRS =
+SUBDIRS = gtest
 
 !IFDEF WITH_LIBHPDF
 SUBDIRS = zlib libpng libhpdf $(SUBDIRS)

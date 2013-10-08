@@ -1,0 +1,34 @@
+The Wolframe directory layout
+-----------------------------
+
+3rdParty/ ............ 3rd party libraries used to build Wolframe
+Artwork/ ............. Images of Wolframe
+INSTALL.Unix ......... Installation instructions for Unix type systems
+INSTALL.Windows ...... Installation instructions for Windows
+GNUmakefile .......... Unix top-level GNU makefile
+Makefile.W32 ......... Windows top-level NMAKE makefile
+src/ ................. core implementation
+src/modules .......... loadable modules
+include/ ............. public header files
+clients/ ............. client library and command line interface,
+                       bindings for clients
+docs/ ................ documentation (Doxygen, Docbook)
+examples/ ............ programming examples
+XML/ ............. DTDs, Scheams, Relax-NG
+database/ ............ initialization schemas and data for database
+tests/ ............... tests, not distributed in released source tarball
+makefiles/ ........... GNU makefile and NMAKEfile system
+po/ .................. translations (i18n)
+packaging/ ........... all things needed by packagers
+
+TO BE DISCUSSED or moved:
+
+Wolframe.sln
+Wolframe.config
+Wolframe.creator
+Wolframe.files
+Wolframe.includes
+XML (--> maybe schemas? So JSON would also fit.)
+contrib
+scripts
+wtest

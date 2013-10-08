@@ -1,4 +1,4 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..
 
 SUBDIRS =
 
@@ -11,7 +11,7 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I$(TOPDIR)\gtest\include \
+	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\3rdParty\freeimage\Source \
 	/I$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus
 
@@ -19,7 +19,7 @@ INCLUDE_LDFLAGS = \
 
 # TODO: static linking for now, something is fishy with the DLL
 INCLUDE_LIBS = \
-	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\3rdParty\freeimage\freeimage3.lib \
 	$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib
 	

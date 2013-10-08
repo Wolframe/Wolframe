@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
 	-I$(TOPDIR) \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
@@ -16,7 +16,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \

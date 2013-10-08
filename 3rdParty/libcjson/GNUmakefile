@@ -18,8 +18,12 @@ OBJS = \
 
 TEST_BINS = \
 	testit$(EXE)
-	
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
+
+# override all flags here, not just CFLAGS, compiler.mk
+# is geared towards C++ compatibility, Sqlite is strict C
+ALL_CFLAGS = $(OPTFLAGS) -I. $(SO_COMPILE_FLAGS)
 
 local_all:
 

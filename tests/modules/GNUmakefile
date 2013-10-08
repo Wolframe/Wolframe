@@ -10,13 +10,13 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/loadModules.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \

@@ -2,7 +2,7 @@ TOPDIR = .
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS = 3rdParty src gtest wtest tests clients include docs
+SUBDIRS = 3rdParty src wtest tests clients include docs
 
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples

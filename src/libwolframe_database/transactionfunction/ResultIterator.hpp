@@ -119,7 +119,8 @@ public:
 	virtual langbind::TypedInputFilter* copy() const;
 	virtual bool getNext( langbind::TypedInputFilter::ElementType& type, types::VariantConst& element);
 	virtual void resetIterator();
-	virtual bool setFlags( Flags f);
+// Aba, no implementation, link problem on Windows
+//	virtual bool setFlags( Flags f);
 
 private:
 	ResultIteratorImpl m_resitr;

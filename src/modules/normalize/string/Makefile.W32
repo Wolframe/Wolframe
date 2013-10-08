@@ -13,7 +13,8 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I$(TOPDIR) \
 	/I$(TOPDIR)\tests \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)

@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR) \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\gtest\include \
+	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\wtest
 
 # Note: libraries are picked automatically on Windows!
@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib \
-	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \

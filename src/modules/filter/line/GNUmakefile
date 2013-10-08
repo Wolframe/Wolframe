@@ -7,7 +7,8 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
 	-I$(TOPDIR) \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/3rdParty
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \

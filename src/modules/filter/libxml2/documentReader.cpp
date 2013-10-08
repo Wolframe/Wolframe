@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of document reader abstraction for the libxml2 library
 #include "documentReader.hpp"
 #include <stdexcept>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -59,7 +60,10 @@ std::string DocumentReader::getContent() const
 	if (!mem)
 	{
 		xmlError* err = xmlGetLastError();
-		throw std::runtime_error( "failed to dump XML document content");
+		std::ostringstream s;
+		s << "Failed to dump XML document content: " << err->message << " at "
+			<< err->line;
+		throw std::runtime_error( s.str());
 	}
 	boost::shared_ptr<xmlChar> contentref( mem, xmlFree);
 	return std::string( (char*)mem, memsize);

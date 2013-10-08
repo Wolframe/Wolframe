@@ -2,7 +2,7 @@ TOPDIR = .
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-SUBDIRS = 3rdParty src gtest wtest tests clients
+SUBDIRS = 3rdParty src wtest tests clients
 
 !IFDEF WITH_EXAMPLES
 SUBDIRS = $(SUBDIRS) examples

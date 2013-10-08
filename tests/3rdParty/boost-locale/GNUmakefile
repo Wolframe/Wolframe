@@ -1,4 +1,4 @@
-TOPDIR = ../..
+TOPDIR = ../../..
 
 SUBDIRS =
 
@@ -9,14 +9,14 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	-I. \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	$(ICU_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	-lboost_locale$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(ICU_LIBS)

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules database AAAA simpleFormCompiler wolfilter
+SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -14,30 +14,6 @@ endif
 endif
 endif
 
-ifeq ($(WITH_PYTHON),1)
-SUBDIRS += python
-endif
-
-ifeq ($(WITH_LIBXML2),1)
-SUBDIRS += libxml2
-endif
-
-ifeq ($(WITH_LIBXSLT),1)
-SUBDIRS += libxslt
-endif
-
-ifeq ($(WITH_LIBHPDF),1)
-SUBDIRS += libhpdf
-endif
-
-ifeq ($(WITH_ICU),1)
-SUBDIRS += boost-locale
-endif
-
-ifeq ($(WITH_FREEIMAGE),1)
-SUBDIRS += freeimage
-endif
-
 INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
@@ -45,7 +21,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
@@ -58,7 +34,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	-lwolftest \
 	-lwolframe \

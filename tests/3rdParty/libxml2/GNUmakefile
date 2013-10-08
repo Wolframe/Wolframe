@@ -1,4 +1,4 @@
-TOPDIR = ../..
+TOPDIR = ../../..
 
 SUBDIRS =
 
@@ -38,7 +38,7 @@ local_distclean:
 ENCODINGS=UTF-8 UCS-2LE UCS-2BE UTF-16LE UTF-16BE
 
 local_test: $(TEST_CPP_BINS)
-	for e in $(ENCODINGS); do \
+	@for e in $(ENCODINGS); do \
 		echo "Testing libxml2 with encoding $$e"; \
 		LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-$$e.xml > $$e.RES; \
 		diff $$e.MUST $$e.RES > $$e.DIFF; \
@@ -47,7 +47,7 @@ local_test: $(TEST_CPP_BINS)
 local_longtest:
 
 testdata:
-	for e in $(ENCODINGS); do \
+	@for e in $(ENCODINGS); do \
 		sed "s/encoding=\"UTF-8\"/encoding=\"$$e\"/" test-orig.xml > x; \
 		iconv -f UTF-8 -t $$e -o test-$$e.xml x; \
 	done

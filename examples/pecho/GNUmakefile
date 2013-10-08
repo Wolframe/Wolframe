@@ -9,7 +9,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
@@ -31,7 +31,7 @@ INCLUDE_LIBS = \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolftest \
-	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(LIBS_DL)
 
 # openssl
