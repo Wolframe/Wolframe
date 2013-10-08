@@ -22,8 +22,6 @@ LIBRARIES = \
 	wolframe_database.lib
 
 CPP_OBJS = \
-	transactionOutput.obj \
-	transactionFunction.obj \
 	transactionfunction/TagTable.obj \
 	transactionfunction/Path.obj \
 	transactionfunction/PreProcessCommand.obj \
@@ -31,6 +29,8 @@ CPP_OBJS = \
 	transactionfunction/ResultStructure.obj \
 	transactionfunction/ResultIterator.obj \
 	transactionfunction/ResultFilter.obj \
+	transactionOutput.obj \
+	transactionFunction.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	preparedStatement.obj \
