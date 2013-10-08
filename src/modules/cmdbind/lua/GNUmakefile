@@ -9,7 +9,7 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	$(LUA_INCLUDE_DIRS) \
+	-I$(TOPDIR)/3rdParty/lua/src \
 	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
@@ -20,7 +20,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_langbind \
-	$(LUA_LIB_DIR)/liblua.a \
+	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 
 
