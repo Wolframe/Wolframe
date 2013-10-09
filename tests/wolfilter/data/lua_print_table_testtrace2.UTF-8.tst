@@ -2,7 +2,7 @@
 **requires:LUA
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM 'invoice.simpleform'>
+<!DOCTYPE invoice SYSTEM "Invoice.simpleform">
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -50,7 +50,7 @@
 </price>
 </item>
 <item>
-<name>Beach Ball 24"</name>
+<name>Beach Ball 24</name>
 <description>Inflatable Ball</description>
 <quantity>2</quantity>
 <discount>0</discount>
@@ -82,25 +82,25 @@
 <payed>0.00</payed>
 <open>1006.45</open>
 </bill>
-<address id='supplier'>
+<address id="supplier">
 <name>The Consumer Company</name>
 <street>Kreuzstrasse 34</street>
 <postalcode>8008</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-<address id='customer'>
+<address id="customer">
 <name>The Consumer Company</name>
 <street>Kreuzstrasse 34</street>
 <postalcode>8008</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-<address id='shipping'>
+<address id="shipping">
 <name>The Manufacturer Company</name>
 <street>Bahnhofstrasse 2</street>
 <postalcode>8001</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
 </invoice>**config
@@ -110,6 +110,8 @@
 iNt=number:integer(10);
 uint=numbeR:unsigned(10);
 float=number:fLoat(10,10);
+currency=number:fixedpoint(13,2);
+percent_1=number:fixedpoint(5,1);
 **file: print_table_textwolf.lua
 
 function run()
@@ -123,7 +125,7 @@ function run()
 end
 
 **file: invoice.sfrm
-FORM invoice
+FORM Invoice
 {
 	invoice
 	{
@@ -142,29 +144,29 @@ FORM invoice
 			name string
 			description string
 			quantity uint
-			discount float
+			discount currency
 			price
 			{
-				unit float
-				total float
+				unit currency
+				total currency
 				tax
 				{
 					description @string
-					_ float
+					_ percent_1
 				}
-				gross float
+				gross currency
 			}
 		}
 		bill
 		{
 			price
 			{
-				total float
-				tax float
-				gross float
+				total currency
+				tax currency
+				gross currency
 			}
-			payed float
-			open float
+			payed currency
+			open currency
 		}
 		address []
 		{

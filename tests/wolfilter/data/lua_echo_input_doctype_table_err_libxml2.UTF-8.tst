@@ -12,6 +12,8 @@ try to read input twice
 int=string:trim,number:integer(10);
 uint=string:trim,number:unsigned(10);
 float=string:trim,number:float(10,10);
+currency=number:fixedpoint(13,2);
+percent_1=number:fixedpoint(5,1);
 **file: echo_input_doctype_table_err.lua
 function run()
 	type = input:doctype()

@@ -1,4 +1,4 @@
-FORM invoice
+FORM Invoice
 {
 	invoice
 	{
@@ -17,29 +17,29 @@ FORM invoice
 			name string
 			description string
 			quantity uint
-			discount float
+			discount currency
 			price
 			{
-				unit float
-				total float
+				unit currency
+				total currency
 				tax
 				{
 					description @string
-					_ float
+					_ percent_1
 				}
-				gross float
+				gross currency
 			}
 		}
 		bill
 		{
 			price
 			{
-				total float
-				tax float
-				gross float
+				total currency
+				tax currency
+				gross currency
 			}
-			payed float
-			open float
+			payed currency
+			open currency
 		}
 		address []
 		{

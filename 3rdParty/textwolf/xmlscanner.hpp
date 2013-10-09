@@ -646,11 +646,12 @@ public:
 
 		while (tokstate.pos < sizeof(tokstate.buf))
 		{
-			tokstate.buf[tokstate.pos++] = ch = m_src.ascii();
+			ch = m_src.ascii();
 			if (ch == ';')
 			{
 				if (tokstate.value > 0xFFFFFFFF)
 				{
+					tokstate.buf[ tokstate.pos++] = ch;
 					fallbackEntity();
 					return true;
 				}
@@ -662,11 +663,12 @@ public:
 			else
 			{
 				unsigned char chval = HEX(ch);
-				if (tokstate.value >= tokstate.base)
+				if (chval >= tokstate.base)
 				{
 					fallbackEntity();
 					return true;
 				}
+				tokstate.buf[ tokstate.pos++] = ch;
 				tokstate.value = tokstate.value * tokstate.base + chval;
 				m_src.skip();
 			}

@@ -68,6 +68,8 @@ float = number:float(12,12);
 f_floAt = string:trim ,Number:float(12,12);
 text_Ascii_de =  localeConv :latinword, ascii_de
 text_ascii_eu=localeconv :  latinword ,ascii_eu ;
+currency=number:fixedpoint(13,2);
+percent_1=number:fixedpoint(5,1);
 **file: typed_invoice.sfrm
 FORM typed_invoice
 {

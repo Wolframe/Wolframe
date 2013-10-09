@@ -159,6 +159,8 @@
 int=number:integer;
 uint=number:unsigned;
 float=number:float;
+currency=number:fixedpoint(13,2);
+percent_1=number:fixedpoint(5,1);
 **file: DBDATA
 --
 -- Generic tree implementation for SQL databases

@@ -35,6 +35,7 @@
 #include "numberNormalize.hpp"
 #include "integerNormalizeFunction.hpp"
 #include "floatNormalizeFunction.hpp"
+#include "fixedpointNormalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
@@ -172,6 +173,20 @@ types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( Re
 			}
 			return new FloatNormalizeFunction( dim.first, dim.second, maxval);
 		}
+		else if (boost::algorithm::iequals( type, "fixedpoint"))
+		{
+			std::pair<std::size_t,std::size_t> dim;
+
+			if (utils::gotoNextToken( ii, ee))
+			{
+				dim = parseFloatDescription( ii, ee);
+				return new FixedpointNormalizeFunction( dim.first, dim.second);
+			}
+			else
+			{
+				return new FixedpointNormalizeFunction( 12, 3);
+			}
+		}
 		else
 		{
 			throw std::runtime_error( std::string( "unknown number type '") + name + "'");
@@ -193,6 +208,7 @@ const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
 			push_back( "integer");
 			push_back( "unsigned");
 			push_back( "float");
+			push_back( "fixedpoint");
 		}
 	};
 	static NormalizeFunctions rt;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM 'invoice.simpleform'>
+<!DOCTYPE invoice SYSTEM "Invoice.simpleform">
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -47,7 +47,7 @@
 </price>
 </item>
 <item>
-<name>Beach Ball 24"</name>
+<name>Beach Ball 24</name>
 <description>Inflatable Ball</description>
 <quantity>2</quantity>
 <discount>0</discount>
@@ -79,25 +79,25 @@
 <payed>0.00</payed>
 <open>1006.45</open>
 </bill>
-<address id='supplier'>
+<address id="supplier">
 <name>The Consumer Company</name>
 <street>Kreuzstrasse 34</street>
 <postalcode>8008</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-<address id='customer'>
+<address id="customer">
 <name>The Consumer Company</name>
 <street>Kreuzstrasse 34</street>
 <postalcode>8008</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-<address id='shipping'>
+<address id="shipping">
 <name>The Manufacturer Company</name>
 <street>Bahnhofstrasse 2</street>
 <postalcode>8001</postalcode>
-<city>&#252;rich</city>
+<city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
 </invoice>
