@@ -38,10 +38,12 @@ local_clean:
 
 local_distclean:
 
+# Currently debug Python is tricky: must build python completly in
+# debug mode first. Later.
 local_test:
 !IFNDEF DEBUG
 	@-copy "$(PYTHON_DIR)\libs\python33.dll" .
+	@-embed my > test.RES
 !ELSE
 	@-copy "$(PYTHON_DIR)\libs\python33_d.dll" .
 !ENDIF
-	@-embed my > test.RES

@@ -1,14 +1,8 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 SUBDIRS =
-
-# all broken on windows due to working telnet
-#!IFDEF WITH_EXPECT
-#SUBDIRS = \
-#	$(SUBDIRS) expect
-#!ENDIF
 
 !IFDEF WITH_PYTHON
 SUBDIRS = \

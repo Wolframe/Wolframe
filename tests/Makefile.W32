@@ -8,38 +8,6 @@ SUBDIRS = modules database AAAA wolfilter
 #	$(SUBDIRS) expect
 #!ENDIF
 
-!IFDEF WITH_PYTHON
-SUBDIRS = \
-	$(SUBDIRS) python
-!ENDIF
-
-!IFDEF WITH_LIBXML2
-SUBDIRS = \
-	$(SUBDIRS) libxml2
-!ENDIF
-
-!IFDEF WITH_LIBXSLT
-!IFDEF WITH_LIBXML2
-SUBDIRS = \
-	$(SUBDIRS) libxslt
-!ENDIF
-!ENDIF
-
-!IFDEF WITH_LIBHPDF
-SUBDIRS = \
-	$(SUBDIRS) libhpdf
-!ENDIF
-
-!IFDEF WITH_ICU
-SUBDIRS = \
-	$(SUBDIRS) boost-locale
-!ENDIF
-
-!IFDEF WITH_FREEIMAGE
-SUBDIRS = \
-	$(SUBDIRS) freeimage
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
@@ -102,10 +70,10 @@ INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
+	$(INCLUDE_DIRS) /I"$(TOPDIR)\3rdParty\libhpdf\include"
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib" \
+	$(INCLUDE_LIBS) "$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib" \
 	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib"
 !ENDIF
 

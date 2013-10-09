@@ -15,26 +15,26 @@ cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
 
 # the Redhat build script
-cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
+cp packaging/redhat/wolframe.spec $OSC_HOME/wolframe.spec
 
 # patches
-cp contrib/osc/boost1.48/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
+cp packaging/obs/boost1.48/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
 
 # compute sizes of packages
 SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.orig.tar.gz`
 CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.orig.tar.gz | cut -f 1 -d' '`
 
 # copy all Debian versions of the description files.
-cp contrib/osc/wolframe*.dsc $OSC_HOME
+cp packaging/obs/wolframe*.dsc $OSC_HOME
 for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 	echo " $CHKSUM $SIZE wolframe_$VERSION.orig.tar.gz" >> $i
 	OS_ORIG=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//'`
 	OS=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//' | tr -d '_'`
 	rm -rf $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz
 	rm -rf /tmp/debian
-	cp -a debian /tmp/.
-	test -f  contrib/osc/control-$OS_ORIG && cp -a contrib/osc/control-$OS_ORIG /tmp/debian/control
-	test -f contrib/osc/rules-$OS_ORIG && cp -a contrib/osc/rules-$OS_ORIG /tmp/debian/rules
+	cp -a packaging/debian /tmp/.
+	test -f packaging/obs/control-$OS_ORIG && cp -a packaging/obs/control-$OS_ORIG /tmp/debian/control
+	test -f packaging/obs/rules-$OS_ORIG && cp -a packaging/obs/rules-$OS_ORIG /tmp/debian/rules
 	OLDDIR=$PWD
 	cd /tmp
 	tar zcf /tmp/wolframe_$VERSION-$OS.debian.tar.gz debian
@@ -46,10 +46,10 @@ for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 done
 
 # Archlinux specific files
-cat contrib/osc/PKGBUILD > $OSC_HOME/PKGBUILD
-cp archlinux/wolframe.conf $OSC_HOME/wolframe.conf
-cp archlinux/wolframed.service $OSC_HOME/wolframed.service
-cp archlinux/wolframe.install $OSC_HOME/wolframe.install
+cat packaging/obs/PKGBUILD > $OSC_HOME/PKGBUILD
+cp packaging/archlinux/wolframe.conf $OSC_HOME/wolframe.conf
+cp packaging/archlinux/wolframed.service $OSC_HOME/wolframed.service
+cp packaging/archlinux/wolframe.install $OSC_HOME/wolframe.install
 
 CHKSUM2=`md5sum $OSC_HOME/wolframe.conf | cut -f 1 -d' '`
 CHKSUM3=`md5sum $OSC_HOME/wolframed.service | cut -f 1 -d' '`

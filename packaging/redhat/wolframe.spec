@@ -1097,28 +1097,28 @@ cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wol
 %endif
 
 %if %{rhel} || %{centos} || %{sles}
-install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
+install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 
 %if %{fedora}
 %if %{fc17} || %{fc18} || %{fc19}
-install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
 %endif
 %endif
 
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
-install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
 %endif
 %endif
 
-install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
+install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 
 %if %{fedora}
 %if %{fc17} || %{fc18} || %{fc19}
-install -D -m644 redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
+install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
 %endif
 

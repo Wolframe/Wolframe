@@ -14,12 +14,15 @@ clients/ ............. client library and command line interface,
                        bindings for clients
 docs/ ................ documentation (Doxygen, Docbook)
 examples/ ............ programming examples
-XML/ ............. DTDs, Scheams, Relax-NG
+XML/ ................. DTDs, Scheams, Relax-NG
 database/ ............ initialization schemas and data for database
 tests/ ............... tests, not distributed in released source tarball
 makefiles/ ........... GNU makefile and NMAKEfile system
 po/ .................. translations (i18n)
 packaging/ ........... all things needed by packagers
+packaging/patches .... patches for 3rdParty software to be able to
+                       build on some systems
+contrib/ ............. various things coming from other people (little helpers)
 
 TO BE DISCUSSED or moved:
 
