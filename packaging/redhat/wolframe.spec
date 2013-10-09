@@ -95,7 +95,7 @@
 %define with_libxslt	1
 %define with_libhpdf	1
 %define with_freeimage	1
-%define with_cjson	0
+%define with_cjson	1
 %define with_examples	1
 
 # Per package decisions
@@ -648,6 +648,16 @@ Wolframe filter JSON filtering module implemented with
 the cjson library.
 
 Requires: %{name} >= %{version}-%{release}
+
+%package cjson-devel
+Summary: Development header files and libraries of the CJSON JSON library
+Group: Application/Business
+
+%description cjson-devel
+Development files of the CJSON JSON library.
+
+Requires: %{name}-cjson >= %{version}-%{release}
+
 %endif
 
 %package libclient
@@ -1480,6 +1490,13 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_filter_cjson.so
+
+%files cjson-devel
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libcjson.a
+%dir %{_includedir}/wolframe/cjson
+%{_includedir}/wolframe/cjson/cJSON.h
 %endif
 
 %endif
