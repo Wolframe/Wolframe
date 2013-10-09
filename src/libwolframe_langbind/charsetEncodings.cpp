@@ -59,6 +59,7 @@ struct CharsetEncodingInstanceBase
 			m_encoding.print( ch, dest);
 		}
 	}
+
 	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const
 	{
 		textwolf::CStringIterator itr( content, contentsize);
@@ -70,6 +71,12 @@ struct CharsetEncodingInstanceBase
 			utf8.print( ch, dest);
 		}
 	}
+
+	virtual void printEOLN( std::string& dest) const
+	{
+		m_encoding.print( '\n', dest);
+	}
+
 private:
 	ENC m_encoding;
 };
@@ -194,11 +201,11 @@ CharsetEncoding langbind::getCharsetEncoding( const std::string& name)
 	{
 		st = new CharsetEncodingInstance<textwolf::charset::UCS2LE>();
 	}
-	else if (enc == "ucs4" || enc == "ucs4be")
+	else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
 	{
 		st = new CharsetEncodingInstance<textwolf::charset::UCS4BE>();
 	}
-	else if (enc == "ucs4le")
+	else if (enc == "utf32le" || enc == "ucs4le")
 	{
 		st = new CharsetEncodingInstance<textwolf::charset::UCS4LE>();
 	}
@@ -249,23 +256,27 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 	}
 	if (maxll == 3)
 	{
-		rt = (Id)((int)rt | (int)U4);
+		rt = UCS4BE;
 	}
 	else if (maxll == 1)
 	{
-		rt = (Id)((int)rt | (int)U2);
+		rt = UCS2BE;
+	}
+	else if (maxll == 2)
+	{
+		return FAIL;
 	}
 	else
 	{
-		rt = (Id)((int)rt | (int)U1);
+		rt = UCS1;
 	}
 	if (size > 2 && maxll == 1)
 	{
 		// ... UTF16 check BOM
-		if ((unsigned char)content[0] == 0xFE && (unsigned char)content[1] == 0xFF) rt = (Id)((int)rt | (int)BE);
-		if ((unsigned char)content[0] == 0xFF && (unsigned char)content[1] == 0xFE) rt = (Id)((int)rt | (int)LE);
+		if ((unsigned char)content[0] == 0xFE && (unsigned char)content[1] == 0xFF) rt = UCS2BE;
+		if ((unsigned char)content[0] == 0xFF && (unsigned char)content[1] == 0xFE) rt = UCS2LE;
 	}
-	if (((int)rt & ((int)LE | (int)BE)) == 0)
+	else if (rt != UCS1)
 	{
 		// ... indians not set
 		for (idx=0; idx < size; ++idx)
@@ -276,35 +287,34 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 				{
 					if (idx % 4 == 0)
 					{
+						if (rt == UCS4LE) return FAIL;
 						//... zero at the start of a character, means allways BE
-						rt = (Id)((int)rt | (int)BE);
+						rt = UCS4BE;
 					}
 					else if (idx % 4 == 3)
 					{
+						if (rt == UCS4BE) return FAIL;
 						//... zero at the end of a character, means allways LE
-						rt = (Id)((int)rt | (int)LE);
+						rt = UCS4LE;
 					}
 				}
 				if (maxll == 1)
 				{
 					if (idx % 2 == 0)
 					{
+						if (rt == UCS2LE) return FAIL;
 						//... zero at the start of a character, means allways BE
-						rt = (Id)((int)rt | (int)BE);
+						rt = UCS2BE;
 					}
 					else if (idx % 2 == 1)
 					{
+						if (rt == UCS2BE) return FAIL;
 						//... zero at the end of a character, means allways LE
-						rt = (Id)((int)rt | (int)LE);
+						rt = UCS2LE;
 					}
 				}
 			}
 		}
-	}
-	if (((int)rt & ((int)LE | (int)BE)) == ((int)LE | (int)BE))
-	{
-		// ... indians contradicting
-		return NONE;
 	}
 	return rt;
 }

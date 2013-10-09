@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "utils/parseUtils.hpp"
+#include "logger-v1.hpp"
 #include "langbind/charsetEncodings.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -68,13 +69,24 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 static std::string guessCharsetEncoding( const void* content, std::size_t contentsize)
 {
 	CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
-	std::string rt = "UTF-";
-	if (((int)cl & (CharsetClass::U1)) != 0) rt += "8";
-	if (((int)cl & (CharsetClass::U2)) != 0) rt += "16";
-	if (((int)cl & (CharsetClass::U4)) != 0) rt += "32";
-	if (((int)cl & (CharsetClass::BE)) != 0) rt += "BE";
-	if (((int)cl & (CharsetClass::LE)) != 0) rt += "LE";
-	return rt;
+	switch (cl)
+	{
+		case CharsetClass::FAIL:
+			throw std::runtime_error( "failed to guess charset encoding for JSON filter");
+		case CharsetClass::NONE:
+			throw std::runtime_error( "cannot guess charset encoding for JSON filter");
+		case CharsetClass::UCS1:
+			return "UTF-8";
+		case CharsetClass::UCS2BE:
+			return "UTF-16BE";
+		case CharsetClass::UCS2LE:
+			return "UTF-16LE";
+		case CharsetClass::UCS4BE:
+			return "UCS4-BE";
+		case CharsetClass::UCS4LE:
+			return "UCS4-LE";
+	}
+	return "";
 }
 
 boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
@@ -106,7 +118,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	{
 		std::string origcontent( m_content);
 		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encoding = guessCharsetEncoding( content, contentsize);
+		m_encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
 		m_root = parse( origcontent);
 
 		const cJSON* first = m_root.get();
@@ -122,6 +134,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 					if (!m_doctype.empty()) throw std::runtime_error("duplicate 'doctype' definition");
 					m_doctype = first->valuestring;
 					first = first->next;
+					continue;
 				}
 				else if (boost::iequals("encoding", first->string))
 				{
@@ -136,153 +149,234 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 						first = m_root.get();
 						while (first && nof_docattributes--) first = first->next;
 					}
-				}
-				else
-				{
-					break;
+					else
+					{
+						first = first->next;
+					}
+					continue;
 				}
 			}
+			break;
 		}
 		m_stk.push_back( StackElement( first));
 	}
 }
 
+bool InputFilterImpl::getNodeValue( const void*& element, std::size_t& elementsize)
+{
+	const cJSON* nd = m_stk.back().m_node;
+	switch (nd->type & 0x7F)
+	{
+		case cJSON_False:
+			element = "false";
+			elementsize = 5;
+			return true;
+		case cJSON_True:
+			element = "true";
+			elementsize = 4;
+			return true;
+		case cJSON_NULL:
+			return false;
+
+		case cJSON_String:
+		case cJSON_Number:
+			if (!nd->valuestring)
+			{
+				setState( Error, "internal: value node without string value found in JSON structure");
+				return false;
+			}
+			element = nd->valuestring;
+			elementsize = nd->valuestring?std::strlen( nd->valuestring):0;
+			return true;
+		case cJSON_Array:
+			return false;
+		case cJSON_Object:
+			return false;
+		default:
+			setState( Error, "internal: memory corruption found in JSON structure");
+			return false;
+	}
+}
+
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 {
+	if (!m_root.get())
+	{
+		setState( EndOfMessage);
+		return false;
+	}
 	while (!m_stk.empty())
 	{
 		const cJSON* nd = m_stk.back().m_node;
-		if (!nd)
+		if (!nd && m_stk.back().m_state != StackElement::StateCheckEnd)
 		{
 			setState( Error, "internal: invalid node in JSON structure");
 			return false;
 		}
-		for (;;) switch (m_stk.back().m_state)
+		for (;;)
 		{
-			case StackElement::StateOpen:
-				if (nd->string)
-				{
-					type = InputFilter::OpenTag;
-					element = nd->string;
-					elementsize = std::strlen( nd->string);
-					m_stk.back().m_state = StackElement::StateChild;
-					return true;
-				}
-				else
-				{
-					m_stk.back().m_state = StackElement::StateChild;
-					continue;
-				}
-			case StackElement::StateChild:
-				if (nd->child)
-				{
-					m_stk.back().m_state = StackElement::StateValue;
-					if (nd->type == cJSON_Array)
-					{
-						m_stk.push_back( StackElement( nd->child, nd->string));
-					}
-					else
-					{
-						m_stk.push_back( StackElement( nd->child));
-					}
-				}
-				continue;
+			LOG_DATA << "[json input filter] State " << StackElement::stateName( m_stk.back().m_state);
 
-			case StackElement::StateValue:
-				switch (nd->type & 0x7F)
-				{
-					case cJSON_False:
-						type = InputFilter::Value;
-						element = "false";
-						elementsize = std::strlen( nd->string);
-						m_stk.back().m_state = StackElement::StateNext;
-						return true;
-					case cJSON_True:
-						type = InputFilter::Value;
-						element = "false";
-						elementsize = std::strlen( nd->string);
-						m_stk.back().m_state = StackElement::StateNext;
-						return true;
-					case cJSON_NULL:
-						m_stk.back().m_state = StackElement::StateNext;
-						break;
-					case cJSON_String:
-					case cJSON_Number:
-						if (!nd->valuestring)
+			switch (m_stk.back().m_state)
+			{
+				case StackElement::StateOpen:
+					if (nd->string)
+					{
+						if (nd->string[0] == '-')
 						{
-							setState( Error, "internal: value node without string value found in JSON structure");
-							return false;
+							if (nd->type == cJSON_NULL)
+							{
+								m_stk.back().m_state = StackElement::StateChild;
+							}
+							else
+							{
+								type = InputFilter::Attribute;
+								element = nd->string+1;
+								elementsize = std::strlen( nd->string+1);
+								m_stk.back().m_state = StackElement::StateAttributeValue;
+							}
 						}
-						type = InputFilter::Value;
-						element = nd->valuestring;
-						elementsize = nd->valuestring?std::strlen( nd->valuestring):0;
-						m_stk.back().m_state = StackElement::StateNext;
-						return true;
-					case cJSON_Array:
-						m_stk.back().m_state = StackElement::StateNext;
-						break;
-					case cJSON_Object:
-						m_stk.back().m_state = StackElement::StateNext;
-						break;
-					default:
-						setState( Error, "internal: memory corruption found in JSON structure");
-						return false;
-				}
-
-			case StackElement::StateNext:
-				if (nd->string)
-				{
-					// close the tag opened in 'StackElement::StateOpen':
-					type = InputFilter::CloseTag;
-					element = 0;
-					elementsize = 0;
-					m_stk.back().m_node = nd->next;
-					m_stk.back().m_state = StackElement::StateCheckEnd;
-					return true;
-				}
-				else
-				{
-					m_stk.back().m_node = nd->next;
-					m_stk.back().m_state = StackElement::StateCheckEnd;
-					break;
-				}
-
-			case StackElement::StateCheckEnd:
-				if (m_stk.back().m_node)
-				{
-					if (m_stk.back().m_tag)
-					{
-						type = InputFilter::CloseTag;
-						element = 0;
-						elementsize = 0;
-						m_stk.back().m_state = StackElement::StateReopen;
+						else if (nd->string[0] == '#')
+						{
+							if (std::strcmp( nd->string, "#text") == 0)
+							{
+								m_stk.back().m_state = StackElement::StateContentValue;
+								continue;
+							}
+							else
+							{
+								setState( Error, "invalid node name in JSON structure");
+								return false;
+							}
+						}
+						else
+						{
+							type = InputFilter::OpenTag;
+							element = nd->string;
+							elementsize = std::strlen( nd->string);
+							m_stk.back().m_state = StackElement::StateChild;
+						}
 						return true;
 					}
 					else
 					{
-						m_stk.back().m_state = StackElement::StateOpen;
+						m_stk.back().m_state = StackElement::StateChild;
+						continue;
 					}
-				}
-				else
-				{
-					m_stk.pop_back();
-					if (m_stk.empty())
+
+				case StackElement::StateChild:
+					if (nd->child)
 					{
-						// final close:
+						m_stk.back().m_state = StackElement::StateValue;
+						if (nd->type == cJSON_Array)
+						{
+							m_stk.push_back( StackElement( nd->child, nd->string));
+							nd = m_stk.back().m_node;
+						}
+						else
+						{
+							m_stk.push_back( StackElement( nd->child));
+							nd = m_stk.back().m_node;
+						}
+					}
+					else
+					{
+						m_stk.back().m_state = StackElement::StateValue;
+					}
+					continue;
+
+				case StackElement::StateAttributeValue:
+				case StackElement::StateContentValue:
+					if (getNodeValue( element, elementsize))
+					{
+						m_stk.back().m_node = nd->next;
+						m_stk.back().m_state = StackElement::StateCheckEnd;
+						type = InputFilter::Value;
+						return true;
+					}
+					else if (state() == InputFilter::Open)
+					{
+						m_stk.back().m_node = nd->next;
+						m_stk.back().m_state = StackElement::StateCheckEnd;
+						continue;
+					}
+					else
+					{
+						return false;
+					}
+				case StackElement::StateValue:
+					if (getNodeValue( element, elementsize))
+					{
+						m_stk.back().m_state = StackElement::StateNext;
+						type = InputFilter::Value;
+						return true;
+					}
+					else if (state() == InputFilter::Open)
+					{
+						m_stk.back().m_state = StackElement::StateNext;
+						continue;
+					}
+					else
+					{
+						return false;
+					}
+
+				case StackElement::StateNext:
+					if (nd->string)
+					{
+						// close the tag opened in 'StackElement::StateOpen':
 						type = InputFilter::CloseTag;
 						element = 0;
 						elementsize = 0;
+						m_stk.back().m_node = nd->next;
+						m_stk.back().m_state = StackElement::StateCheckEnd;
 						return true;
 					}
-				}
-				continue;
+					else
+					{
+						m_stk.back().m_node = nd->next;
+						m_stk.back().m_state = StackElement::StateCheckEnd;
+						break;
+					}
 
-			case StackElement::StateReopen:
-				type = InputFilter::OpenTag;
-				element = m_stk.back().m_tag;
-				elementsize = std::strlen( m_stk.back().m_tag);
-				m_stk.back().m_state = StackElement::StateOpen;
-				return true;
+				case StackElement::StateCheckEnd:
+					if (m_stk.back().m_node)
+					{
+						if (m_stk.back().m_tag)
+						{
+							type = InputFilter::CloseTag;
+							element = 0;
+							elementsize = 0;
+							m_stk.back().m_state = StackElement::StateReopen;
+							return true;
+						}
+						else
+						{
+							m_stk.back().m_state = StackElement::StateOpen;
+						}
+					}
+					else
+					{
+						m_stk.pop_back();
+						if (m_stk.empty())
+						{
+							// final close:
+							type = InputFilter::CloseTag;
+							element = 0;
+							elementsize = 0;
+							return true;
+						}
+						nd = m_stk.back().m_node;
+					}
+					continue;
+
+				case StackElement::StateReopen:
+					type = InputFilter::OpenTag;
+					element = m_stk.back().m_tag;
+					elementsize = std::strlen( m_stk.back().m_tag);
+					m_stk.back().m_state = StackElement::StateOpen;
+					return true;
+			}
 		}
 	}
 	return false;

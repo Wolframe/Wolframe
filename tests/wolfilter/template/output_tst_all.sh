@@ -38,6 +38,11 @@ if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	fi
 	. ./output_tst_libxml2.sh
 	csetlist="$CSETLIST"
+	if [ x"$csetlist" = x ]; then
+		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-4LE UCS-4BE"
+	fi
+	. ./output_tst_json.sh
+	csetlist="$CSETLIST"
 else
 	if [ x"$csetlist" = x ]; then
 		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"

@@ -31,7 +31,7 @@ topdir=`dirname $PWD/$0`"/../../../../"
 filter="cjson"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
-	testcmd="--module $modpath/filter/libxml2/mod_filter_cjson $testcmd"
+	testcmd="--module $modpath/filter/cjson/mod_filter_cjson $testcmd"
 fi
 
 testname="$TESTNAME""_cjson"
@@ -51,6 +51,7 @@ do
 	if test x"$outputfilter" = "x"; then
 		outputfilter="$filter"
 	fi
+	docformat="json"
 	. ./output_tst.sh
 	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
 	echo "cat $topdir/tests/wolfilter/template/doc/$docin.UTF-8.json | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | $topdir/wtest/cleanInput BOM EOLN | $topdir/src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed "s@--form @--form $topdir/tests/wolfilter/scripts/@" | sed "s@--script @--script $topdir/tests/wolfilter/scripts/@" | sed "s@--module @--module $topdir/tests/wolfilter/modules/../@"` > temp/$docout.$cset.json" >> ../../testWolfilter.sh

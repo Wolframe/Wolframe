@@ -33,6 +33,9 @@ fi
 if [ `echo $testname | grep -c '_libxml2'` != "0" ]; then
 	echo '**requires:LIBXML2' >> $output
 fi
+if [ `echo $testname | grep -c '_json'` != "0" ]; then
+	echo '**requires:CJSON' >> $output
+fi
 if [ `echo $testname | grep -c '_sqlite'` != "0" ]; then
 	echo '**requires:SQLITE3' >> $output
 fi
@@ -47,7 +50,7 @@ if [ x"$expecterror" != x ]; then
 	echo "$expecterror" >> $output
 fi
 echo '**input' >> $output
-cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
+cat doc/$docin.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output
 if [ x"$inputfilter$outputfilter" = "x" ]; then
 	echo "$testcmd" >> $output
@@ -66,13 +69,13 @@ do
 done
 echo '**output' >> $output
 if [ x"$docout" != x ]; then
-	if [ -f doc/$docout.UTF-8.xml ]; then
-		cat doc/$docout.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
+	if [ -f doc/$docout.UTF-8.$docformat ]; then
+		cat doc/$docout.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 		echo "" | recode UTF-8..$cset >> $output
-	elif [ -f doc/$docout.xml ]; then
-		cat doc/$docout.xml >> $output
+	elif [ -f doc/$docout.$docformat ]; then
+		cat doc/$docout.$docformat >> $output
 	else
-		echo "OUTPUT FILE doc/$docout.UTF-8.xml OR doc/$docout.xml NOT FOUND !"
+		echo "OUTPUT FILE doc/$docout.UTF-8.$docformat OR doc/$docout.$docformat NOT FOUND !"
 	fi
 fi
 if [ x"$dumpout" != "x" ]; then

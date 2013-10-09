@@ -110,6 +110,7 @@ private:
 	void closeElement();
 	void printStructToBuffer();
 	bool flushBuffer();
+	std::string elementpath() const;
 
 private:
 	std::string m_attribname;				//< attribute name buffer

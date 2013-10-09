@@ -442,12 +442,12 @@ public:
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
 			}
-			else if (enc == "ucs4" || enc == "ucs4be")
+			else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
 			}
-			else if (enc == "ucs4le")
+			else if (enc == "utf32le" || enc == "ucs4le")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>( encoding));
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());

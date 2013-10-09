@@ -45,6 +45,7 @@ struct CharsetEncodingStruct
 	virtual ~CharsetEncodingStruct(){}
 	virtual void convertToUTF8( std::string& dest, const char* content, std::size_t contentsize) const=0;
 	virtual void convertFromUTF8( std::string& dest, const char* content, std::size_t contentsize) const=0;
+	virtual void printEOLN( std::string& dest) const=0;
 };
 typedef boost::shared_ptr<CharsetEncodingStruct> CharsetEncoding;
 
@@ -55,11 +56,12 @@ std::string convertStringUTF8ToCharset( const CharsetEncoding& encoding, const s
 
 struct CharsetClass
 {
-	enum Id {NONE=0x00,U1=0x01,U2=0x02,U4=0x04,BE=0x08,LE=0x10,FAIL=0x80};
+	//\brief Enumeration of recorgnized character set classes (UTF and UCS cannot be distinguished)
+	enum Id {NONE,UCS1,UCS2LE,UCS2BE,UCS4LE,UCS4BE,FAIL};
 
 	///\brief Guess the character set of a source file containing ASCII operators
-	///\remark Does not yet distinguish between UTF and UCS
-	///\return A bitset of matches (e.g. U2|BE for UTF16BE)
+	///\remark Does not distinguish between UTF and UCS
+	///\return A class or FAIL for error or NONE if charset class can not be recognized
 	static CharsetClass::Id guess( const char* content, std::size_t size);
 };
 

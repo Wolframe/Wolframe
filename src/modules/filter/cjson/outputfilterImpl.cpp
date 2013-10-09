@@ -32,12 +32,25 @@ Project Wolframe.
 ///\file outputfilterImpl.hpp
 ///\brief Implementation of output filter abstraction for the cjson library
 #include "outputfilterImpl.hpp"
-#include "outputfilterImpl.hpp"
 #include "langbind/charsetEncodings.hpp"
 #include <boost/algorithm/string.hpp>
+#include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+std::string OutputFilterImpl::elementpath() const
+{
+	std::string rt;
+	std::vector<StackElement>::const_iterator si = m_stk.begin(), se = m_stk.end();
+	for (; si != se; ++si)
+	{
+		if (rt.size()) rt.push_back( '/');
+		rt.append( si->m_name);
+	}
+	return rt;
+}
 
 bool OutputFilterImpl::flushBuffer()
 {
@@ -76,12 +89,15 @@ void OutputFilterImpl::printStructToBuffer()
 	const char* encstr = encoding();
 	if (!encstr || boost::algorithm::iequals( encstr, "UTF-8"))
 	{
+		CharsetEncoding enc = langbind::getCharsetEncoding( encstr);
 		m_elembuf.append( content);
+		enc->printEOLN( m_elembuf);
 	}
 	else
 	{
 		CharsetEncoding enc = langbind::getCharsetEncoding( encstr);
 		m_elembuf.append( langbind::convertStringUTF8ToCharset( enc, content));
+		enc->printEOLN( m_elembuf);
 	}
 	m_stk.clear();
 	m_stk.push_back( StackElement(""));
@@ -90,21 +106,53 @@ void OutputFilterImpl::printStructToBuffer()
 
 void OutputFilterImpl::closeElement()
 {
-	if (m_stk.size() == 1)
+	if (m_stk.size() <= 1)
 	{
-		throw std::runtime_error( "tags not balanced in input");
+		if (!m_stk.empty()) m_stk.pop_back();
 	}
-	std::string name = m_stk.back().m_name;
-	cJSON* val = m_stk.back().m_node;
-	m_stk.back().m_node = 0;
-	m_stk.pop_back();
-
-	if (!m_stk.back().m_node)
+	else
 	{
-		if (name.empty())
+		std::string name = m_stk.back().m_name;
+		cJSON* val = m_stk.back().m_node;
+		m_stk.back().m_node = 0;
+		m_stk.pop_back();
+
+		if (!m_stk.back().m_node)
 		{
-			m_stk.back().m_node = cJSON_CreateArray();
-			if (!m_stk.back().m_node)
+			if (name.empty())
+			{
+				m_stk.back().m_node = cJSON_CreateArray();
+				if (!m_stk.back().m_node)
+				{
+					cJSON_Delete( val);
+					throw std::bad_alloc();
+				}
+			}
+			else
+			{
+				m_stk.back().m_node = cJSON_CreateObject();
+				if (!m_stk.back().m_node)
+				{
+					cJSON_Delete( val);
+					throw std::bad_alloc();
+				}
+			}
+		}
+		if (m_stk.back().m_node->type == cJSON_Array)
+		{
+			cJSON_AddItemToArray( m_stk.back().m_node, val);
+		}
+		else if (m_stk.back().m_node->type == cJSON_Object)
+		{
+			cJSON* arobj = cJSON_DetachItemFromObject( m_stk.back().m_node, name.c_str());
+			if (arobj)
+			{
+				cJSON* ar = cJSON_CreateArray();
+				cJSON_AddItemToArray( ar, arobj);
+				cJSON_AddItemToArray( ar, val);
+				val = ar;
+			}
+			if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
 			{
 				cJSON_Delete( val);
 				throw std::bad_alloc();
@@ -112,60 +160,31 @@ void OutputFilterImpl::closeElement()
 		}
 		else
 		{
+			cJSON* contentval = m_stk.back().m_node;
 			m_stk.back().m_node = cJSON_CreateObject();
 			if (!m_stk.back().m_node)
 			{
 				cJSON_Delete( val);
+				cJSON_Delete( contentval);
+				throw std::bad_alloc();
+			}
+			if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+			{
+				cJSON_Delete( val);
+				cJSON_Delete( contentval);
+				throw std::bad_alloc();
+			}
+			if (!cJSON_AddItemToObject(m_stk.back().m_node,"",contentval))
+			{
+				cJSON_Delete( contentval);
 				throw std::bad_alloc();
 			}
 		}
-	}
-	if (m_stk.back().m_node->type == cJSON_Array)
-	{
-		cJSON_AddItemToArray( m_stk.back().m_node, val);
-	}
-	else if (m_stk.back().m_node->type == cJSON_Object)
-	{
-		cJSON* arobj = cJSON_DetachItemFromObject( m_stk.back().m_node, name.c_str());
-		if (arobj)
+		if (m_stk.size() == 1)
 		{
-			cJSON* ar = cJSON_CreateArray();
-			cJSON_AddItemToArray( ar, arobj);
-			cJSON_AddItemToArray( ar, val);
-			val = ar;
+			// close of a root element -> we print the document content to output
+			printStructToBuffer();
 		}
-		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
-		{
-			cJSON_Delete( val);
-			throw std::bad_alloc();
-		}
-	}
-	else
-	{
-		cJSON* contentval = m_stk.back().m_node;
-		m_stk.back().m_node = cJSON_CreateObject();
-		if (!m_stk.back().m_node)
-		{
-			cJSON_Delete( val);
-			cJSON_Delete( contentval);
-			throw std::bad_alloc();
-		}
-		if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
-		{
-			cJSON_Delete( val);
-			cJSON_Delete( contentval);
-			throw std::bad_alloc();
-		}
-		if (!cJSON_AddItemToObject(m_stk.back().m_node,"",contentval))
-		{
-			cJSON_Delete( contentval);
-			throw std::bad_alloc();
-		}
-	}
-	if (m_stk.size() == 1)
-	{
-		// close of a root element -> we print the document content to output
-		printStructToBuffer();
 	}
 }
 
@@ -176,7 +195,7 @@ void OutputFilterImpl::addStructItem( const std::string name, const std::string&
 		m_stk.back().m_node = cJSON_CreateObject();
 		if (!m_stk.back().m_node) throw std::bad_alloc();
 	}
-	else if (m_stk.back().m_node->type == cJSON_Array)
+	if (m_stk.back().m_node->type == cJSON_Array)
 	{
 		throw std::runtime_error( "mixing structure with array content in output");
 	}
@@ -224,7 +243,7 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 	}
 	else if (m_stk.back().m_node->type == cJSON_Object)
 	{
-		if (!cJSON_AddItemToObject( m_stk.back().m_node,"",val))
+		if (!cJSON_AddItemToObject( m_stk.back().m_node, "#text" ,val))
 		{
 			cJSON_Delete( val);
 			throw std::bad_alloc();
@@ -243,6 +262,11 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
 {
+	if (!flushBuffer()) return false;
+	if (m_stk.empty())
+	{
+		setState( Error, "cjson filter illegal operation: printing after final close");
+	}
 	switch (type)
 	{
 		case OutputFilter::OpenTag:
@@ -295,7 +319,7 @@ void OutputFilterImpl::setDocType( const std::string& value)
 	types::DocType doctype( value);
 	if (doctype.rootid)
 	{
-		m_doctype = doctype.systemid;
+		m_doctype = utils::getFileStem( doctype.systemid);
 	}
 }
 

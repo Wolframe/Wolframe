@@ -108,6 +108,7 @@ struct InputFilterImpl :public InputFilter
 
 private:
 	boost::shared_ptr<cJSON> parse( const std::string& content);
+	bool getNodeValue( const void*& element, std::size_t& elementsize);
 
 private:
 	std::string m_content;
@@ -122,7 +123,12 @@ private:
 		StackElement( const StackElement& o)
 			:m_state(o.m_state),m_node(o.m_node),m_tag(o.m_tag){}
 
-		enum State {StateOpen,StateChild,StateValue,StateNext,StateCheckEnd,StateReopen};
+		enum State {StateOpen,StateAttributeValue,StateContentValue,StateChild,StateValue,StateNext,StateCheckEnd,StateReopen};
+		static const char* stateName( State i)
+		{
+			static const char* ar[] = {"StateOpen","StateAttributeValue","StateContentValue","StateChild","StateValue","StateNext","StateCheckEnd","StateReopen"};
+			return ar[i];
+		}
 		State m_state;
 		const cJSON* m_node;
 		const char* m_tag;

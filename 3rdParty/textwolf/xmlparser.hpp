@@ -546,11 +546,11 @@ private:
 		{
 			m_obj = XMLParserObject<SrcIterator,BufferType,charset::UCS2LE,charset::UTF8>::create( m_mt);
 		}
-		else if (enc == "ucs4" || enc == "ucs4be")
+		else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
 		{
 			m_obj = XMLParserObject<SrcIterator,BufferType,charset::UCS4BE,charset::UTF8>::create( m_mt);
 		}
-		else if (enc == "ucs4le")
+		else if (enc == "utf32le" || enc == "ucs4le")
 		{
 			m_obj = XMLParserObject<SrcIterator,BufferType,charset::UCS4LE,charset::UTF8>::create( m_mt);
 		}
