@@ -95,7 +95,7 @@
 %define with_libxslt	1
 %define with_libhpdf	1
 %define with_freeimage	1
-%define with_cjson	0
+%define with_cjson	1
 %define with_examples	1
 
 # Per package decisions

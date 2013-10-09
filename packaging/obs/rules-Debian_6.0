@@ -21,7 +21,7 @@ export DH_OPTIONS
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
+export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
 
 export BOOST_VERSION=1.48.0
 
@@ -102,8 +102,16 @@ install: build
 	cd src/modules/filter/libxml2; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
+		
+	# the Lua cmdbind module should go in a separate package
+	cd src/modules/cmdbind/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../..
 
-	# the Python3 cmdbind module depends onm Python libraries, separate package
+	# the Python3 cmdbind module depends own Python libraries, separate package
 	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
@@ -112,22 +120,22 @@ install: build
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	cd libhpdf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd 3rdParty/libhpdf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
-		cd ..
+		cd ../..
 	
 	# the graphix module depends on freeimage, put it in a separate package
 	cd src/modules/functions/graphix; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	cd freeimage; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd 3rdParty/freeimage; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
-		cd ..
+		cd ../..
 
 	# filtering with cjson
-#	cd src/modules/filter/cjson; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
-#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
-#		cd ../../../..
+	cd src/modules/filter/cjson; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
 
 	# module database sqlite3
 	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -163,6 +171,19 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
+	
+	# lua cmdbind module
+	cd src/modules/cmdbind/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
+		cd ../../../..
+	cd src/modules/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
+		cd ../../..
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/liblua*.so.* \
+		/usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mkdir /usr/src/packages/BUILD/debian/wolframe-lua/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-lua/DEBIAN	
 
 	# python 3 cmdbind module
 	cd src/modules/cmdbind/python; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -175,9 +196,9 @@ install: build
 	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
 		cd ../../../..
-	cd libhpdf; $(MAKE) install $(WOLFRAME_PARAMS) \
+	cd 3rdParty/libhpdf; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
-		cd ..
+		cd ../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 
@@ -185,14 +206,14 @@ install: build
 	cd src/modules/functions/graphix; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
 		cd ../../../..
-	cd freeimage; $(MAKE) install $(WOLFRAME_PARAMS) \
+	cd 3rdParty/freeimage; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
-		cd ..
+		cd ../..
 
 	# filtering with cjson
-#	cd src/modules/filter/cjson; $(MAKE) install $(WOLFRAME_PARAMS) \
-#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-cjson; \
-#		cd ../../../..
+	cd src/modules/filter/cjson; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-cjson; \
+		cd ../../../..
 	
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost

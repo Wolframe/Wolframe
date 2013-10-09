@@ -49,11 +49,17 @@ Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
  The Wolframe authentication module using Cyrus SASL.
 
+Package: wolframe-lua
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe Lua language bindings.
+ Allows writing business application code in Lua.
+
 Package: wolframe-python
 Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe Python 3 bindings.
- The Wolframe Python 3 bindings.
+ Allows writing business application code in Python 3.
 
 Package: wolframe-libxml2
 Architecture: any
