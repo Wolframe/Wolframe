@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,6 @@
 #include "textwolf/xmlhdriterator.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/sourceiterator.hpp"
-#include "textwolf/xmlattributes.hpp"
 #include "textwolf/xmltagstack.hpp"
 #include "textwolf/xmlprinter.hpp"
 #include "textwolf/xmlparser.hpp"
