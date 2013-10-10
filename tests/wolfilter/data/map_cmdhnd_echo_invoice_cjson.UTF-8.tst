@@ -1,6 +1,8 @@
 **
+**requires:CJSON
 **input
 {
+  "doctype": "Invoice",
   "invoice": {
     "order": {
       "number": "INS03-62",

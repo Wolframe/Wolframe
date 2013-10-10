@@ -229,7 +229,7 @@ void ResultIteratorImpl::nextResult()
 {
 	std::size_t prevfidx = m_resitr->functionidx();
 	++m_resitr;
-	m_nextresult |= prevfidx > m_resitr->functionidx();
+	m_nextresult |= (m_resitr < m_resend) && (prevfidx > m_resitr->functionidx());
 }
 
 bool ResultIteratorImpl::skipResult()

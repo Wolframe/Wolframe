@@ -124,6 +124,12 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		const cJSON* first = m_root.get();
 		int nof_docattributes = 0;
 		bool encodingParsed = false;
+
+		if (!first->string && !first->valuestring && !first->next && first->type == cJSON_Object)
+		{
+			//CJSON creates a toplevel object for multiple root nodes:
+			first = first->child;
+		}
 		for (;;)
 		{
 			if (first->string && first->valuestring)

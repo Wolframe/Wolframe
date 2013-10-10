@@ -233,10 +233,11 @@ std::string langbind::convertStringUTF8ToCharset( const CharsetEncoding& encodin
 
 CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 {
-	CharsetClass::Id rt = NONE;
-	int maxll = 0;
-	int ll = 0;			//< number of zeroes in a row
-	std::size_t idx = 0;
+	int maxll = 0;		//< maximum number of zeroes in a row
+	int ll = 0;		//< number of zeroes in a row
+	std::size_t idx = 0;	//< source index
+
+	if (size == 0) return NONE;
 
 	for (; idx < size; ++idx)
 	{
@@ -250,73 +251,54 @@ CharsetClass::Id CharsetClass::guess( const char* content, std::size_t size)
 			if (ll > maxll)
 			{
 				maxll = ll;
-				if (ll > 3) return FAIL;
+				if (ll >= 3) break;
 			}
 		}
 	}
-	if (maxll == 3)
-	{
-		rt = UCS4BE;
-	}
-	else if (maxll == 1)
-	{
-		rt = UCS2BE;
-	}
-	else if (maxll == 2)
+	if (maxll == 2)
 	{
 		return FAIL;
 	}
-	else
+	else if (maxll == 0)
 	{
-		rt = UCS1;
+		return UCS1;
 	}
-	if (size > 2 && maxll == 1)
+	if (size >= 2 && maxll == 1)
 	{
 		// ... UTF16 check BOM
-		if ((unsigned char)content[0] == 0xFE && (unsigned char)content[1] == 0xFF) rt = UCS2BE;
-		if ((unsigned char)content[0] == 0xFF && (unsigned char)content[1] == 0xFE) rt = UCS2LE;
+		if ((unsigned char)content[0] == 0xFE && (unsigned char)content[1] == 0xFF) return UCS2BE;
+		if ((unsigned char)content[0] == 0xFF && (unsigned char)content[1] == 0xFE) return UCS2LE;
 	}
-	else if (rt != UCS1)
+	// ... indians not set
+	if (maxll == 3)
 	{
-		// ... indians not set
-		for (idx=0; idx < size; ++idx)
+		for (idx=0; idx < size; idx+=4)
 		{
 			if (content[idx] == '\0')
 			{
-				if (maxll == 3)
-				{
-					if (idx % 4 == 0)
-					{
-						if (rt == UCS4LE) return FAIL;
-						//... zero at the start of a character, means allways BE
-						rt = UCS4BE;
-					}
-					else if (idx % 4 == 3)
-					{
-						if (rt == UCS4BE) return FAIL;
-						//... zero at the end of a character, means allways LE
-						rt = UCS4LE;
-					}
-				}
-				if (maxll == 1)
-				{
-					if (idx % 2 == 0)
-					{
-						if (rt == UCS2LE) return FAIL;
-						//... zero at the start of a character, means allways BE
-						rt = UCS2BE;
-					}
-					else if (idx % 2 == 1)
-					{
-						if (rt == UCS2BE) return FAIL;
-						//... zero at the end of a character, means allways LE
-						rt = UCS2LE;
-					}
-				}
+				return UCS4BE;
+			}
+			if (idx > 0 && content[idx-1] == '\0')
+			{
+				return UCS4LE;
 			}
 		}
 	}
-	return rt;
+	else if (maxll == 1)
+	{
+		for (idx=0; idx < size; idx+=2)
+		{
+			if (content[idx] == '\0')
+			{
+				return UCS2BE;
+			}
+			if (idx > 0 && content[idx-1] == '\0')
+			{
+				return UCS2LE;
+			}
+		}
+	}
+	return NONE;
 }
 
 

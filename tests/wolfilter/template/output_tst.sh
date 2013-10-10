@@ -33,7 +33,7 @@ fi
 if [ `echo $testname | grep -c '_libxml2'` != "0" ]; then
 	echo '**requires:LIBXML2' >> $output
 fi
-if [ `echo $testname | grep -c '_json'` != "0" ]; then
+if [ `echo $testname | grep -c '_cjson'` != "0" ]; then
 	echo '**requires:CJSON' >> $output
 fi
 if [ `echo $testname | grep -c '_sqlite'` != "0" ]; then
