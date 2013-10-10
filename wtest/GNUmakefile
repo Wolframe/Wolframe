@@ -46,6 +46,12 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_TEXTWOLF
 endif
 
+# cJSON
+ifeq ($(WITH_CJSON),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_CJSON
+endif
+
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
 INCLUDE_CXXFLAGS += \
