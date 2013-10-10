@@ -34,6 +34,7 @@ OK
 OK CMD3A '4'
 OK enter cmd
 BYE
+--requires:TEXTWOLF
 --config
 !TEST
 ./output_provider_cfg.sh echo.lua >> $output

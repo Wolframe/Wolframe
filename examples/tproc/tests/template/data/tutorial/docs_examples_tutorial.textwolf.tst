@@ -10,6 +10,7 @@ echo "Writing test file $output"
 recode lat1..ibmpc >> $output <<!TEST
 **
 **requires:LUA
+**requires:TEXTWOLF
 **input
 HELLO
 RUN

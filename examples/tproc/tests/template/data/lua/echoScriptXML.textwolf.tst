@@ -23,6 +23,7 @@ echo "Writing test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 --
+--requires:TEXTWOLF
 --requires:LUA
 --input
 HELLO

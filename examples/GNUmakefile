@@ -1,7 +1,10 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho iproc tproc
+SUBDIRS = echo pecho tproc
 
+ifeq ($(WITH_TEXTWOLF),1)
+SUBDIRS += iproc
+endif
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua
 endif

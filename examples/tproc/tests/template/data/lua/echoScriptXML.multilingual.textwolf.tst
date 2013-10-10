@@ -28,6 +28,7 @@ function run( )
 		output:print( c, t)
 	end
 end
+--requires:TEXTWOLF
 --config
 !TEST
 ./output_provider_cfg.sh echo.lua >> $output

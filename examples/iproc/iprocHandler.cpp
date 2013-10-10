@@ -231,6 +231,11 @@ const net::NetworkOperation Connection::nextOperation()
 								return net::CloseConnection();
 							}
 							langbind::Filter* flt = m_provider->filter( "char");
+							if (!flt)
+							{
+								LOG_ERROR << "failed to load filter 'char' (not defined)";
+								return net::CloseConnection();
+							}
 							m_inputfilter = flt->inputfilter();
 							m_outputfilter = flt->outputfilter();
 							if (!flt)

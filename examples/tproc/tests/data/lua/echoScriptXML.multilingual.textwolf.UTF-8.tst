@@ -178,6 +178,7 @@ function run( )
 		output:print( c, t)
 	end
 end
+--requires:TEXTWOLF
 --config
 provider
 {
