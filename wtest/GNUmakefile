@@ -40,6 +40,12 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LIBHPDF
 endif
 
+# textwolf
+ifeq ($(WITH_TEXTWOLF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_TEXTWOLF
+endif
+
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
 INCLUDE_CXXFLAGS += \

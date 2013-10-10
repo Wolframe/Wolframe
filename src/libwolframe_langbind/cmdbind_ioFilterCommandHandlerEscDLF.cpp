@@ -175,6 +175,13 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 									break;
 
 								case InputFilter::EndOfMessage:
+									if (m_input.gotEoD())
+									{
+										LOG_ERROR << "error in input filter: unexpected end of input";
+										m_lastError = "input";
+										m_state = DiscardInput;
+										continue;
+									}
 									return READ;
 
 								case InputFilter::Error:
