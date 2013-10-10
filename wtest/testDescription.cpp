@@ -168,7 +168,10 @@ if (boost::starts_with( flag, "DISABLED "))
 	if (boost::iequals( flag, "LIBXSLT")) return "WITH_LIBXSLT=1 ";
 #endif
 #if !(WITH_CJSON)
-	if (boost::iequals( flag, "CJSON")) return "WITH_JSON=1 ";
+	if (boost::iequals( flag, "CJSON")) return "WITH_CJSON=1 ";
+#endif
+#if !(WITH_TEXTWOLF)
+	if (boost::iequals( flag, "TEXTWOLF")) return "WITH_TEXTWOLF=1 ";
 #endif
 #if !(WITH_ICU)
 	if (boost::iequals( flag, "ICU")) return "WITH_ICU=1 ";
