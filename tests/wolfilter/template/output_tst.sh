@@ -35,6 +35,7 @@ if [ `echo $testname | grep -c '_libxml2'` != "0" ]; then
 fi
 if [ `echo $testname | grep -c '_cjson'` != "0" ]; then
 	echo '**requires:CJSON' >> $output
+	echo '**requires:TEXTWOLF' >> $output
 fi
 if [ `echo $testname | grep -c '_sqlite'` != "0" ]; then
 	echo '**requires:SQLITE3' >> $output

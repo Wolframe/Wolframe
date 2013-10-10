@@ -105,7 +105,7 @@
 </address>
 </invoice>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ./../../src/modules/cmdbind/directmap/mod_command_directmap --module ./../../src/modules/cmdbind/lua/mod_command_lua --module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ./../../src/modules/normalize/number/mod_normalize_number --module ./../../src/modules/normalize/string/mod_normalize_string --cmdprogram=test.dmap --program ../wolfilter/scripts/invoice.sfrm --program ../wolfilter/template/program/simpleform.wnmp --program ../wolfilter/template/program/echo_invoice_table.lua echoInvoice
-
+**requires:TEXTWOLF
 **file: test.dmap
 COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 **output

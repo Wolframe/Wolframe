@@ -8,7 +8,7 @@
 	<item>Im Deutschen sind es die Umlate wie "Ü" "Ä" "Ö"</item>
 </doc>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/normalize//string/mod_normalize_string --program types.wnmp --cmdprogram echo_normalizer_input_iterator.lua run
-
+**requires:TEXTWOLF
 **file:types.wnmp
 name=string:ucname;
 

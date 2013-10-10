@@ -32,13 +32,16 @@ Project Wolframe.
 ///\file charsetEncodings.cpp
 ///\brief Implementation of character set encoding transformations for modules that do support only one or some of them
 #include "langbind/charsetEncodings.hpp"
-#include "textwolf/charset.hpp"
-#include "textwolf/cstringiterator.hpp"
-#include "textwolf/textscanner.hpp"
 #include <string>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+#if WITH_TEXTWOLF
+#include "textwolf/charset.hpp"
+#include "textwolf/cstringiterator.hpp"
+#include "textwolf/textscanner.hpp"
 
 namespace {
 template <class ENC>
@@ -215,6 +218,14 @@ CharsetEncoding langbind::getCharsetEncoding( const std::string& name)
 	}
 	return CharsetEncoding(st);
 }
+
+#else
+
+CharsetEncoding langbind::getCharsetEncoding( const std::string&)
+{
+	throw std::runtime_error( "no character set encoding transformations defined (build with WITH_TEXTWOLF=1 needed)");
+}
+#endif
 
 
 std::string langbind::convertStringCharsetToUTF8( const CharsetEncoding& encoding, const std::string& content)

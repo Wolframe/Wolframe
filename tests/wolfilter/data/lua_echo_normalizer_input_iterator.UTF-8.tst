@@ -7,7 +7,7 @@
 	<item>Im Deutschen sind es die Umlate wie "Ü" "Ä" "Ö"</item>
 </doc>**config
 --input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/normalize//string/mod_normalize_string --program types.wnmp --cmdprogram echo_normalizer_input_iterator.lua run
-
+**requires:TEXTWOLF
 **file:types.wnmp
 name=string:ucname;
 

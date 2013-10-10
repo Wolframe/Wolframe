@@ -1,0 +1,63 @@
+{
+  "doctype" : "typed_invoice",
+  "invoice": {
+    "order": {
+      "number": "INS03-62",
+      "reference": "PO#6123",
+      "representative": " happyHamster1 ",
+      "terms": " 45 ",
+      "issuedate": "2013/03/21",
+      "duedate": "2013/05/05",
+      "description": "Übliche Zusätze und Gerätschaften für öffentliche Schwimmbäder"
+    },
+    "item": {
+      "name": "äÄöÖüÜïÏëËÿŸàéè",
+      "quantity": "1",
+      "discount": "0",
+      "price": {
+        "unit": "789.00",
+        "total": "789.00",
+        "tax": {
+          "-description": "MWST 3.5%",
+          "#text": "27.60"
+        },
+        "gross": "816.60"
+      }
+    },
+    "bill": {
+      "price": {
+        "total": "789.00",
+        "tax": "27.60",
+        "gross": "781.40"
+      },
+      "payed": "0.00",
+      "open": "781.40"
+    },
+    "address": [
+      {
+        "-id": "supplier",
+        "name": " Züliefärär ",
+        "street": "Überlandwäg",
+        "postalcode": "8008",
+        "city": "Zürich",
+        "country": "Switzerland"
+      },
+      {
+        "-id": "customer",
+        "name": "Abnähmer",
+        "street": "Öttestrasse zwölf",
+        "postalcode": "8008",
+        "city": "Zürich",
+        "country": "Switzerland"
+      },
+      {
+        "-id": "shipping",
+        "name": "Hersteller",
+        "street": "Hölderlinwäg 13",
+        "postalcode": "8001",
+        "city": "Zürich",
+        "country": "Switzerland"
+      }
+    ]
+  }
+}

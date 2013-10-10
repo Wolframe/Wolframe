@@ -1,0 +1,46 @@
+{
+  "assignmentlist": {
+    "assignment": [
+      {
+        "issuedate": "8647993",
+        "employee": {
+          "firstname": "juulliiaa",
+          "surname": "teeggeell-saacchheerr",
+          "phone": "901 234 56 78"
+        },
+        "task": [
+          {
+            "key": "a876",
+            "title": "jjoobb 8",
+            "customernumber": "325"
+          },
+          {
+            "key": "v543",
+            "title": "jjoobb 7",
+            "customernumber": "568"
+          }
+        ]
+      },
+      {
+        "issuedate": "8647993",
+        "employee": {
+          "firstname": "jaakkoobb",
+          "surname": "stteeggeelliinn",
+          "phone": "987 654 32 10"
+        },
+        "task": [
+          {
+            "key": "a543",
+            "title": "jjoobb 6",
+            "customernumber": "568"
+          },
+          {
+            "key": "v210",
+            "title": "jjoobb 5",
+            "customernumber": "891"
+          }
+        ]
+      }
+    ]
+  }
+}

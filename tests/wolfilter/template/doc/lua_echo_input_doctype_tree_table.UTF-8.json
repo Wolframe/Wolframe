@@ -1,0 +1,43 @@
+{
+  "doctype" : "trees",
+  "root": {
+    "mtree": {
+      "id": "1",
+      "name": "EINS",
+      "node": [
+        {
+          "id": "11",
+          "name": "EINS EINS"
+        },
+        {
+          "id": "12",
+          "name": "EINS ZWEI",
+          "node": {
+            "id": "121",
+            "name": "EINS ZWEI EINS"
+          }
+        },
+        {
+          "id": "13",
+          "name": "EINS DREI"
+        }
+      ]
+    },
+    "btree": {
+      "id": "1",
+      "right": {
+        "id": "12",
+        "name": "EINS ZWEI",
+        "left": {
+          "id": "121",
+          "name": "EINS ZWEI EINS"
+        }
+      },
+      "name": "EINS",
+      "left": {
+        "id": "11",
+        "name": "EINS EINS"
+      }
+    }
+  }
+}

@@ -33,6 +33,7 @@ if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
 	testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"
 fi
+testdata="**requires:TEXTWOLF$testdata"
 
 cc=`echo $csetlist | sed 's/UTF-8//'`
 if [ x"$cc" != x"$csetlist" ]; then
