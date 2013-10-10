@@ -1,14 +1,19 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = number base64 string
+SUBDIRS = number base64
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+# textwolf
+!IFDEF WITH_TEXTWOLF
+SUBDIRS = \
+	$(SUBDIRS) string
+!ENDIF
 
 !IFDEF WITH_ICU
 SUBDIRS = \
 	$(SUBDIRS) locale
 !ENDIF
-
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

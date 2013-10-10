@@ -1,8 +1,14 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = textwolf token char blob line
+SUBDIRS = blob
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+# textwolf
+!IFDEF WITH_TEXTWOLF
+SUBDIRS = \
+	$(SUBDIRS) textwolf token char line
+!ENDIF
 
 # libxml2
 !IFDEF WITH_LIBXML2

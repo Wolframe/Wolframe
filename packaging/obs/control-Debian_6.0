@@ -61,6 +61,12 @@ Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe Python 3 bindings.
  Allows writing business application code in Python 3.
 
+Package: wolframe-textwolf
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using textwolf.
+ The Wolframe XML parsing module using textwolf.
+
 Package: wolframe-libxml2
 Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}

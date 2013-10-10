@@ -1,0 +1,599 @@
+<html><head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/ico" href="textwolf.ico">
+  <title>textwolf tutorial</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="tutorial-Dateien/ga.js" async="" type="text/javascript"></script><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23872978-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script><style type="text/css">
+    body {
+      margin-top: 1.0em;
+      background-color: #152c58;
+      font-family: Helvetica, Arial, FreeSans, san-serif;
+      color: #ffffff;
+    }
+    #container {
+      margin: 0 auto;
+      width: 700px;
+    }
+    h1 { font-size: 3.8em; color: #ead3a7; margin-bottom: 3px; }
+    h1 .small { font-size: 0.4em; }
+    h1 a { text-decoration: none }
+    h2 { margin-top: 50px; font-size: 1.5em; color: #ead3a7; }
+    h3 { margin-top: 30px; color: #ead3a7; }
+    h4 { margin-top: 30px; color: #ead3a7; }
+    a { color: #ead3a7; }
+    .description { color:#fff; font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .download { float: right; }
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+    pre { background: #000; color: #fff; padding: 15px;}
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+  </style></head>
+
+
+
+  
+
+<body>
+<div id="container">
+
+<h1>Tutorial textwolf</h1>
+
+<h2>How to Use textwolf</h2>
+<div class="description">To use textwolf you have to include include/textwolf.hpp
+<pre>#include "textwolf.hpp"
+</pre>
+</div>
+<div class="description">The namespace textwolf is defined there for all templates introduced here.
+</div>
+
+<h2>W3C Standards and textwolf</h2>
+<div class="description">textwolf follows the standard of <a href="http://www.w3.org/TR/xml/">W3C XML 1.0</a>
+but does not implement all of it. The following list shows the exceptions:
+<ul>
+<li>Documents are not validated against any schema definition and they are assumed to be well formed.
+</li>
+<li>Only entity mappings to single characters are supported.
+</li>
+<li>ENTITY definitions in the XML are ignored. Entity definitions have to be passed as read only table.
+</li>
+<li>Declarative "&lt;! ... &gt;" definitions like DOCTYPE, ELEMENT and ATTLIST are ignored (skipped over). Changing of tokenization (ATTLIST) has to be done 
+by calling the "doTokenize(bool)" method of the scanner or XML path parser. You can do this at any point when you are iterating through the document.
+</li>
+<li>Commands of the form "&lt;? ..." like PI (process instructions) are ignored (skipped over).
+</li>
+<li>Namespace definitions are handled as ordinary tag attributes. The "xmlns" prefix is not interpreted or handled specially.
+</li>
+</ul>
+</div>
+
+<h2>Wide Character Set Encodings</h2>
+<div class="description">textwolf defines the encoding as template parameter. 
+For parsing wide character set encodings like UTF-16 you have to scan the XML header with one iterator and then
+continue scanning with another iterator. This is possible because textwolf does no buffering and no read ahead.
+Parsing an arbitrary XML needs the following steps:</div>
+<ol>
+<li>Parse the header with an XMLScanner iterator to get the encoding attribute of the header.</li>
+<li>Create an XMLPathSelect or XMLScanner and its iterator with the input character set encoding defined in the encoding header attribute value.</li>
+<li>Process the XML body read from the input stream</li>
+</ol>
+
+<h2>Definitions</h2>
+<div class="description">textwolf defines the following templates and types</div>
+
+<h3>TextScanner</h3>
+<div class="description">The TextScanner class template defines an iterator on the characters of the input as
+<ul>
+<li> Unicode characters</li>
+<li> ASCII characters</li>
+<li> XML control characters</li>
+</ul>
+</div>
+
+<div class="description">It has two template arguments
+<ol>
+<li> InputIterator  (explained in the section iterator)</li>
+<li> Charset = character set encoding of the input (explained in the section character set encodings)</li>
+</ol>
+</div>
+
+<h4>Example</h4>
+<pre>char* input = ...;
+textwolf::TextScanner&lt;char*,charset::UCS2&lt;LE&gt; &gt; itr( input);
+while (itr-&gt;chr()) itr++;
+</pre>
+
+<h3>XMLScanner</h3>
+<div class="description">The XMLScanner class template defines the state
+ of a parser scanning the XML elements like 
+tags,atrributes,values,content,etc.. on a source defined with an input 
+iterator.
+It is constructed by passing
+<ul>
+<li>InputIterator&amp; src = an input iterator reference (template argument)</li>
+<li>OutputBuffer outbuf = the buffer to use for output</li>
+<li>EntityMap* emap = pointer to a read only map of entities (template argument, optional)</li>
+</ul>
+</div>
+
+<h4>Template parameters</h4>
+<ol>
+<li>InputIterator = input iterator type (explained in the section iterator)</li>
+<li>InputCharSet = character set encoding of the input (explained in the section character set encodings)</li>
+<li>OutputCharSet = character set encoding of the output (explained in the section character set encodings)</li>
+<li>OutputBuffer = buffer type to use for the tokens parsed (STL back insertion sequence interface)</li>
+<li>EntityMap = read only map from ASCII const char* to UChar that 
+describes the mapping of named entities to unicode characters. (default 
+is std::map)</li>
+</ol>
+
+<h4>Example</h4>
+<pre>char* input = ...;
+std::string outputbuf;
+typedef textwolf::XMLScanner
+	&lt;
+		char*,
+		charset::IsoLatin1,
+		charset::IsoLatin1,
+		std::string
+	&gt; Scan;
+Scan xs( input, outputbuf);
+for (Scan::iterator itr = xs.begin(); itr != xs.end(); itr++)
+{
+	switch (itr-&gt;type())
+	{
+		case MyXMLScanner::ErrorOccurred: throw(...);
+		case MyXMLScanner::OpenTag: ... break;
+		case MyXMLScanner::Content: ... break;
+		...
+	}
+}
+</pre>
+<div class="description">End of tag events come without tag name. So it is not possible to validate an XML with 'textwolf'.</div>
+
+<h3>XMLPathSelectAutomaton</h3>
+<div class="description">This class template defines an automaton for 
+selecting XML path expression and to assign a type as integer to the 
+filtered tokens. It has one template argument:
+<ol>
+<li>OutputCharSet = the character set in which the tokens are stored and therefore in which format they are processed. </li>
+</ol>
+</div>
+<div class="description">The automaton construction is described in the section "how to define an XML path expression automaton".
+</div>
+
+<h3>XMLPathSelect</h3>
+<div class="description">The XMLPathSelect class template defines the 
+state of a set of XML path selections filtered on an input iterator. It 
+is constructed by passing
+<ol>
+<li> textwolf::Automaton* atm = the pointer to an XML path selection automaton</li>
+<li> InputIterator&amp; src = an input iterator reference (template argument)</li>
+<li> OutputBuffer outbuf = the buffer to use for output</li>
+<li> EntityMap* emap = pointer to a read only map of entities (template argument, optional)</li>
+</ol>
+</div>
+
+<div class="description">The class template definition has the following parameters
+<ol>
+<li> InputIterator = input iterator type (explained in the section iterator)</li>
+<li> InputCharSet = character set encoding of the input (explained in the section character set encodings)</li>
+<li> OutputCharSet = character set encoding of the output (explained in the section character set encodings)</li>
+<li> OutputBuffer = buffer type to use for the tokens parsed (STL back insertion sequence interface)</li>
+<li> EntityMap = read only map from ASCII const char* to UChar that 
+describes the mapping of named entities to unicode characters. (default 
+is std::map) </li>
+</ol>
+</div>
+<div class="description">It looks very similar to XMLScanner except that
+ we pass an automaton and the iterator elements get the types assigned 
+to the expressions instead of the predefined XML element enum ids.
+</div>
+
+<h2>Character Set Encodings</h2>
+<h3>Predefined</h3>
+<div class="description">The following character set encodings are defined in the textwolf::charset namespace as examples:
+<ul>
+<li> UTF8 = utf-8</li>
+<li> UTF16LE = utf-16 Litle Endian</li>
+<li> UTF16BE = utf-16 (Big Endian = default for utf-16)</li>
+<li> IsoLatin1 = Iso-Latin-1</li>
+<li> UCS2LE = UCS2 Little Endian</li>
+<li> UCS2BE = UCS2 Big Endian</li>
+<li> UCS4LE = UCS4 Little Endian</li>
+<li> UCS4BE = UCS4 Big Endian</li>
+</ul>
+</div>
+
+<h3>How to Define Your Own</h3>
+<div class="description">
+You can define your own character set 
+encodings. A structure with the following interface is passed to a
+textwolf iterator as a character set encoding definition. Textwolf 
+assumes some form of a single Unicode character (UChar) to be able
+to map them to each other.
+<pre>
+///\class Interface
+///\brief Interface that has to be implemented for a character set encoding
+struct Interface
+{
+	///\brief Skip to start of the next character
+	///\param [in] buf buffer for the character data
+	///\param [in,out] bufpos position in 'buf'
+	///\param [in,out] itr iterator to skip
+	template &lt;class Iterator&gt;
+	static void skip( char* buf, unsigned int& bufpos, Iterator& itr);
+
+	///\brief Fetches the ascii char representation of the current character
+	///\param [in] buf buffer for the parses character data
+	///\param [in,out] bufpos position in 'buf'
+	///\param [in,out] itr iterator on the source
+	///\return the value of the ascii character or -1
+	template &lt;class Iterator&gt;
+	static char asciichar( char* buf, unsigned int& bufpos, Iterator& itr);
+
+	///\brief Fetches the unicode character representation of the current character
+	///\param [in] buf buffer for the parses character data
+	///\param [in,out] bufpos position in 'buf'
+	///\param [in,out] itr iterator on the source
+	///\return the value of the unicode character
+	template &lt;class Iterator&gt;
+	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr);
+
+	///\brief Prints a unicode character to a buffer
+	///\tparam Buffer STL back insertion sequence
+	///\param [in] chr character to print
+	///\param [out] buf buffer to print to
+	template &lt;class Buffer&gt;_
+	static void print( UChar chr, Buffer& buf);
+};
+</pre>
+</div>
+
+
+<h2>Iterators</h2>
+<h3>Input</h3>
+<div class="description">The textwolf scanners,parsers and filters expect an input iterator on a sequence of bytes with the following properties:
+</div>
+<ul>
+<li> It implements pre increment:
+<pre>iterator&amp; operator++()
+</pre>
+</li>
+<li> It implements one byte access, that returns a sequence of 0 (zeros)
+ after reaching end of data and that throws an exception if it reaches 
+end of message:
+<pre>char operator*() const
+</pre>
+</li>
+</ul>
+
+<div class="description">
+The exception thrown by the input iterator is caught by the caller of 
+textwolf. Textwolf just ensures to save its state and that it can be 
+called again, if it has data again and can continue.
+To use it with a pair of STL iterators (begin,end), you have to define 
+and pass a structure like this:
+
+<pre>template &lt;typename iterator&gt;
+struct twiterator
+{
+	iterator m_itr;
+	iterator m_end;
+	bool m_eof;
+
+	struct EndOfMessage {};
+
+	twiterator( const iterator&amp; b, const iterator&amp; e, bool eof)
+			:m_itr(b),m_end(e),m_eof(eof) {}
+
+	char operator*() const
+	{
+		if (m_itr &gt;= m_end)
+		{
+			if (m_eof)
+			{
+				return 0;
+			}
+			else
+			{
+				throw( EndOfMessage());
+			}
+		}
+		else
+		{
+			return *m_itr;
+		}
+	}
+	twiterator&amp; operator++()
+	{
+		++m_itr; return *this;
+	}
+};
+</pre>
+</div><div class="description">It depends very much on your environment 
+where you use textwolf how this structure looks like. So it is left to 
+the user how to define this. It is not part of textwolf.
+</div>
+
+<h3>Output</h3>
+<div class="description">The following iterators refer to InputIterator as the required input iterator type (see input):
+<ul>
+<li> Iterator on the characters of the input
+<pre>InputIterator in = input.begin();
+textwolf::TextScanner
+	&lt;
+		InputIterator,
+		textwolf::charset::UTF8
+	&gt; itr( in);
+for (; itr.control() != textwolf::EndOfText; itr++)
+{
+	UChar chr = *itr; // parse the unicode character
+}
+</pre>
+</li>
+
+<li> Iterator on the XML element (tags,attributes,values,etc.) of the input
+<pre>typedef XMLScanner
+	&lt;
+		InputIterator,
+		charset::IsoLatin1,
+		charset::IsoLatin1,
+		std::string
+	&gt; MyXMLScanner;
+std::string outputbuf;
+InputIterator in = input.begin();
+MyXMLScanner xs( in, outputbuf);
+
+MyXMLScanner::iterator itr;
+for (itr=xs.begin(); itr != xs.end(); itr++)
+{
+	const char* typestr = 0;
+	switch (itr-&gt;type())
+	{
+		case MyXMLScanner::ErrorOccurred:
+			throw std::runtime_error( itr-&gt;content());
+		case MyXMLScanner::HeaderEnd:
+			typestr = "end of header"; break;
+		case MyXMLScanner::TagAttribName:
+		case MyXMLScanner::HeaderAttribName:
+			typestr = "attribute name"; break;
+		case MyXMLScanner::TagAttribValue:
+		case MyXMLScanner::HeaderAttribValue:
+			typestr = "attribute value"; break;
+		case MyXMLScanner::OpenTag:
+			typestr = "open tag"; break;
+		case MyXMLScanner::CloseTag:
+		case MyXMLScanner::CloseTagIm:
+			typestr = "close tag"; break;
+		case MyXMLScanner::Content:
+			typestr = "content"; break;
+		case MyXMLScanner::Exit:
+			typestr = "end of document"; break;
+	}
+	std::cout
+		&lt;&lt; "Element "
+		&lt;&lt; typestr
+		&lt;&lt; " ("
+		&lt;&lt; itr-&gt;name()
+		&lt;&lt; "): "
+		&lt;&lt; itr-&gt;content()
+		&lt;&lt; std::endl;
+	if (itr-&gt;type() == MyXMLScanner::ErrorOccurred) break;
+}
+</pre>
+</li>
+
+<li>Iterator on the XML path expressions filtered in the input
+<pre>//define the automaton
+typedef XMLPathSelectAutomaton&lt;charset::UTF8&gt; Automaton;
+Automaton atm;
+//return '1' for all "//element/@id" attribute values:
+(*atm)--["element"]("id") = 1;
+//return '2' for all text content elements of "/doc":
+(*atm)["doc"]() = 2;
+
+// define the selection on the source by an automaton:
+typedef XMLPathSelect
+	&lt;
+		char,
+		charset::UTF8,
+		charset::UTF8,
+		std::string
+	&gt; MyXMLPathSelect;
+std::string outputbuf;
+MyXMLPathSelect xs( &amp;atm, src, outputbuf);
+
+// iterating through the produced elements and printing them
+MyXMLPathSelect::iterator itr=xs.begin(),end=xs.end();
+for (; itr!=end; itr++)
+{
+	std::cout
+		&lt;&lt; "Element "
+		&lt;&lt; itr-&gt;type()
+		&lt;&lt; ": "
+		&lt;&lt; itr-&gt;content()
+		&lt;&lt; std::endl;
+}
+</pre>
+</li>
+</ul>
+</div>
+
+
+<h2>How to define an XML path expression automaton</h2>
+<div class="description">An XML Path expression automaton in defined as 
+tree. With every expression defined we select first the root node and 
+describe for follow node on the expression path. For the nodes we have 
+defined operators to declare the type of the follow node.
+<br>For a node 'A'</div>
+<ul>
+<li> select the tag with the name "doc" following node A
+<pre>A["doc"]
+</pre>
+<div class="description">or</div>
+<pre>A.selectTag("doc")
+</pre>
+</li>
+
+<li> select the value of the attribute "id"
+<pre>A("id")
+</pre>
+<div class="description">or</div>
+<pre>A.selectAttribute("id")
+</pre>
+</li>
+
+<li> seek the attribute "id" (also defined as function ifAttribute)
+<pre>A("id",0)
+</pre>
+<div class="description">or</div>
+<pre>A.ifAttribute("id",0)
+</pre>
+</li>
+
+<li> seek the attribute "id" with value "188" (same ifAttribute)
+<pre>A("id","188")
+</pre>
+<div class="description">or</div>
+<pre>A.ifAttribute("id","188")
+</pre>
+</li>
+
+<li> select all content values of the node selected by A (also as function selectContent)
+<pre>A()
+</pre>
+<div class="description">or</div>
+<pre>A.selectContent()
+</pre>
+</li>
+
+<li> stop selecting elements with index beyond 24 counted from 0
+<pre>A.TO(25)
+</pre>
+</li>
+
+<li> ignore elements with an index smaller than 2 (counted from 0)
+<pre>A.FROM(2)
+</pre>
+</li>
+
+<li> assign the value 3 as type to all values selected by the expression A (also defined as function assignType)
+<pre>A = 3
+</pre>
+<div class="description">or</div>
+<pre>A.assignType(3)
+</pre>
+</li>
+
+<li>Select all nodes below the current node, so that all conditions 
+expressed in this context apply transitively to all successors of A 
+(also as function doFollow)
+<pre>A--
+</pre>
+<div class="description">or</div>
+<pre>A.doFollow()
+</pre>
+</li>
+</ul>
+
+<div class="description">A special role has the operator '--'. it 
+corresponds to the operator '//' in abbreviated syntax of XPath 
+expressions. It says that the following selection applies also for a 
+successors of the current node.
+</div>
+<ul>
+<li>
+The root node is selector with the operator '*' on the automaton. The 
+following code selects all 'alt/prd' tag content elements in the 
+document and assigns them the type 1:
+<pre>typedef XMLPathSelectAutomaton<charset::utf8> Automaton;
+Automaton atm;
+(*atm)--["alt"]["prd"]() = 1;
+</charset::utf8></pre>
+</li>
+
+<li>If no content or attribute value is selected then textwolf just triggers an event when the tag or attribute appears:
+<br>Get an event '111' for every new document:
+<pre>(*atm) = 111;
+</pre>
+</li>
+
+<li> Get an event '234' for every 'txt' tag:
+<pre>(*atm)["txt"] = 234;
+</pre>
+</li>
+
+<li>Get an event '761' for every attribute 'id' of a 'pers' tag:
+<pre>(*atm)["pers"]("id") = 761;
+</pre>
+</li>
+</ul>
+
+<h2>textwolf and XPath</h2>
+<div class="description">
+textwolf has not the power of XPath and it does not aim to. It does not 
+buffer than the currently processed token so it can't detect patterns 
+that require buffering. It can't even cope with the fact that tag 
+attributes in XML have no order. For expressions that are not 
+expressible in this model, you have to build the logic around textwolf.
+textwolf is not XPath, but with some addional effort you get an engine 
+that is able to process at least 'abbreviated syntax of XPath' without 
+parent references and content conditions.
+</div>
+<div class="description">For example
+</div>
+<pre>A//ter[@id='5' and @name='kaspar']
+</pre>
+<div class="description">
+has to be translated to
+</div>
+<pre>A--["ter"]("id","5")("name","kaspar")
+A--["ter"]("name","kaspar")("id","5")
+</pre>
+<div class="description">
+and
+</div>
+<pre>A//ter[@id='5' or @name='kaspar']
+</pre>
+<div class="description">
+to
+<pre>A--["ter"]("id","5")
+A--["ter"]("name","kaspar")
+</pre>
+</div>
+<div class="description">Some cases are even worse. If you select 
+attribute values where you have attribute conditions, then you can solve
+ it only in the filter functions on the iterator after calling textwolf.
+ Selections have to be at the end, because they are not buffered. 
+Therefore something like
+<pre>A//person[@id='se1']@name
+</pre>
+</div>
+<div class="description">cannot be expressed in textwolf for the case where 'name' appears before 'id' in the XML. The expression
+<pre>A--["ter"]("id","se1")("name",0)
+</pre>
+</div>
+<div class="description">works only for the case where 'id' appears before 'name'. A possible solution is to define
+<pre>A--["ter"]("id","se1") = 201;
+A--["ter"]("name",0) = 202;
+</pre>
+</div>
+<div class="description">and to set the value with 202 on the element and a flag with 201 that together with 202 enables the element created.
+</div>
+
+<br><br>
+<div class="description"><b><i></i>Copyright &copy; Patrick Frey, 2010</b></div>
+</div>
+
+
+
+</body></html>

@@ -21,7 +21,7 @@ export DH_OPTIONS
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
+export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
 
 export BOOST_VERSION=1.48.0
 
@@ -97,6 +97,24 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
+	# the textwolf filtering module and charset detection deserve
+	# their own package, same applies for modules based on textwolf
+	cd src/modules/filter/textwolf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/filter/token; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/filter/char; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/filter/line; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/normalize/string; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	
 	# the libxml2/libxslt filter module depends on libxml2 and 
 	# optionally on libxslt, put it in a separate package
 	cd src/modules/filter/libxml2; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -164,6 +182,26 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
+
+	# the textwolf filtering module and charset detection deserve
+	# their own package, same applies for modules based on textwolf
+	cd src/modules/filter/textwolf; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-textwolf; \
+		cd ../../../..
+	cd src/modules/filter/token; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-textwolf; \
+		cd ../../../..
+	cd src/modules/filter/char; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-textwolf; \
+		cd ../../../..
+	cd src/modules/filter/line; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-textwolf; \
+		cd ../../../..
+	cd src/modules/normalize/string; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-textwolf; \
+		cd ../../../..		
+	mkdir /usr/src/packages/BUILD/debian/wolframe-textwolf/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-textwolf/DEBIAN
 
 	# filter module libxml2
 	cd src/modules/filter/libxml2; $(MAKE) install $(WOLFRAME_PARAMS) \

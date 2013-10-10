@@ -146,6 +146,10 @@ ifeq ($(WITH_PGSQL),1)
 	@echo "PGSQL_LIB_DIRS: $(PGSQL_LIB_DIRS)"
 	@echo "PGSQL_LIBS: $(PGSQL_LIBS)"
 endif
+ifeq ($(WITH_TEXTWOLF),1)
+	@echo
+	@echo "using local textwolf library for charset detection and XML filtering module.."
+endif
 ifeq ($(WITH_LIBXML2),1)
 	@echo
 	@echo "LIBXML2_DIR: $(LIBXML2_DIR)"

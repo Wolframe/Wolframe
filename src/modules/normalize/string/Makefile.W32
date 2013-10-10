@@ -14,7 +14,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR) \
 	/I$(TOPDIR)\tests \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\3rdParty
+	/I$(TOPDIR)\3rdParty\textwolf\include
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)

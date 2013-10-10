@@ -14,7 +14,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/3rdParty
+	-I$(TOPDIR)/3rdParty/textwolf/include
 
 INCLUDE_LIBS = \
 
