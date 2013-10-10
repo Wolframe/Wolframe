@@ -104,7 +104,15 @@ copy_prereq:
 !ENDIF
 !IFDEF WITH_LIBXML2
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" tests\.
-	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests\.
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests\.
+!ENDIF
+!IFDEF WITH_LIBXSLT
+	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" tests\.
+!ENDIF
+!IFNDEF DEBUG
+	@-copy "$(PYTHON_DIR)\libs\python33.dll" tests\.
+!ELSE
+	@-copy "$(PYTHON_DIR)\libs\python33_d.dll" tests\.
 !ENDIF
 
 local_test: $(TEST_CPP_BINS) copy_prereq

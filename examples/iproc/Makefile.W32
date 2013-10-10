@@ -90,7 +90,15 @@ local_test: $(TEST_CPP_BINS)
 !ENDIF
 !IFDEF WITH_LIBXML2
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" tests >> test.bat
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
+	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXSLT
+	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" tests >> test.bat
+!ENDIF
+!IFNDEF DEBUG
+	@-echo copy "$(PYTHON_DIR)\libs\python33.dll" tests >> test.bat
+!ELSE
+	@-echo copy "$(PYTHON_DIR)\libs\python33_d.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
 !IFDEF WITH_LUA
