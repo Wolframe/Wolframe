@@ -188,3 +188,7 @@ examples/demo/lgtree/server/database/lgtree.db
 tests/3rdParty/python/embed
 qtcreator.xml
 3rdParty/libcjson/testit
+3rdParty/textwolf/tests/readStdinIterator
+3rdParty/textwolf/tests/tests/test_TextReader
+3rdParty/textwolf/tests/tests/test_XMLPathSelect
+3rdParty/textwolf/tests/tests/test_XMLScanner

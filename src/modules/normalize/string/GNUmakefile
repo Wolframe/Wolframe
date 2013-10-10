@@ -8,7 +8,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR) -I$(TOPDIR)/src \
 	-I$(TOPDIR) -I$(TOPDIR)/tests \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/3rdParty
+	-I$(TOPDIR)/3rdParty/textwolf/include
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe

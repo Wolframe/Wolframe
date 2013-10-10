@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\3rdParty
+	/I$(TOPDIR)\3rdParty\textwolf\include
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)

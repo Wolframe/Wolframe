@@ -1,8 +1,13 @@
 TOPDIR = ../../..
 
-SUBDIRS = textwolf token char blob line
+SUBDIRS = blob
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
+
+# textwolf
+ifeq ($(WITH_TEXTWOLF),1)
+SUBDIRS += textwolf token char line
+endif
 
 # libxml2
 ifeq ($(WITH_LIBXML2),1)

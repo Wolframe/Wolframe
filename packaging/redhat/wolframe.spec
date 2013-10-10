@@ -91,6 +91,7 @@
 %define with_python	1
 %define with_pam	1
 %define with_sasl	1
+%define with_textwolf	1
 %define with_libxml2	1
 %define with_libxslt	1
 %define with_libhpdf	1
@@ -593,6 +594,17 @@ Requires: python3 >= 0.0
 %endif
 %endif
 
+%if %{with_textwolf}
+%package textwolf
+Summary: Wolframe XML filtering module using textwolf
+Group: Application/Business
+
+%description textwolf
+The Wolframe XML parsing module using textwolf.
+
+Requires: %{name} >= %{version}-%{release}
+%endif
+
 %if %{with_libxml2}
 %package libxml2
 Summary: Wolframe XML filtering module using libxml2
@@ -804,6 +816,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -832,6 +847,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
 %endif
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 %if %{build_libxml2}
 	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
@@ -853,6 +871,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -902,6 +923,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -952,6 +976,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -1007,6 +1034,9 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -1055,6 +1085,9 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+%if %{with_textwolf}
+	WITH_TEXTWOLF=%{with_textwolf} \
+%endif
 	WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 %if %{build_libhpdf}
@@ -1286,10 +1319,6 @@ fi
 
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
-%{_libdir}/wolframe/modules/mod_filter_char.so
-%{_libdir}/wolframe/modules/mod_filter_line.so
-%{_libdir}/wolframe/modules/mod_filter_textwolf.so
-%{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
 %{_libdir}/wolframe/modules/mod_command_directmap.so
@@ -1299,7 +1328,6 @@ fi
 
 %{_libdir}/wolframe/modules/mod_normalize_number.so
 %{_libdir}/wolframe/modules/mod_normalize_base64.so
-%{_libdir}/wolframe/modules/mod_normalize_string.so
 
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
@@ -1407,6 +1435,18 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_sasl.so
+%endif
+
+%if %{with_textwolf}
+%files textwolf
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_filter_textwolf.so
+%{_libdir}/wolframe/modules/mod_filter_char.so
+%{_libdir}/wolframe/modules/mod_filter_line.so
+%{_libdir}/wolframe/modules/mod_filter_token.so
+%{_libdir}/wolframe/modules/mod_normalize_string.so
 %endif
 
 %if %{with_libxml2}

@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I"$(TOPDIR)" \
 	/I"$(TOPDIR)\clients\lib" \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\3rdParty
+	/I$(TOPDIR)\3rdParty\textwolf\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
