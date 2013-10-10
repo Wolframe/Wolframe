@@ -34,8 +34,11 @@
 #include "options.hpp"
 #include "utils.hpp"
 #include "session.hpp"
+#if WITH_TEXTWOLF
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/charset_utf8.hpp"
+//... for checking if XML answer is valid
+#endif
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -128,6 +131,7 @@ public:
 		}
 	}
 
+#if WITH_TEXTWOLF
 	static void checkValidXML( const char* data, std::size_t datasize)
 	{
 		std::string str( data, datasize);
@@ -146,6 +150,9 @@ public:
 		}
 		if (taglevel != 0) throw std::runtime_error( "tags not balanced");
 	}
+#else
+	static void checkValidXML( const char*, std::size_t){}
+#endif
 
 	virtual void answer( const char* data, std::size_t datasize)
 	{

@@ -3,8 +3,10 @@ TOPDIR = ..\..\..
 SUBDIRS = testPdfPrinter
 
 !IFDEF WITH_LIBHPDF
+!IFDEF WITH_TEXTWOLF
 SUBDIRS = \
 	$(SUBDIRS) haruPdfPrinter
+!ENDIF
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

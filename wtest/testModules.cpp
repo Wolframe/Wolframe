@@ -42,9 +42,11 @@ std::list<std::string> _Wolframe::wtest::getTestModuleList( const std::string& t
 {
 	std::list<std::string> rt;
 	static const char* ar[] = {
+#if WITH_TEXTWOLF
 		"filter/textwolf/mod_filter_textwolf",
 		"filter/char/mod_filter_char",
 		"filter/line/mod_filter_line",
+#endif
 #if WITH_LIBXML2
 		"filter/libxml2/mod_filter_libxml2",
 #endif
