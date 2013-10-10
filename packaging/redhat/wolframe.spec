@@ -594,6 +594,17 @@ Requires: python3 >= 0.0
 %endif
 %endif
 
+%if %{with_textwolf}
+%package textwolf
+Summary: Wolframe XML filtering module using textwolf
+Group: Application/Business
+
+%description textwolf
+The Wolframe XML parsing module using textwolf.
+
+Requires: %{name} >= %{version}-%{release}
+%endif
+
 %if %{with_libxml2}
 %package libxml2
 Summary: Wolframe XML filtering module using libxml2
