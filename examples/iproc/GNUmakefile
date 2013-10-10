@@ -7,10 +7,10 @@ SUBDIRS =
 INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR) \
+	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(TOPDIR)/wtest
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
@@ -109,6 +109,9 @@ ifeq ($(WITH_LUA),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/iprocHandlerXMLTest$(EXE)
 endif
 endif
+
+showenv:
+	@echo "LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)"
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

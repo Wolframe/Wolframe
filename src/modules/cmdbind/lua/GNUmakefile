@@ -8,7 +8,9 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LUA
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/3rdParty/lua/src \
 	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)

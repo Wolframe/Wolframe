@@ -7,7 +7,8 @@ SUBDIRS =
 INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
-	-I$(TOPDIR)/include -I. \
+	-I. \
+	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \

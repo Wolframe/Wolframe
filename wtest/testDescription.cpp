@@ -39,7 +39,7 @@
 #pragma warning(disable:4996)
 #endif
 
-#include "testDescription.hpp"
+#include "wtest/testDescription.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>

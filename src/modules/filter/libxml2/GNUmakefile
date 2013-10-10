@@ -5,8 +5,9 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	-I$(TOPDIR) \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src \
 	$(LIBXML2_INCLUDE_DIRS) \
 	-I$(BOOST_INCLUDE_DIR)
 

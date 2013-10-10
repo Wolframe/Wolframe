@@ -6,14 +6,15 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS =
 
+INCLUDE_DIRS = \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
+
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR)
-
-INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \

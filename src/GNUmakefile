@@ -6,17 +6,17 @@ SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_lan
 
 INCLUDE_CXXFLAGS =
 
+INCLUDE_DIRS = \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
+
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind
-
-INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
-	-I$(TOPDIR) \
-	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \

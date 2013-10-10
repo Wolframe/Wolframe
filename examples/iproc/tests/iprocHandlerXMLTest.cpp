@@ -40,7 +40,7 @@
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/procProvider.hpp"
-#include "testHandlerTemplates.hpp"
+#include "wtest/testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "wtest/testModules.hpp"

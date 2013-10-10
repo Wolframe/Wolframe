@@ -5,8 +5,9 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	-I$(TOPDIR) \
+	-I. \
+	-I$(TOPDIR)/include  \
+	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(FREEIMAGE_INCLUDE_DIRS) \
 	$(FREEIMAGEPLUS_INCLUDE_DIRS)

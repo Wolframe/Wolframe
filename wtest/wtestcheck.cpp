@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Program using filters to map stdin to stdout
-#include "testDescription.hpp"
+#include "wtest/testDescription.hpp"
 #include <stdexcept>
 #include <iostream>
 

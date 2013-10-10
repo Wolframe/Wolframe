@@ -42,7 +42,7 @@
 #include "processor/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "testHandlerTemplates.hpp"
+#include "wtest/testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "gtest/gtest.h"

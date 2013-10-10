@@ -14,12 +14,12 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR)\include /I. \
+	/I. \
+	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR) \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\wtest
+	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
