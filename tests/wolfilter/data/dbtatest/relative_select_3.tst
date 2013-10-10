@@ -1,4 +1,5 @@
 **
+**requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <garten>1</garten><wald>3</wald><wiese>2</wiese>

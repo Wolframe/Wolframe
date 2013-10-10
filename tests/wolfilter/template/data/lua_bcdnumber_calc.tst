@@ -16,6 +16,7 @@ output="../data/$testname.tst"
 
 echo '**' > $output
 echo '**requires:LUA' >> $output
+echo '**requires:TEXTWOLF' >> $output
 echo '**input' >> $output
 cat $docin >> $output
 echo '**output' >> $output

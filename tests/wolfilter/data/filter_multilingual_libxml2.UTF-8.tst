@@ -164,7 +164,6 @@
 μεταγενεστέραν διασκευήν.
 </excerpt></book><book id="4" dsc="Unicode: Artificial Example With Codepoints beyond 0xFFFF"><excerpt><div>󰎯󰎠</div><div>󰎻󰎪-󰎾󰎢བ󰊷</div><div>󰋁󰎵󰏁-󰎠:㈲󰎺;󰎬ʤ:̳̳ 󰊺</div></excerpt></book></list>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 - 
-**requires:TEXTWOLF
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <list><book id="1" dsc="Aina Jushi: Idle Talk under Beaus Trellis" language="CN"><author>Aina Jushi</author><title>抱歉，没有找到与您查询的</title><release><date>2008/05/05</date><publisher>The Project Gutenberg</publisher><code>#25328</code></release><excerpt>

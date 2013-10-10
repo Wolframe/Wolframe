@@ -6,6 +6,7 @@ docin=schema_select_task_by_id					# input document name
 docout=output_schema_select_task_by_id				# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"		# resource dump to add to expected test output
 testdata="
+**requires:TEXTWOLF
 **requires:DISABLED WIN32
 **file: schema_select_task_by_id.sfrm
 `cat ../scripts/schema_select_task_by_id.sfrm`

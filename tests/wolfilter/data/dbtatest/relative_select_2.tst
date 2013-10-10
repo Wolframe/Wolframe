@@ -1,4 +1,5 @@
 **
+**requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <baum>hier ist ein baum text</baum><haus>hier ist ein haus text</haus>

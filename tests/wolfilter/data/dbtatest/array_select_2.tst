@@ -1,4 +1,5 @@
 **
+**requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <root><item><aa><xx>1</xx><yy>1</yy></aa></item><item><aa><xx>2</xx></aa></item><item><aa><xx>3</xx><yy>3</yy></aa></item></root>
