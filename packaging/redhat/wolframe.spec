@@ -91,6 +91,7 @@
 %define with_python	1
 %define with_pam	1
 %define with_sasl	1
+%define with_textwolf	1
 %define with_libxml2	1
 %define with_libxslt	1
 %define with_libhpdf	1
