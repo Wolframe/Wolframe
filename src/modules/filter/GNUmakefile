@@ -14,7 +14,7 @@ ifeq ($(WITH_LIBXML2),1)
 SUBDIRS += libxml2
 endif
 
-# rapidjson
+# cJSON
 ifeq ($(WITH_CJSON),1)
 SUBDIRS += cjson
 endif

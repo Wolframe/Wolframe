@@ -7,6 +7,12 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
+# textwolf support for module charsetEncodings
+!IFDEF WITH_TEXTWOLF
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_TEXTWOLF
+!ENDIF
+
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \

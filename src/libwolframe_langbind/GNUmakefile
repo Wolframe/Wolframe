@@ -8,6 +8,12 @@ PACKAGE_NAME = wolframe
 
 INCLUDE_CXXFLAGS =
 
+# textwolf support for module charsetEncodings
+ifeq ($(WITH_TEXTWOLF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_TEXTWOLF
+endif
+
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
