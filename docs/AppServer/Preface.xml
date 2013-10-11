@@ -2,6 +2,13 @@
 
 <preface>
 	<title>Foreword</title>
-	<para>The Wolframe project was started in 2010.</para>
-	<para></para>
+	<para>The <code>Wolframe</code> project was started in 2010.
+	The goal was to create a platform for fully customizable
+	business applications that can be hosted in modern system environments.
+	</para>
+	<para>
+	This manual introduces the architecture of <code>Wolframe</code> and explains
+	how to build client/server applications with it. After reading this
+	you should be able to create an application on your own.
+	</para>
 </preface>
