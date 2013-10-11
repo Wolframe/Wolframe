@@ -78,23 +78,23 @@ Project Wolframe.
 						</Component>
 						<Directory Id="BinDir" Name="bin">
 							<Component Id="EventLogDlls" Guid="{b9855bb2-d7ea-46d7-8873-96e1612212c3}">
-								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="..\src\libwolframe\logger\wolframemsg.dll"/>								
+								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="$(var.topdir)\src\libwolframe\logger\wolframemsg.dll"/>								
 							</Component>
 							
 							<Component Id="WolfilterBinary" Guid="{10d4d86a-78e3-4262-8d61-279b20ef5fc2}">
-								<File Id="wolfilter.exe" Name="wolfilter.exe" DiskId="1" Source="..\src\wolfilter.exe"/>
+								<File Id="wolfilter.exe" Name="wolfilter.exe" DiskId="1" Source="$(var.topdir)\src\wolfilter.exe"/>
 							</Component>
 							
 							<Component Id="Wolframec" Guid="{0cf1d114-d387-4b9d-a10d-e4c158f82744}">
-								<File Id="wolframec.exe" Name="wolframec.exe" DiskId="1" Source="..\clients\cmdline\wolframec.exe"/>
+								<File Id="wolframec.exe" Name="wolframec.exe" DiskId="1" Source="$(var.topdir)\clients\cmdline\wolframec.exe"/>
 							</Component>
 							
 							<Component Id="WolframeCppClientLib" Guid="{5211387d-521f-48d2-930f-efc6de422981}">
-								<File Id="wolframe_client.dll" Name="wolframe_client.dll" DiskId="1" Source="..\clients\lib\wolframe_client.lib"/>
+								<File Id="wolframe_client.dll" Name="wolframe_client.dll" DiskId="1" Source="$(var.topdir)\clients\lib\wolframe_client.lib"/>
 							</Component>
 														
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
-								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
+								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="$(var.topdir)\src\wolframed.exe"/>
 
 								<!-- add firewall rules for plain and SSL -->
 								<firewall:FirewallException Id="Protocol" Name="Wolframe Protocol" Port="7661" Protocol="tcp" Scope="any"/>
@@ -117,16 +117,16 @@ Project Wolframe.
 							
 							<?ifdef with_sqlite3?>
 								<Component Id="Sqlite3Binary" Guid="{d675f10d-261d-4834-a3fb-3bb9ec08768b}">
-									<File Id="sqlite3.exe" Name="sqlite3.exe" DiskId="1" Source="..\sqlite3\sqlite3.exe"/>
+									<File Id="sqlite3.exe" Name="sqlite3.exe" DiskId="1" Source="$(var.topdir)\3rdParty\sqlite3\sqlite3.exe"/>
 								</Component>
 							<?endif?>
 							
 							<?ifdef with_lua?>
 								<Component Id="LuaBinary" Guid="{cdf17532-02be-4259-b3c9-90aea143341b}">
-									<File Id="lua.exe" Name="lua.exe" Source="..\lua\src\lua.exe"/>
+									<File Id="lua.exe" Name="lua.exe" Source="$(var.topdir)\3rdParty\lua\src\lua.exe"/>
 								</Component>
 								<Component Id="LuaDll" Guid="{7dc29da2-ab0b-47ff-b98d-5d3bfaf75544}">
-									<File Id="lua52.dll" Name="lua52.dll" Source="..\lua\src\lua52.dll"/>
+									<File Id="lua52.dll" Name="lua52.dll" Source="$(var.topdir)\3rdParty\lua\src\lua52.dll"/>
 								</Component>
 							<?endif?>
 							
@@ -153,40 +153,40 @@ Project Wolframe.
 							
 							<?ifdef var.with_ssl?>				
 							<Component Id="OpenSSL" Guid="{606BA861-BBE5-49C0-A037-6A4F4B2DD496}"> 
-								<File Id="ssleay32.dll" Name="ssleay32.dll" DiskId="1" Source="..\src\ssleay32.dll"/> 
-								<File Id="libeay32.dll" Name="libeay32.dll" DiskId="1" Source="..\src\libeay32.dll"/> 
+								<File Id="ssleay32.dll" Name="ssleay32.dll" DiskId="1" Source="$(var.topdir)\src\ssleay32.dll"/> 
+								<File Id="libeay32.dll" Name="libeay32.dll" DiskId="1" Source="$(var.topdir)\src\libeay32.dll"/> 
 							</Component>
 							<?endif?>
 
 							<?ifdef var.with_libxml2?>
 							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
-								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="..\src\libxml2.dll"/>
-								<File Id="iconv.dll" Name="iconv.dll" DiskId="1" Source="..\src\iconv.dll"/>
+								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="$(var.topdir)\src\libxml2.dll"/>
+								<File Id="iconv.dll" Name="iconv.dll" DiskId="1" Source="$(var.topdir)\src\iconv.dll"/>
 							</Component>
 							<?endif?>
 							
 							<?ifdef var.with_icu?>
 							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
 								<?ifdef var.debug?>
-									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="..\src\icuin49d.dll"/>
-									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="..\src\icuuc49d.dll"/>
+									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="$(var.topdir)\src\icuin49d.dll"/>
+									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="$(var.topdir)\src\icuuc49d.dll"/>
 								<?else?>
-									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="..\src\icuin49.dll"/>
-									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="..\src\icuuc49.dll"/>
+									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="$(var.topdir)\src\icuin49.dll"/>
+									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="$(var.topdir)\src\icuuc49.dll"/>
 								<?endif?>
 							</Component>
 							<?endif?>							
 							
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
-								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="..\src\libpq.dll"/>
+								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="$(var.topdir)\src\libpq.dll"/>
 								<?ifdef pgdll_with_18n?>
 									<?ifdef pgdll_without_major_versions?>
-										<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
-										<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
+										<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="$(var.topdir)\src\libiconv.dll"/>
+										<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="$(var.topdir)\src\libintl.dll"/>
 									<?else?>
-										<File Id="libiconv.dll" Name="libiconv-2.dll" DiskId="1" Source="..\src\libiconv-2.dll"/>
-										<File Id="libintl.dll" Name="libintl-8.dll" DiskId="1" Source="..\src\libintl-8.dll"/>								
+										<File Id="libiconv.dll" Name="libiconv-2.dll" DiskId="1" Source="$(var.topdir)\src\libiconv-2.dll"/>
+										<File Id="libintl.dll" Name="libintl-8.dll" DiskId="1" Source="$(var.topdir)\src\libintl-8.dll"/>								
 									<?endif?>
 								<?endif?>
 							</Component>
@@ -201,18 +201,18 @@ Project Wolframe.
 
 						<Directory Id="DocumentationDir" Name="doc">
 							<Component Id="WolfBookDocumentationCHM" Guid="{401ef900-41e1-4523-bee7-00fff432cff0}">
-								<File Id="WolfBook.chm" Name="WolfBook.chm" DiskId="1" Source="..\docs\output\htmlhelp\htmlhelp.chm"/>
+								<File Id="WolfBook.chm" Name="WolfBook.chm" DiskId="1" Source="$(var.topdir)\docs\output\htmlhelp\htmlhelp.chm"/>
 							</Component>
 							
 							<Component Id="APIDocumentationCHM" Guid="{2a73f5b4-c257-4696-8847-bd503727fa51}">
-								<File Id="wolframeAPI.chm" Name="wolframeAPI.chm" DiskId="1" Source="..\docs\doxygen\html\index.chm"/>
+								<File Id="wolframeAPI.chm" Name="wolframeAPI.chm" DiskId="1" Source="$(var.topdir)\docs\doxygen\html\index.chm"/>
 							</Component>
 						</Directory>						
 						
 						<Directory Id="ModulesDir" Name="modules">
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
-								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="..\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
+								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
 								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -233,7 +233,7 @@ Project Wolframe.
 
 							<?ifdef with_pgsql?>
 							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
-								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="..\src\modules\database\postgresql\mod_db_postgresql.dll"/>
+								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\postgresql\mod_db_postgresql.dll"/>
 								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -271,7 +271,7 @@ Project Wolframe.
 							<?endif?>
 							
 							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
-								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="..\src\modules\audit\database\mod_audit_database.dll"/>
+								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\database\mod_audit_database.dll"/>
 								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -281,7 +281,7 @@ Project Wolframe.
 							</Component>
 							
 							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
-								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="..\src\modules\audit\textfile\mod_audit_textfile.dll"/>
+								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\textfile\mod_audit_textfile.dll"/>
 								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -291,7 +291,7 @@ Project Wolframe.
 							</Component>
 
 							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
-								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="..\src\modules\authentication\database\mod_auth_database.dll"/>
+								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\authentication\database\mod_auth_database.dll"/>
 								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -301,7 +301,7 @@ Project Wolframe.
 							</Component>
 
 							<Component Id="ModAuthTextfile" Guid="{C3062ADD-6827-4ABE-915F-F1DA1D8EAF47}">
-								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="..\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
+								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
 								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -311,7 +311,7 @@ Project Wolframe.
 							</Component>
 
 							<Component Id="ModAuthzDatabase" Guid="{e9da7e48-2bee-43bf-a388-ce2bb02da1bd}">
-								<File Id="mod_authz_database.dll" Name="mod_authz_database.dll" DiskId="1" Source="..\src\modules\authorization\database\mod_authz_database.dll"/>
+								<File Id="mod_authz_database.dll" Name="mod_authz_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\authorization\database\mod_authz_database.dll"/>
 								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -319,7 +319,7 @@ Project Wolframe.
 
 <!--
 							<Component Id="ModDdlCompilerSimpleForm" Guid="{2a5e72e8-cc29-4264-8026-c222901ea401}">
-								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="..\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
+								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="$(var.topdir)\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
 								<util:XmlFile Id="AppendConfigModDdlCompilerSimpleForm" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_ddlcompiler_simpleform.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -327,7 +327,7 @@ Project Wolframe.
 -->
 
 							<Component Id="ModFilterChar" Guid="{2dc36fbb-e779-43cf-b6cf-c6dbb280fc85}">
-								<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="..\src\modules\filter\char\mod_filter_char.dll"/>
+								<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\char\mod_filter_char.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterChar" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_filter_char.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -335,7 +335,7 @@ Project Wolframe.
 
 							<?ifdef var.with_libxml2?>
 								<Component Id="ModFilterLibXml2" Guid="{ccbe6394-ce8e-4faf-acbf-79b8173c8c12}">
-									<File Id="mod_filter_libxml2.dll" Name="mod_filter_libxml2.dll" DiskId="1" Source="..\src\modules\filter\libxml2\mod_filter_libxml2.dll"/>
+									<File Id="mod_filter_libxml2.dll" Name="mod_filter_libxml2.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\libxml2\mod_filter_libxml2.dll"/>
 									<util:XmlFile Id="AppendConfigModFilterLibXml2" Action="createElement" ElementPath="/configuration/LoadModules"
 												  Name="module" Value="[INSTALLDIR]modules\mod_filter_libxml2.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -343,21 +343,21 @@ Project Wolframe.
 							<?endif?>
 							
 							<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
-								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="..\src\modules\filter\line\mod_filter_line.dll"/>
+								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\line\mod_filter_line.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_filter_line.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModFilterTextwolf" Guid="{2c0379f7-bec4-41f1-bf2b-7cf2e23d22cb}">
-								<File Id="mod_filter_textwolf.dll" Name="mod_filter_textwolf.dll" DiskId="1" Source="..\src\modules\filter\textwolf\mod_filter_textwolf.dll"/>
+								<File Id="mod_filter_textwolf.dll" Name="mod_filter_textwolf.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\textwolf\mod_filter_textwolf.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterTextwolf" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_filter_textwolf.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModFilterToken" Guid="{2424b75e-85cc-4bbe-b5ce-73c21680e622}">
-								<File Id="mod_filter_token.dll" Name="mod_filter_token.dll" DiskId="1" Source="..\src\modules\filter\token\mod_filter_token.dll"/>
+								<File Id="mod_filter_token.dll" Name="mod_filter_token.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\token\mod_filter_token.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterToken" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_filter_token.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
@@ -365,12 +365,12 @@ Project Wolframe.
 
 							<?ifdef var.with_icu?>
 								<Component Id="ModNormalizeLocale" Guid="{619a69fe-f857-40e3-abd1-8acc44b6f939}">
-									<File Id="mod_normalize_locale.dll" Name="mod_normalize_locale.dll" DiskId="1" Source="..\src\modules\normalize\locale\mod_normalize_locale.dll"/>
+									<File Id="mod_normalize_locale.dll" Name="mod_normalize_locale.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\locale\mod_normalize_locale.dll"/>
 								</Component>
 							<?endif?>
 
 							<Component Id="ModNormalizeNumber" Guid="{a77a21c2-5586-470b-a3fa-96968c708705}">
-								<File Id="mod_normalize_number.dll" Name="mod_normalize_number.dll" DiskId="1" Source="..\src\modules\normalize\number\mod_normalize_number.dll"/>
+								<File Id="mod_normalize_number.dll" Name="mod_normalize_number.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\number\mod_normalize_number.dll"/>
 							</Component>
 
 						</Directory>

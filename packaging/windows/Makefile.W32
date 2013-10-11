@@ -1,10 +1,13 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
 SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dtopdir=$(TOPDIR)
 
 !IFDEF DEBUG
 WIX_FLAGS = $(WIX_FLAGS) \

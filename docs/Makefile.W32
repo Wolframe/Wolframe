@@ -19,7 +19,7 @@ doc-htmlhelp:
 	@mkdir output
 	@mkdir output\htmlhelp
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
 	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
 	@-copy "$(LIBXSLT_DIR)\lib\libexslt.dll" .
 	@"$(XSLTPROC)" --xinclude --stringparam draft.mode yes -o output\htmlhelp\WolfBook.html "$(XSLT_HTMLHELP_STYLESHEET)" WolfBook.xml
