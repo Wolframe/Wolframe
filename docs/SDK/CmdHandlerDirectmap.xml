@@ -1,16 +1,9 @@
 <sect1>
-<title>Direct Map Command Handler</title>
+<title>The Standard Command Handler</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can call programs of the logic tier of Wolframe with a mechanism called direct map.
-		Direct map means that you call a function directly with the
-		input structure that is a one to one representation of the input.
-		The result of a direct map is a structure that can be represented
-		one to one in the output.
-	</para>
-	<para>Direct map instructions are specified in a program source file with the extension '.dmap'
-		and the file is specified as program of the direct map command handler
-		in the configuration.
+	<para>The declarations of the <code>Wolframe</code> Standard Command Handler are specified in a program 
+		source file with the extension '.dmap' that is declared in the configuration.
 	</para>
 	</sect2>
 
