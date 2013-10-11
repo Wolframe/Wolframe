@@ -42,17 +42,45 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
+{
+	std::ostringstream out;
+	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != arg.begin()) out << ", ";
+		out << ai->first << "='" << ai->second << "'";
+	}
+	return out.str();
+}
+
 std::string DirectmapCommandDescription::tostring() const
 {
 	std::ostringstream rt;
-	rt << "call='" << call << "'";
-	rt << ", input filter='" << inputfilter << "'";
-	rt << ", output filter='" << outputfilter << "'";
+	rt << "name='" << name << "'";
+	rt << ", call='" << call << "'";
+	rt << ", input filter='" << inputfilter;
+	if (inputfilterarg.size())
+	{
+		rt << "( " << filterargAsString( inputfilterarg) << " )'";
+	}
+	else
+	{
+		rt << "'";
+	}
+	rt << ", output filter='" << outputfilter;
+	if (outputfilterarg.size())
+	{
+		rt << "( " << filterargAsString( outputfilterarg) << " )'";
+	}
+	else
+	{
+		rt << "'";
+	}
 	rt << ", input form='" << inputform << "'";
 	rt << ", output form='" << outputform << "'";
 	return rt.str();
 }
-
 
 bool DirectmapProgram::check( const proc::ProcessorProvider* provider) const
 {
@@ -169,6 +197,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	bool validate = true;
 	bool call_arg_set = false;
 	bool return_arg_set = false;
+	bool return_pass = false;
 	bool input_filter_set = false;
 	bool output_filter_set = false;
 	enum Lexem {PASS,RETURN,CALL,IDENTIFIER,FILTER,INPUT,OUTPUT};
@@ -312,7 +341,13 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				throw std::runtime_error("PASS,FILTER,CALL or RETURN expected instead of token");
 
 			case ParseReturnArg:
-				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of RETURN");
+				if (lexem == PASS)
+				{
+					if (return_pass) throw std::runtime_error( "PASS specified twice after RETURN");
+					return_pass = true;
+					continue;
+				}
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or PASS expected as argument of RETURN");
 				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
 				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for RETURN");
 				return_arg_set = true;
@@ -403,6 +438,10 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	if (return_arg_set)
 	{
 		rt.outputform = return_arg;
+	}
+	if (return_pass)
+	{
+		rt.passoutput = return_pass;
 	}
 	return rt;
 }

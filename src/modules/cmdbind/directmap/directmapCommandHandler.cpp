@@ -66,6 +66,11 @@ const std::string& DirectmapContext::filter( const std::string& docformat) const
 void DirectmapCommandHandler::initcall( const std::string& docformat)
 {
 	m_cmd = m_ctx->command( m_name);
+	if (!m_cmd)
+	{
+		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
+	}
+	m_passoutput = m_cmd->passoutput;
 	if (!m_cmd->inputform.empty())
 	{
 		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
@@ -279,7 +284,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				/* no break here ! */
 			case 4:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
-				if (m_outputform.get())
+				if (m_outputform.get() && !m_passoutput)
 				{
 					const char* xmlroot = m_outputform->description()->xmlRoot();
 					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();

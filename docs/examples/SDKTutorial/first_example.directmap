@@ -1,4 +1,4 @@
 
-InsertCustomer = doInsertCustomer( xml :Customer);
-SelectCustomer = doSelectCustomer( xml ) :Customer;
+COMMAND (insert Customer) CALL doInsertCustomer;
+COMMAND (get Employee) PASS CALL doSelectEmployee( xml ) RETURN Employee;
 

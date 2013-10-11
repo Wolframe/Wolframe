@@ -43,7 +43,8 @@ namespace langbind {
 
 struct DirectmapCommandDescription
 {
-	DirectmapCommandDescription(){}
+	DirectmapCommandDescription()
+		:passoutput(false){}
 	DirectmapCommandDescription( const DirectmapCommandDescription& o)
 		:name(o.name)
 		,call(o.call)
@@ -52,7 +53,8 @@ struct DirectmapCommandDescription
 		,outputfilter(o.outputfilter)
 		,outputfilterarg(o.outputfilterarg)
 		,inputform(o.inputform)
-		,outputform(o.outputform){}
+		,outputform(o.outputform)
+		,passoutput(o.passoutput){}
 
 	std::string name;						//< name of program
 	std::string call;						//< name of the transaction or form function
@@ -62,6 +64,7 @@ struct DirectmapCommandDescription
 	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
+	bool passoutput;						//< output is not validated but document is not standalone and is with doctype returned
 
 	std::string tostring() const;
 };

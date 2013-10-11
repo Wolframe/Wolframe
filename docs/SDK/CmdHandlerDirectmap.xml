@@ -30,12 +30,15 @@
 	</sect2>
 
 	<sect2>
-	<title>Example Directmap Description</title>
-	<para>The following example defines two commands. The first one links a document type "InsertCustomer" to
-		a global transaction "doInsertCustomer", the input is validated with the data form "Customer". 
-		The result is not mapped through a form but returned as it is. The second example command links a 
-		document type "SelectCustomer" to a global transaction "doSelectCustomer". The input is not validated
-		and the transaction output if serialized with help of the form "Customer".
+	<title>Example Command Map Description</title>
+	<para>The following source example could be one of a <code>example.dmap</code> in the configuration example 
+		introduced above. It defines two commands. The first one links a command "insert" with document type
+		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
+		automatically against a form named "Customer" if not explicitely defined else. 
+		The command has no result except that its succeeds or fails. The second example command links a 
+		command "get" with a document type "Employee" to a function "doSelectEmployee". 
+		The input is not validated and the transaction output is validated and mapped through the 
+		form "Employee".
 	</para>
 	<para>
 		<programlisting language='text'>

@@ -91,7 +91,8 @@ public:
 		:m_ctx(ctx_)
 		,m_cmd(0)
 		,m_state(0)
-		,m_function(0){}
+		,m_function(0)
+		,m_passoutput(false){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -118,6 +119,7 @@ private:
 	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
+	bool m_passoutput;							//< output is not validated but document is not standalone and is with doctype returned
 };
 
 }}//namespace
