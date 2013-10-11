@@ -6,14 +6,28 @@
 		source file with the extension '.dmap' that is declared in the configuration.
 	</para>
 	</sect2>
+	<sect2>
+		<title>Example Configuration</title>
+		<para>The following configuration declares a program <code>example.tdl</code> to contain the function
+		declarations for the provider that can be called by the command handler. It declares the database with
+		name <code>pgdb</code> to be used as the database for transactions. It loads a description 
+		<code>example.dmap</code> that will declare the mappings of commands to the filters used and functions 
+		called. It specifies the filter with name <code>libxml2</code> to be used for documents of format XML and
+		the filter with name <code>cjson</code> to be used for documents of format JSON, if
+		not specified else in <code>example.dmap</code>.
+
+		<programlisting language='sql'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/standardCommandHandler.conf" parse="text" />
+		</programlisting>
+		</para>
+	</sect2>
 
 	<sect2>
-	<title>Example</title>
+	<title>Example Program</title>
 	<para>The following example defines two commands. The first one links a document type "InsertCustomer" to
-		a global transaction "doInsertCustomer". The input is deserialized by the filter <code>xml</code>, the default
-		XML filter and validated with the data form "Customer". The result is not mapped through a form but returned
-		as it is. The second example command links a document type "SelectCustomer" to
-		a global transaction "doSelectCustomer". The input is not validated
+		a global transaction "doInsertCustomer", the input is validated with the data form "Customer". 
+		The result is not mapped through a form but returned as it is. The second example command links a 
+		document type "SelectCustomer" to a global transaction "doSelectCustomer". The input is not validated
 		and the transaction output if serialized with help of the form "Customer".
 	</para>
 	<para>
