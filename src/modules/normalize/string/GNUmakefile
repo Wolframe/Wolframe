@@ -5,8 +5,10 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR) -I$(TOPDIR)/src \
-	-I$(TOPDIR) -I$(TOPDIR)/tests \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src \
+	-I$(TOPDIR)/tests \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/textwolf/include
 

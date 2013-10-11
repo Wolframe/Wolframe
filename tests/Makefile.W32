@@ -14,12 +14,12 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR)\include /I. \
+	/I. \
+	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR) \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\wtest
+	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -54,6 +54,19 @@ INCLUDE_DIRS = \
 	/I"$(WIN_ICONV_DIR)"
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+!ENDIF
+
+# libxslt
+
+!IFDEF WITH_LIBXSLT
+INCLUDE_CXXFLAGS = $(INCLUDE_CXXFLAGS) \
+	/DWITH_LIBXSLT
+
+INCLUDE_DIRS = $(INCLUDE_DIRS) \
+	/I"$(LIBXSLT_DIR)\include"
+
+INCLUDE_LIBS = $(INCLUDE_LIBS) \
+	"$(LIBXSLT_DIR)\lib\libxslt.lib"
 !ENDIF
 
 # Postgresql
@@ -163,9 +176,13 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXSLT
+	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
+!ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat

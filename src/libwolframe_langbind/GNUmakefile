@@ -14,16 +14,17 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_TEXTWOLF
 endif
 
+INCLUDE_DIRS = \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/3rdParty/textwolf/include
+
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_serialize
-
-INCLUDE_DIRS = \
-	-I. -I$(TOPDIR) -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/3rdParty/textwolf/include
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \

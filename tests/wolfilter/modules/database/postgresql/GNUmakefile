@@ -6,17 +6,18 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS =
 
+INCLUDE_DIRS = \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src/modules/database/postgresql \
+	-I$(BOOST_INCLUDE_DIR) \
+	$(PGSQL_INCLUDE_DIRS)
+
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
-
-INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
-	-I$(TOPDIR)/src/modules/database/postgresql \
-	-I$(BOOST_INCLUDE_DIR) \
-	$(PGSQL_INCLUDE_DIRS)
 
 INCLUDE_LIBS = \
 	-lwolframe \

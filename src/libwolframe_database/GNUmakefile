@@ -13,7 +13,8 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR) -I$(TOPDIR)/include \
+	-I. \
+	-I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \

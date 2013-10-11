@@ -6,6 +6,7 @@ SUBDIRS =
 
 
 INCLUDE_DIRS = \
+	-I . \
 	-I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(SQLITE3_INCLUDE_DIRS) \

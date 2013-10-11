@@ -9,7 +9,6 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/clients/lib \
-	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/textwolf/include
 

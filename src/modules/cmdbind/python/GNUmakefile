@@ -9,8 +9,9 @@ INCLUDE_CXXFLAGS += \
 	$(PYTHON_CFLAGS)
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	-I$(TOPDIR) \
+	-I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
