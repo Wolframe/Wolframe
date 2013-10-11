@@ -184,12 +184,9 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 void OutputFilterImpl::setDocType( const std::string& value)
 {
 	types::DocType doctype( value);
-	if (doctype.rootid)
-	{
-		m_doctype_root = doctype.rootid;
-		if (doctype.publicid) m_doctype_public = doctype.publicid;
-		if (doctype.systemid) m_doctype_system = doctype.systemid;
-	}
+	m_doctype_root = doctype.rootid;
+	m_doctype_public = doctype.publicid;
+	m_doctype_system = doctype.systemid;
 }
 
 const char* OutputFilterImpl::encoding() const

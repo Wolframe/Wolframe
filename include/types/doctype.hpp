@@ -42,19 +42,21 @@ namespace types {
 
 struct DocType
 {
-	const char* rootid;
-	const char* publicid;
-	const char* systemid;
+	std::string rootid;
+	std::string publicid;
+	std::string systemid;
 
 	DocType();
 	DocType( const char* r, const char* p, const char* s)
-		:rootid(r),publicid(p),systemid(s){}
+		:rootid(r?r:""),publicid(p?p:""),systemid(s?s:""){}
+	DocType( const char* r, const char* s)
+		:rootid(r?r:""),publicid(""),systemid(s?s:""){}
 	explicit DocType( const std::string& value);
+	DocType( const DocType& o)
+		:rootid(o.rootid),publicid(o.publicid),systemid(o.systemid){}
 	~DocType(){}
 
 	std::string tostring() const;
-private:
-	boost::shared_ptr<void> mem;
 };
 
 std::string getIdFromDoctype( const std::string& doctype);

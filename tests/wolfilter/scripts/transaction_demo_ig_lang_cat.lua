@@ -40,32 +40,26 @@ function select_subtree( name)
 	local nodear = formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_subtree2( name)
 	local nodear = formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_children( name)
@@ -73,32 +67,26 @@ function select_children( name)
 	local nodear = formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_children2( name)
 	local nodear = formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_cover( name)
@@ -106,32 +94,26 @@ function select_cover( name)
 	local nodear = formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_cover2( name)
 	local nodear = formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_parents( name)
@@ -139,32 +121,26 @@ function select_parents( name)
 	local nodear = formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function select_parents2( name)
 	local nodear = formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
-	output:print( "\n")
 	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
 		output:closetag()
-		output:print( "\n")
 	end
 	output:closetag()
-	output:print( "\n")
 end
 
 function get_tree( parentid)
@@ -181,19 +157,13 @@ function get_tree( parentid)
 	return a
 end
 
-function print_tree( tree, nodeid, indent)
-	if (indent ~= "") then
-		output:print( "\n" .. indent)
-	end
+function print_tree( tree, nodeid)
 	output:opentag( "class")
 	output:print( tree[ nodeid].name, "name")
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
-		print_tree( tree, v, indent .. "\t")
+		print_tree( tree, v)
 		n = n + 1
-	end
-	if n > 0 then
-		output:print( "\n" .. indent)
 	end
 	output:closetag()
 end
@@ -207,7 +177,7 @@ function run()
 		end
 	end
 	output:opentag( "result")
-	print_tree( get_tree( 1), 1, "")
+	print_tree( get_tree( 1), 1)
 	select_subtree( "italic")
 	select_subtree( "brythonic")
 	select_subtree2( "germanic")
@@ -233,7 +203,7 @@ function run()
 	delete_subtree( "celtic")
 	delete_subtree( "indo iranian")
 	output:opentag( "sparsetree")
-	print_tree( get_tree( 1), 1, "")
+	print_tree( get_tree( 1), 1)
 	output:closetag()
 	output:closetag()
 end

@@ -1,4 +1,5 @@
 {
-  "doctype" : "AllDataRequest"
-  "data": null
+  "doctype" : "AllDataRequest",
+  "data": {
+  }
 }

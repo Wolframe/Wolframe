@@ -233,7 +233,9 @@ struct LuaObject
 			luaL_error( ls, "reserved global variable '%s' has been changed", name);
 			return 0;
 		}
-		return obj->ref();
+		ObjectType* rt = obj->ref();
+		lua_pop( ls, 1);
+		return rt;
 	}
 
 	static ObjectType* getSelf( lua_State* ls, const char* name, const char* method)
@@ -1311,7 +1313,8 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	const char* tag;
 	std::size_t tagsize;
 	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	bool newEnter = (lua_getctx( ls, &ctx) != LUA_YIELD);
+	if (newEnter)
 	{
 		output = LuaObject<Output>::getSelf( ls, "output", "opentag");
 		check_parameters( ls, 1, 1, LUA_TSTRING);
@@ -1320,28 +1323,30 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	}
 	else
 	{
-		tag = (const char*)lua_touserdata( ls, -3);
-		tagsize = (std::size_t)lua_tointeger( ls, -2);
+		tag = (const char*)lua_tolstring( ls, -2, &tagsize);
 		output = (Output*)lua_touserdata( ls, -1);
-		lua_pop( ls, 3);
 	}
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
 		if (!input->inputfilter()->getMetadata())
 		{
-			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)tag));
-			lua_pushinteger( ls, tagsize);
-			lua_pushlightuserdata( ls, output);
+			if (newEnter)
+			{
+				lua_pushlstring( ls, tag, tagsize);
+				lua_pushlightuserdata( ls, output);
+			}
 			lua_yieldk( ls, 0, 1, function_output_opentag);
 		}
 		output->called(true);
 	}
 	if (!output->print( tag, tagsize, 0/*val*/, 0))
 	{
-		lua_pushlightuserdata( ls, const_cast<void*>( (const void*)tag));
-		lua_pushinteger( ls, tagsize);
-		lua_pushlightuserdata( ls, output);
+		if (newEnter)
+		{
+			lua_pushlstring( ls, tag, tagsize);
+			lua_pushlightuserdata( ls, output);
+		}
 		lua_yieldk( ls, 0, 1, function_output_opentag);
 	}
 	return 0;
@@ -1560,19 +1565,19 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 				{
 					types::DocType doctype( doctypestr);
 					lua_newtable( ls);
-					if (doctype.rootid)
+					if (!doctype.rootid.empty())
 					{
-						lua_pushstring( ls, doctype.rootid);
+						lua_pushlstring( ls, doctype.rootid.c_str(), doctype.rootid.size());
 						lua_setfield( ls, -2, "root");
 					}
-					if (doctype.publicid)
+					if (!doctype.publicid.empty())
 					{
-						lua_pushstring( ls, doctype.publicid);
+						lua_pushlstring( ls, doctype.publicid.c_str(), doctype.publicid.size());
 						lua_setfield( ls, -2, "public");
 					}
-					if (doctype.systemid)
+					if (!doctype.systemid.empty())
 					{
-						lua_pushstring( ls, doctype.systemid);
+						lua_pushlstring( ls, doctype.systemid.c_str(), doctype.systemid.size());
 						lua_setfield( ls, -2, "system");
 					}
 					return 1;

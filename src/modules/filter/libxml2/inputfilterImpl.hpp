@@ -106,26 +106,28 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end);
 
+	///\brief Implements InputFilter::getMetadata()
 	virtual bool getMetadata()
 	{
 		return (m_doc.get());
 	}
 
-	bool getDocType( types::DocType& doctype);
-
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
+	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
 	virtual const char* getEncoding() const
 	{
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);
+	bool getDocType( types::DocType& doctype);
 
 private:
 	DocumentReader m_doc;			//< document reader structure

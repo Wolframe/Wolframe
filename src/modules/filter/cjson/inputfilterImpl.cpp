@@ -53,12 +53,31 @@ bool InputFilterImpl::getValue( const char* name, std::string& val)
 
 bool InputFilterImpl::getDocType( std::string& val)
 {
-	if (!m_doctype.empty())
+	if (!m_root.get())
 	{
-		val = m_doctype;
+		setState( EndOfMessage);
+		return false;
+	}
+	val = m_doctype.tostring();
+	return true;
+}
+
+bool InputFilterImpl::getMetadata()
+{
+	if (m_root.get())
+	{
 		return true;
 	}
-	return false;
+	else
+	{
+		setState( EndOfMessage);
+		return false;
+	}
+}
+
+const char* InputFilterImpl::getEncoding() const
+{
+	return m_encoding.empty()?0:m_encoding.c_str();
 }
 
 bool InputFilterImpl::setValue( const char* name, const std::string& value)
@@ -130,6 +149,9 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			//CJSON creates a toplevel object for multiple root nodes:
 			first = first->child;
 		}
+		const char* rootid = 0;
+		const char* systemid = 0;
+		
 		for (;;)
 		{
 			if (first->string && first->valuestring)
@@ -137,8 +159,8 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				if (boost::iequals("doctype",first->string))
 				{
 					++nof_docattributes;
-					if (!m_doctype.empty()) throw std::runtime_error("duplicate 'doctype' definition");
-					m_doctype = first->valuestring;
+					if (systemid) throw std::runtime_error("duplicate 'doctype' definition");
+					systemid = first->valuestring;
 					first = first->next;
 					continue;
 				}
@@ -163,6 +185,21 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				}
 			}
 			break;
+		}
+		if (first->string && !first->next)
+		{
+			rootid = first->string;
+		}
+		if (systemid)
+		{
+			if (rootid)
+			{
+				m_doctype = types::DocType( rootid, systemid);
+			}
+			else
+			{
+				throw std::runtime_error( "document type defined, but no singular root element");
+			}
 		}
 		m_stk.push_back( StackElement( first));
 	}

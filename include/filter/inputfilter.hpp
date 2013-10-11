@@ -131,6 +131,7 @@ public:
 		return true;
 	}
 
+	///\brief Evaluate if the document metadata are avalable and set state for fetching them if needed
 	virtual bool getMetadata()
 	{
 		return true;

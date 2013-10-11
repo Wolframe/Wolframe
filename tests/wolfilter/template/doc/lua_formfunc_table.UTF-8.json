@@ -1,46 +1,37 @@
 {
-  "assignmentlist": {
-    "assignment": [
-      {
-        "issuedate": "8647993",
-        "employee": {
-          "firstname": "juulliiaa",
-          "phone": "901 234 56 78",
-          "surname": "teeggeell-saacchheerr"
-        },
-        "task": [
-          {
-            "customernumber": "325",
-            "title": "jjoobb 8",
-            "key": "a876"
-          },
-          {
-            "customernumber": "568",
-            "title": "jjoobb 7",
-            "key": "v543"
-          }
-        ]
-      },
-      {
-        "issuedate": "8647993",
-        "employee": {
-          "firstname": "jaakkoobb",
-          "phone": "987 654 32 10",
-          "surname": "stteeggeelliinn"
-        },
-        "task": [
-          {
-            "customernumber": "568",
-            "title": "jjoobb 6",
-            "key": "a543"
-          },
-          {
-            "customernumber": "891",
-            "title": "jjoobb 5",
-            "key": "v210"
-          }
-        ]
-      }
-    ]
-  }
+	"assignmentlist":	{
+		"assignment":	[{
+				"issuedate":	"8647993",
+				"employee":	{
+					"firstname":	"juulliiaa",
+					"phone":	"901 234 56 78",
+					"surname":	"teeggeell-saacchheerr"
+				},
+				"task":	[{
+						"customernumber":	"325",
+						"title":	"jjoobb 8",
+						"key":	"a876"
+					}, {
+						"customernumber":	"568",
+						"title":	"jjoobb 7",
+						"key":	"v543"
+					}]
+			}, {
+				"issuedate":	"8647993",
+				"employee":	{
+					"firstname":	"jaakkoobb",
+					"phone":	"987 654 32 10",
+					"surname":	"stteeggeelliinn"
+				},
+				"task":	[{
+						"customernumber":	"568",
+						"title":	"jjoobb 6",
+						"key":	"a543"
+					}, {
+						"customernumber":	"891",
+						"title":	"jjoobb 5",
+						"key":	"v210"
+					}]
+			}]
+	}
 }

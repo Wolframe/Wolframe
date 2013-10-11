@@ -133,15 +133,15 @@ bool InputFilterImpl::getDocType( types::DocType& doctype)
 	if (nd)
 	{
 		xmlDtdPtr dtd = (xmlDtdPtr)nd;
-		doctype.rootid = (const char*)dtd->name;
-		doctype.publicid = (const char*)dtd->ExternalID;
-		doctype.systemid = (const char*)dtd->SystemID;
+		doctype.rootid = dtd->name?(const char*)dtd->name:"";
+		doctype.publicid = dtd->ExternalID?(const char*)dtd->ExternalID:"";
+		doctype.systemid = dtd->SystemID?(const char*)dtd->SystemID:"";
 	}
 	else
 	{
-		doctype.rootid = 0;
-		doctype.publicid = 0;
-		doctype.systemid = 0;
+		doctype.rootid = "";
+		doctype.publicid = "";
+		doctype.systemid = "";
 	}
 	return true;
 }

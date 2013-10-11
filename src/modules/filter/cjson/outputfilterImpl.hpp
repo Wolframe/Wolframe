@@ -71,7 +71,7 @@ public:
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_doctype(o.m_doctype)
+		,m_doctypeid(o.m_doctypeid)
 		,m_encoding(o.m_encoding)
 		,m_headerPrinted(o.m_headerPrinted)
 		,m_stk(o.m_stk)
@@ -105,7 +105,8 @@ public:
 	const char* encoding() const;
 
 private:
-	void addStructItem( const std::string name, const std::string& value);
+	void addStructValue( const std::string name, const std::string& value);
+	void addStructItem( const std::string name, cJSON* val);
 	void setContentValue( const std::string& value);
 	void closeElement();
 	void printStructToBuffer();
@@ -116,7 +117,7 @@ private:
 	std::string m_attribname;				//< attribute name buffer
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
-	std::string m_doctype;					//< document type
+	std::string m_doctypeid;				//< document type
 	std::string m_encoding;					//< character set encoding
 	bool m_headerPrinted;
 

@@ -1,5 +1,5 @@
 {
-	"doctype":	"Invoice",
+	"doctype":	"Invoice.simpleform",
 	"invoice":	{
 		"order":	{
 			"number":	"INS03-62",

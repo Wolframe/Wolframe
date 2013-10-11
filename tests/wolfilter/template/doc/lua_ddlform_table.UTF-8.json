@@ -1,46 +1,37 @@
 {
-  "assignmentlist": {
-    "assignment": [
-      {
-        "issuedate": "13.5.2006",
-        "employee": {
-          "firstname": "Julia",
-          "phone": "098 765 43 21",
-          "surname": "Tegel-Sacher"
-        },
-        "task": [
-          {
-            "customernumber": "324",
-            "key": "A123",
-            "title": "job 1"
-          },
-          {
-            "customernumber": "567",
-            "key": "V456",
-            "title": "job 2"
-          }
-        ]
-      },
-      {
-        "issuedate": "13.5.2006",
-        "employee": {
-          "firstname": "Jakob",
-          "phone": "012 345 67 89",
-          "surname": "Stegelin"
-        },
-        "task": [
-          {
-            "customernumber": "567",
-            "key": "A456",
-            "title": "job 3"
-          },
-          {
-            "customernumber": "890",
-            "key": "V789",
-            "title": "job 4"
-          }
-        ]
-      }
-    ]
-  }
+	"assignmentlist":	{
+		"assignment":	[{
+				"issuedate":	"13.5.2006",
+				"employee":	{
+					"firstname":	"Julia",
+					"phone":	"098 765 43 21",
+					"surname":	"Tegel-Sacher"
+				},
+				"task":	[{
+						"customernumber":	"324",
+						"key":	"A123",
+						"title":	"job 1"
+					}, {
+						"customernumber":	"567",
+						"key":	"V456",
+						"title":	"job 2"
+					}]
+			}, {
+				"issuedate":	"13.5.2006",
+				"employee":	{
+					"firstname":	"Jakob",
+					"phone":	"012 345 67 89",
+					"surname":	"Stegelin"
+				},
+				"task":	[{
+						"customernumber":	"567",
+						"key":	"A456",
+						"title":	"job 3"
+					}, {
+						"customernumber":	"890",
+						"key":	"V789",
+						"title":	"job 4"
+					}]
+			}]
+	}
 }

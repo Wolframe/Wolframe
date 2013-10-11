@@ -32,8 +32,8 @@
 			for the data tier. It also describes the transformation of the output of the data tier to a result structure returned back to the presentation tier.
 			The logic tier supports scripting languages to define the mapping. <code>Wolframe</code> introduces three concepts as fundamental building blocks of the logic tier:
 				<itemizedlist>
-					<listitem><para>Filters: Filters are transforming serialized input data (XML,Jason,CSV,etc.) to a unified serialization of hierarchical structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2) or as scripts (XSLT filter script for rewriting input or output)</para></listitem>
-					<listitem><para>Forms: Forms a data structures defined in a data definition language (DDL). Forms are used to validate and normalize input (XML validation, token normalization).</para></listitem>
+					<listitem><para>Filters: Filters are transforming serialized input data (XML,JSON,CSV,etc.) to a unified serialization of hierarchical structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2) or as scripts (XSLT filter script for rewriting input or output)</para></listitem>
+					<listitem><para>Forms: Forms a data structures defined in a data definition language (DDL). Forms are used to validate and normalize input (XML validation, token normalization, structure definition).</para></listitem>
 					<listitem><para>Functions: Functions delegate processing to the data tier (transactions) or serve as interface to integrate with other environments (e.g. <code>.NET</code>). Functions have a unique name and are called with a structure as argument and a structure as result.</para></listitem>
 				</itemizedlist>
 			You find a detailed description of the Logic tier and how to use it in the SDK manual.
@@ -44,8 +44,9 @@
 			<para>The data tier of <code>Wolframe</code> defines the functions for calling a transaction.
 			The main transaction function gets a complete description of the transaction to execute as input and returns
 			all results of the transaction as output. The logic tier builds the result data structure out of this result.
-			The main transaction function is stateless and an abstraction of the transactional context. (The transaction does
-			not exist outside this function).</para>
+			The main transaction function is stateless and an abstraction of the transactional context. (The transaction
+			context does not exist outside this function. Differently explained: Two functions do not refer to the same
+			transaction).</para>
 		</sect2>
 	</sect1>
 </chapter>

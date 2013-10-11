@@ -89,31 +89,27 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end);
 
-	virtual bool getMetadata()
-	{
-		return (m_root.get());
-	}
+	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
+	virtual const char* getEncoding() const;
 
-	bool getDocType( types::DocType& doctype);
+	///\brief Implements InputFilter::getMetadata()
+	virtual bool getMetadata();
 
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
-	virtual const char* getEncoding() const
-	{
-		return m_encoding.empty()?0:m_encoding.c_str();
-	}
-
+	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
 private:
 	boost::shared_ptr<cJSON> parse( const std::string& content);
 	bool getNodeValue( const void*& element, std::size_t& elementsize);
+	bool getDocType( types::DocType& doctype);
 
 private:
 	std::string m_content;
 	std::string m_encoding;
-	std::string m_doctype;
+	types::DocType m_doctype;
 	boost::shared_ptr<cJSON> m_root;
 
 	struct StackElement

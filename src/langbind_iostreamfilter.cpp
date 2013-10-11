@@ -40,6 +40,7 @@
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
 #include "utils/stringUtils.hpp"
+#include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <fstream>
@@ -304,6 +305,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 				{
 					processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 				}
+				LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
 			}
 		}
 		checkUnconsumedInput( is, *flt.inputfilter());

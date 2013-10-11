@@ -216,6 +216,7 @@ struct InputFilterImpl
 		return false;
 	}
 
+	///\brief Implements InputFilter::getMetadata()
 	virtual bool getMetadata()
 	{
 		try
@@ -262,9 +263,9 @@ private:
 					return true;
 				}
 			}
-			doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
-			doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
-			doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
+			doctype.rootid = m_parser.getDoctypeRoot();
+			doctype.publicid = m_parser.getDoctypePublic();
+			doctype.systemid = m_parser.getDoctypeSystem();
 			return true;
 		}
 		catch (textwolf::SrcIterator::EoM)
@@ -274,11 +275,13 @@ private:
 		};
 	}
 
+	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
 	virtual const char* getEncoding() const
 	{
 		return m_parser.getEncoding();
 	}
 
+	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f)
 	{
 		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
@@ -347,7 +350,11 @@ struct OutputFilterImpl :public OutputFilter
 	virtual void setDocType( const std::string& value)
 	{
 		types::DocType doctype( value);
-		m_printer.setDocumentType( doctype.rootid, doctype.publicid, doctype.systemid);
+		const char* ro = doctype.rootid.empty()?0:doctype.rootid.c_str();
+		const char* pu = doctype.publicid.empty()?0:doctype.publicid.c_str();
+		const char* sy = doctype.systemid.empty()?0:doctype.systemid.c_str();
+		
+		m_printer.setDocumentType( ro, pu, sy);
 	}
 
 	void setEncoding( const std::string& value)

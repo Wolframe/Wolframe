@@ -42,7 +42,7 @@ using namespace _Wolframe::types;
 
 static bool skip( std::string::const_iterator& cc, const std::string::const_iterator& ee)
 {
-	for (;cc != ee && *cc <= ' ' && *cc >= 0; ++cc);
+	for (;cc != ee && (unsigned char)*cc <= 32; ++cc);
 	if (cc == ee) return false;
 	return true;
 }
@@ -59,79 +59,70 @@ static char getbrk( std::string::const_iterator& cc)
 	}
 }
 
-static char* nextid( char*& pp, std::string::const_iterator& cc, const std::string::const_iterator& ee)
+static std::string nextid( std::string::const_iterator& cc, const std::string::const_iterator& ee)
 {
-	char* baseptr = pp;
-	if (!skip( cc, ee)) return 0;
+	std::string rt;
+	if (!skip( cc, ee)) return rt;
 	char eb = getbrk( cc);
 
 	for (;;)
 	{
-		if (ee == cc && eb != ' ') throw std::runtime_error( "incomplete document type definition");
-		if (ee == cc || *cc == eb)
+		if (cc == ee && eb != ' ') throw std::runtime_error( "incomplete document type definition");
+		if (cc == ee || *cc == eb)
 		{
 			if (ee != cc) ++cc;
-			*pp++ = '\0';
-			return baseptr;
+			return rt;
 		}
 		else
 		{
-			*pp++ = *cc++;
+			rt.push_back( *cc++);
 		}
 	}
 }
 
 DocType::DocType()
-	:rootid(0)
-	,publicid(0)
-	,systemid(0)
 {}
 
 DocType::DocType( const std::string& value)
-	:rootid(0)
-	,publicid(0)
-	,systemid(0)
-	,mem(std::malloc( value.size()+1), std::free)
 {
-	char* ptr = (char*)mem.get();
-	char* pp = ptr;
-	if (!ptr) throw std::bad_alloc();
-
 	std::string::const_iterator cc=value.begin(), ee=value.end();
 
-	rootid = nextid( pp, cc, ee);
-	if (!rootid) throw std::runtime_error( "empty document type definition");
-	systemid = nextid( pp, cc, ee);
-	if (systemid && std::strcmp( systemid, "SYSTEM") == 0)
+	rootid = nextid( cc, ee);
+	if (rootid.empty()) throw std::runtime_error( "empty document type definition");
+	systemid = nextid( cc, ee);
+	if (!systemid.empty())
 	{
-		// ... tolerant parsing of XML identifiers in the DOCTYPE declaration
-		systemid = nextid( pp, cc, ee);
-		if (!systemid) throw std::runtime_error( "missing elements in document type definition");
-	}
-	else if (systemid && std::strcmp( systemid, "PUBLIC") == 0)
-	{
-		// ... tolerant parsing of XML identifiers in the DOCTYPE declaration
-		publicid = nextid( pp, cc, ee);
-		systemid = nextid( pp, cc, ee);
-		if (!publicid || !systemid) throw std::runtime_error( "missing elements in document type definition");
-	}
-	else if (systemid)
-	{
-		char* tt = nextid( pp, cc, ee);
-		if (tt)
+		if (systemid == "SYSTEM")
 		{
-			publicid = systemid;
-			systemid = tt;
+			// ... tolerant parsing of XML identifiers in the DOCTYPE declaration
+			systemid = nextid( cc, ee);
+			if (systemid.empty()) throw std::runtime_error( "missing elements in document type definition");
+		}
+		else if (systemid == "PUBLIC")
+		{
+			// ... tolerant parsing of XML identifiers in the DOCTYPE declaration
+			publicid = nextid( cc, ee);
+			systemid = nextid( cc, ee);
+			if (systemid.empty() || publicid.empty()) throw std::runtime_error( "missing or empty elements in document type definition");
+		}
+		else
+		{
+			std::string tt = nextid( cc, ee);
+			if (!tt.empty())
+			{
+				publicid = systemid;
+				systemid = tt;
+			}
 		}
 	}
 	if (skip( cc, ee)) throw std::runtime_error( "too many elements in document type definition");
 }
 
-static void appendstr( std::string& rt, const char* str)
+static void appendstr( std::string& rt, const std::string& str)
 {
-	if (std::strchr( str, '"'))
+	if (std::strchr( str.c_str(), '"'))
 	{
-		if (std::strchr( str, '\'')) throw std::runtime_error("illegal doctype definition (quotes)");
+		if (std::strchr( str.c_str(), '\'')) throw std::runtime_error("illegal doctype definition (quotes)");
 		rt.append( " \'");
 		rt.append( str);
 		rt.append( "\'");
@@ -147,16 +138,16 @@ static void appendstr( std::string& rt, const char* str)
 std::string DocType::tostring() const
 {
 	std::string rt;
-	if (rootid)
+	if (!rootid.empty())
 	{
 		rt.append( rootid);
-		if (publicid)
+		if (!publicid.empty())
 		{
 			rt.append( " PUBLIC ");
 			appendstr( rt, publicid);
-			appendstr( rt, systemid?systemid:"");
+			appendstr( rt, systemid);
 		}
-		else if (systemid)
+		else if (!systemid.empty())
 		{
 			rt.append( " SYSTEM ");
 			appendstr( rt, systemid);
