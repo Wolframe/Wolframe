@@ -113,8 +113,20 @@ run:
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXSLT
+	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
+!ENDIF
 !IFDEF WITH_LUA
-	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
+	@-echo copy "$(LUA_DIR)\src\lua52.dll" . >> test.bat
+!ENDIF
+!IFNDEF DEBUG
+	@-echo copy "$(PYTHON_DIR)\libs\python33.dll" . >> test.bat
+!ELSE
+	@-echo copy "$(PYTHON_DIR)\libs\python33_d.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe iproc example... >> test.bat
 	@-echo iprocd.exe -c iproc.conf >> test.bat
