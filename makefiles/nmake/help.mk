@@ -24,7 +24,7 @@ WITH_EXAMPLES=1        build and test the examples
 WITH_LIBHPDF=1         build code for creating PDFs with LibHpdf
 WITH_ICU=1             build code using ICU (icu4c)
 WITH_FREEIMAGE=1       build modules using FreeImage
-WITH_CJSON =1          build filtering module for JSON with cjson
+WITH_CJSON=1           build filtering module for JSON with cjson
 
 Avaliable optional features during testing only:
 
