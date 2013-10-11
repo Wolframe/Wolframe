@@ -191,6 +191,12 @@ Project Wolframe.
 								<?endif?>
 							</Component>
 							<?endif?>
+
+							<Component Id="MsvcRuntime" Guid="{3211be9c-9df7-4372-94f6-cdf0c8b1b630}">
+								<File Id="msvcp100d.dll" Name="msvcp100d.dll" DiskId="1" Source="C:\windows\system32\msvcp100d.dll"/>
+								<File Id="msvcr100d.dll" Name="msvcr100d.dll" DiskId="1" Source="C:\windows\system32\msvcr100d.dll"/>
+							</Component>
+							
 						</Directory>
 
 						<Directory Id="ConfigDir" Name="config">
@@ -437,6 +443,7 @@ Project Wolframe.
 				<ComponentRef Id="ServiceRegistryEntries"/>
 				<ComponentRef Id="EventLogDlls"/>
 				<ComponentRef Id="EventLogRegistryEntries"/>
+				<ComponentRef Id="MsvcRuntime"/>
 				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
 				<?endif?>
