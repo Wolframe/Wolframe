@@ -1,0 +1,4 @@
+
+COMMAND ( process Document )
+    FILTER INPUT ( myXsltInputFilter ) CALL ( doProcessDocument )
+    RETURN ( Document );

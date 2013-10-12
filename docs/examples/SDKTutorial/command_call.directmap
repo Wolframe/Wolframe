@@ -1,0 +1,2 @@
+
+COMMAND insert Document CALL doInsertDocument;

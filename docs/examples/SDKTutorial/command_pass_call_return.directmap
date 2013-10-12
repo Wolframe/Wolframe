@@ -1,0 +1,2 @@
+
+COMMAND process Document PASS CALL doProcessDocument RETURN Document;

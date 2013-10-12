@@ -30,8 +30,8 @@
 	</sect2>
 
 	<sect2>
-	<title>Example Command Map Description</title>
-	<para>The following source example could be one of a <code>example.dmap</code> in the configuration example 
+		<title>Example Command Description</title>
+		<para>The following source example could be one of a <code>example.dmap</code> in the configuration example 
 		introduced above. It defines two commands. The first one links a command "insert" with document type
 		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
 		automatically against a form named "Customer" if not explicitely defined else. 
@@ -48,93 +48,165 @@
 	</sect2>
 
 	<sect2>
-	<title>Language Description</title>
+	<title>Command Description Language</title>
 	<para>
-		The direct map commands are assignments to names identifying the document type (XML DOCTYPE declaration).
-		If not spezified in the command argument this name identyfies also the form used for input validation.
-		After the '=' follows a function call declation with a command identifier followed by a single argument
-		in '(' ')' brackets. The argument is an identifier naming the inputfilter optionally followed by ':' and
-		an identifier specifying the name of the Input form used for validation.
-		After the closing function call bracket ')' follows optionally a name of the data form used
-		to validate and serialize the function call output.
+		A command map description file like our example shown consists of instructions started with 
+		<code>COMMAND</code> and terminated by semicolon ';'. The first argument after <code>COMMAND</code> is the name of the
+		command followed by the name of the document type of the input document. The name of the command
+		is optional. If not specified the first argument after <code>COMMAND</code> names the input document type.
+
+		<sect4>
+			<title>Simple Document Map</title>
+			<para>
+				The following example shows the simplest possible declaration. It declares that documents with
+				document type "Document" are forwarded to a function with the same name "Document".
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/doctype_only.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Command with Action Prefix</title>
+			<para>
+				The next example adds a action name to the declaration. The implicit name of the function called is
+				insertDocument:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_only.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Explicit Function Name Declaration</title>
+			<para>
+				For declaring the function called explicitely like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Returned Document Declaration</title>
+			<para>
+				The document type returned is specified with <code>RETURN &lt;doctype&gt;</code>:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_only_return.directmap" parse="text" />
+				</programlisting>
+				or with explicit naming of a function called
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call_return.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Passing Over Document Validation</title>
+			<para>
+				If you want to pass over the input document validation, either because you are dealing
+				with legacy software where a strict definition of a schema is not possible or
+				because the function called has strict typeing and validates input on its own (.NET,C++),
+				then you can add a declaration <code>PASS</code>:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_pass_call_return.directmap" parse="text" />
+				</programlisting>
+				The same you can specify for the output in the <code>RETURN</code> declaration:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call_return_pass.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Explicit Filter Definitions for a Command</title>
+			<para>
+				For most of the Processing the standard filters declared in the command handler configuration
+				are enough. But in certain cases you want to explictely declare a filter for a command, for
+				example for preprocessing a certain document type with an XSLT filter. Explicitely declared
+				filters always refer to a document format and documents of other formats have to be converted
+				first or they cannot be preprocessed. The conversions mechanisms we will explain in detail
+				later. Explicit filter declarations are done with
+				<itemizedlist>
+				<listitem><para><code>FILTER &lt;name&gt;</code> or</para></listitem>
+				<listitem><para><code>FILTER INPUT &lt;inputfiltername&gt;</code> or</para></listitem>
+				<listitem><para><code>FILTER OUTPUT &lt;outputfiltername&gt;</code> or</para></listitem>
+				<listitem><para><code>FILTER INPUT &lt;inputfiltername&gt; OUTPUT &lt;outputfiltername&gt;</code></para></listitem>
+				</itemizedlist>
+				Here is an example:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_filter_call_return.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Using Brackets</title>
+			<para>
+				For better readability you can use optional '(' ')' brackets on the arguments. This way you can distinguish
+				better between keywords and arguments:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_with_arg_brackets.directmap" parse="text" />
+				</programlisting>
+			</para>
+		</sect4>
 	</para>
-	</sect2>
+		<sect3>
+		<title>Overview</title>
+		<para>Each command declaration has as already explained the form
+		<itemizedlist>
+		<listitem><para><code>COMMAND &lt;doctype&gt; [OPTIONS] ;</code> or</para></listitem>
+		<listitem><para><code>COMMAND &lt;action&gt; &lt;doctype&gt; [OPTIONS] ;</code></para></listitem>
+		</itemizedlist>
+		The following table shows an overview of the elements that can be used in the <code>[OPTIONS]</code> part of the command:
 
-	<sect2>
-	<title>Syntax as EBNF</title>
-	<para>
-		<productionset>
-		<title>Tokens</title>
+		<table frame="all" width="80%">
+			<title>Options</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Keywords</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
 
-		<production xml:id="dmIdentifier" continuation='restarts'>
-		<lhs>Identifier</lhs>
-		<rhs>
-			( ['A'-'Z'] | ['a'-'z'] | ['0'-'9'] | '_' ) +
-		</rhs>
-		</production>
+			<tbody>
+				<row>
+					<entry>CALL</entry>
+					<entry>Function Name</entry>
+					<entry>Names the function to be called for processing the request</entry>
+				</row>
+				<row>
+					<entry>RETURN</entry>
+					<entry>Document Type</entry>
+					<entry>Specifies the type of the document returned and forces validation of the output</entry>
+				</row>
+				<row>
+					<entry>RETURN PASS</entry>
+					<entry>Document Type</entry>
+					<entry>Specifies the type of the document returned but passes over validation of the output</entry>
+				</row>
+				<row>
+					<entry>PASS</entry>
+					<entry>(no arguments)</entry>
+					<entry>Specifies the input document validation to be passed over</entry>
+				</row>
+				<row>
+					<entry>FILTER INPUT</entry>
+					<entry>Filter Name</entry>
+					<entry>Specifies that the filter &lt;Name&gt; should be used as input filter</entry>
+				</row>
+				<row>
+					<entry>FILTER OUTPUT</entry>
+					<entry>Filter Name</entry>
+					<entry>Specifies that the filter &lt;Name&gt; should be used as output filter</entry>
+				</row>
+				<row>
+					<entry>FILTER</entry>
+					<entry>Filter Name</entry>
+					<entry>Specifies that the filter &lt;Name&gt; should be used as input and output filter</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 
-		<production xml:id="dmFilter">
-		<lhs>Filter</lhs>
-		<rhs>
-			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
-		</rhs>
-		</production>
-
-		<production xml:id="dmFunction">
-		<lhs>Function</lhs>
-		<rhs>
-			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
-		</rhs>
-		</production>
-
-		<production xml:id="dmForm">
-		<lhs>Form</lhs>
-		<rhs>
-			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
-		</rhs>
-		</production>
-		</productionset>
-
-		<productionset>
-		<title>Declarations</title>
-
-		<production xml:id="dmCall">
-		<lhs>Call</lhs>
-		<rhs>
-			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
-			'='
-			<nonterminal def="#dmFunction">Function</nonterminal>
-			'('
-				<nonterminal def="#dmFilter">Filter</nonterminal>
-				(
-					( ':' <nonterminal def="#dmForm">Form</nonterminal> )
-				|
-				)
-			')'
-			(
-				( ':' <nonterminal def="#dmForm">Form</nonterminal> )
-			|
-			)
-		</rhs>
-		</production>
-
-		<production xml:id="dmProgram">
-		<lhs>Program</lhs>
-		<rhs>
-			(
-			  (
-			    <nonterminal def="#dmCall">Call</nonterminal>
-			    <nonterminal def="#dmProgram">Program</nonterminal>
-			  )
-			|
-			  <nonterminal def="#dmCall">Call</nonterminal>
-			)
-		</rhs>
-		</production>
-
-		</productionset>
-
-	</para>
+		</para>
+		</sect3>
 	</sect2>
 	<para></para>
 </sect1>
