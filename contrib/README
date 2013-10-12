@@ -1,5 +1,7 @@
 various development tools:
 
-create_qtcreator_files.sh	- create *.files for qtcreator
-valgrind-suppressions		- known problems when testing
-				  with valgrind memcheck/leakcheck
+create_qtcreator_files.sh   - create *.files for qtcreator
+valgrind-suppressions       - known problems when testing
+                              with valgrind memcheck/leakcheck
+bildWin.bat                 - convenience build script for Windows
+
