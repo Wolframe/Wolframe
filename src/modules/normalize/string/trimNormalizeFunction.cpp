@@ -38,21 +38,28 @@ using namespace langbind;
 
 types::Variant TrimNormalizeFunction::execute( const types::Variant& inp) const
 {
-	std::string str( inp.tostring());
-	std::string::const_iterator ii = str.begin(), ee = str.end();
-	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-	std::string::const_iterator ti = ii, te = ii;
-	for (; ii != ee; ++ii)
+	if (inp.type() == types::Variant::String)
 	{
-		if ((unsigned char)*ii > 32) te = ii+1;
-	}
-	if (ti == str.begin() && te == str.end())
-	{
-		return str;
+		std::string str( inp.tostring());
+		std::string::const_iterator ii = str.begin(), ee = str.end();
+		while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+		std::string::const_iterator ti = ii, te = ii;
+		for (; ii != ee; ++ii)
+		{
+			if ((unsigned char)*ii > 32) te = ii+1;
+		}
+		if (ti == str.begin() && te == str.end())
+		{
+			return str;
+		}
+		else
+		{
+			return std::string( ti, te);
+		}
 	}
 	else
 	{
-		return std::string( ti, te);
+		return inp;
 	}
 }
 

@@ -6,6 +6,7 @@
 		<title>Grammars</title>
 		<para>
 		&SDK_EBNF_TDL;
+		&SDK_EBNF_Normalizer;
 		</para>
 	</sect1>
 </appendix>

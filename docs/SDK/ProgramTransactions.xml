@@ -1,11 +1,16 @@
 <sect1>
-<title>Defining Database Transactions</title>
+<title>Database Transaction Functions</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>
-			For the description of transactions <code>Wolframe</code> provides the definition language (TDL) introduced here.
+			For the description of transactions <code>Wolframe</code> provides the
+			transaction definition language (TDL) introduced here.
 			<code>Wolframe</code> transactions in TDL are defined as functions in a transactional context.
-			This means that whatever is executed in a transaction function belongs by default to a transaction with an auto-commit on function completion if not explicitely defined otherwise by the caller.
+			This means that whatever is executed in a transaction function belongs by default to 
+			a transaction with an auto-commit on function completion if not explicitely defined otherwise 
+			by the caller.
+		</para>
+		<para>
 			A TDL transaction function takes a structure as input and returns a structure as output.
 			The <code>Wolframe</code> database interface defines a transaction as context where input is passed as structure and the output is fetched from as structure.
 			The TDL is a programming language to describe the building of transaction input and the building of the result structure from the database output.

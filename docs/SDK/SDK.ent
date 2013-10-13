@@ -23,5 +23,6 @@
 
 
 <!ENTITY SDKappendix			SYSTEM "Appendix.xml">
-<!ENTITY SDK_EBNF_TDL			SYSTEM "TransactionDefinitionLanguageEBNF.xml">
+<!ENTITY SDK_EBNF_TDL			SYSTEM "EBNF_TransactionDefinitionLanguage.xml">
+<!ENTITY SDK_EBNF_Normalizer		SYSTEM "EBNF_Normalizer.xml">
 <!ENTITY SDKglossary			SYSTEM "Glossary.xml">

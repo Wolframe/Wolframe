@@ -24,9 +24,9 @@
 	</para>
 	</sect2>
 	<sect2>
-	<title>Define Forms in Simple Form DDL</title>
+	<title>Define Forms in Simpleform DDL</title>
 	<para>
-		As example of a form DDL we provide the "Simple Form DDL" as example. The format is based on the "INFO"-format
+		As example of a form DDL we provide the <code>simpleform</code> DDL" as example. The format is based on the "INFO"-format
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
 		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
@@ -39,7 +39,7 @@
 		After this header follows the structure declaration inside curly brackets '{' '}'.
 	</para>
 	<para>
-		There is only one predefined data type known in Simple Form DDL: "string".
+		There is only one predefined data type known in <code>simpleform</code> DDL: "string".
 		All other data types are defined as sequence of 'normalizer' functions in a normalize definition file.
 		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
 	</para>
@@ -62,7 +62,7 @@
 		the embedded elements of the substructure.
 	</para>
 	<para>
-		The following example shows a form defined in simple form DDL.
+		The following example shows a form defined in <code>simpleform</code> DDL.
 		<programlisting language='text'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.simpleform" parse="text" />
 		</programlisting>

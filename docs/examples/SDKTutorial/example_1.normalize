@@ -2,4 +2,4 @@
 int=string:trim,number:integer;
 uint=string:trim,number:unsigned;
 float=string:trim,number:float;
-name=string:lcname;
+name=string:trim,lcname;
