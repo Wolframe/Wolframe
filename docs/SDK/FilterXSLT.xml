@@ -1,0 +1,42 @@
+<sect1>
+<title>XSLT Filter</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>You can use <code>XSLT</code> for data filters in the logic tier of <code>Wolframe</code>.
+	The <code>XSLT</code> filter of <code>Wolframe</code> for is based on <code>libxml2</code> 
+	(<link>http://www.xmlsoft.org</link>).
+	</para>
+	</sect2>
+	
+	<sect2>
+	<title>Character Set Encodings</title>
+	<para>Without explicitely specified, the <code>XSLT</code> filter support the following character set 
+	encodings. For character set encodings that are not in the list, please ask the <code>Wolframe</code> team.
+	<itemizedlist>
+	<listitem><para><code>UTF-8</code> or</para></listitem>
+	<listitem><para><code>UTF-16LE</code> or</para></listitem>
+	<listitem><para><code>UTF-16</code> (<code>UTF-16BE</code>) or</para></listitem>
+	<listitem><para><code>UTF-32LE</code> (<code>UCS-4LE</code>) or</para></listitem>
+	<listitem><para><code>UTF-32</code> (<code>UTF-32BE</code> or <code>UCS-4BE</code>) or</para></listitem>
+	</itemizedlist>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Configuration</title>
+	<para>For using an XSLT filter based <code>libxml2</code>, you have to load the module 'mod_filter_libxml2'.
+	For this you add the following line to the LoadModules section of your <code>Wolframe</code> configuration:
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_libxml2.conf" parse="text" />
+		</programlisting>
+	</para>
+	<para>You also have to add the program of the XSLT filter into the Processor section of the configuration.
+	The name of the filter is the filename of the XSLT filter program without path and extension. In our example
+	the filter would be named invoice_ISOxxxx:
+	<programlisting language='text'>
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_program_xslt.conf" parse="text" />
+	</programlisting>
+	</para>
+	</sect2>
+</sect1>
+

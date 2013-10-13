@@ -1,0 +1,47 @@
+<sect1>
+<title>XML Filter</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>You can use <code>XML</code> for data filters in the logic tier of <code>Wolframe</code>.
+	There are the following variants of <code>XML</code> filters available:
+	<itemizedlist>
+	<listitem><para><code>libxml2</code> (<link>http://www.xmlsoft.org</link>) or</para></listitem>
+	<listitem><para><code>textwolf</code> (<link>http://www.textwolf.net</link>)</para></listitem>
+	</itemizedlist>	
+	</para>
+	</sect2>
+	
+	<sect2>
+	<title>Character Set Encodings</title>
+	<para>The <code>libxml2</code> and the <code>textwolf</code> filter support at least 
+	the following character set encodings. For character set encodings that are not in the list, 
+	please ask the <code>Wolframe</code> team.
+	<itemizedlist>
+	<listitem><para><code>UTF-8</code> or</para></listitem>
+	<listitem><para><code>UTF-16LE</code> or</para></listitem>
+	<listitem><para><code>UTF-16</code> (<code>UTF-16BE</code>) or</para></listitem>
+	<listitem><para><code>UTF-32LE</code> (<code>UCS-4LE</code>) but only with <code>textwolf</code> or</para></listitem>
+	<listitem><para><code>UTF-32</code> (<code>UTF-32BE</code> or <code>UCS-4BE</code>) or</para></listitem>
+	<listitem><para><code>ISO 8859</code> (codepages '1' to '9')</para></listitem>
+	</itemizedlist>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Configuration</title>
+	<para>For using an XML filter based <code>libxml2</code>, you have to load the module 'mod_filter_libxml2'.
+	For this you add the following line to the LoadModules section of your <code>Wolframe</code> configuration:
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_libxml2.conf" parse="text" />
+		</programlisting>
+	</para>
+	<para>
+	For using an XML filter based <code>textwolf</code>, you have to load the module 'mod_filter_textwolf'.
+	For this you add the following line to the LoadModules section of your <code>Wolframe</code> configuration:
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_textwolf.conf" parse="text" />
+		</programlisting>
+	</para>
+	</sect2>
+</sect1>
+

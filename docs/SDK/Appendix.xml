@@ -1,9 +1,11 @@
 <!-- Appendix -->
 <appendix>
-	<title>Appendix for the SDK</title>
+	<title>Language Grammars</title>
 
 	<sect1>
-		<title>Appendix SDK</title>
-		<para></para>
+		<title>Grammars</title>
+		<para>
+		&SDK_EBNF_TDL;
+		</para>
 	</sect1>
 </appendix>

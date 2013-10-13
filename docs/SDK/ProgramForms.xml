@@ -1,12 +1,9 @@
 <sect1>
-<title>Defining Forms</title>
+<title>Form Data Definition Languages</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>Forms can be defined in a module as native C++ structure. In this shape they are used in APIs
-		for built-in functions implemented in modules.
-	</para>
 	<para>
-		Forms can also be defined in a DDL (Data Definition Language).
+		Form data structures can be defined in a DDL (Data Definition Language).
 		It depends very much on the application what DDL is best to use.
 		Users may already have their data definitions in a certain way defined.
 		The form DDL can be defined in the way you want. Wolframe offers a
@@ -71,28 +68,7 @@
 		</programlisting>
 	</para>
 	</sect2>
-	<sect2>
-	<title>Define Forms in C++ for built-in function APIs</title>
-	<para>For defining forms in C++ you have to define the structure and its serialization description.
-		The serialization description is a static function <code>getStructDescription</code> without arguments returning a const structure that describes what element names to bind on what structure elements.
-	</para>
-	<para>
-		The following example shows a form defined in C++.
-		<sect3>
-		<para>Header file "customers.hpp": Declare the structure and the serialization description of the structure.
-		Structures may contain structures with ther own serialization description.</para>
-		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.hpp" parse="text" />
-		</programlisting>
-		</sect3>
-		<sect3>
-		<para>Source file "customers.cpp". Declare 'ID' as attribute and name, canonical_Name, country, locality as tags. The '--' operator marks the end of attributes section and the start of content section.</para>
-		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.cpp" parse="text" />
-		</programlisting>
-		</sect3>
-	</para>
-	</sect2>
 	<para></para>
 </sect1>
 <beginpage/>
+

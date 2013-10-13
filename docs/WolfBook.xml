@@ -120,15 +120,15 @@
 
 		&SDKintroduction;
 		&SDKcmdhandlers;
-		&SDKprograms;
-		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
-		&SDKappendix;
-		-->
+		&SDKfunctions;
+		&SDKforms;
+		&SDKfilters;
 		&SDKglossary;
 
 		<index>
 			<title>Index</title>
 		</index>
+		&SDKappendix;
 		&GPLlicense;
 	</book>
 </set>

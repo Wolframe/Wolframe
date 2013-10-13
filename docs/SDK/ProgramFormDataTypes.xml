@@ -1,5 +1,5 @@
 <sect1>
-<title>Defining Data Types for DDL Forms</title>
+<title>Defining Data Structures for Forms</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>Forms defined by DDLs are typed. The only predefined type is 'string' that is neither

@@ -1,0 +1,19 @@
+<chapter>
+<title>Functions</title>
+<para>This chapter describes how functions are linked to the logic tier. It introduces a language to write
+database transaction functions and a language to describe atomic data type normalizations and gives an overview
+on the language bindings available for Wolframe.
+</para>
+<para>
+After reading this chapter you should be able to write functions of the <code>Wolframe</code> logic tier on your own.
+</para>
+<para>
+Be aware that you have to configure a programming language of the logic tier in <code>Wolframe</code>
+before using it. Each chapter introducing a programming language will have a section that describes how the server
+configuration of <code>Wolframe</code> has to be extended for its availability.
+</para>
+	&SDKprogramTransactions;
+	&SDKprogramFormDataTypes;
+	&SDKprogramLua;
+	&SDKprogramCpp;
+</chapter>

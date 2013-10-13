@@ -8,13 +8,20 @@
 <!ENTITY SDKcmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">
 <!ENTITY SDKcmdhandlerLua		SYSTEM "CmdHandlerLua.xml">
 
-<!ENTITY SDKprograms			SYSTEM "Programs.xml">
+<!ENTITY SDKfunctions			SYSTEM "Functions.xml">
+<!ENTITY SDKforms			SYSTEM "Forms.xml">
+<!ENTITY SDKfilters			SYSTEM "Filters.xml">
 <!ENTITY SDKprogramForms		SYSTEM "ProgramForms.xml">
 <!ENTITY SDKprogramFormDataTypes	SYSTEM "ProgramFormDataTypes.xml">
 <!ENTITY SDKprogramTransactions		SYSTEM "ProgramTransactions.xml">
 <!ENTITY SDKprogramLua			SYSTEM "ProgramLua.xml">
-<!ENTITY SDKmodelTypedFilter	SYSTEM "ModelTypedFilter.xml">
+<!ENTITY SDKprogramCpp			SYSTEM "ProgramCpp.xml">
+<!ENTITY SDKmodelTypedFilter		SYSTEM "ModelTypedFilter.xml">
+<!ENTITY SDKfilterXML			SYSTEM "FilterXML.xml">
+<!ENTITY SDKfilterJSON			SYSTEM "FilterJSON.xml">
+<!ENTITY SDKfilterXSLT			SYSTEM "FilterXSLT.xml">
+
 
 <!ENTITY SDKappendix			SYSTEM "Appendix.xml">
-
+<!ENTITY SDK_EBNF_TDL			SYSTEM "TransactionDefinitionLanguageEBNF.xml">
 <!ENTITY SDKglossary			SYSTEM "Glossary.xml">
