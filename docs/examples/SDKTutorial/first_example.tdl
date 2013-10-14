@@ -1,6 +1,5 @@
 
 TRANSACTION insertItem
-AUTHORIZE (data,user)
 BEGIN
 	INTO user
 		DO UNIQUE NONEMPTY SELECT id FROM UserTable
@@ -9,4 +8,3 @@ BEGIN
 		DO INSERT INTO ItemTable (ownerid,name)
 			VALUES ($1,$(name));
 END
-

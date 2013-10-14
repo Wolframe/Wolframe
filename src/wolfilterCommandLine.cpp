@@ -454,7 +454,7 @@ void WolfilterCommandLine::print( std::ostream& out)
 {
 	static const WolfilterOptionStruct ost;
 	out << "Call:" << std::endl;
-	out << "\twolfilter [OPTION] <cmd> <inputfilter> <outputfilter>" << std::endl;
+	out << "\twolfilter [OPTION] <cmd>" << std::endl;
 	out << ost.fopt << std::endl;
 }
 

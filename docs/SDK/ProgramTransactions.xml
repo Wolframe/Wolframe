@@ -1,17 +1,17 @@
 <sect1>
-<title>Database Transaction Functions</title>
+<title>Database Transaction Functions (TDL)</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>
 			For the description of transactions <code>Wolframe</code> provides the
-			transaction definition language (TDL) introduced here.
-			<code>Wolframe</code> transactions in TDL are defined as functions in a transactional context.
-			This means that whatever is executed in a transaction function belongs by default to 
-			a transaction with an auto-commit on function completion if not explicitely defined otherwise 
-			by the caller.
+			transaction definition language (<code>TDL</code>) introduced here.
+			<code>Wolframe</code> transactions in <code>TDL</code> are defined as functions in a
+			transactional context. This means that whatever is executed in a transaction function
+			belongs by default to a transaction with an auto-commit on function completion
+			if not explicitely defined otherwise by the caller.
 		</para>
 		<para>
-			A TDL transaction function takes a structure as input and returns a structure as output.
+			A <code>TDL</code> transaction function takes a structure as input and returns a structure as output.
 			The <code>Wolframe</code> database interface defines a transaction as context where input is passed as structure and the output is fetched from as structure.
 			The TDL is a programming language to describe the building of transaction input and the building of the result structure from the database output.
 			It defines a transaction as a sequence of database operations. A database operation is either a single embedded database instruction in the language of the underlaying database, a name of a procedure declared in the database or a block of operations delared with OPERATION. It adds some constructs to address input structure elements or database command results as arguments.
@@ -24,43 +24,49 @@
 			preprocessing section where wolframe functions defined can be called for selected input.
 		</para>
 		<para>
-			The TDL is case insensitive. For clearness and better readability TDL keywords are written in uppercase here.
+			The TDL is case insensitive. For clearness and better readability TDL keywords are written in
+			uppercase here.
 		</para>
 	</sect2>
 	<sect2>
-		<title>First example</title>
+		<title>Examples</title>
+		<sect3>
+		<title>First</title>
 		<para>This example selects a key from a table and uses it for an insert into a list. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
-		<title>Example with pre-processing input</title>
+		</sect3>
+		<sect3>
+		<title>Preprocessing Input</title>
 		<para>The example selects are id's depending on a normalized name. The normalization is done in a preprocessing step
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/preprocess_example.tdl" parse="text" />
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
-		<title>Example with pre-processing input and using variables in database commands</title>
+		</sect3>
+		<sect3>
+		<title>Using Variables</title>
 		<para>The example returns the 'id' of a country depending on a normalized name. The normalization is done in a preprocessing step. The result is printed into a structure country/code;
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/variable_example.tdl" parse="text" />
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
-		<title>Example calling operations</title>
+		</sect3>
+		<sect3>
+		<title>Operations (Subroutines)</title>
 		<para>The example calls an operation with one argument to map the output.
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/operation_example.tdl" parse="text" />
 		</programlisting>
 		</para>
+		</sect3>
 	</sect2>
 	<sect2>
-		<title>Description of keywords</title>
+	<title>Language Description</title>
+		<sect3>
+		<title>Keywords</title>
 		<para>
 			<simplelist type="horiz" columns="2">
 			<member>TRANSACTION</member><member>Defines a block of statements in the following BEGIN ... END block as transaction.</member>
@@ -81,9 +87,9 @@
 			<member>PRINT</member><member>Declares a print of an argument into the result context of the print declaration scope. The argument can be a variable or result reference but cannot refer to input. The print instruction can use an INTO path as well to declare a target path in the result</member>
 			</simplelist>
 		</para>
-	</sect2>
-	<sect2>
-		<title>Substitutes in database commands and argument lists of operations</title>
+		</sect3>
+		<sect3>
+		<title>Substitutes in Commands</title>
 		<para>
 			List of Substitutes
 			<simplelist type="horiz" columns="3">
@@ -94,6 +100,7 @@
 			<member>$[varname]</member><member>$[id]</member><member>Variable reference refering to a single result or NULL (not a set!) previously in the same scope declared with LET varname = &lt;result column reference&gt;;</member>
 			</simplelist>
 		</para>
+		</sect3>
 	</sect2>
 </sect1>
 

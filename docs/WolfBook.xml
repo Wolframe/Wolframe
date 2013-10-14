@@ -123,6 +123,7 @@
 		&SDKfunctions;
 		&SDKforms;
 		&SDKfilters;
+		&SDKwolfilter;
 		&SDKglossary;
 
 		<index>
