@@ -3,7 +3,7 @@
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <code>Wolframe</code> with <code>C++</code>. 
-		Because <code>C++</code> is supported vy <code>Wolframe</code> only as a compiled and not as 
+		Because <code>C++</code> is supported by <code>Wolframe</code> only as a compiled and not as 
 		an interpreted language, you have to build a module out of your function implementation.
 		</para>
 	</sect2>

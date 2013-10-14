@@ -13,7 +13,9 @@ before using it. Each chapter introducing a programming language will have a sec
 configuration of <code>Wolframe</code> has to be extended for its availability.
 </para>
 	&SDKprogramTransactions;
-	&SDKprogramFormDataTypes;
+	&SDKprogramDotnet;
+	&SDKprogramPython;
 	&SDKprogramLua;
+	&SDKprogramFormDataTypes;
 	&SDKprogramCpp;
 </chapter>
