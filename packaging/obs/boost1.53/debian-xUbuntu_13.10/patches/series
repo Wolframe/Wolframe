@@ -1,0 +1,8 @@
+chrono-duration.patch
+boost-python-examples.patch
+endian.patch
+boost-1.44-py3.1.patch
+pythonid.patch
+mpi-allocator-c++0x.patch
+fix-ftbfs-python-3.3.patch
+gcc4.8_trac-7242.patch

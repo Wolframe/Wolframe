@@ -25,7 +25,7 @@ How to build locally:
 # install osc and build (and all dependencies)
 osc build xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 # careful:
-- local builds need perl-dom-xml and binutis (ar!)
+- local builds need perl-dom-xml and binutils (ar!)
 
 # set use_keyring=0 in the general secion of ~/.oscrc !!
 
@@ -33,7 +33,8 @@ osc build xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 cd home:andreas_baumann/Wolframe
 osc build --noinit --ccache xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 
-# boost backport (for xUbuntu 10.04 and Debian 6.0)
+# boost backport (for xUbuntu 10.04 and Debian 6.0 this is boost 1.49),
+# for xUbuntu 13.10 it is boost 1.53 (because of a missing libboost1.53-dev)
 - debhelper is older on OSC ((>= 4.1.16))
 - no mpi, remove all stuff we don't need to build
 - debian/rules:

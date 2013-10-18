@@ -1,0 +1,31 @@
+Description: [BOOST_STATIC_ASSERT]: GCC 4.8 warns unused local typedef
+ Part of upstream changeset [82886].
+Bug: https://svn.boost.org/trac/boost/ticket/7242
+Origin: https://svn.boost.org/trac/boost/changeset/82886
+
+--- a/boost/static_assert.hpp
++++ b/boost/static_assert.hpp
+@@ -43,6 +43,14 @@
+ #else
+ #  define BOOST_STATIC_ASSERT_BOOL_CAST(x) (bool)(x)
+ #endif
++//
++// If the compiler warns about unused typedefs then enable this:
++//
++#if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
++#  define BOOST_STATIC_ASSERT_UNUSED_ATTRIBUTE __attribute__((unused))
++#else
++#  define BOOST_STATIC_ASSERT_UNUSED_ATTRIBUTE
++#endif
+ 
+ #ifndef BOOST_NO_CXX11_STATIC_ASSERT
+ #  define BOOST_STATIC_ASSERT( B ) static_assert(B, #B)
+@@ -122,7 +130,7 @@
+ #define BOOST_STATIC_ASSERT( B ) \
+    typedef ::boost::static_assert_test<\
+       sizeof(::boost::STATIC_ASSERTION_FAILURE< BOOST_STATIC_ASSERT_BOOL_CAST( B ) >)>\
+-         BOOST_JOIN(boost_static_assert_typedef_, __LINE__)
++         BOOST_JOIN(boost_static_assert_typedef_, __LINE__) BOOST_STATIC_ASSERT_UNUSED_ATTRIBUTE
+ #endif
+ 
+ #else
