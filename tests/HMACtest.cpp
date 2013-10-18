@@ -35,7 +35,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "types/HMAC.hpp"
+#include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
 

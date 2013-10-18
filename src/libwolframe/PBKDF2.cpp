@@ -38,8 +38,8 @@
 #include <cassert>
 #include <stdexcept>
 
-#include "types/PBKDF2.hpp"
-#include "types/PBKDF2.h"
+#include "crypto/PBKDF2.hpp"
+#include "crypto/PBKDF2.h"
 
 #include "types/byte2hex.h"
 #include "types/base64.hpp"

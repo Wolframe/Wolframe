@@ -37,8 +37,8 @@
 #ifndef _HMAC_H_INCLUDED
 #define _HMAC_H_INCLUDED
 
-#include "types/sha1.h"
-#include "types/sha2.h"
+#include "crypto/sha1.h"
+#include "crypto/sha2.h"
 
 #define	HMAC_SHA1_HASH_SIZE		SHA1_DIGEST_SIZE
 #define	HMAC_SHA256_HASH_SIZE		SHA256_DIGEST_SIZE

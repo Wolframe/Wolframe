@@ -39,8 +39,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "types/HMAC.h"
-#include "types/PBKDF2.h"
+#include "crypto/HMAC.h"
+#include "crypto/PBKDF2.h"
 
 int pbkdf2_hmac_sha1( const unsigned char *salt, size_t saltLen,
 		      const unsigned char *password, size_t pwdLen,

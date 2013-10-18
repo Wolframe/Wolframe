@@ -38,7 +38,7 @@
 #include "gtest/gtest.h"
 
 #include "TextFileAuth.hpp"
-#include "types/sha2.h"
+#include "crypto/sha2.h"
 #include "types/byte2hex.h"
 #include "system/globalRngGen.hpp"
 #include <boost/algorithm/string.hpp>

@@ -35,8 +35,8 @@
 ///
 
 #include <string.h>
-#include "types/HMAC.h"
-#include "types/sha2.h"
+#include "crypto/HMAC.h"
+#include "crypto/sha2.h"
 
 #define HMAC_SHA256_BLOCK_SIZE	SHA256_BLOCK_SIZE
 

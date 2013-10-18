@@ -39,7 +39,7 @@
 
 #include <string.h>
 
-#include "types/sha2.h"
+#include "crypto/sha2.h"
 
 #define SHFR(x, n)    (x >> n)
 #define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))

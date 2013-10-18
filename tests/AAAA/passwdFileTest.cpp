@@ -39,7 +39,7 @@
 #include "passwdFile.hpp"
 #include "system/globalRngGen.hpp"
 #include "AAAA/password.hpp"
-#include "types/HMAC.hpp"
+#include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
 using namespace std;
