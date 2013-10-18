@@ -1389,6 +1389,9 @@ fi
 %dir %{_includedir}/wolframe/types/
 %{_includedir}/wolframe/types/*.hpp
 %{_includedir}/wolframe/types/*.h
+%dir %{_includedir}/wolframe/crypto/
+%{_includedir}/wolframe/crypto/*.hpp
+%{_includedir}/wolframe/crypto/*.h
 %dir %{_includedir}/wolframe/AAAA/
 %{_includedir}/wolframe/AAAA/*.hpp
 %dir %{_includedir}/wolframe/module/
