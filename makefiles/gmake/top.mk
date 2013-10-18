@@ -175,7 +175,6 @@ endif
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
 	@echo
 	@echo "using local libhpdf.."
-endif
 	@echo
 	@echo "LIBPNG_DIR: $(LIBPNG_DIR)"
 	@echo "LIBPNG_INCLUDE_DIRS: $(LIBPNG_INCLUDE_DIRS)"
@@ -186,18 +185,6 @@ endif
 	@echo "LIBZ_INCLUDE_DIRS: $(LIBZ_INCLUDE_DIRS)"
 	@echo "LIBZ_LIB_DIRS: $(LIBZ_LIB_DIRS)"
 	@echo "LIBZ_LIBS: $(LIBZ_LIBS)"
-endif
-ifeq ($(WITH_LIBHPDF),1)
-ifeq ($(WITH_SYSTEM_LIBHPDF),1)
-	@echo
-	@echo "LIBHPDF_DIR: $(LIBHPDF_DIR)"
-	@echo "LIBHPDF_INCLUDE_DIRS: $(LIBHPDF_INCLUDE_DIRS)"
-	@echo "LIBHPDF_LIB_DIRS: $(LIBHPDF_LIB_DIRS)"
-	@echo "LIBHPDF_LIBS: $(LIBHPDF_LIBS)"
-endif
-ifeq ($(WITH_LOCAL_LIBHPDF),1)
-	@echo
-	@echo "using local libhpdf.."
 endif
 endif
 ifeq ($(WITH_ICU),1)

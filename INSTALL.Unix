@@ -20,6 +20,7 @@ Table of Contents
     Ubuntu 12.04 LTS
     Ubuntu 12.10
     Ubuntu 13.04
+    Ubuntu 13.10
     Debian 6.0
     Debian 7.0
     OpenSuSE 12.2
@@ -429,6 +430,38 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Use WITH_LOCAL_FREEIMAGE=1 for image manipulation support. The supplied
 version of freeimage-devel is too old.
+
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
+
+For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+For scripting in Python you have to set WITH_PYTHON=1.
+
+Ubuntu 13.10
+------------
+
+Required packages: libboost-dev (1.53), libboost-program-options-dev,
+                   libboost-filesystem-dev, libboost-thread-dev,
+                   libboost-random-dev,  libboost-locale-dev
+
+Optional packages: libssl-dev (1.0.1e),
+                   libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
+                   libsqlite3-dev (3.7.17), libpq-dev (9.1.10),
+                   libxml2-dev (2.9.1), libxslt1-dev (1.1.28)
+                   libpng12-dev (1.2.49), libhpdf-dev (2.2.1),
+                   libfreeimage-dev (3.15.1), python3-dev (3.3.2)
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
