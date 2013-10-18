@@ -271,12 +271,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "redhat"
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
-XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
@@ -489,16 +483,6 @@ endif
 
 endif
 
-# Fedora 17
-ifeq "$(LINUX_DIST)" "redhat"
-ifeq "$(LINUX_REV)" "17"
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
-endif
-endif
-
 # Fedora 18
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "18"
@@ -650,11 +634,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -829,14 +808,6 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
 
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
@@ -1029,14 +1000,6 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 SASL_DIR ?= /usr
@@ -1219,14 +1182,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1458,14 +1413,6 @@ PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIBS ?= -lpq
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 PGSQL_DIR ?= /usr
@@ -1677,16 +1624,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1922,16 +1859,6 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 LIBXSLT_DIR ?= /usr
@@ -2126,16 +2053,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
@@ -2400,16 +2317,6 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 LIBPNG_DIR ?= /usr
@@ -2639,16 +2546,6 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
 LIBZ_DIR ?= /usr
@@ -2870,16 +2767,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-ICU_DIR ?= /usr
-ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
-ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
-ICU_LIB_DIR ?= $(ICU_DIR)/lib
-ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
-ICU_LIBS ?=
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
@@ -3152,16 +3039,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM

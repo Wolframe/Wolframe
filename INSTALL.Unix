@@ -13,7 +13,6 @@ Table of Contents
   Build instructions for specific Linux Distributions
     RHEL/Centos/SL 5
     RHEL/Centos/SL 6
-    Fedora 17
     Fedora 18
     Fedora 19
     Ubuntu 10.04.1 LTS
@@ -186,38 +185,6 @@ For building the documentation you need 'libxslt', 'doxygen' and
 For scripting in Python you have to set WITH_PYTHON=1. There are no
 official Python 3 packages for this platform, so build your own python there.
 Make sure 'python3-config' is in your path.
-
-Fedora 17
----------
-
-No problems with the supplied packages at all, everything builds out of the box:
-
-Required pacakges: boost-devel (1.48.0)
-Optional packages: openssl-devel (1.0.0j)
-                   pam-devel (1.1.5), cyrus-sasl-devel (2.1.23),
-                   sqlite-devel (3.7.11), postgresql-devel (9.1.5),
-                   libxml2-devel (2.7.8), libxslt-devel (1.1.26),
-                   libpng-devel (1.2.48), zlib-devel (1.2.5),
-                   python3-devel (3.2.3)
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
-For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
-For building the PDF wolfbook install 'fop'.
-
-When rebuilding the SVG images of the documentation you also need 'dia'.
-
-For running non-gtest tests you need 'expect' (5.45).
-
-For running the Sasl AAAA tests you need 'sasl2-bin'.
-
-For running the Postgresql database tests you need 'postgresql-client'.
-
-For running the Sqlite3 database tests you need 'sqlite3'.
-
-For running some tests you need 'telnet' (0.17).
-
-For scripting in Python you have to set WITH_PYTHON=1.
 
 Fedora 18
 ---------
