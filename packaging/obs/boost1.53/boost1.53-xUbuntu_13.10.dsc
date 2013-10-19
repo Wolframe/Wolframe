@@ -60,4 +60,4 @@ Package-List:
  libboost1.53-doc deb doc optional
  libboost1.53-tools-dev deb libdevel optional
 Files: 
- a00d22605d5dbcfb4c9936a9b35bc4c2 55765258 boost1.53_1.53.0.orig.tar.bz2
+ 57a9e2047c0f511c4dfcf00eb5eb2fbb 66562166 boost1.53_1.53.0.orig.tar.gz
