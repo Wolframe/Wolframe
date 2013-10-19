@@ -4,7 +4,7 @@ Binary: libboost1.53-dbg, libboost1.53-dev, libboost1.53-tools-dev, libboost1.53
  libboost-thread1.53.0, libboost-thread1.53-dev, libboost-timer1.53.0, libboost-timer1.53-dev, libboost-wave1.53.0,
  libboost-wave1.53-dev
 Architecture: any all
-Version: 1.53.0-6+exp3ubuntu8
+Version: 1.53.0-xUbuntu13.10
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Uploaders: Steve M. Robbins <smr@debian.org>
 Homepage: http://www.boost.org/
@@ -59,12 +59,5 @@ Package-List:
  libboost1.53-dev deb libdevel optional
  libboost1.53-doc deb doc optional
  libboost1.53-tools-dev deb libdevel optional
-Checksums-Sha1: 
- e6dd1b62ceed0a51add3dda6f3fc3ce0f636a7f3 55765258 boost1.53_1.53.0.orig.tar.bz2
- 7931fa1cd224bdbb175ed46c123638706bec6cde 115697 boost1.53_1.53.0-6+exp3ubuntu8.debian.tar.gz
-Checksums-Sha256: 
- f88a041b01882b0c9c5c05b39603ec8383fb881f772f6f9e6e6fd0e0cddb9196 55765258 boost1.53_1.53.0.orig.tar.bz2
- 610e741f91beac73ed0e8c37b318140d10473f091b4587581dd3177ad4052c8c 115697 boost1.53_1.53.0-6+exp3ubuntu8.debian.tar.gz
 Files: 
  a00d22605d5dbcfb4c9936a9b35bc4c2 55765258 boost1.53_1.53.0.orig.tar.bz2
- 9d395132a8b62799e36b1fff677304e9 115697 boost1.53_1.53.0-6+exp3ubuntu8.debian.tar.gz

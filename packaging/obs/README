@@ -35,6 +35,10 @@ osc build --noinit --ccache xUbuntu_13.04 x86_64 wolframe-xUbuntu_13.04.dsc
 
 # boost backport (for xUbuntu 10.04 and Debian 6.0 this is boost 1.49),
 # for xUbuntu 13.10 it is boost 1.53 (because of a missing libboost1.53-dev)
+- remove ubuntu specific verision tag, add OBS repository one (more for
+  legal than technical purposes)
+- removed checksums, remove references to debian packgage (as this gets
+  appended by the deploy_xx_to_obs.sh script)
 - debhelper is older on OSC ((>= 4.1.16))
 - no mpi, remove all stuff we don't need to build
 - debian/rules:
