@@ -1,0 +1,41 @@
+Source: libhpdf
+Priority: optional
+Maintainer: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), libpng-dev, libz-dev
+Standards-Version: 3.9.2
+Section: libs
+Homepage: http://www.libharu.org
+Vcs-Git: git://git.debian.org/collab-maint/libharu.git
+Vcs-Browser: http://git.debian.org/?p=collab-maint/libharu.git
+
+Package: libhpdf-dev
+Section: libdevel
+Architecture: any
+Depends: libhpdf-2.2.1 (= ${binary:Version}), ${misc:Depends}
+Description: C library for generating pdf files (development files)
+ Haru is a free, cross platform, open-source C library for generating 
+ PDF files. It supports the following features:
+  1. Generation of PDF files with lines, text and images.
+  2. Outlines, text and link annotations.
+  3. Document compression usig deflate-decode.
+  4. Embedded PNG and Jpeg images.
+  5. Embedded Type1 and TrueType fonts.
+  6. Creation of encrypted PDF files.
+  7. Usage of various character sets (ISO8859-1~16, MSCP1250~8, KOI8-R).
+  8. Support for CJK fonts and encodings.
+ This package contains the header files for developing with libharu.
+
+Package: libhpdf-2.2.1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: C library for generating pdf files
+ Haru is a free, cross platform, open-source C library for generating 
+ PDF files. It supports the following features:
+  1. Generation of PDF files with lines, text and images.
+  2. Outlines, text and link annotations.
+  3. Document compression usig deflate-decode.
+  4. Embedded PNG and Jpeg images.
+  5. Embedded Type1 and TrueType fonts.
+  6. Creation of encrypted PDF files.
+  7. Usage of various character sets (ISO8859-1~16, MSCP1250~8, KOI8-R).
+  8. Support for CJK fonts and encodings.

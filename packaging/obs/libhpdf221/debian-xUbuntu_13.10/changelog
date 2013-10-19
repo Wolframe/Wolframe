@@ -1,0 +1,28 @@
+libhpdf (2.2.1-1) unstable; urgency=low
+
+  * update to upstream 2.2.1
+  * Set priority to optional instead of extra (Closes: #631332)
+  * Remove unneeded patches (part of libharu 2.2.0 and above)
+  * Import some upstream bugfixes
+  * Update copyright/rules file, no dfsg cleaning needed anymore
+  * Update package name to reflect soname change
+  * Remove libtool-helper (*.la) and static library (*.a) from -dev package
+  * Update copyright file to DEP-5 format 
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Tue, 30 Aug 2011 18:39:57 -0400
+
+libhpdf (2.1.0+dfsg-1) unstable; urgency=low
+
+  * Initial release (Closes: #581397)
+  * Delete unused windows build files
+  * Delete non-free pngsuite from demos
+  * Remove other copy of pngsuite
+  * Remove demo pdf files
+  * Remove font from demo (already in debian)
+  * Remove font Penguinattack, already packaged
+  * Delete unneeded autom4te cache files
+  * Update example to work with font in debian
+  * Initial import debian/* files
+  * Update autotools
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Fri, 16 Jul 2010 20:35:57 +0200

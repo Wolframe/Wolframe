@@ -1,0 +1,1140 @@
+From: Antony Dovgal <tony@daylessday.org>
+Date: Mon, 28 Mar 2011 17:41:42 +0400
+Subject: fix quite a number of warnings (patch by Davide Achilli)
+
+Now it compiles without any warning under:
+- Microsoft Visual Studio 9.0 with maximum warning level (/W4)
+- Microsoft Visual C++ 6.0 with maximum warning level (/W4)
+- gcc 4.5.0 using -pedantic -Wall on Windows (MinGW) and Linux
+- gcc 4.1.2 using -pedantic -Wall on Linux (Red Hat 4.1.2-44)
+---
+ include/hpdf.h           |    2 +
+ src/hpdf_doc.c           |    2 +
+ src/hpdf_doc_png.c       |    2 +
+ src/hpdf_encoder.c       |   19 +++++++-----
+ src/hpdf_encoder_cns.c   |    4 +++
+ src/hpdf_encoder_cnt.c   |    2 +
+ src/hpdf_encoder_jp.c    |    4 +++
+ src/hpdf_encoder_kr.c    |    4 +++
+ src/hpdf_encrypt.c       |   30 ++++++++++----------
+ src/hpdf_encryptdict.c   |    5 +++
+ src/hpdf_font_cid.c      |   34 ++++++++++++------------
+ src/hpdf_font_tt.c       |    6 ++--
+ src/hpdf_fontdef_tt.c    |   66 +++++++++++++++++++++++-----------------------
+ src/hpdf_fontdef_type1.c |   24 ++++++++--------
+ src/hpdf_image.c         |   21 +++++++-------
+ src/hpdf_namedict.c      |    5 +++
+ src/hpdf_outline.c       |    2 +-
+ src/hpdf_pages.c         |   13 +++++----
+ src/hpdf_pdfa.c          |    2 +
+ src/hpdf_streams.c       |   22 ++++++++++-----
+ src/hpdf_string.c        |    4 +-
+ src/hpdf_u3d.c           |   15 +++++++---
+ src/hpdf_utils.c         |    8 +++---
+ 23 files changed, 173 insertions(+), 123 deletions(-)
+
+diff --git a/include/hpdf.h b/include/hpdf.h
+index 6631ce6..bd71020 100644
+--- a/include/hpdf.h
++++ b/include/hpdf.h
+@@ -20,6 +20,8 @@
+ #include "hpdf_config.h"
+ #include "hpdf_version.h"
+ 
++#define HPDF_UNUSED(a) ((void)(a))
++
+ #ifdef HPDF_DLL_MAKE
+ #    define HPDF_EXPORT(A)  __declspec(dllexport) A  __stdcall
+ #else
+diff --git a/src/hpdf_doc.c b/src/hpdf_doc.c
+index 7c3dcd9..7ba58df 100644
+--- a/src/hpdf_doc.c
++++ b/src/hpdf_doc.c
+@@ -1521,6 +1521,7 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
+     HPDF_FontDef def;
+ 
+     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream\n"));
++    HPDF_UNUSED (file_name);
+ 
+     def = HPDF_TTFontDef_Load (pdf->mmgr, font_data, embedding);
+     if (def) {
+@@ -1599,6 +1600,7 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
+     HPDF_FontDef def;
+ 
+     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream2\n"));
++    HPDF_UNUSED (file_name);
+ 
+     def = HPDF_TTFontDef_Load2 (pdf->mmgr, font_data, index, embedding);
+     if (def) {
+diff --git a/src/hpdf_doc_png.c b/src/hpdf_doc_png.c
+index 263662b..bad87c6 100644
+--- a/src/hpdf_doc_png.c
++++ b/src/hpdf_doc_png.c
+@@ -174,6 +174,8 @@ LoadPngImageFromStream (HPDF_Doc      pdf,
+                         HPDF_BOOL     delayed_loading)
+ {
+     HPDF_SetError (&pdf->error, HPDF_UNSUPPORTED_FUNC, 0);
++    HPDF_UNUSED (delayed_loading);
++    HPDF_UNUSED (imagedata);
+ 
+     return NULL;
+ }
+diff --git a/src/hpdf_encoder.c b/src/hpdf_encoder.c
+index d168be6..b759c44 100644
+--- a/src/hpdf_encoder.c
++++ b/src/hpdf_encoder.c
+@@ -2605,8 +2605,8 @@ HPDF_UNICODE
+ HPDF_CMapEncoder_ToUnicode  (HPDF_Encoder  encoder,
+                              HPDF_UINT16   code)
+ {
+-    HPDF_BYTE l = code;
+-    HPDF_BYTE h = code >> 8;
++    HPDF_BYTE l = (HPDF_BYTE)code;
++    HPDF_BYTE h = (HPDF_BYTE)(code >> 8);
+     HPDF_CMapEncoderAttr attr = (HPDF_CMapEncoderAttr)encoder->attr;
+ 
+     return attr->unicode_map[l][h];
+@@ -2617,8 +2617,8 @@ HPDF_UINT16
+ HPDF_CMapEncoder_ToCID  (HPDF_Encoder  encoder,
+                          HPDF_UINT16   code)
+ {
+-    HPDF_BYTE l = code;
+-    HPDF_BYTE h = code >> 8;
++    HPDF_BYTE l = (HPDF_BYTE)code;
++    HPDF_BYTE h = (HPDF_BYTE)(code >> 8);
+ 
+     HPDF_CMapEncoderAttr attr = (HPDF_CMapEncoderAttr)encoder->attr;
+ 
+@@ -2677,6 +2677,8 @@ HPDF_CMapEncoder_Write  (HPDF_Encoder  encoder,
+                          HPDF_Stream   out)
+ {
+     HPDF_STATUS ret = HPDF_OK;
++    HPDF_UNUSED (out);
++    HPDF_UNUSED (encoder);
+ 
+     return ret;
+ }
+@@ -2689,6 +2691,7 @@ HPDF_Encoder_SetParseText  (HPDF_Encoder        encoder,
+                             HPDF_UINT           len)
+ {
+     HPDF_PTRACE ((" HPDF_CMapEncoder_SetParseText\n"));
++    HPDF_UNUSED (encoder);
+ 
+     state->text = text;
+     state->index = 0;
+@@ -2755,8 +2758,8 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
+         HPDF_STATUS ret;
+ 
+         while (code <= range->to) {
+-            HPDF_BYTE l = code;
+-            HPDF_BYTE h = code >> 8;
++            HPDF_BYTE l = (HPDF_BYTE)code;
++            HPDF_BYTE h = (HPDF_BYTE)(code >> 8);
+ 
+             attr->cid_map[l][h] = cid;
+             code++;
+@@ -2843,8 +2846,8 @@ HPDF_CMapEncoder_SetUnicodeArray  (HPDF_Encoder                 encoder,
+ 
+     if (array != NULL)
+         while (array->unicode != 0xffff) {
+-            HPDF_BYTE l = array->code;
+-            HPDF_BYTE h = array->code >> 8;
++            HPDF_BYTE l = (HPDF_BYTE)array->code;
++            HPDF_BYTE h = (HPDF_BYTE)(array->code >> 8);
+             attr->unicode_map[l][h] = array->unicode;
+             array++;
+         }
+diff --git a/src/hpdf_encoder_cns.c b/src/hpdf_encoder_cns.c
+index 62c210e..e525c23 100644
+--- a/src/hpdf_encoder_cns.c
++++ b/src/hpdf_encoder_cns.c
+@@ -36077,6 +36077,7 @@ static HPDF_BOOL
+ GBK_EUC_IsLeadByte  (HPDF_Encoder    encoder,
+                   HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return ((b >= 0x81 && b <= 0xfe));
+ }
+ 
+@@ -36085,6 +36086,7 @@ static HPDF_BOOL
+ GBK_EUC_IsTrialByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0x40 && b <= 0xfe);
+ }
+ 
+@@ -36200,6 +36202,7 @@ static HPDF_BOOL
+ GB_EUC_IsLeadByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0xa1 && b <= 0xfe);
+ }
+ 
+@@ -36208,6 +36211,7 @@ static HPDF_BOOL
+ GB_EUC_IsTrialByte  (HPDF_Encoder    encoder,
+                     HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0xa1 && b <= 0xfe);
+ }
+ 
+diff --git a/src/hpdf_encoder_cnt.c b/src/hpdf_encoder_cnt.c
+index e7afe4d..a3714fc 100644
+--- a/src/hpdf_encoder_cnt.c
++++ b/src/hpdf_encoder_cnt.c
+@@ -15158,6 +15158,7 @@ static HPDF_BOOL
+ ETen_B5_IsLeadByte  (HPDF_Encoder    encoder,
+                   HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return ((b >= 0x81 && b <= 0xfe));
+ }
+ 
+@@ -15166,6 +15167,7 @@ static HPDF_BOOL
+ ETen_B5_IsTrialByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0x40 && b <= 0xfe);
+ }
+ 
+diff --git a/src/hpdf_encoder_jp.c b/src/hpdf_encoder_jp.c
+index 2ab69b6..11e5daf 100644
+--- a/src/hpdf_encoder_jp.c
++++ b/src/hpdf_encoder_jp.c
+@@ -15772,6 +15772,7 @@ static HPDF_BOOL
+ RKSJ_IsLeadByte  (HPDF_Encoder    encoder,
+                   HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return ((b >= 0x81 && b <= 0x9f) || (b >= 0xe0 && b <= 0xfc));
+ }
+ 
+@@ -15780,6 +15781,7 @@ static HPDF_BOOL
+ RKSJ_IsTrialByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0x40 && b <= 0xfc && b != 0x7f);
+ }
+ 
+@@ -15953,6 +15955,7 @@ static HPDF_BOOL
+ EUC_IsLeadByte  (HPDF_Encoder    encoder,
+                  HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return ((b >= 0xa1 && b <= 0xfe) || b == 0x8e);
+ }
+ 
+@@ -15961,6 +15964,7 @@ static HPDF_BOOL
+ EUC_IsTrialByte  (HPDF_Encoder    encoder,
+                   HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0xa0 && b <= 0xfe);
+ }
+ 
+diff --git a/src/hpdf_encoder_kr.c b/src/hpdf_encoder_kr.c
+index deae18a..540b109 100644
+--- a/src/hpdf_encoder_kr.c
++++ b/src/hpdf_encoder_kr.c
+@@ -27642,6 +27642,7 @@ static HPDF_BOOL
+ KSCms_UHC_IsLeadByte  (HPDF_Encoder    encoder,
+                   HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0x81 && b <= 0xFE);
+ }
+ 
+@@ -27650,6 +27651,7 @@ static HPDF_BOOL
+ KSCms_UHC_IsTrialByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0x41 && b <= 0xfe);
+ }
+ 
+@@ -27807,6 +27809,7 @@ static HPDF_BOOL
+ KSC_EUC_IsLeadByte  (HPDF_Encoder    encoder,
+                    HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0xa1 && b <= 0xfe);
+ }
+ 
+@@ -27815,6 +27818,7 @@ static HPDF_BOOL
+ KSC_EUC_IsTrialByte  (HPDF_Encoder    encoder,
+                     HPDF_BYTE       b)
+ {
++    HPDF_UNUSED (encoder);
+     return (b >= 0xa0 && b <= 0xfe);
+ }
+ 
+diff --git a/src/hpdf_encrypt.c b/src/hpdf_encrypt.c
+index 7e5542c..a534995 100644
+--- a/src/hpdf_encrypt.c
++++ b/src/hpdf_encrypt.c
+@@ -398,7 +398,7 @@ HPDF_Encrypt_CreateOwnerKey  (HPDF_Encrypt  attr)
+             HPDF_BYTE new_key[HPDF_MD5_KEY_LEN];
+ 
+             for (j = 0; j < attr->key_len; j++)
+-                new_key[j] = digest[j] ^ i;
++                new_key[j] = (HPDF_BYTE)(digest[j] ^ i);
+ 
+             HPDF_PTRACE(("@ Algorithm 3.3 step 7 loop %u\n", i));
+ 
+@@ -432,10 +432,10 @@ HPDF_Encrypt_CreateEncryptionKey  (HPDF_Encrypt  attr)
+ 
+     /* Algorithm3.2 step4 */
+     HPDF_PTRACE(("@@@ permission =%d\n", attr->permission));
+-    tmp_flg[0] = attr->permission;
+-    tmp_flg[1] = (attr->permission >> 8);
+-    tmp_flg[2] = (attr->permission >> 16);
+-    tmp_flg[3] = (attr->permission >> 24);
++    tmp_flg[0] = (HPDF_BYTE)(attr->permission);
++    tmp_flg[1] = (HPDF_BYTE)(attr->permission >> 8);
++    tmp_flg[2] = (HPDF_BYTE)(attr->permission >> 16);
++    tmp_flg[3] = (HPDF_BYTE)(attr->permission >> 24);
+ 
+     HPDF_MD5Update(&md5_ctx, tmp_flg, 4);
+ 
+@@ -502,7 +502,7 @@ HPDF_Encrypt_CreateUserKey  (HPDF_Encrypt  attr)
+             HPDF_PTRACE(("@ Algorithm 3.5 step 5 loop %u\n", i));
+ 
+             for (j = 0; j < attr->key_len; j++)
+-                new_key[j] = attr->encryption_key[j] ^ i;
++                new_key[j] = (HPDF_BYTE)(attr->encryption_key[j] ^ i);
+ 
+             HPDF_MemCpy (digest, digest2, HPDF_MD5_KEY_LEN);
+ 
+@@ -529,7 +529,7 @@ ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
+     HPDF_PTRACE((" ARC4Init\n"));
+ 
+     for (i = 0; i < HPDF_ARC4_BUF_SIZE; i++)
+-        ctx->state[i] = i;
++        ctx->state[i] = (HPDF_BYTE)i;
+ 
+     for (i = 0; i < HPDF_ARC4_BUF_SIZE; i++)
+         tmp_array[i] = key[i % key_len];
+@@ -564,8 +564,8 @@ ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
+     for (i = 0; i < len; i++) {
+         HPDF_BYTE tmp;
+ 
+-        ctx->idx1 = (ctx->idx1 + 1) % 256;
+-        ctx->idx2 = (ctx->idx2 +  ctx->state[ctx->idx1]) % 256;
++        ctx->idx1 = (HPDF_BYTE)((ctx->idx1 + 1) % 256);
++        ctx->idx2 = (HPDF_BYTE)((ctx->idx2 +  ctx->state[ctx->idx1]) % 256);
+ 
+         tmp = ctx->state[ctx->idx1];
+         ctx->state[ctx->idx1] = ctx->state[ctx->idx2];
+@@ -574,7 +574,7 @@ ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
+         t = (ctx->state[ctx->idx1] + ctx->state[ctx->idx2]) % 256;
+         K = ctx->state[t];
+ 
+-        out[i] = in[i] ^ K;
++        out[i] = (HPDF_BYTE)(in[i] ^ K);
+     }
+ }
+ 
+@@ -589,11 +589,11 @@ HPDF_Encrypt_InitKey  (HPDF_Encrypt  attr,
+ 
+     HPDF_PTRACE((" HPDF_Encrypt_Init\n"));
+ 
+-    attr->encryption_key[attr->key_len] = object_id;
+-    attr->encryption_key[attr->key_len + 1] = (object_id >> 8);
+-    attr->encryption_key[attr->key_len + 2] = (object_id >> 16);
+-    attr->encryption_key[attr->key_len + 3] = gen_no;
+-    attr->encryption_key[attr->key_len + 4] = (gen_no >> 8);
++    attr->encryption_key[attr->key_len] = (HPDF_BYTE)object_id;
++    attr->encryption_key[attr->key_len + 1] = (HPDF_BYTE)(object_id >> 8);
++    attr->encryption_key[attr->key_len + 2] = (HPDF_BYTE)(object_id >> 16);
++    attr->encryption_key[attr->key_len + 3] = (HPDF_BYTE)gen_no;
++    attr->encryption_key[attr->key_len + 4] = (HPDF_BYTE)(gen_no >> 8);
+ 
+     HPDF_PTRACE(("@@@ OID=%u, gen_no=%u\n", (HPDF_INT)object_id, gen_no));
+ 
+diff --git a/src/hpdf_encryptdict.c b/src/hpdf_encryptdict.c
+index be69d94..1708d77 100644
+--- a/src/hpdf_encryptdict.c
++++ b/src/hpdf_encryptdict.c
+@@ -21,6 +21,9 @@
+ #include "hpdf_objects.h"
+ #include "hpdf_encryptdict.h"
+ #include "hpdf_info.h"
++#ifndef HPDF_UNUSED
++#define HPDF_UNUSED(a) ((void)(a))
++#endif
+ 
+ HPDF_EncryptDict
+ HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
+@@ -70,6 +73,8 @@ HPDF_EncryptDict_CreateID  (HPDF_EncryptDict  dict,
+ #endif /* LIBHPDF_DEBUG */
+ 
+     HPDF_MD5Init (&ctx);
++    HPDF_UNUSED (xref);
++    HPDF_UNUSED (info);
+ 
+ #ifndef LIBHPDF_DEBUG
+     HPDF_MD5Update(&ctx, (HPDF_BYTE *)&t, sizeof(t));
+diff --git a/src/hpdf_font_cid.c b/src/hpdf_font_cid.c
+index 8b65c34..e4aed13 100644
+--- a/src/hpdf_font_cid.c
++++ b/src/hpdf_font_cid.c
+@@ -359,9 +359,9 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
+     if (HPDF_Dict_Add (font, "DW2", array) != HPDF_OK)
+         return NULL;
+ 
+-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom);
+-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom -
+-                fontdef->font_bbox.top);
++    ret += HPDF_Array_AddNumber (array, (HPDF_INT32)(fontdef->font_bbox.bottom));
++    ret += HPDF_Array_AddNumber (array, (HPDF_INT32)(fontdef->font_bbox.bottom -
++                fontdef->font_bbox.top));
+ 
+     HPDF_MemSet (tmp_map, 0, sizeof(HPDF_UNICODE) * 65536);
+ 
+@@ -432,8 +432,8 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
+                 HPDF_BYTE u[2];
+                 HPDF_UINT16 gid = tmp_map[i];
+ 
+-                u[0] = gid >> 8;
+-                u[1] = gid;
++                u[0] = (HPDF_BYTE)(gid >> 8);
++                u[1] = (HPDF_BYTE)gid;
+ 
+                 HPDF_MemCpy ((HPDF_BYTE *)(tmp_map + i), u, 2);
+             }
+@@ -569,8 +569,8 @@ TextWidth  (HPDF_Font         font,
+                     (HPDF_CIDFontDefAttr)attr->fontdef->attr;
+         dw2 = cid_fontdef_attr->DW2[1];
+     } else {
+-        dw2 = attr->fontdef->font_bbox.bottom -
+-                    attr->fontdef->font_bbox.top;
++        dw2 = (HPDF_INT)(attr->fontdef->font_bbox.bottom -
++                    attr->fontdef->font_bbox.top);
+     }
+ 
+     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
+@@ -587,7 +587,7 @@ TextWidth  (HPDF_Font         font,
+ 
+         if (btype == HPDF_BYTE_TYPE_LEAD) {
+             code <<= 8;
+-            code += *text;
++            code = (HPDF_UINT16)(code + *text);
+         }
+ 
+         if (btype != HPDF_BYTE_TYPE_TRIAL) {
+@@ -654,8 +654,8 @@ MeasureText  (HPDF_Font          font,
+                 (HPDF_CIDFontDefAttr)attr->fontdef->attr;
+         dw2 = cid_fontdef_attr->DW2[1];
+     } else {
+-        dw2 = attr->fontdef->font_bbox.bottom -
+-                    attr->fontdef->font_bbox.top;
++        dw2 = (HPDF_INT)(attr->fontdef->font_bbox.bottom -
++                    attr->fontdef->font_bbox.top);
+     }
+ 
+     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
+@@ -670,7 +670,7 @@ MeasureText  (HPDF_Font          font,
+ 
+         if (btype == HPDF_BYTE_TYPE_LEAD) {
+             code <<= 8;
+-            code += b2;
++            code = (HPDF_UINT16)(code + b2);
+         }
+ 
+         if (!wordwrap) {
+@@ -718,14 +718,14 @@ MeasureText  (HPDF_Font          font,
+                             unicode);
+                 }
+             } else {
+-                tmp_w = -dw2;
++                tmp_w = (HPDF_UINT16)(-dw2);
+             }
+ 
+             if (i > 0)
+                 w += char_space;
+         }
+ 
+-        w += (HPDF_DOUBLE)tmp_w * font_size / 1000;
++        w += (HPDF_REAL)((HPDF_DOUBLE)tmp_w * font_size / 1000);
+ 
+         /* 2006.08.04 break when it encountered  line feed */
+         if (w > width || b == 0x0A)
+@@ -766,14 +766,14 @@ UINT16ToHex  (char     *s,
+     *s++ = '<';
+ 
+     if (b[0] != 0) {
+-        c = b[0] >> 4;
++        c = (char)(b[0] >> 4);
+         if (c <= 9)
+             c += 0x30;
+         else
+             c += 0x41 - 10;
+         *s++ = c;
+ 
+-        c = b[0] & 0x0f;
++        c = (char)(b[0] & 0x0f);
+         if (c <= 9)
+             c += 0x30;
+         else
+@@ -781,14 +781,14 @@ UINT16ToHex  (char     *s,
+         *s++ = c;
+     }
+ 
+-    c = b[1] >> 4;
++    c = (char)(b[1] >> 4);
+     if (c <= 9)
+         c += 0x30;
+     else
+         c += 0x41 - 10;
+     *s++ = c;
+ 
+-    c = b[1] & 0x0f;
++    c = (char)(b[1] & 0x0f);
+     if (c <= 9)
+         c += 0x30;
+     else
+diff --git a/src/hpdf_font_tt.c b/src/hpdf_font_tt.c
+index 2aa1b63..5abb12f 100644
+--- a/src/hpdf_font_tt.c
++++ b/src/hpdf_font_tt.c
+@@ -307,14 +307,14 @@ MeasureText (HPDF_Font          font,
+             tmp_len = i + 1;
+ 
+             if (real_width)
+-                *real_width = w;
++                *real_width = (HPDF_REAL)w;
+ 
+             w += word_space;
+         } else if (!wordwrap) {
+             tmp_len = i;
+ 
+             if (real_width)
+-                *real_width = w;
++                *real_width = (HPDF_REAL)w;
+         }
+ 
+         w += (HPDF_DOUBLE)CharWidth (font, b) * font_size / 1000;
+@@ -329,7 +329,7 @@ MeasureText (HPDF_Font          font,
+ 
+     /* all of text can be put in the specified width */
+     if (real_width)
+-        *real_width = w;
++        *real_width = (HPDF_REAL)w;
+     return len;
+ }
+ 
+diff --git a/src/hpdf_fontdef_tt.c b/src/hpdf_fontdef_tt.c
+index d6f15ce..7167987 100644
+--- a/src/hpdf_fontdef_tt.c
++++ b/src/hpdf_fontdef_tt.c
+@@ -460,11 +460,11 @@ LoadFontData (HPDF_FontDef  fontdef,
+ 
+     attr->glyph_tbl.base_offset = tbl->offset;
+     fontdef->cap_height =
+-                HPDF_TTFontDef_GetCharBBox (fontdef, (HPDF_UINT16)'H').top;
++                (HPDF_UINT16)HPDF_TTFontDef_GetCharBBox (fontdef, (HPDF_UINT16)'H').top;
+     fontdef->x_height =
+-                HPDF_TTFontDef_GetCharBBox (fontdef, (HPDF_UINT16)'x').top;
+-    fontdef->missing_width = (HPDF_UINT32)attr->h_metric[0].advance_width * 1000 /
+-                attr->header.units_per_em;
++                (HPDF_UINT16)HPDF_TTFontDef_GetCharBBox (fontdef, (HPDF_UINT16)'x').top;
++    fontdef->missing_width = (HPDF_INT16)((HPDF_UINT32)attr->h_metric[0].advance_width * 1000 /
++                attr->header.units_per_em);
+ 
+     HPDF_PTRACE ((" fontdef->cap_height=%d\n", fontdef->cap_height));
+     HPDF_PTRACE ((" fontdef->x_height=%d\n", fontdef->x_height));
+@@ -560,16 +560,16 @@ HPDF_TTFontDef_GetCharBBox  (HPDF_FontDef   fontdef,
+         return bbox;
+ 
+     ret += GetINT16 (attr->stream, &i);
+-    bbox.left = (HPDF_INT32)i * 1000 / attr->header.units_per_em;
++    bbox.left = (HPDF_REAL)((HPDF_INT32)i * 1000 / attr->header.units_per_em);
+ 
+     ret += GetINT16 (attr->stream, &i);
+-    bbox.bottom = (HPDF_INT32)i * 1000 / attr->header.units_per_em;
++    bbox.bottom = (HPDF_REAL)((HPDF_INT32)i * 1000 / attr->header.units_per_em);
+ 
+     ret += GetINT16 (attr->stream, &i);
+-    bbox.right = (HPDF_INT32)i * 1000 / attr->header.units_per_em;
++    bbox.right = (HPDF_REAL)((HPDF_INT32)i * 1000 / attr->header.units_per_em);
+ 
+     ret += GetINT16 (attr->stream, &i);
+-    bbox.top = (HPDF_INT32)i * 1000 / attr->header.units_per_em;
++    bbox.top = (HPDF_REAL)((HPDF_INT32)i * 1000 / attr->header.units_per_em);
+ 
+     if (ret != HPDF_OK)
+         return HPDF_ToBox(0, 0, 0, 0);
+@@ -785,14 +785,14 @@ ParseHead (HPDF_FontDef  fontdef)
+     if (ret != HPDF_OK)
+         return HPDF_Error_GetCode (fontdef->error);
+ 
+-    fontdef->font_bbox. left = (HPDF_INT32)attr->header.x_min * 1000 /
+-                attr->header.units_per_em;
+-    fontdef->font_bbox. bottom = (HPDF_INT32)attr->header.y_min * 1000 /
+-                attr->header.units_per_em;
+-    fontdef->font_bbox. right = (HPDF_INT32)attr->header.x_max * 1000 /
+-                attr->header.units_per_em;
+-    fontdef->font_bbox. top = (HPDF_INT32)attr->header.y_max * 1000 /
+-                attr->header.units_per_em;
++    fontdef->font_bbox. left = (HPDF_REAL)((HPDF_INT32)attr->header.x_min * 1000 /
++                attr->header.units_per_em);
++    fontdef->font_bbox. bottom = (HPDF_REAL)((HPDF_INT32)attr->header.y_min * 1000 /
++                attr->header.units_per_em);
++    fontdef->font_bbox. right = (HPDF_REAL)((HPDF_INT32)attr->header.x_max * 1000 /
++                attr->header.units_per_em);
++    fontdef->font_bbox. top = (HPDF_REAL)((HPDF_INT32)attr->header.y_max * 1000 /
++                attr->header.units_per_em);
+ 
+     return HPDF_OK;
+ }
+@@ -840,11 +840,11 @@ ParseHhea (HPDF_FontDef  fontdef)
+         return ret;
+ 
+     ret += GetINT16 (attr->stream, &fontdef->ascent);
+-    fontdef->ascent = (HPDF_INT32)fontdef->ascent * 1000 /
+-                attr->header.units_per_em;
++    fontdef->ascent = (HPDF_INT16)((HPDF_INT32)fontdef->ascent * 1000 /
++                attr->header.units_per_em);
+     ret += GetINT16 (attr->stream, &fontdef->descent);
+-    fontdef->descent = (HPDF_INT32)fontdef->descent * 1000 /
+-                attr->header.units_per_em;
++    fontdef->descent = (HPDF_INT16)((HPDF_INT32)fontdef->descent * 1000 /
++                attr->header.units_per_em);
+ 
+     if (ret != HPDF_OK)
+         return HPDF_Error_GetCode (fontdef->error);
+@@ -1052,7 +1052,7 @@ ParseCMAP_format4  (HPDF_FontDef  fontdef,
+         return HPDF_Error_GetCode (fontdef->error);
+ 
+     pend_count = attr->cmap.end_count;
+-    for (i = 0; i < attr->cmap.seg_count_x2 / 2; i++)
++    for (i = 0; i < (HPDF_UINT)attr->cmap.seg_count_x2 / 2; i++)
+         if ((ret = GetUINT16 (attr->stream, pend_count++)) != HPDF_OK)
+             return ret;
+ 
+@@ -1066,7 +1066,7 @@ ParseCMAP_format4  (HPDF_FontDef  fontdef,
+         return HPDF_Error_GetCode (fontdef->error);
+ 
+     pstart_count = attr->cmap.start_count;
+-    for (i = 0; i < attr->cmap.seg_count_x2 / 2; i++)
++    for (i = 0; i < (HPDF_UINT)attr->cmap.seg_count_x2 / 2; i++)
+         if ((ret = GetUINT16 (attr->stream, pstart_count++)) != HPDF_OK)
+             return ret;
+ 
+@@ -1077,7 +1077,7 @@ ParseCMAP_format4  (HPDF_FontDef  fontdef,
+         return HPDF_Error_GetCode (fontdef->error);
+ 
+     pid_delta = attr->cmap.id_delta;
+-    for (i = 0; i < attr->cmap.seg_count_x2 / 2; i++)
++    for (i = 0; i < (HPDF_UINT)attr->cmap.seg_count_x2 / 2; i++)
+         if ((ret = GetINT16 (attr->stream, pid_delta++)) != HPDF_OK)
+             return ret;
+ 
+@@ -1088,7 +1088,7 @@ ParseCMAP_format4  (HPDF_FontDef  fontdef,
+         return HPDF_Error_GetCode (fontdef->error);
+ 
+     pid_range_offset = attr->cmap.id_range_offset;
+-    for (i = 0; i < attr->cmap.seg_count_x2 / 2; i++)
++    for (i = 0; i < (HPDF_UINT)attr->cmap.seg_count_x2 / 2; i++)
+         if ((ret = GetUINT16 (attr->stream, pid_range_offset++)) != HPDF_OK)
+             return ret;
+ 
+@@ -1114,7 +1114,7 @@ ParseCMAP_format4  (HPDF_FontDef  fontdef,
+ 
+ #ifdef LIBHPDF_DEBUG
+     /* print all elements of cmap table */
+-    for (i = 0; i < attr->cmap.seg_count_x2 / 2; i++) {
++    for (i = 0; i < (HPDF_UINT)attr->cmap.seg_count_x2 / 2; i++) {
+         HPDF_PTRACE((" ParseCMAP_format4[%d] start_count=0x%04X, "
+                     "end_count=0x%04X, id_delta=%d, id_range_offset=%u\n", i,
+                     attr->cmap.start_count[i], attr->cmap.end_count[i],
+@@ -1166,7 +1166,7 @@ HPDF_TTFontDef_GetGlyphid  (HPDF_FontDef   fontdef,
+                     " ret=%u\n", i, unicode,
+                     unicode + attr->cmap.id_delta[i]));
+ 
+-        return unicode + attr->cmap.id_delta[i];
++        return (HPDF_UINT16)(unicode + attr->cmap.id_delta[i]);
+     } else {
+         HPDF_UINT idx = attr->cmap.id_range_offset[i] / 2 +
+             (unicode - attr->cmap.start_count[i]) - (seg_count - i);
+@@ -1176,8 +1176,8 @@ HPDF_TTFontDef_GetGlyphid  (HPDF_FontDef   fontdef,
+                         i, idx, (HPDF_UINT)attr->cmap.glyph_id_array_count));
+             return 0;
+         } else {
+-            HPDF_UINT16 gid = attr->cmap.glyph_id_array[idx] +
+-                attr->cmap.id_delta[i];
++            HPDF_UINT16 gid = (HPDF_UINT16)(attr->cmap.glyph_id_array[idx] +
++                attr->cmap.id_delta[i]);
+             HPDF_PTRACE((" HPDF_TTFontDef_GetGlyphid idx=%u unicode=0x%04X "
+                         "id=%u\n", idx, unicode, gid));
+             return gid;
+@@ -1212,8 +1212,8 @@ HPDF_TTFontDef_GetCharWidth  (HPDF_FontDef   fontdef,
+             CheckCompositGryph (fontdef, gid);
+     }
+ 
+-    advance_width = (HPDF_UINT)hmetrics.advance_width * 1000 /
+-            attr->header.units_per_em;
++    advance_width = (HPDF_UINT16)((HPDF_UINT)hmetrics.advance_width * 1000 /
++            attr->header.units_per_em);
+ 
+     return (HPDF_INT16)advance_width;
+ }
+@@ -1323,8 +1323,8 @@ HPDF_TTFontDef_GetGidWidth  (HPDF_FontDef   fontdef,
+ 
+     hmetrics = attr->h_metric[gid];
+ 
+-    advance_width = (HPDF_UINT)hmetrics.advance_width * 1000 /
+-            attr->header.units_per_em;
++    advance_width = (HPDF_UINT16)((HPDF_UINT)hmetrics.advance_width * 1000 /
++            attr->header.units_per_em);
+ 
+     HPDF_PTRACE((" HPDF_TTFontDef_GetGidWidth gid=%u, width=%u\n",
+                 gid, advance_width));
+@@ -1955,7 +1955,7 @@ HPDF_TTFontDef_SaveFontData  (HPDF_FontDef   fontdef,
+     HPDF_Stream tmp_stream;
+     HPDF_UINT32 *new_offsets;
+     HPDF_UINT i;
+-    HPDF_UINT32 check_sum_ptr;
++    HPDF_UINT32 check_sum_ptr = 0;
+     HPDF_STATUS ret;
+     HPDF_UINT32 offset_base;
+     HPDF_UINT32 tmp_check_sum = 0xB1B0AFBA;
+diff --git a/src/hpdf_fontdef_type1.c b/src/hpdf_fontdef_type1.c
+index dadfdb8..499f521 100644
+--- a/src/hpdf_fontdef_type1.c
++++ b/src/hpdf_fontdef_type1.c
+@@ -175,7 +175,7 @@ LoadAfm (HPDF_FontDef  fontdef,
+         } else
+ 
+         if (HPDF_StrCmp (keyword, "ItalicAngle") == 0) {
+-            fontdef->italic_angle = HPDF_AToI (s);
++            fontdef->italic_angle = (HPDF_INT16)HPDF_AToI (s);
+             if (fontdef->italic_angle != 0)
+                 fontdef->flags |= HPDF_FONT_ITALIC;
+         } else
+@@ -195,35 +195,35 @@ LoadAfm (HPDF_FontDef  fontdef,
+             char buf[HPDF_INT_LEN + 1];
+ 
+             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
+-            fontdef->font_bbox.left = HPDF_AToI (buf);
++            fontdef->font_bbox.left = (HPDF_REAL)HPDF_AToI (buf);
+ 
+             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
+-            fontdef->font_bbox.bottom = HPDF_AToI (buf);
++            fontdef->font_bbox.bottom = (HPDF_REAL)HPDF_AToI (buf);
+ 
+             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
+-            fontdef->font_bbox.right = HPDF_AToI (buf);
++            fontdef->font_bbox.right = (HPDF_REAL)HPDF_AToI (buf);
+ 
+             GetKeyword (s, buf, HPDF_INT_LEN + 1);
+-            fontdef->font_bbox.top = HPDF_AToI (buf);
++            fontdef->font_bbox.top = (HPDF_REAL)HPDF_AToI (buf);
+         } else
+         if (HPDF_StrCmp (keyword, "EncodingScheme") == 0) {
+             HPDF_StrCpy (attr->encoding_scheme, s,
+                     attr->encoding_scheme + HPDF_LIMIT_MAX_NAME_LEN);
+         } else
+         if (HPDF_StrCmp (keyword, "CapHeight") == 0) {
+-            fontdef->cap_height = HPDF_AToI (s);
++            fontdef->cap_height = (HPDF_UINT16)HPDF_AToI (s);
+         } else
+         if (HPDF_StrCmp (keyword, "Ascender") == 0) {
+-            fontdef->ascent = HPDF_AToI (s);
++            fontdef->ascent = (HPDF_INT16)HPDF_AToI (s);
+         } else
+         if (HPDF_StrCmp (keyword, "Descender") == 0) {
+-            fontdef->descent = HPDF_AToI (s);
++            fontdef->descent = (HPDF_INT16)HPDF_AToI (s);
+         } else
+         if (HPDF_StrCmp (keyword, "STDHW") == 0) {
+-            fontdef->stemh = HPDF_AToI (s);
++            fontdef->stemh = (HPDF_UINT16)HPDF_AToI (s);
+         } else
+         if (HPDF_StrCmp (keyword, "STDHV") == 0) {
+-            fontdef->stemv = HPDF_AToI (s);
++            fontdef->stemv = (HPDF_UINT16)HPDF_AToI (s);
+         } else
+         if (HPDF_StrCmp (keyword, "StartCharMetrics") == 0) {
+             attr->widths_count = HPDF_AToI (s);
+@@ -261,7 +261,7 @@ LoadAfm (HPDF_FontDef  fontdef,
+             s = GetKeyword (s, buf2, HPDF_LIMIT_MAX_NAME_LEN + 1);
+               HPDF_AToI (buf2);
+ 
+-            cdata->char_cd = HPDF_AToI (buf2);
++            cdata->char_cd = (HPDF_INT16)HPDF_AToI (buf2);
+ 
+         } else
+             return HPDF_SetError (fontdef->error,
+@@ -278,7 +278,7 @@ LoadAfm (HPDF_FontDef  fontdef,
+         if (buf2[0] == 0)
+             return HPDF_SetError (fontdef->error, HPDF_INVALID_WX_DATA, 0);
+ 
+-        cdata->width = HPDF_AToI (buf2);
++        cdata->width = (HPDF_INT16)HPDF_AToI (buf2);
+ 
+         /* N PostScript language character name */
+         s = HPDF_StrStr (s, "N ", 0);
+diff --git a/src/hpdf_image.c b/src/hpdf_image.c
+index d8802d6..eeec7c2 100644
+--- a/src/hpdf_image.c
++++ b/src/hpdf_image.c
+@@ -329,7 +329,7 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
+ {
+     HPDF_Dict image;
+     HPDF_STATUS ret = HPDF_OK;
+-    HPDF_UINT size;
++    HPDF_UINT size=0;
+ 
+     HPDF_PTRACE ((" HPDF_Image_LoadRawImageFromMem\n"));
+ 
+@@ -358,19 +358,20 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
+ 
+     switch (color_space) {
+         case HPDF_CS_DEVICE_GRAY:
+-            size = (HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876;
++            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+             ret = HPDF_Dict_AddName (image, "ColorSpace", COL_GRAY);
+             break;
+         case HPDF_CS_DEVICE_RGB:
+-            size = (HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876;
++            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+             size *= 3;
+             ret = HPDF_Dict_AddName (image, "ColorSpace", COL_RGB);
+             break;
+         case HPDF_CS_DEVICE_CMYK:
+-            size = (HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876;
++            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+             size *= 4;
+             ret = HPDF_Dict_AddName (image, "ColorSpace", COL_CMYK);
+             break;
++        default:;
+     }
+ 
+     if (ret != HPDF_OK)
+@@ -435,8 +436,8 @@ HPDF_Image_GetSize (HPDF_Image  image)
+     height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+ 
+     if (width && height) {
+-      ret.x = width->value;
+-      ret.y = height->value;
++      ret.x = (HPDF_REAL)width->value;
++      ret.y = (HPDF_REAL)height->value;
+     }
+ 
+     return ret;
+@@ -459,8 +460,8 @@ HPDF_Image_GetSize2 (HPDF_Image  image, HPDF_Point *size)
+     height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+ 
+     if (width && height) {
+-      size->x = width->value;
+-      size->y = height->value;
++      size->x = (HPDF_REAL)width->value;
++      size->y = (HPDF_REAL)height->value;
+     }
+ 
+     return HPDF_OK;
+@@ -516,13 +517,13 @@ HPDF_Image_GetColorSpace (HPDF_Image  image)
+ HPDF_EXPORT(HPDF_UINT)
+ HPDF_Image_GetWidth  (HPDF_Image   image)
+ {
+-    return HPDF_Image_GetSize (image).x;
++    return (HPDF_UINT)HPDF_Image_GetSize (image).x;
+ }
+ 
+ HPDF_EXPORT(HPDF_UINT)
+ HPDF_Image_GetHeight  (HPDF_Image   image)
+ {
+-    return HPDF_Image_GetSize (image).y;
++    return (HPDF_UINT)HPDF_Image_GetSize (image).y;
+ }
+ 
+ HPDF_STATUS
+diff --git a/src/hpdf_namedict.c b/src/hpdf_namedict.c
+index ed475b9..f2dff73 100644
+--- a/src/hpdf_namedict.c
++++ b/src/hpdf_namedict.c
+@@ -20,6 +20,10 @@
+ #include "hpdf_consts.h"
+ #include "hpdf_namedict.h"
+ 
++#ifndef HPDF_UNUSED
++#define HPDF_UNUSED(a) ((void)(a))
++#endif
++
+ static const char *HPDF_NAMEDICT_KEYS[] = {
+                                         "EmbeddedFiles"
+                                         };
+@@ -225,5 +229,6 @@ HPDF_EmbeddedFile_New  (HPDF_MMgr  mmgr,
+ HPDF_BOOL
+ HPDF_EmbeddedFile_Validate  (HPDF_EmbeddedFile  emfile)
+ {
++    HPDF_UNUSED (emfile);
+     return HPDF_TRUE;
+ }
+diff --git a/src/hpdf_outline.c b/src/hpdf_outline.c
+index cc2b9d7..87cce04 100644
+--- a/src/hpdf_outline.c
++++ b/src/hpdf_outline.c
+@@ -235,7 +235,7 @@ BeforeWrite  (HPDF_Dict obj)
+         return HPDF_Dict_RemoveElement (obj, "Count");
+ 
+     if (!HPDF_Outline_GetOpened ((HPDF_Outline)obj))
+-        count *= -1;
++        count = count * -1;
+ 
+     if (n)
+         n->value = count;
+diff --git a/src/hpdf_pages.c b/src/hpdf_pages.c
+index 5edfe74..683620a 100644
+--- a/src/hpdf_pages.c
++++ b/src/hpdf_pages.c
+@@ -32,11 +32,11 @@ typedef struct _HPDF_PageSizeValue {
+ static HPDF_PageSizeValue HPDF_PREDEFINED_PAGE_SIZES[] = {
+     {612, 792},     /* HPDF_PAGE_SIZE_LETTER */
+     {612, 1008},    /* HPDF_PAGE_SIZE_LEGAL */
+-    {841.89, 1199.551},    /* HPDF_PAGE_SIZE_A3 */
+-    {595.276, 841.89},     /* HPDF_PAGE_SIZE_A4 */
+-    {419.528, 595.276},     /* HPDF_PAGE_SIZE_A5 */
+-    {708.661, 1000.63},     /* HPDF_PAGE_SIZE_B4 */
+-    {498.898, 708.661},     /* HPDF_PAGE_SIZE_B5 */
++    {(HPDF_REAL)841.89, (HPDF_REAL)1199.551},    /* HPDF_PAGE_SIZE_A3 */
++    {(HPDF_REAL)595.276, (HPDF_REAL)841.89},     /* HPDF_PAGE_SIZE_A4 */
++    {(HPDF_REAL)419.528, (HPDF_REAL)595.276},     /* HPDF_PAGE_SIZE_A5 */
++    {(HPDF_REAL)708.661, (HPDF_REAL)1000.63},     /* HPDF_PAGE_SIZE_B4 */
++    {(HPDF_REAL)498.898, (HPDF_REAL)708.661},     /* HPDF_PAGE_SIZE_B5 */
+     {522, 756},     /* HPDF_PAGE_SIZE_EXECUTIVE */
+     {288, 432},     /* HPDF_PAGE_SIZE_US4x6 */
+     {288, 576},     /* HPDF_PAGE_SIZE_US4x8 */
+@@ -341,7 +341,7 @@ HPDF_Page_New  (HPDF_MMgr   mmgr,
+     /* add requiered elements */
+     ret += HPDF_Dict_AddName (page, "Type", "Page");
+     ret += HPDF_Dict_Add (page, "MediaBox", HPDF_Box_Array_New (page->mmgr,
+-                HPDF_ToBox (0, 0, HPDF_DEF_PAGE_WIDTH, HPDF_DEF_PAGE_HEIGHT)));
++                HPDF_ToBox (0, 0, (HPDF_INT16)(HPDF_DEF_PAGE_WIDTH), (HPDF_INT16)(HPDF_DEF_PAGE_HEIGHT))));
+     ret += HPDF_Dict_Add (page, "Contents", attr->contents);
+ 
+     ret += AddResource (page);
+@@ -1686,6 +1686,7 @@ HPDF_Page_Create3DView    (HPDF_Page       page,
+     HPDF_Dict view;
+ 
+     HPDF_PTRACE((" HPDF_Page_Create3DView\n"));
++    HPDF_UNUSED(annot3d);
+ 
+     if (!HPDF_Page_Validate (page))
+         return NULL;
+diff --git a/src/hpdf_pdfa.c b/src/hpdf_pdfa.c
+index 9ec9db1..26cc6c1 100644
+--- a/src/hpdf_pdfa.c
++++ b/src/hpdf_pdfa.c
+@@ -14,6 +14,8 @@
+  * It is provided "as is" without express or implied warranty.
+  *
+  */
++/* This is used to avoid warnings on 'ctime' when compiling in MSVC 9 */
++#define _CRT_SECURE_NO_WARNINGS
+ 
+ #include <time.h>
+ #include "hpdf_utils.h"
+diff --git a/src/hpdf_streams.c b/src/hpdf_streams.c
+index 2108d09..20e915f 100644
+--- a/src/hpdf_streams.c
++++ b/src/hpdf_streams.c
+@@ -14,10 +14,14 @@
+  * It is provided "as is" without express or implied warranty.
+  *
+  */
++#define _CRT_SECURE_NO_WARNINGS
+ 
+ #ifndef UNDER_CE
+ #include <errno.h>
+ #endif
++#ifndef HPDF_UNUSED
++#define HPDF_UNUSED(a) ((void)(a))
++#endif
+ 
+ #include "hpdf_conf.h"
+ #include "hpdf_consts.h"
+@@ -434,18 +438,18 @@ HPDF_Stream_WriteEscapeText2  (HPDF_Stream    stream,
+ 
+     buf[idx++] = '(';
+ 
+-    for (i = 0; i < len; i++) {
++    for (i = 0; i < (HPDF_INT)len; i++) {
+         HPDF_BYTE c = (HPDF_BYTE)*p++;
+         if (HPDF_NEEDS_ESCAPE(c)) {
+             buf[idx++] = '\\';
+ 
+-            buf[idx] = c >> 6;
++            buf[idx] = (char)(c >> 6);
+             buf[idx] += 0x30;
+             idx++;
+-            buf[idx] = (c & 0x38) >> 3;
++            buf[idx] = (char)((c & 0x38) >> 3);
+             buf[idx] += 0x30;
+             idx++;
+-            buf[idx] = (c & 0x07);
++            buf[idx] = (char)(c & 0x07);
+             buf[idx] += 0x30;
+             idx++;
+         }
+@@ -511,7 +515,7 @@ HPDF_Stream_WriteBinary  (HPDF_Stream      stream,
+     }
+ 
+     for (i = 0; i < len; i++, p++) {
+-        char c = *p >> 4;
++        char c = (char)(*p >> 4);
+ 
+         if (c <= 9)
+             c += 0x30;
+@@ -519,7 +523,7 @@ HPDF_Stream_WriteBinary  (HPDF_Stream      stream,
+             c += 0x41 - 10;
+         buf[idx++] = c;
+ 
+-        c = *p & 0x0f;
++        c = (char)(*p & 0x0f);
+         if (c <= 9)
+             c += 0x30;
+         else
+@@ -668,6 +672,9 @@ HPDF_Stream_WriteToStreamWithDeflate  (HPDF_Stream  src,
+     deflateEnd(&strm);
+     return HPDF_OK;
+ #else /* LIBHPDF_HAVE_NOZLIB */
++    HPDF_UNUSED (e);
++    HPDF_UNUSED (dst);
++    HPDF_UNUSED (src);
+     return HPDF_UNSUPPORTED_FUNC;
+ #endif /* LIBHPDF_HAVE_NOZLIB */
+ }
+@@ -684,6 +691,7 @@ HPDF_Stream_WriteToStream  (HPDF_Stream  src,
+     HPDF_BOOL flg;
+ 
+     HPDF_PTRACE((" HPDF_Stream_WriteToStream\n"));
++    HPDF_UNUSED (filter);
+ 
+     if (!dst || !(dst->write_fn)) {
+         HPDF_SetError (src->error, HPDF_INVALID_OBJECT, 0);
+@@ -1088,7 +1096,7 @@ HPDF_MemStream_SeekFunc  (HPDF_Stream      stream,
+     } else if (mode == HPDF_SEEK_END)
+         pos = stream->size - pos;
+ 
+-    if (pos > stream->size) {
++    if (pos > (HPDF_INT)stream->size) {
+         return HPDF_SetError (stream->error, HPDF_STREAM_EOF, 0);
+     }
+ 
+diff --git a/src/hpdf_string.c b/src/hpdf_string.c
+index 5c1c481..f915093 100644
+--- a/src/hpdf_string.c
++++ b/src/hpdf_string.c
+@@ -145,7 +145,7 @@ HPDF_String_Write  (HPDF_String   obj,
+ 
+         HPDF_Encoder_SetParseText (obj->encoder, &parse_state, src, len);
+ 
+-        for (i = 0; i < len; i++) {
++        for (i = 0; (HPDF_INT32)i < len; i++) {
+             HPDF_BYTE b = src[i];
+             HPDF_UNICODE tmp_unicode;
+             HPDF_ByteType btype = HPDF_Encoder_ByteType (obj->encoder,
+@@ -163,7 +163,7 @@ HPDF_String_Write  (HPDF_String   obj,
+             if (btype != HPDF_BYTE_TYPE_TRIAL) {
+                 if (btype == HPDF_BYTE_TYPE_LEAD) {
+                     HPDF_BYTE b2 = src[i + 1];
+-                    HPDF_UINT16 char_code = (HPDF_UINT) b * 256 + b2;
++                    HPDF_UINT16 char_code = (HPDF_UINT16)((HPDF_UINT) b * 256 + b2);
+ 
+                     tmp_unicode = HPDF_Encoder_ToUnicode (obj->encoder,
+                                 char_code);
+diff --git a/src/hpdf_u3d.c b/src/hpdf_u3d.c
+index d0d8c7f..d0cb264 100644
+--- a/src/hpdf_u3d.c
++++ b/src/hpdf_u3d.c
+@@ -20,6 +20,11 @@
+ 
+ #include <string.h>
+ 
++#ifndef M_PI
++/* Not defined in MSVC6 */
++#define M_PI       3.14159265358979323846
++#endif
++
+ HPDF_U3D
+ HPDF_U3D_LoadU3D  (HPDF_MMgr        mmgr,
+ 				   HPDF_Stream      u3d_data,
+@@ -630,8 +635,8 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
+ 		HPDF_REAL upxprime, upyprime, upzprime;
+ 		HPDF_REAL sinroll, cosroll;
+ 
+-		sinroll =  sin((roll/180.0f)*M_PI);
+-		cosroll =  cos((roll/180.0f)*M_PI);
++		sinroll =  (HPDF_REAL)sin((roll/180.0f)*M_PI);
++		cosroll =  (HPDF_REAL)cos((roll/180.0f)*M_PI);
+ 		leftxprime = leftx*cosroll + upx*sinroll;
+ 		leftyprime = lefty*cosroll + upy*sinroll;
+ 		leftzprime = leftz*cosroll + upz*sinroll;
+@@ -647,9 +652,9 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
+ 	}
+ 	
+ 	/* translation vector*/
+-	roo = fabs(roo);
++	roo = (HPDF_REAL)fabs(roo);
+ 	if (roo == 0.0) {
+-		roo = 0.000000000000000001;
++		roo = (HPDF_REAL)0.000000000000000001;
+ 	}
+ 	transx = coox - roo*viewx;
+ 	transy = cooy - roo*viewy;
+@@ -703,7 +708,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetCamera(HPDF_Dict view, HPDF_REAL coox, H
+ 	ret = HPDF_Dict_Add (view, "C2W", matrix);
+ 	if (ret != HPDF_OK) goto failed;
+ 
+-	ret = HPDF_Dict_AddNumber (view, "CO", roo);
++	ret = HPDF_Dict_AddNumber (view, "CO", (HPDF_INT32)roo);
+ 
+ failed:
+ 	if (ret != HPDF_OK) {
+diff --git a/src/hpdf_utils.c b/src/hpdf_utils.c
+index c1a9376..728da5a 100644
+--- a/src/hpdf_utils.c
++++ b/src/hpdf_utils.c
+@@ -136,7 +136,7 @@ HPDF_IToA  (char        *s,
+     *t-- = 0;
+ 
+     while (val > 0) {
+-        *t = (char)(val % 10) + '0';
++        *t = (char)((char)(val % 10) + '0');
+         val /= 10;
+         t--;
+     }
+@@ -165,7 +165,7 @@ HPDF_IToA2  (char         *s,
+     *u = 0;
+     t = u - 1;
+     while (val > 0 && t >= s) {
+-        *t = (char)(val % 10) + '0';
++        *t = (char)((char)(val % 10) + '0');
+         val /= 10;
+         t--;
+     }
+@@ -209,7 +209,7 @@ HPDF_FToA  (char       *s,
+ 
+     /* process decimal part */
+     for (i = 0; i < 5; i++) {
+-        *t = (char)(fpart_val % 10) + '0';
++        *t = (char)((char)(fpart_val % 10) + '0');
+         fpart_val /= 10;
+         t--;
+     }
+@@ -221,7 +221,7 @@ HPDF_FToA  (char       *s,
+         t--;
+ 
+     while (int_val > 0) {
+-        *t = (char)(int_val % 10) + '0';
++        *t = (char)((char)(int_val % 10) + '0');
+         int_val /= 10;
+         t--;
+     }
+-- 
