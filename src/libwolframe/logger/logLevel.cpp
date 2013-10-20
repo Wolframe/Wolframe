@@ -43,6 +43,7 @@ namespace log {
 LogLevel::Level LogLevel::strToLogLevel( const std::string& s )
 {
 	if( s == "DATA" )		return LogLevel::LOGLEVEL_DATA;
+	else if( s == "DATA2" )		return LogLevel::LOGLEVEL_DATA2;
 	else if( s == "TRACE" )		return LogLevel::LOGLEVEL_TRACE;
 	else if( s == "DEBUG" )		return LogLevel::LOGLEVEL_DEBUG;
 	else if( s == "INFO" )		return LogLevel::LOGLEVEL_INFO;
