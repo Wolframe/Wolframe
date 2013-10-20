@@ -1,0 +1,22 @@
+From: Antony Dovgal <tony@daylessday.org>
+Date: Fri, 20 May 2011 18:54:32 +0400
+Subject: fix HPDF_GetContents() (patch by Vincent Dupont)
+
+---
+ src/hpdf_doc.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/hpdf_doc.c b/src/hpdf_doc.c
+index 7ba58df..4aed4ab 100644
+--- a/src/hpdf_doc.c
++++ b/src/hpdf_doc.c
+@@ -658,7 +658,7 @@ HPDF_GetContents   (HPDF_Doc   pdf,
+                  HPDF_UINT32  *size)
+ {
+     HPDF_Stream stream;
+-    HPDF_UINT isize;
++    HPDF_UINT isize = *size;
+     HPDF_STATUS ret;
+ 
+     HPDF_PTRACE ((" HPDF_GetContents\n"));
+-- 

@@ -1,0 +1,113 @@
+Source: wolframe
+Section: unknown
+Priority: extra
+Maintainer: Mihai Barbos <mihai.barbos@gmail.com>
+Build-Depends: debhelper (>= 4.1.16),
+ libboost1.53-dev, libboost-thread1.53-dev, libboost-system1.53-dev,
+ libboost-program-options1.53-dev, libboost-filesystem1.53-dev,
+ libboost-locale1.53-dev, libboost-regex1.53-dev,
+ libssl-dev, libpam-dev, libsasl2-dev,
+ libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
+ libhpdf-dev, zlib1g-dev, libpng-dev, python3-dev,
+ sqlite3, sasl2-bin, expect, telnet
+Standards-Version: 3.8.3
+Homepage: http://www.wolframe.net
+
+Package: wolframe
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe Daemon
+ The Wolframe server and server utilities.
+
+Package: wolframe-dev
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe Development
+ The Wolframe server SDK development files and static libraries.
+
+Package: wolframe-sqlite3
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Sqlite3 database bindings
+ The Wolframe database module for Sqlite3.
+
+Package: wolframe-postgresql
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Postgresql database bindings
+ The Wolframe database module for Postgresql (libpq).
+
+Package: wolframe-pam
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: PAM authentication bindings
+ The Wolframe authentication module for PAM.
+
+Package: wolframe-sasl
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: SASL authentication bindings
+ The Wolframe authentication module using Cyrus SASL.
+
+Package: wolframe-lua
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe Lua language bindings.
+ Allows writing business application code in Lua.
+
+Package: wolframe-python
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe Python 3 bindings.
+ Allows writing business application code in Python 3.
+
+Package: wolframe-textwolf
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using textwolf.
+ The Wolframe XML parsing module using textwolf.
+
+Package: wolframe-libxml2
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using libxml2.
+ The Wolframe XML parsing module using libxml2.
+ Contains also an XSLT filter using libxslt.
+
+Package: wolframe-libhpdf
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe printing module based on libhpdf/libharu.
+ Wolframe printing module based on libhpdf/libharu.
+
+Package: wolframe-freeimage
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe image manipulation function module.
+ Wolframe image manipulation function module implemented with
+ the FreeImage library.
+
+Package: wolframe-cjson
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe JSON filter module with cjson
+ Wolframe filter JSON filtering module implemented with
+ the cjson library.
+
+Package: wolframe-libclient
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe C++ client library
+ Wolframe client library for C++ (implemented using boost libraries).
+
+Package: wolframe-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe client command line tool.
+ Command line client to access the Wolframe server.
+
+Package: wolframe-doc
+Architecture: all
+Description: Documentation for Wolframe
+ The HTML and PDF WolfBook, tutorial and doxygen API documentation
+ of the Wolframe system.

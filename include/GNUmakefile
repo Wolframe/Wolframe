@@ -11,7 +11,7 @@ INCLUDE_SUBDIRS = \
 	langbind protocol cmdbind database prnt config \
 	ddl logger utils serialize serialize/struct \
 	serialize/ddl processor filter types AAAA module \
-	prgbind
+	prgbind crypto
 
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \

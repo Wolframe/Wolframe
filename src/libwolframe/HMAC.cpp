@@ -38,8 +38,8 @@
 #include <cassert>
 #include <stdexcept>
 
-#include "types/HMAC.hpp"
-#include "types/HMAC.h"
+#include "crypto/HMAC.hpp"
+#include "crypto/HMAC.h"
 
 #include "types/byte2hex.h"
 #include "types/base64.hpp"

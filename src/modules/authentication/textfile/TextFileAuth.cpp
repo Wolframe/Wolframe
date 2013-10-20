@@ -39,7 +39,7 @@
 
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
-#include "types/sha2.h"
+#include "crypto/sha2.h"
 #include "types/byte2hex.h"
 #include "AAAA/CRAM.hpp"
 #include "AAAA/password.hpp"

@@ -54,7 +54,7 @@
 #include "AAAA/password.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
-#include "types/sha2.h"
+#include "crypto/sha2.h"
 #include "system/globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>

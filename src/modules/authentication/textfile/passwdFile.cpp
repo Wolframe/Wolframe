@@ -42,7 +42,7 @@
 
 #include "types/base64.h"
 #include "passwdFile.hpp"
-#include "types/HMAC.hpp"
+#include "crypto/HMAC.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

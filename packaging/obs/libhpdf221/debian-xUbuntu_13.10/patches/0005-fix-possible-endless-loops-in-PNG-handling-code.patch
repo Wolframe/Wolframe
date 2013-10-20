@@ -1,0 +1,32 @@
+From: Antony Dovgal <tony@daylessday.org>
+Date: Fri, 13 May 2011 15:54:20 +0400
+Subject: fix possible endless loops in PNG handling code
+
+reported by Mathew Waters
+---
+ src/hpdf_image_png.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hpdf_image_png.c b/src/hpdf_image_png.c
+index 6057424..85bd29f 100644
+--- a/src/hpdf_image_png.c
++++ b/src/hpdf_image_png.c
+@@ -196,7 +196,7 @@ ReadTransparentPaletteData  (HPDF_Dict    image,
+ 		for (i = 0; i < (HPDF_UINT)height; i++) {
+ 			row_ptr[i] = HPDF_GetMem(image->mmgr, len);
+ 			if (!row_ptr[i]) {
+-				for (; i >= 0; i--) {
++				for (; i > 0; i--) {
+ 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
+ 				}
+ 				HPDF_FreeMem (image->mmgr, row_ptr);
+@@ -260,7 +260,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
+ 		for (i = 0; i < (HPDF_UINT)height; i++) {
+ 			row_ptr[i] = HPDF_GetMem(image->mmgr, len);
+ 			if (!row_ptr[i]) {
+-				for (; i >= 0; i--) {
++				for (; i > 0; i--) {
+ 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
+ 				}
+ 				HPDF_FreeMem (image->mmgr, row_ptr);
+-- 

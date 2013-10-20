@@ -1,0 +1,22 @@
+From: Antony Dovgal <tony@daylessday.org>
+Date: Mon, 9 May 2011 23:10:51 +0400
+Subject: fix typo (noticed by Franco Marchesini)
+
+---
+ src/hpdf_page_operator.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/hpdf_page_operator.c b/src/hpdf_page_operator.c
+index 87ec819..b01f54f 100644
+--- a/src/hpdf_page_operator.c
++++ b/src/hpdf_page_operator.c
+@@ -2430,7 +2430,7 @@ HPDF_Page_TextRect  (HPDF_Page            page,
+     HPDF_Box bbox;
+     HPDF_BOOL char_space_changed = HPDF_FALSE;
+ 
+-    HPDF_PTRACE ((" HPDF_Page_TextOutEx\n"));
++    HPDF_PTRACE ((" HPDF_Page_TextRect\n"));
+ 
+     if (ret != HPDF_OK)
+         return ret;
+-- 

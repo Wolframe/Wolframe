@@ -36,8 +36,8 @@
 
 #include "gtest/gtest.h"
 #include <cstring>
-#include "types/sha2.h"
-#include "types/sha1.h"
+#include "crypto/sha2.h"
+#include "crypto/sha1.h"
 
 
 /* FIPS 180-2 Validation tests */

@@ -2,7 +2,7 @@
 
 OSC_HOME=$HOME/home:andreas_baumann/boost1.48
 
-( cd packaging/obs/boost1.48 && tar zcvf ../../../boost1.48_1.48.0.debian.tar.gz debian )
+( cd packaging/obs/boost1.48 && tar zcf ../../../boost1.48_1.48.0.debian.tar.gz debian )
 cp boost1.48_1.48.0.debian.tar.gz $OSC_HOME/.
 
 SIZE=`stat -c '%s' $OSC_HOME/boost1.48_1.48.0.debian.tar.gz`

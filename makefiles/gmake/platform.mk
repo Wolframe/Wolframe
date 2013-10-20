@@ -100,9 +100,31 @@ PLATFORM_COMPILE_FLAGS = \
 			-DOS_MINOR_VERSION=$(OS_MINOR_VERSION)
 
 ifeq "$(PLATFORM)" "LINUX"
-PLATFORM_COMPILE_FLAGS += \
-			-DLINUX_DIST=$(LINUX_DIST) -DLINUX_REV=$(LINUX_REV)
+ifeq "$(LINUX_DIST)" "arch"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_ARCH=1
 endif
+ifeq "$(LINUX_DIST)" "debian"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_DEBIAN=1
+endif
+ifeq "$(LINUX_DIST)" "redhat"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_REDHAT=1
+endif
+ifeq "$(LINUX_DIST)" "slackware"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SLACKWARE=1
+endif
+ifeq "$(LINUX_DIST)" "sles"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SLES=1
+endif
+ifeq "$(LINUX_DIST)" "suse"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SUSE=1
+endif
+ifeq "$(LINUX_DIST)" "ubuntu"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_UBUNTU=1
+endif
+PLATFORM_COMPILE_FLAGS += \
+			-DLINUX_REV=$(LINUX_REV)
+endif
+
 
 # extensions for shared libraries
 # (TOOD: HP/Unix has .shlib, Mac/X has .lib, but we can't test it currently)
@@ -237,6 +259,10 @@ endif
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
@@ -270,12 +296,6 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
-XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
-endif
 
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
@@ -338,6 +358,13 @@ endif
 
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "13.10"
+BOOST_DIR ?= /usr
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_LIBRARY_TAG ?=
+endif
 
 ifeq "$(LINUX_REV)" "13.04"
 BOOST_DIR ?= /usr
@@ -489,16 +516,6 @@ endif
 
 endif
 
-# Fedora 17
-ifeq "$(LINUX_DIST)" "redhat"
-ifeq "$(LINUX_REV)" "17"
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
-endif
-endif
-
 # Fedora 18
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "18"
@@ -605,6 +622,10 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
@@ -650,11 +671,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -771,6 +787,13 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
@@ -829,14 +852,6 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
 
 # Fedora 18
 ifeq "$(LINUX_REV)" "18"
@@ -954,6 +969,13 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
@@ -1023,14 +1045,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -1150,6 +1164,13 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
@@ -1219,14 +1240,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1366,6 +1379,15 @@ endif
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
@@ -1455,14 +1477,6 @@ PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
@@ -1592,6 +1606,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
@@ -1677,16 +1700,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1829,6 +1842,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
@@ -1914,16 +1936,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
@@ -2065,6 +2077,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+LIBHPDF_DIR ?= /usr
+LIBHPDF_INCLUDE_DIR ?= $(LIBHPDF_DIR)/include
+LIBHPDF_INCLUDE_DIRS = -I$(LIBHPDF_INCLUDE_DIR)
+LIBHPDF_LIB_DIR ?= $(LIBHPDF_DIR)/lib
+LIBHPDF_LIB_DIRS = -L$(LIBHPDF_LIB_DIR)
+LIBHPDF_LIBS ?= -lhpdf
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -2126,16 +2147,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
@@ -2307,6 +2318,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
@@ -2392,16 +2412,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
@@ -2546,6 +2556,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
@@ -2631,16 +2650,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
@@ -2785,6 +2794,15 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+ICU_DIR ?= /usr
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
@@ -2870,16 +2888,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-ICU_DIR ?= /usr
-ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
-ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
-ICU_LIB_DIR ?= $(ICU_DIR)/lib
-ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
-ICU_LIBS ?=
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
@@ -3042,6 +3050,20 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+FREEIMAGE_DIR ?= /usr
+FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
+FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
+FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
+FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
+FREEIMAGEPLUS_LIB_DIRS = -L$(FREEIMAGEPLUS_LIB_DIR)
+FREEIMAGEPLUS_LIBS = -lfreeimageplus
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
@@ -3152,16 +3174,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 17
-ifeq "$(LINUX_REV)" "17"
 FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM

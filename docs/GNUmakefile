@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = images
+SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/doc.mk
 

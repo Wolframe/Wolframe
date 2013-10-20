@@ -47,7 +47,7 @@
 
 #endif /* _WIN32 */
 
-#include "types/sha1.h"
+#include "crypto/sha1.h"
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 

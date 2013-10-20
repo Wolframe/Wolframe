@@ -1,5 +1,0 @@
-Directory for DTDs / Schemas / Relax-NG definitions and for some of the other XML things that we need. 
-
-Note that this might not be (read probably will not be) the final place for those things.
-
-usage: xmllint --relaxng PatternFile.rng <xml file>

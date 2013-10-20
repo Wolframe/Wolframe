@@ -36,7 +36,7 @@
 
 #include "gtest/gtest.h"
 #include <cstring>
-#include "types/md5.h"
+#include "crypto/md5.h"
 
 TEST( MD5fixture, md5 )
 {

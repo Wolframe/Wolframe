@@ -3,6 +3,10 @@
 VERSION=0.0.1
 OSC_HOME=$HOME/home:andreas_baumann/Wolframe
 
+if test "x$TMPDIR" = "x"; then
+	TMPDIR=/tmp
+fi
+
 # the original package
 rm -f wolframe-$VERSION.tar.gz
 make \
@@ -31,15 +35,15 @@ for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 	OS_ORIG=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//'`
 	OS=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//' | tr -d '_'`
 	rm -rf $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz
-	rm -rf /tmp/debian
-	cp -a packaging/debian /tmp/.
-	test -f packaging/obs/control-$OS_ORIG && cp -a packaging/obs/control-$OS_ORIG /tmp/debian/control
-	test -f packaging/obs/rules-$OS_ORIG && cp -a packaging/obs/rules-$OS_ORIG /tmp/debian/rules
+	rm -rf $TMPDIR/debian
+	cp -a packaging/debian $TMPDIR/.
+	test -f packaging/obs/control-$OS_ORIG && cp -a packaging/obs/control-$OS_ORIG $TMPDIR/debian/control
+	test -f packaging/obs/rules-$OS_ORIG && cp -a packaging/obs/rules-$OS_ORIG $TMPDIR/debian/rules
 	OLDDIR=$PWD
-	cd /tmp
-	tar zcf /tmp/wolframe_$VERSION-$OS.debian.tar.gz debian
+	cd $TMPDIR
+	tar zcf $TMPDIR/wolframe_$VERSION-$OS.debian.tar.gz debian
 	cd $OLDDIR
-	mv -f /tmp/wolframe_$VERSION-$OS.debian.tar.gz $OSC_HOME/.
+	mv -f $TMPDIR/wolframe_$VERSION-$OS.debian.tar.gz $OSC_HOME/.
 	DEBIAN_SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz`
 	DEBIAN_CHKSUM=`md5sum  $OSC_HOME/wolframe_$VERSION-$OS.debian.tar.gz | cut -f 1 -d' '`
 	echo " $DEBIAN_CHKSUM $DEBIAN_SIZE wolframe_$VERSION-$OS.debian.tar.gz" >> $i
