@@ -96,6 +96,27 @@ if (boost::starts_with( flag, "DISABLED "))
 #endif
 #ifdef LINUX
 		if (boost::iequals( *ii, "LINUX")) return "DISABLED ON PLATFORM LINUX ";
+#ifdef LINUX_DIST_ARCH
+		if (boost::iequals( *ii, "ARCH_LINUX")) return "DISABLED ON LINUX DISTRIBUTION ArchLinux";
+#endif
+#ifdef LINUX_DIST_DEBIAN
+		if (boost::iequals( *ii, "DEBIAN_LINUX")) return "DISABLED ON LINUX DISTRIBUTION Debian";
+#endif
+#ifdef LINUX_DIST_REDHAT
+		if (boost::iequals( *ii, "REDHAT_LINUX")) return "DISABLED ON LINUX DISTRIBUTION Redhat/Fedora";
+#endif
+#ifdef LINUX_DIST_SLACKWARE
+		if (boost::iequals( *ii, "SLACKWARE_LINUX")) return "DISABLED ON LINUX DISTRIBUTION Slackware";
+#endif
+#ifdef LINUX_DIST_SLES
+		if (boost::iequals( *ii, "SLES_LINUX")) return "DISABLED ON LINUX DISTRIBUTION SuSE Enterprise";
+#endif
+#ifdef LINUX_DIST_SUSE
+		if (boost::iequals( *ii, "SUSE_LINUX")) return "DISABLED ON LINUX DISTRIBUTION OpenSuSE";
+#endif
+#ifdef LINUX_DIST_UBUNTU
+		if (boost::iequals( *ii, "UBUNTU_LINUX")) return "DISABLED ON LINUX DISTRIBUTION Ubuntu";
+#endif
 #endif
 #ifdef SUNOS
 		if (boost::iequals( *ii, "SUNOS")) return "DISABLED ON PLATFORM SUNOS ";
@@ -110,12 +131,36 @@ if (boost::starts_with( flag, "DISABLED "))
 	if (nargs == 0) return "DISABLED ";
 }
 	enum Platform {p_UNKNOWN,p_WIN32,p_LINUX,p_SUNOS,p_FREEBSD,p_NETBSD};
+	enum LinuxDistro {d_UNKNOWN,d_ARCH,d_DEBIAN,d_REDHAT,d_SLACKWARE,d_SLES,d_SUSE,d_UBUNTU};
+
 	Platform platform = p_UNKNOWN;
+	LinuxDistro distro = d_UNKNOWN;
 #ifdef _WIN32
 	platform = p_WIN32;
 #endif
 #ifdef LINUX
 	platform = p_LINUX;
+#if LINUX_DIST == arch
+	distro = d_ARCH;
+#endif
+#if LINUX_DIST == debian
+	distro = d_DEBIAN;
+#endif
+#if LINUX_DIST == redhat
+	distro = d_REDHAT;
+#endif
+#if LINUX_DIST == slackware
+	distro = d_SLACKWARE;
+#endif
+#if LINUX_DIST == sles
+	distro = d_SLES;
+#endif
+#if LINUX_DIST == suse
+	distro = d_SUSE;
+#endif
+#if LINUX_DIST == ubuntu
+	distro = d_UBUNTU;
+#endif
 #endif
 #ifdef SUNOS
 	platform = p_SUNOS;
@@ -128,6 +173,15 @@ if (boost::starts_with( flag, "DISABLED "))
 #endif
 	if (platform != p_WIN32 && boost::iequals( flag, "WIN32")) return "only on platform WINDOWS";
 	if (platform != p_LINUX && boost::iequals( flag, "LINUX")) return "only on platform LINUX";
+#ifdef LINUX
+	if (distro != d_ARCH && boost::iequals( flag, "ARCH_LINUX")) return "only on Linux distribution ArchLinux";
+	if (distro != d_DEBIAN && boost::iequals( flag, "DEBIAN_LINUX")) return "only on Linux distribution Debian";
+	if (distro != d_REDHAT && boost::iequals( flag, "REDHAT_LINUX")) return "only on Linux distribution Redhat";
+	if (distro != d_SLACKWARE && boost::iequals( flag, "SLACKWARE_LINUX")) return "only on Linux distribution Slackware";
+	if (distro != d_SLES && boost::iequals( flag, "SLES_LINUX")) return "only on Linux distribution SuSE Enterprise";
+	if (distro != d_SUSE && boost::iequals( flag, "SUSE_LINUX")) return "only on Linux distribution OpenSuSE";
+	if (distro != d_UBUNTU && boost::iequals( flag, "UBUNTU_LINUX")) return "only on Linux distribution Ubuntu";
+#endif
 	if (platform != p_SUNOS && boost::iequals( flag, "SUNOS")) return "only on platform SUNOS";
 	if (platform != p_FREEBSD && boost::iequals( flag, "FREEBSD")) return "only on platform FREEBSD";
 	if (platform != p_NETBSD && boost::iequals( flag, "NETBSD")) return "only on platform NETBSD";

@@ -100,9 +100,31 @@ PLATFORM_COMPILE_FLAGS = \
 			-DOS_MINOR_VERSION=$(OS_MINOR_VERSION)
 
 ifeq "$(PLATFORM)" "LINUX"
-PLATFORM_COMPILE_FLAGS += \
-			-DLINUX_DIST=$(LINUX_DIST) -DLINUX_REV=$(LINUX_REV)
+ifeq "$(LINUX_DIST)" "arch"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_ARCH=1
 endif
+ifeq "$(LINUX_DIST)" "debian"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_DEBIAN=1
+endif
+ifeq "$(LINUX_DIST)" "redhat"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_REDHAT=1
+endif
+ifeq "$(LINUX_DIST)" "slackware"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SLACKWARE=1
+endif
+ifeq "$(LINUX_DIST)" "sles"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SLES=1
+endif
+ifeq "$(LINUX_DIST)" "suse"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_SUSE=1
+endif
+ifeq "$(LINUX_DIST)" "ubuntu"
+PLATFORM_COMPILE_FLAGS = -DLINUX_DIST_UBUNTU=1
+endif
+PLATFORM_COMPILE_FLAGS += \
+			-DLINUX_REV=$(LINUX_REV)
+endif
+
 
 # extensions for shared libraries
 # (TOOD: HP/Unix has .shlib, Mac/X has .lib, but we can't test it currently)
