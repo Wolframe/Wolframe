@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="11cm" height="20cm" viewBox="134 43 202 394" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <g>
+      <rect style="fill: #ffffff" x="137" y="44" width="196" height="392"/>
+      <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="137" y="44" width="196" height="392"/>
+    </g>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="234" y="61">
+      <tspan x="234" y="61">ProcProvider</tspan>
+      <tspan x="234" y="77">(provider of processing items)</tspan>
+    </text>
+    <g>
+      <rect style="fill: #ffffff" x="156" y="89" width="159" height="62"/>
+      <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="156" y="89" width="159" height="62"/>
+    </g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="136" y1="169" x2="335" y2="168"/>
+    <g>
+      <rect style="fill: #ffffff" x="156.2" y="189.8" width="159" height="38.2"/>
+      <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="156.2" y="189.8" width="159" height="38.2"/>
+    </g>
+    <g>
+      <rect style="fill: #ffffff" x="157.2" y="241.8" width="159" height="38.2"/>
+      <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="157.2" y="241.8" width="159" height="38.2"/>
+    </g>
+    <g>
+      <rect style="fill: #ffffff" x="158.4" y="292.6" width="159" height="38.2"/>
+      <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="158.4" y="292.6" width="159" height="38.2"/>
+    </g>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="165.5" y="105">
+      <tspan x="165.5" y="105">command handler</tspan>
+      <tspan x="165.5" y="121">creator</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="164.7" y="204.9">
+      <tspan x="164.7" y="204.9">filter creator</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="164.7" y="253.9">
+      <tspan x="164.7" y="253.9">bla bla creator</tspan>
+    </text>
+  </g>
+</svg>
