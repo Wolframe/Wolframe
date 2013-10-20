@@ -140,25 +140,25 @@ if (boost::starts_with( flag, "DISABLED "))
 #endif
 #ifdef LINUX
 	platform = p_LINUX;
-#if LINUX_DIST == arch
+#ifdef LINUX_DIST_ARCH
 	distro = d_ARCH;
 #endif
-#if LINUX_DIST == debian
+#ifdef LINUX_DIST_DEBIAN
 	distro = d_DEBIAN;
 #endif
-#if LINUX_DIST == redhat
+#ifdef LINUX_DIST_REDHAT
 	distro = d_REDHAT;
 #endif
-#if LINUX_DIST == slackware
+#ifdef LINUX_DIST_SLACKWARE
 	distro = d_SLACKWARE;
 #endif
-#if LINUX_DIST == sles
+#ifdef LINUX_DIST_SLES
 	distro = d_SLES;
 #endif
-#if LINUX_DIST == suse
+#ifdef LINUX_DIST_SUSE
 	distro = d_SUSE;
 #endif
-#if LINUX_DIST == ubuntu
+#ifdef LINUX_DIST_UBUNTU
 	distro = d_UBUNTU;
 #endif
 #endif
