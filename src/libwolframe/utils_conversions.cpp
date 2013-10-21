@@ -60,7 +60,7 @@ public:
 		} tab;
 	};
 
-	const char* getNumberString( types::Variant::Data::UInt val, Number64& str) const
+	const char* getNumberString( _WOLFRAME_UINTEGER val, Number64& str) const
 	{
 		std::size_t ii=0;
 		if (val == 0) return "0";
@@ -86,31 +86,31 @@ private:
 };
 }//anonymous namespace
 
-static void get_number_string( std::string& rt, types::Variant::Data::UInt val)
+static void get_number_string( std::string& rt, _WOLFRAME_UINTEGER val)
 {
 	static const NumTable tab;
 	NumTable::Number64 numstrbuf;
 	rt.append( tab.getNumberString( val, numstrbuf));
 }
 
-static void get_number_string( std::string& rt, types::Variant::Data::Int val)
+static void get_number_string( std::string& rt, _WOLFRAME_INTEGER val)
 {
 	static const NumTable tab;
 	NumTable::Number64 numstrbuf;
 	if (val < 0)
 	{
 		rt.push_back( '-');
-		rt.append( tab.getNumberString( (types::Variant::Data::UInt)-val, numstrbuf));
+		rt.append( tab.getNumberString( (_WOLFRAME_UINTEGER)-val, numstrbuf));
 	}
 	else
 	{
-		rt.append( tab.getNumberString( (types::Variant::Data::UInt)val, numstrbuf));
+		rt.append( tab.getNumberString( (_WOLFRAME_UINTEGER)val, numstrbuf));
 	}
 }
 
-static types::Variant::Data::UInt string2uint( const char *pp)
+static _WOLFRAME_UINTEGER string2uint( const char *pp)
 {
-	types::Variant::Data::UInt rt = 0, prev = 0;
+	_WOLFRAME_UINTEGER rt = 0, prev = 0;
 	while (*pp >= '0' && *pp <= '9')
 	{
 		prev = rt;
@@ -122,38 +122,38 @@ static types::Variant::Data::UInt string2uint( const char *pp)
 	return rt;
 }
 
-std::string utils::tostring_cast( types::Variant::Data::UInt val)
+std::string utils::tostring_cast( _WOLFRAME_UINTEGER val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-std::string utils::tostring_cast( types::Variant::Data::Int val)
+std::string utils::tostring_cast( _WOLFRAME_INTEGER val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-types::Variant::Data::UInt utils::touint_cast( const std::string& val)
+_WOLFRAME_UINTEGER utils::touint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	return string2uint( val.c_str());
 }
 
-types::Variant::Data::Int utils::toint_cast( const std::string& val)
+_WOLFRAME_INTEGER utils::toint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	if (val.at(0) == '-')
 	{
-		types::Variant::Data::Int rt = (types::Variant::Data::Int)string2uint( val.c_str()+1);
+		_WOLFRAME_INTEGER rt = (_WOLFRAME_INTEGER)string2uint( val.c_str()+1);
 		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
 		return -rt;
 	}
 	else
 	{
-		types::Variant::Data::Int rt = (types::Variant::Data::Int)string2uint( val.c_str());
+		_WOLFRAME_INTEGER rt = (_WOLFRAME_INTEGER)string2uint( val.c_str());
 		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
 		return rt;
 	}
