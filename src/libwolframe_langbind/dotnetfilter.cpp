@@ -32,7 +32,6 @@ Project Wolframe.
 ///\file dotnetfilter.cpp
 ///\brief Implementation of dotnet filters (serialization/deserialization of the .NET VARIANT/IRecordInfo datatype)
 #include "dotnetfilter.hpp"
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>
 
