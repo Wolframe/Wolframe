@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Defines the intrusive parsing of a value in deserialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
+#include "utils/conversions.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -93,34 +94,13 @@ static bool parseValue_( ValueType& val, const ParseValueType::String&, const ty
 {
 	try
 	{
-		switch (element.type())
-		{
-			case types::Variant::Null:
-				return false;
-
-			case types::Variant::Bool:
-				val = (element.tobool())?"true":"false";
-				return true;
-
-			case types::Variant::Double:
-				val = boost::lexical_cast<ValueType>( element.todouble());
-				return true;
-
-			case types::Variant::Int:
-				val = boost::lexical_cast<ValueType>( element.toint());
-				return true;
-
-			case types::Variant::UInt:
-				val = boost::lexical_cast<ValueType>( element.touint());
-				return true;
-
-			case types::Variant::String:
-				val.clear();
-				val.append( element.charptr(), element.charsize());
-				return true;
-		}
+		val = element.tostring();
 	}
 	catch (const boost::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch (const std::runtime_error&)
 	{
 		return false;
 	}
