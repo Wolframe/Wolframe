@@ -95,15 +95,10 @@ static bool parseValue_( ValueType& val, const ParseValueType::String&, const ty
 	try
 	{
 		val = element.tostring();
+		return true;
 	}
-	catch (const boost::bad_lexical_cast&)
-	{
-		return false;
-	}
-	catch (const std::runtime_error&)
-	{
-		return false;
-	}
+	catch (const boost::bad_lexical_cast&){}
+	catch (const std::runtime_error&){}
 	return false;
 }
 
@@ -144,10 +139,8 @@ static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const type
 				return false;
 		}
 	}
-	catch (const boost::bad_lexical_cast&)
-	{
-		return false;
-	}
+	catch (const boost::bad_lexical_cast&){}
+	return false;
 }
 
 template <typename ValueType>
@@ -181,14 +174,8 @@ static bool parseValue_( ValueType& val, const ParseValueType::Arithmetic&, cons
 				return true;
 		}
 	}
-	catch (const boost::bad_lexical_cast&)
-	{
-		return false;
-	}
-	catch (const boost::bad_numeric_cast&)
-	{
-		return false;
-	}
+	catch (const boost::bad_lexical_cast&){}
+	catch (const boost::bad_numeric_cast&){}
 	return false;
 }
 
