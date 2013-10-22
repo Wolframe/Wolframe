@@ -33,7 +33,8 @@ Project Wolframe.
 #include "prnt/pdfPrinterVariable.hpp"
 #include "types/bcdArithmetic.hpp"
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
+#include <iostream>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

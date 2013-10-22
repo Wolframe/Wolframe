@@ -35,8 +35,6 @@
 #include "base64Normalize.hpp"
 #include "base64NormalizeFunction.hpp"
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <limits>
 
 using namespace _Wolframe;

@@ -38,7 +38,6 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
-#include <boost/lexical_cast.hpp>
 
 extern "C"
 {

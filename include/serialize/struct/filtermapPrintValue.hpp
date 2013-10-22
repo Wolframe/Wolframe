@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Defines the intrucsive printing of a value for serialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
-#include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>

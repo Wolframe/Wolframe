@@ -52,7 +52,6 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <cstdarg>
-#include <boost/lexical_cast.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 extern "C"
 {

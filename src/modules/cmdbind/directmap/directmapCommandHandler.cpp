@@ -39,7 +39,6 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

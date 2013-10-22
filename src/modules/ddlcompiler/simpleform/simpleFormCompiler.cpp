@@ -39,7 +39,6 @@ Project Wolframe.
 #include <vector>
 #include <cstring>
 #include <cstddef>
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
