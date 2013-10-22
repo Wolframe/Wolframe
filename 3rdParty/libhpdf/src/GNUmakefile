@@ -7,13 +7,16 @@ PACKAGE_NAME = wolframe
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	$(LIBPNG_INCLUDE_DIRS)
+	$(LIBPNG_INCLUDE_DIRS) \
+	$(LIBZ_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
-	$(LIBPNG_LIB_DIRS)
+	$(LIBPNG_LIB_DIRS) \
+	$(LIBZ_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	$(LIBPNG_LIBS)
+	$(LIBPNG_LIBS) \
+	$(LIBZ_LIBS)
 
 STATIC_LIB = libhpdf.a
 
