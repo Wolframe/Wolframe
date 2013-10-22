@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS =
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = -lpng
 
 STATIC_LIB = libhpdf.a
 
