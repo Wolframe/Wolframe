@@ -46,8 +46,6 @@ doc-html: WolfBook.html Tutorial.html
 
 doc-html-chunked: html/index.html
 
-doc-html-webpage: html-webpage/index.html
-
 doc-pdf: WolfBook.pdf Tutorial.pdf
 
 .PHONY: depend
@@ -77,12 +75,6 @@ html/index.html: WolfBook.xml
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-chunked.xsl WolfBook.xml
 
-html-webpage/index.html: WolfBook.xml
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam draft.mode no \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-webpage.xsl WolfBook.xml
-
 %.epub: %.xml
 	$(XSLT_EPUB) $<
 
@@ -101,7 +93,6 @@ local_clean:
 	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
-	-rm -rf html-webpage/*.html
 	
 local_distclean:
 
