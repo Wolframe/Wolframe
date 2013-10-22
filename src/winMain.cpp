@@ -42,7 +42,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "appProperties.hpp"
-#include "system/version.hpp"
+#include "version.hpp"
 #include "wolframedCommandLine.hpp"
 #include "appconfig.hpp"
 #include "standardConfigs.hpp"

@@ -38,7 +38,7 @@
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
-#include "types/singleton.hpp"
+#include "singleton.hpp"
 
 namespace _Wolframe	{
 

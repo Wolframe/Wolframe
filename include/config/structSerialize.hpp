@@ -76,5 +76,3 @@ std::string structureToString( const Structure& st)
 
 }}//namespace
 #endif
-
-

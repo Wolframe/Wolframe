@@ -42,7 +42,7 @@
 
 #include "appProperties.hpp"
 
-#include "system/version.hpp"
+#include "version.hpp"
 #include "wolframedCommandLine.hpp"
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"

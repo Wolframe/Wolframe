@@ -39,7 +39,7 @@
 
 #include <string>
 #include <list>
-#include "system/version.hpp"
+#include "version.hpp"
 
 namespace _Wolframe {
 namespace UI {

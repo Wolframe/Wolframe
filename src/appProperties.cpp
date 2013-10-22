@@ -35,7 +35,7 @@
 //
 
 #include "appProperties.hpp"
-#include "system/version.hpp"
+#include "version.hpp"
 
 namespace _Wolframe	{
 	static const unsigned short APP_MAJOR_VERSION = 0;
