@@ -21,7 +21,7 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
-	-rm -f *.pdf
+	-rm -f *.pdf test2.raw
 
 local_distclean:
 
