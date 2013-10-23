@@ -12,6 +12,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib \
+	$(TOPDIR)\3rdParty\libpng\libpng.lib \
 	$(TOPDIR)\3rdParty\zlib\zlib.lib
 	
 TEST_CPP_BINS = \
