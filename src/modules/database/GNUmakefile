@@ -14,6 +14,11 @@ ifeq ($(WITH_SQLITE3),1)
 SUBDIRS += sqlite3
 endif
 
+# Oracle
+ifeq ($(WITH_ORACLE),1)
+SUBDIRS += oracle
+endif
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

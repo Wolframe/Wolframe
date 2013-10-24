@@ -26,6 +26,7 @@ WITH_PAM=1              build authentication code with PAM
 WITH_SYSTEM_SQLITE3=1   build AAAA and DB connectors for Sqlite3 (from system) 
 WITH_LOCAL_SQLITE3=1    force building of local amalgataion version of Sqlite3
 WITH_PGSQL=1            build AAAA and DB connectors for PostgreSql
+WITH_ORACLE=1           build AAAA and DB connectors for Oracle
 WITH_TEXTWOLF=1         build code using textwolf
 WITH_LIBXML2=1          build code using libxml2
 WITH_LIBXSLT=1          build code using libxslt (requires also libxml2)

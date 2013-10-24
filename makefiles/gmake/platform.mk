@@ -29,6 +29,7 @@ WITH_PAM ?= 0
 WITH_SYSTEM_SQLITE3 ?= 0
 WITH_LOCAL_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
+WITH_ORACLE ?= 0
 WITH_LIBXML2 ?= 0
 WITH_LIBXSLT ?= 0
 WITH_CJSON ?= 0
@@ -1343,6 +1344,20 @@ SQLITE3_LIB_DIR =
 SQLITE3_LIB_DIRS =
 SQLITE3_LIBS = $(SQLITE3_DIR)/libsqlite3.a
 SQLITE3 = $(SQLITE3_DIR)/sqlite3
+endif
+
+# Oracle
+########
+
+ifeq ($(WITH_ORACLE),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+endif
+
+endif
+
 endif
 
 # Postgresql
