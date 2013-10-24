@@ -9,7 +9,7 @@ arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'libharu'
-         'freeimage')
+         'freeimage' 'python')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
@@ -18,7 +18,7 @@ source=(
   'wolframed.service'
 )
 md5sums=('2fde608c00c6d098683db533cbaab07b'
-         '66bdff0de795380ecafa48edda8d470e')
+         'cc146a28908aad55f156860340934095')
 _gitroot=git://github.com/mbarbos/Wolframe.git
 _gitname=Wolframe
 
@@ -30,7 +30,8 @@ package() {
     WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
     WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
-    WITH_SYSTEM_FREEIMAGE=1 RELEASE=1 \
+    WITH_SYSTEM_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+    WITH_TEXTWOLF=1 RELEASE=1 \
     DESTDIR=${pkgdir} prefix=/usr sbindir=/usr/bin \
     sysconfdir=/etc \
     install
