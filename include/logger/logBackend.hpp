@@ -38,7 +38,7 @@
 #ifndef _LOG_BACKEND_HPP_INCLUDED
 #define _LOG_BACKEND_HPP_INCLUDED
 
-#include "types/singleton.hpp"
+#include "singleton.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 

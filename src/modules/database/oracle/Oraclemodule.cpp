@@ -31,37 +31,39 @@
 
 ************************************************************************/
 //
-// application properties - implementation
+// Oracle module
 //
 
-#include "appProperties.hpp"
-#include "version.hpp"
+#include "Oracle.hpp"
+#include "processor/moduleInterface.hpp"
+#include "logger-v1.hpp"
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
+_Wolframe::log::LogBackend*	logBackendPtr;
 
-	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
-//										  ,APP_BUILD
-										  ); }
+namespace _Wolframe {
+namespace module {
 
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
+static ConfiguredBuilder* createOraclemodule( void )
+{
+	static ConfiguredBuilderDescription< db::Oracleconstructor,
+			db::Oracleconfig > mod( "Oracle database", "database",
+						    "Oracle", "Oracle" );
+	return &mod;
+}
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
+static void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
 
-	const char*	config::defaultServiceName()		{ return "wolframe"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for wolframeing"; }
-#endif // defined( _WIN32 )
 
-} // namespace _Wolframe
+static const unsigned short nrContainers = 1;
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
+	createOraclemodule
+};
 
+ModuleEntryPoint entryPoint( 0, "Oracle database", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
+
+}} // namespace _Wolframe::module

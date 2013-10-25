@@ -9,6 +9,11 @@ ifeq ($(WITH_PGSQL),1)
 SUBDIRS += PostgreSQL
 endif
 
+# Oracle
+ifeq ($(WITH_ORACLE),1)
+SUBDIRS += Oracle
+endif
+
 # sqlite3
 ifeq ($(WITH_SQLITE3),1)
 SUBDIRS += SQLite3

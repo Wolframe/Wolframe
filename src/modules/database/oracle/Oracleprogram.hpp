@@ -30,38 +30,41 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// application properties - implementation
-//
+///\brief Interface to programs of a postgres database
+///\file Oracleprogram.hpp
+#ifndef _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
+#define _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
+#include "types/keymap.hpp"
+#include <string>
+#include <map>
+#include <cstdlib>
 
-#include "appProperties.hpp"
-#include "version.hpp"
+namespace _Wolframe {
+namespace db {
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
+class Oracleprogram
+{
+public:
+	Oracleprogram(){}
+	Oracleprogram( const Oracleprogram& o)
+		:m_statementmap(o.m_statementmap){}
 
-	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
-//										  ,APP_BUILD
-										  ); }
+	void load( const std::string& dbsource);
+	const types::keymap<std::string>* statementmap() const
+	{
+		return &m_statementmap;
+	}
 
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
+	///\brief Add a set of named statements to the sqlite program
+	virtual void addStatements( const types::keymap<std::string>& stmmap)
+	{
+		m_statementmap.insert( stmmap);
+	}
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
+private:
+	types::keymap<std::string> m_statementmap;
+};
 
-	const char*	config::defaultServiceName()		{ return "wolframe"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for wolframeing"; }
-#endif // defined( _WIN32 )
-
-} // namespace _Wolframe
+}}
+#endif
 

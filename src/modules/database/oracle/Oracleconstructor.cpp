@@ -31,37 +31,29 @@
 
 ************************************************************************/
 //
-// application properties - implementation
+// Oracle constructor
 //
 
-#include "appProperties.hpp"
-#include "version.hpp"
+#include "Oracle.hpp"
+#include "logger-v1.hpp"
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
+namespace _Wolframe {
+namespace db {
 
-	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
-//										  ,APP_BUILD
-										  ); }
+OracledbUnit* Oracleconstructor::object( const config::NamedConfiguration& conf )
+{
+	const Oracleconfig& cfg = dynamic_cast< const Oracleconfig& >( conf );
 
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
+	OracledbUnit* m_db = new OracledbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
+						       cfg.user(), cfg.password(),
+						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
+						       cfg.sslRootCert, cfg.sslCRL,
+						       cfg.connectTimeout,
+						       cfg.connections, cfg.acquireTimeout,
+						       cfg.statementTimeout,
+						       cfg.programFiles());
+	MOD_LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
+	return m_db;
+}
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
-
-	const char*	config::defaultServiceName()		{ return "wolframe"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for wolframeing"; }
-#endif // defined( _WIN32 )
-
-} // namespace _Wolframe
-
+}} // namespace _Wolframe::db

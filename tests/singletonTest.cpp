@@ -34,7 +34,7 @@
 // tests singleton, especially cleanup and live time issues when destructing
 //
 
-#include "types/singleton.hpp"
+#include "singleton.hpp"
 
 #include "gtest/gtest.h"
 

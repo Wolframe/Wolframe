@@ -63,7 +63,13 @@ int main (int /* argc */, char **argv)
     HPDF_REAL height;
     HPDF_REAL width;
     HPDF_UINT i;
-
+    HPDF_Image image;
+    double x;
+    double y;
+    double iw;
+    double ih;
+    HPDF_Stream stream;
+    
     strcpy (fname, argv[0]);
     strcat (fname, ".pdf");
 
@@ -127,8 +133,30 @@ int main (int /* argc */, char **argv)
 
     HPDF_Page_EndText (page);
 
-    HPDF_SaveToFile (pdf, fname);
+    /* Add a new page object. */
+    page = HPDF_AddPage (pdf);
 
+    height = HPDF_Page_GetHeight (page);
+    width = HPDF_Page_GetWidth (page);
+    
+    /* load image file. */
+    image = HPDF_LoadPngImageFromFile (pdf, "test.png");
+
+    x = 100;
+    y = 100;
+    iw = HPDF_Image_GetWidth (image);
+    ih = HPDF_Image_GetHeight (image);
+    
+    /* Draw image to the canvas. (normal-mode with actual size.)*/
+    HPDF_Page_DrawImage (page, image, x, y, iw, ih);
+    
+    HPDF_SaveToFile (pdf, fname);
+    
+    /* write something via zlib */
+    stream = HPDF_FileWriter_New( pdf->mmgr, "test2.raw" );    
+    HPDF_Stream_WriteToStream( image->stream, stream, HPDF_STREAM_FILTER_FLATE_DECODE, NULL );
+    HPDF_Stream_Free (stream);
+    
     /* clean up */
     HPDF_Free (pdf);
 

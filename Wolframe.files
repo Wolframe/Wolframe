@@ -1308,6 +1308,7 @@ docs/SDK/BUGS
 docs/SDK/CmdHandlerDirectmap.xml
 docs/SDK/CmdHandlerLua.xml
 docs/SDK/CmdHandlers.xml
+docs/SDK/CommandlineTools.xml
 docs/SDK/EBNF_Normalizer.xml
 docs/SDK/EBNF_TransactionDefinitionLanguage.xml
 docs/SDK/FilterJSON.xml
@@ -1329,7 +1330,6 @@ docs/SDK/ProgramPython.xml
 docs/SDK/ProgramTransactions.xml
 docs/SDK/README
 docs/SDK/SDK.ent
-docs/SDK/Wolfilter.xml
 docs/Tutorial/Introduction.xml
 docs/Tutorial/Preface.xml
 docs/Tutorial/Step1.xml
@@ -1678,6 +1678,7 @@ include/serialize/struct/filtermapSerializeStack.hpp
 include/serialize/struct/filtermapTraits.hpp
 include/serialize/structOptionParser.hpp
 include/serialize/tostringUtils.hpp
+include/singleton.hpp
 include/standardConfigs.hpp
 include/system/connectionEndpoint.hpp
 include/system/connectionHandler.hpp
@@ -1687,7 +1688,6 @@ include/system/globalRngGen.hpp
 include/system/objectPool.hpp
 include/system/serverEndpoint.hpp
 include/system/SSLcertificateInfo.hpp
-include/system/version.hpp
 include/types/allocators.hpp
 include/types/atomicCounter.hpp
 include/types/base64.h
@@ -1702,7 +1702,6 @@ include/types/integer.hpp
 include/types/keymap.hpp
 include/types/malloc.hpp
 include/types/normalizeFunction.hpp
-include/types/singleton.hpp
 include/types/traits.hpp
 include/types/typeSignature.hpp
 include/types/variant.hpp
@@ -1714,6 +1713,7 @@ include/utils/getPassword.hpp
 include/utils/parseUtils.hpp
 include/utils/printFormats.hpp
 include/utils/stringUtils.hpp
+include/version.hpp
 INSTALL.Unix
 INSTALL.Windows
 makefiles/gmake/install_dirs.mk
@@ -1728,9 +1728,12 @@ packaging/obs/boost1.49/debian-xUbuntu_12.10/README.Debian
 packaging/obs/boost1.49/debian-xUbuntu_12.10/README.source
 packaging/obs/boost1.49/debian-xUbuntu_13.04/README.Debian
 packaging/obs/boost1.49/debian-xUbuntu_13.04/README.source
-packaging/obs/deploy_boost1.48_to_osc.sh
-packaging/obs/deploy_boost1.49_to_osc.sh
-packaging/obs/deploy_to_osc.sh
+packaging/obs/boost1.53/debian-xUbuntu_13.10/README.Debian
+packaging/obs/deploy_boost1.48_to_obs.sh
+packaging/obs/deploy_boost1.49_to_obs.sh
+packaging/obs/deploy_boost1.53_to_obs.sh
+packaging/obs/deploy_libhpdf221_to_obs.sh
+packaging/obs/deploy_to_obs.sh
 packaging/obs/README
 packaging/patches/FreeBSD/files/patch-boost_interprocess_errors.hpp
 packaging/patches/FreeBSD/files/patch-boost_locale_conversion.hpp
