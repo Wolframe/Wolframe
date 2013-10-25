@@ -2,38 +2,38 @@
 <title>Implement Functions in Lua</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can write functions for the logic tier of <code>Wolframe</code> with <code>Lua</code>. <code>Lua</code> is a scripting language designed, implemented, and maintained
+	<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>Lua</application>. <application>Lua</application> is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
-		(see http://www.lua.org/authors.html). A description of <code>Lua</code> is not provided here.
-		For an introduction into programming with <code>Lua</code> see http://www.lua.org. The official manual also available as book
-		is very good. <code>Wolframe</code> introduces some <code>Lua</code> interfaces to access input and output and to execute functions.
-		The <code>Lua</code> application layer doesn't have to deal with protocol or encryption issues.
+		(see http://www.lua.org/authors.html). A description of <application>Lua</application> is not provided here.
+		For an introduction into programming with <application>Lua</application> see http://www.lua.org. The official manual also available as book
+		is very good. <application>Wolframe</application> introduces some <application>Lua</application> interfaces to access input and output and to execute functions.
+		The <application>Lua</application> application layer doesn't have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Declaring Functions</title>
-	<para>For <code>Lua</code> you do not have to declare anything besides the <code>Lua</code> script. If you configure a <code>Lua</code>
+	<para>For <application>Lua</application> you do not have to declare anything besides the <application>Lua</application> script. If you configure a <application>Lua</application>
 		script as program, all global functions declared in this script are declared as form
-		functions in <code>Wolframe</code>. For avoiding name conflicts you should declare private functions
+		functions in <application>Wolframe</application>. For avoiding name conflicts you should declare private functions
 		of the script as <code>local</code>.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Wolframe Provider Library</title>
-	<para><code>Wolframe</code> lets you access objects of the global context through
+	<para><application>Wolframe</application> lets you access objects of the global context through
 		a library called <code>provider</code> offering the following functions:
 
 		<simplelist type="horiz" columns="3">
 		<member>Name</member><member>Parameter</member><member>Returns</member>
 		<member>form</member><member>name of the form</member><member>an instance of a form</member>
-		<member>normalizer</member><member>name of the normalize function</member><member>normalize function defined in a <code>Wolframe</code> normalizer program</member>
-		<member>formfunction</member><member>name of the function</member><member>form function defined in a <code>Wolframe</code> program or module</member>
+		<member>normalizer</member><member>name of the normalize function</member><member>normalize function defined in a <application>Wolframe</application> normalizer program</member>
+		<member>formfunction</member><member>name of the function</member><member>form function defined in a <application>Wolframe</application> program or module</member>
 		</simplelist>
 	</para>
 	</sect2>
 	<sect2>
 	<title>Wolframe Global Objects</title>
-	<para>Besides the provider library <code>Wolframe</code> defines the followin objects global in the script execution context:
+	<para>Besides the provider library <application>Wolframe</application> defines the followin objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
 		<member>transaction</member><member>transaction context if not relying on the auto-commit of a transaction function</member>
@@ -47,7 +47,7 @@
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty
 		instance of a form. It takes the name of the form as string argument.
 		If you for example have a form configured called "employee" and you want to create a
-		employee object from a <code>Lua</code> table, you call
+		employee object from a <application>Lua</application> table, you call
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_form_1a.lua" parse="text" />
 			</programlisting>
@@ -74,19 +74,19 @@
 		</para>
 		<para>
 		To access the data in a form there are two form methods available. <code>get()</code> returns an iterator on the form data similar
-		to the iterator on input. Same as for input there is a method <code>value()</code> that returns the form data as <code>Lua</code> data structure
-		(a <code>Lua</code> table or atomic value).
+		to the iterator on input. Same as for input there is a method <code>value()</code> that returns the form data as <application>Lua</application> data structure
+		(a <application>Lua</application> table or atomic value).
 		</para>
 	</sect2>
 	<sect2>
 	<title>Form Functions</title>
 	<para>
-		For calling transactions or built-in functions loaded as modules the <code>Lua</code> layer defines the
+		For calling transactions or built-in functions loaded as modules the <application>Lua</application> layer defines the
 		concept of functions. The provider function <code>provider.formfunction</code> with the name of the function
-		as argument returns a <code>Lua</code> function. This function takes a table or an iterator as argument
+		as argument returns a <application>Lua</application> function. This function takes a table or an iterator as argument
 		and returns a data form structure. The data in the returned form data structure can be
 		accessed with <code>get()</code> that returns an iterator on the content and <code>value()</code>
-		that returns a <code>Lua</code> table or atomic value.
+		that returns a <application>Lua</application> table or atomic value.
 		</para>
 		<para>
 		If you for example have a transaction called "insertEmployee" defined in a transaction description program
@@ -97,14 +97,14 @@
 			</programlisting>
 		</para>
 		<para>
-		The first line creates the function called "insertEmployee" as <code>Lua</code> function.
-		The second calls the transaction, the third creates a <code>Lua</code> table out of the result
+		The first line creates the function called "insertEmployee" as <application>Lua</application> function.
+		The second calls the transaction, the third creates a <application>Lua</application> table out of the result
 		and the fourth selects and prints the "id" element in the table.
 	</para>
 	</sect2>
 
 	<sect2>
-	<title>List of <code>Lua</code> Objects</title>
+	<title>List of <application>Lua</application> Objects</title>
 	<para>This is a list of all objects and functions declared by Wolframe:</para>
 
 		<table frame="all" width="100%">
@@ -129,8 +129,8 @@
 				<row>
 					<entry>value</entry>
 					<entry></entry>
-					<entry><code>Lua</code> table</entry>
-					<entry>Returns the contents of the data form as <code>Lua</code> table or atomic value</entry>
+					<entry><application>Lua</application> table</entry>
+					<entry>Returns the contents of the data form as <application>Lua</application> table or atomic value</entry>
 				</row>
 				<row>
 					<entry>__tostring</entry>
@@ -147,7 +147,7 @@
 				</row>
 				<row>
 					<entry>fill</entry>
-					<entry><code>Lua</code> table or iterator (*), optional validation mode (**)</entry>
+					<entry><application>Lua</application> table or iterator (*), optional validation mode (**)</entry>
 					<entry>the filled form (for concatenation)</entry>
 					<entry>Validates input and fills the input data into the form.</entry>
 				</row>
@@ -155,7 +155,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe <code>Lua</code> object 'get()' method.
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe <application>Lua</application> object 'get()' method.
 		</para>
 		<para>
 			(**) "strict" (full validation), "complete" (only check for all non optional elements initialization) or "relaxed" (no validation except matching of input to elements)
@@ -180,8 +180,8 @@
 				</row>
 				<row>
 					<entry>value</entry>
-					<entry><code>Lua</code> table or atomic value</entry>
-					<entry>Returns the contents of the data form as <code>Lua</code> table or atomic value</entry>
+					<entry><application>Lua</application> table or atomic value</entry>
+					<entry>Returns the contents of the data form as <application>Lua</application> table or atomic value</entry>
 				</row>
 				<row>
 					<entry>__tostring</entry>
@@ -192,7 +192,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe <code>Lua</code> object 'get()' method.
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe <application>Lua</application> object 'get()' method.
 		</para>
 
 		<table frame="all" width="100%">
@@ -268,12 +268,12 @@
 				<row>
 					<entry>provider.formfunction</entry>
 					<entry>name of function (string)</entry>
-					<entry>Returns a lua function to execute the <code>Wolframe</code> function specified by name</entry>
+					<entry>Returns a lua function to execute the <application>Wolframe</application> function specified by name</entry>
 				</row>
 				<row>
 					<entry>provider.normalizer</entry>
 					<entry>type name</entry>
-					<entry>Returns a <code>Lua</code> function for normalizing values of the type specified (as used in forms)</entry>
+					<entry>Returns a <application>Lua</application> function for normalizing values of the type specified (as used in forms)</entry>
 				</row>
 				<row>
 					<entry>scope</entry>
@@ -284,7 +284,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) With iterator we mean an iterator as introduced in previous sections, returned by a <code>Wolframe</code> <code>Lua</code> object 'get()' method.
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a <application>Wolframe</application> <application>Lua</application> object 'get()' method.
 		</para>
 		<para>
 			(**) The iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.

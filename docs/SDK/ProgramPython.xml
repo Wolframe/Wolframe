@@ -2,12 +2,12 @@
 <title>Implement Functions in Python</title>
 	<sect2>
 		<title>Introduction</title>
-		<para>You can write functions for the logic tier of <code>Wolframe</code> with the 
-		<code>Python</code> programming language (<link>http://www.python.org</link>).
+		<para>You can write functions for the logic tier of <application>Wolframe</application> with the 
+		<application>Python</application> programming language (<link>http://www.python.org</link>).
 		</para>
 		<para>
-		The implementation of <code>Python</code> calls is not yet available. 
-		But <code>Wolframe</code> will provide <code>Python</code> functions soon.
+		The implementation of <application>Python</application> calls is not yet available. 
+		But <application>Wolframe</application> will provide <application>Python</application> functions soon.
 		</para>
 	</sect2>
 	<para></para>

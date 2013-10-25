@@ -4,14 +4,14 @@
 
 	<sect1>
 		<title>Introduction to Service Development</title>
-		<para><code>Wolframe</code> application server requests consist of a named command and a structured
+		<para><application>Wolframe</application> application server requests consist of a named command and a structured
 		content (document) as argument.</para>
-		<para>In this chapter we describe how <code>Wolframe</code> application server requests are
+		<para>In this chapter we describe how <application>Wolframe</application> application server requests are
 		processed. You will understand the inwolved bricks of software and how they are configured to build
-		the backend of your <code>Wolframe</code> application.
+		the backend of your <application>Wolframe</application> application.
 		</para>
 		<para>The following illustration shows the processing of one client request to the server.
-			A call of the <code>Wolframe</code> logic tier gets to a command handler
+			A call of the <application>Wolframe</application> logic tier gets to a command handler
 			that calls functions given by the provider to perform the transaction
 			requested.
 		</para>
@@ -26,7 +26,7 @@
 			</mediaobject>
 		</figure>
 		<para>
-			We will describe now the <code>Wolframe</code> standard command handler and how it is configured.
+			We will describe now the <application>Wolframe</application> standard command handler and how it is configured.
 			Then we will show how to write programs that declare the functions executing the requests 
 			and how you link them to your application.
 		</para>

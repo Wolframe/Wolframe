@@ -1,17 +1,17 @@
 <chapter>
 <title>Filters</title>
 <para>This chapter describes how filters for different data formats are linked to the logic tier. For each data format
-supported by <code>Wolframe</code> one or more filter type is introduced. 
+supported by <application>Wolframe</application> one or more filter type is introduced. 
 </para>
 <para>
 After reading this chapter you should be able to handle different document formats and encodings 
-in the logic tier of <code>Wolframe</code>. You will know how to add programs for scriptable filters
+in the logic tier of <application>Wolframe</application>. You will know how to add programs for scriptable filters
 like XSLT.
 </para>
 <para>
-Be aware that you have to configure a data filter of the logic tier in <code>Wolframe</code> before using it.
+Be aware that you have to configure a data filter of the logic tier in <application>Wolframe</application> before using it.
 Each chapter introducing a filter type will have a section that describes how the server configuration 
-of <code>Wolframe</code> has to be extended for its availability.
+of <application>Wolframe</application> has to be extended for its availability.
 </para>
 	&SDKfilterXML;
 	&SDKfilterJSON;

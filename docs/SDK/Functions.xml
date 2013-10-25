@@ -5,12 +5,12 @@ database transaction functions and a language to describe atomic data type norma
 on the language bindings available for Wolframe.
 </para>
 <para>
-After reading this chapter you should be able to write functions of the <code>Wolframe</code> logic tier on your own.
+After reading this chapter you should be able to write functions of the <application>Wolframe</application> logic tier on your own.
 </para>
 <para>
-Be aware that you have to configure a programming language of the logic tier in <code>Wolframe</code>
+Be aware that you have to configure a programming language of the logic tier in <application>Wolframe</application>
 before using it. Each chapter introducing a programming language will have a section that describes how the server
-configuration of <code>Wolframe</code> has to be extended for its availability.
+configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
 	&SDKprogramTransactions;
 	&SDKprogramDotnet;

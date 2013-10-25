@@ -2,18 +2,18 @@
 <title>Forms</title>
 <para>This chapter describes how form data schemas are linked to the logic tier. It introduces a data description
 language (DDL) called <code>simpleform</code> that allows you to specify data schemas with the validation and 
-normalization of atomic types. It also describes the <code>Wolframe</code> module concept for form descriptions that 
+normalization of atomic types. It also describes the <application>Wolframe</application> module concept for form descriptions that 
 allows you to add a compiler for your existing data schemas.
 </para>
 <para>
-After reading this chapter you should be able to write data forms of <code>Wolframe</code> of the  logic tier 
+After reading this chapter you should be able to write data forms of <application>Wolframe</application> of the  logic tier 
 in the <code>simpleform</code> data description language on your own. You should also know how a new data description
 language (DDL) could be added.
 </para>
 <para>
 Be aware that you have to configure a data description language type (DDL compiler) of the logic tier 
-in <code>Wolframe</code> before using it. Each chapter introducing a data form description language will have 
-a section that describes how the server configuration of <code>Wolframe</code> has to be extended for its availability.
+in <application>Wolframe</application> before using it. Each chapter introducing a data form description language will have 
+a section that describes how the server configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
 	&SDKprogramForms;
 </chapter>

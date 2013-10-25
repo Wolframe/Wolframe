@@ -4,47 +4,47 @@
 
 	<sect1>
 		<title>System overview</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 	</sect1>
 
 	<sect1>
 		<title>Processing modules - a more complex business layer</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 	</sect1>
 
 	<sect1>
 		<title>Storing data</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 		<sect2>
 			<title>Using a PostgreSQL database</title>
-			<para><code>Wolframe</code> is 3-tier.
+			<para><application>Wolframe</application> is 3-tier.
 			</para>
 		</sect2>
 		<sect2>
 			<title>Using a SQLite database</title>
-			<para><code>Wolframe</code> is 3-tier.
+			<para><application>Wolframe</application> is 3-tier.
 			</para>
 		</sect2>
 	</sect1>
 
 	<sect1>
 		<title>Printing documents</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 	</sect1>
 
 	<sect1>
 		<title>Authorizing transactions</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 	</sect1>
 
 	<sect1>
 		<title>Auditing</title>
-		<para><code>Wolframe</code> is 3-tier.
+		<para><application>Wolframe</application> is 3-tier.
 		</para>
 	</sect1>
 

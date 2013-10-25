@@ -2,8 +2,8 @@
 <title>JSON Filter</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can use <code>JSON</code> for data filters in the logic tier of <code>Wolframe</code>.
-	The standard <code>JSON</code> filter of <code>Wolframe</code> is called <code>cjson</code> and 
+	<para>You can use <code>JSON</code> for data filters in the logic tier of <application>Wolframe</application>.
+	The standard <code>JSON</code> filter of <application>Wolframe</application> is called <code>cjson</code> and 
 	based on the library <code>cJSON</code> (<link>http://sourceforge.net/projects/cjson</link>) from Dave Gamble.
 	</para>
 	</sect2>
@@ -11,7 +11,7 @@
 	<sect2>
 	<title>Character Set Encodings</title>
 	<para>Without explicitely specified, the <code>cjson</code> filter support the following character set 
-	encodings. For character set encodings that are not in the list, please ask the <code>Wolframe</code> team.
+	encodings. For character set encodings that are not in the list, please ask the <application>Wolframe</application> team.
 	<itemizedlist>
 	<listitem><para><code>UTF-8</code> or</para></listitem>
 	<listitem><para><code>UTF-16LE</code> or</para></listitem>
@@ -25,7 +25,7 @@
 	<sect2>
 	<title>Configuration</title>
 	<para>For using the JSON filter based <code>cJSON</code>, you have to load the module 'mod_filter_cjson'. 
-	For this you add the following line to the LoadModules section of your <code>Wolframe</code> configuration:
+	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_JSON.conf" parse="text" />
 		</programlisting>
