@@ -38,7 +38,6 @@
 #define _ORACLEQL_HPP_INCLUDED
 
 #include "logger-v1.hpp"
-#include <libpq-fe.h>
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
@@ -46,6 +45,7 @@
 #include "config/configurationBase.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
+#include <oci.h>
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -105,6 +105,18 @@ private:
 class OracledbUnit;
 class Oracledatabase;
 
+class OracleConnection
+{
+	public:
+		OCIEnv *envhp;
+};
+
+class OracleStatement
+{
+	public:
+		OCIStmt *stmtp; 
+};
+
 class Oracletransaction : public Transaction
 {
 public:
@@ -133,7 +145,7 @@ private:
 	std::string		m_name;		//< name of transaction
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
-	PoolObject<PGconn*>* m_conn;		//< reference to connection object from pool
+	PoolObject<OracleConnection*>* m_conn;		//< reference to connection object from pool
 };
 
 
@@ -225,7 +237,7 @@ private:
 	const std::string	m_ID;			///< database ID
 	std::string		m_connStr;		///< connection string
 	size_t			m_noConnections;	///< number of connections
-	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
+	ObjectPool< OracleConnection* >	m_connPool;		///< pool of connections
 	unsigned		m_statementTimeout;	///< default statement execution timeout
 	Oracledatabase	m_db;			///< real database object
 	Oracleprogram	m_program;

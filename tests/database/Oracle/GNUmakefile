@@ -8,18 +8,21 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
+	$(ORACLE_INCLUDE_DIRS) \
 	-I$(TOPDIR)/src/modules/database/oracle \
 	-I$(TOPDIR)/3rdParty/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_database
+	-L$(TOPDIR)/src/libwolframe_database \
+	$(ORACLE_LIB_DIRS)
 
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
+	$(ORACLE_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 
