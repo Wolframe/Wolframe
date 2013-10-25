@@ -1,7 +1,7 @@
 <!-- Tutorials -->
 <chapter>
 <title>Presentation Tier</title>
-<para>This chapter describes the presentation tier and how a <code>Wolframe</code> user interface is built.
+<para>This chapter describes the presentation tier and how a <application>Wolframe</application> user interface is built.
 </para>
 	&ClientCLI;
 	&ClientQt;

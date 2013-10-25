@@ -5,12 +5,12 @@
 	<sect2>
 	<title>Architecture</title>
 	<para>
-		The <code>Wolframe</code> standard client <code>wolfclient</code>
+		The <application>Wolframe</application> standard client <application>wolfclient</application>
 		is a thin client which executes XML requests
 		via the Wolframe protocol and presents XML answers. It is written with
 		Qt and is cross-platform. Qt is currently available on
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
-		Userinterfaces for <code>wolfclient</code> are defined as a set of forms
+		Userinterfaces for <application>wolfclient</application> are defined as a set of forms
 		using standard Qt widgets and are if ever possible defined using the
 		<code>Qt&nbsp;Interface&nbsp;Designer</code> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
 	</para>
@@ -19,7 +19,7 @@
 	<sect2>
 	<title>Artifacts</title>
 	<para>
-		The <code>wolfclient</code> renders user interface forms dynamically,
+		The <application>wolfclient</application> renders user interface forms dynamically,
 		this means no code generation or compilation is involved when creating
 		user interfaces for Wolframe.
 	</para>
@@ -40,7 +40,7 @@
 	<sect3>
 		<title>UI form translations</title>
 		<para>
-			The <code>wolfclient</code> uses the Qt translation format, version 2.0 for form translations
+			The <application>wolfclient</application> uses the Qt translation format, version 2.0 for form translations
 			as described in
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-ts-file-format.html">http://doc.qt.digia.com/qt/linguist-ts-file-format.html</link>.
 			Those are the files with extension <emphasis>.ts</emphasis>.
@@ -76,7 +76,7 @@
 	</sect2>
 
 	<sect2>
-		<title>"Programming" the interface</title>
+		<title>Programming the Interface</title>
 		<para>
 			Programming means we annotate the XML of the UI form files with
 			some extra properties. They control the following things:
@@ -278,7 +278,6 @@
 
 		<sect3>
 			<title>Widget properties as dynamic property values</title>
-
 			<para>
 				Dynamic properties can reference properties of widgets
 				like for example <code>property = {variable expression}</code>.
@@ -287,7 +286,67 @@
 				The expression can reference adressable widgets and their properties.
 				Every Qt class has its very own set of properties it understands.
 			</para>
+		</sect3>
+	</sect2>
+	<sect2>
+		<title>Eliminating Interface Defects</title>
+		<para>
+			Functional interface defects like for example syntax errors in the
+			request answer definitions can be eliminated by inspecting the error messages
+			reported by the client in debug mode and fixing the interface accordingly.
+			Here we show you how to get into the developper mode and how to inspect
+			the <application>wolfclient</application> messages.
+		</para>
+		<sect3>
+			<title>Switch the Debug Mode On</title>
 
+			<para>In order to inspect the internals of your client program, you have
+			to switch on "Developper Mode" in the "Developper" context of the "Preferences Dialog"
+			and you have to enable verbose debug output there". The following picture
+			emphasizes the two switches you have to enable (highlighted green).
+			</para>
+			<screenshot>
+				<screeninfo>Enable Debug Window</screeninfo>
+				<mediaobject>
+					<imageobject role="html">
+						<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG"/>
+					</imageobject>
+					<imageobject role="fo">
+						<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG" width="100%" scalefit="1"/>
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+
+		</sect3>
+		<sect3>
+			<title>Inspect Errors and Warnings and Debug Messages Reported</title>
+
+			<para>The debug window is opened by clicking on the bug icon in the
+			main tool bar or via the developper context menu. The following picture
+			shows an example debug output. Each request you do from now on can be
+			inspected by on the level of log messages it emits.
+			</para>
+			<para>
+			You can see the messages in the message list when clicking on the
+			refresh button. The navigation allows you to restrict your focus 
+			on messages on a node in the object tree by clicking on it. 
+			Clicking on the root node shows all messages in the recent history.
+			The history starts with the last main node created
+			before opening the debug window. All message restrictions
+			show the messages in order of their emission. You can restrict also on
+			the severity of messages in the severity level selection.
+			</para>
+			<screenshot>
+				<screeninfo>Debug Window</screeninfo>
+				<mediaobject>
+					<imageobject role="html">
+						<imagedata fileref="images/clients/debug_window.png" format="PNG"/>
+					</imageobject>
+					<imageobject role="fo">
+						<imagedata fileref="images/clients/debug_window.png" format="PNG" width="100%" scalefit="1"/>
+					</imageobject>
+				</mediaobject>
+			</screenshot>
 		</sect3>
 	</sect2>
 </sect1>

@@ -1,13 +1,13 @@
 <chapter>
 <title>Command Line Tools</title>
-<para>In this chapter we describe how <code>Wolframe</code> functions can be called from command line.
+<para>In this chapter we describe how <application>Wolframe</application> functions can be called from command line.
 The programs introduced here are installed as executables together with the wolframe application server.
 </para>
 
 <sect1>
 <title>The program wolfilter</title>
-	<para>The program <code>wolfilter</code> allows you to call any <code>Wolframe</code> function
-	or filter on command line. The idea is to provide a tool that allows testing of <code>Wolframe</code>
+	<para>The program <code>wolfilter</code> allows you to call any <application>Wolframe</application> function
+	or filter on command line. The idea is to provide a tool that allows testing of <application>Wolframe</application>
 	functions without the client server context. 
 	</para>
 </sect1>

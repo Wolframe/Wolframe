@@ -3,12 +3,12 @@
 	<sect2>
 	<title>Introduction</title>
 	<para>
-		The <code>Wolframe</code> standard command handler is called <code>directmap</code> and named so
+		The <application>Wolframe</application> standard command handler is called <code>directmap</code> and named so
 		in the configuration because it only declares a redirection of the commands to functions based on 
 		the document type and the command identifier specified by the client in the request.
 	</para>
 	<para>
-		The declarations of the <code>Wolframe</code> Standard Command Handler (<code>directmap</code>)
+		The declarations of the <application>Wolframe</application> Standard Command Handler (<code>directmap</code>)
 		are specified in a program source file with the extension '.dmap' that is declared in the configuration.
 	</para>
 	</sect2>

@@ -53,7 +53,7 @@
 	<title>Configuration</title>
 	<para>For declaring and using a the .wnmp file of our example above, you have to load the module 'mod_normalize_string'
 	and the module 'mod_normalize_number'.
-	For this you add the following two lines to the LoadModules section of your <code>Wolframe</code> configuration:
+	For this you add the following two lines to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_normalize_number_string.conf" parse="text" />
 		</programlisting>
