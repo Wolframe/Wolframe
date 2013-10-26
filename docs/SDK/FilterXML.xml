@@ -17,12 +17,12 @@
 	the following character set encodings. For character set encodings that are not in the list, 
 	please ask the <application>Wolframe</application> team.
 	<itemizedlist>
-	<listitem><para><code>UTF-8</code> or</para></listitem>
-	<listitem><para><code>UTF-16LE</code> or</para></listitem>
-	<listitem><para><code>UTF-16</code> (<code>UTF-16BE</code>) or</para></listitem>
-	<listitem><para><code>UTF-32LE</code> (<code>UCS-4LE</code>) but only with <application>textwolf</application> or</para></listitem>
-	<listitem><para><code>UTF-32</code> (<code>UTF-32BE</code> or <code>UCS-4BE</code>) or</para></listitem>
-	<listitem><para><code>ISO 8859</code> (codepages '1' to '9')</para></listitem>
+	<listitem><para><abbrev>UTF-8</abbrev> or</para></listitem>
+	<listitem><para><abbrev>UTF-16LE</abbrev> or</para></listitem>
+	<listitem><para><abbrev>UTF-16</abbrev> (<abbrev>UTF-16BE</abbrev>) or</para></listitem>
+	<listitem><para><abbrev>UTF-32LE</abbrev> (<abbrev>UCS-4LE</abbrev>) but only with <application>textwolf</application> or</para></listitem>
+	<listitem><para><abbrev>UTF-32</abbrev> (<abbrev>UTF-32BE</abbrev> or <abbrev>UCS-4BE</abbrev>) or</para></listitem>
+	<listitem><para><abbrev>ISO 8859</abbrev> (codepages '1' to '9')</para></listitem>
 	</itemizedlist>
 	</para>
 	</sect2>

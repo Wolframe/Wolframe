@@ -12,7 +12,7 @@
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
 		Userinterfaces for <application>wolfclient</application> are defined as a set of forms
 		using standard Qt widgets and are if ever possible defined using the
-		<code>Qt&nbsp;Interface&nbsp;Designer</code> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
+		<application>Qt&nbsp;Interface&nbsp;Designer</application> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
 	</para>
 	</sect2>
 

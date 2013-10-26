@@ -3,15 +3,18 @@
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with languages based
-		on <code>.NET</code> (<link>http://www.microsoft.com/net</link>) like for example <code>C#</code> and <code>VB.NET</code>.  
-		Because <code>.NET</code> based libraries can only be called by <application>Wolframe</application> only as a 
+		on <application>.NET</application> (<link>http://www.microsoft.com/net</link>) like for example
+		<application>C#</application> and <application>VB.NET</application>.  
+		Because <application>.NET</application> based libraries can only be called 
+		by <application>Wolframe</application> only as a 
 		compiled and not as an interpreted language, you have to build a module out of your function 
 		implementation.
 		</para>
 		<para>
-		The implementation of <code>.NET</code> calls is not yet available. The implementation exists as
-		prove of concept in a test program. But <application>Wolframe</application> will provide <code>.NET</code> functions 
-		soon.
+		The implementation of <application>.NET</application> calls is not yet available.
+		The implementation exists as prove of concept in a test program. 
+		But <application>Wolframe</application> will provide
+		<application>.NET</application> functions soon.
 		</para>
 	</sect2>
 	<para></para>
