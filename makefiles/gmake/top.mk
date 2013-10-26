@@ -146,6 +146,13 @@ ifeq ($(WITH_PGSQL),1)
 	@echo "PGSQL_LIB_DIRS: $(PGSQL_LIB_DIRS)"
 	@echo "PGSQL_LIBS: $(PGSQL_LIBS)"
 endif
+ifeq ($(WITH_ORACLE),1)
+	@echo
+	@echo "ORACLE_DIR: $(ORACLE_DIR)"
+	@echo "ORACLE_INCLUDE_DIRS: $(ORACLE_INCLUDE_DIRS)"
+	@echo "ORACLE_LIB_DIRS: $(ORACLE_LIB_DIRS)"
+	@echo "ORACLE_LIBS: $(ORACLE_LIBS)"
+endif
 ifeq ($(WITH_TEXTWOLF),1)
 	@echo
 	@echo "using local textwolf library for charset detection and XML filtering module.."

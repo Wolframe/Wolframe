@@ -42,7 +42,6 @@
 #include <vector>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
-#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
@@ -53,7 +52,7 @@ namespace db {
 struct PreparedStatementHandler_oracle :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_oracle( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
+	PreparedStatementHandler_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_oracle();
@@ -104,15 +103,15 @@ private:
 	}
 
 	void setDatabaseErrorMessage();
-	bool status( PGresult* res, State newstate);
+	bool status( OracleStatement* res, State newstate);
 	bool errorStatus( const std::string& message);
 	bool executeInstruction( const char* stmstr, State newstate);
 
 private:
 	State m_state;
-	PGconn* m_conn;
+	OracleConnection* m_conn;
 	const types::keymap<std::string>* m_stmmap;
-	PGresult* m_lastresult;
+	OracleStatement* m_lastresult;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
 	std::size_t m_nof_rows;

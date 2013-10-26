@@ -6,14 +6,17 @@ SUBDIRS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	$(ORACLE_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	$(ORACLE_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	$(ORACLE_LIBS)
 
 NOINST_STATIC_LIB = mod_db_oracle_lib.a
 
