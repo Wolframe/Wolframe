@@ -15,16 +15,18 @@
 	<xsl:template name="user.head.content">
 		<xsl:variable name="codefile" select="document('head-webpage.html',/)"/>
 		<xsl:copy-of select="$codefile/htmlcode/node()"/>
-		<xsl:text disable-output-escaping='yes'>&lt;div class="wrapper row3"></xsl:text>
-		<xsl:text disable-output-escaping='yes'>&lt;div id="container"></xsl:text>
 	</xsl:template>
 
 	<xsl:template name="user.header.navigation">
 		<xsl:variable name="codefile" select="document('header-webpage.html',/)"/>
 		<xsl:copy-of select="$codefile/htmlcode/node()"/>
+		<xsl:text disable-output-escaping='yes'>&lt;div class="wrapper row3"></xsl:text>
+		<xsl:text disable-output-escaping='yes'>&lt;div id="container"></xsl:text>
 	</xsl:template>
 
 	<xsl:template name="user.footer.navigation">
+		<xsl:text disable-output-escaping='yes'>&lt;/div></xsl:text>
+		<xsl:text disable-output-escaping='yes'>&lt;/div></xsl:text>
 		<xsl:variable name="codefile" select="document('footer-webpage.html',/)"/>
 		<xsl:copy-of select="$codefile/htmlcode/node()"/>
 	</xsl:template>
