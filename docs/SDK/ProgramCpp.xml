@@ -1,5 +1,5 @@
 <sect1>
-<title>Implement Functions in C++</title>
+<title>Functions in C++</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>C++</application>. 

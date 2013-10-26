@@ -293,17 +293,15 @@
 		<para>
 			Functional interface defects like for example syntax errors in the
 			request answer definitions can be eliminated by inspecting the error messages
-			reported by the client in debug mode and fixing the interface accordingly.
-			Here we show you how to get into the developper mode and how to inspect
-			the <application>wolfclient</application> messages.
+			reported by the <application>wolfclient</application> in developer mode
+			and fixing the interface accordingly.
 		</para>
 		<sect3>
-			<title>Switch the Debug Mode On</title>
+			<title>Switch the Developer Mode On</title>
 
-			<para>In order to inspect the internals of your client program, you have
-			to switch on "Developper Mode" in the "Developper" context of the "Preferences Dialog"
-			and you have to enable verbose debug output there". The following picture
-			emphasizes the two switches you have to enable (highlighted green).
+			<para>In order to inspect the internals of your client program, we have first
+			to switch on "Developper Mode" in the "Developper" context of the "Preferences Dialog".
+			The following picture emphasizes the checkbox you have to enable (highlighted green).
 			</para>
 			<screenshot>
 				<screeninfo>Enable Debug Window</screeninfo>
@@ -319,22 +317,29 @@
 
 		</sect3>
 		<sect3>
-			<title>Inspect Errors and Warnings and Debug Messages Reported</title>
+			<title>Inspect Errors and  Warnings and Debug Messages Reported</title>
 
-			<para>The debug window is opened by clicking on the bug icon in the
+			<para>To inspect internal messages reported by the <application>wolfclient</application>
+			in developer mode we have to open the debug window.
+			The debug window is opened by clicking on the bug icon in the
 			main tool bar or via the developper context menu. The following picture
-			shows an example debug output. Each request you do from now on can be
-			inspected by on the level of log messages it emits.
+			shows an example debug output. Each action we do from now on with
+			the debug window opened can be followed on the level of messages it emits.
 			</para>
 			<para>
-			You can see the messages in the message list when clicking on the
-			refresh button. The navigation allows you to restrict your focus 
+			We can see the messages in the message list when clicking on the
+			"Refresh" button. The navigation allows us to restrict our focus 
 			on messages on a node in the object tree by clicking on it. 
 			Clicking on the root node shows all messages in the recent history.
 			The history starts with the last main node created
 			before opening the debug window. All message restrictions
-			show the messages in order of their emission. You can restrict also on
-			the severity of messages in the severity level selection.
+			show the messages in order of their emission. We can restrict also on
+			the severity of messages in the severity level selection (the select
+			box set to "Debug" as default left of the "Refresh" button).
+			</para>
+			<para>
+			The "Clear" button allows us to empty the recent history without closing
+			the debug window.
 			</para>
 			<screenshot>
 				<screeninfo>Debug Window</screeninfo>

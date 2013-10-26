@@ -3,15 +3,15 @@
 	<sect2>
 	<title>Introduction</title>
 	<para>
-		Form data structures can be defined in a DDL (Data Definition Language).
-		It depends very much on the application what DDL is best to use.
+		Form data structures can be defined in a <acronym>DDL</acronym> (Data Definition Language).
+		It depends very much on the application what <acronym>DDL</acronym> is best to use.
 		Users may already have their data definitions in a certain way defined.
-		The form DDL can be defined in the way you want. Wolframe offers a
-		plugin mechanism for DDL compilers and provides examples of such compilers.
-		You configure the DDL sources to load and the compiler to use.
+		The form <acronym>DDL</acronym> can be defined in the way you want. Wolframe offers a
+		plugin mechanism for <acronym>DDL</acronym> compilers and provides examples of such compilers.
+		You configure the <acronym>DDL</acronym> sources to load and the compiler to use.
 	</para>
 	<para>
-		With the DDL form description we get a deserialization of some content
+		With the <acronym>DDL</acronym> form description we get a deserialization of some content
 		into a structure and a serialization for the output. We get also a validation
 		and normalization procedure of content by assigning types to atomic form
 		elements that validate and normalize the data elements.
@@ -26,7 +26,7 @@
 	<sect2>
 	<title>Define Forms in Simpleform DDL</title>
 	<para>
-		As example of a form DDL we provide the <code>simpleform</code> DDL" as example. The format is based on the "INFO"-format
+		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym> as example. The format is based on the "INFO"-format
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
 		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
@@ -39,12 +39,12 @@
 		After this header follows the structure declaration inside curly brackets '{' '}'.
 	</para>
 	<para>
-		There is only one predefined data type known in <code>simpleform</code> DDL: "string".
+		There is only one predefined data type known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>: "string".
 		All other data types are defined as sequence of 'normalizer' functions in a normalize definition file.
 		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
 	</para>
 	<para>
-		The following element attributes are known in Simple Form DDL
+		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>
 		<simplelist type="horiz" columns="3">
 		<member>@</member><member>prefix of data type</member><member>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</member>
 		<member>?</member><member>prefix of data type</member><member>Expresses that the element is optional also in strict validation</member>
@@ -62,7 +62,7 @@
 		the embedded elements of the substructure.
 	</para>
 	<para>
-		The following example shows a form defined in <code>simpleform</code> DDL.
+		The following example shows a form defined in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>.
 		<programlisting language='text'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.simpleform" parse="text" />
 		</programlisting>

@@ -1,5 +1,5 @@
 <sect1>
-<title>Implement Functions in Python</title>
+<title>Functions in Python</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with the 

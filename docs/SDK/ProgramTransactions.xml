@@ -1,5 +1,5 @@
 <sect1>
-<title>Database Transaction Functions (TDL)</title>
+<title>Functions in Transaction Definition Language (TDL)</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>
@@ -65,6 +65,96 @@
 	</sect2>
 	<sect2>
 	<title>Language Description</title>
+		<para>
+		A TDL Program consists of subroutine declarations as OPERATION blocks and exported
+		function declarations as TRANSACTION blocks. OPERATION blocks have the same
+		structure as TRANSACTION blocks but without preprocessing blocks and authotization
+		method declarations.
+		</para>
+		<sect3>
+			<title>OPERATION declarations</title>
+			<para>A subroutine declaration starts with the Keyword <code>OPERATION</code> followed
+			by the subroutine name. After this header and an optional result substructure
+			name declaration, the code definition block follows starting with <code>BEGIN</code>,
+			ending with <code>END</code>.
+			<programlisting language='sql'>
+			OPERATION &lt;name&gt;
+			RESULT INTO &lt;result-block-name&gt;
+			BEGIN
+				...&lt;database or subroutine calls&gt;...
+			END
+			</programlisting>
+			The line with the RESULT INTO declaration is optional.
+			</para>
+		</sect3>
+
+		<sect3>
+			<title>TRANSACTION declarations</title>
+			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code> followed
+			by the transaction function name. This name identifies the function globally.
+			The body of the function contains the following parts:
+			<itemizedlist>
+				<listitem><code>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</code>
+					<para>
+						This optional definition is dealing with 
+						authorization and access rights.
+					</para>
+				</listitem>
+				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
+					<para>
+						This optional declaration defines a top level tag for the 
+						result structure and optionally a post processing step as
+						filter referenced by name.
+						It is similar as the construct in the OPERATION block description
+						except that you cannot specify a postprocessing filter in
+						an OPERATION block.
+					</para>
+				</listitem>
+				<listitem><code>PREPROCESS BEGIN &lt;...preprocessing function calls...&gt; END</code>
+					<para>
+						This optional block contains function calls on the transaction
+						function input. The result of these preprocessing function calls are
+						put into the input structure, so that they can be refered to in the main
+						code definition block of the transaction.
+						You can call any global normalization or form function in the 
+						preprocessing block to enrich the input to process.
+					</para>
+				</listitem>
+				<listitem><code>BEGIN &lt;...database or subroutine calls...&gt; END</code>
+					<para>
+					The main processing block starts with <code>BEGIN</code> and
+					ends with <code>END</code>. It contains all the database instructions
+					needed for completing this transaction.
+					</para>
+				</listitem>
+			</itemizedlist>
+			The following pseudo code snippet shows the explained building
+			blocks together:
+			<programlisting language='sql'>
+	
+			TRANSACTION &lt;name&gt;
+			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
+			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
+			PREPROCESS
+			BEGIN
+				...&lt;preprocessing function calls&gt;...
+			END
+			BEGIN
+				...&lt;database or subroutine calls&gt;...
+			END
+			</programlisting>
+			The lines with AUTHORIZE and RESULT INTO and FILTER declarations are optional.
+			So is the preprocessing block PREPROCESS..BEGIN..END. A simpler transaction
+			function looks like the following:
+			<programlisting language='sql'>
+	
+			TRANSACTION &lt;name&gt;
+			BEGIN
+				...&lt;database or subroutine calls&gt;...
+			END
+			</programlisting>
+			</para>
+		</sect3>
 		<sect3>
 		<title>Keywords</title>
 		<para>
