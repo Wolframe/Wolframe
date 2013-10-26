@@ -2018,6 +2018,17 @@ src/modules/database/GNUmakefile
 src/modules/database/Makefile.W32
 src/modules/database/MSSQL/Makefile.W32
 src/modules/database/MSSQL/MSSQLmodule.def
+src/modules/database/oracle/GNUmakefile
+src/modules/database/oracle/Oracleconfig.cpp
+src/modules/database/oracle/Oracleconstructor.cpp
+src/modules/database/oracle/Oracle.cpp
+src/modules/database/oracle/Oracle.hpp
+src/modules/database/oracle/Oraclemodule.cpp
+src/modules/database/oracle/Oraclemodule.def
+src/modules/database/oracle/OraclepreparedStatement.cpp
+src/modules/database/oracle/OraclepreparedStatement.hpp
+src/modules/database/oracle/Oracleprogram.cpp
+src/modules/database/oracle/Oracleprogram.hpp
 src/modules/database/postgresql/GNUmakefile
 src/modules/database/postgresql/Makefile.W32
 src/modules/database/postgresql/PostgreSQLconfig.cpp
@@ -2276,6 +2287,9 @@ tests/counterTest.cpp
 tests/CRAMtest.cpp
 tests/database/GNUmakefile
 tests/database/Makefile.W32
+tests/database/Oracle/GNUmakefile
+tests/database/Oracle/OracleModuleFiles.cpp
+tests/database/Oracle/oracleUnit.cpp
 tests/database/PostgreSQL/dbPing.cpp
 tests/database/PostgreSQL/GNUmakefile
 tests/database/PostgreSQL/Makefile.W32

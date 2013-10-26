@@ -45,7 +45,7 @@
 #include "types/base64.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace crypto {
 
 PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* salt, size_t saltSize,
 				    const unsigned char* password, size_t pwdSize,
@@ -185,4 +185,4 @@ bool PBKDF2_HMAC_SHA1::operator == ( const std::string& rhs ) const
 	return isEqual;
 }
 
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::crypto

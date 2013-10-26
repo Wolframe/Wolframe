@@ -230,7 +230,7 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 	unsigned char	binKey[ MAX_HMAC_KEY_SIZE ];
 	int		keySize;
 
-	HMAC_SHA256 userHash( hash );
+	crypto::HMAC_SHA256 userHash( hash );
 	if (( keySize = base64_decode( key.data(), key.size(),
 				       binKey, MAX_HMAC_KEY_SIZE )) < 0 )	{
 		std::string msg = "Cannot convert '" + key + "' to a HMAC binary key";
@@ -270,7 +270,7 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 			continue;
 		if ( !caseSensitive )
 			boost::algorithm::to_lower( uname );
-		HMAC_SHA256	hsh( binKey, keySize, uname );
+		crypto::HMAC_SHA256 hsh( binKey, keySize, uname );
 		if ( hsh == userHash )	{
 			fclose( file );
 			bool found = parsePwdLine( line, user );

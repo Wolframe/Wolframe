@@ -41,7 +41,7 @@
 #include "HMAC.h"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace crypto {
 
 /// Standard HMAC-SHA1 object
 class HMAC_SHA1
@@ -132,6 +132,6 @@ private:
 	unsigned char	m_HMAC[ HMAC_SHA256_HASH_SIZE ];
 };
 
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::crypto
 
 #endif // _HMAC_HPP_INCLUDED

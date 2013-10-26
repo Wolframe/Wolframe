@@ -132,27 +132,27 @@ SSLcertificateInfo::SSLcertificateInfo( X509* cert )
 {
 	char	buf[ BUFFER_SIZE + 1 ];
 
-	serialNumber_ = ASN1_INTEGER_get( X509_get_serialNumber( cert ));
+	m_serialNumber = ASN1_INTEGER_get( X509_get_serialNumber( cert ));
 
 	memset( buf, 0, BUFFER_SIZE );
 	X509_NAME_oneline( X509_get_issuer_name( cert ), buf, BUFFER_SPACE );
-	issuer_ = std::string( buf );
+	m_issuer = std::string( buf );
 
 	ASN1_TIME *at = X509_get_notBefore( cert );
-	notBefore_ = timeFromASN1( at );
+	m_notBefore = timeFromASN1( at );
 
 	at = X509_get_notAfter( cert );
-	notAfter_ = timeFromASN1( at );
+	m_notAfter = timeFromASN1( at );
 
 	memset( buf, 0, BUFFER_SIZE );
 	X509_NAME_oneline( X509_get_subject_name( cert ), buf, BUFFER_SPACE );
-	subject_ = std::string( buf );
+	m_subject = std::string( buf );
 
 	// this one should be maybe be interpreted differently
 	memset( buf, 0, BUFFER_SIZE );
 	if ( X509_NAME_get_text_by_NID( X509_get_subject_name( cert ),
 						      NID_commonName, buf, 2047 ) != -1 )
-		commonName_ = std::string( buf );
+		m_commonName = std::string( buf );
 }
 
 }} // namespace _Wolframe::net

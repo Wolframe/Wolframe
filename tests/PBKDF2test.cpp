@@ -37,7 +37,7 @@
 #include "gtest/gtest.h"
 #include "crypto/PBKDF2.hpp"
 
-using namespace _Wolframe::AAAA;
+using namespace _Wolframe::crypto;
 
 TEST( PBKDF2, TestVectors )
 {
