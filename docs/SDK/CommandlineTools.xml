@@ -6,7 +6,7 @@ The programs introduced here are installed as executables together with the wolf
 
 <sect1>
 <title>The program wolfilter</title>
-	<para>The program <code>wolfilter</code> allows you to call any <application>Wolframe</application> function
+	<para>The program <application>wolfilter</application> allows you to call any <application>Wolframe</application> function
 	or filter on command line. The idea is to provide a tool that allows testing of <application>Wolframe</application>
 	functions without the client server context. 
 	</para>
@@ -14,9 +14,9 @@ The programs introduced here are installed as executables together with the wolf
 
 <sect1>
 <title>The program wolfwizard</title>
-	<para>The program <code>wolfwizard</code> allows you to get the configured artefacts of an application
-	as <code>XML</code>. This allows you to visualize the context of an application for example with 
-	<code>XSLT</code> or <code>CSS</code>.
+	<para>The program <application>wolfwizard</application> allows you to get the configured artefacts of an application
+	as <acronym>XML</acronym>. This allows you to visualize the context of an application for example with 
+	<acronym>XSLT</acronym> or <acronym>CSS</acronym>.
 	</para>
 </sect1>
 </chapter>

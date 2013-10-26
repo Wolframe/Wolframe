@@ -2,29 +2,29 @@
 <title>XSLT Filter</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can use <code>XSLT</code> for data filters in the logic tier of <application>Wolframe</application>.
-	The <code>XSLT</code> filter of <application>Wolframe</application> for is based on <code>libxml2</code> 
+	<para>You can use <acronym>XSLT</acronym> for data filters in the logic tier of <application>Wolframe</application>.
+	The <acronym>XSLT</acronym> filter of <application>Wolframe</application> for is based on <application>libxml2</application> 
 	(<link>http://www.xmlsoft.org</link>).
 	</para>
 	</sect2>
 	
 	<sect2>
 	<title>Character Set Encodings</title>
-	<para>Without explicitely specified, the <code>XSLT</code> filter support the following character set 
+	<para>Without explicitely specified, the <acronym>XSLT</acronym> filter support the following character set 
 	encodings. For character set encodings that are not in the list, please ask the <application>Wolframe</application> team.
 	<itemizedlist>
-	<listitem><para><code>UTF-8</code> or</para></listitem>
-	<listitem><para><code>UTF-16LE</code> or</para></listitem>
-	<listitem><para><code>UTF-16</code> (<code>UTF-16BE</code>) or</para></listitem>
-	<listitem><para><code>UTF-32LE</code> (<code>UCS-4LE</code>) or</para></listitem>
-	<listitem><para><code>UTF-32</code> (<code>UTF-32BE</code> or <code>UCS-4BE</code>) or</para></listitem>
+	<listitem><para><abbrev>UTF-8</abbrev> or</para></listitem>
+	<listitem><para><abbrev>UTF-16LE</abbrev> or</para></listitem>
+	<listitem><para><abbrev>UTF-16</abbrev> (<abbrev>UTF-16BE</abbrev>) or</para></listitem>
+	<listitem><para><abbrev>UTF-32LE</abbrev> (<abbrev>UCS-4LE</abbrev>) or</para></listitem>
+	<listitem><para><abbrev>UTF-32</abbrev> (<abbrev>UTF-32BE</abbrev> or <abbrev>UCS-4BE</abbrev>) or</para></listitem>
 	</itemizedlist>
 	</para>
 	</sect2>
 
 	<sect2>
 	<title>Configuration</title>
-	<para>For using an XSLT filter based <code>libxml2</code>, you have to load the module 'mod_filter_libxml2'.
+	<para>For using an XSLT filter based <application>libxml2</application>, you have to load the module 'mod_filter_libxml2'.
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_libxml2.conf" parse="text" />
