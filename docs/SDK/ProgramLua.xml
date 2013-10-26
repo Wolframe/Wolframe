@@ -1,5 +1,5 @@
 <sect1>
-<title>Implement Functions in Lua</title>
+<title>Functions in Lua</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>Lua</application>. <application>Lua</application> is a scripting language designed, implemented, and maintained
