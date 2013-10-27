@@ -23,10 +23,11 @@
 			It defines a transaction as a sequence of instructions on multiple data.
 			An instruction is either discribed as a single embedded database command
 			in the language of the underlaying database, a name of a function declared
-			in the database (e.g. a PLSQL function) or a TDL subroutine call.
+			in the database (e.g. a PLSQL function) or a TDL subroutine call
+			working on multiple data.
 		</para>
 		<para>
-			Instruction on multiple data means that the instruction is executed
+			Working on multiple data means that the instruction is executed
 			for every item of an input set. This set can consist of the set of
 			results of the previous instruction or one uniquely addressable
 			tuple of elements in the input of the transaction function.
@@ -42,8 +43,8 @@
 			results to output.
 		</para>
 		<para>
-			For input data conversion the transaction definition language lets 
-			you define a preprocessing section where globally defined wolframe
+			For input data conversion the transaction definition language 
+			defines a preprocessing section where globally defined wolframe
 			functions can be called for selected input. For building an output 
 			structure that cannot be modeled with a language without control
 			structures and recursion TDL provides the possibility to call a
@@ -108,7 +109,7 @@
 			SUBROUTINE &lt;name&gt;
 			RESULT INTO &lt;result-block-name&gt;
 			BEGIN
-				...&lt;database or subroutine calls&gt;...
+				...&lt;instructions&gt;...
 			END
 			</programlisting>
 			The line with the RESULT INTO declaration is optional.
@@ -117,9 +118,9 @@
 
 		<sect3>
 			<title>Transaction Function Declarations</title>
-			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code> followed
-			by the transaction function name. This name identifies the function globally.
-			The body of the function contains the following parts:
+			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code>
+			followed by the transaction function name. This name identifies the
+			function globally. The body of the function contains the following parts:
 			<itemizedlist>
 				<listitem><code>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</code>
 					<para>
@@ -133,21 +134,21 @@
 						result structure and optionally a post processing step as
 						filter referenced by name.
 						It is similar as the construct in the subroutine description
-						except that you cannot specify a postprocessing filter
+						except that one cannot specify a postprocessing filter
 						in a subroutine.
 					</para>
 				</listitem>
-				<listitem><code>PREPROCESS BEGIN &lt;...preprocessing function calls...&gt; END</code>
+				<listitem><code>PREPROCESS BEGIN &lt;...preprocessing instructions...&gt; END</code>
 					<para>
-						This optional block contains function calls on the transaction
-						function input. The result of these preprocessing function calls are
+						This optional block contains instructions on the transaction
+						function input. The result of these preprocessing instructions are
 						put into the input structure, so that they can be refered to in the main
 						code definition block of the transaction.
-						You can call any global normalization or form function in the 
-						preprocessing block to enrich the input to process.
+						We can call any global normalization or form function in the 
+						preprocessing block to enrich or transform the input to process.
 					</para>
 				</listitem>
-				<listitem><code>BEGIN &lt;...database or subroutine calls...&gt; END</code>
+				<listitem><code>BEGIN &lt;...instructions...&gt; END</code>
 					<para>
 					The main processing block starts with <code>BEGIN</code> and
 					ends with <code>END</code>. It contains all the database instructions
@@ -163,10 +164,10 @@
 			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
 			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
 			PREPROCESS BEGIN
-				...&lt;preprocessing function calls&gt;...
+				...&lt;preprocessing instructions&gt;...
 			END
 			BEGIN
-				...&lt;database or subroutine calls&gt;...
+				...&lt;instructions&gt;...
 			END
 			</programlisting>
 			The lines with AUTHORIZE and RESULT INTO and FILTER declarations are optional.
@@ -176,10 +177,136 @@
 	
 			TRANSACTION &lt;name&gt;
 			BEGIN
-				...&lt;database or subroutine calls&gt;...
+				...&lt;instructions&gt;...
 			END
 			</programlisting>
 			</para>
+		</sect3>
+		<sect3>
+			<title>Main Processing Instructions</title>
+			<para>Main processing instructions defined in the main execution block 
+			of a subroutine or transaction function consist of three parts in the
+			following order:
+			<itemizedlist>
+				<listitem><code>INTO &lt;result substructure name&gt;</code>
+					<para>
+						This optional directive specifies if and where the results
+						of the database commands should be put into as part of the
+						function output. In operations this substructure is one
+						relative to the current substructure addressed.
+						A subroutine with an "INTO myres"
+						directive called by a subroutine with an "INTO output"
+						directive will write its result into substructure
+						"output/myres".
+					</para>
+				</listitem>
+				<listitem><code>FOREACH &lt;selector&gt;</code>
+					<para>
+						This optional directive specifies a quantifier
+						defining the set of elements on which the 
+						instruction is executed one by one. Specifying
+						a set of two elements will cause the function to
+						be called twice. An empty set as quantifier will
+						cause the instruction to be ignored. Without
+						quantifier the database command or subroutine call
+						of the instrucution will be always be executed once.
+					</para>
+					<para>
+						The argument of the FOREACH quantifier is either
+						a reference to the result of a previous 
+						instruction or a path selecting a set of input
+						elements.
+					</para>
+					<para>
+						Results of previous instructions are referenced either with
+						the keyword RESULT refering to the result set
+						of the previous command or with a variable
+						naming a result set declared with this name before.
+						
+					</para>
+						Input elements are selected by path relatively
+						from the current path selected starting from
+						the input root element when entering a transaction
+						function. The current path selected and the base
+						element of any relative path calculated in this scope
+						changes when a subroutine is called in in a FOREACH selection
+						context. Calling for example a subroutine in a
+						'FOREACH person' quantifier context will cause
+						relative paths in this subroutine to be subelements
+						of 'person'.
+					<para>
+					</para>
+				</listitem>
+				<listitem><code>DO &lt;command&gt;</code>
+					<para>
+						Commands in an instruction are either embedded
+						database commands, named database functions (e.g. PLSQL functions)
+						or subroutine calls. Command arguments
+						are either constants or relative paths 
+						from the selector path in the FOREACH quantifier 
+						or refering to elements in the result of 
+						a previous command.
+						If an argument is a relative path from the 
+						selector context, its reference
+						has to be unique in the context of the 
+						element selected by the selector.
+						If an argument references a previous command
+						result it must either be unique or dependent
+						an the quantifier argument. 
+						Results that are sets with more than one element
+						can only be referenced if they are bound to 
+						the FOREACH quantifier.
+					</para>
+				</listitem>
+			</itemizedlist>
+			</para>
+		</sect3>
+		<sect3>
+		<title>Preprocessing Instructions</title>
+		<para>Preprocessing instructions defined in the PREPROCESS execution block 
+			of a transaction function consist similar to the instructions
+			in the main execution block of three parts in the
+			following order:
+		<itemizedlist>
+			<listitem><code>INTO &lt;result substructure name&gt;</code>
+				<para>
+					This optional directive specifies if and where the results
+					of the preprocessing commands should be put into as part
+					of the input to be processed by the main processing
+					instructions. The relative paths of the destination structure
+					are calculated relatively to the FOREACH quantifier.
+				</para>
+			</listitem>
+			<listitem><code>FOREACH &lt;selector&gt;</code>
+				<para>
+					This optional directive specifies a quantifier
+					defining the set of elements on which the 
+					instruction is executed one by one.
+					The argument of the FOREACH quantifier defines the number of
+					calls of the command specified as the cardinality
+					of the set selected. The preprocessing command is
+					executed once for each element in the selected set
+					and it will not be executed if the selected
+					set is empty.
+				</para>
+				<para>
+					The argument of the FOREACH quantifier is
+					a path selecting a set of input elements.
+				</para>
+			</listitem>
+			<listitem><code>DO &lt;command&gt;</code>
+				<para>
+					Commands in an instruction are function calls of
+					globally defined form functions or normalization
+					functions. Command arguments
+					are constants or relative paths from the selector
+					path in the FOREACH quantifier referencing unique
+					elements in the context of a quantifier element
+					selected.
+				</para>
+			</listitem>
+		</itemizedlist>
+		</para>
 		</sect3>
 		<sect3>
 		<title>Keywords</title>
