@@ -29,11 +29,9 @@
 		<para>
 			Working on multiple data means that the instruction is executed
 			for every item of an input set. This set can consist of the set of
-			results of the previous instruction or one uniquely addressable
-			tuple of elements in the input of the transaction function.
-			The uniquely addressable input tuple can be made to a set 
-			when the instruction is attributed with a foreach quantifier 
-			that may address multiple elements of the function input.
+			results of a previous instruction or a selection of the
+			input of the transaction function. A quantifier that is 
+			part of the instruction defines the input set.
 		</para>
 		<para>
 			Each instruction result can be declared as being part of the transaction
