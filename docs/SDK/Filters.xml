@@ -1,12 +1,18 @@
 <chapter>
 <title>Filters</title>
-<para>This chapter describes how filters for different data formats are linked to the logic tier. For each data format
+<para>
+Filters describe the transformation of serialized data to a unified serialization of hierarchical structured data and back.
+The application does not care about data formats als long as there exists a filter providing
+the unified form of serialization.
+</para>
+<para>
+This chapter describes how filters for different data formats are linked to the logic tier. For each data format
 supported by <application>Wolframe</application> one or more filter type is introduced. 
 </para>
 <para>
 After reading this chapter you should be able to handle different document formats and encodings 
 in the logic tier of <application>Wolframe</application>. You will know how to add programs for scriptable filters
-like XSLT.
+like <acronym>XSLT</acronym>.
 </para>
 <para>
 Be aware that you have to configure a data filter of the logic tier in <application>Wolframe</application> before using it.

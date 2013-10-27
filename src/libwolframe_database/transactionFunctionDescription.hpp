@@ -107,7 +107,7 @@ public:
 
 	typedef types::keymap<VariableValue> VariableTable;
 
-	class ProcessingStep
+	class PreProcessingStep
 	{
 	public:
 		class Argument
@@ -130,9 +130,9 @@ public:
 		};
 
 		///\brief Default constructor
-		ProcessingStep(){}
+		PreProcessingStep(){}
 		///\brief Copy constructor
-		ProcessingStep( const ProcessingStep& o)
+		PreProcessingStep( const PreProcessingStep& o)
 			:selector_FOREACH(o.selector_FOREACH)
 			,path_INTO(o.path_INTO)
 			,functionname(o.functionname)
@@ -166,19 +166,19 @@ public:
 		std::vector<Argument> args;			//< function call arguments
 	};
 
-	///\class OperationStep
+	///\class MainProcessingStep
 	///\brief Description of one step (database operation) of a transaction function
-	class OperationStep
+	class MainProcessingStep
 	{
 	public:
 		///\brief Default constructor
-		OperationStep()
+		MainProcessingStep()
 			:nonempty(false)
 			,unique(false)
 			,resultref(false){}
 
 		///\brief Copy constructor
-		OperationStep( const OperationStep& o)
+		MainProcessingStep( const MainProcessingStep& o)
 			:selector_FOREACH(o.selector_FOREACH)
 			,call(o.call)
 			,path_INTO(o.path_INTO)
@@ -316,9 +316,9 @@ public:
 	};
 
 	std::map<std::size_t,PrintStep> printsteps;	//< Print variable instruction
-	std::vector<ProcessingStep> preprocs;		//< preprocessing steps on input
+	std::vector<PreProcessingStep> preprocs;	//< preprocessing steps on input
 	std::string resultfilter;			//< result filter function for post processing
-	std::vector<OperationStep> steps;		//< list of database commands or operations
+	std::vector<MainProcessingStep> steps;		//< list of database commands or operations
 	std::vector<Block> blocks;			//< substructures of the output
 	langbind::Authorization auth;			//< authorization definition structure for this function
 	VariableTable variablemap;			//< variable definitions with LET a = ...;

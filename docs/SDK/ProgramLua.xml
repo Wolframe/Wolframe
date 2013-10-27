@@ -43,7 +43,7 @@
 	</para>
 	</sect2>
 	<sect2>
-	<title>Using forms</title>
+	<title>Using Forms</title>
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty
 		instance of a form. It takes the name of the form as string argument.
 		If you for example have a form configured called "employee" and you want to create a

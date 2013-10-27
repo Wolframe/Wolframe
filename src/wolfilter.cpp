@@ -60,7 +60,12 @@ int main( int argc, char **argv )
 	try
 	{
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
-
+		if (argc == 1)
+		{
+			std::cerr << "no arguments specified" << std::endl;
+			config::WolfilterCommandLine::print( std::cerr);
+			return 0;
+		}
 #if defined( DEFAULT_MODULE_LOAD_DIR)
 		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR), "");
 #else

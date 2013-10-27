@@ -1,7 +1,6 @@
 **
 **requires:CJSON
 **requires:TEXTWOLF
-**requires:DISABLED SUSE_LINUX
 **input
 {
   "doctype" : "CDCatalog",

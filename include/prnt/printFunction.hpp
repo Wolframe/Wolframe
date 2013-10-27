@@ -48,7 +48,6 @@ struct PrintFunction
 	typedef types::CountedReference<Input> InputR;
 
 	///\brief Constructor
-	///\param[in] name name of the printing interface
 	explicit PrintFunction(){}
 	///\brief Destructor
 	virtual ~PrintFunction(){}

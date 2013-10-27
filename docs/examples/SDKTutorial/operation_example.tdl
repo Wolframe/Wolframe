@@ -1,5 +1,5 @@
 
-OPERATION selectFamilyMembers( id)
+SUBROUTINE selectFamilyMembers( id)
 BEGIN
 	INTO member
 		DO SELECT surname,prename FROM PersonTable

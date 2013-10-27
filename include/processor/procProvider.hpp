@@ -101,7 +101,7 @@ public:
 	///\brief return a database transaction object for the given name
 	db::Transaction* transaction( const std::string& name ) const;
 
-	///\Get the list of UI-forms
+	///\brief Get the list of UI-forms
 	///\return map name -> uiform xml without header
 	std::map<std::string,std::string> uiforms( const std::string& /*auth_ticket*/, int /*min_version*/, int& /*version*/) const
 	{

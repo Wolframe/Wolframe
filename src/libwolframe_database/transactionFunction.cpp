@@ -324,14 +324,14 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	,m_tagmap(description.casesensitive)
 	,m_resultfilter(description.resultfilter)
 {
-	typedef TransactionFunctionDescription::ProcessingStep ProcessingStep;
+	typedef TransactionFunctionDescription::PreProcessingStep PreProcessingStep;
 	typedef TransactionFunctionDescription::PrintStep PrintStep;
-	typedef TransactionFunctionDescription::OperationStep OperationStep;
-	typedef OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep MainProcessingStep;
+	typedef MainProcessingStep::Call Call;
 
 	// Compile the preprocessing commands:
 	{
-		std::vector<ProcessingStep>::const_iterator pi = description.preprocs.begin(), pe = description.preprocs.end();
+		std::vector<PreProcessingStep>::const_iterator pi = description.preprocs.begin(), pe = description.preprocs.end();
 		for (; pi != pe; ++pi)
 		{
 			std::size_t eidx = pi - description.preprocs.begin();
@@ -339,15 +339,15 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			{
 				Path selector( pi->selector_FOREACH, &m_tagmap);
 				std::vector<PreProcessCommand::Argument> args;
-				std::vector<ProcessingStep::Argument>::const_iterator ai = pi->args.begin(), ae = pi->args.end();
+				std::vector<PreProcessingStep::Argument>::const_iterator ai = pi->args.begin(), ae = pi->args.end();
 				for (; ai != ae; ++ai)
 				{
 					switch (ai->type)
 					{
-						case ProcessingStep::Argument::Selector:
+						case PreProcessingStep::Argument::Selector:
 							args.push_back( PreProcessCommand::Argument( ai->name, Path( ai->value, &m_tagmap)));
 							break;
-						case ProcessingStep::Argument::Constant:
+						case PreProcessingStep::Argument::Constant:
 							args.push_back( PreProcessCommand::Argument( ai->name, ConstantReferencePath( ai->value)));
 							break;
 					}
@@ -356,13 +356,13 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			}
 			catch (const std::runtime_error& e)
 			{
-				throw ProcessingStep::Error( eidx, e.what());
+				throw PreProcessingStep::Error( eidx, e.what());
 			}
 		}
 	}
 	// Compile the database commands:
 	int blkidx;
-	std::vector<OperationStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
+	std::vector<MainProcessingStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
 	for (; di != de; ++di)
 	{
 		std::size_t eidx = di - description.steps.begin();
@@ -456,11 +456,11 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
 				if (!di->hints.empty())
 				{
-					throw OperationStep::Error( eidx, "No ON ERROR hints supported for call of OPERATION");
+					throw MainProcessingStep::Error( eidx, "No ON ERROR hints supported for call of OPERATION");
 				}
 				if (di->nonempty)
 				{
-					throw OperationStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
+					throw MainProcessingStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
 				}
 				std::string iteratingTag;
 				bool hasOutput = false;
@@ -520,7 +520,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw OperationStep::Error( eidx, e.what());
+			throw MainProcessingStep::Error( eidx, e.what());
 		}
 	}
 	// Handle PRINT instructions:

@@ -141,10 +141,10 @@ static std::vector<std::string> parse_INTO_path( const LanguageDescription* lang
 	return rt;
 }
 
-static TransactionFunctionDescription::OperationStep::Call::Param
+static TransactionFunctionDescription::MainProcessingStep::Call::Param
 	parseReferenceParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	char ch = utils::gotoNextToken( si, se);
 	if (ch == '(' || ch == '[')
 	{
@@ -197,10 +197,10 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 	}
 }
 
-static TransactionFunctionDescription::OperationStep::Call::Param
+static TransactionFunctionDescription::MainProcessingStep::Call::Param
 	parsePathParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	std::string pp;
 	std::string tok;
 	char ch;
@@ -229,10 +229,10 @@ static TransactionFunctionDescription::OperationStep::Call::Param
 	return param;
 }
 
-static TransactionFunctionDescription::OperationStep::Call
+static TransactionFunctionDescription::MainProcessingStep::Call
 	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
 {
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	Call rt;
 	std::string stm;
 	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
@@ -264,10 +264,10 @@ static TransactionFunctionDescription::OperationStep::Call
 	return rt;
 }
 
-static TransactionFunctionDescription::OperationStep::Call
+static TransactionFunctionDescription::MainProcessingStep::Call
 	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
 {
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	Call rt;
 	std::string tok;
 
@@ -335,7 +335,7 @@ static TransactionFunctionDescription::OperationStep::Call
 static TransactionFunctionDescription::VariableValue
 	parseVariableValue( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, int scope_functionidx, const TransactionFunctionDescription::VariableTable& varmap)
 {
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	typedef TransactionFunctionDescription::VariableValue VariableValue;
 	typedef TransactionFunctionDescription::ConstantValue ConstantValue;
@@ -376,10 +376,10 @@ static TransactionFunctionDescription::VariableValue
 	throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
 }
 
-static TransactionFunctionDescription::ProcessingStep::Argument
-	parseProcessingStepArgument( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static TransactionFunctionDescription::PreProcessingStep::Argument
+	parsePreProcessingStepArgument( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	typedef TransactionFunctionDescription::ProcessingStep::Argument Argument;
+	typedef TransactionFunctionDescription::PreProcessingStep::Argument Argument;
 	Argument rt;
 	std::string tok;
 	char ch;
@@ -455,10 +455,10 @@ static TransactionFunctionDescription::ProcessingStep::Argument
 	return rt;
 }
 
-static std::vector<TransactionFunctionDescription::ProcessingStep::Argument>
-	parseProcessingStepArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+static std::vector<TransactionFunctionDescription::PreProcessingStep::Argument>
+	parsePreProcessingStepArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
-	typedef TransactionFunctionDescription::ProcessingStep::Argument Argument;
+	typedef TransactionFunctionDescription::PreProcessingStep::Argument Argument;
 	std::vector<Argument> rt;
 
 	for (;;)
@@ -466,12 +466,12 @@ static std::vector<TransactionFunctionDescription::ProcessingStep::Argument>
 		char ch = gotoNextToken( langdescr, si, se);
 		if (ch == ')' || ch == '\0') break;
 
-		rt.push_back( parseProcessingStepArgument( langdescr, si, se));
+		rt.push_back( parsePreProcessingStepArgument( langdescr, si, se));
 	}
 	return rt;
 }
 
-static void parseOperationArguments( TransactionFunctionDescription::VariableTable& variablemap, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+static void parseSubroutineArguments( TransactionFunctionDescription::VariableTable& variablemap, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
 	typedef TransactionFunctionDescription::VariableValue VariableValue;
 	typedef TransactionFunctionDescription::VariableTable VariableTable;
@@ -487,13 +487,13 @@ static void parseOperationArguments( TransactionFunctionDescription::VariableTab
 		VariableTable::const_iterator vi = variablemap.find( varname);
 		if (vi != variablemap.end())
 		{
-			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as operation argument)");
+			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as subroutine argument)");
 		}
 		variablemap[ varname] = VariableValue( ++column_idx, 0);
 	}
 	else
 	{
-		throw std::runtime_error( "variable name expected (itentifier in OPERATION argument list)");
+		throw std::runtime_error( "variable name expected (itentifier in SUBROUTINE argument list)");
 	}
 	while (0!=(ch=gotoNextToken( langdescr, si, se)))
 	{
@@ -505,13 +505,13 @@ static void parseOperationArguments( TransactionFunctionDescription::VariableTab
 			VariableTable::const_iterator vi = variablemap.find( varname);
 			if (vi != variablemap.end())
 			{
-				throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as operation argument)");
+				throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as subroutine argument)");
 			}
 			variablemap[ varname] = VariableValue( ++column_idx, 0);
 		}
 		else
 		{
-			throw std::runtime_error( "variable name expected (itentifier in OPERATION argument list)");
+			throw std::runtime_error( "variable name expected (itentifier in SUBROUTINE argument list)");
 		}
 	}
 	if (ch == ')')
@@ -520,17 +520,17 @@ static void parseOperationArguments( TransactionFunctionDescription::VariableTab
 	}
 	else
 	{
-		throw std::runtime_error( "syntax error in in OPERATION argument list: expected ')'");
+		throw std::runtime_error( "syntax error in in SUBROUTINE argument list: expected ')'");
 	}
 }
 
 
 namespace {
-struct Operation
+struct Subroutine
 {
-	Operation( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
+	Subroutine( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
 		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
-	Operation( const Operation& o)
+	Subroutine( const Subroutine& o)
 		:name(o.name),start(o.start),isTransaction(o.isTransaction),description(o.description),callstartar(o.callstartar),embstm_index(o.embstm_index){}
 
 	std::string name;
@@ -554,7 +554,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
-	types::keymap<TransactionFunctionR> operationmap;
+	types::keymap<TransactionFunctionR> subroutinemap;
 	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4};
 
 	config::PositionalErrorMessageBase ERROR(source);
@@ -576,7 +576,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				isTransaction = true;
 				enterDefinition = true;
 			}
-			else if (boost::algorithm::iequals( tok, "OPERATION") && isLineStart( tokstart, source))
+			else if (boost::algorithm::iequals( tok, "SUBROUTINE") && isLineStart( tokstart, source))
 			{
 				isTransaction = false;
 				enterDefinition = true;
@@ -593,22 +593,22 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
 				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
-				Operation operation( transactionName, dbe, isTransaction);
-				operation.description.casesensitive = langdescr->isCaseSensitive();
+				Subroutine subroutine( transactionName, dbe, isTransaction);
+				subroutine.description.casesensitive = langdescr->isCaseSensitive();
 
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
-				TransactionFunctionDescription::OperationStep opstep;
-				TransactionFunctionDescription::ProcessingStep prcstep;
+				TransactionFunctionDescription::MainProcessingStep opstep;
+				TransactionFunctionDescription::PreProcessingStep prcstep;
 				unsigned int mask = 0;
 				unsigned int sectionMask = 0;
 
 				if (gotoNextToken( langdescr, si, se) == '(')
 				{
-					// ... operation argument list
+					// ... subroutine call argument list
 					parseNextToken( langdescr, tok, si, se);
 					if (isTransaction) throw ERROR( si, "unexpected token '(': no positional arguments allowed positional transaction function");
-					parseOperationArguments( operation.description.variablemap, langdescr, si, se);
+					parseSubroutineArguments( subroutine.description.variablemap, langdescr, si, se);
 				}
 				while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 				{
@@ -631,11 +631,11 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							{
 								if (!isTransaction)
 								{
-									throw ERROR( si, "Cannot define RESULT FILTER in OPERATION. Only allowed as in TRANSACTION definition");
+									throw ERROR( si, "Cannot define RESULT FILTER in SUBROUTINE. Only allowed as in TRANSACTION definition");
 								}
 								if ((rf & 0x2) != 0) throw ERROR( si, "duplicate FILTER definition after RESULT");
 								rf |= 0x2;
-								if (!isAlphaNumeric( parseNextToken( langdescr, operation.description.resultfilter, si, se))) throw ERROR( si, "identifier expected after RESULT FILTER");
+								if (!isAlphaNumeric( parseNextToken( langdescr, subroutine.description.resultfilter, si, se))) throw ERROR( si, "identifier expected after RESULT FILTER");
 							}
 							else if (rf)
 							{
@@ -657,7 +657,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 						if (!isTransaction)
 						{
-							throw ERROR( si, "Cannot define AUTHORIZE in OPERATION. Only allowed as TRANSACTION definition attribute");
+							throw ERROR( si, "Cannot define AUTHORIZE in SUBROUTINE. Only allowed as TRANSACTION definition attribute");
 						}
 						ch = gotoNextToken( langdescr, si, se);
 						if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
@@ -685,7 +685,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
 						}
 						++si;
-						operation.description.auth.init( authfunction, authresource);
+						subroutine.description.auth.init( authfunction, authresource);
 					}
 					else if (boost::algorithm::iequals( tok, "PREPROCESS"))
 					{
@@ -694,7 +694,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 						if (!isTransaction)
 						{
-							throw ERROR( si, "Cannot define PREPROCESS in OPERATION. Only allowed in TRANSACTION definition");
+							throw ERROR( si, "Cannot define PREPROCESS in SUBROUTINE. Only allowed in TRANSACTION definition");
 						}
 						mask = 0;
 						prcstep.clear();
@@ -706,15 +706,15 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 						{
-							while (operation.pprcstartar.size() <= operation.description.preprocs.size())
+							while (subroutine.pprcstartar.size() <= subroutine.description.preprocs.size())
 							{
-								operation.pprcstartar.push_back( si);
+								subroutine.pprcstartar.push_back( si);
 							}
 							if (ch == ';')
 							{
 								if (mask)
 								{
-									operation.description.preprocs.push_back( prcstep);
+									subroutine.description.preprocs.push_back( prcstep);
 									prcstep.clear();
 									mask = 0;
 								}
@@ -775,7 +775,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 									throw std::runtime_error( "'(' expected after preprocessing function name");
 								}
 								++si;
-								prcstep.args = parseProcessingStepArguments( langdescr, si, se);
+								prcstep.args = parsePreProcessingStepArguments( langdescr, si, se);
 								ch = gotoNextToken( langdescr, si, se);
 								if (ch != ')')
 								{
@@ -803,16 +803,16 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 				while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 				{
-					while (operation.callstartar.size() <= operation.description.steps.size())
+					while (subroutine.callstartar.size() <= subroutine.description.steps.size())
 					{
-						operation.callstartar.push_back( si);
+						subroutine.callstartar.push_back( si);
 					}
 					if (ch == ';')
 					{
 						if (mask)
 						{
 							opstep.finalize();
-							operation.description.steps.push_back( opstep);
+							subroutine.description.steps.push_back( opstep);
 							opstep.clear();
 							mask = 0;
 						}
@@ -830,7 +830,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						if (parseNextToken( langdescr, tok, si, se)
 						&&  boost::algorithm::iequals( tok, "ERROR"))
 						{
-							if (operation.description.steps.empty())
+							if (subroutine.description.steps.empty())
 							{
 								throw ERROR( si, "ON ERROR declaration allowed only after a database call");
 							}
@@ -849,11 +849,11 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							{
 								throw ERROR( si, "hint message string expected after ON ERROR <errorclass> HINT");
 							}
-							if (operation.description.steps.back().hints.find( errclass) != operation.description.steps.back().hints.end())
+							if (subroutine.description.steps.back().hints.find( errclass) != subroutine.description.steps.back().hints.end())
 							{
 								throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
 							}
-							operation.description.steps.back().hints[  errclass] = errhint;
+							subroutine.description.steps.back().hints[  errclass] = errhint;
 
 							if (';' != gotoNextToken( langdescr, si, se))
 							{
@@ -877,15 +877,15 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							throw ERROR( si, std::string("'=' expected after LET ") + varname);
 						}
-						int scope_functionidx = operation.description.steps.size();
-						VariableValue varvalue = parseVariableValue( langdescr, si, se, scope_functionidx, operation.description.variablemap);
+						int scope_functionidx = subroutine.description.steps.size();
+						VariableValue varvalue = parseVariableValue( langdescr, si, se, scope_functionidx, subroutine.description.variablemap);
 
-						VariableTable::const_iterator vi = operation.description.variablemap.find( varname);
-						if (vi != operation.description.variablemap.end())
+						VariableTable::const_iterator vi = subroutine.description.variablemap.find( varname);
+						if (vi != subroutine.description.variablemap.end())
 						{
 							throw ERROR( si, std::string("duplicate definition of variable '") + varname + "'");
 						}
-						operation.description.variablemap[ varname] = varvalue;
+						subroutine.description.variablemap[ varname] = varvalue;
 						if (';' != gotoNextToken( langdescr, si, se))
 						{
 							throw ERROR( si, std::string("';' expected after LET ") + varname);
@@ -904,37 +904,37 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							{
 								if (!result_INTO.empty())
 								{
-									operation.description.blocks.insert( operation.description.blocks.begin(), TransactionFunctionDescription::Block( result_INTO, 0, operation.description.steps.size()));
+									subroutine.description.blocks.insert( subroutine.description.blocks.begin(), TransactionFunctionDescription::Block( result_INTO, 0, subroutine.description.steps.size()));
 								}
-								if (operation.isTransaction)
+								if (subroutine.isTransaction)
 								{
-									LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
-									TransactionFunctionR ff( createTransactionFunction( operation.name, operation.description, operationmap));
-									rt.push_back( std::pair<std::string,TransactionFunctionR>( operation.name, ff));
+									LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
+									TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+									rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
 								}
 								else
 								{
-									operationmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.description, operationmap));
+									subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
 								}
 							}
 							else
 							{
-								blockstk.back().size = operation.description.steps.size() - blockstk.back().startidx;
-								operation.description.blocks.push_back( blockstk.back());
+								blockstk.back().size = subroutine.description.steps.size() - blockstk.back().startidx;
+								subroutine.description.blocks.push_back( blockstk.back());
 								blockstk.pop_back();
 							}
 						}
-						catch (const TransactionFunctionDescription::OperationStep::Error& err)
+						catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
 						{
-							throw ERROR( operation.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+							throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
 						}
-						catch (const TransactionFunctionDescription::ProcessingStep::Error& err)
+						catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
 						{
-							throw ERROR( operation.pprcstartar[ err.elemidx], MSG << "error in preprocessing step of transaction: " << err.msg);
+							throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in preprocessing step of transaction: " << err.msg);
 						}
 						catch (const std::runtime_error& err)
 						{
-							throw ERROR( operation.start, MSG << "error in definition of transaction: " << err.what());
+							throw ERROR( subroutine.start, MSG << "error in definition of transaction: " << err.what());
 						}
 						catch (const std::exception& e)
 						{
@@ -979,7 +979,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							throw std::runtime_error( "unexpected token 'PRINT'");
 						}
 						TransactionFunctionDescription::VariableValue
-							varval = parseVariableValue( langdescr, si, se, operation.description.steps.size(), operation.description.variablemap);
+							varval = parseVariableValue( langdescr, si, se, subroutine.description.steps.size(), subroutine.description.variablemap);
 						if (mask == 0x0)
 						{
 							ch = gotoNextToken( langdescr, si, se);
@@ -1001,7 +1001,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							throw std::runtime_error( "unexpected token as end of print expression (';' expected)");
 						}
-						operation.description.printsteps[ operation.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, varval);
+						subroutine.description.printsteps[ subroutine.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, varval);
 						opstep.clear();
 						mask = 0x0;
 					}
@@ -1019,7 +1019,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 							if (parseNextToken( langdescr, tok, si, se)
 							&&  boost::algorithm::iequals( tok, "BEGIN"))
 							{
-								blockstk.push_back( TransactionFunctionDescription::Block( path, operation.description.steps.size(), 0));
+								blockstk.push_back( TransactionFunctionDescription::Block( path, subroutine.description.steps.size(), 0));
 							}
 							else
 							{
@@ -1084,7 +1084,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						}
 						if (langdescr->isEmbeddedStatement( si, se))
 						{
-							opstep.call = parseEmbeddedStatement( langdescr, transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
+							opstep.call = parseEmbeddedStatement( langdescr, transactionName, subroutine.embstm_index++, si, se, embeddedStatementMap);
 						}
 						else
 						{
