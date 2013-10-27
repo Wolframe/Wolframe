@@ -58,7 +58,7 @@ std::string getFileStem( const std::string& path);
 
 ///\brief Get the path 'path' relative to 'refpath' if it is not absolute
 ///\param[in] path relative part of the path or absolute path
-///\param[in] refpath absolute part of the path if 'path' is relative
+///\param[in] refPath absolute part of the path if 'path' is relative
 ///\return the canonical path
 std::string getCanonicalPath( const std::string& path, const std::string& refPath );
 

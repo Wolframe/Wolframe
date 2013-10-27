@@ -1,21 +1,24 @@
 <chapter>
 <title>Command Line Tools</title>
-<para>In this chapter we describe how <application>Wolframe</application> functions can be called from command line.
-The programs introduced here are installed as executables together with the wolframe application server.
+<para>In this chapter we describe how <application>Wolframe</application> functions can be 
+called from command line. The programs introduced here are installed as executables together
+with the wolframe application server.
 </para>
 
 <sect1>
 <title>The program wolfilter</title>
-	<para>The program <application>wolfilter</application> allows you to call any <application>Wolframe</application> function
-	or filter on command line. The idea is to provide a tool that allows testing of <application>Wolframe</application>
-	functions without the client server context. 
+	<para>The command line program <application>wolfilter</application> allows you to call any
+	<application>Wolframe</application> function or filter or mapping into a form structure
+	on command line. The idea is to provide a tool that allows testing of
+	<application>Wolframe</application> functions without the client server context. 
 	</para>
 </sect1>
 
 <sect1>
 <title>The program wolfwizard</title>
-	<para>The program <application>wolfwizard</application> allows you to get the configured artefacts of an application
-	as <acronym>XML</acronym>. This allows you to visualize the context of an application for example with 
+	<para>The command line program <application>wolfwizard</application> allows you to get 
+	the descriptions of the configured artifacts of an application as <acronym>XML</acronym>.
+	This allows you to visualize the context of an application for example with 
 	<acronym>XSLT</acronym> or <acronym>CSS</acronym>.
 	</para>
 </sect1>

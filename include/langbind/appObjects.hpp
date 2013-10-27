@@ -326,6 +326,7 @@ public:
 	bool call();
 
 	///\brief Initialization of call context for a new call
+	///\param[in] provider_ processor provider context
 	///\param[in] i call input
 	void init( const proc::ProcessorProvider* provider_, const TypedInputFilterR& i);
 

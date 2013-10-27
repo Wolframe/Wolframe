@@ -1,10 +1,10 @@
 
-OPERATION getPersonPrename( id)
+SUBROUTINE getPersonPrename( id)
 BEGIN
 	INTO . DO UNIQUE SELECT prename FROM Person WHERE Person.ID = $[id];
 END
 
-OPERATION getPerson( id)
+SUBROUTINE getPerson( id)
 RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
@@ -14,7 +14,7 @@ BEGIN
 	INTO tag PRINT "1001";							-- print constant
 
 	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];	-- embedded command with variable as argument
-	INTO . DO UNIQUE getPersonPrename( $[id]);				-- operation with variable as argument
+	INTO . DO UNIQUE getPersonPrename( $[id]);				-- call subroutine with variable as argument
 
 	INTO id PRINT $[id];							-- print variable
 

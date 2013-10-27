@@ -11,21 +11,45 @@
 			if not explicitely defined otherwise by the caller.
 		</para>
 		<para>
-			A <acronym>TDL</acronym> transaction function takes a structure as input and returns a structure as output.
-			The <application>Wolframe</application> database interface defines a transaction as context where input is passed as structure and the output is fetched from as structure.
-			The TDL is a programming language to describe the building of transaction input and the building of the result structure from the database output.
-			It defines a transaction as a sequence of database operations. A database operation is either a single embedded database instruction in the language of the underlaying database, a name of a procedure declared in the database or a block of operations delared with OPERATION. It adds some constructs to address input structure elements or database command results as arguments.
-			Each database command result can be declared as being part of the transaction result structure.
-			The language has no control structures and is therefore not a general purpose programming language.
-			It just offers some mapping of input to commands and from commands results to output.
+			A <acronym>TDL</acronym> transaction function takes a structure as input
+			and returns a structure as output.
+			The <application>Wolframe</application> database interface defines 
+			a transaction as context where input is passed as structure 
+			and the output is fetched from as structure.
 		</para>
 		<para>
-			For input data conversion the transaction definition language lets you define a
-			preprocessing section where wolframe functions defined can be called for selected input.
+			TDL is a programming language to describe the building of transaction 
+			input and the building of the result structure from the database output.
+			It defines a transaction as a sequence of instructions on multiple data.
+			An instruction is either discribed as a single embedded database command
+			in the language of the underlaying database, a name of a function declared
+			in the database (e.g. a PLSQL function) or a TDL subroutine call.
 		</para>
 		<para>
-			The TDL is case insensitive. For clearness and better readability TDL keywords are written in
-			uppercase here.
+			Instruction on multiple data means that the instruction is executed
+			for every input item in the set of input elements that can be the 
+			set of results of the previous instruction or the set of elements 
+			in the input adressed by a "foreach" qualifier.
+		</para>
+		<para>
+			Each instruction result can be declared as being part of the transaction
+			result structure. The language has no control structures and is 
+			therefore not a general purpose programming language.
+			It just offers some mapping of input to commands and from commands 
+			results to output.
+		</para>
+		<para>
+			For input data conversion the transaction definition language lets 
+			you define a preprocessing section where globally defined wolframe
+			functions can be called for selected input. For building an output 
+			structure that cannot be modeled with a language without control
+			structures and recursion TDL provides the possibility to call a
+			globally defined function as filter for postprocessing of the
+			transaction function result.
+		</para>
+		<para>
+			The TDL is case insensitive. For clearness and better readability
+			TDL keywords are written in uppercase here.
 		</para>
 	</sect2>
 	<sect2>
@@ -55,8 +79,8 @@
 		</para>
 		</sect3>
 		<sect3>
-		<title>Operations (Subroutines)</title>
-		<para>The example calls an operation with one argument to map the output.
+		<title>Subroutines</title>
+		<para>The example calls an subroutine with one argument to map the output.
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/operation_example.tdl" parse="text" />
 		</programlisting>
@@ -66,19 +90,19 @@
 	<sect2>
 	<title>Language Description</title>
 		<para>
-		A TDL Program consists of subroutine declarations as OPERATION blocks and exported
-		function declarations as TRANSACTION blocks. OPERATION blocks have the same
-		structure as TRANSACTION blocks but without preprocessing blocks and authotization
-		method declarations.
+		A TDL program consists of subroutine declarations and exported
+		transaction function declarations. Subroutines have the same
+		structure as transaction function blocks but without pre- and postprocessing
+		and authotization method declarations.
 		</para>
 		<sect3>
-			<title>OPERATION declarations</title>
-			<para>A subroutine declaration starts with the Keyword <code>OPERATION</code> followed
-			by the subroutine name. After this header and an optional result substructure
-			name declaration, the code definition block follows starting with <code>BEGIN</code>,
-			ending with <code>END</code>.
+			<title>Subroutines</title>
+			<para>A subroutine declaration starts with the Keyword <code>SUBROUTINE</code>
+			followed by the subroutine name. After this header and an optional 
+			result substructure name declaration, the code definition block
+			follows starting with <code>BEGIN</code>, ending with <code>END</code>.
 			<programlisting language='sql'>
-			OPERATION &lt;name&gt;
+			SUBROUTINE &lt;name&gt;
 			RESULT INTO &lt;result-block-name&gt;
 			BEGIN
 				...&lt;database or subroutine calls&gt;...
@@ -89,7 +113,7 @@
 		</sect3>
 
 		<sect3>
-			<title>TRANSACTION declarations</title>
+			<title>Transaction Function Declarations</title>
 			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code> followed
 			by the transaction function name. This name identifies the function globally.
 			The body of the function contains the following parts:
@@ -105,9 +129,9 @@
 						This optional declaration defines a top level tag for the 
 						result structure and optionally a post processing step as
 						filter referenced by name.
-						It is similar as the construct in the OPERATION block description
-						except that you cannot specify a postprocessing filter in
-						an OPERATION block.
+						It is similar as the construct in the subroutine description
+						except that you cannot specify a postprocessing filter
+						in a subroutine.
 					</para>
 				</listitem>
 				<listitem><code>PREPROCESS BEGIN &lt;...preprocessing function calls...&gt; END</code>
@@ -135,8 +159,7 @@
 			TRANSACTION &lt;name&gt;
 			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
 			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
-			PREPROCESS
-			BEGIN
+			PREPROCESS BEGIN
 				...&lt;preprocessing function calls&gt;...
 			END
 			BEGIN
@@ -161,25 +184,25 @@
 			<simplelist type="horiz" columns="2">
 			<member>TRANSACTION</member><member>Defines a block of statements in the following BEGIN ... END block as transaction.</member>
 			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
-			<member>OPERATION</member><member>Defines a block of statements in the following BEGIN ... END block as single operation.</member>
+			<member>SUBROUTINE</member><member>Defines a block of statements in the following BEGIN ... END block that can be called as single instruction.</member>
 			<member>PREPROCESS</member><member>Defines a block of preprocessing statements for processing selected input and writing into the input structure for further processing.</member>
-			<member>BEGIN</member><member>Marks the start of an execution block (terminated by END) of a TRANSACTION or OPERATION or PREPROCESS or RESULT INTO block.</member>
+			<member>BEGIN</member><member>Marks the start of an execution block (terminated by END) of a TRANSACTION or SUBROUTINE or PREPROCESS or RESULT INTO block.</member>
 			<member>END</member><member>Marks the end of an execution block.</member>
 			<member>RESULT</member><member>Defines subsection of the result built. It is followed by a INTO and an identifier defining a relative path in result where the following block marked with BEGIN .. END is mapped to</member>
-			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes as input of the associated command. The associated command is executed for each member of the selection. All relative path expressions in the associated command arguments have the path of a selected element of the operation as base.</member>
+			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes as input of the associated command. The associated command is executed for each member of the selection. All relative path expressions in the associated command arguments have the path of a selected element of the instruction as base.</member>
 			<member>INTO</member><member>Followed by an identifier or a path that declares the result tag for each result element of the associated command</member>
-			<member>DO</member><member>Starts a database command or execute operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
-			<member>UNIQUE</member><member>constraint on a database command or operation result: Result must be unique, if it exists</member>
-			<member>NONEMPTY</member><member>constraint on a database command result: Result must not be empty</member>
-			<member>LET</member><member>Starts a variable declaration for the current scope. Variables can refer to single database command results.</member>
-			<member>ON ERROR</member><member>Starts a declaration for a hint for a certain error class to enrich error messages with context information of the current operation</member>
+			<member>DO</member><member>Invokes a database command or subroutine call referenced in the argument. DO is followed by an embedded SQL command terminated with ';' or by a subroutine call</member>
+			<member>UNIQUE</member><member>constraint on a database command or subroutine call result: Result must be unique, if it exists</member>
+			<member>NONEMPTY</member><member>constraint on a database command or subroutine call result: Result must not be empty</member>
+			<member>LET</member><member>Starts a variable declaration for the current scope. Variables can refer to single database command or subroutine call results.</member>
+			<member>ON ERROR</member><member>Starts a declaration for a hint for a certain error class to enrich error messages with context information of the current instruction</member>
 			<member>HINT</member><member>Declares an error message in an ON ERROR &lt;errclass&gt; HINT declaration</member>
 			<member>PRINT</member><member>Declares a print of an argument into the result context of the print declaration scope. The argument can be a variable or result reference but cannot refer to input. The print instruction can use an INTO path as well to declare a target path in the result</member>
 			</simplelist>
 		</para>
 		</sect3>
 		<sect3>
-		<title>Substitutes in Commands</title>
+		<title>Substitutes in Command Arguments</title>
 		<para>
 			List of Substitutes
 			<simplelist type="horiz" columns="3">

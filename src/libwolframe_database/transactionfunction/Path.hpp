@@ -47,7 +47,7 @@ namespace db {
 class Path
 {
 public:
-	typedef TransactionFunctionDescription::OperationStep::Call Call;
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	enum ElementType
 	{
 		Root,

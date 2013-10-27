@@ -1,7 +1,7 @@
 --
 -- InsertTree
 --
-OPERATION InsertTree -- (Table / parentid)
+SUBROUTINE InsertTree -- (Table / parentid)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT $1,rgt FROM $1 WHERE ID = $(parentid);
 	DO UPDATE $1 SET rgt = rgt + 2 WHERE rgt >= $2;
@@ -13,7 +13,7 @@ END
 --
 -- DeleteTree
 --
-OPERATION DeleteTree -- (Table / id)
+SUBROUTINE DeleteTree -- (Table / id)
 BEGIN
 	DO NONEMPTY SELECT $1,lft,rgt,rgt-lft+1 AS width FROM $1 WHERE id = $(id);
 	DO DELETE FROM $1 WHERE lft >= $2 AND lft <= $3;
