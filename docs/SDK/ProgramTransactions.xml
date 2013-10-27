@@ -27,9 +27,12 @@
 		</para>
 		<para>
 			Instruction on multiple data means that the instruction is executed
-			for every input item in the set of input elements that can be the 
-			set of results of the previous instruction or the set of elements 
-			in the input adressed by a "foreach" qualifier.
+			for every item of an input set. This set can consist of the set of
+			results of the previous instruction or one uniquely addressable
+			tuple of elements in the input of the transaction function.
+			The uniquely addressable input tuple can be made to a set 
+			when the instruction is attributed with a foreach quantifier 
+			that may address multiple elements of the function input.
 		</para>
 		<para>
 			Each instruction result can be declared as being part of the transaction
