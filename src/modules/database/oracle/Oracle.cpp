@@ -105,14 +105,14 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		OracleConnection *conn = new OracleConnection( );
 
 		// a server handle
-		status = OCIHandleAlloc( (dvoid *)&( m_db.m_env.envhp ), (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
 			return;
 		}
 
 		// an error handle
-		status = OCIHandleAlloc( (dvoid *)&( m_db.m_env.envhp ), (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -120,7 +120,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 
 		// a service context handle
-		status = OCIHandleAlloc( (dvoid *)&( m_db.m_env.envhp ), (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -130,7 +130,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 
 		// attach to server
 		status = OCIServerAttach( conn->srvhp, conn->errhp,
-			m_connStr.empty( ) ? NULL : (text *)( m_connStr.c_str( ) ),
+			m_connStr.empty( ) ? NULL : (CONST text *)( m_connStr.c_str( ) ),
 			m_connStr.empty( ) ? (sb4)0 : (sb4)( m_connStr.length( ) ),
 			OCI_DEFAULT );
 		if( status != OCI_SUCCESS ) {
@@ -142,11 +142,12 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 
 		/* set attribute server context in the service context */
-		status = OCIAttrSet( (dvoid *)conn->svchp, OCI_HTYPE_SVCCTX,
-			(dvoid *)conn->srvhp, (ub4)0, OCI_ATTR_SERVER,
+		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
+			conn->srvhp, (ub4)0, OCI_ATTR_SERVER,
 			(OCIError *)conn->errhp );		
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -154,10 +155,11 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 		
 		// a user session handle
-		status = OCIHandleAlloc( (dvoid *)&( m_db.m_env.envhp ), (dvoid **)&conn->authp,
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->authp,
 			OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't create handle for Oracle authentication credentials for database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -165,40 +167,55 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 		
 		// user and password credentials (TODO: others, charsets)
-		status = OCIAttrSet( (dvoid *)conn->authp, OCI_HTYPE_SESSION,
-			(dvoid *)user->c_str( ), (ub4)user->length( ),
+		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
+			(dvoid *)user.c_str( ), (ub4)user.length( ),
 			OCI_ATTR_USERNAME, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
+			(dvoid *)password.c_str( ), (ub4)password.length( ),
+			OCI_ATTR_PASSWORD, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
 
-#if 0
+		// open user session
+		status = OCISessionBegin( conn->svchp, conn->errhp, conn->authp,
+			OCI_CRED_RDBMS, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create user session for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
 
-  (void) OCIAttrSet((dvoid *) authp, (ub4) OCI_HTYPE_SESSION,
-                 (dvoid *) username, (ub4) strlen((char *)username),
-                 (ub4) OCI_ATTR_USERNAME, errhp);
-
-  (void) OCIAttrSet((dvoid *) authp, (ub4) OCI_HTYPE_SESSION,
-                 (dvoid *) password, (ub4) strlen((char *)password),
-                 (ub4) OCI_ATTR_PASSWORD, errhp);
-
-  checkerr(errhp, OCISessionBegin ( svchp,  errhp, authp, OCI_CRED_RDBMS,
-                          (ub4) OCI_DEFAULT));
-
-  (void) OCIAttrSet((dvoid *) svchp, (ub4) OCI_HTYPE_SVCCTX,
-                   (dvoid *) authp, (ub4) 0,
-                   (ub4) OCI_ATTR_SESSION, errhp);
-                   
-
-  /* set username attribute in user session handle */
-  OCIAttrSet(conf->authp, OCI_HTYPE_SESSION, (dvoid *)conf->username,
-	     (ub4)strlen(conf->username), OCI_ATTR_USERNAME, conf->errhp);
-  
-  /* set password attribute in user session handle */
-  OCIAttrSet(conf->authp, OCI_HTYPE_SESSION, (dvoid *)conf->password,
-	     (ub4)strlen(conf->password), OCI_ATTR_PASSWORD, conf->errhp);
-  
-#endif
-
-
-                   
+		// set user session in service context
+		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
+			conn->authp, (ub4)0, OCI_ATTR_SESSION, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create set user session in service context for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		
 		// add connection to pool of connections
 		m_connPool.add( conn );
 		m_noConnections++;
@@ -225,6 +242,8 @@ OracledbUnit::~OracledbUnit()
 			throw std::logic_error( "Oracle database destructor: NULL connection from pool" );
 		}
 		
+		OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+		OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 		OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 		OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 		OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -347,6 +366,7 @@ const std::string& Oracletransaction::databaseID() const
 void Oracletransaction::execute_statement( const char* statement)
 {
 	if (!m_conn) throw std::runtime_error( "executing transaction statement without transaction context");
+#if 0
 	std::ostringstream msg;
 	bool success = true;
 	PGresult* res = PQexec( **m_conn, statement);
@@ -360,12 +380,13 @@ void Oracletransaction::execute_statement( const char* statement)
 	}
 	PQclear( res);
 	if (!success) throw std::runtime_error( msg.str());
+#endif
 }
 
 void Oracletransaction::begin()
 {
 	if (m_conn) delete m_conn;
-	m_conn = new PoolObject<PGconn*>( m_unit.m_connPool);
+	m_conn = new PoolObject<OracleConnection *>( m_unit.m_connPool);
 	execute_statement( "BEGIN;");
 }
 
@@ -387,7 +408,7 @@ void Oracletransaction::execute_with_autocommit()
 {
 	try
 	{
-		PoolObject<PGconn*> conn( m_unit.m_connPool);
+		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
 		PreparedStatementHandler_oracle ph( *conn, m_unit.stmmap());
 		try
 		{
