@@ -123,7 +123,7 @@
 		&SDKfunctions;
 		&SDKforms;
 		&SDKfilters;
-		&SDKcommandlineTools;
+		&SDKtesting;
 		&SDKglossary;
 
 		<index>

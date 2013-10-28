@@ -18,12 +18,11 @@
 <!ENTITY SDKprogramCpp			SYSTEM "ProgramCpp.xml">
 <!ENTITY SDKprogramDotnet		SYSTEM "ProgramDotnet.xml">
 <!ENTITY SDKprogramPython		SYSTEM "ProgramPython.xml">
-<!ENTITY SDKcommandlineTools		SYSTEM "CommandlineTools.xml">
 <!ENTITY SDKmodelTypedFilter		SYSTEM "ModelTypedFilter.xml">
 <!ENTITY SDKfilterXML			SYSTEM "FilterXML.xml">
 <!ENTITY SDKfilterJSON			SYSTEM "FilterJSON.xml">
 <!ENTITY SDKfilterXSLT			SYSTEM "FilterXSLT.xml">
-
+<!ENTITY SDKtesting			SYSTEM "Testing.xml">
 
 <!ENTITY SDKappendix			SYSTEM "Appendix.xml">
 <!ENTITY SDK_EBNF_TDL			SYSTEM "EBNF_TransactionDefinitionLanguage.xml">

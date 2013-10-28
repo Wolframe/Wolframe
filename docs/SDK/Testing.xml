@@ -1,0 +1,76 @@
+<chapter>
+<title>Testing and Defect Handling</title>
+<para>In this chapter we learn how parts of a <application>Wolframe</application>
+application can be verified to work correctly. The basis for testing and debugging
+a <application>Wolframe</application> application is the command line tool 
+<application>wolfilter</application>. 
+</para>
+
+<sect1>
+<title>Using wolfilter</title>
+	<para>The command line program <application>wolfilter</application> allows you to call any
+	<application>Wolframe</application> function or filter or mapping into a form structure
+	on command line.
+	</para>
+	<para>
+	There are two possibilities to declare the items involved in the test.
+	Either you pass the configuration with the option '--config' and the name of the command
+	to execute or you declare the items one by one with program options. These two approaches
+	are not mixable. Either you use '--config' or pass the parameters one by one. 
+	A try to mix both of them in one call is refused by <application>wolfilter</application>.
+	</para>
+	<para>The following examples assume the input file name to be in.xml or in.json and
+	the output file to be named out.xml or out.json respectively.
+	</para>
+	<sect2>
+		<title>Testing a Filter</title>
+		<para>The following example shows the mapping through a libxml2 filter.
+		Filters are tested by passing a dash '-' command to execute.
+		<programlisting language='sh'>
+
+		cat in.xml | wolfilter -f libxml2 -m mod_filter_libxml2 - > out.xml
+		</programlisting>
+		</para>
+		<para>The following example shows the processing of the input
+		through an xslt filter and mapping the output through a token filter
+		that shows the tokenization of the input by the input filter.
+		<programlisting language='sh'>
+
+		cat in.xml | wolfilter -i myfilter -o token\
+			-m mod_filter_libxml2\
+			-m mod_filter_token\
+			-p myfilter.xslt - > out.xml
+		</programlisting>
+		</para>
+	</sect2>
+	<sect2>
+		<title>Testing a Form</title>
+		<para>The following example shows the mapping through a form defined with simpleform DDL.
+		Mapping through forms is tested by passing the name of the form as command to execute.
+		<programlisting language='sh'>
+
+		cat in.xml | wolfilter -f libxml2 \
+			-m mod_filter_libxml2\
+			-p myform.sfrm MyForm > out.xml
+		</programlisting>
+		we assume here that the form to use is defined in myform.sfrm and called MyForm.
+		</para>
+	</sect2>
+	<sect2>
+		<title>Testing a Function</title>
+		<para>The following example shows the execution of a function written in Lua.
+		A JSON filter is used for input and output.
+		<programlisting language='sh'>
+
+		cat in.xml | wolfilter -f cjson \
+			-m mod_filter_cjson -m mod_command_lua \
+			-m mod_command_directmap
+			-p myfunc.lua MyFunc > out.json
+		</programlisting>
+		we assume here that the exported function to call defined in myfunc.lua is called MyFunc.
+		</para>
+	</sect2>
+</sect1>
+
+</chapter>
+

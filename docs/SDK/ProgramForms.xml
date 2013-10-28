@@ -24,7 +24,7 @@
 	</para>
 	</sect2>
 	<sect2>
-	<title>Define Forms in Simpleform DDL</title>
+	<title>Forms in Simpleform DDL</title>
 	<para>
 		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym> as example. The format is based on the "INFO"-format
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
