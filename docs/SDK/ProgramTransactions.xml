@@ -184,17 +184,19 @@
 			<title>Main Processing Instructions</title>
 			<para>Main processing instructions defined in the main execution block 
 			of a subroutine or transaction function consist of three parts in the
-			following order:
+			following order terminated by a semicolon ';' (the order of the 
+			INTO and FOREACH expression can be switched):
 			<itemizedlist>
 				<listitem><code>INTO &lt;result substructure name&gt;</code>
 					<para>
 						This optional directive specifies if and where the results
 						of the database commands should be put into as part of the
-						function output. In operations this substructure is one
-						relative to the current substructure addressed.
-						A subroutine with an "INTO myres"
+						function output. In subroutines this substructure is
+						relative to the current substructure addressed in the
+						callers context.
+						For example a subroutine with an "INTO myres"
 						directive called by a subroutine with an "INTO output"
-						directive will write its result into substructure
+						directive will write its result into a substructure with path
 						"output/myres".
 					</para>
 				</listitem>
@@ -226,7 +228,7 @@
 						the input root element when entering a transaction
 						function. The current path selected and the base
 						element of any relative path calculated in this scope
-						changes when a subroutine is called in in a FOREACH selection
+						changes when a subroutine is called in a FOREACH selection
 						context. Calling for example a subroutine in a
 						'FOREACH person' context will cause
 						relative paths in this subroutine to be subelements
@@ -257,13 +259,23 @@
 				</listitem>
 			</itemizedlist>
 			</para>
+			<sect4>
+				<title>Main Processing Example</title>
+				<para>The following example illustrate how the FOREACH,INTO,DO
+				expressions in the main processing block work together:
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_mainprocessing.tdl" parse="text" />
+				</programlisting>
+				</para>
+			</sect4>
 		</sect3>
 		<sect3>
 		<title>Preprocessing Instructions</title>
 		<para>Preprocessing instructions defined in the PREPROCESS execution block 
 			of a transaction function consist similar to the instructions
 			in the main execution block of three parts in the
-			following order:
+			following order terminated by a semicolon ';' (the order of the INTO and FOREACH expression can be
+			switched):
 		<itemizedlist>
 			<listitem><code>INTO &lt;result substructure name&gt;</code>
 				<para>
@@ -289,48 +301,287 @@
 					globally defined form functions or normalization
 					functions. Command arguments
 					are constants or relative paths from the selector
-					path in the FOREACH selection referencing unique
-					elements in the context of an element selected.
+					path in the FOREACH selection. They are uniquely
+					referencing elements in the context of an element
+					selected.
 				</para>
 			</listitem>
 		</itemizedlist>
 		</para>
+			<sect4>
+				<title>Preprocessing Example</title>
+				<para>The following example illustrate how the FOREACH,INTO,DO
+				expressions in the main processing block work together:
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_preprocessing.tdl" parse="text" />
+				</programlisting>
+				</para>
+			</sect4>
 		</sect3>
 		<sect3>
-		<title>Keywords</title>
-		<para>
-			<simplelist type="horiz" columns="2">
-			<member>TRANSACTION</member><member>Defines a block of statements in the following BEGIN ... END block as transaction.</member>
-			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
-			<member>SUBROUTINE</member><member>Defines a block of statements in the following BEGIN ... END block that can be called as single instruction.</member>
-			<member>PREPROCESS</member><member>Defines a block of preprocessing statements for processing selected input and writing into the input structure for further processing.</member>
-			<member>BEGIN</member><member>Marks the start of an execution block (terminated by END) of a TRANSACTION or SUBROUTINE or PREPROCESS or RESULT INTO block.</member>
-			<member>END</member><member>Marks the end of an execution block.</member>
-			<member>RESULT</member><member>Defines subsection of the result built. It is followed by a INTO and an identifier defining a relative path in result where the following block marked with BEGIN .. END is mapped to</member>
-			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes as input of the associated command. The associated command is executed for each member of the selection. All relative path expressions in the associated command arguments have the path of a selected element of the instruction as base.</member>
-			<member>INTO</member><member>Followed by an identifier or a path that declares the result tag for each result element of the associated command</member>
-			<member>DO</member><member>Invokes a database command or subroutine call referenced in the argument. DO is followed by an embedded SQL command terminated with ';' or by a subroutine call</member>
-			<member>UNIQUE</member><member>constraint on a database command or subroutine call result: Result must be unique, if it exists</member>
-			<member>NONEMPTY</member><member>constraint on a database command or subroutine call result: Result must not be empty</member>
-			<member>LET</member><member>Starts a variable declaration for the current scope. Variables can refer to single database command or subroutine call results.</member>
-			<member>ON ERROR</member><member>Starts a declaration for a hint for a certain error class to enrich error messages with context information of the current instruction</member>
-			<member>HINT</member><member>Declares an error message in an ON ERROR &lt;errclass&gt; HINT declaration</member>
-			<member>PRINT</member><member>Declares a print of an argument into the result context of the print declaration scope. The argument can be a variable or result reference but cannot refer to input. The print instruction can use an INTO path as well to declare a target path in the result</member>
-			</simplelist>
+		<title>Selector Path</title>
+		<para>An element of the input or a set of input elements can be selected by a path.
+			A path is a sequence of one of the following elements separated by slashes:
+			<itemizedlist>
+				<listitem>Identifier
+				<para>
+				An identifier uniquely selects sub element of the current position in the tree.
+				</para>
+				</listitem>
+				<listitem><code>*</code>
+				<para>
+				An asterisk selects any sub element of the current position in the tree.
+				</para>
+				</listitem>
+				<listitem><code>..</code>
+				<para>
+				Two dots in a row select the parent element of the current position in the tree.
+				</para>
+				</listitem>
+				<listitem><code>.</code>
+				<para>
+				One dots selects the current element in the tree.
+				This operator can also be useful as part of a path
+				to force the expression to be interpreted
+				as path if it could also be interpreted as a keyword of the 
+				TDL language (for example <code>./RESULT</code>).
+				</para>
+				</listitem>
+			</itemizedlist>
+			A slash at the beginning of a path selects the root element of the transaction function input tree.
+			Two subsequent slashes express that the following node is (transitively) any descendant of the
+			current node in the tree.
 		</para>
+		<para>
+			Paths can appear as argument of a FOREACH selector where they specify
+			the set of elements on which the attached command is executed on.
+			Or they can appear as argument reference in a command expression
+			where they specify uniquely one element that is passed as argument 
+			to the command when it is executed.
+		</para>
+		<para>
+			When used in embedded database statements, selector paths are referenced
+			with <code>$(&lt;path expression&gt;)</code>. When used as database
+			function or subroutine call arguments path expressions can be used in
+			plain without '$' and '(' ')' markers. These markers are just used to 
+			identify substitution entities.
+		</para>
+			<sect4>
+			<title>Path Expression Examples</title>
+				<para>The following list shows different ways of addressing an element by path:
+				<itemizedlist>
+					<listitem><code>/</code>
+					<para>Root element</para>
+					</listitem>
+					<listitem><code>/organization</code>
+					<para>Root element with name "organization"</para>
+					</listitem>
+					<listitem><code>/organization/address/city</code>
+					<para>Element "city" of root "organization" descendant "address"</para>
+					</listitem>
+					<listitem><code>//id</code>
+					<para>Any descendant element with name "id" of the current element</para>
+					</listitem>
+					<listitem><code>//person/id</code>
+					<para>Child with name "id" of any descendant "person" of the current element</para>
+					</listitem>
+					<listitem><code>/.//id</code>
+					<para>Any descendant element with name "id" of the root element</para>
+					</listitem>
+					<listitem><code>/address/*</code>
+					<para>Any direct descendant of the root element "address"</para>
+					</listitem>
+					<listitem><code>.</code>
+					<para>Currently selected element</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+			</sect4>
+			<sect4>
+			<title>Path Usage Example</title>
+			<para>This example shows the usage of path expression in the
+			preprocessing and the main processing part of a transaction function:
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/selectors_example.tdl" parse="text" />
+			</programlisting>
+			</para>
+			</sect4>
 		</sect3>
 		<sect3>
-		<title>Substitutes in Command Arguments</title>
-		<para>
-			List of Substitutes
-			<simplelist type="horiz" columns="3">
-			<member>Element</member><member>Example</member><member>Description</member>
-			<member>$NNN</member><member>$1</member><member>Column of a row of the last result addressed by index (counted from 1 for the first column). A command containing any result reference is executed for each row of the last result</member>
-			<member>$columname</member><member>$id</member><member>Column of a row of last result addressed by name. A command containing any result reference is executed for each row of the last result</member>
-			<member>$(path)</member><member>$(person/id)</member><member>Single element addressed by relative path from the current input selection</member>
-			<member>$[varname]</member><member>$[id]</member><member>Variable reference refering to a single result or NULL (not a set!) previously in the same scope declared with LET varname = &lt;result column reference&gt;;</member>
-			</simplelist>
-		</para>
+			<title>Referencing Database Results</title>
+			<para>Database results of the previous instruction are referenced 
+			with a '$RESULT.' followed by the column identifier or column number.
+			Column numbers start allways from 1, independent from the database !
+			So be aware that even if the database counts column from 0 you have
+			to use 1 for the first column. 
+			</para>
+			<para>
+			As already explained before, data base result sets of cardinality 
+			bigger than one cannot be addressed if not bound to a FOREACH
+			selection. In statements potentially addressing more than one 
+			result element you have to add a <code>FOREACH RESULT</code> quantifier.
+			</para>
+			<para>
+			For addressing results of instructions preceding the previous instruction,
+			you have to name them (see next section). The name of the result can then
+			be used as FOREACH argument to select the elements of a set to be
+			used as base for the command arguments of the instruction. Without
+			binding instruction commands with a FOREACH quantifier the named 
+			results of an instruction can be referenced as
+			<code>$&lt;name&gt;.&lt;columnref&gt;</code>.
+			For example as <code>$person.id</code> for the column with name 'id' of the
+			result named as 'person'.
+			</para>
+			<para>
+			The 'RESULT.' prefix in references to the previous instruction result
+			is a default and can be ommitted in instructions that are not 
+			explicitely bound to any other result than the last one. So the following
+			two instructions are equivalent:
+			<programlisting language='sql'>
+
+				DO SELECT name FROM Company WHERE id = $RESULT.id
+				DO SELECT name FROM Company WHERE id = $id
+			</programlisting>
+			and so are the following two instructions:
+			<programlisting language='sql'>
+
+				FOREACH RESULT DO SELECT name FROM Company WHERE id = $RESULT.id
+				FOREACH RESULT DO SELECT name FROM Company WHERE id = $id
+			</programlisting>
+			</para>
+			<para>
+			The result name prefix of any named result can also be ommitted if the
+			instruction is bound to a FOREACH selector naming the result. So the 
+			following two statements in the context of an existing database
+			result named "ATTRIBUTES" are equivalent:
+			<programlisting language='sql'>
+
+				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $ATTRIBUTES.id
+				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $id
+			</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Naming Database Results</title>
+				<para>Database results can be hold and made referenceable by name
+				with the declaration <code>KEEP AS &lt;resultname&gt;</code>
+				following immediately the instruction with the result to be referenced.
+				The identifier &lt;resultname&gt; references the
+				result in a variable reference or a FOREACH selector expression.
+				</para>
+				<sect4>
+				<title>Named Result Example</title>
+				<para>This example illustrates how a result is declared by name and referenced:
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_keep_as.tdl" parse="text" />
+				</programlisting>
+				</para>
+				</sect4>
+		</sect3>
+		<sect3>
+			<title>Constraints on database results</title>
+			<para>Database commands returning results can have constraints to catch
+			certain errors that would not be recognized at all or too late otherwise.
+			For example a transaction having a result of a previous command as argument
+			would not be executed if the result of the previous command is empty. But
+			nevertheless the overall transaction would succeed because no database
+			error occurring during execution of the commands defined for the 
+			transaction.
+			</para>
+			<para>
+			Constraints on database results are expressed as keywords following
+			the DO keyword of an instruction in the main processing section.
+			</para>
+			<para>
+			The following list explains the result constraints available:
+			<itemizedlist>
+				<listitem><code>NONEMPTY</code>
+				<para>Declares that the database result for each element of the input
+					must not be empty.</para>
+				</listitem>
+				<listitem><code>UNIQUE</code>
+				<para>Declares that the database result for each element of the input 
+					must be unique, if it exists.
+					Result sets with more than one element are refused 
+					but empty sets are accepted. If you
+					want to declare each result to have to exist, 
+					you have to put the double constraint
+					"UNIQUE NONEMPTY" or "NONEMPTY UNIQUE".</para>
+				</listitem>
+			</itemizedlist>
+			</para>
+			<sect4>
+				<title>Example with Result Constraints</title>
+				<para>
+				This example illustrates how to add result constraint for
+				data base commands returning results:
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_result_constraint.tdl" parse="text" />
+				</programlisting>
+				</para>
+			</sect4>
+		</sect3>
+		<sect3>
+			<title>Rewriting Error Messages for the Client</title>
+			<para>Sometimes internal error messages are confusing and are not helpful
+			to the user that does not have a deeper knowledge about the database
+			internals. For a set of error types it is possible to add a message
+			to be shown to the user if an error of a certain class happens.
+			The instruction <code>ON ERROR &lt;errorclass&gt; HINT &lt;message&gt;;</code>
+			following a database instruction catches the errors of class &lt;errorclass&gt;
+			and add the string &lt;message&gt; to the error message show to the user.
+			</para>
+			<para>We can have many subsequent ON ERROR definitions in a row if the
+			error classes to be catched are various.
+			</para>
+			<sect4>
+			<title>Database Error HINT Example</title>
+			<para>The following example shows the usage HINTs in error cases. It
+			catches errors that are constraint violations (error class CONSTRAINT)
+			and extends the error message with a hint that will be shown to the client as error message:
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_hint.tdl" parse="text" />
+			</programlisting>
+			</para>
+			</sect4>
+		</sect3>
+		<sect3>
+			<title>Substructures in the Result</title>
+			<para>We already learned to define substructures of the 
+			transaction function result with
+			the <code>RESULT INTO</code> directive of an OPERATION or 
+			TRANSACTION. But <code>RESULT INTO</code> blocks can also be
+			defined locally as sub blocks in the main processing block.
+			A subblock in the result is declared with 
+			<programlisting language='sql'>
+
+				RESULT INTO &lt;resulttag&gt;
+				BEGIN
+					...&lt;instruction list&gt;...
+				END
+			</programlisting>
+			All the results of the instruction list that get into the final result
+			will be attached to the substructure with name &lt;resulttag&gt;.
+			The nesting of result blocks can be arbitrary and the path of the 
+			elements in the result follows the scope of the subblocks.
+			</para>
+		</sect3>
+		<sect3>
+			<title>Explicit Definition of Elements in the Result</title>
+			<para>The result of a transaction consists normally of database command 
+			results that are mapped into the result with the attached INTO directive.
+			For printing variable values or constant values you can in certain
+			SQL databases use a select constant statement without specifying a table.
+			Unfortunately select of constants might not be supported in your 
+			database of choice. Besides that explicit printing seems to be much
+			more readable. The statement <code>INTO &lt;resulttag&gt; PRINT &lt;value&gt;;</code>
+			prints a value that can be a constant,variable or an input or result reference
+			into the substructure named &lt;resulttag&gt;. The following artificial 
+			example illustrates this.
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_print.tdl" parse="text" />
+			</programlisting>
+			</para>
 		</sect3>
 	</sect2>
 </sect1>

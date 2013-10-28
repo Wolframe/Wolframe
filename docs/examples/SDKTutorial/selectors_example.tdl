@@ -1,0 +1,12 @@
+
+TRANSACTION selectPerson
+PREPROCESS BEGIN
+    FOREACH /person/name INTO normalized DO normalizeName( . );
+    FOREACH /person INTO citycode DO getCityCode( city );
+END
+BEGIN
+    FOREACH person
+        DO INSERT INTO Person (Name,NormalizedName,CityCode)
+            VALUES ($(name),$(name/normalized),$(citycode));
+END
+

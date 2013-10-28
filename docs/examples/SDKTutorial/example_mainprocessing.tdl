@@ -1,0 +1,9 @@
+
+TRANSACTION insertCustomerAddresses
+BEGIN
+    DO SELECT id FROM Customer
+        WHERE name = $(customer/name);
+    FOREACH /customer/address
+        DO INSERT INTO Address (id,address)
+        VALUES ($RESULT.id, $(address));
+END

@@ -1,0 +1,15 @@
+
+TRANSACTION insertPersonTerms
+PREPROCESS BEGIN
+    FOREACH //address/* INTO normalized
+        DO normalizeStructureElements(.);
+    FOREACH //id INTO normalized
+        DO normalizeNumber(.);
+END
+BEGIN
+    DO UNIQUE SELECT id FROM Person
+        WHERE name = $(person/name);
+    FOREACH //normalized DO
+        INSERT INTO SearchTerm (id, value)
+        VALUES ($RESULT.id, $(.));
+END

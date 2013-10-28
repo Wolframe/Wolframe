@@ -1,20 +1,20 @@
 
 TRANSACTION selectCountry
 PREPROCESS BEGIN
-	INTO country/normalizedName DO normalize_diachars( country/name );
+    INTO country/normalizedName DO normalize_diachars( country/name );
 END
 BEGIN
-	DO UNIQUE NONEMPTY SELECT id FROM CountryTable
-		WHERE name = $(country/normalizedName);
-	LET countrycode = $id;
-		-- assigning the result with column name
-		--   'id' to the variable 'countrycode'
-	RESULT INTO country
-		-- building a result block with name 'country'
-	BEGIN
-		INTO code PRINT $[countrycode];
-		-- printing the variable 'countrycode' with tag 'code'
-		--   into the 'country' result block
-	END
+    DO UNIQUE NONEMPTY SELECT id FROM CountryTable
+        WHERE name = $(country/normalizedName);
+    LET countrycode = $id;
+        -- assigning the result with column name
+        --   'id' to the variable 'countrycode'
+    RESULT INTO country
+        -- building a result block with name 'country'
+    BEGIN
+        INTO code PRINT $[countrycode];
+        -- printing the variable 'countrycode' with tag 'code'
+        --   into the 'country' result block
+    END
 END
 

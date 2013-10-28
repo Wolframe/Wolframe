@@ -1,13 +1,13 @@
 
 TRANSACTION selectPersonId
 PREPROCESS BEGIN
-	FOREACH person INTO normalizedName
-		DO normalize_diachars( name );
+    FOREACH person INTO normalizedName
+        DO normalize_diachars( name );
 END
 BEGIN
-	FOREACH person INTO user
-		DO UNIQUE NONEMPTY
-			SELECT id FROM UserTable
-				WHERE name = $(normalizedName);
+    FOREACH person INTO user
+        DO UNIQUE NONEMPTY
+            SELECT id FROM UserTable
+                WHERE name = $(normalizedName);
 END
 
