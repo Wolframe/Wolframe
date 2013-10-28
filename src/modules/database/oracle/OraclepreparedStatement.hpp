@@ -37,6 +37,7 @@
 #include "database/preparedStatement.hpp"
 #include "database/bindStatementParams.hpp"
 #include "database/databaseError.hpp"
+#include "Oracle.hpp"
 #include "types/keymap.hpp"
 #include <string>
 #include <vector>

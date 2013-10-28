@@ -105,10 +105,19 @@ private:
 class OracledbUnit;
 class Oracledatabase;
 
+class OracleEnvirenment
+{
+	public:
+		OCIEnv *envhp; // OCI environemnt handle
+};
+
 class OracleConnection
 {
 	public:
-		OCIEnv *envhp;
+		OCIError *errhp; // error handle
+		OCIServer *srvhp; // server handle
+		OCISvcCtx *svchp; // service handle
+		OCISession *authp; // user authentication handle
 };
 
 class OracleStatement
@@ -190,6 +199,9 @@ public:
 
 private:
 	OracledbUnit*	m_unit;		///< parent database unit
+
+public:
+	OracleEnvirenment m_env;
 };
 
 

@@ -48,131 +48,32 @@ namespace _Wolframe {
 namespace db {
 
 //***  Oracle database functions  ***************************************
-static std::string escConnElement( std::string element )
-{
-	std::string esc;
-	for ( std::string::const_iterator it = element.begin(); it != element.end(); it++ )	{
-		if ( *it == '\'' )
-			esc += "\\'";
-		else if ( *it == '\\' )
-			esc += "\\\\";
-		else
-			esc += *it;
-	}
-	return esc;
-}
 
-static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
-				 const std::string& user, const std::string& password,
-				 const std::string& sslMode, const std::string& sslCert, const std::string& sslKey,
-				 const std::string& sslRootCert, const std::string& sslCRL,
-				 unsigned short connectTimeout )
+static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName )
 {
 	std::stringstream ss;
+	
+	// everything empty, assume default host (whatever that is)
+	if( host.empty( ) && dbName.empty( ) ) {
+		return "";
+	}
 
-	if ( ! host.empty())
-		ss << "host = '" << host << "'";
-	if ( port != 0 )	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "port = " << port;
+	// only a dbName, assume this is a dblink in tnsnames.ora
+	if( host.empty( ) && !dbName.empty( ) ) {
+		return dbName;
 	}
-	if ( ! dbName.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "dbname = '" << escConnElement( dbName ) << "'";
-	}
-	if ( ! user.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "user = '" << escConnElement( user ) << "'";
-		if ( ! password.empty())	{
-			if ( ! ss.str().empty())
-				ss << " ";
-			ss << "password = '" << escConnElement( password ) << "'";
-		}
-	}
-	if ( ! sslMode.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "sslmode = '" << escConnElement( sslMode ) << "'";
-	}
-	if ( ! sslCert.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "sslcert = '" << escConnElement( sslCert ) << "'";
-		if ( ! sslKey.empty())	{
-			if ( ! ss.str().empty())
-				ss << " ";
-			ss << "sslkey = '" << escConnElement( sslKey ) << "'";
-		}
-	}
-	if ( ! sslRootCert.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "sslrootcert = '" << escConnElement( sslRootCert ) << "'";
-	}
-	if ( ! sslCRL.empty())	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "sslcrl = '" << escConnElement( sslCRL ) << "'";
-	}
-	if ( connectTimeout != 0 )	{
-		if ( ! ss.str().empty())
-			ss << " ";
-		ss << "connect_timeout = " << connectTimeout;
-	}
-	return ss.str();
+	
+	// otherwise compose a connection string
+	// TODO: needs improvement!
+	ss << "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
+		<< "(HOST=" << host << ")"
+		<< "(PORT=" << port << ")"
+		<< "(CONNECT_DATA=(SID=" << dbName << ")"
+		<< "))";
+
+	return ss.str( );
 }
 
-_Wolframe::log::LogLevel::Level OracledbUnit::getLogLevel( const std::string& severity)
-{
-	struct LogMsgMap :public std::map<std::string,_Wolframe::log::LogLevel::Level>
-	{
-		LogMsgMap()
-		{
-			typedef _Wolframe::log::LogLevel LV;
-			(*this)["WARNING"] = LV::LOGLEVEL_WARNING;
-			(*this)["ERROR"] = LV::LOGLEVEL_ERROR;
-			(*this)["FATAL"] = LV::LOGLEVEL_FATAL;
-			(*this)["PANIC"] = LV::LOGLEVEL_ALERT;
-			(*this)["NOTICE"] = LV::LOGLEVEL_NOTICE;
-			(*this)["DETAIL"] = LV::LOGLEVEL_INFO;
-			(*this)["INFO"] = LV::LOGLEVEL_INFO;
-			(*this)["DEBUG"] = LV::LOGLEVEL_DEBUG;
-			(*this)["LOG"] = LV::LOGLEVEL_TRACE;
-		}
-	};
-	static LogMsgMap logMsgMap;
-	LogMsgMap::const_iterator li = logMsgMap.find( severity);
-	if (li == logMsgMap.end())
-	{
-		return log::LogLevel::LOGLEVEL_UNDEFINED;
-	}
-	else
-	{
-		return li->second;
-	}
-}
-
-void OracledbUnit::noticeProcessor( void* this_void, const char * message)
-{
-	OracledbUnit* this_ = (OracledbUnit*)this_void;
-	std::size_t ii=0;
-	for (; message[ii] && message[ii] != ':'; ++ii);
-	if (message[ii])
-	{
-		_Wolframe::log::LogLevel::Level lv = getLogLevel( std::string( message, ii));
-		if (lv != log::LogLevel::LOGLEVEL_UNDEFINED)
-		{
-			_Wolframe::log::Logger(logBackendPtr).Get( lv) << "Oracle database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
-			return;
-		}
-	}
-	LOG_ERROR << "Unknown log message type from Oracle database '" << ((this_)?this_->ID():"") << "': " << message;
-}
-
-// This function also needs a lot of work
 OracledbUnit::OracledbUnit(const std::string& id,
 				    const std::string& host, unsigned short port,
 				    const std::string& dbName,
@@ -186,75 +87,138 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
 	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
-	m_connStr = buildConnStr( host, port,  dbName, user, password,
-				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
-				  connectTimeout );
-	MOD_LOG_DATA << "Oracle database '" << m_ID << "' connection string <" << m_connStr << ">";
+	m_connStr = buildConnStr( host, port,  dbName );
+	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
-	for ( size_t i = 0; i < connections; i++ )	{
-		PGconn* conn = PQconnectdb( m_connStr.c_str() );
-		if ( conn == NULL )
-			MOD_LOG_ALERT << "Failed to connect to Oracle database '" << m_ID << "'";
-		else	{
-			PQsetNoticeProcessor( conn, &noticeProcessor, this);
+	sword status;
+	
+	// create an Oracle OCI environment (global per process), what
+	// options do we really need (charset, mutex, threading, pooling)?
+	status = OCIEnvCreate( &( m_db.m_env.envhp ), OCI_DEFAULT | OCI_THREADED, (dvoid *)0,
+		0, 0, 0, 0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) {
+		MOD_LOG_ALERT << "Failed to create Oracle environment for database '" << m_ID << "'";
+		return;
+	}
+	
+	for( size_t i = 0; i < connections; i++ ) {
+		OracleConnection *conn = new OracleConnection( );
 
-			ConnStatusType stat = PQstatus( conn );
-			std::string err = PQerrorMessage( conn );
-			while ( !err.empty() && ( err[ err.size() - 1 ] == '\r' ||  err[ err.size() - 1 ] == '\n' ))
-				err.erase( err.size() - 1 );
-			switch( stat )	{
-				case CONNECTION_OK:
-					MOD_LOG_TRACE << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connected OK.";
-					break;
-				case CONNECTION_BAD:
-					if ( err.compare( 0, 6, "FATAL:" ) == 0 )	{
-						MOD_LOG_ALERT << "Oracle database '" << m_ID << "' (connection "
-							      << i << ") error: '" << err << "'";
-						throw std::runtime_error( "Fatal error connecting to the Oracle database" );
-					}
-					MOD_LOG_WARNING << "Oracle database '" << m_ID << "' connection "
-							<< i << " error: '" << err << "'";
-					break;
-				case CONNECTION_STARTED:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection STARTED: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_STARTED in synchronous connection" );
-					break;
-				case CONNECTION_MADE:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection MADE: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_MADE in synchronous connection" );
-					break;
-				case CONNECTION_AWAITING_RESPONSE:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection AWAITING RESPONSE: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_AWAITING_RESPONSE in synchronous connection" );
-					break;
-				case CONNECTION_AUTH_OK:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection AUTH OK: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_AUTH_OK in synchronous connection" );
-					break;
-				case CONNECTION_SSL_STARTUP:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection SSL start: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_SSL_STARTUP in synchronous connection" );
-					break;
-				case CONNECTION_SETENV:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection SETENV: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_SETENV in synchronous connection" );
-					break;
-				case CONNECTION_NEEDED:
-					MOD_LOG_ALERT << "Oracle database '" << m_ID << "' constructor: connection "
-						      << i << " connection NEEDED: '" << err << "'";
-					throw std::range_error( "Oracle database: CONNECTION_NEEDED in synchronous connection" );
-					break;
-			}
-			m_connPool.add( conn );
-			m_noConnections++;
+		// a server handle
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
+			return;
 		}
+
+		// an error handle
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+
+		// a service context handle
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+
+		// attach to server
+		status = OCIServerAttach( conn->srvhp, conn->errhp,
+			m_connStr.empty( ) ? NULL : (CONST text *)( m_connStr.c_str( ) ),
+			m_connStr.empty( ) ? (sb4)0 : (sb4)( m_connStr.length( ) ),
+			OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+
+		/* set attribute server context in the service context */
+		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
+			conn->srvhp, (ub4)0, OCI_ATTR_SERVER,
+			(OCIError *)conn->errhp );		
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		
+		// a user session handle
+		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->authp,
+			OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create handle for Oracle authentication credentials for database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		
+		// user and password credentials (TODO: others, charsets)
+		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
+			(dvoid *)user.c_str( ), (ub4)user.length( ),
+			OCI_ATTR_USERNAME, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
+			(dvoid *)password.c_str( ), (ub4)password.length( ),
+			OCI_ATTR_PASSWORD, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+
+		// open user session
+		status = OCISessionBegin( conn->svchp, conn->errhp, conn->authp,
+			OCI_CRED_RDBMS, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create user session for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+
+		// set user session in service context
+		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
+			conn->authp, (ub4)0, OCI_ATTR_SESSION, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create set user session in service context for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			return;
+		}
+		
+		// add connection to pool of connections
+		m_connPool.add( conn );
+		m_noConnections++;
 	}
 
 	m_db.setUnit( this );
@@ -271,46 +235,30 @@ OracledbUnit::~OracledbUnit()
 	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
-	while ( m_connPool.available() )	{
-		PGconn* conn = m_connPool.get();
+	while( m_connPool.available( ) ) {
+		OracleConnection *conn = m_connPool.get( );
 		if ( conn == NULL )	{
 			MOD_LOG_ALERT << "Oracle database '" << m_ID << "' destructor: NULL connection from pool";
 			throw std::logic_error( "Oracle database destructor: NULL connection from pool" );
 		}
-		PGTransactionStatusType stat = PQtransactionStatus( conn );
-		switch( stat )	{
-			case PQTRANS_IDLE:
-				PQfinish( conn );
-				MOD_LOG_TRACE << "Oracle database '" << m_ID << "' destructor: Connection " << connections << " idle";
-				m_noConnections--, connections++;
-				break;
-			case PQTRANS_ACTIVE:
-				PQfinish( conn );
-				MOD_LOG_TRACE << "Oracle database '" << m_ID << "' destructor: Connection " << connections << " active";
-				m_noConnections--, connections++;
-				break;
-			case PQTRANS_INTRANS:
-				PQfinish( conn );
-				MOD_LOG_TRACE << "Oracle database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
-				m_noConnections--, connections++;
-				break;
-			case PQTRANS_INERROR:
-				PQfinish( conn );
-				MOD_LOG_TRACE << "Oracle database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
-				m_noConnections--, connections++;
-				break;
-			case PQTRANS_UNKNOWN:
-				PQfinish( conn );
-				MOD_LOG_TRACE << "Oracle database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
-				m_noConnections--, connections++;
-				break;
-		}
+		
+		OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+		OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+		OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+		OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+		OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+				
+		m_noConnections--, connections++;
 	}
+
 	if ( m_noConnections != 0 )	{
 		MOD_LOG_ALERT << "Oracle database unit '" << m_ID << "' destructor: "
 			      << m_noConnections << " connections not destroyed";
 		throw std::logic_error( "Oracle database unit destructor: not all connections destroyed" );
 	}
+
+	(void)OCIHandleFree( (dvoid *)m_db.m_env.envhp, OCI_HTYPE_ENV );
+	
 	MOD_LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
@@ -418,6 +366,7 @@ const std::string& Oracletransaction::databaseID() const
 void Oracletransaction::execute_statement( const char* statement)
 {
 	if (!m_conn) throw std::runtime_error( "executing transaction statement without transaction context");
+#if 0
 	std::ostringstream msg;
 	bool success = true;
 	PGresult* res = PQexec( **m_conn, statement);
@@ -431,12 +380,13 @@ void Oracletransaction::execute_statement( const char* statement)
 	}
 	PQclear( res);
 	if (!success) throw std::runtime_error( msg.str());
+#endif
 }
 
 void Oracletransaction::begin()
 {
 	if (m_conn) delete m_conn;
-	m_conn = new PoolObject<PGconn*>( m_unit.m_connPool);
+	m_conn = new PoolObject<OracleConnection *>( m_unit.m_connPool);
 	execute_statement( "BEGIN;");
 }
 
@@ -458,7 +408,7 @@ void Oracletransaction::execute_with_autocommit()
 {
 	try
 	{
-		PoolObject<PGconn*> conn( m_unit.m_connPool);
+		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
 		PreparedStatementHandler_oracle ph( *conn, m_unit.stmmap());
 		try
 		{
