@@ -37,7 +37,7 @@
 #include "gtest/gtest.h"
 #include "crypto/HMAC.hpp"
 
-using namespace _Wolframe::AAAA;
+using namespace _Wolframe::crypto;
 
 TEST( _HMAC_SHA1_, TestVectors )
 {

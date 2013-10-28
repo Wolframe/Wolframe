@@ -40,7 +40,7 @@
 #include <string>
 
 namespace _Wolframe {
-namespace AAAA {
+namespace crypto {
 
 class PBKDF2_HMAC_SHA1
 {
@@ -82,6 +82,6 @@ private:
 	unsigned char*	m_hash;
 };
 
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::crypto
 
 #endif // _PBKDF2_HPP_INCLUDED

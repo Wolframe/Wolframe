@@ -45,7 +45,7 @@
 #include "types/base64.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace crypto {
 
 static const size_t HMAC_SHA1_BCD_SIZE = HMAC_SHA1_HASH_SIZE * 2 + 1;
 static const size_t HMAC_SHA1_BASE64_SIZE = (( HMAC_SHA1_HASH_SIZE - 1 ) / 3 ) * 4 + 5;
@@ -159,4 +159,4 @@ bool HMAC_SHA256::operator == ( const std::string& rhs ) const
 	return !memcmp( this->m_HMAC, buffer, HMAC_SHA256_HASH_SIZE );
 }
 
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::crypto

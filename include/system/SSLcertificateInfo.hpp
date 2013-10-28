@@ -49,19 +49,19 @@ namespace _Wolframe {
 		public:
 			SSLcertificateInfo( X509* cert );
 
-			long serialNumber() const		{ return serialNumber_; }
-			const std::string& issuer() const	{ return issuer_; }
-			time_t notBefore() const		{ return notBefore_; }
-			time_t notAfter() const			{ return notAfter_; }
-			const std::string& subject() const	{ return subject_; }
-			const std::string& commonName() const	{ return commonName_; }
+			long serialNumber() const		{ return m_serialNumber; }
+			const std::string& issuer() const	{ return m_issuer; }
+			time_t notBefore() const		{ return m_notBefore; }
+			time_t notAfter() const			{ return m_notAfter; }
+			const std::string& subject() const	{ return m_subject; }
+			const std::string& commonName() const	{ return m_commonName; }
 		private:
-			long serialNumber_;
-			std::string issuer_;
-			time_t notBefore_;
-			time_t notAfter_;
-			std::string subject_;
-			std::string commonName_;
+			long m_serialNumber;
+			std::string m_issuer;
+			time_t m_notBefore;
+			time_t m_notAfter;
+			std::string m_subject;
+			std::string m_commonName;
 		};
 
 	} // namespace net

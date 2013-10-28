@@ -42,6 +42,7 @@
 #include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
+using namespace _Wolframe::crypto;
 using namespace std;
 
 // make the logger in the modules work although it does not make sense
