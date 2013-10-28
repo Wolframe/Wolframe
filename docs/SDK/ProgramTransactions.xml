@@ -30,7 +30,7 @@
 			Working on multiple data means that the instruction is executed
 			for every item of an input set. This set can consist of the set of
 			results of a previous instruction or a selection of the
-			input of the transaction function. A quantifier that is 
+			input of the transaction function. A for each selector that is 
 			part of the instruction defines the input set.
 		</para>
 		<para>
@@ -200,17 +200,16 @@
 				</listitem>
 				<listitem><code>FOREACH &lt;selector&gt;</code>
 					<para>
-						This optional directive specifies a quantifier
-						defining the set of elements on which the 
-						instruction is executed one by one. Specifying
-						a set of two elements will cause the function to
-						be called twice. An empty set as quantifier will
+						This optional directive defines the set of 
+						elements on which the instruction is executed one by one.
+						Specifying a set of two elements will cause the function to
+						be called twice. An empty set as selection will
 						cause the instruction to be ignored. Without
 						quantifier the database command or subroutine call
 						of the instrucution will be always be executed once.
 					</para>
 					<para>
-						The argument of the FOREACH quantifier is either
+						The argument of the FOREACH expression is either
 						a reference to the result of a previous 
 						instruction or a path selecting a set of input
 						elements.
@@ -229,7 +228,7 @@
 						element of any relative path calculated in this scope
 						changes when a subroutine is called in in a FOREACH selection
 						context. Calling for example a subroutine in a
-						'FOREACH person' quantifier context will cause
+						'FOREACH person' context will cause
 						relative paths in this subroutine to be subelements
 						of 'person'.
 					<para>
@@ -241,7 +240,7 @@
 						database commands, named database functions (e.g. PLSQL functions)
 						or subroutine calls. Command arguments
 						are either constants or relative paths 
-						from the selector path in the FOREACH quantifier 
+						from the selector path in the FOREACH selection
 						or refering to elements in the result of 
 						a previous command.
 						If an argument is a relative path from the 
@@ -250,7 +249,7 @@
 						element selected by the selector.
 						If an argument references a previous command
 						result it must either be unique or dependent
-						an the quantifier argument. 
+						an the FOREACH argument. 
 						Results that are sets with more than one element
 						can only be referenced if they are bound to 
 						the FOREACH quantifier.
@@ -272,24 +271,16 @@
 					of the preprocessing commands should be put into as part
 					of the input to be processed by the main processing
 					instructions. The relative paths of the destination structure
-					are calculated relatively to the FOREACH quantifier.
+					are calculated relatively to a FOREACH selection element.
 				</para>
 			</listitem>
 			<listitem><code>FOREACH &lt;selector&gt;</code>
 				<para>
-					This optional directive specifies a quantifier
-					defining the set of elements on which the 
-					instruction is executed one by one.
-					The argument of the FOREACH quantifier defines the number of
-					calls of the command specified as the cardinality
-					of the set selected. The preprocessing command is
-					executed once for each element in the selected set
-					and it will not be executed if the selected
-					set is empty.
-				</para>
-				<para>
-					The argument of the FOREACH quantifier is
-					a path selecting a set of input elements.
+					This optional directive defines the set of 
+					elements on which the instruction is executed one by one.
+					The preprocessing command is executed once for each 
+					element in the selected set and it will not be executed 
+					at all if the selected set is empty.
 				</para>
 			</listitem>
 			<listitem><code>DO &lt;command&gt;</code>
@@ -298,9 +289,8 @@
 					globally defined form functions or normalization
 					functions. Command arguments
 					are constants or relative paths from the selector
-					path in the FOREACH quantifier referencing unique
-					elements in the context of a quantifier element
-					selected.
+					path in the FOREACH selection referencing unique
+					elements in the context of an element selected.
 				</para>
 			</listitem>
 		</itemizedlist>
