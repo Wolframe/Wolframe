@@ -6,5 +6,5 @@ BEGIN
             WHERE name = $(name);
     FOREACH item
         DO INSERT INTO ItemTable (ownerid,name)
-            VALUES ($1,$(name));
+            VALUES ($RESULT.id,$(name));
 END

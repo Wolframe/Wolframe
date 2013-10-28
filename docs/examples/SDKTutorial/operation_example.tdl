@@ -3,7 +3,7 @@ SUBROUTINE selectFamilyMembers( id)
 BEGIN
     INTO member
         DO SELECT surname,prename FROM PersonTable
-            WHERE id = $[id];
+            WHERE id = $PARAM.id;
 END
 
 TRANSACTION getFamilyMembers

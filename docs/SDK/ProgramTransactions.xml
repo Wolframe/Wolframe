@@ -74,7 +74,9 @@
 		</sect3>
 		<sect3>
 		<title>Using Variables</title>
-		<para>The example returns the 'id' of a country depending on a normalized name. The normalization is done in a preprocessing step. The result is printed into a structure country/code;
+		<para>The example returns the 'id' of a country depending on a normalized name.
+		The normalization is done in a preprocessing step. 
+		The result is printed into a structure country/code;
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/variable_example.tdl" parse="text" />
 		</programlisting>
@@ -95,7 +97,7 @@
 		A TDL program consists of subroutine declarations and exported
 		transaction function declarations. Subroutines have the same
 		structure as transaction function blocks but without pre- and postprocessing
-		and authotization method declarations.
+		and authorization method declarations.
 		</para>
 		<sect3>
 			<title>Subroutines</title>
@@ -477,6 +479,16 @@
 				</programlisting>
 				</para>
 				</sect4>
+		</sect3>
+		<sect3>
+			<title>Referencing Subroutine Parameters</title>
+				<para>
+				Subroutine Parameters are addressed like results but with
+				the prefix <code>PARAM.</code> instead of <code>RESULT.</code>
+				or a named result prefix. "PARAM." is reserved for parameters.
+				The first instruction without FOREACH quantifier can reference
+				the parameters without prefix by name.
+				</para>
 		</sect3>
 		<sect3>
 			<title>Constraints on database results</title>

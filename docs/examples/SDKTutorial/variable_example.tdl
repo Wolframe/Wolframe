@@ -6,13 +6,13 @@ END
 BEGIN
     DO UNIQUE NONEMPTY SELECT id FROM CountryTable
         WHERE name = $(country/normalizedName);
-    LET countrycode = $id;
+    KEEP AS COUNTRY;
         -- assigning the result with column name
         --   'id' to the variable 'countrycode'
     RESULT INTO country
         -- building a result block with name 'country'
     BEGIN
-        INTO code PRINT $[countrycode];
+        INTO code PRINT $COUNTRY.id;
         -- printing the variable 'countrycode' with tag 'code'
         --   into the 'country' result block
     END
