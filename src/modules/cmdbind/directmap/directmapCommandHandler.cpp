@@ -69,7 +69,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	{
 		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
 	}
-	m_passoutput = m_cmd->passoutput;
+	m_skipvalidation_output = m_cmd->skipvalidation_output;
 	if (!m_cmd->inputform.empty())
 	{
 		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
@@ -283,7 +283,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				/* no break here ! */
 			case 4:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
-				if (m_outputform.get() && !m_passoutput)
+				if (m_outputform.get() && !m_skipvalidation_output)
 				{
 					const char* xmlroot = m_outputform->description()->xmlRoot();
 					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
