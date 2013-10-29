@@ -91,7 +91,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
 	m_connStr = buildConnStr( host, port,  dbName );
-	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string '" << m_connStr << "'";
+	MOD_LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";
 
 	sword status;
 	
