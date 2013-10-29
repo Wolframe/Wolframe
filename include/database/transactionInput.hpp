@@ -95,19 +95,22 @@ public:
 		Command()
 			:m_flags(0)
 			,m_functionidx(0)
-			,m_level(0){}
+			,m_level(0)
+			,m_foreach_functionidx(-1){}
 		///\brief Constructor
-		Command( std::size_t functionidx_, std::size_t level_, const std::string& name_)
+		Command( std::size_t functionidx_, std::size_t level_, const std::string& name_, int foreach_functionidx_=-1)
 			:m_flags(0)
 			,m_functionidx(functionidx_)
 			,m_level(level_)
-			,m_name(name_){}
+			,m_name(name_)
+			,m_foreach_functionidx(foreach_functionidx_){}
 		///\brief Copy constructor
 		Command( const Command& o)
 			:m_flags(o.m_flags)
 			,m_functionidx(o.m_functionidx)
 			,m_level(o.m_level)
 			,m_name(o.m_name)
+			,m_foreach_functionidx(o.m_foreach_functionidx)
 			,m_arg(o.m_arg){}
 
 		///\brief Bind value the the next argument of a command
@@ -161,6 +164,7 @@ public:
 		std::size_t m_functionidx;			//< Identifier used to associate a function description with a result for output with markup
 		std::size_t m_level;				//< Identifier used to implement the scope of values that can be referenced by this command
 		std::string m_name;				//< Name of the command (internal name for embedded database instructions)
+		int m_foreach_functionidx;			//< Quantifier variable for relative result references. If defined (>=0) then the function is executed for each result
 		std::vector<Argument> m_arg;			//< List of arguments passed to the command
 	};
 
