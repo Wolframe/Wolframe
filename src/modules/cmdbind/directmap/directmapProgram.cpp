@@ -197,10 +197,10 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	bool validate = true;
 	bool call_arg_set = false;
 	bool return_arg_set = false;
-	bool return_pass = false;
+	bool return_skip = false;
 	bool input_filter_set = false;
 	bool output_filter_set = false;
-	enum Lexem {PASS,RETURN,CALL,IDENTIFIER,FILTER,INPUT,OUTPUT};
+	enum Lexem {SKIP,RETURN,CALL,IDENTIFIER,FILTER,INPUT,OUTPUT};
 	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseCallArg,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
 	State state = ParseCommand;
 	char ch;
@@ -231,10 +231,10 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 		}
 		if (ch != '\'' && ch != '"')
 		{
-			if (boost::iequals( tok, "PASS"))
+			if (boost::iequals( tok, "SKIP"))
 			{
-				if (!validate) throw std::runtime_error("duplicate definition of PASS");
-				lexem = PASS;
+				if (!validate) throw std::runtime_error("duplicate definition of SKIP");
+				lexem = SKIP;
 			}
 			else if (boost::iequals( tok, "RETURN"))
 			{
@@ -320,7 +320,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 			case ParseAttribute:
 				switch (lexem)
 				{
-					case PASS:
+					case SKIP:
 						validate = false;
 						state = ParseAttribute;
 						continue;
@@ -338,16 +338,16 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 						state = ParseFilter;
 						continue;
 				}
-				throw std::runtime_error("PASS,FILTER,CALL or RETURN expected instead of token");
+				throw std::runtime_error("SKIP,FILTER,CALL or RETURN expected instead of token");
 
 			case ParseReturnArg:
-				if (lexem == PASS)
+				if (lexem == SKIP)
 				{
-					if (return_pass) throw std::runtime_error( "PASS specified twice after RETURN");
-					return_pass = true;
+					if (return_skip) throw std::runtime_error( "SKIP specified twice after RETURN");
+					return_skip = true;
 					continue;
 				}
-				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or PASS expected as argument of RETURN");
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or SKIP expected as argument of RETURN");
 				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
 				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for RETURN");
 				return_arg_set = true;
@@ -439,9 +439,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	{
 		rt.outputform = return_arg;
 	}
-	if (return_pass)
+	if (return_skip)
 	{
-		rt.passoutput = return_pass;
+		rt.skipvalidation_output = return_skip;
 	}
 	return rt;
 }
