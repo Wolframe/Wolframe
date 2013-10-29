@@ -63,11 +63,14 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 		return dbName;
 	}
 	
+	// assume default Oracle listener port, if port is undefined
+	if( port == 0 ) port = 1521;
+
 	// otherwise compose a connection string
 	// TODO: needs improvement!
 	ss << "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
 		<< "(HOST=" << host << ")"
-		<< "(PORT=" << port << ")"
+		<< "(PORT=" << port << "))"
 		<< "(CONNECT_DATA=(SID=" << dbName << ")"
 		<< "))";
 
@@ -88,7 +91,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
 	m_connStr = buildConnStr( host, port,  dbName );
-	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
+	MOD_LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";
 
 	sword status;
 	
@@ -105,14 +108,14 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		OracleConnection *conn = new OracleConnection( );
 
 		// a server handle
-		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
 			return;
 		}
 
 		// an error handle
-		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -120,7 +123,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 
 		// a service context handle
-		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
+		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -155,7 +158,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		}
 		
 		// a user session handle
-		status = OCIHandleAlloc( &( m_db.m_env.envhp ), (dvoid **)&conn->authp,
+		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->authp,
 			OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't create handle for Oracle authentication credentials for database '" << m_ID << "'";
