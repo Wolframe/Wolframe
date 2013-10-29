@@ -1,2 +1,2 @@
 
-COMMAND process Document PASS CALL doProcessDocument RETURN Document;
+COMMAND process Document SKIP CALL doProcessDocument RETURN Document;

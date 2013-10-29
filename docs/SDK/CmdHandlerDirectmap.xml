@@ -98,12 +98,12 @@
 			</para>
 		</sect4>
 		<sect4>
-			<title>Passing Over Document Validation</title>
+			<title>Skipping Document Validation</title>
 			<para>
-				If you want to pass over the input document validation, either because you are dealing
+				If you want to skip the input document validation, either because you are dealing
 				with legacy software where a strict definition of a schema is not possible or
 				because the function called has strict typeing and validates input on its own (.NET,C++),
-				then you can add a declaration <code>PASS</code>:
+				then you can add a declaration <code>SKIP</code>:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_pass_call_return.directmap" parse="text" />
 				</programlisting>
@@ -177,14 +177,14 @@
 					<entry>Specifies the type of the document returned and forces validation of the output</entry>
 				</row>
 				<row>
-					<entry>RETURN PASS</entry>
+					<entry>RETURN SKIP</entry>
 					<entry>Document Type</entry>
-					<entry>Specifies the type of the document returned but passes over validation of the output</entry>
+					<entry>Specifies the type of the document returned but skips validation of the output</entry>
 				</row>
 				<row>
-					<entry>PASS</entry>
+					<entry>SKIP</entry>
 					<entry>(no arguments)</entry>
-					<entry>Specifies the input document validation to be passed over</entry>
+					<entry>Specifies the input document validation to be skipped</entry>
 				</row>
 				<row>
 					<entry>FILTER INPUT</entry>
