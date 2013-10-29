@@ -531,7 +531,7 @@ struct Subroutine
 	Subroutine( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
 		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
 	Subroutine( const Subroutine& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),description(o.description),callstartar(o.callstartar),embstm_index(o.embstm_index){}
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
 
 	std::string name;
 	std::string::const_iterator start;
@@ -654,6 +654,8 @@ static void parseResultDirective( Subroutine& subroutine, config::PositionalErro
 	std::string tok;
 	unsigned int mask = 0;
 
+	std::string::const_iterator start = si;
+	subroutine.result_INTO.clear();
 	while (parseNextToken( langdescr, tok, si, se))
 	{
 		if (boost::algorithm::iequals( tok, "INTO"))
@@ -671,16 +673,21 @@ static void parseResultDirective( Subroutine& subroutine, config::PositionalErro
 			}
 			if ((mask & 0x2) != 0) throw ERROR( si, "duplicate FILTER definition after RESULT");
 			mask |= 0x2;
-			if (!isAlphaNumeric( parseNextToken( langdescr, subroutine.description.resultfilter, si, se))) throw ERROR( si, "identifier expected after RESULT FILTER");
+			if (!isAlphaNumeric( parseNextToken( langdescr, subroutine.description.resultfilter, si, se)))
+			{
+				throw ERROR( si, "identifier expected after RESULT FILTER");
+			}
 		}
 		else if (mask)
 		{
+			si = start;
 			break;
 		}
 		else
 		{
 			throw ERROR( si, "INTO or FILTER expected after RESULT");
 		}
+		start = si;
 	}
 }
 
@@ -725,12 +732,12 @@ static void parseAuthorizeDirective( Subroutine& subroutine, config::PositionalE
 	subroutine.description.auth.init( authfunction, authresource);
 }
 
-static void parsePrintStep( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static void parsePrintStep( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const std::vector<std::string>& print_INTO_path)
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
 
-	std::vector<std::string> pt;
+	std::vector<std::string> pt = print_INTO_path;
 
 	TransactionFunctionDescription::VariableValue
 		varval = parseVariableValue( langdescr, si, se, subroutine.description.steps.size(), subroutine.description.variablemap);
@@ -741,8 +748,15 @@ static void parsePrintStep( Subroutine& subroutine, config::PositionalErrorMessa
 		if (parseNextToken( langdescr, tok, si, se)
 		&&  boost::algorithm::iequals( tok, "INTO"))
 		{
-			pt = parse_INTO_path( langdescr, si, se);
-			ch = gotoNextToken( langdescr, si, se);
+			if (pt.empty())
+			{
+				pt = parse_INTO_path( langdescr, si, se);
+				ch = gotoNextToken( langdescr, si, se);
+			}
+			else
+			{
+				throw ERROR( si, "INTO specified twice for 'PRINT'");
+			}
 		}
 		else
 		{
@@ -915,7 +929,21 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 		}
 		else if (boost::algorithm::iequals( tok, "PRINT"))
 		{
-			parsePrintStep( subroutine, ERROR, langdescr, si, se);
+			std::vector<std::string> print_INTO_path;
+			if (mask != 0)
+			{
+				if (mask == 0x2)
+				{
+					print_INTO_path = opstep.path_INTO;
+					opstep.path_INTO.clear();
+					mask = 0;
+				}
+				else
+				{
+					throw std::runtime_error( "unexpected token PRINT in middle of database instruction definition");
+				}
+			}
+			parsePrintStep( subroutine, ERROR, langdescr, si, se, print_INTO_path);
 		}
 		else if (boost::algorithm::iequals( tok, "RESULT"))
 		{
