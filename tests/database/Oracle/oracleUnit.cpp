@@ -27,9 +27,9 @@ class OracleFixture : public ::testing::Test
 		}
 };
 
-TEST_F( OracleFixture, CreatePostgreSQLunit )
+TEST_F( OracleFixture, CreateOracleunit )
 {
-	OracledbUnit db( "testDB", "localhost", 0, "wolframe",
+	OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
 	ASSERT_STREQ( "Oracle", db.className());

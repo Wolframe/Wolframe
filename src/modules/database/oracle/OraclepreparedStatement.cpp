@@ -48,7 +48,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_oracle::PreparedStatementHandler_oracle( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
+PreparedStatementHandler_oracle::PreparedStatementHandler_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn_)
 	,m_stmmap(stmmap_)
@@ -66,7 +66,7 @@ void PreparedStatementHandler_oracle::clear()
 {
 	if (m_lastresult)
 	{
-		PQclear( m_lastresult);
+//		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
 	m_lasterror.reset();
@@ -141,6 +141,7 @@ static const char* getErrorType( const char* tp)
 
 void PreparedStatementHandler_oracle::setDatabaseErrorMessage()
 {
+/*
 	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
 	const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
 	const char* severitystr = m_lastresult?PQresultErrorField( m_lastresult, PG_DIAG_SEVERITY):"ERROR";
@@ -163,11 +164,14 @@ void PreparedStatementHandler_oracle::setDatabaseErrorMessage()
 	}
 	int errorcode = 0;
 	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
+*/
 }
 
-bool PreparedStatementHandler_oracle::status( PGresult* res, State newstate)
+// was PQResult
+bool PreparedStatementHandler_oracle::status( OracleStatement* res, State newstate)
 {
 	bool rt;
+/*
 	ExecStatusType es = PQresultStatus( res);
 
 	if (es == PGRES_COMMAND_OK)
@@ -192,6 +196,7 @@ bool PreparedStatementHandler_oracle::status( PGresult* res, State newstate)
 	{
 		PQclear( res);
 	}
+*/
 	return rt;
 }
 
@@ -202,7 +207,8 @@ bool PreparedStatementHandler_oracle::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-	return status( PQexec( m_conn, "BEGIN;"), Transaction);
+//	return status( PQexec( m_conn, "BEGIN;"), Transaction);
+	return false;
 }
 
 bool PreparedStatementHandler_oracle::commit()
@@ -216,20 +222,22 @@ bool PreparedStatementHandler_oracle::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	return status( PQexec( m_conn, "COMMIT;"), Init);
+//	return status( PQexec( m_conn, "COMMIT;"), Init);
+	return false;
 }
 
 bool PreparedStatementHandler_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
-	return status( PQexec( m_conn, "ROLLBACK;"), Init);
+//	return status( PQexec( m_conn, "ROLLBACK;"), Init);
+	return false;
 }
 
 bool PreparedStatementHandler_oracle::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+//		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -288,7 +296,8 @@ bool PreparedStatementHandler_oracle::bind( std::size_t idx, const types::Varian
 		encvalue[0] = '\'';
 		boost::shared_ptr<void> encvaluer( encvalue, std::free);
 		int error = 0;
-		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
+//		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
+		size_t encvaluesize = 0;
 		encvalue[encvaluesize+1] = '\'';
 		std::string bindval( encvalue, encvaluesize+2);
 		m_statement.bind( idx, bindval);
@@ -309,19 +318,19 @@ bool PreparedStatementHandler_oracle::execute()
 	}
 	if (m_lastresult)
 	{
-		PQclear( m_lastresult);
+//		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
 	std::string stmstr = m_statement.expanded();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
-	m_lastresult = PQexec( m_conn, stmstr.c_str());
+//	m_lastresult = PQexec( m_conn, stmstr.c_str());
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)
 	{
 		if (m_hasResult)
 		{
-			m_nof_rows = (std::size_t)PQntuples( m_lastresult);
+//			m_nof_rows = (std::size_t)PQntuples( m_lastresult);
 			m_idx_row = 0;
 		}
 		else
@@ -348,7 +357,8 @@ std::size_t PreparedStatementHandler_oracle::nofColumns()
 	{
 		return errorStatus( "command result is empty");
 	}
-	return PQnfields( m_lastresult);
+//	return PQnfields( m_lastresult);
+	return 0;
 }
 
 const char* PreparedStatementHandler_oracle::columnName( std::size_t idx)
@@ -363,7 +373,8 @@ const char* PreparedStatementHandler_oracle::columnName( std::size_t idx)
 		errorStatus( "command result is empty");
 		return 0;
 	}
-	const char* rt = PQfname( m_lastresult, (int)idx-1);
+//	const char* rt = PQfname( m_lastresult, (int)idx-1);
+	const char* rt = "";
 	if (!rt) errorStatus( std::string( "index of column out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 	return rt;
 }
@@ -387,10 +398,11 @@ types::VariantConst PreparedStatementHandler_oracle::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	if (m_idx_row >= m_nof_rows) return types::VariantConst();
-	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
+//	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
+	char *rt = "";
 	if (!rt || rt[0] == '\0')
 	{
-		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
+//		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
 		{
 			return types::VariantConst();
 		}
