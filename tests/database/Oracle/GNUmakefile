@@ -52,4 +52,7 @@ else
 	@echo "No properly configured database for tests"
 endif
 
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
+
 local_longtest:

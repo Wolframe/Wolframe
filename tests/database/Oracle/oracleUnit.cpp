@@ -27,10 +27,15 @@ class OracleFixture : public ::testing::Test
 		}
 };
 
+#define HOST "andreasbaumann.dyndns.org"
+#define SID "orcl"
+#define USER "wolfusr"
+#define PWD "wolfpwd"
+
 TEST_F( OracleFixture, CreateOracleunit )
 {
-	OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
+	OracledbUnit db( "testDB", HOST, 0, SID, USER, PWD,
+			     "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
 	ASSERT_STREQ( "Oracle", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
@@ -39,32 +44,29 @@ TEST_F( OracleFixture, CreateOracleunit )
 
 TEST_F( OracleFixture, WrongHost )
 {
-	OracledbUnit db( "testDB", "blabla", 0, "wolframe",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
-	ASSERT_STREQ( "Oracle", db.className());
-	ASSERT_STREQ( "testDB", db.ID().c_str());
-	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
+	ASSERT_THROW( OracledbUnit db( "testDB", "blabla", 0, SID, USER, PWD,
+			     "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongPassword )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframe",
-					   "wolfusr", "wolfpwdd", "", "", "", "", "",
+	ASSERT_THROW( OracledbUnit db( "testDB", HOST, 0, SID, USER, PWD "d",
+					   "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongUser )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframe",
-					   "wolfusrr", "wolfpwd", "", "", "", "", "",
+	ASSERT_THROW( OracledbUnit db( "testDB", HOST, 0, SID, USER "r", PWD,
+					   "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongDatabase )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframee",
-					   "wolfusr", "wolfpwd", "", "", "", "", "",
+	ASSERT_THROW( OracledbUnit db( "testDB", HOST, 0, SID "e", USER, PWD,
+					   "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
