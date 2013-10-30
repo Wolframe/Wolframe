@@ -81,7 +81,7 @@ public:
 
 	Path(){}
 	Path( const std::string& selector, TagTable* tagmap);
-	Path( const Call::Param& param, const TransactionFunctionDescription::VariableTable* varmap, TagTable* tagmap);
+	Path( const Call::Param& param, TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 

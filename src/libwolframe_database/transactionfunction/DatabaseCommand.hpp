@@ -50,12 +50,14 @@ class DatabaseCommand
 public:
 	///\brief Default constructor
 	DatabaseCommand()
-		:m_nonemptyResult(false)
+		:m_resultsetidx(-1)
+		,m_nonemptyResult(false)
 		,m_uniqueResult(false){}
 	///\brief Copy constructor
 	DatabaseCommand( const DatabaseCommand& o)
 		:m_name(o.m_name)
 		,m_selector(o.m_selector)
+		,m_resultsetidx(o.m_resultsetidx)
 		,m_arg(o.m_arg)
 		,m_nonemptyResult(o.m_nonemptyResult)
 		,m_uniqueResult(o.m_uniqueResult)
@@ -63,9 +65,10 @@ public:
 		,m_hints(o.m_hints){}
 
 	///\brief Constructor
-	DatabaseCommand( const std::string& name_, const Path& selector_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>())
+	DatabaseCommand( const std::string& name_, const Path& selector_, int resultsetidx_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>())
 		:m_name(name_)
 		,m_selector(selector_)
+		,m_resultsetidx(resultsetidx_)
 		,m_arg(arg_)
 		,m_nonemptyResult(setNonemptyResult_)
 		,m_uniqueResult(setUniqueResult_)
@@ -77,6 +80,7 @@ public:
 	const std::vector<Path>& arg() const				{return m_arg;}
 	const std::string& name() const					{return m_name;}
 
+	int resultsetidx() const					{return m_resultsetidx;}
 	bool hasNonemptyResult() const					{return m_nonemptyResult;}
 	bool hasUniqueResult() const					{return m_uniqueResult;}
 	std::size_t level() const					{return m_level;}
@@ -100,6 +104,7 @@ public:
 private:
 	std::string m_name;
 	Path m_selector;
+	int m_resultsetidx;
 	std::vector<Path> m_arg;
 	bool m_nonemptyResult;
 	bool m_uniqueResult;

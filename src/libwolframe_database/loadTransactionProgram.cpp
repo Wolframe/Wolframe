@@ -36,6 +36,7 @@
 #include "transactionFunctionDescription.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/conversions.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
@@ -75,13 +76,18 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 
 static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
-static bool isAlphaNumeric( char ch)
+static bool isAlpha( char ch)
 {
-	if (ch >= '0' && ch <= '9') return true;
 	if (ch >= 'A' && ch <= 'Z') return true;
 	if (ch >= 'a' && ch <= 'z') return true;
 	if (ch == '_') return true;
 	return false;
+}
+
+static bool isAlphaNumeric( char ch)
+{
+	if (ch >= '0' && ch <= '9') return true;
+	return isAlpha( ch);
 }
 
 static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
@@ -141,25 +147,43 @@ static std::vector<std::string> parse_INTO_path( const LanguageDescription* lang
 	return rt;
 }
 
+static int getResultNamespaceIdentifier( const std::string& name, const types::keymap<int>& keepResult_map, int fidx)
+{
+	std::string tok;
+	types::keymap<int>::const_iterator ki = keepResult_map.find( name);
+	if (ki == keepResult_map.end())
+	{
+		if (boost::algorithm::iequals( tok, "PARAM"))
+		{
+			return 0;
+		}
+		else if (boost::algorithm::iequals( tok, "RESULT"))
+		{
+			if (fidx == 0)
+			{
+				throw std::runtime_error( "no command result referenceable here with RESULT");
+			}
+			return fidx;
+		}
+		return -1;
+	}
+	else
+	{
+		return ki->second;
+	}
+}
+
 static TransactionFunctionDescription::MainProcessingStep::Call::Param
-	parseReferenceParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+	parseReferenceParameter( const LanguageDescription* langdescr, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	char ch = utils::gotoNextToken( si, se);
-	if (ch == '(' || ch == '[')
+	if (ch == '(')
 	{
 		char sb,eb;
 		Call::Param::Type type;
-		if (ch == '(')
-		{
-			sb = '('; eb = ')';
-			type = Call::Param::InputSelectorPath;
-		}
-		else
-		{
-			sb = '['; eb = ']';
-			type = Call::Param::VariableReference;
-		}
+		sb = '('; eb = ')';
+		type = Call::Param::InputSelectorPath;
 		++si;
 		std::string::const_iterator argstart = si;
 		std::string tok;
@@ -175,25 +199,68 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 			throw std::runtime_error( std::string( "missing close bracket for expression") + ((eb==')')?"')'":"']'"));
 		}
 	}
-	else if (ch >= '0' && ch <= '9')
-	{
-		std::string::const_iterator argstart = si;
-		for (; si!=se && *si>= '0' && *si<= '9'; ++si);
-		Call::Param::Type type = Call::Param::NumericResultReference;
-		Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si)));
-		return param;
-	}
 	else if (isAlphaNumeric(ch))
 	{
-		std::string::const_iterator argstart = si;
-		for (; si!=se && isAlphaNumeric(*si); ++si);
-		Call::Param::Type type = Call::Param::SymbolicResultReference;
-		Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si)));
-		return param;
+		int resultscope_functionidx = -1;
+		if (isAlpha(ch))
+		{
+			std::string::const_iterator argstart = si;
+			for (; si!=se && isAlphaNumeric(*si); ++si);
+			if (*si == '.')
+			{
+				std::string namspace( argstart, si);
+				resultscope_functionidx = getResultNamespaceIdentifier( namspace, keepResult_map, fidx);
+				if (resultscope_functionidx == -1)
+				{
+					throw std::runtime_error( std::string( "result identifier not found '") + namspace + "'");
+				}
+				++si;
+			}
+			else
+			{
+				si = argstart;
+			}
+		}
+		if (ch >= '0' && ch <= '9')
+		{
+			std::string::const_iterator argstart = si;
+			for (; si!=se && *si>= '0' && *si<= '9'; ++si);
+			Call::Param::Type type = Call::Param::NumericResultReference;
+			Call::Param param( type, std::string( argstart, si), resultscope_functionidx);
+			return param;
+		}
+		else if (isAlpha(ch))
+		{
+			std::string::const_iterator argstart = si;
+			for (; si!=se && isAlphaNumeric(*si); ++si);
+			if (resultscope_functionidx == 0)
+			{
+				// ... Parameter reference has to be converted to a numeric reference
+				std::string paramname = std::string( argstart, si);
+				types::keymap<int>::const_iterator pi = param_map.find( paramname);
+				if (pi == param_map.end())
+				{
+					throw std::runtime_error( std::string("unknown parameter '") + paramname + "'");
+				}
+				Call::Param::Type type = Call::Param::NumericResultReference;
+				Call::Param param( type, utils::tostring_cast((_WOLFRAME_UINTEGER)pi->second), resultscope_functionidx);
+				return param;
+			}
+			else
+			{
+				Call::Param::Type type = Call::Param::SymbolicResultReference;
+				Call::Param param( type, std::string( argstart, si), resultscope_functionidx);
+				return param;
+			}
+		}
+		else
+		{
+			throw std::runtime_error( "expected open bracket '(' or alphanumeric result reference");
+		}
 	}
 	else
 	{
-		throw std::runtime_error( "expected open bracket '(' '[' or digit");
+		throw std::runtime_error( "expected open bracket '(' or alphanumeric result reference");
 	}
 }
 
@@ -230,7 +297,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call
-	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
+	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	Call rt;
@@ -244,10 +311,10 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	{
 		if (ch == '$' && si != se)
 		{
-			if (*si == '(' || *si == '[' || isAlphaNumeric(*si))
+			if (*si == '(' || isAlphaNumeric(*si))
 			{
 				stm.append( start, si - 1);
-				Call::Param param = parseReferenceParameter( langdescr, si, se);
+				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, si, se);
 				rt.paramlist.push_back( param);
 				start = si;
 				stm.append( langdescr->stm_argument_reference( rt.paramlist.size()));
@@ -265,7 +332,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call
-	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
+	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	Call rt;
@@ -314,7 +381,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 			else if (ch == '$')
 			{
 				++ci;
-				Call::Param param = parseReferenceParameter( langdescr, ci, ce);
+				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, ci, ce);
 				rt.paramlist.push_back( param);
 			}
 			else
@@ -330,50 +397,6 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 		}
 	}
 	return rt;
-}
-
-static TransactionFunctionDescription::VariableValue
-	parseVariableValue( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, int scope_functionidx, const TransactionFunctionDescription::VariableTable& varmap)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
-	typedef TransactionFunctionDescription::VariableValue VariableValue;
-	typedef TransactionFunctionDescription::ConstantValue ConstantValue;
-	std::string tok;
-	char ch = gotoNextToken( langdescr, si, se);
-	if (ch == '\'' || ch == '\"')
-	{
-		ch = parseNextToken( langdescr, tok, si, se);
-		return ConstantValue( tok);
-	}
-	else if (ch == '$')
-	{
-		++si;
-		Call::Param param = parseReferenceParameter( langdescr, si, se);
-		switch (param.type)
-		{
-			case Call::Param::VariableReference:
-			{
-				VariableTable::const_iterator vi = varmap.find( param.value);
-				if (vi == varmap.end()) throw std::runtime_error( "undefined variable reference in variable value (LET definition)");
-				return VariableValue( vi->second);
-			}
-			case Call::Param::NumericResultReference:
-			{
-				unsigned short columnidx = boost::lexical_cast<unsigned short>( param.value);
-				if (columnidx == 0) std::runtime_error( "illegal result column reference (0) in variable value (LET definition)");
-				return VariableValue( columnidx, scope_functionidx);
-			}
-			case Call::Param::SymbolicResultReference:
-			{
-				return VariableValue( param.value, scope_functionidx);
-			}
-			case Call::Param::Constant:
-			case Call::Param::InputSelectorPath:
-				throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
-		}
-	}
-	throw std::runtime_error( "string or result column reference expected as variable value (LET definition)");
 }
 
 static TransactionFunctionDescription::PreProcessingStep::Argument
@@ -471,11 +494,8 @@ static std::vector<TransactionFunctionDescription::PreProcessingStep::Argument>
 	return rt;
 }
 
-static void parseSubroutineArguments( TransactionFunctionDescription::VariableTable& variablemap, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+static void parseSubroutineArguments( types::keymap<int>& param_map, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
-	typedef TransactionFunctionDescription::VariableValue VariableValue;
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
-
 	std::string varname;
 	char ch;
 	int column_idx = 0;
@@ -484,12 +504,12 @@ static void parseSubroutineArguments( TransactionFunctionDescription::VariableTa
 
 	if (isAlphaNumeric(ch))
 	{
-		VariableTable::const_iterator vi = variablemap.find( varname);
-		if (vi != variablemap.end())
+		types::keymap<int>::const_iterator vi = param_map.find( varname);
+		if (vi != param_map.end())
 		{
-			throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as subroutine argument)");
+			throw std::runtime_error( std::string("duplicate definition of subroutine parameter '") + varname + "'");
 		}
-		variablemap[ varname] = VariableValue( ++column_idx, 0);
+		param_map[ varname] = ++column_idx;
 	}
 	else
 	{
@@ -502,12 +522,12 @@ static void parseSubroutineArguments( TransactionFunctionDescription::VariableTa
 		ch = parseNextToken( langdescr, varname, si, se);
 		if (isAlphaNumeric(ch))
 		{
-			VariableTable::const_iterator vi = variablemap.find( varname);
-			if (vi != variablemap.end())
+			types::keymap<int>::const_iterator vi = param_map.find( varname);
+			if (vi != param_map.end())
 			{
-				throw std::runtime_error( std::string("duplicate definition of variable '") + varname + "' (as subroutine argument)");
+				throw std::runtime_error( std::string("duplicate definition of subroutine parameter '") + varname + "'");
 			}
-			variablemap[ varname] = VariableValue( ++column_idx, 0);
+			param_map[ varname] = ++column_idx;
 		}
 		else
 		{
@@ -531,11 +551,12 @@ struct Subroutine
 	Subroutine( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
 		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
 	Subroutine( const Subroutine& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
 
 	std::string name;
 	std::string::const_iterator start;
 	bool isTransaction;
+	types::keymap<int> param_map;
 	TransactionFunctionDescription description;
 	std::vector<std::string::const_iterator> callstartar;
 	std::vector<std::string::const_iterator> pprcstartar;
@@ -732,17 +753,36 @@ static void parseAuthorizeDirective( Subroutine& subroutine, config::PositionalE
 	subroutine.description.auth.init( authfunction, authresource);
 }
 
-static void parsePrintStep( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const std::vector<std::string>& print_INTO_path)
+static void parsePrintStep( Subroutine& subroutine, const types::keymap<int>& keepResult_map, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const std::vector<std::string>& print_INTO_path)
 {
+	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
 
 	std::vector<std::string> pt = print_INTO_path;
-
-	TransactionFunctionDescription::VariableValue
-		varval = parseVariableValue( langdescr, si, se, subroutine.description.steps.size(), subroutine.description.variablemap);
+	Call::Param printarg;
 
 	char ch = gotoNextToken( langdescr, si, se);
+	if (ch == '\'' || ch == '\"')
+	{
+		ch = parseNextToken( langdescr, tok, si, se);
+		printarg = Call::Param( Call::Param::Constant, tok);
+	}
+	else if (ch == '$')
+	{
+		++si;
+		printarg = parseReferenceParameter( langdescr, subroutine.param_map, keepResult_map, subroutine.description.steps.size(), si, se);
+		if (printarg.type == Call::Param::InputSelectorPath)
+		{
+			throw std::runtime_error( "cannot handle input reference as argument of PRINT");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "string or result reference expected as argument of PRINT");
+	}
+	
+	ch = gotoNextToken( langdescr, si, se);
 	if (isAlphaNumeric(ch))
 	{
 		if (parseNextToken( langdescr, tok, si, se)
@@ -767,7 +807,7 @@ static void parsePrintStep( Subroutine& subroutine, config::PositionalErrorMessa
 	{
 		throw ERROR( si, "unexpected token as end of print expression (';' expected)");
 	}
-	subroutine.description.printsteps[ subroutine.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, varval);
+	subroutine.description.printsteps[ subroutine.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, printarg);
 }
 
 static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
@@ -815,16 +855,45 @@ static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessa
 	}
 }
 
+static void parseKeepAs( types::keymap<int>& keepResult_map, int fidx, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	config::PositionalErrorMessageBase::Message MSG;
+	std::string tok;
+
+	if (parseNextToken( langdescr, tok, si, se)
+	&&  boost::algorithm::iequals( tok, "AS"))
+	{
+		char ch = parseNextToken( langdescr, tok, si, se);
+		if (!isAlpha(ch))
+		{
+			throw ERROR( si, "identifier expected after KEEP AS");
+		}
+		ch = gotoNextToken( langdescr, si, se);
+		if (ch != ';')
+		{
+			throw ERROR( si, "semicolon ';' expected after KEEP AS <identifier>");
+		}
+		++si;
+		types::keymap<int>::const_iterator ki = keepResult_map.find( tok);
+		if (ki != keepResult_map.end())
+		{
+			throw ERROR( si, std::string("duplicate definition of result set '") + tok + "'");
+		}
+		if (fidx == 0)
+		{
+			throw ERROR( si, "no result available to reference here (KEEP AS)");
+		}
+		keepResult_map.insert( tok, fidx);
+	}
+}
 
 static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	typedef TransactionFunctionDescription::VariableValue VariableValue;
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
-
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
 	unsigned int mask = 0;
 	char ch = 0;
+	types::keymap<int> keepResult_map;
 
 	TransactionFunctionDescription::MainProcessingStep opstep;
 
@@ -846,41 +915,19 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 		}
 		else if (g_optab[ch])
 		{
-			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON,LET) expected instead of operator '" << ch << "'");
+			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON,KEEP) expected instead of operator '" << ch << "'");
 		}
 		else if (ch == '\'' || ch == '\"')
 		{
-			throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON,LET) expected instead string");
+			throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON,KEEP) expected instead string");
 		}
 		else if (boost::algorithm::iequals( tok, "ON"))
 		{
 			parseErrorHint( subroutine, ERROR, langdescr, si, se);
 		}
-		else if (boost::algorithm::iequals( tok, "LET"))
+		else if (boost::algorithm::iequals( tok, "KEEP"))
 		{
-			std::string varname;
-			if (!isAlphaNumeric( parseNextToken( langdescr, varname, si, se)))
-			{
-				throw ERROR( si, "variable name expected after LET");
-			}
-			if ('=' != parseNextToken( langdescr, tok, si, se))
-			{
-				throw ERROR( si, std::string("'=' expected after LET ") + varname);
-			}
-			int scope_functionidx = subroutine.description.steps.size();
-			VariableValue varvalue = parseVariableValue( langdescr, si, se, scope_functionidx, subroutine.description.variablemap);
-
-			VariableTable::const_iterator vi = subroutine.description.variablemap.find( varname);
-			if (vi != subroutine.description.variablemap.end())
-			{
-				throw ERROR( si, std::string("duplicate definition of variable '") + varname + "'");
-			}
-			subroutine.description.variablemap[ varname] = varvalue;
-			if (';' != gotoNextToken( langdescr, si, se))
-			{
-				throw ERROR( si, std::string("';' expected after LET ") + varname);
-			}
-			++si;
+			parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
 		}
 		else if (boost::algorithm::iequals( tok, "END"))
 		{
@@ -943,7 +990,7 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 					throw std::runtime_error( "unexpected token PRINT in middle of database instruction definition");
 				}
 			}
-			parsePrintStep( subroutine, ERROR, langdescr, si, se, print_INTO_path);
+			parsePrintStep( subroutine, keepResult_map, ERROR, langdescr, si, se, print_INTO_path);
 		}
 		else if (boost::algorithm::iequals( tok, "RESULT"))
 		{
@@ -981,6 +1028,12 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 
 			ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 			if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
+
+			opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
+			if (opstep.resultref_FOREACH >= 0)
+			{
+				opstep.selector_FOREACH.clear();
+			}
 		}
 		else if (boost::algorithm::iequals( tok, "INTO"))
 		{
@@ -1024,16 +1077,16 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			}
 			if (langdescr->isEmbeddedStatement( si, se))
 			{
-				opstep.call = parseEmbeddedStatement( langdescr, subroutine.name, subroutine.embstm_index++, si, se, embeddedStatementMap);
+				opstep.call = parseEmbeddedStatement( langdescr, subroutine.name, subroutine.embstm_index++, si, se, embeddedStatementMap, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
 			}
 			else
 			{
-				opstep.call = parseCallStatement( langdescr, si, se);
+				opstep.call = parseCallStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
 			}
 		}
 		else if (mask == 0x0)
 		{
-			throw ERROR( si, MSG << "keyword (RESULT,PRINT,LET,END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
+			throw ERROR( si, MSG << "keyword (RESULT,PRINT,KEEP,END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
 		}
 		else
 		{
@@ -1046,8 +1099,6 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 static std::vector<std::pair<std::string,TransactionFunctionR> >
 	load( const std::string& source, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
-	typedef TransactionFunctionDescription::VariableValue VariableValue;
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
 	std::string tok;
@@ -1102,7 +1153,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					// ... subroutine call argument list
 					parseNextToken( langdescr, tok, si, se);
 					if (subroutine.isTransaction) throw ERROR( si, "unexpected token '(': no positional arguments allowed positional transaction function");
-					parseSubroutineArguments( subroutine.description.variablemap, langdescr, si, se);
+					parseSubroutineArguments( subroutine.param_map, langdescr, si, se);
 				}
 				while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 				{
@@ -1127,25 +1178,25 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 						parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
 					}
-					else if (!boost::algorithm::iequals( tok, "BEGIN"))
+					else if (boost::algorithm::iequals( tok, "BEGIN"))
 					{
-						throw ERROR( si, std::string("RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
+						parseMainBlock( subroutine, ERROR, langdescr, embeddedStatementMap, si, se);
+						if (subroutine.isTransaction)
+						{
+							LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
+							TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
+						}
+						else
+						{
+							subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+						}
+						break;
 					}
 					else
 					{
-						break;
+						throw ERROR( si, std::string("RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
 					}
-				}
-				parseMainBlock( subroutine, ERROR, langdescr, embeddedStatementMap, si, se);
-				if (subroutine.isTransaction)
-				{
-					LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
-					TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
-					rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
-				}
-				else
-				{
-					subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
 				}
 				// append empty lines to keep line info for the dbsource:
 				dbsource.append( std::string( lineCount( dbi, si), '\n'));

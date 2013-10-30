@@ -48,65 +48,6 @@ namespace db {
 class TransactionFunctionDescription
 {
 public:
-	///\class VariableValue
-	///\brief Variable value referencing a command result or a constant
-	class VariableValue
-	{
-	public:
-		///\brief Default constructor
-		VariableValue()
-			:m_scope_functionidx(-1),m_column_idx(-1){}
-		///\brief Copy constructor
-		VariableValue( const VariableValue& o)
-			:m_scope_functionidx(o.m_scope_functionidx),m_column_idx(o.m_column_idx),m_name(o.m_name){}
-		///\brief Symbolic reference constructor
-		VariableValue( const std::string& name_, int scope_functionidx_)
-			:m_scope_functionidx(scope_functionidx_),m_column_idx(-1),m_name(name_){}
-		///\brief Column Index reference constructor
-		VariableValue( int column_idx_, int scope_functionidx_)
-			:m_scope_functionidx(scope_functionidx_),m_column_idx(column_idx_){}
-
-		///\brief Evaluate if the reference is by name
-		///\return true if yes
-		bool isSymbolic() const				{return m_column_idx < 0;}
-		///\brief Evaluate if the reference is by column index
-		///\return true if yes
-		bool isNumeric() const				{return m_column_idx > 0;}
-		///\brief Evaluate if the value is constant
-		///\return true if yes
-		bool isConstant() const				{return m_column_idx == 0;}
-
-		///\brief Get the scope of the referenced result
-		int scope_functionidx() const			{return m_scope_functionidx;}
-		///\brief Get the column index of the referenced result (if isNumeric)
-		int column_idx() const				{return m_column_idx;}
-		///\brief Get the name of the referenced result (if isSymbolic)
-		const std::string& name() const			{return m_name;}
-		///\brief Get the value of a constant (if isConstant)
-		const std::string& value() const		{return m_name;}
-
-	protected:
-		VariableValue( const std::string& name_, int column_idx_, int scope_functionidx_)
-			:m_scope_functionidx(scope_functionidx_),m_column_idx(column_idx_),m_name(name_){}
-
-	private:
-		int m_scope_functionidx;			//< index of the last function defined +1 at the moment of variable definition. Used to defined the scope of this reference (to identify the referenced result.
-		int m_column_idx;				//< index of the result column referenced or -1, if reference is symbolic or 0, if reference is a constant (m_name)
-		std::string m_name;				//< symbolic reference name (m_column_idx < 0) or constant value (m_column_idx == 0)
-	};
-
-	///\class ConstantValue
-	///\brief Constructor for a variable value representing a constant
-	class ConstantValue :public VariableValue
-	{
-	public:
-		///\brief Constructor
-		explicit ConstantValue( const std::string& value_)
-			:VariableValue( value_, 0, -1){}
-	};
-
-	typedef types::keymap<VariableValue> VariableTable;
-
 	class PreProcessingStep
 	{
 	public:
@@ -173,13 +114,15 @@ public:
 	public:
 		///\brief Default constructor
 		MainProcessingStep()
-			:nonempty(false)
+			:resultref_FOREACH(-1)
+			,nonempty(false)
 			,unique(false)
 			,resultref(false){}
 
 		///\brief Copy constructor
 		MainProcessingStep( const MainProcessingStep& o)
 			:selector_FOREACH(o.selector_FOREACH)
+			,resultref_FOREACH(o.resultref_FOREACH)
 			,call(o.call)
 			,path_INTO(o.path_INTO)
 			,nonempty(o.nonempty)
@@ -191,6 +134,7 @@ public:
 		void clear()
 		{
 			selector_FOREACH.clear();
+			resultref_FOREACH = -1;
 			path_INTO.clear();
 			call.clear();
 			nonempty = false;
@@ -233,7 +177,6 @@ public:
 				///\brief Parameter type
 				enum Type
 				{
-					VariableReference,		//< Parameter is a variable reference
 					NumericResultReference,		//< Parameter is a result reference by index
 					SymbolicResultReference,	//< Parameter is a result reference by column name
 					Constant,			//< Parameter is a contant value
@@ -242,20 +185,22 @@ public:
 				///\brief Parameter type name
 				static const char* typeName( Type i)
 				{
-					static const char* ar[] = {"VariableReference","NumericResultReference","SymbolicResultReference","Constant","InputSelectorPath"};
+					static const char* ar[] = {"NumericResultReference","SymbolicResultReference","Constant","InputSelectorPath"};
 					return ar[(std::size_t)i];
 				}
 				Type type;		//< type of the parameter
+				int namspace;		//< result context namespace
 				std::string value;	//< parsed value of the parameter
 
 				///\brief Default constructor
-				Param(){}
+				Param()
+					:type(Constant),namspace(-1){}
 				///\brief Copy constructor
 				Param( const Param& o)
-					:type(o.type),value(o.value){}
+					:type(o.type),namspace(o.namspace),value(o.value){}
 				///\brief Constructor
-				Param( Type type_, const std::string& value_)
-					:type(type_),value(value_){}
+				Param( Type type_, const std::string& value_, int namspace_=-1)
+					:type(type_),namspace(namspace_),value(value_){}
 			};
 
 			std::string funcname;			//< function name
@@ -275,12 +220,13 @@ public:
 			void clear()		{funcname.clear(); paramlist.clear();}
 		};
 
-		std::string selector_FOREACH;		//< parsed argument of foreach
+		std::string selector_FOREACH;		//< parsed argument of FOREACH in case of a selector path
+		int resultref_FOREACH;			//< parsed argument of FOREACH in case of a result reference
 		Call call;				//< called database function
 		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
 		bool nonempty;				//< true, if NONEMPTY is set
 		bool unique;				//< true, if UNIQUE is set
-		bool resultref;			//< true, if the operation is possibly called more than once, either because it has result references or is in a foreach clause
+		bool resultref;				//< true, if the operation is possibly called more than once, either because it has result references or is in a foreach clause
 		types::keymap<std::string> hints;	//< error messages to add to database errors depending on the error class
 	};
 	///\class Block
@@ -305,28 +251,29 @@ public:
 	///\brief Print instruction declaration
 	struct PrintStep
 	{
+		typedef MainProcessingStep::Call::Param Param;
+
 		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
-		VariableValue argument;			//< printed value
+		Param argument;				//< printed value
 
 		PrintStep(){}
-		PrintStep( const std::vector<std::string>& p, const VariableValue& a)
+		PrintStep( const std::vector<std::string>& p, const Param& a)
 			:path_INTO(p),argument(a){}
 		PrintStep( const PrintStep& o)
 			:path_INTO(o.path_INTO),argument(o.argument){}
 	};
 
-	std::map<std::size_t,PrintStep> printsteps;	//< Print variable instruction
+	std::map<std::size_t,PrintStep> printsteps;	//< Print instruction
 	std::vector<PreProcessingStep> preprocs;	//< preprocessing steps on input
 	std::string resultfilter;			//< result filter function for post processing
 	std::vector<MainProcessingStep> steps;		//< list of database commands or operations
 	std::vector<Block> blocks;			//< substructures of the output
 	langbind::Authorization auth;			//< authorization definition structure for this function
-	VariableTable variablemap;			//< variable definitions with LET a = ...;
 	bool casesensitive;				//< true, is the database is case sensitive
 
 	///\brief Copy constructor
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
-		:printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),variablemap(o.variablemap),casesensitive(o.casesensitive){}
+		:printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),casesensitive(o.casesensitive){}
 	///\brief Default constructor
 	TransactionFunctionDescription()
 		:casesensitive(false){}

@@ -41,7 +41,7 @@ void Path::parseSelectorPath( const std::string& selector, TagTable* tagmap)
 {
 	Element elem;
 	std::string::const_iterator ii = selector.begin(), ee = selector.end();
-	for (; ii != ee && (unsigned char)*ii < 32; ++ii);
+	for (; ii != ee && (unsigned char)*ii <= 32; ++ii);
 	if (ii == ee) return;
 	if (*ii == '/')
 	{
@@ -112,38 +112,12 @@ Path::Path( const std::string& selector, TagTable* tagmap)
 	parseSelectorPath( selector, tagmap);
 }
 
-Path::Path( const Call::Param& param, const TransactionFunctionDescription::VariableTable* varmap, TagTable* tagmap)
+Path::Path( const Call::Param& param, TagTable* tagmap)
 {
-	typedef TransactionFunctionDescription::VariableTable VariableTable;
 	typedef Call::Param Param;
 	Element elem;
 	switch (param.type)
 	{
-		case Param::VariableReference:
-		{
-			VariableTable::const_iterator vi = varmap->find( param.value);
-			if (vi == varmap->end()) throw std::runtime_error( std::string("variable not defined '") + param.value + "'");
-			if (vi->second.column_idx() > 0)
-			{
-				elem.m_type = ResultIndex;
-				elem.m_tag = vi->second.column_idx();
-				elem.m_scope_functionidx = vi->second.scope_functionidx();
-			}
-			else if (vi->second.isConstant())
-			{
-				elem.m_type = Constant;
-				m_content = vi->second.value();
-			}
-			else
-			{
-				elem.m_type = ResultSymbol;
-				elem.m_tag = -1;
-				m_content = vi->second.name();
-				elem.m_scope_functionidx = vi->second.scope_functionidx();
-			}
-			m_path.push_back( elem);
-			break;
-		}
 		case Param::NumericResultReference:
 			elem.m_type = ResultIndex;
 			elem.m_tag = boost::lexical_cast<unsigned short>( param.value);
