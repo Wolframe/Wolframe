@@ -222,6 +222,20 @@ bool PreparedStatementHandler_oracle::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
+/*	
+	sword status;
+	
+	status = OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT );
+	if( status != O
+
+  status = OCITransCommit(conf->svchp, conf->errhp, OCI_DEFAULT);
+  if (status != OCI_SUCCESS) {
+    err_error(MODULE,proc,"commit transaction failed\n%s",
+	      get_oci10_error(conf->errhp, OCI_ERROR));    
+    return ERROR;
+  }
+  return OK;
+*/
 //	return status( PQexec( m_conn, "COMMIT;"), Init);
 	return false;
 }

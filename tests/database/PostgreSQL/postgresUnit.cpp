@@ -39,6 +39,7 @@ TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
 
 TEST_F( PQmoduleFixture, WrongHost )
 {
+	// Aba: questionable! should't this be an exception?
 	PostgreSQLdbUnit db( "testDB", "blabla", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
