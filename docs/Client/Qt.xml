@@ -291,8 +291,8 @@
 	<sect2>
 		<title>Eliminating Interface Defects</title>
 		<para>
-			Functional interface defects like for example syntax errors in the
-			request answer definitions can be eliminated by inspecting the error messages
+			Functional defects in the user interface like for example syntax errors in the
+			definitions of the request answer can be eliminated by inspecting the error messages
 			reported by the <application>wolfclient</application> in developer mode
 			and fixing the interface accordingly.
 		</para>
