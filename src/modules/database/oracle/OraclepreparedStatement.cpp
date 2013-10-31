@@ -208,6 +208,9 @@ bool PreparedStatementHandler_oracle::begin()
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
 //	return status( PQexec( m_conn, "BEGIN;"), Transaction);
+
+// CHECK(m_Session.get_error(),OCITransStart(m_Session.get_svc(), m_Session.get_error(), 2, OCI_TRANS_READWRITE));   
+   
 	return false;
 }
 
