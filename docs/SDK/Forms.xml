@@ -3,7 +3,7 @@
 <para>
 Forms are data structures used to validate input and output data and to do some basic normalizations
 in order to make data accessible in a uniform way. Forms are defined in a data definition language
-(<acronym>DDL</acronym>) and translated by a compiler at startup. Compilers are defined as loadable
+(<acronym>DDL</acronym>) and translated by a compiler at startup. Those compilers are defined as loadable
 modules.
 </para>
 <para>

@@ -4,7 +4,7 @@
 	<title>Introduction</title>
 	<para>You can use <application>JSON</application> for data filters in the logic tier of <application>Wolframe</application>.
 	The standard <application>JSON</application> filter of <application>Wolframe</application> is called <application>cjson</application> and 
-	based on the library <application>cJSON</application> (<link>http://sourceforge.net/projects/cjson</link>) from Dave Gamble.
+	based on the library <application>cJSON</application> (<ulink url="http://sourceforge.net/projects/cjson">http://sourceforge.net/projects/cjson</ulink>) from Dave Gamble.
 	</para>
 	</sect2>
 	

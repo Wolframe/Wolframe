@@ -19,7 +19,7 @@
 	<para>For defining input and output parameter structures in <application>C++</application> you have to define the 
 		structure and its serialization description. The serialization description is a static 
 		function <code>getStructDescription</code> without arguments returning a const structure that describes 
-		what element names to bind on what structure elements.
+		what element names to bind to which structure elements.
 	</para>
 	<para>
 		The following example shows a form function parameter structure defined in C++.

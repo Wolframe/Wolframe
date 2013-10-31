@@ -5,7 +5,7 @@
 	<para>
 		Form data structures can be defined in a <acronym>DDL</acronym> (Data Definition Language).
 		It depends very much on the application what <acronym>DDL</acronym> is best to use.
-		Users may already have their data definitions in a certain way defined.
+		Users may already have their data definitions defined in a certain way.
 		The form <acronym>DDL</acronym> can be defined in the way you want. Wolframe offers a
 		plugin mechanism for <acronym>DDL</acronym> compilers and provides examples of such compilers.
 		You configure the <acronym>DDL</acronym> sources to load and the compiler to use.
@@ -13,20 +13,20 @@
 	<para>
 		With the <acronym>DDL</acronym> form description we get a deserialization of some content
 		into a structure and a serialization for the output. We get also a validation
-		and normalization procedure of content by assigning types to atomic form
+		and normalization procedure of the content by assigning types to atomic form
 		elements that validate and normalize the data elements.
 		Most of the business transactions should be doable as input form
 		description, output form description and a transaction that maps
 		input to output without control flow aware programming (direct map).
 	</para>
 	<para>
-		All types of data forms introduced here are equivalent in use for the programs.
+		All types of data forms introduced here are equivalent in use for all programs.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Forms in Simpleform DDL</title>
 	<para>
-		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym> as example. The format is based on the "INFO"-format
+		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym>. The format is based on the "INFO"-format
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
 		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
@@ -36,7 +36,7 @@
 	<para>
 		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference between 'FORM' and 'STRUCT' is that the later is used for declarations that are only referenced inside the same file as sub structure reference,
 		while 'FORM' declares a structure to be exported as global form declaration.
-		After this header follows the structure declaration inside curly brackets '{' '}'.
+		This header is followed by the structure declaration inside curly brackets '{' '}'.
 	</para>
 	<para>
 		There is only one predefined data type known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>: "string".
@@ -44,16 +44,64 @@
 		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
 	</para>
 	<para>
-		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>
-		<simplelist type="horiz" columns="3">
-		<member>@</member><member>prefix of data type</member><member>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</member>
-		<member>?</member><member>prefix of data type</member><member>Expresses that the element is optional also in strict validation</member>
-		<member>^</member><member>prefix of form name</member><member>Expresses that the element is optional and refers to a structure defined in the same module that is expanded only if the element is present. With this construct it is possible to define recursive structures like trees.</member>
-		<member>!</member><member>prefix of data type</member><member>Expresses that the element is always mandatory (also in non strict validation)</member>
-		<member>[]</member><member>postfix of data type</member><member>Expresses that the element is an array of this type</member>
-		<member>[]</member><member>without data type</member><member>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</member>
-		<member>(..)</member><member>postfix of data type</member><member>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</member>
-		</simplelist>
+		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>:
+		
+		<table frame="all" width="100%">
+			<title>element attributes in simpleform</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Attribute</entry>
+					<entry>Location</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>@</entry>
+					<entry>prefix of data type</entry>
+					<entry>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</entry>
+				</row>
+
+				<row>
+					<entry>?</entry>
+					<entry>prefix of data type</entry>
+					<entry>Expresses that the element is optional also in strict validation</entry>
+				</row>
+
+				<row>
+					<entry>^</entry>
+					<entry>prefix of form name</entry>
+					<entry>Expresses that the element is optional and refers to a structure defined in the same module that is expanded only if the element is present. With this construct it is possible to define recursive structures like trees.</entry>
+				</row>
+		
+				<row>
+					<entry>!</entry>
+					<entry>prefix of data type</entry>
+					<entry>Expresses that the element is always mandatory (also in non strict validation)</entry>
+				</row>
+
+				<row>
+					<entry>[]</entry>
+					<entry>prefix of data type</entry>
+					<entry>Expresses that the element is an array of this type</entry>
+				</row>
+		
+				<row>
+					<entry>[]</entry>
+					<entry>without data type</entry>
+					<entry>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</entry>
+				</row>
+
+				<row>
+					<entry>(..)</entry>
+					<entry>postfix of data type</entry>
+					<entry>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 	</para>
 	<para>
 		Using a single underscore as typename ('_') means that element is embedded into the structure

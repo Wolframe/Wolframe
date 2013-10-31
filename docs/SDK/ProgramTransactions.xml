@@ -58,7 +58,7 @@
 	<sect2>
 		<title>Examples</title>
 		<sect3>
-		<title>First</title>
+		<title>First Example</title>
 		<para>Our first example selects a key from a table and inserts it into a list. The substitute "$1" refers to the first column of the query result "SELECT id FROM UserTable ..". The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
