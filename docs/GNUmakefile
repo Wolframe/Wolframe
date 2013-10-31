@@ -40,12 +40,16 @@ XSLT_EPUB = \
 
 local_all:
 
-doc: doc-doxygen doc-html doc-html-chunked doc-html-webpage doc-pdf
+doc: doc-doxygen doc-html doc-html-chunked doc-pdf
 
 man: wolframed.8 wolframe.conf.5 wolfpasswd.1
 
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
+
+doc-doxygen-webpage:
+	@-mkdir doxygen/html-webpage
+	cd $(TOPDIR); doxygen docs/doxygen-webpage.conf
 
 doc-html: WolfBook.html Tutorial.html
 
@@ -102,10 +106,11 @@ wolfpasswd.1: wolfpasswd-man.xml
 Tutorial.html: Tutorial.xml
 
 local_clean:
-	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
+	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
+	-rm -rf doxygen/html-webpage/*
 	
 local_distclean:
 

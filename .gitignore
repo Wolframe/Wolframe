@@ -97,6 +97,7 @@ docs/WolfBook.epub
 docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
+docs/html-webpage/
 src/primary.db
 tests/3rdParty/libxslt/testlibxslt1
 tests/testMethodMemberPointerTemplate

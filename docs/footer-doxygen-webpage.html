@@ -1,11 +1,27 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE xsl:stylesheet [
- <!ENTITY nbsp "&#xa0;">
- <!ENTITY copy "&#169;">
-]>
+<!-- HTML footer for doxygen 1.8.5-->
+<!-- start footer part -->
+<!--BEGIN GENERATE_TREEVIEW-->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    $navpath
+    <li class="footer">$generatedby
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="$relpath^doxygen.png" alt="doxygen"/></a> $doxygenversion </li>
+  </ul>
+</div>
+<!--END GENERATE_TREEVIEW-->
+<!--BEGIN !GENERATE_TREEVIEW-->
+<hr class="footer"/><address class="footer"><small>
+$generatedby &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="$relpath^doxygen.png" alt="doxygen"/>
+</a> $doxygenversion
+</small></address>
+<!--END !GENERATE_TREEVIEW-->
 
-<htmlcode>
-	
+</div>
+</div>
+<!-- /content -->
+
 <!-- Footer -->
 <div class="wrapper row2">
 	<div id="footer" class="clear">
@@ -54,7 +70,12 @@
 <!-- Scripts -->
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
+<script>window.jQuery || document.write('<script src="layout/scripts/jquery-latest.min.js"><\/script>\
+<script src="layout/scripts/jquery-ui.min.js"><\/script>')</script>
+<script>jQuery(document).ready(function($){ $('img').removeAttr('width height'); });</script>
+<script src="layout/scripts/responsiveslides.js-v1.54/responsiveslides.min.js"></script>
 <script src="layout/scripts/jquery-mobilemenu.min.js"></script>
 <script src="layout/scripts/custom.js"></script>
 
-</htmlcode>
+</body>
+</html>
