@@ -14,7 +14,7 @@ testcall
 TRANSACTION testcall
 BEGIN
 	DO run( /aa ,/bb,/cc );
-	INTO doc FOREACH /aa DO exec( $1,$2,$3);
+	INTO doc FOREACH RESULT DO exec( $1,$2,$3);
 END
 **file: DBRES
 #id name street#1 hugo "bahnhof strasse 15"#2 miriam "zum gems weg 3"#3 sara "tannen steig 12"

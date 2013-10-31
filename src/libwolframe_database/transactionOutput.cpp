@@ -86,3 +86,12 @@ std::string TransactionOutput::tostring( const utils::PrintFormat* pformat) cons
 	return rt.str();
 }
 
+TransactionOutput::result_const_iterator TransactionOutput::resultIterator( std::size_t functionidx) const
+{
+	if (m_result.empty()) return end();
+	result_const_iterator rt = m_result.begin() + m_result.size() -1, begin_ = begin();
+	while (rt->functionidx() > functionidx && rt != begin_) --rt;
+	if (rt->functionidx() != functionidx) return end();
+	return rt;
+}
+

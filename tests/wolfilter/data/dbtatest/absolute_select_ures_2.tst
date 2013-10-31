@@ -15,7 +15,7 @@ TRANSACTION testcall
 RESULT INTO result
 BEGIN
 	INTO item DO run( /aa , /bb );
-	DO exec ( $1,$2);
+	FOREACH RESULT DO exec ( $1,$2);
 END
 **file: DBRES
 #id name#1 hugo#2 barbara

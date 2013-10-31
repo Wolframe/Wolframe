@@ -127,6 +127,8 @@ public:
 		const std::string& name() const			{return m_name;}
 		///\brief Get the list of arguments of the command
 		const std::vector<Argument>& arg() const	{return m_arg;}
+		///\brief Get the functionidx result of the result this command is bound to
+		int foreach_functionidx() const			{return m_foreach_functionidx;}
 
 		///\brief Test if he result of this command is defined as non empty
 		bool nonemptyResult() const			{return flags( NonEmptyResult);}

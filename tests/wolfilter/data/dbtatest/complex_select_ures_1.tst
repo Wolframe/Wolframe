@@ -13,8 +13,8 @@ testcall
 **file:DBIN.tdl
 TRANSACTION testcall RESULT INTO result BEGIN
 	FOREACH //aa DO run(.);
-	FOREACH //aa INTO person DO call(. , $1 ) ;
-	FOREACH //aa INTO age DO get ( .,$1 ,$2 ,$3);
+	FOREACH RESULT INTO person DO call( //aa , $1 ) ;
+	FOREACH RESULT INTO age DO get ( //aa,$1 ,$2 ,$3);
 END
 **file: DBRES
 #res#1#2

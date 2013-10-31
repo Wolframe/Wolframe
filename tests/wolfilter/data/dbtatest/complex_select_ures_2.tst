@@ -15,8 +15,8 @@ TRANSACTION testcall
 RESULT INTO da
 BEGIN
 	FOREACH /doc/item/aa DO run(. ,../bb ) ;
-	INTO da DO get($1);
-	FOREACH //bb INTO do DO run( $1 );
+	FOREACH RESULT INTO da DO get($1);
+	FOREACH RESULT INTO do DO run( $1 );
 END
 **file: DBRES
 #res#1
@@ -36,9 +36,6 @@ run #1#2
 run #11#22
 run #111#222
 get #[1]
-run #[1]
-run #[1]
-run #[1]
 run #[1]
 
 start( 'run' );
@@ -101,40 +98,4 @@ execute();
 nofColumns(); returns 1
 get( 1 ); returns 333
 next(); returns 0
-start( 'run' );
-bind( 1, 'a' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'b' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'c' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'a' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'b' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'c' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'a' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'b' );
-execute();
-nofColumns(); returns 0
-start( 'run' );
-bind( 1, 'c' );
-execute();
-nofColumns(); returns 0
 **end

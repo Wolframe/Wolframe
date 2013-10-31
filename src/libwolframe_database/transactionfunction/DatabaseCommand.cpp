@@ -30,49 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file databaseLanguage.hpp
-///\brief Language definitions for embedded commands in transactions
-#ifndef _DATABASE_LANGUAGE_HPP_INCLUDED
-#define _DATABASE_LANGUAGE_HPP_INCLUDED
-#include "database/transaction.hpp"
-#include "types/keymap.hpp"
-#include "processor/userInterface.hpp"
-#include <string>
-#include <iostream>
-#include <sstream>
+///\brief Internal interface for compiled database commands in the transaction function
+///\file transactionfunction/DatabaseCommand.cpp
+#include "transactionfunction/DatabaseCommand.hpp"
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::db;
 
-struct LanguageDescription
+std::string DatabaseCommand::tostring() const
 {
-	LanguageDescription(){}
-	virtual ~LanguageDescription(){}
-
-	///\brief Operator marking the start of an end of line comment.
-	// Default is the SQL standard EOLN comment marker
-	virtual const char* eoln_commentopr() const
+	std::ostringstream rt;
+	if (m_resultsetidx >= 0)
 	{
-		return "--";
+		rt << "FOREACH "<< "RESULT[" << m_resultsetidx << "]" << " DO '" << m_name << "'( ";
 	}
-
-	///\brief String used for declaring a reference to an argument by index (starting with 1).
-	// Default is the SQL standard argument reference in prepared statements.
-	virtual std::string stm_argument_reference( int index) const;
-
-	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;
-
-	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
-
-	///\brief Define if a database is case-insensitive. This has influence on TDL parsing
-	// Default is according SQL standard 'false'
-	virtual bool isCaseSensitive() const
+	else if (m_selector.size())
 	{
-		return false;
+		rt << "FOREACH '"<< m_selector.tostring() << "' DO '" << m_name << "'( ";
 	}
-};
+	else
+	{
+		rt << "DO '" << m_name << "'( ";
+	}
+	std::vector<Path>::const_iterator ai = m_arg.begin(), ae = m_arg.end();
+	int ii = 0;
+	for (; ai != ae; ++ai,++ii)
+	{
+		if (ii) rt << ", ";
+		rt << ai->tostring();
+	}
+	rt << " )";
+	return rt.str();
+}
 
-}} // namespace _Wolframe::db
 
-#endif
 

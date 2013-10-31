@@ -70,16 +70,6 @@ bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, s
 	return false;
 }
 
-bool LanguageDescription::statementHasResult( const std::string& stm) const
-{
-	std::string::const_iterator si = stm.begin(), se = stm.end();
-	std::string::const_iterator start = si;
-	while (si != se && (*si < 0 || *si > 32)) ++si;
-	std::string keyword = boost::algorithm::to_lower_copy( std::string( start, si));
-	if (keyword == "select") return true;
-	return false;
-}
-
 static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
 std::string LanguageDescription::parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const

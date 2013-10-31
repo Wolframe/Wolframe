@@ -77,9 +77,9 @@ struct TransactionFunction::Impl
 	{
 		std::ostringstream rt;
 		std::vector<DatabaseCommand>::const_iterator ci = m_call.begin(), ce = m_call.end();
-		for (; ci != ce; ++ci)
+		for (int idx=0; ci != ce; ++ci,++idx)
 		{
-			rt << ci->tostring() << "; ";
+			rt << idx << ":" << ci->tostring() << "; ";
 		}
 		return rt.str();
 	}
@@ -500,7 +500,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					}
 				}
 
-				DatabaseCommand paramstk( "", selector, -1, param, false, false, 1 + 1/*level*/);
+				DatabaseCommand paramstk( "", selector, di->resultref_FOREACH, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
 				int scope_functionidx_incr = m_call.size();
 
@@ -571,6 +571,7 @@ const char* TransactionFunction::getErrorHint( const std::string& errorclass, in
 
 TransactionFunctionInput* TransactionFunction::getInput() const
 {
+	LOG_DATA << "[transaction function] execute " << tostring();
 	return new TransactionFunctionInput( this);
 }
 
@@ -586,6 +587,11 @@ langbind::TypedInputFilterR TransactionFunction::getOutput( const proc::Processo
 		ResultFilter resultFilter( provider, m_impl->m_resultfilter, m_impl->m_resultstruct, o);
 		return resultFilter.getOutput();
 	}
+}
+
+std::string TransactionFunction::tostring() const
+{
+	return m_impl->tostring();
 }
 
 TransactionFunction* db::createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)

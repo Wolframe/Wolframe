@@ -239,7 +239,7 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
 
 SUBROUTINE getPersonPrename( id)
 BEGIN
-	INTO . DO UNIQUE SELECT prename FROM Person WHERE Person.ID = $[id];
+	INTO . DO UNIQUE SELECT prename FROM Person WHERE Person.ID = $PARAM.id;
 END
 
 SUBROUTINE getPerson( id)
@@ -247,35 +247,35 @@ RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
 		WHERE PersonCompanyRel.companyid = Company.ID
-		AND PersonCompanyRel.ID = $[id];
+		AND PersonCompanyRel.ID = $PARAM.id;
 
-	INTO tag PRINT "1001";							-- print constant
+	INTO tag PRINT "1001";								-- print constant
 
-	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $[id];	-- embedded command with variable as argument
-	INTO . DO UNIQUE getPersonPrename( $[id]);				-- call subroutine with variable as argument
+	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $PARAM.id;	-- embedded command with variable as argument
+	INTO . DO UNIQUE getPersonPrename( $PARAM.id);					-- call subroutine with variable as argument
 
-	INTO id PRINT $[id];							-- print variable
+	INTO id PRINT $PARAM.id;							-- print variable
 
 	INTO child DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
 		WHERE PersonChildRel.childid = Person.ID
-		AND PersonChildRel.ID = $[id];
+		AND PersonChildRel.ID = $PARAM.id;
 
 	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
 		WHERE PersonAddressRel.addressid = Address.ID
-		AND PersonAddressRel.ID = $[id];
+		AND PersonAddressRel.ID = $PARAM.id;
 END
 
 TRANSACTION getData
 BEGIN
 	DO SELECT ID FROM Person;
-	INTO . DO getPerson( $1);
+	FOREACH RESULT INTO . DO getPerson( $1);
 END
 
 TRANSACTION getDataFiltered
 RESULT FILTER addSuffixToName
 BEGIN
 	DO SELECT ID FROM Person;
-	INTO person DO UNIQUE SELECT Person.ID as id,prename,surname FROM Person WHERE Person.ID = $1;
+	FOREACH RESULT INTO person DO UNIQUE SELECT Person.ID as id,prename,surname FROM Person WHERE Person.ID = $1;
 END
 
 TRANSACTION insertWords

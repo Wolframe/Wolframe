@@ -149,21 +149,20 @@ static std::vector<std::string> parse_INTO_path( const LanguageDescription* lang
 
 static int getResultNamespaceIdentifier( const std::string& name, const types::keymap<int>& keepResult_map, int fidx)
 {
-	std::string tok;
 	types::keymap<int>::const_iterator ki = keepResult_map.find( name);
 	if (ki == keepResult_map.end())
 	{
-		if (boost::algorithm::iequals( tok, "PARAM"))
+		if (boost::algorithm::iequals( name, "PARAM"))
 		{
 			return 0;
 		}
-		else if (boost::algorithm::iequals( tok, "RESULT"))
+		else if (boost::algorithm::iequals( name, "RESULT"))
 		{
 			if (fidx == 0)
 			{
 				throw std::runtime_error( "no command result referenceable here with RESULT");
 			}
-			return fidx;
+			return fidx-1;
 		}
 		return -1;
 	}
@@ -212,7 +211,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 				resultscope_functionidx = getResultNamespaceIdentifier( namspace, keepResult_map, fidx);
 				if (resultscope_functionidx == -1)
 				{
-					throw std::runtime_error( std::string( "result identifier not found '") + namspace + "'");
+					throw std::runtime_error( std::string( "result set identifier not found '") + namspace + "'");
 				}
 				++si;
 			}
@@ -855,7 +854,7 @@ static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessa
 	}
 }
 
-static void parseKeepAs( types::keymap<int>& keepResult_map, int fidx, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t commandlistsize, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
@@ -879,11 +878,11 @@ static void parseKeepAs( types::keymap<int>& keepResult_map, int fidx, config::P
 		{
 			throw ERROR( si, std::string("duplicate definition of result set '") + tok + "'");
 		}
-		if (fidx == 0)
+		if (commandlistsize == 0)
 		{
 			throw ERROR( si, "no result available to reference here (KEEP AS)");
 		}
-		keepResult_map.insert( tok, fidx);
+		keepResult_map.insert( tok, commandlistsize-1);
 	}
 }
 
@@ -1032,6 +1031,10 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
 			if (opstep.resultref_FOREACH >= 0)
 			{
+				if (boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
+				{
+					throw ERROR( si, "PARAM not allowed as argument of FOREACH");
+				}
 				opstep.selector_FOREACH.clear();
 			}
 		}
@@ -1185,6 +1188,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
 							TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+							/*[-]*/LOG_DATA << "++++PARSED TRANSACTION FUNCTION " << ff->tostring();
 							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
 						}
 						else

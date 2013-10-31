@@ -34,6 +34,7 @@ CPP_OBJS = \
 	transactionfunction/TagTable.o \
 	transactionfunction/Path.o \
 	transactionfunction/PreProcessCommand.o \
+	transactionfunction/DatabaseCommand.o \
 	transactionfunction/InputStructure.o \
 	transactionfunction/ResultStructure.o \
 	transactionfunction/ResultIterator.o \

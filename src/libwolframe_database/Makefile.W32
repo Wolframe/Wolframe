@@ -24,6 +24,7 @@ CPP_OBJS = \
 	transactionfunction/TagTable.obj \
 	transactionfunction/Path.obj \
 	transactionfunction/PreProcessCommand.obj \
+	transactionfunction/DatabaseCommand.obj \
 	transactionfunction/InputStructure.obj \
 	transactionfunction/ResultStructure.obj \
 	transactionfunction/ResultIterator.obj \

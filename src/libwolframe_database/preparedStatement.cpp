@@ -42,7 +42,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-#define ERRORCODE(E) (E+0x1000000)
+#define ERRORCODE(E) (E+10000)
 
 static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cmdres, const std::string& name)
 {
@@ -57,7 +57,7 @@ static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cm
 	throw std::runtime_error( std::string( "column name '") + name + "' not found in result");
 }
 
-static types::VariantConst resolveScopedReference( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t scope_functionidx, const types::Variant& reference)
+static types::VariantConst resolveResultReference( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t result_functionidx, const types::Variant& reference)
 {
 	types::VariantConst rt;
 	TransactionOutput::result_const_iterator fi = output.end();
@@ -68,10 +68,12 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 	while (ri != output.begin())
 	{
 		-- ri;
-		if (prev_functionidx < ri->functionidx()) break; //... crossing operation scope border
+		if (prev_functionidx < ri->functionidx())
+		{
+			break; //... crossing operation scope border
+		}
 		prev_functionidx = ri->functionidx();
-
-		if (scope_functionidx > ri->functionidx())
+		if (result_functionidx >= ri->functionidx())
 		{
 			fi = ri;
 			found = true;
@@ -90,7 +92,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 			cidx = reference.touint();
 			if (cidx == 0)
 			{
-				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function variable reference)");
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. column name must be >= 1", "internal logic error (transaction function variable reference)");
 				throw db::DatabaseErrorException( dberr);
 			}
 			if (cidx > fi->nofColumns())
@@ -102,7 +104,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 		}
 		if (fi->nofRows() > 1)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "variable referencing a set of results", "internal logic error (transaction function variable reference)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unbound result reference to set of results", "internal logic error (transaction function variable reference)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (fi->nofRows() > 0)
@@ -113,7 +115,7 @@ static types::VariantConst resolveScopedReference( const TransactionOutput& outp
 	return rt;
 }
 
-static types::VariantConst resolveResultReference( const TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const types::Variant& reference, const TransactionInput::cmd_const_iterator& cmditr)
+static types::VariantConst resolveResultIteratorReference( const TransactionOutput::CommandResult& cmdres, const std::vector<TransactionOutput::CommandResult::Row>::const_iterator& resrow, const types::Variant& reference, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	types::VariantConst rt;
 	std::size_t cidx;
@@ -153,13 +155,26 @@ static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOut
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+				}
+				else if (cmditr->foreach_functionidx() == -1)
+				{
+					if (cmditr->functionidx() > 0)
+					{
+						//... result reference without namespace in unbound command
+						val = resolveResultReference( output, cmditr, cmditr->functionidx()-1, ai->value());
+					}
+					else
+					{
+						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
+						throw db::DatabaseErrorException( dberr);
+					}
 				}
 				else if (residx < output.size())
 				{
 					TransactionOutput::result_const_iterator resitr = output.begin() + residx;
 					std::vector<TransactionOutput::CommandResult::Row>::const_iterator rowitr = resitr->begin() + rowidx;
-					val = resolveResultReference( cmdres, rowitr, ai->value(), cmditr);
+					val = resolveResultIteratorReference( cmdres, rowitr, ai->value(), cmditr);
 				}
 				break;
 			}
@@ -271,13 +286,26 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 			{
 				if (ai->scope_functionidx() >= 0)
 				{
-					val = resolveScopedReference( output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+				}
+				else if (cmditr->foreach_functionidx() == -1)
+				{
+					if (cmditr->functionidx() > 0)
+					{
+						//... result reference without namespace in unbound command
+						val = resolveResultReference( output, cmditr, cmditr->functionidx()-1, ai->value());
+					}
+					else
+					{
+						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
+						throw db::DatabaseErrorException( dberr);
+					}
 				}
 				else if (residx < output.size())
 				{
 					TransactionOutput::result_const_iterator resitr = output.begin() + residx;
 					std::vector<TransactionOutput::CommandResult::Row>::const_iterator rowitr = resitr->begin() + rowidx;
-					val = resolveResultReference( cmdres, rowitr, ai->value(), cmditr);
+					val = resolveResultIteratorReference( cmdres, rowitr, ai->value(), cmditr);
 				}
 				break;
 			}
@@ -328,7 +356,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	};
 	OperationType optype = DatabaseCall;
 	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
-	TransactionOutput::CommandResult cmdres( null_functionidx, 0);
+	TransactionOutput::CommandResult cmdres( null_functionidx);
 	std::vector<OperationLoop> loopstk;
 
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
@@ -354,24 +382,17 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			{
 				output.addCommandResult( cmdres);
 			}
-			cmdres = TransactionOutput::CommandResult( ci->functionidx(), ci->level());
+			cmdres = TransactionOutput::CommandResult( ci->functionidx());
 		}
-		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
-
-		for (; ai != ae; ++ai)
+		if (ci->foreach_functionidx() >= 0)
 		{
-			if (ai->type() == TransactionInput::Command::Argument::ResultColumn
-				&& ai->scope_functionidx() == -1) break;
-		}
-		if (ai != ae)
-		{
-			// ... command contains a last result column reference, then we call it for every result row
+			// ... command is bound to a result set, so we call it for every result row
 			TransactionOutput::result_const_iterator ri;
 			switch (optype)
 			{
 				case PushArguments:
 					// start of an operation: execution of a instruction block
-					ri = output.last( ci->level()-1);
+					ri = output.resultIterator( ci->foreach_functionidx());
 					if (ri != output.end())
 					{
 						std::size_t residx = ri - output.begin(); //< start of result referenced by pushArguments
@@ -396,7 +417,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					break;
 
 				case DatabaseCall:
-					ri = output.last( ci->level());
+					ri = output.resultIterator( ci->foreach_functionidx());
 					if (ri != output.end())
 					{
 						std::size_t residx = ri - output.begin();
@@ -421,7 +442,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		}
 		else
 		{
-			// ... command has no result reference, then we call it once
+			// ... command is not bound to a result set, then we call it once
 			std::size_t residx = output.size();
 			switch (optype)
 			{
@@ -463,7 +484,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					{
 						output.addCommandResult( cmdres);//... add command result
 					}
-					cmdres = TransactionOutput::CommandResult( ci->functionidx(), ci->level());
+					cmdres = TransactionOutput::CommandResult( ci->functionidx());
 					if (!pushArguments( output, cmdres, residx, rowidx, ci)) return false;
 					++ci;//... skip to first instruction of the operation
 				}

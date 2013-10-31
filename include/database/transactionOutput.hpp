@@ -66,15 +66,13 @@ public:
 
 	public:
 		///\brief Constructor
-		CommandResult( std::size_t functionidx_, std::size_t level_)
+		CommandResult( std::size_t functionidx_)
 			:m_functionidx(functionidx_)
-			,m_level(level_)
 			,m_colidx(0){}
 
 		///\brief Copy constructor
 		CommandResult( const CommandResult& o)
 			:m_functionidx(o.m_functionidx)
-			,m_level(o.m_level)
 			,m_columnName(o.m_columnName)
 			,m_row(o.m_row)
 			,m_colidx(o.m_colidx){}
@@ -83,7 +81,6 @@ public:
 		CommandResult& operator=( const CommandResult& o)
 		{
 			m_functionidx = o.m_functionidx;
-			m_level = o.m_level;
 			m_columnName = o.m_columnName;
 			m_row = o.m_row;
 			m_colidx = o.m_colidx;
@@ -94,7 +91,6 @@ public:
 		std::vector<Row>::const_iterator end() const			{return m_row.end();}
 
 		std::size_t functionidx() const					{return m_functionidx;}
-		std::size_t level() const					{return m_level;}
 		std::size_t nofRows() const					{return m_row.size();}
 		std::size_t nofColumns() const					{return m_columnName.size();}
 		const std::string& columnName( std::size_t i) const		{return m_columnName[i];}
@@ -108,7 +104,6 @@ public:
 
 	private:
 		std::size_t m_functionidx;
-		std::size_t m_level;
 		std::vector<std::string> m_columnName;
 		std::vector<Row> m_row;
 		std::size_t m_colidx;
@@ -121,15 +116,7 @@ public:// interface for accessing the result and iterating on the result:
 	result_const_iterator end() const					{return m_result.end();}
 	const CommandResult& at( std::size_t ii) const				{return m_result.at(ii);}
 
-	result_const_iterator last( std::size_t level) const
-	{
-		if (m_result.empty()) return end();
-		result_const_iterator rt = m_result.begin() + m_result.size() -1;
-		result_const_iterator begin_ = begin();
-		while (rt->level() > level && rt != begin_) --rt;
-		if (rt->level() != level) return end();
-		return rt;
-	}
+	result_const_iterator resultIterator( std::size_t functionidx) const;
 
 	///\brief Get the size (number of elements) of the result
 	std::size_t size() const						{return m_result.size();}
@@ -141,7 +128,7 @@ public:// interface for accessing the result and iterating on the result:
 	void setCaseSensitive( bool v=true)					{m_isCaseSensitive = v;}
 
 public:// interface for constructing the result:
-	void openCommandResult( std::size_t functionidx, std::size_t level)	{m_result.push_back( CommandResult( functionidx, level));}
+	void openCommandResult( std::size_t functionidx)			{m_result.push_back( CommandResult( functionidx));}
 	void addCommandResult( const CommandResult& r)				{m_result.push_back( r);}
 	void addColumn( const std::string& name)				{m_result.back().addColumn( name);}
 	void openRow()								{m_result.back().openRow();}
