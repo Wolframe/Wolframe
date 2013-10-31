@@ -33,7 +33,7 @@
 	</sect2>
 	<sect2>
 	<title>Wolframe Global Objects</title>
-	<para>Besides the provider library <application>Wolframe</application> defines the followin objects global in the script execution context:
+	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
 		<member>transaction</member><member>transaction context if not relying on the auto-commit of a transaction function</member>

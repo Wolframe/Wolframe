@@ -7,7 +7,7 @@
 		<para><application>Wolframe</application> application server requests consist of a named command and a structured
 		content (document) as argument.</para>
 		<para>In this chapter we describe how <application>Wolframe</application> application server requests are
-		processed. You will understand the inwolved bricks of software and how they are configured to build
+		processed. You will understand the involved bricks of software and how they are configured to build
 		the backend of your <application>Wolframe</application> application.
 		</para>
 		<para>The following illustration shows the processing of one client request to the server.

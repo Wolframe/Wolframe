@@ -25,7 +25,7 @@
 		The following example shows a form function parameter structure defined in C++.
 		<sect3>
 		<para>Header file "customers.hpp": Declare the structure and the serialization description of the structure.
-		Structures may contain structures with ther own serialization description.</para>
+		Structures may contain structures with their own serialization description.</para>
 		<programlisting language='text'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.hpp" parse="text" />
 		</programlisting>

@@ -2,7 +2,7 @@
 <title>Filters</title>
 <para>
 Filters describe the transformation of serialized data to a unified serialization of hierarchical structured data and back.
-The application does not care about data formats als long as there exists a filter providing
+The application does not care about data formats as long as there exists a filter providing
 the unified form of serialization.
 </para>
 <para>

@@ -10,7 +10,7 @@
 	
 	<sect2>
 	<title>Character Set Encodings</title>
-	<para>Without explicitely specified, the <acronym>XSLT</acronym> filter support the following character set 
+	<para>Without explicitly specified, the <acronym>XSLT</acronym> filter support the following character set 
 	encodings. For character set encodings that are not in the list, please ask the <application>Wolframe</application> team.
 	<itemizedlist>
 	<listitem><para><abbrev>UTF-8</abbrev> or</para></listitem>

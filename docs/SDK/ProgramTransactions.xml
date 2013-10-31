@@ -8,7 +8,7 @@
 			<application>Wolframe</application> transactions in <acronym>TDL</acronym> are defined as functions in a
 			transactional context. This means that whatever is executed in a transaction function
 			belongs by default to a transaction with an auto-commit on function completion
-			if not explicitely defined otherwise by the caller.
+			if not explicitly defined otherwise by the caller.
 		</para>
 		<para>
 			A <acronym>TDL</acronym> transaction function takes a structure as input
@@ -21,8 +21,8 @@
 			TDL is a programming language to describe the building of transaction 
 			input and the building of the result structure from the database output.
 			It defines a transaction as a sequence of instructions on multiple data.
-			An instruction is either discribed as a single embedded database command
-			in the language of the underlaying database, a name of a function declared
+			An instruction is either described as a single embedded database command
+			in the language of the underlying database, a name of a function declared
 			in the database (e.g. a PLSQL function) or a TDL subroutine call
 			working on multiple data.
 		</para>
@@ -44,7 +44,7 @@
 			For input data conversion the transaction definition language 
 			defines a preprocessing section where globally defined wolframe
 			functions can be called for selected input. For building an output 
-			structure that cannot be modeled with a language without control
+			structure that cannot be modelled with a language without control
 			structures and recursion TDL provides the possibility to call a
 			globally defined function as filter for postprocessing of the
 			transaction function result.
@@ -58,7 +58,7 @@
 		<title>Examples</title>
 		<sect3>
 		<title>First</title>
-		<para>This example selects a key from a table and uses it for an insert into a list. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
+		<para>This example selects a key from a table and uses it for an insert into a list. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
 		</programlisting>
@@ -142,7 +142,7 @@
 					<para>
 						This optional block contains instructions on the transaction
 						function input. The result of these preprocessing instructions are
-						put into the input structure, so that they can be refered to in the main
+						put into the input structure, so that they can be referred to in the main
 						code definition block of the transaction.
 						We can call any global normalization or form function in the 
 						preprocessing block to enrich or transform the input to process.
@@ -210,7 +210,7 @@
 						be called twice. An empty set as selection will
 						cause the instruction to be ignored. Without
 						quantifier the database command or subroutine call
-						of the instrucution will be always be executed once.
+						of the instruction will be always be executed once.
 					</para>
 					<para>
 						The argument of the FOREACH expression is either
@@ -220,7 +220,7 @@
 					</para>
 					<para>
 						Results of previous instructions are referenced either with
-						the keyword RESULT refering to the result set
+						the keyword RESULT referring to the result set
 						of the previous command or with a variable
 						naming a result set declared with this name before.
 						
@@ -233,7 +233,7 @@
 						changes when a subroutine is called in a FOREACH selection
 						context. Calling for example a subroutine in a
 						'FOREACH person' context will cause
-						relative paths in this subroutine to be subelements
+						relative paths in this subroutine to be sub elements
 						of 'person'.
 					<para>
 					</para>
@@ -245,7 +245,7 @@
 						or subroutine calls. Command arguments
 						are either constants or relative paths 
 						from the selector path in the FOREACH selection
-						or refering to elements in the result of 
+						or referring to elements in the result of 
 						a previous command.
 						If an argument is a relative path from the 
 						selector context, its reference
@@ -413,7 +413,7 @@
 			<title>Referencing Database Results</title>
 			<para>Database results of the previous instruction are referenced 
 			with a '$RESULT.' followed by the column identifier or column number.
-			Column numbers start allways from 1, independent from the database !
+			Column numbers start always from 1, independent from the database !
 			So be aware that even if the database counts column from 0 you have
 			to use 1 for the first column. 
 			</para>
@@ -436,8 +436,8 @@
 			</para>
 			<para>
 			The 'RESULT.' prefix in references to the previous instruction result
-			is a default and can be ommitted in instructions that are not 
-			explicitely bound to any other result than the last one. So the following
+			is a default and can be omitted in instructions that are not 
+			explicitly bound to any other result than the last one. So the following
 			two instructions are equivalent:
 			<programlisting language='sql'>
 
@@ -452,7 +452,7 @@
 			</programlisting>
 			</para>
 			<para>
-			The result name prefix of any named result can also be ommitted if the
+			The result name prefix of any named result can also be omitted if the
 			instruction is bound to a FOREACH selector naming the result. So the 
 			following two statements in the context of an existing database
 			result named "ATTRIBUTES" are equivalent:
@@ -544,7 +544,7 @@
 			and add the string &lt;message&gt; to the error message show to the user.
 			</para>
 			<para>We can have many subsequent ON ERROR definitions in a row if the
-			error classes to be catched are various.
+			error classes to be caught are various.
 			</para>
 			<sect4>
 			<title>Database Error HINT Example</title>
@@ -564,7 +564,7 @@
 			the <code>RESULT INTO</code> directive of an OPERATION or 
 			TRANSACTION. But <code>RESULT INTO</code> blocks can also be
 			defined locally as sub blocks in the main processing block.
-			A subblock in the result is declared with 
+			A sub-block in the result is declared with 
 			<programlisting language='sql'>
 
 				RESULT INTO &lt;resulttag&gt;
@@ -575,7 +575,7 @@
 			All the results of the instruction list that get into the final result
 			will be attached to the substructure with name &lt;resulttag&gt;.
 			The nesting of result blocks can be arbitrary and the path of the 
-			elements in the result follows the scope of the subblocks.
+			elements in the result follows the scope of the sub-blocks.
 			</para>
 		</sect3>
 		<sect3>

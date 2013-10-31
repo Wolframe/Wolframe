@@ -134,7 +134,7 @@
 	</glossentry>
 	<glossentry><glossterm>Yield execution</glossterm>
 		<glossdef>
-			<para>The processor yields execution and gives control back to the connection handler, when it cannot continue execution. The connection handler has to resume with an action returned to the networking framework, that fetches the resources needed by the processor to continue. (see also [http://en.wikipedia.org/wiki/Coroutine wikipedia yield in coroutine]). Lua is able to yield execution.
+			<para>The processor yields execution and gives control back to the connection handler, when it cannot continue execution. The connection handler has to resume with an action returned to the networking framework, that fetches the resources needed by the processor to continue. (see also [http://en.wikipedia.org/wiki/Coroutine Wikipedia yield in coroutine]). Lua is able to yield execution.
 			</para>
 		</glossdef>
 	</glossentry>

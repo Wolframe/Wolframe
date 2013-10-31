@@ -19,7 +19,7 @@
 		<para></para>
 		<sect2>
 		<title>Presentation tier</title>
-		<para>The presentation tier of <application>Wolframe</application> is implemented as thin client.
+		<para>The presentation tier of <application>Wolframe</application> is implemented as a thin client.
 			It maps the presentation of the application from the request answers it gets from the server.
 			Also the data describing this mapping is loaded from the server when connecting to it.
 			So the whole application is driven by the server.
@@ -30,9 +30,9 @@
 		<title>Logic tier</title>
 			<para>The logic tier of <application>Wolframe</application> describes the transformation of input of the presentation tier to a set of instructions
 			for the data tier. The input to the logic tier  consists of a command name plus a
-			structured content also refered to as document. As output of the
-			logic tier a single document is returned to the presentation tier.
-			The logic tier supports scripting languages to define the input/ouput mapping between the
+			structured content also referred to as document. The
+			logic tier returns a single document to the presentation tier.
+			The logic tier supports scripting languages to define the input/output mapping between the
 			layers. 
 			<application>Wolframe</application> introduces three concepts as building blocks of the logic tier:
 				<itemizedlist>

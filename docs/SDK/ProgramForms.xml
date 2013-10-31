@@ -57,8 +57,8 @@
 	</para>
 	<para>
 		Using a single underscore as typename ('_') means that element is embedded into the structure
-		without beeing referencable by name. In case of an atomic value it means that value represents the
-		content value of the structure. In case of a substructure it means that the stucture inherits
+		without being referenceable by name. In case of an atomic value it means that value represents the
+		content value of the structure. In case of a substructure it means that the structure inherits
 		the embedded elements of the substructure.
 	</para>
 	<para>

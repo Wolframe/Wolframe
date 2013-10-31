@@ -3,7 +3,7 @@
 	<sect2>
 	<title>Typed Filters</title>
 	<para>
-		A structure in Wolframe is described as serialization of it's equivalent as tree (more precisely forest) with depht first left order traversal. The equivalent of a tree is a tree with leaf nodes representing the atomic values of the structure and non leaf nodes representing sub structures labeled by the non leaf node value. 
+		A structure in Wolframe is described as serialization of it's equivalent as tree (more precisely forest) with depth first left order traversal. The equivalent of a tree is a tree with leaf nodes representing the atomic values of the structure and non leaf nodes representing sub structures labelled by the non leaf node value. 
 		The serialization is a sequence of (element type, element value) tuples with 3 origin element types for describing such a structure. For having a model that is able to cover at least XML there is a 4th element 'Attribute'.
 	</para>
 	<para>

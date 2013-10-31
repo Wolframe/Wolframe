@@ -22,7 +22,7 @@
 	<listitem><para><abbrev>UTF-16</abbrev> (<abbrev>UTF-16BE</abbrev>) or</para></listitem>
 	<listitem><para><abbrev>UTF-32LE</abbrev> (<abbrev>UCS-4LE</abbrev>) but only with <application>textwolf</application> or</para></listitem>
 	<listitem><para><abbrev>UTF-32</abbrev> (<abbrev>UTF-32BE</abbrev> or <abbrev>UCS-4BE</abbrev>) or</para></listitem>
-	<listitem><para><abbrev>ISO 8859</abbrev> (codepages '1' to '9')</para></listitem>
+	<listitem><para><abbrev>ISO 8859</abbrev> (code pages '1' to '9')</para></listitem>
 	</itemizedlist>
 	</para>
 	</sect2>
