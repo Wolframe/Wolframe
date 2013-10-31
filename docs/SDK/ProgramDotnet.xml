@@ -2,8 +2,8 @@
 <title>Functions in .NET</title>
 	<sect2>
 		<title>Introduction</title>
-		<para>You can write functions for the logic tier of <application>Wolframe</application> with languages based
-		on <application>.NET</application> (<link>http://www.microsoft.com/net</link>) like for example
+		<para>You can write functions for the logic tier of <application>Wolframe</application> in languages based
+		on <application>.NET</application> (<ulink url="http://www.microsoft.com/net">http://www.microsoft.com/net</ulink>) like for example
 		<application>C#</application> and <application>VB.NET</application>.  
 		Because <application>.NET</application> based libraries can only be called 
 		by <application>Wolframe</application> only as a 
