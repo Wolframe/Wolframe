@@ -7,18 +7,19 @@
 			transaction definition language (<acronym>TDL</acronym>) introduced here.
 			<application>Wolframe</application> transactions in <acronym>TDL</acronym> are defined as functions in a
 			transactional context. This means that whatever is executed in a transaction function
-			belongs by default to a transaction with an auto-commit on function completion
-			if not explicitly defined otherwise by the caller.
+			belongs by default to a database transaction with an automatic commit on function completion
+			if not explicitly defined otherwise by the caller. Errors lead to an automatic abort
+			of the database transaction.
 		</para>
 		<para>
 			A <acronym>TDL</acronym> transaction function takes a structure as input
 			and returns a structure as output.
 			The <application>Wolframe</application> database interface defines 
-			a transaction as context where input is passed as structure 
-			and the output is fetched from as structure.
+			a transaction as context where the input is passed as a structure 
+			and the output is fetched from it as a structure.
 		</para>
 		<para>
-			TDL is a programming language to describe the building of transaction 
+			TDL is a language to describe the building of transaction 
 			input and the building of the result structure from the database output.
 			It defines a transaction as a sequence of instructions on multiple data.
 			An instruction is either described as a single embedded database command
@@ -30,24 +31,24 @@
 			Working on multiple data means that the instruction is executed
 			for every item of an input set. This set can consist of the set of
 			results of a previous instruction or a selection of the
-			input of the transaction function. A for each selector that is 
-			part of the instruction defines the input set.
+			input of the transaction function. A "for each" selector
+			defines the input set as part of the instruction.
 		</para>
 		<para>
 			Each instruction result can be declared as being part of the transaction
 			result structure. The language has no control structures and is 
 			therefore not a general purpose programming language.
-			It just offers some mapping of input to commands and from commands 
-			results to output.
+			It just offers some mapping of the input to commands and from the command 
+			results back to the output.
 		</para>
 		<para>
-			For input data conversion the transaction definition language 
-			defines a preprocessing section where globally defined wolframe
-			functions can be called for selected input. For building an output 
+			To convert input data the transaction definition language 
+			defines a preprocessing section where globally defined Wolframe
+			functions can be called for the selected input. To build an output 
 			structure that cannot be modelled with a language without control
-			structures and recursion TDL provides the possibility to call a
+			structures and recursion, TDL provides the possibility to call a
 			globally defined function as filter for postprocessing of the
-			transaction function result.
+			result of the transaction function.
 		</para>
 		<para>
 			The TDL is case insensitive. For clearness and better readability
@@ -58,7 +59,7 @@
 		<title>Examples</title>
 		<sect3>
 		<title>First</title>
-		<para>This example selects a key from a table and uses it for an insert into a list. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
+		<para>Our first example selects a key from a table and inserts it into a list. The substitute "$1" refers to the first column of the query result "SELECT id FROM UserTable ..". The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
 		</programlisting>
@@ -66,7 +67,7 @@
 		</sect3>
 		<sect3>
 		<title>Preprocessing Input</title>
-		<para>The example selects are id's depending on a normalized name. The normalization is done in a preprocessing step
+		<para>This example selects identifiers 'id' of all users matched by their normalized name. The normalization of the name is done in a preprocessing step.
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/preprocess_example.tdl" parse="text" />
 		</programlisting>
@@ -74,9 +75,9 @@
 		</sect3>
 		<sect3>
 		<title>Using Variables</title>
-		<para>The example returns the 'id' of a country depending on a normalized name.
-		The normalization is done in a preprocessing step. 
-		The result is printed into a structure country/code;
+		<para>This example returns the 'id' of a country matched by their normalized name.
+		The normalization of country names is done in a preprocessing step. 
+		The result is printed into a structure 'country/code'.
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/variable_example.tdl" parse="text" />
 		</programlisting>
@@ -84,7 +85,7 @@
 		</sect3>
 		<sect3>
 		<title>Subroutines</title>
-		<para>The example calls an subroutine with one argument to map the output.
+		<para>This example calls a subroutine with one argument to map the output.
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/operation_example.tdl" parse="text" />
 		</programlisting>
@@ -119,7 +120,7 @@
 		<sect3>
 			<title>Transaction Function Declarations</title>
 			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code>
-			followed by the transaction function name. This name identifies the
+			followed by the name of the transaction function. This name identifies the
 			function globally. The body of the function contains the following parts:
 			<itemizedlist>
 				<listitem><code>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</code>
@@ -225,13 +226,13 @@
 						naming a result set declared with this name before.
 						
 					</para>
-						Input elements are selected by path relatively
-						from the current path selected starting from
+						Input elements are selected by path relative
+						to the path currently selected, starting from
 						the input root element when entering a transaction
 						function. The current path selected and the base
 						element of any relative path calculated in this scope
 						changes when a subroutine is called in a FOREACH selection
-						context. Calling for example a subroutine in a
+						context. For example calling a subroutine in a
 						'FOREACH person' context will cause
 						relative paths in this subroutine to be sub elements
 						of 'person'.
@@ -285,7 +286,7 @@
 					of the preprocessing commands should be put into as part
 					of the input to be processed by the main processing
 					instructions. The relative paths of the destination structure
-					are calculated relatively to a FOREACH selection element.
+					are calculated relative to a FOREACH selection element.
 				</para>
 			</listitem>
 			<listitem><code>FOREACH &lt;selector&gt;</code>
@@ -299,20 +300,19 @@
 			</listitem>
 			<listitem><code>DO &lt;command&gt;</code>
 				<para>
-					Commands in an instruction are function calls of
+					Commands in an instruction are function calls to
 					globally defined form functions or normalization
 					functions. Command arguments
 					are constants or relative paths from the selector
 					path in the FOREACH selection. They are uniquely
-					referencing elements in the context of an element
-					selected.
+					referencing elements in the context of a selected element.
 				</para>
 			</listitem>
 		</itemizedlist>
 		</para>
 			<sect4>
 				<title>Preprocessing Example</title>
-				<para>The following example illustrate how the FOREACH,INTO,DO
+				<para>The following example illustrate how the "FOREACH, INTO, DO"
 				expressions in the main processing block work together:
 				<programlisting language='sql'>
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_preprocessing.tdl" parse="text" />
@@ -327,7 +327,7 @@
 			<itemizedlist>
 				<listitem>Identifier
 				<para>
-				An identifier uniquely selects sub element of the current position in the tree.
+				An identifier uniquely selects a sub element of the current position in the tree.
 				</para>
 				</listitem>
 				<listitem><code>*</code>
@@ -357,7 +357,7 @@
 		<para>
 			Paths can appear as argument of a FOREACH selector where they specify
 			the set of elements on which the attached command is executed on.
-			Or they can appear as argument reference in a command expression
+			Or they can appear as reference to an argument in a command expression
 			where they specify uniquely one element that is passed as argument 
 			to the command when it is executed.
 		</para>
@@ -418,7 +418,7 @@
 			to use 1 for the first column. 
 			</para>
 			<para>
-			As already explained before, data base result sets of cardinality 
+			As already explained before, database result sets of cardinality 
 			bigger than one cannot be addressed if not bound to a FOREACH
 			selection. In statements potentially addressing more than one 
 			result element you have to add a <code>FOREACH RESULT</code> quantifier.
@@ -440,13 +440,11 @@
 			explicitly bound to any other result than the last one. So the following
 			two instructions are equivalent:
 			<programlisting language='sql'>
-
 				DO SELECT name FROM Company WHERE id = $RESULT.id
 				DO SELECT name FROM Company WHERE id = $id
 			</programlisting>
 			and so are the following two instructions:
 			<programlisting language='sql'>
-
 				FOREACH RESULT DO SELECT name FROM Company WHERE id = $RESULT.id
 				FOREACH RESULT DO SELECT name FROM Company WHERE id = $id
 			</programlisting>
@@ -457,7 +455,6 @@
 			following two statements in the context of an existing database
 			result named "ATTRIBUTES" are equivalent:
 			<programlisting language='sql'>
-
 				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $ATTRIBUTES.id
 				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $id
 			</programlisting>
@@ -474,8 +471,7 @@
 				<sect4>
 				<title>Named Result Example</title>
 				<para>This example illustrates how a result is declared by name and referenced:
-				<programlisting language='sql'>
-				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_keep_as.tdl" parse="text" />
+				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_keep_as.tdl" parse="text" />
 				</programlisting>
 				</para>
 				</sect4>
@@ -488,6 +484,8 @@
 				or a named result prefix. "PARAM." is reserved for parameters.
 				The first instruction without FOREACH quantifier can reference
 				the parameters without prefix by name.
+				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_soubroutine_params.tdl" parse="text" />
+				</programlisting>
 				</para>
 		</sect3>
 		<sect3>
@@ -495,8 +493,8 @@
 			<para>Database commands returning results can have constraints to catch
 			certain errors that would not be recognized at all or too late otherwise.
 			For example a transaction having a result of a previous command as argument
-			would not be executed if the result of the previous command is empty. But
-			nevertheless the overall transaction would succeed because no database
+			would not be executed if the result of the previous command is empty.
+			Nevertheless the overall transaction would succeed because no database
 			error occurring during execution of the commands defined for the 
 			transaction.
 			</para>
@@ -526,7 +524,7 @@
 				<title>Example with Result Constraints</title>
 				<para>
 				This example illustrates how to add result constraint for
-				data base commands returning results:
+				database commands returning results:
 				<programlisting language='sql'>
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_result_constraint.tdl" parse="text" />
 				</programlisting>
@@ -555,11 +553,16 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_hint.tdl" parse="text" />
 			</programlisting>
 			</para>
+			<para>
+			On the client side the following message will be shown:
+			<programlisting language='sql'>unique constaint validation in transaction 'insertCustomer'. Customers must have a unique name.
+			</programlisting>
+			</para>
 			</sect4>
 		</sect3>
 		<sect3>
 			<title>Substructures in the Result</title>
-			<para>We already learned to define substructures of the 
+			<para>We already learned how to define substructures of the 
 			transaction function result with
 			the <code>RESULT INTO</code> directive of an OPERATION or 
 			TRANSACTION. But <code>RESULT INTO</code> blocks can also be
