@@ -7,7 +7,7 @@
 	<para>
 		The <application>Wolframe</application> standard client <application>wolfclient</application>
 		is a thin client which executes XML requests
-		via the Wolframe protocol and presents XML answers. It is written with
+		via the Wolframe protocol and presents XML answers. It is written in
 		Qt and is cross-platform. Qt is currently available on
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
 		User interfaces for <application>wolfclient</application> are defined as a set of forms
@@ -69,7 +69,7 @@
 		<para>
 			Binary resource files (extension <emphasis>.rss</emphasis>) are compiled from
 			a XML file (extension <emphasis>.qrc</emphasis>) with the <emphasis>rcc</emphasis>
-			message compiler.
+			resource compiler.
 		</para>
 	</sect3>
 
@@ -83,8 +83,8 @@
 			<itemizedlist>
 				<listitem>
 				<para>
-					On which events to replace the current form with a new form,
-					e. g. clicking the <emphasis>Edit</emphasis> button should load
+					Which events in the current form replace it with a new form,
+					e. g. clicking the <emphasis>Edit</emphasis> button loads
 					the form called <emphasis>edit_item</emphasis>.
 				</para>
 				</listitem>
