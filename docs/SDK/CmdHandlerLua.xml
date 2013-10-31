@@ -3,7 +3,7 @@
 	<sect2>
 	<title>Introduction</title>
 	<para>You can write command handlers for the logic tier of Wolframe in Lua.
-		Command handlers written in Lua allow you to script the processessing of the
+		Command handlers written in Lua allow you to script the processing of the
 		input without an intermediate data structure. It gives you full control on
 		input and output. This can be useful if you have to deal with legacy data
 		where the structure of the input or output is not well defined or if you
@@ -123,12 +123,12 @@
 		The same happens when you call print with <code>nil</code> or <code>false</code> as second parameter <code>t</code>. With <code>c</code> passed
 		as <code>nil</code> or <code>false</code> with <code>t</code>, you print a open tag or close tag, depending on <code>t</code>. <code>t</code> is a tag name for
 		open tag and <code>nil</code> or <code>false</code> for a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you
-		print an attribute value assignement.
+		print an attribute value assignment.
 	</para>
 	<para>For convenience there are also the functions
 			<code>output:opentag(t)</code> - equivalent to <code>output:print(false,t)</code>,
 			<code>output:closetag(t)</code> - equivalent to <code>output:print(false,false)</code>
-		defined. When explicitely defining an XML structure output in Lua these functions are more readable.
+		defined. When explicitly defining an XML structure output in Lua these functions are more readable.
 	</para>
 	</sect2>
 	<sect2>

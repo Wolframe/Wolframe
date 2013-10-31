@@ -208,6 +208,9 @@ bool PreparedStatementHandler_oracle::begin()
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
 //	return status( PQexec( m_conn, "BEGIN;"), Transaction);
+
+// CHECK(m_Session.get_error(),OCITransStart(m_Session.get_svc(), m_Session.get_error(), 2, OCI_TRANS_READWRITE));   
+   
 	return false;
 }
 
@@ -222,6 +225,20 @@ bool PreparedStatementHandler_oracle::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
+/*	
+	sword status;
+	
+	status = OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT );
+	if( status != O
+
+  status = OCITransCommit(conf->svchp, conf->errhp, OCI_DEFAULT);
+  if (status != OCI_SUCCESS) {
+    err_error(MODULE,proc,"commit transaction failed\n%s",
+	      get_oci10_error(conf->errhp, OCI_ERROR));    
+    return ERROR;
+  }
+  return OK;
+*/
 //	return status( PQexec( m_conn, "COMMIT;"), Init);
 	return false;
 }

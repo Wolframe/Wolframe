@@ -7,10 +7,10 @@
 	<para>
 		The <application>Wolframe</application> standard client <application>wolfclient</application>
 		is a thin client which executes XML requests
-		via the Wolframe protocol and presents XML answers. It is written with
+		via the Wolframe protocol and presents XML answers. It is written in
 		Qt and is cross-platform. Qt is currently available on
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
-		Userinterfaces for <application>wolfclient</application> are defined as a set of forms
+		User interfaces for <application>wolfclient</application> are defined as a set of forms
 		using standard Qt widgets and are if ever possible defined using the
 		<application>Qt&nbsp;Interface&nbsp;Designer</application> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
 	</para>
@@ -50,7 +50,7 @@
 			tool, then translated with the <emphasis>Qt Linguist</emphasis>.
 		</para>
 		<para>
-			The Qt client needs the files in compiled form as files with the extesion
+			The Qt client needs the files in compiled form as files with the extension
 			<emphasis>.qm</emphasis>. The <emphasis>lupdate</emphasis> tool is taking
 			care of that.
 		</para>
@@ -69,7 +69,7 @@
 		<para>
 			Binary resource files (extension <emphasis>.rss</emphasis>) are compiled from
 			a XML file (extension <emphasis>.qrc</emphasis>) with the <emphasis>rcc</emphasis>
-			message compiler.
+			resource compiler.
 		</para>
 	</sect3>
 
@@ -83,8 +83,8 @@
 			<itemizedlist>
 				<listitem>
 				<para>
-					On which events to replace the current form with a new form,
-					e. g. clicking the <emphasis>Edit</emphasis> button should load
+					Which events in the current form replace it with a new form,
+					e. g. clicking the <emphasis>Edit</emphasis> button loads
 					the form called <emphasis>edit_item</emphasis>.
 				</para>
 				</listitem>
@@ -104,13 +104,13 @@
 			<sect4>
 				<title>Starting Position</title>
 				<para>For mapping data structures from the user interface elements to the
-				data description needed to fulfill an interface for a server request we need
+				data description needed to fulfil an interface for a server request we need
 				some kind of translation. An implicit mapping would only be able to describe
 				very trivial data mappings. After drawing the user interface this translation
 				has to be defined. On the other hand the requests answer returned by the server
 				has to be mapped to be shown in the user interface elements view. Here applies
 				the same: Some kind of translation is needed to map a server data structure
-				to the userinterface elements.
+				to the user interface elements.
 				</para>
 			</sect4>
 			<sect4>
@@ -254,7 +254,7 @@
 			<para>
 				Before loading the next form the client terminates all current
 				requests, for instance a save request of the form data.
-				In case of an error in an action any defined switching of the form is canceled.
+				In case of an error in an action any defined switching of the form is cancelled.
 			</para>
 		</sect3>
 
@@ -262,7 +262,7 @@
 			<title>States and properties of widgets</title>
 
 			<para>
-				Some properties are reserved for states stearing the behaviour of the userinterface:
+				Some properties are reserved for states steering the behaviour of the user interface:
 
 				<itemizedlist>
 				<listitem>
@@ -283,7 +283,7 @@
 				like for example <code>property = {variable expression}</code>.
 			</para>
 			<para>
-				The expression can reference adressable widgets and their properties.
+				The expression can reference addressable widgets and their properties.
 				Every Qt class has its very own set of properties it understands.
 			</para>
 		</sect3>
@@ -291,8 +291,8 @@
 	<sect2>
 		<title>Eliminating Interface Defects</title>
 		<para>
-			Functional interface defects like for example syntax errors in the
-			request answer definitions can be eliminated by inspecting the error messages
+			Functional defects in the user interface like for example syntax errors in the
+			definitions of the request answer can be eliminated by inspecting the error messages
 			reported by the <application>wolfclient</application> in developer mode
 			and fixing the interface accordingly.
 		</para>
@@ -300,8 +300,8 @@
 			<title>Switch the Developer Mode On</title>
 
 			<para>In order to inspect the internals of your client program, we have first
-			to switch on "Developper Mode" in the "Developper" context of the "Preferences Dialog".
-			The following picture emphasizes the checkbox you have to enable (highlighted green).
+			to switch on "Developer Mode" in the "Developer" context of the "Preferences Dialog".
+			The following picture emphasizes the check box you have to enable (highlighted green).
 			</para>
 			<screenshot>
 				<screeninfo>Enable Debug Window</screeninfo>
@@ -322,7 +322,7 @@
 			<para>To inspect internal messages reported by the <application>wolfclient</application>
 			in developer mode we have to open the debug window.
 			The debug window is opened by clicking on the bug icon in the
-			main tool bar or via the developper context menu. The following picture
+			main tool bar or via the developer context menu. The following picture
 			shows an example debug output. Each action we do from now on with
 			the debug window opened can be followed on the level of messages it emits.
 			</para>

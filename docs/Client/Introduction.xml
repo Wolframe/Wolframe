@@ -2,14 +2,14 @@
 <chapter>
 	<title>Introduction</title>
 
-	<para>This part of the manual describes how the user interface part (presentation tier) also called client of
+	<para>This part of the manual describes how the user interface part (presentation tier, also called client) of
 	<application>Wolframe</application> applications can be built.
 	</para>
-	<para>A <application>Wolframe</application> clients can be of various forms. They are communicating with the server over
-	a text based protocol in an plain or encrypted session. All methods used are based on open standards.
+	<para>A <application>Wolframe</application> client can be of various kinds. They all communicate with the server over
+	a text based protocol in a plain or encrypted session. All methods used are based on open standards.
 	</para>
-	<para>We will indroduce two examples of clients: The <application>Wolframe</application> standard client and a web client
-	communicating via a webserver with the <application>Wolframe</application> application server.
+	<para>We will introduce two examples of clients: The <application>Wolframe</application> standard client and a web client
+	communicating via a web server with the <application>Wolframe</application> application server.
 	</para>
 	<para>
 	After reading this chapter you should be able to create a <application>Wolframe</application> client based of one of these

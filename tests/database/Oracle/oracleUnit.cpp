@@ -29,7 +29,7 @@ class OracleFixture : public ::testing::Test
 
 TEST_F( OracleFixture, CreateOracleunit )
 {
-	OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+	OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
 	ASSERT_STREQ( "Oracle", db.className());
@@ -39,31 +39,28 @@ TEST_F( OracleFixture, CreateOracleunit )
 
 TEST_F( OracleFixture, WrongHost )
 {
-	OracledbUnit db( "testDB", "blabla", 0, "wolframe",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
-	ASSERT_STREQ( "Oracle", db.className());
-	ASSERT_STREQ( "testDB", db.ID().c_str());
-	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
+	ASSERT_THROW( OracledbUnit db( "testDB", "blabla", 0, "orcl",
+	                     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongPassword )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframe",
+	ASSERT_THROW( OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 					   "wolfusr", "wolfpwdd", "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongUser )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframe",
+	ASSERT_THROW( OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 					   "wolfusrr", "wolfpwd", "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongDatabase )
 {
-	ASSERT_THROW( OracledbUnit db( "testDB", "localhost", 0, "wolframee",
+	ASSERT_THROW( OracledbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcle",
 					   "wolfusr", "wolfpwd", "", "", "", "", "",
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }

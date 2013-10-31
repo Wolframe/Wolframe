@@ -13,6 +13,7 @@ src/modules/*/*/*.vcxproj.user
 src/modules/*/*/*.vcproj.*
 wolframemsg.h
 *~
+*.bak
 *.o
 *.d
 *.a

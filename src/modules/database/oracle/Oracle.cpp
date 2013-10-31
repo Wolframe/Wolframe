@@ -97,11 +97,11 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	
 	// create an Oracle OCI environment (global per process), what
 	// options do we really need (charset, mutex, threading, pooling)?
-	status = OCIEnvCreate( &( m_db.m_env.envhp ), OCI_DEFAULT | OCI_THREADED, (dvoid *)0,
+	status = OCIEnvCreate( &( m_db.m_env.envhp ), OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) {
 		MOD_LOG_ALERT << "Failed to create Oracle environment for database '" << m_ID << "'";
-		return;
+		throw std::runtime_error( "Fatal error creating an Oracle environment" );
 	}
 	
 	for( size_t i = 0; i < connections; i++ ) {
@@ -111,7 +111,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
-			return;
+			throw std::runtime_error( "Can't allocate OCI server handle for Oracle database" );
 		}
 
 		// an error handle
@@ -119,7 +119,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't allocate OCI error handle for Oracle database" );
 		}
 
 		// a service context handle
@@ -128,7 +128,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			MOD_LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't allocate OCI service context handle for Oracle database" );
 		}
 
 		// attach to server
@@ -141,7 +141,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't attach to Oracle server for Oracle database" );
 		}
 
 		/* set attribute server context in the service context */
@@ -154,7 +154,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't connect to Oracle server" );
 		}
 		
 		// a user session handle
@@ -166,7 +166,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't create handle for authentication credentials for Oracle database" );
 		}
 		
 		// user and password credentials (TODO: others, charsets)
@@ -179,7 +179,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't create handle for username for Oracle database" );
 		}
 		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
 			(dvoid *)password.c_str( ), (ub4)password.length( ),
@@ -190,7 +190,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't create handle for username for Oracle database" );
 		}
 
 		// open user session
@@ -203,7 +203,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't create user session for Oracle database" );
 		}
 
 		// set user session in service context
@@ -216,7 +216,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
-			return;
+			throw std::runtime_error( "Can't create set user session in service context for Oracle database" );
 		}
 		
 		// add connection to pool of connections
@@ -234,24 +234,32 @@ OracledbUnit::OracledbUnit(const std::string& id,
 OracledbUnit::~OracledbUnit()
 {
 	size_t connections = 0;
+	bool hasErrors = false;
 
 	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
 	while( m_connPool.available( ) ) {
 		OracleConnection *conn = m_connPool.get( );
-		if ( conn == NULL )	{
-			MOD_LOG_ALERT << "Oracle database '" << m_ID << "' destructor: NULL connection from pool";
-			throw std::logic_error( "Oracle database destructor: NULL connection from pool" );
+		if( conn == NULL ) {
+			hasErrors = true;
 		}
-		
-		OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
-		OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
-		OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
-		OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
-		OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+
+		// intentionally ignoring errors here, we try hard to close everything
+		// and not to leave things leaking in the Oracle database
+		(void)OCISessionEnd( conn->svchp, conn->errhp, conn->authp, OCI_DEFAULT );
+		(void)OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+		(void)OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+		(void)OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+		(void)OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+		(void)OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
 				
 		m_noConnections--, connections++;
+	}
+	
+	if( hasErrors ) {
+		MOD_LOG_ALERT << "Oracle database '" << m_ID << "' destructor: NULL connection from pool";
+		throw std::logic_error( "Oracle database destructor: NULL connection from pool" );
 	}
 
 	if ( m_noConnections != 0 )	{

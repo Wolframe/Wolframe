@@ -31,10 +31,10 @@
 
 	<sect2>
 		<title>Example Command Description</title>
-		<para>The following source example could be one of a <code>example.dmap</code> in the configuration example 
+		<para>The following source example could be one of the <code>example.dmap</code> in the configuration example 
 		introduced above. It defines two commands. The first one links a command "insert" with document type
 		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
-		automatically against a form named "Customer" if not explicitely defined else. 
+		automatically against a form named "Customer" if not explicitly defined else. 
 		The command has no result except that its succeeds or fails. The second example command links a 
 		command "get" with a document type "Employee" to a function "doSelectEmployee". 
 		The input is not validated and the transaction output is validated and mapped through the 
@@ -58,7 +58,7 @@
 		<sect4>
 			<title>Simple Document Map</title>
 			<para>
-				The following example shows the simplest possible declaration. It declares that documents with
+				The following example shows the simplest possible declaration. It states that documents with the
 				document type "Document" are forwarded to a function with the same name "Document".
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/doctype_only.directmap" parse="text" />
@@ -78,7 +78,7 @@
 		<sect4>
 			<title>Explicit Function Name Declaration</title>
 			<para>
-				For declaring the function called explicitely like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
+				For declaring the function called explicitly like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call.directmap" parse="text" />
 				</programlisting>
@@ -102,23 +102,23 @@
 			<para>
 				If you want to skip the input document validation, either because you are dealing
 				with legacy software where a strict definition of a schema is not possible or
-				because the function called has strict typeing and validates input on its own (.NET,C++),
+				because the function called has strict typing and validates the input on its own (.NET,C++),
 				then you can add a declaration <code>SKIP</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_pass_call_return.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_skip_call_return.directmap" parse="text" />
 				</programlisting>
 				The same you can specify for the output in the <code>RETURN</code> declaration:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call_return_pass.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_skip_return_skip.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
 		<sect4>
 			<title>Explicit Filter Definitions for a Command</title>
 			<para>
-				For most of the Processing the standard filters declared in the command handler configuration
-				are enough. But in certain cases you want to explictely declare a filter for a command, for
-				example for preprocessing a certain document type with an XSLT filter. Explicitely declared
+				For most processing it's enough to declare the standard filters in the configuration of the command handler.
+				But in certain cases you want to explicitly declare a filter for a command, for
+				example to preprocess a certain document type with an XSLT filter. Explicitly declared
 				filters always refer to a document format and documents of other formats have to be converted
 				first or they cannot be preprocessed. The conversions mechanisms we will explain in detail
 				later. Explicit filter declarations are done with
@@ -199,7 +199,7 @@
 				<row>
 					<entry>FILTER</entry>
 					<entry>Filter Name</entry>
-					<entry>Specifies that the filter &lt;Name&gt; should be used as input and output filter</entry>
+					<entry>Specifies that the filter &lt;Name&gt; should be used both as input and output filter</entry>
 				</row>
 			</tbody>
 			</tgroup>

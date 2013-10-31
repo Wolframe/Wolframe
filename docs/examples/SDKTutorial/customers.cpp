@@ -2,7 +2,6 @@
 #include "serialize/struct/filtermapDescription.hpp"
 
 using namespace _Wolframe;
-using namespace test;
 
 namespace {
 struct CustomerDescription :public serialize::StructDescription<Customer>

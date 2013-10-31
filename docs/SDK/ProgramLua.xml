@@ -4,15 +4,15 @@
 	<title>Introduction</title>
 	<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>Lua</application>. <application>Lua</application> is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
-		(see http://www.lua.org/authors.html). A description of <application>Lua</application> is not provided here.
-		For an introduction into programming with <application>Lua</application> see http://www.lua.org. The official manual also available as book
+		(see <ulink url="http://www.lua.org/authors.html">http://www.lua.org/authors.html</ulink>). A description of <application>Lua</application> is not provided here.
+		For an introduction into programming with <application>Lua</application> see <ulink url="http://www.lua.org">http://www.lua.org</ulink>. The official manual which is also available as book
 		is very good. <application>Wolframe</application> introduces some <application>Lua</application> interfaces to access input and output and to execute functions.
-		The <application>Lua</application> application layer doesn't have to deal with protocol or encryption issues.
+		The <application>Lua</application> application layer does not have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Declaring Functions</title>
-	<para>For <application>Lua</application> you do not have to declare anything besides the <application>Lua</application> script. If you configure a <application>Lua</application>
+	<para>For <application>Lua</application> you do not have to declare anything in addition to the <application>Lua</application> script. If you configure a <application>Lua</application>
 		script as program, all global functions declared in this script are declared as form
 		functions in <application>Wolframe</application>. For avoiding name conflicts you should declare private functions
 		of the script as <code>local</code>.
@@ -33,7 +33,7 @@
 	</sect2>
 	<sect2>
 	<title>Wolframe Global Objects</title>
-	<para>Besides the provider library <application>Wolframe</application> defines the followin objects global in the script execution context:
+	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
 		<member>transaction</member><member>transaction context if not relying on the auto-commit of a transaction function</member>
@@ -46,7 +46,7 @@
 	<title>Using Forms</title>
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty
 		instance of a form. It takes the name of the form as string argument.
-		If you for example have a form configured called "employee" and you want to create a
+		If you for example have a form configured called "employee" and you want to create an
 		employee object from a <application>Lua</application> table, you call
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_form_1a.lua" parse="text" />
@@ -58,19 +58,22 @@
 
 		The form method <code>fill</code> takes a second optional parameter. Passing "strict" as
 		second parameter enforces a strict validation of the input against the form, meaning that
-		attributes are checked to be attributes and non optional elements are checked to be initialized.
+		attributes are checked to be attributes (when using XML serialization) and non optional elements are checked to be initialized.
 		Passing "complete" as second parameter forces non optional elements to be checked for initialization
 		but does not distinguish between attributes and content values. "relaxed" is the default and
-		checks only the existence of fill values in the form.
+		checks only the existence of filled-in values in the form.
 		</para>
 		<para>
+		Given the following validation form:
+			<programlisting language='text'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/employee.simpleform" parse="text" />
+			</programlisting>
 
-		The following example call of <code>fill</code> will raise an error because some elements
-		of the form are missing in the input:
+		the call of <code>fill</code> in the following piece of code will raise an error because some elements
+		of the form ('ID' and 'name') are missing in the input:
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_form_1b.lua" parse="text" />
 			</programlisting>
-
 		</para>
 		<para>
 		To access the data in a form there are two form methods available. <code>get()</code> returns an iterator on the form data similar

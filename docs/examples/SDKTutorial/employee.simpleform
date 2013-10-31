@@ -1,0 +1,10 @@
+
+FORM Employee
+{
+   employee
+   {
+       ID !@int                  ; Internal customer id (mandatory)
+       name !string              ; Name of the customer (mandatory)
+       company string            ; Company he is working for (optional)
+   }
+}
