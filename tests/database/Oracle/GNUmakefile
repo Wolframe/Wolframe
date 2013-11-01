@@ -29,13 +29,14 @@ INCLUDE_LIBS = \
 CPP_OBJS = \
 	OracleModuleFiles.o
 
+CPP_BINS = \
+	dbPing$(EXE)
+
 TEST_CPP_BINS = \
 	oracleUnit$(EXE)
 
 
 LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
-#DB_EXISTS = $(shell PGPASSWORD="wolfpwd" psql -h localhost -U wolfusr -d wolframe -c "" >/dev/null 2>&1; echo $$?)
-DB_EXISTS = 0
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -46,11 +47,13 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-ifeq ($(DB_EXISTS),0)
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./oracleUnit$(EXE)
-else
-	@echo "No properly configured database for tests"
-endif
+local_test: $(TEST_CPP_BINS)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./dbPing andreasbaumann.dyndns.org wolfusr wolfpwd orcl; \
+		if test $$? -eq 0; then \
+			LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./oracleUnit$(EXE) ; \
+		else \
+			echo "No properly configured database for tests" ; \
+		fi
 
 showenv:
 	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

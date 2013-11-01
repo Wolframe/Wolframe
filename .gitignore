@@ -97,6 +97,7 @@ docs/WolfBook.epub
 docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
+docs/html-webpage/
 src/primary.db
 tests/3rdParty/libxslt/testlibxslt1
 tests/testMethodMemberPointerTemplate
@@ -142,10 +143,13 @@ tests/AAAA/passwdFileTest
 tests/testSimpleFormCompiler
 tests/stringNormalizationTest
 tests/database/PostgreSQL/postgresUnit
+tests/database/PostgreSQL/dbPing
 tests/database/Oracle/oracleUnit
+tests/database/Oracle/dbPing
 tests/database/SQLite3/sqliteUnit
 tests/database/SQLite3/test.db
 tests/database/SQLite3/garbage.db
+tests/database/SQLite3/createRandom
 tests/unitLibraryTest
 tests/3rdParty/freeimage/freeimageTest
 tests/3rdParty/freeimage/freeimageTestCpp
