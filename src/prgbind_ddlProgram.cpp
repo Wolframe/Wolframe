@@ -68,12 +68,10 @@ void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std:
 			if ((*fi)->name().empty())
 			{
 				library.definePrivateForm( *fi);
-				LOG_DATA << "[form compiler" << (*fi)->ddlname() << "] output struct " << (*fi)->tostring();
 			}
 			else
 			{
 				library.defineForm( (*fi)->name(), *fi);
-				LOG_DATA << "[form compiler" << (*fi)->ddlname() << "] output form " << (*fi)->tostring();
 			}
 		}
 	}

@@ -1188,7 +1188,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
 							TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
-							/*[-]*/LOG_DATA << "++++PARSED TRANSACTION FUNCTION " << ff->tostring();
 							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
 						}
 						else
