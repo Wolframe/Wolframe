@@ -29,9 +29,11 @@ CPP_OBJS = \
 	sqliteModuleFiles.obj
 
 CPP_BINS = \
-	sqliteUnit.exe
+	sqliteUnit.exe \
+	createRandom.exe
 
 sqliteUnit.exe: sqliteUnit.obj sqliteModuleFiles.obj
+createRandom.exe: createRandom.obj
 
 all: $(OBJS) $(CPP_BINS)
 
@@ -46,10 +48,6 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 	@-erase test.db garbage.db 2>NUL
-	@-copy Makefile.W32 garbage.db
+	@-createRandom 4096 garbage.db
 	@$(TOPDIR)\3rdParty\sqlite3\sqlite3.exe test.db < testDB.sql
 	@-sqliteUnit
-
-# Aba: on Windows?
-#	@dd if=/dev/urandom of=garbage.db bs=4096 count=1
-
