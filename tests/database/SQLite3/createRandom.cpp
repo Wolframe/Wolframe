@@ -2,9 +2,9 @@
 
 #include <fstream>
 #include <string>
+#include <ctime>
 
 #ifndef _WIN32
-#include <time.h>
 #include <stdlib.h>
 #endif
 
@@ -17,11 +17,13 @@ using namespace std;
 
 static int intRand( int min, int max )
 {
-	return ( (double)rand( ) / ( (double)RAND_MAX + 1.0 ) ) * ( max - min + 1 ) + min;
+	return (int)(( (double)rand( ) / ( (double)RAND_MAX + 1.0 ) ) * ( max - min + 1 ) + min);
 }
 
 int main( int argc, char *argv[] )
 {
+	srand( (unsigned int)time( NULL ) );
+
 	if( argc != 3 ) {
 		return 1;
 	}
@@ -31,7 +33,6 @@ int main( int argc, char *argv[] )
 	int N = atoi( argv[1] );
 	char *buf = new char[N];
 	 
-	srand( time( 0 ) );
 	for( int i = 0; i < N; i++ ) {
 		buf[i] = (unsigned char )intRand( 0, 255 );
 	}
