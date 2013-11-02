@@ -381,13 +381,13 @@
 					<listitem><code>/organization/address/city</code>
 					<para>Element "city" of root "organization" descendant "address"</para>
 					</listitem>
-					<listitem><code>//id</code>
+					<listitem><code>.//id</code>
 					<para>Any descendant element with name "id" of the current element</para>
 					</listitem>
 					<listitem><code>//person/id</code>
-					<para>Child with name "id" of any descendant "person" of the current element</para>
+					<para>Child with name "id" of any descendant "person" of the root element</para>
 					</listitem>
-					<listitem><code>/.//id</code>
+					<listitem><code>//id</code>
 					<para>Any descendant element with name "id" of the root element</para>
 					</listitem>
 					<listitem><code>/address/*</code>
