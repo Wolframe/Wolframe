@@ -254,7 +254,10 @@ ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
 XSLT_VERSION ?= $(shell pacman -Q | grep docbook-xsl | cut -f 2 -d ' ' | cut -f 1 -d -)
-XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+DOCBOOK_HOME ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)
+XSLT_MAN_STYLESHEET ?= $(DOCBOOK_HOME)/manpages/docbook.xsl
+XSLT_TOWORDML_STYLESHEET ?= $(DOCBOOK_HOME)/roundtrip/dbk2wordml.xsl
+XSLT_TOWORDML_TEMPLATE ?= $(DOCBOOK_HOME)/roundtrip/template.xml
 endif
 
 # Ubuntu

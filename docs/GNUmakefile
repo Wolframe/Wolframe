@@ -4,14 +4,12 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/doc.mk
 
-XSLT_MAN_PARAMS = \
-	--param man.charmap.use.subset "0" \
-	--param make.year.ranges "1" \
-	--param make.single.year.ranges "1"
 
 XSLT_MAN = \
-	$(XSLTPROC) --nonet \
-	$(XSLT_MAN_PARAMS) \
+	$(XSLTPROC) --nonet --xinclude \
+	--param man.charmap.use.subset "0" \
+	--param make.year.ranges "1" \
+	--param make.single.year.ranges "1" \
 	$(XSLT_MAN_STYLESHEET)
 
 XSLT_HTML = \
@@ -38,6 +36,13 @@ XSLT_EPUB = \
 	--stringparam toc.section.depth 4 \
 	output-epub.xsl
 
+XSLT_TOWORDML = \
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 4 \
+	-stringparam wordml.template $(XSLT_TOWORDML_TEMPLATE) \
+	$(XSLT_TOWORDML_STYLESHEET)
+	
 local_all:
 
 doc: doc-doxygen doc-html doc-html-chunked doc-pdf
@@ -70,6 +75,7 @@ doc-epub: WolfBook.epub
 	zip -Xr9D WolfBook.epub META-INF OEBPS
 	rm -rf mimetype META-INF OEBPS
 
+doc-towordml: WolfBook.docx
 
 %.pdf: %.fop
 	fop -fo $< -pdf $@
@@ -94,6 +100,9 @@ html-webpage/index.html: WolfBook.xml
 %.epub: %.xml
 	$(XSLT_EPUB) $<
 
+%.docx: %.xml
+	$(XSLT_TOWORDML) $< > $@
+
 wolframed.8: wolframed-man.xml
 	$(XSLT_MAN) $<
 
@@ -106,7 +115,7 @@ wolfpasswd.1: wolfpasswd-man.xml
 Tutorial.html: Tutorial.xml
 
 local_clean:
-	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
+	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
