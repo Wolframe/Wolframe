@@ -104,7 +104,7 @@
 			<sect4>
 				<title>Starting Position</title>
 				<para>For mapping data structures from the user interface elements to the
-				data description needed to fulfil an interface for a server request we need
+				data description needed to fulfill an interface for a server request we need
 				some kind of translation. An implicit mapping would only be able to describe
 				very trivial data mappings. After drawing the user interface this translation
 				has to be defined. On the other hand the requests answer returned by the server
@@ -116,7 +116,7 @@
 			<sect4>
 				<title>First Example</title>
 				<para>
-					Lets have a look at a <classname>QLineEdit</classname>
+					Let's have a look at a <classname>QLineEdit</classname>
 					element of a form and a possible XML representation of the
 					data used for a request.
 				</para>

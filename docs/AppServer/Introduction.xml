@@ -23,7 +23,7 @@
 			It maps the presentation of the application from the request answers it gets from the server.
 			Also the data describing this mapping is loaded from the server when connecting to it.
 			So the whole application is driven by the server.
-			A special use case are user interface designers that upload the presentation data for other users
+			Special use cases are designers of user interfaces that upload the presentation data for other users
 			to the server.</para>
 		</sect2>
 		<sect2>
@@ -49,7 +49,7 @@
 			The main transaction function gets a complete description of the transaction to execute as input and returns
 			all results of the transaction as output. The logic tier builds the result data structure out of this result.
 			The main transaction function is stateless and an abstraction of the transactional context. (The transaction
-			context does not exist outside this function. Differently explained: Two functions do not refer to the same
+			context does not exist outside this function. Explained differently: Two functions do not refer to the same
 			transaction).</para>
 		</sect2>
 	</sect1>
