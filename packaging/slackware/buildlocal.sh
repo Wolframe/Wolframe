@@ -40,6 +40,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules
 
 make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
@@ -48,16 +49,21 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
 	DESTDIR=$PKGBUILD/PKG install sysconfdir=/etc libdir=$LIBDIR
 
 cd docs; make DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
 
 mkdir $PKGBUILD/PKG/install
 cp packaging/slackware/slack-desc $PKGBUILD/PKG/install/.
-#cp packaging/slackware/doinst-$ARCH.sh $PKGBUILD/PKG/install/.
+cp packaging/slackware/doinst.sh $PKGBUILD/PKG/install/.
+cp packaging/slackware/wolframe.conf $PKGBUILD/PKG/etc/wolframe/.
+mkdir $PKGBUILD/PKG/etc/rc.d
+cp packaging/slackware/rc.wolframed $PKGBUILD/PKG/etc/rc.d/.
+chmod 0775 $PKGBUILD/PKG/etc/rc.d/rc.wolframed
+
 cd $PKGBUILD/PKG
-#makepkg -l y -c n $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION.tgz
-makepkg -c n $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION.tgz
+makepkg -l y -c n $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION.tgz
 
 # rm -rf $PKGBUILD/BUILD
 # rm -rf $PKGBUILD/PKG

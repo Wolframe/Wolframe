@@ -1,0 +1,36 @@
+#!/bin/sh
+# Start/stop/restart Wolframe daemon:
+
+# Start wolframed:
+wolframed_start() {
+  if [ -x /usr/sbin/wolframed ]; then
+    echo "Starting wolframed:  /usr/sbin/wolframed"
+    /usr/sbin/wolframed -c /etc/wolframe/wolframe.conf
+  fi
+}
+
+# Stop wolframed:
+wolframed_stop() {
+  killall wolframed
+}
+
+# Restart wolframed:
+wolframed_restart() {
+  wolframed_stop
+  sleep 1
+  wolframed_start
+}
+
+case "$1" in
+'start')
+  wolframed_start
+  ;;
+'stop')
+  wolframed_stop
+  ;;
+'restart')
+  wolframed_restart
+  ;;
+*)
+  echo "usage rc.wolframed: start|stop|restart"
+esac
