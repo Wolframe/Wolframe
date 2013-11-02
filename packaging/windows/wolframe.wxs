@@ -162,6 +162,9 @@ Project Wolframe.
 							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
 								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="$(var.topdir)\src\libxml2.dll"/>
 								<File Id="iconv.dll" Name="iconv.dll" DiskId="1" Source="$(var.topdir)\src\iconv.dll"/>
+								<?ifdef var.with_libxslt?>
+									<File Id="libxslt.dll" Name="libxslt.dll" DiskId="1" Source="$(var.topdir)\src\libxslt.dll"/>
+								<?endif?>
 							</Component>
 							<?endif?>
 							
@@ -347,7 +350,7 @@ Project Wolframe.
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
 							<?endif?>
-							
+
 							<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
 								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\line\mod_filter_line.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/configuration/LoadModules"

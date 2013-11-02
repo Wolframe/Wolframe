@@ -39,6 +39,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_libxml2=1
 !ENDIF
 
+!IFDEF WITH_LIBXSLT
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_libxslt=1
+!ENDIF
+
 !IFDEF WITH_ICU
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_icu=1 -dicu_lib_version=$(ICU_LIB_VERSION)
