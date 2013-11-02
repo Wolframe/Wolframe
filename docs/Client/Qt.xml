@@ -262,7 +262,7 @@
 			<title>States and properties of widgets</title>
 
 			<para>
-				Some properties are reserved for states steering the behaviour of the user interface:
+				Some properties are reserved for states steering the behavior of the user interface:
 
 				<itemizedlist>
 				<listitem>
@@ -317,7 +317,7 @@
 
 		</sect3>
 		<sect3>
-			<title>Inspect Errors and  Warnings and Debug Messages Reported</title>
+			<title>Inspect Errors and Warnings and Debug Messages Reported</title>
 
 			<para>To inspect internal messages reported by the <application>wolfclient</application>
 			in developer mode we have to open the debug window.

@@ -30,7 +30,7 @@
 	<sect2>
 	<title>Language Description</title>
 	<para>
-		Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by a an assignment 
+		Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
 		operator '='. The left side identifier specifies the name of the type. This type name can be used
 		in a DDL as name instead of the built in type <code>string</code>. When doing so the referenced token is validated
 		and normalized with the comma separated sequence of function references on the right side of 
@@ -51,7 +51,7 @@
 	</sect2>
 	<sect2>
 	<title>Configuration</title>
-	<para>For declaring and using a the .wnmp file of our example above, you have to load the module 'mod_normalize_string'
+	<para>For declaring and using a .wnmp file in our example above, you have to load the module 'mod_normalize_string'
 	and the module 'mod_normalize_number'.
 	For this you add the following two lines to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>

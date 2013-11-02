@@ -45,7 +45,7 @@
 			To convert input data the transaction definition language 
 			defines a preprocessing section where globally defined Wolframe
 			functions can be called for the selected input. To build an output 
-			structure that cannot be modelled with a language without control
+			structure that cannot be modeled with a language without control
 			structures and recursion, TDL provides the possibility to call a
 			globally defined function as filter for postprocessing of the
 			result of the transaction function.
@@ -132,7 +132,7 @@
 				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
 					<para>
 						This optional declaration defines a top level tag for the 
-						result structure and optionally a post processing step as
+						result structure and optionally a postprocessing step as
 						filter referenced by name.
 						It is similar as the construct in the subroutine description
 						except that one cannot specify a postprocessing filter
@@ -413,7 +413,7 @@
 			<title>Referencing Database Results</title>
 			<para>Database results of the previous instruction are referenced 
 			with a '$RESULT.' followed by the column identifier or column number.
-			Column numbers start always from 1, independent from the database !
+			Column numbers start always from 1, independent from the database!
 			So be aware that even if the database counts column from 0 you have
 			to use 1 for the first column. 
 			</para>
@@ -430,8 +430,8 @@
 			used as base for the command arguments of the instruction. Without
 			binding instruction commands with a FOREACH quantifier the named 
 			results of an instruction can be referenced as
-			<code>$&lt;name&gt;.&lt;columnref&gt;</code>.
-			For example as <code>$person.id</code> for the column with name 'id' of the
+			<code>$&lt;name&gt;.&lt;columnref&gt;</code>,
+			for example as <code>$person.id</code> for the column with name 'id' of the
 			result named as 'person'.
 			</para>
 			<para>
@@ -590,7 +590,7 @@
 			Unfortunately select of constants might not be supported in your 
 			database of choice. Besides that explicit printing seems to be much
 			more readable. The statement <code>INTO &lt;resulttag&gt; PRINT &lt;value&gt;;</code>
-			prints a value that can be a constant,variable or an input or result reference
+			prints a value that can be a constant, variable or an input or result reference
 			into the substructure named &lt;resulttag&gt;. The following artificial 
 			example illustrates this.
 			<programlisting language='sql'>

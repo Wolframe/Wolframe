@@ -1,7 +1,7 @@
 <chapter>
 <title>Forms</title>
 <para>
-Forms are data structures used to validate input and output data and to do some basic normalizations
+Forms are data structures used to validate input and output data and to do some basic normalization
 in order to make data accessible in a uniform way. Forms are defined in a data definition language
 (<acronym>DDL</acronym>) and translated by a compiler at startup. Those compilers are defined as loadable
 modules.

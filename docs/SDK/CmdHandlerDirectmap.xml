@@ -35,7 +35,7 @@
 		introduced above. It defines two commands. The first one links a command "insert" with document type
 		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
 		automatically against a form named "Customer" if not explicitly defined else. 
-		The command has no result except that its succeeds or fails. The second example command links a 
+		The command has no result except that it succeeds or fails. The second example command links a 
 		command "get" with a document type "Employee" to a function "doSelectEmployee". 
 		The input is not validated and the transaction output is validated and mapped through the 
 		form "Employee".
