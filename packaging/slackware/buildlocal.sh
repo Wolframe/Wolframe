@@ -63,7 +63,7 @@ cp packaging/slackware/rc.wolframed $PKGBUILD/PKG/etc/rc.d/.
 chmod 0775 $PKGBUILD/PKG/etc/rc.d/rc.wolframed
 
 cd $PKGBUILD/PKG
-makepkg -l y -c n $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION.tgz
+makepkg -l y -c n $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
 
 # rm -rf $PKGBUILD/BUILD
 # rm -rf $PKGBUILD/PKG
