@@ -780,7 +780,7 @@ cd %{_builddir}/%{name}-%{version}
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make help \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -832,7 +832,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make config \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -887,7 +887,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make depend \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -939,7 +939,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -997,7 +997,7 @@ echo ======================= TESTING ==============================
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make test \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make test \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
