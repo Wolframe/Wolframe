@@ -571,7 +571,6 @@ const char* TransactionFunction::getErrorHint( const std::string& errorclass, in
 
 TransactionFunctionInput* TransactionFunction::getInput() const
 {
-	LOG_DATA << "[transaction function] execute " << tostring();
 	return new TransactionFunctionInput( this);
 }
 
