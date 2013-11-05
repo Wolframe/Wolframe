@@ -18,7 +18,7 @@ rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG
 mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
 
 rm -f wolframe-$VERSION.tar.gz
-rm -f $RPMBUILD/BUILD/wolframe_$VERSION.tar.gz
+rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
 
 make distclean
 mkdir /tmp/wolframe-$VERSION

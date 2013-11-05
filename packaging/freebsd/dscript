@@ -1,0 +1,34 @@
+#!/bin/sh -e
+
+# Author: Andreas Baumann <abaumann@yahoo.com>
+
+set -e
+
+case "$2" in
+	DEINSTALL)
+		# forced stop
+		pkill wolframed
+		;;
+	
+	POST-DEINSTALL)
+		# remove log directory and it's contents
+		if test -d /var/log/wolframe; then
+			rm -rf /var/log/wolframe
+		fi
+		
+		# dito lock directory
+		if test -d /var/run/wolframe; then
+			rm -rf /var/run/wolframe
+		fi
+		
+		echo "Remove 'wolframed_enable' from '/etc/rc.conf' manually!"
+		echo
+		;;
+
+	*)
+		echo "dscript called with unknown argument $2" >&2
+		exit 1
+		;;
+esac
+
+exit 0

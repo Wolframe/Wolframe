@@ -1,0 +1,42 @@
+#!/bin/sh -e
+
+# Author: Andreas Baumann <abaumann@yahoo.com>
+
+set -e
+
+case "$2" in
+	PRE-INSTALL)
+		# create wolframe user and group if they don't exist
+		getent group wolframe >/dev/null || /usr/sbin/pw groupadd wolframe
+		getent passwd wolframe >/dev/null || /usr/sbin/pw useradd -g wolframe -c "Wolframe user" -d /dev/null -s /usr/sbin/nologin -n wolframe
+
+		# create lock directory
+		if test ! -d /var/run/wolframe; then
+			mkdir /var/run/wolframe
+			chown wolframe:wolframe /var/run/wolframe
+			chmod 0755 /var/run/wolframe
+		fi
+
+		# create a log directory
+		if test ! -d /var/log/wolframe; then
+			mkdir /var/log/wolframe
+			chown wolframe:wolframe /var/log/wolframe
+			chmod 0755 /var/log/wolframe
+		fi
+
+		;;
+		
+	POST-INSTALL)
+		# echo a message to the installer
+		echo "Add wolframed_enable=\"yes\" to '/etc/rc.conf' to"
+		echo "enable the Wolframe server at startup"
+		echo
+		;;
+
+	*)
+		echo "iscript called with unknown argument $2" >&2
+		exit 1
+		;;
+esac
+
+exit 0

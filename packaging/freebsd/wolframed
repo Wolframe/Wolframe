@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+# PROVIDE: wolframed
+# REQUIRE: DAEMON
+#
+# Add the following lines to /etc/rc.conf to enable the Wolframe server:
+#
+# wolframed_enable="YES"
+#
+
+. /etc/rc.subr
+
+name="wolframed"
+rcvar="wolframed_enable"
+
+command="/usr/local/sbin/wolframed"
+command_args="-c /usr/local/etc/wolframe/wolframe.conf"
+
+pidfile="/var/run/wolframe/${name}.pid"
+
+load_rc_config ${name}
+run_rc_command "$1"

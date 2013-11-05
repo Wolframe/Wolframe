@@ -9,7 +9,7 @@ local_clean:
 INCLUDE_SUBDIRS = \
 	. \
 	langbind protocol cmdbind database prnt config \
-	ddl logger utils serialize serialize/struct \
+	logger utils serialize serialize/struct \
 	serialize/ddl processor filter types AAAA module \
 	prgbind crypto
 
