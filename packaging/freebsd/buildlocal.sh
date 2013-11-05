@@ -6,7 +6,7 @@ ORIG_ARCH=`uname -m`
 if test "x$ORIG_ARCH" = "xamd64"; then
 	ARCH="x86_64"
 else
-if test "x$ORIG_ARCH" = "xi686"; then
+if test "x$ORIG_ARCH" = "xi386"; then
 	ARCH="i686"
 else
 	echo "ERROR: Unknown slackware architecture '$ORIG_ARCH'"
