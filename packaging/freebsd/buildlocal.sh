@@ -17,8 +17,8 @@ else
 fi
 fi
 
-VERSION=`uname -r`
-case $VERSION in
+OS_VERSION=`uname -r`
+case $OS_VERSION in
 	8.3*)
 		FREEIMAGE=""
 		;;
