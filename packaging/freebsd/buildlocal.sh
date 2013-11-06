@@ -24,9 +24,9 @@ case $OS_VERSION in
 		;;
 esac
 
-rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG
+rm -rf $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION
 
-mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
+mkdir -p $PKGBUILD $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION $PKGBUILD/PKGS/$ARCH
 
 rm -f wolframe-$VERSION.tar.gz
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
@@ -68,36 +68,33 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	prefix=/usr/local \
-	DESTDIR=$PKGBUILD/PKG install sysconfdir=/usr/local/etc libdir=/usr/local/lib
+	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION install sysconfdir=/usr/local/etc libdir=/usr/local/lib
 
 # doxygen package currently broken
 #cd docs; gmake DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
 
-mkdir $PKGBUILD/PKG/install
-cp packaging/freebsd/comment $PKGBUILD/PKG/.
-cp packaging/freebsd/description $PKGBUILD/PKG/.
-cp packaging/freebsd/packlist $PKGBUILD/PKG/.
+cp packaging/freebsd/comment $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/freebsd/description $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/freebsd/packlist $PKGBUILD/PKG/wolframe-$VERSION/.
 if test "x$FREEIMAGE" = "xWITH_LOCAL_FREEIMAGE=1"; then
-	cat packaging/freebsd/packlist.freeimage >> $PKGBUILD/PKG/packlist
+	cat packaging/freebsd/packlist.freeimage >> $PKGBUILD/PKG/wolframe-$VERSION/packlist
 fi
-cp packaging/freebsd/iscript $PKGBUILD/PKG/.
-cp packaging/freebsd/dscript $PKGBUILD/PKG/.
-cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/usr/local/etc/wolframe/.
-mkdir $PKGBUILD/PKG/usr/local/etc/rc.d
-cp packaging/freebsd/wolframed $PKGBUILD/PKG/usr/local/etc/rc.d/.
-chmod 0775 $PKGBUILD/PKG/usr/local/etc/rc.d/wolframed
+cp packaging/freebsd/iscript $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/freebsd/dscript $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/wolframe/.
+mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
+cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
+chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed
 
 cd $PKGBUILD
 
 pkg_create -S $PKGBUILD -z -v \
-	-c PKG/comment \
-	-d PKG/description \
-	-f PKG/packlist \
-	-i PKG/iscript \
-	-k PKG/dscript \
-	"wolframe-$VERSION"
-	
-mv $PKGBUILD/wolframe-$VERSION.tgz $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
+	-c PKG/wolframe-$VERSION/comment \
+	-d PKG/wolframe-$VERSION/description \
+	-f PKG/wolframe-$VERSION/packlist \
+	-i PKG/wolframe-$VERSION/iscript \
+	-k PKG/wolframe-$VERSION/dscript \
+	$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
 
 # rm -rf $PKGBUILD/BUILD
 # rm -rf $PKGBUILD/PKG
