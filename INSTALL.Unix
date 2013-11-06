@@ -697,8 +697,8 @@ FreeBSD 8.4
 -----------
 
 Required packages: boost-libs (1.52.0)
-Optional packages: cyrus-sasl2 (2.1.23)
-                   sqlite3 (3.7.4), postgresql92-client (9.2.4), libxml2 (2.8.1),
+Optional packages: cyrus-sasl2 (2.1.26)
+                   sqlite3 (3.7.14.1), postgresql92-client (9.2.4), libxml2 (2.8.0),
                    libxslt (1.1.28), png (1.5.14), python33 (3.3.0)
 
 Some boost header files are broken (and they don't fix them!),
