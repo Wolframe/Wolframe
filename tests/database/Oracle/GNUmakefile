@@ -55,7 +55,7 @@ local_test: $(TEST_CPP_BINS)
 			echo "No properly configured database for tests" ; \
 		fi
 
+local_longtest:
+
 showenv:
 	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
-
-local_longtest:

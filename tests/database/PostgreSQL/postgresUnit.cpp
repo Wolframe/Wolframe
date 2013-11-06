@@ -69,6 +69,32 @@ TEST_F( PQmoduleFixture, WrongDatabase )
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
+TEST_F( PQmoduleFixture, Transaction )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+
+	// ok transaction
+	trans->begin( );
+	trans->commit( );
+	
+	// rollback transaction
+	trans->begin( );
+	trans->rollback( );
+	
+	// error, commit without begin
+	EXPECT_THROW( trans->commit( ), std::runtime_error );
+	
+	// error, rollback without begin
+	EXPECT_THROW( trans->rollback( ), std::runtime_error );
+	
+	trans->close( );
+}
+
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );

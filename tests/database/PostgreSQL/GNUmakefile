@@ -54,3 +54,6 @@ local_test: $(TEST_CPP_BINS)
 		fi
      
 local_longtest:
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
