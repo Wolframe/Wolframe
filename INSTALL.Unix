@@ -29,7 +29,7 @@ Table of Contents
     Slackware 14.0
     Archlinux
   Instructions for other Unixes
-    FreeBSD 8.2
+    FreeBSD 8.4
     FreeBSD 9.1
     NetBSD 6.1
     Solaris 10
@@ -693,18 +693,18 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 Instructions for other Unixes
 -----------------------------
 
-FreeBSD 8.2
+FreeBSD 8.4
 -----------
 
-Optional packages: cyrus-sasl (2.1.23)
-                   sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8),
-                   png (1.4.8)
+Required packages: boost-libs (1.52.0)
+Optional packages: cyrus-sasl2 (2.1.23)
+                   sqlite3 (3.7.4), postgresql92-client (9.2.4), libxml2 (2.8.1),
+                   libxslt (1.1.28), png (1.5.14), python33 (3.3.0)
 
-Boost ist too old (1.45), compile your own version from the ports
-directory. See 'packaging/patches/FreeBSD' for patches and the ports files.
-
-FreeImage doesn't build due to a bug in Gcc and big double number
-handling.
+Some boost header files are broken (and they don't fix them!),
+for patches see packaging/patches/FreeBSD. They can be applied to
+the ports or directly to the installed header files in
+'/usr/local/include/boost'.
 
 You need 'gmake' (3.81_4).
 
@@ -715,9 +715,13 @@ Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
 
-For scripting in Python you have to set WITH_PYTHON=1. Use the BSD
-ports package for python33 as there is no binary Python 3 package.
+FreeImage doesn't build due to a bug in gcc and big double number
+handling.
 
+'postgresql92-server' is needed to execute the database tests.
+
+'expect' is needed to execute some tests.
+ 
 FreeBSD 9.1
 -----------
 
