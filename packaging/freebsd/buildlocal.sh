@@ -16,6 +16,14 @@ else
 	exit 1
 fi
 fi
+
+VERSION=`uname -r`
+case $VERSION in
+	8.3*)
+		FREEIMAGE=""
+		;;
+esac
+
 rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG
 
 mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
