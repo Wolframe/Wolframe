@@ -77,6 +77,9 @@ mkdir $PKGBUILD/PKG/install
 cp packaging/freebsd/comment $PKGBUILD/PKG/.
 cp packaging/freebsd/description $PKGBUILD/PKG/.
 cp packaging/freebsd/packlist $PKGBUILD/PKG/.
+if test "x$FREEIMAGE" = "xWITH_LOCAL_FREEIMAGE=1"; then
+	cat packaging/freebsd/packlist.freeimage >> $PKGBUILD/PKG/packlist
+fi
 cp packaging/freebsd/iscript $PKGBUILD/PKG/.
 cp packaging/freebsd/dscript $PKGBUILD/PKG/.
 cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/usr/local/etc/wolframe/.
