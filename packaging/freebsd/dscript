@@ -2,15 +2,16 @@
 
 # Author: Andreas Baumann <abaumann@yahoo.com>
 
-set -e
-
 case "$2" in
 	DEINSTALL)
-		# forced stop
-		pkill wolframed
+		# forced stop, ignore errors
+		pkill wolframed || true
 		;;
 	
 	POST-DEINSTALL)
+		# don't ignore errors here
+		set -e
+
 		# remove log directory and it's contents
 		if test -d /var/log/wolframe; then
 			rm -rf /var/log/wolframe
@@ -20,6 +21,9 @@ case "$2" in
 		if test -d /var/run/wolframe; then
 			rm -rf /var/run/wolframe
 		fi
+
+		# remove wolframe user (and primary group implicitly)
+		getent group wolframe >/dev/null && /usr/sbin/pw userdel wolframe
 		
 		echo "Remove 'wolframed_enable' from '/etc/rc.conf' manually!"
 		echo
