@@ -39,7 +39,7 @@ else
 			PYTHON_LDFLAGS="$PYTHON_LDFLAGS -L/opt/csw/python-3.3.2/lib"
 			;;
 
-		FreeBSD*9.1*)
+		FreeBSD*9*)
 			# Wrong order of link pathes or missing shared library, creates
 			# a mislink with libpython.a and a warning about -fPIC
 			PYTHON_LDFLAGS=`echo $PYTHON_LDFLAGS | sed 's|-L/usr/local/lib/python3.3/config-3.3m||'`
