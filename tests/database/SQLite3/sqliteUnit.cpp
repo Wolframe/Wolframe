@@ -54,6 +54,30 @@ TEST_F( SQLiteModuleFixture, OpenGarbage )
 		      std::runtime_error );
 }
 
+TEST_F( SQLiteModuleFixture, Transaction )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+
+	// ok transaction
+	trans->begin( );
+	trans->commit( );
+	
+	// rollback transaction
+	trans->begin( );
+	trans->rollback( );
+	
+	// error, commit without begin
+	EXPECT_THROW( trans->commit( ), std::runtime_error );
+	
+	// error, rollback without begin
+	EXPECT_THROW( trans->rollback( ), std::runtime_error );
+	
+	trans->close( );
+}
 
 TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
 {

@@ -104,7 +104,8 @@ private:
 	}
 
 	void setDatabaseErrorMessage();
-	bool status( OracleStatement* res, State newstate);
+//	bool status( OracleStatement* res, State newstate);
+	bool status( sword status, State newstate);
 	bool errorStatus( const std::string& message);
 	bool executeInstruction( const char* stmstr, State newstate);
 

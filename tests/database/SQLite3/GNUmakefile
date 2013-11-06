@@ -56,3 +56,6 @@ local_test: $(TEST_CPP_BINS)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
 
 local_longtest:
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

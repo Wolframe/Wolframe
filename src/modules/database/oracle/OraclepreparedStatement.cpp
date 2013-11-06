@@ -168,35 +168,26 @@ void PreparedStatementHandler_oracle::setDatabaseErrorMessage()
 }
 
 // was PQResult
-bool PreparedStatementHandler_oracle::status( OracleStatement* res, State newstate)
+// bool PreparedStatementHandler_oracle::status( OracleStatement* res, State newstate)
+bool PreparedStatementHandler_oracle::status( sword status, State newstate )
 {
 	bool rt;
-/*
-	ExecStatusType es = PQresultStatus( res);
 
-	if (es == PGRES_COMMAND_OK)
-	{
+	// TODO: check better for status
+	
+	if( status == OCI_SUCCESS ) {
+		// TODO: m_hasResult = xx;
 		m_hasResult = false;
 		m_state = newstate;
 		rt = true;
-	}
-	else if (es == PGRES_TUPLES_OK)
-	{
-		m_hasResult = true;
-		m_state = newstate;
-		rt = true;
-	}
-	else
-	{
-		setDatabaseErrorMessage();
+	} else {
+		// TODO: setDatabaseErrorMessage( );
 		m_state = Error;
 		rt = false;
 	}
-	if (res != m_lastresult)
-	{
-		PQclear( res);
-	}
-*/
+	
+	// TODO: close results sets, cleanup
+		
 	return rt;
 }
 
@@ -207,11 +198,8 @@ bool PreparedStatementHandler_oracle::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-//	return status( PQexec( m_conn, "BEGIN;"), Transaction);
 
-// CHECK(m_Session.get_error(),OCITransStart(m_Session.get_svc(), m_Session.get_error(), 2, OCI_TRANS_READWRITE));   
-   
-	return false;
+	return status( OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Transaction );
 }
 
 bool PreparedStatementHandler_oracle::commit()
@@ -225,29 +213,15 @@ bool PreparedStatementHandler_oracle::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-/*	
-	sword status;
 	
-	status = OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT );
-	if( status != O
-
-  status = OCITransCommit(conf->svchp, conf->errhp, OCI_DEFAULT);
-  if (status != OCI_SUCCESS) {
-    err_error(MODULE,proc,"commit transaction failed\n%s",
-	      get_oci10_error(conf->errhp, OCI_ERROR));    
-    return ERROR;
-  }
-  return OK;
-*/
-//	return status( PQexec( m_conn, "COMMIT;"), Init);
-	return false;
+	return status( OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
 }
 
 bool PreparedStatementHandler_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
-//	return status( PQexec( m_conn, "ROLLBACK;"), Init);
-	return false;
+
+	return status( OCITransRollback( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
 }
 
 bool PreparedStatementHandler_oracle::errorStatus( const std::string& message)
@@ -342,7 +316,8 @@ bool PreparedStatementHandler_oracle::execute()
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
 //	m_lastresult = PQexec( m_conn, stmstr.c_str());
 
-	bool rt = status( m_lastresult, Executed);
+	//bool rt = status( m_lastresult, Executed);
+	bool rt = false;
 	if (rt)
 	{
 		if (m_hasResult)
