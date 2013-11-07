@@ -42,9 +42,7 @@
 				<year>2010 - 2013</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
-			<legalnotice>
-				&WolframeLegalNotice;
-			</legalnotice>
+			&WolframeLegalNotice;
 		</bookinfo>
 
 		&TutorialPreface;

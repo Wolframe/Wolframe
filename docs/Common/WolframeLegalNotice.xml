@@ -1,25 +1,24 @@
+<legalnotice>
 <formalpara>
 	<title>Commercial Usage</title>
-
-<para>
-    Licensees holding valid Project Wolframe Commercial licenses may
-    use this file in accordance with the Project Wolframe
-    Commercial License Agreement provided with the Software or,
-    alternatively, in accordance with the terms contained
-    in a written agreement between the licensee and Project Wolframe.
-</para>
-
+	<para>
+	    Licensees holding valid Project Wolframe Commercial licenses may
+	    use this file in accordance with the Project Wolframe
+	    Commercial License Agreement provided with the Software or,
+	    alternatively, in accordance with the terms contained
+	    in a written agreement between the licensee and Project Wolframe.
+	</para>
 </formalpara>
 
 <formalpara>
 	<title>GNU General Public License Usage</title>
-
-<para>
-    Alternatively, you can redistribute this file and/or modify it
-    under the terms of the <acronym>GNU</acronym> General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-</para>
+	<para>
+	    Alternatively, you can redistribute this file and/or modify it
+	    under the terms of the <acronym>GNU</acronym> General Public License as published by
+	    the Free Software Foundation, either version 3 of the License, or
+	    (at your option) any later version.
+	</para>
+</formalpara>
 
 <para>
     Wolframe is distributed in the hope that it will be useful,
@@ -31,12 +30,11 @@
 <para>
     You should have received a copy of the GNU General Public License
     along with Wolframe.  If not, see
-    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</link>.
+    <ulink url="http://www.gnu.org/licenses/"><citetitle>http://www.gnu.org/licenses/</citetitle></ulink>
 </para>
 
 <para>
     If you have questions regarding the use of this file, please contact
     Project Wolframe.
 </para>
-
-</formalpara>
+<legalnotice>
