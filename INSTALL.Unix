@@ -30,7 +30,7 @@ Table of Contents
     Archlinux
   Instructions for other Unixes
     FreeBSD 8.4
-    FreeBSD 9.1
+    FreeBSD 9.2
     NetBSD 6.1
     Solaris 10
       Solaris 10 (CSW toolchain)
@@ -698,13 +698,16 @@ FreeBSD 8.4
 
 Required packages: boost-libs (1.52.0)
 Optional packages: cyrus-sasl2 (2.1.26)
-                   sqlite3 (3.7.14.1), postgresql92-client (9.2.4), libxml2 (2.8.0),
-                   libxslt (1.1.28), png (1.5.14), python33 (3.3.0)
+                   sqlite3 (3.7.14.1), postgresql92-client (9.2.4),
+                   libxml2 (2.8.0), libxslt (1.1.28), png (1.5.14),
+                   python33 (3.3.0)
 
 Some boost header files are broken (and they don't fix them!),
 for patches see packaging/patches/FreeBSD. They can be applied to
 the ports or directly to the installed header files in
 '/usr/local/include/boost'.
+
+See 'packaging/patches/FreeBSD' for patches and the ports files.
 
 You need 'gmake' (3.81_4).
 
@@ -722,21 +725,20 @@ handling.
 
 'expect' is needed to execute some tests.
  
-FreeBSD 9.1
+FreeBSD 9.2
 -----------
 
-Required packages: boost-libs (1.48.0)
-Optional packages: cyrus-sasl2 (2.1.25_1), sqlite3 (3.7.9), postgresql92-client (9.1.2),
-                   libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
-                   zlib (1.1.0), icu (4.8.1.1)
+Required packages: boost-libs (1.52.0)
+Optional packages: cyrus-sasl2 (2.1.26),
+                   sqlite3 (3.7.17.1), postgresql92-client (9.2.4),
+                   libxml2 (2.8.0), libxslt (1.1.28), png (1.5.17)
 
-If you need boost with ICU support, compile your own boost from the
-ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.
+Some boost header files are broken (and they don't fix them!),
+for patches see packaging/patches/FreeBSD. They can be applied to
+the ports or directly to the installed header files in
+'/usr/local/include/boost'.
+
 See 'packaging/patches/FreeBSD' for patches and the ports files.
-
-Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
-as libfreeimageplus is not build in the ports.
-FreeImage builds only on 64-bit because of some ill defined constants.
 
 You need 'gmake' (3.82).
 
@@ -744,7 +746,13 @@ So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
+Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
+as libfreeimageplus is not build in the ports.
+FreeImage builds only on 64-bit because of some ill defined constants.
+
 For testing postgresql you also need 'postgresql92-server'.
+
+'expect' is needed to execute some tests.
 
 For scripting in Python you have to set WITH_PYTHON=1. Use the BSD
 ports package for python33 as there is no binary Python 3 package.
