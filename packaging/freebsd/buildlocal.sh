@@ -12,7 +12,7 @@ if test "x$ORIG_ARCH" = "xi386"; then
 	# Freeimage is broken on 32-bit FreeBSD (because of gcc)
 	FREEIMAGE=""
 else
-	echo "ERROR: Unknown slackware architecture '$ORIG_ARCH'"
+	echo "ERROR: Unknown FreeBSD architecture '$ORIG_ARCH'"
 	exit 1
 fi
 fi
