@@ -49,7 +49,7 @@
 		If you for example have a form configured called "employee" and you want to create an
 		employee object from a <application>Lua</application> table, you call
 			<programlisting language='lua'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_form_1a.lua" parse="text" />
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_usage_form_1a.lua" parse="text" />
 			</programlisting>
 		The first line creates the data form object.
 		The second line fills the data into the data form object.
@@ -66,13 +66,13 @@
 		<para>
 		Given the following validation form:
 			<programlisting language='text'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/employee.simpleform" parse="text" />
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/employee.simpleform" parse="text" />
 			</programlisting>
 
 		the call of <code>fill</code> in the following piece of code will raise an error because some elements
 		of the form ('ID' and 'name') are missing in the input:
 			<programlisting language='lua'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_form_1b.lua" parse="text" />
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_usage_form_1b.lua" parse="text" />
 			</programlisting>
 		</para>
 		<para>
@@ -96,7 +96,7 @@
 		file declared in the configuration called "insertEmployee" and you want to call it with the 'employee'
 		object defined above as input, you do
 			<programlisting language='lua'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_usage_transaction_1.lua" parse="text" />
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_usage_transaction_1.lua" parse="text" />
 			</programlisting>
 		</para>
 		<para>

@@ -27,14 +27,14 @@
 	<para>For using an XSLT filter based <application>libxml2</application>, you have to load the module 'mod_filter_libxml2'.
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_libxml2.conf" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_libxml2.conf" parse="text" />
 		</programlisting>
 	</para>
 	<para>You also have to add the program of the XSLT filter into the Processor section of the configuration.
 	The name of the filter is the filename of the XSLT filter program without path and extension. In our example
 	the filter would be named invoice_ISOxxxx:
 	<programlisting language='text'>
-	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_program_xslt.conf" parse="text" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_xslt.conf" parse="text" />
 	</programlisting>
 	</para>
 	</sect2>

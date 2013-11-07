@@ -24,7 +24,7 @@
 		not specified else in <code>example.dmap</code>.
 
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/standardCommandHandler.conf" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/standardCommandHandler.conf" parse="text" />
 		</programlisting>
 		</para>
 	</sect2>
@@ -42,7 +42,7 @@
 	</para>
 	<para>
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.directmap" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.directmap" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>
@@ -61,7 +61,7 @@
 				The following example shows the simplest possible declaration. It states that documents with the
 				document type "Document" are forwarded to a function with the same name "Document".
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/doctype_only.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/doctype_only.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -71,7 +71,7 @@
 				The next example adds a action name to the declaration. The implicit name of the function called is
 				insertDocument:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_only.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -80,7 +80,7 @@
 			<para>
 				For declaring the function called explicitly like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -89,11 +89,11 @@
 			<para>
 				The document type returned is specified with <code>RETURN &lt;doctype&gt;</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_only_return.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only_return.directmap" parse="text" />
 				</programlisting>
 				or with explicit naming of a function called
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_call_return.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -105,11 +105,11 @@
 				because the function called has strict typing and validates the input on its own (.NET,C++),
 				then you can add a declaration <code>SKIP</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_skip_call_return.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_call_return.directmap" parse="text" />
 				</programlisting>
 				The same you can specify for the output in the <code>RETURN</code> declaration:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_skip_return_skip.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -130,7 +130,7 @@
 				</itemizedlist>
 				Here is an example:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_filter_call_return.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>
@@ -140,7 +140,7 @@
 				For better readability you can use optional '(' ')' brackets on the arguments. This way you can distinguish
 				better between keywords and arguments:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/command_with_arg_brackets.directmap" parse="text" />
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect4>

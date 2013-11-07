@@ -5,14 +5,11 @@
 	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
 	%xinclude;
 
-	<!ENTITY % AppSrvEntities	SYSTEM	"AppServer/AppServer.ent">
-	%AppSrvEntities;
-
 	<!ENTITY % ClientEntities	SYSTEM	"Client/Client.ent">
 	%ClientEntities;
 
-	<!ENTITY % SDKentities		SYSTEM	"SDK/SDK.ent">
-	%SDKentities;
+	<!ENTITY % AppDevelEntities	SYSTEM	"AppDevelopment/AppDevelopment.ent">
+	%AppDevelEntities;
 
 	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
 	%CommonEntities;
@@ -34,10 +31,10 @@
 		<pubdate>&BookSetPublicationDate;</pubdate>
 	</setinfo>
 
-	<book id="book_AppServer" lang="en">
-		<title>Wolframe Application Server</title>
-		<subtitle>Application Building Manual</subtitle>
-		<titleabbrev>WAS</titleabbrev>
+	<book id="book_AppDevelopment" lang="en">
+		<title>Developing Wolframe Server Applications</title>
+		<subtitle>Wolframe Application Development Manual</subtitle>
+		<titleabbrev>WAD</titleabbrev>
 		<bookinfo>
 			<date>&BookSetPublicationDate;</date>
 			<issuenum>Version &BookSetVersion;</issuenum>
@@ -53,19 +50,18 @@
 
 		&AppPreface;
 		&AppIntroduction;
-		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
-		&AppGettingStarted;
-		&AppComplexServer;
-		&AppCompleteServer;
-		&AppComponents;
-		&AppSecurity;
-		&AppAppendix;
+		&AppCmdhandlers;
+		&AppFunctions;
+		&AppForms;
+		&AppFilters;
+		&AppTesting;
 		&AppGlossary;
-		-->
 
 		<index>
 			<title>Index</title>
 		</index>
+		&AppAppendix;
+		&GPLlicense;
 	</book>
 
 	<book id="book_Client" lang="en">
@@ -90,40 +86,5 @@
 		<index>
 			<title>Index</title>
 		</index>
-	</book>
-
-	<book id="book_SDK" lang="en">
-		<title>Building Wolframe Services</title>
-		<subtitle>Service Development Kit</subtitle>
-		<titleabbrev>SDK</titleabbrev>
-		<bookinfo>
-			<date>&BookSetPublicationDate;</date>
-			<issuenum>Version &BookSetVersion;</issuenum>
-			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
-			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
-
-			<copyright>
-				<year>2010 - 2013</year>
-				<holder>Project Wolframe</holder>
-			</copyright>
-			&WolframeLegalNotice;
-		</bookinfo>
-
-		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
-		&SDKpreface;-->
-
-		&SDKintroduction;
-		&SDKcmdhandlers;
-		&SDKfunctions;
-		&SDKforms;
-		&SDKfilters;
-		&SDKtesting;
-		&SDKglossary;
-
-		<index>
-			<title>Index</title>
-		</index>
-		&SDKappendix;
-		&GPLlicense;
 	</book>
 </set>

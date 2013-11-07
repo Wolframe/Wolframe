@@ -22,5 +22,5 @@ Be aware that you have to configure a data description language type (<acronym>D
 in <application>Wolframe</application> before using it. Each chapter introducing a data form description language will have 
 a section that describes how the server configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
-	&SDKprogramForms;
+	&AppProgramForms;
 </chapter>

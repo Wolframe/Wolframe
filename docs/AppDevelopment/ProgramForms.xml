@@ -112,7 +112,7 @@
 	<para>
 		The following example shows a form defined in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>.
 		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.simpleform" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.simpleform" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>

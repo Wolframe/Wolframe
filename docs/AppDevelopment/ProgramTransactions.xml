@@ -61,7 +61,7 @@
 		<title>First Example</title>
 		<para>Our first example selects a key from a table and inserts it into a list. The substitute "$1" refers to the first column of the query result "SELECT id FROM UserTable ..". The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.tdl" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -69,7 +69,7 @@
 		<title>Preprocessing Input</title>
 		<para>This example selects identifiers 'id' of all users matched by their normalized name. The normalization of the name is done in a preprocessing step.
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/preprocess_example.tdl" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/preprocess_example.tdl" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -79,7 +79,7 @@
 		The normalization of country names is done in a preprocessing step. 
 		The result is printed into a structure 'country/code'.
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/variable_example.tdl" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/variable_example.tdl" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -87,7 +87,7 @@
 		<title>Subroutines</title>
 		<para>This example calls a subroutine with one argument to map the output.
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/operation_example.tdl" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/operation_example.tdl" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -267,7 +267,7 @@
 				<para>The following example illustrate how the FOREACH,INTO,DO
 				expressions in the main processing block work together:
 				<programlisting language='sql'>
-				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_mainprocessing.tdl" parse="text" />
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_mainprocessing.tdl" parse="text" />
 				</programlisting>
 				</para>
 			</sect4>
@@ -315,7 +315,7 @@
 				<para>The following example illustrate how the "FOREACH, INTO, DO"
 				expressions in the main processing block work together:
 				<programlisting language='sql'>
-				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_preprocessing.tdl" parse="text" />
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_preprocessing.tdl" parse="text" />
 				</programlisting>
 				</para>
 			</sect4>
@@ -404,7 +404,7 @@
 			<para>This example shows the usage of path expression in the
 			preprocessing and the main processing part of a transaction function:
 			<programlisting language='sql'>
-			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/selectors_example.tdl" parse="text" />
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/selectors_example.tdl" parse="text" />
 			</programlisting>
 			</para>
 			</sect4>
@@ -471,7 +471,7 @@
 				<sect4>
 				<title>Named Result Example</title>
 				<para>This example illustrates how a result is declared by name and referenced:
-				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_keep_as.tdl" parse="text" />
+				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_keep_as.tdl" parse="text" />
 				</programlisting>
 				</para>
 				</sect4>
@@ -484,7 +484,7 @@
 				or a named result prefix. "PARAM." is reserved for parameters.
 				The first instruction without FOREACH quantifier can reference
 				the parameters without prefix by name.
-				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_soubroutine_params.tdl" parse="text" />
+				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_soubroutine_params.tdl" parse="text" />
 				</programlisting>
 				</para>
 		</sect3>
@@ -526,7 +526,7 @@
 				This example illustrates how to add result constraint for
 				database commands returning results:
 				<programlisting language='sql'>
-				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_result_constraint.tdl" parse="text" />
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_result_constraint.tdl" parse="text" />
 				</programlisting>
 				</para>
 			</sect4>
@@ -550,7 +550,7 @@
 			catches errors that are constraint violations (error class CONSTRAINT)
 			and extends the error message with a hint that will be shown to the client as error message:
 			<programlisting language='sql'>
-			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_hint.tdl" parse="text" />
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_hint.tdl" parse="text" />
 			</programlisting>
 			</para>
 			<para>
@@ -594,7 +594,7 @@
 			into the substructure named &lt;resulttag&gt;. The following artificial 
 			example illustrates this.
 			<programlisting language='sql'>
-			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_print.tdl" parse="text" />
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_print.tdl" parse="text" />
 			</programlisting>
 			</para>
 		</sect3>

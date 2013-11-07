@@ -19,7 +19,7 @@ Be aware that you have to configure a data filter of the logic tier in <applicat
 Each chapter introducing a filter type will have a section that describes how the server configuration 
 of <application>Wolframe</application> has to be extended for its availability.
 </para>
-	&SDKfilterXML;
-	&SDKfilterJSON;
-	&SDKfilterXSLT;
+	&AppFilterXML;
+	&AppFilterJSON;
+	&AppFilterXSLT;
 </chapter>

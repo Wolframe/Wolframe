@@ -5,8 +5,8 @@
 	<sect1>
 		<title>Grammars</title>
 		<para>
-		&SDK_EBNF_TDL;
-		&SDK_EBNF_Normalizer;
+		&App_EBNF_TDL;
+		&App_EBNF_Normalizer;
 		</para>
 	</sect1>
 </appendix>

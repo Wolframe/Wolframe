@@ -27,7 +27,7 @@
 	<para>For using the JSON filter based <application>cJSON</application>, you have to load the module 'mod_filter_cjson'. 
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_JSON.conf" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_JSON.conf" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>

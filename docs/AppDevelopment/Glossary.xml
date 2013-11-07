@@ -6,6 +6,13 @@
 		if they are rarely used in the SDK context. These terms are explained in the
 		Application Building Manual
 	</para>
+	<title>Glossary</title>
+	<para>
+		This is the glossary for the Wolframe Application Building Manual.
+		It covers most of the terms used in a Wolframe application,
+		although some of the terms might be found only in the SDK manual.
+	</para>
+
 
 <glossdiv><title>External glossary</title>
 
@@ -139,5 +146,71 @@
 		</glossdef>
 	</glossentry>
 </glossdiv>
-</glossary>
 
+<glossdiv><title>A</title>
+
+	<glossentry id="AAAA"><glossterm><acronym>AAAA</acronym></glossterm>
+		<glossdef>
+			<para>Acronym for Authentication, Authorization, Accounting and Auditing</para>
+			<glossseealso otherterm="Authentication">Authentication</glossseealso>
+			<glossseealso otherterm="Authorization">Authorization</glossseealso>
+			<glossseealso otherterm="Accounting">Accounting</glossseealso>
+			<glossseealso otherterm="Auditing">Auditing</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Authentication"><glossterm>Authentication</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Authorization"><glossterm>Authorization</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Accounting"><glossterm>Accounting</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Auditing"><glossterm>Auditing</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+</glossdiv>
+
+<glossdiv><title>S</title>
+	<glossentry id="SSL"><glossterm><acronym>SSL</acronym></glossterm>
+		<glossdef>
+			<para>Secure Sockets Layer</para>
+			<para>Cryptographic protocols which provide secure communications on the Internet.
+			SSL is a predecessor to TLS</para>
+			<glossseealso otherterm="TLS">TLS</glossseealso>
+		</glossdef>
+	</glossentry>
+</glossdiv>
+
+<glossdiv><title>T</title>
+	<glossentry id="TLS"><glossterm><acronym>TLS</acronym></glossterm>
+		<glossdef>
+			<para>Transport Layer Security</para>
+			<para>Transport Layer Security (TLS) and its predecessor, Secure Sockets Layer (SSL),
+			are cryptographic protocols that provide communication security over the Internet.
+			TLS and SSL encrypt the segments of network connections above the Transport Layer,
+			using asymmetric cryptography for key exchange, symmetric encryption for privacy,
+			and message authentication codes for message integrity. <citation>Wikipedia</citation></para>
+			<glossseealso otherterm="SSL">SSL</glossseealso>
+		</glossdef>
+	</glossentry>
+</glossdiv>
+
+</glossary>

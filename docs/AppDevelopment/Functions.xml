@@ -12,10 +12,10 @@ Be aware that you have to configure a programming language of the logic tier in 
 before using it. Each chapter introducing a programming language will have a section that describes how the server
 configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
-	&SDKprogramTransactions;
-	&SDKprogramDotnet;
-	&SDKprogramPython;
-	&SDKprogramLua;
-	&SDKprogramFormDataTypes;
-	&SDKprogramCpp;
+	&AppProgramTransactions;
+	&AppProgramDotnet;
+	&AppProgramPython;
+	&AppProgramLua;
+	&AppProgramFormDataTypes;
+	&AppProgramCpp;
 </chapter>

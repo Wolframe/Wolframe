@@ -45,7 +45,7 @@
 		For Lua users processing the input via a table would be the most straightforward way of processing. An example
 		program could look like this:
 			<programlisting language='lua'>
-			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/input_table.lua" parse="text" />
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/input_table.lua" parse="text" />
 			</programlisting>
 
 	</para>
@@ -137,7 +137,7 @@
 		<title>Example 1: A character by character echo program</title>
 		<para>This example echoes the input character by character in UTF-16.
 		<programlisting language='lua'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_1.lua" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_script_1.lua" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -145,7 +145,7 @@
 		<title>Example 2: An line by line echo program</title>
 		<para>This example echoes the input line by line in UTF-8.
 		<programlisting language='lua'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_2.lua" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_script_2.lua" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -166,7 +166,7 @@
 			platform. So it you want to output the XML in the same encoding as the input you have to call
 			input:as and output:as with the same filter object as follows:
 		<programlisting language='lua'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_3.lua" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_script_3.lua" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -175,7 +175,7 @@
 		<para>This example does the same as example3 but treats the content of the tag "content" in
 			its own procedure.
 		<programlisting language='lua'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_4.lua" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_script_4.lua" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>
@@ -185,7 +185,7 @@
 			This example procedure loads the contents of the XML document into a table and prints the
 			elements 'name' and 'country'.
 		<programlisting language='lua'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_5.lua" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_script_5.lua" parse="text" />
 		</programlisting>
 		</para>
 		</sect3>

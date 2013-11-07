@@ -32,14 +32,14 @@
 	<para>For using an <acronym>XML</acronym> filter based <application>libxml2</application>, you have to load the module 'mod_filter_libxml2'.
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_libxml2.conf" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_libxml2.conf" parse="text" />
 		</programlisting>
 	</para>
 	<para>
 	For using an <acronym>XML</acronym> filter based <application>textwolf</application>, you have to load the module 'mod_filter_textwolf'.
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/cfg_filter_textwolf.conf" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_textwolf.conf" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>

@@ -1,0 +1,32 @@
+<!-- Wolframe Application Development documentation -->
+
+<!ENTITY AppPreface			SYSTEM "Preface.xml">
+
+<!ENTITY AppIntroduction		SYSTEM "Introduction.xml">
+
+<!ENTITY AppGettingStarted		SYSTEM "GettingStarted.xml">
+
+<!ENTITY AppCmdhandlers			SYSTEM "CmdHandlers.xml">
+<!ENTITY AppCmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">
+<!ENTITY AppCmdhandlerLua		SYSTEM "CmdHandlerLua.xml">
+
+<!ENTITY AppFunctions			SYSTEM "Functions.xml">
+<!ENTITY AppForms			SYSTEM "Forms.xml">
+<!ENTITY AppFilters			SYSTEM "Filters.xml">
+<!ENTITY AppProgramForms		SYSTEM "ProgramForms.xml">
+<!ENTITY AppProgramFormDataTypes	SYSTEM "ProgramFormDataTypes.xml">
+<!ENTITY AppProgramTransactions		SYSTEM "ProgramTransactions.xml">
+<!ENTITY AppProgramLua			SYSTEM "ProgramLua.xml">
+<!ENTITY AppProgramCpp			SYSTEM "ProgramCpp.xml">
+<!ENTITY AppProgramDotNet		SYSTEM "ProgramDotNet.xml">
+<!ENTITY AppProgramPython		SYSTEM "ProgramPython.xml">
+<!ENTITY AppModelTypedFilter		SYSTEM "ModelTypedFilter.xml">
+<!ENTITY AppFilterXML			SYSTEM "FilterXML.xml">
+<!ENTITY AppFilterJSON			SYSTEM "FilterJSON.xml">
+<!ENTITY AppFilterXSLT			SYSTEM "FilterXSLT.xml">
+<!ENTITY AppTesting			SYSTEM "Testing.xml">
+
+<!ENTITY AppAppendix			SYSTEM "Appendix.xml">
+<!ENTITY App_EBNF_TDL			SYSTEM "EBNF_TransactionDefinitionLanguage.xml">
+<!ENTITY App_EBNF_Normalizer		SYSTEM "EBNF_Normalizer.xml">
+<!ENTITY AppGlossary			SYSTEM "Glossary.xml">
