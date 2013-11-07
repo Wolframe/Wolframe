@@ -39,6 +39,7 @@ else
 			PYTHON_LDFLAGS="$PYTHON_LDFLAGS -L/opt/csw/python-3.3.2/lib"
 			;;
 
+		FreeBSD*8*)
 		FreeBSD*9*)
 			# Wrong order of link pathes or missing shared library, creates
 			# a mislink with libpython.a and a warning about -fPIC
