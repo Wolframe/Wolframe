@@ -13,7 +13,7 @@ before using it. Each chapter introducing a programming language will have a sec
 configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
 	&AppProgramTransactions;
-	&AppProgramDotnet;
+	&AppProgramDotNet;
 	&AppProgramPython;
 	&AppProgramLua;
 	&AppProgramFormDataTypes;
