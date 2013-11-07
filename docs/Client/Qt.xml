@@ -9,10 +9,10 @@
 		is a thin client which executes XML requests
 		via the Wolframe protocol and presents XML answers. It is written in
 		Qt and is cross-platform. Qt is currently available on
-		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
+		<ulink url="http://doc.qt.digia.com/qt/index.html"><citetitle>http://doc.qt.digia.com/qt/index.html</citetitle></ulink>.
 		User interfaces for <application>wolfclient</application> are defined as a set of forms
 		using standard Qt widgets and are if ever possible defined using the
-		<application>Qt&nbsp;Interface&nbsp;Designer</application> (see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>).
+		<application>Qt&nbsp;Interface&nbsp;Designer</application> (see <ulink url="http://qt-project.org/doc/qt-4.8/designer-manual.html"><citetitle>http://qt-project.org/doc/qt-4.8/designer-manual.html</citetitle></ulink>).
 	</para>
 	</sect2>
 
@@ -28,7 +28,7 @@
 		<para>
 			The UI files follow the schema
 			'qt-ui-4.7.xsd', as documented in
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/designer-ui-file-format.html">http://doc.qt.digia.com/qt/designer-ui-file-format.html</link>.
+			<ulink url="http://doc.qt.digia.com/qt/designer-ui-file-format.html"><citetitle>http://doc.qt.digia.com/qt/designer-ui-file-format.html</citetitle></ulink>.
 			The UI files have the extension <emphasis>.ui</emphasis>
 		</para>
 
@@ -42,7 +42,7 @@
 		<para>
 			The <application>wolfclient</application> uses the Qt translation format, version 2.0 for form translations
 			as described in
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-ts-file-format.html">http://doc.qt.digia.com/qt/linguist-ts-file-format.html</link>.
+			<ulink url="http://doc.qt.digia.com/qt/linguist-ts-file-format.html"><citetitle>http://doc.qt.digia.com/qt/linguist-ts-file-format.html</citetitle></ulink>.
 			Those are the files with extension <emphasis>.ts</emphasis>.
 		</para>
 		<para>
@@ -56,7 +56,7 @@
 		</para>
 		<para>
 			Read more on translations in
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-manual.html">http://doc.qt.digia.com/qt/linguist-manual.html</link>.
+			<ulink url="http://doc.qt.digia.com/qt/linguist-manual.html"><citetitle>http://doc.qt.digia.com/qt/linguist-manual.html</citetitle></ulink>.
 		</para>
 	</sect3>
 
