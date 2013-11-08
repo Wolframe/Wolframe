@@ -178,8 +178,8 @@ ApiFormData::~ApiFormData()
 }
 
 
-BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunction& f)
-	:types::TypeSignature("langbind::BuiltInFunctionClosure", __LINE__)
+CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
+	:types::TypeSignature("langbind::CppFormFunctionClosure", __LINE__)
 	,m_func(f)
 	,m_state(0)
 	,m_param_data(f.api_param())
@@ -187,7 +187,7 @@ BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunction& f)
 	,m_result(m_result_data.data(),m_result_data.descr())
 	,m_parser(m_param_data.data(),m_param_data.descr()){}
 
-BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunctionClosure& o)
+CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
 	:types::TypeSignature(o)
 	,m_func(o.m_func)
 	,m_state(0)
@@ -197,12 +197,12 @@ BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunctionClosure& o)
 	,m_parser(o.m_parser)
 	{}
 
-void BuiltInFunctionClosure::init( const TypedInputFilterR& i, serialize::Context::Flags flags)
+void CppFormFunctionClosure::init( const TypedInputFilterR& i, serialize::Context::Flags flags)
 {
 	m_parser.init(i,flags);
 }
 
-bool BuiltInFunctionClosure::call()
+bool CppFormFunctionClosure::call()
 {
 	void* param_struct = m_param_data.get();
 	void* result_struct = m_result_data.get();

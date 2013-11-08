@@ -51,13 +51,13 @@
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-class BuiltInFunctionClosure
+class CppFormFunctionClosure
 	:public virtual types::TypeSignature
 	,public langbind::FormFunctionClosure
 {
 public:
-	BuiltInFunctionClosure( const langbind::BuiltInFunction& f)
-		:types::TypeSignature("prgbind::BuiltInFunctionClosure", __LINE__)
+	CppFormFunctionClosure( const langbind::CppFormFunction& f)
+		:types::TypeSignature("prgbind::CppFormFunctionClosure", __LINE__)
 		,m_func(f)
 		,m_state(0)
 		,m_param_data(f.api_param())
@@ -65,7 +65,7 @@ public:
 		,m_result(langbind::TypedInputFilterR( new serialize::StructSerializer( m_result_data.data(),m_result_data.descr())))
 		,m_parser(m_param_data.data(),m_param_data.descr()){}
 
-	BuiltInFunctionClosure( const BuiltInFunctionClosure& o)
+	CppFormFunctionClosure( const CppFormFunctionClosure& o)
 		:types::TypeSignature(o)
 		,m_func(o.m_func)
 		,m_state(0)
@@ -108,7 +108,7 @@ public:
 	}
 
 private:
-	langbind::BuiltInFunction m_func;
+	langbind::CppFormFunction m_func;
 	int m_state;
 	langbind::ApiFormData m_param_data;
 	langbind::ApiFormData m_result_data;
@@ -116,21 +116,21 @@ private:
 	serialize::StructParser m_parser;
 };
 
-class BuiltInFunction
+class CppFormFunction
 	:public langbind::FormFunction
 {
 public:
-	BuiltInFunction( const langbind::BuiltInFunction& f)
+	CppFormFunction( const langbind::CppFormFunction& f)
 		:m_impl(f){}
 
 	virtual langbind::FormFunctionClosure* createClosure() const
 	{
-		return new BuiltInFunctionClosure( m_impl);
+		return new CppFormFunctionClosure( m_impl);
 	}
 
 private:
 	const proc::ProcessorProvider* m_provider;
-	langbind::BuiltInFunction m_impl;
+	langbind::CppFormFunction m_impl;
 };
 
 class NormalizeFunctionMap
@@ -177,14 +177,14 @@ public:
 	Impl( const Impl& o)
 		:m_programTypes(o.m_programTypes){}
 
-	void defineBuiltInFunction( const std::string& name, const BuiltInFunction& f)
+	void defineCppFormFunction( const std::string& name, const CppFormFunction& f)
 	{
 		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
 		{
 			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
 			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
 		}
-		m_formFunctionMap.insert( name, langbind::FormFunctionR( new BuiltInFunction( f)));
+		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
 	}
 
 	void defineFormFunction( const std::string& name, langbind::FormFunctionR f)
@@ -341,9 +341,9 @@ ProgramLibrary::~ProgramLibrary()
 	delete m_impl;
 }
 
-void ProgramLibrary::defineBuiltInFunction( const std::string& name, const langbind::BuiltInFunction& f)
+void ProgramLibrary::defineCppFormFunction( const std::string& name, const langbind::CppFormFunction& f)
 {
-	m_impl->defineBuiltInFunction( name, f);
+	m_impl->defineCppFormFunction( name, f);
 }
 
 void ProgramLibrary::defineFormFunction( const std::string& name, langbind::FormFunctionR f)

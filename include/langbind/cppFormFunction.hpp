@@ -29,31 +29,31 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/builtInFunction.hpp
+///\file langbind/cppFormFunction.hpp
 ///\brief Interface to the built-in function for processor language bindings
-#ifndef _Wolframe_langbind_BUILT_IN_FUNCTION_HPP_INCLUDED
-#define _Wolframe_langbind_BUILT_IN_FUNCTION_HPP_INCLUDED
+#ifndef _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
+#define _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class BuiltInFunction
+///\class CppFormFunction
 ///\brief Function of language bindings implemented in C++ with a form as argument and as result. The forms are defined by a serialization description.
-class BuiltInFunction
+class CppFormFunction
 {
 public:
 	typedef int (Function)( void* res, const void* param);
 
 	///\brief Default constructor
-	BuiltInFunction()
+	CppFormFunction()
 		:m_function(0)
 		,m_api_param(0)
 		,m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	BuiltInFunction( const BuiltInFunction& o)
+	CppFormFunction( const CppFormFunction& o)
 		:m_function(o.m_function)
 		,m_api_param(o.m_api_param)
 		,m_api_result(o.m_api_result){}
@@ -62,7 +62,7 @@ public:
 	///\param[in] f function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	BuiltInFunction( Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
+	CppFormFunction( Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
 		:m_function(f)
 		,m_api_param(p)
 		,m_api_result(r){}
@@ -87,7 +87,7 @@ private:
 	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
 
-typedef types::CountedReference<BuiltInFunction> BuiltInFunctionR;
+typedef types::CountedReference<CppFormFunction> CppFormFunctionR;
 
 }}//namespace
 #endif

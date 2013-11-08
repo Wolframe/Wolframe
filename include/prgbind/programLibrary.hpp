@@ -38,7 +38,7 @@
 #include "filter/filter.hpp"
 #include "module/filterBuilder.hpp"
 #include "database/database.hpp"
-#include "langbind/builtInFunction.hpp"
+#include "langbind/cppFormFunction.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
@@ -62,7 +62,7 @@ public:
 	ProgramLibrary( const ProgramLibrary& o);
 
 	virtual ~ProgramLibrary();
-	virtual void defineBuiltInFunction( const std::string& name, const langbind::BuiltInFunction& f);
+	virtual void defineCppFormFunction( const std::string& name, const langbind::CppFormFunction& f);
 	virtual void defineFormFunction( const std::string& name, langbind::FormFunctionR f);
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);

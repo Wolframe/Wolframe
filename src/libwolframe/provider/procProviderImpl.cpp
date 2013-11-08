@@ -37,7 +37,7 @@
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
 #include "module/ddlcompilerBuilder.hpp"
-#include "module/builtInFunctionBuilder.hpp"
+#include "module/cppFormFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
@@ -193,7 +193,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:
 			{	// object is a form function
-				module::BuiltInFunctionConstructor* ffo = dynamic_cast< module::BuiltInFunctionConstructor* >((*it)->constructor());
+				module::CppFormFunctionConstructor* ffo = dynamic_cast< module::CppFormFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
 						  << "'' is not a form function";
@@ -203,8 +203,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					try
 					{
 						std::string name = ffo->objectClassName();
-						langbind::BuiltInFunctionR func( ffo->object());
-						m_programs->defineBuiltInFunction( name, *func);
+						langbind::CppFormFunctionR func( ffo->object());
+						m_programs->defineCppFormFunction( name, *func);
 						LOG_TRACE << "registered '" << name << "' built-in form function ";
 					}
 					catch (const std::runtime_error& e)

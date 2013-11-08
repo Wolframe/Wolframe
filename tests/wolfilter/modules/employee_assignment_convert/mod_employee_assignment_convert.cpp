@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_employee_assignment_convert.cpp
 ///\brief Module for testing form functions
-#include "module/builtInFunctionBuilder.hpp"
+#include "module/cppFormFunctionBuilder.hpp"
 #include "employee_assignment_convert.hpp"
 #include "logger-v1.hpp"
 
@@ -54,9 +54,9 @@ struct employee_assingment_convert_func
 	{
 		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
 		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::BuiltInFunction func( convertAssignmentListDoc, param, result);
+		langbind::CppFormFunction func( convertAssignmentListDoc, param, result);
 
-		return new BuiltInFunctionBuilder( "employee_assignment_convert", func);
+		return new CppFormFunctionBuilder( "employee_assignment_convert", func);
 	}
 };
 }

@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "langbind/builtInFunction.hpp"
+#include "langbind/cppFormFunction.hpp"
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
@@ -271,19 +271,19 @@ private:
 	boost::shared_ptr<void> m_data;
 };
 
-///\class BuiltInFunctionClosure
-///\brief Closure with calling state of called BuiltInFunction
-class BuiltInFunctionClosure
+///\class CppFormFunctionClosure
+///\brief Closure with calling state of called CppFormFunction
+class CppFormFunctionClosure
 	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	BuiltInFunctionClosure( const BuiltInFunction& f);
+	CppFormFunctionClosure( const CppFormFunction& f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	BuiltInFunctionClosure( const BuiltInFunctionClosure& o);
+	CppFormFunctionClosure( const CppFormFunctionClosure& o);
 
 	///\brief Calls the form function with the input from the input filter specified
 	///\return true when completed
@@ -297,7 +297,7 @@ public:
 	const serialize::StructSerializer& result() const		{return m_result;}
 
 private:
-	BuiltInFunction m_func;
+	CppFormFunction m_func;
 	int m_state;
 	ApiFormData m_param_data;
 	ApiFormData m_result_data;

@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_graphix.cpp
 ///\brief Module for graphic functions with FreeImage
-#include "module/builtInFunctionBuilder.hpp"
+#include "module/cppFormFunctionBuilder.hpp"
 #include "logger-v1.hpp"
 #include "graphix.hpp"
 
@@ -55,9 +55,9 @@ struct graphix_info_func
 	{
 		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::BuiltInFunction func( imageInfo, param, result );
+		langbind::CppFormFunction func( imageInfo, param, result );
 
-		return new BuiltInFunctionBuilder( "imageInfo", func);
+		return new CppFormFunctionBuilder( "imageInfo", func);
 	}
 };
 
@@ -67,9 +67,9 @@ struct graphix_thumb_func
 	{
 		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::BuiltInFunction func( imageThumb, param, result );
+		langbind::CppFormFunction func( imageThumb, param, result );
 
-		return new BuiltInFunctionBuilder( "imageThumb", func);
+		return new CppFormFunctionBuilder( "imageThumb", func);
 	}
 };
 
@@ -79,9 +79,9 @@ struct graphix_rescale_func
 	{
 		static const serialize::StructDescriptionBase* param = ImageRescale::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::BuiltInFunction func( imageRescale, param, result );
+		langbind::CppFormFunction func( imageRescale, param, result );
 
-		return new BuiltInFunctionBuilder( "imageRescale", func);
+		return new CppFormFunctionBuilder( "imageRescale", func);
 	}
 };
 
