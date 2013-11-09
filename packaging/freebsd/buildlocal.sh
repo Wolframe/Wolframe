@@ -19,7 +19,7 @@ fi
 
 OS_VERSION=`uname -r`
 case $OS_VERSION in
-	8.3*)
+	8.*)
 		FREEIMAGE=""
 		;;
 esac
@@ -79,6 +79,7 @@ cp packaging/freebsd/packlist $PKGBUILD/PKG/wolframe-$VERSION/.
 if test "x$FREEIMAGE" = "xWITH_LOCAL_FREEIMAGE=1"; then
 	cat packaging/freebsd/packlist.freeimage >> $PKGBUILD/PKG/wolframe-$VERSION/packlist
 fi
+cat packaging/freebsd/packlist.tail >> $PKGBUILD/PKG/wolframe-$VERSION/packlist
 cp packaging/freebsd/iscript $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/freebsd/dscript $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/wolframe/.

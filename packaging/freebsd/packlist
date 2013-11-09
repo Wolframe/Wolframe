@@ -57,12 +57,10 @@ usr/local/lib/wolframe/modules/mod_command_python.so
 usr/local/lib/wolframe/modules/mod_job_schedule_db.so
 usr/local/lib/wolframe/modules/mod_lua_datetime.so
 usr/local/lib/wolframe/modules/mod_lua_bcdnumber.so
-@dirrm usr/local/lib/wolframe/modules
 usr/local/lib/wolframe/libwolframe_client.a
 usr/local/lib/wolframe/libwolframe_client.so.0.0.0
 usr/local/lib/wolframe/libwolframe_client.so.0
 usr/local/lib/wolframe/libwolframe_client.so
-@dirrm usr/local/lib/wolframe
 usr/local/include/wolframe/libhpdf/hpdf_3dmeasure.h
 usr/local/include/wolframe/libhpdf/hpdf_annotation.h
 usr/local/include/wolframe/libhpdf/hpdf_catalog.h
