@@ -118,7 +118,7 @@ usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/langbind/appObjects.hpp
 usr/local/include/wolframe/langbind/authorization.hpp
-usr/local/include/wolframe/langbind/builtInFunction.hpp
+usr/local/include/wolframe/langbind/cppFormFunction.hpp
 usr/local/include/wolframe/langbind/charsetEncodings.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
@@ -257,7 +257,7 @@ usr/local/include/wolframe/AAAA/authorization.hpp
 usr/local/include/wolframe/AAAA/password.hpp
 usr/local/include/wolframe/AAAA/user.hpp
 @dirrm usr/local/include/wolframe/AAAA
-usr/local/include/wolframe/module/builtInFunctionBuilder.hpp
+usr/local/include/wolframe/module/cppFormFunctionBuilder.hpp
 usr/local/include/wolframe/module/constructor.hpp
 usr/local/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/local/include/wolframe/module/filterBuilder.hpp

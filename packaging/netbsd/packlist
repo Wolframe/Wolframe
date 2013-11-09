@@ -1,0 +1,306 @@
+@name wolframe-0.0.1
+@cwd /
+@srcdir PKG/wolframe-0.0.1
+usr/pkg/lib/wolframe/libhpdf.a
+usr/pkg/lib/wolframe/libhpdf.so.2.2.1
+usr/pkg/lib/wolframe/libhpdf.so.2
+usr/pkg/lib/wolframe/libhpdf.so
+usr/pkg/lib/wolframe/libcjson.a
+usr/pkg/lib/wolframe/liblua.a
+usr/pkg/lib/wolframe/liblua.so.5.2.0
+usr/pkg/lib/wolframe/liblua.so.5
+usr/pkg/lib/wolframe/liblua.so
+usr/pkg/lib/wolframe/libwolframe.a
+usr/pkg/lib/wolframe/libwolframe.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe.so.0
+usr/pkg/lib/wolframe/libwolframe.so
+usr/pkg/lib/wolframe/libwolframe_serialize.a
+usr/pkg/lib/wolframe/libwolframe_serialize.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe_serialize.so.0
+usr/pkg/lib/wolframe/libwolframe_serialize.so
+usr/pkg/lib/wolframe/libwolframe_database.a
+usr/pkg/lib/wolframe/libwolframe_database.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe_database.so.0
+usr/pkg/lib/wolframe/libwolframe_database.so
+usr/pkg/lib/wolframe/libwolframe_langbind.a
+usr/pkg/lib/wolframe/libwolframe_langbind.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe_langbind.so.0
+usr/pkg/lib/wolframe/libwolframe_langbind.so
+usr/pkg/lib/wolframe/libwolframe_prnt.a
+usr/pkg/lib/wolframe/libwolframe_prnt.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe_prnt.so.0
+usr/pkg/lib/wolframe/libwolframe_prnt.so
+usr/pkg/lib/wolframe/modules/mod_db_postgresql.so
+usr/pkg/lib/wolframe/modules/mod_db_sqlite3.so
+usr/pkg/lib/wolframe/modules/mod_audit_database.so
+usr/pkg/lib/wolframe/modules/mod_audit_textfile.so
+usr/pkg/lib/wolframe/modules/mod_auth_database.so
+usr/pkg/lib/wolframe/modules/mod_auth_textfile.so
+usr/pkg/lib/wolframe/modules/mod_auth_sasl.so
+usr/pkg/lib/wolframe/modules/mod_authz_database.so
+usr/pkg/lib/wolframe/modules/mod_filter_blob.so
+usr/pkg/lib/wolframe/modules/mod_filter_textwolf.so
+usr/pkg/lib/wolframe/modules/mod_filter_token.so
+usr/pkg/lib/wolframe/modules/mod_filter_char.so
+usr/pkg/lib/wolframe/modules/mod_filter_line.so
+usr/pkg/lib/wolframe/modules/mod_filter_libxml2.so
+usr/pkg/lib/wolframe/modules/mod_filter_cjson.so
+usr/pkg/lib/wolframe/modules/mod_normalize_number.so
+usr/pkg/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
+usr/pkg/lib/wolframe/modules/mod_normalize_base64.so
+usr/pkg/lib/wolframe/modules/mod_normalize_string.so
+usr/pkg/lib/wolframe/modules/mod_normalize_locale.so
+usr/pkg/lib/wolframe/modules/mod_haru_pdf_printer.so
+usr/pkg/lib/wolframe/modules/mod_command_directmap.so
+usr/pkg/lib/wolframe/modules/mod_command_lua.so
+usr/pkg/lib/wolframe/modules/mod_command_python.so
+usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
+usr/pkg/lib/wolframe/modules/mod_lua_datetime.so
+usr/pkg/lib/wolframe/modules/mod_lua_bcdnumber.so
+usr/pkg/lib/wolframe/modules/mod_graphix.so
+@dirrm usr/pkg/lib/wolframe/modules
+usr/pkg/lib/wolframe/libwolframe_client.a
+usr/pkg/lib/wolframe/libwolframe_client.so.0.0.0
+usr/pkg/lib/wolframe/libwolframe_client.so.0
+usr/pkg/lib/wolframe/libwolframe_client.so
+usr/pkg/lib/wolframe/libfreeimageplus.a
+usr/pkg/lib/wolframe/libfreeimageplus.so.3.15.4
+usr/pkg/lib/wolframe/libfreeimageplus.so.3
+usr/pkg/lib/wolframe/libfreeimageplus.so
+usr/pkg/lib/wolframe/libfreeimage.a
+usr/pkg/lib/wolframe/libfreeimage.so.3.15.4
+usr/pkg/lib/wolframe/libfreeimage.so.3
+usr/pkg/lib/wolframe/libfreeimage.so
+@dirrm usr/pkg/lib/wolframe
+usr/pkg/include/wolframe/libhpdf/hpdf_3dmeasure.h
+usr/pkg/include/wolframe/libhpdf/hpdf_annotation.h
+usr/pkg/include/wolframe/libhpdf/hpdf_catalog.h
+usr/pkg/include/wolframe/libhpdf/hpdf_conf.h
+usr/pkg/include/wolframe/libhpdf/hpdf_config.h
+usr/pkg/include/wolframe/libhpdf/hpdf_consts.h
+usr/pkg/include/wolframe/libhpdf/hpdf_destination.h
+usr/pkg/include/wolframe/libhpdf/hpdf_doc.h
+usr/pkg/include/wolframe/libhpdf/hpdf_encoder.h
+usr/pkg/include/wolframe/libhpdf/hpdf_encryptdict.h
+usr/pkg/include/wolframe/libhpdf/hpdf_encrypt.h
+usr/pkg/include/wolframe/libhpdf/hpdf_error.h
+usr/pkg/include/wolframe/libhpdf/hpdf_exdata.h
+usr/pkg/include/wolframe/libhpdf/hpdf_ext_gstate.h
+usr/pkg/include/wolframe/libhpdf/hpdf_fontdef.h
+usr/pkg/include/wolframe/libhpdf/hpdf_font.h
+usr/pkg/include/wolframe/libhpdf/hpdf_gstate.h
+usr/pkg/include/wolframe/libhpdf/hpdf.h
+usr/pkg/include/wolframe/libhpdf/hpdf_image.h
+usr/pkg/include/wolframe/libhpdf/hpdf_info.h
+usr/pkg/include/wolframe/libhpdf/hpdf_list.h
+usr/pkg/include/wolframe/libhpdf/hpdf_mmgr.h
+usr/pkg/include/wolframe/libhpdf/hpdf_namedict.h
+usr/pkg/include/wolframe/libhpdf/hpdf_objects.h
+usr/pkg/include/wolframe/libhpdf/hpdf_outline.h
+usr/pkg/include/wolframe/libhpdf/hpdf_page_label.h
+usr/pkg/include/wolframe/libhpdf/hpdf_pages.h
+usr/pkg/include/wolframe/libhpdf/hpdf_pdfa.h
+usr/pkg/include/wolframe/libhpdf/hpdf_streams.h
+usr/pkg/include/wolframe/libhpdf/hpdf_types.h
+usr/pkg/include/wolframe/libhpdf/hpdf_u3d.h
+usr/pkg/include/wolframe/libhpdf/hpdf_utils.h
+usr/pkg/include/wolframe/libhpdf/hpdf_version.h
+@dirrm usr/pkg/include/wolframe/libhpdf
+usr/pkg/include/wolframe/cjson/cJSON.h
+@dirrm usr/pkg/include/wolframe/cjson
+usr/pkg/include/wolframe/lua/lauxlib.h
+usr/pkg/include/wolframe/lua/lua.h
+usr/pkg/include/wolframe/lua/lua.hpp
+usr/pkg/include/wolframe/lua/luaconf.h
+usr/pkg/include/wolframe/lua/lualib.h
+@dirrm usr/pkg/include/wolframe/lua
+usr/pkg/include/wolframe/libclient/connection.hpp
+usr/pkg/include/wolframe/libclient/exportable.hpp
+usr/pkg/include/wolframe/libclient/protocol.hpp
+usr/pkg/include/wolframe/libclient/session.hpp
+@dirrm usr/pkg/include/wolframe/libclient
+usr/pkg/include/wolframe/appConfig.hpp
+usr/pkg/include/wolframe/appProperties.hpp
+usr/pkg/include/wolframe/logger-v1.hpp
+usr/pkg/include/wolframe/singleton.hpp
+usr/pkg/include/wolframe/standardConfigs.hpp
+usr/pkg/include/wolframe/version.hpp
+usr/pkg/include/wolframe/langbind/appObjects.hpp
+usr/pkg/include/wolframe/langbind/authorization.hpp
+usr/pkg/include/wolframe/langbind/cppFormFunction.hpp
+usr/pkg/include/wolframe/langbind/charsetEncodings.hpp
+usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
+usr/pkg/include/wolframe/langbind/formFunction.hpp
+usr/pkg/include/wolframe/langbind/iostreamfilter.hpp
+usr/pkg/include/wolframe/langbind/luaArithmeticType.hpp
+usr/pkg/include/wolframe/langbind/luaCppCall.hpp
+usr/pkg/include/wolframe/langbind/luaException.hpp
+usr/pkg/include/wolframe/langbind/normalizeFunction.hpp
+@dirrm usr/pkg/include/wolframe/langbind
+usr/pkg/include/wolframe/protocol/buffers.hpp
+usr/pkg/include/wolframe/protocol/ioblocks.hpp
+usr/pkg/include/wolframe/protocol/iterators.hpp
+usr/pkg/include/wolframe/protocol/parser.hpp
+@dirrm usr/pkg/include/wolframe/protocol
+usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
+usr/pkg/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
+usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
+usr/pkg/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
+usr/pkg/include/wolframe/cmdbind/lineCommandHandler.hpp
+@dirrm usr/pkg/include/wolframe/cmdbind
+usr/pkg/include/wolframe/database/DBprovider.hpp
+usr/pkg/include/wolframe/database/bindStatementParams.hpp
+usr/pkg/include/wolframe/database/database.hpp
+usr/pkg/include/wolframe/database/databaseError.hpp
+usr/pkg/include/wolframe/database/databaseLanguage.hpp
+usr/pkg/include/wolframe/database/loadTransactionProgram.hpp
+usr/pkg/include/wolframe/database/preparedStatement.hpp
+usr/pkg/include/wolframe/database/transaction.hpp
+usr/pkg/include/wolframe/database/transactionFunction.hpp
+usr/pkg/include/wolframe/database/transactionInput.hpp
+usr/pkg/include/wolframe/database/transactionOutput.hpp
+@dirrm usr/pkg/include/wolframe/database
+usr/pkg/include/wolframe/prnt/pdfPrinter.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterDocument.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterDocument_libhpdf.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterDocument_testtrace.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterExpression.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterMethod.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinterVariable.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinter_libhpdf.hpp
+usr/pkg/include/wolframe/prnt/pdfPrinter_testtrace.hpp
+usr/pkg/include/wolframe/prnt/printFunction.hpp
+@dirrm usr/pkg/include/wolframe/prnt
+usr/pkg/include/wolframe/config/ConfigurationTree.hpp
+usr/pkg/include/wolframe/config/configurationBase.hpp
+usr/pkg/include/wolframe/config/programBase.hpp
+usr/pkg/include/wolframe/config/structSerialize.hpp
+usr/pkg/include/wolframe/config/valueParser.hpp
+@dirrm usr/pkg/include/wolframe/config
+usr/pkg/include/wolframe/logger/logBackend.hpp
+usr/pkg/include/wolframe/logger/logError.hpp
+usr/pkg/include/wolframe/logger/logLevel.hpp
+usr/pkg/include/wolframe/logger/logObject.hpp
+usr/pkg/include/wolframe/logger/logSyslogFacility.hpp
+@dirrm usr/pkg/include/wolframe/logger
+usr/pkg/include/wolframe/utils/conversions.hpp
+usr/pkg/include/wolframe/utils/fileUtils.hpp
+usr/pkg/include/wolframe/utils/getPassword.hpp
+usr/pkg/include/wolframe/utils/parseUtils.hpp
+usr/pkg/include/wolframe/utils/printFormats.hpp
+usr/pkg/include/wolframe/utils/stringUtils.hpp
+@dirrm usr/pkg/include/wolframe/utils
+usr/pkg/include/wolframe/serialize/mapContext.hpp
+usr/pkg/include/wolframe/serialize/structOptionParser.hpp
+usr/pkg/include/wolframe/serialize/tostringUtils.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapBase.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapDescription.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapParse.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapParseStack.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapParseValue.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapPrintValue.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapProperty.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapSerialize.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapSerializeStack.hpp
+usr/pkg/include/wolframe/serialize/struct/filtermapTraits.hpp
+@dirrm usr/pkg/include/wolframe/serialize/struct
+usr/pkg/include/wolframe/serialize/ddl/filtermapDDLParse.hpp
+usr/pkg/include/wolframe/serialize/ddl/filtermapDDLParseStack.hpp
+usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerialize.hpp
+usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
+@dirrm usr/pkg/include/wolframe/serialize/ddl
+@dirrm usr/pkg/include/wolframe/serialize
+usr/pkg/include/wolframe/processor/jobSchedule.hpp
+usr/pkg/include/wolframe/processor/moduleDirectory.hpp
+usr/pkg/include/wolframe/processor/moduleInterface.hpp
+usr/pkg/include/wolframe/processor/procProvider.hpp
+usr/pkg/include/wolframe/processor/userInterface.hpp
+@dirrm usr/pkg/include/wolframe/processor
+usr/pkg/include/wolframe/filter/bufferingfilter.hpp
+usr/pkg/include/wolframe/filter/contentfilterAttributes.hpp
+usr/pkg/include/wolframe/filter/dotnetfilter.hpp
+usr/pkg/include/wolframe/filter/filter.hpp
+usr/pkg/include/wolframe/filter/filterbase.hpp
+usr/pkg/include/wolframe/filter/inputfilter.hpp
+usr/pkg/include/wolframe/filter/inputfilterScope.hpp
+usr/pkg/include/wolframe/filter/null_filter.hpp
+usr/pkg/include/wolframe/filter/outputfilter.hpp
+usr/pkg/include/wolframe/filter/ptreefilter.hpp
+usr/pkg/include/wolframe/filter/singlefilter.hpp
+usr/pkg/include/wolframe/filter/tostringfilter.hpp
+usr/pkg/include/wolframe/filter/typedfilter.hpp
+usr/pkg/include/wolframe/filter/typedfilterScope.hpp
+usr/pkg/include/wolframe/filter/typingfilter.hpp
+@dirrm usr/pkg/include/wolframe/filter
+usr/pkg/include/wolframe/types/allocators.hpp
+usr/pkg/include/wolframe/types/atomicCounter.hpp
+usr/pkg/include/wolframe/types/base64.h
+usr/pkg/include/wolframe/types/base64.hpp
+usr/pkg/include/wolframe/types/bcdArithmetic.hpp
+usr/pkg/include/wolframe/types/byte2hex.h
+usr/pkg/include/wolframe/types/countedReference.hpp
+usr/pkg/include/wolframe/types/dateArithmetic.hpp
+usr/pkg/include/wolframe/types/doctype.hpp
+usr/pkg/include/wolframe/types/form.hpp
+usr/pkg/include/wolframe/types/integer.hpp
+usr/pkg/include/wolframe/types/keymap.hpp
+usr/pkg/include/wolframe/types/malloc.hpp
+usr/pkg/include/wolframe/types/normalizeFunction.hpp
+usr/pkg/include/wolframe/types/traits.hpp
+usr/pkg/include/wolframe/types/typeSignature.hpp
+usr/pkg/include/wolframe/types/variant.hpp
+usr/pkg/include/wolframe/types/variantStruct.hpp
+usr/pkg/include/wolframe/types/variantStructDescription.hpp
+@dirrm usr/pkg/include/wolframe/types
+usr/pkg/include/wolframe/AAAA/AAAAinformation.hpp
+usr/pkg/include/wolframe/AAAA/AAAAprovider.hpp
+usr/pkg/include/wolframe/AAAA/CRAM.hpp
+usr/pkg/include/wolframe/AAAA/audit.hpp
+usr/pkg/include/wolframe/AAAA/authentication.hpp
+usr/pkg/include/wolframe/AAAA/authorization.hpp
+usr/pkg/include/wolframe/AAAA/password.hpp
+usr/pkg/include/wolframe/AAAA/user.hpp
+@dirrm usr/pkg/include/wolframe/AAAA
+usr/pkg/include/wolframe/module/cppFormFunctionBuilder.hpp
+usr/pkg/include/wolframe/module/constructor.hpp
+usr/pkg/include/wolframe/module/ddlcompilerBuilder.hpp
+usr/pkg/include/wolframe/module/filterBuilder.hpp
+usr/pkg/include/wolframe/module/luaExtensionBuilder.hpp
+usr/pkg/include/wolframe/module/normalizeFunctionBuilder.hpp
+usr/pkg/include/wolframe/module/printFunctionBuilder.hpp
+usr/pkg/include/wolframe/module/programTypeBuilder.hpp
+@dirrm usr/pkg/include/wolframe/module
+usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
+usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
+usr/pkg/include/wolframe/prgbind/printProgram.hpp
+usr/pkg/include/wolframe/prgbind/program.hpp
+usr/pkg/include/wolframe/prgbind/programLibrary.hpp
+usr/pkg/include/wolframe/prgbind/transactionProgram.hpp
+@dirrm usr/pkg/include/wolframe/prgbind
+usr/pkg/include/wolframe/crypto/HMAC.h
+usr/pkg/include/wolframe/crypto/HMAC.hpp
+usr/pkg/include/wolframe/crypto/PBKDF2.h
+usr/pkg/include/wolframe/crypto/PBKDF2.hpp
+usr/pkg/include/wolframe/crypto/md5.h
+usr/pkg/include/wolframe/crypto/sha1.h
+usr/pkg/include/wolframe/crypto/sha2.h
+@dirrm usr/pkg/include/wolframe/crypto
+@dirrm usr/pkg/include/wolframe
+usr/pkg/bin/wolfpasswd
+usr/pkg/bin/wolfilter
+usr/pkg/bin/wolfwizard
+usr/pkg/bin/wolframec
+usr/pkg/sbin/wolframed
+usr/pkg/etc/wolframe/wolframe.conf
+@dirrm usr/pkg/etc/wolframe
+usr/pkg/share/man/man5/wolframe.conf.5.gz
+usr/pkg/share/man/man8/wolframed.8.gz
+usr/pkg/share/man/man1/wolfpasswd.1.gz
+@mode 0775
+usr/pkg/share/examples/rc.d/wolframed
+@mode

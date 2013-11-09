@@ -1,0 +1,39 @@
+#!/bin/sh -e
+
+# Author: Andreas Baumann <abaumann@yahoo.com>
+
+case "$2" in
+	DEINSTALL)
+		# forced stop, ignore errors
+		pkill wolframed || true
+		;;
+	
+	POST-DEINSTALL)
+		# don't ignore errors here
+		set -e
+
+		# remove log directory and it's contents
+		if test -d /var/log/wolframe; then
+			rm -rf /var/log/wolframe
+		fi
+		
+		# dito lock directory
+		if test -d /var/run/wolframe; then
+			rm -rf /var/run/wolframe
+		fi
+
+		# remove wolframe user (and primary group implicitly)
+		getent passwd wolframe >/dev/null && /usr/sbin/userdel wolframe
+		getent group wolframe >/dev/null && /usr/sbin/groupdel wolframe
+		
+		echo "Remove 'wolframed=yes' from '/etc/rc.conf' manually!"
+		echo
+		;;
+
+	*)
+		echo "dscript called with unknown argument $2" >&2
+		exit 1
+		;;
+esac
+
+exit 0
