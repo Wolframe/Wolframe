@@ -88,7 +88,7 @@ EOF
 cd $PKGBUILD/PKG/wolframe-$VERSION
 
 pkg_create -v -p . -I / \
-	-b build-info \
+	-B build-info \
 	-c comment \
 	-d description \
 	-f packlist \
