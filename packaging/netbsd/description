@@ -1,0 +1,4 @@
+Wolframe server and modules
+
+Wolframe is an application server written in C++ providing database access,
+AAAA, printing, etc. in a modular way.

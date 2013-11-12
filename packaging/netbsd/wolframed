@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# $NetBSD$
+#
+# PROVIDE: wolframed
+# REQUIRE: DAEMON
+#
+# Add the following lines to /etc/rc.conf to enable the Wolframe server:
+#
+# wolframed=YES
+#
+
+. /etc/rc.subr
+
+name="wolframed"
+rcvar=$name
+
+command="/usr/pkg/sbin/wolframed"
+command_args="-c /usr/pkg/etc/wolframe/wolframe.conf"
+
+pidfile="/var/run/wolframe/${name}.pid"
+
+LD_LIBRARY_PATH=/usr/pkg/lib
+export LD_LIBRARY_PATH
+
+load_rc_config $name
+run_rc_command "$1"
