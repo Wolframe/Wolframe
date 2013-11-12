@@ -83,6 +83,9 @@ else
 							LINUX_DIST='suse'
 							LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
 						fi
+					elif test -f /etc/system-release; then
+						LINUX_DIST='redhat'
+						LINUX_REV=`cat /etc/system-release | cut -f 4 -d ' '`
 					else
 						LINUX_DIST='unknown'
 						LINUX_REV='unknown'

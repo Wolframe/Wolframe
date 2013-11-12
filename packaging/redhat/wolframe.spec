@@ -35,6 +35,21 @@
 %define centos6 1
 %endif
 
+%define scilin 0
+%define scilin5 0
+%if 0%{?scilin_version} >= 500 && 0%{?scilin_version} <= 599
+%define dist scilin5
+%define scilin 1
+%define scilin5 1
+%endif
+
+%define scilin6 0
+%if 0%{?scilin_version} >= 600 && 0%{?scilin_version} <= 699
+%define dist scilin6
+%define scilin 1
+%define scilin6 1
+%endif
+
 %define fedora 0
 %define fc18 0
 %if 0%{?fedora_version} == 18
@@ -107,7 +122,7 @@
 # build local boost for distributions which have a too old version
 
 %define build_boost 0
-%if %{rhel} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
@@ -152,8 +167,8 @@
 %define libxml2_version 2.9.1
 %endif
 %endif
-%if %{centos}
-%if %{centos5}
+%if %{centos} || %{scilin}
+%if %{centos5} || %{scilin5}
 %define build_libxml2 1
 %define libxml2_version 2.9.1
 %endif
@@ -171,8 +186,8 @@
 %define libxslt_version 1.1.28
 %endif
 %endif
-%if %{centos}
-%if %{centos5}
+%if %{centos} || %{scilin}
+%if %{centos5} || %{scilin5}
 %define build_libxslt 1
 %define libxslt_version 1.1.28
 %endif
@@ -195,6 +210,12 @@
 %define python_version 3.3.2
 %endif
 %endif
+%if %{scilin}
+%if %{scilin5} || %{scilin6}
+%define build_python 1
+%define python_version 3.3.2
+%endif
+%endif
 %if %{sles}
 %define build_python 1
 %define python_version 3.3.2
@@ -203,7 +224,7 @@
 
 # init script to start the daemon
 
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %define initscript	wolframed.initd.RHEL
 %endif
 %if %{sles}
@@ -255,6 +276,9 @@ BuildRequires: redhat-release
 %if %{centos}
 BuildRequires: centos-release
 %endif
+%if %{scilin}
+BuildRequires: sl-release
+%endif
 %if %{fedora} && !0%{?opensuse_bs}
 BuildRequires: fedora-release
 %endif
@@ -283,7 +307,7 @@ BuildRequires: systemd
 
 %if %{build_boost}
 %if %{with_icu}
-%if %{centos} || %{fedora}
+%if %{centos} || %{scilin} || %{fedora} 
 BuildRequires: libicu-devel >= 3.6
 %endif
 %if %{rhel}
@@ -298,7 +322,7 @@ BuildRequires: libicu-devel >= 4.0
 %endif
 %else
 BuildRequires: boost-devel
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
 Requires: boost >= 1.48
 Requires: boost-thread >= 1.48
 Requires: boost-date-time >= 1.48
@@ -370,7 +394,7 @@ BuildRequires: postgresql84-devel >= 8.4
 BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
-%if %{fedora} || %{suse} || %{sles}
+%if %{fedora} || %{scilin} || %{suse} || %{sles}
 BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
@@ -397,12 +421,17 @@ BuildRequires: postgresql-devel >= 8.3
 %define build_sqlite 1
 %endif
 %endif
+%if %{scilin}
+%if %{scilin5}
+%define build_sqlite 1
+%endif
+%endif
 %endif
 
 # if we use the system one, we must pick the right version
 %if !%{build_sqlite}
 %if %{with_sqlite}
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{scilin} || %{centos} || %{fedora}
 %if %{rhel}
 %if %{rhel5} || %{rhel6}
 BuildRequires: sqlite-devel >= 3.0
@@ -419,6 +448,11 @@ BuildRequires: sqlite >= 3.0
 BuildRequires: sqlite3-devel >= 3.0
 # for testing only
 BuildRequires: sqlite3 >= 3.0
+%endif
+%endif
+%if %{scilin}
+%if %{scilin6}
+BuildRequires: sqlite >= 3.0
 %endif
 %endif
 %endif
@@ -517,6 +551,11 @@ Requires: sqlite >= 3.0
 %if %{suse} || %{sles}
 Requires: sqlite3 >= 3.0
 %endif
+%if %{scilin}
+%if %{scilin6}
+Requires: sqlite >= 3.0
+%endif
+%endif
 
 %endif
 
@@ -541,7 +580,7 @@ Group: Application/Business
 The Wolframe authentication module using Cyrus SASL.
 
 Requires: %{name} >= %{version}-%{release}
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
 Requires: cyrus-sasl-lib >= 2.1.19
 %endif
 %if %{suse} || %{sles}
@@ -672,7 +711,7 @@ Wolframe client library for C++ (implemented using boost libraries).
 
 %if !%{build_boost}
 BuildRequires: boost-devel
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
 Requires: boost >= 1.48
 Requires: boost-thread >= 1.48
 Requires: boost-date-time >= 1.48
@@ -1130,7 +1169,7 @@ ln -s libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxslt.s
 cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wolframe
 %endif
 
-%if %{rhel} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 
@@ -1162,7 +1201,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 getent group %{WOLFRAME_GRP} >/dev/null || /usr/sbin/groupadd %{WOLFRAME_GRP}
-%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
 getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user" -d /dev/null
 %endif
 %if %{suse} || %{sles}
@@ -1176,7 +1215,7 @@ if test ! -d /var/run/wolframe; then
 fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
-%if %{rhel} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 echo
 echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
 echo Wolframe server at startup
@@ -1210,7 +1249,7 @@ echo
 
 %preun
 if [ "$1" = 0 ]; then
-%if %{rhel} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
     /etc/init.d/wolframed stop > /dev/null 2>&1
     /sbin/chkconfig --del wolframed
 %endif
@@ -1236,7 +1275,7 @@ fi
 
 %files
 %defattr( -, root, root )
-%if %{rhel} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 %attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %if %{suse}
