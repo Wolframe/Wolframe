@@ -177,6 +177,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	char ch = utils::gotoNextToken( si, se);
+	bool isParameterReference = false;
 	if (ch == '(')
 	{
 		char sb,eb;
@@ -208,6 +209,10 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 			if (*si == '.')
 			{
 				std::string namspace( argstart, si);
+				if (boost::algorithm::iequals( namspace, "PARAM"))
+				{
+					isParameterReference = true;
+				}
 				resultscope_functionidx = getResultNamespaceIdentifier( namspace, keepResult_map, fidx);
 				if (resultscope_functionidx == -1)
 				{
@@ -232,7 +237,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 		{
 			std::string::const_iterator argstart = si;
 			for (; si!=se && isAlphaNumeric(*si); ++si);
-			if (resultscope_functionidx == 0)
+			if (isParameterReference)
 			{
 				// ... Parameter reference has to be converted to a numeric reference
 				std::string paramname = std::string( argstart, si);
