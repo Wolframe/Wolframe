@@ -45,16 +45,16 @@
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler_sqlite3
-///\brief Handler to process prepared statements with sqlite3
+///\class TransactionExecStatemachine_sqlite3
+///\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
 ///\remark The sqlite3 connection is opened, closed, created and disposed by the caller
-struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
+struct TransactionExecStatemachine_sqlite3 :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
+	TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
 
 	///\brief Destructor
-	virtual ~PreparedStatementHandler_sqlite3();
+	virtual ~TransactionExecStatemachine_sqlite3();
 
 	///\brief Begin transaction
 	bool begin();

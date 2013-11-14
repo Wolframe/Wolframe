@@ -48,7 +48,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_oracle::PreparedStatementHandler_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn_)
 	,m_stmmap(stmmap_)
@@ -57,12 +57,12 @@ PreparedStatementHandler_oracle::PreparedStatementHandler_oracle( OracleConnecti
 	,m_idx_row(0)
 	,m_hasResult(false){}
 
-PreparedStatementHandler_oracle::~PreparedStatementHandler_oracle()
+TransactionExecStatemachine_oracle::~TransactionExecStatemachine_oracle()
 {
 	clear();
 }
 
-void PreparedStatementHandler_oracle::clear()
+void TransactionExecStatemachine_oracle::clear()
 {
 	if (m_lastresult)
 	{
@@ -139,7 +139,7 @@ static const char* getErrorType( const char* tp)
 	return 0;
 }
 
-void PreparedStatementHandler_oracle::setDatabaseErrorMessage()
+void TransactionExecStatemachine_oracle::setDatabaseErrorMessage()
 {
 /*
 	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
@@ -168,8 +168,8 @@ void PreparedStatementHandler_oracle::setDatabaseErrorMessage()
 }
 
 // was PQResult
-// bool PreparedStatementHandler_oracle::status( OracleStatement* res, State newstate)
-bool PreparedStatementHandler_oracle::status( sword status, State newstate )
+// bool TransactionExecStatemachine_oracle::status( OracleStatement* res, State newstate)
+bool TransactionExecStatemachine_oracle::status( sword status, State newstate )
 {
 	bool rt;
 
@@ -191,7 +191,7 @@ bool PreparedStatementHandler_oracle::status( sword status, State newstate )
 	return rt;
 }
 
-bool PreparedStatementHandler_oracle::begin()
+bool TransactionExecStatemachine_oracle::begin()
 {
 	LOG_TRACE << "[oracle statement] CALL begin()";
 	if (m_state != Init)
@@ -202,7 +202,7 @@ bool PreparedStatementHandler_oracle::begin()
 	return status( OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Transaction );
 }
 
-bool PreparedStatementHandler_oracle::commit()
+bool TransactionExecStatemachine_oracle::commit()
 {
 	LOG_TRACE << "[oracle statement] CALL commit()";
 	if (m_state == Transaction)
@@ -217,14 +217,14 @@ bool PreparedStatementHandler_oracle::commit()
 	return status( OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
 }
 
-bool PreparedStatementHandler_oracle::rollback()
+bool TransactionExecStatemachine_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
 
 	return status( OCITransRollback( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
 }
 
-bool PreparedStatementHandler_oracle::errorStatus( const std::string& message)
+bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
@@ -234,7 +234,7 @@ bool PreparedStatementHandler_oracle::errorStatus( const std::string& message)
 	return false;
 }
 
-bool PreparedStatementHandler_oracle::start( const std::string& stmname)
+bool TransactionExecStatemachine_oracle::start( const std::string& stmname)
 {
 	LOG_TRACE << "[oracle statement] CALL start (" << stmname << ")";
 	if (m_state == Executed || m_state == Prepared)
@@ -256,7 +256,7 @@ bool PreparedStatementHandler_oracle::start( const std::string& stmname)
 	return true;
 }
 
-bool PreparedStatementHandler_oracle::bind( std::size_t idx, const types::VariantConst& value)
+bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::VariantConst& value)
 {
 	if (value.defined())
 	{
@@ -301,7 +301,7 @@ bool PreparedStatementHandler_oracle::bind( std::size_t idx, const types::Varian
 	return true;
 }
 
-bool PreparedStatementHandler_oracle::execute()
+bool TransactionExecStatemachine_oracle::execute()
 {
 	if (m_state != Prepared)
 	{
@@ -334,12 +334,12 @@ bool PreparedStatementHandler_oracle::execute()
 	return rt;
 }
 
-bool PreparedStatementHandler_oracle::hasResult()
+bool TransactionExecStatemachine_oracle::hasResult()
 {
 	return m_hasResult && m_nof_rows > 0;
 }
 
-std::size_t PreparedStatementHandler_oracle::nofColumns()
+std::size_t TransactionExecStatemachine_oracle::nofColumns()
 {
 	if (m_state != Executed)
 	{
@@ -353,7 +353,7 @@ std::size_t PreparedStatementHandler_oracle::nofColumns()
 	return 0;
 }
 
-const char* PreparedStatementHandler_oracle::columnName( std::size_t idx)
+const char* TransactionExecStatemachine_oracle::columnName( std::size_t idx)
 {
 	if (m_state != Executed)
 	{
@@ -371,12 +371,12 @@ const char* PreparedStatementHandler_oracle::columnName( std::size_t idx)
 	return rt;
 }
 
-const DatabaseError* PreparedStatementHandler_oracle::getLastError()
+const DatabaseError* TransactionExecStatemachine_oracle::getLastError()
 {
 	return m_lasterror.get();
 }
 
-types::VariantConst PreparedStatementHandler_oracle::get( std::size_t idx)
+types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 {
 	LOG_TRACE << "[oracle statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
@@ -402,7 +402,7 @@ types::VariantConst PreparedStatementHandler_oracle::get( std::size_t idx)
 	return types::VariantConst( rt);
 }
 
-bool PreparedStatementHandler_oracle::next()
+bool TransactionExecStatemachine_oracle::next()
 {
 	LOG_TRACE << "[oracle statement] CALL next()";
 	if (m_state != Executed)

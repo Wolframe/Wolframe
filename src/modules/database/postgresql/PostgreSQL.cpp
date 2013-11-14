@@ -459,7 +459,7 @@ void PostgreSQLtransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<PGconn*> conn( m_unit.m_connPool);
-		PreparedStatementHandler_postgres ph( *conn, m_unit.stmmap());
+		TransactionExecStatemachine_postgres ph( *conn, m_unit.stmmap());
 		try
 		{
 			if (!ph.begin()
@@ -490,7 +490,7 @@ void PostgreSQLtransaction::execute_as_transaction()
 
 void PostgreSQLtransaction::execute_as_operation()
 {
-	PreparedStatementHandler_postgres ph( **m_conn, m_unit.stmmap(), true);
+	TransactionExecStatemachine_postgres ph( **m_conn, m_unit.stmmap(), true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))

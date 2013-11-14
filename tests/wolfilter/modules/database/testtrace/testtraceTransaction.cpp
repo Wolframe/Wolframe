@@ -136,7 +136,7 @@ FakeResult::FakeResult( const std::string& str)
 }
 
 
-class TransactionHandler :public PreparedStatementHandler
+class TransactionHandler :public TransactionExecStatemachine
 {
 public:
 	///\brief Constructor

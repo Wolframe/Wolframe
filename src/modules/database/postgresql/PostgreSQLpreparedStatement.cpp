@@ -48,7 +48,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
+TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn_)
 	,m_stmmap(stmmap_)
@@ -57,12 +57,12 @@ PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* co
 	,m_idx_row(0)
 	,m_hasResult(false){}
 
-PreparedStatementHandler_postgres::~PreparedStatementHandler_postgres()
+TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
 	clear();
 }
 
-void PreparedStatementHandler_postgres::clear()
+void TransactionExecStatemachine_postgres::clear()
 {
 	if (m_lastresult)
 	{
@@ -139,7 +139,7 @@ static const char* getErrorType( const char* tp)
 	return 0;
 }
 
-void PreparedStatementHandler_postgres::setDatabaseErrorMessage()
+void TransactionExecStatemachine_postgres::setDatabaseErrorMessage()
 {
 	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
 	const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
@@ -165,7 +165,7 @@ void PreparedStatementHandler_postgres::setDatabaseErrorMessage()
 	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
 }
 
-bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
+bool TransactionExecStatemachine_postgres::status( PGresult* res, State newstate)
 {
 	bool rt;
 	ExecStatusType es = PQresultStatus( res);
@@ -195,7 +195,7 @@ bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
 	return rt;
 }
 
-bool PreparedStatementHandler_postgres::begin()
+bool TransactionExecStatemachine_postgres::begin()
 {
 	LOG_TRACE << "[postgresql statement] CALL begin()";
 	if (m_state != Init)
@@ -205,7 +205,7 @@ bool PreparedStatementHandler_postgres::begin()
 	return status( PQexec( m_conn, "BEGIN;"), Transaction);
 }
 
-bool PreparedStatementHandler_postgres::commit()
+bool TransactionExecStatemachine_postgres::commit()
 {
 	LOG_TRACE << "[postgresql statement] CALL commit()";
 	if (m_state == Transaction)
@@ -219,13 +219,13 @@ bool PreparedStatementHandler_postgres::commit()
 	return status( PQexec( m_conn, "COMMIT;"), Init);
 }
 
-bool PreparedStatementHandler_postgres::rollback()
+bool TransactionExecStatemachine_postgres::rollback()
 {
 	LOG_TRACE << "[postgresql statement] CALL rollback()";
 	return status( PQexec( m_conn, "ROLLBACK;"), Init);
 }
 
-bool PreparedStatementHandler_postgres::errorStatus( const std::string& message)
+bool TransactionExecStatemachine_postgres::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
@@ -235,7 +235,7 @@ bool PreparedStatementHandler_postgres::errorStatus( const std::string& message)
 	return false;
 }
 
-bool PreparedStatementHandler_postgres::start( const std::string& stmname)
+bool TransactionExecStatemachine_postgres::start( const std::string& stmname)
 {
 	LOG_TRACE << "[postgresql statement] CALL start (" << stmname << ")";
 	if (m_state == Executed || m_state == Prepared)
@@ -257,7 +257,7 @@ bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 	return true;
 }
 
-bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::VariantConst& value)
+bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::VariantConst& value)
 {
 	if (value.defined())
 	{
@@ -301,7 +301,7 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const types::Vari
 	return true;
 }
 
-bool PreparedStatementHandler_postgres::execute()
+bool TransactionExecStatemachine_postgres::execute()
 {
 	if (m_state != Prepared)
 	{
@@ -333,12 +333,12 @@ bool PreparedStatementHandler_postgres::execute()
 	return rt;
 }
 
-bool PreparedStatementHandler_postgres::hasResult()
+bool TransactionExecStatemachine_postgres::hasResult()
 {
 	return m_hasResult && m_nof_rows > 0;
 }
 
-std::size_t PreparedStatementHandler_postgres::nofColumns()
+std::size_t TransactionExecStatemachine_postgres::nofColumns()
 {
 	if (m_state != Executed)
 	{
@@ -351,7 +351,7 @@ std::size_t PreparedStatementHandler_postgres::nofColumns()
 	return PQnfields( m_lastresult);
 }
 
-const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
+const char* TransactionExecStatemachine_postgres::columnName( std::size_t idx)
 {
 	if (m_state != Executed)
 	{
@@ -368,12 +368,12 @@ const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
 	return rt;
 }
 
-const DatabaseError* PreparedStatementHandler_postgres::getLastError()
+const DatabaseError* TransactionExecStatemachine_postgres::getLastError()
 {
 	return m_lasterror.get();
 }
 
-types::VariantConst PreparedStatementHandler_postgres::get( std::size_t idx)
+types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 {
 	LOG_TRACE << "[postgresql statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
@@ -398,7 +398,7 @@ types::VariantConst PreparedStatementHandler_postgres::get( std::size_t idx)
 	return types::VariantConst( rt);
 }
 
-bool PreparedStatementHandler_postgres::next()
+bool TransactionExecStatemachine_postgres::next()
 {
 	LOG_TRACE << "[postgresql statement] CALL next()";
 	if (m_state != Executed)

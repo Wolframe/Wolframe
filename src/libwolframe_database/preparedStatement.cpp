@@ -142,7 +142,7 @@ static types::VariantConst resolveResultIteratorReference( const TransactionOutp
 	return rt;
 }
 
-static bool executeCommand( PreparedStatementHandler* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
+static bool executeCommand( TransactionExecStatemachine* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -347,7 +347,7 @@ struct OperationLoop
 }//namespace
 
 
-bool PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
+bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
 	enum OperationType
 	{

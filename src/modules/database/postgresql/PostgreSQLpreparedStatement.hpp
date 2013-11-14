@@ -47,16 +47,16 @@
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler_postgres
-///\brief Handler to process prepared statements with postgresql (libpq)
+///\class TransactionExecStatemachine_postgres
+///\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
 ///\remark The postgres connection is opened, closed, created and disposed by the caller
-struct PreparedStatementHandler_postgres :public PreparedStatementHandler
+struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
+	TransactionExecStatemachine_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
 
 	///\brief Destructor
-	virtual ~PreparedStatementHandler_postgres();
+	virtual ~TransactionExecStatemachine_postgres();
 
 	///\brief Begin transaction
 	bool begin();

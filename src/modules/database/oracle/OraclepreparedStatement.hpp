@@ -47,16 +47,16 @@
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler_oracle
-///\brief Handler to process prepared statements with Oracle
+///\class TransactionExecStatemachine_oracle
+///\brief Implementation of the standard database transaction execution statemechine for Oracle
 ///\remark The Oracle connection is opened, closed, created and disposed by the caller
-struct PreparedStatementHandler_oracle :public PreparedStatementHandler
+struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	PreparedStatementHandler_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
+	TransactionExecStatemachine_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
 
 	///\brief Destructor
-	virtual ~PreparedStatementHandler_oracle();
+	virtual ~TransactionExecStatemachine_oracle();
 
 	///\brief Begin transaction
 	bool begin();

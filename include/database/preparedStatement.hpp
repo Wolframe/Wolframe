@@ -44,15 +44,17 @@
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler
-///\brief Interface to process prepared statements in a database
-class PreparedStatementHandler
+///\class TransactionExecStatemachine
+///\brief Interface to the standard database transaction execution statemechine.
+//	The database specific functions are defined here as abstract methods and implemented in the database handler for each database.
+///\remark TODO: Provide state transition schema
+class TransactionExecStatemachine
 {
 public:
 	///\brief Constructor
-	PreparedStatementHandler(){}
+	TransactionExecStatemachine(){}
 	///\brief Destructor
-	virtual ~PreparedStatementHandler(){}
+	virtual ~TransactionExecStatemachine(){}
 
 	///\brief Start new command statement
 	///\param[in] stmname name of prepared statement

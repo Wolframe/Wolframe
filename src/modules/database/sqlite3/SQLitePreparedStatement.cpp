@@ -91,7 +91,7 @@ static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
 }
 
 
-PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn)
 	,m_dbname(dbname_)
@@ -103,12 +103,12 @@ PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* con
 	m_curstm = m_stmmap->end();
 }
 
-PreparedStatementHandler_sqlite3::~PreparedStatementHandler_sqlite3()
+TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
 	clear();
 }
 
-void PreparedStatementHandler_sqlite3::clear()
+void TransactionExecStatemachine_sqlite3::clear()
 {
 	m_lasterror.reset();
 	if (m_stm)
@@ -122,7 +122,7 @@ void PreparedStatementHandler_sqlite3::clear()
 	m_state = Init;
 }
 
-void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
+void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 {
 	int errcode = sqlite3_errcode( m_conn);
 #if SQLITE_VERSION_NUMBER >= 3006005
@@ -165,7 +165,7 @@ void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), (m_curstm == m_stmmap->end())?"":m_curstm->second.c_str(), errtype, errmsg, errmsg));
 }
 
-bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, State newstate)
+bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr, State newstate)
 {
 	m_hasResult = false;
 	m_hasRow = false;
@@ -187,7 +187,7 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 	return rt;
 }
 
-bool PreparedStatementHandler_sqlite3::begin()
+bool TransactionExecStatemachine_sqlite3::begin()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL begin()";
 	if (m_state != Init)
@@ -197,7 +197,7 @@ bool PreparedStatementHandler_sqlite3::begin()
 	return executeInstruction( "BEGIN TRANSACTION;", Transaction);
 }
 
-bool PreparedStatementHandler_sqlite3::commit()
+bool TransactionExecStatemachine_sqlite3::commit()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL commit()";
 	if (m_state == Transaction)
@@ -211,7 +211,7 @@ bool PreparedStatementHandler_sqlite3::commit()
 	return executeInstruction( "COMMIT TRANSACTION;", Init);
 }
 
-bool PreparedStatementHandler_sqlite3::rollback()
+bool TransactionExecStatemachine_sqlite3::rollback()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL rollback()";
 	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
@@ -219,7 +219,7 @@ bool PreparedStatementHandler_sqlite3::rollback()
 	return rt;
 }
 
-bool PreparedStatementHandler_sqlite3::status( int rc, State newstate)
+bool TransactionExecStatemachine_sqlite3::status( int rc, State newstate)
 {
 	if (rc != SQLITE_OK && rc != SQLITE_DONE && rc != SQLITE_ROW)
 	{
@@ -234,7 +234,7 @@ bool PreparedStatementHandler_sqlite3::status( int rc, State newstate)
 	return true;
 }
 
-bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
+bool TransactionExecStatemachine_sqlite3::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
@@ -244,7 +244,7 @@ bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
 	return false;
 }
 
-bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
+bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
 {
 	LOG_TRACE << "[sqlite3 statement] CALL start (" << stmname << ")";
 	m_hasResult = false;
@@ -282,7 +282,7 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 	return status( rc, Prepared);
 }
 
-bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::VariantConst& value)
+bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::VariantConst& value)
 {
 	if (value.defined())
 	{
@@ -331,7 +331,7 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const types::Varia
 	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
 }
 
-bool PreparedStatementHandler_sqlite3::execute()
+bool TransactionExecStatemachine_sqlite3::execute()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL execute()";
 	if (m_state != Prepared)
@@ -372,12 +372,12 @@ bool PreparedStatementHandler_sqlite3::execute()
 	return status( rc, Executed);
 }
 
-bool PreparedStatementHandler_sqlite3::hasResult()
+bool TransactionExecStatemachine_sqlite3::hasResult()
 {
 	return m_hasRow;
 }
 
-std::size_t PreparedStatementHandler_sqlite3::nofColumns()
+std::size_t TransactionExecStatemachine_sqlite3::nofColumns()
 {
 	if (m_state != Executed)
 	{
@@ -387,7 +387,7 @@ std::size_t PreparedStatementHandler_sqlite3::nofColumns()
 	return (std::size_t)sqlite3_column_count( m_stm);
 }
 
-const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
+const char* TransactionExecStatemachine_sqlite3::columnName( std::size_t idx)
 {
 	if (m_state != Executed)
 	{
@@ -407,12 +407,12 @@ const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
 	return rt;
 }
 
-const db::DatabaseError* PreparedStatementHandler_sqlite3::getLastError()
+const db::DatabaseError* TransactionExecStatemachine_sqlite3::getLastError()
 {
 	return m_lasterror.get();
 }
 
-bool PreparedStatementHandler_sqlite3::firstResultIsNullRow() const
+bool TransactionExecStatemachine_sqlite3::firstResultIsNullRow() const
 {
 	if (!m_hasRow || m_state != Executed) return false;
 	int ii=0, nn=(std::size_t)sqlite3_column_count( m_stm);
@@ -423,7 +423,7 @@ bool PreparedStatementHandler_sqlite3::firstResultIsNullRow() const
 	return true;
 }
 
-types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
+types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 {
 	LOG_TRACE << "[sqlite3 statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
@@ -475,7 +475,7 @@ types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
 	}
 }
 
-bool PreparedStatementHandler_sqlite3::next()
+bool TransactionExecStatemachine_sqlite3::next()
 {
 	LOG_TRACE << "[sqlite3 statement] [sqlite3 statement] CALL next()";
 	if (m_state != Executed)

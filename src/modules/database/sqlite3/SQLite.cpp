@@ -326,7 +326,7 @@ void SQLiteTransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<sqlite3*> conn( m_unit.m_connPool );
-		PreparedStatementHandler_sqlite3 ph( *conn, m_db.ID(), m_unit.stmmap() );
+		TransactionExecStatemachine_sqlite3 ph( *conn, m_db.ID(), m_unit.stmmap() );
 		try
 		{
 			if (!ph.begin()
@@ -357,7 +357,7 @@ void SQLiteTransaction::execute_as_transaction()
 
 void SQLiteTransaction::execute_as_operation()
 {
-	PreparedStatementHandler_sqlite3 ph( **m_conn, m_db.ID(), m_unit.stmmap(), true );
+	TransactionExecStatemachine_sqlite3 ph( **m_conn, m_db.ID(), m_unit.stmmap(), true );
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
