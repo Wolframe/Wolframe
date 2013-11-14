@@ -86,6 +86,7 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 
 private:
 	void clear();
+	bool firstResultIsNullRow() const;
 
 	enum State
 	{
@@ -113,6 +114,7 @@ private:
 	const types::keymap<std::string>* m_stmmap;
 	types::keymap<std::string>::const_iterator m_curstm;
 	bool m_hasResult;
+	bool m_hasRow;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	sqlite3_stmt* m_stm;
 };
