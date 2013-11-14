@@ -415,7 +415,7 @@ void Oracletransaction::rollback()
 	m_conn = 0;
 }
 
-void Oracletransaction::execute_with_autocommit()
+void Oracletransaction::execute_as_transaction()
 {
 	try
 	{
@@ -449,7 +449,7 @@ void Oracletransaction::execute_with_autocommit()
 	}
 }
 
-void Oracletransaction::execute_transaction_operation()
+void Oracletransaction::execute_as_operation()
 {
 	PreparedStatementHandler_oracle ph( **m_conn, m_unit.stmmap(), true);
 	try
@@ -477,11 +477,11 @@ void Oracletransaction::execute()
 {
 	if (m_conn)
 	{
-		execute_transaction_operation();
+		execute_as_operation();
 	}
 	else
 	{
-		execute_with_autocommit();
+		execute_as_transaction();
 	}
 }
 

@@ -321,7 +321,7 @@ void SQLiteTransaction::rollback()
 	m_conn = 0;
 }
 
-void SQLiteTransaction::execute_with_autocommit()
+void SQLiteTransaction::execute_as_transaction()
 {
 	try
 	{
@@ -355,7 +355,7 @@ void SQLiteTransaction::execute_with_autocommit()
 	}
 }
 
-void SQLiteTransaction::execute_transaction_operation()
+void SQLiteTransaction::execute_as_operation()
 {
 	PreparedStatementHandler_sqlite3 ph( **m_conn, m_db.ID(), m_unit.stmmap(), true );
 	try
@@ -385,11 +385,11 @@ void SQLiteTransaction::execute()
 {
 	if ( m_conn )
 	{
-		execute_transaction_operation();
+		execute_as_operation();
 	}
 	else
 	{
-		execute_with_autocommit();
+		execute_as_transaction();
 	}
 }
 

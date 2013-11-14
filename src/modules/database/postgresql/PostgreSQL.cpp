@@ -454,7 +454,7 @@ void PostgreSQLtransaction::rollback()
 	m_conn = 0;
 }
 
-void PostgreSQLtransaction::execute_with_autocommit()
+void PostgreSQLtransaction::execute_as_transaction()
 {
 	try
 	{
@@ -488,7 +488,7 @@ void PostgreSQLtransaction::execute_with_autocommit()
 	}
 }
 
-void PostgreSQLtransaction::execute_transaction_operation()
+void PostgreSQLtransaction::execute_as_operation()
 {
 	PreparedStatementHandler_postgres ph( **m_conn, m_unit.stmmap(), true);
 	try
@@ -516,11 +516,11 @@ void PostgreSQLtransaction::execute()
 {
 	if (m_conn)
 	{
-		execute_transaction_operation();
+		execute_as_operation();
 	}
 	else
 	{
-		execute_with_autocommit();
+		execute_as_transaction();
 	}
 }
 
