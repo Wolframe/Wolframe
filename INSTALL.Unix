@@ -9,7 +9,6 @@ Table of Contents
   Manually build the prerequisites
     Compile and install boost
     Compile and install openssl
-    Compile and install Qt
   Build instructions for specific Linux Distributions
     RHEL/Centos/SL 5
     RHEL/Centos/SL 6
@@ -148,8 +147,6 @@ Boost is not available in a decent version (1.33), build your own one.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
-Qt (4.2.1) is too old, compile your own one.
-
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).
 
@@ -177,8 +174,6 @@ http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779).
 Build your own libicu library and build your own boost library with boost-locale.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
-Qt (4.2.1) is too old, compile your own one.
 
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).

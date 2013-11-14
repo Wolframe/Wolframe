@@ -35,15 +35,22 @@ if test ! -f $RPMBUILD/SOURCES/boost_1_48_0.tar.gz; then
 	wget -O $RPMBUILD/SOURCES/boost_1_48_0.tar.gz \
 		http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.48.0%2F&ts=1353483626&use_mirror=ignum
 fi
+
+http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
+
+if test ! -f $RPMBUILD/SOURCES/Python-3.3.2.tar.bz2; then
+	wget -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
+		http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
+	gunzip $RPMBUILD/SOURCES/Python-3.3.2.tgz
+	bzip2 $RPMBUILD/SOURCES/Python-3.3.2.tar
+fi
  
 cp packaging/obs/boost1.48/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
 
 cd $RPMBUILD/SPECS
 
-echo "Building started, check with 'tail -f $RPMBUILD/SPECS/log'."
-
 export CC='ccache gcc'
 export CXX='ccache g++'
-rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec > log 2>&1
+rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec
 
 echo "Build done."
