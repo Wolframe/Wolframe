@@ -281,21 +281,30 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
 		return false;
 	}
-	if (value.defined())
+	switch (value.type())
 	{
-		std::string strval = value.tostring();
-		char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
-		encvalue[0] = '\'';
-		boost::shared_ptr<void> encvaluer( encvalue, std::free);
-		int error = 0;
-		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
-		encvalue[encvaluesize+1] = '\'';
-		std::string bindval( encvalue, encvaluesize+2);
-		m_statement.bind( idx, bindval);
-	}
-	else
-	{
-		m_statement.bind( idx, "NULL");
+		case types::Variant::Null:
+			m_statement.bind( idx, "NULL");
+			break;
+		case types::Variant::Int:
+		case types::Variant::UInt:
+		case types::Variant::Bool:
+		case types::Variant::Double:
+			m_statement.bind( idx, value.tostring());
+			break;
+		case types::Variant::String:
+		{
+			std::string strval = value.tostring();
+			char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
+			encvalue[0] = '\'';
+			boost::shared_ptr<void> encvaluer( encvalue, std::free);
+			int error = 0;
+			size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
+			encvalue[encvaluesize+1] = '\'';
+			std::string bindval( encvalue, encvaluesize+2);
+			m_statement.bind( idx, bindval);
+			break;
+		}
 	}
 	m_state = CommandReady;
 	return true;
