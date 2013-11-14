@@ -97,6 +97,7 @@ PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* con
 	,m_dbname(dbname_)
 	,m_stmmap(stmmap)
 	,m_hasResult(false)
+	,m_hasRow(false)
 	,m_stm(0)
 {
 	m_curstm = m_stmmap->end();
@@ -116,6 +117,7 @@ void PreparedStatementHandler_sqlite3::clear()
 		m_stm = 0;
 	}
 	m_hasResult = false;
+	m_hasRow = false;
 	m_curstm = m_stmmap->end();
 	m_state = Init;
 }
@@ -166,6 +168,7 @@ void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, State newstate)
 {
 	m_hasResult = false;
+	m_hasRow = false;
 	m_curstm = m_stmmap->end();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
@@ -245,6 +248,7 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 {
 	LOG_TRACE << "[sqlite3 statement] CALL start (" << stmname << ")";
 	m_hasResult = false;
+	m_hasRow = false;
 	m_curstm = m_stmmap->find( stmname);
 	if (m_state == Executed || m_state == Prepared)
 	{
@@ -335,17 +339,42 @@ bool PreparedStatementHandler_sqlite3::execute()
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
 	int rc = sqlite3_step( m_stm);
-	m_hasResult = (rc == SQLITE_ROW || rc == SQLITE_DONE);
+	if (rc == SQLITE_ROW)
+	{
+		m_hasResult = true;
+		m_hasRow = true;
+		while (firstResultIsNullRow())
+		{
+			if (!next())
+			{
+				m_hasRow = false;
+				break; 
+			}
+		}
+	}
+	else
+	{
+		m_hasResult = (rc == SQLITE_DONE);
+		m_hasRow = false;
+	}
 	if (!m_hasResult)
 	{
 		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( m_conn) << ")";
+	}
+	else if (m_hasRow)
+	{
+		LOG_TRACE << "[sqlite3 statement] CALL got results";
+	}
+	else
+	{
+		LOG_TRACE << "[sqlite3 statement] CALL got empty set as result";
 	}
 	return status( rc, Executed);
 }
 
 bool PreparedStatementHandler_sqlite3::hasResult()
 {
-	return m_hasResult;
+	return m_hasRow;
 }
 
 std::size_t PreparedStatementHandler_sqlite3::nofColumns()
@@ -381,6 +410,17 @@ const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
 const db::DatabaseError* PreparedStatementHandler_sqlite3::getLastError()
 {
 	return m_lasterror.get();
+}
+
+bool PreparedStatementHandler_sqlite3::firstResultIsNullRow() const
+{
+	if (!m_hasRow || m_state != Executed) return false;
+	int ii=0, nn=(std::size_t)sqlite3_column_count( m_stm);
+	for (; ii<nn; ++ii)
+	{
+		if (sqlite3_column_type( m_stm, ii) != SQLITE_NULL) return false;
+	}
+	return true;
 }
 
 types::VariantConst PreparedStatementHandler_sqlite3::get( std::size_t idx)
@@ -443,7 +483,8 @@ bool PreparedStatementHandler_sqlite3::next()
 		return errorStatus( std::string( "command not executed, next result of not available in state '") + stateName(m_state) + "'");
 	}
 	int rc = sqlite3_step( m_stm);
-	if (rc == SQLITE_ROW) return true;
+	m_hasRow = (rc == SQLITE_ROW);
+	if (m_hasRow) return true;
 	if (rc == SQLITE_DONE) return false;
 	return status( rc, Executed);
 }
