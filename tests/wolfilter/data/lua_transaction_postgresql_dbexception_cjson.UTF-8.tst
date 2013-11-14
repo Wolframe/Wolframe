@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **requires:PGSQL
 **exception
-error in transaction insertCustomer:  Key (name)=(Hugo) already exists.  . Customers must have a unique name.
+error in transaction insertCustomer:*Customers must have a unique name.
 **input
 {
   "customers": {
