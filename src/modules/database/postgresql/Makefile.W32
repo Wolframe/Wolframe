@@ -29,7 +29,7 @@ CPP_OBJS = \
 	PostgreSQLconfig.obj \
 	PostgreSQLconstructor.obj \
 	PostgreSQL.obj \
-	PostgreSQLpreparedStatement.obj \
+	PostgreSQLtransactionExecStatemachine.obj \
 	PostgreSQLprogram.obj \
 	PostgreSQLmodule.obj
 

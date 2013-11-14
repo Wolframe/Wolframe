@@ -26,7 +26,7 @@ CPP_OBJS = \
 	Oracleconfig.o \
 	Oracleconstructor.o \
 	Oracle.o \
-	OraclepreparedStatement.o \
+	OracleTransactionExecStatemachine.o \
 	Oracleprogram.o \
 	Oraclemodule.o
 

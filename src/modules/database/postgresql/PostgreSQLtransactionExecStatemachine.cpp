@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of processing prepared statements with postgres client using libpq
-///\file modules/database/postgres/PostgreSQLpreparedStatement.cpp
+///\brief Implementation of the standard database transaction execution statemechine with postgres client using libpq
+///\file PostgreSQLtransactionExecStatemachine.cpp
 
-#include "PostgreSQLpreparedStatement.hpp"
+#include "PostgreSQLtransactionExecStatemachine.hpp"
 #include "PostgreSQL.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
@@ -212,7 +212,7 @@ bool TransactionExecStatemachine_postgres::commit()
 	{
 		LOG_WARNING << "executed transaction is empty";
 	}
-	else if (m_state != Executed && m_state != Prepared)
+	else if (m_state != Executed && m_state != CommandReady)
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
@@ -238,7 +238,7 @@ bool TransactionExecStatemachine_postgres::errorStatus( const std::string& messa
 bool TransactionExecStatemachine_postgres::start( const std::string& stmname)
 {
 	LOG_TRACE << "[postgresql statement] CALL start (" << stmname << ")";
-	if (m_state == Executed || m_state == Prepared)
+	if (m_state == Executed || m_state == CommandReady)
 	{
 		m_state = Transaction;
 	}
@@ -253,7 +253,7 @@ bool TransactionExecStatemachine_postgres::start( const std::string& stmname)
 		throw std::runtime_error( std::string( "statement '") + stmname + "' is not defined");
 	}
 	m_statement.init( si->second);
-	m_state = Prepared;
+	m_state = CommandReady;
 	return true;
 }
 
@@ -267,7 +267,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 	{
 		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", NULL)";
 	}
-	if (m_state != Prepared && m_state != Executed)
+	if (m_state != CommandReady && m_state != Executed)
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
@@ -297,13 +297,13 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 	{
 		m_statement.bind( idx, "NULL");
 	}
-	m_state = Prepared;
+	m_state = CommandReady;
 	return true;
 }
 
 bool TransactionExecStatemachine_postgres::execute()
 {
-	if (m_state != Prepared)
+	if (m_state != CommandReady)
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}

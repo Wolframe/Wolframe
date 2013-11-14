@@ -57,7 +57,7 @@ struct LanguageDescription
 	}
 
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
-	// Default is the SQL standard argument reference in prepared statements.
+	// Default is the SQL standard argument reference in embedded database statements.
 	virtual std::string stm_argument_reference( int index) const;
 
 	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;

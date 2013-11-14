@@ -33,7 +33,7 @@
 ///\brief Fake implementation to "process" database commands for testing
 ///\file modules/database/testtrace/testtraceTransaction.cpp
 #include "testtraceTransaction.hpp"
-#include "database/preparedStatement.hpp"
+#include "database/transactionExecStatemachine.hpp"
 #include "types/variant.hpp"
 #include "utils/stringUtils.hpp"
 #include "utils/parseUtils.hpp"

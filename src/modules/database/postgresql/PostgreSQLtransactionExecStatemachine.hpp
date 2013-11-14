@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to process prepared statements with postgres client using libpq
-///\file PostgreSQLpreparedStatement.hpp
-#ifndef _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
-#define _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
-#include "database/preparedStatement.hpp"
+///\brief PostgreSQL interface to the standard database transaction execution statemechine
+///\file PostgreSQLtransactionExecStatemachine.hpp
+#ifndef _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
+#define _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
+#include "database/transactionExecStatemachine.hpp"
 #include "database/bindStatementParams.hpp"
 #include "database/databaseError.hpp"
 #include "types/keymap.hpp"
@@ -93,13 +93,13 @@ private:
 	{
 		Init,
 		Transaction,
-		Prepared,
+		CommandReady,
 		Executed,
 		Error
 	};
 	static const char* stateName( State i)
 	{
-		const char* ar[] = {"Init","Transaction","Prepared","Executed","Error"};
+		const char* ar[] = {"Init","Transaction","CommandReady","Executed","Error"};
 		return ar[ (int)i];
 	}
 

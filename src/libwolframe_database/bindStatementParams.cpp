@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implements substitution of parameters in an SQL statement in prepared statement syntax
+///\brief Implements substitution of parameters in embedded SQL statements
 ///\file bindStatementParams.cpp
 #include "database/bindStatementParams.hpp"
 #include <boost/lexical_cast.hpp>

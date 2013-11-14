@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to process prepared statements by a transaction function execute
-///\file database/preparedStatement.hpp
-#ifndef _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
-#define _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
+///\brief Interface to the standard database transaction execution statemechine
+///\file database/transactionExecStatemachine.hpp
+#ifndef _DATABASE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
+#define _DATABASE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
 #include "database/databaseError.hpp"
@@ -57,7 +57,7 @@ public:
 	virtual ~TransactionExecStatemachine(){}
 
 	///\brief Start new command statement
-	///\param[in] stmname name of prepared statement
+	///\param[in] stmname name of statement
 	virtual bool start( const std::string& stmname)=0;
 	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value)=0;

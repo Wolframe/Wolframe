@@ -42,7 +42,7 @@ CPP_OBJS = \
 	transactionfunction/ResultFilter.o \
 	loadTransactionProgram.o \
 	databaseLanguage.o \
-	preparedStatement.o \
+	transactionExecStatemachine.o \
 	bindStatementParams.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

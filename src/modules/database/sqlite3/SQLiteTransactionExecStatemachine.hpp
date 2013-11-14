@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to process prepared statements with sqlite3
-///\file modules/database/sqlite3/SQLitePreparedStatement.hpp
-#ifndef _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
-#define _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
-#include "database/preparedStatement.hpp"
+///\brief SQLite3 interface to the standard database transaction execution statemechine
+///\file SQLiteTransactionExecStatemachine.hpp
+#ifndef _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
+#define _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
+#include "database/transactionExecStatemachine.hpp"
 #include "types/keymap.hpp"
 #include <string>
 #include <map>
@@ -92,13 +92,13 @@ private:
 	{
 		Init,
 		Transaction,
-		Prepared,
+		CommandReady,
 		Executed,
 		Error
 	};
 	static const char* stateName( State i)
 	{
-		const char* ar[] = {"Init","Transaction","Prepared","Executed","Error"};
+		const char* ar[] = {"Init","Transaction","CommandReady","Executed","Error"};
 		return ar[ (int)i];
 	}
 

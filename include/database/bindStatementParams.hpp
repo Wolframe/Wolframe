@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to substitute parameters in an SQL statement in prepared statement syntax
+///\brief Interface to substitute parameters in embedded SQL statements
 ///\file database/bindStatementParams.hpp
 #ifndef _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
 #define _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED

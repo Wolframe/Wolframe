@@ -36,7 +36,7 @@
 
 #include "logger-v1.hpp"
 #include "SQLite.hpp"
-#include "SQLitePreparedStatement.hpp"
+#include "SQLiteTransactionExecStatemachine.hpp"
 #include "utils/fileUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>

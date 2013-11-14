@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implements execution of a transaction using a prepared statement interface
-///\file preparedStatement.cpp
-#include "database/preparedStatement.hpp"
+///\brief Implements the main execution loop (non database specific part) of the standard database transaction execution statemechine
+///\file transactionExecStatemachine.cpp
+#include "database/transactionExecStatemachine.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>

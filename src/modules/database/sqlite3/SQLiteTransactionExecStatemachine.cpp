@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of processing prepared statements with sqlite3
-///\file modules/database/sqlite3/SQLitePreparedStatement.cpp
-#include "SQLitePreparedStatement.hpp"
+///\brief SQLite3 implementation of the standard database transaction execution statemechine
+///\file SQLiteTransactionExecStatemachine.cpp
+#include "SQLiteTransactionExecStatemachine.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -204,7 +204,7 @@ bool TransactionExecStatemachine_sqlite3::commit()
 	{
 		LOG_WARNING << "executed transaction is empty";
 	}
-	else if (m_state != Executed && m_state != Prepared)
+	else if (m_state != Executed && m_state != CommandReady)
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
@@ -250,7 +250,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
 	m_hasResult = false;
 	m_hasRow = false;
 	m_curstm = m_stmmap->find( stmname);
-	if (m_state == Executed || m_state == Prepared)
+	if (m_state == Executed || m_state == CommandReady)
 	{
 		sqlite3_finalize( m_stm);
 		m_stm = 0;
@@ -279,7 +279,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
 			}
 		}
 	}
-	return status( rc, Prepared);
+	return status( rc, CommandReady);
 }
 
 bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::VariantConst& value)
@@ -292,7 +292,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 	{
 		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", NULL)";
 	}
-	if (m_state != Prepared && m_state != Executed)
+	if (m_state != CommandReady && m_state != Executed)
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
@@ -308,25 +308,25 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 	switch (value.type())
 	{
 		case types::Variant::Null:
-			return status( wrap_sqlite3_bind_null( m_stm, (int)idx), Prepared);
+			return status( wrap_sqlite3_bind_null( m_stm, (int)idx), CommandReady);
 		case types::Variant::Bool:
-			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool()), Prepared);
+			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool()), CommandReady);
 		case types::Variant::Int:
-			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), Prepared);
+			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), CommandReady);
 		case types::Variant::UInt:
 			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
 			{
-				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), Prepared);
+				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), CommandReady);
 			}
 			else
 			{
 				std::string strval( value.tostring());
-				return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), Prepared);
+				return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), CommandReady);
 			}
 		case types::Variant::Double:
-			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), Prepared);
+			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), CommandReady);
 		case types::Variant::String:
-			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), Prepared);
+			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), CommandReady);
 	}
 	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
 }
@@ -334,7 +334,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 bool TransactionExecStatemachine_sqlite3::execute()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL execute()";
-	if (m_state != Prepared)
+	if (m_state != CommandReady)
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
