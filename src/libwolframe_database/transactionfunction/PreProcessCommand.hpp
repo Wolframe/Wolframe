@@ -77,6 +77,7 @@ public:
 
 	///\brief Call the command on the input 'structure'
 	void call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const;
+	std::string tostring( const TagTable* tagmap) const;
 
 private:
 	std::string m_name;						//< name of the function (defined by the provider)

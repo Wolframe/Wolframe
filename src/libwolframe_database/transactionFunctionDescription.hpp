@@ -116,8 +116,7 @@ public:
 		MainProcessingStep()
 			:resultref_FOREACH(-1)
 			,nonempty(false)
-			,unique(false)
-			,resultref(false){}
+			,unique(false){}
 
 		///\brief Copy constructor
 		MainProcessingStep( const MainProcessingStep& o)
@@ -127,7 +126,6 @@ public:
 			,path_INTO(o.path_INTO)
 			,nonempty(o.nonempty)
 			,unique(o.unique)
-			,resultref(o.resultref)
 			,hints(o.hints){}
 
 		///\brief Clear content (default constructor)
@@ -139,18 +137,10 @@ public:
 			call.clear();
 			nonempty = false;
 			unique = false;
-			resultref = false;
 			hints.clear();
 		}
 
-		void finalize()
-		{
-			if (!resultref)
-			{
-				std::vector<Call::Param>::const_iterator pi = call.paramlist.begin(), pe = call.paramlist.end();
-				for (; pi != pe; ++pi) resultref |= (pi->type == Call::Param::NumericResultReference || pi->type == Call::Param::SymbolicResultReference);
-			}
-		}
+		std::string tostring() const;
 
 		///\class Error
 		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
@@ -188,6 +178,11 @@ public:
 					static const char* ar[] = {"NumericResultReference","SymbolicResultReference","Constant","InputSelectorPath"};
 					return ar[(std::size_t)i];
 				}
+				const char* typeName() const
+				{
+					return typeName(type);
+				}
+
 				Type type;		//< type of the parameter
 				int namspace;		//< result context namespace
 				std::string value;	//< parsed value of the parameter
@@ -218,6 +213,7 @@ public:
 
 			///\brief Reset call
 			void clear()		{funcname.clear(); paramlist.clear();}
+			std::string tostring() const;
 		};
 
 		std::string selector_FOREACH;		//< parsed argument of FOREACH in case of a selector path
@@ -226,7 +222,6 @@ public:
 		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
 		bool nonempty;				//< true, if NONEMPTY is set
 		bool unique;				//< true, if UNIQUE is set
-		bool resultref;				//< true, if the operation is possibly called more than once, either because it has result references or is in a foreach clause
 		types::keymap<std::string> hints;	//< error messages to add to database errors depending on the error class
 	};
 	///\class Block

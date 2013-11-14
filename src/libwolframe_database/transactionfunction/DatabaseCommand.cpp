@@ -37,16 +37,17 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-std::string DatabaseCommand::tostring() const
+std::string DatabaseCommand::tostring( const TagTable* tagmap) const
 {
 	std::ostringstream rt;
+	rt << "[L" << m_level << "] ";
 	if (m_resultsetidx >= 0)
 	{
 		rt << "FOREACH "<< "RESULT[" << m_resultsetidx << "]" << " DO '" << m_name << "'( ";
 	}
 	else if (m_selector.size())
 	{
-		rt << "FOREACH '"<< m_selector.tostring() << "' DO '" << m_name << "'( ";
+		rt << "FOREACH '"<< m_selector.tostring(tagmap) << "' DO '" << m_name << "'( ";
 	}
 	else
 	{
@@ -57,7 +58,7 @@ std::string DatabaseCommand::tostring() const
 	for (; ai != ae; ++ai,++ii)
 	{
 		if (ii) rt << ", ";
-		rt << ai->tostring();
+		rt << ai->tostring( tagmap);
 	}
 	rt << " )";
 	return rt.str();

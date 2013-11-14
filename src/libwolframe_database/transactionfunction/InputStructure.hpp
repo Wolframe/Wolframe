@@ -93,12 +93,13 @@ public:
 	class NodeVisitor
 	{
 	public:
+		typedef int Index;
 		///\brief Constructor
-		NodeVisitor( int nodeidx_=0)		:m_nodeidx(nodeidx_){}
+		NodeVisitor( Index nodeidx_=0)		:m_nodeidx(nodeidx_){}
 		///\brief Copy constructor
 		NodeVisitor( const NodeVisitor& o)	:m_nodeidx(o.m_nodeidx){}
 
-		int m_nodeidx;				//< index of the visited node
+		Index m_nodeidx;			//< index of the visited node
 	};
 
 public://visit structure:
@@ -116,16 +117,18 @@ public://visit structure:
 	const Node* root() const;
 	///\brief Get the root node visitor of the tree
 	NodeVisitor rootvisitor() const					{return NodeVisitor(0);}
+	///\brief Get the root node index of the tree
+	NodeVisitor::Index rootindex() const				{return 0;}
 
 	///\brief Get all children of a node having a tag matching to tag or all children if tag is 0.
 	///\param[out] rt where to append the result nodes
-	void next( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	void next( const Node* nd, int tag, std::vector<NodeVisitor::Index>& rt) const;
 	///\brief Get all children (transitive, e.g. also children of children) of a node having a tag matching to tag or all children if tag is 0.
 	///\param[out] rt where to append the result nodes
-	void find( const Node* nd, int tag, std::vector<const Node*>& rt) const;
+	void find( const Node* nd, int tag, std::vector<NodeVisitor::Index>& rt) const;
 	///\brief Append parent of a node to a node list
 	///\param[out] rt where to append the result node
-	void up( const Node* nd, std::vector<const Node*>& rt) const;
+	void up( const Node* nd, std::vector<NodeVisitor::Index>& rt) const;
 	///\brief Get the value of a node or null, if not defined
 	const types::Variant* contentvalue( const Node* nd) const;
 	///\brief Get the name of the tag of a node
@@ -142,8 +145,10 @@ public://visit structure:
 	///\brief Find out if two tags are the same (depends on TagMap::case_sensitive())
 	bool isequalTag( const std::string& t1, const std::string& t2) const;
 
+	bool check( const NodeVisitor& nv = NodeVisitor()) const;
+
 	///\brief Declaration of an element (element name plus node reference) of a structure
-	typedef std::pair<std::string,const Node*> NodeAssignment;
+	typedef std::pair<std::string,NodeVisitor::Index> NodeAssignment;
 	///\brief Create an input filter for a list of nodes and their content structures to pass to a function as parameters
 	langbind::TypedInputFilter* createInputFilter( const std::vector<NodeAssignment>& nodes_) const;
 	///\brief Create an output filter for the output of a preprocessing command

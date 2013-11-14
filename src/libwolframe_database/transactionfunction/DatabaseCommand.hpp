@@ -88,7 +88,7 @@ public:
 
 	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
 
-	std::string tostring() const;
+	std::string tostring( const TagTable* tagmap) const;
 
 private:
 	std::string m_name;

@@ -30,59 +30,59 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of templates describing printing of structures
-///\file utils_printFormats.cpp
-#include "utils/printFormats.hpp"
+///\brief Implementation of the description for transaction function constructor
+///\file transactionFunctionDescription.hpp
+#include "transactionFunctionDescription.hpp"
+#include <sstream>
+#include <iostream>
 
 using namespace _Wolframe;
-using namespace _Wolframe::utils;
+using namespace _Wolframe::db;
 
-const PrintFormat* utils::logPrintFormat()
+std::string TransactionFunctionDescription::MainProcessingStep::Call::tostring() const
 {
-	static const PrintFormat rt = {
-		""  /*indent*/,
-		" " /*newitem*/,
-		"{" /*openstruct*/,
-		"}" /*closestruct*/,
-		":" /*endheader*/,
-		"'" /*startvalue*/,
-		"'" /*endvalue*/,
-		";" /*decldelimiter*/,
-		" " /*itemdelimiter*/,
-		"=" /*assign*/,
-		60  /*maxitemsize*/
-	};
-	return &rt;
-}
+	std::ostringstream out;
+	out << funcname << "( ";
+	std::vector<Param>::const_iterator pi = paramlist.begin(), pe = paramlist.end();
 
-const PrintFormat* utils::ptreePrintFormat()
-{
-	static const PrintFormat rt = {
-		"\t"  /*indent*/,
-		"\n"  /*newitem*/,
-		"{"   /*openstruct*/,
-		"}"   /*closestruct*/,
-		":"   /*endheader*/,
-		"'"   /*startvalue*/,
-		"'"   /*endvalue*/,
-		";"   /*decldelimiter*/,
-		" "   /*itemdelimiter*/,
-		"="   /*assign*/,
-		0     /*maxitemsize*/
-	};
-	return &rt;
-}
-
-std::string utils::getLogString( const types::Variant& val, std::size_t maxsize)
-{
-	std::string rt;
-	rt.append( val.tostring());
-	if (rt.size() > maxsize)
+	for (int idx=0; pi != pe; ++pi)
 	{
-		rt.resize( maxsize);
-		rt.append( "...");
+		if (idx++) out << ", ";
+		out << pi->typeName() << " ";
+		if (pi->namspace >= 0) out << "%" << pi->namspace << " ";
+		out << "'" << pi->value << "'";
 	}
-	return rt;
+	out << ")";
+	return out.str();
+}
+
+std::string TransactionFunctionDescription::MainProcessingStep::tostring() const
+{
+	std::ostringstream out;
+	if (selector_FOREACH.size())
+	{
+		out << "FOREACH " << selector_FOREACH << " ";
+	}
+	if (resultref_FOREACH >= 0)
+	{
+		out << "FOREACH %" << resultref_FOREACH << " ";
+	}
+	if (path_INTO.size())
+	{
+		out << "INTO ";
+		std::vector<std::string>::const_iterator pi = path_INTO.begin(), pe = path_INTO.end();
+		for (int idx=0; pi != pe; ++pi)
+		{
+			if (idx++) out << ".";
+			out << *pi;
+		}
+		out << " ";
+	}
+	out << "DO ";
+	if (nonempty) out << "NONEMPTY ";
+	if (unique) out << "UNIQUE ";
+	out << call.tostring() << ";";
+	return out.str();
 }
 
 

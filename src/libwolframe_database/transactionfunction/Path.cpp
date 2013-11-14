@@ -115,23 +115,21 @@ Path::Path( const std::string& selector, TagTable* tagmap)
 Path::Path( const Call::Param& param, TagTable* tagmap)
 {
 	typedef Call::Param Param;
-	Element elem;
+	int tag_;
+
 	switch (param.type)
 	{
 		case Param::NumericResultReference:
-			elem.m_type = ResultIndex;
-			elem.m_tag = boost::lexical_cast<unsigned short>( param.value);
-			m_path.push_back( elem);
+			tag_ = boost::lexical_cast<unsigned short>( param.value);
+			m_path.push_back( Element( ResultIndex, tag_, param.namspace));
 			break;
 		case Param::SymbolicResultReference:
-			elem.m_type = ResultSymbol;
 			m_content = param.value;
-			m_path.push_back( elem);
+			m_path.push_back( Element( ResultSymbol, 0, param.namspace));
 			break;
 		case Param::Constant:
-			elem.m_type = Constant;
 			m_content = param.value;
-			m_path.push_back( elem);
+			m_path.push_back( Element( Constant));
 			break;
 		case Param::InputSelectorPath:
 			parseSelectorPath( param.value, tagmap);
@@ -199,7 +197,7 @@ const std::string& Path::constantReference() const
 	throw std::logic_error("internal: illegal call of Path::constantReference");
 }
 
-std::string Path::tostring() const
+std::string Path::tostring( const TagTable* tagmap) const
 {
 	switch (referenceType())
 	{
@@ -226,7 +224,7 @@ std::string Path::tostring() const
 			std::ostringstream rt;
 			for (; ii != ee; ++ii)
 			{
-				rt << elementTypeName( ii->m_type) << " " << ii->m_tag << std::endl;
+				rt << "(" << elementTypeName( ii->m_type) << " '" << tagmap->getstr(ii->m_tag) << "')";
 			}
 			return rt.str();
 		}
@@ -234,18 +232,18 @@ std::string Path::tostring() const
 	throw std::logic_error( "internal: illegal state in Path::tostring()");
 }
 
-void Path::selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node* nd, std::vector<const TransactionFunctionInput::Structure::Node*>& ar) const
+void Path::selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
-	std::vector<const Node*> ar1,ar2;
-	ar1.push_back( nd);
+	std::vector<NodeVisitor::Index> ar1,ar2;
+	ar1.push_back( nv.m_nodeidx);
 
 	// [B.1] Find selected nodes:
 	std::vector<Element>::const_iterator si = begin(), se = end();
 	for (; si != se; ++si)
 	{
 		ar2.clear();
-		std::vector<const Node*>::const_iterator ni = ar1.begin(), ne = ar1.end();
+		std::vector<NodeVisitor::Index>::const_iterator ni = ar1.begin(), ne = ar1.end();
 		for (; ni != ne; ++ni)
 		{
 			switch (si->m_type)
@@ -256,19 +254,19 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 					break;
 
 				case Find:
-					st.find( *ni, si->m_tag, ar2);
+					st.find( st.node(*ni), si->m_tag, ar2);
 					break;
 
 				case Root:
-					ar2.push_back( st.root());
+					ar2.push_back( st.rootindex());
 					break;
 
 				case Next:
-					st.next( *ni, si->m_tag, ar2);
+					st.next( st.node(*ni), si->m_tag, ar2);
 					break;
 
 				case Up:
-					st.up( *ni, ar2);
+					st.up( st.node(*ni), ar2);
 					break;
 			}
 		}

@@ -88,6 +88,37 @@ static void mapResult( langbind::TypedInputFilter* in, langbind::TypedOutputFilt
 	}
 }
 
+std::string PreProcessCommand::tostring( const TagTable* tagmap) const
+{
+	std::ostringstream rt;
+	if (m_selector.size())
+	{
+		rt << "FOREACH '"<< m_selector.tostring(tagmap) << "'' ";
+	}
+	std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.end();
+	if (ri != re)
+	{
+		rt << "INTO ";
+		for (int idx=0; ri != re; ++ri)
+		{
+			if (idx++) rt << ":";
+			rt << *ri;
+		}
+		rt << " ";
+	}
+	rt << "DO '" << m_name << "'( ";
+
+	std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
+	int ii = 0;
+	for (; ai != ae; ++ai,++ii)
+	{
+		if (ii) rt << ", ";
+		rt << ai->name << ":" << ai->selector.tostring( tagmap);
+	}
+	rt << " )";
+	return rt.str();
+}
+
 void PreProcessCommand::call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const
 {
 	// Select the nodes to execute the command with:
@@ -95,7 +126,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 	typedef Structure::Node Node;
 	typedef Structure::NodeAssignment NodeAssignment;
 	typedef Structure::NodeVisitor NodeVisitor;
-	std::map<const Node*, int> selectmap;
+	std::map<NodeVisitor::Index, int> selectmap;
 	std::map<int, bool> sourccetagmap;
 
 	const types::NormalizeFunction* nf = 0;
@@ -105,8 +136,8 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 		ff = provider->formFunction( m_name);
 		if (!ff) nf = provider->normalizeFunction( m_name);
 
-		std::vector<const Node*> nodearray;
-		m_selector.selectNodes( structure, structure.root(), nodearray);
+		std::vector<NodeVisitor::Index> nodearray;
+		m_selector.selectNodes( structure, structure.rootindex(), nodearray);
 		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), utils::logPrintFormat());
 		if (nodearray.size())
 		{
@@ -116,7 +147,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 		{
 			LOG_DATA << "[transaction preprocess] empty selection (no execution) for function " << m_name;
 		}
-		std::vector<const Node*>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+		std::vector<NodeVisitor::Index>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			if (selectmap[*ni]++ > 0)
@@ -125,7 +156,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				continue;
 			}
 			// [1A] Create the destination node for the result:
-			NodeVisitor resultnode = structure.visitor( *ni);
+			NodeVisitor resultnode( *ni);
 			if (!m_resultpath.empty())
 			{
 				if (m_resultpath.size() > 1)
@@ -155,7 +186,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 			}
 			// [2] Build the parameter structure:
 			std::vector<NodeAssignment> parameterassign;
-			std::vector<const Node*> parameter;
+			std::vector<NodeVisitor::Index> parameter;
 			std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
 			std::size_t aidx = 1;
 			for (; ai != ae; ++ai,++aidx)
@@ -175,7 +206,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 				}
 				else
 				{
-					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( structure.visitor( parameter.back()), utils::logPrintFormat());
+					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
 					parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
 				}
 			}

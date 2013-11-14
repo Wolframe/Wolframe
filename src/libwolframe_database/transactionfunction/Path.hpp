@@ -48,6 +48,8 @@ class Path
 {
 public:
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
+	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
+
 	enum ElementType
 	{
 		Root,
@@ -73,7 +75,7 @@ public:
 
 		Element()
 			:m_type(Root),m_tag(0),m_scope_functionidx(-1){}
-		Element( ElementType type_, int tag_, int scope_functionidx_)
+		explicit Element( ElementType type_, int tag_=0, int scope_functionidx_=-1)
 			:m_type(type_),m_tag(tag_),m_scope_functionidx(scope_functionidx_){}
 		Element( const Element& o)
 			:m_type(o.m_type),m_tag(o.m_tag),m_scope_functionidx(o.m_scope_functionidx){}
@@ -83,14 +85,14 @@ public:
 	Path( const std::string& selector, TagTable* tagmap);
 	Path( const Call::Param& param, TagTable* tagmap);
 	Path( const Path& o);
-	std::string tostring() const;
+	std::string tostring( const TagTable* tagmap) const;
 
 	ElementType referenceType() const;
 	std::size_t resultReferenceIndex() const;
 	const std::string& resultReferenceSymbol() const;
 	int resultReferenceScope() const;
 	const std::string& constantReference() const;
-	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node* nd, std::vector<const TransactionFunctionInput::Structure::Node*>& ar) const;
+	void selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}

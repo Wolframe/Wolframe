@@ -90,6 +90,15 @@ static bool isAlphaNumeric( char ch)
 	return isAlpha( ch);
 }
 
+static bool isIdentifier( const std::string& str)
+{
+	std::string::const_iterator si = str.begin(), se = str.end();
+	if (si == se) return false;
+	if (!isAlpha(*si)) return false;
+	for (++si; si != se && isAlphaNumeric(*si); ++si){}
+	return (si == se);
+}
+
 static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
 {
 	const char* commentopr = langdescr->eoln_commentopr();
@@ -911,7 +920,6 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 		{
 			if (mask)
 			{
-				opstep.finalize();
 				subroutine.description.steps.push_back( opstep);
 				opstep.clear();
 				mask = 0;
@@ -1033,14 +1041,17 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 			if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 
-			opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
-			if (opstep.resultref_FOREACH >= 0)
+			if (isIdentifier(opstep.selector_FOREACH))
 			{
-				if (boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
+				opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
+				if (opstep.resultref_FOREACH >= 0)
 				{
-					throw ERROR( si, "PARAM not allowed as argument of FOREACH");
+					if (opstep.resultref_FOREACH == 0 && boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
+					{
+						throw ERROR( si, "PARAM not allowed as argument of FOREACH");
+					}
+					opstep.selector_FOREACH.clear();
 				}
-				opstep.selector_FOREACH.clear();
 			}
 		}
 		else if (boost::algorithm::iequals( tok, "INTO"))

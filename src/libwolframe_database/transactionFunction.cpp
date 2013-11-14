@@ -73,14 +73,20 @@ struct TransactionFunction::Impl
 
 	void handlePrintStep( const PrintStep& printstep);
 
-	std::string tostring() const
+	std::string tostring( const utils::PrintFormat* pformat) const
 	{
 		std::ostringstream rt;
+		std::vector<PreProcessCommand>::const_iterator pi = m_preprocs.begin(), pe = m_preprocs.end();
+		for (; pi != pe; ++pi)
+		{
+			rt << "PRE " << pi->tostring( &m_tagmap) << pformat->newitem;
+		}
 		std::vector<DatabaseCommand>::const_iterator ci = m_call.begin(), ce = m_call.end();
 		for (int idx=0; ci != ce; ++ci,++idx)
 		{
-			rt << idx << ":" << ci->tostring() << "; ";
+			rt << "CMD " << idx << ":" << ci->tostring( &m_tagmap) << pformat->newitem;
 		}
+		rt << "RESULT " << m_resultstruct->tostring() << pformat->newitem;
 		return rt.str();
 	}
 };
@@ -137,9 +143,10 @@ void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
-static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node* selectornode)
+static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::NodeVisitor& selectornode)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
+	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 
 	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
 	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
@@ -161,7 +168,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 			case Path::Next:
 			case Path::Up:
 			{
-				std::vector<const Node*> param;
+				std::vector<NodeVisitor::Index> param;
 				pi->selectNodes( inputst->structure(), selectornode, param);
 				if (param.size() == 0)
 				{
@@ -169,12 +176,12 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 				}
 				else
 				{
-					std::vector<const Node*>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+					std::vector<NodeVisitor::Index>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
 					for (; gi != ge; ++gi)
 					{
 						if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 					}
-					const types::Variant* valref = inputst->structure().contentvalue( *gs);
+					const types::Variant* valref = inputst->structure().contentvalue( inputst->structure().node( *gs));
 					if (valref)
 					{
 						ti.bindCommandArgAsValue( *valref);
@@ -189,9 +196,10 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 	}
 }
 
-static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<const TransactionFunctionInput::Structure::Node*>& rootnodearray)
+static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::NodeVisitor::Index>& rootnodearray)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
+	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 	std::size_t fidx = startfidx;
 	for (; ci != ce; ++ci,++fidx)
 	{
@@ -212,8 +220,8 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		}
 
 		// Select the nodes to execute the command with:
-		std::vector<const Node*> nodearray;
-		std::vector<const Node*>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
+		std::vector<NodeVisitor::Index> nodearray;
+		std::vector<NodeVisitor::Index>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			ci->selector().selectNodes( this_->structure(), *ni, nodearray);
@@ -228,12 +236,12 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 			{
 				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
 			}
-			std::vector<const Node*>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi);
-				std::vector<const Node*> opnodearray;
+				std::vector<NodeVisitor::Index> opnodearray;
 				opnodearray.push_back( *vi);
 				getOperationInput( this_, rt, fidx+1, ci->level(), ci+1, ca, opnodearray);
 			}
@@ -244,7 +252,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		else
 		{
 			// Call DatabaseCommand: For each selected node do expand the function call arguments:
-			std::vector<const Node*>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
@@ -256,11 +264,12 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 
 TransactionInput TransactionFunctionInput::get() const
 {
+	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 	TransactionInput rt;
 	std::vector<DatabaseCommand>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
 
-	std::vector<const Structure::Node*> nodearray;
-	nodearray.push_back( structure().root());
+	std::vector<NodeVisitor::Index> nodearray;
+	nodearray.push_back( structure().rootindex());
 	getOperationInput( this, rt, 0, 1, ci, ce, nodearray);
 	return rt;
 }
@@ -501,18 +510,32 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				}
 
 				DatabaseCommand paramstk( "", selector, di->resultref_FOREACH, param, false, false, 1 + 1/*level*/);
-				m_call.push_back( paramstk);
 				int scope_functionidx_incr = m_call.size();
+				m_call.push_back( paramstk);
 
 				std::vector<DatabaseCommand>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
 				for (; fsi != fse; ++fsi)
 				{
+					int paramResRefCorr = 0;
+					if (fsi->level() >= 2)
+					{
+						//.. PF:HACK: for commands higher than the the first level (1)
+						// we have to make a correction of references. There the PARAM element does not exist
+						if (fsi->name().empty() && fsi->level() == 2)
+						{
+							//... parameter rows (name empty) have been assigned one level higher. So the discrimination is different (>2 insead of >=2)
+						}
+						else
+						{
+							paramResRefCorr = 1;
+						}
+					}
 					Path fselector = fsi->selector();
-					fselector.rewrite( rwtab, scope_functionidx_incr);
-					int fresultsetidx = fsi->resultsetidx() + scope_functionidx_incr;
+					fselector.rewrite( rwtab, scope_functionidx_incr + paramResRefCorr);
+					int fresultsetidx = (fsi->resultsetidx()==-1)?-1:(fsi->resultsetidx() + scope_functionidx_incr + paramResRefCorr);
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
-					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
+					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr + paramResRefCorr);
 					DatabaseCommand cc( fsi->name(), fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
 				}
@@ -523,6 +546,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			throw MainProcessingStep::Error( eidx, e.what());
 		}
 	}
+	
 	// Handle PRINT instructions:
 	std::map<std::size_t,PrintStep>::const_iterator pp = description.printsteps.find( description.steps.size());
 	if (pp != description.printsteps.end())
@@ -551,7 +575,10 @@ TransactionFunction::Impl::Impl( const Impl& o)
 TransactionFunction::TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_name(name_)
 	,m_authorization( description.auth)
-	,m_impl( new Impl( description, functionmap)){}
+	,m_impl( new Impl( description, functionmap))
+{
+	LOG_DATA2 << "[transaction function build] " << tostring();
+}
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	:m_name(o.m_name)
@@ -571,6 +598,7 @@ const char* TransactionFunction::getErrorHint( const std::string& errorclass, in
 
 TransactionFunctionInput* TransactionFunction::getInput() const
 {
+	LOG_DATA << "[transaction function execute] " << tostring();
 	return new TransactionFunctionInput( this);
 }
 
@@ -588,9 +616,12 @@ langbind::TypedInputFilterR TransactionFunction::getOutput( const proc::Processo
 	}
 }
 
-std::string TransactionFunction::tostring() const
+std::string TransactionFunction::tostring( const utils::PrintFormat* pformat) const
 {
-	return m_impl->tostring();
+	std::ostringstream rt;
+	rt << "FUNCTION " << m_name << pformat->endheader;
+	rt << m_impl->tostring( pformat);
+	return rt.str();
 }
 
 TransactionFunction* db::createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)

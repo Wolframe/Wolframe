@@ -87,6 +87,29 @@ struct StackElement
 };
 }//anonymous namespace
 
+bool TransactionFunctionInput::Structure::check( const NodeVisitor& nv) const
+{
+	bool rt = true;
+	const Node* nd = node( nv);
+	if (nv.m_nodeidx)
+	{
+		int ci = nv.m_nodeidx;
+		for (; node(ci)->m_next != 0; ci=node(ci)->m_next){}
+
+		const Node* pn = node( nd->m_parent);
+		if (ci != pn->m_lastchild)
+		{
+			std::cout << "HALLY GALLY AT " << (int)__LINE__ << " DIFF " << nv.m_nodeidx << " " << pn->m_lastchild << std::endl;
+			rt = false;
+		}
+	}
+	if (nd->m_firstchild)
+	{
+		rt &= check( NodeVisitor( nd->m_firstchild));
+	}
+	return rt;
+}
+
 void TransactionFunctionInput::Structure::print( std::ostream& out, const utils::PrintFormat* pformat, const NodeVisitor& nv) const
 {
 	std::vector <StackElement> stk;
@@ -181,8 +204,8 @@ std::string TransactionFunctionInput::Structure::nodepath( const Node* nd) const
 TransactionFunctionInput::Structure::NodeVisitor
 	TransactionFunctionInput::Structure::createChildNode( const NodeVisitor& nv)
 {
-	Node* nd = node( nv);
 	int idx = (int)m_nodemem.alloc( 1);
+	Node* nd = node( nv);
 	if (!nd->m_lastchild)
 	{
 		nd->m_lastchild = nd->m_firstchild = idx;
@@ -394,61 +417,63 @@ void TransactionFunctionInput::Structure::pushValue( const NodeVisitor& nv, cons
 }
 
 
-void TransactionFunctionInput::Structure::next( const Node* nd, int tag, std::vector<const Node*>& nextnd) const
+void TransactionFunctionInput::Structure::next( const Node* nd, int tag, std::vector<NodeVisitor::Index>& nextnd) const
 {
 	if (!nd->m_firstchild) return;
-	const Node* cd = node( nd->m_firstchild);
+	NodeVisitor::Index ci = nd->m_firstchild;
+	const Node* cd = node( ci);
 	if (!tag)
 	{
 		for (;;)
 		{
-			nextnd.push_back( cd);
+			nextnd.push_back( ci);
 			if (!cd->m_next) break;
-			cd = node( cd->m_next);
+			cd = node( ci=cd->m_next);
 		}
 	}
 	else
 	{
 		for (;;)
 		{
-			if (cd->m_tag == tag) nextnd.push_back( cd);
+			if (cd->m_tag == tag) nextnd.push_back( ci);
 			if (!cd->m_next) break;
-			cd = node( cd->m_next);
+			cd = node( ci=cd->m_next);
 		}
 	}
 }
 
-void TransactionFunctionInput::Structure::find( const Node* nd, int tag, std::vector<const Node*>& findnd) const
+void TransactionFunctionInput::Structure::find( const Node* nd, int tag, std::vector<NodeVisitor::Index>& findnd) const
 {
 	if (!nd->m_firstchild) return;
-	const Node* cd = node( nd->m_firstchild);
+	NodeVisitor::Index ci = nd->m_firstchild;
+	const Node* cd = node( ci);
 	if (!tag)
 	{
 		for (;;)
 		{
-			findnd.push_back( cd);
+			findnd.push_back( ci);
 			if (cd->m_firstchild) find( cd, tag, findnd);
 			if (!cd->m_next) break;
-			cd = node( cd->m_next);
+			cd = node( ci=cd->m_next);
 		}
 	}
 	else
 	{
 		for (;;)
 		{
-			if (cd->m_tag == tag) findnd.push_back( cd);
+			if (cd->m_tag == tag) findnd.push_back( ci);
 			if (cd->m_firstchild) find( cd, tag, findnd);
 			if (!cd->m_next) break;
-			cd = node( cd->m_next);
+			cd = node( ci=cd->m_next);
 		}
 	}
 }
 
-void TransactionFunctionInput::Structure::up( const Node* nd, std::vector<const Node*>& rt) const
+void TransactionFunctionInput::Structure::up( const Node* nd, std::vector<NodeVisitor::Index>& rt) const
 {
 	if (nd->m_parent != -1)
 	{
-		rt.push_back( node( nd->m_parent));
+		rt.push_back( nd->m_parent);
 	}
 	else
 	{
@@ -578,7 +603,7 @@ public:
 					return true;
 				}
 				// ... push the next node in the list to process
-				m_stack.push_back( StackElement( m_nodeitr->second, false));
+				m_stack.push_back( StackElement( m_structure->node( m_nodeitr->second), false));
 				if (!m_nodeitr->first.empty())
 				{
 					// ... only open non empty tags

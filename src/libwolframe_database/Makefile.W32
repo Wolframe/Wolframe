@@ -31,6 +31,7 @@ CPP_OBJS = \
 	transactionfunction/ResultFilter.obj \
 	transactionOutput.obj \
 	transactionFunction.obj \
+	transactionFunctionDescription.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	preparedStatement.obj \

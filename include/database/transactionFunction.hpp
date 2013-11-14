@@ -42,6 +42,7 @@
 #include "database/transactionOutput.hpp"
 #include "langbind/authorization.hpp"
 #include "processor/procProvider.hpp"
+#include "utils/printFormats.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -136,7 +137,7 @@ public:
 	///\brief Get a hint for a given error class
 	const char* getErrorHint( const std::string& errorclass, int functionidx) const;
 
-	std::string tostring() const;
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 private:
 	std::string m_name;				//< transaction function name
