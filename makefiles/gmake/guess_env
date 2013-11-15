@@ -45,9 +45,13 @@ else
 
 						CentOS)
 							LINUX_DIST='redhat'
-							LINUX_REV=`echo $rev | tr -s ' ' | cut -f 1 -d .`
+							LINUX_REV=`echo $rev | tr -s ' ' '\t' | cut -f 1 -d .`
 							;;
 							
+						*Scientific*)
+							LINIX_DIR='redhat'
+							LINUX_REV=`echo $rev | tr -s ' ' '\t' | cut -f 1 -d .`
+							;;
 						*)
 							LINUX_DIST='unknown'
 							LINUX_REV='unknown'
