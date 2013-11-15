@@ -562,13 +562,14 @@ namespace {
 struct Subroutine
 {
 	Subroutine( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
-		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
+		:name(name_),start(start_),isTransaction(isTransaction_),isValidDatabase(true),embstm_index(0){}
 	Subroutine( const Subroutine& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),isValidDatabase(o.isValidDatabase),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
 
 	std::string name;
 	std::string::const_iterator start;
 	bool isTransaction;
+	bool isValidDatabase;
 	types::keymap<int> param_map;
 	TransactionFunctionDescription description;
 	std::vector<std::string::const_iterator> callstartar;
@@ -1114,18 +1115,56 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 	}
 }
 
+static std::vector<std::string> parseDatabaseList( config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	std::vector<std::string> rt;
+	std::string dbName;
+	for (;;)
+	{
+		char ch = parseNextToken( langdescr, dbName, si, se);
+		if (!ch) throw ERROR( si, "unexpected end of file in DATABASE declaration");
+		if (isAlpha(ch))
+		{
+			rt.push_back( dbName);
+			ch = gotoNextToken( langdescr, si, se);
+			if (ch == ',')
+			{
+				++si;
+				continue;
+			}
+			else
+			{
+				return rt;
+			}
+		}
+		throw ERROR( si, "unexpected token in DATABASE declaration");
+	}
+}
+
+static bool checkDatabaseList( const std::string& databaseID, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	std::vector<std::string> dblist = parseDatabaseList( ERROR, langdescr, si, se);
+	std::vector<std::string>::const_iterator di = dblist.begin(), de = dblist.end();
+	for (; di != de; ++di)
+	{
+		if (boost::algorithm::iequals( *di, databaseID)) return true;
+	}
+	return false;
+}
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& source, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+	load( const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
+	bool firstDef = true;
+	bool isValidDatabase = true;
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
 	types::keymap<TransactionFunctionR> subroutinemap;
-	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4};
+	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4,Database=0x8,MainBlock=0x10};
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
@@ -1141,6 +1180,18 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 			ch = parseNextToken( langdescr, tok, si, se);
 			bool enterDefinition = false;
 			bool isTransaction = false;
+			if (boost::algorithm::iequals( tok, "DATABASE") && isLineStart( tokstart, source))
+			{
+				if (!firstDef)
+				{
+					throw ERROR( si, MSG << "DATABASE definition only allowed at the beginning of the TDL source (global) or as part of the transaction declaration (per function)");
+				}
+				isValidDatabase = checkDatabaseList( databaseId, ERROR, langdescr, si, se);
+				if (!isValidDatabase)
+				{
+					LOG_DEBUG << "TDL file parsed but ignored for database '" << databaseId << "'";
+				}
+			}
 			if (boost::algorithm::iequals( tok, "TRANSACTION") && isLineStart( tokstart, source))
 			{
 				isTransaction = true;
@@ -1176,45 +1227,73 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				}
 				while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 				{
-					if (boost::algorithm::iequals( tok, "RESULT"))
+					if (boost::algorithm::iequals( tok, "DATABASE"))
 					{
-						if ((mask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction");
+						if ((mask & (unsigned int)Database) != 0) throw std::runtime_error( "duplicate DATABASE definition in transaction/subroutine");
+						mask |= (unsigned int)Database;
+
+						subroutine.isValidDatabase = checkDatabaseList( databaseId, ERROR, langdescr, si, se);
+					}
+					else if (boost::algorithm::iequals( tok, "RESULT"))
+					{
+						if ((mask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction/subroutine");
 						mask |= (unsigned int)Result;
 
 						parseResultDirective( subroutine, ERROR, langdescr, si, se);
 					}
 					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
 					{
-						if ((mask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction");
+						if ((mask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction/subroutine");
 						mask |= (unsigned int)Authorize;
 
 						parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
 					}
 					else if (boost::algorithm::iequals( tok, "PREPROCESS"))
 					{
-						if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROCESS definition in transaction");
+						if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROCESS definition in transaction/subroutine");
 						mask |= (unsigned int)Preprocess;
 
 						parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
 					}
 					else if (boost::algorithm::iequals( tok, "BEGIN"))
 					{
+						if ((mask & (unsigned int)MainBlock) != 0) throw std::runtime_error( "duplicate main block (BEGIN..END) definition in transaction/subroutine");
+						mask |= (unsigned int)MainBlock;
+
 						parseMainBlock( subroutine, ERROR, langdescr, embeddedStatementMap, si, se);
-						if (subroutine.isTransaction)
+						if (isValidDatabase)
 						{
-							LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
-							TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
-							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
-						}
-						else
-						{
-							subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+							if (subroutine.isValidDatabase)
+							{
+								if (subroutine.isTransaction)
+								{
+									LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
+									TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+									rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
+								}
+								else
+								{
+									subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+								}
+							}
+							else
+							{
+								LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.name << "' for active transaction database '" << databaseId << "'";
+							}
 						}
 						break;
 					}
+					else if (boost::algorithm::iequals( tok, "TRANSACTION"))
+					{
+						throw ERROR( si, "missing main block BEGIN..END in transaction/subroutine");
+					}
+					else if (boost::algorithm::iequals( tok, "SUBROUTINE"))
+					{
+						throw ERROR( si, "missing main block BEGIN..END in transaction/subroutine");
+					}
 					else
 					{
-						throw ERROR( si, std::string("RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
+						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
 					}
 				}
 				// append empty lines to keep line info for the dbsource:
@@ -1239,13 +1318,14 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 std::vector<std::pair<std::string,TransactionFunctionR> >
 	_Wolframe::db::loadTransactionProgramFile(
 		const std::string& filename,
+		const std::string& databaseId,
 		const LanguageDescription* langdescr,
 		std::string& dbsource,
 		types::keymap<std::string>& embeddedStatementMap)
 {
 	try
 	{
-		return load( utils::readSourceFileContent( filename), langdescr, dbsource, embeddedStatementMap);
+		return load( utils::readSourceFileContent( filename), databaseId, langdescr, dbsource, embeddedStatementMap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{

@@ -598,6 +598,24 @@
 			</programlisting>
 			</para>
 		</sect3>
+		<sect3>
+			<title>Database Specific Code</title>
+			<para>TDL allows the support of different transaction databases with one code base. 
+			For example one for testing and demonstration and one for the productive system.
+			We can tag transactions,subroutines or whole TDL sources as beeing valid for one or a list of databases
+			with the command <code>DATABASE</code> followed by a comma separated list of database names as declared in
+			the configuration. The following example declares the transaction function 'getCustomer' to be valid only for
+			the databases DB1 and DBtest.
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_database_local.tdl" parse="text" />
+			</programlisting>
+			The following example does the same but declares the valid databases for the whole TDL file. In this case the database
+			declaration has to appear as first declaration in the file.
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_database_global.tdl" parse="text" />
+			</programlisting>
+			</para>
+		</sect3>
 	</sect2>
 </sect1>
 

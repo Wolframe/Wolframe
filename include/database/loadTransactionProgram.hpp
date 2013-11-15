@@ -49,6 +49,7 @@ namespace db {
 std::vector<std::pair<std::string,TransactionFunctionR> >
 	loadTransactionProgramFile(
 		const std::string& filename,
+		const std::string& databaseId,
 		const LanguageDescription* langdescr,
 		std::string& dbsource,
 		types::keymap<std::string>& embeddedStatementMap);

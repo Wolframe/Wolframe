@@ -103,7 +103,7 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	try
 	{
 		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-			= db::loadTransactionProgramFile( filename, languageDescr, dbsource, embeddedStatementMap);
+			= db::loadTransactionProgramFile( filename, transactionDB->ID(), languageDescr, dbsource, embeddedStatementMap);
 
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)

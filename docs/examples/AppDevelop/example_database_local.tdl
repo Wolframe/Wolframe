@@ -1,0 +1,7 @@
+
+TRANSACTION getCustomer
+DATABASE DB1,DBtest
+BEGIN
+	INTO customer DO SELECT * FROM CustomerData WHERE ID=$(id);
+END
+
