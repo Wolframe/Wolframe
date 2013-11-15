@@ -35,8 +35,6 @@ if test ! -f $RPMBUILD/SOURCES/boost_1_48_0.tar.gz; then
 		http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.48.0%2F&ts=1353483626&use_mirror=ignum
 fi
 
-http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
-
 if test ! -f $RPMBUILD/SOURCES/Python-3.3.2.tar.bz2; then
 	wget -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
 		http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
