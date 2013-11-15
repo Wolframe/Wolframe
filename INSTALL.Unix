@@ -135,13 +135,15 @@ RHEL/Centos/SL 5
 
 Optional packages:
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
-                              sqlite-devel (3.3.6), postgresql84-devel (8.4.13),
+                              postgresql84-devel (8.4.13),
                               zlib-devel (1.2.3-4), libpng-devel (1.2.10-16),
                               libicu-devel (3.6-5.16.1)
 
 Libxml2 is too old (2.6.26), build your own 2.9.1 one.
 Libxslt is too old (1.1.17) and we should link it against the one built above,
 so also build your own one.
+
+Sqlite is too old, use WITH_LOCAL_SQLITE=1 to build the locally supplied one.
 
 Boost is not available in a decent version (1.33), build your own one.
 
