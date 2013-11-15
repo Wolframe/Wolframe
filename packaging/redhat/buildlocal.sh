@@ -17,7 +17,6 @@ RPMBUILD=$HOME/rpmbuild
 rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
 	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log \
 	/tmp/boost-1.48.0 /tmp/libxml2-2.7.8 /tmp/Python-3.3.2
-touch $RPMBUILD/SPECS/log
 
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
@@ -44,7 +43,17 @@ if test ! -f $RPMBUILD/SOURCES/Python-3.3.2.tar.bz2; then
 	gunzip $RPMBUILD/SOURCES/Python-3.3.2.tgz
 	bzip2 $RPMBUILD/SOURCES/Python-3.3.2.tar
 fi
- 
+
+if test ! -f $RPMBUILD/SOURCES/libxml2-2.9.1.tar.gz; then
+	wget -O $RPMBUILD/SOURCES/libxml2-2.9.1.tar.gz \
+		ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
+fi
+
+if test ! -f $RPMBUILD/SOURCES/libxslt-1.1.28.tar.gz; then
+	wget -O $RPMBUILD/SOURCES/libxslt-1.1.28.tar.gz \
+		ftp://xmlsoft.org/libxml2/libxslt-1.1.28.tar.gz
+fi
+
 cp packaging/obs/boost1.48/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
 
 cd $RPMBUILD/SPECS
