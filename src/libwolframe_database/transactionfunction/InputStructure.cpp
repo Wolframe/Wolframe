@@ -589,7 +589,7 @@ public:
 					setState( langbind::InputFilter::Error, "internal: illegal call of input filter");
 					return false;
 				}
-				while (m_nodeitr != m_nodelist.end() && !m_nodeitr->second)
+				while (m_nodeitr != m_nodelist.end() && m_nodeitr->second < 0)
 				{
 					//... skip empty nodes (null values)
 					++m_nodeitr;
