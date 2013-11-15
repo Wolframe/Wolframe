@@ -394,7 +394,14 @@ BuildRequires: postgresql84-devel >= 8.4
 BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
-%if %{fedora} || %{scilin} || %{suse} || %{sles}
+%if %{scilin}
+%if %{scilin5}
+BuildRequires: postgresql84-devel >= 8.4
+%else
+BuildRequires: postgresql-devel >= 8.3
+%endif
+%endif
+%if %{fedora} || %{suse} || %{sles}
 BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
