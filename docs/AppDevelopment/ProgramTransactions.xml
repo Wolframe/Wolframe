@@ -1,5 +1,5 @@
 <sect1>
-<title>Functions in Transaction Definition Language (TDL)</title>
+<title>Transactions in TDL</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>
@@ -15,7 +15,7 @@
 			A <acronym>TDL</acronym> transaction function takes a structure as input
 			and returns a structure as output.
 			The <application>Wolframe</application> database interface defines 
-			a transaction as context where the input is passed as a structure 
+			a transaction as object where the input is passed to as a structure 
 			and the output is fetched from it as a structure.
 		</para>
 		<para>
@@ -32,7 +32,7 @@
 			for every item of an input set. This set can consist of the set of
 			results of a previous instruction or a selection of the
 			input of the transaction function. A "for each" selector
-			defines the input set as part of the instruction.
+			defines the input set as part of the command.
 		</para>
 		<para>
 			Each instruction result can be declared as being part of the transaction
@@ -46,51 +46,14 @@
 			defines a preprocessing section where globally defined Wolframe
 			functions can be called for the selected input. To build an output 
 			structure that cannot be modeled with a language without control
-			structures and recursion, TDL provides the possibility to call a
-			globally defined function as filter for postprocessing of the
+			structures and recursion, TDL provides the possibility to define a
+			function as filter for postprocessing of the
 			result of the transaction function.
 		</para>
 		<para>
 			The TDL is case insensitive. For clearness and better readability
 			TDL keywords are written in uppercase here.
 		</para>
-	</sect2>
-	<sect2>
-		<title>Examples</title>
-		<sect3>
-		<title>First Example</title>
-		<para>Our first example selects a key from a table and inserts it into a list. The substitute "$1" refers to the first column of the query result "SELECT id FROM UserTable ..". The substitute "$(name)" in the first statement refers to the toplevel element 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name being unique per item and item describing a set of items).
-		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.tdl" parse="text" />
-		</programlisting>
-		</para>
-		</sect3>
-		<sect3>
-		<title>Preprocessing Input</title>
-		<para>This example selects identifiers 'id' of all users matched by their normalized name. The normalization of the name is done in a preprocessing step.
-		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/preprocess_example.tdl" parse="text" />
-		</programlisting>
-		</para>
-		</sect3>
-		<sect3>
-		<title>Using Variables</title>
-		<para>This example returns the 'id' of a country matched by their normalized name.
-		The normalization of country names is done in a preprocessing step. 
-		The result is printed into a structure 'country/code'.
-		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/variable_example.tdl" parse="text" />
-		</programlisting>
-		</para>
-		</sect3>
-		<sect3>
-		<title>Subroutines</title>
-		<para>This example calls a subroutine with one argument to map the output.
-		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/operation_example.tdl" parse="text" />
-		</programlisting>
-		</para>
-		</sect3>
 	</sect2>
 	<sect2>
 	<title>Language Description</title>
@@ -103,17 +66,54 @@
 		<sect3>
 			<title>Subroutines</title>
 			<para>A subroutine declaration starts with the Keyword <code>SUBROUTINE</code>
-			followed by the subroutine name. After this header and an optional 
-			result substructure name declaration, the code definition block
-			follows starting with <code>BEGIN</code>, ending with <code>END</code>.
+			followed by the subroutine name and optionally some parameter names
+			in brackets ('(' ')') separated by comma.
+			The declared subroutine name identifies the
+			function in the scope of this sourcefile after this subroutine declaration.
+			The name is not exported and the subroutine not available for other TDL
+			modules. The body of the function contains the following parts:
+			<itemizedlist>
+				<listitem><code>DATABASE &lt;database name list&gt;</code>
+					<para>
+						This optional definition is restriction the definition
+						and availability of the function to a set of
+						databases. The databases are listed by name
+						separated by comma (','). The names are the
+						database id's defined in your server configuration.
+						If the database declaration is omitted then the 
+						transaction function is avaiable for any 
+						database. This declaration allows you to
+						run your application with configurations
+						using different databases but sharing a common
+						code base.
+					</para>
+				</listitem>
+				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
+					<para>
+						This optional declaration defines a tag for the
+						result structure relative to the result context
+						of the caller.
+					</para>
+				</listitem>
+				<listitem><code>BEGIN &lt;...instructions...&gt; END</code>
+					<para>
+					The main processing block starts with <code>BEGIN</code> and
+					ends with <code>END</code>. It contains all the commands
+					executed when calling this subroutine from another
+					subroutine or a transaction function.
+					</para>
+				</listitem>
+			</itemizedlist>
+			The following pseudocode example shows the parts of a subroutine declaration:
 			<programlisting language='sql'>
-			SUBROUTINE &lt;name&gt;
+			SUBROUTINE &lt;name&gt; ( &lt;parameter name list&gt; )
+			DATABASE &lt;list of database names&gt;
 			RESULT INTO &lt;result-block-name&gt;
 			BEGIN
 				...&lt;instructions&gt;...
 			END
 			</programlisting>
-			The line with the RESULT INTO declaration is optional.
+			The line with the RESULT INTO declaration and the DATABASE declaration are optional.
 			</para>
 		</sect3>
 
@@ -127,6 +127,21 @@
 					<para>
 						This optional definition is dealing with 
 						authorization and access rights.
+					</para>
+				</listitem>
+				<listitem><code>DATABASE &lt;database name list&gt;</code>
+					<para>
+						This optional definition is restriction the definition
+						and availability of the function to a set of
+						databases. The databases are listed by name
+						separated by comma (','). The names are the
+						database id's defined in your server configuration.
+						If the database declaration is omitted then the 
+						transaction function is avaiable for any 
+						database. This declaration allows you to
+						run your application with configurations
+						using different databases but sharing a common
+						code base.
 					</para>
 				</listitem>
 				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
@@ -158,11 +173,12 @@
 				</listitem>
 			</itemizedlist>
 			The following pseudo code snippet shows the explained building
-			blocks together:
+			blocks in transaction functions together:
 			<programlisting language='sql'>
 	
 			TRANSACTION &lt;name&gt;
 			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
+			DATABASE &lt;list of database names&gt;
 			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
 			PREPROCESS BEGIN
 				...&lt;preprocessing instructions&gt;...
@@ -171,9 +187,9 @@
 				...&lt;instructions&gt;...
 			END
 			</programlisting>
-			The lines with AUTHORIZE and RESULT INTO and FILTER declarations are optional.
-			So is the preprocessing block PREPROCESS..BEGIN..END. A simpler transaction
-			function looks like the following:
+			The lines with AUTHORIZE,DATABASE,RESULT INTO and FILTER are optional.
+			So is the preprocessing block PREPROCESS..BEGIN..END. A simpler
+			transaction function looks like the following:
 			<programlisting language='sql'>
 	
 			TRANSACTION &lt;name&gt;
