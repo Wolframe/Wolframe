@@ -14,9 +14,12 @@ VERSION=0.0.1
 RPMBUILD=$HOME/rpmbuild
 #OSB_PLATFORM=
 
-rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
+rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD/wolframe-$VERSION \
+	$RPMBUILD/BUILD/boost-1.48.0 $RPMBUILD/BUILD/libxml2-2.9.1 \
+	$RPMBUILD/BUILD/libxslt-1.1.28 $RPMBUILD/BUILD/Python-3.3.2 \
+	$RPMBUILD/RPMS/*/* \
 	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log \
-	/tmp/boost-1.48.0 /tmp/libxml2-2.7.8 /tmp/Python-3.3.2
+	/tmp/boost-1.48.0 /tmp/libxml2-2.9.1 /tmp/libxslt-1.1.28 /tmp/Python-3.3.2
 
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
