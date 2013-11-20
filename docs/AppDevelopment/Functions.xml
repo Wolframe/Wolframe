@@ -1,8 +1,16 @@
 <chapter>
 <title>Functions</title>
-<para>This chapter describes how functions are linked to the logic tier. It introduces a language to write
-database transaction functions and a language to describe atomic data type normalizations and gives an overview
-on the language bindings available for Wolframe.
+<para>This chapter describes how functions are linked to the logic tier. 
+It gives an overview on the language bindings available for Wolframe.
+</para>
+<para>
+For defining database transactions Wolframe introduces a language called TDL (Transaction Definition Language).
+TDL embeddes the language of the underlaying database (SQL) in a language that defines how
+sets of elements of input and output are addressed.
+</para>
+<para>
+This chapter also describes how data types are defined that can be used in data definion languages
+(DDL) for form desciptions. Forms and their definition will be introduced in a different chapter.
 </para>
 <para>
 After reading this chapter you should be able to write functions of the <application>Wolframe</application> logic tier on your own.

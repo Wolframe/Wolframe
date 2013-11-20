@@ -44,16 +44,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static bool isLineStart( std::string::const_iterator si, const std::string& src)
-{
-	if (si == src.begin()) return true;
-	for (--si; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
-	{
-		if (*si == '\n') return true;
-	}
-	return si == src.begin();
-}
-
 static std::string::const_iterator lineStart( std::string::const_iterator si, const std::string& src)
 {
 	if (si == src.begin()) return si;
@@ -62,16 +52,6 @@ static std::string::const_iterator lineStart( std::string::const_iterator si, co
 		if (*si == '\n') return si+1;
 	}
 	throw std::logic_error( "internal: Called lineStart without calling isLineStart before");
-}
-
-static std::size_t lineCount( std::string::const_iterator si, std::string::const_iterator se)
-{
-	std::size_t rt = 0;
-	for (; si != se; ++si)
-	{
-		if (*si == '\n') ++rt;
-	}
-	return rt;
 }
 
 static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
@@ -1152,8 +1132,24 @@ static bool checkDatabaseList( const std::string& databaseID, config::Positional
 	return false;
 }
 
+///\brief Forward declaration
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap);
+
+static std::string getInclude( const std::string& mainfilename, const std::string& incfilename)
+{
+	std::string::const_iterator fi = incfilename.begin(), fe = incfilename.end();
+	for (; fi != fe; ++fi)
+	{
+		char ch = *fi | 32;
+		if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_'|| ch == '/' || ch == '\\') continue;
+		throw std::runtime_error( "illegal include file: only relative paths without extension allowed for include");
+	}
+	return utils::readSourceFileContent( utils::getParentPath( mainfilename) + incfilename + utils::getFileExtension( mainfilename));
+}
+
+static std::vector<std::pair<std::string,TransactionFunctionR> >
+	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
@@ -1162,14 +1158,10 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
-	std::string::const_iterator dbi = source.begin();
-	types::keymap<TransactionFunctionR> subroutinemap;
 	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4,Database=0x8,MainBlock=0x10};
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
-
-	dbsource.clear();
 
 	if (!langdescr) throw std::logic_error( "no database language description defined");
 	try
@@ -1180,7 +1172,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 			ch = parseNextToken( langdescr, tok, si, se);
 			bool enterDefinition = false;
 			bool isTransaction = false;
-			if (boost::algorithm::iequals( tok, "DATABASE") && isLineStart( tokstart, source))
+			if (boost::algorithm::iequals( tok, "DATABASE"))
 			{
 				if (!firstDef)
 				{
@@ -1192,15 +1184,30 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					LOG_DEBUG << "TDL file parsed but ignored for database '" << databaseId << "'";
 				}
 			}
-			if (boost::algorithm::iequals( tok, "TRANSACTION") && isLineStart( tokstart, source))
+			else if (boost::algorithm::iequals( tok, "TRANSACTION"))
 			{
 				isTransaction = true;
 				enterDefinition = true;
 			}
-			else if (boost::algorithm::iequals( tok, "SUBROUTINE") && isLineStart( tokstart, source))
+			else if (boost::algorithm::iequals( tok, "SUBROUTINE"))
 			{
 				isTransaction = false;
 				enterDefinition = true;
+			}
+			else if (boost::algorithm::iequals( tok, "INCLUDE"))
+			{
+				enterDefinition = false;
+				std::string includeFileName;
+
+				ch = parseNextToken( langdescr, includeFileName, si, se);
+				if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
+				std::vector<std::pair<std::string,TransactionFunctionR> > lst
+					= includeFile( filename, includeFileName, databaseId, langdescr, embeddedStatementMap, subroutineMap);
+				rt.insert( rt.begin(), lst.begin(), lst.end());
+			}
+			else
+			{
+				throw ERROR( si, std::string( "DATABASE, TRANSACTION, SUBROUTINE or INCLUDE expected instead of '") + tok + "'");
 			}
 			if (enterDefinition)
 			{
@@ -1214,8 +1221,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				Subroutine subroutine( transactionName, dbe, isTransaction);
 				subroutine.description.casesensitive = langdescr->isCaseSensitive();
 
-				dbsource.append( std::string( dbi, dbe));
-				dbi = dbe;
 				unsigned int mask = 0;
 
 				if (gotoNextToken( langdescr, si, se) == '(')
@@ -1268,12 +1273,12 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 								if (subroutine.isTransaction)
 								{
 									LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
-									TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+									TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutineMap));
 									rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
 								}
 								else
 								{
-									subroutinemap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutinemap));
+									subroutineMap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutineMap));
 								}
 							}
 							else
@@ -1296,9 +1301,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
 					}
 				}
-				// append empty lines to keep line info for the dbsource:
-				dbsource.append( std::string( lineCount( dbi, si), '\n'));
-				dbi = si;
 			}
 		}
 	}
@@ -1310,22 +1312,49 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 	{
 		throw ERROR( si, e.what());
 	}
-	dbsource.append( std::string( dbi, source.end()));
 	return rt;
 }
 
+static std::vector<std::pair<std::string,TransactionFunctionR> >
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap)
+{
+	try
+	{
+		std::string incsrc = getInclude( mainfilename, incfilename);
+		return load( mainfilename, incsrc, databaseId, langdescr, embeddedStatementMap, subroutineMap);
+	}
+	catch (const config::PositionalErrorException& e)
+	{
+		config::PositionalFileError err( e, incfilename);
+		throw config::PositionalFileErrorException( err);
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_ERROR << "error loading program from file '" << mainfilename << " when including file '" << incfilename << "'";
+		throw e;
+	}
+	catch (...)
+	{
+		LOG_ERROR << "uncaught exception in TDL include file '" << incfilename << "' included from file '" << mainfilename << "'";
+		throw std::runtime_error( "uncaught exception. see logs");
+	}
+}
 
 std::vector<std::pair<std::string,TransactionFunctionR> >
 	_Wolframe::db::loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
 		const LanguageDescription* langdescr,
-		std::string& dbsource,
 		types::keymap<std::string>& embeddedStatementMap)
 {
 	try
 	{
-		return load( utils::readSourceFileContent( filename), databaseId, langdescr, dbsource, embeddedStatementMap);
+		types::keymap<TransactionFunctionR> subroutineMap;
+		return load( filename, utils::readSourceFileContent( filename), databaseId, langdescr, embeddedStatementMap, subroutineMap);
+	}
+	catch (const config::PositionalFileErrorException& e)
+	{
+		throw e;
 	}
 	catch (const config::PositionalErrorException& e)
 	{

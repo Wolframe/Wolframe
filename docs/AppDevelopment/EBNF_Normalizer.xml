@@ -1,10 +1,5 @@
 	<sect2>
 	<title>EBNF of the Normalizer Function Declarations</title>
-	<para>The declaration of a type starts with an identifier followed by an assignment operator '='
-		and a comma separated sequence of ':' separated identifier tuples, defining the name
-		of the normalization module (1st) and the name of the function (2nd).
-		The type declaration is closed with a semicolon ';'.</para>
-
 		<productionset>
 		<title>Tokens</title>
 

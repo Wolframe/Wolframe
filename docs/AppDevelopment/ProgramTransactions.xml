@@ -632,6 +632,40 @@
 			</programlisting>
 			</para>
 		</sect3>
+		<sect3>
+			<title>Subroutine Templates</title>
+			<para>To reuse code with different context, for example for doing the same
+			procedure on different tables, subroutine templates can be defined in TDL.
+			Subroutines become useful when we want to make items instantiable
+			that are not allowed to be dependent on variable arguments.
+			Most SQL implementations for example forbid tables to be dependent on
+			variable arguments. To reuse code on different tables you can 
+			define subroutine templates with the involved table names as 
+			template argument. The following example defines a transaction using 
+			the template subroutine insertIntoTree on a table passed as template 
+			argument.
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_subroutine_template.tdl" parse="text" />
+			</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Includes</title>
+			<para>TDL has the possibility to include files for reusing subroutines 
+			or subroutine templates in different modules.
+			The keyword INCLUDE followed by the name of the relative path of the TDL file without the extension .tdl includes the declarations of the included file.
+			The declarations in the included file are treated as they would have been
+			made in the including file instead.
+			The following example swhows the use of include.
+			We assume that the subroutine template <code>insertIntoTree</code> 
+			of the example before is defined in a separate include file
+			<code>treeOperations.tdl</code> located in the same folder as the 
+			TDL program.
+			<programlisting language='sql'>
+			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_include.tdl" parse="text" />
+			</programlisting>
+			</para>
+		</sect3>
 	</sect2>
 </sect1>
 

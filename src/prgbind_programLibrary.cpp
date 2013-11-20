@@ -40,12 +40,13 @@
 #include "prgbind/printProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
 #include "database/transactionFunction.hpp"
+#include "module/normalizeFunctionBuilder.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
+#include "utils/fileUtils.hpp"
 #include <algorithm>
 
 using namespace _Wolframe;
@@ -167,6 +168,7 @@ public:
 	types::keymap<types::FormDescriptionR> m_formMap;
 	std::vector<types::FormDescriptionR> m_privateFormList;
 	std::vector<ProgramR> m_programTypes;
+	std::string m_curfile;
 
 	Impl()
 	{
@@ -323,7 +325,7 @@ public:
 		for (; ti != te; ++ti)
 		{
 			LOG_TRACE << "Loading program '" << ti->second << "'";
-			ti->first->loadProgram( library, transactionDB, ti->second);
+			ti->first->loadProgram( library, transactionDB, m_curfile=ti->second);
 		}
 	}
 };

@@ -229,8 +229,8 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		std::vector<DatabaseCommand>::const_iterator ca = ci;
 		if (ci->level() > level)
 		{
-			// call OPERATION (embedded): For each selected node execute all the database commands or OPERATIONs:
-			if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling OPERATION");
+			// call SUBROUTINE: For each selected node execute all the database commands or SUBROUTINEs:
+			if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling SUBROUTINE");
 			std::size_t nextfidx = fidx;
 			for (++ca; ca != ce; ++ca,++nextfidx)
 			{
@@ -464,11 +464,11 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
 				if (!di->hints.empty())
 				{
-					throw MainProcessingStep::Error( eidx, "No ON ERROR hints supported for call of OPERATION");
+					throw MainProcessingStep::Error( eidx, "No ON ERROR hints supported for call of SUBROUTINE");
 				}
 				if (di->nonempty)
 				{
-					throw MainProcessingStep::Error( eidx, "NONEMTY not supported for call of OPERATION");
+					throw MainProcessingStep::Error( eidx, "NONEMTY not supported for call of SUBROUTINE");
 				}
 				std::string iteratingTag;
 				bool hasOutput = false;

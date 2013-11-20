@@ -93,7 +93,6 @@ bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 
 void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)
 {
-	std::string dbsource;
 	types::keymap<std::string> embeddedStatementMap;
 	static const db::LanguageDescription defaultLanguageDescr;
 	const db::LanguageDescription* languageDescr = (transactionDB)?transactionDB->getLanguageDescription():&defaultLanguageDescr;
@@ -103,7 +102,7 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	try
 	{
 		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-			= db::loadTransactionProgramFile( filename, transactionDB->ID(), languageDescr, dbsource, embeddedStatementMap);
+			= db::loadTransactionProgramFile( filename, transactionDB->ID(), languageDescr, embeddedStatementMap);
 
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
@@ -114,7 +113,6 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 		}
 		if (transactionDB)
 		{
-			transactionDB->addProgram( dbsource);
 			transactionDB->addStatements( embeddedStatementMap);
 		}
 	}

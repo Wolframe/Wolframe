@@ -51,7 +51,6 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 		const std::string& filename,
 		const std::string& databaseId,
 		const LanguageDescription* langdescr,
-		std::string& dbsource,
 		types::keymap<std::string>& embeddedStatementMap);
 
 
