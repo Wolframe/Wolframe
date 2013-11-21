@@ -50,8 +50,14 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
+std::string utils::joinPath( const std::string& path, const std::string& item)
+{
+	boost::filesystem::path rt( path);
+	rt /= item;
+	return rt.string();
+}
 
-std::string _Wolframe::utils::resolvePath( const std::string& path )
+std::string utils::resolvePath( const std::string& path )
 {
 	boost::filesystem::path result;
 	boost::filesystem::path	p( path );

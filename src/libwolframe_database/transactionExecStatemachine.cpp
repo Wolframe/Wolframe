@@ -153,9 +153,9 @@ static bool executeCommand( TransactionExecStatemachine* stmh, const Transaction
 		{
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				if (ai->scope_functionidx() >= 0)
+				if (ai->scope_functionidx() > 0)
 				{
-					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx()-1, ai->value());
 				}
 				else if (cmditr->foreach_functionidx() == -1)
 				{
@@ -284,9 +284,9 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 		{
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				if (ai->scope_functionidx() >= 0)
+				if (ai->scope_functionidx() > 0)
 				{
-					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx()-1, ai->value());
 				}
 				else if (cmditr->foreach_functionidx() == -1)
 				{
@@ -384,7 +384,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 			}
 			cmdres = TransactionOutput::CommandResult( ci->functionidx());
 		}
-		if (ci->foreach_functionidx() >= 0)
+		if (ci->foreach_functionidx() > 0)
 		{
 			// ... command is bound to a result set, so we call it for every result row
 			TransactionOutput::result_const_iterator ri;
@@ -392,7 +392,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 			{
 				case PushArguments:
 					// start of an operation: execution of a instruction block
-					ri = output.resultIterator( ci->foreach_functionidx());
+					ri = output.resultIterator( ci->foreach_functionidx()-1);
 					if (ri != output.end())
 					{
 						std::size_t residx = ri - output.begin(); //< start of result referenced by pushArguments
@@ -417,7 +417,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 					break;
 
 				case DatabaseCall:
-					ri = output.resultIterator( ci->foreach_functionidx());
+					ri = output.resultIterator( ci->foreach_functionidx()-1);
 					if (ri != output.end())
 					{
 						std::size_t residx = ri - output.begin();

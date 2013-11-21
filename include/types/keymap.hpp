@@ -72,7 +72,10 @@ struct keymap
 
 	void insert( const keystring& key, const ValueType& value)
 	{
-		if (Parent::find( key) != this->end()) throw std::runtime_error( std::string( "duplicate definition of '") + key + "'");
+		if (Parent::find( key) != this->end())
+		{
+			throw std::runtime_error( std::string( "duplicate definition of '") + key + "'");
+		}
 		Parent::operator[](key) = value;
 	}
 
@@ -80,6 +83,26 @@ struct keymap
 	{
 		typename Parent::const_iterator ki = m.begin(), ke = m.end();
 		for (; ki != ke; ++ki) insert( ki->first, ki->second);
+	}
+
+	void join( const keymap& m)
+	{
+		typename Parent::const_iterator ki = m.begin(), ke = m.end();
+		for (; ki != ke; ++ki)
+		{
+			typename Parent::const_iterator fi = Parent::find( ki->first);
+			if (fi != this->end())
+			{
+				if (ki->second != fi->second)
+				{
+					throw std::runtime_error( std::string( "duplicate definition of '") + ki->first + "'");
+				}
+			}
+			else
+			{
+				Parent::operator[](ki->first) = ki->second;
+			}
+		}
 	}
 
 	template <class KeyList>

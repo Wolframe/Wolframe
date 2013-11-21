@@ -34,6 +34,7 @@
 ///\file transactionFunctionDescription.hpp
 #ifndef _DATABASE_TRANSACTION_FUNCTION_DESCRIPTION_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_DESCRIPTION_HPP_INCLUDED
+#include "database/transactionFunction.hpp"
 #include "langbind/authorization.hpp"
 #include "types/keymap.hpp"
 #include <string>
@@ -89,7 +90,6 @@ public:
 		}
 
 		///\class Error
-		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
 		struct Error
 		{
 			///\brief Constructor
@@ -143,7 +143,6 @@ public:
 		std::string tostring() const;
 
 		///\class Error
-		///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
 		struct Error
 		{
 			///\brief Constructor
@@ -199,16 +198,17 @@ public:
 			};
 
 			std::string funcname;			//< function name
+			std::vector<std::string> templatearg;	//< list of template arguments
 			std::vector<Param> paramlist;		//< list of arguments
 
 			///\brief Default constructor
 			Call(){}
 			///\brief Copy constructor
 			Call( const Call& o)
-				:funcname(o.funcname),paramlist(o.paramlist){}
+				:funcname(o.funcname),templatearg(o.templatearg),paramlist(o.paramlist){}
 			///\brief Constructor
-			Call( const std::string& funcname_, const std::vector<Param>& paramlist_)
-				:funcname(funcname_),paramlist(paramlist_)
+			Call( const std::string& funcname_, const std::vector<std::string>& templatearg_, const std::vector<Param>& paramlist_)
+				:funcname(funcname_),templatearg(templatearg_),paramlist(paramlist_)
 			{}
 
 			///\brief Reset call
@@ -258,6 +258,7 @@ public:
 			:path_INTO(o.path_INTO),argument(o.argument){}
 	};
 
+	std::string name;
 	std::map<std::size_t,PrintStep> printsteps;	//< Print instruction
 	std::vector<PreProcessingStep> preprocs;	//< preprocessing steps on input
 	std::string resultfilter;			//< result filter function for post processing
@@ -268,10 +269,34 @@ public:
 
 	///\brief Copy constructor
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
-		:printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),casesensitive(o.casesensitive){}
+		:name(o.name),printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),casesensitive(o.casesensitive){}
 	///\brief Default constructor
 	TransactionFunctionDescription()
 		:casesensitive(false){}
+};
+
+class SubroutineDeclaration
+{
+public:
+	SubroutineDeclaration(){}
+	SubroutineDeclaration( const std::vector<std::string>& templateArguments_, const TransactionFunctionR& function_)
+		:templateArguments(templateArguments_)
+		,function(function_){}
+	SubroutineDeclaration( const SubroutineDeclaration& o)
+		:templateArguments(o.templateArguments)
+		,function(o.function){}
+public:
+	std::vector<std::string> templateArguments;
+	TransactionFunctionR function;
+	
+};
+
+class SubroutineDeclarationMap :public types::keymap<SubroutineDeclaration>
+{
+public:
+	SubroutineDeclarationMap(){}
+	SubroutineDeclarationMap( const SubroutineDeclarationMap& o)
+		:types::keymap<SubroutineDeclaration>(o){}
 };
 
 }}//namespace

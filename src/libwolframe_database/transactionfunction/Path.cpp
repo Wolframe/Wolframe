@@ -148,10 +148,7 @@ void Path::rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
 	{
 		if (pi->m_type == ResultIndex || pi->m_type == ResultSymbol)
 		{
-			if (pi->m_scope_functionidx >= 0)
-			{
-				pi->m_scope_functionidx += scope_functionidx_incr;
-			}
+			pi->m_scope_functionidx += scope_functionidx_incr;
 		}
 		else if (pi->m_type == Next || pi->m_type == Find)
 		{

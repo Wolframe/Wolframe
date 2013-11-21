@@ -64,6 +64,9 @@ struct LanguageDescription
 
 	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
 
+	typedef std::pair<std::string,std::string> TemplateArgumentAssignment;
+	virtual std::string substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const;
+
 	///\brief Define if a database is case-insensitive. This has influence on TDL parsing
 	// Default is according SQL standard 'false'
 	virtual bool isCaseSensitive() const

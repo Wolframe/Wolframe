@@ -60,13 +60,19 @@ std::string getFileStem( const std::string& path);
 ///\param[in] path relative part of the path or absolute path
 ///\param[in] refPath absolute part of the path if 'path' is relative
 ///\return the canonical path
-std::string getCanonicalPath( const std::string& path, const std::string& refPath );
+std::string getCanonicalPath( const std::string& path, const std::string& refPath);
 
 ///\brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
 ///\param[in] path the path to get the parent path from
 ///\param[in] levels how many level (1 = parent, 2 = granparent, etc.)
 ///\return the parent path
 std::string getParentPath( const std::string& path, unsigned int levels=1);
+
+///\brief Join path with an item of the path to a combined path
+///\param[in] path the main path 
+///\param[in] item the sub path to join to path
+///\return the joined path
+std::string joinPath( const std::string& path, const std::string& item);
 
 ///\brief Returns true, if the file with path 'path' exists
 bool fileExists( const std::string& path);

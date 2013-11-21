@@ -68,7 +68,7 @@ struct TransactionFunction::Impl
 	std::vector<PreProcessCommand> m_preprocs;
 	std::string m_resultfilter;
 
-	Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
+	Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
 	Impl( const Impl& o);
 
 	void handlePrintStep( const PrintStep& printstep);
@@ -327,7 +327,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 	}
 }
 
-TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
+TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
 	:m_resultstruct( new ResultStructure())
 	,m_tagmap(description.casesensitive)
 	,m_resultfilter(description.resultfilter)
@@ -412,9 +412,13 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				Path pa( *ai, &m_tagmap);
 				param.push_back( pa);
 			}
-			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.funcname);
+			SubroutineDeclarationMap::const_iterator fui = functionmap.find( di->call.funcname);
 			if (fui == functionmap.end())
 			{
+				if (di->call.templatearg.size())
+				{
+					throw MainProcessingStep::Error( eidx, "unknown subroutine template called");
+				}
 				DatabaseCommand cc( di->call.funcname, selector, di->resultref_FOREACH, param, di->nonempty, di->unique, 1, di->hints);
 				if (di->path_INTO.empty())
 				{
@@ -460,7 +464,19 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			}
 			else
 			{
-				Impl* func = fui->second->m_impl;
+				if (di->call.templatearg.size() != fui->second.templateArguments.size())
+				{
+					throw MainProcessingStep::Error( eidx, "Number of template arguments to subroutine call does not match declaration");
+				}
+				std::vector<LanguageDescription::TemplateArgumentAssignment> templateArgAssignments;
+				std::vector<std::string>::const_iterator vi = di->call.templatearg.begin(), ve = di->call.templatearg.end();
+				std::vector<std::string>::const_iterator ti = fui->second.templateArguments.begin(), te = fui->second.templateArguments.end();
+				for (; vi != ve && ti != te; ++ti,++vi)
+				{
+					templateArgAssignments.push_back( LanguageDescription::TemplateArgumentAssignment( *ti, *vi));
+				}
+
+				Impl* func = fui->second.function->m_impl;
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
 				if (!di->hints.empty())
 				{
@@ -510,34 +526,50 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				}
 
 				DatabaseCommand paramstk( "", selector, di->resultref_FOREACH, param, false, false, 1 + 1/*level*/);
-				int scope_functionidx_incr = m_call.size();
 				m_call.push_back( paramstk);
+				int scope_functionidx_incr = m_call.size();
 
 				std::vector<DatabaseCommand>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
 				for (; fsi != fse; ++fsi)
 				{
-					int paramResRefCorr = 0;
-					if (fsi->level() >= 2)
-					{
-						//.. PF:HACK: for commands higher than the the first level (1)
-						// we have to make a correction of references. There the PARAM element does not exist
-						if (fsi->name().empty() && fsi->level() == 2)
-						{
-							//... parameter rows (name empty) have been assigned one level higher. So the discrimination is different (>2 insead of >=2)
-						}
-						else
-						{
-							paramResRefCorr = 1;
-						}
-					}
 					Path fselector = fsi->selector();
-					fselector.rewrite( rwtab, scope_functionidx_incr + paramResRefCorr);
-					int fresultsetidx = (fsi->resultsetidx()==-1)?-1:(fsi->resultsetidx() + scope_functionidx_incr + paramResRefCorr);
+					fselector.rewrite( rwtab, scope_functionidx_incr);
+					int fresultsetidx = -1;
+					if (fsi->resultsetidx() >= 0)
+					{
+						fresultsetidx = fsi->resultsetidx() + scope_functionidx_incr;
+					}
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
-					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr + paramResRefCorr);
-					DatabaseCommand cc( fsi->name(), fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
-					m_call.push_back( cc);
+					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
+					bool templated = false;
+					if (fui->second.templateArguments.size())
+					{
+						types::keymap<std::string>::const_iterator ei = embeddedStatementMap.find( fsi->name());
+						if (ei != embeddedStatementMap.end())
+						{
+							std::string stm = langdescr->substituteTemplateArguments( ei->second, templateArgAssignments);
+							if (stm != ei->second)
+							{
+								//... subroutine main step has template arguments substituted
+								templated = true;
+								std::string stmname;
+								stmname.append( "__");
+								stmname.append( description.name);
+								stmname.append( "_");
+								stmname.append( boost::lexical_cast<std::string>( m_call.size()));
+								embeddedStatementMap[ stmname] = stm;
+
+								DatabaseCommand cc( stmname, fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
+								m_call.push_back( cc);
+							}
+						}
+					}
+					if (!templated)
+					{
+						DatabaseCommand cc( fsi->name(), fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
+						m_call.push_back( cc);
+					}
 				}
 			}
 		}
@@ -572,10 +604,10 @@ TransactionFunction::Impl::Impl( const Impl& o)
 	,m_preprocs(o.m_preprocs){}
 
 
-TransactionFunction::TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
-	:m_name(name_)
+TransactionFunction::TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
+	:m_name(description.name)
 	,m_authorization( description.auth)
-	,m_impl( new Impl( description, functionmap))
+	,m_impl( new Impl( description, langdescr, embeddedStatementMap, functionmap))
 {
 	LOG_DATA2 << "[transaction function build] " << tostring();
 }
@@ -624,9 +656,9 @@ std::string TransactionFunction::tostring( const utils::PrintFormat* pformat) co
 	return rt.str();
 }
 
-TransactionFunction* db::createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap)
+TransactionFunction* db::createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
 {
-	return new TransactionFunction( name, description, functionmap);
+	return new TransactionFunction( description, langdescr, embeddedStatementMap, functionmap);
 }
 
 

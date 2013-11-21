@@ -79,6 +79,29 @@ static bool isIdentifier( const std::string& str)
 	return (si == se);
 }
 
+static std::string errorTokenString( char ch, const std::string& tok)
+{
+	if (g_optab[ch])
+	{
+		std::string rt;
+		rt.push_back( ch);
+		return rt;
+	}
+	if (ch == '"' || ch == '\'')
+	{
+		std::string rt( "string ");
+		rt.push_back( ch);
+		rt.append( tok);
+		rt.push_back( ch);
+		return rt;
+	}
+	if (ch == 0)
+	{
+		return "end of file";
+	}
+	return tok;
+}
+
 static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
 {
 	const char* commentopr = langdescr->eoln_commentopr();
@@ -151,7 +174,7 @@ static int getResultNamespaceIdentifier( const std::string& name, const types::k
 			{
 				throw std::runtime_error( "no command result referenceable here with RESULT");
 			}
-			return fidx-1;
+			return fidx;
 		}
 		return -1;
 	}
@@ -159,6 +182,31 @@ static int getResultNamespaceIdentifier( const std::string& name, const types::k
 	{
 		return ki->second;
 	}
+}
+
+static std::vector<std::string>
+	parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	std::vector<std::string> rt;
+	std::string tok;
+	if (gotoNextToken( langdescr, si, se) == '<')
+	{
+		++si;
+		for (;;)
+		{
+			char ch = parseNextToken( langdescr, tok, si, se);
+			if (!ch) throw std::runtime_error( "unexpected end of template argument list");
+			if (ch == ',') std::runtime_error( "expected template argument identifier before comma ','");
+			if (ch == '>') break;
+			if (!isAlpha(ch)) throw std::runtime_error( std::string( "template argument is not an identifier: '") + errorTokenString( ch, tok) + "'");
+			rt.push_back( tok);
+			ch = parseNextToken( langdescr, tok, si, se);
+			if (ch == '>') break;
+			if (ch == ',') continue;
+			if (ch == ',') std::runtime_error( "expected comma ',' or end of template identifier list '>'");
+		}
+	}
+	return rt;
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call::Param
@@ -282,7 +330,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 		}
 		else
 		{
-			throw std::runtime_error( "illegal token in path parameter of function call");
+			throw std::runtime_error( std::string( "illegal token in path parameter of function call: ") + errorTokenString( ch, tok));
 		}
 	}
 	Call::Param param( Call::Param::InputSelectorPath, pp);
@@ -293,7 +341,8 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	Call rt;
+	std::string callname;			//< function name
+	std::vector<Call::Param> paramlist;	//< list of arguments
 	std::string stm;
 	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
 	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
@@ -308,27 +357,37 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 			{
 				stm.append( start, si - 1);
 				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, si, se);
-				rt.paramlist.push_back( param);
+				paramlist.push_back( param);
 				start = si;
-				stm.append( langdescr->stm_argument_reference( rt.paramlist.size()));
+				stm.append( langdescr->stm_argument_reference( paramlist.size()));
 			}
 		}
 	}
 	stm.append( start, si);
 
-	rt.funcname.append( "__");
-	rt.funcname.append( funcname);
-	rt.funcname.append( "_");
-	rt.funcname.append( boost::lexical_cast<std::string>( index));
-	embeddedStatementMap.insert( rt.funcname, stm);
-	return rt;
+	callname.append( "__");
+	callname.append( funcname);
+	callname.append( "_");
+	callname.append( boost::lexical_cast<std::string>( index));
+	types::keymap<std::string>::const_iterator ei = embeddedStatementMap.find( callname);
+	if (ei == embeddedStatementMap.end())
+	{
+		embeddedStatementMap.insert( callname, stm);
+	}
+	else if (ei->second != stm)
+	{
+		throw std::runtime_error( std::string("duplicate definition of function '") + funcname + "'");
+	}
+	return Call( callname, std::vector<std::string>(), paramlist);
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call
 	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	Call rt;
+	std::string callname;			//< function name
+	std::vector<std::string> templatearg;	//< list of template arguments
+	std::vector<Call::Param> paramlist;	//< list of arguments
 	std::string tok;
 
 	if (!utils::gotoNextToken( ci, ce))
@@ -337,22 +396,27 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	}
 	while (ci < ce && isAlphaNumeric( *ci))
 	{
-		rt.funcname.push_back( *ci);
+		callname.push_back( *ci);
 		++ci;
 	}
-	if (rt.funcname.empty())
+	if (callname.empty())
 	{
 		throw std::runtime_error( "identifier expected for name of function");
 	}
-	utils::gotoNextToken( ci, ce);
-	if (*ci != '(')
+	char ch = utils::gotoNextToken( ci, ce);
+	if (ch == '<')
+	{
+		templatearg = parseTemplateArguments( langdescr, ci, ce);
+		ch = utils::gotoNextToken( ci, ce);
+	}
+	if (ch != '(')
 	{
 		throw std::runtime_error( "'(' expected after function name");
 	}
-	++ci; utils::gotoNextToken( ci, ce);
+	++ci; ch = utils::gotoNextToken( ci, ce);
 
 	// Parse parameter list:
-	if (*ci == ')')
+	if (ch == ')')
 	{
 		// ... empty parameter list
 		++ci;
@@ -360,7 +424,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	else
 	{
 		std::string pp;
-		char ch = ',';
+		ch = ',';
 		while (ch == ',')
 		{
 			ch = gotoNextToken( langdescr, ci, ce);
@@ -369,18 +433,18 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 				ch = parseNextToken( langdescr, tok, ci, ce);
 				Call::Param::Type type = Call::Param::Constant;
 				Call::Param param( type, tok);
-				rt.paramlist.push_back( param);
+				paramlist.push_back( param);
 			}
 			else if (ch == '$')
 			{
 				++ci;
 				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, ci, ce);
-				rt.paramlist.push_back( param);
+				paramlist.push_back( param);
 			}
 			else
 			{
 				Call::Param param = parsePathParameter( langdescr, ci, ce);
-				rt.paramlist.push_back( param);
+				paramlist.push_back( param);
 			}
 			ch = parseNextToken( langdescr, tok, ci, ce);
 		}
@@ -389,7 +453,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 			throw std::runtime_error( "unexpected token in function call parameter. close bracket ')' or comma ',' expected after argument");
 		}
 	}
-	return rt;
+	return Call( callname, templatearg, paramlist);
 }
 
 static TransactionFunctionDescription::PreProcessingStep::Argument
@@ -541,12 +605,12 @@ static void parseSubroutineArguments( types::keymap<int>& param_map, const Langu
 namespace {
 struct Subroutine
 {
-	Subroutine( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
-		:name(name_),start(start_),isTransaction(isTransaction_),isValidDatabase(true),embstm_index(0){}
+	Subroutine( const std::vector<std::string>& templateArguments_, std::string::const_iterator start_, bool isTransaction_)
+		:templateArguments(templateArguments_),start(start_),isTransaction(isTransaction_),isValidDatabase(true),embstm_index(0){}
 	Subroutine( const Subroutine& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),isValidDatabase(o.isValidDatabase),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
+		:templateArguments(o.templateArguments),start(o.start),isTransaction(o.isTransaction),isValidDatabase(o.isValidDatabase),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
 
-	std::string name;
+	std::vector<std::string> templateArguments;
 	std::string::const_iterator start;
 	bool isTransaction;
 	bool isValidDatabase;
@@ -598,7 +662,7 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 		}
 		else if (ch == '\'' || ch == '\"')
 		{
-			throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead string");
+			throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead of string");
 		}
 		else if (boost::algorithm::iequals( tok, "END"))
 		{
@@ -658,7 +722,7 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 		}
 		else
 		{
-			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
+			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of " << errorTokenString( ch, tok));
 		}
 	}
 }
@@ -877,7 +941,7 @@ static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t command
 		{
 			throw ERROR( si, "no result available to reference here (KEEP AS)");
 		}
-		keepResult_map.insert( tok, commandlistsize-1);
+		keepResult_map.insert( tok, commandlistsize);
 	}
 }
 
@@ -948,10 +1012,6 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
 			{
 				throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-			}
-			catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
-			{
-				throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in preprocessing step of transaction: " << err.msg);
 			}
 			catch (const std::runtime_error& err)
 			{
@@ -1077,7 +1137,7 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			}
 			if (langdescr->isEmbeddedStatement( si, se))
 			{
-				opstep.call = parseEmbeddedStatement( langdescr, subroutine.name, subroutine.embstm_index++, si, se, embeddedStatementMap, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+				opstep.call = parseEmbeddedStatement( langdescr, subroutine.description.name, subroutine.embstm_index++, si, se, embeddedStatementMap, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
 			}
 			else
 			{
@@ -1134,7 +1194,7 @@ static bool checkDatabaseList( const std::string& databaseID, config::Positional
 
 ///\brief Forward declaration
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap);
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap);
 
 static std::string getInclude( const std::string& mainfilename, const std::string& incfilename)
 {
@@ -1142,19 +1202,28 @@ static std::string getInclude( const std::string& mainfilename, const std::strin
 	for (; fi != fe; ++fi)
 	{
 		char ch = *fi | 32;
-		if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_'|| ch == '/' || ch == '\\') continue;
-		throw std::runtime_error( "illegal include file: only relative paths without extension allowed for include");
+		if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_' || ch == '/' || ch == '\\' || ch == '.') continue;
+		throw std::runtime_error( "illegal include file: only relative paths allowed for include");
 	}
-	return utils::readSourceFileContent( utils::getParentPath( mainfilename) + incfilename + utils::getFileExtension( mainfilename));
+	std::string ext = utils::getFileExtension( incfilename);
+	if (ext.empty())
+	{
+		return utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename) + utils::getFileExtension( mainfilename));
+	}
+	else
+	{
+		return utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename));
+	}
 }
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap)
+	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
 	bool firstDef = true;
 	bool isValidDatabase = true;
+	std::vector<std::string> templateArguments;
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
@@ -1172,6 +1241,8 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 			ch = parseNextToken( langdescr, tok, si, se);
 			bool enterDefinition = false;
 			bool isTransaction = false;
+			templateArguments.clear();
+
 			if (boost::algorithm::iequals( tok, "DATABASE"))
 			{
 				if (!firstDef)
@@ -1194,12 +1265,31 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				isTransaction = false;
 				enterDefinition = true;
 			}
+			else if (boost::algorithm::iequals( tok, "TEMPLATE"))
+			{
+				if (gotoNextToken( langdescr, si, se) != '<')
+				{
+					throw ERROR( si, MSG << "template argument list in '<' '>' brackets expected instead of '" << ch << "'");
+				}
+				templateArguments = parseTemplateArguments( langdescr, si, se);
+
+				ch = parseNextToken( langdescr, tok, si, se);
+				if (boost::algorithm::iequals( tok, "SUBROUTINE"))
+				{
+					isTransaction = false;
+					enterDefinition = true;
+				}
+				else
+				{
+					throw ERROR( si, MSG << "SUBROUTINE declaration expected after TEMPLATE declaration instead of '" << errorTokenString( ch, tok) << "'");
+				}
+			}
 			else if (boost::algorithm::iequals( tok, "INCLUDE"))
 			{
 				enterDefinition = false;
 				std::string includeFileName;
 
-				ch = parseNextToken( langdescr, includeFileName, si, se);
+				ch = utils::parseNextToken( includeFileName, si, se, utils::emptyCharTable(), utils::anyCharTable());
 				if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
 				std::vector<std::pair<std::string,TransactionFunctionR> > lst
 					= includeFile( filename, includeFileName, databaseId, langdescr, embeddedStatementMap, subroutineMap);
@@ -1207,7 +1297,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 			}
 			else
 			{
-				throw ERROR( si, std::string( "DATABASE, TRANSACTION, SUBROUTINE or INCLUDE expected instead of '") + tok + "'");
+				throw ERROR( si, std::string( "DATABASE, TRANSACTION, SUBROUTINE or INCLUDE expected instead of ") + errorTokenString( ch, tok));
 			}
 			if (enterDefinition)
 			{
@@ -1218,7 +1308,8 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
 				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
-				Subroutine subroutine( transactionName, dbe, isTransaction);
+				Subroutine subroutine( templateArguments, dbe, isTransaction);
+				subroutine.description.name = transactionName;
 				subroutine.description.casesensitive = langdescr->isCaseSensitive();
 
 				unsigned int mask = 0;
@@ -1270,20 +1361,32 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						{
 							if (subroutine.isValidDatabase)
 							{
-								if (subroutine.isTransaction)
+								try
 								{
-									LOG_TRACE << "Registering transaction definition '" << subroutine.name << "'";
-									TransactionFunctionR ff( createTransactionFunction( subroutine.name, subroutine.description, subroutineMap));
-									rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.name, ff));
+									if (subroutine.isTransaction)
+									{
+										LOG_TRACE << "Registering transaction definition '" << subroutine.description.name << "'";
+										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, embeddedStatementMap, subroutineMap));
+										rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.description.name, func));
+									}
+									else
+									{
+										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, embeddedStatementMap, subroutineMap));
+										subroutineMap[ subroutine.description.name] = SubroutineDeclaration( subroutine.templateArguments, func);
+									}
 								}
-								else
+								catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
 								{
-									subroutineMap[ subroutine.name] = TransactionFunctionR( createTransactionFunction( subroutine.name, subroutine.description, subroutineMap));
+									throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+								}
+								catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
+								{
+									throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
 								}
 							}
 							else
 							{
-								LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.name << "' for active transaction database '" << databaseId << "'";
+								LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.description.name << "' for active transaction database '" << databaseId << "'";
 							}
 						}
 						break;
@@ -1298,7 +1401,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else
 					{
-						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of '") + tok + "'");
+						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of ") + errorTokenString( ch, tok));
 					}
 				}
 			}
@@ -1316,7 +1419,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 }
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, types::keymap<TransactionFunctionR>& subroutineMap)
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap)
 {
 	try
 	{
@@ -1349,7 +1452,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 {
 	try
 	{
-		types::keymap<TransactionFunctionR> subroutineMap;
+		SubroutineDeclarationMap subroutineMap;
 		return load( filename, utils::readSourceFileContent( filename), databaseId, langdescr, embeddedStatementMap, subroutineMap);
 	}
 	catch (const config::PositionalFileErrorException& e)

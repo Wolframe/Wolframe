@@ -51,6 +51,9 @@ namespace _Wolframe {
 namespace db {
 
 ///\brief Forward declaration
+class SubroutineDeclarationMap;
+
+///\brief Forward declaration
 class TransactionFunctionDescription;
 
 ///\class TransactionFunction
@@ -107,7 +110,7 @@ public:
 	///\brief Copy constructor
 	TransactionFunction( const TransactionFunction& o);
 	///\brief Constructor
-	TransactionFunction( const std::string& name_, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
+	TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
 	///\brief Destructor
 	virtual ~TransactionFunction();
 
@@ -149,7 +152,7 @@ private:
 ///\param[in] name name of  the transaction
 ///\param[in] description description of the function
 ///\param[in] functionmap map op operations in the module context that can be referenced
-TransactionFunction* createTransactionFunction( const std::string& name, const TransactionFunctionDescription& description, const types::keymap<TransactionFunctionR>& functionmap);
+TransactionFunction* createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
 
 }}//namespace
 #endif

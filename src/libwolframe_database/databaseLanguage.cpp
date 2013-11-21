@@ -34,9 +34,11 @@
 ///\brief Implementation of language definitions for embedded commands in transactions
 #include "database/databaseLanguage.hpp"
 #include "utils/parseUtils.hpp"
+#include "types/keymap.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -47,6 +49,31 @@ std::string LanguageDescription::stm_argument_reference( int index) const
 	rt << "$" << index;
 	return rt.str();
 }
+
+namespace {
+class SQL_KeywordMap :public types::keymap<bool>
+{
+public:
+	SQL_KeywordMap& operator()( const char* keyword)
+	{
+		types::keymap<bool>::insert( std::string(keyword), true);
+		return *this;
+	}
+
+	SQL_KeywordMap()
+	{
+		(*this)("INTO")("FROM")("SELECT")("UPDATE")("DELETE")("CREATE")
+		("INSERT")("RENAME")("REPLACE")("ORDER")("GROUP")("IN")("BY")
+		("ON")("OF")("DESC")("ASC")("DISTINCT")("DROP")("INNER")("OUTER")
+		("NATURAL")("INSTEAD")("INTERSECT")("IS")("JOIN")("LEFT")("LIKE")
+		("LIMIT")("MATCH")("NULL")("SET")("TABLE")("TEMPORARY")
+		("UNION")("UNIQUE")("VALUES")("VIEW")("AND")("OR")("NOT");
+	}
+};
+}
+
+static SQL_KeywordMap g_keywordMap;
+
 
 bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const
 {
@@ -75,8 +102,8 @@ static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 std::string LanguageDescription::parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const
 {
 	std::string rt;
-	const char* commentopr = eoln_commentopr();
 	std::string tok;
+	const char* commentopr = eoln_commentopr();
 	std::string::const_iterator start = si;
 	char ch;
 	while (0!=(ch=utils::parseNextToken( tok, si, se, g_optab)))
@@ -108,5 +135,71 @@ std::string LanguageDescription::parseEmbeddedStatement( std::string::const_iter
 	--si; //... terminating ';' is not swallowed
 	rt.append( std::string( start, si));
 	return rt;
+}
+
+static bool isAlpha( char ch)
+{
+	if (ch >= 'A' && ch <= 'Z') return true;
+	if (ch >= 'a' && ch <= 'z') return true;
+	if (ch == '_') return true;
+	return false;
+}
+
+std::string LanguageDescription::substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const
+{
+	const char* commentopr = eoln_commentopr();
+	std::vector<TemplateArgumentAssignment>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (g_keywordMap.find( ai->first) != g_keywordMap.end())
+		{
+			throw std::runtime_error( "tried to use SQL keyword as template argument");
+		}
+	}
+	std::string rt;
+	std::string tok;
+	std::string::const_iterator si = cmd.begin(), se = cmd.end();
+	std::string::const_iterator start = si;
+	char ch;
+	while (0!=(ch=utils::parseNextToken( tok, si, se, g_optab)))
+	{
+		if (isAlpha(ch))
+		{
+			ai = arg.begin(), ae = arg.end();
+			for (; ai != ae; ++ai)
+			{
+				if (boost::algorithm::iequals( tok, ai->first))
+				{
+					// ... substiture identifier
+					rt.append( start, si - tok.size());
+					rt.append( ai->second);
+					start = si;
+				}
+			}
+		}
+		else if (ch == commentopr[0])
+		{
+			std::size_t ci = 1;
+			while (commentopr[ci] && si != se && commentopr[ci] == *si)
+			{
+				++ci;
+				++si;
+			}
+			if (!commentopr[ci])
+			{
+				// skip to end of line
+				while (si != se && *si != '\n') ++si;
+			}
+		}
+	}
+	if (start == cmd.begin())
+	{
+		return cmd;
+	}
+	else
+	{
+		rt.append( start, si);
+		return rt;
+	}
 }
 
