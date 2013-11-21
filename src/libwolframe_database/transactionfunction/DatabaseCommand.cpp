@@ -64,5 +64,19 @@ std::string DatabaseCommand::tostring( const TagTable* tagmap) const
 	return rt.str();
 }
 
+void DatabaseCommand::rewriteResultReferences( int scope_functionidx_incr)
+{
+	std::vector<Path>::iterator ai = m_arg.begin(), ae = m_arg.end();
+	int ii = 0;
+	for (; ai != ae; ++ai,++ii)
+	{
+		ai->rewriteResultReferences( scope_functionidx_incr);
+	}
+	m_selector.rewriteResultReferences( scope_functionidx_incr);
+	if (m_resultsetidx > 0)
+	{
+		m_resultsetidx += scope_functionidx_incr;
+	}
+}
 
 

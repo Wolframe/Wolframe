@@ -159,6 +159,21 @@ void Path::rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
 	}
 }
 
+void Path::rewriteResultReferences( int scope_functionidx_incr)
+{
+	std::vector<Element>::iterator pi = m_path.begin(), pe = m_path.end();
+	for (; pi != pe; ++pi)
+	{
+		if (pi->m_type == ResultIndex || pi->m_type == ResultSymbol)
+		{
+			if (pi->m_scope_functionidx > 0)
+			{
+				pi->m_scope_functionidx += scope_functionidx_incr;
+			}
+		}
+	}
+}
+
 void Path::append( const Path& o)
 {
 	m_path.insert( m_path.end(), o.begin(), o.end());

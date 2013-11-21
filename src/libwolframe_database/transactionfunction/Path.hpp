@@ -99,6 +99,7 @@ public:
 	std::size_t size() const					{return m_path.size();}
 
 	void rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr);
+	void rewriteResultReferences( int scope_functionidx_incr);
 	void append( const Path& o);
 
 private:

@@ -59,6 +59,7 @@ public:
 	ResultElement( const ResultElement& o)
 		:m_type(o.m_type),m_idx(o.m_idx){}
 
+	void setType( Type type_)	{m_type = type_;}
 	Type type() const		{return m_type;}
 	std::size_t idx() const		{return m_idx;}
 
@@ -110,6 +111,7 @@ public:
 public:
 	const_iterator begin() const	{return const_iterator(this);}
 	const_iterator end() const	{return const_iterator();}
+	ResultElement& back()		{return m_ar.back();}
 
 	void addOpenTag( const std::string& name);
 	void addResultColumnName( const std::string& name);

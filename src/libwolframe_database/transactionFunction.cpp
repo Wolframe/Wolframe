@@ -420,6 +420,10 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					throw MainProcessingStep::Error( eidx, "unknown subroutine template called");
 				}
 				DatabaseCommand cc( di->call.funcname, selector, di->resultref_FOREACH, param, di->nonempty, di->unique, 1, di->hints);
+				if (eidx != m_call.size())
+				{
+					cc.rewriteResultReferences( (int)m_call.size() - (int)eidx);
+				}
 				if (di->path_INTO.empty())
 				{
 					m_resultstruct->addIgnoreResult( m_call.size());
@@ -503,12 +507,21 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				{
 					m_resultstruct->addOpenTag( iteratingTag);
 				}
-				if (!di->unique)
+				bool hasIndex = (!di->unique && (di->selector_FOREACH.size() || di->resultref_FOREACH > 0));
+				if (hasIndex)
 				{
 					m_resultstruct->addMark( ResultElement::IndexStart, m_call.size()+1);
 				}
 				m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
-				if (!di->unique)
+
+				if (hasOutput && m_resultstruct->back().type() == ResultElement::IgnoreResult)
+				{
+					std::size_t residx = m_resultstruct->back().idx();
+					m_resultstruct->back().setType( ResultElement::FunctionStart);
+					m_resultstruct->addValueReference( residx);
+					m_resultstruct->addMark( ResultElement::FunctionEnd, residx);
+				}
+				if (hasIndex)
 				{
 					m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size()+1);
 				}
@@ -516,6 +529,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				{
 					m_resultstruct->addCloseTag();
 				}
+
 				m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
 				if (!di->path_INTO.empty())
 				{
@@ -554,7 +568,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 								//... subroutine main step has template arguments substituted
 								templated = true;
 								std::string stmname;
-								stmname.append( "__");
+								stmname.append( "__T_");
 								stmname.append( description.name);
 								stmname.append( "_");
 								stmname.append( boost::lexical_cast<std::string>( m_call.size()));
