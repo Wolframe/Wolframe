@@ -528,14 +528,6 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					m_resultstruct->addMark( ResultElement::IndexStart, m_call.size()+1);
 				}
 				m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size()+1);
-
-				if (hasOutput && m_resultstruct->back().type() == ResultElement::IgnoreResult)
-				{
-					std::size_t residx = m_resultstruct->back().idx();
-					m_resultstruct->back().setType( ResultElement::FunctionStart);
-					m_resultstruct->addValueReference( residx);
-					m_resultstruct->addMark( ResultElement::FunctionEnd, residx);
-				}
 				if (hasIndex)
 				{
 					m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size()+1);
