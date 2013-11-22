@@ -244,7 +244,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
 			}
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-			for (int loopcnt=0; vi != ve; ++vi,++loopcnt)
+			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi, loopcnt);
@@ -260,7 +260,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		{
 			// Call DatabaseCommand: For each selected node do expand the function call arguments:
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-			for (int loopcnt=0; vi != ve; ++vi,++loopcnt)
+			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi, loopcnt);
