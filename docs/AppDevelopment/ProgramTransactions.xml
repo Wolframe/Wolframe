@@ -154,7 +154,7 @@
 						in a subroutine.
 					</para>
 				</listitem>
-				<listitem><code>PREPROCESS BEGIN &lt;...preprocessing instructions...&gt; END</code>
+				<listitem><code>PREPROC &lt;...preprocessing instructions...&gt; ENDPROC</code>
 					<para>
 						This optional block contains instructions on the transaction
 						function input. The result of these preprocessing instructions are
@@ -180,15 +180,15 @@
 			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
 			DATABASE &lt;list of database names&gt;
 			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
-			PREPROCESS BEGIN
+			PREPROC
 				...&lt;preprocessing instructions&gt;...
-			END
+			ENDPROC
 			BEGIN
 				...&lt;instructions&gt;...
 			END
 			</programlisting>
 			The lines with AUTHORIZE,DATABASE,RESULT INTO and FILTER are optional.
-			So is the preprocessing block PREPROCESS..BEGIN..END. A simpler
+			So is the preprocessing block PREPROC..ENDPROC. A simpler
 			transaction function looks like the following:
 			<programlisting language='sql'>
 	
@@ -290,7 +290,7 @@
 		</sect3>
 		<sect3>
 		<title>Preprocessing Instructions</title>
-		<para>Preprocessing instructions defined in the PREPROCESS execution block 
+		<para>Preprocessing instructions defined in the PREPROC execution block 
 			of a transaction function consist similar to the instructions
 			in the main execution block of three parts in the
 			following order terminated by a semicolon ';' (the order of the INTO and FOREACH expression can be

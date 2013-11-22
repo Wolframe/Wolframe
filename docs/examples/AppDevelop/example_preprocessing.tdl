@@ -1,11 +1,11 @@
 
 TRANSACTION insertPersonTerms
-PREPROCESS BEGIN
+PREPROC
     FOREACH //address/* INTO normalized
         DO normalizeStructureElements(.);
     FOREACH //id INTO normalized
         DO normalizeNumber(.);
-END
+ENDPROC
 BEGIN
     DO UNIQUE SELECT id FROM Person
         WHERE name = $(person/name);

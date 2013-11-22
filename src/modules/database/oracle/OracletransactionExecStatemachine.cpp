@@ -378,28 +378,31 @@ const DatabaseError* TransactionExecStatemachine_oracle::getLastError()
 
 types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 {
-	LOG_TRACE << "[oracle statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "inspect command result not possible in state '") + stateName(m_state) + "'");
+		LOG_DATA << "[oracle statement] CALL get(" << idx << ") => NULL";
 		return types::VariantConst();
 	}
 	if (!m_lastresult)
 	{
 		errorStatus( "command result is empty");
+		LOG_DATA << "[oracle statement] CALL get(" << idx << ") => NULL";
 		return types::VariantConst();
 	}
 	if (m_idx_row >= m_nof_rows) return types::VariantConst();
-//	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
-	char *rt = "";
-	if (!rt || rt[0] == '\0')
+//	char* resval = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
+	char *resval = "";
+	if (!resval || resval[0] == '\0')
 	{
 //		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
 		{
 			return types::VariantConst();
 		}
 	}
-	return types::VariantConst( rt);
+	types::VariantConst rt( resval);
+	LOG_DATA << "[oracle statement] CALL get(" << idx << ") => " << rt.typeName() << " '" << rt.tostring() << "'";
+	return rt;
 }
 
 bool TransactionExecStatemachine_oracle::next()

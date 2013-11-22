@@ -90,6 +90,7 @@ public:
 
 	std::string tostring( const TagTable* tagmap) const;
 	void rewriteResultReferences( int scope_functionidx_incr);
+	void rewriteResultReferences( const std::map<int,int>& addrtab);
 
 private:
 	std::string m_name;

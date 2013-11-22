@@ -214,7 +214,6 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	char ch = utils::gotoNextToken( si, se);
-	bool isParameterReference = false;
 	if (ch == '(')
 	{
 		char sb,eb;
@@ -236,8 +235,16 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 			throw std::runtime_error( std::string( "missing close bracket for expression") + ((eb==')')?"')'":"']'"));
 		}
 	}
+	else if (ch == '#')
+	{
+		// Internal LOOPCOUNT variable:
+		++si;
+		Call::Param param( Call::Param::InternalVariable, "#");
+		return param;
+	}
 	else if (isAlphaNumeric(ch))
 	{
+		// Parse namespaces and result references:
 		int resultscope_functionidx = -1;
 		if (isAlpha(ch))
 		{
@@ -246,16 +253,13 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 			if (*si == '.')
 			{
 				std::string namspace( argstart, si);
-				if (boost::algorithm::iequals( namspace, "PARAM"))
-				{
-					isParameterReference = true;
-				}
 				resultscope_functionidx = getResultNamespaceIdentifier( namspace, keepResult_map, fidx);
 				if (resultscope_functionidx == -1)
 				{
 					throw std::runtime_error( std::string( "result set identifier not found '") + namspace + "'");
 				}
 				++si;
+				ch = (si==se)?0:*si;
 			}
 			else
 			{
@@ -266,6 +270,10 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 		{
 			std::string::const_iterator argstart = si;
 			for (; si!=se && *si>= '0' && *si<= '9'; ++si);
+			if (si != se && isAlphaNumeric(*si))
+			{
+				throw std::runtime_error( "operator or space expected after numeric reference");
+			}
 			Call::Param::Type type = Call::Param::NumericResultReference;
 			Call::Param param( type, std::string( argstart, si), resultscope_functionidx);
 			return param;
@@ -274,7 +282,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 		{
 			std::string::const_iterator argstart = si;
 			for (; si!=se && isAlphaNumeric(*si); ++si);
-			if (isParameterReference)
+			if (resultscope_functionidx == 0)
 			{
 				// ... Parameter reference has to be converted to a numeric reference
 				std::string paramname = std::string( argstart, si);
@@ -353,7 +361,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	{
 		if (ch == '$' && si != se)
 		{
-			if (*si == '(' || isAlphaNumeric(*si))
+			if (*si == '(' || isAlphaNumeric(*si) || *si == '#')
 			{
 				stm.append( start, si - 1);
 				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, si, se);
@@ -630,17 +638,12 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 	std::string tok;
 	if (!subroutine.isTransaction)
 	{
-		throw ERROR( si, "Cannot define PREPROCESS in SUBROUTINE. Only allowed in TRANSACTION definition");
+		throw ERROR( si, "Cannot define PREPROC in SUBROUTINE. Only allowed in TRANSACTION definition");
 	}
 	char ch = 0;
 	unsigned int mask = 0;
 	TransactionFunctionDescription::PreProcessingStep prcstep;
 
-	if (!parseNextToken( langdescr, tok, si, se)
-	||  !boost::algorithm::iequals( tok, "BEGIN"))
-	{
-		throw ERROR( si, "BEGIN expected after PREPROCESS");
-	}
 	while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 	{
 		while (subroutine.pprcstartar.size() <= subroutine.description.preprocs.size())
@@ -658,13 +661,13 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 		}
 		else if (g_optab[ch])
 		{
-			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
+			throw ERROR( si, MSG << "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
 		}
 		else if (ch == '\'' || ch == '\"')
 		{
-			throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead of string");
+			throw ERROR( si, "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of string");
 		}
-		else if (boost::algorithm::iequals( tok, "END"))
+		else if (boost::algorithm::iequals( tok, "ENDPROC"))
 		{
 			if (mask != 0)
 			{
@@ -722,7 +725,7 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 		}
 		else
 		{
-			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of " << errorTokenString( ch, tok));
+			throw ERROR( si, MSG << "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of " << errorTokenString( ch, tok));
 		}
 	}
 }
@@ -1344,9 +1347,9 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 
 						parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
 					}
-					else if (boost::algorithm::iequals( tok, "PREPROCESS"))
+					else if (boost::algorithm::iequals( tok, "PREPROC"))
 					{
-						if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROCESS definition in transaction/subroutine");
+						if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROC definition in transaction/subroutine");
 						mask |= (unsigned int)Preprocess;
 
 						parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
@@ -1401,7 +1404,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else
 					{
-						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROCESS or BEGIN expected instead of ") + errorTokenString( ch, tok));
+						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROC or BEGIN expected instead of ") + errorTokenString( ch, tok));
 					}
 				}
 			}

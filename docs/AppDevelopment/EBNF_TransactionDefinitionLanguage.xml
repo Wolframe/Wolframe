@@ -202,9 +202,9 @@
 		<production xml:id="PreprcBody">
 		<lhs>PreprcBody</lhs>
 		<rhs>
-			'BEGIN'
+			'PREPROC'
 			<nonterminal def="#PreprcStmLst">PreprcStmLst</nonterminal>
-			'END'
+			'ENDPROC'
 		</rhs>
 		</production>
 
@@ -244,7 +244,7 @@
 				'AUTHORIZE' '(' <nonterminal def="#Identifier">Identifier</nonterminal> ','
 						<nonterminal def="#Identifier">Identifier</nonterminal> ')'
 			]
-			[	'PREPROCESS'
+			[
 				<nonterminal def="#PreprcBody">PreprcBody</nonterminal>
 			]
 			[

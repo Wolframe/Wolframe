@@ -29,6 +29,7 @@ CPP_OBJS = \
 	transactionfunction/ResultStructure.obj \
 	transactionfunction/ResultIterator.obj \
 	transactionfunction/ResultFilter.obj \
+	transactionInput.obj \
 	transactionOutput.obj \
 	transactionFunction.obj \
 	transactionFunctionDescription.obj \

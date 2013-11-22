@@ -73,10 +73,32 @@ void DatabaseCommand::rewriteResultReferences( int scope_functionidx_incr)
 		ai->rewriteResultReferences( scope_functionidx_incr);
 	}
 	m_selector.rewriteResultReferences( scope_functionidx_incr);
-	if (m_resultsetidx > 0)
+	if (m_resultsetidx >= 0)
 	{
 		m_resultsetidx += scope_functionidx_incr;
 	}
 }
 
+void DatabaseCommand::rewriteResultReferences( const std::map<int,int>& addrtab)
+{
+	std::vector<Path>::iterator ai = m_arg.begin(), ae = m_arg.end();
+	int ii = 0;
+	for (; ai != ae; ++ai,++ii)
+	{
+		ai->rewriteResultReferences( addrtab);
+	}
+	m_selector.rewriteResultReferences( addrtab);
+	if (m_resultsetidx >= 0)
+	{
+		std::map<int,int>::const_iterator ti = addrtab.find( m_resultsetidx);
+		if (ti == addrtab.end())
+		{
+			throw std::logic_error( "TDL compiler error: cannot relocate result reference address");
+		}
+		else
+		{
+			m_resultsetidx = ti->second;
+		}
+	}
+}
 

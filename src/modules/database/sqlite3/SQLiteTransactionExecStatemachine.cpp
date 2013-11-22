@@ -425,47 +425,48 @@ bool TransactionExecStatemachine_sqlite3::firstResultIsNullRow() const
 
 types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 {
-	LOG_TRACE << "[sqlite3 statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "data of result columns not available in state '") + stateName(m_state) + "'");
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => NULL";
 		return types::VariantConst();
 	}
 	if (idx == 0 || idx > (std::size_t)sqlite3_column_count( m_stm))
 	{
 		errorStatus( std::string( "column index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => NULL";
 		return types::VariantConst();
 	}
 	int restype = sqlite3_column_type( m_stm, (int)idx-1);
 	if (restype == SQLITE_INTEGER)
 	{
 		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
-		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_INTEGER " << resval;
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER " << resval;
 		return types::VariantConst( (types::Variant::Data::Int)resval);
 	}
 	else if (restype == SQLITE_FLOAT)
 	{
 		double resval = sqlite3_column_double( m_stm, (int)idx-1);
-		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_FLOAT " << resval;
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_FLOAT " << resval;
 		return types::VariantConst( resval);
 	}
 	else if (restype == SQLITE_TEXT)
 	{
 		const char* resval = (const char*)sqlite3_column_text( m_stm, (int)idx-1);
 		if (!resval) resval = "";
-		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_TEXT " << resval;
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_TEXT '" << resval << "'";
 		return types::VariantConst( resval);
 	}
 	else  if (restype == SQLITE_BLOB)
 	{
 		const char* resval = (const char*)sqlite3_column_blob( m_stm, (int)idx-1);
 		int ressize = resval?sqlite3_column_bytes( m_stm, (int)idx-1):0;
-		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_BLOB -binary data-";
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_BLOB -binary data-";
 		return types::VariantConst( resval, ressize);
 	}
 	else  if (restype == SQLITE_NULL)
 	{
-		LOG_DATA << "[sqlite3 statement] RESULT get SQLITE_NULL";
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_NULL";
 		return types::VariantConst();
 	}
 	else

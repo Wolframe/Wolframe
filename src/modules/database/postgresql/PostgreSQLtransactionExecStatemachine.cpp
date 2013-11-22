@@ -384,7 +384,6 @@ const DatabaseError* TransactionExecStatemachine_postgres::getLastError()
 
 types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 {
-	LOG_TRACE << "[postgresql statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "inspect command result not possible in state '") + stateName(m_state) + "'");
@@ -396,15 +395,18 @@ types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	if (m_idx_row >= m_nof_rows) return types::VariantConst();
-	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
-	if (!rt || rt[0] == '\0')
+	char* resval = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
+	if (!resval || resval[0] == '\0')
 	{
 		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
 		{
+			LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => NULL";
 			return types::VariantConst();
 		}
 	}
-	return types::VariantConst( rt);
+	types::VariantConst rt( resval);
+	LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => " << rt.typeName() << " '" << rt.tostring() << "'";
+	return rt;
 }
 
 bool TransactionExecStatemachine_postgres::next()

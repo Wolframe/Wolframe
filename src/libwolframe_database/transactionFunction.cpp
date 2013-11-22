@@ -143,7 +143,7 @@ void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
-static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::NodeVisitor& selectornode)
+static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::NodeVisitor& selectornode, int loopcnt)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
@@ -162,7 +162,14 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 			case Path::Constant:
 				ti.bindCommandArgAsValue( pi->constantReference());
 				break;
-
+			case Path::InternalVariable:
+				switch (pi->internalVariableType())
+				{
+					case Path::ForeachLoopIndex:
+						ti.bindCommandArgAsValue( loopcnt);
+						break;
+				}
+				break;
 			case Path::Find:
 			case Path::Root:
 			case Path::Next:
@@ -237,10 +244,10 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
 			}
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-			for (; vi != ve; ++vi)
+			for (int loopcnt=0; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
-				bindArguments( rt, *ci, this_, *vi);
+				bindArguments( rt, *ci, this_, *vi, loopcnt);
 				std::vector<NodeVisitor::Index> opnodearray;
 				opnodearray.push_back( *vi);
 				getOperationInput( this_, rt, fidx+1, ci->level(), ci+1, ca, opnodearray);
@@ -253,10 +260,10 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		{
 			// Call DatabaseCommand: For each selected node do expand the function call arguments:
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-			for (; vi != ve; ++vi)
+			for (int loopcnt=0; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
-				bindArguments( rt, *ci, this_, *vi);
+				bindArguments( rt, *ci, this_, *vi, loopcnt);
 			}
 		}
 	}
@@ -317,6 +324,8 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 			}
 			m_resultstruct->addResultColumnName( printstep.argument.value);
 			break;
+		case Param::InternalVariable:
+			throw std::runtime_error("internal variables are not allowed as argument of PRINT");
 		case Param::InputSelectorPath:
 			throw std::logic_error("internal: input reference is an unexpected argument of PRINT");
 	}	
@@ -370,12 +379,16 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 	}
 	// Compile the database commands:
 	int blkidx;
+	std::map<int,int> result_reference_relocation_tab;
 	std::vector<MainProcessingStep>::const_iterator di = description.steps.begin(), de = description.steps.end();
 	for (; di != de; ++di)
 	{
 		std::size_t eidx = di - description.steps.begin();
 		try
 		{
+			// Update address map for relocating result references
+			result_reference_relocation_tab[ eidx] = m_call.size();
+
 			// Create substructure context for RESULT INTO instructions:
 			if ((blkidx=hasCloseSubstruct( description.blocks, eidx)) >= 0)
 			{
@@ -386,6 +399,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					m_resultstruct->addCloseTag();
 				}
 			}
+			// Handle INTO .. BEGIN open structure:
 			if ((blkidx=hasOpenSubstruct( description.blocks, eidx)) >= 0)
 			{
 				const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
@@ -412,18 +426,19 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				Path pa( *ai, &m_tagmap);
 				param.push_back( pa);
 			}
+
+
 			SubroutineDeclarationMap::const_iterator fui = functionmap.find( di->call.funcname);
 			if (fui == functionmap.end())
 			{
+				//... not a SUBROUTINE
 				if (di->call.templatearg.size())
 				{
 					throw MainProcessingStep::Error( eidx, "unknown subroutine template called");
 				}
 				DatabaseCommand cc( di->call.funcname, selector, di->resultref_FOREACH, param, di->nonempty, di->unique, 1, di->hints);
-				if (eidx != m_call.size())
-				{
-					cc.rewriteResultReferences( (int)m_call.size() - (int)eidx);
-				}
+				cc.rewriteResultReferences( result_reference_relocation_tab);
+
 				if (di->path_INTO.empty())
 				{
 					m_resultstruct->addIgnoreResult( m_call.size());
@@ -568,7 +583,7 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 								//... subroutine main step has template arguments substituted
 								templated = true;
 								std::string stmname;
-								stmname.append( "__T_");
+								stmname.append( "__T__");
 								stmname.append( description.name);
 								stmname.append( "_");
 								stmname.append( boost::lexical_cast<std::string>( m_call.size()));

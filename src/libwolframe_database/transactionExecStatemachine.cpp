@@ -144,16 +144,21 @@ static types::VariantConst resolveResultIteratorReference( const TransactionOutp
 
 static bool executeCommand( TransactionExecStatemachine* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
+	/*[-]*/LOG_DATA << "CALL executeCommand " << cmditr->tostring();
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
 	{
 		types::VariantConst val;
-
 		switch (ai->type())
 		{
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				if (ai->scope_functionidx() > 0)
+				if (ai->scope_functionidx() == 0)
+				{
+					//... parameter reference
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+				}
+				else if (ai->scope_functionidx() > 0)
 				{
 					val = resolveResultReference( output, cmditr, ai->scope_functionidx()-1, ai->value());
 				}
@@ -284,7 +289,12 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 		{
 			case TransactionInput::Command::Argument::ResultColumn:
 			{
-				if (ai->scope_functionidx() > 0)
+				if (ai->scope_functionidx() == 0)
+				{
+					//... parameter reference
+					val = resolveResultReference( output, cmditr, ai->scope_functionidx(), ai->value());
+				}
+				else if (ai->scope_functionidx() > 0)
 				{
 					val = resolveResultReference( output, cmditr, ai->scope_functionidx()-1, ai->value());
 				}
@@ -349,6 +359,7 @@ struct OperationLoop
 
 bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
+	LOG_DATA << "[execute transaction] " << input.tostring();
 	enum OperationType
 	{
 		DatabaseCall,

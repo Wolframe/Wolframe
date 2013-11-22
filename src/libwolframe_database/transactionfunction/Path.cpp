@@ -134,6 +134,15 @@ Path::Path( const Call::Param& param, TagTable* tagmap)
 		case Param::InputSelectorPath:
 			parseSelectorPath( param.value, tagmap);
 			break;
+		case Param::InternalVariable:
+			if (param.value == "#")
+			{
+				m_path.push_back( Element( InternalVariable, (int)ForeachLoopIndex));
+			}
+			else
+			{
+				throw std::runtime_error( "unknown internal variable");
+			}
 	}
 }
 
@@ -148,7 +157,10 @@ void Path::rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr)
 	{
 		if (pi->m_type == ResultIndex || pi->m_type == ResultSymbol)
 		{
-			pi->m_scope_functionidx += scope_functionidx_incr;
+			if (pi->m_scope_functionidx >= 0)
+			{
+				pi->m_scope_functionidx += scope_functionidx_incr;
+			}
 		}
 		else if (pi->m_type == Next || pi->m_type == Find)
 		{
@@ -166,9 +178,29 @@ void Path::rewriteResultReferences( int scope_functionidx_incr)
 	{
 		if (pi->m_type == ResultIndex || pi->m_type == ResultSymbol)
 		{
-			if (pi->m_scope_functionidx > 0)
+			if (pi->m_scope_functionidx >= 0)
 			{
 				pi->m_scope_functionidx += scope_functionidx_incr;
+			}
+		}
+	}
+}
+
+void Path::rewriteResultReferences( const std::map<int,int>& addrtab)
+{
+	std::vector<Element>::iterator pi = m_path.begin(), pe = m_path.end();
+	for (; pi != pe; ++pi)
+	{
+		if ((pi->m_type == ResultIndex || pi->m_type == ResultSymbol) && pi->m_scope_functionidx >= 0)
+		{
+			std::map<int,int>::const_iterator ai = addrtab.find( pi->m_scope_functionidx);
+			if (ai == addrtab.end())
+			{
+				throw std::logic_error( "TDL compiler error: cannot relocate result reference address in argument or selector");
+			}
+			else
+			{
+				pi->m_scope_functionidx = ai->second;
 			}
 		}
 	}
@@ -197,6 +229,12 @@ std::size_t Path::resultReferenceIndex() const
 	throw std::logic_error("internal: illegal call of Path::resultReferenceIndex");
 }
 
+Path::InternalVariableType Path::internalVariableType() const
+{
+	if (m_path.size() == 1 && m_path[0].m_type == InternalVariable) return (InternalVariableType)m_path[0].m_tag;
+	throw std::logic_error("internal: illegal call of Path::internalVariableType");
+}
+
 const std::string& Path::resultReferenceSymbol() const
 {
 	if (m_path.size() == 1 && m_path[0].m_type == ResultSymbol) return m_content;
@@ -215,7 +253,7 @@ std::string Path::tostring( const TagTable* tagmap) const
 	{
 		case ResultIndex:
 		{
-			std::string rt = std::string("$") + boost::lexical_cast<std::string>( resultReferenceIndex());
+			std::string rt = std::string("%") + boost::lexical_cast<std::string>( resultReferenceIndex());
 			if (resultReferenceScope() >= 0) rt = rt + ":" + boost::lexical_cast<std::string>( resultReferenceScope());
 			return rt;
 		}
@@ -225,7 +263,11 @@ std::string Path::tostring( const TagTable* tagmap) const
 			if (resultReferenceScope() >= 0) rt = rt + ":" + boost::lexical_cast<std::string>( resultReferenceScope());
 			return rt;
 		}
-		case Constant: return std::string("'") + constantReference() + std::string("'");
+		case Constant:
+			return std::string("'") + constantReference() + std::string("'");
+
+		case InternalVariable:
+			return std::string("$") + internalVariableTypeName();
 
 		case Find:
 		case Root:
@@ -263,6 +305,7 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Nod
 				case ResultIndex:
 				case ResultSymbol:
 				case Constant:
+				case InternalVariable:
 					break;
 
 				case Find:

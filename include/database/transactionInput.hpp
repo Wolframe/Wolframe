@@ -36,10 +36,13 @@
 #define _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
+#include "utils/printFormats.hpp"
 #include <string>
 #include <vector>
 #include <stdexcept>
 #include <cstdlib>
+#include <sstream>
+#include <iostream>
 
 namespace _Wolframe {
 namespace db {
@@ -70,6 +73,15 @@ public:
 				Value,
 				ResultColumn
 			};
+			static const char* typeName( Type i)
+			{
+				static const char* ar[] = {"Value","ResultColumn"};
+				return ar[(int)i];
+			}
+			const char* typeName() const
+			{
+				return typeName( m_type);
+			}
 
 			///\brief Default constructor
 			Argument()
@@ -84,6 +96,7 @@ public:
 			Type type() const			{return m_type;}
 			int scope_functionidx() const		{return m_scope_functionidx;}
 			const types::Variant& value() const	{return m_value;}
+			std::string tostring() const;
 
 		private:
 			Type m_type;				//< type of the argument value
@@ -144,11 +157,13 @@ public:
 		typedef std::vector<Argument>::const_iterator arg_const_iterator;
 		typedef std::vector<Argument>::iterator arg_iterator;
 
-		arg_const_iterator begin() const			{return m_arg.begin();}
-		arg_iterator begin()					{return m_arg.begin();}
+		arg_const_iterator begin() const		{return m_arg.begin();}
+		arg_iterator begin()				{return m_arg.begin();}
 
-		arg_const_iterator end() const				{return m_arg.end();}
-		arg_iterator end()					{return m_arg.end();}
+		arg_const_iterator end() const			{return m_arg.end();}
+		arg_iterator end()				{return m_arg.end();}
+
+		std::string tostring() const;
 
 	private:
 		enum Flags
@@ -217,6 +232,8 @@ public:
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
 		m_cmd.back().bind( Command::Argument::ResultColumn, types::Variant( resultsymbol), scope_functionidx);
 	}
+
+	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 
 private:
 	std::vector<Command> m_cmd;				//< list of commands of the transaction

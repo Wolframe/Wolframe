@@ -169,7 +169,8 @@ public:
 					NumericResultReference,		//< Parameter is a result reference by index
 					SymbolicResultReference,	//< Parameter is a result reference by column name
 					Constant,			//< Parameter is a contant value
-					InputSelectorPath		//< Parameter refers to a set of input values
+					InputSelectorPath,		//< Parameter refers to a set of input values
+					InternalVariable		//< Parameter refers to an internal variable (e.g. #COUNT)
 				};
 				///\brief Parameter type name
 				static const char* typeName( Type i)

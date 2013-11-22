@@ -1,9 +1,9 @@
 
 TRANSACTION selectPerson
-PREPROCESS BEGIN
+PREPROC
     FOREACH /person/name INTO normalized DO normalizeName( . );
     FOREACH /person INTO citycode DO getCityCode( city );
-END
+ENDPROC
 BEGIN
     FOREACH person
         DO INSERT INTO Person (Name,NormalizedName,CityCode)

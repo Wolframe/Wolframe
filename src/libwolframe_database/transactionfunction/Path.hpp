@@ -50,6 +50,16 @@ public:
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
 	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 
+	enum InternalVariableType
+	{
+		ForeachLoopIndex
+	};
+	static const char* internalVariableTypeName( InternalVariableType i)
+	{
+		static const char* ar[] = {"#"};
+		return ar[(int)i];
+	}
+
 	enum ElementType
 	{
 		Root,
@@ -58,7 +68,8 @@ public:
 		Up,
 		ResultSymbol,
 		ResultIndex,
-		Constant
+		Constant,
+		InternalVariable
 	};
 
 	static const char* elementTypeName( ElementType i)
@@ -91,6 +102,8 @@ public:
 	std::size_t resultReferenceIndex() const;
 	const std::string& resultReferenceSymbol() const;
 	int resultReferenceScope() const;
+	InternalVariableType internalVariableType() const;
+	const char* internalVariableTypeName() const			{return internalVariableTypeName( internalVariableType());}
 	const std::string& constantReference() const;
 	void selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const;
 
@@ -100,6 +113,7 @@ public:
 
 	void rewrite( const std::map<int,int>& rwtab, int scope_functionidx_incr);
 	void rewriteResultReferences( int scope_functionidx_incr);
+	void rewriteResultReferences( const std::map<int,int>& addrtab);
 	void append( const Path& o);
 
 private:
