@@ -1,0 +1,70 @@
+
+<title>Language for Requests/Answers</title>
+<para>
+</para>
+
+<title>Adressing Widget Data</title>
+
+Constant (server request only):		string with single (') or double (") quotes or numeric integral constant
+Mandatory attribute:			name={variablepath}
+Mandatory content value:		name{{variablepath}}
+Optional attribute:			name={variablepath:?}
+Optional content value:			name{{variablepath:?}}
+Optional attribute with default:	name={variablepath:default}
+Optional content with default:		name{{variablepath:default}}
+Ignored attribute:			name={?}
+Ignored content value:			name{{?}}
+Ignored sub structure			name{?}
+
+
+<title>Data Structures<title>
+
+Structure elements are separated by semicolon ';'.
+elem1; elem2; elem3
+
+For example:
+address{tag=1; surname{{person.surname}}; prename{{person.prename}}; street{{address.street}}}
+
+<title>Arrays<title>
+<para>Arrays are marked with opened and closed square brackets without specifying dimension (arbitrary size or empty when missing).
+</para>
+
+Arbitrary size array of content values:	name[]{{variablepath}}
+Arbitrary size array of structures:	name[]{structure definition}
+
+For example an array of addresses:
+address[]{surname{{address.surname}}; prename{{address.prename}}; street{{address.street}}}
+
+The widget element paths used to address the widget elements have to have a common ancessor path.
+In our example this would be 'address'. The common ancessor path is determining how elements
+are grouped together in the widget. It tells what belongs together to the same array element
+in the widget. Without common common ancessor path it would be impossible to determine what 
+is forming a structure in the widget data. It distinguishes the case of having an array of
+adresses and the case of having an array of surnames, and array of prenames and an array
+of streets. The later makes not much sense here. With the common prefix we state how entities
+are grouped together to structures in the representation in the widget.
+
+
+<title>Indirection</title>
+
+Indirection allows to define recursive structures. Indirection means that an element is 
+specified as reference that is expanded when the element appears in the data structure to map.
+The grouping element of the indirection elements is the common ancessor of all non indirection 
+elements in the structure containing the indirection.
+
+Indirection to a ancessor (parent,granparent,etc.):	^ancessorname
+... when the name of the indirection differs:		^itemname:ancessorname
+Multiple occurrence of indirection			^ancessorname[]
+... when the name of the indirection differs:		^itemname:ancessorname[]
+
+Example representing a tree:
+item{id={treewidget.id}; name{{treewidget.name}}; ^item[]}
+
+Example representing a binary tree:
+item{id={treewidget.id}; name{{treewidget.name}}; ^left:item; ^right:item}
+
+
+
+
+
+
