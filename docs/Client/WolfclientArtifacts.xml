@@ -1,0 +1,57 @@
+<sect1>
+<title>Artifacts</title>
+<para>
+	The <application>wolfclient</application> renders user interface forms dynamically,
+	this means no code generation or compilation is involved when creating
+	user interfaces for Wolframe.
+</para>
+	<sect2>
+		<title>UI forms</title>
+		<para>
+			The UI files follow the schema
+			'qt-ui-4.7.xsd', as documented in
+			<ulink url="http://doc.qt.digia.com/qt/designer-ui-file-format.html"><citetitle>http://doc.qt.digia.com/qt/designer-ui-file-format.html</citetitle></ulink>.
+			The UI files have the extension <emphasis>.ui</emphasis>
+		</para>
+
+		<para>
+			UI files are created and edited with the Qt designer.
+		</para>
+	</sect2>
+
+	<sect2>
+		<title>UI form translations</title>
+		<para>
+			The <application>wolfclient</application> uses the Qt translation format, version 2.0 for form translations
+			as described in
+			<ulink url="http://doc.qt.digia.com/qt/linguist-ts-file-format.html"><citetitle>http://doc.qt.digia.com/qt/linguist-ts-file-format.html</citetitle></ulink>.
+			Those are the files with extension <emphasis>.ts</emphasis>.
+		</para>
+		<para>
+			The translation files can get merged and generated with the <emphasis>lupdate</emphasis>
+			tool, then translated with the <emphasis>Qt Linguist</emphasis>.
+		</para>
+		<para>
+			The Qt client needs the files in compiled form as files with the extension
+			<emphasis>.qm</emphasis>. The <emphasis>lupdate</emphasis> tool is taking
+			care of that.
+		</para>
+		<para>
+			Read more on translations in
+			<ulink url="http://doc.qt.digia.com/qt/linguist-manual.html"><citetitle>http://doc.qt.digia.com/qt/linguist-manual.html</citetitle></ulink>.
+		</para>
+	</sect2>
+
+	<sect2>
+		<title>Resources</title>
+		<para>
+			Binary resource files contain images for the user interface.
+		</para>
+
+		<para>
+			Binary resource files (extension <emphasis>.rss</emphasis>) are compiled from
+			a XML file (extension <emphasis>.qrc</emphasis>) with the <emphasis>rcc</emphasis>
+			resource compiler.
+		</para>
+	</sect2>
+</sect1>

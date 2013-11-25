@@ -1,67 +1,235 @@
-
-<title>Language for Requests/Answers</title>
+<sect1>
+<title>Programming Server Requests/Answers</title>
 <para>
 </para>
+	<sect2>
+	<title>Adressing Widget Data</title>
+	<para>
+	Widget data elements elements are addressed by using the relative path of the element
+	from the widget where the request or answer was specified. The relative path is 
+	a sequence of widget object names separated by dots ('.'). Only atomic element 
+	references are specified in request/answer structure.
+	</para>
+	<sect3>
+	<title>Biggest Common Ancestor Path</title>
+	<para>
+	The grouping of elements into structures is
+	done by the biggest common ancestor path of all atomic element references in
+	a structure. It is assumed that this biggest common ancestor is addressing the structure.
+	If for example a structure has the atomic widget element references "home.user.name"
+	and "home.user.id" then we assume that "home.user" is adressing the structure 
+	containing "name" and "id" in the widget data.
+	</para>
+	</sect3>
+	<sect3>
+	<title>Addressing Atomic Elements</title>
+	<table frame="all" width="100%">
+		<title>Basic Elements of Request/Answer</title>
+		<tgroup cols="2">
+		<thead>
+			<row>
+				<entry>Description</entry>
+				<entry>Syntax</entry>
+			</row>
+		</thead>
 
-<title>Adressing Widget Data</title>
+		<tbody>
+			<row>
+				<entry>Constant (server request only)</entry>
+				<entry>string with single (') or double (") quotes or numeric integral constant</entry>
+			</row>
+			<row>
+				<entry>Mandatory attribute</entry>
+				<entry>name={variablepath}</entry>
+			</row>
+			<row>
+				<entry>Mandatory content value</entry>
+				<entry>name{{variablepath}}</entry>
+			</row>
+			<row>
+				<entry>Optional attribute</entry>
+				<entry>name={variablepath:?}</entry>
+			</row>
+			<row>
+				<entry>Optional content value</entry>
+				<entry>name{{variablepath:?}}</entry>
+			</row>
+			<row>
+				<entry>Optional attribute with default</entry>
+				<entry>name={variablepath:default}</entry>
+			</row>
+			<row>
+				<entry>Optional content with default value</entry>
+				<entry>name{{variablepath:default}}</entry>
+			</row>
+			<row>
+				<entry>Ignored attribute</entry>
+				<entry>name={?}</entry>
+			</row>
+			<row>
+				<entry>Ignored content value</entry>
+				<entry>name{{?}}</entry>
+			</row>
+			<row>
+				<entry>Ignored sub structure</entry>
+				<entry>name{?}</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	</sect3>
+	<sect3>
+	<title>Special Path Elements</title>
+	<para>Variable references can address other widgets than sub widgets of the current widget.
+	</para>
+		<sect4>
+		<title>Addressing the Form Widget</title>
+		<para>The reserved path element 'main' addresses the form widget root.</para>
+		</sect4>
 
-Constant (server request only):		string with single (') or double (") quotes or numeric integral constant
-Mandatory attribute:			name={variablepath}
-Mandatory content value:		name{{variablepath}}
-Optional attribute:			name={variablepath:?}
-Optional content value:			name{{variablepath:?}}
-Optional attribute with default:	name={variablepath:default}
-Optional content with default:		name{{variablepath:default}}
-Ignored attribute:			name={?}
-Ignored content value:			name{{?}}
-Ignored sub structure			name{?}
+		<sect4>
+		<title>Widget Links</title>
+		<para>A dynamic property with the prefix 'link:' followed by an identifier
+		as name declares the widget with the widget id as dynamic property value of
+		the link definition to be referencable by name. The referencing name 
+		is the identifier after the prefix 'link:'. So if we for example define
+		a dynamic property 'link:myform' with a widget id as value, then we can
+		use the variable 'myform' in a widget path to address the widget.</para>
+		<para>
+		The mechanism of widget links is mainly used for implementing form/sub-form
+		relationships. A form opens a subform and passes its widget id to it with the
+		form parameter 'widgetid=..'.
+		A link is defined to the sub-form with the widget id passed to it. 
+		The subform signals some action to the parent that can address the data
+		entered in the subform via this link.
+		</para>
+		</sect4>
+	</sect3>
+	</sect2>
+
+	<sect2>
+	<title>Data Structures</title>
+	<para>Structure elements are separated by semicolon ';' and put into '{' brackets '}' 
+	with the name of the structure in front.
+	</para>
+		<sect3>
+		<title>Example</title>
+		<para>The following example shows an address as structure:
+		</para>
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/request_struct.txt" parse="text" />
+		</programlisting>
+		</sect3>
+	</sect2>
+
+	<sect2>
+	<title>Arrays</title>
+	<para>Arrays are marked with opened and closed square brackets '[' ']' without specifying dimension (arbitrary size or empty when missing).
+	</para>
+		<sect3>
+		<title>Description</title>
+		<table frame="all" width="100%">
+			<title>Types of Arrays</title>
+			<tgroup cols="2">
+			<thead>
+				<row>
+					<entry>Description</entry>
+					<entry>Syntax</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>Arbitrary Size Array of Content Values</entry>
+					<entry>name[]{{variablepath}}</entry>
+				</row>
+				<row>
+					<entry>Arbitrary Size Array of Structures</entry>
+					<entry>name[]{structure definition}</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		</sect3>
+
+		<sect3>
+		<title>Example</title>
+		<para>
+		The following example shows an array of addresses:
+		</para>
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/request_array.txt" parse="text" />
+		</programlisting>
+		</sect3>
+
+		<para>
+		The widget element paths used to address the widget elements have to have a common ancestor path.
+		In our example this would be 'address'. The common ancestor path is determining how elements
+		are grouped together in the widget. It tells what belongs together to the same array element
+		in the widget. Without common common ancestor path it would be impossible to determine what 
+		is forming a structure in the widget data. It distinguishes the case of having an array of
+		adresses and the case of having an array of surnames, and array of prenames and an array
+		of streets. The later makes not much sense here. With the common prefix we state how entities
+		are grouped together to structures in the representation in the widget.
+		</para>
+	</sect2>
+
+	<sect2>
+	<title>Indirection and Recursion</title>
+	<para>Indirection allows to define recursive structures. Indirection means that an element is 
+	specified as reference that is expanded when the element appears in the data structure to map.
+	The grouping element of the indirection elements is the common ancestor of all non indirection 
+	elements in the structure containing the indirection.
+	</para>
+
+		<sect3>
+		<title>Description</title>
+		<table frame="all" width="100%">
+			<title>Types of Indirections</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Description</entry>
+					<entry>Syntax (name equals ancestor name)</entry>
+					<entry>Syntax (name differs from ancestor name)</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>Single Element Indirection</entry>
+					<entry>^ancestor</entry>
+					<entry>^item:ancestor</entry>
+				</row>
+				<row>
+					<entry>Multiple Indirection</entry>
+					<entry>^ancestor[]</entry>
+					<entry>^item:ancestor[]</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		</sect3>
+
+		<sect3>
+		<title>Example (Arbitrary Tree)</title>
+		<para>Example representing a tree with arbitrary number of children per node:
+		</para>
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/request_arbitraryTree.txt" parse="text" />
+		</programlisting>
+		</sect3>
+		<sect3>
+		<title>Example (Binary Tree)</title>
+		<para>Example representing a binary tree:
+		</para>
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/request_binaryTree.txt" parse="text" />
+		</programlisting>
+		</sect3>
+	</sect2>
+</sect1>
 
 
-<title>Data Structures<title>
-
-Structure elements are separated by semicolon ';'.
-elem1; elem2; elem3
-
-For example:
-address{tag=1; surname{{person.surname}}; prename{{person.prename}}; street{{address.street}}}
-
-<title>Arrays<title>
-<para>Arrays are marked with opened and closed square brackets without specifying dimension (arbitrary size or empty when missing).
-</para>
-
-Arbitrary size array of content values:	name[]{{variablepath}}
-Arbitrary size array of structures:	name[]{structure definition}
-
-For example an array of addresses:
-address[]{surname{{address.surname}}; prename{{address.prename}}; street{{address.street}}}
-
-The widget element paths used to address the widget elements have to have a common ancessor path.
-In our example this would be 'address'. The common ancessor path is determining how elements
-are grouped together in the widget. It tells what belongs together to the same array element
-in the widget. Without common common ancessor path it would be impossible to determine what 
-is forming a structure in the widget data. It distinguishes the case of having an array of
-adresses and the case of having an array of surnames, and array of prenames and an array
-of streets. The later makes not much sense here. With the common prefix we state how entities
-are grouped together to structures in the representation in the widget.
-
-
-<title>Indirection</title>
-
-Indirection allows to define recursive structures. Indirection means that an element is 
-specified as reference that is expanded when the element appears in the data structure to map.
-The grouping element of the indirection elements is the common ancessor of all non indirection 
-elements in the structure containing the indirection.
-
-Indirection to a ancessor (parent,granparent,etc.):	^ancessorname
-... when the name of the indirection differs:		^itemname:ancessorname
-Multiple occurrence of indirection			^ancessorname[]
-... when the name of the indirection differs:		^itemname:ancessorname[]
-
-Example representing a tree:
-item{id={treewidget.id}; name{{treewidget.name}}; ^item[]}
-
-Example representing a binary tree:
-item{id={treewidget.id}; name{{treewidget.name}}; ^left:item; ^right:item}
 
 
 

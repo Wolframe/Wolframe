@@ -1,0 +1,7 @@
+
+item{
+  id={treewidget.id};
+  name{{treewidget.name}};
+  ^left:item;
+  ^right:item
+}

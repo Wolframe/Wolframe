@@ -1,0 +1,281 @@
+<sect1>
+	<title>Programming the Interface</title>
+	<para>
+		Programming means we annotate the XML of the UI form files with
+		some extra properties. They control the following things:
+		<itemizedlist>
+			<listitem>
+			<para>
+				Which events in the current form replace it with a new form,
+				e. g. clicking the <emphasis>Edit</emphasis> button loads
+				the form called <emphasis>edit_item</emphasis>.
+			</para>
+			</listitem>
+			<listitem>
+			<para>
+				When and how requests to the Wolframe server should be sent
+				and how the results should be interpreted when adding data
+				to the widgets, e.g. executing a <emphasis>save item request</emphasis>
+				with all the data in the text fields of the form added to the request
+				XML.
+			</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+	<sect2>
+		<title>Mapping XML Data</title>
+		<sect3>
+			<title>Starting Position</title>
+			<para>For mapping data structures from the user interface elements to the
+			data description needed to fulfill an interface for a server request we need
+			some kind of translation. An implicit mapping would only be able to describe
+			very trivial data mappings. After drawing the user interface this translation
+			has to be defined. On the other hand the requests answer returned by the server
+			has to be mapped to be shown in the user interface elements view. Here applies
+			the same: Some kind of translation is needed to map a server data structure
+			to the user interface elements.
+			</para>
+		</sect3>
+		<sect3>
+			<title>First Example</title>
+			<para>
+				Let's have a look at a <classname>QLineEdit</classname>
+				element of a form and a possible XML representation of the
+				data used for a request.
+			</para>
+
+			<screenshot>
+				<screeninfo>Simple Qt data input form</screeninfo>
+				<mediaobject>
+					<imageobject role="html">
+						<imagedata fileref="images/clients/simple_form.png" format="PNG"/>
+					</imageobject>
+					<imageobject role="fo">
+						<imagedata fileref="images/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				For an insert or update request that transmits all data of the form to the
+				server we have to fill the name field and the address field into the request
+				data structure XML.
+				The translation is defined as dynamic property "action" or "action." plus a suffix for the action identifier
+				if needed. We will explain this naming of actions later. The
+				value of the property is describing the request and could look as follows:
+			</para>
+
+			<programlisting language='text'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.request.txt" parse="text" />
+			</programlisting>
+
+			<para>
+				For the initial filling of the form with data we submit a
+				request that just sends an id to the server.
+				The answer that is returned by the server has then to be
+				translated to fill the name field and the address field
+				of the form.
+				The translation is defined as dynamic property "answer"
+				or "answer." plus a suffix for the action identifier.
+				As in the request example we postpone a detailed explanation
+				of this action naming semantics.
+				The value of the property is describing the answer
+				in the same language as a request and could look as follows.
+				A detailed description of the language used to describe requests
+				and answers will follow later.
+			</para>
+			<programlisting language='text'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.answer.txt" parse="text" />
+			</programlisting>
+		</sect3>
+		<sect3>
+			<title>Another Example</title>
+			<para>
+				Some elements are more complicated than that.
+				They present the user a list of options or items the user to pick from, e.g. a list of cities.
+			</para>
+
+			<screenshot>
+				<screeninfo>More complex Qt data input form with city list to pick from</screeninfo>
+				<mediaobject>
+					<imageobject role="html">
+						<imagedata fileref="images/clients/complex_form.png" format="PNG"/>
+					</imageobject>
+					<imageobject role="fo">
+						<imagedata fileref="images/clients/complex_form.png" format="PNG" width="100%" scalefit="1"/>
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+
+			<para>
+				When the form is saved, the currently selected element is written into
+				the resulting XML:
+			</para>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				In this case the widget with the city list can load its own domain data as a separate
+				XML request:
+			</para>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_request.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				and the corresponding domain load request answer definition in the dynamic property "answer"
+				could look like follows:
+			</para>
+			<programlisting language='text'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.domainload_answer.txt" parse="text" />
+			</programlisting>
+
+			<para>
+				The answer contains all possible values in the domain, in our case
+				a list of all cities and their internal id.
+			</para>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_extract.xml" parse="text" />
+			</programlisting>
+		</sect3>
+	</sect2>
+
+	<sect2>
+		<title>Switching UI forms</title>
+		<para>
+			A UI form contains a set of widgets, the dynamic property
+			<code>form</code> contains the name of a widget (without
+			extension <emphasis>.ui</emphasis>) to load.
+		</para>
+
+		<para>
+			For linking a push <classname>QPushButton</classname> click in the Qt designer
+			to the switching of the form you have to attach a dynamic property
+			named <code>form</code>	of type <code>string</code> to the corresponding
+			widget of type <classname>QPushButton</classname>:
+
+			<screenshot>
+				<screeninfo>Attach form dynamic property to a push button</screeninfo>
+				<mediaobject>
+					<imageobject role="html">
+						<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG"/>
+					</imageobject>
+					<imageobject role="fo">
+						<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG" width="100%" scalefit="1"/>
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+
+		</para>
+
+		<para>
+			Before loading the next form the client terminates all current
+			requests, for instance a save request of the form data.
+			In case of an error in an action any defined switching of the form is cancelled.
+		</para>
+	</sect2>
+
+	<sect2>
+		<title>States and properties of widgets</title>
+
+		<para>
+			Some properties are reserved for states steering the behavior of the user interface:
+
+			<itemizedlist>
+			<listitem>
+				<para><code>initialFocus</code>:
+				This is a thing which got forgotten in the Qt design.
+				We can set a boolean value to one widget in a form which should
+				get the initial keyboard focus.
+				</para>
+			</listitem>
+			</itemizedlist>
+		</para>
+	</sect2>
+
+	<sect2>
+		<title>Widget properties as dynamic property values</title>
+		<para>
+			Dynamic properties can reference properties of widgets
+			like for example <code>property = {variable expression}</code>.
+		</para>
+		<para>
+			The expression can reference addressable widgets and their properties.
+			Every Qt class has its very own set of properties it understands.
+		</para>
+	</sect2>
+</sect1>
+<sect1>
+	<title>Eliminating Interface Defects</title>
+	<para>
+		Functional defects in the user interface like for example syntax errors in the
+		definitions of the request answer can be eliminated by inspecting the error messages
+		reported by the <application>wolfclient</application> in developer mode
+		and fixing the interface accordingly.
+	</para>
+	<sect2>
+		<title>Switch the Developer Mode On</title>
+
+		<para>In order to inspect the internals of your client program, we have first
+		to switch on "Developer Mode" in the "Developer" context of the "Preferences Dialog".
+		The following picture emphasizes the check box you have to enable (highlighted green).
+		</para>
+		<screenshot>
+			<screeninfo>Enable Debug Window</screeninfo>
+			<mediaobject>
+				<imageobject role="html">
+					<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG"/>
+				</imageobject>
+				<imageobject role="fo">
+					<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG" width="100%" scalefit="1"/>
+				</imageobject>
+			</mediaobject>
+		</screenshot>
+
+	</sect2>
+	<sect2>
+		<title>Inspect Errors and Warnings and Debug Messages Reported</title>
+
+		<para>To inspect internal messages reported by the <application>wolfclient</application>
+		in developer mode we have to open the debug window.
+		The debug window is opened by clicking on the bug icon in the
+		main tool bar or via the developer context menu. The following picture
+		shows an example debug output. Each action we do from now on with
+		the debug window opened can be followed on the level of messages it emits.
+		</para>
+		<para>
+		We can see the messages in the message list when clicking on the
+		"Refresh" button. The navigation allows us to restrict our focus 
+		on messages on a node in the object tree by clicking on it. 
+		Clicking on the root node shows all messages in the recent history.
+		The history starts with the last main node created
+		before opening the debug window. All message restrictions
+		show the messages in order of their emission. We can restrict also on
+		the severity of messages in the severity level selection (the select
+		box set to "Debug" as default left of the "Refresh" button).
+		</para>
+		<para>
+		The "Clear" button allows us to empty the recent history without closing
+		the debug window.
+		</para>
+		<screenshot>
+			<screeninfo>Debug Window</screeninfo>
+			<mediaobject>
+				<imageobject role="html">
+					<imagedata fileref="images/clients/debug_window.png" format="PNG"/>
+				</imageobject>
+				<imageobject role="fo">
+					<imagedata fileref="images/clients/debug_window.png" format="PNG" width="100%" scalefit="1"/>
+				</imageobject>
+			</mediaobject>
+		</screenshot>
+	</sect2>
+</sect1>

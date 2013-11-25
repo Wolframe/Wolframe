@@ -81,7 +81,8 @@
 		</bookinfo>
 
 		&ClientIntroduction;
-		&Clients;
+		&Wolfclient;
+		&ClientCLI;
 
 		<index>
 			<title>Index</title>

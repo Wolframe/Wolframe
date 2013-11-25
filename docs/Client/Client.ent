@@ -6,5 +6,9 @@
 
 <!ENTITY Clients			SYSTEM "Clients.xml">
 
-<!ENTITY ClientQt			SYSTEM "Qt.xml">
+<!ENTITY Wolfclient			SYSTEM "Wolfclient.xml">
+<!ENTITY WolfclientArchitecture		SYSTEM "WolfclientArchitecture.xml">
+<!ENTITY WolfclientArtifacts		SYSTEM "WolfclientArtifacts.xml">
+<!ENTITY WolfclientProgrammingInterface	SYSTEM "WolfclientProgrammingInterface.xml">
+<!ENTITY WolfclientRequestAnswer	SYSTEM "WolfclientRequestAnswer.xml">
 <!ENTITY ClientCLI			SYSTEM "CLI.xml">

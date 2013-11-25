@@ -1,0 +1,7 @@
+
+address{
+  tag=1;
+  surname{{person.surname}};
+  prename{{person.prename}};
+  street{{address.street}}
+}
