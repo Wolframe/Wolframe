@@ -9,5 +9,6 @@
 	&WolfclientArtifacts;
 	&WolfclientProgrammingInterface;
 	&WolfclientRequestAnswer;
+	&WolfclientDebugging;
 </chapter>
 

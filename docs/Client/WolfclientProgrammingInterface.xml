@@ -81,12 +81,10 @@
 				of the form.
 				The translation is defined as dynamic property "answer"
 				or "answer." plus a suffix for the action identifier.
-				As in the request example we postpone a detailed explanation
-				of this action naming semantics.
-				The value of the property is describing the answer
-				in the same language as a request and could look as follows.
-				A detailed description of the language used to describe requests
-				and answers will follow later.
+				A detailed description of the language in the request
+				and answer property value that describes requests and answers 
+				will presented in the next chapter. We provide here just an
+				example:
 			</para>
 			<programlisting language='text'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.answer.txt" parse="text" />
@@ -131,7 +129,7 @@
 
 			<para>
 				and the corresponding domain load request answer definition in the dynamic property "answer"
-				could look like follows:
+				could look like this:
 			</para>
 			<programlisting language='text'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.domainload_answer.txt" parse="text" />
@@ -211,71 +209,5 @@
 			The expression can reference addressable widgets and their properties.
 			Every Qt class has its very own set of properties it understands.
 		</para>
-	</sect2>
-</sect1>
-<sect1>
-	<title>Eliminating Interface Defects</title>
-	<para>
-		Functional defects in the user interface like for example syntax errors in the
-		definitions of the request answer can be eliminated by inspecting the error messages
-		reported by the <application>wolfclient</application> in developer mode
-		and fixing the interface accordingly.
-	</para>
-	<sect2>
-		<title>Switch the Developer Mode On</title>
-
-		<para>In order to inspect the internals of your client program, we have first
-		to switch on "Developer Mode" in the "Developer" context of the "Preferences Dialog".
-		The following picture emphasizes the check box you have to enable (highlighted green).
-		</para>
-		<screenshot>
-			<screeninfo>Enable Debug Window</screeninfo>
-			<mediaobject>
-				<imageobject role="html">
-					<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG"/>
-				</imageobject>
-				<imageobject role="fo">
-					<imagedata fileref="images/clients/preferences_developper_develmode.png" format="PNG" width="100%" scalefit="1"/>
-				</imageobject>
-			</mediaobject>
-		</screenshot>
-
-	</sect2>
-	<sect2>
-		<title>Inspect Errors and Warnings and Debug Messages Reported</title>
-
-		<para>To inspect internal messages reported by the <application>wolfclient</application>
-		in developer mode we have to open the debug window.
-		The debug window is opened by clicking on the bug icon in the
-		main tool bar or via the developer context menu. The following picture
-		shows an example debug output. Each action we do from now on with
-		the debug window opened can be followed on the level of messages it emits.
-		</para>
-		<para>
-		We can see the messages in the message list when clicking on the
-		"Refresh" button. The navigation allows us to restrict our focus 
-		on messages on a node in the object tree by clicking on it. 
-		Clicking on the root node shows all messages in the recent history.
-		The history starts with the last main node created
-		before opening the debug window. All message restrictions
-		show the messages in order of their emission. We can restrict also on
-		the severity of messages in the severity level selection (the select
-		box set to "Debug" as default left of the "Refresh" button).
-		</para>
-		<para>
-		The "Clear" button allows us to empty the recent history without closing
-		the debug window.
-		</para>
-		<screenshot>
-			<screeninfo>Debug Window</screeninfo>
-			<mediaobject>
-				<imageobject role="html">
-					<imagedata fileref="images/clients/debug_window.png" format="PNG"/>
-				</imageobject>
-				<imageobject role="fo">
-					<imagedata fileref="images/clients/debug_window.png" format="PNG" width="100%" scalefit="1"/>
-				</imageobject>
-			</mediaobject>
-		</screenshot>
 	</sect2>
 </sect1>

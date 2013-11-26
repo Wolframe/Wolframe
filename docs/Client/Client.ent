@@ -11,4 +11,5 @@
 <!ENTITY WolfclientArtifacts		SYSTEM "WolfclientArtifacts.xml">
 <!ENTITY WolfclientProgrammingInterface	SYSTEM "WolfclientProgrammingInterface.xml">
 <!ENTITY WolfclientRequestAnswer	SYSTEM "WolfclientRequestAnswer.xml">
+<!ENTITY WolfclientDebugging		SYSTEM "WolfclientDebugging.xml">
 <!ENTITY ClientCLI			SYSTEM "CLI.xml">
