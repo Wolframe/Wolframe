@@ -65,7 +65,21 @@ $generatedby &#160;<a href="http://www.doxygen.org/index.html">
 			<nav class="footer_nav">
 				<ul class="nospace">
 					<li><strong>Email:</strong> <a href="/mailto:contact@wolframe.net">contact@wolframe.net</a></li>
-					<li><a href="https://plus.google.com/116915890857205562872" rel="publisher">Google+</a></li>
+					<li>
+						<a id="googleplus-bttn" href="http://plus.google.com/116915890857205562872?prsrc=3" rel="publisher" target="_top" style="text-decoration:none;">
+							<span>Google+</span></a>
+						<a  id="linkedin-bttn" href="#" target="_top" style="text-decoration:none;">
+							<span>LinkedIn</span></a>
+						<a id="twitter-bttn" href="http://twitter.com/ProjectWolframe" target="_top" style="text-decoration:none;">
+							<span>twitter</span></a>
+						<a id="rss-bttn" href="#" target="_top" style="text-decoration:none;">
+							<span>rss</span></a>
+					</li>
+					<li>
+						<a href="https://twitter.com/ProjectWolframe" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @ProjectWolframe</a>
+						<div class="g-follow" data-annotation="none" data-height="20" data-href="http://plus.google.com/116915890857205562872" data-rel="publisher"></div>
+						<div class="g-plusone" data-href="http://www.wolframe.net" data-size="medium"></div>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -87,5 +101,31 @@ $generatedby &#160;<a href="http://www.doxygen.org/index.html">
 <script>jQuery(document).ready(function($){ $('img').removeAttr('width height'); });</script>
 <script src="/layout/scripts/jquery-mobilemenu.min.js"></script>
 <script src="/layout/scripts/custom.js"></script>
+<!-- Tweeter follow script -->
+<script>
+	!function( d, s, id )	{
+		var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location)?'http':'https';
+		if( !d.getElementById( id ))	{
+			js = d.createElement( s );
+			js.id = id;
+			js.src = p + '://platform.twitter.com/widgets.js';
+			fjs.parentNode.insertBefore( js,fjs );
+		}
+	} ( document, 'script', 'twitter-wjs' );
+</script>
+
+<!-- Google +1, follow -->
+<script type="text/javascript">
+	window.___gcfg = {
+		lang: 'en-US',
+		parsetags: 'onload'
+	};
+	( function()	{
+		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		po.src = 'https://apis.google.com/js/plusone.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	}) ();
+</script>
+
 </body>
 </html>
