@@ -89,7 +89,7 @@ public:
 	void loadProgram( const std::string& filename);
 
 	///\brief Check that all functions configured exists
-	bool check( const proc::ProcessorProvider* provider) const;
+	bool checkReferences( const proc::ProcessorProvider* provider) const;
 
 	const DirectmapCommandDescription* get( const std::string& name) const
 	{

@@ -121,6 +121,14 @@ public:
 		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
 		return cfg->commands();
 	}
+
+	virtual bool checkReferences( const config::NamedConfiguration& cfgi, const proc::ProcessorProvider* provider) const
+	{
+		const DirectmapCommandHandlerConfig* cfg = dynamic_cast<const DirectmapCommandHandlerConfig*>(&cfgi);
+		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
+		return cfg->checkReferences( provider);
+	}
+
 };
 
 

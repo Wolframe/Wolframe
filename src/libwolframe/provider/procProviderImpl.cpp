@@ -84,7 +84,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a commandHandler. See log." );
 				}
 				else	{
-					m_cmd.push_back( cnstrctr );
+					m_cmd.push_back( CommandHandlerDef( cnstrctr, *it));
 
 					// register handler commands
 					std::list<std::string> cmds = cnstrctr->commands( **it);
@@ -94,14 +94,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						CmdMap::const_iterator ci = m_cmdMap.find( opName);
 						if (ci != m_cmdMap.end())
 						{
-							const char* c1 = ci->second.second->className();
+							const char* c1 = m_cmd.at(ci->second).configuration->className();
 							const char* c2 = (*it)->className();
-							LOG_ERROR << "Duplicate definition of command '" << opName << "' (in '" << c1 << "' and in '" << c2 << "')";
+							LOG_ERROR << "duplicate definition of command '" << opName << "' (in '" << c1 << "' and in '" << c2 << "')";
 							throw std::runtime_error( "duplicate command definition");
 						}
 						else
 						{
-							m_cmdMap[ opName ] = std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*>( cnstrctr, *it);
+							m_cmdMap[ opName ] = m_cmd.size()-1;
 						}
 						LOG_TRACE << "Command '" << opName << "' registered for '" << cnstrctr->objectClassName() << "' command handler";
 					}
@@ -330,6 +330,21 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	}
 }
 
+bool ProcessorProvider::ProcessorProvider_Impl::checkReferences( const ProcessorProvider* provider) const
+{
+	bool rt = true;
+	std::vector<CommandHandlerDef>::const_iterator ci = m_cmd.begin(), ce = m_cmd.end();
+	for (; ci != ce; ++ci)
+	{
+		if (!ci->constructor->checkReferences( *ci->configuration, provider))
+		{
+			rt = false;
+			LOG_ERROR << "invalid references found in configuration of '" << ci->configuration->sectionName() << "' '" << ci->configuration->className() << "'";
+		}
+	}
+	return rt;
+}
+
 
 bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
@@ -385,13 +400,13 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
-	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >::const_iterator cmd = m_cmdMap.find( cmdName );
+	std::map<std::string, std::size_t>::const_iterator cmd = m_cmdMap.find( cmdName );
 	if ( cmd == m_cmdMap.end() )
 	{
 		return NULL;
 	}
-	cmdbind::CommandHandlerConstructor* constructor = cmd->second.first;
-	config::NamedConfiguration* cfg = cmd->second.second;
+	cmdbind::CommandHandlerConstructor* constructor = m_cmd.at( cmd->second).constructor;
+	config::NamedConfiguration* cfg = m_cmd.at( cmd->second).configuration;
 	return constructor->object( *cfg);
 }
 

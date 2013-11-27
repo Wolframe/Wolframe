@@ -74,14 +74,28 @@ public:
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
 
 	bool loadPrograms();
+	bool checkReferences( const ProcessorProvider* provider) const;
 
 private:
 	std::string					m_dbLabel;
 	db::Database*					m_db;
 
-	std::list<cmdbind::CommandHandlerConstructor*>	m_cmd;
-	typedef std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> > CmdMap;
-	CmdMap	m_cmdMap;
+	class CommandHandlerDef
+	{
+	public:
+		CommandHandlerDef()
+			:constructor(0),configuration(0){}
+		CommandHandlerDef( const CommandHandlerDef& o)
+			:constructor(o.constructor),configuration(o.configuration){}
+		CommandHandlerDef( cmdbind::CommandHandlerConstructor* constructor_, config::NamedConfiguration* configuration_)
+			:constructor(constructor_),configuration(configuration_){}
+	public:
+		cmdbind::CommandHandlerConstructor* constructor;
+		config::NamedConfiguration* configuration;
+	};
+	std::vector<CommandHandlerDef> m_cmd;
+	typedef std::map<std::string,std::size_t> CmdMap;
+	CmdMap m_cmdMap;
 
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;

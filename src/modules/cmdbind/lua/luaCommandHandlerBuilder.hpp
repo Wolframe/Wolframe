@@ -122,6 +122,7 @@ public:
 		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
 		return cfg->commands();
 	}
+	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProvider*) const	{return true;}
 };
 
 

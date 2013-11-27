@@ -82,7 +82,7 @@ std::string DirectmapCommandDescription::tostring() const
 	return rt.str();
 }
 
-bool DirectmapProgram::check( const proc::ProcessorProvider* provider) const
+bool DirectmapProgram::checkReferences( const proc::ProcessorProvider* provider) const
 {
 	bool rt = true;
 	types::keymap<DirectmapCommandDescription>::const_iterator di = begin(), de = end();
@@ -93,6 +93,38 @@ bool DirectmapProgram::check( const proc::ProcessorProvider* provider) const
 		{
 			LOG_ERROR << "configured non existing form function call in directmap for '" << di->second.name << "': '" << di->second.call << "'";
 			rt = false;
+		}
+		if (!di->second.inputform.empty() && !provider->formDescription( di->second.inputform))
+		{
+			LOG_ERROR << "configured non existing input form in directmap for '" << di->second.name << "': '" << di->second.inputform << "'";
+		}
+		if (!di->second.outputform.empty() && !di->second.skipvalidation_output && !provider->formDescription( di->second.outputform))
+		{
+			LOG_ERROR << "configured non existing output form in directmap for '" << di->second.name << "': '" << di->second.outputform << "'";
+		}
+		if (!di->second.inputfilter.empty())
+		{
+			langbind::Filter* flt = provider->filter( di->second.inputfilter);
+			if (flt)
+			{
+				delete flt;
+			}
+			else
+			{
+				LOG_ERROR << "configured non existing input filter in directmap for '" << di->second.name << "': '" << di->second.inputfilter << "'";
+			}
+		}
+		if (!di->second.outputfilter.empty() && !provider->filter( di->second.outputfilter))
+		{
+			langbind::Filter* flt = provider->filter( di->second.outputfilter);
+			if (flt)
+			{
+				delete flt;
+			}
+			else
+			{
+				LOG_ERROR << "configured non existing output filter in directmap for '" << di->second.name << "': '" << di->second.outputfilter << "'";
+			}
 		}
 	}
 	return rt;

@@ -213,7 +213,7 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 
 bool ProcessorProvider::loadPrograms()
 {
-	return m_impl->loadPrograms();
+	return m_impl->loadPrograms() && m_impl->checkReferences( this);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name ) const

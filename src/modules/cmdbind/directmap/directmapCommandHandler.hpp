@@ -72,7 +72,7 @@ public:
 
 	bool checkReferences( const proc::ProcessorProvider* provider) const
 	{
-		return m_program.check( provider);
+		return m_program.checkReferences( provider);
 	}
 
 private:
