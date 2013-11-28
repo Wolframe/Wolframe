@@ -72,6 +72,7 @@ public:
 	};
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)				{return Variant::typeName( (Variant::Type)i);}
+	const char* typeName() const					{return typeName( (VariantStruct::Type)type());}
 
 	///\brief Default constructor
 	VariantStruct()							:Variant(){}

@@ -91,7 +91,7 @@ public:
 		void setMandatory( bool v=true)					{if (v) flags |= (unsigned char)Mandatory; else flags -= (flags & (unsigned char)Mandatory);}
 		void setAttribute( bool v=true)					{if (v) flags |= (unsigned char)Attribute; else flags -= (flags & (unsigned char)Attribute);}
 
-		Variant::Type type();
+		Variant::Type type() const;
 		void makeArray();
 		void copy( const Element& o);
 	};

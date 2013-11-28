@@ -71,7 +71,7 @@ void VariantStructDescription::Element::copy( const Element& o)
 	std::memcpy( this, &elem, sizeof( elem));
 }
 
-Variant::Type VariantStructDescription::Element::type()
+Variant::Type VariantStructDescription::Element::type() const
 {
 	return (Variant::Type)initvalue->type();
 }

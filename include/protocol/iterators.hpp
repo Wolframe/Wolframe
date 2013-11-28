@@ -39,9 +39,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace protocol {
 
-///\brief namespace for distiguishing iterator class fom other
-namespace array
-{
 ///\class iterator_t
 ///\brief template for STL conform random access iterators for arrays as used by the protocol
 ///\tparam array_type_ type of array this iterator iterates on
@@ -100,7 +97,5 @@ private:
 	array_type* m_this;	///< reference to the array iterated. The array is accessed over the structure (*m_this)[ m_idx] to catch ABR/ABW (Array Bounds Read/Write)
 	size_type m_idx;        ///< iterator position index
 };
-}//namespace array
-
 }}//namespace
 #endif

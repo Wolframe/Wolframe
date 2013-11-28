@@ -170,6 +170,7 @@ public:
 	std::vector<ProgramR> m_programTypes;
 	std::string m_curfile;
 
+	virtual ~Impl(){}
 	Impl()
 	{
 		m_programTypes.push_back( ProgramR( new TransactionDefinitionProgram()));

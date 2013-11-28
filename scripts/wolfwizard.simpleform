@@ -1,12 +1,14 @@
 STRUCT Element
 {
 	name @string
-	class @string
-	type ?@string
+	value ?@string
+	type @string
+	elemtype ?@string
 	status ?@string
 	size ?@string
-	attribute @string
-	element Element[]
+	attribute ?@string
+	backref ?@string
+	element ^Element[]
 }
 
 STRUCT FormDef

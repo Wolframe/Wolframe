@@ -43,6 +43,7 @@
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 
@@ -54,26 +55,76 @@ static const unsigned short APP_BUILD = 0;
 
 #define DO_STRINGIFY(x)	#x
 #define STRINGIFY(x)	DO_STRINGIFY(x)
-#define INDENTTAB	"  "
 
-static void printStructXML( std::ostream& out, const char* name, const types::VariantStruct& st, bool isAttribute, std::string indent, bool optional, bool mandatory)
+
+struct StackElement
 {
-	const char* status = "";
-	const char* addressing = isAttribute?" attribute='yes'":" attribute='no'";
-	if (optional) status = " status='optional'";
-	if (mandatory) status = " status='mandatory'";
+	types::VariantStructDescription::const_iterator itr;
+	types::VariantStructDescription::const_iterator end;
 
+	StackElement( const StackElement& o)
+		:itr(o.itr),end(o.end){}
+	StackElement( const types::VariantStructDescription::const_iterator& itr_, const types::VariantStructDescription::const_iterator& end_)
+		:itr(itr_),end(end_){}
+};
+
+struct Header
+{
+	Header(){}
+	Header( const Header& o)
+		:m_content(o.m_content){}
+
+	void define( const std::string& name, const std::string& value)
+	{
+		m_content.push_back( std::pair<std::string,std::string>( name, value));
+	}
+
+	std::string openContent() const
+	{
+		std::string rt( attributeContent());
+		rt.append( ">");
+		return rt;
+	}
+	std::string openCloseContent() const
+	{
+		std::string rt( attributeContent());
+		rt.append( "/>");
+		return rt;
+	}
+	std::string closeContent() const
+	{
+		std::string rt( "</element>");
+		return rt;
+	}
+
+private:
+	std::string attributeContent() const
+	{
+		std::string rt( "<element");
+		std::vector<std::pair<std::string,std::string> >::const_iterator ci = m_content.begin(), ce = m_content.end();
+		for (; ci != ce; ++ci)
+		{
+			rt.append( " ");
+			rt.append( ci->first);
+			rt.append( "='");
+			rt.append( ci->second);
+			rt.append( "'");
+		}
+		return rt;
+	}
+private:
+	std::vector<std::pair<std::string,std::string> > m_content;
+};
+
+static void setAtomicElemAttributes( Header& hdr, const types::VariantStruct& st)
+{
 	switch (st.type())
 	{
 		case types::VariantStruct::Null:
 			break;
 		case types::VariantStruct::Unresolved:
 		{
-			out << indent << "<element";
-			if (name) out << " name='" << name << "'";
-			out << " class='indirection'";
-			out << " type='" << types::VariantStruct::typeName(st.type()) << "'";
-			out << " symbol='" << st.unresolvedName() << "'/>" << std::endl;
+			hdr.define( "value", st.unresolvedName());
 			break;
 		}
 		case types::VariantStruct::Bool:
@@ -82,49 +133,149 @@ static void printStructXML( std::ostream& out, const char* name, const types::Va
 		case types::VariantStruct::UInt:
 		case types::VariantStruct::String:
 		{
-			out << indent << "<element";
-			if (name) out << " name='" << name << "'";
-			out << " class='atomic'";
-			out << " type='" << types::VariantStruct::typeName(st.type()) << "'";
-			out << " value='" << st.tostring() << "'";
-			out << addressing << status << "/>" << std::endl;
+			hdr.define( "value", ((const types::Variant)st).tostring());
 			break;
 		}
 		case types::VariantStruct::Array:
-		{
-			out << indent << "<element";
-			if (name) out << " name='" << name << "'";
-			out << " class='vector'";
-			out << addressing << status << ">" << std::endl;
-			printStructXML( out, name, *st.prototype(), isAttribute, indent+INDENTTAB, false, false);
-			out << indent << "</element>" << std::endl;
-			break;
-		}
 		case types::VariantStruct::Struct:
-		{
-			if (name)
-			{
-				out << indent << "<element";
-				out << " name='" << name << "'";
-				out << " class='struct'";
-				out << " size='" << st.nof_elements() << "'" << addressing << status << ">" << std::endl;
-			}
-			types::VariantStruct::const_iterator ii = st.begin(), ee = st.end();
-			types::VariantStructDescription::const_iterator di = st.description()->begin();
-			std::size_t idx;
-			for (idx=0; ii != ee; ++di,++ii,++idx)
-			{
-				printStructXML( out, di->name, *ii, di->attribute(), indent+INDENTTAB, di->optional(), di->mandatory());
-			}
-			if (name) out << indent << "</element>" << std::endl;
-			break;
-		}
+			throw std::logic_error( "illegal state in print atomic element");
+
 		case types::VariantStruct::Indirection:
-			out << indent << "<element";
-			if (name) out << " name='" << name << "'";
-			out << " class='indirection'";
-			out << " type='" << types::VariantStruct::typeName( st.prototype()->type()) << "'" << addressing << status << "/>" << std::endl;
+			hdr.define( "value", ((const types::Variant)st).tostring());
 			break;
+	}
+}
+
+
+static const char* resolveIndirection( std::vector<StackElement> stk, const types::VariantStructDescription* ref)
+{
+	const char* rt = 0;
+	if (!ref) throw std::logic_error( "internal: cannot resolve name of undefined (NULL) indirection pointer");
+	std::vector<StackElement>::const_iterator si = stk.begin(), se = stk.end();
+	for (; si != se; ++si)
+	{
+		if (si->itr->substruct == ref)
+		{
+			rt = si->itr->name;
+		}
+		if (si->itr->array() && si->itr->initvalue->prototype()->description() == ref)
+		{
+			rt = si->itr->name;
+		}
+	}
+	return rt;
+}
+
+static std::string indent( std::size_t n)
+{
+	std::string rt( n, ' ');
+	return rt + rt;
+}
+
+static void printStructXML( std::ostream& out, const types::VariantStructDescription::const_iterator& itr_, const types::VariantStructDescription::const_iterator& end_)
+{
+	std::vector<StackElement> stk;
+	stk.push_back( StackElement( itr_, end_));
+
+	while (!stk.empty())
+	{
+		if (stk.back().itr == stk.back().end)
+		{
+			stk.pop_back();
+			if (stk.size())
+			{
+				Header hdr;
+				out << indent( stk.size()) << hdr.closeContent() << std::endl;
+			}
+			++stk.back().itr;
+			continue;
+		}
+		Header hdr;
+		hdr.define( "name", stk.back().itr->name);
+		if (!stk.back().itr->array())
+		{
+			if (stk.back().itr->optional())
+			{
+				hdr.define( "status", "optional");
+			}
+			else if (stk.back().itr->mandatory())
+			{
+				hdr.define( "status", "mandatory");
+			}
+		}
+		hdr.define( "type", types::VariantStruct::typeName( (types::VariantStruct::Type)stk.back().itr->type()));
+
+		switch ((types::VariantStruct::Type)stk.back().itr->type())
+		{
+			case types::VariantStruct::Null:
+			case types::VariantStruct::Unresolved:
+			case types::VariantStruct::Bool:
+			case types::VariantStruct::Double:
+			case types::VariantStruct::Int:
+			case types::VariantStruct::UInt:
+			case types::VariantStruct::String:
+				hdr.define( "attribute", stk.back().itr->attribute()?"yes":"no");
+				if (stk.back().itr->initvalue)
+				{
+					setAtomicElemAttributes( hdr, *stk.back().itr->initvalue);
+					out << indent(stk.size()) << hdr.openCloseContent() << std::endl;
+				}
+				++stk.back().itr;
+				break;
+
+			case types::VariantStruct::Array:
+			{
+				const types::VariantStruct* elemst = stk.back().itr->initvalue->prototype();
+				hdr.define( "elemtype", elemst->typeName());
+
+				if (elemst->type() == types::VariantStruct::Indirection)
+				{
+					if (elemst->description())
+					{
+						const char* indname = resolveIndirection( stk, elemst->description());
+						if (indname)
+						{
+							hdr.define( "backref", indname);
+						}
+					}
+					out << indent(stk.size()) << hdr.openCloseContent() << std::endl;
+					++stk.back().itr;
+				}
+				else if (elemst->description())
+				{
+					hdr.define( "size", boost::lexical_cast<std::string>( elemst->description()->size()));
+					out << indent(stk.size()) << hdr.openContent() << std::endl;
+					stk.push_back( StackElement( elemst->description()->begin(), elemst->description()->end()));
+				}
+				else
+				{
+					hdr.define( "attribute", stk.back().itr->attribute()?"yes":"no");
+					setAtomicElemAttributes( hdr, *elemst);
+					out << indent(stk.size()) << hdr.openCloseContent() << std::endl;
+					++stk.back().itr;
+				}
+				break;
+			}
+			case types::VariantStruct::Struct:
+			{
+				const types::VariantStructDescription* descr = stk.back().itr->substruct;
+				hdr.define( "size", boost::lexical_cast<std::string>( descr->size()));
+				out << indent(stk.size()) << hdr.openContent() << std::endl;
+				stk.push_back( StackElement( descr->begin(), descr->end()));
+				break;
+			}
+			case types::VariantStruct::Indirection:
+			{
+				const char* indname = resolveIndirection( stk, stk.back().itr->initvalue->description());
+				if (indname)
+				{
+					hdr.define( "backref", indname);
+				}
+				out << indent(stk.size()) << hdr.openCloseContent() << std::endl;
+				++stk.back().itr;
+				break;
+			}
+		}
 	}
 }
 
@@ -133,7 +284,7 @@ static void printFormXML( std::ostream& out, const types::Form& form)
 	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
 	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
 	out << ">" << std::endl;
-	printStructXML( out, 0, form, false, "", false, false);
+	printStructXML( out, form.description()->begin(), form.description()->end());
 	out << "</form>" << std::endl;
 }
 
@@ -196,16 +347,18 @@ int main( int argc, char **argv )
 			throw std::runtime_error( "error in command line. failed to setup a valid processor provider configuration");
 		}
 
-		prgbind::ProgramLibrary programLibrary;
-		proc::ProcessorProvider processorProvider( &providerconf, &modDir, &programLibrary);
+		prgbind::ProgramLibrary* programLibrary = new prgbind::ProgramLibrary();
+		proc::ProcessorProvider* processorProvider = new proc::ProcessorProvider( &providerconf, &modDir, programLibrary);
 
-		if (!processorProvider.loadPrograms())
+		if (!processorProvider->loadPrograms())
 		{
 			throw std::runtime_error( "Not all programs could be loaded. See log." );
 		}
 
 		// Output:
-		printWizardXML( std::cout, programLibrary);
+		printWizardXML( std::cout, *programLibrary);
+		delete processorProvider;
+		delete programLibrary;
 	}
 	catch (const std::bad_alloc& e)
 	{

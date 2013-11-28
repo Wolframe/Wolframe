@@ -187,10 +187,10 @@ public:
 	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; m_eodcharbuf=o.m_eodcharbuf; return *this;}
 
 	///\brief Random access const iterator
-	typedef array::iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
+	typedef iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
 
 	///\brief Random access iterator
-	typedef array::iterator_t<InputBlock,std::size_t,char,char&,char*> iterator;
+	typedef iterator_t<InputBlock,std::size_t,char,char&,char*> iterator;
 
 	///\brief Get the starting const iterator
 	const_iterator begin() const				{const_iterator rt(this); return rt;}

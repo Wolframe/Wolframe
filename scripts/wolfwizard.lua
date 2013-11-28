@@ -1,25 +1,69 @@
+local function isAtomic( typename)
+	if typename == "string" then
+		return true
+	elseif typename == "int" then
+		return true
+	elseif typename == "uint" then
+		return true
+	elseif typename == "bool" then
+		return true
+	elseif typename == "double" then
+		return true
+	else
+		return false
+	end
+end
+
 local function mapFormElements( elements)
 	local rt = ""
 	local function separator()
 		if rt ~= "" then rt = rt .. "; " end
 	end
 	for i,element in pairs( elements) do
+		logger.printc( "VISIT ", element)
 		local ee
 		if element.attribute == "yes" then
 			separator()
 			ee = element.name .. "=" .. "{?}"
-		elseif element.class == "atomic" then
+		elseif isAtomic( element.type) then
 			separator()
 			ee = element.name .. "{{?}}"
-		elseif element.class == "indirection" then
+		elseif element.type == "indirection" then
 			separator()
-			ee = element.name .. "{{?}}"
-		elseif tonumber(element.size) ~= 0 then
-			separator()
-			if element.class == "vector" then
-				ee = element.name .. "[] {" .. mapFormElements( element.element ) .. "}"
+			if element.backref then
+				if element.backref == element.name then
+					ee = "^" .. element.name
+				else
+					ee = "^" .. element.name .. ":" .. element.backref
+				end
 			else
+				ee = element.name .. "{?}"
+			end
+		elseif element.type == "array" then
+			separator()
+			if element.elemtype == "struct" then
+				if element.element then
+					ee = element.name .. "[] {" .. mapFormElements( element.element ) .. "}"
+				end
+			elseif element.elemtype == "indirection" then
+				if element.backref then
+					if element.backref == element.name then
+						ee = "^" .. element.name .. "[]"
+					else
+						ee = "^" .. element.name .. ":" .. element.backref  .. "[]"
+					end
+				else
+					ee = element.name .. "[] {?}"
+				end
+			else
+				ee = element.name .. " " .. element.elemtype .. "[]"
+			end
+		elseif element.type == "struct" then
+			separator()
+			if element.element then			
 				ee = element.name .. " {" .. mapFormElements( element.element ) .. "}"
+			else
+				ee = element.name .. " {}"
 			end
 		else
 			ee = ""
