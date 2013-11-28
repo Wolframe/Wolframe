@@ -40,9 +40,12 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void SQLiteProgram::load( const std::string&)
+void SQLiteProgram::load( const std::string& src)
 {
-	throw std::runtime_error("Postgres SQL programs not implemented yet");
+	if (boost::algorithm::trim_copy(src).size())
+	{
+		throw std::runtime_error( "SQlite programs not implemented yet");
+	}
 }
 
 

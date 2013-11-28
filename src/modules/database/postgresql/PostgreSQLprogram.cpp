@@ -39,9 +39,12 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void PostgreSQLprogram::load( const std::string&)
+void PostgreSQLprogram::load( const std::string& src)
 {
-	throw std::runtime_error("Postgres SQL programs not implemented yet");
+	if (boost::algorithm::trim_copy(src).size())
+	{
+		throw std::runtime_error( "Postgres SQL programs not implemented yet");
+	}
 }
 
 

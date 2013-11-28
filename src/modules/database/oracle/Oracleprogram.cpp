@@ -39,9 +39,12 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void Oracleprogram::load( const std::string& source)
+void Oracleprogram::load( const std::string& src)
 {
-	throw std::runtime_error("Oracle programs not implemented yet");
+	if (boost::algorithm::trim_copy(src).size())
+	{
+		throw std::runtime_error( "Oracle programs not implemented yet");
+	}
 }
 
 
