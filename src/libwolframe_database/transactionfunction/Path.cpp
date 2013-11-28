@@ -288,7 +288,6 @@ std::string Path::tostring( const TagTable* tagmap) const
 
 void Path::selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const
 {
-//	typedef TransactionFunctionInput::Structure::Node Node;
 	std::vector<NodeVisitor::Index> ar1,ar2;
 	ar1.push_back( nv.m_nodeidx);
 

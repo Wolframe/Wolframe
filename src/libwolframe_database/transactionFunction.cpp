@@ -145,7 +145,6 @@ void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider
 
 static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::NodeVisitor& selectornode, int loopcnt)
 {
-//	typedef TransactionFunctionInput::Structure::Node Node;
 	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 
 	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
@@ -205,7 +204,6 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 
 static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::NodeVisitor::Index>& rootnodearray)
 {
-//	typedef TransactionFunctionInput::Structure::Node Node;
 	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 	std::size_t fidx = startfidx;
 	for (; ci != ce; ++ci,++fidx)
