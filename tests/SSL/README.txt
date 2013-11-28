@@ -35,12 +35,12 @@ List of files:
 
 README.txt		this file
 
-CA.cert.pem		Wolframe CA certificate
+CA.cert.pem		Wolframe CA certificate (valid till Feb 28 23:59:47 2016 GMT)
 CA.key.pem		Wolframe CA key
 openssl.cnf		configuration file used in the commands above
 
-CAclient.cert.pem	another CA certificate
-CAclient.key.pem	the key for the other certificate
+ClientCA.cert.pem	another CA certificate (valid till Feb 29 00:21:29 2016 GMT)
+ClientCA.key.pem	the key for the other certificate
 ClientCA.cnf		similar to openssl.cnf, used with the Client CA
 
 index.txt
