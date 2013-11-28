@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// utility functions for string handling
-//
+///\file utils/stringUtils.hpp
+///\brief Utility functions for string handling (Mainly to hide intrusive stuff. Implementation is done with help of STL/boost)
+
 #ifndef _WOLFRAME_STRING_UTILS_HPP_INCLUDED
 #define _WOLFRAME_STRING_UTILS_HPP_INCLUDED
 #include <string>

@@ -25,6 +25,7 @@ CPP_OBJS = \
 	ddl_filtermapParse.obj \
 	ddl_filtermapSerialize.obj \
 	mapContext.obj \
+	serializationErrorException.obj \
 	struct_filtermapBase.obj \
 	struct_filtermapParse.obj \
 	struct_filtermapParseStack.obj \

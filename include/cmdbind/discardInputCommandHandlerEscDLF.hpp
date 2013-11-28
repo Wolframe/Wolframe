@@ -31,6 +31,8 @@
 
 ************************************************************************/
 ///\file cmdbind/discardInputCommandHandlerEscDLF.hpp
+///\brief Command handler that discards the input (> /dev/null ) instead of processing it. Used for handling rest of content when an error occurrs before the whole input has been consumed.
+
 #ifndef _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"

@@ -31,6 +31,8 @@
 
 ************************************************************************/
 ///\file cmdbind/contentBufferCommandHandlerEscDLF.hpp
+///\brief Command handler base class for handlers buffering the input processed
+
 #ifndef _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
@@ -91,7 +93,7 @@ private:
 
 	protocol::EscapeBuffer m_escapeBuffer;
 	State m_state;					//< processing state machine state
-	std::string m_content;
+	std::string m_content;				//< buffered content processed
 	protocol::InputBlock m_input;			//< input buffer
 	protocol::OutputBlock m_output;			//< output buffer
 	protocol::InputBlock::iterator m_eoD;		//< input end of data marker

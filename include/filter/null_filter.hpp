@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file char_filter.hpp
-///\brief Filter reading/writing character by character
+///\file filter/null_filter.hpp
+///\brief Filter that emits an error for beeing undefined instead of doing something when used
 
-#ifndef _Wolframe_FILTER_CHAR_HPP_INCLUDED
-#define _Wolframe_FILTER_CHAR_HPP_INCLUDED
+#ifndef _Wolframe_FILTER_NULL_HPP_INCLUDED
+#define _Wolframe_FILTER_NULL_HPP_INCLUDED
 #include "filter/filter.hpp"
 
 namespace _Wolframe {
