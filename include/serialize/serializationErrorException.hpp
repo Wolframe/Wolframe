@@ -29,27 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/structProgramOption.hpp
-///\brief Provides uniform handling of structures in program command line options
-#ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
+///\file serialize/serializationErrorException.hpp
+///\brief Defines the error exception of serialization/deserialization
+
+#ifndef _Wolframe_SERIALIZE_ERROR_EXCEPTION_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_ERROR_EXCEPTION_HPP_INCLUDED
 #include <string>
-#include <boost/property_tree/ptree.hpp>
+#include <stdexcept>
+#include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
-void parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt);
-
-template <class Structure>
-void parseStructOptionString( Structure& st, const std::string& opt)
+class SerializationErrorException :public std::runtime_error
 {
-	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
-}
+public:
+	SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment);
+	SerializationErrorException( const char* title, const std::string& element, const std::string& tag);
+	SerializationErrorException( const char* title, const std::string& tag);
+	SerializationErrorException( const char* title);
+};
 
-boost::property_tree::ptree structOptionTree( const std::string& opt);
-
-}}
+}}//namespace
 #endif
+
 

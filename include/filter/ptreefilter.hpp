@@ -32,6 +32,7 @@
 ************************************************************************/
 ///\file filter/ptreefilter.hpp
 ///\brief Filter for serialization/deserialization of a property tree
+
 #ifndef _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #define _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"

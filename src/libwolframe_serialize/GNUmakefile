@@ -33,6 +33,7 @@ CPP_OBJS = \
 	ddl_filtermapParse.o \
 	ddl_filtermapSerialize.o \
 	mapContext.o \
+	serializationErrorException.o \
 	struct_filtermapBase.o \
 	struct_filtermapParse.o \
 	struct_filtermapParseStack.o \

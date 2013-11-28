@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implements the non intrusive base class of serialization/deserialization
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "serialize/serializationErrorException.hpp"
 #include "filter/typingfilter.hpp"
 #include "utils/printFormats.hpp"
 #include "logger-v1.hpp"

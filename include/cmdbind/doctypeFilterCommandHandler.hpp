@@ -31,6 +31,7 @@
 
 ************************************************************************/
 ///\file cmdbind/doctypeFilterCommandHandler.hpp
+///\brief Command handler that does nothing but extracting the document type from the content and buffering the input processed. The document type extracted and the current command determine what command handler has to process the buffered plus the unprocessed content.
 #ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"

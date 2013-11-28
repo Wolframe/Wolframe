@@ -31,9 +31,7 @@
 
 ************************************************************************/
 ///\file cmdbind/execCommandHandler.hpp
-///\brief command handler for the selection and execution of commands defined as a list of command handlers.
-//        Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued.
-//        Includes also a 'Capa' command for showing the list of available commands
+///\brief Command handler for the selection and execution of commands defined as a list of command handlers. Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued. Includes also a 'Capabilities' command for showing the list of available commands
 #ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"

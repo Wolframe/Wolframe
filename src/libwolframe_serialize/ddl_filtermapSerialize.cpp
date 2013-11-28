@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file serialize_ddl_filtermapSerialize.cpp
 
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
 #include "types/variantStruct.hpp"

@@ -31,6 +31,8 @@
 
 ************************************************************************/
 ///\file cmdbind/ioFilterCommandHandlerEscDLF.hpp
+///\brief Filter based command handler base class that escapes patterns in input/output that could be mixeed with the protocol end of content marker "Dot LF" or "Dot CR LF"
+
 #ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"

@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file mapContext.cpp
-///\brief Defines the error handling of serialization/deserialization functions and some other common stuff
+///\brief Implements the data structure holding the global serialization state variables (without the stack)
 
 #include "serialize/mapContext.hpp"
 #include <cstring>
@@ -54,16 +54,5 @@ void Context::clear()
 	m_has_elem = false;
 }
 
-SerializationErrorException::SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment)
-	:std::runtime_error( std::string() + (title?title:"unknown error") + " (" + element + ")" + (tag.size()?" at ":"") + tag + "-" + comment){}
-
-SerializationErrorException::SerializationErrorException( const char* title, const std::string& element, const std::string& tag)
-	:std::runtime_error( std::string() + (title?title:"unknown error") + " (" + element + ")" + (tag.size()?" at ":"") + tag){}
-
-SerializationErrorException::SerializationErrorException( const char* title, const std::string& tag)
-	:std::runtime_error( std::string() + (title?title:"unknown error") + (tag.size()?" at ":"") + tag){}
-
-SerializationErrorException::SerializationErrorException( const char* title)
-	:std::runtime_error( title?title:"unknown error"){}
 
 

@@ -30,27 +30,18 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\brief Defines the data structure holding the global serialization state variables (without the stack)
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_MAPCONTEXT_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_MAPCONTEXT_HPP_INCLUDED
 #include <string>
-#include <stdexcept>
 #include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
-class SerializationErrorException :public std::runtime_error
-{
-public:
-	SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment);
-	SerializationErrorException( const char* title, const std::string& element, const std::string& tag);
-	SerializationErrorException( const char* title, const std::string& tag);
-	SerializationErrorException( const char* title);
-};
-
-
+///\class Context
+///\brief Global state variables of a running serialization/deserialization procedure (without the stack)
 class Context
 {
 public:

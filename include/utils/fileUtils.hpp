@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// utility functions for file handling
-//
+///\file utils/fileUtils.hpp
+///\brief Utility functions for file handling
+
 #ifndef _WOLFRAME_FILE_UTILS_HPP_INCLUDED
 #define _WOLFRAME_FILE_UTILS_HPP_INCLUDED
 #include <string>
