@@ -43,15 +43,15 @@ std::string DatabaseCommand::tostring( const TagTable* tagmap) const
 	rt << "[L" << m_level << "] ";
 	if (m_resultsetidx >= 0)
 	{
-		rt << "FOREACH "<< "RESULT[" << m_resultsetidx << "]" << " DO '" << m_name << "'( ";
+		rt << "FOREACH "<< "RESULT[" << m_resultsetidx << "]" << " DO '" << m_statement << "'( ";
 	}
 	else if (m_selector.size())
 	{
-		rt << "FOREACH '"<< m_selector.tostring(tagmap) << "' DO '" << m_name << "'( ";
+		rt << "FOREACH '"<< m_selector.tostring(tagmap) << "' DO '" << m_statement << "'( ";
 	}
 	else
 	{
-		rt << "DO '" << m_name << "'( ";
+		rt << "DO '" << m_statement << "'( ";
 	}
 	std::vector<Path>::const_iterator ai = m_arg.begin(), ae = m_arg.end();
 	int ii = 0;

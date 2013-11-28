@@ -191,9 +191,6 @@ public:
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
 
-	///\brief Add a set of named statements to the postgresql program
-	virtual void addStatements( const types::keymap<std::string>& stmmap_);
-
 	virtual const LanguageDescription* getLanguageDescription( ) const
 	{
 		static OracleLanguageDescription langdescr;
@@ -234,17 +231,6 @@ public:
 
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
-
-	const types::keymap<std::string>* stmmap() const
-	{
-		return m_program.statementmap();
-	}
-
-	///\brief Add a set of named statements to the postgresql program
-	virtual void addStatements( const types::keymap<std::string>& stmmap_)
-	{
-		m_program.addStatements( stmmap_);
-	}
 
 	static void noticeProcessor( void* this_void, const char * message);
 

@@ -56,7 +56,7 @@ public:
 		,m_uniqueResult(false){}
 	///\brief Copy constructor
 	DatabaseCommand( const DatabaseCommand& o)
-		:m_name(o.m_name)
+		:m_statement(o.m_statement)
 		,m_selector(o.m_selector)
 		,m_resultsetidx(o.m_resultsetidx)
 		,m_arg(o.m_arg)
@@ -66,8 +66,8 @@ public:
 		,m_hints(o.m_hints){}
 
 	///\brief Constructor
-	DatabaseCommand( const std::string& name_, const Path& selector_, int resultsetidx_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>())
-		:m_name(name_)
+	DatabaseCommand( const std::string& statement_, const Path& selector_, int resultsetidx_, const std::vector<Path>& arg_, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>())
+		:m_statement(statement_)
 		,m_selector(selector_)
 		,m_resultsetidx(resultsetidx_)
 		,m_arg(arg_)
@@ -79,7 +79,7 @@ public:
 
 	const Path& selector() const					{return m_selector;}
 	const std::vector<Path>& arg() const				{return m_arg;}
-	const std::string& name() const					{return m_name;}
+	const std::string& statement() const				{return m_statement;}
 
 	int resultsetidx() const					{return m_resultsetidx;}
 	bool hasNonemptyResult() const					{return m_nonemptyResult;}
@@ -93,7 +93,7 @@ public:
 	void rewriteResultReferences( const std::map<int,int>& addrtab);
 
 private:
-	std::string m_name;
+	std::string m_statement;
 	Path m_selector;
 	int m_resultsetidx;
 	std::vector<Path> m_arg;

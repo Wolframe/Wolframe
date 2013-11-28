@@ -50,8 +50,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
-		const LanguageDescription* langdescr,
-		types::keymap<std::string>& embeddedStatementMap);
+		const LanguageDescription* langdescr);
 
 
 }}//namespace

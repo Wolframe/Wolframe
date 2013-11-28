@@ -42,7 +42,14 @@ using namespace _Wolframe::db;
 std::string TransactionFunctionDescription::MainProcessingStep::Call::tostring() const
 {
 	std::ostringstream out;
-	out << funcname << "( ";
+	if (embedded)
+	{
+		out << "[" << statement << "]( ";
+	}
+	else
+	{
+		out << statement << "( ";
+	}
 	std::vector<Param>::const_iterator pi = paramlist.begin(), pe = paramlist.end();
 
 	for (int idx=0; pi != pe; ++pi)

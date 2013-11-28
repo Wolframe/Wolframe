@@ -34,7 +34,6 @@
 ///\file Oracleprogram.hpp
 #ifndef _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
 #define _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
-#include "types/keymap.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -46,23 +45,9 @@ class Oracleprogram
 {
 public:
 	Oracleprogram(){}
-	Oracleprogram( const Oracleprogram& o)
-		:m_statementmap(o.m_statementmap){}
+	Oracleprogram( const Oracleprogram&){}
 
 	void load( const std::string& dbsource);
-	const types::keymap<std::string>* statementmap() const
-	{
-		return &m_statementmap;
-	}
-
-	///\brief Add a set of named statements to the sqlite program
-	virtual void addStatements( const types::keymap<std::string>& stmmap)
-	{
-		m_statementmap.join( stmmap);
-	}
-
-private:
-	types::keymap<std::string> m_statementmap;
 };
 
 }}

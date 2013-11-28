@@ -198,22 +198,23 @@ public:
 					:type(type_),namspace(namspace_),value(value_){}
 			};
 
-			std::string funcname;			//< function name
-			std::vector<std::string> templatearg;	//< list of template arguments
+			bool embedded;
+			std::string statement;			//< statement or command name
+			std::vector<std::string> templatearg;	//< list of template arguments in case of templated subroutine call
 			std::vector<Param> paramlist;		//< list of arguments
 
 			///\brief Default constructor
 			Call(){}
 			///\brief Copy constructor
 			Call( const Call& o)
-				:funcname(o.funcname),templatearg(o.templatearg),paramlist(o.paramlist){}
+				:embedded(o.embedded),statement(o.statement),templatearg(o.templatearg),paramlist(o.paramlist){}
 			///\brief Constructor
-			Call( const std::string& funcname_, const std::vector<std::string>& templatearg_, const std::vector<Param>& paramlist_)
-				:funcname(funcname_),templatearg(templatearg_),paramlist(paramlist_)
+			Call( const std::string& statement_, const std::vector<std::string>& templatearg_, const std::vector<Param>& paramlist_, bool embedded_)
+				:embedded(embedded_),statement(statement_),templatearg(templatearg_),paramlist(paramlist_)
 			{}
 
 			///\brief Reset call
-			void clear()		{funcname.clear(); paramlist.clear();}
+			void clear()			{statement.clear(); paramlist.clear();}
 			std::string tostring() const;
 		};
 
@@ -225,25 +226,27 @@ public:
 		bool unique;				//< true, if UNIQUE is set
 		types::keymap<std::string> hints;	//< error messages to add to database errors depending on the error class
 	};
-	///\class Block
+
+	///\class ResultBlock
 	///\brief Result block declaration
-	struct Block
+	struct ResultBlock
 	{
 		std::vector<std::string> path_INTO;	//< parsed argument of INTO (splitted by '/')
-		std::size_t startidx;			//< start of block declaration
-		std::size_t size;			//< number of command calls in block declaration
+		std::size_t startidx;			//< start of result block declaration
+		std::size_t size;			//< number of command calls in result block declaration
 
 		///\brief Constructor
-		Block( const std::vector<std::string>& p, std::size_t i, std::size_t n)
+		ResultBlock( const std::vector<std::string>& p, std::size_t i, std::size_t n)
 			:path_INTO(p),startidx(i),size(n){}
 		///\brief Copy constructor
-		Block( const Block& o)
+		ResultBlock( const ResultBlock& o)
 			:path_INTO(o.path_INTO),startidx(o.startidx),size(o.size){}
 		///\brief Default constructor
-		Block()
+		ResultBlock()
 			:startidx(0),size(0){}
 	};
-	///\class Block
+
+	///\class PrintStep
 	///\brief Print instruction declaration
 	struct PrintStep
 	{
@@ -264,13 +267,13 @@ public:
 	std::vector<PreProcessingStep> preprocs;	//< preprocessing steps on input
 	std::string resultfilter;			//< result filter function for post processing
 	std::vector<MainProcessingStep> steps;		//< list of database commands or operations
-	std::vector<Block> blocks;			//< substructures of the output
+	std::vector<ResultBlock> resultblocks;		//< substructures of the output
 	langbind::Authorization auth;			//< authorization definition structure for this function
 	bool casesensitive;				//< true, is the database is case sensitive
 
 	///\brief Copy constructor
 	TransactionFunctionDescription( const TransactionFunctionDescription& o)
-		:name(o.name),printsteps(o.printsteps),steps(o.steps),blocks(o.blocks),auth(o.auth),casesensitive(o.casesensitive){}
+		:name(o.name),printsteps(o.printsteps),steps(o.steps),resultblocks(o.resultblocks),auth(o.auth),casesensitive(o.casesensitive){}
 	///\brief Default constructor
 	TransactionFunctionDescription()
 		:casesensitive(false){}

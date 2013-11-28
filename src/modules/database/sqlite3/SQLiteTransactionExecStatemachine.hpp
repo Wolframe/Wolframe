@@ -35,7 +35,6 @@
 #ifndef _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
-#include "types/keymap.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -51,7 +50,7 @@ namespace db {
 struct TransactionExecStatemachine_sqlite3 :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
+	TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
@@ -64,7 +63,7 @@ struct TransactionExecStatemachine_sqlite3 :public TransactionExecStatemachine
 	bool rollback();
 
 	///\brief Start new command statement
-	virtual bool start( const std::string& stmname);
+	virtual bool start( const std::string& statement);
 	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value);
 	///\brief Execute instance of current statement
@@ -111,8 +110,7 @@ private:
 	State m_state;
 	sqlite3* m_conn;
 	std::string m_dbname;
-	const types::keymap<std::string>* m_stmmap;
-	types::keymap<std::string>::const_iterator m_curstm;
+	std::string m_curstm;
 	bool m_hasResult;
 	bool m_hasRow;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;

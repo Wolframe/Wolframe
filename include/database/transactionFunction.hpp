@@ -110,7 +110,7 @@ public:
 	///\brief Copy constructor
 	TransactionFunction( const TransactionFunction& o);
 	///\brief Constructor
-	TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
+	TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap);
 	///\brief Destructor
 	virtual ~TransactionFunction();
 
@@ -152,7 +152,7 @@ private:
 ///\param[in] name name of  the transaction
 ///\param[in] description description of the function
 ///\param[in] functionmap map op operations in the module context that can be referenced
-TransactionFunction* createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
+TransactionFunction* createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap);
 
 }}//namespace
 #endif

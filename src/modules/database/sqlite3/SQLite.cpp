@@ -238,13 +238,6 @@ void SQLiteDatabase::addProgram( const std::string& program )
 	m_unit->addProgram( program );
 }
 
-void SQLiteDatabase::addStatements( const types::keymap<std::string>& stmmap_)
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addStatements: SQLite database unit not initialized" );
-	m_unit->addStatements( stmmap_);
-}
-
 Transaction* SQLiteDatabase::transaction( const std::string& name)
 {
 	return new SQLiteTransaction( *this, name);
@@ -326,7 +319,7 @@ void SQLiteTransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<sqlite3*> conn( m_unit.m_connPool );
-		TransactionExecStatemachine_sqlite3 ph( *conn, m_db.ID(), m_unit.stmmap() );
+		TransactionExecStatemachine_sqlite3 ph( *conn, m_db.ID());
 		try
 		{
 			if (!ph.begin()
@@ -357,7 +350,7 @@ void SQLiteTransaction::execute_as_transaction()
 
 void SQLiteTransaction::execute_as_operation()
 {
-	TransactionExecStatemachine_sqlite3 ph( **m_conn, m_db.ID(), m_unit.stmmap(), true );
+	TransactionExecStatemachine_sqlite3 ph( **m_conn, m_db.ID(), true );
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))

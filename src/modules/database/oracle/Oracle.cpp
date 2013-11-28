@@ -342,13 +342,6 @@ void Oracledatabase::addProgram( const std::string& program )
 	m_unit->addProgram( program );
 }
 
-void Oracledatabase::addStatements( const types::keymap<std::string>& stmmap_)
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addStatements: Oracle database unit not initialized" );
-	m_unit->addStatements( stmmap_);
-}
-
 Transaction* Oracledatabase::transaction( const std::string& name)
 {
 	return new Oracletransaction( *this, name);
@@ -420,7 +413,7 @@ void Oracletransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
-		TransactionExecStatemachine_oracle ph( *conn, m_unit.stmmap());
+		TransactionExecStatemachine_oracle ph( *conn);
 		try
 		{
 			if (!ph.begin()
@@ -451,7 +444,7 @@ void Oracletransaction::execute_as_transaction()
 
 void Oracletransaction::execute_as_operation()
 {
-	TransactionExecStatemachine_oracle ph( **m_conn, m_unit.stmmap(), true);
+	TransactionExecStatemachine_oracle ph( **m_conn, true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))

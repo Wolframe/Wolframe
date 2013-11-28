@@ -68,7 +68,7 @@ struct TransactionFunction::Impl
 	std::vector<PreProcessCommand> m_preprocs;
 	std::string m_resultfilter;
 
-	Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap);
+	Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap);
 	Impl( const Impl& o);
 
 	void handlePrintStep( const PrintStep& printstep);
@@ -237,16 +237,16 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		if (ci->level() > level)
 		{
 			// call SUBROUTINE: For each selected node execute all the database commands or SUBROUTINEs:
-			if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling SUBROUTINE");
+			if (!ci->statement().empty()) throw std::logic_error("passing arguments expected when calling SUBROUTINE");
 			std::size_t nextfidx = fidx;
 			for (++ca; ca != ce; ++ca,++nextfidx)
 			{
-				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
+				if (ca->level() < level || (ca->level() == level && ca->statement().empty())) break;
 			}
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
-				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
+				rt.startCommand( fidx, ci->level(), ci->statement(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi, loopcnt);
 				std::vector<NodeVisitor::Index> opnodearray;
 				opnodearray.push_back( *vi);
@@ -262,7 +262,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
-				rt.startCommand( fidx, ci->level(), ci->name(), ci->resultsetidx());
+				rt.startCommand( fidx, ci->level(), ci->statement(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi, loopcnt);
 			}
 		}
@@ -282,14 +282,14 @@ TransactionInput TransactionFunctionInput::get() const
 }
 
 
-static int hasOpenSubstruct( const std::vector<TransactionFunctionDescription::Block>& blocks, std::size_t idx)
+static int hasOpenSubstruct( const std::vector<TransactionFunctionDescription::ResultBlock>& blocks, std::size_t idx)
 {
 	std::size_t ii = 0;
 	for (; ii<blocks.size(); ++ii) if (idx == blocks.at(ii).startidx) return ii;
 	return -1;
 }
 
-static int hasCloseSubstruct( const std::vector<TransactionFunctionDescription::Block>& blocks, std::size_t idx)
+static int hasCloseSubstruct( const std::vector<TransactionFunctionDescription::ResultBlock>& blocks, std::size_t idx)
 {
 	std::size_t ii = 0;
 	for (; ii<blocks.size(); ++ii) if (idx == blocks.at(ii).startidx + blocks.at(ii).size && blocks.at(ii).size != 0) return ii;
@@ -336,7 +336,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 	}
 }
 
-TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
+TransactionFunction::Impl::Impl( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap)
 	:m_resultstruct( new ResultStructure())
 	,m_tagmap(description.casesensitive)
 	,m_resultfilter(description.resultfilter)
@@ -390,9 +390,9 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 			result_reference_relocation_tab[ eidx] = m_call.size();
 
 			// Create substructure context for RESULT INTO instructions:
-			if ((blkidx=hasCloseSubstruct( description.blocks, eidx)) >= 0)
+			if ((blkidx=hasCloseSubstruct( description.resultblocks, eidx)) >= 0)
 			{
-				const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+				const std::vector<std::string>& ps = description.resultblocks.at(blkidx).path_INTO;
 				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 				for (; pi != pe; ++pi)
 				{
@@ -400,9 +400,9 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				}
 			}
 			// Handle INTO .. BEGIN open structure:
-			if ((blkidx=hasOpenSubstruct( description.blocks, eidx)) >= 0)
+			if ((blkidx=hasOpenSubstruct( description.resultblocks, eidx)) >= 0)
 			{
-				const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+				const std::vector<std::string>& ps = description.resultblocks.at(blkidx).path_INTO;
 				std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 				for (; pi != pe; ++pi)
 				{
@@ -427,16 +427,15 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 				param.push_back( pa);
 			}
 
-
-			SubroutineDeclarationMap::const_iterator fui = functionmap.find( di->call.funcname);
-			if (fui == functionmap.end())
+			SubroutineDeclarationMap::const_iterator fui = functionmap.find( di->call.statement);
+			if (di->call.embedded || fui == functionmap.end())
 			{
 				//... not a SUBROUTINE
 				if (di->call.templatearg.size())
 				{
 					throw MainProcessingStep::Error( eidx, "unknown subroutine template called");
 				}
-				DatabaseCommand cc( di->call.funcname, selector, di->resultref_FOREACH, param, di->nonempty, di->unique, 1, di->hints);
+				DatabaseCommand cc( di->call.statement, selector, di->resultref_FOREACH, param, di->nonempty, di->unique, 1, di->hints);
 				cc.rewriteResultReferences( result_reference_relocation_tab);
 
 				if (di->path_INTO.empty())
@@ -563,34 +562,18 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 					std::vector<Path> fparam = fsi->arg();
 					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
 					for (; fai != fae; ++fai) fai->rewrite( rwtab, scope_functionidx_incr);
-					bool templated = false;
+
+					std::string fstm;
 					if (fui->second.templateArguments.size())
 					{
-						types::keymap<std::string>::const_iterator ei = embeddedStatementMap.find( fsi->name());
-						if (ei != embeddedStatementMap.end())
-						{
-							std::string stm = langdescr->substituteTemplateArguments( ei->second, templateArgAssignments);
-							if (stm != ei->second)
-							{
-								//... subroutine main step has template arguments substituted
-								templated = true;
-								std::string stmname;
-								stmname.append( "__T__");
-								stmname.append( description.name);
-								stmname.append( "_");
-								stmname.append( boost::lexical_cast<std::string>( m_call.size()));
-								embeddedStatementMap[ stmname] = stm;
-
-								DatabaseCommand cc( stmname, fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
-								m_call.push_back( cc);
-							}
-						}
+						fstm = langdescr->substituteTemplateArguments( fsi->statement(), templateArgAssignments);
 					}
-					if (!templated)
+					else
 					{
-						DatabaseCommand cc( fsi->name(), fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
-						m_call.push_back( cc);
+						fstm = fsi->statement();
 					}
+					DatabaseCommand cc( fstm, fselector, fresultsetidx, fparam, false, false, fsi->level() + 1);
+					m_call.push_back( cc);
 				}
 			}
 		}
@@ -607,9 +590,9 @@ TransactionFunction::Impl::Impl( const TransactionFunctionDescription& descripti
 		handlePrintStep( pp->second);
 	}
 	// Create substructure context for RESULT INTO instructions:
-	if ((blkidx=hasCloseSubstruct( description.blocks, description.steps.size())) >= 0)
+	if ((blkidx=hasCloseSubstruct( description.resultblocks, description.steps.size())) >= 0)
 	{
-		const std::vector<std::string>& ps = description.blocks.at(blkidx).path_INTO;
+		const std::vector<std::string>& ps = description.resultblocks.at(blkidx).path_INTO;
 		std::vector<std::string>::const_iterator pi = ps.begin(), pe = ps.end();
 		for (; pi != pe; ++pi)
 		{
@@ -625,10 +608,10 @@ TransactionFunction::Impl::Impl( const Impl& o)
 	,m_preprocs(o.m_preprocs){}
 
 
-TransactionFunction::TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
+TransactionFunction::TransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap)
 	:m_name(description.name)
 	,m_authorization( description.auth)
-	,m_impl( new Impl( description, langdescr, embeddedStatementMap, functionmap))
+	,m_impl( new Impl( description, langdescr, functionmap))
 {
 	LOG_DATA2 << "[transaction function build] " << tostring();
 }
@@ -677,9 +660,9 @@ std::string TransactionFunction::tostring( const utils::PrintFormat* pformat) co
 	return rt.str();
 }
 
-TransactionFunction* db::createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, const SubroutineDeclarationMap& functionmap)
+TransactionFunction* db::createTransactionFunction( const TransactionFunctionDescription& description, const LanguageDescription* langdescr, const SubroutineDeclarationMap& functionmap)
 {
-	return new TransactionFunction( description, langdescr, embeddedStatementMap, functionmap);
+	return new TransactionFunction( description, langdescr, functionmap);
 }
 
 

@@ -125,7 +125,7 @@ private:
 	std::string		m_name;		//< name of transaction
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
-	PoolObject<sqlite3*>* m_conn;		//< connection object from pool
+	PoolObject<sqlite3*>*	m_conn;		//< connection object from pool
 };
 
 
@@ -188,9 +188,6 @@ public:
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
 
-	///\brief Add a set of named statements to the sqlite program
-	virtual void addStatements( const types::keymap<std::string>& stmmap_);
-
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
 		static SQLiteLanguageDescription langdescr;
@@ -226,18 +223,6 @@ public:
 
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
-
-	///\brief Add a set of named statements to the sqlite program
-	virtual void addStatements( const types::keymap<std::string>& stmmap_)
-	{
-		m_program.addStatements( stmmap_);
-	}
-
-
-	const types::keymap<std::string>* stmmap() const
-	{
-		return m_program.statementmap();
-	}
 
 private:
 	const std::string	m_ID;

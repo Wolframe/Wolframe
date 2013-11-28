@@ -37,7 +37,6 @@
 #include "database/transactionExecStatemachine.hpp"
 #include "database/bindStatementParams.hpp"
 #include "database/databaseError.hpp"
-#include "types/keymap.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -53,7 +52,7 @@ namespace db {
 struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
+	TransactionExecStatemachine_postgres( PGconn* conn_, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_postgres();
@@ -66,7 +65,7 @@ struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 	bool rollback();
 
 	///\brief Start new command statement
-	virtual bool start( const std::string& stmname);
+	virtual bool start( const std::string& statement);
 	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value);
 	///\brief Execute instance of current statement
@@ -111,7 +110,6 @@ private:
 private:
 	State m_state;
 	PGconn* m_conn;
-	const types::keymap<std::string>* m_stmmap;
 	PGresult* m_lastresult;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;

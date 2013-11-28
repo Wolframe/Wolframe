@@ -57,8 +57,8 @@ public:
 	virtual ~TransactionExecStatemachine(){}
 
 	///\brief Start new command statement
-	///\param[in] stmname name of statement
-	virtual bool start( const std::string& stmname)=0;
+	///\param[in] statement statement string
+	virtual bool start( const std::string& statement)=0;
 	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value)=0;
 	///\brief Execute instance of current statement

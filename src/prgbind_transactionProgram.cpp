@@ -93,7 +93,6 @@ bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 
 void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)
 {
-	types::keymap<std::string> embeddedStatementMap;
 	static const db::LanguageDescription defaultLanguageDescr;
 	const db::LanguageDescription* languageDescr = (transactionDB)?transactionDB->getLanguageDescription():&defaultLanguageDescr;
 
@@ -103,7 +102,7 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	{
 		std::string dbid = (transactionDB)?transactionDB->ID():std::string();
 		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-			= db::loadTransactionProgramFile( filename, dbid, languageDescr, embeddedStatementMap);
+			= db::loadTransactionProgramFile( filename, dbid, languageDescr);
 
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
@@ -111,10 +110,6 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 			langbind::FormFunctionR func( new TransactionFunction( fi->second));
 			library.defineFormFunction( fi->first, func);
 			LOG_DEBUG << "Loaded transaction function '" << fi->first << "'";
-		}
-		if (transactionDB)
-		{
-			transactionDB->addStatements( embeddedStatementMap);
 		}
 	}
 	catch (const config::PositionalErrorException& e)

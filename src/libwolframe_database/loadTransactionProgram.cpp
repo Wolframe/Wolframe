@@ -346,10 +346,9 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call
-	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
+	parseEmbeddedStatement( const LanguageDescription* langdescr, std::string::const_iterator& osi, std::string::const_iterator ose, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
 {
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	std::string callname;			//< function name
 	std::vector<Call::Param> paramlist;	//< list of arguments
 	std::string stm;
 	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
@@ -372,21 +371,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 		}
 	}
 	stm.append( start, si);
-
-	callname.append( "__");
-	callname.append( funcname);
-	callname.append( "_");
-	callname.append( boost::lexical_cast<std::string>( index));
-	types::keymap<std::string>::const_iterator ei = embeddedStatementMap.find( callname);
-	if (ei == embeddedStatementMap.end())
-	{
-		embeddedStatementMap.insert( callname, stm);
-	}
-	else if (ei->second != stm)
-	{
-		throw std::runtime_error( std::string("duplicate definition of function '") + funcname + "'");
-	}
-	return Call( callname, std::vector<std::string>(), paramlist);
+	return Call( stm, std::vector<std::string>(), paramlist, true);
 }
 
 static TransactionFunctionDescription::MainProcessingStep::Call
@@ -461,7 +446,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 			throw std::runtime_error( "unexpected token in function call parameter. close bracket ')' or comma ',' expected after argument");
 		}
 	}
-	return Call( callname, templatearg, paramlist);
+	return Call( callname, templatearg, paramlist, false);
 }
 
 static TransactionFunctionDescription::PreProcessingStep::Argument
@@ -626,8 +611,8 @@ struct Subroutine
 	TransactionFunctionDescription description;
 	std::vector<std::string::const_iterator> callstartar;
 	std::vector<std::string::const_iterator> pprcstartar;
-	std::vector<std::string> result_INTO;				//< RESULT INTO path
-	std::vector<TransactionFunctionDescription::Block> blockstk;	//< stack of current RESULT INTO block scope
+	std::vector<std::string> result_INTO;					//< RESULT INTO path
+	std::vector<TransactionFunctionDescription::ResultBlock> blockstk;	//< stack of current RESULT INTO block scope
 	int embstm_index;
 };
 }// anonymous namespace
@@ -948,7 +933,7 @@ static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t command
 	}
 }
 
-static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, std::string::const_iterator& si, const std::string::const_iterator& se)
+static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
@@ -1001,14 +986,14 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				{
 					if (!subroutine.result_INTO.empty())
 					{
-						subroutine.description.blocks.insert( subroutine.description.blocks.begin(), TransactionFunctionDescription::Block( subroutine.result_INTO, 0, subroutine.description.steps.size()));
+						subroutine.description.resultblocks.insert( subroutine.description.resultblocks.begin(), TransactionFunctionDescription::ResultBlock( subroutine.result_INTO, 0, subroutine.description.steps.size()));
 					}
 					break; //... end loop, return
 				}
 				else
 				{
 					subroutine.blockstk.back().size = subroutine.description.steps.size() - subroutine.blockstk.back().startidx;
-					subroutine.description.blocks.push_back( subroutine.blockstk.back());
+					subroutine.description.resultblocks.push_back( subroutine.blockstk.back());
 					subroutine.blockstk.pop_back();
 				}
 			}
@@ -1062,7 +1047,7 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				if (parseNextToken( langdescr, tok, si, se)
 				&&  boost::algorithm::iequals( tok, "BEGIN"))
 				{
-					subroutine.blockstk.push_back( TransactionFunctionDescription::Block( path, subroutine.description.steps.size(), 0));
+					subroutine.blockstk.push_back( TransactionFunctionDescription::ResultBlock( path, subroutine.description.steps.size(), 0));
 				}
 				else
 				{
@@ -1140,7 +1125,7 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 			}
 			if (langdescr->isEmbeddedStatement( si, se))
 			{
-				opstep.call = parseEmbeddedStatement( langdescr, subroutine.description.name, subroutine.embstm_index++, si, se, embeddedStatementMap, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+				opstep.call = parseEmbeddedStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
 			}
 			else
 			{
@@ -1197,7 +1182,7 @@ static bool checkDatabaseList( const std::string& databaseID, config::Positional
 
 ///\brief Forward declaration
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap);
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap);
 
 static std::string getInclude( const std::string& mainfilename, const std::string& incfilename)
 {
@@ -1220,7 +1205,7 @@ static std::string getInclude( const std::string& mainfilename, const std::strin
 }
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap)
+	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
@@ -1295,7 +1280,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				ch = utils::parseNextToken( includeFileName, si, se, utils::emptyCharTable(), utils::anyCharTable());
 				if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
 				std::vector<std::pair<std::string,TransactionFunctionR> > lst
-					= includeFile( filename, includeFileName, databaseId, langdescr, embeddedStatementMap, subroutineMap);
+					= includeFile( filename, includeFileName, databaseId, langdescr, subroutineMap);
 				rt.insert( rt.begin(), lst.begin(), lst.end());
 			}
 			else
@@ -1359,7 +1344,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 						if ((mask & (unsigned int)MainBlock) != 0) throw std::runtime_error( "duplicate main block (BEGIN..END) definition in transaction/subroutine");
 						mask |= (unsigned int)MainBlock;
 
-						parseMainBlock( subroutine, ERROR, langdescr, embeddedStatementMap, si, se);
+						parseMainBlock( subroutine, ERROR, langdescr, si, se);
 						if (isValidDatabase)
 						{
 							if (subroutine.isValidDatabase)
@@ -1369,12 +1354,12 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 									if (subroutine.isTransaction)
 									{
 										LOG_TRACE << "Registering transaction definition '" << subroutine.description.name << "'";
-										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, embeddedStatementMap, subroutineMap));
+										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
 										rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.description.name, func));
 									}
 									else
 									{
-										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, embeddedStatementMap, subroutineMap));
+										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
 										subroutineMap[ subroutine.description.name] = SubroutineDeclaration( subroutine.templateArguments, func);
 									}
 								}
@@ -1422,12 +1407,12 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 }
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, types::keymap<std::string>& embeddedStatementMap, SubroutineDeclarationMap& subroutineMap)
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
 {
 	try
 	{
 		std::string incsrc = getInclude( mainfilename, incfilename);
-		return load( mainfilename, incsrc, databaseId, langdescr, embeddedStatementMap, subroutineMap);
+		return load( mainfilename, incsrc, databaseId, langdescr, subroutineMap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{
@@ -1450,13 +1435,12 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	_Wolframe::db::loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
-		const LanguageDescription* langdescr,
-		types::keymap<std::string>& embeddedStatementMap)
+		const LanguageDescription* langdescr)
 {
 	try
 	{
 		SubroutineDeclarationMap subroutineMap;
-		return load( filename, utils::readSourceFileContent( filename), databaseId, langdescr, embeddedStatementMap, subroutineMap);
+		return load( filename, utils::readSourceFileContent( filename), databaseId, langdescr, subroutineMap);
 	}
 	catch (const config::PositionalFileErrorException& e)
 	{

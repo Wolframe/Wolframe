@@ -48,10 +48,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleConnection* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleConnection* conn_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn_)
-	,m_stmmap(stmmap_)
 	,m_lastresult(0)
 	,m_nof_rows(0)
 	,m_idx_row(0)
@@ -234,9 +233,9 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 	return false;
 }
 
-bool TransactionExecStatemachine_oracle::start( const std::string& stmname)
+bool TransactionExecStatemachine_oracle::start( const std::string& statement)
 {
-	LOG_TRACE << "[oracle statement] CALL start (" << stmname << ")";
+	LOG_TRACE << "[oracle statement] CALL start (" << statement << ")";
 	if (m_state == Executed || m_state == CommandReady)
 	{
 		m_state = Transaction;
@@ -246,12 +245,7 @@ bool TransactionExecStatemachine_oracle::start( const std::string& stmname)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	types::keymap<std::string>::const_iterator si = m_stmmap->find( stmname);
-	if (si == m_stmmap->end())
-	{
-		throw std::runtime_error( std::string( "statement '") + stmname + "' is not defined");
-	}
-	m_statement.init( si->second);
+	m_statement.init( statement);
 	m_state = CommandReady;
 	return true;
 }

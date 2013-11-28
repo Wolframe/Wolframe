@@ -111,18 +111,18 @@ public:
 			,m_level(0)
 			,m_foreach_functionidx(-1){}
 		///\brief Constructor
-		Command( std::size_t functionidx_, std::size_t level_, const std::string& name_, int foreach_functionidx_=-1)
+		Command( std::size_t functionidx_, std::size_t level_, const std::string& statement_, int foreach_functionidx_=-1)
 			:m_flags(0)
 			,m_functionidx(functionidx_)
 			,m_level(level_)
-			,m_name(name_)
+			,m_statement(statement_)
 			,m_foreach_functionidx(foreach_functionidx_){}
 		///\brief Copy constructor
 		Command( const Command& o)
 			:m_flags(o.m_flags)
 			,m_functionidx(o.m_functionidx)
 			,m_level(o.m_level)
-			,m_name(o.m_name)
+			,m_statement(o.m_statement)
 			,m_foreach_functionidx(o.m_foreach_functionidx)
 			,m_arg(o.m_arg){}
 
@@ -136,8 +136,8 @@ public:
 		std::size_t level() const			{return m_level;}
 		///\brief Get the id of the associated function description
 		std::size_t functionidx() const			{return m_functionidx;}
-		///\brief Get the name of the command
-		const std::string& name() const			{return m_name;}
+		///\brief Get the command statement
+		const std::string& statement() const		{return m_statement;}
 		///\brief Get the list of arguments of the command
 		const std::vector<Argument>& arg() const	{return m_arg;}
 		///\brief Get the functionidx result of the result this command is bound to
@@ -180,7 +180,7 @@ public:
 		unsigned char m_flags;				//< Flags defining some constraints on the command result (bitfield for enum Flags)
 		std::size_t m_functionidx;			//< Identifier used to associate a function description with a result for output with markup
 		std::size_t m_level;				//< Identifier used to implement the scope of values that can be referenced by this command
-		std::string m_name;				//< Name of the command (internal name for embedded database instructions)
+		std::string m_statement;			//< The command statement
 		int m_foreach_functionidx;			//< Quantifier variable for relative result references. If defined (>=0) then the function is executed for each result
 		std::vector<Argument> m_arg;			//< List of arguments passed to the command
 	};
@@ -199,10 +199,10 @@ public:
 	///\brief Start new command statement
 	///\param[in] functionidx index of the function in the list of calls in the transaction definition (starting with 0)
 	///\param[in] level in the hierarchy of operations to determine begin and end of an operation (starting with 1, incremented by one for the scope a sub operation)
-	///\param[in] stmname name of statement
-	void startCommand( std::size_t functionidx, std::size_t level, const std::string& stmname, int foreach_functionidx)
+	///\param[in] statement string of the statement
+	void startCommand( std::size_t functionidx, std::size_t level, const std::string& statement, int foreach_functionidx)
 	{
-		m_cmd.push_back( Command( functionidx, level, stmname, foreach_functionidx));
+		m_cmd.push_back( Command( functionidx, level, statement, foreach_functionidx));
 	}
 
 	///\brief Bind parameter value on current command statement

@@ -383,13 +383,6 @@ void PostgreSQLdatabase::addProgram( const std::string& program )
 	m_unit->addProgram( program );
 }
 
-void PostgreSQLdatabase::addStatements( const types::keymap<std::string>& stmmap_)
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addStatements: PostgreSQL database unit not initialized" );
-	m_unit->addStatements( stmmap_);
-}
-
 Transaction* PostgreSQLdatabase::transaction( const std::string& name)
 {
 	return new PostgreSQLtransaction( *this, name);
@@ -459,7 +452,7 @@ void PostgreSQLtransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<PGconn*> conn( m_unit.m_connPool);
-		TransactionExecStatemachine_postgres ph( *conn, m_unit.stmmap());
+		TransactionExecStatemachine_postgres ph( *conn);
 		try
 		{
 			if (!ph.begin()
@@ -490,7 +483,7 @@ void PostgreSQLtransaction::execute_as_transaction()
 
 void PostgreSQLtransaction::execute_as_operation()
 {
-	TransactionExecStatemachine_postgres ph( **m_conn, m_unit.stmmap(), true);
+	TransactionExecStatemachine_postgres ph( **m_conn, true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))

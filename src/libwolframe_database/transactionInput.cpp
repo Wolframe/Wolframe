@@ -54,7 +54,7 @@ std::string TransactionInput::Command::tostring() const
 	if (m_foreach_functionidx>0) rt << "/" << m_foreach_functionidx << " ";
 	if (flags(NonEmptyResult)) rt << "NONEMPTY ";
 	if (flags(UniqueResult)) rt << "UNIQUE ";
-	rt << m_name << "( ";
+	rt << m_statement << "( ";
 	arg_const_iterator ai = begin(), ae = end();
 	for (int idx=0;ai!=ae;++ai)
 	{

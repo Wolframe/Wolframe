@@ -91,17 +91,13 @@ static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
 }
 
 
-TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn)
 	,m_dbname(dbname_)
-	,m_stmmap(stmmap)
 	,m_hasResult(false)
 	,m_hasRow(false)
-	,m_stm(0)
-{
-	m_curstm = m_stmmap->end();
-}
+	,m_stm(0){}
 
 TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
@@ -118,7 +114,7 @@ void TransactionExecStatemachine_sqlite3::clear()
 	}
 	m_hasResult = false;
 	m_hasRow = false;
-	m_curstm = m_stmmap->end();
+	m_curstm.clear();
 	m_state = Init;
 }
 
@@ -162,14 +158,14 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 		case SQLITE_NOTADB: errtype = "SYSTEM"; break;
 	}
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), (m_curstm == m_stmmap->end())?"":m_curstm->second.c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), m_curstm.c_str(), errtype, errmsg, errmsg));
 }
 
 bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr, State newstate)
 {
 	m_hasResult = false;
 	m_hasRow = false;
-	m_curstm = m_stmmap->end();
+	m_curstm.clear();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
 	int rc = wrap_sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
@@ -238,18 +234,18 @@ bool TransactionExecStatemachine_sqlite3::errorStatus( const std::string& messag
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), (m_curstm == m_stmmap->end())?"":m_curstm->second.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_curstm.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
 		m_state = Error;
 	}
 	return false;
 }
 
-bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
+bool TransactionExecStatemachine_sqlite3::start( const std::string& statement)
 {
-	LOG_TRACE << "[sqlite3 statement] CALL start (" << stmname << ")";
+	LOG_TRACE << "[sqlite3 statement] CALL start (" << statement << ")";
 	m_hasResult = false;
 	m_hasRow = false;
-	m_curstm = m_stmmap->find( stmname);
+	m_curstm = statement;
 	if (m_state == Executed || m_state == CommandReady)
 	{
 		sqlite3_finalize( m_stm);
@@ -260,13 +256,9 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
 	{
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_curstm == m_stmmap->end())
-	{
-		return errorStatus( std::string( "statement not found '") + stmname + "'");
-	}
 	const char *stmtail = 0;
 
-	int rc = wrap_sqlite3_prepare_v2( m_conn, m_curstm->second.c_str(), m_curstm->second.size(), &m_stm, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -275,7 +267,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& stmname)
 			while (stmtail[ii] && stmtail[ii]<32) ++ii;
 			if (stmtail[ii])
 			{
-				return errorStatus( std::string( "prepared statement '") + stmname + "' consists of more than one SQL statement");
+				return errorStatus( std::string( "prepared statement '") + statement + "' consists of more than one SQL statement");
 			}
 		}
 	}
@@ -303,7 +295,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 	std::size_t stmcnt = (std::size_t)wrap_sqlite3_bind_parameter_count( m_stm);
 	if (idx > stmcnt)
 	{
-		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm->second + ")");
+		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm + ")");
 	}
 	switch (value.type())
 	{

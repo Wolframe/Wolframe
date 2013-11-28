@@ -44,17 +44,17 @@ using namespace _Wolframe::db;
 
 #define ERRORCODE(E) (E+10000)
 
-static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cmdres, const std::string& name)
+static std::size_t resolveColumnName( const TransactionOutput::CommandResult& cmdres, const std::string& colname)
 {
 	std::size_t ci = 0, ce = cmdres.nofColumns();
 	for (; ci != ce; ++ci)
 	{
-		if (boost::algorithm::iequals( cmdres.columnName( ci), name))
+		if (boost::algorithm::iequals( cmdres.columnName( ci), colname))
 		{
 			return ci;
 		}
 	}
-	throw std::runtime_error( std::string( "column name '") + name + "' not found in result");
+	throw std::runtime_error( std::string( "column name '") + colname + "' not found in result");
 }
 
 static types::VariantConst resolveResultReference( const TransactionOutput& output, const TransactionInput::cmd_const_iterator& cmditr, std::size_t result_functionidx, const types::Variant& reference)
@@ -92,19 +92,19 @@ static types::VariantConst resolveResultReference( const TransactionOutput& outp
 			cidx = reference.touint();
 			if (cidx == 0)
 			{
-				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. column name must be >= 1", "internal logic error (transaction function variable reference)");
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. column name must be >= 1", "internal logic error (transaction function variable reference)");
 				throw db::DatabaseErrorException( dberr);
 			}
 			if (cidx > fi->nofColumns())
 			{
-				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(42), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function variable reference)");
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(42), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function variable reference)");
 				throw db::DatabaseErrorException( dberr);
 			}
 			cidx -= 1;
 		}
 		if (fi->nofRows() > 1)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unbound result reference to set of results", "internal logic error (transaction function variable reference)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "unbound result reference to set of results", "internal logic error (transaction function variable reference)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (fi->nofRows() > 0)
@@ -128,12 +128,12 @@ static types::VariantConst resolveResultIteratorReference( const TransactionOutp
 		cidx = reference.touint();
 		if (cidx == 0)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (cidx > resrow->size())
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		cidx -= 1;
@@ -171,7 +171,7 @@ static bool executeCommand( TransactionExecStatemachine* stmh, const Transaction
 					}
 					else
 					{
-						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
+						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
 						throw db::DatabaseErrorException( dberr);
 					}
 				}
@@ -241,13 +241,13 @@ static bool executeCommand( TransactionExecStatemachine* stmh, const Transaction
 			} while (stmh->next());
 			if (unique && rescnt > 1)
 			{
-				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(1), 0/*dbname*/, cmditr->name().c_str(), "NOTUNIQUE", "more than one result result for command (UNIQUE)", "internal data constraint validation error");
+				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(1), 0/*dbname*/, cmditr->statement().c_str(), "NOTUNIQUE", "more than one result result for command (UNIQUE)", "internal data constraint validation error");
 				throw db::DatabaseErrorException( dberr);
 			}
 		}
 		else if (nonempty)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(2), 0/*dbname*/, cmditr->name().c_str(), "NOTNONEMPTY", "missing result for command (NONEMPTY)", "internal data constraint validation error");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(2), 0/*dbname*/, cmditr->statement().c_str(), "NOTNONEMPTY", "missing result for command (NONEMPTY)", "internal data constraint validation error");
 			throw db::DatabaseErrorException( dberr);
 		}
 	}
@@ -255,12 +255,12 @@ static bool executeCommand( TransactionExecStatemachine* stmh, const Transaction
 	{
 		if (nonempty)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(11), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition NONEMPTY on result for a command without result set", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(11), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "unexpected condition NONEMPTY on result for a command without result set", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (unique)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(12), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition UNIQUE on result for a command without result set", "internal logic error (transaction function definition)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(12), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "unexpected condition UNIQUE on result for a command without result set", "internal logic error (transaction function definition)");
 			throw db::DatabaseErrorException( dberr);
 		}
 	}
@@ -307,7 +307,7 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 					}
 					else
 					{
-						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
+						db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(31), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "Referencing result in first command", "semantic error");
 						throw db::DatabaseErrorException( dberr);
 					}
 				}
@@ -338,7 +338,7 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 static TransactionInput::cmd_const_iterator endOfOperation( TransactionInput::cmd_const_iterator ci, TransactionInput::cmd_const_iterator ce)
 {
 	std::size_t level = ci->level();
-	for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->name().empty())); ++ci);
+	for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->statement().empty())); ++ci);
 	return ci;
 }
 
@@ -373,7 +373,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
 	while (ci != ce)
 	{
-		if (ci->name().empty())
+		if (ci->statement().empty())
 		{
 			optype = PushArguments;
 		}
@@ -435,7 +435,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
 						for (std::size_t rowidx=0; wi != we; ++wi,++rowidx)
 						{
-							if (!start( ci->name())
+							if (!start( ci->statement())
 							||  !executeCommand( this, output, cmdres, residx, rowidx, ci, nonempty, unique))
 							{
 								const DatabaseError* lasterr = getLastError();
@@ -461,7 +461,7 @@ bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 					if (!pushArguments( output, cmdres, residx, 0/*rowidx*/, ci)) return false;
 					break;
 				case DatabaseCall:
-					if (!start( ci->name())
+					if (!start( ci->statement())
 					||  !executeCommand( this, output, cmdres, residx, 0/*rowidx*/, ci, nonempty, unique))
 					{
 						const DatabaseError* lasterr = getLastError();

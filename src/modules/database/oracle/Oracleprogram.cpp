@@ -39,67 +39,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
-
 void Oracleprogram::load( const std::string& source)
 {
-	config::PositionalErrorMessageBase ERROR(source);
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string::const_iterator si = source.begin(), se = source.end();
-	char ch;
-	std::string tok;
-	const char* commentopr = "--";
-
-	while ((ch = utils::gotoNextToken( si, se)) != 0)
-	{
-		if (ch == commentopr[0])
-		{
-			std::string::const_iterator ti = si;
-			std::size_t ci = 0;
-			while (commentopr[ci] && commentopr[ci] == *ti)
-			{
-				ci++;
-				ti++;
-			}
-			if (!commentopr[ci])
-			{
-				// skip to end of line
-				while (ti != se && *ti != '\n') ++ti;
-				si = ti;
-				continue;
-			}
-		}
-		ch = utils::parseNextToken( tok, si, se, g_optab);
-		if ((ch|32) == 'p' && boost::iequals( tok, "PREPARE"))
-		{
-			std::string stmname;
-			ch = utils::parseNextToken( stmname, si, se, g_optab);
-			if (!ch) throw ERROR( si, MSG << "unexpected end of file");
-			if (g_optab[ch]) throw ERROR( si, MSG << "unexpected token '" << ch << "'");
-
-			ch = utils::parseNextToken( tok, si, se, g_optab);
-			if (!ch) throw ERROR( si, MSG << "unexpected end of file");
-			if (g_optab[ch]) throw ERROR( si, MSG << "unexpected token '" << ch << "'");
-			if (!boost::iequals( tok, "AS") && !boost::iequals( tok, "FROM"))
-			{
-				throw ERROR( si, MSG << "unexpected token '" << tok << "'");
-			}
-
-			std::string::const_iterator stmstart = si;
-			while (utils::parseNextToken( tok, si, se, g_optab) != ';');
-			std::string stm( stmstart, si - 1);
-
-			m_statementmap.insert( stmname, stm);
-		}
-		else if (g_optab[ch])
-		{
-			throw ERROR( si, MSG << "unexpected token '" << ch << "'");
-		}
-		else
-		{
-			throw ERROR( si, MSG << "unexpected token '" << tok << "'");
-		}
-	}
+	throw std::runtime_error("Oracle programs not implemented yet");
 }
 
 

@@ -248,7 +248,7 @@ static void printTransactionInput( std::ostream& out, const TransactionInput& in
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
-		out << ci->name();
+		out << ci->statement();
 		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
 		if (ai != ae) out << " ";
 
