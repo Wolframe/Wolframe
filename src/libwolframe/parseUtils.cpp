@@ -272,15 +272,18 @@ std::string IdentifierTable::tostring() const
 int utils::parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab)
 {
 	char ch = utils::gotoNextToken( si, se);
-	std::string::const_iterator start = si;
-	std::string tok;
-	ch = utils::parseNextToken( tok, si, se);
 	if (identifierCharTable()[ch])
 	{
-		int idx = idtab[ tok];
-		if (idx) return idx;
+		std::string::const_iterator start = si;
+		std::string tok;
+		ch = utils::parseNextToken( tok, si, se);
+		if (identifierCharTable()[ch])
+		{
+			int idx = idtab[ tok];
+			if (idx) return idx;
+		}
+		si = start;
 	}
-	si = start;
 	return 0;
 }
 
