@@ -183,6 +183,7 @@ public:
 	OracledbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
+	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
 
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();

@@ -38,7 +38,6 @@
 #define _DATABASE_HPP_INCLUDED
 #include "database/transaction.hpp"
 #include "database/databaseLanguage.hpp"
-#include "types/keymap.hpp"
 #include "processor/userInterface.hpp"
 #include <string>
 #include <iostream>
@@ -54,10 +53,13 @@ class Database
 public:
 	virtual ~Database()			{}
 
-	/// Database identification.
-	/// All databases must have an identifier as they are referenced using this identifier.
-	/// The identifier must be unique (of course).
+	///\brief Database identification.
+	// All databases must have an identifier as they are referenced using this identifier.
+	// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
+
+	///\brief Database type identification.
+	virtual const char* className() const = 0;
 
 	///\brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
@@ -79,12 +81,6 @@ public:
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& program) = 0;
 
-	///\brief Add a set of embedded statements to the database program
-	virtual void addStatements( const types::keymap<std::string>& stmmap)
-	{
-		if (!stmmap.empty()) throw std::runtime_error( "embedded statements not defined for this database");
-	}
-
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
 		static LanguageDescription langdescr;
@@ -104,7 +100,7 @@ class DatabaseUnit
 public:
 	virtual ~DatabaseUnit()			{}
 
-	///\brief Database class (module type).
+	///\brief Database type identification
 	///\remark All database implementations need a class name.
 	///\remark Class names must be unique.
 	virtual const char* className() const = 0;
@@ -127,11 +123,6 @@ public:
 	///\brief add a database program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& program ) = 0;
-
-	virtual void addStatements( const types::keymap<std::string>& stmmap)
-	{
-		if (!stmmap.empty()) throw std::runtime_error( "embedded statements not defined for this database");
-	}
 };
 
 }} // namespace _Wolframe::db

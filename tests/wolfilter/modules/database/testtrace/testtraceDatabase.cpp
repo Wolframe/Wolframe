@@ -115,7 +115,7 @@ void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePa
 }
 
 
-TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool)
+TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_)
 	:m_id(id_)
 	,m_outfilename(outfilename_)
 {

@@ -161,6 +161,7 @@ public:
 	PostgreSQLdbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
+	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();

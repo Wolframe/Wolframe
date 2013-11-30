@@ -180,6 +180,7 @@ public:
 	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
+	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();

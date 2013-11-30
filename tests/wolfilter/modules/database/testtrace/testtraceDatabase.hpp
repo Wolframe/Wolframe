@@ -85,15 +85,14 @@ private:
 
 
 ///\class TesttraceDatabase
-///\brief Testtrace fake database constructor
+///\brief Testtrace fake database instance
 class TesttraceDatabase
 	:public Database
-	,public DatabaseUnit
 {
 public:
-	TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool);
+	TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_);
 	TesttraceDatabase( const TesttraceDatabase& o)
-		:Database(), DatabaseUnit()
+		:Database()
 		,m_id(o.m_id)
 		,m_outfilename(o.m_outfilename)
 		,m_result(o.m_result){}
@@ -108,11 +107,6 @@ public:
 	virtual const char* className() const
 	{
 		return TESTTRACE_DATABASE_CLASSNAME;
-	}
-
-	virtual Database* database()
-	{
-		return this;
 	}
 
 	virtual Transaction* transaction( const std::string& /*name*/ );
@@ -132,6 +126,56 @@ private:
 	std::vector<std::string> m_result;
 };
 
+///\class TesttraceDatabaseUnit
+///\brief Testtrace fake database constructor
+class TesttraceDatabaseUnit
+	:public DatabaseUnit
+{
+public:
+	TesttraceDatabaseUnit( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_)
+		:m_id(id_)
+		,m_db(id_,resultfilename_,outfilename_)
+		{}
+	TesttraceDatabaseUnit( const TesttraceDatabaseUnit& o)
+		:DatabaseUnit()
+		,m_id(o.m_id)
+		,m_db(o.m_db)
+		{}
+
+	virtual ~TesttraceDatabaseUnit(){}
+
+	virtual const std::string& ID() const
+	{
+		return m_id;
+	}
+
+	virtual const char* className() const
+	{
+		return TESTTRACE_DATABASE_CLASSNAME;
+	}
+
+	virtual Database* database()
+	{
+		return &m_db;
+	}
+
+	virtual void addProgram( const std::string& source)
+	{
+		m_db.addProgram( source);
+	}
+
+	virtual void loadProgram( const std::string& filename)
+	{
+		m_db.loadProgram( filename);
+	}
+
+	virtual void loadAllPrograms(){}
+
+private:
+	std::string m_id;
+	TesttraceDatabase m_db;
+};
+
 
 ///\class TesttraceDatabaseConstructor
 ///\brief Testtrace fake database constructor
@@ -148,10 +192,10 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	virtual TesttraceDatabase* object( const config::NamedConfiguration& conf_)
+	virtual TesttraceDatabaseUnit* object( const config::NamedConfiguration& conf_)
 	{
 		const TesttraceDatabaseConfig& conf = dynamic_cast<const TesttraceDatabaseConfig&>( conf_);
-		return new TesttraceDatabase( conf.id(), conf.resultfilename(), conf.outfilename(), 0, false);
+		return new TesttraceDatabaseUnit( conf.id(), conf.resultfilename(), conf.outfilename());
 	}
 };
 
