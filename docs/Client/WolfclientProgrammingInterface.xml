@@ -182,21 +182,251 @@
 	</sect2>
 
 	<sect2>
-		<title>States and properties of widgets</title>
+		<title>States and Behaviour</title>
+		<sect3>
+		<title>Reserved Private Dynamic Properties</title>
+			<para>The <code>_w_</code> prefix is used for internal widget properties not of interest for the user.
+			</para>
+		</sect3>
 
-		<para>
-			Some properties are reserved for states steering the behavior of the user interface:
-
-			<itemizedlist>
-			<listitem>
-				<para><code>initialFocus</code>:
-				This is a thing which got forgotten in the Qt design.
-				We can set a boolean value to one widget in a form which should
-				get the initial keyboard focus.
-				</para>
-			</listitem>
-			</itemizedlist>
+		<sect3>
+		<title>Reserved Public Dynamic Properties</title>
+		<para>The dynamic properties introduced here are edited by the user to stear application behaviour:
 		</para>
+			<sect4>
+			<title>Stearing of Widget Behaviour</title>
+			<para>The following properties are reserved for states steering the behavior of the user interface:
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>initialFocus</entry>
+						<entry><para>Boolean value for one widget in a form that should
+						get the initial keyboard focus.</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>User Interface Flow</title>
+			<para>The following properties stear the user interface elements flow:
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>form</entry>
+						<entry><para>Defines a form to be opened on click (push button). If the widget has an action defined, then the action is executed before and the form is opened when the action succeeds and not opened when it fails.</para></entry>
+					</row>
+					<row>
+						<entry>form:IDENTIFIER</entry>
+						<entry><para>Defines a form related to a context menu entry (when clicked). If the context menu entry has also an action defined, then the action is executed before. The form is opened only if the action succeeds.</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>Additional Interface Elements</title>
+			<para>The following properties define additional interface elements:
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>contextmenu</entry>
+						<entry><para>Defines a context menu with a comma separated list of identifiers of actions defined as propery value. Two following commas without menu entry identifier are used to define a separator.</para></entry>
+					</row>
+					<row>
+						<entry>contextmenu:NAME</entry>
+						<entry><para>Defines the (translatable) text of a context menu entry. NAME refers to a non empty name in the list of context menu entries.</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>Defining Server Request/Answer</title>
+			<para>The following properties are used for the communication with the server:
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>action</entry>
+						<entry><para>Defines a server request. This can either be
+							a load action request for a widget that is not a push button
+							or an action request without answer than OK/ERROR for a push button
+						</para></entry>
+					</row>
+					<row>
+						<entry>action:IDENTIFIER</entry>
+						<entry><para>Defines an action request either
+						related to a context menu entry (when clicked) or
+						related to a dataslot declaration of this widget named with IDENTIFIER.</para></entry>
+					</row>
+					<row>
+						<entry>answer</entry>
+						<entry><para>Defines the format of a validated action answer
+						</para></entry>
+					</row>
+					<row>
+						<entry>answer:IDENTIFIER</entry>
+						<entry><para>Defines the format of a validated answer of the action defined as 'action:IDENTIFIER'
+						</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>Variables and Symbolic Links</title>
+			<para>
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>global:IDENTIFIER</entry>
+						<entry><para>Defines an assignment from a global variable IDENTIFIER at initialization and writing the global variable when closing the widget.
+						</para></entry>
+					</row>
+					<row>
+						<entry>assign:PROP</entry>
+						<entry><para>Defines an assingment of property PROP to the property defined as value "assign:PROP" on data load and refresh
+						</para></entry>
+					</row>
+					<row>
+						<entry>link:IDENTIFIER</entry>
+						<entry><para>Defines a symbolic link to another widget.
+						Defining the property "link:&lt;name&gt;" = &lt;widgetid&gt;: defines &lt;name&gt; to be a reference to the widget with the widgetid set to &lt;widgetid&gt;.
+						Links are used to read data from other widgets.
+						</para></entry>
+					</row>
+					<row>
+						<entry>widgetid</entry>
+						<entry><para>Unique identifier of the widget used for identifying it when 
+						resolving symbolic links or an address of a request aswer. When not explicitely
+						defined it is implicitely defined on widget creation.
+						</para></entry>
+					</row>
+					<row>
+						<entry>synonym:NAME</entry>
+						<entry><para>Defines a renaming of the identifier NAME to the identifier in the property value.
+						</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>Widget States Depending on Data</title>
+			<para>
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>state:IDENFITIER</entry>
+						<entry><para>Defines a state of the widget dependent on a condition.
+							IDENTIFIER is one of 'enabled', 'disabled', 'hidden', 'visible'. 
+							The state condition is defined the property value.
+							The value can be a property reference in '{' '}' brackets.
+							The condition is true when the property is defined.
+							A condition can also be a boolean expression of the form
+							&lt;prop&gt; &lt;op&gt; &lt;value&gt;, where &lt;prop&gt; is a property reference in '{' '}'
+							brackets, &lt;op&gt; an operator and &lt;value&gt; a constant value
+							Valid operators are: '==' (string),'!=' (string),'&lt;=' (integer), '&lt;' (integer) ,'&gt;=' (integer), '&gt;' (integer)
+							For 'action' definitions the state 'state:enabled' is dependent on the
+							properties referenced in the 'action' value.
+						</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+
+			<sect4>
+			<title>Additional Signals and Slots</title>
+			<para>
+			</para>
+			<table frame="all" width="100%">
+				<title>Properties</title>
+				<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>Name</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>datasignal:IDENTIFIER</entry>
+						<entry><para>
+						Defines a signal of type IDENTIFIER (clicked,doubleclicked,destroyed,signaled,loaded) with the slot name and destination address defined as property value of "datasignal:IDENTIFIER"
+						Datasignal destinations can be defined as follows: As widgetid, as slot identifier (declared with 'dataslot'), as widget path.
+						A preceding identifier followed by '@' specifies the name of the identifier of the target slot.
+						</para></entry>
+					</row>
+					<row>
+						<entry>dataslot</entry>
+						<entry><para>Defines a comma separated list of slots for the signal of with the property value as slot identifer and optionally followed by a widget id in '(..)' brackets that sepcifies a sender from where the signal is accepted.
+						</para></entry>
+					</row>
+				</tbody>
+				</tgroup>
+			</table>
+			</sect4>
+		</sect3>
 	</sect2>
 
 	<sect2>
