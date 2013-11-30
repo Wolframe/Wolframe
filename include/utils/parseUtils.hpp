@@ -37,6 +37,7 @@
 #define _WOLFRAME_PARSE_UTILS_HPP_INCLUDED
 #include <string>
 #include <vector>
+#include <map>
 
 namespace _Wolframe {
 namespace utils {
@@ -55,6 +56,22 @@ private:
 const CharTable& identifierCharTable();
 const CharTable& emptyCharTable();
 const CharTable& anyCharTable();
+
+///\class IdentifierTable
+///\brief Identifier table structure for parseNextIdentifier( std::string::const_iterator&, std::string::const_iterator, ...);
+class IdentifierTable
+{
+public:
+	IdentifierTable( bool casesensitive_, const char** arg);
+
+	int operator[]( const std::string&) const;
+	std::string tostring() const;
+
+private:
+	bool m_casesensitive;
+	std::map<std::string,int> m_tab;
+};
+
 
 ///\brief Parsing the next token in a UTF-8 or Isolatin-1 string that is either
 // - a single quoted (') string backslash escaping returned without the delimiting quotes and escaping resolved
@@ -81,6 +98,12 @@ char gotoNextToken( std::string::const_iterator& itr, std::string::const_iterato
 ///\param[in] se end of chunk to parse
 ///\return line parsed without end of line marker
 std::string parseLine( std::string::const_iterator& si, const std::string::const_iterator& se);
+///\brief Parse the next identifier if it is in 'idtab' or goto the next token if not
+///\return the index of the identifier (starting from 1) in 'idtab' or 0, if the next token does not match
+///\param[in,out] si scanning iterator passed as start of the source to parse and returned as source position after the token parsed if it matches or start of the token not matching if not
+///\param[in] end iterator marking the end of the source
+///\param[in] idtab identifier table
+int parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab);
 
 ///\brief Parse a token assignement 'identifier = token'
 ///\return pair with assignement first = identifier, second = token

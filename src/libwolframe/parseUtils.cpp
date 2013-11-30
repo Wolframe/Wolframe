@@ -39,6 +39,7 @@ Project Wolframe.
 #include <string>
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
+#include <stdarg.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
@@ -94,14 +95,14 @@ char utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, 
 	}
 }
 
-struct IdentifierTable :public CharTable
+struct IdentifierCharTable :public CharTable
 {
-	IdentifierTable() :CharTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"){}
+	IdentifierCharTable() :CharTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"){}
 };
 
 const CharTable& _Wolframe::utils::identifierCharTable()
 {
-	static const IdentifierTable rt;
+	static const IdentifierCharTable rt;
 	return rt;
 }
 
@@ -229,4 +230,57 @@ std::string utils::parseLine( std::string::const_iterator& si, const std::string
 	return rt;
 }
 
+IdentifierTable::IdentifierTable( bool casesensitive_, const char** arg)
+	:m_casesensitive(casesensitive_)
+{
+	for (int idx=0; arg[idx]; ++idx)
+	{
+		if (idx > 200) throw std::logic_error("IdentifierTable parameter list not NULL terminated or with more than 200 elements");
+		std::string kk( arg[idx]);
+		if (!m_casesensitive) boost::algorithm::to_upper( kk);
+		m_tab[ kk] = idx;
+	}
+}
+
+int IdentifierTable::operator[]( const std::string& tok) const
+{
+	std::map<std::string,int>::const_iterator ti;
+	if (m_casesensitive)
+	{
+		ti = m_tab.find( tok);
+	}
+	else
+	{
+		ti = m_tab.find( boost::algorithm::to_upper_copy( tok));
+	}
+	if (ti == m_tab.end()) return 0;
+	return ti->second;
+}
+
+std::string IdentifierTable::tostring() const
+{
+	std::string rt;
+	std::map<std::string,int>::const_iterator ti = m_tab.begin(), te = m_tab.end();
+	for (int idx=0; ti != te; ++ti)
+	{
+		if (idx++) rt.append(", ");
+		rt.append( ti->first);
+	}
+	return rt;
+}
+
+int utils::parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab)
+{
+	char ch = utils::gotoNextToken( si, se);
+	std::string::const_iterator start = si;
+	std::string tok;
+	ch = utils::parseNextToken( tok, si, se);
+	if (identifierCharTable()[ch])
+	{
+		int idx = idtab[ tok];
+		if (idx) return idx;
+	}
+	si = start;
+	return 0;
+}
 
