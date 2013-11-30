@@ -276,12 +276,9 @@ int utils::parseNextIdentifier( std::string::const_iterator& si, const std::stri
 	{
 		std::string::const_iterator start = si;
 		std::string tok;
-		ch = utils::parseNextToken( tok, si, se);
-		if (identifierCharTable()[ch])
-		{
-			int idx = idtab[ tok];
-			if (idx) return idx;
-		}
+		utils::parseNextToken( tok, si, se);
+		int idx = idtab[ tok];
+		if (idx) return idx;
 		si = start;
 	}
 	return 0;
