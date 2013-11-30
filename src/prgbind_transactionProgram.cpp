@@ -100,9 +100,15 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 
 	try
 	{
-		std::string dbid = (transactionDB)?transactionDB->ID():std::string();
+		std::string databaseID;
+		std::string databaseClassName;
+		if (transactionDB)
+		{
+			databaseID = transactionDB->ID();
+			databaseClassName = transactionDB->className();
+		}
 		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-			= db::loadTransactionProgramFile( filename, dbid, languageDescr);
+			= db::loadTransactionProgramFile( filename, databaseID, databaseClassName, languageDescr);
 
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)

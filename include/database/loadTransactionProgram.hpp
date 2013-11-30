@@ -50,6 +50,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
+		const std::string& databaseClassName,
 		const LanguageDescription* langdescr);
 
 

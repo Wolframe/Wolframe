@@ -617,6 +617,10 @@ struct Subroutine
 };
 }// anonymous namespace
 
+static const char* g_preproc_ids[] = {"ENDPROC","FOREACH","INTO","DO",0};
+enum PreProcKeyword{ p_NONE,p_ENDPROC,p_FOREACH,p_INTO,p_DO };
+static const utils::IdentifierTable g_preproc_idtab( false, g_preproc_ids);
+
 static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	config::PositionalErrorMessageBase::Message MSG;
@@ -629,88 +633,91 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 	unsigned int mask = 0;
 	TransactionFunctionDescription::PreProcessingStep prcstep;
 
-	while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
+	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 	{
 		while (subroutine.pprcstartar.size() <= subroutine.description.preprocs.size())
 		{
 			subroutine.pprcstartar.push_back( si);
 		}
-		if (ch == ';')
+		switch ((PreProcKeyword)utils::parseNextIdentifier( si, se, g_preproc_idtab))
 		{
-			if (mask)
-			{
-				subroutine.description.preprocs.push_back( prcstep);
-				prcstep.clear();
-				mask = 0;
-			}
-		}
-		else if (g_optab[ch])
-		{
-			throw ERROR( si, MSG << "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
-		}
-		else if (ch == '\'' || ch == '\"')
-		{
-			throw ERROR( si, "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of string");
-		}
-		else if (boost::algorithm::iequals( tok, "ENDPROC"))
-		{
-			if (mask != 0)
-			{
-				throw std::runtime_error( "preprocessing command not terminated with ';'");
-			}
-			break;
-		}
-		else if (boost::algorithm::iequals( tok, "FOREACH"))
-		{
-			if (0 != (mask & 0x1))
-			{
-				throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
-			}
-			mask |= 0x1;
+			case p_NONE:
+				ch = parseNextToken( langdescr, tok, si, se);
+				if (ch == ';')
+				{
+					if (mask)
+					{
+						subroutine.description.preprocs.push_back( prcstep);
+						prcstep.clear();
+						mask = 0;
+					}
+				}
+				else if (g_optab[ch])
+				{
+					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of operator '" << ch << "'");
+				}
+				else if (ch == '\'' || ch == '\"')
+				{
+					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of string");
+				}
+				else
+				{
+					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+				}
+				break;
 
-			ch = utils::parseNextToken( prcstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
-			if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
-		}
-		else if (boost::algorithm::iequals( tok, "INTO"))
-		{
-			if (0 != (mask & 0x2))
-			{
-				throw ERROR( si, "function result (INTO ..) specified twice in a command");
-			}
-			mask |= 0x2;
+			case p_ENDPROC:
+				if (mask != 0)
+				{
+					throw std::runtime_error( "preprocessing command not terminated with ';'");
+				}
+				return;
+			case p_FOREACH:
+				if (0 != (mask & 0x1))
+				{
+					throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
+				}
+				mask |= 0x1;
+	
+				ch = utils::parseNextToken( prcstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
+				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
+				break;
+			case p_INTO:
+				if (0 != (mask & 0x2))
+				{
+					throw ERROR( si, "function result (INTO ..) specified twice in a command");
+				}
+				mask |= 0x2;
+	
+				prcstep.path_INTO = parse_INTO_path( langdescr, si, se);
+				break;
 
-			prcstep.path_INTO = parse_INTO_path( langdescr, si, se);
-		}
-		else if (boost::algorithm::iequals( tok, "DO"))
-		{
-			if (0 != (mask & 0x4))
-			{
-				throw ERROR( si, "function call (DO ..) specified twice in a command");
-			}
-			mask |= 0x4;
-
-			ch = parseNextToken( langdescr, prcstep.functionname, si, se);
-			if (!isAlphaNumeric( ch))
-			{
-				throw std::runtime_error( "identifier expected for preprocessing function name after DO");
-			}
-			ch = gotoNextToken( langdescr, si, se);
-			if (ch != '(')
-			{
-				throw std::runtime_error( "'(' expected after preprocessing function name");
-			}
-			++si;
-			prcstep.args = parsePreProcessingStepArguments( langdescr, si, se);
-			ch = gotoNextToken( langdescr, si, se);
-			if (ch != ')')
-			{
-				throw std::runtime_error( "')' expected after preprocessing function arguments");
-			}
-			++si;
-		}
-		else
-		{
-			throw ERROR( si, MSG << "keyword (ENDPROC,FOREACH,INTO,DO) expected instead of " << errorTokenString( ch, tok));
+			case p_DO:
+				if (0 != (mask & 0x4))
+				{
+					throw ERROR( si, "function call (DO ..) specified twice in a command");
+				}
+				mask |= 0x4;
+	
+				ch = parseNextToken( langdescr, prcstep.functionname, si, se);
+				if (!isAlphaNumeric( ch))
+				{
+					throw std::runtime_error( "identifier expected for preprocessing function name after DO");
+				}
+				ch = gotoNextToken( langdescr, si, se);
+				if (ch != '(')
+				{
+					throw std::runtime_error( "'(' expected after preprocessing function name");
+				}
+				++si;
+				prcstep.args = parsePreProcessingStepArguments( langdescr, si, se);
+				ch = gotoNextToken( langdescr, si, se);
+				if (ch != ')')
+				{
+					throw std::runtime_error( "')' expected after preprocessing function arguments");
+				}
+				++si;
+				break;
 		}
 	}
 }
@@ -719,20 +726,21 @@ static void parseResultDirective( Subroutine& subroutine, config::PositionalErro
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
+	char ch;
 	unsigned int mask = 0;
 
 	std::string::const_iterator start = si;
 	subroutine.result_INTO.clear();
-	while (parseNextToken( langdescr, tok, si, se))
+	while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 	{
-		if (boost::algorithm::iequals( tok, "INTO"))
+		if (isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
 		{
 			if ((mask & 0x2) != 0) throw ERROR( si, "wrong order of definition in RESULT: INTO defined after FILTER");
 			if ((mask & 0x1) != 0) throw ERROR( si, "duplicate INTO definition after RESULT");
 			mask |= 0x1;
 			subroutine.result_INTO = parse_INTO_path( langdescr, si, se);
 		}
-		else if (boost::algorithm::iequals( tok, "FILTER"))
+		else if (isAlpha(ch) && boost::algorithm::iequals( tok, "FILTER"))
 		{
 			if (!subroutine.isTransaction)
 			{
@@ -831,8 +839,8 @@ static void parsePrintStep( Subroutine& subroutine, const types::keymap<int>& ke
 	ch = gotoNextToken( langdescr, si, se);
 	if (isAlphaNumeric(ch))
 	{
-		if (parseNextToken( langdescr, tok, si, se)
-		&&  boost::algorithm::iequals( tok, "INTO"))
+		if (0!=(parseNextToken( langdescr, tok, si, se))
+		&& isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
 		{
 			if (pt.empty())
 			{
@@ -860,9 +868,10 @@ static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessa
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
+	char ch;
 
-	if (parseNextToken( langdescr, tok, si, se)
-	&&  boost::algorithm::iequals( tok, "ERROR"))
+	if (0!=(ch=parseNextToken( langdescr, tok, si, se))
+	&&  isAlpha(ch) && boost::algorithm::iequals( tok, "ERROR"))
 	{
 		if (subroutine.description.steps.empty())
 		{
@@ -873,7 +882,8 @@ static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessa
 		{
 			throw ERROR( si, "error class expected after ON ERROR");
 		}
-		if (!parseNextToken( langdescr, tok, si, se)
+		if (0==(ch=parseNextToken( langdescr, tok, si, se))
+		||  !isAlpha(ch)
 		||  !boost::algorithm::iequals( tok, "HINT"))
 		{
 			throw ERROR( si, "keyword HINT expected after ON ERROR <errorclass>");
@@ -905,11 +915,12 @@ static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t command
 {
 	config::PositionalErrorMessageBase::Message MSG;
 	std::string tok;
+	char ch;
 
-	if (parseNextToken( langdescr, tok, si, se)
-	&&  boost::algorithm::iequals( tok, "AS"))
+	if (0!=(ch=parseNextToken( langdescr, tok, si, se))
+	&&  isAlpha(ch) && boost::algorithm::iequals( tok, "AS"))
 	{
-		char ch = parseNextToken( langdescr, tok, si, se);
+		ch = parseNextToken( langdescr, tok, si, se);
 		if (!isAlpha(ch))
 		{
 			throw ERROR( si, "identifier expected after KEEP AS");
@@ -933,6 +944,10 @@ static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t command
 	}
 }
 
+static const char* g_mainblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT","RESULT",0};
+enum MainBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT,m_RESULT};
+static const utils::IdentifierTable g_mainblock_idtab(false, g_mainblock_ids);
+
 static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	config::PositionalErrorMessageBase::Message MSG;
@@ -943,202 +958,201 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 
 	TransactionFunctionDescription::MainProcessingStep opstep;
 
-	while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
+	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 	{
+		
 		while (subroutine.callstartar.size() <= subroutine.description.steps.size())
 		{
 			subroutine.callstartar.push_back( si);
 		}
-		if (ch == ';')
+		switch ((MainBlockKeyword)utils::parseNextIdentifier( si, se, g_mainblock_idtab))
 		{
-			if (mask)
-			{
-				subroutine.description.steps.push_back( opstep);
-				opstep.clear();
-				mask = 0;
-			}
-		}
-		else if (g_optab[ch])
-		{
-			throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON,KEEP) expected instead of operator '" << ch << "'");
-		}
-		else if (ch == '\'' || ch == '\"')
-		{
-			throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON,KEEP) expected instead string");
-		}
-		else if (boost::algorithm::iequals( tok, "ON"))
-		{
-			parseErrorHint( subroutine, ERROR, langdescr, si, se);
-		}
-		else if (boost::algorithm::iequals( tok, "KEEP"))
-		{
-			parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
-		}
-		else if (boost::algorithm::iequals( tok, "END"))
-		{
-			if (mask != 0)
-			{
-				throw std::runtime_error( "database command not terminated with ';'");
-			}
-			try
-			{
-				if (subroutine.blockstk.empty())
+			case m_NONE:
+				ch = parseNextToken( langdescr, tok, si, se);
+				if (ch == ';')
 				{
-					if (!subroutine.result_INTO.empty())
+					if (mask)
 					{
-						subroutine.description.resultblocks.insert( subroutine.description.resultblocks.begin(), TransactionFunctionDescription::ResultBlock( subroutine.result_INTO, 0, subroutine.description.steps.size()));
+						subroutine.description.steps.push_back( opstep);
+						opstep.clear();
+						mask = 0;
 					}
-					break; //... end loop, return
+				}
+				else if (g_optab[ch])
+				{
+					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of operator '" << ch << "'");
+				}
+				else if (ch == '\'' || ch == '\"')
+				{
+					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of string");
+				}
+				else if (mask == 0x0)
+				{
+					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
 				}
 				else
 				{
-					subroutine.blockstk.back().size = subroutine.description.steps.size() - subroutine.blockstk.back().startidx;
-					subroutine.description.resultblocks.push_back( subroutine.blockstk.back());
-					subroutine.blockstk.pop_back();
+					throw ERROR( si, MSG << "keyword (FOREACH,INTO,DO) expected instead of '" << tok << "'");
 				}
-			}
-			catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
-			{
-				throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-			}
-			catch (const std::runtime_error& err)
-			{
-				throw ERROR( subroutine.start, MSG << "error in definition of transaction: " << err.what());
-			}
-			catch (const std::exception& e)
-			{
-				LOG_ERROR << "uncaught exception loading transaction program: " << e.what();
-			}
-			catch (...)
-			{
-				LOG_ERROR << "uncaught exception loading transaction program";
-			}
-			break;
-		}
-		else if (boost::algorithm::iequals( tok, "PRINT"))
-		{
-			std::vector<std::string> print_INTO_path;
-			if (mask != 0)
-			{
-				if (mask == 0x2)
+				break;
+			case m_ON:
+				parseErrorHint( subroutine, ERROR, langdescr, si, se);
+				break;
+			case m_KEEP:
+				parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
+				break;
+			case m_END:
+				if (mask != 0)
 				{
-					print_INTO_path = opstep.path_INTO;
-					opstep.path_INTO.clear();
-					mask = 0;
+					throw std::runtime_error( "database command not terminated with ';'");
 				}
-				else
+				try
 				{
-					throw std::runtime_error( "unexpected token PRINT in middle of database instruction definition");
-				}
-			}
-			parsePrintStep( subroutine, keepResult_map, ERROR, langdescr, si, se, print_INTO_path);
-		}
-		else if (boost::algorithm::iequals( tok, "RESULT"))
-		{
-			if (mask != 0)
-			{
-				throw std::runtime_error( "unexpected token RESULT in middle of database command");
-			}
-			if (parseNextToken( langdescr, tok, si, se)
-			&&  boost::algorithm::iequals( tok, "INTO"))
-			{
-				std::vector<std::string> path = parse_INTO_path( langdescr, si, se);
-
-				if (parseNextToken( langdescr, tok, si, se)
-				&&  boost::algorithm::iequals( tok, "BEGIN"))
-				{
-					subroutine.blockstk.push_back( TransactionFunctionDescription::ResultBlock( path, subroutine.description.steps.size(), 0));
-				}
-				else
-				{
-					throw ERROR( si, "keyword (BEGIN) expected after RESULT INTO <path>");
-				}
-			}
-			else
-			{
-				throw ERROR( si, "keyword (INTO) expected after RESULT");
-			}
-		}
-		else if (boost::algorithm::iequals( tok, "FOREACH"))
-		{
-			if (0 != (mask & 0x1))
-			{
-				throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
-			}
-			mask |= 0x1;
-
-			ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
-			if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
-
-			if (isIdentifier(opstep.selector_FOREACH))
-			{
-				opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
-				if (opstep.resultref_FOREACH >= 0)
-				{
-					if (opstep.resultref_FOREACH == 0 && boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
+					if (subroutine.blockstk.empty())
 					{
-						throw ERROR( si, "PARAM not allowed as argument of FOREACH");
+						if (!subroutine.result_INTO.empty())
+						{
+							subroutine.description.resultblocks.insert( subroutine.description.resultblocks.begin(), TransactionFunctionDescription::ResultBlock( subroutine.result_INTO, 0, subroutine.description.steps.size()));
+						}
 					}
-					opstep.selector_FOREACH.clear();
+					else
+					{
+						subroutine.blockstk.back().size = subroutine.description.steps.size() - subroutine.blockstk.back().startidx;
+						subroutine.description.resultblocks.push_back( subroutine.blockstk.back());
+						subroutine.blockstk.pop_back();
+					}
 				}
-			}
-		}
-		else if (boost::algorithm::iequals( tok, "INTO"))
-		{
-			if (0 != (mask & 0x2))
-			{
-				throw ERROR( si, "function result (INTO ..) specified twice in a command");
-			}
-			mask |= 0x2;
-
-			opstep.path_INTO = parse_INTO_path( langdescr, si, se);
-		}
-		else if (boost::algorithm::iequals( tok, "DO"))
-		{
-			if (0 != (mask & 0x4))
-			{
-				throw ERROR( si, "function call (DO ..) specified twice in a command");
-			}
-			mask |= 0x4;
-
-			std::string::const_iterator oi = si;
-			while (parseNextToken( langdescr, tok, oi, se))
-			{
-				if (boost::algorithm::iequals( tok, "NONEMPTY"))
+				catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
 				{
-					opstep.nonempty = true;
-					si = oi;
+					throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
 				}
-				else if (boost::algorithm::iequals( tok, "UNIQUE"))
+				catch (const std::runtime_error& err)
 				{
-					opstep.unique = true;
-					si = oi;
+					throw ERROR( subroutine.start, MSG << "error in definition of transaction: " << err.what());
+				}
+				catch (const std::exception& e)
+				{
+					LOG_ERROR << "uncaught exception loading transaction program: " << e.what();
+				}
+				catch (...)
+				{
+					LOG_ERROR << "uncaught exception loading transaction program";
+				}
+				return;
+			case m_PRINT:
+				{
+					std::vector<std::string> print_INTO_path;
+					if (mask != 0)
+					{
+						if (mask == 0x2)
+						{
+							print_INTO_path = opstep.path_INTO;
+							opstep.path_INTO.clear();
+							mask = 0;
+						}
+						else
+						{
+							throw std::runtime_error( "unexpected token PRINT in middle of database instruction definition");
+						}
+					}
+					parsePrintStep( subroutine, keepResult_map, ERROR, langdescr, si, se, print_INTO_path);
+				}
+				break;
+			case m_RESULT:
+				if (mask != 0)
+				{
+					throw std::runtime_error( "unexpected token RESULT in middle of database command");
+				}
+				if (0!=(ch=parseNextToken( langdescr, tok, si, se))
+				&&  isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
+				{
+					std::vector<std::string> path = parse_INTO_path( langdescr, si, se);
+	
+					if (0!=(ch=parseNextToken( langdescr, tok, si, se))
+					&&  isAlpha(ch) && boost::algorithm::iequals( tok, "BEGIN"))
+					{
+						subroutine.blockstk.push_back( TransactionFunctionDescription::ResultBlock( path, subroutine.description.steps.size(), 0));
+					}
+					else
+					{
+						throw ERROR( si, "keyword (BEGIN) expected after RESULT INTO <path>");
+					}
 				}
 				else
 				{
-					break;
+					throw ERROR( si, "keyword (INTO) expected after RESULT");
 				}
-			}
-			if (!gotoNextToken( langdescr, si, se))
-			{
-				throw ERROR( si, "unexpected end of transaction description after DO");
-			}
-			if (langdescr->isEmbeddedStatement( si, se))
-			{
-				opstep.call = parseEmbeddedStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
-			}
-			else
-			{
-				opstep.call = parseCallStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
-			}
-		}
-		else if (mask == 0x0)
-		{
-			throw ERROR( si, MSG << "keyword (RESULT,PRINT,KEEP,END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
-		}
-		else
-		{
-			throw ERROR( si, MSG << "keyword (FOREACH,INTO,DO) expected instead of '" << tok << "'");
+				break;
+			case m_FOREACH:
+				if (0 != (mask & 0x1))
+				{
+					throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
+				}
+				mask |= 0x1;
+	
+				ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
+				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
+	
+				if (isIdentifier(opstep.selector_FOREACH))
+				{
+					opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
+					if (opstep.resultref_FOREACH >= 0)
+					{
+						if (opstep.resultref_FOREACH == 0 && boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
+						{
+							throw ERROR( si, "PARAM not allowed as argument of FOREACH");
+						}
+						opstep.selector_FOREACH.clear();
+					}
+				}
+				break;
+			case m_INTO:
+				if (0 != (mask & 0x2))
+				{
+					throw ERROR( si, "function result (INTO ..) specified twice in a command");
+				}
+				mask |= 0x2;
+	
+				opstep.path_INTO = parse_INTO_path( langdescr, si, se);
+				break;
+			case m_DO:
+				if (0 != (mask & 0x4))
+				{
+					throw ERROR( si, "function call (DO ..) specified twice in a command");
+				}
+				mask |= 0x4;
+	
+				std::string::const_iterator oi = si;
+				while (0!=(ch=parseNextToken( langdescr, tok, oi, se)))
+				{
+					if (isAlpha(ch) && boost::algorithm::iequals( tok, "NONEMPTY"))
+					{
+						opstep.nonempty = true;
+						si = oi;
+					}
+					else if (isAlpha(ch) && boost::algorithm::iequals( tok, "UNIQUE"))
+					{
+						opstep.unique = true;
+						si = oi;
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (!gotoNextToken( langdescr, si, se))
+				{
+					throw ERROR( si, "unexpected end of transaction description after DO");
+				}
+				if (langdescr->isEmbeddedStatement( si, se))
+				{
+					opstep.call = parseEmbeddedStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+				}
+				else
+				{
+					opstep.call = parseCallStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+				}
+				break;
 		}
 	}
 }
@@ -1169,20 +1183,21 @@ static std::vector<std::string> parseDatabaseList( config::PositionalErrorMessag
 	}
 }
 
-static bool checkDatabaseList( const std::string& databaseID, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static bool checkDatabaseList( const std::string& databaseID, const std::string& databaseClassName, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	std::vector<std::string> dblist = parseDatabaseList( ERROR, langdescr, si, se);
 	std::vector<std::string>::const_iterator di = dblist.begin(), de = dblist.end();
 	for (; di != de; ++di)
 	{
 		if (boost::algorithm::iequals( *di, databaseID)) return true;
+		if (boost::algorithm::iequals( *di, databaseClassName)) return true;
 	}
 	return false;
 }
 
 ///\brief Forward declaration
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap);
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap);
 
 static std::string getInclude( const std::string& mainfilename, const std::string& incfilename)
 {
@@ -1204,8 +1219,85 @@ static std::string getInclude( const std::string& mainfilename, const std::strin
 	}
 }
 
+static const char* g_body_ids[] = {"DATABASE","TRANSACTION","SUBROUTINE","RESULT","AUTHORIZE","PREPROC","BEGIN",0};
+enum BodyKeyword{ b_NONE, b_DATABASE,b_TRANSACTION,b_SUBROUTINE,b_RESULT,b_AUTHORIZE,b_PREPROC,b_BEGIN};
+static const utils::IdentifierTable g_body_idtab( false, g_body_ids);
+
+static bool parseProcedureBody( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4,Database=0x8,MainBlock=0x10};
+	unsigned int mask = 0;
+	config::PositionalErrorMessageBase::Message MSG;
+	char ch;
+	std::string tok;
+
+	while (0!=(ch=gotoNextToken( langdescr, si, se)))
+	{
+		switch ((BodyKeyword)utils::parseNextIdentifier( si, se, g_body_idtab))
+		{
+			case b_NONE:
+				ch = utils::parseNextToken( tok, si, se);
+				throw ERROR( si, MSG << "keyword (" << g_body_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+			case b_DATABASE:
+				if ((mask & (unsigned int)Database) != 0) throw std::runtime_error( "duplicate DATABASE definition in transaction/subroutine");
+				mask |= (unsigned int)Database;
+
+				subroutine.isValidDatabase &= checkDatabaseList( databaseId, databaseClassName, ERROR, langdescr, si, se);
+				break;
+			case b_RESULT:
+				if ((mask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction/subroutine");
+				mask |= (unsigned int)Result;
+
+				parseResultDirective( subroutine, ERROR, langdescr, si, se);
+				break;
+			case b_AUTHORIZE:
+				if ((mask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction/subroutine");
+				mask |= (unsigned int)Authorize;
+
+				parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
+				break;
+			case b_PREPROC:
+				if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROC definition in transaction/subroutine");
+				mask |= (unsigned int)Preprocess;
+
+				parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
+				break;
+			case b_BEGIN:
+				if ((mask & (unsigned int)MainBlock) != 0) throw std::runtime_error( "duplicate main block (BEGIN..END) definition in transaction/subroutine");
+				mask |= (unsigned int)MainBlock;
+
+				parseMainBlock( subroutine, ERROR, langdescr, si, se);
+				if (subroutine.isValidDatabase)
+				{
+					return true;
+				}
+				else
+				{
+					LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.description.name << "' for active transaction database '" << databaseId << "'";
+				}
+				return false;
+			case b_TRANSACTION:
+			case b_SUBROUTINE:
+				break;
+		}
+	}
+	if (subroutine.isTransaction)
+	{
+		throw ERROR( si, "missing main block BEGIN..END in TRANSACTION");
+	}
+	else
+	{
+		throw ERROR( si, "missing main block BEGIN..END in SUBROUTINE");
+	}
+}
+
+
+static const char* g_toplevel_ids[] = {"DATABASE","TRANSACTION","SUBROUTINE","TEMPLATE","INCLUDE",0};
+enum TopLevelKeyword{ t_NONE,t_DATABASE,t_TRANSACTION,t_SUBROUTINE,t_TEMPLATE,t_INCLUDE};
+static const utils::IdentifierTable g_toplevel_idtab( false, g_toplevel_ids);
+
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& filename, const std::string& source, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
+	load( const std::string& filename, const std::string& source, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
@@ -1215,7 +1307,6 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
-	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4,Database=0x8,MainBlock=0x10};
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
@@ -1226,66 +1317,61 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 		while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 		{
 			tokstart = si;
-			ch = parseNextToken( langdescr, tok, si, se);
 			bool enterDefinition = false;
 			bool isTransaction = false;
 			templateArguments.clear();
 
-			if (boost::algorithm::iequals( tok, "DATABASE"))
+			switch ((TopLevelKeyword)utils::parseNextIdentifier( si, se, g_toplevel_idtab))
 			{
-				if (!firstDef)
-				{
-					throw ERROR( si, MSG << "DATABASE definition only allowed at the beginning of the TDL source (global) or as part of the transaction declaration (per function)");
-				}
-				isValidDatabase = checkDatabaseList( databaseId, ERROR, langdescr, si, se);
-				if (!isValidDatabase)
-				{
-					LOG_DEBUG << "TDL file parsed but ignored for database '" << databaseId << "'";
-				}
-			}
-			else if (boost::algorithm::iequals( tok, "TRANSACTION"))
-			{
-				isTransaction = true;
-				enterDefinition = true;
-			}
-			else if (boost::algorithm::iequals( tok, "SUBROUTINE"))
-			{
-				isTransaction = false;
-				enterDefinition = true;
-			}
-			else if (boost::algorithm::iequals( tok, "TEMPLATE"))
-			{
-				if (gotoNextToken( langdescr, si, se) != '<')
-				{
-					throw ERROR( si, MSG << "template argument list in '<' '>' brackets expected instead of '" << ch << "'");
-				}
-				templateArguments = parseTemplateArguments( langdescr, si, se);
-
-				ch = parseNextToken( langdescr, tok, si, se);
-				if (boost::algorithm::iequals( tok, "SUBROUTINE"))
-				{
+				case t_NONE:
+					ch = utils::parseNextToken( tok, si, se);
+					throw ERROR( si, MSG << "keyword (" << g_toplevel_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+				case t_DATABASE:
+					if (!firstDef)
+					{
+						throw ERROR( si, MSG << "DATABASE definition only allowed at the beginning of the TDL source (global) or as part of the transaction declaration (per function)");
+					}
+					isValidDatabase = checkDatabaseList( databaseId, databaseClassName, ERROR, langdescr, si, se);
+					if (!isValidDatabase)
+					{
+						LOG_DEBUG << "TDL file parsed but ignored for database '" << databaseId << "'";
+					}
+					break;
+				case t_TRANSACTION:
+					isTransaction = true;
+					enterDefinition = true;
+					break;
+				case t_SUBROUTINE:
 					isTransaction = false;
 					enterDefinition = true;
-				}
-				else
-				{
-					throw ERROR( si, MSG << "SUBROUTINE declaration expected after TEMPLATE declaration instead of '" << errorTokenString( ch, tok) << "'");
-				}
-			}
-			else if (boost::algorithm::iequals( tok, "INCLUDE"))
-			{
-				enterDefinition = false;
-				std::string includeFileName;
+					break;
+				case t_TEMPLATE:
+					if (gotoNextToken( langdescr, si, se) != '<')
+					{
+						throw ERROR( si, MSG << "template argument list in '<' '>' brackets expected instead of '" << ch << "'");
+					}
+					templateArguments = parseTemplateArguments( langdescr, si, se);
+	
+					ch = parseNextToken( langdescr, tok, si, se);
+					if (isAlpha(ch) && boost::algorithm::iequals( tok, "SUBROUTINE"))
+					{
+						isTransaction = false;
+						enterDefinition = true;
+					}
+					else
+					{
+						throw ERROR( si, MSG << "SUBROUTINE declaration expected after TEMPLATE declaration instead of '" << errorTokenString( ch, tok) << "'");
+					}
+					break;
+				case t_INCLUDE:
+					enterDefinition = false;
 
-				ch = utils::parseNextToken( includeFileName, si, se, utils::emptyCharTable(), utils::anyCharTable());
-				if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
-				std::vector<std::pair<std::string,TransactionFunctionR> > lst
-					= includeFile( filename, includeFileName, databaseId, langdescr, subroutineMap);
-				rt.insert( rt.begin(), lst.begin(), lst.end());
-			}
-			else
-			{
-				throw ERROR( si, std::string( "DATABASE, TRANSACTION, SUBROUTINE or INCLUDE expected instead of ") + errorTokenString( ch, tok));
+					ch = utils::parseNextToken( tok, si, se, utils::emptyCharTable(), utils::anyCharTable());
+					if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
+					std::vector<std::pair<std::string,TransactionFunctionR> > lst
+						= includeFile( filename, tok, databaseId, databaseClassName, langdescr, subroutineMap);
+					rt.insert( rt.begin(), lst.begin(), lst.end());
+					break;
 			}
 			if (enterDefinition)
 			{
@@ -1299,99 +1385,40 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 				Subroutine subroutine( templateArguments, dbe, isTransaction);
 				subroutine.description.name = transactionName;
 				subroutine.description.casesensitive = langdescr->isCaseSensitive();
+				subroutine.isValidDatabase = isValidDatabase;
 
-				unsigned int mask = 0;
-
-				if (gotoNextToken( langdescr, si, se) == '(')
+				if (!subroutine.isTransaction && gotoNextToken( langdescr, si, se) == '(')
 				{
 					// ... subroutine call argument list
 					parseNextToken( langdescr, tok, si, se);
-					if (subroutine.isTransaction) throw ERROR( si, "unexpected token '(': no positional arguments allowed positional transaction function");
 					parseSubroutineArguments( subroutine.param_map, langdescr, si, se);
 				}
-				while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
+				try
 				{
-					if (boost::algorithm::iequals( tok, "DATABASE"))
+					if (parseProcedureBody( subroutine, ERROR, databaseId, databaseClassName, langdescr, si, se))
 					{
-						if ((mask & (unsigned int)Database) != 0) throw std::runtime_error( "duplicate DATABASE definition in transaction/subroutine");
-						mask |= (unsigned int)Database;
-
-						subroutine.isValidDatabase = checkDatabaseList( databaseId, ERROR, langdescr, si, se);
-					}
-					else if (boost::algorithm::iequals( tok, "RESULT"))
-					{
-						if ((mask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction/subroutine");
-						mask |= (unsigned int)Result;
-
-						parseResultDirective( subroutine, ERROR, langdescr, si, se);
-					}
-					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
-					{
-						if ((mask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction/subroutine");
-						mask |= (unsigned int)Authorize;
-
-						parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
-					}
-					else if (boost::algorithm::iequals( tok, "PREPROC"))
-					{
-						if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROC definition in transaction/subroutine");
-						mask |= (unsigned int)Preprocess;
-
-						parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
-					}
-					else if (boost::algorithm::iequals( tok, "BEGIN"))
-					{
-						if ((mask & (unsigned int)MainBlock) != 0) throw std::runtime_error( "duplicate main block (BEGIN..END) definition in transaction/subroutine");
-						mask |= (unsigned int)MainBlock;
-
-						parseMainBlock( subroutine, ERROR, langdescr, si, se);
-						if (isValidDatabase)
+						if (subroutine.isTransaction)
 						{
-							if (subroutine.isValidDatabase)
-							{
-								try
-								{
-									if (subroutine.isTransaction)
-									{
-										LOG_TRACE << "Registering transaction definition '" << subroutine.description.name << "'";
-										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
-										rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.description.name, func));
-									}
-									else
-									{
-										TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
-										subroutineMap[ subroutine.description.name] = SubroutineDeclaration( subroutine.templateArguments, func);
-									}
-								}
-								catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
-								{
-									throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-								}
-								catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
-								{
-									throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-								}
-							}
-							else
-							{
-								LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.description.name << "' for active transaction database '" << databaseId << "'";
-							}
+							LOG_TRACE << "Registering transaction definition '" << subroutine.description.name << "'";
+							TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
+							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.description.name, func));
 						}
-						break;
-					}
-					else if (boost::algorithm::iequals( tok, "TRANSACTION"))
-					{
-						throw ERROR( si, "missing main block BEGIN..END in transaction/subroutine");
-					}
-					else if (boost::algorithm::iequals( tok, "SUBROUTINE"))
-					{
-						throw ERROR( si, "missing main block BEGIN..END in transaction/subroutine");
-					}
-					else
-					{
-						throw ERROR( si, std::string("DATABASE, RESULT, AUTHORIZE, PREPROC or BEGIN expected instead of ") + errorTokenString( ch, tok));
+						else
+						{
+							TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
+							subroutineMap[ subroutine.description.name] = SubroutineDeclaration( subroutine.templateArguments, func);
+						}
 					}
 				}
+				catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
+				{
+					throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+				}
+				catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
+				{
+					throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+				}
+
 			}
 		}
 	}
@@ -1407,12 +1434,12 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 }
 
 static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
+	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
 {
 	try
 	{
 		std::string incsrc = getInclude( mainfilename, incfilename);
-		return load( mainfilename, incsrc, databaseId, langdescr, subroutineMap);
+		return load( mainfilename, incsrc, databaseId, databaseClassName, langdescr, subroutineMap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{
@@ -1435,12 +1462,13 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	_Wolframe::db::loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
+		const std::string& databaseClassName,
 		const LanguageDescription* langdescr)
 {
 	try
 	{
 		SubroutineDeclarationMap subroutineMap;
-		return load( filename, utils::readSourceFileContent( filename), databaseId, langdescr, subroutineMap);
+		return load( filename, utils::readSourceFileContent( filename), databaseId, databaseClassName, langdescr, subroutineMap);
 	}
 	catch (const config::PositionalFileErrorException& e)
 	{

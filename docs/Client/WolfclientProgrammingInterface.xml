@@ -418,7 +418,9 @@
 						<entry><para>
 						Defines a signal of type IDENTIFIER (clicked,doubleclicked,destroyed,signaled,loaded) with the slot name and destination address defined as property value of "datasignal:IDENTIFIER"
 						Datasignal destinations can be defined as follows: As widgetid, as slot identifier (declared with 'dataslot'), as widget path.
-						A preceding identifier followed by '@' specifies the name of the identifier of the target slot.
+						A preceding identifier followed by '@' specifies what to do with the widget of the target slot.
+						If you specify 'close' there in a form top level widget then the form is closed. Every other identifier
+						causes a reload of the widget.
 						</para></entry>
 					</row>
 					<row>
