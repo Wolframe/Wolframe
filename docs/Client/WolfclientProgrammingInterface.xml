@@ -237,7 +237,7 @@
 					</row>
 					<row>
 						<entry>form:IDENTIFIER</entry>
-						<entry><para>Defines a form related to a context menu entry (when clicked). If the context menu entry has also an action defined, then the action is executed before. The form is opened only if the action succeeds.</para></entry>
+						<entry><para>Defines a form related to a context menu entry with identifier IDENTIFIER. If the context menu entry has also an action defined, then the action is executed before. The form is opened only if the action succeeds.</para></entry>
 					</row>
 				</tbody>
 				</tgroup>
@@ -300,12 +300,12 @@
 					</row>
 					<row>
 						<entry>answer</entry>
-						<entry><para>Defines the format of a validated action answer
+						<entry><para>Defines the format of the action request answer linked to the widget activation (for example a click on a push button).
 						</para></entry>
 					</row>
 					<row>
 						<entry>answer:IDENTIFIER</entry>
-						<entry><para>Defines the format of a validated answer of the action defined as 'action:IDENTIFIER'
+						<entry><para>Defines the format of the request answer of the action defined as 'action:IDENTIFIER'
 						</para></entry>
 					</row>
 				</tbody>
@@ -341,19 +341,23 @@
 						<entry>link:IDENTIFIER</entry>
 						<entry><para>Defines a symbolic link to another widget.
 						Defining the property "link:&lt;name&gt;" = &lt;widgetid&gt;: defines &lt;name&gt; to be a reference to the widget with the widgetid set to &lt;widgetid&gt;.
-						Links are used to read data from other widgets.
+						Links are used to read data from other widgets
+						on load and refresh.
 						</para></entry>
 					</row>
 					<row>
 						<entry>widgetid</entry>
 						<entry><para>Unique identifier of the widget used for identifying it when 
 						resolving symbolic links or an address of a request aswer. When not explicitely
-						defined it is implicitely defined on widget creation.
+						defined it is implicitely defined as unique identifier on widget creation.
+						Unique means unique during one run of one client. It's a simple counter plus the name
+						of the widget.
 						</para></entry>
 					</row>
 					<row>
 						<entry>synonym:NAME</entry>
 						<entry><para>Defines a renaming of the identifier NAME to the identifier in the property value.
+						Be careful when using synonyms. They are the last instrument you should consider to use in the client.
 						</para></entry>
 					</row>
 				</tbody>
