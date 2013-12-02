@@ -148,7 +148,6 @@ usr/local/include/wolframe/database/database.hpp
 usr/local/include/wolframe/database/databaseError.hpp
 usr/local/include/wolframe/database/databaseLanguage.hpp
 usr/local/include/wolframe/database/loadTransactionProgram.hpp
-usr/local/include/wolframe/database/preparedStatement.hpp
 usr/local/include/wolframe/database/transaction.hpp
 usr/local/include/wolframe/database/transactionFunction.hpp
 usr/local/include/wolframe/database/transactionInput.hpp

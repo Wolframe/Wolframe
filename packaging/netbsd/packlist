@@ -159,7 +159,6 @@ usr/pkg/include/wolframe/database/database.hpp
 usr/pkg/include/wolframe/database/databaseError.hpp
 usr/pkg/include/wolframe/database/databaseLanguage.hpp
 usr/pkg/include/wolframe/database/loadTransactionProgram.hpp
-usr/pkg/include/wolframe/database/preparedStatement.hpp
 usr/pkg/include/wolframe/database/transaction.hpp
 usr/pkg/include/wolframe/database/transactionFunction.hpp
 usr/pkg/include/wolframe/database/transactionInput.hpp
