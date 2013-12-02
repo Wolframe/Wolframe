@@ -17,7 +17,7 @@ static void test_atomic_param_clr_call( const comauto::CommonLanguageRuntime& cl
 
 	std::cout << std::endl << "RESULT call CLR: 13 + 2 = " << std::endl;
 	std::string buf;
-	langbind::TypedFilterBase::Element elem = comauto::getAtomicElement( result, buf);
+	types::VariantConst elem = comauto::getAtomicElement( result, buf);
 	std::cout << elem.tostring() << std::endl;
 }
 
@@ -31,13 +31,13 @@ static void test_function_call( const std::map<std::string,comauto::FunctionR>& 
 	if (!closure->call()) throw std::runtime_error( std::string("function call failed: '") + name + "'");
 
 	langbind::TypedInputFilterR funcres = closure->result();
-	langbind::TypedFilterBase::ElementType elemtype;
-	langbind::TypedFilterBase::Element elem;
+	langbind::FilterBase::ElementType elemtype;
+	types::VariantConst elem;
 
 	std::cout << std::endl << title << std::endl;
 	while (funcres->getNext( elemtype, elem))
 	{
-		std::cout << langbind::TypedFilterBase::elementTypeName( elemtype) << " '" << elem.tostring() << "'" << std::endl;
+		std::cout << langbind::FilterBase::elementTypeName( elemtype) << " '" << elem.tostring() << "'" << std::endl;
 	}
 }
 

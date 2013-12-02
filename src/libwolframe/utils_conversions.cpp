@@ -46,8 +46,8 @@ public:
 		std::size_t ii=0,dd=0;
 		for (; ii<100; ++ii,dd+=2)
 		{
-			tab.chr[dd+0] = (ii/10) + '0';
-			tab.chr[dd+1] = (ii%10) + '0';
+			tab.chr[dd+0] = (char)((ii/10) + '0');
+			tab.chr[dd+1] = (char)((ii%10) + '0');
 		}
 	}
 

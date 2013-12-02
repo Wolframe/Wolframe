@@ -75,7 +75,7 @@ public:
 
 	virtual FormInputFilter* copy() const	{return new FormInputFilter(*this);}
 
-	virtual bool getNext( ElementType& type, Element& element);
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
 private:
 	enum TagState

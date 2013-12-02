@@ -428,6 +428,13 @@ VARIANT comauto::createVariantType( int val)
 	return IntegerConstructor<sizeof(val)>::createInteger<int>( val);
 }
 
+VARIANT comauto::createVariantType()
+{
+	VARIANT rt;
+	rt.vt = VT_EMPTY;
+	return rt;
+}
+
 VARIANT comauto::createVariantType( unsigned int val)
 {
 	VARIANT rt;
@@ -452,19 +459,19 @@ VARIANT comauto::createVariantType( unsigned short val)
 	return rt;
 }
 
-VARIANT comauto::createVariantType( long val)
+VARIANT comauto::createVariantType( signed __int64 val)
 {
 	VARIANT rt;
 	rt.vt = VT_I8;
-	rt.lVal = val;
+	rt.llVal = val;
 	return rt;
 }
 
-VARIANT comauto::createVariantType( unsigned long val)
+VARIANT comauto::createVariantType( unsigned __int64 val)
 {
 	VARIANT rt;
-	rt.vt = VT_UI4;
-	rt.ulVal = val;
+	rt.vt = VT_UI8;
+	rt.ullVal = val;
 	return rt;
 }
 
@@ -533,34 +540,34 @@ VARIANT comauto::createVariantType( const std::string& val)
 	return comauto::createVariantType( val.c_str(), val.size());
 }
 
-VARIANT comauto::createVariantType( const langbind::TypedInputFilter::Element& val)
+VARIANT comauto::createVariantType( const types::Variant& val)
 {
 	VARIANT rt;
 	rt.vt = VT_EMPTY;
-	switch (val.type)
+	switch (val.type())
 	{
-		case langbind::TypedFilterBase::Element::bool_:		rt = comauto::createVariantType( val.value.bool_); break;
-		case langbind::TypedFilterBase::Element::double_:	rt = comauto::createVariantType( val.value.double_); break;
-		case langbind::TypedFilterBase::Element::int_:		rt = comauto::createVariantType( val.value.int_); break;
-		case langbind::TypedFilterBase::Element::uint_:		rt = comauto::createVariantType( val.value.uint_); break;
-		case langbind::TypedFilterBase::Element::string_:	rt = comauto::createVariantType( val.value.string_.ptr, val.value.string_.size); break;
-		case langbind::TypedFilterBase::Element::blob_:		rt = comauto::createVariantType( (const char*)val.value.blob_.ptr, val.value.blob_.size); break;
+		case types::Variant::Null:		rt = comauto::createVariantType(); break;
+		case types::Variant::Bool:		rt = comauto::createVariantType( val.data().value.Bool); break;
+		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
+		case types::Variant::Int:		rt = comauto::createVariantType( val.data().value.Int); break;
+		case types::Variant::UInt:		rt = comauto::createVariantType( val.data().value.UInt); break;
+		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize()); break;
 	}
 	return rt;
 }
 
-VARIANT comauto::createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype)
+VARIANT comauto::createVariantType( const types::Variant& val, VARTYPE dsttype)
 {
 	VARIANT rt;
 	rt.vt = VT_EMPTY;
-	switch (val.type)
+	switch (val.type())
 	{
-		case langbind::TypedFilterBase::Element::bool_:		rt = comauto::createVariantType( val.value.bool_); break;
-		case langbind::TypedFilterBase::Element::double_:	rt = comauto::createVariantType( val.value.double_); break;
-		case langbind::TypedFilterBase::Element::int_:		rt = comauto::createVariantType( val.value.int_); break;
-		case langbind::TypedFilterBase::Element::uint_:		rt = comauto::createVariantType( val.value.uint_); break;
-		case langbind::TypedFilterBase::Element::string_:	rt = comauto::createVariantType( val.value.string_.ptr, val.value.string_.size, (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
-		case langbind::TypedFilterBase::Element::blob_:		rt = comauto::createVariantType( (const char*)val.value.blob_.ptr, val.value.blob_.size, (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR); break;
+		case types::Variant::Null:		rt = comauto::createVariantType(); break;
+		case types::Variant::Bool:		rt = comauto::createVariantType( val.data().value.Bool); break;
+		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
+		case types::Variant::Int:		rt = comauto::createVariantType( val.data().value.Int); break;
+		case types::Variant::UInt:		rt = comauto::createVariantType( val.data().value.UInt); break;
+		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
 	}
 	if (rt.vt != dsttype)
 	{
@@ -842,7 +849,7 @@ HRESULT comauto::wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc
 }
 
 
-void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val)
+void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const types::Variant& val)
 {
 	if (dsttype == VT_BSTR)
 	{
@@ -963,28 +970,26 @@ std::string comauto::variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc)
 	return rt;
 }
 
-langbind::TypedInputFilter::Element comauto::getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf)
+types::VariantConst comauto::getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf)
 {
-	typedef langbind::TypedInputFilter::Element Element;
-	Element element;
 	switch (vt)
 	{
-		case VT_I1:  element.type = Element::int_; element.value.int_ = *(const SHORT*)ref; break;
-		case VT_I2:  element.type = Element::int_; element.value.int_ = *(const SHORT*)ref; break;
-		case VT_I4:  element.type = Element::int_; element.value.int_ = *(const LONG*)ref; break;
-		case VT_I8:  element.type = Element::int_; element.value.int_ = boost::lexical_cast<int>(*(const LONGLONG*)ref); break;
-		case VT_INT: element.type = Element::int_; element.value.int_ = *(const INT*)ref; break;
-		case VT_UI1:  element.type = Element::uint_; element.value.uint_ = *(const USHORT*)ref; break;
-		case VT_UI2:  element.type = Element::uint_; element.value.uint_ = *(const USHORT*)ref; break;
-		case VT_UI4:  element.type = Element::uint_; element.value.uint_ = *(const ULONG*)ref; break;
-		case VT_UI8:  element.type = Element::uint_; element.value.uint_ = boost::lexical_cast<unsigned int>(*(const ULONGLONG*)ref); break;
-		case VT_UINT: element.type = Element::uint_; element.value.uint_ = *(const UINT*)ref; break;
-		case VT_R4:  element.type = Element::double_; element.value.double_ = *(const FLOAT*)ref; break;
-		case VT_R8:  element.type = Element::double_; element.value.double_ = *(const DOUBLE*)ref; break;
-		case VT_BOOL: element.type = Element::bool_; element.value.bool_ = *(const VARIANT_BOOL*)ref != VARIANT_FALSE; break;
-		case VT_BSTR: element = Element( elembuf = comauto::utf8string( *(const BSTR*)ref)); break;
-		case VT_LPSTR: element = Element( elembuf = comauto::utf8string( *(LPCSTR*)ref)); break;
-		case VT_LPWSTR: element = Element( elembuf = comauto::utf8string( *(LPCWSTR*)ref)); break;
+	case VT_I1:  return types::VariantConst( (types::Variant::Data::Int)(*(const SHORT*)ref)); 
+		case VT_I2:  return types::VariantConst( (types::Variant::Data::Int)(*(const SHORT*)ref));
+		case VT_I4:  return types::VariantConst( (types::Variant::Data::Int)(*(const LONG*)ref));
+		case VT_I8:  return types::VariantConst( (types::Variant::Data::Int)(*(const LONGLONG*)ref));
+		case VT_INT: return types::VariantConst( (types::Variant::Data::Int)(*(const INT*)ref));
+		case VT_UI1:  return types::VariantConst( (types::Variant::Data::UInt)(*(const USHORT*)ref));
+		case VT_UI2:  return types::VariantConst( (types::Variant::Data::UInt)(*(const USHORT*)ref));
+		case VT_UI4:  return types::VariantConst( (types::Variant::Data::UInt)(*(const ULONG*)ref));
+		case VT_UI8:  return types::VariantConst( (types::Variant::Data::UInt)(*(const ULONGLONG*)ref));
+		case VT_UINT: return types::VariantConst( (types::Variant::Data::UInt)(*(const UINT*)ref));
+		case VT_R4:  return types::VariantConst( (double)(*(const FLOAT*)ref));
+		case VT_R8:  return types::VariantConst( (double)(*(const DOUBLE*)ref));
+		case VT_BOOL: return types::VariantConst( (bool)(*(const VARIANT_BOOL*)ref != VARIANT_FALSE));
+		case VT_BSTR: return types::VariantConst( elembuf = comauto::utf8string( *(const BSTR*)ref));
+		case VT_LPSTR: return types::VariantConst( elembuf = comauto::utf8string( *(LPCSTR*)ref));
+		case VT_LPWSTR: return types::VariantConst( elembuf = comauto::utf8string( *(LPCWSTR*)ref));
 		default:
 		{
 			VARIANT elemorig;
@@ -995,7 +1000,7 @@ langbind::TypedInputFilter::Element comauto::getAtomicElement( VARTYPE vt, const
 				elemorig.vt = vt | VT_BYREF;
 				WRAP( comauto::wrapVariantCopyInd( &elemcopy, &elemorig))
 				WRAP( comauto::wrapVariantChangeType( &elemcopy, &elemcopy, 0, VT_BSTR))
-				element = Element( elembuf = comauto::utf8string( elemcopy.bstrVal));
+				return types::VariantConst( elembuf = comauto::utf8string( elemcopy.bstrVal));
 			}
 			catch (const std::runtime_error& e)
 			{
@@ -1005,10 +1010,9 @@ langbind::TypedInputFilter::Element comauto::getAtomicElement( VARTYPE vt, const
 			}
 		}
 	}
-	return element;
 }
 
-langbind::TypedInputFilter::Element comauto::getAtomicElement( const VARIANT& val, std::string& elembuf)
+types::VariantConst comauto::getAtomicElement( const VARIANT& val, std::string& elembuf)
 {
 	return getAtomicElement( val.vt, comauto::arithmeticTypeAddress( &val), elembuf);
 }

@@ -43,22 +43,23 @@ std::string variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc);
 
 bool isCOMInterfaceMethod( const std::string& name);
 
+VARIANT createVariantType();
 VARIANT createVariantType( bool val);
 VARIANT createVariantType( int val);
 VARIANT createVariantType( unsigned int val);
 VARIANT createVariantType( short val);
 VARIANT createVariantType( unsigned short val);
-VARIANT createVariantType( long val);
-VARIANT createVariantType( unsigned long val);
+VARIANT createVariantType( signed __int64 val);
+VARIANT createVariantType( unsigned __int64 val);
 VARIANT createVariantType( float val);
 VARIANT createVariantType( double val);
 VARIANT createVariantType( const std::string& val);
 VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringtype=VT_BSTR);
 VARIANT createVariantType( const std::wstring& val);
-VARIANT createVariantType( const langbind::TypedInputFilter::Element& val);
-VARIANT createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype);
+VARIANT createVariantType( const types::Variant& val);
+VARIANT createVariantType( const types::Variant& val, VARTYPE dsttype);
 VARIANT createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, const std::vector<VARIANT>& ar=std::vector<VARIANT>());
-void copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val);
+void copyVariantType( VARTYPE dsttype, void* dstfield, const types::Variant& val);
 HRESULT wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc);
 HRESULT wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc);
 HRESULT wrapVariantClear( VARIANT* pvarg);
@@ -70,8 +71,8 @@ bool isStringType( int vt);
 const void* arithmeticTypeAddress( const VARIANT* val);
 void* arithmeticTypeAddress( VARIANT* val);
 
-langbind::TypedInputFilter::Element getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf);
-langbind::TypedInputFilter::Element getAtomicElement( const VARIANT& val, std::string& elembuf);
+types::VariantConst getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf);
+types::VariantConst getAtomicElement( const VARIANT& val, std::string& elembuf);
 
 #define WRAP(SYSCALL){\
 	static const char* call = "" #SYSCALL;\

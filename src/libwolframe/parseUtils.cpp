@@ -235,10 +235,10 @@ IdentifierTable::IdentifierTable( bool casesensitive_, const char** arg)
 {
 	for (int idx=0; arg[idx]; ++idx)
 	{
-		if (idx > 200) throw std::logic_error("IdentifierTable parameter list not NULL terminated or with more than 200 elements");
+		if (idx >= 100) throw std::logic_error("internal: IdentifierTable parameter list not NULL terminated or with more than 100 elements");
 		std::string kk( arg[idx]);
 		if (!m_casesensitive) boost::algorithm::to_upper( kk);
-		m_tab[ kk] = idx;
+		m_tab[ kk] = idx+1;
 	}
 }
 

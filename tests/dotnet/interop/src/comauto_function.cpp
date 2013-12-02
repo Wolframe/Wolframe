@@ -36,7 +36,7 @@ public:
 		return new FunctionResult( *this);
 	}
 
-	virtual bool getNext( ElementType& type, Element& element);
+	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
 private:
 	enum State
@@ -360,8 +360,8 @@ bool comauto::FunctionClosure::call()
 AGAIN:
 	try
 	{
-		langbind::TypedFilterBase::ElementType elemtype;
-		langbind::TypedFilterBase::Element elemvalue;
+		langbind::FilterBase::ElementType elemtype;
+		types::VariantConst elemvalue;
 
 		if (m_paramclosure.get())
 		{
@@ -408,19 +408,21 @@ AGAIN:
 				case langbind::InputFilter::Attribute:
 				case langbind::InputFilter::OpenTag:
 				{
-					if (elemvalue.type == langbind::TypedFilterBase::Element::int_)
+					if (elemvalue.type() == types::Variant::Int)
 					{
-						if (elemvalue.value.int_ < 0 || (std::size_t)elemvalue.value.int_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-						m_paramidx = (std::size_t)elemvalue.value.int_;
+						__int64 val = elemvalue.data().value.Int;
+						if (val < 0 || (std::size_t)val >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						m_paramidx = (std::size_t)val;
 					}
-					else if (elemvalue.type == langbind::TypedFilterBase::Element::uint_)
+					else if (elemvalue.type() == types::Variant::UInt)
 					{
-						if ((std::size_t)elemvalue.value.uint_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-						m_paramidx = (std::size_t)elemvalue.value.uint_;
+						unsigned __int64 val = elemvalue.data().value.UInt;
+						if ((std::size_t)val >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						m_paramidx = (std::size_t)val;
 					}
-					else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
+					else if (elemvalue.type() == types::Variant::String)
 					{
-						std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
+						std::string paramname( elemvalue.charptr(), elemvalue.charsize());
 						m_paramidx = m_func->getParameterIndex( paramname);
 					}
 					else
@@ -515,7 +517,7 @@ AGAIN:
 					case Function::Parameter::Value:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
-							m_param[ ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
+							m_param[ ii] = comauto::createVariantType( types::Variant(), param->typedesc->vt);
 						}
 						else if (param->typeinfo)
 						{
@@ -614,7 +616,7 @@ FunctionResult::StackElem::~StackElem()
 	}
 }
 
-bool FunctionResult::getNext( ElementType& type, Element& element)
+bool FunctionResult::getNext( ElementType& type, types::VariantConst& element)
 {
 AGAIN:
 	VARIANT data;
@@ -643,11 +645,11 @@ AGAIN:
 					cur.state = VarClose;
 					if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0 || cur.name.empty())
 					{
-						element = Element( cur.idx+1);
+						element = types::VariantConst( cur.idx+1);
 					}
 					else
 					{
-						element = Element( m_elembuf = cur.name);
+						element = types::VariantConst( m_elembuf = cur.name);
 					}
 					type = OpenTag;
 					LONG idx = cur.idx++;
@@ -737,7 +739,7 @@ AGAIN:
 						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
 						{
 							type = OpenTag;
-							element = Element( m_elembuf = comauto::utf8string( varname));
+							element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
 							cur.state = VarClose;
 							rt = true;
 						}
@@ -763,13 +765,13 @@ AGAIN:
 						reftypeinfo->Release();
 						reftypeinfo = 0;
 						type = OpenTag;
-						element = Element( m_elembuf = comauto::utf8string( varname));
+						element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
 					}
 					else if (comauto::isAtomicType( data.vt) || comauto::isStringType( data.vt))
 					{
 						m_stk.push_back( StackElem( "", 0, 0, data));
 						type = OpenTag;
-						element = Element( m_elembuf = comauto::utf8string( varname));
+						element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
 					}
 					else
 					{
@@ -787,7 +789,7 @@ AGAIN:
 			case VarClose:
 			{
 				cur.state = VarOpen;
-				element = Element();
+				element = types::VariantConst();
 				type = CloseTag;
 				return true;
 			}

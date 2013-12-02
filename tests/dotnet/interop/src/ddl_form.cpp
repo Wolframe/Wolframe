@@ -1,5 +1,6 @@
 #include "ddl_form.hpp"
 #include <stdexcept>
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -85,58 +86,58 @@ FormInputFilter::FormInputFilter( const Form& form)
 	}
 }
 
-static TypedFilterBase::Element::Type getType( const std::string& val)
+static types::Variant::Type getType( const std::string& val)
 {
 	std::string::const_iterator vi = val.begin(), ve = val.end();
-	TypedFilterBase::Element::Type rt = TypedFilterBase::Element::string_;
+	types::Variant::Type rt = types::Variant::String;
 	if (vi != ve && *vi == '-')
 	{
 		++vi;
-		if (vi != ve && *vi >= '0' && *vi <= '9') rt = TypedFilterBase::Element::int_;
+		if (vi != ve && *vi >= '0' && *vi <= '9') rt = types::Variant::Int;
 	}
 	else if (vi != ve && *vi >= '0' && *vi <= '9')
 	{
-		rt = TypedFilterBase::Element::uint_;
+		rt = types::Variant::UInt;
 	}
 	else if (vi != ve && (*vi == 'f' || *vi == 't'))
 	{
-		if (val == "true") return TypedFilterBase::Element::bool_;
-		if (val == "false") return TypedFilterBase::Element::bool_;
+		if (val == "true") return types::Variant::Bool;
+		if (val == "false") return types::Variant::Bool;
 	}
 	for (; vi != ve; ++vi)
 	{
 		switch (rt)
 		{
-			case TypedFilterBase::Element::string_:
-			case TypedFilterBase::Element::bool_: return rt;
+			case types::Variant::String:
+			case types::Variant::Bool: return rt;
 
-			case TypedFilterBase::Element::int_:
-			case TypedFilterBase::Element::uint_:
+			case types::Variant::Int:
+			case types::Variant::UInt:
 				if (*vi >= '0' && *vi <= '9') continue; 
-				if (*vi == '.') rt = TypedFilterBase::Element::double_;
-				rt = TypedFilterBase::Element::string_;
+				if (*vi == '.') rt = types::Variant::Double;
+				rt = types::Variant::String;
 				break;
-			case TypedFilterBase::Element::double_:
+			case types::Variant::Double:
 				if (*vi >= '0' && *vi <= '9') continue; 
-				rt = TypedFilterBase::Element::string_;
+				rt = types::Variant::String;
 				break;
 		}
 	}
 	return rt;
 }
 
-static TypedFilterBase::Element getElement( const std::string& val)
+static types::VariantConst getElement( const std::string& val)
 {
 	switch (getType( val))
 	{
-		case TypedFilterBase::Element::string_: return TypedFilterBase::Element( val);
-		case TypedFilterBase::Element::blob_: return TypedFilterBase::Element( val);
-		case TypedFilterBase::Element::bool_: return TypedFilterBase::Element( (bool)(val == "true"));
-		case TypedFilterBase::Element::int_: return TypedFilterBase::Element( boost::lexical_cast<int>( val));
-		case TypedFilterBase::Element::uint_: return TypedFilterBase::Element( boost::lexical_cast<unsigned int>( val));
-		case TypedFilterBase::Element::double_: return TypedFilterBase::Element( boost::lexical_cast<double>( val));
+		case types::Variant::String: return types::VariantConst( val);
+		case types::Variant::Null: return types::VariantConst();
+		case types::Variant::Bool: return types::VariantConst( (bool)(val == "true"));
+		case types::Variant::Int: return types::VariantConst( boost::lexical_cast<types::Variant::Data::Int>( val));
+		case types::Variant::UInt: return types::VariantConst( boost::lexical_cast<types::Variant::Data::UInt>( val));
+		case types::Variant::Double: return types::VariantConst( boost::lexical_cast<double>( val));
 	}
-	return TypedFilterBase::Element( val);
+	return types::VariantConst( val);
 }
 
 bool FormInputFilter::StackElem::end() const
@@ -150,7 +151,7 @@ bool FormInputFilter::StackElem::end() const
 	return true;
 }
 
-bool FormInputFilter::getNext( ElementType& type, Element& element)
+bool FormInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 AGAIN:
 	if (m_stk.empty()) return false;
@@ -174,7 +175,7 @@ AGAIN:
 
 		case CloseTagState:
 			type = FilterBase::CloseTag;
-			element = Element();
+			element = types::VariantConst();
 			switch (m_stk.back().type)
 			{
 				case Form::Struct:

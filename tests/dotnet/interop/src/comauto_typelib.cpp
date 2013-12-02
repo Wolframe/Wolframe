@@ -365,8 +365,8 @@ bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
 	ITypeInfo* rectypeinfo = 0;
 	VARDESC* vardesc = 0;
 	if (m_stk.empty()) return true;
-	langbind::TypedFilterBase::ElementType elemtype;
-	langbind::TypedFilterBase::Element elemvalue;
+	langbind::FilterBase::ElementType elemtype;
+	types::VariantConst elemvalue;
 	StackElem* cur = 0;
 
 	try
@@ -377,10 +377,10 @@ AGAIN:
 			cur = &m_stk.back();
 			switch (elemtype)
 			{
-				case langbind::TypedFilterBase::OpenTag:
+				case langbind::FilterBase::OpenTag:
 				{
 					if (!cur->key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of open tag expected after attribute)");
-					if (elemvalue.type != langbind::TypedFilterBase::Element::string_) throw std::runtime_error( "string expected for tag name");
+					if (elemvalue.type() != types::Variant::String) throw std::runtime_error( "string expected for tag name");
 					if (cur->value.vt != VT_RECORD || cur->value.pvRecord == 0 || cur->value.pRecInfo == 0) throw std::runtime_error( "structure assigned to atomic value or array"); 
 					cur->key = elemvalue.tostring();
 					std::map<std::string,int>::const_iterator ki = cur->keymap.find( cur->key);
@@ -436,7 +436,7 @@ AGAIN:
 					}
 					break;
 				}
-				case langbind::TypedFilterBase::CloseTag:
+				case langbind::FilterBase::CloseTag:
 				{
 					std::map<std::size_t,std::vector<VARIANT> >::iterator ei = cur->elemar.begin(), ee = cur->elemar.end();
 					for (; ei != ee; ++ei)
@@ -495,14 +495,14 @@ AGAIN:
 					cur->key.clear();
 					break;
 				}
-				case langbind::TypedFilterBase::Attribute:
+				case langbind::FilterBase::Attribute:
 				{
 					if (!cur->key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of attribute expected after attribute)");
-					if (elemvalue.type != langbind::TypedFilterBase::Element::string_) throw std::runtime_error( "string expected for attribute name");
+					if (elemvalue.type() != types::Variant::String) throw std::runtime_error( "string expected for attribute name");
 					cur->key = elemvalue.tostring();
 					break;
 				}
-				case langbind::TypedFilterBase::Value:
+				case langbind::FilterBase::Value:
 				{
 					if (!cur->key.empty())
 					{
@@ -527,7 +527,7 @@ AGAIN:
 			}
 			if (m_single)
 			{
-				if (elemtype != langbind::TypedFilterBase::Value) throw std::runtime_error( "atomic value expected");
+				if (elemtype != langbind::FilterBase::Value) throw std::runtime_error( "atomic value expected");
 				break;
 			}
 		}

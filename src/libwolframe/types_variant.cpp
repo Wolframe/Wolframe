@@ -15,7 +15,7 @@ void Variant::init( Type type_)
 {
 	static char strinit[1] = "";
 	std::memset( this, 0, sizeof( *this));
-	m_type = type_;
+	m_type = (unsigned char)type_;
 	switch (m_type)
 	{
 		case Null:

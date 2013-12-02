@@ -357,7 +357,7 @@
 					<row>
 						<entry>synonym:NAME</entry>
 						<entry><para>Defines a renaming of the identifier NAME to the identifier in the property value.
-						Be careful when using synonyms. They are the last instrument you should consider to use in the client.
+						Be careful when using synonyms. They are the last construct you should consider to use in the client.
 						</para></entry>
 					</row>
 				</tbody>
