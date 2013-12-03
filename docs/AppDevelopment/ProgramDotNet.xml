@@ -135,6 +135,7 @@
 					<entry>[MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_XX)]</entry>
 				</row>
 				</tbody>
+				</tgroup>
 			</table>
 			<para>Decimal floating point and numeric types (DECIMAL) are not yet supported, but
 			will soon be available.</para>
@@ -165,6 +166,7 @@
 			<code>gacutil /if &lt;assemblypath&gt;</code> with your assembly path &lt;assemblypath&gt;
 			as argument. Furthermore the command <code>gacutil</code> has to be called from
 			administrator command line.
+			</para>
 			</sect4>
 		</sect3>
 	</sect2>
