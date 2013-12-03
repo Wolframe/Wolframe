@@ -9,7 +9,7 @@ The file with the extension TLB is created in the current directory. This file c
 Inspect a TLB:
 Call \Program Files\Microsoft SDKs\Windows\v7.1\Bin\OleView.exe or use the Wolframe interop test program WolfCLR in tests/interop/
 
-Register the Assembly in the GAC:
+Register the Assembly in the GAC (Administrator command line):
 Call "\Program Files\Microsoft SDKs\Windows\v7.1\Bin\gacutil.exe"  /if <assemblypath>
 
 Register the TypeLibrary:
@@ -18,4 +18,9 @@ Call "C:\Windows\Microsoft.NET\Framework\v4.0.30319\regtlibv12.exe"  <tlbfilepat
 Documentation about COM/.NET interop is gathered in Links.txt
 
 
+
+Errors:
+MSB3325:
+	sn -i Functions.pfx VS_KEY_9013B58D58AE1C9F 
+	(Wolframe)
 

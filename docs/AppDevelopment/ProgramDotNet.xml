@@ -16,6 +16,157 @@
 		But <application>Wolframe</application> will provide
 		<application>.NET</application> functions soon.
 		</para>
+		<sect3>
+		<title>Prepare .NET Modules for Wolframe</title>
+		<para>
+		To make functions written in .NET callable by Wolframe, several steps have to be performed.
+		First the asseblies with the functions exported to Wolframe have to be build COM visible.
+		Wolframe itself is not a .NET application. Therefore it has to call .NET functions via
+		COM/.NET interop interface of the CLR.
+		</para>
+			<sect4>
+			<title>Make Assemblies COM visible</title>
+			<para>To make the .NET functions called from Wolframe COM visible, you have to tick
+			"Properties/Assembly Information" the switch "Make assembly COM visible". Furthermore
+			every object and method that is part of the exported API (also objects used as parameters)
+			has to be tagged in the source as COM visible with <code>[ComVisible(true)]</code>.
+			</para>
+			</sect4>
+
+			<sect4>
+			<title>Tag Exported Objects with a Guid</title>
+			<para>Each object that is part of the exported API has to be tagged with a global unique
+			identifier (Guid) in order to be adressable. Modules with .NET functions will have to be globally
+			registered and the objects need to be identified by the Guid because that's the only way
+			to make the record info structure visible for Wolframe. The record info structure is
+			needed to serialize/deserialize .NET objects from another interpreter context that
+			is not registered for .NET. There are many ways to create a Guid and
+			tag an object like this: <code>[Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]</code>.
+			</para>
+			</sect4>
+
+			<sect4>
+			<title>Add Marshalling Tags to Values</title>
+			<para>For marshalling function calls correctly, Wolframe needs
+			tags for every parameter and member of a sub structure of a parameter
+			of methods exported as functions.
+			The following table lists the supported types and their marshalling tags:
+			</para>
+			<table frame="all" width="100%">
+				<title>Marshalling Tags</title>
+				<tgroup cols="3">
+				<thead>
+				<row>
+					<entry>.NET Type</entry>
+					<entry>Wolframe Type</entry>
+					<entry>Marshalling Tag</entry>
+				</row>
+				</thead>
+
+				<tbody>
+				<row>
+					<entry>I2</entry>
+					<entry>Int</entry>
+					<entry>[MarshalAs(UnmanagedType.I2)]</entry>
+				</row>
+				<row>
+					<entry>I4</entry>
+					<entry>Int</entry>
+					<entry>[MarshalAs(UnmanagedType.I4)]</entry>
+				</row>
+				<row>
+					<entry>I8</entry>
+					<entry>Int</entry>
+					<entry>[MarshalAs(UnmanagedType.I8)]</entry>
+				</row>
+				<row>
+					<entry>UI2</entry>
+					<entry>UInt</entry>
+					<entry>[MarshalAs(UnmanagedType.UI2)]</entry>
+				</row>
+				<row>
+					<entry>UI4</entry>
+					<entry>UInt</entry>
+					<entry>[MarshalAs(UnmanagedType.UI4)]</entry>
+				</row>
+				<row>
+					<entry>UI8</entry>
+					<entry>UInt</entry>
+					<entry>[MarshalAs(UnmanagedType.UI8)]</entry>
+				</row>
+				<row>
+					<entry>R4</entry>
+					<entry>Double</entry>
+					<entry>[MarshalAs(UnmanagedType.R4)]</entry>
+				</row>
+				<row>
+					<entry>R8</entry>
+					<entry>Double</entry>
+					<entry>[MarshalAs(UnmanagedType.R8)]</entry>
+				</row>
+				<row>
+					<entry>BOOL</entry>
+					<entry>Bool</entry>
+					<entry>[MarshalAs(UnmanagedType.BOOL)]</entry>
+				</row>
+				<row>
+					<entry>string</entry>
+					<entry>String</entry>
+					<entry>[MarshalAs(UnmanagedType.BStr)]</entry>
+				</row>
+				<row>
+					<entry>RECORD</entry>
+					<entry>struct</entry>
+					<entry><para>no tag needed</para></entry>
+				</row>
+				<row>
+					<entry>array of structures</entry>
+					<entry>array</entry>
+					<entry>[MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)]</entry>
+				</row>
+				<row>
+					<entry>array of strings</entry>
+					<entry>array</entry>
+					<entry>[MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)]</entry>
+				</row>
+				<row>
+					<entry>array of atomic types XX (XX=I2,I4,I8,..)</entry>
+					<entry>array</entry>
+					<entry>[MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_XX)]</entry>
+				</row>
+				</tbody>
+			</table>
+			<para>Decimal floating point and numeric types (DECIMAL) are not yet supported, but
+			will soon be available.</para>
+			</sect4>
+
+			<sect4>
+			<title>Create a Type Library</title>
+			<para>For making the API introspectable by Wolframe, we have to create a TLB
+			(Type Library) file from the assembly (DLL) after build. The type library has
+			to be recreated every time the Interface (API) changes. The type library is
+			created with the program <code>tlbexp</code>.</para>
+			</sect4>
+
+			<sect4>
+			<title>Register the Type Library</title>
+			<para>The type library created with <code>tlbexp</code> has also to be registered.
+			For this you call the program <code>regtlibv12</code> with your type library file
+			(.tlb file) as argument.
+			</para>
+			</sect4>
+
+			<sect4>
+			<title>Register the Assembly in the GAC</title>
+			<para>Wolframe does not accept local assemblies. In order to be addressable over
+			the type library interface assemblies need to be put into the global assembly cache (GAC).
+			Unfortunately this has to be repeated every time the assembly binary changes.
+			There is no way around. For registration in the GAC you have to call the program
+			<code>gacutil /if &lt;assemblypath&gt;</code> with your assembly path &lt;assemblypath&gt;
+			as argument. Furthermore the command <code>gacutil</code> has to be called from
+			administrator command line.
+			</sect4>
+		</sect3>
 	</sect2>
 	<para></para>
 </sect1>

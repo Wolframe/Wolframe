@@ -165,7 +165,7 @@ int main( int , const char**)
 	try
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
-		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
+		std::string path( "C:\\Github\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
 		std::string assembly( "Functions, Version=1.0.0.30, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);

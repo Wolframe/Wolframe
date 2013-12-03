@@ -243,11 +243,11 @@ int Variant::compare( const Variant& o) const
 				return compare_double( variant_cast<double>( o), m_data.value.Double);
 			case Variant::Int:
 				if (o.type() == UInt && o.m_data.value.UInt > (Data::UInt)std::numeric_limits<Data::Int>::max()) return -1;
-				return compare_int( variant_cast<Data::Int>( o), m_data.value.Int);
+				return compare_int( variant2int_cast( o), m_data.value.Int);
 			case Variant::UInt:
-				return compare_int( variant_cast<Data::UInt>( o), m_data.value.UInt);
+				return compare_int( variant2uint_cast( o), m_data.value.UInt);
 			case Variant::Bool:
-				return compare_bool( variant_cast<bool>( o), m_data.value.Bool);
+				return compare_bool( variant2int_cast( o) != 0, m_data.value.Bool);
 			case Variant::String:
 				throw std::logic_error("illegal state in Variant::compare (string has lowest order)");
 		}
@@ -279,7 +279,7 @@ double Variant::todouble() const
 
 bool Variant::tobool() const
 {
-	return variant_cast<bool>( *this);
+	return (variant2int_cast( *this) != 0);
 }
 
 Variant::Data::Int Variant::toint() const
