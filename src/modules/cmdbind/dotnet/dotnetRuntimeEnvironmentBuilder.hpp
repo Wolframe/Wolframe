@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
+#include "langbind/formFunction.hpp"
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
 #include "processor/moduleInterface.hpp"

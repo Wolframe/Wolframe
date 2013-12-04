@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file dotnetRuntimeEnvironmentBuilder.cpp
+//\file dotnetRuntimeEnvironmentBuilder.cpp
 #include "dotnetRuntimeEnvironmentBuilder.hpp"
 #include "comauto/utils.hpp"
 

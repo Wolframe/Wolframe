@@ -35,6 +35,7 @@
 #ifndef _Wolframe_PRGBIND_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_PRGBIND_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #include "module/constructor.hpp"
+#include "langbind/formFunction.hpp"
 #include "processor/moduleInterface.hpp"
 #include <string>
 #include <list>

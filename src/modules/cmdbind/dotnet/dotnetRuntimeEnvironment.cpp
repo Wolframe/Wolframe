@@ -29,23 +29,22 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file dotnetRuntimeEnvironment.cpp
-///\brief Implementation .NET runtime environment
+//\file dotnetRuntimeEnvironment.cpp
+//\brief Implementation .NET runtime environment
 #include "dotnetRuntimeEnvironment.hpp"
-#include "comauto/function.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
 DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironmentConfig* cfg)
-	:m_clr(cfg->m_clrversion)
+	:m_clr(cfg->clrversion())
 {
-	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->m_assemblylist.begin(), le = cfg->m_assemblylist.end();
+	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->assemblylist().begin(), le = cfg->assemblylist().end();
 	for (; li != le; ++li)
 	{
 		try
 		{
-			std::string path( joinPath( cfg->m_typelibpath, std::string(li->name) + ".tlb"));
+			std::string path( joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
 			m_typelibs.push_back( comauto::TypeLib( path));
 
 			std::vector<comauto::FunctionR> funcs = comauto::loadFunctions( &typelib, &clr, assembly);

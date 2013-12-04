@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file dotnetRuntimeEnvironmentConfig.hpp
-///\brief Interface .NET runtime environment configuration
+//\file dotnetRuntimeEnvironmentConfig.hpp
+//\brief Interface .NET runtime environment configuration
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
@@ -47,6 +47,19 @@ namespace module {
 class DotnetRuntimeEnvironmentConfig
 	:public config::NamedConfiguration
 {
+public:
+	class AssemblyDescription
+	{
+	public:
+		std::string name;
+		std::string description;
+
+		AssemblyDescription(){}
+		AssemblyDescription( const std::string& description_);
+		AssemblyDescription( const AssemblyDescription& o)
+			:name(o.name),description(o.description){}
+	};
+
 public:
 	DotnetRuntimeEnvironmentConfig( const char* className_, const char* name, const char* logParent, const char* logName)
 		:config::NamedConfiguration( name, logParent, logName)
@@ -73,24 +86,24 @@ public:
 		return m_className;
 	}
 
-	std::vector<std::string> programs() const
+	const std::vector<AssemblyDescription>& assemblylist() const
 	{
-		return m_assemblylist();
+		return m_assemblylist;
+	}
+
+	const std::string& clrversion() const
+	{
+		return m_clrversion;
+	}
+
+	const std::string& typelibpath() const
+	{
+		return m_typelibpath;
 	}
 
 private:
 	std::string m_clrversion;
 	std::string m_typelibpath;
-	struct AssemblyDescription
-	{
-		std::string name;
-		std::string description;
-
-		AssemblyDescription(){}
-		AssemblyDescription( const std::string& description_);
-		AssemblyDescription( const AssemblyDescription& o)
-			:name(o.name),description(o.description){}
-	};
 
 	std::vector<AssemblyDescription> m_assemblylist;
 	const char* m_className;

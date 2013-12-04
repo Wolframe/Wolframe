@@ -27,7 +27,9 @@ DYNAMIC_MODULE = \
 	mod_command_dotnet.dll
 
 DOTNET_CPP_OBJS = \
-	dotnetFunctionProgramType.obj
+	dotnetRuntimeEnvironmentBuilder.obj \
+	dotnetRuntimeEnvironmentConfig.obj \
+	dotnetRuntimeEnvironment.obj
 
 DOTNET_INTEROP_CPP_OBJS = \
 	comauto/clr.obj \
@@ -57,5 +59,4 @@ local_clean:
 local_distclean:
 
 local_test:
-
 

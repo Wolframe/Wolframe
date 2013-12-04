@@ -29,11 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file dotnetRuntimeEnvironment.hpp
-///\brief Interface .NET runtime environment
+//\file dotnetRuntimeEnvironment.hpp
+//\brief Interface .NET runtime environment
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #include "dotnetRuntimeEnvironmentConfig.hpp"
+#include "langbind/formFunction.hpp"
 #include "types/keymap.hpp"
 #include "comauto/clr.hpp"
 #include "comauto/typelib.hpp"
@@ -44,8 +45,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-
-///\class DotnetRuntimeEnvironment
+//\class DotnetRuntimeEnvironment
 class DotnetRuntimeEnvironment
 	:public prgbind::RuntimeEnvironment
 {
@@ -57,7 +57,7 @@ public:
 
 	virtual std::vector<std::string> functions() const
 	{
-		return m_functionmap.getkeys<std::vector<std::string> >(); 
+		return m_functionmap.getkeys<std::vector<std::string> >();
 	}
 
 private:
