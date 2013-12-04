@@ -1,6 +1,6 @@
 #ifndef _Wolframe_COM_AUTOMATION_TYPELIB_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_TYPELIB_HPP_INCLUDED
-#include "comauto_utils.hpp"
+#include "comauto/utils.hpp"
 #include <oaidl.h>
 #include <comdef.h>
 #include <atlbase.h>

@@ -1,6 +1,6 @@
 #ifndef _Wolframe_COM_AUTOMATION_CLR_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_CLR_HPP_INCLUDED
-#include "comauto_utils.hpp"
+#include "comauto/utils.hpp"
 #include <cstring>
 #include <string>
 #include <vector>

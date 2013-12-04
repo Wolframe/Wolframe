@@ -1,5 +1,5 @@
-#include "comauto_clr.hpp"
-#include "comauto_utils.hpp"
+#include "comauto/clr.hpp"
+#include "comauto/utils.hpp"
 #include <mscoree.h>
 #include <metahost.h>
 #pragma comment(lib,"MSCorEE.lib") 

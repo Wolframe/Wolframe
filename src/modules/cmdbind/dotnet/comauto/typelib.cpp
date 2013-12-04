@@ -1,6 +1,6 @@
-#include "comauto_typelib.hpp"
-#include "comauto_utils.hpp"
-#include "comauto_function.hpp"
+#include "comauto/typelib.hpp"
+#include "comauto/utils.hpp"
+#include "comauto/function.hpp"
 #include "ddl_form.hpp"
 #include <iostream>
 #include <sstream>

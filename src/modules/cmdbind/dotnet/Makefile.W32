@@ -27,7 +27,6 @@ DYNAMIC_MODULE = \
 	mod_command_dotnet.dll
 
 DOTNET_CPP_OBJS = \
-	dotnetfilter.obj \
 	dotnetFunctionProgramType.obj
 
 DOTNET_INTEROP_CPP_OBJS = \

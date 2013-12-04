@@ -1,8 +1,8 @@
 #ifndef _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
-#include "comauto_utils.hpp"
-#include "comauto_recordinfo.hpp"
-#include "comauto_typelib.hpp"
+#include "comauto/utils.hpp"
+#include "comauto/recordinfo.hpp"
+#include "comauto/typelib.hpp"
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
 #include <oaidl.h>

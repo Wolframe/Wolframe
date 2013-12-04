@@ -1,5 +1,5 @@
-#include "comauto_recordinfo.hpp"
-#include "comauto_utils.hpp"
+#include "comauto/recordinfo.hpp"
+#include "comauto/utils.hpp"
 #include <cstring>
 #include <limits>
 #pragma warning(disable:4996)

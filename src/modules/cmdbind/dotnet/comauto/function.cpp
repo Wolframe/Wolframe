@@ -1,7 +1,7 @@
-#include "comauto_function.hpp"
-#include "comauto_utils.hpp"
-#include "comauto_clr.hpp"
-#include "comauto_recordinfo.hpp"
+#include "comauto/function.hpp"
+#include "comauto/utils.hpp"
+#include "comauto/clr.hpp"
+#include "comauto/recordinfo.hpp"
 #include <iostream>
 #include <sstream>
 

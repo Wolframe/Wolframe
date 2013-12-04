@@ -56,7 +56,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\include;C:\Boost\boost_1_55_0\boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\include;C:\Boost\boost_1_55_0\boost_1_55_0</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -83,7 +83,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAsManaged>false</CompileAsManaged>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\include;C:\boost\boost_1_51</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\interop\src;..\..\..\interop\src;..\..\..\..\include;C:\boost\boost_1_51</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,11 +96,11 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\comauto_clr.hpp" />
-    <ClInclude Include="..\..\src\comauto_function.hpp" />
-    <ClInclude Include="..\..\src\comauto_recordinfo.hpp" />
-    <ClInclude Include="..\..\src\comauto_typelib.hpp" />
-    <ClInclude Include="..\..\src\comauto_utils.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\recordinfo.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -110,11 +110,11 @@
     <ClCompile Include="..\..\..\..\..\src\libwolframe\typeSignature.cpp" />
     <ClCompile Include="..\..\..\..\..\src\libwolframe\types_variant.cpp" />
     <ClCompile Include="..\..\..\..\..\src\libwolframe\utils_conversions.cpp" />
-    <ClCompile Include="..\..\src\comauto_clr.cpp" />
-    <ClCompile Include="..\..\src\comauto_function.cpp" />
-    <ClCompile Include="..\..\src\comauto_recordinfo.cpp" />
-    <ClCompile Include="..\..\src\comauto_typelib.cpp" />
-    <ClCompile Include="..\..\src\comauto_utils.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\recordinfo.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.cpp" />
     <ClCompile Include="..\..\src\ddl_form.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WolfCLR.cpp">
