@@ -15,7 +15,6 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const 
 		boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 		for (; pi != pe; ++pi)
 		{
-			// optional configuration parameters:
 			if (boost::iequals( pi->first, "filter"))
 			{
 				std::vector<std::string> filterdef;
@@ -33,7 +32,6 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const 
 					throw std::runtime_error( "illegal value for filter declaration. expected two items separated by a '='");
 				}
 			}
-			// required configuration parameters:
 			else if (boost::iequals( pi->first, "program"))
 			{
 				m_programfiles.push_back( pi->second.get_value<std::string>());

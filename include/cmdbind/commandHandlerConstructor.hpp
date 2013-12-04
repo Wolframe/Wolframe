@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/commandHandlerUnit.hpp
-///\brief Interface to command handler units
+///\file cmdbind/commandHandlerConstructor.hpp
+///\brief Interface to command handler constructors
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
@@ -67,4 +67,4 @@ public:
 
 }} //namespace _Wolframe::cmdbind
 
-#endif // _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#endif

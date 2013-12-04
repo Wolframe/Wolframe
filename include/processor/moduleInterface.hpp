@@ -96,6 +96,7 @@ public:
 
 	/// the virtual constructor for the object
 	virtual ObjectConstructorBase* constructor() = 0;
+
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
 	const char* m_section;		///< configuration section to which the

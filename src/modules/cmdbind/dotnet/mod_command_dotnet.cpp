@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_command_python.cpp
-///\brief Module for command handler executing python code
+///\file mod_command_dotnet.cpp
+///\brief Module for calling functions as methods defined in .NET assemblies via .NET interop
 #include "module/programTypeBuilder.hpp"
-#include "pythonFunctionProgramType.hpp"
+#include "dotnetFunctionProgramType.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -46,36 +46,26 @@ static void setModuleLogger( void* logger)
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
+namespace {
+static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
 {
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
+	static DotnetRuntimeEnvironmentBuilder
+		mod( "DotnetRuntimeEnvironment", "runtime environment for .NET", "runtimeenv", "dotnet", "RuntimeEnvironment");
 	return &mod;
 }
-*/
 
-static SimpleBuilder* pythonProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
+}//anonymous namespace
 
-enum {NofConfiguredBuilder=0};
-/* LATER
+enum {NofConfiguredBuilder=1};
+enum {NofSimpleBuilder=0};
 static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
 {
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
+	createDotnetRuntimeEnvironmentBuilder
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
+ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
 				setModuleLogger,
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
+				NofConfiguredBuilder, configuredBuilder,
+				NofSimpleBuilder, 0);
 
 

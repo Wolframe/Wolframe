@@ -57,7 +57,7 @@ class LuaTableInputFilter :public TypedInputFilter, public LuaExceptionHandlerSc
 {
 public:
 	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableInputFilter::getNext(ElementType&,types::VariantConst&)
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaInputFilter::getNext(ElementType&,types::VariantConst&)
 	explicit LuaTableInputFilter( lua_State* ls);
 
 	///\brief Copy constructor

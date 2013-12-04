@@ -36,7 +36,7 @@ Project Wolframe.
 #include "luaCommandHandler.hpp"
 #include "luaScriptContext.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/moduleInterface.hpp"

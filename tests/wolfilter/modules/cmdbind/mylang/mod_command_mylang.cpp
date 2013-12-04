@@ -48,7 +48,7 @@ static void setModuleLogger( void* logger)
 
 static SimpleBuilder* mylangProgramTypeBuilder()
 {
-	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "mylang", langbind::createMylangProgramType);
+	return new ProgramTypeBuilder( "MylangProgramType", "mylang", langbind::createMylangProgramType);
 }
 
 enum {NofConfiguredBuilder=0};

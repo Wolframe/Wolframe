@@ -35,7 +35,7 @@ Project Wolframe.
 #define _Wolframe_DIRECTMAP_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
 #include "directmapCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/moduleInterface.hpp"
@@ -47,7 +47,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-///\brief Named configuration definition based on a langbind::ScriptEnvironmentConfigStruct structure
+///\brief Named configuration definition
 class DirectmapCommandHandlerConfig
 	:public config::NamedConfiguration
 {

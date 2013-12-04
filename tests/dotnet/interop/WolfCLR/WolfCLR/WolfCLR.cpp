@@ -1,10 +1,10 @@
 // WolfCLR.cpp : Defines the entry point for the console application.
 //
 #include "stdafx.h"
-#include "comauto_utils.hpp"
-#include "comauto_typelib.hpp"
-#include "comauto_clr.hpp"
-#include "comauto_function.hpp"
+#include "comauto/utils.hpp"
+#include "comauto/typelib.hpp"
+#include "comauto/clr.hpp"
+#include "comauto/function.hpp"
 #include "ddl_form.hpp"
 #include <iostream>
 

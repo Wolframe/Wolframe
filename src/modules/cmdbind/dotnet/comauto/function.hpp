@@ -36,16 +36,16 @@ public:
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
-	const proc::ProcessorProvider* m_provider;						//< processor provider reference for function called
-	const Function* m_func;											//< function to call
-	langbind::TypedInputFilterR m_input;							//< input parameters
-	serialize::Context::Flags m_flags;								//< flag passed by called to stear validation strictness
-	VARIANT* m_param;												//< array of function parameters to initialize
+	const proc::ProcessorProvider* m_provider;			//< processor provider reference for function called
+	const Function* m_func;						//< function to call
+	langbind::TypedInputFilterR m_input;				//< input parameters
+	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
+	VARIANT* m_param;						//< array of function parameters to initialize
 	enum {null_paramidx=0xFFFF};
-	std::size_t m_paramidx;											//< currently selected parameter of the function [0,1,.. n-1]
-	TypeLib::AssignmentClosureR m_paramclosure;						//< closure for current parameter assignment
-	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;		//< temporary buffer for parameters passed as array (with their name)
-	langbind::TypedInputFilterR m_result;							//< reference to result of the function call
+	std::size_t m_paramidx;						//< currently selected parameter of the function [0,1,.. n-1]
+	TypeLib::AssignmentClosureR m_paramclosure;			//< closure for current parameter assignment
+	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;	//< temporary buffer for parameters passed as array (with their name)
+	langbind::TypedInputFilterR m_result;				//< reference to result of the function call
 };
 
 
@@ -82,16 +82,16 @@ public:
 	Function( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx);
 	virtual ~Function();
 
-	const std::string& assemblyname() const								{return m_assemblyname;}
-	const std::string& classname() const								{return m_classname;}
-	const std::string& methodname() const								{return m_methodname;}
-	std::size_t nofParameter() const									{return m_parameterlist.size();}
+	const std::string& assemblyname() const				{return m_assemblyname;}
+	const std::string& classname() const				{return m_classname;}
+	const std::string& methodname() const				{return m_methodname;}
+	std::size_t nofParameter() const				{return m_parameterlist.size();}
 	std::size_t getParameterIndex( const std::string& name) const;
 	const Parameter* getParameter( std::size_t idx) const;
-	comauto::CommonLanguageRuntime* clr() const							{return m_clr;}
-	const comauto::TypeLib* typelib() const								{return m_typelib;}
-	const ITypeInfo* typeinfo() const									{return m_typeinfo;}
-	const ReturnType* getReturnType() const								{return &m_returntype;}
+	comauto::CommonLanguageRuntime* clr() const			{return m_clr;}
+	const comauto::TypeLib* typelib() const				{return m_typelib;}
+	const ITypeInfo* typeinfo() const				{return m_typeinfo;}
+	const ReturnType* getReturnType() const				{return &m_returntype;}
 
 	void print( std::ostream& out) const;
 	virtual langbind::FormFunctionClosure* createClosure() const		{return new FunctionClosure(this);}

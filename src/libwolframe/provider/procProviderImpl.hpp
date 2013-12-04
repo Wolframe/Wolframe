@@ -40,8 +40,9 @@
 #include "processor/procProvider.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandlerConstructor.hpp"
 #include "prgbind/programLibrary.hpp"
+#include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include <list>
 #include <map>
 
@@ -99,6 +100,8 @@ private:
 
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;
+	std::vector<prgbind::RuntimeEnvironmentDef> m_runtime_environment_defs;
+	std::vector<prgbind::RuntimeEnvironmentR> m_runtime_environments;
 };
 
 }} // namespace _Wolframe::proc

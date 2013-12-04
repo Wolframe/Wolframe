@@ -59,6 +59,7 @@ public:
 		CMD_HANDLER_OBJECT,
 		LANGUAGE_EXTENSION_OBJECT,
 		PROGRAM_TYPE_OBJECT,
+		RUNTIME_ENVIRONMENT_OBJECT,
 		TEST_OBJECT
 	};
 
@@ -79,9 +80,14 @@ public:
 			"Command Handler",
 			"Language Extension",
 			"Form Function Program Type",
+			"Runtime Environment",
 			"Test"
 		};
 		return ar[ (int)tp];
+	}
+	const char* objectTypeName()
+	{
+		return objectTypeName( objectType());
 	}
 
 	virtual ~ObjectConstructorBase()	{}

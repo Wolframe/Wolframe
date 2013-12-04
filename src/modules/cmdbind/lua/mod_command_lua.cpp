@@ -57,7 +57,7 @@ static ConfiguredBuilder* createLuaCommandHandler()
 }
 static SimpleBuilder* createLuaProgramType()
 {
-	return new ProgramTypeBuilder( "module::ProgramTypeBuilder", "luaformfunc", langbind::createLuaProgramType);
+	return new ProgramTypeBuilder( "LuaProgramType", "luaformfunc", langbind::createLuaProgramType);
 }
 }//anonymous namespace
 

@@ -41,6 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
+#include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -105,6 +106,22 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						}
 						LOG_TRACE << "Command '" << opName << "' registered for '" << cnstrctr->objectClassName() << "' command handler";
 					}
+				}
+			}
+			else if (builder->objectType() == ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT)
+			{
+				prgbind::RuntimeEnvironmentConstructor* constructor =
+					dynamic_cast<prgbind::RuntimeEnvironmentConstructor*>( builder->constructor());
+
+				if (!constructor)	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << builder->objectClassName()
+						  << "' is not a runtime environment constructor";
+					throw std::logic_error( "Object is not a runtime environment constructor. See log." );
+				}
+				else
+				{
+					prgbind::RuntimeEnvironmentConstructorR cref( constructor);
+					m_runtime_environment_defs.push_back( prgbind::RuntimeEnvironmentDef( cref, *it));
 				}
 			}
 			else	{
@@ -261,43 +278,21 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				break;
 			}
-
-			case ObjectConstructorBase::AUDIT_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as an AUDIT_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
-			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as an AUTHENTICATION_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
-			case ObjectConstructorBase::AUTHORIZATION_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as an AUTHORIZATION_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
-			case ObjectConstructorBase::JOB_SCHEDULE_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as an JOB_SCHEDULE_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
-			case ObjectConstructorBase::DATABASE_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as a DATABASE_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
-			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as a CMD_HANDLER_OBJECT but has a simple object constructor";
-				throw std::logic_error( "Object is not a valid simple object. See log." );
-				break;
 			case ObjectConstructorBase::LANGUAGE_EXTENSION_OBJECT:
 				// ... language extension modules are not handled here
 				break;
+
+			case ObjectConstructorBase::AUDIT_OBJECT:
+			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
+			case ObjectConstructorBase::AUTHORIZATION_OBJECT:
+			case ObjectConstructorBase::JOB_SCHEDULE_OBJECT:
+			case ObjectConstructorBase::DATABASE_OBJECT:
+			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
+			case ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT:
 			case ObjectConstructorBase::TEST_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as a TEST_OBJECT but has a simple object constructor";
+					  << "'' is marked as '" << ObjectConstructorBase::objectTypeName( it->objectType())
+					  << "' object but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			default:
@@ -322,6 +317,23 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 		// load all globally defined programs:
 		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
 		return true;
+
+		// load functions based on a configured runtime environment:
+		std::vector<prgbind::RuntimeEnvironmentDef>::const_iterator ri = m_runtime_environment_defs.begin(), re = m_runtime_environment_defs.end();
+		for (; ri != re; ++ri)
+		{
+			prgbind::RuntimeEnvironmentR env( ri->constructor->object( *ri->configuration));
+			m_runtime_environments.push_back( env);
+
+			std::vector<std::string> functionlist = env->functions();
+			std::vector<std::string>::const_iterator fi = functionlist.begin(), fe = functionlist.end();
+			for (; fi != fe; ++fi)
+			{
+				langbind::FormFunctionR func( new prgbind::RuntimeEnvironmentFormFunction( *fi, env.get()));
+				m_programs->defineFormFunction( *fi, func);
+				LOG_TRACE << "Function '" << *fi << "' registered as '" << ri->constructor->objectClassName() << "' function";
+			}
+		}
 	}
 	catch (const std::runtime_error& e)
 	{
