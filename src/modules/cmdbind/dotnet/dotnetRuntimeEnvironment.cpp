@@ -32,6 +32,7 @@ Project Wolframe.
 //\file dotnetRuntimeEnvironment.cpp
 //\brief Implementation .NET runtime environment
 #include "dotnetRuntimeEnvironment.hpp"
+#include "utils/fileUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
@@ -40,20 +41,20 @@ DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironme
 	:m_clr(cfg->clrversion())
 {
 	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->assemblylist().begin(), le = cfg->assemblylist().end();
-	for (; li != le; ++li)
+	for (int typelibidx=0; li != le; ++li,++typelibidx)
 	{
 		try
 		{
-			std::string path( joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
+			std::string path( utils::joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
 			m_typelibs.push_back( comauto::TypeLib( path));
 
-			std::vector<comauto::FunctionR> funcs = comauto::loadFunctions( &typelib, &clr, assembly);
-			std::vector<comauto::FunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
+			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->name);
+			std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		
 			for (; fi != fe; ++fi)
 			{
 				std::string funcname( (*fi)->classname() + "." + (*fi)->methodname());
-				m_functionmap.insert( funcname, *fi);
+				m_functionmap.insert( funcname, FunctionDescr( typelibidx,*fi));
 			}
 		}
 		catch (const std::runtime_error& e)
@@ -74,7 +75,7 @@ langbind::FormFunctionClosure* DotnetRuntimeEnvironment::createClosure( const st
 	{
 		throw std::runtime_error( std::string( ".NET function not found: '") + funcname + "'");
 	}
-	return comauto::FunctionClosure( fi->second.m_func.get());
+	return fi->second.m_func->createClosure();
 }
 
 

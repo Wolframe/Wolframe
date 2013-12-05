@@ -31,15 +31,26 @@ Project Wolframe.
 ************************************************************************/
 //\file dotnetRuntimeEnvironmentBuilder.cpp
 #include "dotnetRuntimeEnvironmentBuilder.hpp"
+#include "dotnetRuntimeEnvironment.hpp"
 #include "comauto/utils.hpp"
 
-DotnetRuntimeEnvironmentBuilder::DotnetRuntimeEnvironmentBuilder( const char* classname_, const char* title, const char* section, const char* keyword, const char* id)
-	:ConfiguredBuilder( title, section, keyword, id)
+using namespace _Wolframe;
+
+module::DotnetRuntimeEnvironment* module::DotnetRuntimeEnvironmentConstructor::object( const config::NamedConfiguration& cfgi)
+{
+	const DotnetRuntimeEnvironmentConfig* cfg = dynamic_cast<const DotnetRuntimeEnvironmentConfig*>(&cfgi);
+	if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");
+	DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);
+	return rt;
+}
+
+module::DotnetRuntimeEnvironmentBuilder::DotnetRuntimeEnvironmentBuilder( const char* title_, const char* section_, const char* keyword_, const char* classname_)
+	:ConfiguredBuilder( title_, section_, keyword_, classname_)
 {
 	WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED));
 }
 
-DotnetRuntimeEnvironmentBuilder::~DotnetRuntimeEnvironmentBuilder()
+module::DotnetRuntimeEnvironmentBuilder::~DotnetRuntimeEnvironmentBuilder()
 {
 }
 

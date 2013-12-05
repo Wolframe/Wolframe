@@ -38,8 +38,8 @@ Project Wolframe.
 #include "types/keymap.hpp"
 #include "comauto/clr.hpp"
 #include "comauto/typelib.hpp"
+#include "comauto/function.hpp"
 #include <string>
-#include <map>
 #include <vector>
 
 namespace _Wolframe {
@@ -67,11 +67,11 @@ private:
 	struct FunctionDescr
 	{
 		std::size_t m_typelibidx;
-		comauto::FunctionR m_func;
+		comauto::DotnetFunctionR m_func;
 
 		FunctionDescr()
 			:m_typelibidx(0){}
-		FunctionDescr( std::size_t typelibidx_, const comauto::FunctionR& func_)
+		FunctionDescr( std::size_t typelibidx_, const comauto::DotnetFunctionR& func_)
 			:m_typelibidx(typelibidx_),m_func(func_){}
 		FunctionDescr( const FunctionDescr& o)
 			:m_typelibidx(o.m_typelibidx),m_func(o.m_func){}
@@ -79,7 +79,7 @@ private:
 	types::keymap<FunctionDescr> m_functionmap;
 };
 
-}} namespace
+}} //namespace
 #endif
 
 

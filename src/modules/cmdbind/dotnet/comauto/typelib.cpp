@@ -1,7 +1,37 @@
+/************************************************************************
+Copyright (C) 2011 - 2013 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
 #include "comauto/typelib.hpp"
 #include "comauto/utils.hpp"
 #include "comauto/function.hpp"
-#include "ddl_form.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -9,13 +39,108 @@
 #include <cstring>
 #include <oaidl.h>
 #include <comdef.h>
-#include <atlbase.h>
 #include <atlcom.h>
+#include <atlbase.h>
 
 using namespace _Wolframe;
 
-comauto::TypeLib::TypeLib( const std::string& file)
-	:m_typelib(0),m_libattr(0)
+class comauto::AssignmentClosure::Impl
+{
+public:
+	Impl();
+	Impl( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, VARTYPE outtype, bool single_);
+	Impl( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_);
+	virtual ~Impl(){}
+
+	bool call( VARIANT& value);
+	std::string variablepath() const;
+	const IRecordInfo* recinfo() const		{return m_recinfo;}
+
+private:
+	struct StackElem
+	{
+		ITypeInfo* typeinfo;
+		TYPEATTR* typeattr;
+		const IRecordInfo* recinfo;
+		VARTYPE vt;
+		VARIANT value;
+		std::string key;
+		std::map<std::string,int> keymap;
+		std::map<std::size_t,std::vector<VARIANT> > elemar;
+
+		StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt_);
+		StackElem( VARTYPE vt_);
+		StackElem( const StackElem& o);
+		~StackElem();
+	};
+
+private:
+	const TypeLib* m_typelib;
+	const ITypeInfo* m_typeinfo;
+	const IRecordInfo* m_recinfo;
+	std::vector<StackElem> m_stk;
+	langbind::TypedInputFilterR m_input;
+	VARTYPE m_outtype;
+	bool m_single;
+};
+
+comauto::AssignmentClosure::AssignmentClosure()
+	:m_impl(new Impl())
+{}
+
+comauto::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, unsigned short/*VARTYPE*/ outtype, bool single_)
+	:m_impl( new Impl( typelib_, input_, outtype, single_))
+{}
+
+comauto::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_)
+	:m_impl( new Impl( typelib_, input_, typeinfo_))
+{}
+
+comauto::AssignmentClosure::~AssignmentClosure()
+{
+	delete m_impl;
+}
+
+bool comauto::AssignmentClosure::call( VARIANT& value)
+{
+	return m_impl->call( value);
+}
+
+std::string comauto::AssignmentClosure::variablepath() const
+{
+	return m_impl->variablepath();
+}
+
+const IRecordInfo* comauto::AssignmentClosure::recinfo() const
+{
+	return m_impl->recinfo();
+}
+
+
+class comauto::TypeLib::Impl
+{
+public:
+	explicit Impl( const std::string& file, comauto::TypeLib* this_);
+	virtual ~Impl();
+
+	void print( std::ostream& out) const;
+	void printvalue( std::ostream& out, const std::string& name, const VARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt=0) const;
+
+	const IRecordInfo* getRecordInfo( const ITypeInfo* typeinfo) const;
+
+	const ITypeLib* typelib() const			{return m_typelib;}
+	const TLIBATTR* libattr() const			{return m_libattr;}
+
+private:
+	comauto::TypeLib* m_this;
+	ITypeLib* m_typelib;
+	TLIBATTR* m_libattr;
+};
+
+
+
+comauto::TypeLib::Impl::Impl( const std::string& file, comauto::TypeLib* this_)
+	:m_this(this_),m_typelib(0),m_libattr(0)
 {
 	try
 	{
@@ -31,7 +156,7 @@ comauto::TypeLib::TypeLib( const std::string& file)
 
 }
 
-comauto::TypeLib::~TypeLib()
+comauto::TypeLib::Impl::~Impl()
 {
 	if (m_typelib)
 	{
@@ -73,7 +198,7 @@ static void printAttributes( std::ostream& out, const char* title, const comauto
 			}
 			for (ii = 0; ii < typeattr->cFuncs; ++ii)
 			{
-				comauto::Function func( 0, typelib, typeinfo, "", "", ii);
+				comauto::DotnetFunction func( 0, typelib, typeinfo, "", "", ii);
 				if (!comauto::isCOMInterfaceMethod( func.methodname()))
 				{
 					out << std::string( indentcnt+1, '\t');
@@ -185,12 +310,12 @@ static void printItem( std::ostream& out, const comauto::TypeLib* typelib, int i
 	}
 }
 
-void comauto::TypeLib::print( std::ostream& out) const
+void comauto::TypeLib::Impl::print( std::ostream& out) const
 {
-	printItem( out, this);
+	printItem( out, m_this);
 }
 
-void comauto::TypeLib::printvalue( std::ostream& out, const std::string& name, const VARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt) const
+void comauto::TypeLib::Impl::printvalue( std::ostream& out, const std::string& name, const VARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt) const
 {
 	VARIANT elem;
 	elem.vt = VT_EMPTY;
@@ -252,7 +377,7 @@ void comauto::TypeLib::printvalue( std::ostream& out, const std::string& name, c
 	}
 }
 
-const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) const
+const IRecordInfo* comauto::TypeLib::Impl::getRecordInfo( const ITypeInfo* typeinfo) const
 {
 	LCID lcid_US = 0x0409;
 	IRecordInfo* rt = NULL;
@@ -282,7 +407,7 @@ const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) c
 	return rt;
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt_)
+comauto::AssignmentClosure::Impl::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt_)
 	:typeinfo(typeinfo_),typeattr(0),recinfo(recinfo_),vt(vt_)
 {
 	if (!typeinfo) throw std::logic_error( "illegal state in AssignmentClosure::StackElem");
@@ -315,13 +440,13 @@ comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_,
 	}
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem( VARTYPE vt_)
+comauto::AssignmentClosure::Impl::StackElem::StackElem( VARTYPE vt_)
 	:typeinfo(0),typeattr(0),recinfo(0),vt(vt_)
 {
 	value.vt = VT_EMPTY;
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem( const StackElem& o)
+comauto::AssignmentClosure::Impl::StackElem::StackElem( const StackElem& o)
 	:typeinfo(o.typeinfo),typeattr(0),recinfo(o.recinfo),vt(o.vt),key(o.key),keymap(o.keymap),elemar(o.elemar)
 {
 	value.vt = VT_EMPTY;
@@ -333,7 +458,7 @@ comauto::TypeLib::AssignmentClosure::StackElem::StackElem( const StackElem& o)
 	}
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::~StackElem()
+comauto::AssignmentClosure::Impl::StackElem::~StackElem()
 {
 	if (typeinfo)
 	{
@@ -343,7 +468,7 @@ comauto::TypeLib::AssignmentClosure::StackElem::~StackElem()
 	}
 }
 
-std::string comauto::TypeLib::AssignmentClosure::variablepath() const
+std::string comauto::AssignmentClosure::Impl::variablepath() const
 {
 	std::string rt;
 	std::vector<StackElem>::const_iterator si = m_stk.begin(), se = m_stk.end();
@@ -358,7 +483,7 @@ std::string comauto::TypeLib::AssignmentClosure::variablepath() const
 	return rt;
 }
 
-bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
+bool comauto::AssignmentClosure::Impl::call( VARIANT& output)
 {
 	VARIANT value;
 	value.vt = VT_EMPTY;
@@ -554,20 +679,55 @@ AGAIN:
 	}
 }
 
-comauto::TypeLib::AssignmentClosure::AssignmentClosure()
+comauto::AssignmentClosure::Impl::Impl()
 	:m_typelib(0),m_typeinfo(0),m_recinfo(0),m_outtype(VT_EMPTY),m_single(false)
 {}
 
-comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, VARTYPE outtype_, bool single_)
+comauto::AssignmentClosure::Impl::Impl( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, VARTYPE outtype_, bool single_)
 	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo(0),m_recinfo(0),m_input(input_),m_outtype(outtype_),m_single(single_)
 {
 	m_stk.push_back( StackElem( outtype_));
 }
 
-comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_)
+comauto::AssignmentClosure::Impl::Impl( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_)
 	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo( const_cast<ITypeInfo*>(typeinfo_)),m_recinfo(0),m_input(input_),m_outtype(VT_USERDEFINED),m_single(false)
 {
 	m_recinfo = m_typelib->getRecordInfo( m_typeinfo);
 	m_stk.push_back( StackElem( const_cast<ITypeInfo*>(m_typeinfo), m_recinfo, VT_RECORD));
+}
+
+
+comauto::TypeLib::TypeLib( const std::string& file)
+	:m_impl( new Impl(file,this))
+{}
+
+comauto::TypeLib::~TypeLib()
+{
+	delete m_impl;
+}
+
+void comauto::TypeLib::print( std::ostream& out) const
+{
+	m_impl->print( out);
+}
+
+void comauto::TypeLib::printvalue( std::ostream& out, const std::string& name, const tagVARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt) const
+{
+	m_impl->printvalue( out, name, val, typeinfo, indentcnt);
+}
+
+const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) const
+{
+	return m_impl->getRecordInfo( typeinfo);
+}
+
+const ITypeLib* comauto::TypeLib::typelib() const
+{
+	return m_impl->typelib();
+}
+
+const tagTLIBATTR* comauto::TypeLib::libattr() const
+{
+	return m_impl->libattr();
 }
 

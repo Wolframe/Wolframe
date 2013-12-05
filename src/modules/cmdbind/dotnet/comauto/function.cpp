@@ -1,11 +1,133 @@
+/************************************************************************
+Copyright (C) 2011 - 2013 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
 #include "comauto/function.hpp"
 #include "comauto/utils.hpp"
 #include "comauto/clr.hpp"
-#include "comauto/recordinfo.hpp"
+#include "comauto/typelib.hpp"
+#include <oaidl.h>
+#include <comdef.h>
+#include <atlbase.h>
+#include <atlcom.h>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
 #include <iostream>
 #include <sstream>
 
 using namespace _Wolframe;
+using namespace _Wolframe::comauto;
+
+class DotnetFunctionClosure::Impl
+{
+public:
+	Impl( const DotnetFunction* func_);
+
+	~Impl();
+	bool call();
+
+	void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+
+	langbind::TypedInputFilterR result() const;
+
+private:
+	const proc::ProcessorProvider* m_provider;			//< processor provider reference for function called
+	const DotnetFunction* m_func;					//< function to call
+	langbind::TypedInputFilterR m_input;				//< input parameters
+	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
+	VARIANT* m_param;						//< array of function parameters to initialize
+	enum {null_paramidx=0xFFFF};
+	std::size_t m_paramidx;						//< currently selected parameter of the function [0,1,.. n-1]
+	AssignmentClosureR m_paramclosure;			//< closure for current parameter assignment
+	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;	//< temporary buffer for parameters passed as array (with their name)
+	langbind::TypedInputFilterR m_result;				//< reference to result of the function call
+};
+
+class DotnetFunction::Impl
+{
+public:
+	struct Parameter
+	{
+		enum AddrMode {Value,Safearray};
+
+		Parameter( const Parameter& o);
+		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_);
+		~Parameter();
+
+		std::string name;
+		AddrMode addrMode;
+		const TYPEDESC* typedesc;
+		const ITypeInfo* typeinfo;
+	};
+
+	struct ReturnType
+	{
+		ReturnType( const ReturnType& o);
+		ReturnType( const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_);
+		explicit ReturnType( const TYPEDESC* typedesc_=0);
+		~ReturnType();
+
+		const TYPEDESC* typedesc;
+		const ITypeInfo* typeinfo;
+	};
+
+public:
+	Impl( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx);
+	~Impl();
+
+	const std::string& assemblyname() const				{return m_assemblyname;}
+	const std::string& classname() const				{return m_classname;}
+	const std::string& methodname() const				{return m_methodname;}
+	std::size_t nofParameter() const				{return m_parameterlist.size();}
+	std::size_t getParameterIndex( const std::string& name) const;
+	const Parameter* getParameter( std::size_t idx) const;
+	comauto::CommonLanguageRuntime* clr() const			{return m_clr;}
+	const comauto::TypeLib* typelib() const				{return m_typelib;}
+	const ITypeInfo* typeinfo() const				{return m_typeinfo;}
+	const ReturnType* getReturnType() const				{return &m_returntype;}
+
+	void print( std::ostream& out) const;
+
+private:
+	comauto::CommonLanguageRuntime* m_clr;
+	const comauto::TypeLib* m_typelib;
+	const ITypeInfo* m_typeinfo;
+	FUNCDESC* m_funcdesc;
+	std::string m_assemblyname;
+	std::string m_classname;
+	std::string m_methodname;
+	std::vector<Parameter> m_parameterlist;
+	ReturnType m_returntype;
+};
 
 namespace
 {
@@ -66,7 +188,7 @@ private:
 }//anonymous namespace
 
 
-static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typeinfo, std::vector<comauto::FunctionR>& funcs, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname, const std::string& classname)
+static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typeinfo, std::vector<comauto::DotnetFunctionR>& funcs, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname, const std::string& classname)
 {
 	TYPEATTR* typeattr = 0;
 	ITypeInfo* classtypeinfo = 0;
@@ -86,7 +208,7 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 			}
 			for (ii = 0; ii < typeattr->cFuncs; ++ii)
 			{
-				comauto::FunctionR func( new comauto::Function( clr, typelib, typeinfo, assemblyname, classname, ii));
+				comauto::DotnetFunctionR func( new comauto::DotnetFunction( clr, typelib, typeinfo, assemblyname, classname, ii));
 				if (!comauto::isCOMInterfaceMethod( func->methodname()))
 				{
 					funcs.push_back( func);
@@ -123,9 +245,9 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 	}
 }
 
-std::vector<comauto::FunctionR> comauto::loadFunctions( const comauto::TypeLib* typelib, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname)
+std::vector<comauto::DotnetFunctionR> comauto::loadFunctions( const comauto::TypeLib* typelib, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname)
 {
-	std::vector<comauto::FunctionR> rt;
+	std::vector<comauto::DotnetFunctionR> rt;
 	ITypeInfo* typeinfo = 0;
 	try
 	{
@@ -150,45 +272,44 @@ std::vector<comauto::FunctionR> comauto::loadFunctions( const comauto::TypeLib* 
 }
 
 
-comauto::Function::Parameter::Parameter( const Parameter& o)
+comauto::DotnetFunction::Impl::Parameter::Parameter( const Parameter& o)
 	:name(o.name),addrMode(o.addrMode),typedesc(o.typedesc),typeinfo(o.typeinfo)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
 
-comauto::Function::Parameter::Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_)
+comauto::DotnetFunction::Impl::Parameter::Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_)
 	:name(name_),addrMode(addrMode_),typedesc(typedesc_),typeinfo(typeinfo_)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
 
-comauto::Function::Parameter::~Parameter()
+comauto::DotnetFunction::Impl::Parameter::~Parameter()
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->Release();
 }
 
-comauto::Function::ReturnType::ReturnType( const ReturnType& o)
+comauto::DotnetFunction::Impl::ReturnType::ReturnType( const ReturnType& o)
 	:typedesc(o.typedesc),typeinfo(o.typeinfo)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
 
-comauto::Function::ReturnType::ReturnType( const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_)
+comauto::DotnetFunction::Impl::ReturnType::ReturnType( const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_)
 	:typedesc(typedesc_),typeinfo(typeinfo_)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
 
-comauto::Function::ReturnType::ReturnType( const TYPEDESC* typedesc_)
+comauto::DotnetFunction::Impl::ReturnType::ReturnType( const TYPEDESC* typedesc_)
 	:typedesc(typedesc_),typeinfo(0){}
 
-comauto::Function::ReturnType::~ReturnType()
+comauto::DotnetFunction::Impl::ReturnType::~ReturnType()
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->Release();
 }
 
-
-comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
+comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
 	:m_clr(clr_)
 	,m_typelib(typelib_)
 	,m_typeinfo(typeinfo_)
@@ -261,7 +382,7 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto
 	}
 }
 
-comauto::Function::~Function()
+comauto::DotnetFunction::Impl::~Impl()
 {
 	if (m_typeinfo)
 	{
@@ -270,7 +391,7 @@ comauto::Function::~Function()
 	}
 }
 
-void comauto::Function::print( std::ostream& out) const
+void comauto::DotnetFunction::Impl::print( std::ostream& out) const
 {
 	if (m_classname.empty())
 	{
@@ -289,7 +410,7 @@ void comauto::Function::print( std::ostream& out) const
 	out << " ) :" << comauto::typestr( m_typeinfo, m_returntype.typedesc) << std::endl;
 }
 
-std::size_t comauto::Function::getParameterIndex( const std::string& name) const
+std::size_t comauto::DotnetFunction::Impl::getParameterIndex( const std::string& name) const
 {
 	std::vector<Parameter>::const_iterator pi = m_parameterlist.begin(), pe = m_parameterlist.end();
 	for (; pi != pe; ++pi)
@@ -299,13 +420,13 @@ std::size_t comauto::Function::getParameterIndex( const std::string& name) const
 	throw std::runtime_error( std::string("unknown parameter name '") + name + "'");
 }
 
-const comauto::Function::Parameter* comauto::Function::getParameter( std::size_t idx) const
+const comauto::DotnetFunction::Impl::Parameter* comauto::DotnetFunction::Impl::getParameter( std::size_t idx) const
 {
 	if (idx >= m_parameterlist.size()) throw std::runtime_error( "parameter index out of range");
 	return &m_parameterlist.at( idx);
 }
 
-comauto::FunctionClosure::FunctionClosure( const Function* func_)
+comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
 		:m_provider(0)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
@@ -323,11 +444,11 @@ static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 	ap.clear();
 }
 
-comauto::FunctionClosure::~FunctionClosure()
+comauto::DotnetFunctionClosure::Impl::~Impl()
 {
 	if (m_param)
 	{
-		std::size_t pi = 0, pe = m_func->nofParameter();
+		std::size_t pi = 0, pe = m_func->m_impl->nofParameter();
 		for (; pi != pe; ++pi)
 		{
 			comauto::wrapVariantClear( &m_param[pi]);
@@ -337,15 +458,15 @@ comauto::FunctionClosure::~FunctionClosure()
 	clearArrayParam( m_arrayparam);
 }
 
-void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
 	m_provider = p;
 	m_input = i;
 	m_flags = f;
-	std::size_t ii = 0,nn = m_func->nofParameter();
+	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
 	if (m_param) delete [] m_param;
 	m_param = 0;	//... because of exception safety (new VARIANT[] might fail)
-	m_param = new VARIANT[ m_func->nofParameter()];
+	m_param = new VARIANT[ m_func->m_impl->nofParameter()];
 	for (; ii < nn; ++ii)
 	{
 		m_param[ii].vt = VT_EMPTY;
@@ -355,7 +476,7 @@ void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const lan
 }
 
 
-bool comauto::FunctionClosure::call()
+bool comauto::DotnetFunctionClosure::Impl::call()
 {
 AGAIN:
 	try
@@ -375,17 +496,17 @@ AGAIN:
 					if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
 					return false;
 				}
-				const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
+				const DotnetFunction::Impl::Parameter* paramdescr = m_func->m_impl->getParameter( m_paramidx);
 				if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
 
 				switch (paramdescr->addrMode)
 				{
-					case Function::Parameter::Value:
+					case DotnetFunction::Impl::Parameter::Value:
 					{
 						m_param[ m_paramidx] = paramvalue;
 						break;
 					}
-					case Function::Parameter::Safearray:
+					case DotnetFunction::Impl::Parameter::Safearray:
 					{
 						m_arrayparam[ m_paramidx].push_back( paramvalue);
 						paramvalue.vt = VT_EMPTY;
@@ -411,25 +532,25 @@ AGAIN:
 					if (elemvalue.type() == types::Variant::Int)
 					{
 						__int64 val = elemvalue.data().value.Int;
-						if (val < 0 || (std::size_t)val >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						if (val < 0 || (std::size_t)val >= m_func->m_impl->nofParameter()) throw std::runtime_error( "function parameter index out of range");
 						m_paramidx = (std::size_t)val;
 					}
 					else if (elemvalue.type() == types::Variant::UInt)
 					{
 						unsigned __int64 val = elemvalue.data().value.UInt;
-						if ((std::size_t)val >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						if ((std::size_t)val >= m_func->m_impl->nofParameter()) throw std::runtime_error( "function parameter index out of range");
 						m_paramidx = (std::size_t)val;
 					}
 					else if (elemvalue.type() == types::Variant::String)
 					{
 						std::string paramname( elemvalue.charptr(), elemvalue.charsize());
-						m_paramidx = m_func->getParameterIndex( paramname);
+						m_paramidx = m_func->m_impl->getParameterIndex( paramname);
 					}
 					else
 					{
 						throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
 					}
-					const Function::Parameter* param = m_func->getParameter( m_paramidx);
+					const DotnetFunction::Impl::Parameter* param = m_func->m_impl->getParameter( m_paramidx);
 
 					if (elemtype==langbind::InputFilter::Attribute)
 					{
@@ -439,18 +560,18 @@ AGAIN:
 						}
 						else
 						{
-							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, true));
+							m_paramclosure.reset( new AssignmentClosure( m_func->m_impl->typelib(), m_input, param->typedesc->vt, true));
 						}
 					}
 					else
 					{
 						if (param->typeinfo)
 						{
-							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typeinfo));
+							m_paramclosure.reset( new AssignmentClosure( m_func->m_impl->typelib(), m_input, param->typeinfo));
 						}
 						else
 						{
-							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, false));
+							m_paramclosure.reset( new AssignmentClosure( m_func->m_impl->typelib(), m_input, param->typedesc->vt, false));
 						}
 					}
 					goto AGAIN;
@@ -474,8 +595,8 @@ AGAIN:
 		std::map<std::size_t,std::vector<VARIANT> >::iterator pi = m_arrayparam.begin(), pe = m_arrayparam.end();
 		for (; pi != pe; ++pi)
 		{
-			const Function::Parameter* param = m_func->getParameter( pi->first);
-			const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+			const DotnetFunction::Impl::Parameter* param = m_func->m_impl->getParameter( pi->first);
+			const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 			m_param[ pi->first] = comauto::createVariantArray( pi->second[0].vt, recinfo, pi->second);
 		}
 
@@ -484,12 +605,12 @@ AGAIN:
 		{
 			// ... don't know yet what to do here, because attributes are not defined for .NET functions ...
 		}
-		std::size_t ii = 0,nn = m_func->nofParameter();
+		std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
 		for (; ii < nn; ++ii)
 		{
 			if (m_param[ii].vt == VT_EMPTY)
 			{
-				const Function::Parameter* param = m_func->getParameter( ii);
+				const DotnetFunction::Impl::Parameter* param = m_func->m_impl->getParameter( ii);
 
 				if ((m_flags & serialize::Context::ValidateInitialization) != 0)
 				{
@@ -497,15 +618,15 @@ AGAIN:
 				}
 				switch (param->addrMode)
 				{
-					case Function::Parameter::Safearray:
+					case DotnetFunction::Impl::Parameter::Safearray:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
-							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 							m_param[ ii] = comauto::createVariantArray( param->typedesc->vt, recinfo);
 						}
 						else if (param->typeinfo)
 						{
-							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
 							m_param[ ii] = comauto::createVariantArray( param->typedesc->vt, recinfo);
 						}
@@ -514,14 +635,14 @@ AGAIN:
 							throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
 						}
 						break;
-					case Function::Parameter::Value:
+					case DotnetFunction::Impl::Parameter::Value:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
 							m_param[ ii] = comauto::createVariantType( types::Variant(), param->typedesc->vt);
 						}
 						else if (param->typeinfo)
 						{
-							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
 							m_param[ ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
 							m_param[ ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
@@ -535,16 +656,17 @@ AGAIN:
 				}
 			}
 		}
-		VARIANT resdata = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_param);
-		m_result.reset( new FunctionResult( m_func->typelib(), m_func->getReturnType()->typeinfo, resdata, m_flags));
+		VARIANT resdata;
+		m_func->m_impl->clr()->call( &resdata, m_func->m_impl->assemblyname(), m_func->m_impl->classname(), m_func->m_impl->methodname(), m_func->m_impl->nofParameter(), m_param);
+		m_result.reset( new FunctionResult( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata, m_flags));
 		return true;
 	}
 	catch (const std::runtime_error& e)
 	{
-		std::string funcname = m_func->classname() + "." +  m_func->methodname();
+		std::string funcname = m_func->m_impl->classname() + "." +  m_func->m_impl->methodname();
 		if (m_paramclosure.get())
 		{
-			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
+			const DotnetFunction::Impl::Parameter* paramdescr = m_func->m_impl->getParameter( m_paramidx);
 			throw std::runtime_error( std::string("error calling function '") + funcname + " in parameter '" + paramdescr->name + "' (" + m_paramclosure->variablepath() + "): " + e.what());
 		}
 		else
@@ -554,7 +676,7 @@ AGAIN:
 	}
 }
 
-langbind::TypedInputFilterR comauto::FunctionClosure::result() const
+langbind::TypedInputFilterR comauto::DotnetFunctionClosure::Impl::result() const
 {
 	return m_result;
 }
@@ -804,4 +926,51 @@ AGAIN:
 	}
 	return false;
 }
+
+DotnetFunctionClosure::DotnetFunctionClosure( const DotnetFunction* func_)
+	:m_impl(new Impl( func_))
+{}
+
+DotnetFunctionClosure::~DotnetFunctionClosure()
+{
+	delete m_impl;
+}
+
+bool DotnetFunctionClosure::call()
+{
+	return m_impl->call();
+}
+
+void DotnetFunctionClosure::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+{
+	m_impl->init( p, i, f);
+}
+
+langbind::TypedInputFilterR DotnetFunctionClosure::result() const
+{
+	return m_impl->result();
+}
+
+DotnetFunction::DotnetFunction( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
+	:m_impl(new Impl(clr_,typelib_,typeinfo_,assemblyname_,classname_,fidx))
+{}
+
+DotnetFunction::~DotnetFunction()
+{
+	delete m_impl;
+}
+
+void DotnetFunction::print( std::ostream& out) const
+{
+	m_impl->print( out);
+}
+
+langbind::FormFunctionClosure* DotnetFunction::createClosure() const
+{
+	return new DotnetFunctionClosure(this);
+}
+
+const std::string& DotnetFunction::assemblyname() const	{return m_impl->assemblyname();}
+const std::string& DotnetFunction::classname() const		{return m_impl->classname();}
+const std::string& DotnetFunction::methodname() const		{return m_impl->methodname();}
 

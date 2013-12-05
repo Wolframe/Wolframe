@@ -13,7 +13,8 @@ using namespace _Wolframe;
 static void test_atomic_param_clr_call( const comauto::CommonLanguageRuntime& clr, const std::string& assembly)
 {
 	VARIANT param[ 2] = {comauto::createVariantType( (int)13), comauto::createVariantType( (int)2)};
-	VARIANT result = clr.call( assembly, "Functions", "Add", 2, param);
+	VARIANT result;
+	clr.call( &result, assembly, "Functions", "Add", 2, param);
 
 	std::cout << std::endl << "RESULT call CLR: 13 + 2 = " << std::endl;
 	std::string buf;
@@ -21,12 +22,12 @@ static void test_atomic_param_clr_call( const comauto::CommonLanguageRuntime& cl
 	std::cout << elem.tostring() << std::endl;
 }
 
-static void test_function_call( const std::map<std::string,comauto::FunctionR>& funcmap, const char* name, const langbind::Form& param, const char* title)
+static void test_function_call( const std::map<std::string,comauto::DotnetFunctionR>& funcmap, const char* name, const langbind::Form& param, const char* title)
 {
-	std::map<std::string,comauto::FunctionR>::const_iterator xi = funcmap.find( name);
+	std::map<std::string,comauto::DotnetFunctionR>::const_iterator xi = funcmap.find( name);
 	if (xi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + name + "'");
 
-	langbind::FormFunctionClosure* closure = xi->second ->createClosure();
+	langbind::FormFunctionClosure* closure = xi->second->createClosure();
 	closure->init( 0, param.get());
 	if (!closure->call()) throw std::runtime_error( std::string("function call failed: '") + name + "'");
 
@@ -41,14 +42,14 @@ static void test_function_call( const std::map<std::string,comauto::FunctionR>& 
 	}
 }
 
-static void test_atomic_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
+static void test_atomic_param_fun_call( const std::map<std::string,comauto::DotnetFunctionR>& funcmap)
 {
 	langbind::Form param;
 	param( "i", langbind::Form("17"))( "j", langbind::Form("14"));
 	test_function_call( funcmap, "Functions.Add", param, "RESULT Add (17 + 14):");
 }
 
-static void test_struct_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
+static void test_struct_param_fun_call( const std::map<std::string,comauto::DotnetFunctionR>& funcmap)
 {
 	langbind::Form user, user2, users(langbind::Form::Array), usergroup, place, place2, pair, pair2, pair3, pair4, pairs(langbind::Form::Array), intarr(langbind::Form::Array);
 	langbind::Form sar(langbind::Form::Array);
@@ -171,9 +172,9 @@ int main( int , const char**)
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");
 
-		std::vector<comauto::FunctionR> funcs = comauto::loadFunctions( &typelib, &clr, assembly);
-		std::vector<comauto::FunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		std::map<std::string,comauto::FunctionR> funcmap;
+		std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &typelib, &clr, assembly);
+		std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
+		std::map<std::string,comauto::DotnetFunctionR> funcmap;
 
 		std::string asmname;
 		for (; fi != fe; ++fi)
@@ -183,7 +184,7 @@ int main( int , const char**)
 				asmname = (*fi)->assemblyname();
 				std::cout << "ASSEMBLY " << asmname << std::endl;
 			}
-			std::cout << "FUNCTION " << (*fi)->classname() << "." << (*fi)->methodname() << "[" << (*fi)->nofParameter() << "]" << std::endl;
+			std::cout << "FUNCTION " << (*fi)->classname() << "." << (*fi)->methodname() << std::endl;
 			funcmap[ (*fi)->classname() + "." + (*fi)->methodname()] = *fi;
 		}
 		test_atomic_param_clr_call( clr, assembly);

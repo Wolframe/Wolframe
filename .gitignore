@@ -13,6 +13,10 @@ src/modules/*/*/*.vcxproj.user
 src/modules/*/*/*.vcproj.*
 wolframemsg.h
 *~
+*.sdf
+*.opensdf
+*.suo
+*.asm
 *.bak
 *.o
 *.d

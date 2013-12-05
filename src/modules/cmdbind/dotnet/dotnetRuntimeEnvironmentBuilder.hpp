@@ -38,9 +38,6 @@ Project Wolframe.
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
 #include "processor/moduleInterface.hpp"
-#include "module/constructor.hpp"
-#include <string>
-#include <map>
 
 namespace _Wolframe {
 namespace module {
@@ -53,13 +50,7 @@ public:
 
 	virtual ~DotnetRuntimeEnvironmentConstructor(){}
 
-	virtual DotnetRuntimeEnvironment* object( const config::NamedConfiguration& cfgi)
-	{
-		const DotnetRuntimeEnvironmentConfig* cfg = dynamic_cast<const DotnetRuntimeEnvironmentConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");
-		DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);
-		return rt;
-	}
+	virtual DotnetRuntimeEnvironment* object( const config::NamedConfiguration& cfgi);
 
 	virtual const char* objectClassName() const
 	{
@@ -77,7 +68,7 @@ class DotnetRuntimeEnvironmentBuilder
 	:public ConfiguredBuilder
 {
 public:
-	DotnetRuntimeEnvironmentBuilder( const char* classname_, const char* title, const char* section, const char* keyword, const char* id);
+	DotnetRuntimeEnvironmentBuilder( const char* title_, const char* section_, const char* keyword_, const char* classname_);
 
 	virtual ~DotnetRuntimeEnvironmentBuilder();
 

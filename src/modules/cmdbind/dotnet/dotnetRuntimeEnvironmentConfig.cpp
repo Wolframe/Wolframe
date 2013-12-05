@@ -32,6 +32,8 @@ Project Wolframe.
 ///\file dotnetRuntimeEnvironmentConfig.cpp
 ///\brief Implementation .NET runtime environment configuration
 #include "dotnetRuntimeEnvironmentConfig.hpp"
+#include "logger-v1.hpp"
+#include "utils/fileUtils.hpp"
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 
@@ -46,7 +48,7 @@ DotnetRuntimeEnvironmentConfig::AssemblyDescription::AssemblyDescription( const 
 	name.append( boost::algorithm::trim_copy( std::string( description.c_str(), ee - description.c_str())));
 }
 
-bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory* modules)
+bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory*)
 {
 	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 	for (; pi != pe; ++pi)
@@ -95,10 +97,10 @@ void DotnetRuntimeEnvironmentConfig::print( std::ostream& os, size_t indent) con
 	os << indentstr << "Version CLR: " << m_clrversion << std::endl;
 	os << indentstr << "Path of Type Library Descriptions: " << m_typelibpath << std::endl;
 	
-	std::vector<std::string>::const_iterator ai = m_assemblylist.begin(), ae = m_assemblylist.end();
+	std::vector<AssemblyDescription>::const_iterator ai = m_assemblylist.begin(), ae = m_assemblylist.end();
 	for (; ai != ae; ++ai)
 	{
-		os << indentstr << "Assembly Declaration: '" << *ai << "'" << std::endl;
+		os << indentstr << "Assembly Declaration of " << ai->name << ": '" << ai->description << "'" << std::endl;
 	}
 }
 

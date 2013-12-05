@@ -1,3 +1,34 @@
+/************************************************************************
+Copyright (C) 2011 - 2013 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
 #include "comauto/utils.hpp"
 #include <iostream>
 #include <sstream>
@@ -6,11 +37,11 @@
 using namespace _Wolframe;
 
 const char*& comauto::impl_V_LPSTR( const VARIANT* v)		{ return *(const char**)comauto::arithmeticTypeAddress(v); }
-char*& comauto::impl_V_LPSTR( VARIANT* v)					{ return *(char**)comauto::arithmeticTypeAddress(v); }
+char*& comauto::impl_V_LPSTR( VARIANT* v)			{ return *(char**)comauto::arithmeticTypeAddress(v); }
 const wchar_t*& comauto::impl_V_LPWSTR( const VARIANT* v)	{ return *(const wchar_t**)comauto::arithmeticTypeAddress(v); }
-wchar_t*& comauto::impl_V_LPWSTR( VARIANT* v)				{ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
-const BSTR& comauto::impl_V_BSTR( const VARIANT* v)			{ return *(const BSTR*)&v->bstrVal;}
-BSTR& comauto::impl_V_BSTR( VARIANT* v)						{ return *(BSTR*)&v->bstrVal;}
+wchar_t*& comauto::impl_V_LPWSTR( VARIANT* v)			{ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
+const BSTR& comauto::impl_V_BSTR( const VARIANT* v)		{ return *(const BSTR*)&v->bstrVal;}
+BSTR& comauto::impl_V_BSTR( VARIANT* v)				{ return *(BSTR*)&v->bstrVal;}
 
 void* comauto::allocMem( std::size_t size)
 {
@@ -46,8 +77,8 @@ std::wstring comauto::utf16string( const char* utf8ptr, std::size_t utf8size)
 	{
 		rt.resize( len);
 		::MultiByteToWideChar( CP_UTF8, 0, utf8ptr, utf8size, (LPWSTR)(void*)rt.c_str(), len);
-   }
-   return rt;
+	}
+	return rt;
 }
 
 std::wstring comauto::utf16string( const std::string& utf8str)
@@ -63,8 +94,8 @@ std::string comauto::utf8string( const std::wstring& utf16str)
 	{
 		rt.resize( len);
 		::WideCharToMultiByte( CP_UTF8, 0, utf16str.c_str(), utf16str.size(), (LPSTR)(void*)rt.c_str(), len, NULL, NULL);
-   }
-   return rt;
+	}
+	return rt;
 }
 
 std::string comauto::utf8string( LPCSTR str)
@@ -89,8 +120,8 @@ std::string comauto::utf8string( const BSTR& str)
 	{
 		rt.resize( len);
 		::WideCharToMultiByte( CP_UTF8, 0, str, strl, (LPSTR)(void*)rt.c_str(), len, NULL, NULL);
-   }
-   return rt;
+	}
+	return rt;
 }
 
 char* comauto::createLPSTR( const std::string& str)
@@ -143,13 +174,13 @@ std::wstring comauto::tostring( VARIANT* v)
 {
 	VARIANT vcp;
 	vcp.vt = VT_EMPTY;
-	WRAP( comauto::wrapVariantCopy( &vcp, v))
+	WRAP( comauto::wrapVariantCopy( &vcp, v));
 	if (v->vt != VT_BSTR)
 	{
-		WRAP( comauto::wrapVariantChangeType( &vcp, &vcp, 0, VT_BSTR))
+		WRAP( comauto::wrapVariantChangeType( &vcp, &vcp, 0, VT_BSTR));
 	}
 	std::wstring rt( vcp.bstrVal, ::SysStringLen( vcp.bstrVal));
-	WRAP( comauto::wrapVariantClear( &vcp))
+	WRAP( comauto::wrapVariantClear( &vcp));
 	return rt;
 }
 
@@ -159,17 +190,18 @@ std::wstring comauto::tostring( const _com_error& err)
 	LPTSTR errstr = NULL;
 
 	FormatMessage(
-	   FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_IGNORE_INSERTS,  
-	   NULL, err.Error(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&errstr, 0, NULL);
+		FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, err.Error(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&errstr, 0, NULL);
 
 	if (errstr)
 	{
-	   rt.append( errstr);
-	   ::LocalFree( errstr);
+		rt.append( (wchar_t*)errstr);
+		::LocalFree( errstr);
 	}
 	else
 	{
-		rt.append( err.ErrorMessage());
+		const TCHAR* ee = err.ErrorMessage();
+		for (int ii=0; ee[ii]; ++ii) rt.push_back( ee[ii]);
 	}
 	return rt;
 }
@@ -190,16 +222,16 @@ std::string comauto::typestr( VARTYPE vt)
 		case VT_VOID:	rt.append( "VT_VOID"); break;
 		case VT_NULL:	rt.append( "VT_NULL"); break;
 		case VT_INT:	rt.append( "VT_INT"); break;
-		case VT_I1:		rt.append( "VT_I1"); break;
-		case VT_I2:		rt.append( "VT_I2"); break;
-		case VT_I4:		rt.append( "VT_I4"); break;
+		case VT_I1:	rt.append( "VT_I1"); break;
+		case VT_I2:	rt.append( "VT_I2"); break;
+		case VT_I4:	rt.append( "VT_I4"); break;
 		case VT_UINT:	rt.append( "VT_UINT"); break;
 		case VT_UI1:	rt.append( "VT_UI1"); break;
 		case VT_UI2:	rt.append( "VT_UI2"); break;
 		case VT_UI4:	rt.append( "VT_UI4"); break;
-		case VT_R4:		rt.append( "VT_R4"); break;
-		case VT_R8:		rt.append( "VT_R8"); break;
-		case VT_CY:		rt.append( "VT_CY"); break;
+		case VT_R4:	rt.append( "VT_R4"); break;
+		case VT_R8:	rt.append( "VT_R8"); break;
+		case VT_CY:	rt.append( "VT_CY"); break;
 		case VT_DATE:	rt.append( "VT_DATE"); break;
 		case VT_BSTR:	rt.append( "VT_BSTR"); break;
 		case VT_DISPATCH:rt.append( "VT_DISPATCH"); break;
@@ -215,13 +247,13 @@ std::string comauto::typestr( VARTYPE vt)
 		case VT_LPWSTR:	rt.append( "VT_LPWSTR"); break;
 		case VT_BLOB:	rt.append( "VT_BLOB"); break;
 		case VT_STREAM:	rt.append( "VT_STREAM"); break;
-		case VT_STORAGE:	rt.append( "VT_STORAGE"); break;
+		case VT_STORAGE:rt.append( "VT_STORAGE"); break;
 		case VT_STREAMED_OBJECT:rt.append( "VT_STREAMED_OBJECT"); break;
 		case VT_STORED_OBJECT:rt.append( "VT_STORED_OBJECT"); break;
 		case VT_BLOB_OBJECT:rt.append( "VT_BLOB_OBJECT"); break;
-		case VT_CF:		rt.append( "VT_CF"); break;
+		case VT_CF:	rt.append( "VT_CF"); break;
 		case VT_CLSID:	rt.append( "VT_CLSID"); break;
-		default:		rt.append( "[Unknown]"); break;
+		default:	rt.append( "[Unknown]"); break;
 	}
 	return rt;
 }
@@ -331,10 +363,10 @@ std::string comauto::structstring( const ITypeInfo* typeinfo)
 
 VARIANT comauto::createVariantType( bool val)
 {
-   VARIANT rt;
-   rt.vt = VT_BOOL;
-   rt.boolVal = val ? VARIANT_TRUE : VARIANT_FALSE;
-   return rt;
+	VARIANT rt;
+	rt.vt = VT_BOOL;
+	rt.boolVal = val ? VARIANT_TRUE : VARIANT_FALSE;
+	return rt;
 }
 
 namespace {

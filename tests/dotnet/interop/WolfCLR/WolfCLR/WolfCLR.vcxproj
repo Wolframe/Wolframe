@@ -98,7 +98,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.hpp" />
-    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\recordinfo.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
@@ -112,7 +111,6 @@
     <ClCompile Include="..\..\..\..\..\src\libwolframe\utils_conversions.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.cpp" />
-    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\recordinfo.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.cpp" />
     <ClCompile Include="..\..\src\ddl_form.cpp" />

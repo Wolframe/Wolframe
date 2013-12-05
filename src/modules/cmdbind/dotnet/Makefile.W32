@@ -32,16 +32,15 @@ DOTNET_CPP_OBJS = \
 	dotnetRuntimeEnvironment.obj
 
 DOTNET_INTEROP_CPP_OBJS = \
-	comauto/clr.obj \
 	comauto/function.obj \
-	comauto/recordinfo.obj \
+	comauto/clr.obj \
 	comauto/typelib.obj \
 	comauto/utils.obj
 
 CPP_OBJS = \
-	$(DOTNET_CPP_OBJS) \
 	$(DOTNET_INTEROP_CPP_OBJS) \
-	mod_command_lua.obj
+	$(DOTNET_CPP_OBJS) \
+	mod_command_dotnet.obj
 
 all: $(DYNAMIC_MODULE)
 
@@ -54,6 +53,7 @@ local_all:
 
 local_clean:
 	@-erase $(DYNAMIC_MODULE) 2>NUL
+	@-erase $(DOTNET_INTEROP_CPP_OBJS) 2>NUL
 	@-erase $(CPP_OBJS) 2>NUL
 
 local_distclean:

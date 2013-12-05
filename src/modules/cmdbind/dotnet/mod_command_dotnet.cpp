@@ -32,8 +32,7 @@
 ************************************************************************/
 ///\file mod_command_dotnet.cpp
 ///\brief Module for calling functions as methods defined in .NET assemblies via .NET interop
-#include "module/programTypeBuilder.hpp"
-#include "dotnetFunctionProgramType.hpp"
+#include "dotnetRuntimeEnvironmentBuilder.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -50,7 +49,7 @@ namespace {
 static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
 {
 	static DotnetRuntimeEnvironmentBuilder
-		mod( "DotnetRuntimeEnvironment", "runtime environment for .NET", "runtimeenv", "dotnet", "RuntimeEnvironment");
+		mod( "runtime environment for .NET", "runtimeenv", "dotnet", "DotnetRuntimeEnvironment");
 	return &mod;
 }
 
