@@ -40,8 +40,9 @@
 	</para>
 	<para>
 		There is only one predefined data type known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>: "string".
-		All other data types are defined as sequence of 'normalizer' functions in a normalize definition file.
-		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
+		All other data types are defined as sequence of <glossterm>normalizer</glossterm> functions in a normalize definition file.
+		The <glossterm>normalizer</glossterm> functions assigned to a type validate the value and transform it to its normalized form.
+		We explain in the next section how data types are defined.
 	</para>
 	<para>
 		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>:
@@ -116,6 +117,7 @@
 		</programlisting>
 	</para>
 	</sect2>
+
 	<para></para>
 </sect1>
 <beginpage/>

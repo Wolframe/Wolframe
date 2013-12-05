@@ -23,4 +23,5 @@ in <application>Wolframe</application> before using it. Each chapter introducing
 a section that describes how the server configuration of <application>Wolframe</application> has to be extended for its availability.
 </para>
 	&AppProgramForms;
+	&AppProgramFormDataTypes;
 </chapter>

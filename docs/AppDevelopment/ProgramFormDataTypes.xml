@@ -1,20 +1,24 @@
 <sect1>
-<title>DDL Data Types</title>
+<title>Datatypes in DDLs</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>Forms are data structures used for validation of input and output.
-		They are defined for Wolframe in Data Definition Languages (DDLs).
-		We will introduce Forms in the next chapter. Atomic elements of forms are
-		typed. With each type a function is associated to validate and normalize the
-		atomic element of that type. There is only one predefined type called 'string'.
-		strings are neither validated nor transformed for processing in any way.
-		The others are defined in files with the extension ".wnmp" that are referenced
-		as programs in the configuration.
+	<para>The basic elements to build atomic data types in <application>Wolframe</application>
+		are normalization functions. Basic normalization functions are written in C++
+		and loadable as modules.
 	</para>
 	<para>
-		A .wnmp file contains assignments of a type name to sequences of normalization
-		function calls where the first takes the initial input. The output of a function
-		in the sequence gets the input of the next one and the final output for the last one.
+		As we already mentioned are atomic elements in forms typed.
+		With each type a function is associated to validate and normalize the
+		atomic element of that type. There is only one predefined type called 'string'.
+		strings are neither validated nor transformed for processing in any way.
+		The others are defined in files with the extension <code>.wnmp</code>
+		that are referenced as programs in the configuration.
+	</para>
+	<para>
+		A <code>.wnmp</code> file contains assignments of a type name to sequences 
+		of basic normalization function calls where the first takes the initial input.
+		The output of a function in the sequence gets the input of the next one and 
+		the final output for the last one.
 		Each normalization step validates the input as atomic type (arithmetic,string,etc.)
 		and transforms it to another atomic type.
 	</para>
@@ -56,14 +60,14 @@
 	</sect2>
 	<sect2>
 	<title>Configuration</title>
-	<para>For declaring and using a .wnmp file in our example above, you have to load the module 'mod_normalize_string'
+	<para>For declaring and using a .wnmp file in our example above, we have to load the module 'mod_normalize_string'
 	and the module 'mod_normalize_number'.
-	For this you add the following two lines to the LoadModules section of your <application>Wolframe</application> configuration:
+	For this we add the following two lines to the LoadModules section of our <application>Wolframe</application> configuration:
 		<programlisting language='text'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_normalize_number_string.conf" parse="text" />
 		</programlisting>
 	</para>
-	<para>You also have to add the declaration of the program "example.wnmp" (listing example above) 
+	<para>We also have to add the declaration of the program "example.wnmp" (listing example above) 
 	to the Processor section of the configuration.
 	<programlisting language='text'>
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_wnmp.conf" parse="text" />
@@ -72,5 +76,5 @@
 	</sect2>
 	<para></para>
 </sect1>
-<beginpage/>
+
 

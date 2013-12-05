@@ -24,6 +24,5 @@ configuration of <application>Wolframe</application> has to be extended for its 
 	&AppProgramDotNet;
 	&AppProgramPython;
 	&AppProgramLua;
-	&AppProgramFormDataTypes;
 	&AppProgramCpp;
 </chapter>
