@@ -1,5 +1,5 @@
 <sect1>
-<title>Functions in C++</title>
+<title>Functions in Native C++</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>C++</application>. 
@@ -7,6 +7,14 @@
 		interpreted language, you have to build a module out of your function implementation.
 		</para>
 	</sect2>
+
+	<sect2>
+	<title>Prerequisites</title>
+	<para>For native C++ you need a C++ build system with compiler and linker or an integrated
+	development environment for C++. 
+	</para>
+	</sect2>
+
 	<sect2>
 	<title>Declaring Functions</title>
 	<para>

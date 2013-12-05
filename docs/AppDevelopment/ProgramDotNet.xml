@@ -13,12 +13,13 @@
 	</sect2>
 
 	<sect2>
-	<title>Prerequisites</title>
+	<title>Configuration</title>
 	<para>For enabling .NET you have to declare the loading of the module 'mod_command_dotnet'
 		in the main section of the server configuration file.
 		<programlisting language='awk'>
-		module mod_command_dotnet
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_command_dotnet.conf" parse="text" />
 		</programlisting>
+		For the configuration of the .NET assemblies to be loaded, see section 'Configure .NET Modules'.
 	</para>
 	</sect2>
 

@@ -2,9 +2,14 @@
 <title>DDL Data Types</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>Forms defined by DDLs are typed. The only predefined type is 'string' that is neither
-		validated nor transformed for processing in any way. The types that can be used in DDLs are
-		defined in files with the extension ".wnmp" and defined as programs in the configuration.
+	<para>Forms are data structures used for validation of input and output.
+		They are defined for Wolframe in Data Definition Languages (DDLs).
+		We will introduce Forms in the next chapter. Atomic elements of forms are
+		typed. With each type a function is associated to validate and normalize the
+		atomic element of that type. There is only one predefined type called 'string'.
+		strings are neither validated nor transformed for processing in any way.
+		The others are defined in files with the extension ".wnmp" that are referenced
+		as programs in the configuration.
 	</para>
 	<para>
 		A .wnmp file contains assignments of a type name to sequences of normalization

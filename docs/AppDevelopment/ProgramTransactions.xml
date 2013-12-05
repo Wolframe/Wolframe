@@ -55,6 +55,15 @@
 			TDL keywords are written in uppercase here.
 		</para>
 	</sect2>
+
+	<sect2>
+	<title>Configuration</title>
+		<para>
+		Each TDL program source referenced has to be declared in the <code>Processor</code>
+		section of the configuration with <code>program &lt;sourcefile&gt;</code>.
+		</para>
+	</sect2>
+
 	<sect2>
 	<title>Language Description</title>
 		<para>
