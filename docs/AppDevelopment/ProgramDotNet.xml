@@ -10,16 +10,31 @@
 		compiled and not as an interpreted language, you have to build a module out of your function 
 		implementation.
 		</para>
+	</sect2>
+
+	<sect2>
+	<title>Prerequisites</title>
+	<para>For enabling .NET you have to declare the loading of the module 'mod_command_dotnet'
+		in the main section of the server configuration file.
+		<programlisting language='awk'>
+		module mod_command_dotnet
+		</programlisting>
+	</para>
+	</sect2>
+
+	<sect2>
+		<title>Restrictions</title>
 		<para>
-		The implementation of <application>.NET</application> calls is not yet available.
-		The implementation exists as prove of concept in a test program. 
-		But <application>Wolframe</application> will provide
-		<application>.NET</application> functions soon.
+		Currently <application>.NET</application> procedures called from Wolframe
+		cannot call other Wolframe functions.
+		But we will provide the possibility to call Wolframe global function calls
+		like for example transaction function calls from <application>.NET</application>
+		soon.
 		</para>
 	</sect2>
 
 	<sect2>
-	<title>Prepare .NET Modules for Wolframe</title>
+	<title>Prepare .NET Modules</title>
 	<para>
 	To make functions written in .NET callable by Wolframe, several steps have to be performed.
 	First the asseblies with the functions exported to Wolframe have to be build COM visible.
@@ -135,7 +150,11 @@
 		<para>For making the API introspectable by Wolframe, we have to create a TLB
 		(Type Library) file from the assembly (DLL) after build. The type library has
 		to be recreated every time the module interface (API) changes. The type library is
-		created with the program <code>tlbexp</code>.</para>
+		created with the program <code>tlbexp</code>. All created type library (.tlb) file
+		that will be loaded with the same runtime environment have to be copied into
+		the same directory. They will be referenced for introspection in the 
+		configuration. The configuration of .NET will be explained later.
+		</para>
 		</sect3>
 
 		<sect3>
@@ -158,6 +177,20 @@
 		administrator command line.
 		</para>
 		</sect3>
+	</sect2>
+
+	<sect2>
+	<title>Configure .NET Modules</title>
+	<para>
+	.NET modules are grouped together in a configuration block that specifies the configuration
+	of the Microsoft Common Language Runtime (CLR) used for .NET interop calls. The configuration
+	block has the header <code>runtimeEnv dotNET</code> and configures the version of the 
+	runtime loaded and the path where the typelibraries (.tlb) files can be found. 
+	With the <code>assembly</code> definitions you declare the registered assemblies to load.
+	<programlisting language='cfg'>
+	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_dotnet.conf" parse="text" />
+	</programlisting>
+	</para>
 	</sect2>
 	<para></para>
 </sect1>

@@ -30,21 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "appdevel.hpp"
-#include "employee_assignment_convert_exec.hpp"
+///\file employee_assignment_convert_exec.hpp
+///\brief Interface wolfilter test plugin function
+#ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_exec_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_exec_HPP_INCLUDED
+#include "employee_assignment_convert.hpp"
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("test form function")
+namespace _Wolframe {
+namespace test {
 
-using namespace _Wolframe;
-
-static module::createBuilderFunc objdef[] =
+struct AssignmentListDocConvert
 {
-	appdevel::CppFormFunction<test::AssignmentListDocConvert>::constructor
+	typedef AssignmentListDoc InputType; 
+	typedef AssignmentListDoc OutputType; 
+	static const char* name() {return "employee_assignment_convert";}
+
+	static int exec( InputType& res, const OutputType& param);
 };
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END(1,objdef)
-
+}} //namespace
+#endif
 
 

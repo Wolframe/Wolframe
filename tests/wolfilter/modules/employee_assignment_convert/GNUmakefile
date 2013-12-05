@@ -22,6 +22,7 @@ DYNAMIC_MODULE = mod_employee_assignment_convert.so
 
 CPP_OBJS = \
 	employee_assignment_convert.o \
+	employee_assignment_convert_exec.o \
 	mod_employee_assignment_convert.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

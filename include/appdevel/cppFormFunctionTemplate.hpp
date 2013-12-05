@@ -30,21 +30,35 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "appdevel.hpp"
-#include "employee_assignment_convert_exec.hpp"
+///\file appdevel/cppFunctionTemplate.hpp
+///\brief Template for declaring C++ form function
+#ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
+#include "module/cppFormFunctionBuilder.hpp"
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("test form function")
+namespace _Wolframe {
+namespace appdevel {
 
-using namespace _Wolframe;
-
-static module::createBuilderFunc objdef[] =
+template <class Definition>
+struct CppFormFunction
 {
-	appdevel::CppFormFunction<test::AssignmentListDocConvert>::constructor
+	static int implementation( void* res, const void* param)
+	{
+		return Definition::exec( *(typename Definition::OutputType*)res, *(const typename Definition::InputType*) param);
+	}
+	
+	static module::SimpleBuilder* constructor()
+	{
+		static const serialize::StructDescriptionBase* param = Definition::InputType::getStructDescription();
+		static const serialize::StructDescriptionBase* result = Definition::OutputType::getStructDescription();
+
+		langbind::CppFormFunction func( implementation, param, result);
+		return new module::CppFormFunctionBuilder( Definition::name(), func);
+	}
 };
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END(1,objdef)
+}} //namespace
+#endif
 
 
 

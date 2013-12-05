@@ -3,15 +3,49 @@
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>C++</application>. 
-		Because <application>C++</application> is supported by <application>Wolframe</application> only as a compiled and not as 
-		an interpreted language, you have to build a module out of your function implementation.
+		Because native <application>C++</application> is by nature a compiled and not an
+		interpreted language, you have to build a module out of your function implementation.
 		</para>
 	</sect2>
 	<sect2>
 	<title>Declaring Functions</title>
 	<para>
-		...
+		Form functions declared in C++ have two arguments. The output structure to fill
+		is passed by reference as first and the input structure passed is by value.
+		The input structure copy should not be modified by the callee. 
+		This means in C++ that it is passed as const reference.
+		The function returns an <code>int</code> that is <code>0</code> on success and any other value indicating
+		an error code. The function may also throw a runtime error exception in case 
+		of an error.
+		The following example shows a function declaration. The function declaration
+		is not complete because the input output structures need to be declared with some
+		additional attributes needed for introspection. We will explain this in the following
+		section.
 	</para>
+		<sect3>
+		<title>Example Function Declaration</title>
+		<para>The function takes a structure as input and writes the result into an
+		output structure. In this example input and output type are the same, but this
+		is not required. It's just the same here for simplicity. 
+		</para>
+		<para>
+		The elements of the function declaration are put into a structure with four elements.
+		The <code>typedef</code> for the InputType and OutputType structures is required,
+		because the input and output types should be recogniceable without complicated 
+		type introspection templates. (Template based introspection might cause spurious
+		and hard to understand error messages when building the module). 
+		</para>
+		<para>
+		The function <code>name</code> returns the name of the function that
+		identifies the function in the Wolframe global scope.
+		</para>
+		<para>
+		The <code>exec</code> function declared as static function with this signature refers to 
+		the function implementation.</para>
+		<programlisting language='C++'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customersFunction.hpp" parse="text" />
+		</programlisting>
+		</sect3>
 	</sect2>
 
 	<sect2>
@@ -23,19 +57,62 @@
 	</para>
 	<para>
 		The following example shows a form function parameter structure defined in C++.
+	</para>
 		<sect3>
-		<para>Header file "customers.hpp": Declare the structure and the serialization description of the structure.
+		<title>Header File</title>
+		<para>Declares the structure and the serialization description of the structure.
 		Structures may contain structures with their own serialization description.</para>
-		<programlisting language='text'>
+		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.hpp" parse="text" />
 		</programlisting>
 		</sect3>
+
 		<sect3>
-		<para>Source file "customers.cpp". Declare 'ID' as attribute and name, canonical_Name, country, locality as tags. The '--' operator marks the end of attributes section and the start of content section.</para>
-		<programlisting language='text'>
+		<title>Source File</title>
+		<para>Declares 'ID' as attribute and name, canonical_Name, country, locality as tags. 
+		The '--' operator marks the end of attributes section and the start of content 
+		section.</para>
+		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.cpp" parse="text" />
 		</programlisting>
 		</sect3>
+	</sect2>
+
+	<sect2>
+	<title>Writing the Module</title>
+	<para>Now we have all pieces together to build a loadable
+	<application>Wolframe</application> module with our example C++ function. The following example shows what you have to
+	declare in the main module source file.
+	</para>
+		<sect3>
+		<title>Module Declaration</title>
+		<para>The module declaration needs to inlcude <code>appdevel.hpp</code> and
+		of course all headers with the function and data structure declarations needed.
+		The module starts with a header macro and ends with a footer macro.
+		Inbetween is the declaration of an array of functions of type <code>module::createBuilderFunc</code>.
+		The size of the array and its name you pass to the macro call that ends the
+		module declaration. The following example illustrates this:
+		</para>
+		<programlisting language='C++'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customersModule.cpp" parse="text" />
+		</programlisting>
+		</sect3>
+	</sect2>
+
+	<sect2>
+	<title>Building the Module</title>
+	<para>For building the module we have to include all modules introduced here and
+	to link at against the wolframe serialization library (wolframe_serialize)
+	and the wolframe core library (wolframe).
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Using the Module</title>
+	<para>The module built can be loaded as the other modules by declaring it in the wolframe
+	LoadModules section of the configuration. Simply list it there with 
+	<code>module &lt;yourModuleName&gt;</code> with &lt;yourModuleName&gt; being the name
+	or path to your module.
 	</para>
 	</sect2>
 	<para></para>

@@ -30,16 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/modules/employee_assignment_convert/employee_assignment_convert.cpp
-///\brief Implementation wolfilter test plugin function
+///\file employee_assignment_convert.cpp
+///\brief Implementation wolfilter test plugin data
 
 #include "serialize/struct/filtermapDescription.hpp"
-#include "wolfilter/modules/employee_assignment_convert/employee_assignment_convert.hpp"
+#include "employee_assignment_convert.hpp"
 #include <string>
 #include <vector>
 
 using namespace _Wolframe;
-using namespace test;
+using namespace _Wolframe::test;
 
 namespace {
 struct TaskDescription :public serialize::StructDescription<Task>
@@ -123,50 +123,5 @@ const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription(
 {
 	static AssignmentListDocDescription rt;
 	return &rt;
-}
-
-static void convertString( std::string& res, const std::string& param)
-{
-	std::string::const_iterator itr=param.begin();
-	while (itr != param.end())
-	{
-		if (*itr >= '0' && *itr <= '9') res.push_back( '9'-*itr + '0');
-		else if (*itr >= 'a' && *itr <= 'z') {res.push_back( *itr); res.push_back( *itr);}
-		else if (*itr >= 'A' && *itr <= 'Z') {res.push_back( ::tolower(*itr));}
-		else if (*itr == ' ' || *itr == '-' || *itr == '_') {res.push_back( *itr);}
-		++itr;
-	}
-}
-
-int AssignmentListDoc::convert( AssignmentListDoc& res, const AssignmentListDoc& param)
-{
-	std::vector<Assignment>::const_iterator itr=param.assignmentlist.assignment.begin();
-	while (itr != param.assignmentlist.assignment.end())
-	{
-		Assignment aa;
-		convertString( aa.issuedate, itr->issuedate);
-		convertString( aa.employee.firstname, itr->employee.firstname);
-		convertString( aa.employee.surname, itr->employee.surname);
-		convertString( aa.employee.phone, itr->employee.phone);
-		std::vector<Task>::const_iterator taskitr=itr->task.begin();
-		while (taskitr != itr->task.end())
-		{
-			Task tt;
-			convertString( tt.title, taskitr->title);
-			convertString( tt.key, taskitr->key);
-			tt.customernumber = taskitr->customernumber + 1;
-			aa.task.push_back( tt);
-			++taskitr;
-		}
-		res.assignmentlist.assignment.push_back( aa);
-		++itr;
-	}
-	return 0;
-}
-
-
-int _Wolframe::test::convertAssignmentListDoc( void* res, const void* param)
-{
-	return AssignmentListDoc::convert( *(AssignmentListDoc*)res, *(const AssignmentListDoc*) param);
 }
 

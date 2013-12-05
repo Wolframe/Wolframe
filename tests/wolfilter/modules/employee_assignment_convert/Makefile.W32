@@ -27,6 +27,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	employee_assignment_convert.obj \
+	employee_assignment_convert_exec.obj \
 	mod_employee_assignment_convert.obj
 
 all: $(DYNAMIC_MODULE)

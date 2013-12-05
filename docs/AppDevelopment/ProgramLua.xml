@@ -10,6 +10,17 @@
 		The <application>Lua</application> application layer does not have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
+
+	<sect2>
+	<title>Prerequisites</title>
+	<para>For enabling Lua you have to declare the loading of the module 'mod_command_lua'
+		in the main section of the server configuration file.
+		<programlisting language='awk'>
+		module mod_command_lua
+		</programlisting>
+	</para>
+	</sect2>
+
 	<sect2>
 	<title>Declaring Functions</title>
 	<para>For <application>Lua</application> you do not have to declare anything in addition to the <application>Lua</application> script. If you configure a <application>Lua</application>
@@ -108,7 +119,7 @@
 
 	<sect2>
 	<title>List of <application>Lua</application> Objects</title>
-	<para>This is a list of all objects and functions declared by Wolframe:</para>
+	<para>This is a list of all objects and functions declared by <application>Wolframe</application>:</para>
 
 		<table frame="all" width="100%">
 			<title>Data forms declared by DDL</title>

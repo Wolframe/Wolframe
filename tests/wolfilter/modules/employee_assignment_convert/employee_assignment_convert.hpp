@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/src/employee_assignment_convert.hpp
-///\brief Interface wolfilter test plugin function
+///\file employee_assignment_convert.hpp
+///\brief Interface wolfilter test plugin data
 #ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
@@ -81,10 +81,7 @@ struct AssignmentListDoc
 	AssignmentList assignmentlist;
 
 	static const serialize::StructDescriptionBase* getStructDescription();
-	static int convert( AssignmentListDoc& res, const AssignmentListDoc& param);
 };
-
-int convertAssignmentListDoc( void* res, const void* param);
 
 }}
 #endif
