@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OSC_HOME=$HOME/home:andreas_baumann/boost1.49
+OSC_HOME=$HOME/home:wolframe_user/boost1.49
 
 if test "x$TMPDIR" = "x"; then
 	TMPDIR=/tmp

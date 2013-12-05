@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OSC_HOME=$HOME/home:andreas_baumann/boost1.48
+OSC_HOME=$HOME/home:wolframe_user/boost1.48
 
 ( cd packaging/obs/boost1.48 && tar zcf ../../../boost1.48_1.48.0.debian.tar.gz debian )
 cp boost1.48_1.48.0.debian.tar.gz $OSC_HOME/.

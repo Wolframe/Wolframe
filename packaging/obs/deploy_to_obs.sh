@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION=0.0.1
-OSC_HOME=$HOME/home:andreas_baumann/Wolframe
+OSC_HOME=$HOME/home:wolframe_user/Wolframe
 
 if test "x$TMPDIR" = "x"; then
 	TMPDIR=/tmp
