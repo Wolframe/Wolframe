@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OSC_HOME=$HOME/home:andreas_baumann/libhpdf221
+OSC_HOME=$HOME/home:wolframe_user/libhpdf221
 
 if test "x$TMPDIR" = "x"; then
 	TMPDIR=/tmp
