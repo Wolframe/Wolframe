@@ -47,14 +47,16 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+//\class StructDescriptionBase
+//\brief Base class for structure description used for introspection in serialization/deserialization
 class StructDescriptionBase
 {
 public:
 	enum ElementType
 	{
-		Atomic,
-		Struct,
-		Vector
+		Atomic,		//< Atomic element type
+		Struct,		//< Structure with fixed number of named elements
+		Vector		//< Array of structures or atomic values
 	};
 
 	typedef std::vector<std::pair<std::string,StructDescriptionBase> > Map;
@@ -170,6 +172,8 @@ private:
 };
 
 
+//\class StructSerializer
+//\brief Iterator on elements of structures based on a structure description
 class StructSerializer :public langbind::TypedInputFilter
 {
 public:
@@ -206,6 +210,8 @@ private:
 };
 
 
+//\class StructParser
+//\brief Initializer of a structure based on a structure description feeded with a serialization
 class StructParser
 {
 public:

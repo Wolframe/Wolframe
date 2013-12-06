@@ -41,6 +41,8 @@
 namespace _Wolframe {
 namespace prgbind {
 
+//\class TransactionDefinitionProgram
+//\brief Program type for the transaction definition language (TDL)
 class TransactionDefinitionProgram
 	:public Program
 {

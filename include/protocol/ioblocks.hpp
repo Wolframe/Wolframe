@@ -340,7 +340,8 @@ public:
 	void release()						{setPos(0);}
 };
 
-
+//\class CharBuffer
+//\brief Buffer for an arbitrary size string (with array doubling strategy for the allocator) 
 struct CharBuffer :public types::ArrayDoublingAllocator
 {
 	CharBuffer(){}

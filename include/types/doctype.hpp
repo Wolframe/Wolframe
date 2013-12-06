@@ -40,6 +40,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\struct DocType
+//\brief Document type representation. Inspired by XML but acting as superset of all document type descriptions.
 struct DocType
 {
 	std::string rootid;
@@ -59,6 +61,7 @@ struct DocType
 	std::string tostring() const;
 };
 
+//\brief Extract the identifier from a document type. The identifier is used as dispatcher key for requests.
 std::string getIdFromDoctype( const std::string& doctype);
 
 }}//namespace

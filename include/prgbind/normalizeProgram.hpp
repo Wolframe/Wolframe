@@ -42,6 +42,8 @@
 namespace _Wolframe {
 namespace prgbind {
 
+//\class NormalizeProgram
+//\brief Program type for normalizer functions (.wnmp files) used for atomic types in form data description languages.
 class NormalizeProgram
 	:public Program
 {

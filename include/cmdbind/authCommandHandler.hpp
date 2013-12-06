@@ -39,6 +39,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
+//\class AuthCommandHandler
+//\brief Command handler for the sub protocol for authorization
 class AuthCommandHandler :public cmdbind::LineCommandHandlerTemplate<AuthCommandHandler>
 {
 public:

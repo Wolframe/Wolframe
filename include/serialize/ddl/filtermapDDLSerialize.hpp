@@ -44,6 +44,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+//\class DDLStructSerializer
+//\brief Iterator on a DDL structure (serializer of VariantStruct)
 class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:

@@ -42,6 +42,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\struct NormalizeFunction
+//\brief Basic normalization function for atomic values (variant type)
 struct NormalizeFunction
 {
 	virtual ~NormalizeFunction(){}
@@ -49,14 +51,18 @@ struct NormalizeFunction
 	virtual Variant execute( const Variant& i) const=0;
 };
 
+//\brief Shared ownership reference to normalizatio functions for atomic values (variant type)
 typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
 
+//\struct NormalizeFunctionMap
+//\brief Map of basic normalization functions for atomic values (variant type)
 struct NormalizeFunctionMap
 {
 	virtual ~NormalizeFunctionMap(){}
 	virtual const NormalizeFunction* get( const std::string& name) const=0;
 };
 
+//\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
 typedef types::CountedReference<NormalizeFunctionMap> NormalizeFunctionMapR;
 
 }}//namespace

@@ -46,6 +46,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\struct keystring
+//\brief Constructor for implementing implicit type reductions in key maps that store the key as upper case string.
 struct keystring
 	:public std::string
 {
@@ -56,6 +58,8 @@ struct keystring
 	keystring(){}
 };
 
+//\struct keymap
+//\brief Map with case insensitive strings as keys
 template <typename ValueType>
 struct keymap
 	:public std::map<keystring,ValueType>

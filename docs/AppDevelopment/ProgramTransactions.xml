@@ -514,7 +514,7 @@
 				</para>
 		</sect3>
 		<sect3>
-			<title>Constraints on database results</title>
+			<title>Constraints on Database Results</title>
 			<para>Database commands returning results can have constraints to catch
 			certain errors that would not be recognized at all or too late otherwise.
 			For example a transaction having a result of a previous command as argument

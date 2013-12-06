@@ -48,6 +48,7 @@ namespace proc {
 namespace prgbind {
 
 ///\class RuntimeEnvironment
+//\brief Runtime environment for functions that need it. (for example as structure hosting the CLR for .NET function calls)
 class RuntimeEnvironment
 {
 public:
@@ -59,6 +60,7 @@ public:
 private:
 };
 
+//\brief Shared ownership reference to a runtime environment
 typedef types::CountedReference<RuntimeEnvironment> RuntimeEnvironmentR;
 
 
@@ -80,6 +82,8 @@ public:
 typedef types::CountedReference<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
 
 
+///\class RuntimeEnvironmentDef
+///\brief Definition of a runtime environment for executing functions
 class RuntimeEnvironmentDef
 {
 public:

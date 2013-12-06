@@ -46,6 +46,8 @@ namespace serialize {
 ///\brief Forward declaration
 class FiltermapParseStateStack;
 
+//\class FiltermapParseState
+//\brief State stack element for an initializer of a structure
 class FiltermapParseState
 {
 public:
@@ -73,6 +75,8 @@ private:
 	std::size_t m_stateidx;
 };
 
+//\class FiltermapParseStateStack
+//\brief State stack for an initializer of a structure
 class FiltermapParseStateStack :public std::vector<FiltermapParseState>
 {
 public:

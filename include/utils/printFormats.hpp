@@ -40,6 +40,8 @@
 namespace _Wolframe {
 namespace utils {
 
+//\class PrintFormat
+//\brief Structure with info for uniform printing for a type of message (log format as compact one liner, text as multi liner)
 struct PrintFormat
 {
 	const char* indent;		//< string to print for indentiation per level of hierarchy for a new item (after 'newitem')
@@ -55,9 +57,12 @@ struct PrintFormat
 	std::size_t maxitemsize;	//< maximum size of printed items
 };
 
+//\brief Get the print format for logger output
 const PrintFormat* logPrintFormat();
+//\brief Get the print format for readable multi line output similar to property tree format
 const PrintFormat* ptreePrintFormat();
 
+//\brief Get a string to log out of a variant structure with a restriction of the size of the atomic elements
 std::string getLogString( const types::Variant& val, std::size_t maxsize=60);
 
 }}

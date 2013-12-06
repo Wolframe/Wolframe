@@ -42,7 +42,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class ContentBufferCommandHandlerEscDLF
+//\class ContentBufferCommandHandlerEscDLF
+//\brief Command handler base class for handlers buffering the input processed
 class ContentBufferCommandHandlerEscDLF :public CommandHandler
 {
 public:

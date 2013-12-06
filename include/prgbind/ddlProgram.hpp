@@ -42,6 +42,8 @@
 namespace _Wolframe {
 namespace prgbind {
 
+//\class DDLProgram
+//\brief Program type for a data definition language (DDL) for forms.
 class DDLProgram
 	:public Program
 {

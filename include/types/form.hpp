@@ -47,6 +47,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\class FormDescription
+//\brief Description of a form structure
 class FormDescription
 	:public types::VariantStructDescription
 {
@@ -112,6 +114,8 @@ private:
 typedef types::CountedReference<FormDescription> FormDescriptionR;
 
 
+//\class Form
+//\brief Form data structure
 class Form
 	:public types::VariantStruct
 {
@@ -163,6 +167,7 @@ private:
 	const FormDescription* m_description;
 };
 
+//\brief shared ownership reference to form data structure
 typedef types::CountedReference<Form> FormR;
 
 }}//namespace

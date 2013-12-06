@@ -40,7 +40,8 @@
 namespace _Wolframe {
 namespace types {
 
-///\brief Interface for an allocator for small chunks without a free. Memory is freed in the destructor of the allocator
+//\class GreedySmallChunkAllocator
+//\brief Interface for an allocator for small chunks without a free. Memory is freed in the destructor of the allocator
 class GreedySmallChunkAllocator
 {
 public:
@@ -54,6 +55,8 @@ private:
 };
 
 
+//\class ArrayDoublingAllocator
+//\brief Interface for an allocator implemented with the strategy of array doubling
 class ArrayDoublingAllocator
 {
 public:
@@ -73,6 +76,8 @@ private:
 };
 
 
+//\class TypedArrayDoublingAllocator
+//\brief Interface for an array doubling allocator that allocates only one fixed size type of element
 template <typename Type>
 struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 {

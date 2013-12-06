@@ -45,6 +45,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+//\class FiltermapDDLSerializeState
+//\brief State stack element for an iterator on a DDL structure (serializer of VariantStruct)
 class FiltermapDDLSerializeState
 {
 public:
@@ -111,6 +113,7 @@ private:
 	types::VariantConst m_tag;
 };
 
+//\brief State stack for an iterator on a DDL structure (serializer of VariantStruct)
 typedef std::vector<FiltermapDDLSerializeState> FiltermapDDLSerializeStateStack;
 
 }}//namespace

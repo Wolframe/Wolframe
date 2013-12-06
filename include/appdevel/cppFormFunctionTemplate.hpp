@@ -39,6 +39,8 @@
 namespace _Wolframe {
 namespace appdevel {
 
+//\class CppFormFunction
+//\brief Application development template for form functions written in C++
 template <class Definition>
 struct CppFormFunction
 {

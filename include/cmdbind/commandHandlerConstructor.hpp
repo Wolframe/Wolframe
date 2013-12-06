@@ -48,7 +48,7 @@ namespace proc {
 namespace cmdbind {
 
 ///\class CommandHandlerConstructor
-///\brief Set of command handlers adressable by identifiers
+///\brief Handler for a set of commands adressable by identifiers
 class CommandHandlerConstructor
 	:public ConfiguredObjectConstructor<cmdbind::CommandHandler>
 {

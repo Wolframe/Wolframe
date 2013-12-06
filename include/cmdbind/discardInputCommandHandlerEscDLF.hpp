@@ -40,6 +40,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
+//\class DiscardInputCommandHandlerEscDLF
+//\brief Command handler that does nothing but seek for the end of content marker. Used to delegate protocol input in case of an error in the protocol on a command that expects "LT.LF" terminated content.
 class DiscardInputCommandHandlerEscDLF :public IOFilterCommandHandlerEscDLF
 {
 public:
