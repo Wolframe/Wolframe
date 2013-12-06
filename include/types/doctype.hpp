@@ -40,7 +40,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\struct DocType
+//\class DocType
 //\brief Document type representation. Inspired by XML but acting as superset of all document type descriptions.
 struct DocType
 {

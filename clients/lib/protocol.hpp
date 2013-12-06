@@ -52,11 +52,11 @@ namespace client {
 class Protocol :public ConnectionHandler
 {
 public:
-	///\struct Event
+	///\class Event
 	///\brief Protocl event structure
 	struct Event
 	{
-		///\struct Type
+		///\class Type
 		///\brief Enumeration of protocol event types
 		enum Type
 		{

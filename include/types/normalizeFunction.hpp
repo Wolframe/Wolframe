@@ -42,7 +42,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\struct NormalizeFunction
+//\class NormalizeFunction
 //\brief Basic normalization function for atomic values (variant type)
 struct NormalizeFunction
 {
@@ -54,7 +54,7 @@ struct NormalizeFunction
 //\brief Shared ownership reference to normalizatio functions for atomic values (variant type)
 typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
 
-//\struct NormalizeFunctionMap
+//\class NormalizeFunctionMap
 //\brief Map of basic normalization functions for atomic values (variant type)
 struct NormalizeFunctionMap
 {

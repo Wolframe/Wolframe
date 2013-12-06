@@ -48,7 +48,7 @@
 namespace _Wolframe {
 namespace config {
 
-//\struct LineInfo
+//\class LineInfo
 //\brief Info for line/coulumn position
 struct LineInfo
 	:public utils::LineInfo
@@ -70,7 +70,7 @@ struct LineInfo
 	}
 };
 
-//\struct PositionalFileError
+//\class PositionalFileError
 //\brief Error class with message and source position info
 struct PositionalError
 {
@@ -94,7 +94,7 @@ struct PositionalError
 	}
 };
 
-//\struct PositionalFileError
+//\class PositionalFileError
 //\brief Error class with message and source file and position info
 struct PositionalFileError
 {
@@ -121,7 +121,7 @@ struct PositionalFileError
 	}
 };
 
-//\struct PositionalErrorException
+//\class PositionalErrorException
 //\brief Base class for an error exception including source position info
 struct PositionalErrorException
 	:public log::Exception<std::runtime_error,PositionalError>
@@ -130,7 +130,7 @@ struct PositionalErrorException
 		:log::Exception<std::runtime_error,PositionalError>(err_){}
 };
 
-//\struct PositionalFileErrorException
+//\class PositionalFileErrorException
 //\brief Base class for an error exception including source file and position info
 struct PositionalFileErrorException
 	:public log::Exception<std::runtime_error,PositionalFileError>
@@ -139,7 +139,7 @@ struct PositionalFileErrorException
 		:log::Exception<std::runtime_error,PositionalFileError>(err_){}
 };
 
-//\struct PositionalErrorMessageBase
+//\class PositionalErrorMessageBase
 //\brief Base class to build up a positional error exception with its error message
 class PositionalErrorMessageBase
 {

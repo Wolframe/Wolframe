@@ -99,11 +99,11 @@ public:
 class Connection
 {
 public:
-	///\struct Event
+	///\class Event
 	///\brief Structure for a connection event
 	struct Event
 	{
-		///\struct Type
+		///\class Type
 		///\brief Enumeration of connection event types
 		enum Type
 		{

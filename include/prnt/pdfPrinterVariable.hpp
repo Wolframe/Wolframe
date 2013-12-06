@@ -40,7 +40,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace prnt {
 
-///\struct Variable
+///\class Variable
 ///\brief Fixed list of usable Variables (Registers)
 struct Variable
 {

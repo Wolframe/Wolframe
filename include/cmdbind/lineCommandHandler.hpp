@@ -250,7 +250,7 @@ struct LineCommandHandlerWrapper
 };
 
 
-//\struct LineCommandHandlerSTMTemplate
+//\class LineCommandHandlerSTMTemplate
 //\brief Template to build up a protocol description out of basic bricks
 template <class LineCommandHandlerImpl>
 struct LineCommandHandlerSTMTemplate :public LineCommandHandlerSTM
