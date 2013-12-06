@@ -12,13 +12,15 @@
 	</sect2>
 
 	<sect2>
-	<title>Prerequisites</title>
+	<title>Configuration</title>
 	<para>For enabling Lua you have to declare the loading of the module 'mod_command_lua'
 		in the main section of the server configuration file.
 		<programlisting language='awk'>
-		module mod_command_lua
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_command_lua.conf" parse="text" />
 		</programlisting>
-	</para>
+		Each Lua script referenced has to be declared in the <code>Processor</code>
+		section of the configuration with <code>program &lt;sourcefile&gt;</code>.
+		</para>
 	</sect2>
 
 	<sect2>

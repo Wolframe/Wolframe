@@ -17,7 +17,7 @@
 		elements that validate and normalize the data elements.
 		Most of the business transactions should be doable as input form
 		description, output form description and a transaction that maps
-		input to output without control flow aware programming (direct map).
+		input to output without control flow aware programming.
 	</para>
 	<para>
 		All types of data forms introduced here are equivalent in use for all programs.
@@ -40,8 +40,9 @@
 	</para>
 	<para>
 		There is only one predefined data type known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>: "string".
-		All other data types are defined as sequence of 'normalizer' functions in a normalize definition file.
-		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
+		All other data types are defined as sequence of <glossterm>normalizer</glossterm> functions in a normalize definition file.
+		The <glossterm>normalizer</glossterm> functions assigned to a type validate the value and transform it to its normalized form.
+		We explain in the next section how data types are defined.
 	</para>
 	<para>
 		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>:
@@ -84,7 +85,7 @@
 
 				<row>
 					<entry>[]</entry>
-					<entry>prefix of data type</entry>
+					<entry>suffix of data type</entry>
 					<entry>Expresses that the element is an array of this type</entry>
 				</row>
 		
@@ -96,7 +97,7 @@
 
 				<row>
 					<entry>(..)</entry>
-					<entry>postfix of data type</entry>
+					<entry>suffix of data type</entry>
 					<entry>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</entry>
 				</row>
 			</tbody>
@@ -116,6 +117,7 @@
 		</programlisting>
 	</para>
 	</sect2>
+
 	<para></para>
 </sect1>
 <beginpage/>
