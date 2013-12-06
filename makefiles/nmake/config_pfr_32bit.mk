@@ -46,7 +46,7 @@ OPENSSL_DIR = C:\OpenSSL\Win32
 # (http://www.postgresql.org/)
 ##############################
 
-PGSQL_DIR = 'C:\Program Files (x86)\PostgreSQL\9.3'
+PGSQL_DIR = C:\Program Files (x86)\PostgreSQL\9.3
 
 # Tcl 8.5 and Expect
 ####################

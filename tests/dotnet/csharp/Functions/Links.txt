@@ -40,6 +40,7 @@ Articles:
 		NOTE: This article points also out the interface only export from .NET to COM interop
 	[A10] Registration free COM/.NET interop: http://blogs.msdn.com/b/junfeng/archive/2006/05/17/registration-free-com-net-interop.aspx
 	[A11] Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
+	[A12] List of terms with explanation notes (Spick): http://progtutorials.tripod.com/COM.htm
 
 Code Examples:
 	[C01] Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
