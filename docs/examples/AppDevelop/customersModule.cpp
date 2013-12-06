@@ -1,5 +1,5 @@
 
-#include "appdevel.hpp"
+#include "appDevel.hpp"
 // ... PUT THE INCLUDES FOR THE "ProcessCustomer" FUNCTION DECLARATION HERE !
 
 CPP_APPLICATION_FORM_FUNCTION_MODULE("process customer function")

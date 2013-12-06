@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel.hpp
+///\file appDevel.hpp
 ///\brief Macros and templates for building Wolframe extensions. This is the main include file for writing Wolframe application extensions in native C++.
 #ifndef _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
