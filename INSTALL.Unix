@@ -15,7 +15,6 @@ Table of Contents
     Fedora 18
     Fedora 19
     Ubuntu 10.04.1 LTS
-    Ubuntu 11.04
     Ubuntu 12.04 LTS
     Ubuntu 12.10
     Ubuntu 13.04
@@ -299,52 +298,16 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 
 For scripting in Python you have to set WITH_PYTHON=1.
 
-Ubuntu 11.04
-------------
-
-Optional packages: libssl-dev (0.9.8o),
-                   libpam-dev (1.1.2), libsasl2-dev (2.1.23),
-                   libsqlite3-dev (3.7.4), libpq-dev (8.4.8),
-                   libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
-
-libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
-compile your own one.
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
-Use WITH_LOCAL_FREEIMAGE=1 for image manipulation support. The supplied
-version of freeimage-devel is too old.
-
-For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
-
-When rebuilding the SVG images of the documentation you also need 'dia'.
-
-For running non-gtest tests you need 'expect'.
-
-For running the Sasl AAAA tests you need 'sasl2-bin'.
-
-For running the Postgresql database tests you need 'postgresql-client'.
-
-For running the Sqlite3 database tests you need 'sqlite3'.
-
-For running some tests you need 'telnet' (0.17).
-
-For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
-
-For scripting in Python you have to set WITH_PYTHON=1.
-
 Ubuntu 12.04
 ------------
-
-Required packages: libboost-dev (1.48), libboost-program-options-dev,
-                   libboost-filesystem-dev, libboost-thread-dev,
-                   libboost-random-dev, libboost-locale-dev
 
 Optional packages: libssl-dev (1.0.1),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
                    libsqlite3-dev (3.7.9), libpq-dev (9.1.3),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
                    libpng-dev (1.2.46), python3-dev (3.2.3)
+
+libboost-dev (1.42) is too old. Compile your own one.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
