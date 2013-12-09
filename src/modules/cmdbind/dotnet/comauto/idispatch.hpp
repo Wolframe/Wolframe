@@ -33,12 +33,7 @@
 //\brief Implements IDispatch interface for a reference class to pass to .NET via interop
 #ifndef _Wolframe_COM_AUTOMATION_IDISPATCH_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_IDISPATCH_HPP_INCLUDED
-
-struct _GUID;
-typedef _GUID* REFIID; 
-#ifndef HRESULT
-#define HRESULT __int32
-#undef
+#include <objbase.h>
 
 namespace _Wolframe {
 namespace comauto {
@@ -47,52 +42,65 @@ template <class Object>
 class ObjectReference :public IDispatch
 {
 public:
-	ObjectReference( const Object& obj_, REFIID iid_)
-		:m_obj(obj_),m_iid(iid_){}
+	ObjectReference( const Object& obj_)
+		:m_obj(obj_){}
 
 	~ObjectReference(){}
 
-	typedef __uint32 ULONG;
-	typedef __int32 LONG;
-
-	HRESULT QueryInterface( REFIID riid, void** ppvObj)
+    // IDispatch
+    HRESULT __stdcall GetTypeInfoCount( UINT* pCountTypeInfo)
 	{
-		if (!ppvObj) return E_INVALIDARG;
-		*ppvObj = 0;
-		if (riid == IID_IUnknown)
-		{
-			*ppvObj = (LPVOID)this;
-			AddRef();
-			return NOERROR;
-		}
-		else if (riid == m_iid)
-		{
-			*ppvObj = (LPVOID)this;
-			AddRef();
-			return NOERROR;
-		}
-		return E_NOINTERFACE;
+		*pCountTypeInfo = 0;
+		return 0;
 	}
 
-	ULONG AddRef()
+	HRESULT __stdcall GetTypeInfo( UINT, LCID, ITypeInfo**)
 	{
-		::InterlockedIncrement( m_cRef);
-		return m_cRef;
+		return E_NOTIMPL;
 	}
 
-	ULONG Release()
+    HRESULT __stdcall GetIDsOfNames( REFIID /*riid IID_NULL always*/, LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
 	{
-		ULONG ulRefCount = ::InterlockedDecrement(m_cRef);
-		if (0 == m_cRef)
+		enum {strlen_call = 4};
+		static LPOLESTR rgszName_call = L"call";
+		if (riid == 0)
 		{
-			delete this;
+			 if (cNames != 1) return DISP_E_UNKNOWNNAME;
+			 int ii=0;
+			 for (; ii<=(int)strlen_call && rgszNames[0][ii] == rgszName_call[ii]; ++ii){}
+			 if (ii == (int)strlen_call+1)
+			 {
+				rgDispId[0] = 0x0001;
+				return S_OK;
+			 }
 		}
-		return ulRefCount;
+		else
+		{
+			return DISP_E_UNKNOWNNAME;
+		}
 	}
 
+    HRESULT __stdcall Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+	{
+		try
+		{
+			m_obj->call();
+		}
+		catch (const std::runtime_error& e)
+		{
+			pExcepInfo->wCode = 0;
+			pExcepInfo->wReserved = 0;
+			pExcepInfo->bstrSource = "Wolframe Processor Provider";
+			pExcepInfo->bstrDescription = e.what();
+			pExcepInfo->bstrHelpFile = 0;
+			pExcepInfo->dwHelpContext = 0;
+			pExcepInfo->pvReserved = 0;
+			pExcepInfo->pfnDeferredFillIn = 0;
+			pExcepInfo->scode = 0;
+		}
+	}
 private:
 	Object m_obj;
-	REFIID m_iid;
 };
 
 }}//namespace

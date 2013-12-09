@@ -296,11 +296,21 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* typedes
 		try
 		{
 			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( typedesc->hreftype, &rectypeinfo))
-			rt.append( "{");
-			rt.append( structstring( rectypeinfo));
 			WRAP( rectypeinfo->GetTypeAttr( &recattr))
-			if (recattr->typekind != TKIND_RECORD) throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods)");
-			rt.append( "}");
+			if (recattr->typekind == TKIND_RECORD)
+			{
+				rt.append( "{");
+				rt.append( structstring( rectypeinfo));
+				rt.append( "}");
+			}
+			else if (recattr->typekind == TKIND_DISPATCH)
+			{
+				rt.append( "[IDispatch]");
+			}
+			else
+			{
+				throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods) or TKIND_DISPATCH (processor provider context)");
+			}
 		}
 		catch (const std::runtime_error& e)
 		{

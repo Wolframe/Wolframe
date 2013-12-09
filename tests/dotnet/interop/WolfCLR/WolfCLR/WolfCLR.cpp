@@ -53,7 +53,7 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Dotn
 {
 	langbind::Form user, user2, users(langbind::Form::Array), usergroup, place, place2, pair, pair2, pair3, pair4, pairs(langbind::Form::Array), intarr(langbind::Form::Array);
 	langbind::Form sar(langbind::Form::Array);
-	langbind::Form param_AddIdPair, param_AddIdPairs, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers, param_StoreUserGroup, param_Sum;
+	langbind::Form param_AddIdPair, param_AddIdPairs, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers, param_StoreUserGroup, param_Sum, param_GetUserAddress;
 	langbind::Form param_ConcatStrings,param_GetIdPairs;
 	pair
 		( "a", langbind::Form( "1"))
@@ -149,6 +149,9 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Dotn
 	param_StoreUserGroup
 		( "usr", usergroup)
 		;
+	param_GetUserAddress
+		( "usr", user)
+		;
 	test_function_call( funcmap, "Functions.AddIdPair", param_AddIdPair, "RESULT AddIdPair:");
 	test_function_call( funcmap, "Functions.GetIdPairs", param_GetIdPairs, "RESULT GetIdPairs:");
 	test_function_call( funcmap, "Functions.ConcatStrings", param_ConcatStrings, "RESULT ConcatStrings:");
@@ -158,6 +161,7 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Dotn
 	test_function_call( funcmap, "Functions.Sum", param_Sum, "RESULT Sum:");
 	test_function_call( funcmap, "Functions.StoreUsers", param_StoreUsers, "RESULT StoreUsers:");
 	test_function_call( funcmap, "Functions.StoreUserGroup", param_StoreUserGroup, "RESULT StoreUserGroup:");
+	//[+]test_function_call( funcmap, "Functions.GetUserAddress", param_GetUserAddress, "RESULT GetUserAddress:");
 };
 
 
@@ -167,7 +171,7 @@ int main( int , const char**)
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED));
 		std::string path( "C:\\Github\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
-		std::string assembly( "Functions, Version=1.0.0.30, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+		std::string assembly( "Functions, Version=1.0.0.31, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");

@@ -96,10 +96,13 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\include\langbind\formFunction.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\procProviderDispatch.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -111,8 +114,10 @@
     <ClCompile Include="..\..\..\..\..\src\libwolframe\utils_conversions.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\procProviderDispatch.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\typelib.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.cpp" />
     <ClCompile Include="..\..\src\ddl_form.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WolfCLR.cpp">

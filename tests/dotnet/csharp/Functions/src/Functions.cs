@@ -5,10 +5,6 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Wolframe;
 
-//
-// [ClassInterface(ClassInterfaceType.AutoDispatch)]
-//
-
 [ComVisible(true)]
 [Guid("755efe8f-f125-494c-89a2-cf3cb03a0c8c")]
 public struct IdPair
@@ -181,6 +177,7 @@ public class Functions : FunctionInterface
     }
     public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
     {
+        Address rt = (Address)provider.call("GetAddress", (object)usr);
         rt.street = "Korneliusstr. 11";
         rt.country = "Schweiz";
         return rt;

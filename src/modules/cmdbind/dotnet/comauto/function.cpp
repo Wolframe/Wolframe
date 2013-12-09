@@ -29,10 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+#include "comauto/procProviderDispatch.hpp"
 #include "comauto/function.hpp"
 #include "comauto/utils.hpp"
 #include "comauto/clr.hpp"
 #include "comauto/typelib.hpp"
+#include "comauto/variantInputFilter.hpp"
 #include <oaidl.h>
 #include <comdef.h>
 #include <atlbase.h>
@@ -60,7 +62,7 @@ public:
 	langbind::TypedInputFilterR result() const;
 
 private:
-	const proc::ProcessorProvider* m_provider;			//< processor provider reference for function called
+	ProcessorProviderDispatch m_provider;		//< processor provider reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
 	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
@@ -77,7 +79,7 @@ class DotnetFunction::Impl
 public:
 	struct Parameter
 	{
-		enum AddrMode {Value,Safearray};
+		enum AddrMode {Value,SafeArray,ProcProvider};
 
 		Parameter( const Parameter& o);
 		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_);
@@ -128,65 +130,6 @@ private:
 	std::vector<Parameter> m_parameterlist;
 	ReturnType m_returntype;
 };
-
-namespace
-{
-class FunctionResult
-	:public langbind::TypedInputFilter
-{
-public:
-	FunctionResult( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
-		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
-		,m_typelib(typelib_)
-		,m_flags(flags_)
-	{
-		m_stk.push_back( StackElem( "", m_typelib->getRecordInfo(typeinfo_), const_cast<ITypeInfo*>(typeinfo_), data_));
-	}
-
-	FunctionResult( const FunctionResult& o)
-		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
-		,m_stk(o.m_stk)
-		,m_elembuf(o.m_elembuf)
-		,m_typelib(o.m_typelib)
-	{}
-
-	virtual ~FunctionResult()
-	{}
-
-	virtual TypedInputFilter* copy() const
-	{
-		return new FunctionResult( *this);
-	}
-
-	virtual bool getNext( ElementType& type, types::VariantConst& element);
-
-private:
-	enum State
-	{
-		VarOpen,
-		VarClose
-	};
-	struct StackElem
-	{
-		State state;
-		ITypeInfo* typeinfo;
-		const IRecordInfo* recinfo;
-		TYPEATTR* typeattr;
-		VARIANT data;
-		std::string name;
-		std::size_t idx;
-
-		StackElem( const StackElem& o);
-		StackElem( const std::string& name_, const IRecordInfo* recinfo_, ITypeInfo* typeinfo_, VARIANT data_);
-		~StackElem();
-	};
-	std::vector<StackElem> m_stk;
-	std::string m_elembuf;
-	const comauto::TypeLib* m_typelib;
-	serialize::Context::Flags m_flags;
-};
-}//anonymous namespace
-
 
 static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typeinfo, std::vector<comauto::DotnetFunctionR>& funcs, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname, const std::string& classname)
 {
@@ -324,8 +267,9 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 		BSTR* pnames;
 		UINT size;
 		ITypeInfo* rectypeinfo;
+		TYPEATTR* recattr;
 
-		Local()	:pnames(0),rectypeinfo(0){}
+		Local()	:pnames(0),rectypeinfo(0),recattr(0){}
 		~Local()
 		{
 			if (pnames)
@@ -333,7 +277,14 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 				for (UINT ii=0; ii<size; ++ii) if (pnames[ii]) ::SysFreeString( pnames[ii]);
 				delete [] pnames;
 			}
+			clear();
+		}
+		void clear()
+		{
+			if (rectypeinfo && recattr) rectypeinfo->ReleaseTypeAttr( recattr);
+			recattr = 0;
 			if (rectypeinfo) rectypeinfo->Release();
+			rectypeinfo = 0;
 		}
 	};
 	Local local;
@@ -347,11 +298,44 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 		const TYPEDESC* td = &m_funcdesc->lprgelemdescParam[ii-1].tdesc;
 		if (td->vt == VT_USERDEFINED)
 		{
-			if (local.rectypeinfo) local.rectypeinfo->Release();
-			local.rectypeinfo = 0;
+			local.clear();
+
 			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->hreftype, &local.rectypeinfo))
-			Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::Value);
-			m_parameterlist.push_back( param);
+			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr))
+			if (local.recattr->typekind == TKIND_RECORD)
+			{
+				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::Value);
+				m_parameterlist.push_back( param);
+			}
+			else if (local.recattr->typekind == TKIND_DISPATCH)
+			{
+				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::ProcProvider);
+				m_parameterlist.push_back( param);
+			}
+			else
+			{
+				throw std::runtime_error( "can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods) or TKIND_DISPATCH (processor provider context)");
+			}
+		}
+		else if (td->vt == VT_PTR && td->lptdesc->vt == VT_USERDEFINED)
+		{
+			local.clear();
+
+			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
+			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr))
+			if (local.recattr->typekind == TKIND_DISPATCH)
+			{
+				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::ProcProvider);
+				m_parameterlist.push_back( param);
+			}
+			else if (local.recattr->typekind == TKIND_RECORD)
+			{
+				m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td, 0, Parameter::Value));
+			}
+			else
+			{
+				throw std::runtime_error( "can only handle VT_PTR of VT_USERDEFINED type of TKIND_DISPATCH (processor provider context)");
+			}
 		}
 		else if (td->vt == VT_SAFEARRAY)
 		{
@@ -361,7 +345,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 			{
 				WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
 			}
-			Parameter param( comauto::utf8string( local.pnames[ii]), td->lptdesc, local.rectypeinfo, Parameter::Safearray);
+			Parameter param( comauto::utf8string( local.pnames[ii]), td->lptdesc, local.rectypeinfo, Parameter::SafeArray);
 			m_parameterlist.push_back( param);
 		}
 		else
@@ -405,7 +389,7 @@ void comauto::DotnetFunction::Impl::print( std::ostream& out) const
 	for (; pi != pe; ++pi)
 	{
 		if (pi != m_parameterlist.begin()) out << ", ";
-		out << pi->name << " :" << ((pi->addrMode==Parameter::Safearray)?"[] ":"") << comauto::typestr( m_typeinfo, const_cast<TYPEDESC*>(pi->typedesc));
+		out << pi->name << " :" << ((pi->addrMode==Parameter::SafeArray)?"[] ":"") << comauto::typestr( m_typeinfo, const_cast<TYPEDESC*>(pi->typedesc));
 	}
 	out << " ) :" << comauto::typestr( m_typeinfo, m_returntype.typedesc) << std::endl;
 }
@@ -501,12 +485,18 @@ AGAIN:
 
 				switch (paramdescr->addrMode)
 				{
+					case DotnetFunction::Impl::Parameter::ProcProvider:
+					{
+						m_param[ m_paramidx].vt = VT_DISPATCH;
+						m_param[ m_paramidx].pdispVal = &m_provider;
+						break;
+					}
 					case DotnetFunction::Impl::Parameter::Value:
 					{
 						m_param[ m_paramidx] = paramvalue;
 						break;
 					}
-					case DotnetFunction::Impl::Parameter::Safearray:
+					case DotnetFunction::Impl::Parameter::SafeArray:
 					{
 						m_arrayparam[ m_paramidx].push_back( paramvalue);
 						paramvalue.vt = VT_EMPTY;
@@ -603,7 +593,7 @@ AGAIN:
 		// function signature validation:
 		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
 		{
-			// ... don't know yet what to do here, because attributes are not defined for .NET functions ...
+			// ... ignored because XML attributes are unknown in .NET structures ...
 		}
 		std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
 		for (; ii < nn; ++ii)
@@ -618,7 +608,7 @@ AGAIN:
 				}
 				switch (param->addrMode)
 				{
-					case DotnetFunction::Impl::Parameter::Safearray:
+					case DotnetFunction::Impl::Parameter::SafeArray:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
 							const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
@@ -653,12 +643,14 @@ AGAIN:
 							throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
 						}
 						break;
+					case DotnetFunction::Impl::Parameter::ProcProvider:
+						break;
 				}
 			}
 		}
 		VARIANT resdata;
 		m_func->m_impl->clr()->call( &resdata, m_func->m_impl->assemblyname(), m_func->m_impl->classname(), m_func->m_impl->methodname(), m_func->m_impl->nofParameter(), m_param);
-		m_result.reset( new FunctionResult( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata, m_flags));
+		m_result.reset( new VariantInputFilter( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata, m_flags));
 		return true;
 	}
 	catch (const std::runtime_error& e)
@@ -679,252 +671,6 @@ AGAIN:
 langbind::TypedInputFilterR comauto::DotnetFunctionClosure::Impl::result() const
 {
 	return m_result;
-}
-
-FunctionResult::StackElem::StackElem( const StackElem& o)
-	:name(o.name),state(o.state),recinfo(o.recinfo),typeinfo(o.typeinfo),typeattr(o.typeattr),idx(o.idx)
-{
-	try
-	{
-		data.vt = VT_EMPTY;
-		WRAP( comauto::wrapVariantCopy( &data, &o.data))
-		if (typeinfo)
-		{
-			typeinfo->AddRef();
-			WRAP( typeinfo->GetTypeAttr( &typeattr))
-		}
-	}
-	catch (const std::runtime_error& e)
-	{
-		comauto::wrapVariantClear( &data);
-		if (typeinfo)
-		{
-			if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
-			typeinfo->Release();
-		}
-		throw e;
-	}
-}
-
-FunctionResult::StackElem::StackElem( const std::string& name_, const IRecordInfo* recinfo_, ITypeInfo* typeinfo_, VARIANT data_)
-	:name(name_),state(VarOpen),recinfo(recinfo_),typeinfo(typeinfo_),typeattr(0),data(data_),idx(0)
-{
-	try
-	{
-		if (typeinfo)
-		{
-			typeinfo->AddRef();
-			WRAP( typeinfo->GetTypeAttr( &typeattr))
-		}
-	}
-	catch (const std::runtime_error& e)
-	{
-		if (typeinfo)
-		{
-			if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
-			typeinfo->Release();
-		}
-		throw e;
-	}
-}
-
-FunctionResult::StackElem::~StackElem()
-{
-	comauto::wrapVariantClear( &data);
-	if (typeinfo)
-	{
-		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
-		typeinfo->Release();
-	}
-}
-
-bool FunctionResult::getNext( ElementType& type, types::VariantConst& element)
-{
-AGAIN:
-	VARIANT data;
-	data.vt = VT_EMPTY;
-	VARDESC* vardesc = 0;
-	ITypeInfo* reftypeinfo = 0;
-	try
-	{
-		if (m_stk.empty()) return false;
-		StackElem& cur = m_stk.back();	//< REMARK: 'cur' only valid till next m_stk.push_back()/pop_back(). Check that push/pop return or goto AGAIN !
-		switch (cur.state)
-		{
-			case VarOpen:
-			{
-				if ((cur.data.vt & VT_ARRAY) == VT_ARRAY)
-				{
-					if (1 != cur.data.parray->cDims)
-					{
-						throw std::runtime_error( "cannont handle multi dimensional arrays");
-					}
-					if (cur.idx >= cur.data.parray->rgsabound->cElements)
-					{
-						m_stk.pop_back();
-						goto AGAIN;
-					}
-					cur.state = VarClose;
-					if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0 || cur.name.empty())
-					{
-						element = types::VariantConst( cur.idx+1);
-					}
-					else
-					{
-						element = types::VariantConst( m_elembuf = cur.name);
-					}
-					type = OpenTag;
-					LONG idx = cur.idx++;
-					VARTYPE elemvt = cur.data.vt - VT_ARRAY;
-
-					if (comauto::isAtomicType( elemvt))
-					{
-						data.vt = elemvt;
-						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(comauto::arithmeticTypeAddress( &data))))
-						cur.state = VarClose;
-						m_stk.push_back( StackElem( "", 0, 0, data));
-						std::memset( &data, 0, sizeof(data));
-						data.vt = VT_EMPTY;
-					}
-					else if (comauto::isStringType( elemvt))
-					{
-						std::memset( &data, 0, sizeof(data));
-						data.vt = elemvt;
-						switch (elemvt)
-						{
-							case VT_LPSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPSTR( const_cast<VARIANT*>(&data))))
-								break;
-							case VT_LPWSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPWSTR( const_cast<VARIANT*>(&data))))
-								break;
-							case VT_BSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, V_BSTR( const_cast<VARIANT*>(&data))))
-								break;
-							default:
-								throw std::logic_error("internal: unknown string type");
-						}
-						cur.state = VarClose;
-						m_stk.push_back( StackElem( "", 0, 0, data));
-						std::memset( &data, 0, sizeof(data));
-						data.vt = VT_EMPTY;
-					}
-					else if (elemvt == VT_RECORD)
-					{
-						std::memset( &data, 0, sizeof(data));
-						data.vt = elemvt;
-						WRAP( ::SafeArrayGetRecordInfo( cur.data.parray, &data.pRecInfo))
-						if (!data.pRecInfo) throw std::runtime_error( "cannot iterate on result structure without record info");
-						data.pvRecord = data.pRecInfo->RecordCreate();
-						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(data.pvRecord)))
-						data.pRecInfo->GetTypeInfo( &reftypeinfo);
-						cur.state = VarClose;
-						m_stk.push_back( StackElem( "", data.pRecInfo, reftypeinfo, data));
-						std::memset( &data, 0, sizeof(data));
-						data.vt = VT_EMPTY;
-						reftypeinfo->Release();
-						reftypeinfo = 0;
-					}
-					else
-					{
-						throw std::runtime_error(std::string("cannot handle this array element type in result: '") + comauto::typestr(elemvt));
-					}
-					return true;
-				}
-				else if (comauto::isAtomicType( cur.data.vt) || comauto::isStringType( cur.data.vt))
-				{
-					element = comauto::getAtomicElement( cur.data, m_elembuf);
-					type = Value;
-					m_stk.pop_back();
-					return true;
-				}
-				else if (cur.data.vt == VT_RECORD)
-				{
-					LONG idx = cur.idx++;
-					cur.state = VarClose;
-
-					if (idx >= cur.typeattr->cVars)
-					{
-						m_stk.pop_back();
-						goto AGAIN;
-					}
-					WRAP( cur.typeinfo->GetVarDesc( idx, &vardesc))
-					std::wstring varname( comauto::variablename_utf16( cur.typeinfo, vardesc));
-					cur.typeinfo->ReleaseVarDesc( vardesc);
-					vardesc = 0;
-
-					const_cast<IRecordInfo*>(cur.recinfo)->GetField( cur.data.pvRecord, varname.c_str(), &data);
-					if ((data.vt & VT_ARRAY) == VT_ARRAY)
-					{
-						bool rt = false;
-						std::string elemname;
-						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
-						{
-							type = OpenTag;
-							element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
-							cur.state = VarClose;
-							rt = true;
-						}
-						else
-						{
-							elemname = comauto::utf8string(varname);
-							cur.state = VarOpen;
-						}
-						m_stk.push_back( StackElem( elemname, 0, 0, data));
-						std::memset( &data, 0, sizeof(data));
-						data.vt = VT_EMPTY;
-						if (rt) return true;
-						goto AGAIN;
-					}
-					else if (data.vt == VT_RECORD)
-					{
-						if (!data.pRecInfo || !data.pvRecord) 
-						{
-							throw std::runtime_error("cannot iterate through structure without record info");
-						}
-						WRAP( data.pRecInfo->GetTypeInfo( &reftypeinfo));
-						m_stk.push_back( StackElem( "", data.pRecInfo, reftypeinfo, data));
-						reftypeinfo->Release();
-						reftypeinfo = 0;
-						type = OpenTag;
-						element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
-					}
-					else if (comauto::isAtomicType( data.vt) || comauto::isStringType( data.vt))
-					{
-						m_stk.push_back( StackElem( "", 0, 0, data));
-						type = OpenTag;
-						element = types::VariantConst( m_elembuf = comauto::utf8string( varname));
-					}
-					else
-					{
-						throw std::runtime_error( std::string( "cannot handle this type in result structure '") + comauto::typestr(data.vt) + "'");
-					}
-					std::memset( &data, 0, sizeof(data));
-					data.vt = VT_EMPTY;
-					return true;
-				}
-				else
-				{
-					throw std::runtime_error( std::string("cannot handle this type of result '") + comauto::typestr(cur.data.vt) + "'");
-				}
-			}
-			case VarClose:
-			{
-				cur.state = VarOpen;
-				element = types::VariantConst();
-				type = CloseTag;
-				return true;
-			}
-		}
-	}
-	catch (const std::runtime_error& e)
-	{
-		comauto::wrapVariantClear( &data);
-		if (vardesc) m_stk.back().typeinfo->ReleaseVarDesc( vardesc);
-		if (reftypeinfo) reftypeinfo->Release();
-		throw e;
-	}
-	return false;
 }
 
 DotnetFunctionClosure::DotnetFunctionClosure( const DotnetFunction* func_)

@@ -17,6 +17,7 @@ Glossary and Microsoft Documentation:
 	[D10] COM/ATL FAQ (HOWTO: Use structs in Automation-compatible interfaces): http://vcfaq.mvps.org/com/4.htm
 	[D11] Marshalling Details (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/ms692621(v=vs.85).aspx 
 	[D12] Fibers: http://msdn.microsoft.com/en-us/library/windows/desktop/ms682661(v=vs.85).aspx
+	[D13] What is Windows.h: http://en.wikipedia.org/wiki/Windows.h
 
 Books:
 	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
