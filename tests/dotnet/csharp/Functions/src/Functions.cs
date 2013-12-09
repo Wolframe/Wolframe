@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Wolframe;
+
+//
+// [ClassInterface(ClassInterfaceType.AutoDispatch)]
+//
 
 [ComVisible(true)]
 [Guid("755efe8f-f125-494c-89a2-cf3cb03a0c8c")]
@@ -55,6 +60,7 @@ public interface FunctionInterface
     [ComVisible(true)]  string ConcatStrings( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar);
     [ComVisible(true)]  Address GetAddress_p( [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
     [ComVisible(true)]  User GetUser_p(int id, [MarshalAs(UnmanagedType.BStr)] string name, [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
+    [ComVisible(true)]  Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr);
 }
 
 [ComVisible(true)]
@@ -171,6 +177,12 @@ public class Functions : FunctionInterface
         rt.name = name;
         rt.place.street = street;
         rt.place.country = country;
+        return rt;
+    }
+    public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
+    {
+        rt.street = "Korneliusstr. 11";
+        rt.country = "Schweiz";
         return rt;
     }
 }

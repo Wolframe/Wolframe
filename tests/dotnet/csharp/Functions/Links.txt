@@ -21,6 +21,7 @@ Glossary and Microsoft Documentation:
 Books:
 	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
 		NOTE: Chapter Creating a TypeLibrary: http://www.thrysoee.dk/InsideCOM+/ch09b.htm 
+		NOTE: IDispatch http://thrysoee.dk/InsideCOM+/ch05c.htm
 
 Articles:
 	[A01] CLR Hosting APIs (MSDN Magazine) http://msdn.microsoft.com/en-us/magazine/cc163567.aspx
@@ -41,8 +42,13 @@ Articles:
 	[A10] Registration free COM/.NET interop: http://blogs.msdn.com/b/junfeng/archive/2006/05/17/registration-free-com-net-interop.aspx
 	[A11] Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
 	[A12] List of terms with explanation notes (Spick): http://progtutorials.tripod.com/COM.htm
+	[A13] COM interop blog (10 Articles): http://blog.kutulu.org/2012/01/com-interop-part-10-recapping-and.html
 
 Code Examples:
 	[C01] Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
 	[C02] Example calling .NET from native C++ via CLR: http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
+
+Stackoverflow:
+	[S01] How to send an event callback parameter to a com object with .NET: http://stackoverflow.com/questions/4773943/how-to-send-an-event-callback-parameter-to-a-com-object-with-net
+	[S02] Implement COM IDispatch without ATL: http://stackoverflow.com/questions/19253471/implement-com-idispatch-without-atl
 
