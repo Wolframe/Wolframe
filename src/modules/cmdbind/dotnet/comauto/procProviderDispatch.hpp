@@ -47,9 +47,10 @@ class ProcessorProviderDispatch :public IDispatch
 {
 public:
 	ProcessorProviderDispatch( const proc::ProcessorProvider* provider_)
-		:m_provider(provider_){}
+		:m_provider(provider_),m_refcount(1){}
 
-	~ProcessorProviderDispatch(){}
+	~ProcessorProviderDispatch()
+	{}
 
     // Interface IDispatch:
     HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);

@@ -47,12 +47,14 @@ static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvid
 
 HRESULT comauto::ProcessorProviderDispatch::GetTypeInfoCount( UINT* pCountTypeInfo)
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetTypeInfoCount" << std::endl;
 	*pCountTypeInfo = 0;
 	return 0;
 }
 
 HRESULT comauto::ProcessorProviderDispatch::GetTypeInfo( UINT, LCID, ITypeInfo**)
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetTypeInfo" << std::endl;
 	return E_NOTIMPL;
 }
 
@@ -76,6 +78,7 @@ static int compareIdentifier( LPOLESTR aa, LPOLESTR bb)
 
 HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetIDsOfNames" << std::endl;
 	if (riid == IID_NULL)
 	{
 			if (cNames != 1) return DISP_E_UNKNOWNNAME;
@@ -93,6 +96,7 @@ HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR
 
 HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::Invoke" << std::endl;
 	try
 	{
 		const char* function_ = "FUNCNAME";
@@ -117,6 +121,7 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 
 HRESULT comauto::ProcessorProviderDispatch::QueryInterface( REFIID riid, void** ppvObj)
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::QueryInterface" << std::endl;
 	if (!ppvObj) return E_INVALIDARG;
 	*ppvObj = 0;
 	if (riid == IID_IUnknown)
@@ -136,12 +141,15 @@ HRESULT comauto::ProcessorProviderDispatch::QueryInterface( REFIID riid, void** 
 
 ULONG comauto::ProcessorProviderDispatch::AddRef()
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::AddRef" << std::endl;
 	::InterlockedIncrement( &m_refcount);
 	return m_refcount;
 }
 
 ULONG comauto::ProcessorProviderDispatch::Release()
 {
+	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::Release" << std::endl;
+
 	ULONG ulRefCount = ::InterlockedDecrement( &m_refcount);
 	if (0 == m_refcount)
 	{

@@ -161,7 +161,7 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Dotn
 	test_function_call( funcmap, "Functions.Sum", param_Sum, "RESULT Sum:");
 	test_function_call( funcmap, "Functions.StoreUsers", param_StoreUsers, "RESULT StoreUsers:");
 	test_function_call( funcmap, "Functions.StoreUserGroup", param_StoreUserGroup, "RESULT StoreUserGroup:");
-	//[+]test_function_call( funcmap, "Functions.GetUserAddress", param_GetUserAddress, "RESULT GetUserAddress:");
+	test_function_call( funcmap, "Functions.GetUserAddress", param_GetUserAddress, "RESULT GetUserAddress:");
 };
 
 

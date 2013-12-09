@@ -72,16 +72,19 @@ public class Functions : FunctionInterface
     {
         return i + j;
     }
+
     public int Sub( int i, int j)
     {
         return i - j;
     }
+
     public int Sum( int[] aa)
     {
         int rt = 0;
         for (int ii = 0; ii < aa.Length; ++ii) rt += aa[ii];
         return rt;
     }
+
     public User StoreUser( User usr)
     {
         usr.id += 1;
@@ -120,10 +123,12 @@ public class Functions : FunctionInterface
     {
         return adr.country.Length;
     }
+
     public int AddIdPair( IdPair p)
     {
         return p.a + p.b;
     }
+
     public int AddIdPairs( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] IdPair[] p)
     {
         int rt = 0;
@@ -133,6 +138,7 @@ public class Functions : FunctionInterface
         }
         return rt;
     }
+
     public string ConcatStrings( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar)
     {
         string rt = "";
@@ -142,6 +148,7 @@ public class Functions : FunctionInterface
         }
         return rt;
     }
+
     public IdPair GetIdPair(int a)
     {
         IdPair rt;
@@ -149,6 +156,7 @@ public class Functions : FunctionInterface
         rt.b = a - 1;
         return rt;
     }
+
     public IdPair[] GetIdPairs( int len)
     {
         IdPair[] rt = new IdPair[ len];
@@ -159,6 +167,7 @@ public class Functions : FunctionInterface
         }
         return rt;
     }
+
     public Address GetAddress_p([MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country)
     {
         Address rt = new Address();
@@ -166,6 +175,7 @@ public class Functions : FunctionInterface
         rt.country = country;
         return rt;
     }
+
     public User GetUser_p(int id, [MarshalAs(UnmanagedType.BStr)] string name, [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country)
     {
         User rt = new User();
@@ -175,9 +185,10 @@ public class Functions : FunctionInterface
         rt.place.country = country;
         return rt;
     }
+
     public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
     {
-        Address rt = (Address)provider.call("GetAddress", (object)usr);
+        Address rt;// = (Address)provider.call("GetAddress", (object)usr);
         rt.street = "Korneliusstr. 11";
         rt.country = "Schweiz";
         return rt;

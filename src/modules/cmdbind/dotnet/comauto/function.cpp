@@ -62,7 +62,7 @@ public:
 	langbind::TypedInputFilterR result() const;
 
 private:
-	ProcessorProviderDispatch m_provider;		//< processor provider reference for function called
+	ProcessorProviderDispatch* m_provider;		//< processor provider reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
 	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
@@ -430,6 +430,10 @@ static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 
 comauto::DotnetFunctionClosure::Impl::~Impl()
 {
+	if (m_provider)
+	{
+		m_provider->Release();
+	}
 	if (m_param)
 	{
 		std::size_t pi = 0, pe = m_func->m_impl->nofParameter();
@@ -444,7 +448,9 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 
 void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
-	m_provider = p;
+	if (m_provider) m_provider->Release();
+	m_provider = 0;
+	m_provider = new ProcessorProviderDispatch(p);
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
@@ -488,7 +494,7 @@ AGAIN:
 					case DotnetFunction::Impl::Parameter::ProcProvider:
 					{
 						m_param[ m_paramidx].vt = VT_DISPATCH;
-						m_param[ m_paramidx].pdispVal = &m_provider;
+						m_param[ m_paramidx].pdispVal = m_provider;
 						break;
 					}
 					case DotnetFunction::Impl::Parameter::Value:
