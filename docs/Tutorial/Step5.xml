@@ -5,7 +5,7 @@
 
 	<para>
 		It's time now to get something visual working, so we start to add a first
-		simple interface to our qtclient.
+		simple interface to our wolfclient.
 	</para>
 	
 	<para>
@@ -44,7 +44,7 @@
 	</screenshot>
 	
 	<para>
-		When we save the form and start the qtclient, we get (after logging in) the
+		When we save the form and start the wolfclient, we get (after logging in) the
 		first page with the "Customer List" button. Pressing it gives the error
 		message:
 	</para>
@@ -65,7 +65,7 @@
 		This means we have to define a new form called
 		<filename>customers.ui</filename>, which will
 		show the list of customers, for now we leave it empty. When we start the
-		qtclient and press the "Customer List" button again, we see that
+		wolfclient and press the "Customer List" button again, we see that
 		the form gets changed to the "customer" form (empty).
 	</para>
 
@@ -129,7 +129,7 @@
 	</screenshot>
 	
 	<para>
-		When we start the qtclient, we get a funny error message:
+		When we start the wolfclient, we get a funny error message:
 	</para>
 
 	<programlisting language='shell'>
@@ -138,7 +138,7 @@
 
 	<para>
 		This means we have to configure the id attribute in the server in the simpleform.
-		The qtclient adds an id automatically to the customer tag in the request.
+		The wolfclient adds an id automatically to the customer tag in the request.
 	</para>
 	
 	<para>
@@ -156,7 +156,7 @@
 	</programlisting>
 	
 	<para>
-		If we restart the server and run qtclient again we get the desired result:
+		If we restart the server and run wolfclient again we get the desired result:
 	</para>
 
 	<screenshot>

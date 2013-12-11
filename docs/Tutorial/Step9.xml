@@ -59,7 +59,7 @@
 	END
 	</programlisting>
 	
-		Executing the request we see in the qtclient debug output:
+		Executing the request we see in the wolfclient debug output:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.xml" parse="text" />

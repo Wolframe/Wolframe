@@ -12,7 +12,7 @@
 		We start the Qt client with:
 
 		<programlisting language='shell'>
-	qtclient -c tutorial.conf
+	wolfclient -c tutorial.conf
 		</programlisting>
 	</para>
 		

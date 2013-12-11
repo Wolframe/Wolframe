@@ -9,11 +9,13 @@
 		<title>Requirements</title>
 		
 		<para>
-			You need the following packages:
+			You need the following packages (we assume you are
+			on an Ubuntu Linux, for other platforms there are
+			similar packages avaiable):
 			<itemizedlist>
 				<listitem>
 				<para>
-					wolframe_0.0.1-1_amd64.deb: the Wolframe server
+					wolframe_0.0.1-1_amd64.deb: the Wolframe core server
 				</para>
 				</listitem>
 
@@ -25,13 +27,13 @@
 
 				<listitem>
 				<para>
-					wolframe-libxml2_0.0.1-1_amd64.deb: contains XML filter based on libxml2
+					wolframe-libxml2_0.0.1-1_amd64.deb: the XML filter based on libxml2
 				</para>
 				</listitem>
 
 				<listitem>
 				<para>
-					wolframe-client_0.0.1-1_amd64.deb: contains the Qt frontend
+					wolfclient_0.0.3-1_amd64.deb: the Wolframe graphical user interface client 
 				</para>
 				</listitem>
 			</itemizedlist>

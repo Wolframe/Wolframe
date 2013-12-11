@@ -104,9 +104,9 @@
 	</screenshot>
 
 	<para>
-		If we start the qtclient and select a customer and press 'Show' we will
+		If we start the wolfclient and select a customer and press 'Show' we will
 		notice that the whole "Show Customer" form is empty, even the id. What's
-		wrong? Well, the widgets in qtclient have the default behaviour of using
+		wrong? Well, the widgets in wolfclient have the default behaviour of using
 		'id' attributes attached to the colums of a list for instance. We must
 		make sure, the server is mapping us the XML correctly with 'id' attribute
 		and not 'id' as element.
@@ -187,7 +187,7 @@
 	
 	<para>
 		We see, that we use the value of 'global.id' again and add it to the 'initAction'
-		request as attribute 'id' (we can use the qtclient with -d to see the communication
+		request as attribute 'id' (we can use the wolfclient with -d to see the communication
 		on the wire):
 
 	<programlisting language='xml'>
