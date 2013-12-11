@@ -124,6 +124,7 @@ local_clean:
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
+	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf doxygen/html-webpage/*
 	
 local_distclean:
