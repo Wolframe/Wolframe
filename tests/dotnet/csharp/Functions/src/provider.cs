@@ -4,17 +4,20 @@ using System.Runtime.InteropServices;
 namespace Wolframe
 {
 
-// Declare processor provider as a COM only (AutoDispatch) interface which 
+// Declare processor provider as COM interface
 [ComVisible(true)]
+[Guid("CE320901-8DBD-459A-821F-423E6C14D661")]
 [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
 public interface ProcProvider
 {
 	//\param[in] funcname Name of Wolframe function to call
 	//\param[in] argument Structure to pass to function as input
 	//\param[out] result Result structure to get from function as output
-    object call(
+    [DispId(1)]
+    void call(
 		[In, MarshalAs(UnmanagedType.BStr)] string funcname,
-		[In, MarshalAs(UnmanagedType.Struct)] object argument);
+        [In] object argument,
+		[Out] object result);
 }
 
 } //namespace

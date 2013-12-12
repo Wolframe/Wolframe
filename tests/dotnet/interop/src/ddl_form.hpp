@@ -38,7 +38,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
-namespace langbind {
+namespace test {
 
 class Form
 {
@@ -100,7 +100,7 @@ class FormInputFilter
 	:public langbind::TypedInputFilter
 {
 public:
-	FormInputFilter( const Form& form);
+	FormInputFilter( const Form* form);
 	FormInputFilter( const FormInputFilter& o);
 	virtual ~FormInputFilter(){}
 

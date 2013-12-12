@@ -32,30 +32,67 @@ Project Wolframe.
 //\file comauto/procProviderDispatch.cpp
 //\brief Implementation of Dispatch Interface for calls of processor provider function from .NET via interop callback
 #include "comauto/procProviderDispatch.hpp"
+#include "comauto/variantInputFilter.hpp"
+#include "comauto/variantAssignment.hpp"
 #include "comauto/utils.hpp"
+#include "comauto/typelib.hpp"
+#include "logger-v1.hpp"
 #include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::comauto;
 
-static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvider* provider_, const char* function_, const langbind::TypedInputFilterR& input_)
+//\brief GUID of ProcProvider (orig "CE320901-8DBD-459A-821F-423E6C14D661")
+static const CLSID g_CLSID_ProcProvider =
+	{ 0xCE320901,0x8DBD,0x459A,{0x82,0x1F,0x42,0x3E,0x6C,0x14,0xD6,0x61}};
+
+GUID comauto::ProcessorProviderDispatch::uuid()
 {
-	std::cout << "CALLING FUNCTION '" << function_ << std::endl;
-	langbind::TypedInputFilterR rt;
-	return rt;
+	return g_CLSID_ProcProvider;
+}
+
+static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvider* provider_, const std::string& funcname_, const langbind::TypedInputFilterR& input_)
+{
+	const langbind::FormFunction* func = provider_->formFunction( funcname_);
+	if (func == 0)
+	{
+		throw std::runtime_error( "function not found (processor provider function call)" );
+	}
+	langbind::FormFunctionClosureR funcexec( func->createClosure());
+	if (!funcexec.get())
+	{
+		throw std::runtime_error( "creation of function execution context failed (processor provider function call)" );
+	}
+	serialize::Context::Flags flags = serialize::Context::CaseInsensitiveCompare;
+	funcexec->init( provider_, input_, flags);
+	if (!funcexec->call())
+	{
+		throw std::runtime_error( "call of function failed (processor provider function call)" );
+	}
+	return funcexec->result();
 }
 
 HRESULT comauto::ProcessorProviderDispatch::GetTypeInfoCount( UINT* pCountTypeInfo)
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetTypeInfoCount" << std::endl;
-	*pCountTypeInfo = 0;
-	return 0;
+	*pCountTypeInfo = 1;
+	return NOERROR;
 }
 
-HRESULT comauto::ProcessorProviderDispatch::GetTypeInfo( UINT, LCID, ITypeInfo**)
+HRESULT comauto::ProcessorProviderDispatch::GetTypeInfo( UINT tidx, LCID, ITypeInfo** typeinfo_)
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetTypeInfo" << std::endl;
-	return E_NOTIMPL;
+	if (typeinfo_ == NULL) return E_INVALIDARG;
+	*typeinfo_ = 0;
+
+	if (tidx == 0)
+	{
+		m_typeinfo->AddRef();
+		*typeinfo_ = m_typeinfo;
+		return NOERROR;
+	}
+	else
+	{
+		return DISP_E_BADINDEX;
+	}
 }
 
 //\brief Ascii case insensitive compare of two strings
@@ -78,30 +115,64 @@ static int compareIdentifier( LPOLESTR aa, LPOLESTR bb)
 
 HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::GetIDsOfNames" << std::endl;
-	if (riid == IID_NULL)
-	{
-			if (cNames != 1) return DISP_E_UNKNOWNNAME;
-			if (compareIdentifier( rgszNames[0], L"call"))
-			{
-				rgDispId[0] = 0x0001;
-			}
-			return S_OK;
-	}
-	else
-	{
-		return DISP_E_UNKNOWNNAME;
-	}
+	return DispGetIDsOfNames( m_typeinfo, rgszNames, cNames, rgDispId);
 }
 
 HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::Invoke" << std::endl;
 	try
 	{
-		const char* function_ = "FUNCNAME";
-		langbind::TypedInputFilterR input_;
-		langbind::TypedInputFilterR result = callProcProvider( m_provider, function_, input_);
+		if (dispIdMember == (DISPID)DispID_CALL)
+		{
+			if (pDispParams->cNamedArgs != 0)
+			{
+				throw std::runtime_error( "handling of named parameters not implemented");
+			}
+			if (pDispParams->cArgs != 3)
+			{
+				throw std::runtime_error( "illegal number of arguments (3 arguments expected)");
+			}
+			std::string funcname = utf8string( pDispParams->rgvarg[ 2].bstrVal);
+			VARIANT* inputarg  = &pDispParams->rgvarg[1];
+			VARIANT* resultarg = &pDispParams->rgvarg[0];
+
+			ITypeInfo* resultTypeInfo = 0;
+			ITypeInfo* inputTypeInfo = 0;
+			HRESULT hr = S_OK;
+			if (!resultarg->pRecInfo) throw std::runtime_error( "result parameter of provider call is not a valid structure (VT_RECORD) with public type info");
+			try
+			{
+				hr = inputarg->pRecInfo->GetTypeInfo( &inputTypeInfo);
+				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of input (is it declared as public ?)");
+				hr = resultarg->pRecInfo->GetTypeInfo( &resultTypeInfo);
+				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of result (is it declared as public ?)");
+
+				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
+				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
+
+//				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
+//				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
+
+//				AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
+//				VARIANT res;
+//				res.vt = VT_EMPTY;
+//				if (!resultassign.call( res))
+//				{
+//					throw std::runtime_error( "failed to assign result of processor provider call");
+//				}
+				//*resultarg = res;
+				//res.vt = VT_EMPTY;
+
+				if (resultTypeInfo) resultTypeInfo->Release();
+				if (inputTypeInfo) inputTypeInfo->Release();
+			}
+			catch (const std::runtime_error& e)
+			{
+				if (resultTypeInfo) resultTypeInfo->Release();
+				if (inputTypeInfo) inputTypeInfo->Release();
+				throw e;
+			}
+		}
 		return S_OK;
 	}
 	catch (const std::runtime_error& e)
@@ -121,7 +192,6 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 
 HRESULT comauto::ProcessorProviderDispatch::QueryInterface( REFIID riid, void** ppvObj)
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::QueryInterface" << std::endl;
 	if (!ppvObj) return E_INVALIDARG;
 	*ppvObj = 0;
 	if (riid == IID_IUnknown)
@@ -136,26 +206,42 @@ HRESULT comauto::ProcessorProviderDispatch::QueryInterface( REFIID riid, void** 
 		AddRef();
 		return NOERROR;
 	}
+	else if (riid == IID_NULL)
+	{
+		*ppvObj = (LPVOID)this;
+		AddRef();
+		return NOERROR;
+	}
+	else if (riid == g_CLSID_ProcProvider)
+	{
+		*ppvObj = (LPVOID)this;
+		AddRef();
+		return NOERROR;
+	}
 	return E_NOINTERFACE;
 }
 
 ULONG comauto::ProcessorProviderDispatch::AddRef()
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::AddRef" << std::endl;
 	::InterlockedIncrement( &m_refcount);
 	return m_refcount;
 }
 
 ULONG comauto::ProcessorProviderDispatch::Release()
 {
-	/*[-]*/std::cerr << "CALL comauto::ProcessorProviderDispatch::Release" << std::endl;
-
 	ULONG ulRefCount = ::InterlockedDecrement( &m_refcount);
 	if (0 == m_refcount)
 	{
 		delete this;
 	}
 	return ulRefCount;
+}
+
+IDispatch* ProcessorProviderDispatch::create(  const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+{
+	ProcessorProviderDispatch* inst = new ProcessorProviderDispatch( provider_, typelib_, typeinfo_);
+	IDispatch* rt = inst;
+	return rt;
 }
 
 

@@ -57,6 +57,7 @@ public interface FunctionInterface
     [ComVisible(true)]  Address GetAddress_p( [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
     [ComVisible(true)]  User GetUser_p(int id, [MarshalAs(UnmanagedType.BStr)] string name, [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
     [ComVisible(true)]  Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr);
+    [ComVisible(true)]  int GetUserXYZ([In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider);
 }
 
 [ComVisible(true)]
@@ -188,10 +189,19 @@ public class Functions : FunctionInterface
 
     public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
     {
-        Address rt;// = (Address)provider.call("GetAddress", (object)usr);
-        rt.street = "Korneliusstr. 11";
+        Address rt = new Address();
+        provider.call("GetAddress", usr, rt);
         rt.country = "Schweiz";
+        rt.street = "Fuzuweg 7";
         return rt;
+    }
+
+    public int GetUserXYZ([In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider)
+    {
+        Address rt = new Address();
+        User usr = new User();
+        provider.call( "GetAddress", usr, rt);
+        return 1;
     }
 }
 

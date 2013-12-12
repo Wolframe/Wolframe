@@ -34,23 +34,30 @@ Project Wolframe.
 #ifndef _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "processor/procProvider.hpp"
 #include <objbase.h>
 
 namespace _Wolframe {
-namespace proc
-{
-	class ProcessorProvider;
-}
 namespace comauto {
+
+class TypeLib;
 
 class ProcessorProviderDispatch :public IDispatch
 {
 public:
-	ProcessorProviderDispatch( const proc::ProcessorProvider* provider_)
-		:m_provider(provider_),m_refcount(1){}
+	//\brief DispId declarations in the ProcProviderInterface
+	enum DispID {DispID_CALL=1}; 
+
+public:
+	ProcessorProviderDispatch( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+		:m_provider(provider_),m_refcount(1),m_typelib(typelib_),m_typeinfo(typeinfo_)
+	{}
 
 	~ProcessorProviderDispatch()
 	{}
+
+	static GUID uuid();
+	static IDispatch* create( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
 
     // Interface IDispatch:
     HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);
@@ -66,6 +73,8 @@ public:
 private:
 	const proc::ProcessorProvider* m_provider;	//< processor provider reference
 	volatile LONG m_refcount;					//< atomic counter
+	const TypeLib* m_typelib;					//< type library reference for introspection of provider call argument types
+	ITypeInfo* m_typeinfo;						//< type info of the IDispatch interface
 };
 
 }}//namespace

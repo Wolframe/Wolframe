@@ -29,9 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#ifndef _Wolframe_COM_AUTOMATION_TYPELIB_HPP_INCLUDED
-#define _Wolframe_COM_AUTOMATION_TYPELIB_HPP_INCLUDED
-#include "langbind/formFunction.hpp"
+//\file Interface for assignment of Input Filter to MSDN Variant Type
+#ifndef _Wolframe_COM_AUTOMATION_VARIANT_ASSIGNMENT_HPP_INCLUDED
+#define _Wolframe_COM_AUTOMATION_VARIANT_ASSIGNMENT_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
 #include <cstring>
 #include <string>
 #include <vector>
@@ -39,34 +40,33 @@ Project Wolframe.
 #include <ostream>
 #include <boost/shared_ptr.hpp>
 
-struct IRecordInfo;
 struct ITypeInfo;
-struct ITypeLib;
+struct IRecordInfo;
 struct tagVARIANT;
-struct tagTLIBATTR;
 
 namespace _Wolframe {
 namespace comauto {
 
-class TypeLib
+class TypeLib;
+
+class AssignmentClosure
 {
 public:
-	explicit TypeLib( const std::string& file);
-	virtual ~TypeLib();
-	void print( std::ostream& out) const;
-	void printvalue( std::ostream& out, const std::string& name, const tagVARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt=0) const;
+	AssignmentClosure();
+	AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, unsigned short/*VARTYPE*/ outtype, bool single_);
+	AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_);
+	virtual ~AssignmentClosure();
 
-	const IRecordInfo* getRecordInfo( const ITypeInfo* typeinfo) const;
-
-	const ITypeLib* typelib() const;
-	const tagTLIBATTR* libattr() const;
-	ITypeInfo* getProviderInterface() const;
-
-	class Impl;
+	bool call( tagVARIANT& value);
+	std::string variablepath() const;
+	const IRecordInfo* recinfo() const;
 
 private:
+	class Impl;
 	Impl* m_impl;
 };
+
+typedef boost::shared_ptr<AssignmentClosure> AssignmentClosureR;
 
 }} //namespace
 #endif

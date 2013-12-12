@@ -34,7 +34,7 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::langbind;
+using namespace _Wolframe::test;
 
 Form& Form::operator()( const std::string& name, const Form& value)
 {
@@ -92,7 +92,7 @@ Form& Form::operator[]( std::size_t idx)
 
 langbind::TypedInputFilterR Form::get() const
 {
-	return langbind::TypedInputFilterR( new FormInputFilter( *this));
+	return langbind::TypedInputFilterR( new FormInputFilter( this));
 }
 
 FormInputFilter::FormInputFilter( const FormInputFilter& o)
@@ -100,20 +100,20 @@ FormInputFilter::FormInputFilter( const FormInputFilter& o)
 	,langbind::TypedInputFilter(o)
 	,m_stk(o.m_stk){}
 
-FormInputFilter::FormInputFilter( const Form& form)
+FormInputFilter::FormInputFilter( const Form* form)
 	:types::TypeSignature("langbind::FormInputFilter", __LINE__)
 {
-	if (form.isArray())
+	if (form->isArray())
 	{
 		throw std::runtime_error("form input filter can only be created from structure or atomic type");
 	}
-	else if (form.isStruct())
+	else if (form->isStruct())
 	{
-		m_stk.push_back( StackElem( form.structbegin(), form.structend()));
+		m_stk.push_back( StackElem( form->structbegin(), form->structend()));
 	}
 	else
 	{
-		m_stk.push_back( StackElem( &form.value()));
+		m_stk.push_back( StackElem( &form->value()));
 	}
 }
 

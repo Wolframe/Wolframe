@@ -35,6 +35,7 @@ Project Wolframe.
 #include "comauto/clr.hpp"
 #include "comauto/typelib.hpp"
 #include "comauto/variantInputFilter.hpp"
+#include "comauto/variantAssignment.hpp"
 #include <oaidl.h>
 #include <comdef.h>
 #include <atlbase.h>
@@ -62,7 +63,7 @@ public:
 	langbind::TypedInputFilterR result() const;
 
 private:
-	ProcessorProviderDispatch* m_provider;		//< processor provider reference for function called
+	const proc::ProcessorProvider* m_provider;		//< processor provider reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
 	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
@@ -71,6 +72,7 @@ private:
 	std::size_t m_paramidx;						//< currently selected parameter of the function [0,1,.. n-1]
 	AssignmentClosureR m_paramclosure;			//< closure for current parameter assignment
 	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;	//< temporary buffer for parameters passed as array (with their name)
+	IDispatch* m_providerdispatch;					//< IDispatch Interface of processor provider
 	langbind::TypedInputFilterR m_result;				//< reference to result of the function call
 };
 
@@ -139,7 +141,7 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 	{
 		unsigned short ii;
 		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
-		if ((typeattr->typekind == TKIND_DISPATCH || typeattr->typekind == TKIND_RECORD) && classname.empty())
+		if ((typeattr->typekind == TKIND_INTERFACE || typeattr->typekind == TKIND_DISPATCH || typeattr->typekind == TKIND_RECORD) && classname.empty())
 		{
 			return; //no follow on toplevel interface or POD data structure declaration
 		}
@@ -161,7 +163,18 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 		std::string subclassname( classname);
 		if (typeattr->typekind == TKIND_COCLASS)
 		{
-			if (!classname.empty()) throw std::runtime_error( "nested class definitions not supported");
+			if (!classname.empty())
+			{
+				throw std::runtime_error( "nested class definitions not supported");
+			}
+			if (subclassname != "IUnknown")
+			{
+				subclassname.clear();
+				subclassname.append( comauto::typestr( typeinfo));
+			}
+		}
+		else if (typeattr->typekind == TKIND_INTERFACE)
+		{
 			if (subclassname != "IUnknown")
 			{
 				subclassname.clear();
@@ -293,7 +306,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
 
 	m_methodname = comauto::utf8string( local.pnames[0]);
-	for (ii=1; ii<nn; ++ii)
+	for (ii=nn-1; ii>0; --ii)
 	{
 		const TYPEDESC* td = &m_funcdesc->lprgelemdescParam[ii-1].tdesc;
 		if (td->vt == VT_USERDEFINED)
@@ -307,14 +320,14 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::Value);
 				m_parameterlist.push_back( param);
 			}
-			else if (local.recattr->typekind == TKIND_DISPATCH)
+			else if (local.recattr->guid == ProcessorProviderDispatch::uuid())
 			{
 				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::ProcProvider);
 				m_parameterlist.push_back( param);
 			}
 			else
 			{
-				throw std::runtime_error( "can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods) or TKIND_DISPATCH (processor provider context)");
+				throw std::runtime_error( "can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods) or TKIND_DISPATCH as IID_ProcProvider");
 			}
 		}
 		else if (td->vt == VT_PTR && td->lptdesc->vt == VT_USERDEFINED)
@@ -323,7 +336,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 
 			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
 			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr))
-			if (local.recattr->typekind == TKIND_DISPATCH)
+			if (local.recattr->guid == ProcessorProviderDispatch::uuid())
 			{
 				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::ProcProvider);
 				m_parameterlist.push_back( param);
@@ -334,7 +347,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 			}
 			else
 			{
-				throw std::runtime_error( "can only handle VT_PTR of VT_USERDEFINED type of TKIND_DISPATCH (processor provider context)");
+				throw std::runtime_error( "can only handle VT_PTR of VT_USERDEFINED type of kind TKIND_RECORD or processor provider context (TKIND_DISPATCH IID_ProcProvider)");
 			}
 		}
 		else if (td->vt == VT_SAFEARRAY)
@@ -399,7 +412,10 @@ std::size_t comauto::DotnetFunction::Impl::getParameterIndex( const std::string&
 	std::vector<Parameter>::const_iterator pi = m_parameterlist.begin(), pe = m_parameterlist.end();
 	for (; pi != pe; ++pi)
 	{
-		if (pi->name == name) return pi-m_parameterlist.begin();
+		if (pi->name == name)
+		{
+			return (pi-m_parameterlist.begin());
+		}
 	}
 	throw std::runtime_error( std::string("unknown parameter name '") + name + "'");
 }
@@ -415,7 +431,8 @@ comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
-		,m_paramidx(null_paramidx){}
+		,m_paramidx(null_paramidx)
+		,m_providerdispatch(0){}
 
 static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 {
@@ -430,10 +447,6 @@ static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 
 comauto::DotnetFunctionClosure::Impl::~Impl()
 {
-	if (m_provider)
-	{
-		m_provider->Release();
-	}
 	if (m_param)
 	{
 		std::size_t pi = 0, pe = m_func->m_impl->nofParameter();
@@ -444,13 +457,15 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 		delete [] m_param;
 	}
 	clearArrayParam( m_arrayparam);
+	if (m_providerdispatch)
+	{
+		m_providerdispatch->Release();
+	}
 }
 
 void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
-	if (m_provider) m_provider->Release();
-	m_provider = 0;
-	m_provider = new ProcessorProviderDispatch(p);
+	m_provider = p;
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
@@ -493,9 +508,7 @@ AGAIN:
 				{
 					case DotnetFunction::Impl::Parameter::ProcProvider:
 					{
-						m_param[ m_paramidx].vt = VT_DISPATCH;
-						m_param[ m_paramidx].pdispVal = m_provider;
-						break;
+						throw std::runtime_error( std::string( "Processor provider parameter is reserved for callback and cannot be initialized: '") + paramdescr->name + "'");
 					}
 					case DotnetFunction::Impl::Parameter::Value:
 					{
@@ -650,6 +663,13 @@ AGAIN:
 						}
 						break;
 					case DotnetFunction::Impl::Parameter::ProcProvider:
+						if (!m_providerdispatch)
+						{
+							m_providerdispatch = ProcessorProviderDispatch::create( m_provider, m_func->m_impl->typelib(), m_func->m_impl->typelib()->getProviderInterface());
+						}
+						m_param[ ii].vt = VT_DISPATCH | VT_BYREF;
+						m_providerdispatch->AddRef();
+						m_param[ ii].ppdispVal = &m_providerdispatch;
 						break;
 				}
 			}

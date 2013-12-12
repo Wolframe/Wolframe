@@ -307,6 +307,10 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* typedes
 			{
 				rt.append( "[IDispatch]");
 			}
+			else if (recattr->typekind == TKIND_INTERFACE)
+			{
+				rt.append( "[Interface]");
+			}
 			else
 			{
 				throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods) or TKIND_DISPATCH (processor provider context)");
