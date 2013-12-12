@@ -113,8 +113,3 @@ rm /tmp/results.$$
 IFS=$OLDIFS
 
 exit
-	cp -av binaries/*.rpm $dir
-	cp -av binaries/*.deb $dir
-	cp -av binaries/*.pkg.tar.xz $dir
-	cp -av binaries/*.tgz $dir
-	rm -rf binaries
