@@ -60,7 +60,7 @@ doc-html: WolfBook.html Tutorial.html
 
 doc-html-chunked: html/index.html
 
-doc-html-webpage: html-webpage/index.html
+doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
 
 doc-pdf: WolfBook.pdf Tutorial.pdf
 
@@ -97,6 +97,11 @@ html-webpage/index.html: WolfBook.xml
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl WolfBook.xml
 
+html-tutorial-webpage/index.html: Tutorial.xml
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam toc.section.depth 3 \
+	-o $@ output-html-webpage.xsl Tutorial.xml
+
 %.epub: %.xml
 	$(XSLT_EPUB) $<
 
@@ -119,6 +124,7 @@ local_clean:
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
+	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf doxygen/html-webpage/*
 	
 local_distclean:
