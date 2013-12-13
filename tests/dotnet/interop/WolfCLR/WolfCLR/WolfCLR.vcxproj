@@ -106,6 +106,7 @@
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantAssignment.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.hpp" />
+    <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantToString.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
     <ClInclude Include="..\..\src\processor\procProvider.hpp" />
     <ClInclude Include="..\..\src\testFormFunction.hpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\utils.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantAssignment.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantToString.cpp" />
     <ClCompile Include="..\..\src\ddl_form.cpp" />
     <ClCompile Include="..\..\src\testFormFunction.cpp" />
     <ClCompile Include="stdafx.cpp" />

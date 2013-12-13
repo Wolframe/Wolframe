@@ -36,6 +36,7 @@ Project Wolframe.
 #include "comauto/variantAssignment.hpp"
 #include "comauto/utils.hpp"
 #include "comauto/typelib.hpp"
+#include "comauto/variantToString.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 
@@ -150,18 +151,18 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
 				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
 
-//				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
-//				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
+				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
+				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
 
-//				AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
-//				VARIANT res;
-//				res.vt = VT_EMPTY;
-//				if (!resultassign.call( res))
-//				{
-//					throw std::runtime_error( "failed to assign result of processor provider call");
-//				}
-				//*resultarg = res;
-				//res.vt = VT_EMPTY;
+				AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
+				VARIANT res;
+				res.vt = VT_EMPTY;
+				if (!resultassign.call( res))
+				{
+					throw std::runtime_error( "failed to assign result of processor provider call");
+				}
+				*resultarg = res;
+				/*[-]*/std::cout << "FUNCTION RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *resultarg) << std::endl;
 
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();

@@ -346,7 +346,6 @@ void comauto::TypeLib::Impl::printvalue( std::ostream& out, const std::string& n
 	}
 	catch (const std::runtime_error& e)
 	{
-		if (elem.vt != VT_EMPTY) comauto::wrapVariantClear( &elem);
 		if (vardesc) const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( vardesc);
 		if (rectypeinfo) rectypeinfo->Release();
 		if (typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);

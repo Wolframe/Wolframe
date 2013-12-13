@@ -100,7 +100,6 @@ void comauto::CommonLanguageRuntime::call( tagVARIANT* res, const std::wstring& 
 		Local() {::memset( this, 0, sizeof( *this)); varResult.vt = VT_EMPTY;}
 		~Local()
 		{
-			comauto::wrapVariantClear( &varResult);
 			if (spType) spType->Release();
 			if (spAssembly) spAssembly->Release();
 			if (spDefaultAppDomain) spDefaultAppDomain->Release();

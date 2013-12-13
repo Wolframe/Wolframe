@@ -136,7 +136,6 @@ comauto::AssignmentClosure::Impl::StackElem::~StackElem()
 	{
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
 		typeinfo->Release();
-		comauto::wrapVariantClear( &value);
 	}
 }
 
@@ -345,7 +344,6 @@ AGAIN:
 	catch (const std::runtime_error& e)
 	{
 		if (vardesc) cur->typeinfo->ReleaseVarDesc( vardesc);
-		comauto::wrapVariantClear( &value);
 		if (rectypeinfo) rectypeinfo->Release();
 		throw e;
 	}

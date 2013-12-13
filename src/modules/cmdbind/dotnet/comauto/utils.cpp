@@ -180,7 +180,6 @@ std::wstring comauto::tostring( VARIANT* v)
 		WRAP( comauto::wrapVariantChangeType( &vcp, &vcp, 0, VT_BSTR));
 	}
 	std::wstring rt( vcp.bstrVal, ::SysStringLen( vcp.bstrVal));
-	WRAP( comauto::wrapVariantClear( &vcp));
 	return rt;
 }
 
@@ -740,23 +739,29 @@ HRESULT comauto::wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc)
 
 HRESULT comauto::wrapVariantClear( VARIANT* pvarg)
 {
+	HRESULT rt = S_OK;
 	switch (pvarg->vt)
 	{
 		case VT_LPSTR:
 			if (V_LPSTR( pvarg) != NULL) comauto::freeMem( V_LPSTR( pvarg));
 			V_LPSTR( pvarg) = NULL;
 			pvarg->vt = VT_EMPTY;
-			return S_OK;
+			rt = S_OK;
+			break;
 
 		case VT_LPWSTR:
 			if (V_LPWSTR( pvarg) != NULL) comauto::freeMem( V_LPWSTR( pvarg));
 			V_LPWSTR( pvarg) = NULL;
 			pvarg->vt = VT_EMPTY;
-			return S_OK;
+			rt = S_OK;
+			break;
 
 		default:
-			return ::VariantClear( pvarg);
+			rt = ::VariantClear( pvarg);
+			pvarg->vt = VT_EMPTY;
+			break;
 	}
+	return rt;
 }
 
 HRESULT comauto::wrapVariantChangeType( VARIANT* pvargDest, const VARIANT* pvargSrc, unsigned short wFlags, VARTYPE vt)

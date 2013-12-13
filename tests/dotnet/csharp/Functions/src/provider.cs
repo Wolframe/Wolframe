@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 // Include this module for Wolframe .NET modules (COM/.NET interop callback to processor provider)
@@ -14,10 +15,10 @@ public interface ProcProvider
 	//\param[in] argument Structure to pass to function as input
 	//\param[out] result Result structure to get from function as output
     [DispId(1)]
-    void call(
+    object call(
 		[In, MarshalAs(UnmanagedType.BStr)] string funcname,
         [In] object argument,
-		[Out] object result);
+        [In] Guid resulttype);
 }
 
 } //namespace

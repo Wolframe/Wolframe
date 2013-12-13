@@ -189,6 +189,13 @@ AGAIN:
 	if (m_stk.back().end())
 	{
 		m_stk.pop_back();
+		if (m_stk.empty())
+		{
+			// ... last element consumed -> emit final close tag
+			type = FilterBase::CloseTag;
+			element = types::VariantConst();
+			return true;
+		}
 		goto AGAIN;
 	}
 	switch (m_stk.back().state)

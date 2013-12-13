@@ -77,7 +77,6 @@ VariantInputFilter::StackElem::StackElem( const StackElem& o)
 	}
 	catch (const std::runtime_error& e)
 	{
-		comauto::wrapVariantClear( &data);
 		if (typeinfo)
 		{
 			if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
@@ -111,7 +110,6 @@ VariantInputFilter::StackElem::StackElem( const std::string& name_, const IRecor
 
 VariantInputFilter::StackElem::~StackElem()
 {
-	comauto::wrapVariantClear( &data);
 	if (typeinfo)
 	{
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
@@ -300,7 +298,6 @@ AGAIN:
 	}
 	catch (const std::runtime_error& e)
 	{
-		comauto::wrapVariantClear( &data);
 		if (vardesc) m_stk.back().typeinfo->ReleaseVarDesc( vardesc);
 		if (reftypeinfo) reftypeinfo->Release();
 		throw e;

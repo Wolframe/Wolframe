@@ -189,18 +189,16 @@ public class Functions : FunctionInterface
 
     public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
     {
-        Address rt = new Address();
-        provider.call("GetAddress", usr, rt);
-        rt.country = "Schweiz";
-        rt.street = "Fuzuweg 7";
+        Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
+        Console.WriteLine("street='{0}', country='{1}'", rt.street, rt.country);
         return rt;
     }
 
     public int GetUserXYZ([In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider)
     {
-        Address rt = new Address();
         User usr = new User();
-        provider.call( "GetAddress", usr, rt);
+        Address rt = (Address)provider.call( "GetAddress", usr, typeof(Address).GUID);
+        Console.WriteLine("street='{0}', country='{1}'", rt.street, rt.country);
         return 1;
     }
 }

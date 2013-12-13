@@ -36,6 +36,7 @@ Project Wolframe.
 #include "comauto/typelib.hpp"
 #include "comauto/variantInputFilter.hpp"
 #include "comauto/variantAssignment.hpp"
+#include "comauto/variantToString.hpp"
 #include <oaidl.h>
 #include <comdef.h>
 #include <atlbase.h>
@@ -494,44 +495,38 @@ AGAIN:
 			//... we are in a parameter initilization
 			VARIANT paramvalue;
 			paramvalue.vt = VT_EMPTY;
-			try
-			{
-				if (!m_paramclosure->call( paramvalue))
-				{
-					if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
-					return false;
-				}
-				const DotnetFunction::Impl::Parameter* paramdescr = m_func->m_impl->getParameter( m_paramidx);
-				if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
 
-				switch (paramdescr->addrMode)
-				{
-					case DotnetFunction::Impl::Parameter::ProcProvider:
-					{
-						throw std::runtime_error( std::string( "Processor provider parameter is reserved for callback and cannot be initialized: '") + paramdescr->name + "'");
-					}
-					case DotnetFunction::Impl::Parameter::Value:
-					{
-						m_param[ m_paramidx] = paramvalue;
-						break;
-					}
-					case DotnetFunction::Impl::Parameter::SafeArray:
-					{
-						m_arrayparam[ m_paramidx].push_back( paramvalue);
-						paramvalue.vt = VT_EMPTY;
-						break;
-					}
-				}
-				m_paramidx = null_paramidx;
-				m_paramclosure.reset();
-			}
-			catch (const std::runtime_error& e)
+			if (!m_paramclosure->call( paramvalue))
 			{
-				comauto::wrapVariantClear( &paramvalue);
-				throw e;
+				if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
+				return false;
 			}
+			const DotnetFunction::Impl::Parameter* paramdescr = m_func->m_impl->getParameter( m_paramidx);
+			if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
+
+			switch (paramdescr->addrMode)
+			{
+				case DotnetFunction::Impl::Parameter::ProcProvider:
+				{
+					throw std::runtime_error( std::string( "Processor provider parameter is reserved for callback and cannot be initialized: '") + paramdescr->name + "'");
+				}
+				case DotnetFunction::Impl::Parameter::Value:
+				{
+					m_param[ m_paramidx] = paramvalue;
+					break;
+				}
+				case DotnetFunction::Impl::Parameter::SafeArray:
+				{
+					m_arrayparam[ m_paramidx].push_back( paramvalue);
+					paramvalue.vt = VT_EMPTY;
+					break;
+				}
+			}
+			m_paramidx = null_paramidx;
+			m_paramclosure.reset();
 		}
-		while (m_input->getNext( elemtype, elemvalue))
+		bool parameters_consumed = false;
+		while (!parameters_consumed && m_input->getNext( elemtype, elemvalue))
 		{
 			switch (elemtype)
 			{
@@ -586,7 +581,12 @@ AGAIN:
 					goto AGAIN;
 				}
 				case langbind::InputFilter::CloseTag:
-					throw std::runtime_error( "unexpected close tag (tags not balanced)");
+					if (m_input->getNext( elemtype, elemvalue))
+					{
+						throw std::runtime_error( "unexpected close tag (tags not balanced)");
+					}
+					parameters_consumed = true;
+					// ... got final close
 					break;
 
 				case langbind::InputFilter::Value:
@@ -676,6 +676,7 @@ AGAIN:
 		}
 		VARIANT resdata;
 		m_func->m_impl->clr()->call( &resdata, m_func->m_impl->assemblyname(), m_func->m_impl->classname(), m_func->m_impl->methodname(), m_func->m_impl->nofParameter(), m_param);
+		/*[-]*/std::cout << "FUNCTION RETURNS " << comauto::variantToString( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata) << std::endl;
 		m_result.reset( new VariantInputFilter( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata, m_flags));
 		return true;
 	}
