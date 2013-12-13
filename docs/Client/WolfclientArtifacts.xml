@@ -10,7 +10,7 @@
 		<para>
 			The UI files follow the schema
 			'qt-ui-4.7.xsd', as documented in
-			<ulink url="http://doc.qt.digia.com/qt/designer-ui-file-format.html"><citetitle>http://doc.qt.digia.com/qt/designer-ui-file-format.html</citetitle></ulink>.
+			<ulink url="http://qt-project.org/doc/qt-4.8/designer-ui-file-format.html"><citetitle>http://qt-project.org/doc/qt-4.8/designer-ui-file-format.html</citetitle></ulink>.
 			The UI files have the extension <emphasis>.ui</emphasis>
 		</para>
 
@@ -24,7 +24,7 @@
 		<para>
 			The <application>wolfclient</application> uses the Qt translation format, version 2.0 for form translations
 			as described in
-			<ulink url="http://doc.qt.digia.com/qt/linguist-ts-file-format.html"><citetitle>http://doc.qt.digia.com/qt/linguist-ts-file-format.html</citetitle></ulink>.
+			<ulink url="http://qt-project.org/doc/qt-4.8/linguist-ts-file-format.html"><citetitle>http://qt-project.org/doc/qt-4.8/linguist-ts-file-format.htmll</citetitle></ulink>.
 			Those are the files with extension <emphasis>.ts</emphasis>.
 		</para>
 		<para>
@@ -38,7 +38,7 @@
 		</para>
 		<para>
 			Read more on translations in
-			<ulink url="http://doc.qt.digia.com/qt/linguist-manual.html"><citetitle>http://doc.qt.digia.com/qt/linguist-manual.html</citetitle></ulink>.
+			<ulink url="http://qt-project.org/doc/qt-4.8/linguist-manual.html"><citetitle>http://qt-project.org/doc/qt-4.8/linguist-manual.html</citetitle></ulink>.
 		</para>
 	</sect2>
 
