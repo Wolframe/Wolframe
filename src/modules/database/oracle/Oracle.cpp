@@ -210,13 +210,37 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
 			conn->authp, (ub4)0, OCI_ATTR_SESSION, conn->errhp );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create set user session in service context for Oracle database '" << m_ID << "'";
+			MOD_LOG_ALERT << "Can't set user session in service context for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
 			throw std::runtime_error( "Can't create set user session in service context for Oracle database" );
+		}
+
+		// allocate and set transaction handle
+		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->transhp,
+			OCI_HTYPE_TRANS, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't create transaction handle for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			throw std::runtime_error( "Can't create transaction handle for Oracle database" );
+		}
+		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
+			conn->transhp, (ub4)0, OCI_ATTR_TRANS, conn->errhp );
+		if( status != OCI_SUCCESS ) {
+			MOD_LOG_ALERT << "Can't set transaction handle in service context for Oracle database '" << m_ID << "'";
+			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
+			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
+			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
+			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
+			throw std::runtime_error( "Can't  transaction handle in service context for Oracle database" );
 		}
 		
 		// add connection to pool of connections
@@ -249,6 +273,7 @@ OracledbUnit::~OracledbUnit()
 		// and not to leave things leaking in the Oracle database
 		(void)OCISessionEnd( conn->svchp, conn->errhp, conn->authp, OCI_DEFAULT );
 		(void)OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
+		(void)OCIHandleFree( conn->transhp, OCI_HTYPE_TRANS );
 		(void)OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 		(void)OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 		(void)OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -367,43 +392,105 @@ const std::string& Oracletransaction::databaseID() const
 	return m_unit.ID();
 }
 
-void Oracletransaction::execute_statement( const char* statement)
+std::string Oracletransaction::getErrorMsg( sword status )
 {
-	if (!m_conn) throw std::runtime_error( "executing transaction statement without transaction context");
-#if 0
-	std::ostringstream msg;
-	bool success = true;
-	PGresult* res = PQexec( **m_conn, statement);
-	if (PQresultStatus( res) != PGRES_COMMAND_OK)
-	{
-		const char* statusType = PQresStatus( PQresultStatus( res));
-		const char* errmsg = PQresultErrorMessage( res);
-		success = false;
-		msg << "Oracle status " << (statusType?statusType:"unknown");
-		msg << "; message: '" << (errmsg?errmsg:"unknown") << "'";
+	sb4 errcode = 0;
+	std::ostringstream os;
+	text errbuf[512];
+	
+	switch( status ) {
+		case OCI_SUCCESS:
+			os << "OCI_SUCCESS";
+			break;
+
+		case OCI_SUCCESS_WITH_INFO:
+			os << "OCI_SUCCESS_WITH_INFO";
+			break;
+		
+		case OCI_NEED_DATA:
+			os << "OCI_NEED_DATA";
+			break;
+		
+		case OCI_NO_DATA:
+			os << "OCI_NO_DATA";
+			break;
+		
+		case OCI_INVALID_HANDLE:
+			os << "OCI_INVALID_HANDLE";
+			break;
+		
+		case OCI_STILL_EXECUTING:
+			os << "OCI_STILL_EXECUTING";
+			break;
+		
+		case OCI_CONTINUE:
+			os << "OCI_CONTINUE";
+			break;
+			
+		case OCI_ERROR:
+			(void)OCIErrorGet( (dvoid *)(*m_conn)->errhp, (ub4)1, (text *)NULL,
+				&errcode, errbuf, (ub4)sizeof( errbuf ), OCI_HTYPE_ERROR );
+			os << errbuf;
+			break;
 	}
-	PQclear( res);
-	if (!success) throw std::runtime_error( msg.str());
-#endif
+	return os.str( );
 }
 
 void Oracletransaction::begin()
 {
 	if (m_conn) delete m_conn;
 	m_conn = new PoolObject<OracleConnection *>( m_unit.m_connPool);
-	execute_statement( "BEGIN;");
+
+	MOD_LOG_TRACE << "Oracle Begin Transaction";
+		
+	sword status;
+        status = OCITransStart( (*m_conn)->svchp, (*m_conn)->errhp, (uword)0, (ub4)OCI_TRANS_NEW );
+	if( status != OCI_SUCCESS ) {
+		std::ostringstream os;
+		os << "Failed to call OCITransStart to start transaction: " << getErrorMsg( status );
+		MOD_LOG_ALERT << os.str( );
+		delete m_conn;
+		m_conn = 0;
+		throw std::runtime_error( os.str( ) );
+	}
 }
 
 void Oracletransaction::commit()
 {
-	execute_statement( "COMMIT;");
+	MOD_LOG_TRACE << "Oracle Commit";
+
+	if (!m_conn) throw std::runtime_error( "Called commit without transaction context");
+	
+	sword status;
+	status = OCITransCommit((*m_conn)->svchp, (*m_conn)->errhp, (ub4)OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) {
+		std::ostringstream os;
+		os << "Failed to call OCITransCommit to commit transaction: " << getErrorMsg( status );
+		MOD_LOG_ALERT << os.str( );
+		delete m_conn;
+		m_conn = 0;
+		throw std::runtime_error( os.str( ) );
+	}
 	delete m_conn;
 	m_conn = 0;
 }
 
 void Oracletransaction::rollback()
 {
-	execute_statement( "ROLLBACK;");
+	MOD_LOG_TRACE << "Oracle Rollback";
+	
+	if (!m_conn) throw std::runtime_error( "Called rollback without transaction context");
+	
+	sword status;
+	status = OCITransRollback((*m_conn)->svchp, (*m_conn)->errhp, (ub4)OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) {
+		std::ostringstream os;
+		os << "Failed to call OCITransRollback to abort transaction: " << getErrorMsg( status );
+		MOD_LOG_ALERT << os.str( );
+		delete m_conn;
+		m_conn = 0;
+		throw std::runtime_error( os.str( ) );
+	}
 	delete m_conn;
 	m_conn = 0;
 }
