@@ -47,7 +47,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 static std::string buildConnStr( const std::string& host, unsigned short port,
-				 const std::string& user, const std::string& password,
+				 const std::string& /* user */, const std::string& /* password */,
 				 const std::string& dbName )
 {
 	std::stringstream ss;
@@ -118,12 +118,12 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
 	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
-		(dvoid *)user.c_str( ), (ub4)user.length( ),
+		(dvoid *)const_cast<char *>( user.c_str( ) ), (ub4)user.length( ),
 		OCI_ATTR_USERNAME, errhp );
 	if( status != OCI_SUCCESS ) goto cleanup;
 
 	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
-		(dvoid *)password.c_str( ), (ub4)password.length( ),
+		(dvoid *)const_cast<char *>( password.c_str( ) ), (ub4)password.length( ),
 		OCI_ATTR_PASSWORD, errhp );
 	if( status != OCI_SUCCESS ) goto cleanup;
 
@@ -209,14 +209,63 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 	boost::shared_ptr<FILE> file_closer( fh, fclose);
 
 	std::string connStr = buildConnStr( host, port, user, password, dbName );
-#if 0
-	PGconn* conn = PQconnectdb( connStr.c_str() );
+	
+	OCIEnv *envhp = 0;
+	OCIError *errhp = 0;
+	OCIServer *srvhp = 0;
+	OCISvcCtx *svchp = 0;
+	OCISession *authp = 0;
+	
+	sword status;
 
-	if ( PQstatus( conn ) != CONNECTION_OK )	{
-		std::string msg = std::string( "Connection to database failed: " ) + PQerrorMessage( conn );
-		PQfinish( conn );
-		throw std::runtime_error( msg );
-	}
+	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+		0, 0, 0, 0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIHandleAlloc( envhp, (dvoid **)&srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIHandleAlloc( envhp, (dvoid **)&errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIHandleAlloc( envhp, (dvoid **)&svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIServerAttach( srvhp, errhp,
+		connStr.empty( ) ? NULL : (CONST text *)( connStr.c_str( ) ),
+		connStr.empty( ) ? (sb4)0 : (sb4)( connStr.length( ) ),
+		OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) goto cleanup;
+		
+	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
+		srvhp, (ub4)0, OCI_ATTR_SERVER,
+		(OCIError *)errhp );		
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIHandleAlloc( envhp, (dvoid **)&authp,
+		OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
+		(dvoid *)const_cast<char *>( user.c_str( ) ), (ub4)user.length( ),
+		OCI_ATTR_USERNAME, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
+		(dvoid *)const_cast<char *>( password.c_str( ) ), (ub4)password.length( ),
+		OCI_ATTR_PASSWORD, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCISessionBegin( svchp, errhp, authp,
+		OCI_CRED_RDBMS, OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
+		authp, (ub4)0, OCI_ATTR_SESSION, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+#if 0
+
 	// Get a list of tables (in the public schema)
 	PGresult* res = PQexec( conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" );
 	if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
@@ -287,8 +336,19 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 	}
 
 	PQclear( res );
-	PQfinish( conn );
 #endif
+cleanup:
+	if( srvhp && errhp && authp ) (void)OCISessionEnd( svchp, errhp, authp, OCI_DEFAULT );
+	if( srvhp && errhp ) (void)OCIServerDetach( srvhp, errhp, OCI_DEFAULT );
+	if( authp ) (void)OCIHandleFree( authp, OCI_HTYPE_SESSION );
+	if( svchp ) (void)OCIHandleFree( svchp, OCI_HTYPE_SVCCTX );
+	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
+	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
+	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
+	
+	if( status != OCI_SUCCESS ) {
+		throw std::runtime_error( "Connection to Oracle database failed" );
+	}
 }
 
 void OracleTestConstructor::createTestDatabase( const OracleTestConfig& cfg )

@@ -171,7 +171,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 		
 		// user and password credentials (TODO: others, charsets)
 		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
-			(dvoid *)user.c_str( ), (ub4)user.length( ),
+			(dvoid *)const_cast<char *>( user.c_str( ) ), (ub4)user.length( ),
 			OCI_ATTR_USERNAME, conn->errhp );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
@@ -182,7 +182,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 			throw std::runtime_error( "Can't create handle for username for Oracle database" );
 		}
 		status = OCIAttrSet( conn->authp, OCI_HTYPE_SESSION,
-			(dvoid *)password.c_str( ), (ub4)password.length( ),
+			(dvoid *)const_cast<char *>( password.c_str( ) ), (ub4)password.length( ),
 			OCI_ATTR_PASSWORD, conn->errhp );
 		if( status != OCI_SUCCESS ) {
 			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
