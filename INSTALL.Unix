@@ -75,6 +75,7 @@ Prerequisites
   the 'freeimage' subdirectory.
 - optionally (WITH_PYTHON): build Python 3 module for
   scripting Wolframe in Python
+- optionally (WITH_ORACLE): build Oracle database module
 
 Configuration of the build
 --------------------------
@@ -649,6 +650,10 @@ and 'fop'. Newest versions run only with the SVN version of
 from the AUR.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For building the Oracle database module you need the two packages
+'oracle-instantclient-basic', 'oracle-instantclient-sdk' (built
+manually or from 'oracle' pacman repository).
 
 Instructions for other Unixes
 -----------------------------

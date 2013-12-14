@@ -49,6 +49,10 @@
 #ifdef WITH_PGSQL
 #include <libpq-fe.h>
 #endif
+#ifdef WITH_ORACLE
+#include <oci.h>
+#include <sstream>
+#endif
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
@@ -61,7 +65,6 @@ static bool check_PGSQL_RUNNING()
 {
 	static bool rt = false;
 #ifdef WITH_PGSQL
-	if (rt) return true;
 	static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
 	PGconn* conn = PQconnectdb( connstr);
 	if (conn)
@@ -77,6 +80,94 @@ static bool check_PGSQL_RUNNING()
 	return rt;
 }
 
+static bool check_ORACLE_RUNNING()
+{
+	static bool rt = false;
+
+#ifdef WITH_ORACLE
+	char user[10] = "wolfusr";
+	char password[10] = "wolfpwd";
+
+	std::ostringstream ss;
+	ss << "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
+		<< "(HOST=andreasbaumann.dyndns.org" << ")"
+		<< "(PORT=1521" << "))"
+		<< "(CONNECT_DATA=(SID=orcl" << ")"
+		<< "))";
+	std::string connStr = ss.str( );
+
+	OCIEnv *envhp = 0;
+	OCIError *errhp = 0;
+	OCIServer *srvhp = 0;
+	OCISvcCtx *svchp = 0;
+	OCISession *authp = 0;
+
+	sword status;
+	
+	// create an Oracle OCI environment (global per process), what
+	// options do we really need (charset, mutex, threading, pooling)?
+	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+		0, 0, 0, 0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIHandleAlloc( envhp, (dvoid **)&srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIHandleAlloc( envhp, (dvoid **)&errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIHandleAlloc( envhp, (dvoid **)&svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIServerAttach( srvhp, errhp,
+		connStr.empty( ) ? NULL : (CONST text *)( connStr.c_str( ) ),
+		connStr.empty( ) ? (sb4)0 : (sb4)( connStr.length( ) ),
+		OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) goto cleanup;
+		
+	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
+		srvhp, (ub4)0, OCI_ATTR_SERVER,
+		(OCIError *)errhp );		
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIHandleAlloc( envhp, (dvoid **)&authp,
+		OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
+	if( status != OCI_SUCCESS ) goto cleanup;
+	
+	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
+		(dvoid *)user, (ub4)strlen( user ),
+		OCI_ATTR_USERNAME, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
+		(dvoid *)password, (ub4)strlen( password ),
+		OCI_ATTR_PASSWORD, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCISessionBegin( svchp, errhp, authp,
+		OCI_CRED_RDBMS, OCI_DEFAULT );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
+		authp, (ub4)0, OCI_ATTR_SESSION, errhp );
+	if( status != OCI_SUCCESS ) goto cleanup;
+
+	// success
+	rt = true;
+	
+cleanup:
+
+	if( srvhp && errhp && authp ) (void)OCISessionEnd( svchp, errhp, authp, OCI_DEFAULT );
+	if( srvhp && errhp ) (void)OCIServerDetach( srvhp, errhp, OCI_DEFAULT );
+	if( authp ) (void)OCIHandleFree( authp, OCI_HTYPE_SESSION );
+	if( svchp ) (void)OCIHandleFree( svchp, OCI_HTYPE_SVCCTX );
+	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
+	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
+	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
+#endif
+	
+	return rt;
+}
 
 static const char* check_flag( const std::string& flag)
 {
@@ -214,6 +305,11 @@ if (boost::starts_with( flag, "DISABLED "))
 	if (boost::iequals( flag, "PGSQL")) return "WITH_PGSQL=1 ";
 #else
 	if (boost::iequals( flag, "PGSQL") && !check_PGSQL_RUNNING()) return "RUNNING Postgresql Database ";
+#endif
+#if !(WITH_ORACLE)
+	if (boost::iequals( flag, "ORACLE")) return "WITH_ORACLE=1 ";
+#else
+	if (boost::iequals( flag, "ORACLE") && !check_ORACLE_RUNNING()) return "RUNNING Oracle Database ";
 #endif
 #if !(WITH_LIBXML2)
 	if (boost::iequals( flag, "LIBXML2")) return "WITH_LIBXML2=1 ";

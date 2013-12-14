@@ -1,0 +1,5 @@
+#include "Oracleconfig.cpp"
+#include "Oracleconstructor.cpp"
+#include "Oracle.cpp"
+#include "Oracleprogram.cpp"
+#include "OracletransactionExecStatemachine.cpp"
