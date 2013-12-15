@@ -36,12 +36,14 @@
 #include "logger-v1.hpp"
 #include "OracleTest.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include <boost/system/error_code.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -76,6 +78,50 @@ static std::string buildConnStr( const std::string& host, unsigned short port,
 	return ss.str( );
 }
 
+static std::string getErrorMsg( sword status, OCIError *errhp )
+{
+	sb4 errcode = 0;
+	std::ostringstream os;
+	text errbuf[512];
+	
+	switch( status ) {
+		case OCI_SUCCESS:
+			os << "OCI_SUCCESS";
+			break;
+
+		case OCI_SUCCESS_WITH_INFO:
+			os << "OCI_SUCCESS_WITH_INFO";
+			break;
+		
+		case OCI_NEED_DATA:
+			os << "OCI_NEED_DATA";
+			break;
+		
+		case OCI_NO_DATA:
+			os << "OCI_NO_DATA";
+			break;
+		
+		case OCI_INVALID_HANDLE:
+			os << "OCI_INVALID_HANDLE";
+			break;
+		
+		case OCI_STILL_EXECUTING:
+			os << "OCI_STILL_EXECUTING";
+			break;
+		
+		case OCI_CONTINUE:
+			os << "OCI_CONTINUE";
+			break;
+			
+		case OCI_ERROR:
+			(void)OCIErrorGet( (dvoid *)errhp, (ub4)1, (text *)NULL,
+				&errcode, errbuf, (ub4)sizeof( errbuf ), OCI_HTYPE_ERROR );
+			os << errbuf;
+			break;
+	}
+	return os.str( );
+}
+
 static void createTestDatabase_( const std::string& host, unsigned short port,
 				 const std::string& user, const std::string& password,
 				 const std::string& dbName, const std::string& inputfile )
@@ -86,6 +132,8 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	OCIServer *srvhp = 0;
 	OCISvcCtx *svchp = 0;
 	OCISession *authp = 0;
+	OCIStmt *stmthp = 0;
+	OCIDefine *defhp = 0;
 	
 	sword status;
 
@@ -135,65 +183,198 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 		authp, (ub4)0, OCI_ATTR_SESSION, errhp );
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
-	// Get a list of tables (in the public schema)
-	//select table_name from user_tables;
+	{
+		// Get a list of tables (in the public schema)
+		std::vector<std::string> tables;
+		std::string dbcmd = std::string( "select table_name from user_tables" );	
+		char tableName[60];
 		
-#if 0
-	PGresult* res = PQexec( conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" );
-	if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
-		std::string msg = std::string( "Failed to list tables: " ) + PQerrorMessage( conn );
-		PQclear( res );
-		PQfinish( conn );
-		throw std::runtime_error( msg );
-	}
-	std::vector< std::string > tables;
-	for ( int i = 0; i < PQntuples( res ); i++ )
-		tables.push_back( PQgetvalue( res, i, 0 ));
+		status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+			OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) goto cleanup;
+		
+		status = OCIStmtPrepare( stmthp, errhp, 
+			(text *)const_cast<char *>( dbcmd.c_str( ) ),
+			(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
 
-	PQclear( res );
-	res = 0;
-	// Drop the tables
-	for ( std::vector< std::string >::const_iterator it = tables.begin();
-							it != tables.end(); it++ )	{
-		std::string query = "DROP TABLE " + *it + " CASCADE";
-		if (res) PQclear( res );
-		res = PQexec( conn, query.c_str() );
-		ExecStatusType es = PQresultStatus(res);
-		if ( es != PGRES_TUPLES_OK && es != PGRES_COMMAND_OK)	{
-			std::string msg = std::string( "Failed to delete table " ) + *it
-					  + ": " + PQerrorMessage( conn );
-			PQfinish( conn );
-			throw std::runtime_error( msg );
+		status = OCIDefineByPos( stmthp, &defhp, errhp, 1, (dvoid *)&tableName,
+			(sword)60, SQLT_STR, (dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
+
+		status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+			NULL, NULL, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
+		
+		while( status != OCI_NO_DATA ) {
+			tables.push_back( tableName );
+			status = OCIStmtFetch( stmthp, errhp, 1, 0, 0 );
 		}
-		PQclear( res );
-		res = 0;
+  
+		if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+		
+		// Drop the tables
+		for ( std::vector< std::string >::const_iterator it = tables.begin();
+								it != tables.end(); it++ )	{
+			std::string query = "DROP TABLE " + *it;
+			
+			MOD_LOG_TRACE << "Deleting test table " << query;
+
+			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+			
+			status = OCIStmtPrepare( stmthp, errhp, 
+				(text *)const_cast<char *>( query.c_str( ) ),
+				(ub4)query.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+				NULL, NULL, OCI_DEFAULT );
+			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
+
+			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+		}
 	}
 
-	// Now create the test database
-	std::string dbsource = utils::readSourceFileContent( inputfile );
-	res = PQexec( conn, dbsource.c_str() );
-	ExecStatusType es = PQresultStatus( res );
-	if ( es != PGRES_TUPLES_OK && es != PGRES_COMMAND_OK)	{
-		std::string msg = std::string( "Failed to create PostgrSQL test database: " ) + PQerrorMessage( conn );
-		PQclear( res );
-		PQfinish( conn );
-		throw std::runtime_error( msg );
+	{
+		// Get a list of sequences (in the public schema)
+		std::vector<std::string> tables;
+		std::string dbcmd = std::string( "select sequence_name from user_sequences" );	
+		char tableName[60];
+		
+		status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+			OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+		if( status != OCI_SUCCESS ) goto cleanup;
+		
+		status = OCIStmtPrepare( stmthp, errhp, 
+			(text *)const_cast<char *>( dbcmd.c_str( ) ),
+			(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
+
+		status = OCIDefineByPos( stmthp, &defhp, errhp, 1, (dvoid *)&tableName,
+			(sword)60, SQLT_STR, (dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
+
+		status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+			NULL, NULL, OCI_DEFAULT );
+		if( status != OCI_SUCCESS ) goto cleanup;
+		
+		while( status != OCI_NO_DATA ) {
+			tables.push_back( tableName );
+			status = OCIStmtFetch( stmthp, errhp, 1, 0, 0 );
+		}
+  
+		if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+		
+		// Drop the tables
+		for ( std::vector< std::string >::const_iterator it = tables.begin();
+								it != tables.end(); it++ )	{
+			std::string query = "DROP SEQUENCE " + *it;
+			
+			MOD_LOG_TRACE << "Deleting test sequence " << query;
+
+			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+			
+			status = OCIStmtPrepare( stmthp, errhp, 
+				(text *)const_cast<char *>( query.c_str( ) ),
+				(ub4)query.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+				NULL, NULL, OCI_DEFAULT );
+			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
+
+			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+		}
 	}
 
-	PQclear( res );
-#endif
+	{
+		// Now create the test database
+		std::string dbsource = utils::readSourceFileContent( inputfile );
+		std::vector<std::string> dbcmds;
+		utils::splitString( dbcmds, dbsource, ";" );
+		std::vector<std::string>::const_iterator end = dbcmds.end( );
+		bool collect_trigger_code = false;
+		std::string dbcmd;
+		std::string nextCmd;
+		std::vector<std::string>::const_iterator it = dbcmds.begin( );
+		while( it != end ) {
 
+			if( !nextCmd.empty( ) ) {
+				dbcmd = nextCmd;
+				nextCmd.clear( );
+			} else {
+				std::string part = boost::algorithm::trim_copy( *it );
+				it++;
+
+				size_t pos = part.find( "\n" );
+				while( pos != std::string::npos ) {
+					part.replace( pos, 1, " " );
+					pos = part.find( "\n", pos+1 );
+				}
+
+				if( boost::starts_with( part, "CREATE TRIGGER"  ) ) {
+					collect_trigger_code = true;
+				}
+				if( collect_trigger_code ) {
+					if( boost::starts_with( part, "/" ) ) {
+						collect_trigger_code = false;
+						nextCmd = part.substr( 2 );
+					} else {
+						dbcmd.append( part );
+						dbcmd.append( "; " );
+						continue;
+					}
+				} else {
+					dbcmd = part;
+				}				
+			}
+			
+			if( dbcmd.empty( ) ) continue;
+			
+			MOD_LOG_TRACE << "Creating database SQL statement: " << dbcmd;
+			
+			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+			
+			status = OCIStmtPrepare( stmthp, errhp, 
+				(text *)const_cast<char *>( dbcmd.c_str( ) ),
+				(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+				NULL, NULL, OCI_DEFAULT );
+			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
+
+			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			
+			dbcmd.clear( );
+		}
+	}
+	
 cleanup:
+	std::string errmsg;
+	if( status != OCI_SUCCESS ) {
+		std::ostringstream os;
+		os << "Setting up Oracle test database failed: " << getErrorMsg( status, errhp );
+		errmsg = os.str( );
+	}
+	
 	if( srvhp && errhp && authp ) (void)OCISessionEnd( svchp, errhp, authp, OCI_DEFAULT );
 	if( srvhp && errhp ) (void)OCIServerDetach( srvhp, errhp, OCI_DEFAULT );
+	if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
 	if( authp ) (void)OCIHandleFree( authp, OCI_HTYPE_SESSION );
 	if( svchp ) (void)OCIHandleFree( svchp, OCI_HTYPE_SVCCTX );
-	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
 	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
 	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
-	
+	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
+
 	if( status != OCI_SUCCESS ) {
-		throw std::runtime_error( "Connection to Oracle database failed" );
+		throw std::runtime_error( errmsg );
 	}
 }
 
