@@ -253,8 +253,6 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	MOD_LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
-
-// This function needs a lot of work and thinking...
 OracledbUnit::~OracledbUnit()
 {
 	size_t connections = 0;
@@ -500,7 +498,7 @@ void Oracletransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
-		TransactionExecStatemachine_oracle ph( *conn);
+		TransactionExecStatemachine_oracle ph( *conn, m_db.ID());
 		try
 		{
 			if (!ph.begin()
@@ -531,7 +529,7 @@ void Oracletransaction::execute_as_transaction()
 
 void Oracletransaction::execute_as_operation()
 {
-	TransactionExecStatemachine_oracle ph( **m_conn, true);
+	TransactionExecStatemachine_oracle ph( **m_conn, m_db.ID(), true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))

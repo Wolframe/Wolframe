@@ -234,8 +234,6 @@ public:
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
 
-	static void noticeProcessor( void* this_void, const char * message);
-
 private:
 	const std::string	m_ID;			///< database ID
 	std::string		m_connStr;		///< connection string
