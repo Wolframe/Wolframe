@@ -232,7 +232,7 @@ AGAIN:
 					cur.typeinfo->ReleaseVarDesc( vardesc);
 					vardesc = 0;
 
-					const_cast<IRecordInfo*>(cur.recinfo)->GetField( cur.data.pvRecord, varname.c_str(), &data);
+					WRAP( const_cast<IRecordInfo*>(cur.recinfo)->GetField( cur.data.pvRecord, varname.c_str(), &data));
 					if ((data.vt & VT_ARRAY) == VT_ARRAY)
 					{
 						bool rt = false;

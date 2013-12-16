@@ -119,6 +119,80 @@ HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR
 	return DispGetIDsOfNames( m_typeinfo, rgszNames, cNames, rgDispId);
 }
 
+static CLSID getUUIDfromVariantArg( const VARIANT& arg, const IRecordInfo* recordinfo, const ITypeInfo* typeinfo)
+{
+	CLSID rt;
+	std::memset( &rt, 0, sizeof(rt));
+
+	TYPEATTR *typeattr = 0;
+	int varidx = 0;
+	wchar_t fieldname[3];
+	fieldname[0] = '_';
+	fieldname[1] = 'a';
+	fieldname[2] = 0;
+	VARIANT elem;
+	elem.vt = VT_EMPTY;
+	try
+	{
+		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr));
+
+		if (typeattr->cVars != 11/*1+2+8*/)
+		{
+			throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+		}
+		for (; varidx < typeattr->cVars; ++varidx,++fieldname[1])
+		{
+			if (S_OK != const_cast<IRecordInfo*>(recordinfo)->GetField( arg.pvRecord, fieldname, &elem))
+			{
+				throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+			}
+			if (elem.vt == VT_I4)
+			{
+				if (varidx != 0)
+				{
+					throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+				}
+				rt.Data1 = elem.intVal;
+			}
+			else if (elem.vt == VT_I2)
+			{
+				if (varidx == 1)
+				{
+					rt.Data2 = elem.iVal;
+				}
+				else if (varidx == 2)
+				{
+					rt.Data3 = elem.iVal;
+				}
+				else
+				{
+					throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+				}
+			}
+			else if (elem.vt == VT_UI1)
+			{
+				if (varidx < 3)
+				{
+					throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+				}
+				rt.Data4[varidx-3] = elem.bVal;
+			}
+			else
+			{
+				throw std::runtime_error( "invalid argument for Guid (3rd argument of ProcProvider::call)");
+			}
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (typeinfo && typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		throw e;
+	}
+	if (typeinfo && typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+	return rt;
+}
+
+
 HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
 	try
@@ -137,16 +211,21 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 			VARIANT* inputarg  = &pDispParams->rgvarg[1];
 			VARIANT* resultarg = &pDispParams->rgvarg[0];
 
+			ITypeInfo* resultGuidTypeInfo = 0;
 			ITypeInfo* resultTypeInfo = 0;
 			ITypeInfo* inputTypeInfo = 0;
 			HRESULT hr = S_OK;
-			if (!resultarg->pRecInfo) throw std::runtime_error( "result parameter of provider call is not a valid structure (VT_RECORD) with public type info");
+
+			if (resultarg->vt != VT_RECORD || !resultarg->pRecInfo) throw std::runtime_error( "result parameter of provider call is not a valid structure (VT_RECORD) with public type info");
 			try
 			{
 				hr = inputarg->pRecInfo->GetTypeInfo( &inputTypeInfo);
 				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of input (is it declared as public ?)");
-				hr = resultarg->pRecInfo->GetTypeInfo( &resultTypeInfo);
+				hr = resultarg->pRecInfo->GetTypeInfo( &resultGuidTypeInfo);
 				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of result (is it declared as public ?)");
+
+				CLSID resultUUID = getUUIDfromVariantArg( *resultarg, resultarg->pRecInfo, resultGuidTypeInfo);
+				WRAP (const_cast<ITypeLib*>(m_typelib->typelib())->GetTypeInfoOfGuid( resultUUID, &resultTypeInfo));
 
 				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
 				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
@@ -161,14 +240,16 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				{
 					throw std::runtime_error( "failed to assign result of processor provider call");
 				}
-				*resultarg = res;
-				/*[-]*/std::cout << "FUNCTION RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *resultarg) << std::endl;
+				*pVarResult = res;
+				/*[-]*/std::cout << "FUNCTION RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *pVarResult) << std::endl;
 
 				if (resultTypeInfo) resultTypeInfo->Release();
+				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();
 			}
 			catch (const std::runtime_error& e)
 			{
+				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();
 				throw e;
