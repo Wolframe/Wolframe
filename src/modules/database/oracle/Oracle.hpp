@@ -121,12 +121,6 @@ class OracleConnection
 		OCITrans *transhp; // transaction handle
 };
 
-class OracleStatement
-{
-	public:
-		OCIStmt *stmtp; 
-};
-
 class Oracletransaction : public Transaction
 {
 public:
