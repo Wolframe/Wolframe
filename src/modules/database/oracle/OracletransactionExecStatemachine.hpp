@@ -103,7 +103,7 @@ private:
 		return ar[ (int)i];
 	}
 
-	void setDatabaseErrorMessage();
+	void setDatabaseErrorMessage( sword status );
 //	bool status( OracleStatement* res, State newstate);
 	bool status( sword status, State newstate);
 	bool errorStatus( const std::string& message);

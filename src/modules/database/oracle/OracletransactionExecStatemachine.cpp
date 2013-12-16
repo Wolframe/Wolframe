@@ -142,59 +142,50 @@ static const char* getErrorType( const char* /* tp */)
 #endif
 }
 
-void TransactionExecStatemachine_oracle::setDatabaseErrorMessage()
+void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status )
 {
-	sb4 errorcode = 0;
-	text errbuf[512];
+	sb4 errcode = 0;
+	char errmsg[512];
 
-/*
- * std::string Oracletransaction::getErrorMsg( sword status )
-{	
 	switch( status ) {
 		case OCI_SUCCESS:
-			os << "OCI_SUCCESS";
+			strcpy( errmsg, "OCI_SUCCESS" );
 			break;
 
 		case OCI_SUCCESS_WITH_INFO:
-			os << "OCI_SUCCESS_WITH_INFO";
+			strcpy( errmsg, "OCI_SUCCESS_WITH_INFO" );
 			break;
 		
 		case OCI_NEED_DATA:
-			os << "OCI_NEED_DATA";
+			strcpy( errmsg, "OCI_NEED_DATA" );
 			break;
 		
 		case OCI_NO_DATA:
-			os << "OCI_NO_DATA";
+			strcpy( errmsg, "OCI_NO_DATA" );
 			break;
 		
 		case OCI_INVALID_HANDLE:
-			os << "OCI_INVALID_HANDLE";
+			strcpy( errmsg, "OCI_INVALID_HANDLE" );
 			break;
 		
 		case OCI_STILL_EXECUTING:
-			os << "OCI_STILL_EXECUTING";
+			strcpy( errmsg, "OCI_STILL_EXECUTING" );
 			break;
 		
 		case OCI_CONTINUE:
-			os << "OCI_CONTINUE";
+			strcpy( errmsg, "OCI_CONTINUE" );
 			break;
 			
 		case OCI_ERROR:
-			(void)OCIErrorGet( (dvoid *)(*m_conn)->errhp, (ub4)1, (text *)NULL,
-				&errcode, errbuf, (ub4)sizeof( errbuf ), OCI_HTYPE_ERROR );
-			os << errbuf;
+			(void)OCIErrorGet( (dvoid *)m_conn->errhp, (ub4)1, (text *)NULL,
+				&errcode, (text *)errmsg, (ub4)sizeof( errmsg ), OCI_HTYPE_ERROR );
 			break;
 	}
-	return os.str( );
-}
-
-	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
-	const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
-	const char* severitystr = m_lastresult?PQresultErrorField( m_lastresult, PG_DIAG_SEVERITY):"ERROR";
-	log::LogLevel::Level severity = OracledbUnit::getLogLevel( severitystr);
-*/
+	
+	//~ const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
+	//~ const char* severitystr = m_lastresult?PQresultErrorField( m_lastresult, PG_DIAG_SEVERITY):"ERROR";
+	//~ log::LogLevel::Level severity = OracledbUnit::getLogLevel( severitystr);
 	const char *usermsg = 0;
-	const char *errmsg = "TODO OCI ERROR";
 	const char *errtype = "INTERNAL";
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
 	if (errmsg)
@@ -211,7 +202,7 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage()
 			usermsg = errmsg;
 		}
 	}
-	m_lasterror.reset( new DatabaseError( severity, errorcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, usermsg));
 }
 
 // was PQResult
@@ -228,7 +219,7 @@ bool TransactionExecStatemachine_oracle::status( sword status, State newstate )
 		m_state = newstate;
 		rt = true;
 	} else {
-		setDatabaseErrorMessage( );
+		setDatabaseErrorMessage( status );
 		m_state = Error;
 		rt = false;
 	}
@@ -356,7 +347,26 @@ bool TransactionExecStatemachine_oracle::execute()
 	}
 	std::string stmstr = m_statement.expanded();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
+	sword status;
+	status = O
 //	m_lastresult = PQexec( m_conn, stmstr.c_str());
+
+/*
+			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+			
+			status = OCIStmtPrepare( stmthp, errhp, 
+				(text *)const_cast<char *>( dbcmd.c_str( ) ),
+				(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+				NULL, NULL, OCI_DEFAULT );
+			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
+
+			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+ */
 	bool rt = status( 0, Executed);
 	if (rt)
 	{

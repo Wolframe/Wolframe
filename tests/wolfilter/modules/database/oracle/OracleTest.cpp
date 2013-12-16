@@ -204,7 +204,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 
 		status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
 			NULL, NULL, OCI_DEFAULT );
-		if( status != OCI_SUCCESS ) goto cleanup;
+		if( status != OCI_SUCCESS && status != OCI_NO_DATA ) goto cleanup;
 		
 		while( status != OCI_NO_DATA ) {
 			tables.push_back( tableName );
@@ -258,7 +258,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 
 		status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
 			NULL, NULL, OCI_DEFAULT );
-		if( status != OCI_SUCCESS ) goto cleanup;
+		if( status != OCI_SUCCESS && status != OCI_NO_DATA ) goto cleanup;
 		
 		while( status != OCI_NO_DATA ) {
 			tables.push_back( tableName );
@@ -267,7 +267,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
   
 		if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
 		
-		// Drop the tables
+		// Drop sequences
 		for ( std::vector< std::string >::const_iterator it = tables.begin();
 								it != tables.end(); it++ )	{
 			std::string query = "DROP SEQUENCE " + *it;
