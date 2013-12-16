@@ -9,6 +9,13 @@ SUBDIRS = testtrace
 SUBDIRS = \
         $(SUBDIRS) postgresql
 !ENDIF
+
+# Oracle
+!IFDEF WITH_ORACLE
+SUBDIRS = \
+        $(SUBDIRS) oracle
+!ENDIF
+
 # sqlite3
 !IFDEF WITH_SQLITE3
 SUBDIRS = \

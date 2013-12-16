@@ -118,6 +118,7 @@ class OracleConnection
 		OCIServer *srvhp; // server handle
 		OCISvcCtx *svchp; // service handle
 		OCISession *authp; // user authentication handle
+		OCITrans *transhp; // transaction handle
 };
 
 class OracleStatement
@@ -144,12 +145,12 @@ public:
 	virtual void close();
 
 private:
-	void execute_statement( const char* statement );
-
 	///\brief Execute as transaction (all operations belong to one transaction implicitely defined)
 	void execute_as_transaction();
 	///\brief Execute with transaction context defined in outer context
 	void execute_as_operation();
+
+	std::string getErrorMsg( sword status );
 
 private:
 	Oracledatabase&	m_db;		//< parent database
@@ -232,8 +233,6 @@ public:
 
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
-
-	static void noticeProcessor( void* this_void, const char * message);
 
 private:
 	const std::string	m_ID;			///< database ID

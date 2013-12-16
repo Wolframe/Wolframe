@@ -111,6 +111,18 @@ INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif
 
+# Oracle
+ifeq ($(WITH_ORACLE),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_ORACLE
+INCLUDE_DIRS += \
+	$(ORACLE_INCLUDE_DIRS)
+INCLUDE_LDFLAGS += \
+	$(ORACLE_LIB_DIRS)
+INCLUDE_LIBS += \
+	$(ORACLE_LIBS)
+endif
+
 # Python (missing symbols on FreeBSD only, should
 # be investigated as we want to keep all python
 # dependencies strictly to the modules), otherwise

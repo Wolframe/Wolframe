@@ -53,7 +53,7 @@ namespace db {
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleConnection* conn_, bool inTransactionContext=false);
+	TransactionExecStatemachine_oracle( OracleConnection* conn_, const std::string& dbname_, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
@@ -103,7 +103,7 @@ private:
 		return ar[ (int)i];
 	}
 
-	void setDatabaseErrorMessage();
+	void setDatabaseErrorMessage( sword status );
 //	bool status( OracleStatement* res, State newstate);
 	bool status( sword status, State newstate);
 	bool errorStatus( const std::string& message);
@@ -112,6 +112,7 @@ private:
 private:
 	State m_state;
 	OracleConnection* m_conn;
+	std::string m_dbname;
 	OracleStatement* m_lastresult;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
