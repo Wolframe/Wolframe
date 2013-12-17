@@ -591,8 +591,8 @@
 			<para>
 			On the client side the following message will be shown:
 			<programlisting language='sql'>
-			unique constaint violation in transaction 'insertCustomer'.
-			Customers must have a unique name.
+			unique constaint violation in transaction 'insertCustomer'
+			-- Customers must have a unique name.
 			</programlisting>
 			</para>
 			</sect4>

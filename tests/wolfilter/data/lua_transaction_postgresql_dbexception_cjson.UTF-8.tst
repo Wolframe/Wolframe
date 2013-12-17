@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **requires:PGSQL
 **exception
-error in transaction insertCustomer:*Customers must have a unique name.
+error in transaction 'insertCustomer':*Customers must have a unique name.
 **input
 {
   "customers": {
@@ -36,7 +36,7 @@ CREATE TABLE Customer (
 TRANSACTION insertCustomer
 BEGIN
 	DO INSERT INTO Customer (name) VALUES ($(name));
-	ON ERROR CONSTRAINT HINT ". Customers must have a unique name.";
+	ON ERROR CONSTRAINT HINT "Customers must have a unique name.";
 END
 **outputfile:DBDUMP
 **file: transaction_dbexception.lua

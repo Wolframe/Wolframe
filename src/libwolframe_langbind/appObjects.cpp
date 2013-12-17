@@ -279,7 +279,7 @@ bool TransactionFunctionClosure::call()
 				LOG_ERROR << e.what();
 				const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
 				std::string explain;
-				if (hint) explain = explain + " " + hint;
+				if (hint) explain = explain + " -- " + hint;
 				throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
 			}
 			db::TransactionOutputR res( new db::TransactionOutput( trsr->getResult()));
