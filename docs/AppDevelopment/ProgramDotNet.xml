@@ -34,7 +34,7 @@
 		are classes and method calls. The way of defining callable items for 
 		<application>Wolframe</application> is restricted either due to the current 
 		state of the <application>Wolframe</application> COM/.NET interoperability
-		implementation or due to general or version dependend restrictions of .NET objects exposed 
+		implementation or due to general or version dependent restrictions of .NET objects exposed 
 		via COM/.NET interop. We list here the restrictions:
 		<itemizedlist>
 			<listitem><para>The methods exported as functions for <application>Wolframe</application>
@@ -239,7 +239,7 @@
 		the type library interface assemblies need to be put into the global assembly cache (GAC).
 		Unfortunately this has to be repeated every time the assembly binary changes.
 		There is no way around. For registration in the GAC you have to call the program
-		<code>gacutil /if &lt;assemblypath&gt;</code> with your assembly path &lt;assemblypath&gt;
+		<code>gacutil /if &lt;assemblypath&gt;</code> with the assembly path &lt;assemblypath&gt;
 		as argument. Furthermore the command <code>gacutil</code> has to be called from
 		administrator command line. Before calling <code>gacutil</code>, assemblies have to
 		be strongly signed. We refer here to the MSDN documentation for how to sign an application.
@@ -285,12 +285,71 @@
 	<application>.NET</application> modules are grouped together in a configuration block that specifies the configuration
 	of the Microsoft Common Language Runtime (CLR) used for <application>.NET</application> interop calls. The configuration
 	block has the header <code>runtimeEnv dotNET</code> and configures the version of the 
-	runtime loaded and the path where the typelibraries (.tlb) files can be found. 
+	runtime loaded (clrversion) and the path where the typelibraries (.tlb) files can be 
+	found (typelibpath).
+	</para>
+	<para>
 	With the <code>assembly</code> definitions you declare the registered assemblies to load.
 	<programlisting language='cfg'>
 	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_dotnet.conf" parse="text" />
 	</programlisting>
 	</para>
+		<sect3>
+		<table frame="all" width="80%">
+			<title>Attributes of Assembly declarations</title>
+			<tgroup cols="2">
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>&lt;no identifier&gt;</entry>
+					<entry>The first element of the assembly definition does not have an attribute identifier. 
+					The value is the name of the assembly (and also of the type library)</entry>
+				</row>
+				<row>
+					<entry>Version</entry>
+					<entry>4 element (Major.Minor.Build.Revision) version number of the assembly.
+					This value is defined in the assembly info file of the assembly project.</entry>
+				</row>
+				<row>
+					<entry>Culture</entry>
+					<entry>For <application>Wolframe</application> applications until now always "neutral".
+					Functionality is in Wolframe not yet culture dependent on the server side.</entry>
+				</row>
+				<row>
+					<entry>PublicKeyToken</entry>
+					<entry>Public key token values for signed assemblies. See next section how to set it.</entry>
+				</row>
+				<row>
+					<entry>processorArchitecture</entry>
+					<entry>Meaning not explained here. Has on ordinary Windows .NET plattforms usually the value "MSIL". Read the MSDN documentation to dig deeper.</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		</sect3>
+
+		<sect3>
+		<title>Get the PublicKeyToken</title>
+		<para>
+		We already found out that <application>Wolframe</application> .NET modules 
+		have to be strongly signed. 
+		Each strongly signed assembly has such a public key token
+		that has to be used as attribute when referencing the assembly.
+		</para>
+		<para>
+		You can get the <code>PublicKeyToken</code> of the assembly 
+		by calling <code>sn -T &lt;assemblypath&gt;</code> from the command line (cmd)
+		with &lt;assemblypath&gt; as the path of the assembly. The printed value is the
+		public key to insert as attribute value of <code>PublicKeyToken</code> in the
+		<application>Wolframe</application> configuration for each .NET assembly.
+		</para>
+		</sect3>
 	</sect2>
 	<para></para>
 </sect1>

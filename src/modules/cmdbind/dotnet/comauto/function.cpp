@@ -276,6 +276,10 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 {
 	if (m_typeinfo) const_cast<ITypeInfo*>(m_typeinfo)->AddRef();
 	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetFuncDesc( fidx, &m_funcdesc));
+	if (!m_funcdesc)
+	{
+		throw std::runtime_error("FUNCDESC not defined for .NET function")
+	}
 	struct Local	//exception safe memory allocation of local variables
 	{
 		BSTR* pnames;
@@ -353,8 +357,8 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 		}
 		else if (td->vt == VT_SAFEARRAY)
 		{
-			if (local.rectypeinfo) local.rectypeinfo->Release();
-			local.rectypeinfo = 0;
+			local.clear();
+
 			if (!comauto::isAtomicType(td->lptdesc->vt) && !comauto::isStringType(td->lptdesc->vt))
 			{
 				WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo));
@@ -369,8 +373,8 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	}
 	if (m_funcdesc->elemdescFunc.tdesc.vt == VT_USERDEFINED)
 	{
-		if (local.rectypeinfo) local.rectypeinfo->Release();
-		local.rectypeinfo = 0;
+		local.clear();
+
 		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_funcdesc->elemdescFunc.tdesc.hreftype, &local.rectypeinfo));
 		m_returntype = ReturnType( &m_funcdesc->elemdescFunc.tdesc, local.rectypeinfo);
 	}
@@ -484,9 +488,9 @@ void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* 
 
 bool comauto::DotnetFunctionClosure::Impl::call()
 {
-AGAIN:
 	try
 	{
+AGAIN:
 		langbind::FilterBase::ElementType elemtype;
 		types::VariantConst elemvalue;
 
@@ -742,7 +746,7 @@ langbind::FormFunctionClosure* DotnetFunction::createClosure() const
 	return new DotnetFunctionClosure(this);
 }
 
-const std::string& DotnetFunction::assemblyname() const	{return m_impl->assemblyname();}
+const std::string& DotnetFunction::assemblyname() const		{return m_impl->assemblyname();}
 const std::string& DotnetFunction::classname() const		{return m_impl->classname();}
 const std::string& DotnetFunction::methodname() const		{return m_impl->methodname();}
 
