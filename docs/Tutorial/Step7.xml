@@ -44,35 +44,41 @@
 	<screenshot>
 		<screeninfo>Step 7 customers edit form</screeninfo>
 		<mediaobject>
-			<imageobject role="html"> 
+			<imageobject role="html">
 				<imagedata fileref="images/Tutorial/step7_customer_edit.png" format="PNG"/>
-			</imageobject> 
-			<imageobject role="fo"> 
+			</imageobject>
+			<imageobject role="fo">
 				<imagedata fileref="images/Tutorial/step7_customer_edit.png" format="PNG" width="100%" scalefit="1"/>
-			</imageobject> 
+			</imageobject>
 		</mediaobject>
 	</screenshot>
-	
+
+	<para>
 		The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
+	</para>
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.xml" parse="text" />
 	</programlisting>
 
+	<para>
 		Similar to to the "show customer" case we add now a new map:
+	</para>
 
 	<programlisting language='xml'>
 	editCustomerUpdate = UpdateCustomer( xml );
 	</programlisting>
-	
+	<para>
 		We also add a simple form <filename>CustomerUpdate.simpleform</filename>
 		which looks very similar to the <filename>Customer.simpleform</filename>:
-
+	</para>
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.simpleform" parse="text" />
 	</programlisting>
 
+	<para>
 		add it to <filename>tutorial.conf</filename>:
+	</para>
 
 	<programlisting language='shell'>
 	Processor {
@@ -81,9 +87,11 @@
 		...
 	}
 	</programlisting>
-	
+
+	<para>
 		finally we write the transaction function 'CustomerUpdate' in
 		<filename>Customer.tdl</filename>:
+	</para>
 
 	<programlisting language='sql'>
 	TRANSACTION UpdateCustomer
@@ -92,11 +100,11 @@
 			WHERE id=$(customer/id);
 	END
 	</programlisting>
-	
+
 	<para>
 		Note, that this time the database transaction doesn't return a result.
 	</para>
-	
+
 	<para>
 		Restart server and client and start to edit the customers.
 	</para>
