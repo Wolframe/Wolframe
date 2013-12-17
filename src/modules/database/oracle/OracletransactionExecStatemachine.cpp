@@ -48,8 +48,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleConnection* conn_, const std::string& dbname_, bool inTransactionContext)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleConnection* conn_, const std::string& dbname_, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
+	,m_env(env_)
 	,m_conn(conn_)
 	,m_dbname(dbname_)
 	,m_lastresult(0)
@@ -66,7 +67,7 @@ void TransactionExecStatemachine_oracle::clear()
 {
 	if (m_lastresult)
 	{
-//		PQclear( m_lastresult);
+		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
 		m_lastresult = 0;
 	}
 	m_lasterror.reset();
@@ -142,12 +143,12 @@ static const char* getErrorType( const char* /* tp */)
 #endif
 }
 
-void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status )
+void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ )
 {
 	sb4 errcode = 0;
 	char errmsg[512];
 
-	switch( status ) {
+	switch( status_ ) {
 		case OCI_SUCCESS:
 			strcpy( errmsg, "OCI_SUCCESS" );
 			break;
@@ -188,38 +189,25 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status )
 	const char *usermsg = 0;
 	const char *errtype = "INTERNAL";
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	if (errmsg)
-	{
-		usermsg = strstr( errmsg, "DETAIL:");
-		if (usermsg) usermsg = usermsg + 7;
-		if (!usermsg)
-		{
-			usermsg = strstr( errmsg, "ERROR:");
-			if (usermsg) usermsg = usermsg + 7;
-		}
-		if (!usermsg)
-		{
-			usermsg = errmsg;
-		}
-	}
+	
 	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, usermsg));
 }
 
 // was PQResult
 // bool TransactionExecStatemachine_oracle::status( OracleStatement* res, State newstate)
-bool TransactionExecStatemachine_oracle::status( sword status, State newstate )
+bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
 {
 	bool rt;
 
 	// TODO: check better for status
 	
-	if( status == OCI_SUCCESS ) {
+	if( status_ == OCI_SUCCESS ) {
 		// TODO: m_hasResult = xx;
 		m_hasResult = false;
 		m_state = newstate;
 		rt = true;
 	} else {
-		setDatabaseErrorMessage( status );
+		setDatabaseErrorMessage( status_ );
 		m_state = Error;
 		rt = false;
 	}
@@ -319,7 +307,7 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 		char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
 		encvalue[0] = '\'';
 		boost::shared_ptr<void> encvaluer( encvalue, std::free);
-		int error = 0;
+		//~ int error = 0;
 //		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
 		size_t encvaluesize = 0;
 		encvalue[encvaluesize+1] = '\'';
@@ -342,32 +330,24 @@ bool TransactionExecStatemachine_oracle::execute()
 	}
 	if (m_lastresult)
 	{
-//		PQclear( m_lastresult);
+		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
 		m_lastresult = 0;
 	}
 	std::string stmstr = m_statement.expanded();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
-	sword status;
-	status = O
-//	m_lastresult = PQexec( m_conn, stmstr.c_str());
+	sword status_;
 
-/*
-			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
-				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
-			if( status != OCI_SUCCESS ) goto cleanup;
-			
-			status = OCIStmtPrepare( stmthp, errhp, 
-				(text *)const_cast<char *>( dbcmd.c_str( ) ),
-				(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
-			if( status != OCI_SUCCESS ) goto cleanup;
+	status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
+		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
 
-			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
-				NULL, NULL, OCI_DEFAULT );
-			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
+	status_ = OCIStmtPrepare( m_lastresult, m_conn->errhp, 
+		(text *)const_cast<char *>( stmstr.c_str( ) ),
+		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
 
-			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
- */
-	bool rt = status( 0, Executed);
+	status_ = OCIStmtExecute( m_conn->svchp, m_lastresult, m_conn->errhp, (ub4)1, (ub4)0,
+		NULL, NULL, OCI_DEFAULT );
+
+	bool rt = status( status_, Executed);
 	if (rt)
 	{
 		if (m_hasResult)

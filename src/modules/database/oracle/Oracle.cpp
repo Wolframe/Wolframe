@@ -498,7 +498,7 @@ void Oracletransaction::execute_as_transaction()
 	try
 	{
 		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
-		TransactionExecStatemachine_oracle ph( *conn, m_db.ID());
+		TransactionExecStatemachine_oracle ph( &m_db.m_env, *conn, m_db.ID());
 		try
 		{
 			if (!ph.begin()
@@ -529,7 +529,7 @@ void Oracletransaction::execute_as_transaction()
 
 void Oracletransaction::execute_as_operation()
 {
-	TransactionExecStatemachine_oracle ph( **m_conn, m_db.ID(), true);
+	TransactionExecStatemachine_oracle ph( &m_db.m_env, **m_conn, m_db.ID(), true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
