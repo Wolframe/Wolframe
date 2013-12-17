@@ -3,8 +3,10 @@ INCLUDE treeOperations
 
 TRANSACTION addTag
 BEGIN
-	DO insertIntoTree<TagTable>( $(parentID) )
-	UPDATE TagTable SET name=$(name),description=$(description) WHERE ID=$RESULT.id;
+    DO insertIntoTree<TagTable>( $(parentID) )
+    DO UPDATE TagTable
+        SET name=$(name),description=$(description)
+            WHERE ID=$RESULT.id;
 END
 
 

@@ -3,6 +3,7 @@ DATABASE DB1,DBtest
 
 TRANSACTION getCustomer
 BEGIN
-	INTO customer DO SELECT * FROM CustomerData WHERE ID=$(id);
+    INTO customer DO SELECT *
+        FROM CustomerData WHERE ID=$(id);
 END
 

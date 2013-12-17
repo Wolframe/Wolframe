@@ -87,32 +87,45 @@ private:
 ///\param[in] operatorTable (optional) operator table
 ///\param[in] alphaTable (optional) token alphabet as character table
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable, const CharTable& alphaTable);
+
 ///\brief See utils::parseNextToken(std::string&,std::string::const_iterator&,std::string::const_iterator,const CharTable&,const CharTable&)
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable);
+
 ///\brief See utils::parseNextToken(std::string&,std::string::const_iterator&,std::string::const_iterator,const CharTable&,const CharTable&)
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
+
 ///\brief Skip to next token (skip white spaces)
 char gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end);
+
 ///\brief Parse the rest of the line starting
 ///\param[in,out] si start of chunk to parse as input and first character after end of line if found or end of chunk to parse as output
 ///\param[in] se end of chunk to parse
 ///\return line parsed without end of line marker
 std::string parseLine( std::string::const_iterator& si, const std::string::const_iterator& se);
+
 ///\brief Parse the next identifier if it is in 'idtab' or goto the next token if not
 ///\return the index of the identifier (starting from 1) in 'idtab' or 0, if the next token does not match
 ///\param[in,out] si scanning iterator passed as start of the source to parse and returned as source position after the token parsed if it matches or start of the token not matching if not
-///\param[in] end iterator marking the end of the source
+///\param[in] se iterator marking the end of the source
 ///\param[in] idtab identifier table
 int parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab);
 
 ///\brief Parse a token assignement 'identifier = token'
 ///\return pair with assignement first = identifier, second = token
+///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the expression parsed
+///\param[in] end iterator marking the end of the source
+///\param[in] alphaTable table with characters valid in an identifier
 std::pair<std::string,std::string> parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& alphaTable);
+
+///\brief Parse a token assignement 'identifier = token' with the standard identifier table
+///\return pair with assignement first = identifier, second = token
+///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the expression parsed
+///\param[in] end iterator marking the end of the source
 std::pair<std::string,std::string> parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end);
 
 ///\remark throws exception on error
 ///\return line parsed
-///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
+///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the expression parsed)
 ///\param[in] end iterator marking the end of the source
 std::string parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end);
 

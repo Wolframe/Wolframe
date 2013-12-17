@@ -6,9 +6,12 @@
 		on <application>.NET</application> (<ulink url="http://www.microsoft.com/net">http://www.microsoft.com/net</ulink>) like for example
 		<application>C#</application> and <application>VB.NET</application>.  
 		Because <application>.NET</application> based libraries can only be called 
-		by <application>Wolframe</application> only as a 
-		compiled and not as an interpreted language, you have to build a module out of your function 
-		implementation.
+		by <application>Wolframe</application> as a compiled and not as an 
+		interpreted language, you have to build a .NET assembly out of a group of 
+		function implementations. There are further restrictions on a .NET implementation.
+		But we will discuss all of them, so that you should be able
+		to write .NET assemblies for <application>Wolframe</application> on your own 
+		after reading this chapter.
 		</para>
 	</sect2>
 
@@ -24,66 +27,80 @@
 	</sect2>
 
 	<sect2>
-		<title>.NET Function Interface</title>
+		<title>Function Interface</title>
 		<sect3>
-		<title>Function (Method) Context</title>
-		<para>In .NET only objects and method calls exist. The methods exported as functions
-		for Wolframe must not be defined in a nested class. They should be defined in a top level
-		class without namespace.
-		The class must be derived from an inteface with all methods exported declared.
-		</para>
-		<para>
-		The methods must not be static because COM/.NET interop cannot cope with static
-		method calls. Even if the methods nature is static, they have to be defined as ordinary
-		method calls.
-		</para>
-		<para>
-		<note>The restriction of having unique class names without namespaces is due to
-		the current state of the Wolframe COM/.NET interoperability implementation.
-		</note>
+		<title>Function Context</title>
+		<para>In .NET the building blocks for functions called by <application>Wolframe</application>
+		are classes and method calls. The way of defining callable items for 
+		<application>Wolframe</application> is restricted either due to the current 
+		state of the <application>Wolframe</application> COM/.NET interoperability
+		implementation or due to general or version dependend restrictions of .NET objects exposed 
+		via COM/.NET interop. We list here the restrictions:
+		<itemizedlist>
+			<listitem><para>The methods exported as functions for <application>Wolframe</application>
+			must not be defined in a nested class. They should be defined in a top level class 
+			without namespace. This is a restriction imposed by the current development 
+			state of Wolframe. </para>
+			</listitem>
+			<listitem>The class must be derived from an interface with all methods
+			exported declared.
+			</listitem>
+			<listitem>The methods must not be static because COM/.NET interop,
+			as far as we know, cannot cope with static method calls. Even if the 
+			methods nature is static, they have to be defined as ordinary method calls.
+			</listitem>
+		</itemizedlist>
 		</para>
 		</sect3>
+
 		<sect3>
-		<title>Function (Method) Signature</title>
+		<title>Function Signature</title>
 		<para>
-		Functions callable from Wolframe take an arbitrary number of arguments as input and
-		return a structure (<code>struct</code>). The named input parameters referencing atomic
-		elements or structures are forming the input structure of the Wolframe function.
-		A wolframe function called with a structure containing the elements "A" and "B" is
-		implemented in <application>.NET</application> as function taking two arguments
-		with the name "A" and "B". <application>.NET</application> functions
+		Functions callable from <application>Wolframe</application> take an arbitrary 
+		number of arguments as input and return a structure (<code>struct</code>) as 
+		output. The named input parameters referencing atomic elements or complex 
+		structures are forming the input structure of the <application>Wolframe</application> 
+		function. A <application>Wolframe</application> function called with a 
+		structure containing the elements "A" and "B" is implemented in 
+		<application>.NET</application> as function taking two arguments
+		with the name "A" and "B". Both "A" and "B" can represent either atomic elements 
+		or arbitrary complex structures. <application>.NET</application> functions
 		that need to call global <application>Wolframe</application> functions,
-		for example to perform database transactions, need to declare a <code>ProcProvider</code>
-		interface from <application>Wolframe</application> namespace as additional parameter.
-		We will describe the <code>ProcProvider</code> interface in a separate section of this chapter.
+		for example to perform database transactions, need to declare 
+		a <code>ProcProvider</code> interface from <application>Wolframe</application>
+		namespace as additional parameter. We will describe the <code>ProcProvider</code>
+		interface in a separate section of this chapter.
 		</para>
 		</sect3>
 
 		<sect3>
 		<title>Example</title>
-		<para>The following example is without marshalling and introspection tags. It can not
-		work therefore. The example just illustrates the structure of the exported object with
+		<para>The following simple example without provider context is declared 
+		without marshalling and introspection tags. It can therefore not be called
+		by <code>Wolframe</code>. We explain later how to make it callable. 
+		The example just illustrates the structure of the exported object with
 		its interface (example <application>C#</application>):
 		<programlisting language='C#'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructure.cs" parse="text" />
 		</programlisting>
+		</para>
 		</sect3>
 	</sect2>
 
 	<sect2>
 	<title>Prepare .NET Modules</title>
 	<para>
-	Wolframe itself is not a <application>.NET</application> application. Therefore it has to call
+	<application>Wolframe</application> itself is not a <application>.NET</application> application. Therefore it has to call
 	<application>.NET</application> functions via COM/.NET interop interface of a hosted CLR
 	(Common Language Runtime).
-	To make functions written in <application>.NET</application> callable by Wolframe, the following steps
+	To make functions written in <application>.NET</application> callable by <application>Wolframe</application>, the following steps
 	have to be performed:
 	</para>
 		<sect3>
 		<title>Make Assemblies COM visible</title>
 		<para>
-		First the asseblies with the functions exported to Wolframe have to be build COM visible.
-		To make the <application>.NET</application> functions called from Wolframe COM visible, you have to tick
+		First the asseblies with the functions exported to <application>Wolframe</application> have to be build COM visible.
+		To make the <application>.NET</application> functions called from <application>Wolframe</application> COM visible, you have to tick
 		"Properties/Assembly Information" the switch "Make assembly COM visible". Furthermore
 		every object and method that is part of the exported API (also objects used as parameters)
 		has to be tagged in the source as COM visible with <code>[ComVisible(true)]</code>.
@@ -95,7 +112,7 @@
 		<para>Each object that is part of the exported API has to be tagged with a global unique
 		identifier (Guid) in order to be adressable. Modules with <application>.NET</application> functions will have to be globally
 		registered and the objects need to be identified by the Guid because that's the only way
-		to make the record info structure visible for Wolframe. The record info structure is
+		to make the record info structure visible for <application>Wolframe</application>. The record info structure is
 		needed to serialize/deserialize <application>.NET</application> objects from another interpreter context that
 		is not registered for <application>.NET</application>. There are many ways to create a Guid and
 		tag an object like this: <code>[Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]</code>.
@@ -104,7 +121,7 @@
 
 		<sect3>
 		<title>Add Marshalling Tags to Values</title>
-		<para>For marshalling function calls correctly, Wolframe needs
+		<para>For marshalling function calls correctly, <application>Wolframe</application> needs
 		tags for every parameter and member of a sub structure of a parameter
 		of methods exported as functions.
 		The following table lists the supported types and their marshalling tags:
@@ -192,11 +209,12 @@
 		<programlisting language='C#'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructureWithTags.cs" parse="text" />
 		</programlisting>
+		</para>
 		</sect3>
 
 		<sect3>
 		<title>Create a Type Library</title>
-		<para>For making the API introspectable by Wolframe, we have to create a TLB
+		<para>For making the API introspectable by <application>Wolframe</application>, we have to create a TLB
 		(Type Library) file from the assembly (DLL) after build. The type library has
 		to be recreated every time the module interface (API) changes. The type library is
 		created with the program <code>tlbexp</code>. All created type library (.tlb) file
@@ -217,7 +235,7 @@
 
 		<sect3>
 		<title>Register the Assembly in the GAC</title>
-		<para>Wolframe does not accept local assemblies. In order to be addressable over
+		<para><application>Wolframe</application> does not accept local assemblies. In order to be addressable over
 		the type library interface assemblies need to be put into the global assembly cache (GAC).
 		Unfortunately this has to be repeated every time the assembly binary changes.
 		There is no way around. For registration in the GAC you have to call the program
@@ -231,7 +249,7 @@
 
 	<sect2>
 	<title>Calling Global Wolframe Functions</title>
-	<para>.NET functions calling globally defined Wolframe functions need to declare the processor
+	<para>.NET functions calling globally defined <application>Wolframe</application> functions need to declare the processor
 	provider interface as an additional parameter. The processor provider interface is defined as
 	follows (example <application>C#</application>):
 	<programlisting language='C#'>
@@ -247,10 +265,10 @@
 	</para>
 	<para>
 	The following example shows the usage of a <code>Wolframe.ProcProvider</code> call.
-	The method <code>GetUserObject</code> is declared as Wolframe function requiring the processor
+	The method <code>GetUserObject</code> is declared as <application>Wolframe</application> function requiring the processor
 	provider context as additional argument and taking one object of type <code>User</code> as
 	argument named <code>usr</code>.
-	The example function implementation redirects the call to the global Wolframe function
+	The example function implementation redirects the call to the global <application>Wolframe</application> function
 	named <code>GetAddress</code> returning an object of type <code>Address</code>
 	(example <application>C#</application>):
 	<programlisting language='C#'>

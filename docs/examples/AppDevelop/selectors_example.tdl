@@ -1,8 +1,10 @@
 
 TRANSACTION selectPerson
 PREPROC
-    FOREACH /person/name INTO normalized DO normalizeName( . );
-    FOREACH /person INTO citycode DO getCityCode( city );
+    FOREACH /person/name
+        INTO normalized DO normalizeName( . );
+    FOREACH /person
+        INTO citycode DO getCityCode( city );
 ENDPROC
 BEGIN
     FOREACH person

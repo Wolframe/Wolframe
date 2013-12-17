@@ -1,8 +1,11 @@
 
 TRANSACTION selectDevices
 BEGIN
-    SELECT id FROM DevIdMap WHERE name = $(device/name);
+    DO SELECT id FROM DevIdMap
+        WHERE name = $(device/name);
     KEEP AS dev;
-    FOREACH dev SELECT key,name,registration FROM Devices WHERE sid=$id;
+    FOREACH dev
+        DO SELECT key,name,registration
+            FROM Devices WHERE sid=$id;
 END
 

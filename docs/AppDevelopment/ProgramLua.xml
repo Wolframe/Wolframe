@@ -7,7 +7,6 @@
 		(see <ulink url="http://www.lua.org/authors.html">http://www.lua.org/authors.html</ulink>). A description of <application>Lua</application> is not provided here.
 		For an introduction into programming with <application>Lua</application> see <ulink url="http://www.lua.org">http://www.lua.org</ulink>. The official manual which is also available as book
 		is very good. <application>Wolframe</application> introduces some <application>Lua</application> interfaces to access input and output and to execute functions.
-		The <application>Lua</application> application layer does not have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
 
@@ -26,8 +25,8 @@
 	<sect2>
 	<title>Declaring Functions</title>
 	<para>For <application>Lua</application> you do not have to declare anything in addition to the <application>Lua</application> script. If you configure a <application>Lua</application>
-		script as program, all global functions declared in this script are declared as form
-		functions in <application>Wolframe</application>. For avoiding name conflicts you should declare private functions
+		script as program, all global functions declared in this script are declared as global form
+		functions. For avoiding name conflicts you should declare private functions
 		of the script as <code>local</code>.
 	</para>
 	</sect2>

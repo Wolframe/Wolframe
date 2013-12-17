@@ -3,7 +3,8 @@ TRANSACTION selectCustomerAddress
 BEGIN
     DO NONEMPTY UNIQUE SELECT id FROM Customer
         WHERE name = $(customer/name);
-    INTO address DO NONEMPTY SELECT street,city,country
-        FROM Address WHERE id = $id;
+    INTO address
+        DO NONEMPTY SELECT street,city,country
+            FROM Address WHERE id = $id;
 END
 

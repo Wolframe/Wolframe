@@ -1,11 +1,11 @@
 SUBROUTINE selectDevice( id)
 BEGIN
-	INTO device
-		DO SELECT name FROM DevIdMap
-			WHERE id = $PARAM.id;
+    INTO device
+        DO SELECT name FROM DevIdMap
+            WHERE id = $PARAM.id;
 END
 
 TRANSACTION selectDevices
 BEGIN
-	DO selectDevice( id );
+    DO selectDevice( id );
 END

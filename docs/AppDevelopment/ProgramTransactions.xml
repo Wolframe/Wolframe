@@ -465,13 +465,19 @@
 			explicitly bound to any other result than the last one. So the following
 			two instructions are equivalent:
 			<programlisting language='sql'>
-				DO SELECT name FROM Company WHERE id = $RESULT.id
-				DO SELECT name FROM Company WHERE id = $id
+			DO SELECT name FROM Company
+			    WHERE id = $RESULT.id
+			DO SELECT name FROM Company
+			    WHERE id = $id
 			</programlisting>
 			and so are the following two instructions:
 			<programlisting language='sql'>
-				FOREACH RESULT DO SELECT name FROM Company WHERE id = $RESULT.id
-				FOREACH RESULT DO SELECT name FROM Company WHERE id = $id
+			FOREACH RESULT
+			    DO SELECT name FROM Company
+			        WHERE id = $RESULT.id
+			FOREACH RESULT
+			    DO SELECT name FROM Company
+			        WHERE id = $id
 			</programlisting>
 			</para>
 			<para>
@@ -480,8 +486,12 @@
 			following two statements in the context of an existing database
 			result named "ATTRIBUTES" are equivalent:
 			<programlisting language='sql'>
-				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $ATTRIBUTES.id
-				FOREACH ATTRIBUTES DO SELECT name FROM Company WHERE id = $id
+			FOREACH ATTRIBUTES
+			    DO SELECT name FROM Company
+			        WHERE id = $ATTRIBUTES.id
+			FOREACH ATTRIBUTES
+			    DO SELECT name FROM Company
+			        WHERE id = $id
 			</programlisting>
 			</para>
 		</sect3>
@@ -580,7 +590,9 @@
 			</para>
 			<para>
 			On the client side the following message will be shown:
-			<programlisting language='sql'>unique constaint validation in transaction 'insertCustomer'. Customers must have a unique name.
+			<programlisting language='sql'>
+			unique constaint violation in transaction 'insertCustomer'.
+			Customers must have a unique name.
 			</programlisting>
 			</para>
 			</sect4>

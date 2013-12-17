@@ -2,16 +2,23 @@
 TEMPLATE <TreeTable>
 SUBROUTINE insertIntoTree( parentID)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM TreeTable WHERE ID = $PARAM.parentID;
-	DO UPDATE TreeTable SET rgt = rgt + 2 WHERE rgt >= $1;
-	DO UPDATE TreeTable SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO TreeTable (parentID, lft, rgt) VALUES ( $PARAM.parentID, $1, $1+1);
-	DO NONEMPTY UNIQUE SELECT ID AS "ID" from TreeTable WHERE lft = $1;
+    DO NONEMPTY UNIQUE SELECT rgt FROM TreeTable
+        WHERE ID = $PARAM.parentID;
+    DO UPDATE TreeTable
+        SET rgt = rgt + 2 WHERE rgt >= $1;
+    DO UPDATE TreeTable
+        SET lft = lft + 2 WHERE lft > $1;
+    DO INSERT INTO TreeTable (parentID, lft, rgt)
+        VALUES ( $PARAM.parentID, $1, $1+1);
+    DO NONEMPTY UNIQUE SELECT ID AS "ID" from TreeTable
+        WHERE lft = $1;
 END
 
 TRANSACTION addTag
 BEGIN
-	DO insertIntoTree<TagTable>( $(parentID) )
-	UPDATE TagTable SET name=$(name),description=$(description) WHERE ID=$RESULT.id;
+    DO insertIntoTree<TagTable>( $(parentID) )
+    DO UPDATE TagTable
+        SET name=$(name),description=$(description)
+            WHERE ID=$RESULT.id;
 END
 
