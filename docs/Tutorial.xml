@@ -31,7 +31,6 @@
 	<book id="book_AppServer" lang="en">
 		<title>Wolframe Application Server</title>
 		<subtitle>Tutorial</subtitle>
-		<titleabbrev>TUT</titleabbrev>
 		<bookinfo>
 			<date>&BookSetPublicationDate;</date>
 			<issuenum>Version &BookSetVersion;</issuenum>

@@ -34,7 +34,6 @@
 	<book id="book_AppDevelopment" lang="en">
 		<title>Developing Wolframe Server Applications</title>
 		<subtitle>Wolframe Application Development Manual</subtitle>
-		<titleabbrev>WAD</titleabbrev>
 		<bookinfo>
 			<date>&BookSetPublicationDate;</date>
 			<issuenum>Version &BookSetVersion;</issuenum>
