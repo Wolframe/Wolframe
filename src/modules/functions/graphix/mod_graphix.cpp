@@ -55,7 +55,7 @@ struct graphix_info_func
 	{
 		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::CppFormFunction func( imageInfo, param, result );
+		langbind::CppFormFunction func( imageInfoExec, param, result );
 
 		return new CppFormFunctionBuilder( "imageInfo", func);
 	}
@@ -67,7 +67,7 @@ struct graphix_thumb_func
 	{
 		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::CppFormFunction func( imageThumb, param, result );
+		langbind::CppFormFunction func( imageThumbExec, param, result );
 
 		return new CppFormFunctionBuilder( "imageThumb", func);
 	}
@@ -79,7 +79,7 @@ struct graphix_rescale_func
 	{
 		static const serialize::StructDescriptionBase* param = ImageRescale::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::CppFormFunction func( imageRescale, param, result );
+		langbind::CppFormFunction func( imageRescaleExec, param, result );
 
 		return new CppFormFunctionBuilder( "imageRescale", func);
 	}

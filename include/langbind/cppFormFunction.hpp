@@ -36,6 +36,10 @@ Project Wolframe.
 #include "serialize/struct/filtermapBase.hpp"
 
 namespace _Wolframe {
+namespace proc {
+	//\brief Forward declaration
+	class ProcessorProvider;
+}
 namespace langbind {
 
 ///\class CppFormFunction
@@ -43,7 +47,7 @@ namespace langbind {
 class CppFormFunction
 {
 public:
-	typedef int (Function)( void* res, const void* param);
+	typedef int (Function)( const proc::ProcessorProvider* provider, void* res, const void* param);
 
 	///\brief Default constructor
 	CppFormFunction()
@@ -69,17 +73,20 @@ public:
 
 	///\brief Get the form function parameter description
 	///\return The description
-	const serialize::StructDescriptionBase* api_param() const	{return m_api_param;}
+	const serialize::StructDescriptionBase* api_param() const
+		{return m_api_param;}
 
 	///\brief Get the form function result description
 	///\return The description
-	const serialize::StructDescriptionBase* api_result() const	{return m_api_result;}
+	const serialize::StructDescriptionBase* api_result() const
+		{return m_api_result;}
 
 	///\brief Call the form function
 	///\param[in] res pointer to structure as defined with 'api_result()' to hold the form function result
 	///\param[in] param pointer to structure as defined with 'api_param()' to hold the form function parameter
 	///\return 0 on success, error code else
-	int call( void* res, const void* param) const			{return (*m_function)( res, param);}
+	int call( const proc::ProcessorProvider* provider, void* res, const void* param) const
+		{return (*m_function)( provider, res, param);}
 
 private:
 	Function* m_function;						//< form function implementation

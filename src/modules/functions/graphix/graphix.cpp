@@ -252,17 +252,18 @@ int ImageImpl::rescale( Image &res, const ImageRescale &param )
 	return 0;
 }
 
-int _Wolframe::graphix::imageInfo( void *res, const void *param )
+int graphix::imageInfoExec( const proc::ProcessorProvider*, void *res, const void *param )
 {
 	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
 }
 
-int _Wolframe::graphix::imageThumb( void *res, const void *param )
+int graphix::imageThumbExec( const proc::ProcessorProvider*, void *res, const void *param )
 {
 	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
 }
 
-int _Wolframe::graphix::imageRescale( void *res, const void *param )
+int graphix::imageRescaleExec( const proc::ProcessorProvider*, void *res, const void *param )
 {
 	return ImageImpl::rescale( *(Image *)res, *(const ImageRescale *)param );
 }
+

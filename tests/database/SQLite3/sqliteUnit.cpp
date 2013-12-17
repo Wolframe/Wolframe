@@ -87,7 +87,7 @@ TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
 	Database* db = dbUnit.database();
 	const UserInterfaceLibrary* lib = db->UIlibrary();
 
-	std::list< InterfaceObject::Info > objs = lib->interface( "", "", "" );
+	std::list< InterfaceObject::Info > objs = lib->userInterface( "", "", "" );
 	EXPECT_TRUE( objs.empty() );
 	delete lib;
 }

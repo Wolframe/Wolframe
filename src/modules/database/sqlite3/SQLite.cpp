@@ -404,17 +404,17 @@ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 {}
 
 
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::interface( const std::string& platform,
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
 									 const std::string& role,
 									 const std::string& culture,
 									 const std::string& tag ) const
 {
 	std::list< std::string > roles;
 	roles.push_back( role );
-	return interface( platform, roles, culture, tag );
+	return userInterface( platform, roles, culture, tag );
 }
 
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::interface( const std::string& platform,
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
 									 const std::list< std::string >& roles,
 									 const std::string& culture,
 									 const std::string& /*tag*/ ) const
