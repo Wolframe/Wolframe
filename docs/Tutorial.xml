@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE set PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
 
 	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
@@ -17,36 +17,23 @@
 
 ]>
 
-<set>
-	<setinfo>
-		<title>Wolframe Tutorial (NOT UP TO DATE!!)</title>
+<book id="book_Tutorial" lang="en">
+	<title>The Wolframe Application Server: Getting Started</title>
+	<subtitle>Build your first Wolframe application</subtitle>
+	<bookinfo>
+		<date>&BookSetPublicationDate;</date>
+		<issuenum>Version &BookSetVersion;</issuenum>
+		<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
+		<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
+
 		<copyright>
 			<year>2010 - 2013</year>
 			<holder>Project Wolframe</holder>
 		</copyright>
-		<edition>version &BookSetVersion;</edition>
-		<pubdate>&BookSetPublicationDate;</pubdate>
-	</setinfo>
+		&WolframeLegalNotice;
+	</bookinfo>
 
-	<book id="book_AppServer" lang="en">
-		<title>Wolframe Application Server</title>
-		<subtitle>Tutorial</subtitle>
-		<bookinfo>
-			<date>&BookSetPublicationDate;</date>
-			<issuenum>Version &BookSetVersion;</issuenum>
-			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
-			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
-
-			<copyright>
-				<year>2010 - 2013</year>
-				<holder>Project Wolframe</holder>
-			</copyright>
-			&WolframeLegalNotice;
-		</bookinfo>
-
-		&TutorialPreface;
-		&TutorialIntroduction;
-		&TutorialSteps;
-		
-	</book>
-</set>
+	&TutorialPreface;
+	&TutorialIntroduction;
+	&TutorialSteps;
+</book>
