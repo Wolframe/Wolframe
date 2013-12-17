@@ -175,7 +175,8 @@
 		There is no way around. For registration in the GAC you have to call the program
 		<code>gacutil /if &lt;assemblypath&gt;</code> with your assembly path &lt;assemblypath&gt;
 		as argument. Furthermore the command <code>gacutil</code> has to be called from
-		administrator command line.
+		administrator command line. Before calling <code>gacutil</code>, assemblies have to
+		be strongly signed. We refer here to the MSDN documentation for how to sign an application.
 		</para>
 		</sect3>
 	</sect2>

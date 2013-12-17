@@ -241,7 +241,6 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 					throw std::runtime_error( "failed to assign result of processor provider call");
 				}
 				*pVarResult = res;
-				/*[-]*/std::cout << "FUNCTION RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *pVarResult) << std::endl;
 
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();

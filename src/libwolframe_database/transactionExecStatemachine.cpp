@@ -144,7 +144,6 @@ static types::VariantConst resolveResultIteratorReference( const TransactionOutp
 
 static bool executeCommand( TransactionExecStatemachine* stmh, const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr, bool nonempty, bool unique)
 {
-	/*[-]*/LOG_DATA << "CALL executeCommand " << cmditr->tostring();
 	TransactionInput::Command::arg_const_iterator ai = cmditr->arg().begin(), ae = cmditr->arg().end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
 	{

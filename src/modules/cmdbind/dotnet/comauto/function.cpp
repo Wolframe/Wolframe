@@ -676,7 +676,6 @@ AGAIN:
 		}
 		VARIANT resdata;
 		m_func->m_impl->clr()->call( &resdata, m_func->m_impl->assemblyname(), m_func->m_impl->classname(), m_func->m_impl->methodname(), m_func->m_impl->nofParameter(), m_param);
-		/*[-]*/std::cout << "FUNCTION RETURNS " << comauto::variantToString( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata) << std::endl;
 		m_result.reset( new VariantInputFilter( m_func->m_impl->typelib(), m_func->m_impl->getReturnType()->typeinfo, resdata, m_flags));
 		return true;
 	}
