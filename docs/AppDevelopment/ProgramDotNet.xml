@@ -40,14 +40,14 @@
 			<listitem><para>The methods exported as functions for <application>Wolframe</application>
 			must not be defined in a nested class. They should be defined in a top level class 
 			without namespace. This is a restriction imposed by the current development 
-			state of Wolframe. </para>
+			state of Wolframe.</para>
 			</listitem>
-			<listitem>The class must be derived from an interface with all methods
-			exported declared.
+			<listitem><para>The class must be derived from an interface with all methods
+			exported declared.</para>
 			</listitem>
-			<listitem>The methods must not be static because COM/.NET interop,
+			<listitem><para>The methods must not be static because COM/.NET interop,
 			as far as we know, cannot cope with static method calls. Even if the 
-			methods nature is static, they have to be defined as ordinary method calls.
+			methods nature is static, they have to be defined as ordinary method calls.</para>
 			</listitem>
 		</itemizedlist>
 		</para>
@@ -292,6 +292,5 @@
 	</programlisting>
 	</para>
 	</sect2>
-	<para></para>
 </sect1>
 

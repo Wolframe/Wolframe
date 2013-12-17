@@ -32,9 +32,6 @@
 		</para>
 	</sect1>
 
-
-	<title>Introduction</title>
-
 	<sect1>
 		<title>Architecture</title>
 		<para><application>Wolframe</application> is a 3-tier application server.

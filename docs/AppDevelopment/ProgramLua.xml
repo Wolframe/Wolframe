@@ -306,7 +306,5 @@
 			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
 	</sect2>
-	<para></para>
 </sect1>
-<beginpage/>
 

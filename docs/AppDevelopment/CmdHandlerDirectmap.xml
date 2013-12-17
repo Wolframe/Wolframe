@@ -54,8 +54,8 @@
 		<code>COMMAND</code> and terminated by semicolon ';'. The first argument after <code>COMMAND</code> is the name of the
 		command followed by the name of the document type of the input document. The name of the command
 		is optional. If not specified the first argument after <code>COMMAND</code> names the input document type.
-
-		<sect4>
+	</para>
+		<sect3>
 			<title>Simple Document Map</title>
 			<para>
 				The following example shows the simplest possible declaration. It states that documents with the
@@ -64,8 +64,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/doctype_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Command with Action Prefix</title>
 			<para>
 				The next example adds a action name to the declaration. The implicit name of the function called is
@@ -74,8 +74,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Explicit Function Name Declaration</title>
 			<para>
 				For declaring the function called explicitly like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
@@ -83,8 +83,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Returned Document Declaration</title>
 			<para>
 				The document type returned is specified with <code>RETURN &lt;doctype&gt;</code>:
@@ -96,8 +96,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Skipping Document Validation</title>
 			<para>
 				If you want to skip the input document validation, either because you are dealing
@@ -112,8 +112,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Explicit Filter Definitions for a Command</title>
 			<para>
 				For most processing it's enough to declare the standard filters in the configuration of the command handler.
@@ -133,8 +133,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-		<sect4>
+		</sect3>
+		<sect3>
 			<title>Using Brackets</title>
 			<para>
 				For better readability you can use optional '(' ')' brackets on the arguments. This way you can distinguish
@@ -143,8 +143,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect4>
-	</para>
+		</sect3>
+
 		<sect3>
 		<title>Overview</title>
 		<para>Each command declaration has as already explained the form
@@ -208,7 +208,6 @@
 		</para>
 		</sect3>
 	</sect2>
-	<para></para>
 </sect1>
-<beginpage/>
+
 

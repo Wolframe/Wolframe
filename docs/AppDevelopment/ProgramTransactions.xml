@@ -82,7 +82,7 @@
 			The name is not exported and the subroutine not available for other TDL
 			modules. The body of the function contains the following parts:
 			<itemizedlist>
-				<listitem><code>DATABASE &lt;database name list&gt;</code>
+				<listitem><programlisting>DATABASE &lt;database name list&gt;</programlisting>
 					<para>
 						This optional definition is restriction the definition
 						and availability of the function to a set of
@@ -97,14 +97,14 @@
 						code base.
 					</para>
 				</listitem>
-				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
+				<listitem><programlisting>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</programlisting>
 					<para>
 						This optional declaration defines a tag for the
 						result structure relative to the result context
 						of the caller.
 					</para>
 				</listitem>
-				<listitem><code>BEGIN &lt;...instructions...&gt; END</code>
+				<listitem><programlisting>BEGIN &lt;...instructions...&gt; END</programlisting>
 					<para>
 					The main processing block starts with <code>BEGIN</code> and
 					ends with <code>END</code>. It contains all the commands
@@ -132,13 +132,13 @@
 			followed by the name of the transaction function. This name identifies the
 			function globally. The body of the function contains the following parts:
 			<itemizedlist>
-				<listitem><code>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</code>
+				<listitem><programlisting>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</programlisting>
 					<para>
 						This optional definition is dealing with 
 						authorization and access rights.
 					</para>
 				</listitem>
-				<listitem><code>DATABASE &lt;database name list&gt;</code>
+				<listitem><programlisting>DATABASE &lt;database name list&gt;</programlisting>
 					<para>
 						This optional definition is restriction the definition
 						and availability of the function to a set of
@@ -153,7 +153,7 @@
 						code base.
 					</para>
 				</listitem>
-				<listitem><code>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</code>
+				<listitem><programlisting>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</programlisting>
 					<para>
 						This optional declaration defines a top level tag for the 
 						result structure and optionally a postprocessing step as
@@ -163,7 +163,7 @@
 						in a subroutine.
 					</para>
 				</listitem>
-				<listitem><code>PREPROC &lt;...preprocessing instructions...&gt; ENDPROC</code>
+				<listitem><programlisting>PREPROC &lt;...preprocessing instructions...&gt; ENDPROC</programlisting>
 					<para>
 						This optional block contains instructions on the transaction
 						function input. The result of these preprocessing instructions are
@@ -173,7 +173,7 @@
 						preprocessing block to enrich or transform the input to process.
 					</para>
 				</listitem>
-				<listitem><code>BEGIN &lt;...instructions...&gt; END</code>
+				<listitem><programlisting>BEGIN &lt;...instructions...&gt; END</programlisting>
 					<para>
 					The main processing block starts with <code>BEGIN</code> and
 					ends with <code>END</code>. It contains all the database instructions
@@ -215,7 +215,7 @@
 			following order terminated by a semicolon ';' (the order of the 
 			INTO and FOREACH expression can be switched):
 			<itemizedlist>
-				<listitem><code>INTO &lt;result substructure name&gt;</code>
+				<listitem><programlisting>INTO &lt;result substructure name&gt;</programlisting>
 					<para>
 						This optional directive specifies if and where the results
 						of the database commands should be put into as part of the
@@ -228,7 +228,7 @@
 						"output/myres".
 					</para>
 				</listitem>
-				<listitem><code>FOREACH &lt;selector&gt;</code>
+				<listitem><programlisting>FOREACH &lt;selector&gt;</programlisting>
 					<para>
 						This optional directive defines the set of 
 						elements on which the instruction is executed one by one.
@@ -251,6 +251,7 @@
 						naming a result set declared with this name before.
 						
 					</para>
+					<para>
 						Input elements are selected by path relative
 						to the path currently selected, starting from
 						the input root element when entering a transaction
@@ -261,10 +262,9 @@
 						'FOREACH person' context will cause
 						relative paths in this subroutine to be sub elements
 						of 'person'.
-					<para>
-					</para>
+					</para>	
 				</listitem>
-				<listitem><code>DO &lt;command&gt;</code>
+				<listitem><programlisting>DO &lt;command&gt;</programlisting>
 					<para>
 						Commands in an instruction are either embedded
 						database commands, named database functions (e.g. PLSQL functions)
@@ -305,7 +305,7 @@
 			following order terminated by a semicolon ';' (the order of the INTO and FOREACH expression can be
 			switched):
 		<itemizedlist>
-			<listitem><code>INTO &lt;result substructure name&gt;</code>
+			<listitem><programlisting>INTO &lt;result substructure name&gt;</programlisting>
 				<para>
 					This optional directive specifies if and where the results
 					of the preprocessing commands should be put into as part
@@ -314,7 +314,7 @@
 					are calculated relative to a FOREACH selection element.
 				</para>
 			</listitem>
-			<listitem><code>FOREACH &lt;selector&gt;</code>
+			<listitem><programlisting>FOREACH &lt;selector&gt;</programlisting>
 				<para>
 					This optional directive defines the set of 
 					elements on which the instruction is executed one by one.
@@ -323,7 +323,7 @@
 					at all if the selected set is empty.
 				</para>
 			</listitem>
-			<listitem><code>DO &lt;command&gt;</code>
+			<listitem><programlisting>DO &lt;command&gt;</programlisting>
 				<para>
 					Commands in an instruction are function calls to
 					globally defined form functions or normalization
@@ -350,22 +350,22 @@
 		<para>An element of the input or a set of input elements can be selected by a path.
 			A path is a sequence of one of the following elements separated by slashes:
 			<itemizedlist>
-				<listitem>Identifier
+				<listitem><programlisting>Identifier</programlisting>
 				<para>
 				An identifier uniquely selects a sub element of the current position in the tree.
 				</para>
 				</listitem>
-				<listitem><code>*</code>
+				<listitem><programlisting>*</programlisting>
 				<para>
 				An asterisk selects any sub element of the current position in the tree.
 				</para>
 				</listitem>
-				<listitem><code>..</code>
+				<listitem><programlisting>..</programlisting>
 				<para>
 				Two dots in a row select the parent element of the current position in the tree.
 				</para>
 				</listitem>
-				<listitem><code>.</code>
+				<listitem><programlisting>.</programlisting>
 				<para>
 				One dots selects the current element in the tree.
 				This operator can also be useful as part of a path
@@ -397,28 +397,28 @@
 			<title>Path Expression Examples</title>
 				<para>The following list shows different ways of addressing an element by path:
 				<itemizedlist>
-					<listitem><code>/</code>
+					<listitem><programlisting>/</programlisting>
 					<para>Root element</para>
 					</listitem>
-					<listitem><code>/organization</code>
+					<listitem><programlisting>/organization</programlisting>
 					<para>Root element with name "organization"</para>
 					</listitem>
-					<listitem><code>/organization/address/city</code>
+					<listitem><programlisting>/organization/address/city</programlisting>
 					<para>Element "city" of root "organization" descendant "address"</para>
 					</listitem>
-					<listitem><code>.//id</code>
+					<listitem><programlisting>.//id</programlisting>
 					<para>Any descendant element with name "id" of the current element</para>
 					</listitem>
-					<listitem><code>//person/id</code>
+					<listitem><programlisting>//person/id</programlisting>
 					<para>Child with name "id" of any descendant "person" of the root element</para>
 					</listitem>
-					<listitem><code>//id</code>
+					<listitem><programlisting>//id</programlisting>
 					<para>Any descendant element with name "id" of the root element</para>
 					</listitem>
-					<listitem><code>/address/*</code>
+					<listitem><programlisting>/address/*</programlisting>
 					<para>Any direct descendant of the root element "address"</para>
 					</listitem>
-					<listitem><code>.</code>
+					<listitem><programlisting>.</programlisting>
 					<para>Currently selected element</para>
 					</listitem>
 				</itemizedlist>
@@ -540,11 +540,11 @@
 			<para>
 			The following list explains the result constraints available:
 			<itemizedlist>
-				<listitem><code>NONEMPTY</code>
+				<listitem><programlisting>NONEMPTY</programlisting>
 				<para>Declares that the database result for each element of the input
 					must not be empty.</para>
 				</listitem>
-				<listitem><code>UNIQUE</code>
+				<listitem><programlisting>UNIQUE</programlisting>
 				<para>Declares that the database result for each element of the input 
 					must be unique, if it exists.
 					Result sets with more than one element are refused 
