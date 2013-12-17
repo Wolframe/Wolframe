@@ -112,7 +112,7 @@ int InterfaceCommandHandler::doInfo( int argc, const char** argv, std::ostream& 
 	const char* culture = argv[1];
 	const char* tag = (argc == 2)?"":argv[2];
 	const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
-	std::list<UI::InterfaceObject::Info> selection = uilib->interface( platform, m_roles, culture, tag);
+	std::list<UI::InterfaceObject::Info> selection = uilib->userInterface( platform, m_roles, culture, tag);
 
 	std::list<UI::InterfaceObject::Info>::const_iterator ni = selection.begin(), ne = selection.end();
 	for (; ni != ne; ++ni)

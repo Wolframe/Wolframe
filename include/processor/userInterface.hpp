@@ -111,13 +111,13 @@ public:
 	// \param roles		a list of roles for which to get the interface
 	// \param culture	the culture for the interface
 	// \note  use an epmty string, "*" or "all" to get the interface for all cultures
-	virtual const std::list< InterfaceObject::Info > interface( const std::string& platform,
+	virtual const std::list< InterfaceObject::Info > userInterface( const std::string& platform,
 								    const std::list< std::string >& roles,
 								    const std::string& culture,
 								    const std::string& tag = "" ) const = 0;
 
 	// \brief Interface wrapper for single role
-	virtual const std::list< InterfaceObject::Info > interface( const std::string& platform,
+	virtual const std::list< InterfaceObject::Info > userInterface( const std::string& platform,
 								    const std::string& role,
 								    const std::string& culture,
 								    const std::string& tag = "" ) const = 0;

@@ -134,6 +134,10 @@ void comauto::CommonLanguageRuntime::call( tagVARIANT* res, const std::wstring& 
 	// Create an instance of the object to invoke the method:
 	variant_t vtObject;
 	WRAP( local.spAssembly->CreateInstance( bstrClassName, &vtObject));
+	if (!vtObject.punkVal)
+	{
+		throw std::runtime_error( std::string( "class definition not found '") + utf8string( bstrClassName.GetBSTR()) + "'");
+	}
 
 	// Initialize the method arguments structure:
 	local.dispParams.cNamedArgs = 0;

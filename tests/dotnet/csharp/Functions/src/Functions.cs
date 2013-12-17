@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using Wolframe;
 
@@ -9,25 +6,32 @@ using Wolframe;
 [Guid("755efe8f-f125-494c-89a2-cf3cb03a0c8c")]
 public struct IdPair
 {
-    [MarshalAs(UnmanagedType.I4)] public int a;
-    [MarshalAs(UnmanagedType.I4)] public int b;
+    [MarshalAs(UnmanagedType.I4)]
+    public int a;
+    [MarshalAs(UnmanagedType.I4)]
+    public int b;
 };
 
 [ComVisible(true)]
 [Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]
 public struct Address
 {
-    [MarshalAs(UnmanagedType.BStr)] public string street;
-    [MarshalAs(UnmanagedType.BStr)] public string country;
+    [MarshalAs(UnmanagedType.BStr)]
+    public string street;
+    [MarshalAs(UnmanagedType.BStr)]
+    public string country;
 };
 
 [ComVisible(true)]
 [Guid("50085256-73D2-443E-B22B-9BB1BBAAFCDD")]
 public struct User
 {
-    [MarshalAs(UnmanagedType.I4)] public int id;
-    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_I4)] public int[] relation;
-    [MarshalAs(UnmanagedType.BStr)] public string name;
+    [MarshalAs(UnmanagedType.I4)]
+    public int id;
+    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_I4)]
+    public int[] relation;
+    [MarshalAs(UnmanagedType.BStr)]
+    public string name;
     public Address place;
 };
 
@@ -35,29 +39,47 @@ public struct User
 [Guid("B3BFB013-B9A5-49B9-9C4D-93ADE58063FE")]
 public struct UserGroup
 {
-    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)]  public User[] usr;
-    [MarshalAs(UnmanagedType.BStr)] public string name;
+    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)]
+    public User[] usr;
+    [MarshalAs(UnmanagedType.BStr)]
+    public string name;
 };
 
 [ComVisible(true)]
 public interface FunctionInterface
 {
-    [ComVisible(true)]  int Sub( int i, int j);
-    [ComVisible(true)]  int Add( int i, int j);
-    [ComVisible(true)]  int Sum( int[] aa);
-    [ComVisible(true)]  User StoreUser( User usr);
-    [ComVisible(true)]  User[] StoreUsers( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] User[] usr);
-    [ComVisible(true)]  UserGroup StoreUserGroup( UserGroup usr);
-    [ComVisible(true)]  int MapAddress( Address adr);
-    [ComVisible(true)]  int AddIdPair( IdPair p);
-    [ComVisible(true)]  int AddIdPairs( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] IdPair[] p);
-    [ComVisible(true)]  IdPair GetIdPair( int a);
-    [ComVisible(true)]  IdPair[] GetIdPairs( int len);
-    [ComVisible(true)]  string ConcatStrings( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar);
-    [ComVisible(true)]  Address GetAddress_p( [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
-    [ComVisible(true)]  User GetUser_p(int id, [MarshalAs(UnmanagedType.BStr)] string name, [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
-    [ComVisible(true)]  Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr);
-    [ComVisible(true)]  int GetUserXYZ([In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider);
+    [ComVisible(true)]
+    int Sub(int i, int j);
+    [ComVisible(true)]
+    int Add(int i, int j);
+    [ComVisible(true)]
+    int Sum(int[] aa);
+    [ComVisible(true)]
+    User StoreUser(User usr);
+    [ComVisible(true)]
+    User[] StoreUsers([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] User[] usr);
+    [ComVisible(true)]
+    UserGroup StoreUserGroup(UserGroup usr);
+    [ComVisible(true)]
+    int MapAddress(Address adr);
+    [ComVisible(true)]
+    int AddIdPair(IdPair p);
+    [ComVisible(true)]
+    int AddIdPairs([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] IdPair[] p);
+    [ComVisible(true)]
+    IdPair GetIdPair(int a);
+    [ComVisible(true)]
+    IdPair[] GetIdPairs(int len);
+    [ComVisible(true)]
+    string ConcatStrings([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar);
+    [ComVisible(true)]
+    Address GetAddress_p([MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
+    [ComVisible(true)]
+    User GetUser_p(int id, [MarshalAs(UnmanagedType.BStr)] string name, [MarshalAs(UnmanagedType.BStr)] string street, [MarshalAs(UnmanagedType.BStr)] string country);
+    [ComVisible(true)]
+    Address GetUserAddress(Wolframe.ProcProvider provider, User usr);
+    [ComVisible(true)]
+    int GetUserXYZ(Wolframe.ProcProvider provider);
 }
 
 [ComVisible(true)]
@@ -69,24 +91,24 @@ public class Functions : FunctionInterface
         //default constructor needed for COM
     }
 
-    public int Add( int i, int j)
+    public int Add(int i, int j)
     {
         return i + j;
     }
 
-    public int Sub( int i, int j)
+    public int Sub(int i, int j)
     {
         return i - j;
     }
 
-    public int Sum( int[] aa)
+    public int Sum(int[] aa)
     {
         int rt = 0;
         for (int ii = 0; ii < aa.Length; ++ii) rt += aa[ii];
         return rt;
     }
 
-    public User StoreUser( User usr)
+    public User StoreUser(User usr)
     {
         usr.id += 1;
         usr.name = usr.name.ToLower();
@@ -95,7 +117,7 @@ public class Functions : FunctionInterface
         return usr;
     }
 
-    public User[] StoreUsers( User[] usr)
+    public User[] StoreUsers(User[] usr)
     {
         for (int ii = 0; ii < usr.Length; ++ii)
         {
@@ -107,7 +129,7 @@ public class Functions : FunctionInterface
         return usr;
     }
 
-    public UserGroup StoreUserGroup( UserGroup usr)
+    public UserGroup StoreUserGroup(UserGroup usr)
     {
         usr.name = usr.name.ToUpper();
         for (int ii = 0; ii < usr.usr.Length; ++ii)
@@ -125,12 +147,12 @@ public class Functions : FunctionInterface
         return adr.country.Length;
     }
 
-    public int AddIdPair( IdPair p)
+    public int AddIdPair(IdPair p)
     {
         return p.a + p.b;
     }
 
-    public int AddIdPairs( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] IdPair[] p)
+    public int AddIdPairs([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] IdPair[] p)
     {
         int rt = 0;
         for (int ii = 0; ii < p.Length; ++ii)
@@ -140,7 +162,7 @@ public class Functions : FunctionInterface
         return rt;
     }
 
-    public string ConcatStrings( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar)
+    public string ConcatStrings([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)] string[] sar)
     {
         string rt = "";
         for (int ii = 0; ii < sar.Length; ++ii)
@@ -158,13 +180,13 @@ public class Functions : FunctionInterface
         return rt;
     }
 
-    public IdPair[] GetIdPairs( int len)
+    public IdPair[] GetIdPairs(int len)
     {
-        IdPair[] rt = new IdPair[ len];
+        IdPair[] rt = new IdPair[len];
         for (int ii = 0; ii < len; ++ii)
         {
-            rt[ ii].a = 10+ii;
-            rt[ ii].b = 10+ii+1;
+            rt[ii].a = 10 + ii;
+            rt[ii].b = 10 + ii + 1;
         }
         return rt;
     }
@@ -187,19 +209,17 @@ public class Functions : FunctionInterface
         return rt;
     }
 
-    public Address GetUserAddress( [In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider, User usr)
+    public Address GetUserAddress(Wolframe.ProcProvider provider, User usr)
     {
         Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
-        Console.WriteLine("street='{0}', country='{1}'", rt.street, rt.country);
         return rt;
     }
 
-    public int GetUserXYZ([In, MarshalAs(UnmanagedType.IDispatch)] Wolframe.ProcProvider provider)
+    public int GetUserXYZ(Wolframe.ProcProvider provider)
     {
         User usr = new User();
-        Address rt = (Address)provider.call( "GetAddress", usr, typeof(Address).GUID);
+        Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
         Console.WriteLine("street='{0}', country='{1}'", rt.street, rt.country);
         return 1;
     }
 }
-

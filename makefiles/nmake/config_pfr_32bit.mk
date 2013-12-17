@@ -39,8 +39,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
-
-OPENSSL_DIR = C:\OpenSSL\Win32
+# OPENSSL_DIR = C:\OpenSSL\Win32
 
 # Postgresql libpq
 # (http://www.postgresql.org/)

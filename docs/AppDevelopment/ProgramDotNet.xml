@@ -24,27 +24,66 @@
 	</sect2>
 
 	<sect2>
-		<title>Restrictions</title>
-		<para>
-		Currently <application>.NET</application> procedures called from Wolframe
-		cannot call other Wolframe functions.
-		But we will provide the possibility to call Wolframe global function calls
-		like for example transaction function calls from <application>.NET</application>
-		soon.
+		<title>.NET Function Interface</title>
+		<sect3>
+		<title>Function (Method) Context</title>
+		<para>In .NET only objects and method calls exist. The methods exported as functions
+		for Wolframe must not be defined in a nested class. They should be defined in a top level
+		class without namespace.
+		The class must be derived from an inteface with all methods exported declared.
 		</para>
+		<para>
+		The methods must not be static because COM/.NET interop cannot cope with static
+		method calls. Even if the methods nature is static, they have to be defined as ordinary
+		method calls.
+		</para>
+		<para>
+		<note>The restriction of having unique class names without namespaces is due to
+		the current state of the Wolframe COM/.NET interoperability implementation.
+		</note>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Function (Method) Signature</title>
+		<para>
+		Functions callable from Wolframe take an arbitrary number of arguments as input and
+		return a structure (<code>struct</code>). The named input parameters referencing atomic
+		elements or structures are forming the input structure of the Wolframe function.
+		A wolframe function called with a structure containing the elements "A" and "B" is
+		implemented in <application>.NET</application> as function taking two arguments
+		with the name "A" and "B". <application>.NET</application> functions
+		that need to call global <application>Wolframe</application> functions,
+		for example to perform database transactions, need to declare a <code>ProcProvider</code>
+		interface from <application>Wolframe</application> namespace as additional parameter.
+		We will describe the <code>ProcProvider</code> interface in a separate section of this chapter.
+		</para>
+		</sect3>
+
+		<sect3>
+		<title>Example</title>
+		<para>The following example is without marshalling and introspection tags. It can not
+		work therefore. The example just illustrates the structure of the exported object with
+		its interface (example <application>C#</application>):
+		<programlisting language='C#'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructure.cs" parse="text" />
+		</programlisting>
+		</sect3>
 	</sect2>
 
 	<sect2>
 	<title>Prepare .NET Modules</title>
 	<para>
-	To make functions written in .NET callable by Wolframe, several steps have to be performed.
-	First the asseblies with the functions exported to Wolframe have to be build COM visible.
-	Wolframe itself is not a .NET application. Therefore it has to call .NET functions via
-	COM/.NET interop interface of the CLR.
+	Wolframe itself is not a <application>.NET</application> application. Therefore it has to call
+	<application>.NET</application> functions via COM/.NET interop interface of a hosted CLR
+	(Common Language Runtime).
+	To make functions written in <application>.NET</application> callable by Wolframe, the following steps
+	have to be performed:
 	</para>
 		<sect3>
 		<title>Make Assemblies COM visible</title>
-		<para>To make the .NET functions called from Wolframe COM visible, you have to tick
+		<para>
+		First the asseblies with the functions exported to Wolframe have to be build COM visible.
+		To make the <application>.NET</application> functions called from Wolframe COM visible, you have to tick
 		"Properties/Assembly Information" the switch "Make assembly COM visible". Furthermore
 		every object and method that is part of the exported API (also objects used as parameters)
 		has to be tagged in the source as COM visible with <code>[ComVisible(true)]</code>.
@@ -54,11 +93,11 @@
 		<sect3>
 		<title>Tag Exported Objects with a Guid</title>
 		<para>Each object that is part of the exported API has to be tagged with a global unique
-		identifier (Guid) in order to be adressable. Modules with .NET functions will have to be globally
+		identifier (Guid) in order to be adressable. Modules with <application>.NET</application> functions will have to be globally
 		registered and the objects need to be identified by the Guid because that's the only way
 		to make the record info structure visible for Wolframe. The record info structure is
-		needed to serialize/deserialize .NET objects from another interpreter context that
-		is not registered for .NET. There are many ways to create a Guid and
+		needed to serialize/deserialize <application>.NET</application> objects from another interpreter context that
+		is not registered for <application>.NET</application>. There are many ways to create a Guid and
 		tag an object like this: <code>[Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]</code>.
 		</para>
 		</sect3>
@@ -147,6 +186,15 @@
 		</sect3>
 
 		<sect3>
+		<title>Example with COM Introspection Tags</title>
+		<para>The following C# module definition repeats the example introduced above with the
+		correct tagging for COM visibility and introspection:
+		<programlisting language='C#'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructureWithTags.cs" parse="text" />
+		</programlisting>
+		</sect3>
+
+		<sect3>
 		<title>Create a Type Library</title>
 		<para>For making the API introspectable by Wolframe, we have to create a TLB
 		(Type Library) file from the assembly (DLL) after build. The type library has
@@ -154,7 +202,7 @@
 		created with the program <code>tlbexp</code>. All created type library (.tlb) file
 		that will be loaded with the same runtime environment have to be copied into
 		the same directory. They will be referenced for introspection in the 
-		configuration. The configuration of .NET will be explained later.
+		configuration. The configuration of <application>.NET</application> will be explained later.
 		</para>
 		</sect3>
 
@@ -182,10 +230,42 @@
 	</sect2>
 
 	<sect2>
+	<title>Calling Global Wolframe Functions</title>
+	<para>.NET functions calling globally defined Wolframe functions need to declare the processor
+	provider interface as an additional parameter. The processor provider interface is defined as
+	follows (example <application>C#</application>):
+	<programlisting language='C#'>
+	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_WolframeProcProviderInterface.cs" parse="text" />
+	</programlisting>
+	To use it we have to include the reference to the assembly <code>WolframeProcessorProvider.DLL</code>.
+	</para>
+	<para>
+	The interface defined there has a method <code>call</code> taking 3 arguments: The name of the
+	function to call, the object to pass as argument and the <code>Guid</code> of the object type
+	to return. The returned object will be created with help of the registered <code>Guid</code>
+	and can be casted to the type with this <code>Guid</code>.
+	</para>
+	<para>
+	The following example shows the usage of a <code>Wolframe.ProcProvider</code> call.
+	The method <code>GetUserObject</code> is declared as Wolframe function requiring the processor
+	provider context as additional argument and taking one object of type <code>User</code> as
+	argument named <code>usr</code>.
+	The example function implementation redirects the call to the global Wolframe function
+	named <code>GetAddress</code> returning an object of type <code>Address</code>
+	(example <application>C#</application>):
+	<programlisting language='C#'>
+	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_WolframeProcProviderCall.cs" parse="text" />
+	</programlisting>
+	The objects involved in this example need no more tagging because the provider context and also
+	structures (<code>struct</code>) need no additional mashalling tags.
+	</para>
+	</sect2>
+
+	<sect2>
 	<title>Configure .NET Modules</title>
 	<para>
-	.NET modules are grouped together in a configuration block that specifies the configuration
-	of the Microsoft Common Language Runtime (CLR) used for .NET interop calls. The configuration
+	<application>.NET</application> modules are grouped together in a configuration block that specifies the configuration
+	of the Microsoft Common Language Runtime (CLR) used for <application>.NET</application> interop calls. The configuration
 	block has the header <code>runtimeEnv dotNET</code> and configures the version of the 
 	runtime loaded and the path where the typelibraries (.tlb) files can be found. 
 	With the <code>assembly</code> definitions you declare the registered assemblies to load.

@@ -126,7 +126,6 @@ comauto::TypeLib::Impl::Impl( const std::string& file, comauto::TypeLib* this_)
 		if (m_typelib) m_typelib->Release();
 		throw e;
 	}
-
 }
 
 comauto::TypeLib::Impl::~Impl()
@@ -207,7 +206,7 @@ static void printItem( std::ostream& out, const comauto::TypeLib* typelib, const
 	{
 		std::string indent( indentcnt, '\t');
 		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
-
+		
 		switch (typeattr->typekind)
 		{
 			case TKIND_ENUM:
