@@ -141,7 +141,7 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 	try
 	{
 		unsigned short ii;
-		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
+		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr));
 		if ((typeattr->typekind == TKIND_INTERFACE || typeattr->typekind == TKIND_DISPATCH || typeattr->typekind == TKIND_RECORD) && classname.empty())
 		{
 			return; //no follow on toplevel interface or POD data structure declaration
@@ -185,8 +185,8 @@ static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typ
 		for (ii = 0; ii < typeattr->cImplTypes; ++ii)
 		{
 			HREFTYPE hreftype;
-			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeOfImplType( ii, &hreftype))
-			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( hreftype, &classtypeinfo))
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeOfImplType( ii, &hreftype));
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( hreftype, &classtypeinfo));
 			findFunctions( typelib, classtypeinfo, funcs, clr, assemblyname, subclassname);
 			classtypeinfo->Release();
 			classtypeinfo = 0;
@@ -213,7 +213,7 @@ std::vector<comauto::DotnetFunctionR> comauto::loadFunctions( const comauto::Typ
 
 		for (; ii < nn; ++ii)
 		{
-			WRAP( tl->GetTypeInfo( ii, &typeinfo))
+			WRAP( tl->GetTypeInfo( ii, &typeinfo));
 			typelib->getRecordInfo( typeinfo);
 			findFunctions( typelib, typeinfo, rt, clr, assemblyname, "");
 			typeinfo->Release();
@@ -275,7 +275,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	,m_classname(classname_)
 {
 	if (m_typeinfo) const_cast<ITypeInfo*>(m_typeinfo)->AddRef();
-	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetFuncDesc( fidx, &m_funcdesc))
+	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetFuncDesc( fidx, &m_funcdesc));
 	struct Local	//exception safe memory allocation of local variables
 	{
 		BSTR* pnames;
@@ -304,7 +304,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	Local local;
 	local.pnames = new BSTR[ local.size = m_funcdesc->cParams+1];
 	UINT ii,nn;
-	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
+	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn));
 
 	m_methodname = comauto::utf8string( local.pnames[0]);
 	for (ii=nn-1; ii>0; --ii)
@@ -314,8 +314,8 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 		{
 			local.clear();
 
-			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->hreftype, &local.rectypeinfo))
-			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr))
+			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->hreftype, &local.rectypeinfo));
+			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr));
 			if (local.recattr->typekind == TKIND_RECORD)
 			{
 				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::Value);
@@ -335,8 +335,8 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 		{
 			local.clear();
 
-			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
-			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr))
+			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo));
+			WRAP( local.rectypeinfo->GetTypeAttr( &local.recattr));
 			if (local.recattr->guid == ProcessorProviderDispatch::uuid())
 			{
 				Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::ProcProvider);
@@ -357,7 +357,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 			local.rectypeinfo = 0;
 			if (!comauto::isAtomicType(td->lptdesc->vt) && !comauto::isStringType(td->lptdesc->vt))
 			{
-				WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
+				WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo));
 			}
 			Parameter param( comauto::utf8string( local.pnames[ii]), td->lptdesc, local.rectypeinfo, Parameter::SafeArray);
 			m_parameterlist.push_back( param);
@@ -371,7 +371,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	{
 		if (local.rectypeinfo) local.rectypeinfo->Release();
 		local.rectypeinfo = 0;
-		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_funcdesc->elemdescFunc.tdesc.hreftype, &local.rectypeinfo))
+		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_funcdesc->elemdescFunc.tdesc.hreftype, &local.rectypeinfo));
 		m_returntype = ReturnType( &m_funcdesc->elemdescFunc.tdesc, local.rectypeinfo);
 	}
 	else
