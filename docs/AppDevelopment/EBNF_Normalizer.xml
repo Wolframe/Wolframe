@@ -9,6 +9,13 @@
 			( ['A'-'Z'] | ['a'-'z'] | ['0'-'9'] | '_' ) +
 		</rhs>
 		</production>
+
+		<production xml:id="normNumber" continuation='restarts'>
+		<lhs>Number</lhs>
+		<rhs>
+			( ['0'-'9'] ) +
+		</rhs>
+		</production>
 		</productionset>
 
 		<productionset>
@@ -19,6 +26,32 @@
 		<rhs>
 			<nonterminal def="#normIdentifier">Identifier</nonterminal>
 			':'
+		</rhs>
+		</production>
+
+		<production xml:id="normArgument">
+		<lhs>Argument</lhs>
+		<rhs>
+			(
+			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
+			|
+			  <nonterminal def="#normNumber">Number</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="normArgumentList">
+		<lhs>ArgumentList</lhs>
+		<rhs>
+			(
+			  (
+				<nonterminal def="#normArgument">Argument</nonterminal>
+				','
+				<nonterminal def="#normArgumentList">ArgumentList</nonterminal>
+			  )
+			|
+			  <nonterminal def="#normArgument">Argument</nonterminal>
+			)
 		</rhs>
 		</production>
 
@@ -33,6 +66,11 @@
 			|
 			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
 			)
+			[
+				'('
+				<nonterminal def="#normArgumentList">ArgumentList</nonterminal>
+				')'
+			]
 		</rhs>
 		</production>
 

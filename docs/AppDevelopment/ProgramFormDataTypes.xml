@@ -38,25 +38,34 @@
 
 	<sect2>
 	<title>Language Description</title>
-	<para>
-		Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
-		operator '='. The left side identifier specifies the name of the type. This type name can be used
-		in a DDL as name instead of the built in type <code>string</code>. When doing so the referenced token is validated
-		and normalized with the comma separated sequence of function references on the right side of 
-		the assignment before being assigned as value to the element in the form declared to be of this type.
-	</para>
-	<para>
-		The function names are either identifiers or have two parts separated by ':'. The left part is the name
-		of the module declaring the function. The right part is the name of the function 
-		in the module with the name in front of the ':'. If the function is 
-		declared as one single identifier then the module referred to is the previous one in the sequence 
-		before the identifier. The 4th line in the example declaration list above
-		for example refers to the 'lcname' function in the 'string' normalization module.
-	</para>
-	<para>Functions can have a comma separated list of constant arguments in brackets ('(' and ')') 
-		depending on the function type. An integer type for example could have 
-		the maximum number of digits of the integer type.
-	</para>
+		<sect3>
+		<title>Type Assignments</title>	
+		<para>
+			Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
+			operator '='. The left side identifier specifies the name of the type. This type name can be used
+			in a DDL as name instead of the built in type <code>string</code>. When doing so the referenced token is validated
+			and normalized with the comma separated sequence of function references on the right side of
+			the assignment before being assigned as value to the element in the form declared to be of this type.
+		</para>
+		</sect3>
+		<sect3>
+		<title>Function Names</title>	
+		<para>
+			The function names are either identifiers or have two parts separated by ':'. The left part is the name
+			of the module declaring the function. The right part is the name of the function 
+			in the module with the name in front of the ':'. If the function is 
+			declared as one single identifier then the module referred to is the previous one in the sequence 
+			before the identifier. The 4th line in the example declaration list above
+			for example refers to the 'lcname' function in the 'string' normalization module.
+		</para>
+		</sect3>
+		<sect3>
+		<title>Function Arguments</title>	
+			<para>Functions can have a comma separated list of constant arguments in brackets ('(' and ')') 
+				depending on the function type. An integer type for example could have 
+				the maximum number of digits of the integer type.
+		</para>
+		</sect3>
 	</sect2>
 	<sect2>
 	<title>Configuration</title>
