@@ -8,10 +8,11 @@
 		Because <application>.NET</application> based libraries can only be called 
 		by <application>Wolframe</application> as a compiled and not as an 
 		interpreted language, you have to build a .NET assembly out of a group of 
-		function implementations. There are further restrictions on a .NET implementation.
-		But we will discuss all of them, so that you should be able
-		to write .NET assemblies for <application>Wolframe</application> on your own 
-		after reading this chapter.
+		function implementations before using it. There are further restrictions 
+		on a .NET implementation.
+		We will discuss all of them, so that you should be able
+		to write and configure .NET assemblies for using in 
+		<application>Wolframe</application> on your own after reading this chapter.
 		</para>
 	</sect2>
 
