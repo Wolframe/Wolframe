@@ -48,7 +48,6 @@
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
-		<member>transaction</member><member>transaction context if not relying on the auto-commit of a transaction function</member>
 		<member>scope</member><member>function with an iterator as argument returning an iterator for iterating on the currently visited node and its children taking ownership on this sub iterator scope</member>
 		<member>logger</member><member>object with methods for logging or debugging</member>
 		</simplelist>
@@ -209,33 +208,6 @@
 		<para>
 			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe <application>Lua</application> object 'get()' method.
 		</para>
-
-		<table frame="all" width="100%">
-			<title>Global Transaction Context</title>
-			<tgroup cols="2">
-			<thead>
-				<row>
-					<entry>Method Name</entry>
-					<entry>Description</entry>
-				</row>
-			</thead>
-
-			<tbody>
-				<row>
-					<entry>transaction.begin</entry>
-					<entry>Starts a transaction</entry>
-				</row>
-				<row>
-					<entry>transaction.commit</entry>
-					<entry>Commit of a transaction</entry>
-				</row>
-				<row>
-					<entry>transaction.rollback</entry>
-					<entry>Rollback of a transaction</entry>
-				</row>
-			</tbody>
-			</tgroup>
-		</table>
 
 		<table frame="all" width="100%">
 			<title>Logger functions</title>

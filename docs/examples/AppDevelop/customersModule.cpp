@@ -8,7 +8,7 @@ using namespace _Wolframe;
 
 static module::createBuilderFunc objdef[] =
 {
-	appdevel::CppFormFunction<ProcessCustomer>::constructor
+    appdevel::CppFormFunction<ProcessCustomer>::constructor
 };
 
 CPP_APPLICATION_FORM_FUNCTION_MODULE_END(1,objdef)

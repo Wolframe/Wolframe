@@ -3,10 +3,10 @@
 
 struct ProcessCustomer
 {
-	typedef Customer InputType; 
-	typedef Customer OutputType; 
-	static const char* name() {return "process_customer";}
+    typedef Customer InputType; 
+    typedef Customer OutputType; 
+    static const char* name() {return "process_customer";}
 
-	static int exec( InputType& res, const OutputType& param);
+    static int exec( const proc::ProcessorProvider* provider, InputType& res, const OutputType& param);
 };
 
