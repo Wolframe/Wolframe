@@ -29,13 +29,15 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-
+//\file types/typeSignature.hpp
+//\brief Implementation of signature for structures to detect memory problems
 #include "types/typeSignature.hpp"
 #include <boost/lexical_cast.hpp>
 
-namespace _Wolframe {
-namespace types {
+using namespace _Wolframe;
+using namespace _Wolframe::types;
 
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 void TypeSignature::verify() const
 {
 	if (m_objid != m_objid || m_objinvid != getStmp(m_objid) || m_chk != chk())
@@ -43,5 +45,4 @@ void TypeSignature::verify() const
 		throw std::runtime_error( std::string( "internal: memory curruption detected for object ") + m_objname + " line:" + boost::lexical_cast<std::string>(m_objid) + ")");
 	}
 }
-
-}}	// namespace _Wolframe::types
+#endif

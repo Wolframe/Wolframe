@@ -32,7 +32,6 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief Implementation of scripting language objects
 #include "langbind/appObjects.hpp"
-#include "database/databaseError.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/filter.hpp"
@@ -225,86 +224,6 @@ bool CppFormFunctionClosure::call()
 			m_state = 2;
 	}
 	return true;
-}
-
-
-TransactionFunctionClosure::TransactionFunctionClosure( const db::TransactionFunction* f, const db::TransactionR& t)
-	:types::TypeSignature("langbind::TransactionFunctionClosure", __LINE__)
-	,m_provider(0)
-	,m_func(f)
-	,m_state(0)
-	,m_inputstructptr(f->getInput())
-	,m_transaction(t)
-{
-	m_inputstruct.reset( m_inputstructptr);
-}
-
-TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
-	:types::TypeSignature(o)
-	,m_provider(o.m_provider)
-	,m_func(o.m_func)
-	,m_state(o.m_state)
-	,m_input(o.m_input)
-	,m_inputstructptr(o.m_inputstructptr)
-	,m_inputstruct(o.m_inputstruct)
-	,m_result(o.m_result)
-	,m_transaction(o.m_transaction){}
-
-bool TransactionFunctionClosure::call()
-{
-	switch (m_state)
-	{
-		case 0:
-			throw std::runtime_error( "input not initialized");
-		case 1:
-			if (!m_input.call()) return false;
-			m_state = 2;
-		case 2:
-		{
-			m_inputstructptr->finalize( m_provider);
-
-			types::CountedReference<db::Transaction> trsr = m_transaction;
-			if (!trsr.get())
-			{
-				trsr.reset( m_provider->transaction( m_func->name()));
-				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
-			}
-			trsr->putInput( m_inputstructptr->get());
-			try
-			{
-				trsr->execute();
-			}
-			catch (const db::DatabaseTransactionErrorException& e)
-			{
-				LOG_ERROR << e.what();
-				const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
-				std::string explain;
-				if (hint) explain = explain + " -- " + hint;
-				throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
-			}
-			db::TransactionOutputR res( new db::TransactionOutput( trsr->getResult()));
-			m_result = m_func->getOutput( m_provider, res);
-			if (!res->isCaseSensitive())
-			{
-				//... If not case sensitive result then propagate this
-				//	to be respected in mapping to structures.
-				m_result->setFlags( TypedInputFilter::PropagateNoCase);
-			}
-			m_state = 3;
-			return true;
-		}
-		default:
-			return true;
-	}
-}
-
-void TransactionFunctionClosure::init( const proc::ProcessorProvider* provider_, const TypedInputFilterR& i)
-{
-	m_provider = provider_;
-	m_inputstruct.reset( m_inputstructptr = m_func->getInput());
-	i->setFlags( TypedInputFilter::SerializeWithIndices);
-	m_input.init( i, m_inputstruct);
-	m_state = 1;
 }
 
 

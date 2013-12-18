@@ -32,8 +32,9 @@
 ************************************************************************/
 ///\brief Implements the loading of programs in the transaction definition language
 ///\file prgbind_transactionProgram.cpp
-
 #include "prgbind/transactionProgram.hpp"
+#include "database/transactionFunction.hpp"
+#include "database/databaseError.hpp"
 #include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
 #include "config/programBase.hpp"
@@ -43,29 +44,102 @@ using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
 class TransactionFunctionClosure
-	:public langbind::FormFunctionClosure
-	,public langbind::TransactionFunctionClosure
+	:public types::TypeSignature
+	,public langbind::FormFunctionClosure
 {
 public:
 	TransactionFunctionClosure( const db::TransactionFunction* f)
 		:types::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
-		,langbind::TransactionFunctionClosure(f){}
+		,m_provider(0)
+		,m_func(f)
+		,m_state(0)
+		,m_inputstructptr(f->getInput())
+		,m_flags(serialize::Context::None)
+		{}
 
+	TransactionFunctionClosure( const TransactionFunctionClosure& o)
+		:types::TypeSignature(o)
+		,m_provider(o.m_provider)
+		,m_func(o.m_func)
+		,m_state(o.m_state)
+		,m_input(o.m_input)
+		,m_inputstructptr(o.m_inputstructptr)
+		,m_inputstruct(o.m_inputstruct)
+		,m_result(o.m_result)
+		,m_flags(o.m_flags)
+		{}
+	
 	virtual bool call()
 	{
-		return langbind::TransactionFunctionClosure::call();
+		switch (m_state)
+		{
+			case 0:
+				throw std::runtime_error( "input not initialized");
+			case 1:
+				if (!m_input.call()) return false;
+				m_state = 2;
+			case 2:
+			{
+				m_inputstructptr->finalize( m_provider);
+	
+				types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
+				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
+
+				trsr->putInput( m_inputstructptr->get());
+				try
+				{
+					trsr->execute();
+				}
+				catch (const db::DatabaseTransactionErrorException& e)
+				{
+					LOG_ERROR << e.what();
+					const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
+					std::string explain;
+					if (hint) explain = explain + " -- " + hint;
+					throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
+				}
+				db::TransactionOutputR res( new db::TransactionOutput( trsr->getResult()));
+				m_result = m_func->getOutput( m_provider, res);
+				if (!res->isCaseSensitive())
+				{
+					//... If not case sensitive result then propagate this
+					//	to be respected in mapping to structures.
+					m_result->setFlags( langbind::TypedInputFilter::PropagateNoCase);
+				}
+				m_state = 3;
+				return true;
+			}
+			default:
+				return true;
+		}
 	}
 
-	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags)
+	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
-		langbind::TransactionFunctionClosure::init(p,i);
+		m_provider = p;
+		m_inputstruct.reset( m_inputstructptr = m_func->getInput());
+		i->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
+		m_input.init( i, m_inputstruct);
+		m_state = 1;
+		m_flags = f;
 	}
 
 	virtual langbind::TypedInputFilterR result() const
 	{
-		return langbind::TransactionFunctionClosure::result();
+		return m_result;
 	}
+
+private:
+	const proc::ProcessorProvider* m_provider;	//< processor provider to get transaction object
+	const db::TransactionFunction* m_func;		//< function to execute
+	int m_state;					//< current state of call
+	langbind::RedirectFilterClosure m_input;	//< builder of structure from input
+	db::TransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
+	langbind::TypedOutputFilterR m_inputstruct;	//< input structure
+	langbind::TypedInputFilterR m_result;		//< function call result
+	serialize::Context::Flags m_flags;		//< flags for input serialization
 };
+
 
 class TransactionFunction
 	:public langbind::FormFunction

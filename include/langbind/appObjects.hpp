@@ -29,13 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appObjects.hpp
-///\brief Interface to system objects for processor language bindings
+//\file langbind/appObjects.hpp
+//\brief Interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/cppFormFunction.hpp"
-#include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "types/typeSignature.hpp"
@@ -52,49 +51,50 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class Logger
-///\brief Logger as seen from scripting language binding
-///\remark Empty object because it is represented as singleton in the system
+//\class Logger
+//\brief Logger as seen from scripting language binding
+//\remark Empty object because it is represented as singleton in the system
 struct Logger
 {
 	int _;			//< dummy element because some bindings (Lua) do not like empty structures (objects of size 1)
 	Logger() :_(0){}
 };
 
-///\class Output
-///\brief Output as seen from scripting language binding
+
+//\class Output
+//\brief Output as seen from scripting language binding
 class Output
 	:public virtual types::TypeSignature
 {
 public:
-	///\brief Constructor
+	//\brief Constructor
 	Output()
 		:types::TypeSignature("langbind::Output", __LINE__)
 		,m_state(0)
 		,m_called(false){}
-	///\brief Copy constructor
-	///\param[in] o copied item
+	//\brief Copy constructor
+	//\param[in] o copied item
 	Output( const Output& o)
 		:types::TypeSignature(o)
 		,m_outputfilter(o.m_outputfilter)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
-	///\brief Constructor by output filter
-	///\param[in] flt output filter reference
+	//\brief Constructor by output filter
+	//\param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
 		:types::TypeSignature("langbind::Output", __LINE__)
 		,m_outputfilter(flt)
 		,m_state(0)
 		,m_called(false){}
-	///\brief Destructor
+	//\brief Destructor
 	~Output(){}
 
-	///\brief Print the next element
-	///\param[in] e1 first element
-	///\param[in] e1size first element size
-	///\param[in] e2 second element
-	///\param[in] e2size second element size
-	///\return true, on success, false if we have to yield processing
+	//\brief Print the next element
+	//\param[in] e1 first element
+	//\param[in] e1size first element size
+	//\param[in] e2 second element
+	//\param[in] e2size second element size
+	//\return true, on success, false if we have to yield processing
 	bool print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 	const OutputFilterR& outputfilter() const		{return m_outputfilter;}
@@ -109,34 +109,35 @@ private:
 	bool m_called;						//< has already been called
 };
 
-///\class Input
-///\brief input as seen from the application processor program
+
+//\class Input
+//\brief input as seen from the application processor program
 class Input
 	:public virtual types::TypeSignature
 {
 public:
-	///\brief Constructor
+	//\brief Constructor
 	Input()
 		:types::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false){}
 
-	///\brief Copy constructor
-	///\param[in] o copied item
+	//\brief Copy constructor
+	//\param[in] o copied item
 	Input( const Input& o)
 		:types::TypeSignature(o)
 		,m_used(o.m_used)
 		,m_inputfilter(o.m_inputfilter)
 		,m_docformat(o.m_docformat){}
 
-	///\brief Constructor by input filter
-	///\param[in] flt input filter reference
+	//\brief Constructor by input filter
+	//\param[in] flt input filter reference
 	Input( const InputFilterR& flt, const std::string& docformat_)
 		:types::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false)
 		,m_inputfilter(flt)
 		,m_docformat(docformat_){}
 
-	///\brief Destructor
+	//\brief Destructor
 	~Input(){}
 
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
@@ -150,6 +151,7 @@ private:
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 	std::string m_docformat;
 };
+
 
 class DDLFormParser
 	:public virtual types::TypeSignature
@@ -186,6 +188,7 @@ public:
 private:
 	types::FormR m_form;
 };
+
 
 class DDLFormSerializer
 	:public virtual types::TypeSignature
@@ -225,7 +228,8 @@ private:
 	types::FormR m_form;
 };
 
-///\class RedirectFilterClosure
+
+//\class RedirectFilterClosure
 class RedirectFilterClosure
 	:public virtual types::TypeSignature
 {
@@ -235,13 +239,13 @@ public:
 	RedirectFilterClosure( const RedirectFilterClosure& o);
 	~RedirectFilterClosure(){}
 
-	///\brief Calls the fetching of input and printing it to output until end or interruption
-	///\return true when completed
+	//\brief Calls the fetching of input and printing it to output until end or interruption
+	//\return true when completed
 	bool call();
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	///\param[in] o call output
+	//\brief Initialization of call context for a new call
+	//\param[in] i call input
+	//\param[in] o call output
 	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o);
 
 	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
@@ -256,6 +260,8 @@ private:
 	types::VariantConst m_elem;		//< last element read from command result
 };
 
+
+//\class ApiFormData
 class ApiFormData
 	:public virtual types::TypeSignature
 {
@@ -263,38 +269,39 @@ public:
 	ApiFormData( const serialize::StructDescriptionBase* descr);
 	~ApiFormData();
 
-	void* get() const						{return m_data.get();}
+	void* get() const					{return m_data.get();}
 	const serialize::StructDescriptionBase* descr() const	{return m_descr;}
-	const boost::shared_ptr<void>& data() const			{return m_data;}
+	const boost::shared_ptr<void>& data() const		{return m_data;}
 private:
 	const serialize::StructDescriptionBase* m_descr;
 	boost::shared_ptr<void> m_data;
 };
 
-///\class CppFormFunctionClosure
-///\brief Closure with calling state of called CppFormFunction
+
+//\class CppFormFunctionClosure
+//\brief Closure with calling state of called CppFormFunction
 class CppFormFunctionClosure
 	:public virtual types::TypeSignature
 {
 public:
-	///\brief Constructor
-	///\param[in] f function called
+	//\brief Constructor
+	//\param[in] f function called
 	CppFormFunctionClosure( const CppFormFunction& f);
 
-	///\brief Copy constructor
-	///\param[in] o copied item
+	//\brief Copy constructor
+	//\param[in] o copied item
 	CppFormFunctionClosure( const CppFormFunctionClosure& o);
 
-	///\brief Calls the form function with the input from the input filter specified
-	///\return true when completed
+	//\brief Calls the form function with the input from the input filter specified
+	//\return true when completed
 	bool call();
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	///\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
+	//\brief Initialization of call context for a new call
+	//\param[in] i call input
+	//\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
 	void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& i, serialize::Context::Flags flags);
 
-	const serialize::StructSerializer& result() const		{return m_result;}
+	const serialize::StructSerializer& result() const	{return m_result;}
 
 private:
 	CppFormFunction m_func;
@@ -306,67 +313,26 @@ private:
 	const proc::ProcessorProvider* m_provider;
 };
 
-///\class TransactionFunctionClosure
-///\brief Closure with calling state of called TransactionFunction
-class TransactionFunctionClosure
-	:public virtual types::TypeSignature
-{
-public:
-	///\brief Constructor
-	///\param[in] provider_ processor provider to allocate transaction object
-	///\param[in] f function called
-	///\param[in] t transaction context, if provided by caller
-	TransactionFunctionClosure( const db::TransactionFunction* f, const db::TransactionR& t=db::TransactionR());
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	TransactionFunctionClosure( const TransactionFunctionClosure& o);
-
-	///\brief Calls the transaction function with the input from the input filter specified
-	///\return true when completed
-	bool call();
-
-	///\brief Initialization of call context for a new call
-	///\param[in] provider_ processor provider context
-	///\param[in] i call input
-	void init( const proc::ProcessorProvider* provider_, const TypedInputFilterR& i);
-
-	const TypedInputFilterR& result() const
-	{
-		return m_result;
-	}
-
-private:
-	const proc::ProcessorProvider* m_provider;	//< processor provider to get transaction object
-	const db::TransactionFunction* m_func;		//< function to execute
-	int m_state;					//< current state of call
-	RedirectFilterClosure m_input;			//< builder of structure from input
-	db::TransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
-	TypedOutputFilterR m_inputstruct;		//< input structure
-	TypedInputFilterR m_result;			//< function call result
-	db::TransactionR m_transaction;			//< transaction context, created in the transaction (autocommit) if not defined
-};
-
-///\class PrintFunctionClosure
-///\brief Closure with calling state of called PrintFunction
+//\class PrintFunctionClosure
+//\brief Closure with calling state of called PrintFunction
 class PrintFunctionClosure
 	:public virtual types::TypeSignature
 {
 public:
-	///\brief Constructor
-	///\param[in] f function called
+	//\brief Constructor
+	//\param[in] f function called
 	PrintFunctionClosure( const prnt::PrintFunction* f);
 
-	///\brief Copy constructor
-	///\param[in] o copied item
+	//\brief Copy constructor
+	//\param[in] o copied item
 	PrintFunctionClosure( const PrintFunctionClosure& o);
 
-	///\brief Calls the transaction function with the input from the input filter specified
-	///\return true when completed
+	//\brief Calls the transaction function with the input from the input filter specified
+	//\return true when completed
 	bool call();
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
+	//\brief Initialization of call context for a new call
+	//\param[in] i call input
 	void init( const TypedInputFilterR& i);
 
 	const std::string& result() const		{return m_result;}
