@@ -22,10 +22,10 @@ INCLUDE_LDFLAGS = \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/src/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	$(TOPDIR)/src/libwolframe.a \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
