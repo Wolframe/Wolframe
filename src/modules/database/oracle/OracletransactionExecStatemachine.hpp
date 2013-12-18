@@ -47,6 +47,10 @@
 namespace _Wolframe {
 namespace db {
 
+struct OracleColumnDescription {
+	std::string name; // name of the column in the result
+};
+
 ///\class TransactionExecStatemachine_oracle
 ///\brief Implementation of the standard database transaction execution statemechine for Oracle
 ///\remark The Oracle connection is opened, closed, created and disposed by the caller
@@ -104,7 +108,6 @@ private:
 	}
 
 	void setDatabaseErrorMessage( sword status );
-//	bool status( OracleStatement* res, State newstate);
 	bool status( sword status, State newstate);
 	bool errorStatus( const std::string& message);
 	bool executeInstruction( const char* stmstr, State newstate);
@@ -115,6 +118,8 @@ private:
 	OracleConnection* m_conn;
 	std::string m_dbname;
 	OCIStmt *m_lastresult; // handle for a statement
+	std::vector<OracleColumnDescription> m_colDescr; // array of column descriptors
+	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
 	std::size_t m_nof_rows;
