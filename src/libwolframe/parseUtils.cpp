@@ -47,9 +47,28 @@ using namespace _Wolframe::utils;
 CharTable::CharTable( const char* op, bool isInverse)
 {
 	std::size_t ii;
-	for (ii=0; ii<=32; ++ii) m_ar[ii]=false;
-	for (ii=33; ii<sizeof(m_ar); ++ii) m_ar[ii]=isInverse;
-	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=!isInverse;
+	for (ii=0; ii<=32; ++ii) m_ar[ii] = false;
+	for (ii=33; ii<sizeof(m_ar); ++ii) m_ar[ii] = isInverse;
+	for (ii=0; op[ii]; ++ii)
+	{
+		if (op[ii] == '.' && op[ii+1] == '.' && op[ii+2] && ii > 0)
+		{
+			unsigned char hi = (unsigned char)op[ii+2];
+			unsigned char lo = (unsigned char)op[ii-1];
+			if (hi < lo)
+			{
+				unsigned char tmp = hi;
+				hi = lo;
+				lo = tmp; //... swapped 'hi' and 'lo'
+			}
+			for (++lo; lo<=hi; ++lo)
+			{
+				m_ar[ lo] = !isInverse;
+			}
+			ii += 2;
+		}
+		m_ar[(unsigned char)(op[ii])] = !isInverse;
+	}
 }
 
 char utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable, const CharTable& alphaTable)
@@ -97,7 +116,7 @@ char utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, 
 
 struct IdentifierCharTable :public CharTable
 {
-	IdentifierCharTable() :CharTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"){}
+	IdentifierCharTable() :CharTable( "a..z_A..Z0..9"){}
 };
 
 const CharTable& _Wolframe::utils::identifierCharTable()
@@ -232,6 +251,7 @@ std::string utils::parseLine( std::string::const_iterator& si, const std::string
 
 IdentifierTable::IdentifierTable( bool casesensitive_, const char** arg)
 	:m_casesensitive(casesensitive_)
+	,m_arg(arg)
 {
 	for (int idx=0; arg[idx]; ++idx)
 	{
@@ -267,6 +287,11 @@ std::string IdentifierTable::tostring() const
 		rt.append( ti->first);
 	}
 	return rt;
+}
+
+const char* IdentifierTable::idstring( int id) const
+{
+	return m_arg[ id];
 }
 
 int utils::parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab)

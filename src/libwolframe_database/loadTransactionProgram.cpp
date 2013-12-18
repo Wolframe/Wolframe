@@ -387,7 +387,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 	{
 		throw std::runtime_error( "unexpected end of transaction description. Function call expected");
 	}
-	while (ci < ce && isAlphaNumeric( *ci))
+	while (ci < ce && (isAlphaNumeric( *ci) || *ci == '.'))
 	{
 		callname.push_back( *ci);
 		++ci;
@@ -617,6 +617,17 @@ struct Subroutine
 };
 }// anonymous namespace
 
+
+static void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab, config::PositionalErrorMessageBase& ERROR, std::string::const_iterator& si)
+{
+	unsigned int idshft = (1 << (id+1));
+	if (0 != (mask & idshft))
+	{
+		throw ERROR( si, std::string( idtab.idstring(id)) + " specified twice in a command");
+	}
+	mask |= idshft;
+}
+
 static const char* g_preproc_ids[] = {"ENDPROC","FOREACH","INTO","DO",0};
 enum PreProcKeyword{ p_NONE,p_ENDPROC,p_FOREACH,p_INTO,p_DO };
 static const utils::IdentifierTable g_preproc_idtab( false, g_preproc_ids);
@@ -673,31 +684,19 @@ static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalE
 				}
 				return;
 			case p_FOREACH:
-				if (0 != (mask & 0x1))
-				{
-					throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
-				}
-				mask |= 0x1;
+				checkUniqOccurrence( p_FOREACH, mask, g_preproc_idtab, ERROR, si);
 	
 				ch = utils::parseNextToken( prcstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 				break;
 			case p_INTO:
-				if (0 != (mask & 0x2))
-				{
-					throw ERROR( si, "function result (INTO ..) specified twice in a command");
-				}
-				mask |= 0x2;
+				checkUniqOccurrence( p_INTO, mask, g_preproc_idtab, ERROR, si);
 	
 				prcstep.path_INTO = parse_INTO_path( langdescr, si, se);
 				break;
 
 			case p_DO:
-				if (0 != (mask & 0x4))
-				{
-					throw ERROR( si, "function call (DO ..) specified twice in a command");
-				}
-				mask |= 0x4;
+				checkUniqOccurrence( p_DO, mask, g_preproc_idtab, ERROR, si);
 	
 				ch = parseNextToken( langdescr, prcstep.functionname, si, se);
 				if (!isAlphaNumeric( ch))
@@ -748,9 +747,15 @@ static void parseResultDirective( Subroutine& subroutine, config::PositionalErro
 			}
 			if ((mask & 0x2) != 0) throw ERROR( si, "duplicate FILTER definition after RESULT");
 			mask |= 0x2;
-			if (!isAlphaNumeric( parseNextToken( langdescr, subroutine.description.resultfilter, si, se)))
+			ch = gotoNextToken( langdescr, si, se);
+			if (!isAlpha(ch))
 			{
-				throw ERROR( si, "identifier expected after RESULT FILTER");
+				throw ERROR( si, "function name expected after RESULT FILTER");
+			}
+			while (si < se && (isAlphaNumeric( *si) || *si == '.'))
+			{
+				subroutine.description.resultfilter.push_back( *si);
+				++si;
 			}
 		}
 		else if (mask)
@@ -960,7 +965,6 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 
 	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 	{
-		
 		while (subroutine.callstartar.size() <= subroutine.description.steps.size())
 		{
 			subroutine.callstartar.push_back( si);
@@ -996,16 +1000,17 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				}
 				break;
 			case m_ON:
+				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
+
 				parseErrorHint( subroutine, ERROR, langdescr, si, se);
 				break;
 			case m_KEEP:
+				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
+
 				parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
 				break;
 			case m_END:
-				if (mask != 0)
-				{
-					throw std::runtime_error( "database command not terminated with ';'");
-				}
+				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
 				try
 				{
 					if (subroutine.blockstk.empty())
@@ -1044,7 +1049,8 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 					std::vector<std::string> print_INTO_path;
 					if (mask != 0)
 					{
-						if (mask == 0x2)
+						unsigned int idshft = (1 << ((unsigned int)m_INTO+1));
+						if (mask == idshft)
 						{
 							print_INTO_path = opstep.path_INTO;
 							opstep.path_INTO.clear();
@@ -1059,10 +1065,8 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				}
 				break;
 			case m_RESULT:
-				if (mask != 0)
-				{
-					throw std::runtime_error( "unexpected token RESULT in middle of database command");
-				}
+				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
+
 				if (0!=(ch=parseNextToken( langdescr, tok, si, se))
 				&&  isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
 				{
@@ -1084,12 +1088,8 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				}
 				break;
 			case m_FOREACH:
-				if (0 != (mask & 0x1))
-				{
-					throw ERROR( si, "selector (FOREACH ..) specified twice in a command");
-				}
-				mask |= 0x1;
-	
+				checkUniqOccurrence( m_FOREACH, mask, g_mainblock_idtab, ERROR, si);
+
 				ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
 				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 	
@@ -1107,20 +1107,12 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				}
 				break;
 			case m_INTO:
-				if (0 != (mask & 0x2))
-				{
-					throw ERROR( si, "function result (INTO ..) specified twice in a command");
-				}
-				mask |= 0x2;
+				checkUniqOccurrence( m_INTO, mask, g_mainblock_idtab, ERROR, si);
 	
 				opstep.path_INTO = parse_INTO_path( langdescr, si, se);
 				break;
 			case m_DO:
-				if (0 != (mask & 0x4))
-				{
-					throw ERROR( si, "function call (DO ..) specified twice in a command");
-				}
-				mask |= 0x4;
+				checkUniqOccurrence( m_DO, mask, g_mainblock_idtab, ERROR, si);
 	
 				std::string::const_iterator oi = si;
 				while (0!=(ch=parseNextToken( langdescr, tok, oi, se)))
@@ -1225,7 +1217,6 @@ static const utils::IdentifierTable g_body_idtab( false, g_body_ids);
 
 static bool parseProcedureBody( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	enum SectionMask {Preprocess=0x1,Authorize=0x2,Result=0x4,Database=0x8,MainBlock=0x10};
 	unsigned int mask = 0;
 	config::PositionalErrorMessageBase::Message MSG;
 	char ch;
@@ -1239,33 +1230,23 @@ static bool parseProcedureBody( Subroutine& subroutine, config::PositionalErrorM
 				ch = utils::parseNextToken( tok, si, se);
 				throw ERROR( si, MSG << "keyword (" << g_body_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
 			case b_DATABASE:
-				if ((mask & (unsigned int)Database) != 0) throw std::runtime_error( "duplicate DATABASE definition in transaction/subroutine");
-				mask |= (unsigned int)Database;
-
+				checkUniqOccurrence( b_DATABASE, mask, g_body_idtab, ERROR, si);
 				subroutine.isValidDatabase &= checkDatabaseList( databaseId, databaseClassName, ERROR, langdescr, si, se);
 				break;
 			case b_RESULT:
-				if ((mask & (unsigned int)Result) != 0) throw std::runtime_error( "duplicate RESULT definition in transaction/subroutine");
-				mask |= (unsigned int)Result;
-
+				checkUniqOccurrence( b_RESULT, mask, g_body_idtab, ERROR, si);
 				parseResultDirective( subroutine, ERROR, langdescr, si, se);
 				break;
 			case b_AUTHORIZE:
-				if ((mask & (unsigned int)Authorize) != 0) throw std::runtime_error( "duplicate AUTHORIZE definition in transaction/subroutine");
-				mask |= (unsigned int)Authorize;
-
+				checkUniqOccurrence( b_AUTHORIZE, mask, g_body_idtab, ERROR, si);
 				parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
 				break;
 			case b_PREPROC:
-				if ((mask & (unsigned int)Preprocess) != 0) throw std::runtime_error( "duplicate PREPROC definition in transaction/subroutine");
-				mask |= (unsigned int)Preprocess;
-
+				checkUniqOccurrence( b_PREPROC, mask, g_body_idtab, ERROR, si);
 				parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
 				break;
 			case b_BEGIN:
-				if ((mask & (unsigned int)MainBlock) != 0) throw std::runtime_error( "duplicate main block (BEGIN..END) definition in transaction/subroutine");
-				mask |= (unsigned int)MainBlock;
-
+				checkUniqOccurrence( b_BEGIN, mask, g_body_idtab, ERROR, si);
 				parseMainBlock( subroutine, ERROR, langdescr, si, se);
 				if (subroutine.isValidDatabase)
 				{

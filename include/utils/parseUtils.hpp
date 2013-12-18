@@ -66,10 +66,12 @@ public:
 
 	int operator[]( const std::string&) const;
 	std::string tostring() const;
+	const char* idstring( int id) const;
 
 private:
 	bool m_casesensitive;
 	std::map<std::string,int> m_tab;
+	const char** m_arg;
 };
 
 

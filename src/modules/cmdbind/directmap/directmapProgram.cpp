@@ -219,6 +219,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 {
 	DirectmapCommandDescription rt;
 	static const utils::CharTable optab( ";()");
+	static const utils::CharTable fchartab( "a..zA..Z_0..9.");
 	std::string tok;
 	std::vector<std::string> toklist;
 	std::string cmdname;
@@ -246,7 +247,14 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 		{
 			for (;;)
 			{
-				ch = utils::parseNextToken( tok, si, se, optab);
+				if (state == ParseCallArg)
+				{
+					ch = utils::parseNextToken( tok, si, se, optab, fchartab);
+				}
+				else
+				{
+					ch = utils::parseNextToken( tok, si, se, optab);
+				}
 				if (ch == ')') break;
 				if (!ch) throw std::runtime_error( "unexpected end of expression: argument list not closed with ')'");
 				if (optab[ch]) throw std::runtime_error("expected identifier or string as argument of COMMAND");
