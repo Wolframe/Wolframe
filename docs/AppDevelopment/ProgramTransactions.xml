@@ -536,6 +536,8 @@
 			<para>
 			Constraints on database results are expressed as keywords following
 			the DO keyword of an instruction in the main processing section.
+			If a constraint on database results is violated the whole transaction
+			fails and a rollback occurrs.
 			</para>
 			<para>
 			The following list explains the result constraints available:

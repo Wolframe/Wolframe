@@ -2,7 +2,7 @@
 <chapter>
 	<title>Introduction</title>
 	<para>
-	We first describe the architecture and the data flow of a <application>Wolframe</application> application.
+	First we describe the overall architecture and the data flow in a <application>Wolframe</application> application.
 	</para>
 	<sect1>
 		<title>Architecture</title>

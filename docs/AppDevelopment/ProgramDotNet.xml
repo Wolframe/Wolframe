@@ -7,23 +7,23 @@
 		<application>C#</application> and <application>VB.NET</application>.  
 		Because <application>.NET</application> based libraries can only be called 
 		by <application>Wolframe</application> as a compiled and not as an 
-		interpreted language, you have to build a .NET assembly out of a group of 
+		interpreted language, you have to build a <application>.NET</application> assembly out of a group of 
 		function implementations before using it. There are further restrictions 
-		on a .NET implementation.
+		on a <application>.NET</application> implementation.
 		We will discuss all of them, so that you should be able
-		to write and configure .NET assemblies for using in 
+		to write and configure <application>.NET</application> assemblies for using in 
 		<application>Wolframe</application> on your own after reading this chapter.
 		</para>
 	</sect2>
 
 	<sect2>
 	<title>Configuration</title>
-	<para>For enabling .NET you have to declare the loading of the module 'mod_command_dotnet'
+	<para>For enabling <application>.NET</application> you have to declare the loading of the module 'mod_command_dotnet'
 		in the main section of the server configuration file.
 		<programlisting language='awk'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_command_dotnet.conf" parse="text" />
 		</programlisting>
-		For the configuration of the .NET assemblies to be loaded, see section 'Configure .NET Modules'.
+		For the configuration of the <application>.NET</application> assemblies to be loaded, see section 'Configure .NET Modules'.
 	</para>
 	</sect2>
 
@@ -31,12 +31,13 @@
 		<title>Function Interface</title>
 		<sect3>
 		<title>Function Context</title>
-		<para>In .NET the building blocks for functions called by <application>Wolframe</application>
+		<para>In <application>.NET</application> the building blocks for functions called by <application>Wolframe</application>
 		are classes and method calls. The way of defining callable items for 
 		<application>Wolframe</application> is restricted either due to the current 
 		state of the <application>Wolframe</application> COM/.NET interoperability
-		implementation or due to general or version dependent restrictions of .NET objects exposed 
-		via COM/.NET interop. We list here the restrictions:
+		implementation or due to general or version dependent restrictions of 
+		<application>.NET</application> objects exposed via COM/.NET interop.
+		We list here the restrictions:
 		<itemizedlist>
 			<listitem><para>The methods exported as functions for <application>Wolframe</application>
 			must not be defined in a nested class. They should be defined in a top level class 
@@ -89,7 +90,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Prepare .NET Modules</title>
+	<title>Prepare .NET Assemblies</title>
 	<para>
 	<application>Wolframe</application> itself is not a <application>.NET</application> application. Therefore it has to call
 	<application>.NET</application> functions via COM/.NET interop interface of a hosted CLR
@@ -249,10 +250,11 @@
 	</sect2>
 
 	<sect2>
-	<title>Calling Global Wolframe Functions</title>
-	<para>.NET functions calling globally defined <application>Wolframe</application> functions need to declare the processor
-	provider interface as an additional parameter. The processor provider interface is defined as
-	follows (example <application>C#</application>):
+	<title>Calling Wolframe Functions</title>
+	<para>Wolframe functions in <application>.NET</application> calling globally 
+	defined <application>Wolframe</application> 
+	functions need to declare the processor provider interface as an additional parameter.
+	The processor provider interface is defined as follows (example <application>C#</application>):
 	<programlisting language='C#'>
 	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_WolframeProcProviderInterface.cs" parse="text" />
 	</programlisting>
@@ -281,7 +283,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Configure .NET Modules</title>
+	<title>Configure .NET Assemblies</title>
 	<para>
 	<application>.NET</application> modules are grouped together in a configuration block that specifies the configuration
 	of the Microsoft Common Language Runtime (CLR) used for <application>.NET</application> interop calls. The configuration
@@ -328,7 +330,9 @@
 				</row>
 				<row>
 					<entry>processorArchitecture</entry>
-					<entry>Meaning not explained here. Has on ordinary Windows .NET plattforms usually the value "MSIL". Read the MSDN documentation to dig deeper.</entry>
+					<entry>Meaning not explained here. Has on ordinary Windows <application>.NET</application>
+					plattforms usually the value "MSIL". Read the MSDN 
+					documentation to dig deeper.</entry>
 				</row>
 			</tbody>
 			</tgroup>
@@ -338,7 +342,7 @@
 		<sect3>
 		<title>Get the PublicKeyToken</title>
 		<para>
-		We already found out that <application>Wolframe</application> .NET modules 
+		We already found out that <application>Wolframe</application> <application>.NET</application> modules 
 		have to be strongly signed. 
 		Each strongly signed assembly has such a public key token
 		that has to be used as attribute when referencing the assembly.
@@ -348,10 +352,26 @@
 		by calling <code>sn -T &lt;assemblypath&gt;</code> from the command line (cmd)
 		with &lt;assemblypath&gt; as the path of the assembly. The printed value is the
 		public key to insert as attribute value of <code>PublicKeyToken</code> in the
-		<application>Wolframe</application> configuration for each .NET assembly.
+		<application>Wolframe</application> configuration for each <application>.NET</application> assembly.
 		</para>
 		</sect3>
 	</sect2>
+
+	<sect2>
+	<title>Validation Issues</title>
+	<para>
+	Languages of <application>.NET</application> called via the CLR are strongly typed languages. This means that
+	the input of a function and the output is already validated to be of a strictly
+	defined structure. So a validation by passing the input through a form
+	might not be needed anymore. Validation with <application>.NET</application> 
+	data structures is weaker than for example XML validation with forms defined in
+	a schema language. But only if distinguishing XML attributes from content elements
+	is an issue. 
+	See in the documentation of the standard command handler how validation can be
+	skipped with the attribute <code>SKIP</code>.
+	</para>
+	</sect2>
+
 	<para></para>
 </sect1>
 
