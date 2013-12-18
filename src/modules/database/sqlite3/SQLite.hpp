@@ -135,12 +135,12 @@ public:
 	SQLiteUIlibrary( const SQLiteDatabase& database );
 	~SQLiteUIlibrary()			{}
 
-	virtual const std::list< UI::InterfaceObject::Info > interface( const std::string& platform,
+	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
 									const std::list< std::string >& roles,
 									const std::string& culture,
 									const std::string& tag = "" ) const;
 
-	virtual const std::list< UI::InterfaceObject::Info > interface( const std::string& platform,
+	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
 									const std::string& roles,
 									const std::string& culture,
 									const std::string& tag = "" ) const;

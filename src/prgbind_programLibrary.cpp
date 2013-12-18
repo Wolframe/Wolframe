@@ -64,7 +64,9 @@ public:
 		,m_param_data(f.api_param())
 		,m_result_data(f.api_result())
 		,m_result(langbind::TypedInputFilterR( new serialize::StructSerializer( m_result_data.data(),m_result_data.descr())))
-		,m_parser(m_param_data.data(),m_param_data.descr()){}
+		,m_parser(m_param_data.data(),m_param_data.descr())
+		,m_provider(0)
+		{}
 
 	CppFormFunctionClosure( const CppFormFunctionClosure& o)
 		:types::TypeSignature(o)
@@ -74,6 +76,7 @@ public:
 		,m_result_data(o.m_result_data)
 		,m_result(o.m_result)
 		,m_parser(o.m_parser)
+		,m_provider(o.m_provider)
 		{}
 
 	virtual bool call()
@@ -86,7 +89,7 @@ public:
 				if (!m_parser.call()) return false;
 				m_state = 1;
 			case 1:
-				int rt = m_func.call( result_struct, param_struct);
+				int rt = m_func.call( m_provider, result_struct, param_struct);
 				if (rt != 0)
 				{
 					std::ostringstream msg;
@@ -98,8 +101,9 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider*, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( const proc::ProcessorProvider* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
+		m_provider = provider;
 		m_parser.init( i, f);
 	}
 
@@ -115,6 +119,7 @@ private:
 	langbind::ApiFormData m_result_data;
 	langbind::TypedInputFilterR m_result;
 	serialize::StructParser m_parser;
+	const proc::ProcessorProvider* m_provider;
 };
 
 class CppFormFunction

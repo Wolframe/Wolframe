@@ -536,6 +536,8 @@
 			<para>
 			Constraints on database results are expressed as keywords following
 			the DO keyword of an instruction in the main processing section.
+			If a constraint on database results is violated the whole transaction
+			fails and a rollback occurrs.
 			</para>
 			<para>
 			The following list explains the result constraints available:
@@ -591,8 +593,8 @@
 			<para>
 			On the client side the following message will be shown:
 			<programlisting language='sql'>
-			unique constaint violation in transaction 'insertCustomer'.
-			Customers must have a unique name.
+			unique constaint violation in transaction 'insertCustomer'
+			-- Customers must have a unique name.
 			</programlisting>
 			</para>
 			</sect4>

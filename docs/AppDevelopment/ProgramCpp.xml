@@ -10,21 +10,23 @@
 
 	<sect2>
 	<title>Prerequisites</title>
-	<para>For native C++ you need a C++ build system with compiler and linker or an integrated
-	development environment for C++. 
+	<para>For native <application>C++</application> you need a <application>C++</application>
+	build system with compiler and linker or an integrated
+	development environment for <application>C++</application>. 
 	</para>
 	</sect2>
 
 	<sect2>
 	<title>Declaring Functions</title>
 	<para>
-		Form functions declared in C++ have two arguments. The output structure to fill
+		Form functions declared in <application>C++</application> have two arguments. The output structure to fill
 		is passed by reference as first and the input structure passed is by value.
 		The input structure copy should not be modified by the callee. 
-		This means in C++ that it is passed as const reference.
-		The function returns an <code>int</code> that is <code>0</code> on success and any other value indicating
-		an error code. The function may also throw a runtime error exception in case 
-		of an error.
+		This means in <application>C++</application> that it is passed as const 
+		reference.
+		The function returns an <code>int</code> that is <code>0</code> on success 
+		and any other value indicating an error code. The function may also throw a 
+		runtime error exception in case of an error.
 		The following example shows a function declaration. The function declaration
 		is not complete because the input output structures need to be declared with some
 		additional attributes needed for introspection. We will explain this in the following
@@ -64,7 +66,7 @@
 		what element names to bind to which structure elements.
 	</para>
 	<para>
-		The following example shows a form function parameter structure defined in C++.
+		The following example shows a form function parameter structure defined in <application>C++</application>.
 	</para>
 		<sect3>
 		<title>Header File</title>
@@ -89,7 +91,8 @@
 	<sect2>
 	<title>Writing the Module</title>
 	<para>Now we have all pieces together to build a loadable
-	<application>Wolframe</application> module with our example C++ function. The following example shows what you have to
+	<application>Wolframe</application> module with our example <application>C++</application>
+	function. The following example shows what you have to
 	declare in the main module source file.
 	</para>
 		<sect3>
@@ -123,5 +126,20 @@
 	or path to your module.
 	</para>
 	</sect2>
-</sect1>
 
+	<sect2>
+	<title>Validation Issues</title>
+	<para>
+	<application>C++</application> is a strongly typed language. This means that the
+	input of a function and the output is already validated to be of a strictly
+	defined structure. So a validation by passing the input through a form
+	might not be needed anymore. The constructs used to describe structures of
+	<application>Wolframe</application>
+	in native <application>C++</application> are even capable of describing attributes
+	like used in XML (section 'Input/Output Data Structures' above).
+	See in the documentation of the standard command handler how validation can be
+	skipped with the attribute <code>SKIP</code>.
+	</para>
+	</sect2>
+
+</sect1>

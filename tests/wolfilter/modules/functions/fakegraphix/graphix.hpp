@@ -35,6 +35,7 @@
 #ifndef _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #include "serialize/struct/filtermapDescription.hpp"
+#include "processor/procProvider.hpp"
 #include <string>
 #include <vector>
 
@@ -76,8 +77,8 @@ class ImageImpl
 		static int thumb( Image &res, const ImageThumb &param );
 };
 
-int imageInfo( void *res, const void *param );
-int imageThumb( void *res, const void *param );
+int imageInfo( const proc::ProcessorProvider* provider, void *res, const void *param );
+int imageThumb( const proc::ProcessorProvider* provider, void *res, const void *param );
 
 }}
 #endif

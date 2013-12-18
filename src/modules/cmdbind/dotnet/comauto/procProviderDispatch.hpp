@@ -59,11 +59,11 @@ public:
 	static GUID uuid();
 	static IDispatch* create( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
 
-    // Interface IDispatch:
-    HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);
+	// Interface IDispatch:
+	HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);
 	HRESULT STDMETHODCALLTYPE GetTypeInfo( UINT, LCID, ITypeInfo**);
-    HRESULT STDMETHODCALLTYPE GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid,  DISPID* rgDispId);
-    HRESULT STDMETHODCALLTYPE Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr);
+	HRESULT STDMETHODCALLTYPE GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid,  DISPID* rgDispId);
+	HRESULT STDMETHODCALLTYPE Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr);
 
 	// Interface IUnknown:
 	HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, void** ppvObj);

@@ -292,7 +292,7 @@ public:
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
 	///\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
-	void init( const TypedInputFilterR& i, serialize::Context::Flags flags);
+	void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& i, serialize::Context::Flags flags);
 
 	const serialize::StructSerializer& result() const		{return m_result;}
 
@@ -303,6 +303,7 @@ private:
 	ApiFormData m_result_data;
 	serialize::StructSerializer m_result;
 	serialize::StructParser m_parser;
+	const proc::ProcessorProvider* m_provider;
 };
 
 ///\class TransactionFunctionClosure

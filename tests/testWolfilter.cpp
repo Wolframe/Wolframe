@@ -201,7 +201,7 @@ TEST_F( WolfilterTest, tests)
 						ee.close();
 
 						boost::this_thread::sleep( boost::posix_time::seconds( 3));
-						std::cerr << "exception part '" << *pi << "' not found in '" << ap << "'" << std::endl;
+						std::cerr << "exception part '" << *pi << "' not found in '" << e.what() << "'" << std::endl;
 						EXPECT_EQ( pi, pe);
 					}
 				}
