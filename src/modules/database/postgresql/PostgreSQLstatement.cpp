@@ -4,11 +4,12 @@
 #include <cstring>
 #include <stdint.h>
 #include <libpq-fe.h>
+
 #if defined( _WIN32 )
+#define WIN32_MEAN_AND_LEAN
 #include <winsock2.h>
 #else
-#include <sys/types.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 
