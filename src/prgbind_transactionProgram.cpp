@@ -81,24 +81,27 @@ public:
 			case 2:
 			{
 				m_inputstructptr->finalize( m_provider);
+				db::TransactionInput transactionInput( m_inputstructptr->get());
+				db::TransactionOutputR res;
+				{
+					types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
+					if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 	
-				types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
-				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
-
-				trsr->putInput( m_inputstructptr->get());
-				try
-				{
-					trsr->execute();
+					trsr->putInput( transactionInput);
+					try
+					{
+						trsr->execute();
+					}
+					catch (const db::DatabaseTransactionErrorException& e)
+					{
+						LOG_ERROR << e.what();
+						const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
+						std::string explain;
+						if (hint) explain = explain + " -- " + hint;
+						throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
+					}
+					res.reset( new db::TransactionOutput( trsr->getResult()));
 				}
-				catch (const db::DatabaseTransactionErrorException& e)
-				{
-					LOG_ERROR << e.what();
-					const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
-					std::string explain;
-					if (hint) explain = explain + " -- " + hint;
-					throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
-				}
-				db::TransactionOutputR res( new db::TransactionOutput( trsr->getResult()));
 				m_result = m_func->getOutput( m_provider, res);
 				if (!res->isCaseSensitive())
 				{

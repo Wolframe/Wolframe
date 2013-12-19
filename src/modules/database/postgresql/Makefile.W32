@@ -30,6 +30,7 @@ CPP_OBJS = \
 	PostgreSQLconstructor.obj \
 	PostgreSQL.obj \
 	PostgreSQLtransactionExecStatemachine.obj \
+	PostgreSQLbindParam.obj \
 	PostgreSQLprogram.obj \
 	PostgreSQLmodule.obj
 

@@ -99,7 +99,7 @@
 	have to be performed:
 	</para>
 		<sect3>
-		<title>Make Assemblies COM visible</title>
+		<title>Make Assemblies COM Visible</title>
 		<para>
 		First the asseblies with the functions exported to <application>Wolframe</application> have to be build COM visible.
 		To make the <application>.NET</application> functions called from <application>Wolframe</application> COM visible, you have to tick
@@ -299,7 +299,7 @@
 	</para>
 		<sect3>
 		<table frame="all" width="80%">
-			<title>Attributes of Assembly declarations</title>
+			<title>Attributes of assembly declarations</title>
 			<tgroup cols="2">
 			<thead>
 				<row>
@@ -348,7 +348,7 @@
 		that has to be used as attribute when referencing the assembly.
 		</para>
 		<para>
-		You can get the <code>PublicKeyToken</code> of the assembly 
+		We can get the <code>PublicKeyToken</code> of the assembly 
 		by calling <code>sn -T &lt;assemblypath&gt;</code> from the command line (cmd)
 		with &lt;assemblypath&gt; as the path of the assembly. The printed value is the
 		public key to insert as attribute value of <code>PublicKeyToken</code> in the
