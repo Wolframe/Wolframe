@@ -30,7 +30,8 @@ CPP_OBJS = \
 	PostgreSQLconstructor.obj \
 	PostgreSQL.obj \
 	PostgreSQLtransactionExecStatemachine.obj \
-	PostgreSQLprogram.obj \
+        PostgreSQLstatement.obj \
+        PostgreSQLprogram.obj \
 	PostgreSQLmodule.obj
 
 all: $(DYNAMIC_MODULE)

@@ -2,7 +2,6 @@
 #include "types/variant.hpp"
 #include <boost/cstdint.hpp>
 #include <cstring>
-#include <limits>
 #include <stdint.h>
 #include <libpq-fe.h>
 #if defined( _WIN32 )
@@ -53,11 +52,12 @@ void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 			break;
 
 		case types::Variant::Int:
-			if (value.data().value.Int <= std::numeric_limits<boost::int16_t>::max())
+			// numeric_limits::max does not work with windows includes
+			if (value.data().value.Int <= 0x7FFF && value.data().value.Int >= -0x7FFF)
 			{
 				bindInt16( (boost::int16_t)value.data().value.Int);
 			}
-			else if (value.data().value.Int <= std::numeric_limits<boost::int32_t>::max())
+			else if (value.data().value.Int <= 0x7FFFffff && value.data().value.Int >= -(0x7FFFffff))
 			{
 				bindInt32( (boost::int32_t)value.data().value.Int);
 			}
@@ -68,11 +68,11 @@ void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 			break;
 
 		case types::Variant::UInt:
-			if (value.data().value.UInt <= std::numeric_limits<boost::uint16_t>::max())
+			if (value.data().value.UInt <= 0xFFff)
 			{
 				bindUInt16( (boost::uint16_t)value.data().value.UInt);
 			}
-			else if (value.data().value.UInt <= std::numeric_limits<boost::uint32_t>::max())
+			else if (value.data().value.UInt <= 0xFFFFffff)
 			{
 				bindUInt32( (boost::uint32_t)value.data().value.UInt);
 			}
