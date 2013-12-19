@@ -31,9 +31,9 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/bindStatementParams.hpp
-#ifndef _POSTGRESQL_BIND_PARAMETER_HPP_INCLUDED
-#define _POSTGRESQL_BIND_PARAMETER_HPP_INCLUDED
+///\file database/PostgreSQLstatement.hpp
+#ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
+#define _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
