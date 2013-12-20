@@ -48,7 +48,14 @@ namespace _Wolframe {
 namespace db {
 
 struct OracleColumnDescription {
+	ub2 dataType; // Oracle data type of the column
 	std::string name; // name of the column in the result
+	std::size_t bufsize; // size of column in bytes
+	char *buf; // container for Oracle result for this column
+	OCIDefine *defhp; // handle to the column definition
+	sb2 ind; // NULL indicator for a value in this column
+	ub2 len; // length of the returned data
+	ub2 errcode; // error code on field level
 };
 
 ///\class TransactionExecStatemachine_oracle
@@ -122,9 +129,8 @@ private:
 	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
-	std::size_t m_nof_rows;
-	std::size_t m_idx_row;
 	bool m_hasResult;
+	bool m_hasRow;
 };
 
 }}//namespace
