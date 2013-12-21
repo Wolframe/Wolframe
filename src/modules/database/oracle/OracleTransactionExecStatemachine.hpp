@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Oracle interface to the standard database transaction execution statemechine
-///\file OracletransactionExecStatemachine.hpp
+///\file OracleTransactionExecStatemachine.hpp
 #ifndef _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"

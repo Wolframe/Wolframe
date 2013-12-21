@@ -30,26 +30,21 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to programs of a postgres database
-///\file Oracleprogram.hpp
-#ifndef _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
-#define _DATABASE_PROGRAM_ORACLE_HPP_INCLUDED
-#include <string>
-#include <map>
-#include <cstdlib>
+///\brief Implementation of programs for a postgres database
+///\file OracleProgram.cpp
+#include "OracleProgram.hpp"
+#include "config/programBase.hpp"
+#include <boost/algorithm/string.hpp>
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::db;
 
-class Oracleprogram
+void OracleProgram::load( const std::string& src)
 {
-public:
-	Oracleprogram(){}
-	Oracleprogram( const Oracleprogram&){}
+	if (boost::algorithm::trim_copy(src).size())
+	{
+		throw std::runtime_error( "Oracle programs not implemented yet");
+	}
+}
 
-	void load( const std::string& dbsource);
-};
-
-}}
-#endif
 

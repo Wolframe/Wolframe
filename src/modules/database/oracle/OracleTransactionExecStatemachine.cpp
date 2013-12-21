@@ -31,9 +31,9 @@
 
 ************************************************************************/
 ///\brief Implementation of the standard database transaction execution statemechine with Oracle
-///\file OracletransactionExecStatemachine.cpp
+///\file OracleTransactionExecStatemachine.cpp
 
-#include "OracletransactionExecStatemachine.hpp"
+#include "OracleTransactionExecStatemachine.hpp"
 #include "Oracle.hpp"
 #include "logger-v1.hpp"
 #include <iostream>

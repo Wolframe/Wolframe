@@ -44,11 +44,11 @@ namespace db {
 
 ///\class OracleTestConfig
 ///\brief Oracle test database configuration
-class OracleTestConfig : public Oracleconfig
+class OracleTestConfig : public OracleConfig
 {
 public:
 	OracleTestConfig( const char* name, const char* logParent, const char* logName )
-		: Oracleconfig( name, logParent, logName )	{}
+		: OracleConfig( name, logParent, logName )	{}
 
 	virtual ~OracleTestConfig()
 	{
@@ -58,12 +58,12 @@ public:
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
 			    const module::ModulesDirectory* modules )
 	{
-		return Oracleconfig::parse( extractMyNodes( pt), node, modules );
+		return OracleConfig::parse( extractMyNodes( pt), node, modules );
 	}
 
 	virtual void setCanonicalPathes( const std::string& referencePath )
 	{
-		Oracleconfig::setCanonicalPathes( referencePath );
+		OracleConfig::setCanonicalPathes( referencePath );
 		setMyCanonicalPathes( referencePath );
 	}
 
@@ -79,7 +79,7 @@ private:
 	std::string m_dump_filename;
 };
 
-class OracleTestConstructor : public Oracleconstructor
+class OracleTestConstructor : public OracleConstructor
 {
 public:
 	OracleTestConstructor()		{}
@@ -89,7 +89,7 @@ public:
 	{
 		const OracleTestConfig& cfg = dynamic_cast< const OracleTestConfig& >( conf );
 		createTestDatabase( cfg );
-		return Oracleconstructor::object( conf );
+		return OracleConstructor::object( conf );
 	}
 
 private:

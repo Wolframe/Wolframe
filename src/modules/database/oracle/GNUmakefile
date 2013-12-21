@@ -23,12 +23,13 @@ NOINST_STATIC_LIB = mod_db_oracle_lib.a
 DYNAMIC_MODULE = mod_db_oracle.so
 
 CPP_OBJS = \
-	Oracleconfig.o \
-	Oracleconstructor.o \
+	OracleConfig.o \
+	OracleConstructor.o \
 	Oracle.o \
-	OracletransactionExecStatemachine.o \
-	Oracleprogram.o \
-	Oraclemodule.o
+	OracleTransactionExecStatemachine.o \
+	OracleStatement.o \
+	OracleProgram.o \
+	OracleModule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

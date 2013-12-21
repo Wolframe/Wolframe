@@ -50,7 +50,7 @@ namespace _Wolframe {
 namespace db {
 
 //***  Oracle configuration functions  **********************************
-Oracleconfig::Oracleconfig( const char* cfgName, const char* logParent, const char* logName )
+OracleConfig::OracleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {
 	m_port = 0;
@@ -58,7 +58,7 @@ Oracleconfig::Oracleconfig( const char* cfgName, const char* logParent, const ch
 	acquireTimeout = 0;
 }
 
-bool Oracleconfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool OracleConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
@@ -193,7 +193,7 @@ bool Oracleconfig::parse( const config::ConfigurationTree& pt, const std::string
 	return retVal;
 }
 
-void Oracleconfig::setCanonicalPathes( const std::string& refPath )
+void OracleConfig::setCanonicalPathes( const std::string& refPath )
 {
 	if ( ! sslCert.empty() )	{
 		std::string oldPath = sslCert;
@@ -239,7 +239,7 @@ void Oracleconfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-void Oracleconfig::print( std::ostream& os, size_t indent ) const
+void OracleConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
@@ -291,7 +291,7 @@ void Oracleconfig::print( std::ostream& os, size_t indent ) const
 	}
 }
 
-bool Oracleconfig::check() const
+bool OracleConfig::check() const
 {
 	if ( connections == 0 )	{
 		MOD_LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
