@@ -43,6 +43,9 @@ fi
 if [ `echo $testname | grep -c '_postgresql'` != "0" ]; then
 	echo '**requires:PGSQL' >> $output
 fi
+if [ `echo $testname | grep -c '_oracle'` != "0" ]; then
+	echo '**requires:ORACLE' >> $output
+fi
 if [ x"$disabled" = x"1" ]; then
 	echo '**requires:DISABLED' >> $output
 fi

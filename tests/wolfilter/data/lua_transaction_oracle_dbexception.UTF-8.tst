@@ -2,7 +2,7 @@
 **requires:LUA
 **requires:ORACLE
 **exception
-error in transaction insertCustomer:*Customers must have a unique name.
+error in transaction 'insertCustomer':*Customers must have a unique name.
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <customers><customer><name>Hugo</name></customer><customer><name>Hugo</name></customer></customers>**config
@@ -36,7 +36,7 @@ END;
 TRANSACTION insertCustomer
 BEGIN
 	DO INSERT INTO Customer (name) VALUES ($(name));
-	ON ERROR CONSTRAINT HINT ". Customers must have a unique name.";
+	ON ERROR CONSTRAINT HINT "Customers must have a unique name.";
 END
 **outputfile:DBDUMP
 **file: transaction_dbexception.lua

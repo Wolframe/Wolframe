@@ -395,7 +395,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			descr.buf = (char *)malloc( descr.bufsize );
 			status_ = OCIDefineByPos( m_lastresult, &descr.defhp,
 				m_conn->errhp, counter, (dvoid *)descr.buf,
-				(sb4)descr.bufsize+1, descr.dataType,
+				(sb4)descr.bufsize, descr.dataType,
 				&descr.ind, &descr.len, &descr.errcode, OCI_DEFAULT );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
