@@ -317,8 +317,8 @@ BEGIN
 	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct town', $(town));
 	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ('struct surname', $(.));
 	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ('struct prename', $(prename));
-	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct tag', $(tag));
-	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct id', $(id));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct tag', $(tag));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct id', $(id));
 	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
 END
 **file:preprocess.dmap
