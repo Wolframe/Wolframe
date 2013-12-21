@@ -30,7 +30,6 @@ CPP_OBJS = \
 	OracleConstructor.obj \
 	Oracle.obj \
 	OracleTransactionExecStatemachine.obj \
-	OracleStatement.obj \
 	OracleProgram.obj \
 	OracleModule.obj
 

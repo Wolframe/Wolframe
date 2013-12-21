@@ -68,6 +68,12 @@ void TransactionExecStatemachine_oracle::clear()
 	{
 		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
 		m_lastresult = 0;
+		std::vector<OracleColumnDescription>::iterator end = m_colDescr.end( );
+		for( std::vector<OracleColumnDescription>::iterator it = m_colDescr.begin( );
+			it != end; it++ ) {
+			free( (*it).buf );
+		}
+		m_colDescr.clear( );
 	}
 	m_lasterror.reset();
 	m_statement.clear();
@@ -378,10 +384,16 @@ bool TransactionExecStatemachine_oracle::execute()
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 			
-			descr.bufsize = col_width;
+//			ub2 char_size = (ub2) ( (OCILib.nls_utf8 == TRUE) ? UTF8_BYTES_PER_CHAR : sizeof(dtext) );
 
 			// set buffer size depending on data type of column
 			switch( descr.dataType ) {
+				case SQLT_CHR:
+					descr.fetchType = SQLT_STR;
+					// TODO: depends on NLS_LANG and some other things for sure
+					descr.bufsize = ( col_width + 1 ) * 4;
+					break;
+					
 				case SQLT_NUM:
 					descr.fetchType = SQLT_VNU;
 					descr.bufsize = sizeof( OCINumber );
@@ -436,7 +448,6 @@ bool TransactionExecStatemachine_oracle::execute()
 bool TransactionExecStatemachine_oracle::hasResult()
 {
 	return m_hasResult;
-	//~ return m_hasResult && m_nof_rows > 0;
 }
 
 std::size_t TransactionExecStatemachine_oracle::nofColumns()
@@ -502,13 +513,19 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	sword status_;
 	
 	switch( descr.dataType ) {
+		case SQLT_CHR: {
+			LOG_DATA << "[Oracle get SQLT_CHR]: " << descr.buf;
+			rt = types::VariantConst( descr.buf );
+			break;
+		}
+		
 		case SQLT_NUM: {
 			unsigned int intval;
 			status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descr.buf,
 				(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
 			LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
 			if( status( status_, Executed ) ) {
-				rt = (types::Variant::Data::Int)intval;
+				rt = (types::Variant::Data::UInt)intval;
 			} else {
 				rt = types::VariantConst( );
 			}
