@@ -48,7 +48,8 @@ namespace _Wolframe {
 namespace db {
 
 struct OracleColumnDescription {
-	ub2 dataType; // Oracle data type of the column
+	ub2 dataType; // Oracle data type of the column (as reported in implicit description)
+	ub2 fetchType; // how do we want to fetch the column (not the same as dataType!)
 	std::string name; // name of the column in the result
 	std::size_t bufsize; // size of column in bytes
 	char *buf; // container for Oracle result for this column

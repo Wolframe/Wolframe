@@ -383,6 +383,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			// set buffer size depending on data type of column
 			switch( descr.dataType ) {
 				case SQLT_NUM:
+					descr.fetchType = SQLT_VNU;
 					descr.bufsize = sizeof( OCINumber );
 					break;
 					
@@ -395,7 +396,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			descr.buf = (char *)malloc( descr.bufsize );
 			status_ = OCIDefineByPos( m_lastresult, &descr.defhp,
 				m_conn->errhp, counter, (dvoid *)descr.buf,
-				(sb4)descr.bufsize, descr.dataType,
+				(sb4)descr.bufsize, descr.fetchType,
 				&descr.ind, &descr.len, &descr.errcode, OCI_DEFAULT );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
@@ -504,7 +505,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		case SQLT_NUM: {
 			unsigned int intval;
 			status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descr.buf,
-				(ub4)sizeof( unsigned int ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
+				(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
 			LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
 			if( status( status_, Executed ) ) {
 				rt = (types::Variant::Data::Int)intval;
