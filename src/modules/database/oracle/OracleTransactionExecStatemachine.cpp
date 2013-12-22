@@ -89,6 +89,8 @@ static const char* getErrorType( sword errorcode )
 {
 	// TODO: find OCI error code list and map it
 	switch( errorcode ) {
+		case 1:
+			return "CONSTRAINT";
 		case 1017:
 			return "PRIVILEGE";
 		default:
@@ -136,13 +138,12 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 			break;
 	}
 	
-	const char *usermsg = 0;
 	const char *errtype = getErrorType( errcode );
 	
 	// TODO: map OCI codes to severity levels, so far everything is ERROR
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
 	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -527,8 +528,14 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	OracleColumnDescription descr = m_colDescr[idx-1];
 
 	// check for NULL value
-	if( descr.ind < 0 ) {
+	if( descr.ind == -1 ) {
 		return types::VariantConst();
+	} else if( descr.ind == -2 ) {
+		errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, we don not know how badly..");
+		return types::VariantConst();		
+	} else if( descr.ind >= 0 ) {
+		errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, got only " + boost::lexical_cast<std::string>( descr.ind ) + " bytes");
+		return types::VariantConst();		
 	}
 
 	types::VariantConst rt;
@@ -577,6 +584,8 @@ bool TransactionExecStatemachine_oracle::next()
 		errorStatus( std::string( "get next command result not possible in state '") + stateName(m_state) + "'");
 		return false;
 	}
+	
+	if( !m_hasRow ) return false;
 
 	sword status_ = OCIStmtFetch( m_lastresult, m_conn->errhp, (ub4)1,
 		(ub2)OCI_FETCH_NEXT, (ub4)OCI_DEFAULT );
