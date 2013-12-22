@@ -527,14 +527,25 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	
 	OracleColumnDescription descr = m_colDescr[idx-1];
 
-	// check for NULL value
-	if( descr.ind == -1 ) {
+	if( descr.errcode == 0 ) {
+		// ok case, handled below
+	} else if( descr.errcode == 1405 ) {
+		// check for NULL value
 		return types::VariantConst();
-	} else if( descr.ind == -2 ) {
-		errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, we don not know how badly..");
-		return types::VariantConst();		
-	} else if( descr.ind >= 0 ) {
-		errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, got only " + boost::lexical_cast<std::string>( descr.ind ) + " bytes");
+	} else if( descr.errcode == 1406 ) {
+		// column got truncated, show a message on how
+		if( descr.ind == -2 ) {
+			errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, we don not know how badly..");
+			return types::VariantConst();		
+		} else if( descr.ind > 0 ) {
+			errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, got only " + boost::lexical_cast<std::string>( descr.ind ) + " bytes, errcode: " + boost::lexical_cast<std::string>( descr.errcode ) );
+			return types::VariantConst();		
+		} else {
+			errorStatus( std::string( "value of column (" ) + boost::lexical_cast<std::string>(idx) + ") indicated as truncated (OCI-1406), but indicator is ok?!" );
+			return types::VariantConst();		
+		}
+	} else {
+		errorStatus( std::string( "error " ) + boost::lexical_cast<std::string>( descr.errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 		return types::VariantConst();		
 	}
 
