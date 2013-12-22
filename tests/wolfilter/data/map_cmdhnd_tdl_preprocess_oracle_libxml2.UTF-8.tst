@@ -69,64 +69,89 @@ normname=string:convdia,lcname;
 **file: DBDATA
 CREATE TABLE Person
 (
- ID SERIAL NOT NULL PRIMARY KEY,
- prename TEXT,
- surname TEXT
+ ID INTEGER NOT NULL PRIMARY KEY,
+ prename VARCHAR2(30),
+ surname VARCHAR2(30)
 );
+CREATE SEQUENCE Person_ID_Seq START WITH 1 INCREMENT BY 1;
+CREATE TRIGGER Person_Insert
+BEFORE INSERT ON Person
+FOR EACH ROW
+BEGIN
+	SELECT Person_ID_Seq.nextval into :new.id FROM dual;
+END;
+/
 
 CREATE TABLE Address
 (
- ID SERIAL NOT NULL PRIMARY KEY,
- street TEXT,
- town TEXT
+ ID INTEGER NOT NULL PRIMARY KEY,
+ street VARCHAR2(30),
+ town VARCHAR2(30)
 );
+CREATE SEQUENCE Address_ID_Seq START WITH 1 INCREMENT BY 1;
+CREATE TRIGGER Address_Insert
+BEFORE INSERT ON Address
+FOR EACH ROW
+BEGIN
+	SELECT Address_ID_Seq.nextval into :new.id FROM dual;
+END;
+/
 
 CREATE TABLE Company
 (
- ID SERIAL NOT NULL PRIMARY KEY,
- name TEXT
+ ID INTEGER NOT NULL PRIMARY KEY,
+ name VARCHAR2(30)
 );
+CREATE SEQUENCE Company_ID_Seq START WITH 1 INCREMENT BY 1;
+CREATE TRIGGER Company_Insert
+BEFORE INSERT ON Company
+FOR EACH ROW
+BEGIN
+	SELECT Company_ID_Seq.nextval into :new.id FROM dual;
+END;
+/
+
 
 CREATE TABLE PersonChildRel
 (
- ID INT,
- childid  INT
+ ID INTEGER,
+ childid  INTEGER
 );
 
 CREATE TABLE PersonAddressRel
 (
- ID INT,
- addressid  INT
+ ID INTEGER,
+ addressid  INTEGER
 );
 
 CREATE TABLE CompanyChildRel
 (
- ID INT,
- childid  INT
+ ID INTEGER,
+ childid  INTEGER
 );
 
 CREATE TABLE CompanyAddressRel
 (
- ID INT,
- addressid  INT
+ ID INTEGER,
+ addressid  INTEGER
 );
 
 CREATE TABLE PersonCompanyRel
 (
- ID INT,
- companyid  INT
+ ID INTEGER,
+ companyid  INTEGER
 );
 
 CREATE TABLE WordTable
 (
- name TEXT,
- word TEXT
+ name VARCHAR2(30),
+ word VARCHAR2(30)
 );
 
 CREATE TABLE NumberTable
 (
- name TEXT,
- number INT
+ name VARCHAR2(30),
+ "number" INTEGER
 );
 
 INSERT INTO Address (street,town) VALUES ('Amselstrasse 12','Aulach');
@@ -293,8 +318,8 @@ BEGIN
 	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct town', $(town));
 	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ('struct surname', $(.));
 	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ('struct prename', $(prename));
-	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct tag', $(tag));
-	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,number) VALUES ('struct id', $(id));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct tag', $(tag));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct id', $(id));
 	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
 END
 **file:preprocess.dmap

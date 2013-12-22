@@ -2,7 +2,7 @@
 **requires:LUA
 **requires:ORACLE
 **exception
-error in transaction insertCustomer:*Customers must have a unique name.
+error in transaction 'insertCustomer':*Customers must have a unique name.
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <customers><customer><name>Hugo</name></customer><customer><name>Hugo</name></customer></customers>**config
@@ -17,10 +17,18 @@ percent_1=number:fixedpoint(5,1);
 **file: DBDATA
 
 CREATE TABLE Customer (
- ID SERIAL NOT NULL PRIMARY KEY,
- name TEXT ,
+ ID INTEGER NOT NULL PRIMARY KEY,
+ name VARCHAR(32) ,
  CONSTRAINT tag_name_check UNIQUE( name )
 );
+CREATE SEQUENCE Customer_ID_Seq START WITH 1 INCREMENT BY 1;
+CREATE TRIGGER Customer_Insert
+BEFORE INSERT ON Customer
+FOR EACH ROW
+BEGIN
+	SELECT Customer_ID_Seq.nextval into :new.id FROM dual;
+END;
+/
 **file:DBPRG.tdl
 --
 -- insertCustomer
@@ -28,7 +36,7 @@ CREATE TABLE Customer (
 TRANSACTION insertCustomer
 BEGIN
 	DO INSERT INTO Customer (name) VALUES ($(name));
-	ON ERROR CONSTRAINT HINT ". Customers must have a unique name.";
+	ON ERROR CONSTRAINT HINT "Customers must have a unique name.";
 END
 **outputfile:DBDUMP
 **file: transaction_dbexception.lua

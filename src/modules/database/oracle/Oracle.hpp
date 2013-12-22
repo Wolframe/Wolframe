@@ -41,7 +41,7 @@
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
-#include "Oracleprogram.hpp"
+#include "OracleProgram.hpp"
 #include "config/configurationBase.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
@@ -60,14 +60,14 @@ static const unsigned int ORACLE_MIN_DB_VERSION = 80400;
 static const unsigned short ORACLE_MIN_PROTOCOL_VERSION = 3;
 
 /// Oracle server connection configuration
-class Oracleconfig : public config::NamedConfiguration
+class OracleConfig : public config::NamedConfiguration
 {
-	friend class Oracleconstructor;
+	friend class OracleConstructor;
 public:
 	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
 
-	Oracleconfig( const char* name, const char* logParent, const char* logName );
-	~Oracleconfig()			{}
+	OracleConfig( const char* name, const char* logParent, const char* logName );
+	~OracleConfig()			{}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
@@ -235,13 +235,13 @@ private:
 	ObjectPool< OracleConnection* >	m_connPool;		///< pool of connections
 	unsigned		m_statementTimeout;	///< default statement execution timeout
 	Oracledatabase	m_db;			///< real database object
-	Oracleprogram	m_program;
+	OracleProgram	m_program;
 	std::list<std::string>	m_programFiles;
 };
 
 
 //***  Oracle database constructor  ***************************************
-class Oracleconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
+class OracleConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
 	ObjectConstructorBase::ObjectType objectType() const

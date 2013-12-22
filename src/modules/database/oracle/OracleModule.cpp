@@ -31,29 +31,39 @@
 
 ************************************************************************/
 //
-// Oracle constructor
+// Oracle module
 //
 
 #include "Oracle.hpp"
+#include "processor/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
+_Wolframe::log::LogBackend*	logBackendPtr;
+
 namespace _Wolframe {
-namespace db {
+namespace module {
 
-OracledbUnit* Oracleconstructor::object( const config::NamedConfiguration& conf )
+static ConfiguredBuilder* createOracleModule( void )
 {
-	const Oracleconfig& cfg = dynamic_cast< const Oracleconfig& >( conf );
-
-	OracledbUnit* m_db = new OracledbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
-						       cfg.user(), cfg.password(),
-						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
-						       cfg.sslRootCert, cfg.sslCRL,
-						       cfg.connectTimeout,
-						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout,
-						       cfg.programFiles());
-	MOD_LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
-	return m_db;
+	static ConfiguredBuilderDescription< db::OracleConstructor,
+			db::OracleConfig > mod( "Oracle database", "database",
+						    "Oracle", "Oracle" );
+	return &mod;
 }
 
-}} // namespace _Wolframe::db
+static void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+
+static const unsigned short nrContainers = 1;
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
+	createOracleModule
+};
+
+ModuleEntryPoint entryPoint( 0, "Oracle database", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
+
+}} // namespace _Wolframe::module

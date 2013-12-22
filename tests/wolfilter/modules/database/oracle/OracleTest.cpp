@@ -44,6 +44,7 @@
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <fstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -293,7 +294,14 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 
 	{
 		// Now create the test database
-		std::string dbsource = utils::readSourceFileContent( inputfile );
+		std::string dbsource;
+		std::string line;
+		std::ifstream sinputfile( inputfile.c_str( ) );
+		while( std::getline( sinputfile, line ) ) {
+			if( boost::starts_with( line, "--" ) ) continue;
+			dbsource.append( line );
+			dbsource.append( "\n" );
+		}
 		std::vector<std::string> dbcmds;
 		utils::splitString( dbcmds, dbsource, ";" );
 		std::vector<std::string>::const_iterator end = dbcmds.end( );
@@ -322,7 +330,9 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 				if( collect_trigger_code ) {
 					if( boost::starts_with( part, "/" ) ) {
 						collect_trigger_code = false;
-						nextCmd = part.substr( 2 );
+						if( part.length( ) > 2 ) {
+							nextCmd = part.substr( 2 );
+						}
 					} else {
 						dbcmd.append( part );
 						dbcmd.append( "; " );

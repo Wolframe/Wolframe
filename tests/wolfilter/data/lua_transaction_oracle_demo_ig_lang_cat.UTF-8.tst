@@ -171,14 +171,21 @@ percent_1=number:fixedpoint(5,1);
 -- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
 
 CREATE TABLE tree (
- ID SERIAL NOT NULL PRIMARY KEY,
- parent INT REFERENCES tree( ID ),
- name TEXT,
+ ID INTEGER NOT NULL PRIMARY KEY,
+ parent INTEGER REFERENCES tree( ID ),
+ name VARCHAR(32),
  lft INT NOT NULL CHECK ( lft > 0 ),
  rgt INT NOT NULL CHECK ( rgt > 1 ),
  CONSTRAINT order_check CHECK ( rgt > lft )
 );
-ALTER SEQUENCE tree_ID_seq RESTART WITH 1;
+CREATE SEQUENCE tree_ID_seq START WITH 1 INCREMENT BY 1;
+CREATE TRIGGER tree_Insert
+BEFORE INSERT ON tree
+FOR EACH ROW
+BEGIN
+	SELECT tree_ID_seq.nextval into :new.id FROM dual;
+END;
+/
 **file:DBPRG.tdl
 --
 -- treeAddRoot
