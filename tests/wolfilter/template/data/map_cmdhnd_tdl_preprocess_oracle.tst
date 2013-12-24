@@ -2,7 +2,7 @@
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
 schema=tdl_preprocess/schema_oracle.sql
-luascript=tdl_preprocess/preprocess.lua
+luascript=tdl_preprocess/preprocess-oracle.lua
 direcmap=tdl_preprocess/preprocess.dmap
 ddl=tdl_preprocess/preprocess.sfrm
 tdl=tdl_preprocess/preprocess.tdl

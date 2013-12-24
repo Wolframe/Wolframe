@@ -1,5 +1,5 @@
-tree:
-id, parent, name, lft, rgt
+TREE:
+ID, PARENT, NAME, LFT, RGT
 '1', NULL, 'indogermanic', '1', '152'
 '14', '1', 'germanic', '2', '77'
 '15', '14', 'west germanic', '3', '58'
