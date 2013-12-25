@@ -51,7 +51,7 @@ function run()
 end
 
 **output
-customer:
-id, name
+CUSTOMER:
+ID, NAME
 '1', 'Hugo'
 **end
