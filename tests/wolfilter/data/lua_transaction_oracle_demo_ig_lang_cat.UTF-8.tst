@@ -237,11 +237,11 @@ END
 --
 TRANSACTION treeSelectNodeAndParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectNodeAndParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -250,11 +250,11 @@ END
 --
 TRANSACTION treeSelectParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -263,11 +263,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 --
@@ -276,11 +276,11 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 
@@ -317,7 +317,7 @@ BEGIN
 			P1.lgt-$4+$1 AS lgt,
 			P1.rgt-$5+$2 AS rgt,
 			P1.name AS name
-		FROM tree AS P1, tree AS P2
+		FROM tree P1, tree P2
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 
 	-- delete the original node
@@ -360,7 +360,7 @@ BEGIN
 			P1.lgt-$4+$1 AS lgt,
 			P1.rgt-$5+$2 AS rgt,
 			P1.name AS name
-		FROM tree AS P1, tree AS P2
+		FROM tree P1, tree P2
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 END
 **outputfile:DBDUMP
@@ -578,8 +578,8 @@ end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result><class name="indogermanic"><class name="celtic"><class name="gaulisch"/><class name="goidelic"><class name="old irish"/><class name="middle irish"/><class name="manx"/><class name="irish"/><class name="scotts gaelic"/></class><class name="brythonic"><class name="comish"/><class name="welsh"/><class name="breton"/></class></class><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"/><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="hellenic"><class name="greek"/></class><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="hittie"/><class name="indo iranian"><class name="iranian"><class name="avestan"><class name="pashto"/></class><class name="old persian"><class name="balushti"/><class name="kurdish"/><class name="ossetic"/><class name="pashto"/><class name="persian"/></class><class name="scythian"/></class><class name="indic"><class name="sanskrit"/><class name="prakrit"/><class name="pali"/><class name="bengali"/><class name="bihari"/><class name="bhili"/><class name="gujarati"/><class name="hindi"/><class name="hindustani"/><class name="marati"/><class name="nepali"/><class name="bahari"/><class name="punjabi"/><class name="rajasthani"/><class name="sindhi"/><class name="singhalese"/><class name="urdu"/></class></class><class name="tocharian"/></class><subtree name="italic"><node id="49" name="italic"/><node id="50" name="oscan"/><node id="51" name="umbrian"/><node id="52" name="old latin"/><node id="53" name="catalan"/><node id="54" name="french"/><node id="55" name="galician"/><node id="56" name="portuguese"/><node id="57" name="italian"/><node id="58" name="provencal"/><node id="59" name="romansch"/><node id="60" name="romanian"/><node id="61" name="spanish"/></subtree><subtree name="brythonic"><node id="10" name="brythonic"/><node id="11" name="comish"/><node id="12" name="welsh"/><node id="13" name="breton"/></subtree><subtree name="germanic"><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/><node id="22" name="german"/><node id="23" name="low german"/><node id="24" name="old saxon"/><node id="25" name="plattdeutsch"/><node id="26" name="old low franconian"/><node id="27" name="dutch"/><node id="28" name="flemish"/><node id="29" name="afrikaans"/><node id="30" name="south african dutch"/><node id="31" name="high german"/><node id="32" name="alemannic"/><node id="33" name="alsatian"/><node id="34" name="bavarian"/><node id="35" name="franconian"/><node id="36" name="german"/><node id="37" name="pensilvania german"/><node id="38" name="swiss"/><node id="39" name="yiddish"/><node id="40" name="east germanic"/><node id="41" name="north germanic"/><node id="42" name="old west norse"/><node id="43" name="islandic"/><node id="44" name="faroese"/><node id="45" name="old east norse"/><node id="46" name="norwegian"/><node id="47" name="danish"/><node id="48" name="swedish"/></subtree><subtree name="anglo-frisian"><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/></subtree><children name="gaulisch"/><children name="slavonic"><node id="63" name="west slavic"/><node id="64" name="chech"/><node id="65" name="polish"/><node id="66" name="slovak"/><node id="67" name="sorbian"/><node id="68" name="east slavic"/><node id="69" name="belarussian"/><node id="70" name="russian"/><node id="71" name="ukrainian"/><node id="72" name="south slavic"/><node id="73" name="bosnian"/><node id="74" name="bulgarian"/><node id="75" name="macedonian"/><node id="76" name="serbo-croatian"/><node id="77" name="slovene"/></children><children name="east germanic"/><children name="indic"><node id="99" name="sanskrit"/><node id="100" name="prakrit"/><node id="101" name="pali"/><node id="102" name="bengali"/><node id="103" name="bihari"/><node id="104" name="bhili"/><node id="105" name="gujarati"/><node id="106" name="hindi"/><node id="107" name="hindustani"/><node id="108" name="marati"/><node id="109" name="nepali"/><node id="110" name="bahari"/><node id="111" name="punjabi"/><node id="112" name="rajasthani"/><node id="113" name="sindhi"/><node id="114" name="singhalese"/><node id="115" name="urdu"/></children><cover name="italic"><node id="1" name="indogermanic"/><node id="49" name="italic"/></cover><cover name="brythonic"><node id="1" name="indogermanic"/><node id="2" name="celtic"/><node id="10" name="brythonic"/></cover><cover name="germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></cover><cover name="anglo-frisian"><node id="1" name="indogermanic"/><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/></cover><parents name="gaulisch"><node id="1" name="indogermanic"/><node id="2" name="celtic"/></parents><parents name="slavonic"><node id="1" name="indogermanic"/></parents><parents name="east germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></parents><parents name="indic"><node id="1" name="indogermanic"/><node id="87" name="indo iranian"/></parents><sparsetree><class name="indogermanic"><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"><class name="bern german"/><class name="eastern swiss german"/><class name="grison german"/></class><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="tocharian"/><class name="hittie"/></class></sparsetree></result>
-tree:
-id, parent, name, lft, rgt
+TREE:
+ID, PARENT, NAME, LFT, RGT
 '1', NULL, 'indogermanic', '1', '152'
 '14', '1', 'germanic', '2', '77'
 '15', '14', 'west germanic', '3', '58'

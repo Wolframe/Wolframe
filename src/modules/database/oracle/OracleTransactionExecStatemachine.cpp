@@ -398,6 +398,9 @@ bool TransactionExecStatemachine_oracle::execute()
 			
 			// allocate buffer for column and register it at the column position
 			descr.buf = (char *)calloc( descr.bufsize, sizeof( char ) );
+			descr.ind = 0;
+			descr.len = 0;
+			descr.errcode = 0;
 			status_ = OCIDefineByPos( m_lastresult, &descr.defhp,
 				m_conn->errhp, counter, (dvoid *)descr.buf,
 				(sb4)descr.bufsize, descr.fetchType,

@@ -491,39 +491,112 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 		std::sort( tables.begin(), tables.end());
 		for ( std::vector< std::string >::const_iterator it = tables.begin();
 								it != tables.end(); it++ )	{
+			// dump the name of the table
 			fprintf( fh, "%s:\n", it->c_str() );
-		}
-	}
+
+			// dump metadata (currently column name) of the table
+
+			OCIDescribe *descrhp;
+
+			status = OCIHandleAlloc( envhp, (dvoid **)&descrhp,
+				OCI_HTYPE_DESCRIBE, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			status = OCIDescribeAny( svchp, errhp, (dvoid *)const_cast<char *>( it->c_str( ) ),
+				(ub4)it->length( ), (ub1)OCI_OTYPE_NAME,
+				(ub1)OCI_DEFAULT, (ub1)OCI_PTYPE_TABLE,
+				descrhp );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			OCIParam *parmh = 0;
+			status = OCIAttrGet( (dvoid *)descrhp, (ub4)OCI_HTYPE_DESCRIBE,
+				(dvoid *)&parmh, (ub4 *)0, (ub4)OCI_ATTR_PARAM, errhp );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			ub4 numCols;
+			status = OCIAttrGet( (dvoid *)parmh, (ub4)OCI_DTYPE_PARAM,
+				(dvoid *)&numCols, (ub4 *)0, (ub4)OCI_ATTR_NUM_COLS, errhp );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			OCIParam *collsthd = 0;
+			status = OCIAttrGet( (dvoid *)parmh, (ub4)OCI_DTYPE_PARAM,
+				(dvoid *)&collsthd, (ub4 *)0, (ub4)OCI_ATTR_LIST_COLUMNS, errhp );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			for( ub4 i = 1; i <= numCols; i++ ) {
+				OCIParam *colhd;
+				status = OCIParamGet( (dvoid *)collsthd, (ub4)OCI_DTYPE_PARAM,
+					errhp, (dvoid **)&colhd, i );
+				if( status != OCI_SUCCESS ) goto cleanup;
+
+				ub4 colNameLen;
+				char *colName;
+				status = OCIAttrGet( (dvoid *)colhd, (ub4)OCI_DTYPE_PARAM,
+					(dvoid *)&colName, (ub4 *)&colNameLen, (ub4)OCI_ATTR_NAME, errhp );
+				if( status != OCI_SUCCESS ) goto cleanup;
+
+				fprintf( fh, ( i > 1 ) ? ", %s" : "%s", colName );
+			} // foreach column
+
+			fprintf( fh, "\n" );
+
+			if( collsthd ) (void)OCIHandleFree( collsthd, OCI_HTYPE_DESCRIBE );
+
+			if( descrhp ) (void)OCIHandleFree( descrhp, OCI_HTYPE_DESCRIBE );
+
+			// the data
+			dbcmd = "SELECT * from " + *it;
+
+			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
+				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+			if( status != OCI_SUCCESS ) goto cleanup;
+			
+			status = OCIStmtPrepare( stmthp, errhp, 
+				(text *)const_cast<char *>( dbcmd.c_str( ) ),
+				(ub4)dbcmd.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+			if( status != OCI_SUCCESS ) goto cleanup;
+
+			char **data = (char **)calloc( sizeof( char *), numCols );
+			ub2 *errcode = (ub2 *)calloc( sizeof( ub2 ), numCols );
+			ub2 *ind = (ub2 *)calloc( sizeof( ub2 ), numCols );
+			for( ub4 i = 1; i <= numCols; i++ ) {
+				data[i-1] = (char *)calloc( sizeof( char ), 255 );
+			}
+			for( ub4 i = 1; i <= numCols; i++ ) {
+				status = OCIDefineByPos( stmthp, &defhp, errhp, i, (dvoid *)data[i-1],
+					(sword)255, SQLT_STR, (dvoid *)&ind[i-1], (ub2 *)0, (ub2 *)&errcode[i-1], OCI_DEFAULT );
+				if( status != OCI_SUCCESS ) goto cleanup;
+			}
+
+			status = OCIStmtExecute( svchp, stmthp, errhp, (ub4)1, (ub4)0,
+				NULL, NULL, OCI_DEFAULT );
+			if( status != OCI_SUCCESS && status != OCI_NO_DATA ) goto cleanup;
+			
+			while( status != OCI_NO_DATA ) {
+				for( ub4 i = 1; i <= numCols; i++ ) {
+					if( errcode[i-1] == 1405 ) {
+						fprintf( fh, ( i > 1 ) ? ", NULL" : "NULL" );
+					} else {
+						fprintf( fh, ( i > 1 ) ? ", '%s'" : "'%s'", data[i-1] );
+					}
+				}			
+				fprintf( fh, "\n" );
+
+				status = OCIStmtFetch( stmthp, errhp, 1, 0, 0 );
+			}
+
+			for( ub4 i = 1; i < numCols; i++ ) {
+				(void)free( data[i-1] );
+			}
+			(void)free( data );
+			(void)free( errcode );
+
+			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+
+		} // foreach table
+	} // end of scope
 	
 #if 0
-
-	// Dump the tables
-		std::string query;
-		std::string orderby = "";
-		int nFields;
-		query = std::string("select column_name from information_schema.columns where table_name = '") + *it + "' ORDER BY ORDINAL_POSITION";
-		PQclear( res );
-		res = PQexec( conn, query.c_str() );
-		if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
-			std::string msg = std::string( "Failed to dump table " ) + *it
-					  + ": " + PQerrorMessage( conn );
-			PQfinish( conn );
-			throw std::runtime_error( msg );
-		}
-
-		fprintf( fh, "%s:\n", it->c_str() );
-		for ( int i = 0; i < PQntuples( res ); i++ )
-		{
-			const char* rv = PQgetvalue( res, i, 0);
-			orderby.append( i ? ", ":" ORDER BY ");
-			orderby.append( "\"");
-			orderby.append( rv?rv:"");
-			orderby.append( "\"");
-			orderby.append( " ASC");
-			fprintf( fh, i ? ", %s" : "%s", rv?rv:"");
-		}
-		fprintf( fh, "\n" );
-
 		query = "SELECT * FROM " + *it + orderby;
 		PQclear( res );
 		res = PQexec( conn, query.c_str() );

@@ -29,7 +29,7 @@ testdata="
 **file: DBDATA
 `cat program/first/tree_schema_oracle.sql`
 **file:DBPRG.tdl
-`cat program/first/tree_transactions.tdl`
+`cat program/first/tree_transactions_oracle.tdl`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh
