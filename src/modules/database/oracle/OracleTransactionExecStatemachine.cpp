@@ -530,6 +530,12 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	
 	OracleColumnDescription descr = m_colDescr[idx-1];
 
+	MOD_LOG_TRACE << "Data "
+		<< ", type: " << descr.dataType
+		<< ", fetchType: " << descr.fetchType
+		<< ", ind: " << descr.ind
+		<< ", errcode: " << descr.errcode;
+
 	if( descr.errcode == 0 ) {
 		// ok case, handled below
 	} else if( descr.errcode == 1405 ) {
@@ -569,14 +575,22 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		
 		case SQLT_NUM: {
 			sword status_;
-			unsigned int intval;
-			status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descr.buf,
-				(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
-			//~ LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
-			if( status( status_, Executed ) ) {
-				rt = (types::Variant::Data::UInt)intval;
-			} else {
+			unsigned int intval = 0;
+			boolean isInt = 0;
+			status_ = OCINumberIsInt( m_conn->errhp, (OCINumber *)descr.buf, &isInt );
+			if( !isInt ) {
+				// a NULL value, should have indicated NULL state above,
+				// but doesn't
 				rt = types::VariantConst( );
+			} else {
+				status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descr.buf,
+					(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
+				//~ LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
+				if( status( status_, Executed ) ) {
+					rt = (types::Variant::Data::UInt)intval;
+				} else {
+					rt = types::VariantConst( );
+				}
 			}
 			break;
 		}
