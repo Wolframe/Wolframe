@@ -1,5 +1,5 @@
-tree:
-id, parent, name, lft, rgt
+TREE:
+ID, PARENT, NAME, LFT, RGT
 '1', NULL, 'Albert', '1', '12'
 '2', '1', 'Bert', '2', '3'
 '3', '1', 'Chuck', '4', '11'
