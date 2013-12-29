@@ -48,6 +48,19 @@ namespace _Wolframe {
 namespace db {
 
 //***  Oracle database functions  ***************************************
+static std::string escConnElement( std::string element )
+{
+	std::string esc;
+	for ( std::string::const_iterator it = element.begin(); it != element.end(); it++ )	{
+		if ( *it == '\'' )
+			esc += "\\'";
+		else if ( *it == '\\' )
+			esc += "\\\\";
+		else
+			esc += *it;
+	}
+	return esc;
+}
 
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName )
 {
@@ -71,13 +84,13 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	ss << "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
 		<< "(HOST=" << host << ")"
 		<< "(PORT=" << port << "))"
-		<< "(CONNECT_DATA=(SID=" << dbName << ")"
+		<< "(CONNECT_DATA=(SID=" << escConnElement( dbName ) << ")"
 		<< "))";
 
 	return ss.str( );
 }
 
-OracledbUnit::OracledbUnit(const std::string& id,
+OracleDbUnit::OracleDbUnit(const std::string& id,
 				    const std::string& host, unsigned short port,
 				    const std::string& dbName,
 				    const std::string& user, const std::string& password,
@@ -253,7 +266,7 @@ OracledbUnit::OracledbUnit(const std::string& id,
 	MOD_LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
-OracledbUnit::~OracledbUnit()
+OracleDbUnit::~OracleDbUnit()
 {
 	size_t connections = 0;
 	bool hasErrors = false;
@@ -296,7 +309,7 @@ OracledbUnit::~OracledbUnit()
 	MOD_LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-void OracledbUnit::loadProgram( const std::string& filename )
+void OracleDbUnit::loadProgram( const std::string& filename )
 {
 	// No program file, do nothing
 	if ( filename.empty())
@@ -316,7 +329,7 @@ void OracledbUnit::loadProgram( const std::string& filename )
 	}
 }
 
-void OracledbUnit::loadAllPrograms()
+void OracleDbUnit::loadAllPrograms()
 {
 	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
@@ -328,7 +341,7 @@ void OracledbUnit::loadAllPrograms()
 }
 
 
-Database* OracledbUnit::database()
+Database* OracleDbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
 }
@@ -336,7 +349,7 @@ Database* OracledbUnit::database()
 
 
 /*****  Oracle database  ******************************************/
-const std::string& Oracledatabase::ID() const
+const std::string& OracleDatabase::ID() const
 {
 	if ( m_unit )
 		return m_unit->ID();
@@ -344,53 +357,55 @@ const std::string& Oracledatabase::ID() const
 		throw std::runtime_error( "Oracle database unit not initialized" );
 }
 
-void Oracledatabase::loadProgram( const std::string& filename )
+void OracleDatabase::loadProgram( const std::string& filename )
 {
 	if ( !m_unit )
 		throw std::runtime_error( "loadProgram: Oracle database unit not initialized" );
 	m_unit->loadProgram( filename );
 }
 
-void Oracledatabase::loadAllPrograms()
+void OracleDatabase::loadAllPrograms()
 {
 	if ( !m_unit )
 		throw std::runtime_error( "loadAllPrograms: Oracle database unit not initialized" );
 	m_unit->loadAllPrograms();
 }
 
-void Oracledatabase::addProgram( const std::string& program )
+void OracleDatabase::addProgram( const std::string& program )
 {
 	if ( !m_unit )
 		throw std::runtime_error( "addProgram: Oracle database unit not initialized" );
 	m_unit->addProgram( program );
 }
 
-Transaction* Oracledatabase::transaction( const std::string& name)
+Transaction* OracleDatabase::transaction( const std::string& name)
 {
-	return new Oracletransaction( *this, name);
+	return new OracleTransaction( &m_env, *this, name);
 }
 
-void Oracledatabase::closeTransaction( Transaction *t )
+void OracleDatabase::closeTransaction( Transaction *t )
 {
 	delete t;
 }
 
 /*****  Oracle transaction  ***************************************/
-Oracletransaction::Oracletransaction( Oracledatabase& database, const std::string& name_)
-	: m_db( database ), m_unit( database.dbUnit() ), m_name(name_), m_conn( 0)
-{}
+OracleTransaction::OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_)
+	: StatemachineBasedTransaction( name_, new TransactionExecStatemachine_oracle( env_, name_, &database.dbUnit( ) ) ) { }
 
-Oracletransaction::~Oracletransaction()
+#if OLD
+m_db( database ), m_unit( database.dbUnit() ), m_name(name_), m_conn( 0)
+
+OracleTransaction::~OracleTransaction()
 {
 	if (m_conn) delete m_conn;
 }
 
-const std::string& Oracletransaction::databaseID() const
+const std::string& OracleTransaction::databaseID() const
 {
 	return m_unit.ID();
 }
 
-std::string Oracletransaction::getErrorMsg( sword status )
+std::string OracleTransaction::getErrorMsg( sword status )
 {
 	sb4 errcode = 0;
 	std::ostringstream os;
@@ -434,7 +449,7 @@ std::string Oracletransaction::getErrorMsg( sword status )
 	return os.str( );
 }
 
-void Oracletransaction::begin()
+void OracleTransaction::begin()
 {
 	if (m_conn) delete m_conn;
 	m_conn = new PoolObject<OracleConnection *>( m_unit.m_connPool);
@@ -453,7 +468,7 @@ void Oracletransaction::begin()
 	}
 }
 
-void Oracletransaction::commit()
+void OracleTransaction::commit()
 {
 	MOD_LOG_TRACE << "Oracle Commit";
 
@@ -473,7 +488,7 @@ void Oracletransaction::commit()
 	m_conn = 0;
 }
 
-void Oracletransaction::rollback()
+void OracleTransaction::rollback()
 {
 	MOD_LOG_TRACE << "Oracle Rollback";
 	
@@ -493,7 +508,7 @@ void Oracletransaction::rollback()
 	m_conn = 0;
 }
 
-void Oracletransaction::execute()
+void OracleTransaction::execute()
 {
 	try
 	{
@@ -507,7 +522,7 @@ void Oracletransaction::execute()
 	}
 }
 
-void Oracletransaction::close()
+void OracleTransaction::close()
 {
 	if (m_conn) {
 		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
@@ -516,6 +531,7 @@ void Oracletransaction::close()
 	m_conn = 0;
 	m_db.closeTransaction( this );
 }
+#endif
 
 }} // _Wolframe::db
 

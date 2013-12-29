@@ -40,11 +40,11 @@
 namespace _Wolframe {
 namespace db {
 
-OracledbUnit* OracleConstructor::object( const config::NamedConfiguration& conf )
+OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf )
 {
 	const OracleConfig& cfg = dynamic_cast< const OracleConfig& >( conf );
 
-	OracledbUnit* m_db = new OracledbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
+	OracleDbUnit* m_db = new OracleDbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
 						       cfg.user(), cfg.password(),
 						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
 						       cfg.sslRootCert, cfg.sslCRL,

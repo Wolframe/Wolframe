@@ -85,7 +85,7 @@ public:
 	OracleTestConstructor()		{}
 	virtual ~OracleTestConstructor()	{}
 
-	virtual OracledbUnit* object( const config::NamedConfiguration& conf )
+	virtual OracleDbUnit* object( const config::NamedConfiguration& conf )
 	{
 		const OracleTestConfig& cfg = dynamic_cast< const OracleTestConfig& >( conf );
 		createTestDatabase( cfg );

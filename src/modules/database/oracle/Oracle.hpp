@@ -41,6 +41,7 @@
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
+#include "database/transactionExecStatemachine.hpp"
 #include "OracleProgram.hpp"
 #include "config/configurationBase.hpp"
 #include "module/constructor.hpp"
@@ -55,9 +56,6 @@ namespace _Wolframe {
 namespace db {
 
 static const char* ORACLE_DB_CLASS_NAME = "Oracle";
-
-static const unsigned int ORACLE_MIN_DB_VERSION = 80400;
-static const unsigned short ORACLE_MIN_PROTOCOL_VERSION = 3;
 
 /// Oracle server connection configuration
 class OracleConfig : public config::NamedConfiguration
@@ -102,54 +100,7 @@ private:
 };
 
 
-class OracledbUnit;
-class Oracledatabase;
-
-class OracleEnvirenment
-{
-	public:
-		OCIEnv *envhp; // OCI environemnt handle
-};
-
-class OracleConnection
-{
-	public:
-		OCIError *errhp; // error handle
-		OCIServer *srvhp; // server handle
-		OCISvcCtx *svchp; // service handle
-		OCISession *authp; // user authentication handle
-		OCITrans *transhp; // transaction handle
-};
-
-class Oracletransaction : public Transaction
-{
-public:
-	Oracletransaction( Oracledatabase& database, const std::string& name_);
-	 ~Oracletransaction();
-
-	virtual const std::string& databaseID() const;
-
-	virtual void putInput( const TransactionInput& input_ )		{ m_input = input_; }
-	virtual const TransactionOutput& getResult() const		{ return m_output; }
-
-	virtual void execute();
-	virtual void begin();
-	virtual void commit();
-	virtual void rollback();
-	virtual void close();
-
-private:
-	std::string getErrorMsg( sword status );
-
-private:
-	Oracledatabase&	m_db;		//< parent database
-	OracledbUnit&	m_unit;		//< parent database unit
-	std::string		m_name;		//< name of transaction
-	TransactionInput	m_input;	//< input data structure
-	TransactionOutput	m_output;	//< output data structure
-	PoolObject<OracleConnection*>* m_conn;		//< reference to connection object from pool
-};
-
+class OracleDbUnit;
 
 struct OracleLanguageDescription : public LanguageDescription
 {
@@ -161,16 +112,21 @@ struct OracleLanguageDescription : public LanguageDescription
 	}
 };
 
+class OracleEnvirenment
+{
+	public:
+		OCIEnv *envhp; // OCI environemnt handle
+};
 
-class Oracledatabase : public Database
+class OracleDatabase : public Database
 {
 public:
-	Oracledatabase() : m_unit( NULL )	{}
-	~Oracledatabase()			{}
+	OracleDatabase() : m_unit( NULL )	{}
+	~OracleDatabase()			{}
 
-	void setUnit( OracledbUnit* unit )	{ m_unit = unit; }
+	void setUnit( OracleDbUnit* unit )	{ m_unit = unit; }
 	bool hasUnit() const			{ return m_unit != NULL; }
-	OracledbUnit& dbUnit() const	{ return *m_unit; }
+	OracleDbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
 	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
@@ -189,18 +145,27 @@ public:
 	}
 
 private:
-	OracledbUnit*	m_unit;		///< parent database unit
+	OracleDbUnit*	m_unit;		///< parent database unit
 
 public:
-	OracleEnvirenment m_env;
+	OracleEnvirenment m_env;	///< Oracle environment
 };
 
-
-class OracledbUnit : public DatabaseUnit
+class OracleConnection
 {
-	friend class Oracletransaction;
+	public:
+		OCIError *errhp; // error handle
+		OCIServer *srvhp; // server handle
+		OCISvcCtx *svchp; // service handle
+		OCISession *authp; // user authentication handle
+		OCITrans *transhp; // transaction handle
+};
+
+class OracleDbUnit : public DatabaseUnit
+{
+	friend class OracleTransaction;
 public:
-	OracledbUnit( const std::string& id,
+	OracleDbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
 			  const std::string& user, const std::string& password,
 			  std::string sslMode, std::string sslCert, std::string sslKey,
@@ -209,7 +174,7 @@ public:
 			  size_t connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout,
 			  const std::list<std::string>& programFiles_);
-	~OracledbUnit();
+	~OracleDbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
@@ -223,13 +188,15 @@ public:
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
 
+	PoolObject<OracleConnection *> *newConnection( ) { return new PoolObject<OracleConnection *>( m_connPool ); }
+
 private:
 	const std::string	m_ID;			///< database ID
 	std::string		m_connStr;		///< connection string
 	size_t			m_noConnections;	///< number of connections
 	ObjectPool< OracleConnection* >	m_connPool;		///< pool of connections
 	unsigned		m_statementTimeout;	///< default statement execution timeout
-	Oracledatabase	m_db;			///< real database object
+	OracleDatabase	m_db;			///< real database object
 	OracleProgram	m_program;
 	std::list<std::string>	m_programFiles;
 };
@@ -242,8 +209,44 @@ public:
 	ObjectConstructorBase::ObjectType objectType() const
 						{ return DATABASE_OBJECT; }
 	const char* objectClassName() const	{ return ORACLE_DB_CLASS_NAME; }
-	OracledbUnit* object( const config::NamedConfiguration& conf );
+	OracleDbUnit* object( const config::NamedConfiguration& conf );
 };
+
+
+class OracleTransaction : public StatemachineBasedTransaction
+{
+public:
+	OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_);
+	virtual ~OracleTransaction() {}
+
+#ifdef OLD
+	virtual const std::string& databaseID() const;
+
+	virtual void putInput( const TransactionInput& input_ )		{ m_input = input_; }
+	virtual const TransactionOutput& getResult() const		{ return m_output; }
+
+	virtual void execute();
+	virtual void begin();
+	virtual void commit();
+	virtual void rollback();
+	virtual void close();
+
+private:
+	std::string getErrorMsg( sword status );
+
+private:
+	OracleDatabase&	m_db;		//< parent database
+	OracleDbUnit&	m_unit;		//< parent database unit
+	std::string		m_name;		//< name of transaction
+	TransactionInput	m_input;	//< input data structure
+	TransactionOutput	m_output;	//< output data structure
+	PoolObject<OracleConnection*>* m_conn;		//< reference to connection object from pool
+#endif
+};
+
+
+
+
 
 }} // _Wolframe::db
 

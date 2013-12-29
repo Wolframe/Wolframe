@@ -65,10 +65,13 @@ struct OracleColumnDescription {
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleConnection* conn_, const std::string& dbname_, bool inTransactionContext=false);
+	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
+
+	//\brief Get the database identifier
+	virtual const std::string& databaseID() const;
 
 	///\brief Begin transaction
 	virtual bool begin();
@@ -123,7 +126,6 @@ private:
 private:
 	State m_state;
 	OracleEnvirenment *m_env;
-	OracleConnection* m_conn;
 	std::string m_dbname;
 	OCIStmt *m_lastresult; // handle for a statement
 	std::vector<OracleColumnDescription> m_colDescr; // array of column descriptors
@@ -132,6 +134,8 @@ private:
 	Statement m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
+	OracleDbUnit* m_dbUnit;
+	PoolObject<OracleConnection*> *m_conn;	//< DB connection
 };
 
 }}//namespace
