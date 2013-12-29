@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //\file database/transaction.hpp
-//\brief Interface database transaction
+//\brief Interface of a database transaction
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
@@ -45,18 +45,28 @@
 namespace _Wolframe {
 namespace db {
 
+//\brief Transaction interface
 struct Transaction
 {
+	//\brief Destructor
 	virtual ~Transaction(){}
+	//\brief Configured ID of the underlaying database
 	virtual const std::string& databaseID() const=0;
 
+	//\brief Begin of a new transaction
 	virtual void begin()=0;
+	//\brief Commit of the running transaction
 	virtual void commit()=0;
+	//\brief Rollback of the running transaction
 	virtual void rollback()=0;
+	//\brief Close of the committed or rolled back transaction
 	virtual void close()=0;
 
+	//\brief Execute a transaction
 	virtual void execute( const TransactionInput& input, TransactionOutput& output)=0;
 
+	//\class Result
+	//\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
 	class Result
 	{
 	public:
@@ -79,6 +89,7 @@ struct Transaction
 		std::vector<Row> m_rows;
 	};
 
+	//\brief Execute a single statement
 	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
 };
 
