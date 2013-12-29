@@ -1,52 +1,3 @@
-**
-**requires:LUA
-**requires:LIBXML2
-**requires:ORACLE
-**input
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<transactions>
-<treeAddRoot><name>Albert</name></treeAddRoot>
-<treeAddNode><parentid>1</parentid><name>Bert</name></treeAddNode>
-<treeAddNode><parentid>1</parentid><name>Chuck</name></treeAddNode>
-<treeAddNode><parentid>3</parentid><name>Donna</name></treeAddNode>
-<treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
-<treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
-</transactions>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram=transaction_demo_tree.lua --program simpleform.wnmp --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/oracle/mod_db_oracletest --database 'identifier=testdb,host=andreasbaumann.dyndns.org,port=1521,database=orcl,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
-
-**file:simpleform.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
-**file: DBDATA
---
--- Generic tree implementation for SQL databases
--- (Modified Preorder Tree Traversal)
---
--- Note: the parent restriction assumes that references accept NULL
--- Note: if DEFERRED does not work on UNIQUE constraints then the
---       UNIQUE constraint must be dropped
--- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
-
-CREATE TABLE tree (
- ID INTEGER NOT NULL PRIMARY KEY,
- parent INTEGER REFERENCES tree( ID ),
- name VARCHAR(32),
- lft INT NOT NULL CHECK ( lft > 0 ),
- rgt INT NOT NULL CHECK ( rgt > 1 ),
- CONSTRAINT order_check CHECK ( rgt > lft )
-);
-CREATE SEQUENCE tree_ID_seq START WITH 1 INCREMENT BY 1;
-CREATE TRIGGER tree_Insert
-BEFORE INSERT ON tree
-FOR EACH ROW
-BEGIN
-	SELECT tree_ID_seq.nextval into :new.id FROM dual;
-END;
-/
-**file:DBPRG.tdl
 --
 -- treeAddRoot
 --
@@ -97,11 +48,11 @@ END
 --
 TRANSACTION treeSelectNodeAndParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectNodeAndParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -110,11 +61,11 @@ END
 --
 TRANSACTION treeSelectParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -123,11 +74,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree P1, tree P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 --
@@ -136,11 +87,11 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree P1, tree P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 
@@ -177,7 +128,7 @@ BEGIN
 			P1.lgt-$4+$1 AS lgt,
 			P1.rgt-$5+$2 AS rgt,
 			P1.name AS name
-		FROM tree AS P1, tree AS P2
+		FROM tree P1, tree P2
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 
 	-- delete the original node
@@ -220,33 +171,7 @@ BEGIN
 			P1.lgt-$4+$1 AS lgt,
 			P1.rgt-$5+$2 AS rgt,
 			P1.name AS name
-		FROM tree AS P1, tree AS P2
+		FROM tree P1, tree P2
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 END
-**outputfile:DBDUMP
-**file: transaction_demo_tree.lua
-function run()
-	filter().empty = false
-	output:opentag( "result")			-- top level result tag
-	local itr = input:get()
-	for v,t in itr do
-		if t and t ~= "transactions" then	-- top level tag names are the transaction names
-			f = formfunction( t )		-- call the transaction
-			output:print( f( itr))		-- print the result
-		end
-	end
-	output:closetag()				-- close result
-end
 
-**output
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
-TREE:
-ID, PARENT, NAME, LFT, RGT
-'1', NULL, 'Albert', '1', '12'
-'2', '1', 'Bert', '2', '3'
-'3', '1', 'Chuck', '4', '11'
-'4', '3', 'Donna', '5', '6'
-'5', '3', 'Eddie', '7', '8'
-'6', '3', 'Fred', '9', '10'
-**end

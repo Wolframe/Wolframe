@@ -367,7 +367,7 @@ end
 function addSuffixToName( inp)
 	rec = inp:table()
 	for i,v in ipairs( rec["person"]) do
-		v[ "prename"] = v[ "prename"] .. v[ "id"]
+		v[ "PRENAME"] = v[ "PRENAME"] .. v[ "ID"]
 	end
 	return rec
 end
@@ -589,8 +589,8 @@ end
 			}]
 	}
 }
-address:
-id, street, town
+ADDRESS:
+ID, STREET, TOWN
 '1', 'Amselstrasse 12', 'Aulach'
 '2', 'Butterweg 23', 'Bendorf'
 '3', 'Camelstreet 34', 'Carassa'
@@ -599,8 +599,8 @@ id, street, town
 '6', 'Fabelweg 67', 'Formkon'
 '7', 'Geranienstrasse 78', 'Ganaus'
 '8', 'Hurtika 89', 'Hof'
-company:
-id, name
+COMPANY:
+ID, NAME
 '1', 'Arindo Inc.'
 '2', 'Baluba Inc.'
 '3', 'Carimba Inc.'
@@ -609,8 +609,8 @@ id, name
 '6', 'Figaji Inc.'
 '7', 'Gaurami Inc.'
 '8', 'Huratz Inc.'
-companyaddressrel:
-id, addressid
+COMPANYADDRESSREL:
+ID, ADDRESSID
 '1', '2'
 '1', '3'
 '1', '4'
@@ -626,8 +626,8 @@ id, addressid
 '4', '5'
 '5', '6'
 '7', '8'
-companychildrel:
-id, childid
+COMPANYCHILDREL:
+ID, CHILDID
 '1', '2'
 '1', '3'
 '1', '4'
@@ -643,8 +643,8 @@ id, childid
 '4', '5'
 '5', '6'
 '7', '8'
-numbertable:
-name, number
+NUMBERTABLE:
+name, NUMBER
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'
@@ -661,8 +661,8 @@ name, number
 'struct tag', '1101'
 'struct tag', '1101'
 'struct tag', '1101'
-person:
-id, prename, surname
+PERSON:
+ID, PRENAME, SURNAME
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'
 '3', 'Carla', 'Carlson'
@@ -671,8 +671,8 @@ id, prename, surname
 '6', 'Fran', 'Fuioko'
 '7', 'Gerd', 'Golto'
 '8', 'Hubert', 'Hauer'
-personaddressrel:
-id, addressid
+PERSONADDRESSREL:
+ID, ADDRESSID
 '1', '2'
 '1', '3'
 '1', '4'
@@ -688,8 +688,8 @@ id, addressid
 '4', '5'
 '5', '6'
 '7', '8'
-personchildrel:
-id, childid
+PERSONCHILDREL:
+ID, CHILDID
 '1', '2'
 '1', '3'
 '1', '4'
@@ -705,8 +705,8 @@ id, childid
 '4', '5'
 '5', '6'
 '7', '8'
-personcompanyrel:
-id, companyid
+PERSONCOMPANYREL:
+ID, COMPANYID
 '1', '2'
 '1', '3'
 '1', '4'
@@ -722,8 +722,8 @@ id, companyid
 '4', '5'
 '5', '6'
 '7', '8'
-wordtable:
-name, word
+WORDTABLE:
+NAME, WORD
 'company name', 'baluba inc'
 'company name', 'carimba inc'
 'company name', 'carimba inc'
