@@ -119,7 +119,7 @@ TEST_F( SQLiteModuleFixture, Transaction )
 
 	// ok select result that must contain the elements inserted in the previous transaction
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest;");
+	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id ASC;");
 	trans->commit( );
 	EXPECT_EQ( res.size(), 2);
 	EXPECT_EQ( res.colnames().size(), 2);
