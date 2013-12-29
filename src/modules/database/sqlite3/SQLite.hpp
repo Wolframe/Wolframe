@@ -39,6 +39,7 @@
 
 #include "database/database.hpp"
 #include "database/transaction.hpp"
+#include "database/transactionExecStatemachine.hpp"
 #include "processor/userInterface.hpp"
 #include "config/configurationBase.hpp"
 #include "types/keymap.hpp"
@@ -91,71 +92,6 @@ private:
 };
 
 
-class SQLiteDBunit;
-class SQLiteDatabase;
-
-class SQLiteTransaction : public Transaction
-{
-public:
-	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
-	 ~SQLiteTransaction();
-
-	virtual const std::string& databaseID() const;
-
-	virtual void putInput( const TransactionInput& input_)		{ m_input = input_; }
-	virtual const TransactionOutput& getResult() const		{ return m_output; }
-
-	virtual void execute();
-	virtual void begin();
-	virtual void commit();
-	virtual void rollback();
-	virtual void close();
-
-private:
-	void execute_statement( const char* stmstr);
-
-	///\brief Execute as transaction (all operations belong to one transaction implicitely defined)
-	void execute_as_transaction();
-	///\brief Execute with transaction context defined in outer context
-	void execute_as_operation();
-
-private:
-	SQLiteDatabase&		m_db;		//< parent database
-	SQLiteDBunit&		m_unit;		//< parent database unit
-	std::string		m_name;		//< name of transaction
-	TransactionInput	m_input;	//< input data structure
-	TransactionOutput	m_output;	//< output data structure
-	PoolObject<sqlite3*>*	m_conn;		//< connection object from pool
-};
-
-
-class SQLiteUIlibrary : public UI::UserInterfaceLibrary
-{
-public:
-	SQLiteUIlibrary( const SQLiteDatabase& database );
-	~SQLiteUIlibrary()			{}
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::list< std::string >& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::string& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void addObject( const UI::InterfaceObject& newObject ) const;
-
-	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void close()			{ delete this; }
-private:
-	SQLiteDBunit&		m_unit;		///< parent database unit
-};
-
 
 struct SQLiteLanguageDescription :public LanguageDescription
 {
@@ -168,6 +104,7 @@ struct SQLiteLanguageDescription :public LanguageDescription
 	}
 };
 
+class SQLiteDBunit;
 
 class SQLiteDatabase : public Database
 {
@@ -225,6 +162,8 @@ public:
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
 
+	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
+
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
@@ -237,7 +176,37 @@ private:
 	std::list<std::string>	m_extensionFiles;
 };
 
-//***  SQLite database constructor  *******************************************
+
+class SQLiteUIlibrary : public UI::UserInterfaceLibrary
+{
+public:
+	SQLiteUIlibrary( const SQLiteDatabase& database );
+	~SQLiteUIlibrary()			{}
+
+	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
+									const std::list< std::string >& roles,
+									const std::string& culture,
+									const std::string& tag = "" ) const;
+
+	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
+									const std::string& roles,
+									const std::string& culture,
+									const std::string& tag = "" ) const;
+
+	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
+
+	virtual void addObject( const UI::InterfaceObject& newObject ) const;
+
+	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
+
+	virtual void close()			{ delete this; }
+private:
+	SQLiteDBunit&		m_unit;		///< parent database unit
+};
+
+
+//\class SQLiteConstructor
+//\brief SQLite database constructor
 class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
@@ -246,6 +215,18 @@ public:
 	const char* objectClassName() const	{ return SQLite_DB_CLASS_NAME; }
 	SQLiteDBunit* object( const config::NamedConfiguration& conf );
 };
+
+
+//\class SQLiteTransaction
+class SQLiteTransaction
+	:public StatemachineBasedTransaction
+{
+public:
+	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
+	virtual ~SQLiteTransaction(){}
+};
+
+
 
 }} // _Wolframe::db
 

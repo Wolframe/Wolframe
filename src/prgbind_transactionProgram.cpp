@@ -86,21 +86,23 @@ public:
 				{
 					types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
 					if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
-	
-					trsr->putInput( transactionInput);
+					db::TransactionOutput* outputptr = new db::TransactionOutput();
 					try
 					{
-						trsr->execute();
+						trsr->begin();
+						trsr->execute( transactionInput, *outputptr);
+						trsr->commit();
+						res.reset( outputptr);
 					}
 					catch (const db::DatabaseTransactionErrorException& e)
 					{
+						delete outputptr;
 						LOG_ERROR << e.what();
 						const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
 						std::string explain;
 						if (hint) explain = explain + " -- " + hint;
 						throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
 					}
-					res.reset( new db::TransactionOutput( trsr->getResult()));
 				}
 				m_result = m_func->getOutput( m_provider, res);
 				if (!res->isCaseSensitive())

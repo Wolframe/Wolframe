@@ -30,13 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief PostgreSQL interface to the standard database transaction execution statemechine
-///\file PostgreSQLtransactionExecStatemachine.hpp
+//\brief PostgreSQL interface to the standard database transaction execution statemechine
+//\file PostgreSQLtransactionExecStatemachine.hpp
 #ifndef _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
 #include "database/bindStatementParams.hpp"
 #include "database/databaseError.hpp"
+#include "system/objectPool.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -46,43 +47,48 @@
 namespace _Wolframe {
 namespace db {
 
-///\class TransactionExecStatemachine_postgres
-///\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
-///\remark The postgres connection is opened, closed, created and disposed by the caller
+class PostgreSQLdbUnit;
+
+//\class TransactionExecStatemachine_postgres
+//\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
+//\remark The postgres connection is opened, closed, created and disposed by the caller
 struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
-	///\brief Constructor
-	TransactionExecStatemachine_postgres( PGconn* conn_, bool inTransactionContext=false);
+	//\brief Constructor
+	explicit TransactionExecStatemachine_postgres( const std::string& name_, PostgreSQLdbUnit* dbunit_);
 
-	///\brief Destructor
+	//\brief Destructor
 	virtual ~TransactionExecStatemachine_postgres();
 
-	///\brief Begin transaction
-	bool begin();
-	///\brief Commit current transaction
-	bool commit();
-	///\brief Rollback current transaction
-	bool rollback();
+	//\brief Get the database identifier
+	virtual const std::string& databaseID() const;
 
-	///\brief Start new command statement
+	//\brief Begin transaction
+	virtual bool begin();
+	//\brief Commit current transaction
+	virtual bool commit();
+	//\brief Rollback current transaction
+	virtual bool rollback();
+
+	//\brief Start new command statement
 	virtual bool start( const std::string& statement);
-	///\brief Bind parameter value on current command statement
+	//\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value);
-	///\brief Execute instance of current statement
+	//\brief Execute instance of current statement
 	virtual bool execute();
-	///\brief Return true is the last command has at least one result row returned
+	//\brief Return true is the last command has at least one result row returned
 	virtual bool hasResult();
-	///\brief Get the number of columns of the last result
+	//\brief Get the number of columns of the last result
 	virtual std::size_t nofColumns();
-	///\brief Get a column title of the last result
+	//\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
-	///\brief Get the last database error as string
+	//\brief Get the last database error as string
 	virtual const db::DatabaseError* getLastError();
-	///\brief Get a column of the last result
+	//\brief Get a column of the last result
 	virtual types::VariantConst get( std::size_t idx);
-	///\brief Skip to the next row of the last result
+	//\brief Skip to the next row of the last result
 	virtual bool next();
-	///\brief Find out if the database is case sensitive or not
+	//\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()	{return false;}
 
 private:
@@ -109,13 +115,14 @@ private:
 
 private:
 	State m_state;
-	PGconn* m_conn;
 	PGresult* m_lastresult;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;
 	bool m_hasResult;
+	PostgreSQLdbUnit* m_dbunit;
+	PoolObject<PGconn*>* m_conn;		//< DB connection
 };
 
 }}//namespace

@@ -116,7 +116,7 @@ template < typename objectType >
 class PoolObject
 {
 public:
-	PoolObject( ObjectPool< objectType >& pool )
+	explicit PoolObject( ObjectPool< objectType >& pool )
 		: m_pool( pool ), m_object( pool.get())	{}
 	~PoolObject()				{ m_pool.add( m_object ); }
 

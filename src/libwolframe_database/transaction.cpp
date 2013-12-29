@@ -30,32 +30,42 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-//
-//
-
-#ifndef _TESTTRACE_TRANSACTION_HPP_INCLUDED
-#define _TESTTRACE_TRANSACTION_HPP_INCLUDED
+//\file database/transaction.hpp
+//\brief Implementation database transaction
 #include "database/transaction.hpp"
-#include "database/transactionExecStatemachine.hpp"
-#include "testtraceDatabase.hpp"
-#include <string>
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::db;
 
-class TesttraceTransaction
-	:public StatemachineBasedTransaction
+Transaction::Result Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
 {
-public:
-	TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_);
-	virtual ~TesttraceTransaction(){}
+	Result rt;
+	TransactionInput input;
+	input.startCommand( 1, 0, stm, -1);
+	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
+	for (; pi != pe; ++pi)
+	{
+		input.bindCommandArgAsValue( *pi);
+	}
+	TransactionOutput output;
+	execute( input, output);
+	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
+	if (ri == re) return rt;
+	if (ri +1 != re) throw std::logic_error("internal: more than one result (set of rows) for one command");
+	std::vector<std::string> colnames;
+	std::vector<Transaction::Result::Row> rows;
 
-private:
-	const TesttraceDatabase* m_dbref;
-	std::vector<std::string> m_result;
-};
+	std::size_t ci=0, ce = ri->nofColumns();
+	for (; ci != ce; ++ci)
+	{
+		colnames.push_back( ri->columnName( ci));
+	}
+	std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
+	for (; wi != we; ++wi)
+	{
+		rows.push_back( *wi);
+	}
+	return Result( colnames, rows);
+}
 
-}} // namespace _Wolframe::db
 
-#endif // _TRANSACTION_HPP_INCLUDED

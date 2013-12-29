@@ -266,7 +266,7 @@ static bool executeCommand( TransactionExecStatemachine* stmh, const Transaction
 	return true;
 }
 
-static bool pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr)
+static void pushArguments( const TransactionOutput& output, TransactionOutput::CommandResult& cmdres, std::size_t residx, std::size_t rowidx, const TransactionInput::cmd_const_iterator& cmditr)
 {
 	TransactionInput::Command::arg_const_iterator ai = cmditr->begin(), ae = cmditr->end();
 	int argidx;
@@ -331,7 +331,6 @@ static bool pushArguments( const TransactionOutput& output, TransactionOutput::C
 			cmdres.addNull();
 		}
 	}
-	return true;
 }
 
 static TransactionInput::cmd_const_iterator endOfOperation( TransactionInput::cmd_const_iterator ci, TransactionInput::cmd_const_iterator ce)
@@ -356,163 +355,232 @@ struct OperationLoop
 }//namespace
 
 
-bool TransactionExecStatemachine::doTransaction( const TransactionInput& input, TransactionOutput& output)
+void TransactionExecStatemachine::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
 	LOG_DATA << "[execute transaction] " << input.tostring();
-	enum OperationType
+	try
 	{
-		DatabaseCall,
-		PushArguments
-	};
-	OperationType optype = DatabaseCall;
-	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
-	TransactionOutput::CommandResult cmdres( null_functionidx);
-	std::vector<OperationLoop> loopstk;
-
-	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
-	while (ci != ce)
-	{
-		if (ci->statement().empty())
+		enum OperationType
 		{
-			optype = PushArguments;
-		}
-		else
+			DatabaseCall,
+			PushArguments
+		};
+		OperationType optype = DatabaseCall;
+		std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
+		TransactionOutput::CommandResult cmdres( null_functionidx);
+		std::vector<OperationLoop> loopstk;
+	
+		TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
+		while (ci != ce)
 		{
-			optype = DatabaseCall;
-		}
-		bool nonempty = ci->nonemptyResult();
-		bool unique = ci->uniqueResult();
-
-		if (cmdres.functionidx() != ci->functionidx())
-		{
-			// When we get to the next group of functions with the same id
-			// we add the result if there exist one of the previous
-			// function group as last result (to be referenced by $1,$2,etc.).
-			if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
+			if (ci->statement().empty())
 			{
-				output.addCommandResult( cmdres);
+				optype = PushArguments;
 			}
-			cmdres = TransactionOutput::CommandResult( ci->functionidx());
-		}
-		if (ci->foreach_functionidx() > 0)
-		{
-			// ... command is bound to a result set, so we call it for every result row
-			TransactionOutput::result_const_iterator ri;
-			switch (optype)
+			else
 			{
-				case PushArguments:
-					// start of an operation: execution of a instruction block
-					ri = output.resultIterator( ci->foreach_functionidx()-1);
-					if (ri != output.end())
-					{
-						std::size_t residx = ri - output.begin(); //< start of result referenced by pushArguments
-						if (ri->nofRows())
+				optype = DatabaseCall;
+			}
+			bool nonempty = ci->nonemptyResult();
+			bool unique = ci->uniqueResult();
+	
+			if (cmdres.functionidx() != ci->functionidx())
+			{
+				// When we get to the next group of functions with the same id
+				// we add the result if there exist one of the previous
+				// function group as last result (to be referenced by $1,$2,etc.).
+				if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
+				{
+					output.addCommandResult( cmdres);
+				}
+				cmdres = TransactionOutput::CommandResult( ci->functionidx());
+			}
+			if (ci->foreach_functionidx() > 0)
+			{
+				// ... command is bound to a result set, so we call it for every result row
+				TransactionOutput::result_const_iterator ri;
+				switch (optype)
+				{
+					case PushArguments:
+						// start of an operation: execution of a instruction block
+						ri = output.resultIterator( ci->foreach_functionidx()-1);
+						if (ri != output.end())
 						{
-							LOG_DATA << "start of loop on result for calling an OPERATION";
-							// ... result non empty, then push arguments of first row
-							if (!pushArguments( output, cmdres, residx, 0/*rowidx*/, ci)) return false;
-							// ... put on the loop stack the following row
-							loopstk.push_back(
-								OperationLoop( ci,//...push parameters instruction of operation
-										endOfOperation( ci, ce),//...next instruction after operation
-										residx, 1//...next row index after first
-									));
-							break;
-						}
-						// ... result non empty = no result
-					}
-					//... no result, so we have to skip all operation steps, not only the parameter passing
-					ci = endOfOperation( ci, ce);
-					--ci; //... decrement for loop increment compensate
-					break;
-
-				case DatabaseCall:
-					ri = output.resultIterator( ci->foreach_functionidx()-1);
-					if (ri != output.end())
-					{
-						std::size_t residx = ri - output.begin();
-						std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
-						for (std::size_t rowidx=0; wi != we; ++wi,++rowidx)
-						{
-							if (!start( ci->statement())
-							||  !executeCommand( this, output, cmdres, residx, rowidx, ci, nonempty, unique))
+							std::size_t residx = ri - output.begin(); //< start of result referenced by pushArguments
+							if (ri->nofRows())
 							{
-								const DatabaseError* lasterr = getLastError();
-								if (lasterr)
+								LOG_DATA << "start of loop on result for calling an OPERATION";
+								// ... result non empty, then push arguments of first row
+								pushArguments( output, cmdres, residx, 0/*rowidx*/, ci);
+								// ... put on the loop stack the following row
+								loopstk.push_back(
+									OperationLoop( ci,//...push parameters instruction of operation
+											endOfOperation( ci, ce),//...next instruction after operation
+											residx, 1//...next row index after first
+										));
+								break;
+							}
+							// ... result non empty = no result
+						}
+						//... no result, so we have to skip all operation steps, not only the parameter passing
+						ci = endOfOperation( ci, ce);
+						--ci; //... decrement for loop increment compensate
+						break;
+	
+					case DatabaseCall:
+						ri = output.resultIterator( ci->foreach_functionidx()-1);
+						if (ri != output.end())
+						{
+							std::size_t residx = ri - output.begin();
+							std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
+							for (std::size_t rowidx=0; wi != we; ++wi,++rowidx)
+							{
+								if (!start( ci->statement())
+								||  !executeCommand( this, output, cmdres, residx, rowidx, ci, nonempty, unique))
 								{
-									DatabaseError err( *lasterr);
-									err.functionidx = ci->functionidx();
-									throw DatabaseErrorException( err);
+									const DatabaseError* lasterr = getLastError();
+									if (lasterr)
+									{
+										DatabaseError err( *lasterr);
+										err.functionidx = ci->functionidx();
+										throw DatabaseErrorException( err);
+									}
+									throw std::runtime_error("unknown database error");
 								}
-								return false;
 							}
 						}
-					}
+				}
 			}
-		}
-		else
-		{
-			// ... command is not bound to a result set, then we call it once
-			std::size_t residx = output.size();
-			switch (optype)
+			else
 			{
-				case PushArguments:
-					if (!pushArguments( output, cmdres, residx, 0/*rowidx*/, ci)) return false;
-					break;
-				case DatabaseCall:
-					if (!start( ci->statement())
-					||  !executeCommand( this, output, cmdres, residx, 0/*rowidx*/, ci, nonempty, unique))
-					{
-						const DatabaseError* lasterr = getLastError();
-						if (lasterr)
+				// ... command is not bound to a result set, then we call it once
+				std::size_t residx = output.size();
+				switch (optype)
+				{
+					case PushArguments:
+						pushArguments( output, cmdres, residx, 0/*rowidx*/, ci);
+						break;
+					case DatabaseCall:
+						if (!start( ci->statement())
+						||  !executeCommand( this, output, cmdres, residx, 0/*rowidx*/, ci, nonempty, unique))
 						{
-							DatabaseError err( *lasterr);
-							err.functionidx = ci->functionidx();
-							throw DatabaseErrorException( err);
+							const DatabaseError* lasterr = getLastError();
+							if (lasterr)
+							{
+								DatabaseError err( *lasterr);
+								err.functionidx = ci->functionidx();
+								throw DatabaseErrorException( err);
+							}
+							throw std::runtime_error("unknown database error");
 						}
-						return false;
-					}
-					break;
+						break;
+				}
 			}
-		}
-
-		// Fetch next instrucution:
-		++ci;
-		if (!loopstk.empty())
-		{
-			if (ci == loopstk.back().ce)
+	
+			// Fetch next instrucution:
+			++ci;
+			if (!loopstk.empty())
 			{
-				// ... we reached the end of a loop on result executing an operation sub block
-				std::size_t residx = loopstk.back().residx;
-				std::size_t rowidx = loopstk.back().rowidx++; // ... skip to the next row of the result to process by the operation
-				if (rowidx < output.at(residx).nofRows())
+				if (ci == loopstk.back().ce)
 				{
-					// ... there are still results left to process
-					LOG_DATA << "skip to element " << (rowidx+1) << " of loop on result for calling an OPERATION";
-					ci = loopstk.back().ci; //... jump back to parameter pass instruction of the operation
-					if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
+					// ... we reached the end of a loop on result executing an operation sub block
+					std::size_t residx = loopstk.back().residx;
+					std::size_t rowidx = loopstk.back().rowidx++; // ... skip to the next row of the result to process by the operation
+					if (rowidx < output.at(residx).nofRows())
 					{
-						output.addCommandResult( cmdres);//... add command result
+						// ... there are still results left to process
+						LOG_DATA << "skip to element " << (rowidx+1) << " of loop on result for calling an OPERATION";
+						ci = loopstk.back().ci; //... jump back to parameter pass instruction of the operation
+						if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
+						{
+							output.addCommandResult( cmdres);//... add command result
+						}
+						cmdres = TransactionOutput::CommandResult( ci->functionidx());
+						pushArguments( output, cmdres, residx, rowidx, ci);
+						++ci;//... skip to first instruction of the operation
 					}
-					cmdres = TransactionOutput::CommandResult( ci->functionidx());
-					if (!pushArguments( output, cmdres, residx, rowidx, ci)) return false;
-					++ci;//... skip to first instruction of the operation
-				}
-				else
-				{
-					LOG_DATA << "end of loop on result for calling an OPERATION";
-					loopstk.pop_back();
+					else
+					{
+						LOG_DATA << "end of loop on result for calling an OPERATION";
+						loopstk.pop_back();
+					}
 				}
 			}
+	
 		}
-
+		if (cmdres.functionidx() != null_functionidx)
+		{
+			output.addCommandResult( cmdres);
+		}
+		output.setCaseSensitive( isCaseSensitive());
 	}
-	if (cmdres.functionidx() != null_functionidx)
+	catch (const db::DatabaseErrorException& e)
 	{
-		output.addCommandResult( cmdres);
+		rollback();
+		throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
 	}
-	output.setCaseSensitive( isCaseSensitive());
-	return true;
+	catch (const std::runtime_error& e)
+	{
+		rollback();
+		throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
+	}
 }
 
+
+void StatemachineBasedTransaction::begin()
+{
+	if (!m_stm) throw std::runtime_error( "'begin' called on undefined transaction statemachine");
+	if (m_state) throw std::runtime_error( "'begin' called on running transaction");
+	if (!m_stm->begin())
+	{
+		const db::DatabaseError* err = m_stm->getLastError();
+		if (!err) throw std::runtime_error( "unknown database error on begin");
+		throw db::DatabaseErrorException( *err);
+	}
+	m_state = 1;
+}
+
+void StatemachineBasedTransaction::commit()
+{
+	if (!m_stm) throw std::runtime_error( "'commit' called on undefined transaction statemachine");
+	if (!m_state) throw std::runtime_error( "'commit' called on transaction without 'begin' called first");
+	if (!m_stm->commit())
+	{
+		const db::DatabaseError* err = m_stm->getLastError();
+		if (!err) throw std::runtime_error( "unknown database error on commit");
+		throw db::DatabaseErrorException( *err);
+	}
+	m_state = 0;
+}
+
+void StatemachineBasedTransaction::rollback()
+{
+	if (!m_stm) throw std::runtime_error( "'rollback' called on undefined transaction statemachine");
+	if (!m_state) throw std::runtime_error( "'rollback' called on transaction without 'begin' called first");
+	m_state = 0;
+	if (!m_stm->rollback())
+	{
+		const db::DatabaseError* err = m_stm->getLastError();
+		if (!err) throw std::runtime_error( "unknown database error on rollback");
+		throw db::DatabaseErrorException( *err);
+	}
+}
+
+void StatemachineBasedTransaction::close()
+{
+	if (m_stm)
+	{
+		if (m_state) m_stm->rollback();
+		delete m_stm;
+		m_stm = 0;
+	}
+	m_state = 0;
+}
+
+void StatemachineBasedTransaction::execute( const TransactionInput& input,TransactionOutput& output)
+{
+	if (!m_stm) throw std::runtime_error( "'execute' called on undefined transaction statemachine");
+	if (!m_state) throw std::runtime_error( "'execute' called without 'begin' called first");
+	m_stm->doTransaction( input, output);
+}
 

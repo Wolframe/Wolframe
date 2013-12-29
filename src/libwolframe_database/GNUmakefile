@@ -29,6 +29,7 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
+	transaction.o \
 	transactionInput.o \
 	transactionOutput.o \
 	transactionFunction.o \

@@ -33,6 +33,7 @@
 ///\brief SQLite3 implementation of the standard database transaction execution statemechine
 ///\file SQLiteTransactionExecStatemachine.cpp
 #include "SQLiteTransactionExecStatemachine.hpp"
+#include "SQLite.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -91,13 +92,15 @@ static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
 }
 
 
-TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, bool inTransactionContext)
-	:m_state(inTransactionContext?Transaction:Init)
-	,m_conn(conn)
-	,m_dbname(dbname_)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_)
+	:TransactionExecStatemachine(name_)
+	,m_state(Init)
 	,m_hasResult(false)
 	,m_hasRow(false)
-	,m_stm(0){}
+	,m_stm(0)
+	,m_dbunit(dbunit_)
+	,m_conn(0)
+{}
 
 TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
@@ -120,13 +123,13 @@ void TransactionExecStatemachine_sqlite3::clear()
 
 void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 {
-	int errcode = sqlite3_errcode( m_conn);
+	int errcode = sqlite3_errcode( **m_conn);
 #if SQLITE_VERSION_NUMBER >= 3006005
-	int extcode = sqlite3_extended_errcode( m_conn);
+	int extcode = sqlite3_extended_errcode( **m_conn);
 #else
 	int extcode = 0;
 #endif
-	const char* errmsg = sqlite3_errmsg( m_conn);
+	const char* errmsg = sqlite3_errmsg( **m_conn);
 	const char* errtype = 0;
 	switch (errcode)
 	{
@@ -158,7 +161,7 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 		case SQLITE_NOTADB: errtype = "SYSTEM"; break;
 	}
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), m_curstm.c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, databaseID().c_str(), m_curstm.c_str(), errtype, errmsg, errmsg));
 }
 
 bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr, State newstate)
@@ -168,7 +171,7 @@ bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr
 	m_curstm.clear();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
-	int rc = wrap_sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( **m_conn, stmstr, -1, &inst, &stmtail);
 
 	if (rc != SQLITE_OK && rc != SQLITE_DONE) return status( rc, newstate);
 
@@ -190,6 +193,8 @@ bool TransactionExecStatemachine_sqlite3::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
+	if (m_conn) delete m_conn;
+	m_conn = m_dbunit->newConnection();
 	return executeInstruction( "BEGIN TRANSACTION;", Transaction);
 }
 
@@ -204,7 +209,13 @@ bool TransactionExecStatemachine_sqlite3::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	return executeInstruction( "COMMIT TRANSACTION;", Init);
+	bool rt = executeInstruction( "COMMIT TRANSACTION;", Init);
+	if (rt)
+	{
+		delete m_conn;
+		m_conn = 0;
+	}
+	return rt;
 }
 
 bool TransactionExecStatemachine_sqlite3::rollback()
@@ -212,6 +223,11 @@ bool TransactionExecStatemachine_sqlite3::rollback()
 	LOG_TRACE << "[sqlite3 statement] CALL rollback()";
 	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
 	clear();
+	if (rt)
+	{
+		delete m_conn;
+		m_conn = 0;
+	}
 	return rt;
 }
 
@@ -234,7 +250,7 @@ bool TransactionExecStatemachine_sqlite3::errorStatus( const std::string& messag
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_curstm.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, databaseID().c_str(), m_curstm.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
 		m_state = Error;
 	}
 	return false;
@@ -258,7 +274,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& statement)
 	}
 	const char *stmtail = 0;
 
-	int rc = wrap_sqlite3_prepare_v2( m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( **m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -351,7 +367,7 @@ bool TransactionExecStatemachine_sqlite3::execute()
 	}
 	if (!m_hasResult)
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( m_conn) << ")";
+		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( **m_conn) << ")";
 	}
 	else if (m_hasRow)
 	{
@@ -482,4 +498,8 @@ bool TransactionExecStatemachine_sqlite3::next()
 	return status( rc, Executed);
 }
 
+const std::string& TransactionExecStatemachine_sqlite3::databaseID() const
+{
+	return m_dbunit->ID();
+}
 

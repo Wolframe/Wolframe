@@ -35,6 +35,7 @@
 #ifndef _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
+#include "system/objectPool.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -44,23 +45,29 @@
 namespace _Wolframe {
 namespace db {
 
+class SQLiteDBunit;
+
 ///\class TransactionExecStatemachine_sqlite3
 ///\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
 ///\remark The sqlite3 connection is opened, closed, created and disposed by the caller
-struct TransactionExecStatemachine_sqlite3 :public TransactionExecStatemachine
+struct TransactionExecStatemachine_sqlite3
+	:public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_sqlite3( sqlite3* conn, const std::string& dbname_, bool inTransactionContext=false);
+	TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
 
+	//\brief Get the database identifier
+	virtual const std::string& databaseID() const;
+
 	///\brief Begin transaction
-	bool begin();
+	virtual bool begin();
 	///\brief Commit current transaction
-	bool commit();
+	virtual bool commit();
 	///\brief Rollback current transaction
-	bool rollback();
+	virtual bool rollback();
 
 	///\brief Start new command statement
 	virtual bool start( const std::string& statement);
@@ -108,13 +115,14 @@ private:
 
 private:
 	State m_state;
-	sqlite3* m_conn;
 	std::string m_dbname;
 	std::string m_curstm;
 	bool m_hasResult;
 	bool m_hasRow;
-	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	sqlite3_stmt* m_stm;
+	boost::shared_ptr<db::DatabaseError> m_lasterror;	//< last error occurred
+	sqlite3_stmt* m_stm;					//< current statement
+	SQLiteDBunit* m_dbunit;					//< database unit
+	PoolObject<sqlite3*>* m_conn;				//< database connection
 };
 
 }}//namespace

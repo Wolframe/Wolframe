@@ -71,11 +71,11 @@ struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 	virtual ~TransactionExecStatemachine_oracle();
 
 	///\brief Begin transaction
-	bool begin();
+	virtual bool begin();
 	///\brief Commit current transaction
-	bool commit();
+	virtual bool commit();
 	///\brief Rollback current transaction
-	bool rollback();
+	virtual bool rollback();
 
 	///\brief Start new command statement
 	virtual bool start( const std::string& statement);

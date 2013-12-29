@@ -139,11 +139,6 @@ public:
 	virtual void close();
 
 private:
-	///\brief Execute as transaction (all operations belong to one transaction implicitely defined)
-	void execute_as_transaction();
-	///\brief Execute with transaction context defined in outer context
-	void execute_as_operation();
-
 	std::string getErrorMsg( sword status );
 
 private:

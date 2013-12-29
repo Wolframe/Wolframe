@@ -136,113 +136,6 @@ FakeResult::FakeResult( const std::string& str)
 }
 
 
-class TransactionHandler :public TransactionExecStatemachine
-{
-public:
-	///\brief Constructor
-	TransactionHandler( std::ostream* out, const std::vector<std::string>& res)
-		:m_res(res)
-		,m_out(out)
-	{
-		m_resitr = m_res.begin();
-	}
-
-	TransactionHandler( const TransactionHandler& o)
-		:m_res(o.m_res)
-		,m_out(o.m_out)
-	{
-		m_resitr = m_res.begin();
-	}
-
-	virtual bool start( const std::string& stmname)
-	{
-		(*m_out) << "start( '" << stmname << "' );" << std::endl;
-		return true;
-	}
-
-	virtual bool bind( std::size_t idx, const types::VariantConst& value)
-	{
-		if (value.defined())
-		{
-			(*m_out) << "bind( " << idx << ", '" << value.tostring() << "' );" << std::endl;
-		}
-		else
-		{
-			(*m_out) << "bind( " << idx << ", NULL );" << std::endl;
-		}
-		return true;
-	}
-
-	virtual bool execute()
-	{
-		(*m_out) << "execute();" << std::endl;
-		if (m_resitr == m_res.end())
-		{
-			m_fakeres = FakeResult();
-		}
-		else
-		{
-			m_fakeres = FakeResult( *m_resitr++);
-		}
-		return true;
-	}
-
-	virtual bool hasResult()
-	{
-		return (m_fakeres.nofResults() != 0);
-	}
-
-	virtual bool next()
-	{
-		bool rt = m_fakeres.next();
-		(*m_out) << "next(); returns " << (int)rt << std::endl;
-		return rt;
-	}
-
-	virtual std::size_t nofColumns()
-	{
-		std::size_t rt = m_fakeres.nofColumns();
-		(*m_out) << "nofColumns(); returns " << rt << std::endl;
-		return rt;
-	}
-
-	virtual const char* columnName( std::size_t idx)
-	{
-		const char* rt = m_fakeres.columnName( idx);
-		(*m_out) << "columnName( " << idx << "); returns " << (rt?rt:"NULL") << std::endl;
-		return rt;
-	}
-
-	virtual types::VariantConst get( std::size_t idx)
-	{
-		const char* rt = m_fakeres.get( idx);
-		(*m_out) << "get( " << idx << " ); returns " << rt << std::endl;
-		if (rt)
-		{
-			return types::VariantConst(rt);
-		}
-		else
-		{
-			return types::VariantConst(rt);
-		}
-	}
-
-	virtual const db::DatabaseError* getLastError()
-	{
-		return 0;
-	}
-
-	///\brief Find out if the database is case sensitive or not
-	virtual bool isCaseSensitive()	{return false;}
-
-private:
-	std::vector<std::string> m_res;
-	std::vector<std::string>::const_iterator m_resitr;
-	std::ostream* m_out;
-	FakeResult m_fakeres;
-};
-
-
 static void printTransactionInput( std::ostream& out, const TransactionInput& input)
 {
 	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
@@ -276,40 +169,137 @@ static void printTransactionInput( std::ostream& out, const TransactionInput& in
 	out << std::endl;
 }
 
-void TesttraceTransaction::begin()
-{
-	throw std::runtime_error( "transactional context (begin) not implemented in testtrace database");
-}
 
-void TesttraceTransaction::commit()
+class TransactionHandler :public TransactionExecStatemachine
 {
-	throw std::runtime_error( "transactional context (commit) not implemented in testtrace database");
-}
+public:
+	typedef TransactionExecStatemachine Parent;
 
-void TesttraceTransaction::rollback()
-{
-	throw std::runtime_error( "transactional context (rollback) not implemented in testtrace database");
-}
-
-void TesttraceTransaction::execute()
-{
-	std::ofstream buf( m_dbref->outfilename().c_str());
-	printTransactionInput( buf, m_input);
-
-	TransactionHandler stm( &buf, m_result);
-	if (!stm.doTransaction( m_input, m_output))
+	///\brief Constructor
+	TransactionHandler( const std::string& outfilename, const std::vector<std::string>& res)
+		:TransactionExecStatemachine("TEST")
+		,m_res(res)
+		,m_out(outfilename.c_str())
 	{
-		const db::DatabaseError* err = stm.getLastError();
-		if (err)
+		m_resitr = m_res.begin();
+	}
+
+	std::ofstream& out()
+	{
+		return m_out;
+	}
+
+	virtual const std::string& databaseID() const
+	{
+		static const std::string rt = "TEST";
+		return rt;
+	}
+
+	virtual bool begin(){return true;}
+	virtual bool commit(){return true;}
+	virtual bool rollback(){return true;}
+
+	virtual bool start( const std::string& stmname)
+	{
+		m_out << "start( '" << stmname << "' );" << std::endl;
+		return true;
+	}
+
+	virtual bool bind( std::size_t idx, const types::VariantConst& value)
+	{
+		if (value.defined())
 		{
-			throw db::DatabaseErrorException( *err);
+			m_out << "bind( " << idx << ", '" << value.tostring() << "' );" << std::endl;
 		}
 		else
 		{
-			throw std::runtime_error( "unspecified error");
+			m_out << "bind( " << idx << ", NULL );" << std::endl;
+		}
+		return true;
+	}
+
+	virtual bool execute()
+	{
+		m_out << "execute();" << std::endl;
+		if (m_resitr == m_res.end())
+		{
+			m_fakeres = FakeResult();
+		}
+		else
+		{
+			m_fakeres = FakeResult( *m_resitr++);
+		}
+		return true;
+	}
+
+	virtual bool hasResult()
+	{
+		return (m_fakeres.nofResults() != 0);
+	}
+
+	virtual bool next()
+	{
+		bool rt = m_fakeres.next();
+		m_out << "next(); returns " << (int)rt << std::endl;
+		return rt;
+	}
+
+	virtual std::size_t nofColumns()
+	{
+		std::size_t rt = m_fakeres.nofColumns();
+		m_out << "nofColumns(); returns " << rt << std::endl;
+		return rt;
+	}
+
+	virtual const char* columnName( std::size_t idx)
+	{
+		const char* rt = m_fakeres.columnName( idx);
+		m_out << "columnName( " << idx << "); returns " << (rt?rt:"NULL") << std::endl;
+		return rt;
+	}
+
+	virtual types::VariantConst get( std::size_t idx)
+	{
+		const char* rt = m_fakeres.get( idx);
+		m_out << "get( " << idx << " ); returns " << rt << std::endl;
+		if (rt)
+		{
+			return types::VariantConst(rt);
+		}
+		else
+		{
+			return types::VariantConst(rt);
 		}
 	}
-}
+
+	virtual const db::DatabaseError* getLastError()
+	{
+		return 0;
+	}
+
+	///\brief Find out if the database is case sensitive or not
+	virtual bool isCaseSensitive()	{return false;}
+
+	void doTransaction( const TransactionInput& input, TransactionOutput& output)
+	{
+		printTransactionInput( m_out, input);
+		Parent::doTransaction( input, output);
+	}
+
+private:
+	std::vector<std::string> m_res;
+	std::vector<std::string>::const_iterator m_resitr;
+	std::ofstream m_out;
+	FakeResult m_fakeres;
+};
+
+
+TesttraceTransaction::TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
+	:StatemachineBasedTransaction( "TEST", new TransactionHandler( dbref_->outfilename().c_str(), result_))
+	,m_dbref(dbref_)
+	,m_result(result_)
+{}
+
 
 
 

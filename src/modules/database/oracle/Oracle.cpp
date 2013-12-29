@@ -493,73 +493,17 @@ void Oracletransaction::rollback()
 	m_conn = 0;
 }
 
-void Oracletransaction::execute_as_transaction()
+void Oracletransaction::execute()
 {
 	try
 	{
 		PoolObject<OracleConnection*> conn( m_unit.m_connPool);
 		TransactionExecStatemachine_oracle ph( &m_db.m_env, *conn, m_db.ID());
-		try
-		{
-			if (!ph.begin()
-			||  !ph.doTransaction( m_input, m_output)
-			||  !ph.commit())
-			{
-				const db::DatabaseError* err = ph.getLastError();
-				if (!err) throw std::runtime_error( "unknown database error");
-				throw db::DatabaseErrorException( *err);
-			}
-		}
-		catch (const db::DatabaseErrorException& e)
-		{
-			ph.rollback();
-			throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
-		}
-		catch (const std::runtime_error& e)
-		{
-			ph.rollback();
-			throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
-		}
+		ph.doTransaction( m_name, m_input, m_output);
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
 	{
 		throw std::runtime_error("timeout in database connection pool object allocation");
-	}
-}
-
-void Oracletransaction::execute_as_operation()
-{
-	TransactionExecStatemachine_oracle ph( &m_db.m_env, **m_conn, m_db.ID(), true);
-	try
-	{
-		if (!ph.doTransaction( m_input, m_output))
-		{
-			const db::DatabaseError* err = ph.getLastError();
-			if (!err) throw std::runtime_error( "unknown database error");
-			throw db::DatabaseErrorException( *err);
-		}
-	}
-	catch (const db::DatabaseErrorException& e)
-	{
-		ph.rollback();
-		throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
-	}
-	catch (const std::runtime_error& e)
-	{
-		ph.rollback();
-		throw std::runtime_error( std::string("transaction operation failed: ") + e.what());
-	}
-}
-
-void Oracletransaction::execute()
-{
-	if (m_conn)
-	{
-		execute_as_operation();
-	}
-	else
-	{
-		execute_as_transaction();
 	}
 }
 

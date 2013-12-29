@@ -48,16 +48,20 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PGconn* conn_, bool inTransactionContext)
-	:m_state(inTransactionContext?Transaction:Init)
-	,m_conn(conn_)
+TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( const std::string& name_, PostgreSQLdbUnit* dbunit_)
+	:TransactionExecStatemachine(name_)
+	,m_state(Init)
 	,m_lastresult(0)
 	,m_nof_rows(0)
 	,m_idx_row(0)
-	,m_hasResult(false){}
+	,m_hasResult(false)
+	,m_dbunit(dbunit_)
+	,m_conn(0)
+	{}
 
 TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
+	if (m_conn) delete m_conn;
 	clear();
 }
 
@@ -161,7 +165,7 @@ void TransactionExecStatemachine_postgres::setDatabaseErrorMessage()
 		}
 	}
 	int errorcode = 0;
-	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
 }
 
 bool TransactionExecStatemachine_postgres::status( PGresult* res, State newstate)
@@ -201,7 +205,9 @@ bool TransactionExecStatemachine_postgres::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-	return status( PQexec( m_conn, "BEGIN;"), Transaction);
+	if (m_conn) delete m_conn;
+	m_conn = m_dbunit->newConnection();
+	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
 bool TransactionExecStatemachine_postgres::commit()
@@ -215,20 +221,37 @@ bool TransactionExecStatemachine_postgres::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	return status( PQexec( m_conn, "COMMIT;"), Init);
+	bool rt = status( PQexec( **m_conn, "COMMIT;"), Init);
+	if (rt)
+	{
+		delete m_conn;
+		m_conn = 0;
+	}
+	return rt;
 }
 
 bool TransactionExecStatemachine_postgres::rollback()
 {
 	LOG_TRACE << "[postgresql statement] CALL rollback()";
-	return status( PQexec( m_conn, "ROLLBACK;"), Init);
+	if (m_conn)
+	{
+		bool rt = status( PQexec( **m_conn, "ROLLBACK;"), Init);
+		if (rt)
+		{
+			delete m_conn;
+			m_conn = 0;
+		}
+		return rt;
+	}
+	return true;
 }
 
 bool TransactionExecStatemachine_postgres::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		const char* dbname = m_conn?PQdb(**m_conn):"POSTGRESQL";
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -293,7 +316,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 			encvalue[0] = '\'';
 			boost::shared_ptr<void> encvaluer( encvalue, std::free);
 			int error = 0;
-			size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
+			size_t encvaluesize = PQescapeStringConn( **m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
 			encvalue[encvaluesize+1] = '\'';
 			std::string bindval( encvalue, encvaluesize+2);
 			m_statement.bind( idx, bindval);
@@ -317,7 +340,7 @@ bool TransactionExecStatemachine_postgres::execute()
 	}
 	std::string stmstr = m_statement.expanded();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = PQexec( m_conn, stmstr.c_str());
+	m_lastresult = PQexec( **m_conn, stmstr.c_str());
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)
@@ -418,5 +441,11 @@ bool TransactionExecStatemachine_postgres::next()
 	}
 	return false;
 }
+
+const std::string& TransactionExecStatemachine_postgres::databaseID() const
+{
+	return m_dbunit->ID();
+}
+
 
 

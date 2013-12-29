@@ -42,6 +42,7 @@
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
+#include "database/transactionExecStatemachine.hpp"
 #include "PostgreSQLprogram.hpp"
 #include "config/configurationBase.hpp"
 #include "module/constructor.hpp"
@@ -103,41 +104,6 @@ private:
 
 
 class PostgreSQLdbUnit;
-class PostgreSQLdatabase;
-
-class PostgreSQLtransaction : public Transaction
-{
-public:
-	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);
-	 ~PostgreSQLtransaction();
-
-	virtual const std::string& databaseID() const;
-
-	virtual void putInput( const TransactionInput& input_ )		{ m_input = input_; }
-	virtual const TransactionOutput& getResult() const		{ return m_output; }
-
-	virtual void execute();
-	virtual void begin();
-	virtual void commit();
-	virtual void rollback();
-	virtual void close();
-
-private:
-	void execute_statement( const char* statement );
-	///\brief Execute as transaction (all operations belong to one transaction implicitely defined)
-	void execute_as_transaction();
-	///\brief Execute with transaction context defined in outer context
-	void execute_as_operation();
-
-private:
-	PostgreSQLdatabase&	m_db;		//< parent database
-	PostgreSQLdbUnit&	m_unit;		//< parent database unit
-	std::string		m_name;		//< name of transaction
-	TransactionInput	m_input;	//< input data structure
-	TransactionOutput	m_output;	//< output data structure
-	PoolObject<PGconn*>* m_conn;		//< reference to connection object from pool
-};
-
 
 struct PostgreSQLLanguageDescription : public LanguageDescription
 {
@@ -148,7 +114,6 @@ struct PostgreSQLLanguageDescription : public LanguageDescription
 		return rt.str( );
 	}
 };
-
 
 class PostgreSQLdatabase : public Database
 {
@@ -183,7 +148,6 @@ private:
 
 class PostgreSQLdbUnit : public DatabaseUnit
 {
-	friend class PostgreSQLtransaction;
 public:
 	PostgreSQLdbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
@@ -210,6 +174,8 @@ public:
 
 	static void noticeProcessor( void* this_void, const char * message);
 
+	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
+
 private:
 	const std::string	m_ID;			///< database ID
 	std::string		m_connStr;		///< connection string
@@ -231,6 +197,18 @@ public:
 	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
 	PostgreSQLdbUnit* object( const config::NamedConfiguration& conf );
 };
+
+
+//\class PostgreSQLtransaction
+class PostgreSQLtransaction
+	:public StatemachineBasedTransaction
+{
+public:
+	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);
+	virtual ~PostgreSQLtransaction(){}
+};
+
+
 
 }} // _Wolframe::db
 

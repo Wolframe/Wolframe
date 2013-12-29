@@ -30,16 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-//
-//
+//\file database/transaction.hpp
+//\brief Interface database transaction
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
 #include "types/countedReference.hpp"
+#include "types/variant.hpp"
 #include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace db {
@@ -47,15 +48,40 @@ namespace db {
 struct Transaction
 {
 	virtual ~Transaction(){}
-	virtual const std::string& databaseID() const = 0;
-	virtual void execute() = 0;
-	virtual void putInput( const TransactionInput& input) = 0;
-	virtual const TransactionOutput& getResult() const = 0;
-	virtual void close() = 0;
-	virtual void begin() = 0;
-	virtual void commit() = 0;
-	virtual void rollback() = 0;
+	virtual const std::string& databaseID() const=0;
+
+	virtual void begin()=0;
+	virtual void commit()=0;
+	virtual void rollback()=0;
+	virtual void close()=0;
+
+	virtual void execute( const TransactionInput& input, TransactionOutput& output)=0;
+
+	class Result
+	{
+	public:
+		typedef std::vector<types::Variant> Row;
+
+		Result(){}
+		Result( const std::vector<std::string>& colnames_, const std::vector<Row>& rows_)
+			:m_colnames(colnames_),m_rows(rows_){}
+		Result( const Result& o)
+			:m_colnames(o.m_colnames),m_rows(o.m_rows){}
+
+		const std::vector<std::string>& colnames() const	{return m_colnames;}
+		const std::vector<Row>& rows() const			{return m_rows;}
+		std::size_t size() const				{return m_rows.size();}
+		std::vector<Row>::const_iterator begin() const		{return m_rows.begin();}
+		std::vector<Row>::const_iterator end() const		{return m_rows.end();}
+
+	private:
+		std::vector<std::string> m_colnames;
+		std::vector<Row> m_rows;
+	};
+
+	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
 };
+
 
 typedef types::CountedReference<Transaction> TransactionR;
 

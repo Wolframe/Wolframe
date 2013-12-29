@@ -36,6 +36,7 @@
 #define _DATABASE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
+#include "database/transaction.hpp"
 #include "database/databaseError.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -52,9 +53,20 @@ class TransactionExecStatemachine
 {
 public:
 	///\brief Constructor
-	TransactionExecStatemachine(){}
+	explicit TransactionExecStatemachine( const std::string& name_)
+		:m_name(name_){}
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine(){}
+
+	///\brief Get database identifier
+	virtual const std::string& databaseID() const=0;
+
+	///\brief Begin transaction
+	virtual bool begin()=0;
+	///\brief Commit current transaction
+	virtual bool commit()=0;
+	///\brief Rollback current transaction
+	virtual bool rollback()=0;
 
 	///\brief Start new command statement
 	///\param[in] statement statement string
@@ -79,8 +91,57 @@ public:
 	virtual bool isCaseSensitive()=0;
 
 	///\brief Executes the transaction using the interface defined
-	virtual bool doTransaction( const TransactionInput& input, TransactionOutput& output);
+	virtual void doTransaction( const TransactionInput& input, TransactionOutput& output);
+
+private:
+	const std::string m_name;
 };
+
+
+//\class StatemachineBasedTransaction
+//\brief Transaction implemented with 'TransactionExecStatemachine'
+class StatemachineBasedTransaction
+	:public Transaction
+{
+public:
+	//\brief Constructor
+	//\param[in] name_ name of the transaction
+	//\param[in] stm_ statemachine instance (transfer ownership)
+	StatemachineBasedTransaction( const std::string& name_, TransactionExecStatemachine* stm_)
+		:m_name(name_),m_state(0),m_stm(stm_)
+	{}
+
+	//\brief Destructor
+	virtual ~StatemachineBasedTransaction()
+	{
+		if (m_stm) delete m_stm;
+	}
+
+	//\brief Get the database identifier from configuration
+	virtual const std::string& databaseID() const
+	{
+		if (m_stm) return m_stm->databaseID();
+		throw std::runtime_error( "database not defined");
+	}
+
+	///\brief Begin of the transaction
+	virtual void begin();
+	///\brief Commit of the transaction
+	virtual void commit();
+	///\brief Rollback of the transaction
+	virtual void rollback();
+	///\brief Destroy of the transaction
+	virtual void close();
+
+	///\brief Execute with transaction input structure
+	virtual void execute( const TransactionInput& input, TransactionOutput& output);
+
+private:
+	std::string m_name;
+	int m_state;
+	TransactionExecStatemachine* m_stm;
+};
+
 
 }}//namespace
 #endif
