@@ -523,6 +523,8 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				(dvoid *)&collsthd, (ub4 *)0, (ub4)OCI_ATTR_LIST_COLUMNS, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;
 
+			std::string orderby;
+
 			for( ub4 i = 1; i <= numCols; i++ ) {
 				OCIParam *colhd;
 				status = OCIParamGet( (dvoid *)collsthd, (ub4)OCI_DTYPE_PARAM,
@@ -535,6 +537,12 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 					(dvoid *)&colName, (ub4 *)&colNameLen, (ub4)OCI_ATTR_NAME, errhp );
 				if( status != OCI_SUCCESS ) goto cleanup;
 
+				orderby.append( ( i > 1 ) ? ", ":" ORDER BY "); 
+				orderby.append( "\"");
+				orderby.append( colName);
+				orderby.append( "\"");
+				orderby.append( " ASC");
+
 				fprintf( fh, ( i > 1 ) ? ", %s" : "%s", colName );
 			} // foreach column
 
@@ -545,7 +553,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 			if( descrhp ) (void)OCIHandleFree( descrhp, OCI_HTYPE_DESCRIBE );
 
 			// the data
-			dbcmd = "SELECT * from " + *it;
+			dbcmd = "SELECT * from " + *it + orderby;
 
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -596,38 +604,6 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 		} // foreach table
 	} // end of scope
 	
-#if 0
-		query = "SELECT * FROM " + *it + orderby;
-		PQclear( res );
-		res = PQexec( conn, query.c_str() );
-		if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
-			std::string msg = std::string( "Failed to dump table " ) + *it
-					  + ": " + PQerrorMessage( conn );
-			PQfinish( conn );
-			throw std::runtime_error( msg );
-		}
-		nFields = PQnfields( res );
-		for ( int i = 0; i < PQntuples( res ); i++ )	{
-			for ( int j = 0; j < nFields; j++ )
-			{
-				std::string value;
-				if (PQgetisnull( res, i, j))
-				{
-					value = "NULL";
-				}
-				else
-				{
-					value = std::string("'") + PQgetvalue( res, i, j) + "'";
-				}
-				fprintf( fh, j ? ", %s" : "%s", value.c_str());
-			}
-			fprintf( fh, "\n" );
-		}
-	}
-
-	PQclear( res );
-#endif
-
 cleanup:
 	std::string errmsg;
 	if( status != OCI_SUCCESS && status != OCI_NO_DATA ) {
