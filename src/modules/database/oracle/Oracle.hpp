@@ -218,30 +218,6 @@ class OracleTransaction : public StatemachineBasedTransaction
 public:
 	OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_);
 	virtual ~OracleTransaction() {}
-
-#ifdef OLD
-	virtual const std::string& databaseID() const;
-
-	virtual void putInput( const TransactionInput& input_ )		{ m_input = input_; }
-	virtual const TransactionOutput& getResult() const		{ return m_output; }
-
-	virtual void execute();
-	virtual void begin();
-	virtual void commit();
-	virtual void rollback();
-	virtual void close();
-
-private:
-	std::string getErrorMsg( sword status );
-
-private:
-	OracleDatabase&	m_db;		//< parent database
-	OracleDbUnit&	m_unit;		//< parent database unit
-	std::string		m_name;		//< name of transaction
-	TransactionInput	m_input;	//< input data structure
-	TransactionOutput	m_output;	//< output data structure
-	PoolObject<OracleConnection*>* m_conn;		//< reference to connection object from pool
-#endif
 };
 
 
