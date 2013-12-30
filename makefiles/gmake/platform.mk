@@ -309,6 +309,12 @@ XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+endif
+
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
@@ -536,6 +542,16 @@ BOOST_LIBRARY_TAG ?= -mt
 endif
 endif
 
+# Fedora 20
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "20"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?= -mt
+endif
+endif
+
 # RHEL5
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "5"
@@ -677,6 +693,11 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -852,6 +873,14 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
 PAM_LIB_DIR ?= /lib
@@ -1049,6 +1078,14 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -1231,6 +1268,14 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1482,6 +1527,14 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -1697,6 +1750,16 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1932,6 +1995,16 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -2126,6 +2199,16 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+LIBHPDF_DIR ?= /usr
+LIBHPDF_INCLUDE_DIR ?= $(LIBHPDF_DIR)/include
+LIBHPDF_INCLUDE_DIRS = -I$(LIBHPDF_INCLUDE_DIR)
+LIBHPDF_LIB_DIR ?= $(LIBHPDF_DIR)/lib
+LIBHPDF_LIB_DIRS = -L$(LIBHPDF_LIB_DIR)
+LIBHPDF_LIBS ?= -lhpdf
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 LIBHPDF_DIR ?= /usr
 LIBHPDF_INCLUDE_DIR ?= $(LIBHPDF_DIR)/include
 LIBHPDF_INCLUDE_DIRS = -I$(LIBHPDF_INCLUDE_DIR)
@@ -2390,6 +2473,16 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -2619,6 +2712,16 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -2840,6 +2943,16 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+ICU_DIR ?= /usr
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
@@ -3112,6 +3225,16 @@ endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
+FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+
+# Fedora 20
+ifeq "$(LINUX_REV)" "20"
 FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM

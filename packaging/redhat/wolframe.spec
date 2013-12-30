@@ -63,6 +63,12 @@
 %define fc19 1
 %define fedora 1
 %endif
+%define fc20 0
+%if 0%{?fedora_version} == 20
+%define dist fc20
+%define fc20 1
+%define fedora 1
+%endif
 
 %define suse 0
 %define osu122 0
@@ -135,7 +141,7 @@
 %if !%{build_boost}
 %define with_icu	0
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 %define with_icu	1
 %endif
 %endif
@@ -294,7 +300,7 @@ BuildRequires: pwdutils >= 3.2
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 BuildRequires: systemd
 %endif
 %endif
@@ -462,7 +468,7 @@ BuildRequires: sqlite >= 3.0
 %define build_libhpdf 1
 %if %{with_libhpdf}
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 %define build_libhpdf 0
 %endif
 %endif
@@ -1175,7 +1181,7 @@ install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{n
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
 %endif
 %endif
@@ -1191,7 +1197,7 @@ install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
 %endif
@@ -1223,7 +1229,7 @@ echo Wolframe server at startup
 echo
 %endif
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
@@ -1283,7 +1289,7 @@ fi
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
 %endif
@@ -1300,7 +1306,7 @@ fi
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 %if %{fedora}
-%if %{fc18} || %{fc19}
+%if %{fc18} || %{fc19} || %{fc20}
 %{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
 %endif
