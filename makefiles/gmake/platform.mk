@@ -548,7 +548,7 @@ ifeq "$(LINUX_REV)" "20"
 BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
+BOOST_LIBRARY_TAG ?=
 endif
 endif
 

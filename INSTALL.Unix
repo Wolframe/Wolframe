@@ -268,16 +268,14 @@ For scripting in Python you have to set WITH_PYTHON=1.
 Fedora 20
 ---------
 
-TODO:
-
 No problems with the supplied packages at all, everything builds out of the box:
 
-Required pacakges: boost-devel (1.53.0)
+Required pacakges: boost-devel (1.54.0)
 Optional packages: openssl-devel (1.0.1e)
-                   pam-devel (1.1.6), cyrus-sasl-devel (2.1.26),
-                   sqlite-devel (3.7.17), postgresql-devel (9.2.4),
+                   pam-devel (1.1.8), cyrus-sasl-devel (2.1.26),
+                   sqlite-devel (3.8.2), postgresql-devel (9.3.2),
                    libxml2-devel (2.9.1), libxslt-devel (1.1.28),
-                   libpng-devel (1.5.13), zlib-devel (1.2.7),
+                   libpng-devel (1.6.3), zlib-devel (1.2.8),
                    libharu-devel (2.2.1), python3-devel (3.3.2)
 
 Use WITH_SYSTEM_LIBHPDF=1 for PDF support. Install libharu-devel (2.2.1) in
