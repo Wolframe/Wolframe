@@ -486,7 +486,7 @@ bool TransactionExecStatemachine_oracle::execute()
 
 bool TransactionExecStatemachine_oracle::hasResult()
 {
-	return m_hasResult;
+	return m_hasResult && m_hasRow;
 }
 
 std::size_t TransactionExecStatemachine_oracle::nofColumns()
@@ -546,6 +546,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		errorStatus( std::string( "index of column out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 		return types::VariantConst();
 	}
+	if( !m_hasRow ) return types::VariantConst( );
 	
 	OracleColumnDescription descr = m_colDescr[idx-1];
 
