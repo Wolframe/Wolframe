@@ -543,7 +543,8 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				orderby.append( "\"");
 				orderby.append( " ASC");
 
-				fprintf( fh, ( i > 1 ) ? ", %s" : "%s", colName );
+				std::string realColName = std::string( colName, colNameLen );
+				fprintf( fh, ( i > 1 ) ? ", %s" : "%s", realColName.c_str( ) );
 			} // foreach column
 
 			fprintf( fh, "\n" );
