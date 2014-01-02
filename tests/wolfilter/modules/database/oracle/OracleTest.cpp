@@ -513,7 +513,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				(dvoid *)&parmh, (ub4 *)0, (ub4)OCI_ATTR_PARAM, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;
 
-			ub4 numCols;
+			ub4 numCols = 0;
 			status = OCIAttrGet( (dvoid *)parmh, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&numCols, (ub4 *)0, (ub4)OCI_ATTR_NUM_COLS, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;
@@ -536,11 +536,10 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				status = OCIAttrGet( (dvoid *)colhd, (ub4)OCI_DTYPE_PARAM,
 					(dvoid *)&colName, (ub4 *)&colNameLen, (ub4)OCI_ATTR_NAME, errhp );
 				if( status != OCI_SUCCESS ) goto cleanup;
-				colName[colNameLen] = '\0';
 
 				orderby.append( ( i > 1 ) ? ", ":" ORDER BY "); 
 				orderby.append( "\"");
-				orderby.append( colName);
+				orderby.append( colName, colNameLen);
 				orderby.append( "\"");
 				orderby.append( " ASC");
 

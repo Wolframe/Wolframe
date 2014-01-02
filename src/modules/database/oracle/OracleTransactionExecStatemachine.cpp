@@ -354,8 +354,7 @@ bool TransactionExecStatemachine_oracle::execute()
 				(*m_conn)->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
-			colName[colNameLen] = '\0';
-			descr.name = std::string( colName );
+			descr.name = std::string( colName, colNameLen );
 			
 			// determine how many bytes we have to allocate to hold the
 			// data of this column in one row fetch
