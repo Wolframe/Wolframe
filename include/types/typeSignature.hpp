@@ -64,7 +64,9 @@ public:
 
 	virtual ~TypeSignature()
 	{
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 		verify();
+#endif
 	}
 
 	void operator=( const TypeSignature& o)
