@@ -694,7 +694,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 
 For building the Oracle database module you need the two packages
 'oracle-instantclient-basic', 'oracle-instantclient-sdk' (built
-manually or from 'oracle' pacman repository).
+manually from the AUR or from the 'oracle' pacman repository).
 
 Instructions for other Unixes
 -----------------------------
