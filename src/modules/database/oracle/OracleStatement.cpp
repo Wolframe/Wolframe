@@ -3,7 +3,7 @@
 #include <boost/cstdint.hpp>
 #include <cstring>
 #include <stdint.h>
-#include <libpq-fe.h>
+//#include <libpq-fe.h>
 
 #if defined( _WIN32 )
 #define WIN32_MEAN_AND_LEAN
