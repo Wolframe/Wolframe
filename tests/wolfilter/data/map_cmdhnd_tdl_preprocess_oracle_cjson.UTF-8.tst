@@ -267,43 +267,43 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
 
 SUBROUTINE getPersonPrename( id)
 BEGIN
-	INTO . DO UNIQUE SELECT prename FROM Person WHERE Person.ID = $PARAM.id;
+	INTO . DO UNIQUE SELECT prename AS "prename" FROM Person WHERE Person.ID = $PARAM.id;
 END
 
 SUBROUTINE getPerson( id)
 RESULT INTO person
 BEGIN
-	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
+	INTO company DO SELECT Company.name AS "name" FROM Company,PersonCompanyRel
 		WHERE PersonCompanyRel.companyid = Company.ID
 		AND PersonCompanyRel.ID = $PARAM.id;
 
 	INTO tag PRINT "1001";								-- print constant
 
-	INTO . DO UNIQUE SELECT surname FROM Person WHERE Person.ID = $PARAM.id;	-- embedded command with variable as argument
+	INTO . DO UNIQUE SELECT surname AS "surname" FROM Person WHERE Person.ID = $PARAM.id;	-- embedded command with variable as argument
 	INTO . DO UNIQUE getPersonPrename( $PARAM.id);					-- call subroutine with variable as argument
 
 	INTO id PRINT $PARAM.id;							-- print variable
 
-	INTO child DO SELECT Person.prename,Person.surname FROM Person,PersonChildRel
+	INTO child DO SELECT Person.prename AS "prename",Person.surname AS "surname" FROM Person,PersonChildRel
 		WHERE PersonChildRel.childid = Person.ID
 		AND PersonChildRel.ID = $PARAM.id;
 
-	INTO location DO SELECT Address.street,Address.town FROM Address,PersonAddressRel
+	INTO location DO SELECT Address.street AS "street",Address.town AS "town" FROM Address,PersonAddressRel
 		WHERE PersonAddressRel.addressid = Address.ID
 		AND PersonAddressRel.ID = $PARAM.id;
 END
 
 TRANSACTION getData
 BEGIN
-	DO SELECT ID FROM Person;
+	DO SELECT ID AS "id" FROM Person;
 	FOREACH RESULT INTO . DO getPerson( $1);
 END
 
 TRANSACTION getDataFiltered
 RESULT FILTER addSuffixToName
 BEGIN
-	DO SELECT ID FROM Person;
-	FOREACH RESULT INTO person DO UNIQUE SELECT Person.ID as id,prename,surname FROM Person WHERE Person.ID = $1;
+	DO SELECT ID AS "id" FROM Person;
+	FOREACH RESULT INTO person DO UNIQUE SELECT Person.ID as "id",prename AS "prename",surname AS "surname" FROM Person WHERE Person.ID = $1;
 END
 
 TRANSACTION insertWords
@@ -367,7 +367,7 @@ end
 function addSuffixToName( inp)
 	rec = inp:table()
 	for i,v in ipairs( rec["person"]) do
-		v[ "PRENAME"] = v[ "PRENAME"] .. v[ "ID"]
+		v[ "prename"] = v[ "prename"] .. v[ "id"]
 	end
 	return rec
 end
@@ -644,7 +644,7 @@ ID, CHILDID
 '5', '6'
 '7', '8'
 NUMBERTABLE:
-name, NUMBER
+NAME, number
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'
