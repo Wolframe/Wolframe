@@ -1,0 +1,62 @@
+
+SUBROUTINE getPersonPrename( id)
+BEGIN
+	INTO . DO UNIQUE SELECT prename AS "prename" FROM Person WHERE Person.ID = $PARAM.id;
+END
+
+SUBROUTINE getPerson( id)
+RESULT INTO person
+BEGIN
+	INTO company DO SELECT Company.name AS "name" FROM Company,PersonCompanyRel
+		WHERE PersonCompanyRel.companyid = Company.ID
+		AND PersonCompanyRel.ID = $PARAM.id;
+
+	INTO tag PRINT "1001";								-- print constant
+
+	INTO . DO UNIQUE SELECT surname AS "surname" FROM Person WHERE Person.ID = $PARAM.id;	-- embedded command with variable as argument
+	INTO . DO UNIQUE getPersonPrename( $PARAM.id);					-- call subroutine with variable as argument
+
+	INTO id PRINT $PARAM.id;							-- print variable
+
+	INTO child DO SELECT Person.prename AS "prename",Person.surname AS "surname" FROM Person,PersonChildRel
+		WHERE PersonChildRel.childid = Person.ID
+		AND PersonChildRel.ID = $PARAM.id;
+
+	INTO location DO SELECT Address.street AS "street",Address.town AS "town" FROM Address,PersonAddressRel
+		WHERE PersonAddressRel.addressid = Address.ID
+		AND PersonAddressRel.ID = $PARAM.id;
+END
+
+TRANSACTION getData
+BEGIN
+	DO SELECT ID AS "id" FROM Person;
+	FOREACH RESULT INTO . DO getPerson( $1);
+END
+
+TRANSACTION getDataFiltered
+RESULT FILTER addSuffixToName
+BEGIN
+	DO SELECT ID AS "id" FROM Person;
+	FOREACH RESULT INTO person DO UNIQUE SELECT Person.ID as "id",prename AS "prename",surname AS "surname" FROM Person WHERE Person.ID = $1;
+END
+
+TRANSACTION insertWords
+PREPROC
+	FOREACH /data/person DO luanorm( . ) INTO norm;
+
+	FOREACH /data/person/location DO normname( street) INTO norm_street;
+	FOREACH /data/person/location DO normname( town) INTO norm_town;
+ENDPROC
+BEGIN
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ('select street', $(norm_street));
+	FOREACH /data/person/location DO INSERT INTO WordTable (name,word) VALUES ('select town', $(norm_town));
+
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct street', $(street));
+	FOREACH /data/person/norm/location DO INSERT INTO WordTable (name,word) VALUES ('struct town', $(town));
+	FOREACH /data/person/norm/surname DO INSERT INTO WordTable (name,word) VALUES ('struct surname', $(.));
+	FOREACH /data/person/norm DO INSERT INTO WordTable (name,word) VALUES ('struct prename', $(prename));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct tag', $(tag));
+	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct id', $(id));
+	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
+END
+

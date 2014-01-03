@@ -53,7 +53,7 @@ ID, CHILDID
 '5', '6'
 '7', '8'
 NUMBERTABLE:
-name, NUMBER
+NAME, number
 'struct id', '101'
 'struct id', '102'
 'struct id', '103'

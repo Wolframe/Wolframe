@@ -2,10 +2,10 @@
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
 schema=tdl_preprocess/schema_oracle.sql
-luascript=tdl_preprocess/preprocess-oracle.lua
+luascript=tdl_preprocess/preprocess.lua
 direcmap=tdl_preprocess/preprocess.dmap
 ddl=tdl_preprocess/preprocess.sfrm
-tdl=tdl_preprocess/preprocess.tdl
+tdl=tdl_preprocess/preprocess-oracle.tdl
 normalize=tdl_preprocess/preprocess.wnmp
 
 # Modules to load
