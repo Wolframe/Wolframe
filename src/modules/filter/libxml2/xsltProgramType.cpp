@@ -70,25 +70,33 @@ class XsltFilterConstructor
 public:
 	XsltFilterConstructor( const std::string& sourcefile_)
 		:module::FilterConstructor( utils::getFileStem(sourcefile_), 0)
+		,m_ptr(0)
 	{
-		xsltStylesheetPtr pp = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
-		if (!pp)
+		m_ptr = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
+		if (!m_ptr)
 		{
 			xmlError* err = xmlGetLastError();
 			throw std::runtime_error( std::string("error loading XSLT program '") + sourcefile_ + "': '" + (err?err->message:"unspecified XSLT error") + "'");
 		}
-		m_ptr = boost::shared_ptr<xsltStylesheet>( pp, xsltFreeStylesheet);
 	}
 
-	virtual ~XsltFilterConstructor(){}
+	virtual ~XsltFilterConstructor()
+	{
+		if (m_ptr) xsltFreeStylesheet( m_ptr);
+	}
 
 	virtual langbind::Filter* object( const std::vector<langbind::FilterArgument>& arg) const
 	{
-		return new XsltFilter( m_ptr.get(), arg);
+		return new XsltFilter( m_ptr, arg);
 	}
 
 private:
-	boost::shared_ptr<xsltStylesheet> m_ptr;
+	XsltFilterConstructor( const XsltFilterConstructor& o)
+		:module::FilterConstructor(o)
+	{
+		throw std::logic_error( "non copyable XsltFilterConstructor");
+	}
+	xsltStylesheetPtr m_ptr;
 };
 
 

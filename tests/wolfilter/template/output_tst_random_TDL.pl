@@ -315,6 +315,7 @@ sub createTransaction
 }
 
 my $ii;
+print "**\n";
 print "**file:DBRES\n";
 print "**file:DBIN.tdl\n";
 for ($ii=0; $ii<$testSize; ++$ii) {

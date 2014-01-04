@@ -49,7 +49,7 @@ DocumentReader::DocumentReader( const char* content, std::size_t contentsize)
 }
 
 DocumentReader::DocumentReader( xmlDocPtr doc)
-	:m_ptr(doc){}
+	:m_ptr(doc, xmlFreeDoc){}
 
 
 std::string DocumentReader::getContent() const

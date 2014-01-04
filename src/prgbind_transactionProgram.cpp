@@ -53,7 +53,7 @@ public:
 		,m_provider(0)
 		,m_func(f)
 		,m_state(0)
-		,m_inputstructptr(f->getInput())
+		,m_inputstructptr(0)
 		,m_flags(serialize::Context::None)
 		{}
 
