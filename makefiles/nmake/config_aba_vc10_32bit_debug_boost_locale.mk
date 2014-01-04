@@ -163,8 +163,3 @@ CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visu
 ########
 
 ORACLE_DIR = C:\Oracle\instantclient_12_1
-ORACLE_INCLUDE_DIR = $(ORACLE_DIR)/include
-ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
-ORACLE_LIB_DIR = $(ORACLE_DIR)/lib
-ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
-ORACLE_LIBS = -lclntsh

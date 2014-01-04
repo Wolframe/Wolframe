@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src\modules\database\oracle \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I"$(ORACLE_DIR)\include"
+	/I"$(ORACLE_DIR)\sdk\include"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -20,16 +20,16 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
-	"$(ORACLE_DIR)\lib\liboci.lib" \
+	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_oracletest.dll
 
 CPP_OBJS = \
-	OracleSQLTest.obj \
-	OracleSQLModuleFiles.obj \
-	mod_db_postgresqltest.obj
+	OracleModuleFiles.obj \
+	OracleTest.obj \
+	mod_db_oracletest.obj
 
 all: $(DYNAMIC_MODULE)
 
