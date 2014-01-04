@@ -96,9 +96,14 @@ sub getTagName {
 	return $tags[ $idx];
 }
 
-sub getTagElems {
+sub getTagNofElems {
 	my ($idx) = (@_);
 	return $tagElems[ $idx];
+}
+
+sub getTagElem {
+	my ($idx,$no) = (@_);
+	return "X$idx" . "X$no" . "X";
 }
 
 
@@ -178,20 +183,20 @@ sub getArg {
 	} else {
 		if (getLastResultIdx() < 0 || $rnd < 6) {
 			my $idx = getResultIdx();
-			if ($tidx >= 0 && $tagElems[$tidx] > 1 && getResultNofRows($idx) > 1) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($idx) > 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultName($idx) . "." . getResultColumn($idx);
 			}
 		} elsif ($fidx >= 0) {
-			if ($tidx >= 0 && $tagElems[$tidx] > 1 && getResultNofRows($fidx) > 1) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($fidx) > 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultColumn($fidx);
 			}
 		} else {
 			my $idx = getLastResultIdx();
-			if ($tidx >= 0 && $tagElems[$tidx] > 1 && getResultNofRows($idx) > 1) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($idx) > 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultColumn($idx);
@@ -294,9 +299,52 @@ sub createSubroutine {
 	return $rt;
 }
 
+sub createTransaction
+{
+	my $rt = "TRANSACTION test_transaction\n"; 
+	$rt = $rt . "BEGIN\n";
+	@instructionResults = ();
+	@instructionResultColumns = ();
+	my $nn = int(rand(12))+1;
+	my $ii;
+	for ($ii=0; $ii<$nn; ++$ii) {
+		$rt = $rt . createInstruction();
+	}
+	$rt = $rt . "END\n";
+	return $rt;
+}
 
 my $ii;
+print "**file:DBRES\n";
+print "**file:DBIN.tdl\n";
 for ($ii=0; $ii<$testSize; ++$ii) {
 	print (createSubroutine() . "\n\n");
 }
+print (createTransaction() . "\n\n");
 
+print "**file: test.dmap\n";
+print "COMMAND(run) CALL(test_transaction);\n";
+
+print "**config\n";
+my $dir_testmod = "./../wolfilter/modules/";
+print "--input-filter token --output-filter token ";
+print "--module $dir_testmod/filter/testtoken/mod_filter_testtoken ";
+print "--module ./../../src/modules/cmdbind/directmap/mod_command_directmap ";
+print "--module $dir_testmod/database/testtrace/mod_db_testtrace ";
+print "--database 'identifier=testdb,outfile=DBOUT,file=DBRES' ";
+print "--program=DBIN.tdl --cmdprogram=test.dmap run";
+
+print "**input\n";
+print ">doc\n";
+for ($ii=0; $ii<=$#tags; ++$ii) {
+	my $nn = getTagNofElems( $ii);
+	my $kk;
+	for ($kk=0; $kk<=$nn; ++$kk) {
+		print ">" . getTagName( $ii) . "\n";
+		print "=" . getTagElem( $ii,$kk) . "\n";
+		print "<" . getTagName( $ii) . "\n";
+	}
+}
+print "<doc\n";
+print "**output\n";
+print "**end\n";

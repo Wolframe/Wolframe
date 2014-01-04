@@ -1,0 +1,4 @@
+LIBRARY mod_filter_testtoken
+
+EXPORTS
+entryPoint	@1
