@@ -37,6 +37,7 @@
 #include "cmdbind/commandHandler.hpp"
 #include "module/constructor.hpp"
 #include "processor/moduleInterface.hpp"
+#include "types/countedReference.hpp"
 #include <string>
 #include <list>
 
@@ -64,6 +65,9 @@ public:
 	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const=0;
 	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProvider*) const=0;
 };
+
+///\brief Command handler constructor reference
+typedef types::CountedReference<CommandHandlerConstructor> CommandHandlerConstructorR;
 
 }} //namespace _Wolframe::cmdbind
 

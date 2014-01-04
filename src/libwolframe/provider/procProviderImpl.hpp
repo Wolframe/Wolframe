@@ -85,14 +85,15 @@ private:
 	{
 	public:
 		CommandHandlerDef()
-			:constructor(0),configuration(0){}
+			:configuration(0){}
 		CommandHandlerDef( const CommandHandlerDef& o)
 			:constructor(o.constructor),configuration(o.configuration){}
-		CommandHandlerDef( cmdbind::CommandHandlerConstructor* constructor_, config::NamedConfiguration* configuration_)
+		CommandHandlerDef( cmdbind::CommandHandlerConstructor* constructor_, const config::NamedConfiguration* configuration_)
 			:constructor(constructor_),configuration(configuration_){}
+		~CommandHandlerDef(){}
 	public:
-		cmdbind::CommandHandlerConstructor* constructor;
-		config::NamedConfiguration* configuration;
+		cmdbind::CommandHandlerConstructorR constructor;
+		const config::NamedConfiguration* configuration;
 	};
 	std::vector<CommandHandlerDef> m_cmd;
 	typedef std::map<std::string,std::size_t> CmdMap;

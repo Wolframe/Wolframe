@@ -417,8 +417,8 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 	{
 		return NULL;
 	}
-	cmdbind::CommandHandlerConstructor* constructor = m_cmd.at( cmd->second).constructor;
-	config::NamedConfiguration* cfg = m_cmd.at( cmd->second).configuration;
+	cmdbind::CommandHandlerConstructor* constructor = m_cmd.at( cmd->second).constructor.get();
+	const config::NamedConfiguration* cfg = m_cmd.at( cmd->second).configuration;
 	return constructor->object( *cfg);
 }
 
