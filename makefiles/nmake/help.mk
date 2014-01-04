@@ -17,6 +17,7 @@ WITH_LUA=1             build code depending on Lua
 WITH_PYTHON=1          build bindings and modules for Python
 WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
+WITH_ORACLE=1          build AAAA and DB connectors for Oracle
 WITH_TEXTWOLF=1        build code using textwolf
 WITH_LIBXML2=1         build code using libxml2
 WITH_LIBXSLT=1         build code using libxslt (requires also libxml2)

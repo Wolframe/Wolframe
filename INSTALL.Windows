@@ -17,6 +17,7 @@ Table of Contents
       Notes for Postgreslql 9.0.4
       Notes for Visual Studio 2010
       Notes for 32-bit dependencies
+    Oracle
     LibXML2
     LibXSLT
     Python 3
@@ -39,8 +40,9 @@ Prerequisites
   (integrated in subdir 'lua')
 - optionally (WITH_PYTHON) Python 3 scripting
 - for database support
-  - optionally (WITH_SQLITE3): using the sources i n 'sqlite3'
-  - optionally (WITH_PGSQL)
+  - optionally (WITH_SQLITE3): using the sources in 'sqlite3'
+  - optionally (WITH_PGSQL): 
+  - optionally (WITH_ORACLE): Oracle Instant client SDK
 - for XML support
   - optionally (WITH_LIBXML2): libxml2 (with iconv support)
 - for XSLT processing
@@ -279,6 +281,13 @@ You can get gettext/libintl and other libraries from
 http://gnuwin32.sourceforge.net/packages.html
 
 as packages.
+
+Oracle
+------
+
+Download the packages of the "Oracle Instant Client SDK",
+those are 'instantclient-basic-nt-12.1.0.1.0.zip' and
+'instantclient-sdk-nt-12.1.0.1.0.zip'.
 
 LibXML2
 -------

@@ -158,3 +158,13 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 
 CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
 CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+
+# Oracle
+########
+
+ORACLE_DIR = C:\Oracle\instantclient_12_1
+ORACLE_INCLUDE_DIR = $(ORACLE_DIR)/include
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR = $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS = -lclntsh
