@@ -1387,6 +1387,21 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "13.10"
+ORACLE_VERSION ?= 12.1
+ifeq "$(ARCH)" "x86_64"
+ORACLE_CLIENT_ARCH=client64
+else
+ORACLE_CLIENT_ARCH=client
+endif
+ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= -lclntsh
+endif
+
 ifeq "$(LINUX_REV)" "13.04"
 ORACLE_VERSION ?= 12.1
 ifeq "$(ARCH)" "x86_64"
@@ -1402,7 +1417,7 @@ ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
 ORACLE_LIBS ?= -lclntsh
 endif
 
-ifeq "$(LINUX_REV)" "13.10"
+ifeq "$(LINUX_REV)" "12.10"
 ORACLE_VERSION ?= 12.1
 ifeq "$(ARCH)" "x86_64"
 ORACLE_CLIENT_ARCH=client64
@@ -1414,7 +1429,7 @@ ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH
 ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
 ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
 ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
-ORACLE_LIBS ?= -lclntsh
+ORACLE_LIBS ?= -lclntsh -lnnz12 -lons -lclntshcore
 endif
 
 endif
