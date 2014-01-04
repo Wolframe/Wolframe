@@ -63,21 +63,33 @@ using namespace wtest;
 
 static bool check_PGSQL_RUNNING()
 {
-	static bool rt = false;
+	enum PGSQLState {Init,ConnSuccess,ConnFail};
+	static PGSQLState state = Init;
 #ifdef WITH_PGSQL
-	static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
-	PGconn* conn = PQconnectdb( connstr);
-	if (conn)
+	if (state == Init)
 	{
-		ConnStatusType stat = PQstatus( conn);
-		if (stat == CONNECTION_OK)
+		static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
+		PGconn* conn = PQconnectdb( connstr);
+		if (conn)
 		{
-			rt = true;
+			ConnStatusType stat = PQstatus( conn);
+			if (stat == CONNECTION_OK)
+			{
+				state = ConnSuccess;
+			}
+			else
+			{
+				state = ConnFail;
+			}
 		}
+		else
+		{
+			state = ConnFail;
+		}
+		PQfinish( conn );
 	}
-	PQfinish( conn );
 #endif
-	return rt;
+	return (state == ConnSuccess);
 }
 
 static bool check_ORACLE_RUNNING()
