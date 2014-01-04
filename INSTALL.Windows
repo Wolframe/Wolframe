@@ -289,6 +289,9 @@ Download the packages of the "Oracle Instant Client SDK",
 those are 'instantclient-basic-nt-12.1.0.1.0.zip' and
 'instantclient-sdk-nt-12.1.0.1.0.zip'.
 
+Unpack the Zip files for example in "C:\Oracle\instantclient_12_1" 
+and adapt ORACLE_DIR in 'makefiles\nmake\config.mk'.
+
 LibXML2
 -------
 

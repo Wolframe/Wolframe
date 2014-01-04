@@ -36,7 +36,7 @@ TEST_CPP_BINS = \
 	oracleUnit$(EXE)
 
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(ORACLE_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

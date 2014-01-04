@@ -5,12 +5,12 @@
 #include <stdint.h>
 //#include <libpq-fe.h>
 
-#if defined( _WIN32 )
-#define WIN32_MEAN_AND_LEAN
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
+//~ #if defined( _WIN32 )
+//~ #define WIN32_MEAN_AND_LEAN
+//~ #include <winsock2.h>
+//~ #else
+//~ #include <arpa/inet.h>
+//~ #endif
 
 
 using namespace _Wolframe;
@@ -100,12 +100,12 @@ void OracleStatement::bind( unsigned int idx, const types::Variant& value)
 //\remark See implementation of pq_sendint64
 void OracleStatement::bindUInt64( boost::uint64_t value, const char* type)
 {
-	boost::uint32_t pp[2];
-	pp[0] = (boost::uint32_t) (value >> 32);
-	pp[0] = htonl( pp[0]);
-	pp[1] = (boost::uint32_t) (value);
-	pp[1] = htonl( pp[1]);
-	setNextParam( (const void*)&pp, sizeof(pp), type);
+	//~ boost::uint32_t pp[2];
+	//~ pp[0] = (boost::uint32_t) (value >> 32);
+	//~ pp[0] = htonl( pp[0]);
+	//~ pp[1] = (boost::uint32_t) (value);
+	//~ pp[1] = htonl( pp[1]);
+	//~ setNextParam( (const void*)&pp, sizeof(pp), type);
 }
 
 void OracleStatement::bindInt64( boost::int64_t value)
@@ -115,9 +115,9 @@ void OracleStatement::bindInt64( boost::int64_t value)
 
 void OracleStatement::bindUInt32( boost::uint32_t value, const char* type)
 {
-	boost::uint32_t pp;
-	pp = htonl( value);
-	setNextParam( &pp, sizeof(pp), type);
+	//~ boost::uint32_t pp;
+	//~ pp = htonl( value);
+	//~ setNextParam( &pp, sizeof(pp), type);
 }
 
 void OracleStatement::bindInt32( boost::int32_t value)
@@ -127,8 +127,8 @@ void OracleStatement::bindInt32( boost::int32_t value)
 
 void OracleStatement::bindUInt16( boost::uint16_t value, const char* type)
 {
-	boost::uint16_t pp = htons( value);
-	setNextParam( &pp, sizeof(pp), type);
+	//~ boost::uint16_t pp = htons( value);
+	//~ setNextParam( &pp, sizeof(pp), type);
 }
 
 void OracleStatement::bindInt16( boost::int16_t value)
@@ -289,6 +289,7 @@ OCIStmt* OracleStatement::execute( OracleConnection *conn) const
 //	return PQexecParams(
 //			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/, 
 //			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
+	return 0;
 }
 
 
