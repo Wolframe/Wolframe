@@ -134,14 +134,25 @@ TEST_F( WolfilterTest, tests)
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		enum {MaxNofArgs=63};
+		std::string cmdargstr;
 		int cmdargc = cmd.size()+1;
 		char* cmdargv[MaxNofArgs+1];
+		std::size_t cmdargi[MaxNofArgs+1];
 		if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");
-		cmdargv[0] = strdup( g_gtest_ARGV[0] );
+		cmdargi[0] = 0;
+		cmdargstr.append( g_gtest_ARGV[0]);
+		cmdargstr.push_back( 0);
 		for (int ci=1; ci<cmdargc; ++ci)
 		{
-			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
+			cmdargi[ci] = cmdargstr.size();
+			cmdargstr.append( cmd[ci-1]);
+			cmdargstr.push_back( 0);
 		}
+		for (int ci=0; ci<cmdargc; ++ci)
+		{
+			cmdargv[ ci] = const_cast<char*>( cmdargstr.c_str() + cmdargi[ ci]);
+		}
+
 		boost::filesystem::path refpath( g_testdir / "temp");
 		std::string outstr;
 		{
@@ -248,10 +259,6 @@ TEST_F( WolfilterTest, tests)
 			boost::this_thread::sleep( boost::posix_time::seconds( 3));
 		}
 		EXPECT_EQ( td.expected, outstr);
-		for (int ci=0; ci<cmdargc; ++ci)
-		{
-			free( cmdargv[ci] );
-		}
 	}
 }
 
