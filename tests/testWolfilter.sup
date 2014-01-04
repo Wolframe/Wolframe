@@ -18,14 +18,38 @@
 {
    CRYPTO_malloc
    Memcheck:Leak
-   fun:CRYPTO_malloc
-   obj:/lib/x86_64-linux-gnu/libcrypto.so*
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
 }
 {
    CRYPTO_realloc
    Memcheck:Leak
-   fun:CRYPTO_realloc
-   obj:/lib/x86_64-linux-gnu/libcrypto.so*
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   CRYPTO_malloc2
+   Memcheck:Free
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   CRYPTO_realloc2
+   Memcheck:Free
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   CRYPTO_malloc3
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   CRYPTO_realloc4
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   PGConnect
+   Memcheck:Leak
+   fun:PQconnectdb
+   obj:/usr/lib/libpq.so.5.4
 }
 {
    dl_open_malloc
@@ -56,5 +80,4835 @@
    fun:calloc
    fun:_dl_new_object
    obj:*
+}
+{
+   S01
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb0EED1Ev
+   fun:_ZNSt10moneypunctIwLb0EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   fun:__cxa_finalize
+   obj:/usr/local/lib/libboost_filesystem.so.1.53.0
+   obj:/usr/local/lib/libboost_filesystem.so.1.53.0
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+{
+   S02
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb1EED1Ev
+   fun:_ZNSt10moneypunctIwLb1EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   fun:__cxa_finalize
+   obj:/usr/local/lib/libboost_filesystem.so.1.53.0
+   obj:/usr/local/lib/libboost_filesystem.so.1.53.0
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+{
+   S03
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:BUF_strndup
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S04
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_add
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S05
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S06
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:BUF_strndup
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_load_builtin_modules
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S07
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S08
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S09
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S10
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S11
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S12
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S14
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S15
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_get_state
+   fun:ERR_clear_error
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S16
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S17
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:BIO_set
+   fun:BIO_new
+   fun:BIO_new_file
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_modules_load_file
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+}
+{
+   S18
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:BIO_set
+   fun:BIO_new
+   fun:BIO_new_file
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_modules_load_file
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S19
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S20
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S21
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S22
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S23
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S24
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S25
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S26
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S27
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S28
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S29
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S30
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S31
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S32
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S33
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S34
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S35
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S36
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S38
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S39
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S40
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S41
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S42
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S43
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S44
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S45
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S46
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S47
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S49
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S50
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S51
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S52
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S53
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S54
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S55
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S56
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S57
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S58
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S59
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S60
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S61
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S62
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S63
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S64
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S65
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S66
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S67
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S68
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S69
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S70
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S71
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S72
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S73
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S74
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S75
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S76
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S77
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S78
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S79
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S80
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S81
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S82
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S83
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S84
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S85
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S86
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S87
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S88
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S89
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S90
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S91
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S92
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S93
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S94
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S95
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S96
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S97
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S98
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OBJ_NAME_add
+   fun:EVP_add_digest
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_get_ex_data_X509_STORE_CTX_idx
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_get_ex_data_X509_STORE_CTX_idx
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_SESSION_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_SESSION_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:RSA_new_method
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:RSA_new_method
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:DH_new_method
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:DH_new_method
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_load_builtin_modules
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_load_builtin_modules
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:calloc
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+   fun:_ZN9_Wolframe6config20WolfilterCommandLineC1EiPPcRKSsS5_S5_
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+   fun:_ZN7testing8TestInfo3RunEv
+   fun:_ZN7testing8TestCase3RunEv
+   fun:_ZN7testing8internal12UnitTestImpl11RunAllTestsEv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_add
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_add
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:BIO_set
+   fun:BIO_new
+   fun:BIO_new_file
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_modules_load_file
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:BIO_set
+   fun:BIO_new
+   fun:BIO_new_file
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_modules_load_file
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_COMP_get_compression_methods
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_COMP_get_compression_methods
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_get_ex_data_X509_STORE_CTX_idx
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_get_ex_data_X509_STORE_CTX_idx
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:sk_dup
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_SESSION_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_SESSION_new
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:RSA_new_method
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:RSA_new_method
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:DH_new_method
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:sk_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:DH_new_method
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:SSL_get_ex_data_X509_STORE_CTX_idx
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:RSA_new_method
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ASN1_item_ex_d2i
+   fun:ASN1_item_d2i
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_load_builtin_modules
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:CONF_module_add
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:X509_VERIFY_PARAM_new
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:X509_VERIFY_PARAM_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ECDH_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_RAND_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_COMP_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ECDSA_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_get_state
+   fun:ERR_clear_error
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:X509_STORE_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_BUF_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_OBJ_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_get_state
+   fun:ERR_clear_error
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ENGINE_register_complete
+   fun:ENGINE_register_all_complete
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   fun:OBJ_NAME_init
+   fun:OBJ_NAME_add
+   fun:EVP_add_cipher
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ERR_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_new
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:ENGINE_new
+   fun:ENGINE_load_rsax
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:ENGINE_new
+   fun:ENGINE_load_dynamic
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ERR_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_CRYPTO_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_UI_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:nss_parse_service_list
+   fun:__nss_database_lookup
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:expand_dynamic_string_token
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+   fun:_ZN9_Wolframe6config20WolfilterCommandLineC1EiPPcRKSsS5_S5_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_DH_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_OCSP_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:realloc
+   fun:CRYPTO_realloc
+   fun:lh_insert
+   fun:OBJ_NAME_add
+   fun:SSL_library_init
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_CONF_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:ERR_get_state
+   fun:ERR_clear_error
+   fun:ENGINE_load_builtin_engines
+   fun:OPENSSL_config
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_DSA_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ERR_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_PKCS12_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_BIO_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ERR_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ENGINE_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_BN_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_PEM_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_PKCS7_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:realloc
+   fun:CRYPTO_realloc
+   fun:sk_insert
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:realloc
+   fun:CRYPTO_realloc
+   fun:sk_dup
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   fun:SSL_CTX_new
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_X509_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_check_map_versions
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+   fun:_ZN9_Wolframe6config20WolfilterCommandLineC1EiPPcRKSsS5_S5_
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_DSO_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_TS_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_RSA_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_X509V3_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+   fun:_ZN9_Wolframe5wtest15TestDescriptionC1ERKSsPKc
+   fun:_ZN24WolfilterTest_tests_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_CMS_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_EVP_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_ASN1_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_EC_strings
+   fun:ERR_load_crypto_strings
+   fun:SSL_load_error_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+}
+{
+   S99
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_SSL_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:realloc
+   fun:CRYPTO_realloc
+   fun:lh_insert
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+   fun:ERR_load_SSL_strings
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZL19check_PGSQL_RUNNINGv
+   fun:_ZL10check_flagRKSs
+   fun:_ZL8readFileRKSsRSt6vectorISsSaISsEES4_RSsS4_
+}
+{
+   S99
+   Memcheck:Leak
+   fun:calloc
+   fun:do_lookup_x
+   fun:_dl_lookup_symbol_x
+   fun:_dl_relocate_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN9_Wolframe6module11LoadModulesERNS0_16ModulesDirectoryERKSt4listISsSaISsEERKSs
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZN9_Wolframe2db16PostgreSQLdbUnitC1ERKSsS3_tS3_S3_S3_SsSsSsSsSstmtjRKSt4listISsSaISsEE
+   fun:_ZN9_Wolframe2db21PostgreSQLconstructor6objectERKNS_6config18NamedConfigurationE
+   fun:_ZN9_Wolframe2db25PostgreSQLTestConstructor6objectERKNS_6config18NamedConfigurationE
+}
+{
+   S99
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectPoll
+   obj:/usr/lib/libpq.so.5.4
+   fun:PQconnectdb
+   fun:_ZN9_Wolframe2db16PostgreSQLdbUnitC1ERKSsS3_tS3_S3_S3_SsSsSsSsSstmtjRKSt4listISsSaISsEE
+   fun:_ZN9_Wolframe2db21PostgreSQLconstructor6objectERKNS_6config18NamedConfigurationE
+   fun:_ZN9_Wolframe2db25PostgreSQLTestConstructor6objectERKNS_6config18NamedConfigurationE
 }
 

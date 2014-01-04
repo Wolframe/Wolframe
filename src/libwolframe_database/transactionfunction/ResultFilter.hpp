@@ -49,6 +49,7 @@ class ResultFilter
 public:
 	ResultFilter( const proc::ProcessorProvider* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_);
 	ResultFilter( const ResultFilter& o);
+	virtual ~ResultFilter(){}
 
 	langbind::TypedInputFilterR getOutput() const		{return m_result;}
 

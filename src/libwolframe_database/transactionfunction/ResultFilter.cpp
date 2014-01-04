@@ -62,7 +62,8 @@ ResultFilter::ResultFilter( const proc::ProcessorProvider* provider_, const std:
 	m_dbres.reset( new ResultIterator( resultstruct_,data_));
 	m_func = provider_->formFunction( filtername_);
 	if (!m_func) throw std::runtime_error( std::string( "transaction result filter function '") + filtername_ + "' not found (must be defined as form function)");
-	m_filterres.reset( m_func->createClosure());
+	langbind::FormFunctionClosureR clos( m_func->createClosure());
+	m_filterres = clos;
 	m_filterres->init( provider_, m_dbres);
 
 	if (!m_filterres->call())
