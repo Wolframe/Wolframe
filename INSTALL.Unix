@@ -305,6 +305,16 @@ change auth method from 'ident' to 'md5' in pg_hba.conf
 
 For scripting in Python you have to set WITH_PYTHON=1.
 
+For building the Oracle database module you have to download the RPM packages
+oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm  
+oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm  
+
+If you want to use the 'sqlplus' command line tool for manual testing you also
+have to install:
+oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm  
+
+You also need the 'libaio' package.
+
 Ubuntu 10.04.1 LTS
 ------------------
 
