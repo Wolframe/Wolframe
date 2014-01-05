@@ -107,7 +107,10 @@ public:
 	XsltProgramType()
 		:prgbind::Program( prgbind::Program::Function){}
 
-	virtual ~XsltProgramType(){}
+	virtual ~XsltProgramType()
+	{
+		xsltCleanupGlobals();
+	}
 
 	virtual bool is_mine( const std::string& filename) const
 	{

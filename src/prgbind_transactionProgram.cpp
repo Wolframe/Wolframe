@@ -103,6 +103,11 @@ public:
 						if (hint) explain = explain + " -- " + hint;
 						throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
 					}
+					catch (const std::runtime_error& e)
+					{
+						delete outputptr;
+						throw e;
+					}
 				}
 				m_result = m_func->getOutput( m_provider, res);
 				if (!res->isCaseSensitive())
