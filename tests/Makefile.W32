@@ -77,6 +77,13 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# Oracle
+!IFDEF WITH_ORACLE
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(ORACLE_DIR)\sdk\lib\msvc\oci.lib"
+!ENDIF
+
 # libhpdf
 !IFDEF WITH_LIBHPDF
 INCLUDE_CXXFLAGS = \
@@ -193,6 +200,9 @@ local_test:
 	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
 	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
 !ENDIF
+!ENDIF
+!IFDEF WITH_ORACLE
+	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
 !ENDIF
 	@-echo testNamedRetVal >> test.bat
 	@-echo testVirtualInheritance >> test.bat

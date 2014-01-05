@@ -17,7 +17,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\3rdParty\gtest\include
 
 INCLUDE_LDFLAGS = \
-	$(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS) \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
@@ -51,12 +51,12 @@ local_clean:
 local_distclean:
 
 local_test: dbPing.exe
-	@-copy "$(ORACLE_DIR)\oci.dll" .
 	@-echo @echo off > test.bat
+	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
 	@-echo dbping andreasbaumann.dyndns.org wolfusr wolfpwd orcl >> test.bat
 	@-echo if errorlevel 1 goto skip >> test.bat
 	@-echo echo continue >> test.bat
-	@-echo postgresUnit >> test.bat
+	@-echo oracleUnit >> test.bat
 	@-echo goto end >> test.bat
 	@-echo :skip >> test.bat
 	@-echo echo No properly configured database for tests >> test.bat
