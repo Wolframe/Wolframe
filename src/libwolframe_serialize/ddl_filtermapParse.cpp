@@ -160,8 +160,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
-
-	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " " << utils::getLogString( element);
+	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << utils::getLogString( element) << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

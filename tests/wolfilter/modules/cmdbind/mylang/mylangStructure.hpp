@@ -67,8 +67,6 @@ public:
 	///\brief Find out if 'this' represents an array of 'Structure'
 	///\return true, if yes
 	bool array() const;
-	///\brief Find out how many elements are defined in this structure
-	///\return the count
 
 	typedef std::pair<types::Variant,StructureR> KeyValuePair;
 

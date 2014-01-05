@@ -63,7 +63,7 @@ public:
 	{
 		if (m_data.get())
 		{
-			m_stk.push_back( StackElem( *m_data));
+			m_stk.push_back( StackElem( *m_data, -1));
 		}
 		else
 		{
@@ -92,7 +92,7 @@ public:
 	{
 		for (;;)
 		{
-			if (m_bufidx == m_buf.size())
+			if (m_bufidx && m_bufidx == m_buf.size())
 			{
 				m_bufidx = 0;
 				m_buf.clear();
@@ -111,12 +111,20 @@ public:
 			if (m_stk.back().itr == m_stk.back().end)
 			{
 				m_stk.pop_back();
-				if (m_stk.empty() || !m_stk.back().tag.defined())
+				if (m_stk.empty())
 				{
 					// ... if tag is defined then Open/Close was printed with every (array-) element
 					type = InputFilter::CloseTag;
 					element.clear();
+					return true;
 				}
+				++m_stk.back().itr;
+				if (m_stk.back().idx >= 0)
+				{
+					m_buf.push_back( BufElem( InputFilter::CloseTag, types::Variant()));
+				}
+				type = InputFilter::CloseTag;
+				element.clear();
 				return true;
 			}
 			if (m_stk.back().itr->atomic())
@@ -124,6 +132,10 @@ public:
 				if (m_stk.back().tag.defined())
 				{
 					m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().tag));
+				}
+				else if (m_stk.back().idx >= 0)
+				{
+					m_buf.push_back( BufElem( InputFilter::OpenTag, types::Variant(++m_stk.back().idx)));
 				}
 				else
 				{
@@ -135,16 +147,24 @@ public:
 			}
 			else
 			{
-				types::Variant tag;
-				if (m_stk.back().itr->array() && !flag( TypedInputFilter::SerializeWithIndices))
+				if (m_stk.back().itr->array())
 				{
-					if (m_stk.back().tag.defined())
+					if (m_stk.back().tag.defined() || m_stk.back().idx >= 0)
 					{
 						throw std::runtime_error("illegal structure: array of array");
 					}
-					tag = m_stk.back().itr->key;
-					// ... if tag is defined then Open/Close will be printed with every (array-) element
-					//	and here we do not print an 'Open'
+					if (flag( TypedInputFilter::SerializeWithIndices))
+					{
+						m_stk.push_back( StackElem( m_stk.back().itr->val, types::Variant(), 0));
+						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
+					}
+					else
+					{
+						types::Variant tag = m_stk.back().itr->key;
+						// ... if tag is defined then Open/Close will be printed with every (array-) element
+						//	and here we do not print an 'Open'
+						m_stk.push_back( StackElem( m_stk.back().itr->val, tag, -1));
+					}
 				}
 				else
 				{
@@ -152,15 +172,16 @@ public:
 					{
 						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().tag));
 					}
+					else if (m_stk.back().idx >= 0)
+					{
+						m_buf.push_back( BufElem( InputFilter::OpenTag, types::Variant(++m_stk.back().idx)));
+					}
 					else
 					{
 						m_buf.push_back( BufElem( InputFilter::OpenTag, m_stk.back().itr->key));
 					}
-					// ... if tag is not defined then an 'Open' is printed
-					//	and a final 'Close' will be printed when the structure is popped from the stack.
+					m_stk.push_back( StackElem( m_stk.back().itr->val, types::Variant(), -1));
 				}
-				m_stk.push_back( StackElem( m_stk.back().itr->val, tag));
-				++m_stk[ m_stk.size()-2].itr;
 			}
 		}
 	}
@@ -188,21 +209,22 @@ private:
 		python::Structure::const_iterator itr;
 		python::Structure::const_iterator end;
 		types::Variant tag;
+		int idx;
 		python::Structure obj;
 
 		StackElem(){}
-		StackElem( const python::Structure& obj_)
-			:obj(obj_)
+		StackElem( const python::Structure& obj_, int idx_)
+			:obj(obj_),idx(idx_)
 		{
 			itr = obj.begin(); end = obj.end();
 		}
-		StackElem( PyObject* obj_, const types::Variant& tag_)
-			:tag(tag_),obj(obj_)
+		StackElem( PyObject* obj_, const types::Variant& tag_, int idx_)
+			:tag(tag_),idx(idx_),obj(obj_)
 		{
 			itr = obj.begin(); end = obj.end();
 		}
 		StackElem( const StackElem& o)
-			:itr(o.itr),end(o.end),tag(o.tag),obj(o.obj){}
+			:itr(o.itr),end(o.end),tag(o.tag),idx(o.idx),obj(o.obj){}
 	};
 	std::vector<StackElem> m_stk;
 };
