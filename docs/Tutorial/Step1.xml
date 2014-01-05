@@ -78,9 +78,6 @@
 		we get:
 
 		<programlisting language='shell'>
-	Trying ::1...
-	Connection failed: Connection refused
-	Trying 127.0.0.1...
 	Connected to localhost.
 	Escape character is '^]'.
 	BYE Access denied.

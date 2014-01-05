@@ -12,27 +12,45 @@
 		We start the Qt client with:
 
 		<programlisting language='shell'>
-	wolfclient -c tutorial.conf
+	wolfclient tutorial.conf
 		</programlisting>
 	</para>
 		
 	<para>
-		First define your connection by selecting "Manage Connections" in
-		the "Connection" menu. Define a new connection called "tutorial"
+		First define your connection by selecting "Manage servers" in
+		the "File" menu. Define a new connection called "tutorial"
 		which connects to server "localhost" on port 7661. Leave the
 		SSL connection unchecked.
 	</para>
 	
 	<para>
-		Now you can try to login to your server by selection "Connection"
-		and then "Login" in the menu.	
+		You can test the connection now by pressing the "Test Connection"
+		button. 
+	</para>
+
+	<para>
+		You should get a message like
+
+		<programlisting language='shell'>
+	Connection successful
+		</programlisting>
+		
+		in a dialog box.
+	</para>
+	
+	<para>
+		Now you can try to login to your server by selecting 
+		"Login" in the "File" menu. Leave the "Username" and the
+		"Password" fields empty as we did not configure any
+		authentification method. Just pick the server called
+		"tutorial" in the "Server" field.
 	</para>
 	
 	<para>
 		Because we didn't write any user interfaces yet, we get
 		an error message:
 		<programlisting language='shell'>
-	Unable to load form 'init', does it exist?
+	Unable to load form plugin 'init', does the plugin exist?
 		</programlisting>
 		
 		To get rid of that error message we will have to create
@@ -41,7 +59,7 @@
 	</para>
 				
 	<para>
-		We start now the Qt designer and create an empty QWidget form named
+		We start now the Qt designer and create an empty form of type QWidget named
 		<filename>~/tutorial/client/init.ui</filename> and save it.
 	</para>
 	

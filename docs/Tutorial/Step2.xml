@@ -1,7 +1,7 @@
 <!-- step 2 -->
 
 <sect1>
-	<title>Step 2 - Basic Authentication</title>	
+	<title>Step 2 - Basic Authorization</title>	
 
 	<para>
 		So we have to add a dummy authorization to the server configuration
@@ -20,6 +20,7 @@
 		If we start the server now, the telnet shows us:
 		
 		<programlisting language='shell'>
+	Connected to localhost.
 	Escape character is '^]'.
 	Wolframe
 	OK

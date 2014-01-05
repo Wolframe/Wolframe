@@ -4,8 +4,8 @@
 	<title>Step 4 - Implement server side customer list</title>	
 
 	<para>
-		We want to store the customer data in a sqlite database, so we have to
-		prepare the server:
+		We want to store the customer data in a Sqlite database, so we have to
+		tell the server to load the database module for Sqlite:
 		<programlisting language='shell'>
 	LoadModules {
 		module mod_db_sqlite3
@@ -14,8 +14,8 @@
 	</para>
 	
 	<para>
-		This loads the database driver for Sqlite3. Now we also have to create
-		a database and populate the following schema:
+		Now we also have to create a database and populate it with the
+		following schema:
 
 		<programlisting language='shell'>
 	CREATE TABLE Customer (
@@ -75,7 +75,7 @@
 		use:
 
 		<programlisting language='shell'>
-	wolframed -p -c tutorial.conf
+	/usr/sbin/wolframed -p -c tutorial.conf
 		</programlisting>
 	</para>
 
@@ -109,7 +109,8 @@
 		database sqlitedb
 		cmdhandler {
 			directmap {
-				program tutorial.directmap
+				filter libxml2
+				program tutorial.dmap
 			}
 		}
 	}
@@ -117,11 +118,16 @@
 	</para>
 
 	<para>
-		Now we have to a file <filename>tutorial.directmap</filename>.
+		The "filter" directory specifies that the command handler should
+		use the libxml2 module to parse XML requests.
+	</para>
+	
+	<para>
+		Now we have to create a file <filename>tutorial.dmap</filename>.
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	CustomerListRequest = SelectCustomerList( xml );
+	COMMAND CustomerListRequest CALL SelectCustomerList;
 		</programlisting>
 
 		This means that we map the 'CustomerListRequest' request which gives us a list
@@ -158,12 +164,12 @@
 
 	Processor {
 		..
-		program CustomerListRequest.simpleform	
+		program CustomerListRequest.sfrm	
 		..
 	}
 		</programlisting>
 
-	and we add a simple form file <filename>CustomerListRequest.simpleform</filename>,
+	and we add a simple form file <filename>CustomerListRequest.sfrm</filename>,
 	for now we can leave it empty but for the root element:
 
 		<programlisting language='shell'>
@@ -176,9 +182,18 @@
 	</para>
 	
 	<para>
-		Now we create a telnet request, which contains basic authentication and
-		a request for the list of customers, called
-		<filename>CustomerListRequest.netcat</filename>:
+		The server shows now a message about the transaction function it
+		loaded:
+		
+		<programlisting language='shell'>
+	DEBUG: Loaded transaction function 'SelectCustomerList'
+		</programlisting>
+	</para>
+
+	<para>
+		Now we create a telnet request which contains pseudo authentication credentials 
+		and a request for the list of customers, called
+		<filename>~/tutorial/client/CustomerListRequest.netcat</filename>:
 
 		<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListRequest.netcat" parse="text" />
@@ -216,7 +231,8 @@
 	</para>
 
 	<para>
-		When we reexecute the netcat command we see:
+		When we reexecute the netcat command we see that the answer contains now
+		the list of customers:
 
 		<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerList.xml" parse="text" />
