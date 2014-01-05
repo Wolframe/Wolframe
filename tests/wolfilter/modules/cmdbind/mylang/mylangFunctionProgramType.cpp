@@ -84,16 +84,16 @@ public:
 	{
 		for (;;)
 		{
-			if (m_bufidx < m_buf.size())
+			if (m_bufidx == m_buf.size())
+			{
+				m_bufidx = 0;
+				m_buf.clear();
+			}
+			else if (m_bufidx < m_buf.size())
 			{
 				type = m_buf.at( m_bufidx).first;
 				element = m_buf.at( m_bufidx).second;
 				++m_bufidx;
-				if (m_bufidx == m_buf.size())
-				{
-					m_bufidx = 0;
-					m_buf.clear();
-				}
 				return true;
 			}
 			if (m_stk.empty())

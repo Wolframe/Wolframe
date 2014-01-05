@@ -177,8 +177,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			}
 			if (idx < 0)
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "unknown tag ", elementstr, getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
+				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk), std::string(".. candidates are {") + descr->names(", ") + "}");
 			}
 			types::VariantStructDescription::const_iterator
 				ei = descr->begin() + idx;
@@ -187,8 +186,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					std::string elementstr( element.tostring());
-					throw SerializationErrorException( "attribute element expected for ", elementstr, getElementPath( stk));
+					throw SerializationErrorException( "attribute element expected for ", element.tostring(), getElementPath( stk));
 				}
 			}
 			types::VariantStruct* elem = st.at( idx);
@@ -196,8 +194,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 
 			if (type != types::VariantStruct::Array && elem->initialized())
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "duplicate structure element definition", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
 			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
@@ -221,28 +218,24 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			}
 			if (idx < 0)
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "unknown attribute ", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "unknown attribute ", element.tostring(), getElementPath( stk));
 			}
 			types::VariantStructDescription::const_iterator ei = descr->begin() + idx;
 			if (!ei->attribute())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					std::string elementstr( element.tostring());
-					throw SerializationErrorException( "content element expected", elementstr, getElementPath( stk));
+					throw SerializationErrorException( "content element expected", element.tostring(), getElementPath( stk));
 				}
 			}
 			types::VariantStruct* elem = st.at( idx);
 			if (!elem->atomic())
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "atomic element expected", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "atomic element expected", element.tostring(), getElementPath( stk));
 			}
 			if (elem->initialized())
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "duplicate structure attribute definition", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "duplicate structure attribute definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
 			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
@@ -256,15 +249,13 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			if (idx < 0)
 			{
 				if (emptycontent( element)) return true;
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", element.tostring(), getElementPath( stk));
 			}
 			types::VariantStructDescription::const_iterator
 				ei = descr->begin() + idx;
 			if (ei->attribute())
 			{
-				std::string elementstr( element.tostring());
-				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", elementstr, getElementPath( stk));
+				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", element.tostring(), getElementPath( stk));
 			}
 			types::VariantStruct* elem = st.at( idx);
 			elem->setInitialized();
@@ -285,8 +276,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				case types::VariantStruct::Indirection:
 				case types::VariantStruct::Unresolved:
 				{
-					std::string elementstr( element.tostring());
-					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", elementstr, getElementPath( stk));
+					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 				}
 				case types::VariantStruct::Array:
 					if (elem->prototype()->atomic())
@@ -298,8 +288,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 					}
 					else
 					{
-						std::string elementstr( element.tostring());
-						throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", elementstr, getElementPath( stk));
+						throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 					}
 			}
 		}
