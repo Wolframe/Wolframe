@@ -47,9 +47,10 @@
 		
 		<programlisting language='shell'>
 	NOTICE: Starting server
+	INFO: Undefined ServerTokens, using ProductOnly
 	DEBUG: Random generator initialized. Using device '/dev/urandom'
 	DEBUG: AAAA database references resolved
-	INFO: Accepting connections on ::1:7661
+	INFO: Accepting connections on 0.0.0.0:7661
 	DEBUG: 1 network acceptor(s) created.
 	DEBUG: 0 network SSL acceptor(s) created.
 		</programlisting>
@@ -77,7 +78,10 @@
 		we get:
 
 		<programlisting language='shell'>
-	Access denied.
+	Connected to localhost.
+	Escape character is '^]'.
+	BYE Access denied.
+	Connection closed by foreign host.
 		</programlisting>
 	</para>
 	
@@ -85,8 +89,8 @@
 		The server tells us:
 
 		<programlisting language='shell'>
-	DEBUG: Connection from ::1:52134 to localhost:7661 not authorized
-	DEBUG: Connection to ::1:52134 closed
+	DEBUG: Connection from 127.0.0.1:39110 to 0.0.0.0:7661 not authorized
+	DEBUG: Connection to 127.0.0.1:39110 closed
 		</programlisting>
 	</para>
 	

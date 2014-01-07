@@ -79,8 +79,8 @@ build() {
     CFLAGS='-O2' CXXFLAGS='-O2' \
     LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
 
-  msg "Building documentation.."
-  cd docs
-  make doc
+#  msg "Building documentation.."
+#  cd docs
+#  make doc
   cd ..
 }
