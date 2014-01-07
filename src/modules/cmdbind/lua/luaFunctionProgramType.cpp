@@ -50,15 +50,34 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 namespace {
+struct ResultData
+	:public langbind::TypedInputFilter::Data
+{
+	ResultData( const langbind::LuaScriptInstanceR& interp_)
+		:m_interp(interp_){}
+
+	ResultData( const ResultData& o)
+		:m_interp(o.m_interp){}
+
+	virtual ~ResultData(){}
+
+	virtual Data* copy() const
+		{return new ResultData(*this);}
+
+private:
+	langbind::LuaScriptInstanceR m_interp;
+};
 
 class LuaFormFunctionClosure
 	:public langbind::FormFunctionClosure
 {
 public:
 	LuaFormFunctionClosure( const langbind::LuaScriptInstanceR& interp_, const std::string& name_)
-		:m_interp(interp_),m_name(name_),m_firstcall(false){}
+		:m_interp(interp_),m_name(name_),m_firstcall(false)
+	{}
 
-	virtual ~LuaFormFunctionClosure(){}
+	virtual ~LuaFormFunctionClosure()
+	{}
 
 	virtual bool call()
 	{
@@ -86,6 +105,7 @@ public:
 			LOG_ERROR << "lua function returned no result or nil (structure expected)";
 			throw std::runtime_error( "called lua function without result");
 		}
+		m_result->setData( new ResultData( m_interp));
 		return true;
 	}
 

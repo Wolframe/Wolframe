@@ -68,7 +68,7 @@ public:
 		,m_result(o.m_result)
 		,m_flags(o.m_flags)
 		{}
-	
+
 	virtual bool call()
 	{
 		switch (m_state)

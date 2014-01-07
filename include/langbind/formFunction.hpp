@@ -63,6 +63,7 @@ struct FormFunctionClosure
 	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None)=0;
 
 	///\brief Get the iterator for the function result
+	///\remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
 	virtual TypedInputFilterR result() const=0;
 };
 

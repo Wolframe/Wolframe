@@ -1,6 +1,5 @@
 **
 **requires:LIBXML2
-**requires:DISABLED SUSE_LINUX
 **input
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE CATALOG SYSTEM 'CDCatalog'>
