@@ -82,6 +82,22 @@
    obj:*
 }
 {
+   dl_open_malloc3
+   Memcheck:Leak
+   fun:malloc
+   fun:open_path
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_error
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+}
+{
    S01
    Memcheck:Addr8
    fun:wcscmp
@@ -4910,5 +4926,21 @@
    fun:_ZN9_Wolframe2db16PostgreSQLdbUnitC1ERKSsS3_tS3_S3_S3_SsSsSsSsSstmtjRKSt4listISsSaISsEE
    fun:_ZN9_Wolframe2db21PostgreSQLconstructor6objectERKNS_6config18NamedConfigurationE
    fun:_ZN9_Wolframe2db25PostgreSQLTestConstructor6objectERKNS_6config18NamedConfigurationE
+}
+{
+   XSLT_Cond
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   obj:/lib/x86_64-linux-gnu/libz.so.1.2.3.4
+   obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.7.8
+   fun:__xmlParserInputBufferCreateFilename
+   fun:xmlNewInputFromFile
+   obj:/usr/lib/x86_64-linux-gnu/libxslt.so.1.1.26
+   fun:xsltParseStylesheetFile
+   fun:_ZN12_GLOBAL__N_121XsltFilterConstructorC1ERKSs
+   fun:_ZN12_GLOBAL__N_115XsltProgramType11loadProgramERN9_Wolframe7prgbind14ProgramLibraryEPNS1_2db8DatabaseERKSs
+   fun:_ZN9_Wolframe7prgbind14ProgramLibrary4Impl12loadProgramsERS1_PNS_2db8DatabaseERKSt4listISsSaISsEE
+   fun:_ZN9_Wolframe7prgbind14ProgramLibrary12loadProgramsEPNS_2db8DatabaseERKSt4listISsSaISsEE
 }
 
