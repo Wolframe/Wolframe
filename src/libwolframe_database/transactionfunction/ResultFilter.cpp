@@ -37,33 +37,14 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-namespace {
-struct FilterData
-	:public langbind::TypedInputFilter::Data
-{
-	FilterData( const langbind::FormFunction* f,
-		const langbind::TypedInputFilterR& dr,
-		const langbind::FormFunctionClosureR& fr)	:func(f),dbres(dr),filterres(fr){}
-
-	FilterData( const FilterData& o)			:func(o.func),dbres(o.dbres),filterres(o.filterres){}
-
-	virtual ~FilterData(){}
-	virtual Data* copy() const				{return new FilterData(*this);}
-private:
-	const langbind::FormFunction* func;
-	langbind::TypedInputFilterR dbres;
-	langbind::FormFunctionClosureR filterres;
-};
-}
-
 ResultFilter::ResultFilter( const proc::ProcessorProvider* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_)
 	:m_func(0)
 {
 	m_dbres.reset( new ResultIterator( resultstruct_,data_));
 	m_func = provider_->formFunction( filtername_);
 	if (!m_func) throw std::runtime_error( std::string( "transaction result filter function '") + filtername_ + "' not found (must be defined as form function)");
-	langbind::FormFunctionClosureR clos( m_func->createClosure());
-	m_filterres = clos;
+
+	m_filterres = langbind::FormFunctionClosureR( m_func->createClosure());
 	m_filterres->init( provider_, m_dbres);
 
 	if (!m_filterres->call())
@@ -71,7 +52,6 @@ ResultFilter::ResultFilter( const proc::ProcessorProvider* provider_, const std:
 		throw std::runtime_error( std::string( "failed to call filter function '") + filtername_ + "' with result of transaction (input not complete)");
 	}
 	m_result = m_filterres->result();
-	m_result->setData( new FilterData( m_func, m_dbres, m_filterres));
 	if (m_dbres->flag( langbind::TypedInputFilter::PropagateNoCase))
 	{
 		m_result->setFlags( langbind::TypedInputFilter::PropagateNoCase);

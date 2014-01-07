@@ -195,7 +195,7 @@ struct LuaObject
 		try
 		{
 			const char* mt = metaTableName<ObjectType>();
-			(void*)new (ls,mt) LuaObject( o);
+			LuaObject* THIS = (LuaObject*)(void*)new (ls,mt) LuaObject( o);
 		}
 		catch (const std::bad_alloc&)
 		{
