@@ -324,7 +324,7 @@ for ($ii=0; $ii<$testSize; ++$ii) {
 print (createTransaction() . "\n\n");
 
 print "**file: test.dmap\n";
-print "COMMAND(run) CALL(test_transaction);\n";
+print "COMMAND(run) SKIP CALL(test_transaction);\n";
 
 print "**config\n";
 my $dir_testmod = "./../wolfilter/modules/";
@@ -333,7 +333,7 @@ print "--module $dir_testmod/filter/testtoken/mod_filter_testtoken ";
 print "--module ./../../src/modules/cmdbind/directmap/mod_command_directmap ";
 print "--module $dir_testmod/database/testtrace/mod_db_testtrace ";
 print "--database 'identifier=testdb,outfile=DBOUT,file=DBRES' ";
-print "--program=DBIN.tdl --cmdprogram=test.dmap run";
+print "--program=DBIN.tdl --cmdprogram=test.dmap run\n";
 
 print "**input\n";
 print ">doc\n";

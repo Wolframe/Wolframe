@@ -251,6 +251,11 @@ struct InputFilterImpl :public InputFilter
 			while (tg == '\n' || tg == '\r');
 			if (!tg)
 			{
+				if (!m_srcend)
+				{
+					setState( EndOfMessage);
+					return false;
+				}
 				if (m_taglevel != 0)
 				{
 					setState( InputFilter::Error, "token filter - tags not balanced");
@@ -284,21 +289,7 @@ struct InputFilterImpl :public InputFilter
 				}
 				else
 				{
-					type = m_elemtype;
-					element = m_elembuf.c_str();
-					elementsize = m_elembuf.size();
-					if (m_elemtype == OpenTag)
-					{
-						++m_taglevel;
-					}
-					else if (m_elemtype == CloseTag)
-					{
-						--m_taglevel;
-					}
-					m_tag = '\0';
-					m_linecomplete = true;
-					m_eolnread = false;
-					return true;
+					break;
 				}
 			}
 			else if (ch == '\r')
@@ -318,7 +309,7 @@ struct InputFilterImpl :public InputFilter
 				++m_srcpos;
 			}
 		}
-		if (m_elembuf.size() != 0)
+		if (m_eolnread)
 		{
 			type = m_elemtype;
 			element = m_elembuf.c_str();

@@ -66,8 +66,7 @@ public:
 	explicit CountedReference( OBJ* ptr=0)
 		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
 
-	virtual ~CountedReference()
-	{}
+	virtual ~CountedReference(){}
 
 	CountedReference& operator =( const CountedReference& o)
 	{
