@@ -209,8 +209,8 @@ private:
 		python::Structure::const_iterator itr;
 		python::Structure::const_iterator end;
 		types::Variant tag;
-		int idx;
 		python::Structure obj;
+		int idx;
 
 		StackElem(){}
 		StackElem( const python::Structure& obj_, int idx_)
@@ -219,12 +219,12 @@ private:
 			itr = obj.begin(); end = obj.end();
 		}
 		StackElem( PyObject* obj_, const types::Variant& tag_, int idx_)
-			:tag(tag_),idx(idx_),obj(obj_)
+			:tag(tag_),obj(obj_),idx(idx_)
 		{
 			itr = obj.begin(); end = obj.end();
 		}
 		StackElem( const StackElem& o)
-			:itr(o.itr),end(o.end),tag(o.tag),idx(o.idx),obj(o.obj){}
+			:itr(o.itr),end(o.end),tag(o.tag),obj(o.obj),idx(o.idx){}
 	};
 	std::vector<StackElem> m_stk;
 };
