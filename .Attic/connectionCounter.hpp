@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file connectionCounter.hpp
-///\brief Alternative atomic (lockfree) counter implementation for handling the number of connections
-
+//\file types/connectionCounter.hpp
+//\brief Alternative atomic (lockfree) counter implementation for handling the number of connections
 #ifndef _CONNECTION_COUNTER_HPP_INCLUDED
 #define _CONNECTION_COUNTER_HPP_INCLUDED
 #include <boost/atomic/atomic.hpp>
@@ -40,37 +39,54 @@
 namespace _Wolframe {
 namespace types {
 
-///\class Atomic limit counter for number of connections
+//\class ConnectionCounter
+//\brief Atomic counter with upper value limit for number of connections
 class ConnectionCounter
+	:protected boost::atomic<unsigned int>
 {
 public:
 	typedef unsigned int CounterType;
 	typedef boost::atomic<CounterType> Parent;
 
-	ConnectionCounter( CounterType initialValue, CounterType limitValue)
-		:boost::atomic<CounterType>(initialValue){}
+	//\brief Constructor
+	explicit ConnectionCounter( CounterType initialValue=0, CounterType limitValue_=0)
+		:boost::atomic<CounterType>(initialValue)
+		,m_limitValue(limitValue_)
+	{}
 
+	//\brief Aquire the counter
+	//\return 0 in case of error, the counter instance auqired (>0) in case of success
 	CounterType aquire()
 	{
-		for (;;)
+		if (m_limitValue)
 		{
-			CounterType val = Parent::load( boost::memory_order_acquire);
-			if (val >= limitValue) return 0;
-			if (compare_exchange_strong( val, val+1, boost::memory_order_acq_rel)) return val+1;
-			if (val >= limitValue) return 0;
+			for (;;)
+			{
+				CounterType val = Parent::load( boost::memory_order_relaxed);
+				if (val >= m_limitValue) return 0;
+				if (Parent::compare_exchange_strong( val, val+1, boost::memory_order_acquire))
+				{
+					return val+1;
+				}
+			}
+		}
+		else
+		{
+			return Parent::fetch_add( 1, boost::memory_order_acquire)+1;
 		}
 	}
 
+	//\brief Release the counter
 	void release()
 	{
-		Parent::fetch_sub( 1, boost::memory_order_relaxed);
+		Parent::fetch_sub( 1, boost::memory_order_release);
 	}
 
 	///\brief Aquire a counter in a limit in an exception save scope
 	// Example:
 	//	ConnectionCounter globalCnt;
 	//	....
-	//	ScopedAquire cntscope( globalCnt);
+	//	ConnectionCounter::ScopedAquire cntscope( globalCnt);
 	//	if (cntscope.entered())
 	//	{
 	//		... do something that might throw
@@ -85,27 +101,30 @@ public:
 			if (!m_cc->aquire()) m_cc = 0;
 		}
 
-		~Scope()
+		~ScopedAquire()
 		{
 			if (m_cc) m_cc->release();
 		}
 
+		//\brief Evaluate if the counter could be aquired in the given limits
+		//\return true if yes
 		bool entered() const
 		{
 			return m_cc;
 		}
 
+		//\brief Complete aquiring of the counter: All operations belonging to the counter aquiring that might throw have been completed with success.
 		void done()
 		{
 			m_cc = 0;
 		}
 
 	private:
-		ConnectionCounter* m_cc;
+		ConnectionCounter* m_cc;	//< glocal counter reference
 	};
 
 private:
-	boost::memory_order m_order;
+	CounterType m_limitValue;		//< upper counter limit
 };
 
 }}//namespace
