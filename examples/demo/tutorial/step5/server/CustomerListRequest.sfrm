@@ -1,6 +1,5 @@
 FORM CustomerListRequest
 {
 	customer {
-		id ?@string
 	}
 }

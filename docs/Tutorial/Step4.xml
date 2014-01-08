@@ -118,8 +118,8 @@
 	</para>
 
 	<para>
-		The "filter" directory specifies that the command handler should
-		use the libxml2 module to parse XML requests.
+		The "filter" directive denotes that the command handler should
+		use the "libxml2" module to parse XML requests.
 	</para>
 	
 	<para>
@@ -132,7 +132,7 @@
 
 		This means that we map the 'CustomerListRequest' request which gives us a list
 		of customers to the TDL transaction 'SelectCustomerList'. This also means
-		we need to configure the TDL program in the server:
+		we need to configure a TDL program in the server:
 
 		<programlisting language='shell'>
 	Processor {
@@ -218,7 +218,7 @@
 	</para>
 	
 	<para>
-		Let's also add some demo data now:
+		Let's add some customer data now:
 
 		<programlisting language='shell'>
 	cat > data.sql

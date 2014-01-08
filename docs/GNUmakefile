@@ -58,7 +58,7 @@ doc-doxygen-webpage:
 
 doc-html: WolfBook.html Tutorial.html
 
-doc-html-chunked: html/index.html
+doc-html-chunked: html/index.html html-tutorial/index.html
 
 doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
 
@@ -97,6 +97,12 @@ html-webpage/index.html: WolfBook.xml
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl WolfBook.xml
 
+html-tutorial/index.html: Tutorial.xml
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 3 \
+	-o $@ output-html-chunked.xsl Tutorial.xml
+
 html-tutorial-webpage/index.html: Tutorial.xml
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
@@ -123,6 +129,7 @@ local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
+	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
 	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf doxygen/html-webpage/*
