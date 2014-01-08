@@ -30,18 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file system/connectionCounter.hpp
-//\brief Alternative atomic (lockfree) counter implementation for handling the number of connections
-#ifndef _CONNECTION_COUNTER_HPP_INCLUDED
-#define _CONNECTION_COUNTER_HPP_INCLUDED
+//\file system/syncCounter.hpp
+//\brief Atomic (lockfree) counter implementation for a synchronized counting of objects
+#ifndef _SYNCHRONIZED_COUNTER_HPP_INCLUDED
+#define _SYNCHRONIZED_COUNTER_HPP_INCLUDED
 #include <boost/atomic/atomic.hpp>
 
 namespace _Wolframe {
 namespace system {
 
-//\class ConnectionCounter
-//\brief Atomic counter with upper value limit for number of connections
-class ConnectionCounter
+//\class SyncCounter
+//\brief Atomic counter with upper value limit for a synchronized counting of objects
+class SyncCounter
 	:protected boost::atomic<unsigned int>
 {
 public:
@@ -49,7 +49,7 @@ public:
 	typedef boost::atomic<CounterType> Parent;
 
 	//\brief Constructor
-	explicit ConnectionCounter( CounterType initialValue=0, CounterType limitValue_=0)
+	explicit SyncCounter( CounterType initialValue=0, CounterType limitValue_=0)
 		:boost::atomic<CounterType>(initialValue)
 		,m_limitValue(limitValue_)
 	{}
@@ -84,9 +84,9 @@ public:
 
 	///\brief Aquire a counter in a limit in an exception save scope
 	// Example:
-	//	ConnectionCounter globalCnt;
+	//	SyncCounter globalCnt;
 	//	....
-	//	ConnectionCounter::ScopedAquire cntscope( globalCnt);
+	//	SyncCounter::ScopedAquire cntscope( globalCnt);
 	//	if (cntscope.entered())
 	//	{
 	//		... do something that might throw
@@ -95,7 +95,7 @@ public:
 	//
 	class ScopedAquire
 	{
-		ScopedAquire( ConnectionCounter& cc_)
+		ScopedAquire( SyncCounter& cc_)
 			:m_cc(&cc_)
 		{
 			if (!m_cc->aquire()) m_cc = 0;
@@ -120,7 +120,7 @@ public:
 		}
 
 	private:
-		ConnectionCounter* m_cc;	//< global counter reference
+		SyncCounter* m_cc;	//< global counter reference
 	};
 
 private:
