@@ -30,49 +30,52 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file connectionTypeSocket.hpp
-//\brief Connection type Socket
-#ifndef _Wolframe_CONNECTION_TYPE_SOCKET_HPP_INCLUDED
-#define _Wolframe_CONNECTION_TYPE_SOCKET_HPP_INCLUDED
-#include <boost/asio.hpp>
-#include <list>
-#include "connectionBase.hpp"
-#include "connectionCount.hpp"
-#include "types/syncCounter.hpp"
+//\file acceptorSocket.hpp
+//\brief Acceptor on socket
+#ifndef _Wolframe_ACCEPTOR_SOCKET_HPP_INCLUDED
+#define _Wolframe_ACCEPTOR_SOCKET_HPP_INCLUDED
+#include "connectionTypeSocket.hpp"
 #include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 
 namespace _Wolframe {
 namespace net {
 
-//\brief Represents a single connection from a client.
-class ConnectionTypeSocket
-	:public ConnectionBase< boost::asio::ip::tcp::socket >
-	,public ConnectionCount
+//\brief Acceptor of new connections
+class AcceptorSocket
+	:private boost::noncopyable
 {
 public:
 	//\brief Construct a connection with the given io_service.
-	ConnectionTypeSocket( boost::asio::io_service& IOservice,
-				types::SyncCounter* classCounter_,
-				types::SyncCounter* globalCounter_,
-				ConnectionHandler *handler);
-	~ConnectionTypeSocket();
+	AcceptorSocket( boost::asio::io_service* IOservice,
+			const std::string& host, unsigned short port, unsigned maxConnections,
+			types::SyncCounter* globalCounter_,
+			ServerHandler* srvHandler );
+	~AcceptorSocket();
 
-	//\brief Get the socket associated with the connection.
-	boost::asio::ip::tcp::socket& socket()	{ return m_socket; }
-
-	//\brief Start the first asynchronous operation for the connection.
-	void start();
-
-	//\brief Get a description of this connection for log messages
-	std::string logString() const;
+	//\brief Stop the acceptor. Outstanding asynchronous operations will be completed.
+	void stop();
 
 private:
-	boost::asio::ip::tcp::socket m_socket;		//< socket for the connection
-};
+	//\brief Handle completion of an asynchronous accept operation.
+	void handleAccept( const boost::system::error_code& e );
 
-typedef boost::shared_ptr<ConnectionTypeSocket> ConnectionTypeSocketR;
+	//\brief Handle a request to stop the server.
+	void handleStop();
+
+private:
+	boost::asio::io_service*		m_IOservice;	// The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
+	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
+	ConnectionTypeSocketR			m_newConnection;// The next connection to be accepted.
+	types::SyncCounter			m_connectionCounter;
+	types::SyncCounter*			m_globalCounter;
+
+	std::string				m_identifier;
+	_Wolframe::ServerHandler*		m_srvHandler;	// The handler for all incoming requests.
+};
 
 }}//namespace
 #endif

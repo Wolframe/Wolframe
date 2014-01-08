@@ -39,6 +39,7 @@
 #include <boost/asio/ssl.hpp>
 #include <list>
 #include "connectionBase.hpp"
+#include "connectionCount.hpp"
 #include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -52,14 +53,15 @@ class ConnectionTypeSSL
 	:public ConnectionBase< ssl_socket >
 	,public ConnectionCount
 {
+public:
 	//\brief Construct a connection with the given io_service and SSL conetext.
-	SSLconnection( boost::asio::io_service& IOservice,
+	ConnectionTypeSSL( boost::asio::io_service& IOservice,
 				boost::asio::ssl::context& SSLcontext,
 				types::SyncCounter* classCounter_,
 				types::SyncCounter* globalCounter_,
 				ConnectionHandler *handler );
 
-	~SSLconnection();
+	~ConnectionTypeSSL();
 
 	//\brief Get the socket associated with the SSL connection.
 	ssl_socket& socket()			{ return m_SSLsocket; }
@@ -78,6 +80,9 @@ private:
 	ssl_socket m_SSLsocket;
 };
 
+typedef boost::shared_ptr<ConnectionTypeSSL> ConnectionTypeSSLR;
+
+}}//namespace
 #endif // WITH_SSL
 #endif
 

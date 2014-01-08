@@ -60,18 +60,10 @@ public:
 	{
 		types::SyncCounter::ScopedAquire gs( *m_globalCounter);
 		{
-			if (!gs.entered())
-			{
-				refuse();
-				return false;
-			}
+			if (!gs.entered()) return false;
 			types::SyncCounter::ScopedAquire ls( *m_classCounter);
 			{
-				if (!ls.entered())
-				{
-					refuse();
-					return false;
-				}
+				if (!ls.entered()) return false;
 				ls.done();
 			}
 			gs.done();

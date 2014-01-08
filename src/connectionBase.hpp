@@ -85,9 +85,6 @@ public:
 	/// Start the first asynchronous operation for the connection.
 	virtual void start() = 0;
 
-	/// Unregister the connection from the list of active connections
-	virtual void unregister() = 0;
-
 	/// Dispatch a signal for the processor
 	void signal()
 	{
@@ -171,7 +168,6 @@ public:
 				LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
 				// Initiate graceful connection closure.
 				setTimeout( 0 );
-				unregister();
 				m_strand.post( boost::bind( &ConnectionBase::handleShutdown,
 							    this->shared_from_this() ));
 				break;

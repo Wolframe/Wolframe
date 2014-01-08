@@ -32,11 +32,15 @@
 ************************************************************************/
 //\file connectionTypeSSL.cpp
 //\brief Implementation of the connection type SSL
-#include "connectionTypeSSL.hpp"
 #ifdef WITH_SSL
+#include "connectionTypeSSL.hpp"
+#include "logger-v1.hpp"
+#include "system/SSLcertificateInfo.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::net;
+
+static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
 ConnectionTypeSSL::ConnectionTypeSSL(
 			boost::asio::io_service& IOservice,
@@ -46,7 +50,7 @@ ConnectionTypeSSL::ConnectionTypeSSL(
 			ConnectionHandler *handler )
 	:ConnectionBase< ssl_socket >( IOservice, handler )
 	,ConnectionCount(classCounter_,globalCounter_)
-	m_SSLsocket( IOservice, SSLcontext )
+	,m_SSLsocket( IOservice, SSLcontext )
 {
 	LOG_TRACE << "New SSL connection created";
 }
@@ -76,8 +80,6 @@ void ConnectionTypeSSL::start()
 
 void ConnectionTypeSSL::handleHandshake( const boost::system::error_code& e )
 {
-	assert( m_connList );
-
 	if ( !e )	{
 		LOG_DATA << "successful SSL handshake, peer " << identifier();
 
@@ -96,7 +98,6 @@ void ConnectionTypeSSL::handleHandshake( const boost::system::error_code& e )
 			if ( peerCert )	{
 				certInfo = new SSLcertificateInfo( peerCert );
 			}
-			m_connList->push( boost::static_pointer_cast< ConnectionTypeSSL >( shared_from_this()) );
 			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
 								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
 								   certInfo ));
@@ -112,7 +113,7 @@ void ConnectionTypeSSL::handleHandshake( const boost::system::error_code& e )
 }
 
 
-std::string ConnectionTypeSSL::toString() const
+std::string ConnectionTypeSSL::logString() const
 {
 	std::string str;
 

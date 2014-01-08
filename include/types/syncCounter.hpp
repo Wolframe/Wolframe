@@ -95,6 +95,7 @@ public:
 	//
 	class ScopedAquire
 	{
+	public:
 		ScopedAquire( SyncCounter& cc_)
 			:m_cc(&cc_)
 		{

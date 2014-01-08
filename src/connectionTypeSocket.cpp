@@ -33,9 +33,12 @@
 //\file connectionTypeSocket.cpp
 //\brief Implementation of the connection type Socket
 #include "connectionTypeSocket.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::net;
+
+static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
 ConnectionTypeSocket::ConnectionTypeSocket(
 			boost::asio::io_service& IOservice,
