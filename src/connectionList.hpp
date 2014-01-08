@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file system/connectionList.hpp
+//\file connectionList.hpp
 //\brief Interface to list of connections
 #ifndef _CONNECTION_LIST_HPP_INCLUDED
 #define _CONNECTION_LIST_HPP_INCLUDED
-#include "system/syncCounter.hpp"
-#include "system/syncObjectList.hpp"
+#include "types/syncCounter.hpp"
+#include "types/syncObjectList.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -47,20 +47,20 @@ class ConnectionList
 public:
 	typedef CONNECTION* (*CreateConnectionF)( const DESCRIPTION& descr);
 	typedef boost::shared_ptr<CONNECTION> ConnectionR;
-	typedef system::SyncObjectList<ConnectionR>::Handle ConnectionHandle;
+	typedef types::SyncObjectList<ConnectionR>::Handle ConnectionHandle;
 
-	ConnectionList( unsigned int maxNofConnections, CreateConnectionF createConn_, system::SyncCounter* globalcounter_)
+	ConnectionList( unsigned int maxNofConnections, CreateConnectionF createConn_, types::SyncCounter* globalcounter_)
 		:m_globalcounter(globalcounter_)
 		,m_counter( maxNofConnections)
 		,m_createConn(createConn_){}
 
 	ConnectionHandle createConnection( const DESCRIPTION& descr)
 	{
-		system::SyncCounter::ScopedAquire gs( *m_globalcounter);
+		types::SyncCounter::ScopedAquire gs( *m_globalcounter);
 		{
 			if (!gs.entered()) throw std::runtime_error( "too many connections");
 
-			system::SyncCounter::ScopedAquire ls( m_counter);
+			types::SyncCounter::ScopedAquire ls( m_counter);
 			{
 				if (!ls.entered()) throw std::runtime_error( "too many connections");
 
@@ -72,9 +72,9 @@ public:
 		}
 	}
 private:
-	system::SyncCounter* m_globalcounter;
-	system::SyncCounter m_counter;
-	system::SyncObjectList<ConnectionR> m_list;
+	types::SyncCounter* m_globalcounter;
+	types::SyncCounter m_counter;
+	types::SyncObjectList<ConnectionR> m_list;
 	CreateConnectionF m_createConn;
 };
 }}
