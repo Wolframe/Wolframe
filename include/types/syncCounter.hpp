@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file system/syncCounter.hpp
+//\file types/syncCounter.hpp
 //\brief Atomic (lockfree) counter implementation for a synchronized counting of objects
-#ifndef _SYNCHRONIZED_COUNTER_HPP_INCLUDED
-#define _SYNCHRONIZED_COUNTER_HPP_INCLUDED
+#ifndef _Wolframe_SYNCHRONIZED_COUNTER_HPP_INCLUDED
+#define _Wolframe_SYNCHRONIZED_COUNTER_HPP_INCLUDED
 #include <boost/atomic/atomic.hpp>
 
 namespace _Wolframe {
-namespace system {
+namespace types {
 
 //\class SyncCounter
 //\brief Atomic counter with upper value limit for a synchronized counting of objects

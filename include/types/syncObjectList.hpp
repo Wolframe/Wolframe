@@ -30,17 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file system/syncObjectList.hpp
+//\file Wolframe_/syncObjectList.hpp
 //\brief Interface to shared and synchronized list of objects
-#ifndef _SYNC_OBJECT_LIST_HPP_INCLUDED
-#define _SYNC_OBJECT_LIST_HPP_INCLUDED
+#ifndef _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
+#define _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
 #include <list>
-#include <stdexcept>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 namespace _Wolframe {
-namespace system {
+namespace types {
 
 //\class SyncObjectList
 //\brief Shared and synchronized list of objects
@@ -48,7 +47,7 @@ template <class OBJ>
 class SyncObjectList
 {
 public:
-	typedef typename std::list<OBJ>::iterator Handle;
+	typedef typename std::list<OBJ>::iterator Reference;
 	
 	//\brief Constructor
 	SyncObjectList()
@@ -56,17 +55,17 @@ public:
 
 	//\brief Insert object into the list
 	//\return a handle to the object
-	Handle insert( OBJ obj)
+	Reference insert( OBJ obj)
 	{
 		boost::mutex::scoped_lock lock( m_mutex);
 		m_list.push_front( obj);
 		return m_list.begin();
 	}
 
-	void release( const Handle& objhandle)
+	void release( const Reference& objref)
 	{
 		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.erase( objhandle);
+		m_list.erase( objref);
 	}
 
 private:
