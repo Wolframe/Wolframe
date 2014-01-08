@@ -48,7 +48,7 @@ template <class OBJ>
 class SyncObjectList
 {
 public:
-	typedef typename std::list<OBJ*>::iterator Handle;
+	typedef typename std::list<OBJ>::iterator Handle;
 	
 	//\brief Constructor
 	SyncObjectList()
@@ -56,7 +56,7 @@ public:
 
 	//\brief Insert object into the list
 	//\return a handle to the object
-	Handle insert( OBJ* obj)
+	Handle insert( OBJ obj)
 	{
 		boost::mutex::scoped_lock lock( m_mutex);
 		m_list.push_front( obj);
@@ -71,7 +71,7 @@ public:
 
 private:
 	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ*> m_list;		//< list of object references
+	std::list<OBJ> m_list;		//< list of object references
 };
 
 }}//namespace
