@@ -30,50 +30,55 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file types/syncObjectList.hpp
-//\brief Interface to shared and synchronized list of objects
-#ifndef _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
-#define _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
+//\file connectionTypeSSL.hpp
+//\brief Connection type SSL
+#ifndef _Wolframe_CONNECTION_TYPE_SSL_HPP_INCLUDED
+#define _Wolframe_CONNECTION_TYPE_SSL_HPP_INCLUDED
+#ifdef WITH_SSL
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 #include <list>
+#include "connectionBase.hpp"
+#include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace types {
+namespace net {
 
-//\class SyncObjectList
-//\brief Shared and synchronized list of objects
-template <class OBJ>
-class SyncObjectList
+typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
+
+class ConnectionTypeSSL
+	:public ConnectionBase< ssl_socket >
+	,public ConnectionCount
 {
-public:
-	typedef typename std::list<OBJ>::iterator Reference;
-	
-	//\brief Constructor
-	SyncObjectList()
-	{}
+	//\brief Construct a connection with the given io_service and SSL conetext.
+	SSLconnection( boost::asio::io_service& IOservice,
+				boost::asio::ssl::context& SSLcontext,
+				types::SyncCounter* classCounter_,
+				types::SyncCounter* globalCounter_,
+				ConnectionHandler *handler );
 
-	//\brief Insert object into the list
-	//\return a handle to the object
-	Reference insert( OBJ obj)
-	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.push_front( obj);
-		return m_list.begin();
-	}
+	~SSLconnection();
 
-	void release( const Reference& objref)
-	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.erase( objref);
-	}
+	//\brief Get the socket associated with the SSL connection.
+	ssl_socket& socket()			{ return m_SSLsocket; }
+
+	//\brief Start the first asynchronous operation for the connection.
+	void start();
+
+	//\brief Get a description of this connection for log messages
+	std::string logString() const;
 
 private:
-	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ> m_list;		//< list of object references
+	//\brief Handle the SSL handshake
+	void handleHandshake( const boost::system::error_code& error );
+
+	//\brief Socket for the SSL connection.
+	ssl_socket m_SSLsocket;
 };
 
-}}//namespace
+#endif // WITH_SSL
 #endif
 
 

@@ -30,50 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file types/syncObjectList.hpp
-//\brief Interface to shared and synchronized list of objects
-#ifndef _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
-#define _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
+//\file connectionTypeSocket.hpp
+//\brief Connection type Socket
+#ifndef _Wolframe_CONNECTION_TYPE_SOCKET_HPP_INCLUDED
+#define _Wolframe_CONNECTION_TYPE_SOCKET_HPP_INCLUDED
+#include <boost/asio.hpp>
 #include <list>
+#include "connectionBase.hpp"
+#include "connectionCount.hpp""
+#include "types/syncCounter.hpp"
+#include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace types {
+namespace net {
 
-//\class SyncObjectList
-//\brief Shared and synchronized list of objects
-template <class OBJ>
-class SyncObjectList
+//\brief Represents a single connection from a client.
+class ConnectionTypeSocket
+	:public ConnectionBase< boost::asio::ip::tcp::socket >
+	,public ConnectionCount
 {
 public:
-	typedef typename std::list<OBJ>::iterator Reference;
-	
-	//\brief Constructor
-	SyncObjectList()
-	{}
+	//\brief Construct a connection with the given io_service.
+	ConnectionTypeSocket( boost::asio::io_service& IOservice,
+				types::SyncCounter* classCounter_,
+				types::SyncCounter* globalCounter_,
+				ConnectionHandler *handler);
+	~ConnectionTypeSocket();
 
-	//\brief Insert object into the list
-	//\return a handle to the object
-	Reference insert( OBJ obj)
-	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.push_front( obj);
-		return m_list.begin();
-	}
+	//\brief Get the socket associated with the connection.
+	boost::asio::ip::tcp::socket& socket()	{ return m_socket; }
 
-	void release( const Reference& objref)
-	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.erase( objref);
-	}
+	//\brief Start the first asynchronous operation for the connection.
+	void start();
+
+	//\brief Get a description of this connection for log messages
+	std::string logString() const;
 
 private:
-	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ> m_list;		//< list of object references
+	boost::asio::ip::tcp::socket m_socket;		//< socket for the connection
 };
 
-}}//namespace
-#endif
+}}
 
+#endif
 

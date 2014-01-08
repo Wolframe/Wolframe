@@ -30,50 +30,63 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file types/syncObjectList.hpp
-//\brief Interface to shared and synchronized list of objects
-#ifndef _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
-#define _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
-#include <list>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+//\file connectionCount.hpp
+//\brief Counter for bookkeeping of connections
+#ifndef _Wolframe_CONNECTION_COUNT_HPP_INCLUDED
+#define _Wolframe_CONNECTION_COUNT_HPP_INCLUDED
+#include "types/syncCounter.hpp"
 
 namespace _Wolframe {
-namespace types {
+namespace net {
 
-//\class SyncObjectList
-//\brief Shared and synchronized list of objects
-template <class OBJ>
-class SyncObjectList
+//\brief Represents the aspect of book keeping of connections.
+class ConnectionCount
 {
 public:
-	typedef typename std::list<OBJ>::iterator Reference;
-	
-	//\brief Constructor
-	SyncObjectList()
-	{}
+	//\brief Construct a connection with the given io_service.
+	ConnectionCount( types::SyncCounter* classCounter_, types::SyncCounter* globalCounter_)
+		:m_registered(false),m_classCounter(classCounter_),m_globalCounter(globalCounter_){}
 
-	//\brief Insert object into the list
-	//\return a handle to the object
-	Reference insert( OBJ obj)
+	~ConnectionCount()
 	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.push_front( obj);
-		return m_list.begin();
+		if (m_registered)
+		{
+			m_globalCounter->release();
+			m_classCounter->release();
+		}
 	}
 
-	void release( const Reference& objref)
+	bool registerConnection()
 	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.erase( objref);
+		types::SyncCounter::ScopedAquire gs( *m_globalCounter);
+		{
+			if (!gs.entered())
+			{
+				refuse();
+				return false;
+			}
+			types::SyncCounter::ScopedAquire ls( *m_classCounter);
+			{
+				if (!ls.entered())
+				{
+					refuse();
+					return false;
+				}
+				ls.done();
+			}
+			gs.done();
+		}
+		m_registered = true;
+		return true;
 	}
 
 private:
-	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ> m_list;		//< list of object references
+	bool m_registered;
+	types::SyncCounter* m_classCounter;
+	types::SyncCounter* m_globalCounter;
 };
 
-}}//namespace
-#endif
+}}
 
+#endif
 
