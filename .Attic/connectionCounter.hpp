@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file types/connectionCounter.hpp
+//\file system/connectionCounter.hpp
 //\brief Alternative atomic (lockfree) counter implementation for handling the number of connections
 #ifndef _CONNECTION_COUNTER_HPP_INCLUDED
 #define _CONNECTION_COUNTER_HPP_INCLUDED
 #include <boost/atomic/atomic.hpp>
 
 namespace _Wolframe {
-namespace types {
+namespace system {
 
 //\class ConnectionCounter
 //\brief Atomic counter with upper value limit for number of connections
@@ -120,7 +120,7 @@ public:
 		}
 
 	private:
-		ConnectionCounter* m_cc;	//< glocal counter reference
+		ConnectionCounter* m_cc;	//< global counter reference
 	};
 
 private:
