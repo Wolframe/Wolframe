@@ -49,8 +49,8 @@ public:
 	typedef boost::atomic<CounterType> Parent;
 
 	//\brief Constructor
-	explicit SyncCounter( CounterType initialValue=0, CounterType limitValue_=0)
-		:boost::atomic<CounterType>(initialValue)
+	explicit SyncCounter( CounterType limitValue_=0, CounterType initialValue_=0)
+		:boost::atomic<CounterType>(initialValue_)
 		,m_limitValue(limitValue_)
 	{}
 

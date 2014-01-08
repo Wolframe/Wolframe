@@ -30,51 +30,54 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file system/syncObjectList.hpp
-//\brief Interface to shared and synchronized list of objects
-#ifndef _SYNC_OBJECT_LIST_HPP_INCLUDED
-#define _SYNC_OBJECT_LIST_HPP_INCLUDED
-#include <list>
-#include <stdexcept>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+//\file system/connectionList.hpp
+//\brief Interface to list of connections
+#ifndef _CONNECTION_LIST_HPP_INCLUDED
+#define _CONNECTION_LIST_HPP_INCLUDED
+#include "system/syncCounter.hpp"
+#include "system/syncObjectList.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace system {
+namespace net {
 
-//\class SyncObjectList
-//\brief Shared and synchronized list of objects
-template <class OBJ>
-class SyncObjectList
+template <class CONNECTION, class DESCRIPTION>
+class ConnectionList
 {
 public:
-	typedef typename std::list<OBJ>::iterator Handle;
-	
-	//\brief Constructor
-	SyncObjectList()
-	{}
+	typedef CONNECTION* (*CreateConnectionF)( const DESCRIPTION& descr);
+	typedef boost::shared_ptr<CONNECTION> ConnectionR;
+	typedef system::SyncObjectList<ConnectionR>::Handle ConnectionHandle;
 
-	//\brief Insert object into the list
-	//\return a handle to the object
-	Handle insert( OBJ obj)
+	ConnectionList( unsigned int maxNofConnections, CreateConnectionF createConn_, system::SyncCounter* globalcounter_)
+		:m_globalcounter(globalcounter_)
+		,m_counter( maxNofConnections)
+		,m_createConn(createConn_){}
+
+	ConnectionHandle createConnection( const DESCRIPTION& descr)
 	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.push_front( obj);
-		return m_list.begin();
-	}
+		system::SyncCounter::ScopedAquire gs( *m_globalcounter);
+		{
+			if (!gs.entered()) throw std::runtime_error( "too many connections");
 
-	void release( const Handle& objhandle)
-	{
-		boost::mutex::scoped_lock lock( m_mutex);
-		m_list.erase( objhandle);
-	}
+			system::SyncCounter::ScopedAquire ls( m_counter);
+			{
+				if (!ls.entered()) throw std::runtime_error( "too many connections");
 
+				ConnectionR conn( m_createConn( descr));
+				m_list.insert( conn);
+				ls.done();
+			}
+			gs.done();
+		}
+	}
 private:
-	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ> m_list;		//< list of object references
+	system::SyncCounter* m_globalcounter;
+	system::SyncCounter m_counter;
+	system::SyncObjectList<ConnectionR> m_list;
+	CreateConnectionF m_createConn;
 };
-
-}}//namespace
+}}
 #endif
 
 
