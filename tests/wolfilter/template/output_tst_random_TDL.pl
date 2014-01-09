@@ -1,23 +1,29 @@
 #!/usr/bin/perl
+use strict;
 
 # GLOBALS
-@subroutines = ();
-@subroutineArgs = ();
-@subroutineResults = ();
-@actions = ();
-@actionArgs = ();
-@actionResults = ();
-@tags = ();
-@tagElems = ();
-@intos = ();
+my @subroutines = ();		# MAP subroutine index to subroutine name
+my @subroutineArgs = ();		# MAP subroutine index to number of subroutine arguments
+my @subroutineResults = ();	# MAP subroutine index to number of subroutine results
+my @subroutineResultActions = ();	# MAP subroutine index to number of subroutine results
+my %subroutineStart = ();		# MAP subroutine name to address (index) in @instructions
+my @actions = ();			# MAP action index to (dbcall) name
+my @actionArgs = ();		# MAP action index to number of action arguments
+my @actionResults = ();		# MAP action index to number of action results
+my @tags = ();			# MAP input tag index to name
+my @tagElems = ();			# MAP input tag index to number of input elements
+my @intos = ();			# MAP result index (INTO output) to name
+my @vmInstructions = ();		# database instructions to execute:
+#vmInstructions Element Format:
+#	into index#(T|R)#tag/result index#(S|A)#subroutine/action index
 
-$testSize = $ARGV[0];
-$testSeed = $ARGV[1];
+my $testSize = $ARGV[0];
+my $testSeed = $ARGV[1];
 
 # INIT
 srand($testSeed);
 
-
+# COMMON
 sub createName {
 	my ($prefix,$cnt) = @_;
 	my $suffix = "$cnt";
@@ -28,6 +34,7 @@ sub createName {
 	return "$prefix$suffix";
 }
 
+# SUBROUTINE
 sub createSubroutineName {
 	my $rt = createName( "proc_", $#subroutines + 1);
 	push( @subroutines, $rt);
@@ -46,7 +53,7 @@ sub getSubroutineName {
 }
 
 
-
+# ACTION
 sub createActionName {
 	my $rt = createName( "dbcall_", $#actions + 1);
 	push( @actions, $rt);
@@ -55,7 +62,7 @@ sub createActionName {
 	return $rt;
 }
 
-for ($ii=0; $ii<100; ++$ii) {
+for (my $ii=0; $ii<100; ++$ii) {
 	createActionName();
 }
 
@@ -73,7 +80,7 @@ sub getActionResults {
 	return $actionResults[ $idx];
 }
 
-
+# INPUT TAG
 sub createTagName {
 	my $rt = createName( "tag_", $#tags + 1);
 	push( @tags, $rt);
@@ -81,13 +88,13 @@ sub createTagName {
 	return $rt;
 }
 
-for ($ii=0; $ii<100; ++$ii)
+for (my $ii=0; $ii<100; ++$ii)
 {
 	createTagName();
 }
 
 sub getTagIdx {
-	$idx = int( rand( 100));
+	my $idx = int( rand( 100));
 	return $idx;
 }
 
@@ -107,19 +114,20 @@ sub getTagElem {
 }
 
 
+# INTO
 sub createIntoName {
 	my $rt = createName( "out_", $#intos + 1);
 	push( @intos, $rt);
 	return $rt;
 }
 
-for ($ii=0; $ii<100; ++$ii)
+for (my $ii=0; $ii<100; ++$ii)
 {
 	createIntoName();
 }
 
 sub getIntoIdx {
-	$idx = int( rand( 100));
+	my $idx = int( rand( 100));
 	return $idx;
 }
 
@@ -129,10 +137,28 @@ sub getIntoName {
 }
 
 
-@instructionResults = ();
-@instructionResultColumns = ();
-@instructionResultNofRows = ();
+# VIRTUAL MACHINE INSTRUCTIONS
+sub startVirtualMachineSubroutine
+{
+	my $addr = $#vmInstructions +1;
+	$subroutineStart{ $subroutines[ $#subroutines] } = $addr;
+}
 
+sub createVirtualMachineInstruction
+{
+	my ($intoIndex,$ForeachClass,$ForeachIndex,$InstructionClass,$InstructionIndex) = @_;
+	push( @vmInstructions, "$intoIndex:$ForeachClass:$ForeachIndex:$InstructionClass:$InstructionIndex");
+}
+
+
+
+# SUBROUTINE DATA
+my @instructionResults = ();
+my @instructionResultColumns = ();
+my @instructionResultNofRows = ();
+my @instructionResultAction = ();
+
+# INSTRUCTION RESULT
 sub createResultName {
 	my ($nofRows) = (@_);
 	my $rt = createName( "res_", $#instructionResults + 1);
@@ -171,6 +197,7 @@ sub getResultNofRows {
 	return $instructionResultNofRows[ $idx];
 }
 
+# INSTRUCTION/SUBROUTINE ARGUMENT
 sub getArg {
 	my ($fidx,$tidx) = (@_);
 	my $rt = "";
@@ -178,7 +205,7 @@ sub getArg {
 	if ($#instructionResults < 0 || $rnd < 1) {
 		$rt = '$(.)';
 	} elsif ($rnd < 3 && $subroutineArgs[ $#subroutineArgs] > 0) {
-		$argno = int( rand( $subroutineArgs[ $#subroutineArgs])) + 1;
+		my $argno = int( rand( $subroutineArgs[ $#subroutineArgs])) + 1;
 		$rt = '$' . "PARAM." . $argno;
 	} else {
 		if (getLastResultIdx() < 0 || $rnd < 6) {
@@ -225,6 +252,11 @@ sub getSubroutineResults {
 }
 
 sub createInstruction {
+	my $vm_into_index = -1;
+	my $vm_foreach_class = "";
+	my $vm_foreach_index = 0;
+	my $vm_instruction_class = "";
+	my $vm_instruction_index = 0;
 	my $rt = "";
 	my $foreach_result_idx = getResultIdx();
 	my $foreach_tag_idx = -1;
@@ -239,19 +271,26 @@ sub createInstruction {
 	if (int(rand(10)) > 1) {
 		if ($foreach_tag_idx >= 0) {
 			$rt = $rt . "FOREACH " . getTagName( $foreach_tag_idx) . " ";
+			$vm_foreach_class = "T";
+			$vm_foreach_index = $foreach_tag_idx;
 		} else {
 			$rt = $rt . "FOREACH " . getResultName( $foreach_result_idx) . " ";
+			$vm_foreach_class = "R";
+			$vm_foreach_index = $foreach_result_idx;
 		}
 	}
 	if (int(rand(5)) > 1) {
 		my $idx = getIntoIdx();
 		$rt = $rt . "INTO " . getIntoName($idx) . " ";
+		$vm_into_index = $idx;
 	}
 	my $nofRows = 0;
 	if ($#subroutines >= 0 && int(rand(5)) > 3) {
 		my $idx = getSubroutineIdx();
 		$rt = $rt . "DO " . getSubroutineName( $idx) . "(" . getArgs($foreach_result_idx,$foreach_tag_idx) . ")";
 		$subroutineResults[ $#subroutineResults] = getSubroutineResults( $idx);
+		$vm_instruction_class = "S";
+		$vm_instruction_index = $idx;
 	}
 	else
 	{
@@ -261,8 +300,13 @@ sub createInstruction {
 		if ($#subroutineResults >= 0) {
 			$subroutineResults[ $#subroutineResults] = $nofRows;
 		}
+		$vm_instruction_class = "A";
+		$vm_instruction_index = $idx;
 	}
 	$rt = $rt . ";\n";
+
+	createVirtualMachineInstruction( $vm_into_index, $vm_foreach_class, $vm_foreach_index, $vm_instruction_class, $vm_instruction_index);
+
 	if (int(rand(5)) > 2)
 	{
 		$rt = $rt . "KEEP AS " . createResultName( $nofRows) . ";\n";
@@ -272,6 +316,8 @@ sub createInstruction {
 
 sub createSubroutine {
 	my $rt = "SUBROUTINE " . createSubroutineName();
+	startVirtualMachineSubroutine();
+
 	if ($subroutineArgs[$#subroutineArgs] > 0)
 	{
 		$rt = $rt . "(";
@@ -347,5 +393,6 @@ for ($ii=0; $ii<=$#tags; ++$ii) {
 	}
 }
 print "<doc\n";
+print "**outputfile:DBOUT\n";
 print "**output\n";
 print "**end\n";
