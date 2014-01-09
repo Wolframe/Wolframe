@@ -51,8 +51,7 @@ AcceptorSSL::AcceptorSSL( boost::asio::io_service* IOservice,
 	m_strand( *IOservice ),
 	m_acceptor( *IOservice ),
 	m_SSLcontext( *IOservice, boost::asio::ssl::context::sslv23 ),
-	m_connectionCounter( maxConnections),
-	m_globalCounter( globalCounter_),
+	m_connectionList( maxConnections, globalCounter_),
 	m_srvHandler( srvHandler )
 {
 	boost::system::error_code	ec;
@@ -117,7 +116,7 @@ AcceptorSSL::AcceptorSSL( boost::asio::io_service* IOservice,
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler->newConnection( LocalSSLendpoint( host, port ));
-	m_newConnection = ConnectionTypeSSLR( new ConnectionTypeSSL( *m_IOservice, m_SSLcontext, &m_connectionCounter, m_globalCounter, handler ));
+	m_newConnection = ConnectionTypeSSLR( new ConnectionTypeSSL( *m_IOservice, m_SSLcontext, &m_connectionList, handler ));
 
 	m_acceptor.open( endpoint.protocol() );
 	m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -146,7 +145,7 @@ void AcceptorSSL::handleAccept( const boost::system::error_code& e )
 
 		ConnectionHandler *handler = m_srvHandler->newConnection( LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
 											   m_acceptor.local_endpoint().port() ));
-		m_newConnection.reset( new ConnectionTypeSSL( *m_IOservice, m_SSLcontext, &m_connectionCounter, m_globalCounter, handler ));
+		m_newConnection.reset( new ConnectionTypeSSL( *m_IOservice, m_SSLcontext, &m_connectionList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
 					 m_strand.wrap( boost::bind( &AcceptorSSL::handleAccept,
 								     this,

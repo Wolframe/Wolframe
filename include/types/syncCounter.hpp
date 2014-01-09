@@ -47,10 +47,11 @@ class SyncCounter
 public:
 	typedef unsigned int CounterType;
 	typedef boost::atomic<CounterType> Parent;
+	enum {NoLimit=0};
 
 	//\brief Constructor
-	explicit SyncCounter( CounterType limitValue_=0, CounterType initialValue_=0)
-		:boost::atomic<CounterType>(initialValue_)
+	explicit SyncCounter( CounterType limitValue_=NoLimit)
+		:boost::atomic<CounterType>(0)
 		,m_limitValue(limitValue_)
 	{}
 

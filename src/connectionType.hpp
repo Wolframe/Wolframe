@@ -30,59 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file connectionTypeSSL.hpp
-//\brief Connection type SSL
-#ifndef _Wolframe_CONNECTION_TYPE_SSL_HPP_INCLUDED
-#define _Wolframe_CONNECTION_TYPE_SSL_HPP_INCLUDED
-#ifdef WITH_SSL
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
+//\file connectionType.hpp
+//\brief Connection type interface
+#ifndef _Wolframe_CONNECTION_TYPE_HPP_INCLUDED
+#define _Wolframe_CONNECTION_TYPE_HPP_INCLUDED
 #include <list>
-#include "connectionBase.hpp"
-#include "connectionType.hpp"
-#include "system/connectionHandler.hpp"
-#include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
+#include "types/syncObjectList.hpp"
 
 namespace _Wolframe {
 namespace net {
 
-typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
+class ConnectionType;
+typedef types::BoundedSyncObjectList<ConnectionType*> ConnectionTypeList;
 
-class ConnectionTypeSSL
-	:public ConnectionBase< ssl_socket >
-	,public ConnectionType
+class ConnectionType
 {
 public:
-	//\brief Construct a connection with the given io_service and SSL conetext.
-	ConnectionTypeSSL( boost::asio::io_service& IOservice,
-				boost::asio::ssl::context& SSLcontext,
-				ConnectionTypeList* connList_,
-				ConnectionHandler *handler );
 
-	~ConnectionTypeSSL();
+	explicit ConnectionType( ConnectionTypeList* listref_)
+		:m_listref(listref_)
+		,m_inserted(false){}
 
-	//\brief Get the socket associated with the SSL connection.
-	ssl_socket& socket()			{ return m_SSLsocket; }
+	virtual ~ConnectionType()
+	{
+		if (m_inserted) m_listref->release( m_elemref);
+	}
 
-	//\brief Start the first asynchronous operation for the connection.
-	void start();
-
-	//\brief Get a description of this connection for log messages
-	std::string logString() const;
+	bool registerConnection()
+	{
+		if (m_inserted) throw std::logic_error("connection registered twice");
+		return m_inserted=m_listref->insert( this, m_elemref);
+	}
 
 private:
-	//\brief Handle the SSL handshake
-	void handleHandshake( const boost::system::error_code& error );
-
-	//\brief Socket for the SSL connection.
-	ssl_socket m_SSLsocket;
+	ConnectionTypeList::ElementReference m_elemref;
+	ConnectionTypeList* m_listref;
+	bool m_inserted;
 };
 
-typedef boost::shared_ptr<ConnectionTypeSSL> ConnectionTypeSSLR;
-
-}}//namespace
-#endif // WITH_SSL
+}}
 #endif
-
 

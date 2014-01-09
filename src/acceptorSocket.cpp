@@ -46,8 +46,7 @@ AcceptorSocket::AcceptorSocket( boost::asio::io_service* IOservice,
 	m_IOservice( IOservice ),
 	m_strand( *IOservice ),
 	m_acceptor( *IOservice ),
-	m_connectionCounter( maxConnections),
-	m_globalCounter( globalCounter_),
+	m_connectionList( maxConnections, globalCounter_),
 	m_srvHandler( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -64,7 +63,7 @@ AcceptorSocket::AcceptorSocket( boost::asio::io_service* IOservice,
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler->newConnection( LocalTCPendpoint( host, port ));
-	m_newConnection = ConnectionTypeSocketR( new ConnectionTypeSocket( *m_IOservice, &m_connectionCounter, m_globalCounter, handler ));
+	m_newConnection = ConnectionTypeSocketR( new ConnectionTypeSocket( *m_IOservice, &m_connectionList, handler ));
 
 	try	{
 		m_acceptor.open( endpoint.protocol() );
@@ -100,7 +99,7 @@ void AcceptorSocket::handleAccept( const boost::system::error_code& e )
 
 		ConnectionHandler *handler = m_srvHandler->newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
 											   m_acceptor.local_endpoint().port() ));
-		m_newConnection.reset( new ConnectionTypeSocket( *m_IOservice, &m_connectionCounter, m_globalCounter, handler ));
+		m_newConnection.reset( new ConnectionTypeSocket( *m_IOservice, &m_connectionList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket(),
 					 m_strand.wrap( boost::bind( &AcceptorSocket::handleAccept,
 								     this,

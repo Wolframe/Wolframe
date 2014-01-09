@@ -37,7 +37,7 @@
 #include <boost/asio.hpp>
 #include <list>
 #include "connectionBase.hpp"
-#include "connectionCount.hpp"
+#include "connectionType.hpp"
 #include "types/syncCounter.hpp"
 #include "system/connectionHandler.hpp"
 #include <boost/thread/mutex.hpp>
@@ -49,24 +49,23 @@ namespace net {
 //\brief Represents a single connection from a client.
 class ConnectionTypeSocket
 	:public ConnectionBase< boost::asio::ip::tcp::socket >
-	,public ConnectionCount
+	,public ConnectionType
 {
 public:
 	//\brief Construct a connection with the given io_service.
 	ConnectionTypeSocket( boost::asio::io_service& IOservice,
-				types::SyncCounter* classCounter_,
-				types::SyncCounter* globalCounter_,
+				ConnectionTypeList* connList,
 				ConnectionHandler *handler);
-	~ConnectionTypeSocket();
+	virtual ~ConnectionTypeSocket();
 
 	//\brief Get the socket associated with the connection.
 	boost::asio::ip::tcp::socket& socket()	{ return m_socket; }
 
 	//\brief Start the first asynchronous operation for the connection.
-	void start();
+	virtual void start();
 
 	//\brief Get a description of this connection for log messages
-	std::string logString() const;
+	virtual std::string logString() const;
 
 private:
 	boost::asio::ip::tcp::socket m_socket;		//< socket for the connection

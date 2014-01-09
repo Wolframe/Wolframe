@@ -42,11 +42,10 @@ static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
 ConnectionTypeSocket::ConnectionTypeSocket(
 			boost::asio::io_service& IOservice,
-			types::SyncCounter* classCounter_,
-			types::SyncCounter* globalCounter_,
+			ConnectionTypeList* connList,
 			ConnectionHandler *handler)
 	:ConnectionBase< boost::asio::ip::tcp::socket >( IOservice, handler )
-	,ConnectionCount(classCounter_,globalCounter_)
+	,ConnectionType(connList)
 	,m_socket( IOservice )
 {
 	LOG_TRACE << "New connection created";

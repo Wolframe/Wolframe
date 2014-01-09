@@ -79,8 +79,7 @@ private:
 	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
 	boost::asio::ssl::context		m_SSLcontext;	// SSL acceptor server context
 	ConnectionTypeSSLR			m_newConnection;// The next connection to be accepted.
-	types::SyncCounter			m_connectionCounter;
-	types::SyncCounter*			m_globalCounter;
+	ConnectionTypeList			m_connectionList;
 	std::string				m_identifier;
 	_Wolframe::ServerHandler*		m_srvHandler;	// The handler for all incoming requests.
 };

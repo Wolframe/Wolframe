@@ -45,11 +45,10 @@ static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 ConnectionTypeSSL::ConnectionTypeSSL(
 			boost::asio::io_service& IOservice,
 			boost::asio::ssl::context& SSLcontext,
-			types::SyncCounter* classCounter_,
-			types::SyncCounter* globalCounter_,
+			ConnectionTypeList* connList,
 			ConnectionHandler *handler )
 	:ConnectionBase< ssl_socket >( IOservice, handler )
-	,ConnectionCount(classCounter_,globalCounter_)
+	,ConnectionType(connList)
 	,m_SSLsocket( IOservice, SSLcontext )
 {
 	LOG_TRACE << "New SSL connection created";

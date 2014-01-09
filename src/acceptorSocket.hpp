@@ -70,9 +70,7 @@ private:
 	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
 	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
 	ConnectionTypeSocketR			m_newConnection;// The next connection to be accepted.
-	types::SyncCounter			m_connectionCounter;
-	types::SyncCounter*			m_globalCounter;
-
+	ConnectionTypeList			m_connectionList;
 	std::string				m_identifier;
 	_Wolframe::ServerHandler*		m_srvHandler;	// The handler for all incoming requests.
 };

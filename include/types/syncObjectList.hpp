@@ -34,6 +34,7 @@
 //\brief Interface to shared and synchronized list of objects
 #ifndef _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
 #define _Wolframe_SYNC_OBJECT_LIST_HPP_INCLUDED
+#include "types/syncCounter.hpp"
 #include <list>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -47,22 +48,27 @@ template <class OBJ>
 class SyncObjectList
 {
 public:
-	typedef typename std::list<OBJ>::iterator Reference;
+	typedef typename std::list<OBJ>::iterator ElementReference;
 	
 	//\brief Constructor
 	SyncObjectList()
 	{}
+	//\brief Destructor
+	virtual ~SyncObjectList(){}
 
 	//\brief Insert object into the list
-	//\return a handle to the object
-	Reference insert( OBJ obj)
+	//\param[in] obj object to insert by value
+	//\param[out] ref handle to the object returned
+	//\return true, if success, false if constraint failed
+	virtual bool insert( const OBJ& obj, ElementReference& ref)
 	{
 		boost::mutex::scoped_lock lock( m_mutex);
 		m_list.push_front( obj);
-		return m_list.begin();
+		ref = m_list.begin();
+		return true;
 	}
 
-	void release( const Reference& objref)
+	virtual void release( const ElementReference& objref)
 	{
 		boost::mutex::scoped_lock lock( m_mutex);
 		m_list.erase( objref);
@@ -70,7 +76,74 @@ public:
 
 private:
 	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
-	std::list<OBJ> m_list;		//< list of object references
+	std::list<OBJ> m_list;		//< list of objects
+};
+
+
+//\class BoundedSyncObjectList
+//\brief SyncObjectList with limit for maximum number of elements to insert
+template <class OBJ>
+class BoundedSyncObjectList
+	:public SyncObjectList<OBJ>
+{
+public:
+	typedef SyncObjectList<OBJ> Parent;
+	typedef typename std::list<OBJ>::iterator ElementReference;
+
+	//\brief Constructor
+	explicit BoundedSyncObjectList( unsigned int maxNofObjects=SyncCounter::NoLimit, SyncCounter* globalCounter_=0)
+		:m_counter(maxNofObjects)
+		,m_globalCounter(globalCounter_){}
+
+	//\brief Destructor
+	virtual ~BoundedSyncObjectList(){}
+
+	//\brief Insert object into the list
+	//\param[in] obj object to insert by value
+	//\param[out] ref handle to the object returned
+	//\return true, if success, false if the maxinum number of elements limit has been reached
+	virtual bool insert( const OBJ& obj, ElementReference& ref)
+	{
+		if (m_globalCounter)
+		{
+			types::SyncCounter::ScopedAquire gs( *m_globalCounter);
+			{
+				if (!gs.entered()) return false;
+	
+				types::SyncCounter::ScopedAquire ls( m_counter);
+				{
+					if (!ls.entered()) return false;
+					if (!Parent::insert( obj, ref)) return false;
+					ls.done();
+				}
+				gs.done();
+			}
+			return true;
+		}
+		else
+		{
+			types::SyncCounter::ScopedAquire ls( m_counter);
+			{
+				if (!ls.entered()) return false;
+				if (!Parent::insert( obj, ref)) return false;
+				ls.done();
+			}
+			return true;
+		}
+	}
+
+	//\brief Remove object referenced from list
+	//\param[in] obj object reference (iterator) in list
+	virtual void release( const ElementReference& objref)
+	{
+		m_counter.release();
+		if (m_globalCounter) m_globalCounter->release();
+		Parent::release( objref);
+	}
+
+private:
+	SyncCounter m_counter;		//< counter for maximum number of elements limit
+	SyncCounter* m_globalCounter;	//< global counter for maximum total number of elements limit
 };
 
 }}//namespace
