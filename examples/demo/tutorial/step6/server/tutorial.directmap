@@ -1,2 +1,0 @@
-CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
-CustomerRequest = SelectCustomer( xml ) : Customer;

@@ -124,7 +124,8 @@
 		
 		We define the 'action' to be executed, when the form is loaded. In our
 		case we want to execute a 'CustomerListRequest'. The root element of the
-		request should be customer:
+		request should be 'customer'. We currently don't want to pass any additional
+		elements, so we specify '{ }' for the empty content:
 	</para>
 
 	<screenshot>

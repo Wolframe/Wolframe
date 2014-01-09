@@ -164,13 +164,14 @@
 
 	Processor {
 		..
-		program CustomerListRequest.sfrm	
+		program Customer.sfrm	
 		..
 	}
 		</programlisting>
 
-	and we add a simple form file <filename>CustomerListRequest.sfrm</filename>,
-	for now we can leave it empty but for the root element:
+	and we add a simple form file <filename>Customer.sfrm</filename>.
+	We add a form called 'CustomerListRequest' which is empty for now 
+	but for the root element 'customer':
 
 		<programlisting language='shell'>
 	FORM CustomerListRequest

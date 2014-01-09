@@ -1,6 +1,6 @@
 	FORM CustomerRequest
 	{
 		customer {
-			id ?@string
+			id !@string
 		}
 	}
