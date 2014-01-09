@@ -59,13 +59,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	prgbind_programLibrary.o \
 	langbind_iostreamfilter.o \
 	jobScheduler.o \
-	acceptor.o \
 	acceptorSocket.o \
 	acceptorSSL.o \
 	serverEndpoint.o \
 	connectionTypeSocket.o \
 	connectionTypeSSL.o \
-	connection.o \
 	serverConfig.o \
 	server.o
 

@@ -36,7 +36,7 @@
 
 #ifndef _NETWORK_ACCEPTOR_HPP_INCLUDED
 #define _NETWORK_ACCEPTOR_HPP_INCLUDED
-
+#error DEPRECATED
 #include <boost/asio.hpp>
 #ifdef WITH_SSL
 #include <boost/asio/ssl.hpp>

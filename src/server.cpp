@@ -39,7 +39,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "server.hpp"
-#include "acceptor.hpp"
 #include "logger-v1.hpp"
 #include "system/serverEndpoint.hpp"
 #include "system/connectionHandler.hpp"
@@ -49,15 +48,16 @@ namespace net	{
 
 server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler )
 	: m_threadPoolSize( conf->threads ),
-	  m_globalList( conf->maxConnections )
+	  m_globalConnectionCounter( conf->maxConnections )
 {
 	int i = 0;
 	for ( std::list<ServerTCPendpoint>::const_iterator it = conf->address.begin();
 	      it != conf->address.end(); it++ )	{
-		acceptor* acptr = new acceptor( m_IOservice,
+		AcceptorSocket* acptr = new AcceptorSocket( 
+						&m_IOservice,
 						it->host(), it->port(), it->maxConnections(),
-						m_globalList,
-						serverHandler );
+						&m_globalConnectionCounter,
+						&serverHandler );
 		m_acceptors.push_back( acptr );
 		i++;
 	}
@@ -66,13 +66,13 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 	i = 0;
 	for ( std::list<ServerSSLendpoint>::const_iterator it = conf->SSLaddress.begin();
 	      it != conf->SSLaddress.end(); it++ )	{
-		SSLacceptor* acptr = new SSLacceptor( m_IOservice,
-						      it->certificate(), it->key(),
-						      it->verifyClientCert(),
-						      it->CAchain(), it->CAdirectory(),
-						      it->host(), it->port(), it->maxConnections(),
-						      m_globalList,
-						      serverHandler );
+		AcceptorSSL* acptr = new AcceptorSSL( &m_IOservice,
+							it->certificate(), it->key(),
+							it->verifyClientCert(),
+							it->CAchain(), it->CAdirectory(),
+							it->host(), it->port(), it->maxConnections(),
+							&m_globalConnectionCounter,
+							&serverHandler );
 		m_SSLacceptors.push_back( acptr );
 		i++;
 	}
@@ -87,13 +87,13 @@ server::~server()
 	LOG_TRACE << "Server destructor called";
 
 	std::size_t	i = 0;
-	for ( std::list< acceptor* >::iterator it = m_acceptors.begin();
+	for ( std::list< AcceptorSocket* >::iterator it = m_acceptors.begin();
 						it != m_acceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " acceptor(s) deleted";
 #ifdef WITH_SSL
 	i = 0;
-	for ( std::list< SSLacceptor* >::iterator it = m_SSLacceptors.begin();
+	for ( std::list< AcceptorSSL* >::iterator it = m_SSLacceptors.begin();
 						it != m_SSLacceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " SSL acceptor(s) deleted";
@@ -127,13 +127,13 @@ void server::stop()
 	LOG_DEBUG << "Network server received a shutdown request";
 
 	std::size_t	i = 0;
-	for ( std::list< acceptor* >::iterator it = m_acceptors.begin();
+	for ( std::list< AcceptorSocket* >::iterator it = m_acceptors.begin();
 	      it != m_acceptors.end(); it++, i++ )
 		(*it)->stop();
 	LOG_DEBUG << i << " acceptor(s) signaled to stop";
 #ifdef WITH_SSL
 	i = 0;
-	for ( std::list< SSLacceptor* >::iterator it = m_SSLacceptors.begin();
+	for ( std::list< AcceptorSSL* >::iterator it = m_SSLacceptors.begin();
 	      it != m_SSLacceptors.end(); it++, i++ )
 		(*it)->stop();
 	LOG_DEBUG << i << " SSL acceptor(s) signaled to stop";

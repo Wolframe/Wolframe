@@ -36,7 +36,7 @@
 
 #ifndef _CONNECTION_HPP_INCLUDED
 #define _CONNECTION_HPP_INCLUDED
-
+#error DEPRECATED
 #include <boost/asio.hpp>
 #ifdef WITH_SSL
 #include <boost/asio/ssl.hpp>

@@ -130,6 +130,11 @@ public:
 		SyncCounter* m_cc;		//< global counter reference
 	};
 
+	void setLimit( const CounterType& limitValue_)
+	{
+		m_limitValue = limitValue_;
+	}
+
 private:
 	CounterType m_limitValue;		//< upper counter limit
 };

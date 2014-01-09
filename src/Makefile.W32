@@ -67,10 +67,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	prgbind_programLibrary.obj \
 	langbind_iostreamfilter.obj \
 	jobScheduler.obj \
-	acceptor.obj \
 	acceptorSocket.obj \
 	acceptorSSL.obj \
-	connection.obj \
 	connectionTypeSocket.obj \
 	connectionTypeSSL.obj \
 	serverConfig.obj \

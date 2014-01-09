@@ -43,7 +43,9 @@
 #include <list>
 
 #include "system/serverEndpoint.hpp"
-#include "acceptor.hpp"
+#include "acceptorSocket.hpp"
+#include "acceptorSSL.hpp"
+#include "types/syncCounter.hpp"
 #include "system/connectionHandler.hpp"	// for server handler
 #include "config/configurationBase.hpp"
 #include "standardConfigs.hpp"		// for server configuration
@@ -78,11 +80,11 @@ private:
 	boost::asio::io_service	m_IOservice;
 
 	/// The list(s) of connection acceptors.
-	std::list< acceptor* >	m_acceptors;
+	std::list< AcceptorSocket* > m_acceptors;
 #ifdef WITH_SSL
-	std::list< SSLacceptor* > m_SSLacceptors;
+	std::list< AcceptorSSL* > m_SSLacceptors;
 #endif // WITH_SSL
-	GlobalConnectionList	m_globalList;
+	types::SyncCounter m_globalConnectionCounter;
 };
 
 }} // namespace _Wolframe::net
