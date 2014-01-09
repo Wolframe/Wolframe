@@ -1,11 +1,9 @@
 TRANSACTION SelectCustomerList
-RESULT INTO list
 BEGIN
 	INTO customer DO SELECT * from Customer;
 END
 
 TRANSACTION SelectCustomer
-RESULT INTO customer
 BEGIN
-	INTO . DO SELECT * from Customer WHERE id=$(customer/id);
+	INTO . DO SELECT * from Customer WHERE id=$(id);
 END

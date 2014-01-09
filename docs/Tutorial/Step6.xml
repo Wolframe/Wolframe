@@ -4,7 +4,7 @@
 	<title>Step 6 - Show customer</title>	
 
 	<para>
-		As next step we want to show how data is communicated between the forms
+		In the next step we want to show how data is communicated between the forms
 		by implementing a simple "show me customer data" use case.
 	</para>
 
@@ -25,7 +25,22 @@
 	</screenshot>
 
 	<para>
-		We add dynamic properties, one is the 'form' which we set to 'customer_show'.
+		We add a dynamic property 'form' to the button which we set to:
+
+		<programlisting language='shell'>
+	customer_show?id={customer.selected}
+		</programlisting>
+
+		As before 'customer_show' is the name of the form to be loaded
+		when we press the button.
+	</para>
+	
+	<para>
+		We want the currently selected customer to be accessible in the
+		<filename>customer_show.ui</filename> form, so we have to pass
+		the parameter 'id' as the value of the currenctly selected row
+		in the 'customer' list widget. This is denoted by 
+		'{customer.selected}'.
 	</para>
 	
 	<para>
@@ -46,32 +61,12 @@
 	</screenshot>
 
 	<para>
-		We want the currently selected customer to be accessible in the
-		<filename>customer_show.ui</filename> form, so we have to remember
-		the current selection of the <classname>QTreeWidget</classname>
-		named 'customer' as global variable 'id'. We add a dynamic property
-		with the name 'global.id' and the value '{customer.id}':
-	</para>
-
-	<screenshot>
-		<screeninfo>Step 6 customer show button with all properties</screeninfo>
-		<mediaobject>
-			<imageobject role="html"> 
-				<imagedata fileref="images/Tutorial/step6_customers_edit_button_props.png" format="PNG"/>
-			</imageobject> 
-			<imageobject role="fo"> 
-				<imagedata fileref="images/Tutorial/step6_customers_edit_button_props.png" format="PNG" width="100%" scalefit="1"/>
-			</imageobject> 
-		</mediaobject>
-	</screenshot>
-
-	<para>
 		Now of course we have to create a new form called <filename>customer_show.ui</filename>. We
 		choose a form layout and add two fields with labels 'Name:' and 'Address:'
 		and each of them having a <classname>QLineEdit</classname> widget. The names of the widgets
 		should be 'name' and 'address' in order to match the future read request
 		from the server. Temporarily we also add an 'id' field which shows us
-		the current value of 'global.id':
+		the current value of the form parameter 'id' passed by the 'customers':
 	</para>
 
 	<screenshot>
@@ -104,41 +99,44 @@
 	</screenshot>
 
 	<para>
-		If we start the wolfclient and select a customer and press 'Show' we will
-		notice that the whole "Show Customer" form is empty, even the id. What's
-		wrong? Well, the widgets in wolfclient have the default behaviour of using
-		'id' attributes attached to the colums of a list for instance. We must
-		make sure, the server is mapping us the XML correctly with 'id' attribute
-		and not 'id' as element.
+		If we start the wolfclient and select a customer and try to press 'Show' we will
+		notice that the button is disabled. This is because the form parameter 'id'
+		cannot be set to the id of the currently selected customer. Widgets in wolfclient
+		have the default behaviour of using the 'id' attribute as an identifier for the
+		whole row. In the previous step we didn't map the 'id' from the XML to the 'id'
+		property of the row. So we change the 'answer' property of the 'customer' widget
+		in the 'customers.ui' form:
+
+		<programlisting language='shell'>
+	Customer list {customer[] {id={row.id}; name{{row.name}}; address{{row.address}} } }
+		</programlisting>
+		
+		'id={row.id}' maps the 'id' attribute to the 'id' property of each row.
+	</para>
+		
+	<para>
+		The 'id' is now an XML attribute and not an element anymore.
+		We also would like to do some validation on the output, so
+		we can rely on each customers to actually have an 'id' attribute.
 	</para>
 	
 	<para>
-		This is the moment we go back to the server and start output form validation.
-		We add a <filename>CustomerList.simpleform</filename> form which describes
+		This is the moment we go back to the server and start with output form validation.
+		We add a form called 'CustomerList' to the file <filename>Customer.sfrm</filename> form which describes
 		the result of the 'CustomerListRequest' more precisely and especially
 		declares the 'id' as mandatory attribute of the customer:
 	</para>
 
 	<programlisting language='shell'>
-<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerList.simpleform" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerList.srfm" parse="text" />
 	</programlisting>
 
 	<para>
-		We have to declare output form validation in the 'CustomerListRequest'
-		in <filename>tutorial.directmap</filename> as well:
+		We have to declare a new output form validation 'CustomerList'
+		in <filename>tutorial.dmap</filename> as well:
 
 	<programlisting language='shell'>
-	CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
-	</programlisting>
-	
-		and we have to include the program in <filename>tutorial.conf</filename> of the server:
-
-	<programlisting language='shell'>
-	Processor {
-		..
-		program CustomerList.simpleform	
-		..
-	}
+	COMMAND CustomerListRequest CALL SelectCustomerList RETURN CustomerList;
 	</programlisting>
 	
 		Checking with:
@@ -150,45 +148,61 @@
 		we get now:
 
 	<programlisting language='xml'>
+	ERR REQUEST unknown tag  (list)-.. candidates are {customer}
+	</programlisting>
+	
+	If using validated output, the wolframe server adds automatically the
+	root element 'list' as declared in the form definition to the result.
+	So we can remove the 'RESULT INTO list' in the TDL function
+	'SelectCustomerList':
+	
+	<programlisting language='xml'>
+	TRANSACTION SelectCustomerList
+	BEGIN
+		INTO customer DO SELECT * from Customer;
+	END
+	</programlisting>
+	
+		Now we get the desired result:
+	
+	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListWithIdAttributes.xml" parse="text" />
 	</programlisting>
 
-		So, that looks ok.
 	</para>
 
 	<para>
-		Now also the wolfclient shows the id of the customer, when the user double
-		clicks the customer in the list.
+		Now the 'Show' button is no longer disabled and when double-clicking an entry
+		in the list of customers the wolfclient shows the id of the customer.
 	</para>
 	
 	<para>
-		The 'name' and the 'address' fields are still empty. We could of course
-		use global variables again to propagate the values between forms, but
-		if the form gets more complex, this is not a good idea.
+		The 'name' and the 'address' fields are still empty though. We could of course
+		use two form parameters 'name' and 'address' to propagate the values between 
+		the two forms, but if the form gets more complex, this is not a good idea.
+		It's better to load the data for one customer, selecting the data by the current 'id'.
 	</para>
 	
 	<para>
-		We start to use the 'initAction' property on the <filename>customer_show.ui</filename> form
+		We start by setting the 'action' property on the <filename>customer_show.ui</filename> form
 		as follows: we want it to execute a read with a document type 'CustomerRequest'
 		which searches for a single customer by customer id:
 	</para>
 
 	<screenshot>
-		<screeninfo>Step 6 customer show customer, initAction</screeninfo>
+		<screeninfo>Step 6 customer show customer, load action</screeninfo>
 		<mediaobject>
 			<imageobject role="html"> 
-				<imagedata fileref="images/Tutorial/step6_customer_show_initaction.png" format="PNG"/>
+				<imagedata fileref="images/Tutorial/step6_customer_show_action.png" format="PNG"/>
 			</imageobject> 
 			<imageobject role="fo"> 
-				<imagedata fileref="images/Tutorial/step6_customer_show_initaction.png" format="PNG" width="100%" scalefit="1"/>
+				<imagedata fileref="images/Tutorial/step6_customer_show_action.png" format="PNG" width="100%" scalefit="1"/>
 			</imageobject> 
 		</mediaobject>
 	</screenshot>
 	
 	<para>
-		We see, that we use the value of 'global.id' again and add it to the 'initAction'
-		request as attribute 'id' (we can use the wolfclient with -d to see the communication
-		on the wire):
+		The XML sent to the server will look as follows:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerRequest.xml" parse="text" />
@@ -197,78 +211,57 @@
 		We also get in the client:
 
 	<programlisting language='shell'>
-	CRITICAL: ERROR: error in network data loader "Protocol error in command REQUEST, received:  no command handler for 'CustomerRequest'." 
+	no command handler for 'CustomerRequest'
 	</programlisting>
 
 		and in the server:
 
 	<programlisting language='shell'>
-	ERROR: error redirect input: no command handler for 'CustomerRequest'
+	ERROR: Error calling procedure: no command handler for 'CustomerRequest'	
 	</programlisting>
 
 	We see, that the request is sent to the server, but we didn't define the
-	necessary things in the server yet. So we add another map:
+	necessary things in the server yet. So we add another simple mapping:
 
 	<programlisting language='shell'>
-	CustomerRequest = SelectCustomer( xml ) : Customer;
+	COMMAND CustomerRequest CALL SelectCustomer RETURN Customer;
 	</programlisting>
 
-		to <filename>tutorial.directmap</filename>.
+		to <filename>tutorial.dmap</filename>.
 	</para>
 
 	<para>
-		We define a new file <filename>CustomerRequest.simpleform</filename> which contains the
-		validation of the customer request (for now, this looks exactly like
-		the request for the list of customers, but we may want to change that
-		later):
+		We define a new form 'CustomerRequest' in <filename>Customer.sfrm</filename> which contains the
+		validation of the customer request. The customer request should have except the root element
+		'customer' and a mandatory attribute 'id' to search for:
 	</para>
 	
 	<programlisting language='shell'>
-<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerRequest.simpleform" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerRequest.sfrm" parse="text" />
 	</programlisting>
 
 	<para>
-	We register the form in <filename>tutorial.conf</filename>:
-
-	<programlisting language='shell'>
-	Processor {
-		..
-		program CustomerRequest.simpleform
-		..
-	}
-	</programlisting>
-	
-		And of course we have to define a transaction function 'SelectCustomer'
+		Of course we have to define a transaction function 'SelectCustomer'
 		in <filename>Customer.tdl</filename>:
 
 	<programlisting language='sql'>
 	TRANSACTION SelectCustomer
-	RESULT INTO customer
 	BEGIN
-		INTO . DO SELECT * from Customer WHERE id=$(customer/id);
+		INTO . DO SELECT * from Customer WHERE id=$(id);
 	END
 	</programlisting>
 	
-		The '$(customer/id)' refers to the ID we pass down for the customer record
-		to retrieve. The 'RESULT INTO customer' makes sure the result will again
-		be in a table with 'customer' as root element.
+		The '$(id)' refers to the 'id' we pass down for the customer record
+		to retrieve. We don't have to specify '$(customer/id)' here as the root
+		element is always removed before.
 	</para>
 	
 	<para>	
-		We also have to define how the result should be mapped, so:
+		We also have to define how the result should be mapped, so
+		we add a 'Customer' form to <filename>Customer.sfrm</filename>:
 
 	<programlisting language='shell'>
-	Processor {
-		..
-		program Customer.simpleform
-		..
-	}
-	</programlisting>
-	
-		and <filename>Customer.simpleform</filename>:
-
-	<programlisting language='shell'>
-<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/Customer.simpleform" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/Customer.sfrm" parse="text" />
 	</programlisting>
 
 		Now if we restart client and server and we click on the second
@@ -291,4 +284,17 @@
 		So we successfully read the data of a customer into a form.
 	</para>
 
+	<para>
+		This time we didn't specify an 'answer' attribute in the 'customer_show.ui' form. So
+		how could the data be mapped back into the widget? There is an implicit mapping of
+		elements by name, so the contents of the 'name' XML element are mapped into the widget
+		with name 'name'. This should only be used if the forms are simple, it's better to
+		specify an explicit answer as follows:
+
+		<programlisting language='shell'>
+	Customer customer { id={?}; name{{name}}; address{{address}} }
+		</programlisting>
+	</para>
+	
+	
 </sect1>

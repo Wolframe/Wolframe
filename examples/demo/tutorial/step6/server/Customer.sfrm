@@ -1,0 +1,34 @@
+FORM CustomerListRequest
+{
+	customer {
+	}
+}
+
+FORM CustomerList
+{
+	list { 
+		customer []
+		{
+			id !@string
+			name string
+			address string
+		}
+	}
+}
+
+FORM CustomerRequest
+{
+	customer {
+		id !@string
+	}
+}
+
+FORM Customer
+{
+	customer
+	{
+		id !@string
+		name string
+		address string
+	}
+}
