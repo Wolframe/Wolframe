@@ -37,6 +37,7 @@
 #include "types/syncCounter.hpp"
 #include <list>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 namespace _Wolframe {
@@ -74,6 +75,26 @@ public:
 		m_list.erase( objref);
 	}
 
+	virtual unsigned int size()
+	{
+		boost::mutex::scoped_lock lock( m_mutex);
+		return m_list.size();
+	}
+
+	template <class Functor>
+	void doForeach( const Functor& f)
+	{
+		boost::mutex::scoped_lock lock( m_mutex);
+		typename std::list<OBJ>::iterator ci = m_list.begin(), ce = m_list.end();
+		for (; ci != ce; ++ci)
+		{
+			f( *ci);
+		}
+	}
+
+private:
+	SyncObjectList( const SyncObjectList&){}
+
 private:
 	boost::mutex m_mutex;		//< mutex for mutual exclusion of writes
 	std::list<OBJ> m_list;		//< list of objects
@@ -93,7 +114,9 @@ public:
 	//\brief Constructor
 	explicit BoundedSyncObjectList( unsigned int maxNofObjects=SyncCounter::NoLimit, SyncCounter* globalCounter_=0)
 		:m_counter(maxNofObjects)
-		,m_globalCounter(globalCounter_){}
+		,m_globalCounter(globalCounter_)
+		,m_lastError(Ok)
+		{}
 
 	//\brief Destructor
 	virtual ~BoundedSyncObjectList(){}
@@ -108,26 +131,40 @@ public:
 		{
 			types::SyncCounter::ScopedAquire gs( *m_globalCounter);
 			{
-				if (!gs.entered()) return false;
+				if (!gs.entered())
+				{
+					m_lastError = GlobalBoundaryLimitError;
+					return false;
+				}
 	
 				types::SyncCounter::ScopedAquire ls( m_counter);
 				{
-					if (!ls.entered()) return false;
+					if (!ls.entered())
+					{
+						m_lastError = LocalBoundaryLimitError;
+						return false;
+					}
 					if (!Parent::insert( obj, ref)) return false;
 					ls.done();
 				}
 				gs.done();
 			}
+			m_lastError = Ok;
 			return true;
 		}
 		else
 		{
 			types::SyncCounter::ScopedAquire ls( m_counter);
 			{
-				if (!ls.entered()) return false;
+				if (!ls.entered())
+				{
+					m_lastError = LocalBoundaryLimitError;
+					return false;
+				}
 				if (!Parent::insert( obj, ref)) return false;
 				ls.done();
 			}
+			m_lastError = Ok;
 			return true;
 		}
 	}
@@ -141,9 +178,39 @@ public:
 		Parent::release( objref);
 	}
 
+	//\brief Evaluate the current size of the list
+	//\return the list size in elements
+	virtual unsigned int size()
+	{
+		return *m_counter;
+	}
+
+	//\brief Check consistency of list size with counter
+	//\return true if yes
+	bool check()
+	{
+		return Parent::size() == size();
+	}
+
+	enum ErrorCode {Ok,GlobalBoundaryLimitError,LocalBoundaryLimitError};
+	ErrorCode lastError() const
+	{
+		return m_lastError;
+	}
+
+	template <class Functor>
+	void doForeach( const Functor& f)
+	{
+		SyncObjectList<OBJ>::doForeach(f);
+	}
+
+private:
+	BoundedSyncObjectList( const BoundedSyncObjectList&){}
+
 private:
 	SyncCounter m_counter;		//< counter for maximum number of elements limit
 	SyncCounter* m_globalCounter;	//< global counter for maximum total number of elements limit
+	ErrorCode m_lastError;
 };
 
 }}//namespace

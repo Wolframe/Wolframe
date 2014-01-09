@@ -147,6 +147,7 @@ TEST_CPP_BINS = \
 	testArrayDoublingAllocator$(EXE) \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
+	connectionListTest$(EXE) \
 	resolvePathTest$(EXE) \
 	testBoostPath$(EXE) \
 	singletonTest$(EXE) \
@@ -240,6 +241,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./versionTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./counterTest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./connectionListTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./resolvePathTest
 	@echo

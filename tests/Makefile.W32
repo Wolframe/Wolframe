@@ -103,6 +103,7 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	testMethodMemberPointerTemplate.exe \
 	counterTest.exe \
+	connectionListTest.exe \
 	resolvePathTest.exe \
 	testBoostPath.exe \
 	singletonTest.exe \
@@ -143,6 +144,7 @@ testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
+connectionListTest.exe: connectionListTest.obj $(TOPDIR)\src\wolframe.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 testBoostPath.exe: testBoostPath.obj
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
@@ -211,6 +213,7 @@ local_test:
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
+	@-echo connectionListTest >> test.bat
 	@-echo resolvePathTest >> test.bat
 	@-echo testBoostPath >> test.bat
 	@-echo singletonTest >> test.bat

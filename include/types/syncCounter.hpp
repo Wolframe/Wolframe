@@ -83,6 +83,11 @@ public:
 		Parent::fetch_sub( 1, boost::memory_order_release);
 	}
 
+	CounterType operator*() const
+	{
+		return load();
+	}
+
 	///\brief Aquire a counter in a limit in an exception save scope
 	// Example:
 	//	SyncCounter globalCnt;
@@ -122,7 +127,7 @@ public:
 		}
 
 	private:
-		SyncCounter* m_cc;	//< global counter reference
+		SyncCounter* m_cc;		//< global counter reference
 	};
 
 private:

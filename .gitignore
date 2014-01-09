@@ -51,6 +51,7 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/counterTest
+tests/connectionListTest
 tests/testSHA
 tests/testMD5
 tests/byte2hexTest

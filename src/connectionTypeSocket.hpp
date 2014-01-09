@@ -67,6 +67,11 @@ public:
 	//\brief Get a description of this connection for log messages
 	virtual std::string logString() const;
 
+	virtual void signalTerminate()
+	{
+		signal();
+	}
+
 private:
 	boost::asio::ip::tcp::socket m_socket;		//< socket for the connection
 };

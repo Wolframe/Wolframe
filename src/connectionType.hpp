@@ -46,26 +46,38 @@ typedef types::BoundedSyncObjectList<ConnectionType*> ConnectionTypeList;
 class ConnectionType
 {
 public:
-
+	//\brief Constructor
+	//\param[in] listref_ reference to list where 'this' belongs to, if registered
 	explicit ConnectionType( ConnectionTypeList* listref_)
 		:m_listref(listref_)
 		,m_inserted(false){}
 
+	//\brief Destructor
 	virtual ~ConnectionType()
 	{
 		if (m_inserted) m_listref->release( m_elemref);
 	}
 
+	//\brief Insert connection into the list passed as constructor argument, if allowed
 	bool registerConnection()
 	{
 		if (m_inserted) throw std::logic_error("connection registered twice");
 		return m_inserted=m_listref->insert( this, m_elemref);
 	}
 
+	//\brief Check if registerConnection() was called with success
+	bool registered() const
+	{
+		return m_inserted;
+	}
+
+	virtual void signalTerminate()
+	{}
+
 private:
-	ConnectionTypeList::ElementReference m_elemref;
-	ConnectionTypeList* m_listref;
-	bool m_inserted;
+	ConnectionTypeList::ElementReference m_elemref;	//< reference of 'this' in m_listref
+	ConnectionTypeList* m_listref;			//< reference to list of all connections (list where 'this' belongs to)
+	bool m_inserted;				//< true, if 'this' was inserted into '*m_listref'
 };
 
 }}

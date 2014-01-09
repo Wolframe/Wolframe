@@ -165,11 +165,22 @@ void AcceptorSSL::stop()
 	m_IOservice->post( m_strand.wrap( boost::bind( &AcceptorSSL::handleStop, this )));
 }
 
+class TerminateSignal
+{
+public:
+	TerminateSignal(){}
+	void operator()( ConnectionType* conn) const
+	{
+		conn->signalTerminate();
+	}
+};
+
 void AcceptorSSL::handleStop()
 {
 	m_acceptor.close();
 	LOG_DEBUG << "Closed acceptor for " << m_identifier;
-	//TODO SIGNAL CONNECTIONS TO TERMINATE
+
+	m_connectionList.doForeach( TerminateSignal());
 }
 
 #endif

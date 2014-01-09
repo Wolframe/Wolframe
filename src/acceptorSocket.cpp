@@ -116,6 +116,16 @@ void AcceptorSocket::stop()
 	m_IOservice->post( m_strand.wrap( boost::bind( &AcceptorSocket::handleStop, this )));
 }
 
+class TerminateSignal
+{
+public:
+	TerminateSignal(){}
+	void operator()( ConnectionType* conn) const
+	{
+		conn->signalTerminate();
+	}
+};
+
 // The server is stopped by closing the acceptor.
 // When all outstanding operations are completed
 // all calls to io_service::run() will return.
@@ -123,6 +133,7 @@ void AcceptorSocket::handleStop()
 {
 	m_acceptor.close();
 	LOG_DEBUG << "Closed acceptor for " << m_identifier;
-	//TODO SIGNAL CONNECTIONS TO TERMINATE
+
+	m_connectionList.doForeach<TerminateSignal>( TerminateSignal());
 }
 
