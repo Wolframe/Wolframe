@@ -120,6 +120,7 @@ private:
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
 	bool m_skipvalidation_output;						//< output is not validated but document is not standalone and is with doctype returned
+	std::string m_output_rootelement;					//< root element of non validated output
 };
 
 }}//namespace

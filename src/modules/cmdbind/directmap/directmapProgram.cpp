@@ -224,9 +224,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	std::vector<std::string> toklist;
 	std::string cmdname;
 	std::string in_doctype;
-	std::string out_doctype;
 	std::string call_arg;
 	std::string return_arg;
+	std::string return_root;
 	bool validate = true;
 	bool call_arg_set = false;
 	bool return_arg_set = false;
@@ -269,7 +269,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				tok.clear();
 			}
 		}
-		if (ch != '\'' && ch != '"')
+		else if (ch != '\'' && ch != '"')
 		{
 			if (boost::iequals( tok, "SKIP"))
 			{
@@ -388,10 +388,15 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					continue;
 				}
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or SKIP expected as argument of RETURN");
-				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
-				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for RETURN");
-				return_arg_set = true;
+				if (toklist.size() > 2) throw std::runtime_error( "to many arguments for RETURN");
+				if (toklist.size() > 1)
+				{
+					return_root = toklist.at(1);
+					if (return_root.empty()) throw std::runtime_error( "expected nonempty document root element as second argument for RETURN");
+				}
+				if (tok.empty()) throw std::runtime_error( "expected nonempty document type name (with optional root element) as argument for RETURN");
 				return_arg = tok;
+				return_arg_set = true;
 				state = ParseAttribute;
 				continue;
 
@@ -478,10 +483,15 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	if (return_arg_set)
 	{
 		rt.outputform = return_arg;
+		rt.outputrootelem = return_root;
 	}
 	if (return_skip)
 	{
 		rt.skipvalidation_output = return_skip;
+		if (!return_root.empty())
+		{
+			throw std::runtime_error("root element (2nd argument of RETURN) only allowed when SKIP is specified");
+		}
 	}
 	return rt;
 }

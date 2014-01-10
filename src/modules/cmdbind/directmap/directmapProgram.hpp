@@ -54,6 +54,7 @@ struct DirectmapCommandDescription
 		,outputfilterarg(o.outputfilterarg)
 		,inputform(o.inputform)
 		,outputform(o.outputform)
+		,outputrootelem(o.outputrootelem)
 		,skipvalidation_output(o.skipvalidation_output){}
 
 	std::string name;						//< name of program
@@ -64,6 +65,7 @@ struct DirectmapCommandDescription
 	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
+	std::string outputrootelem;					//< name of the output root element (in case of SKIP and no form defined)
 	bool skipvalidation_output;					//< output is not validated but document is not standalone and is with doctype returned
 
 	std::string tostring() const;
@@ -71,8 +73,6 @@ struct DirectmapCommandDescription
 
 ///\class DirectmapProgram
 ///\brief Program describing direct mappings (many function descriptions per source file)
-//	Function description syntax: identifier = call( filter :inputform) :outputform;
-//
 class DirectmapProgram
 	:public types::keymap<DirectmapCommandDescription>
 {
