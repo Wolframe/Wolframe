@@ -109,6 +109,7 @@ usr/local/include/wolframe/libclient/protocol.hpp
 usr/local/include/wolframe/libclient/session.hpp
 @dirrm usr/local/include/wolframe/libclient
 usr/local/include/wolframe/appConfig.hpp
+usr/local/include/wolframe/appDevel.hpp
 usr/local/include/wolframe/appProperties.hpp
 usr/local/include/wolframe/logger-v1.hpp
 usr/local/include/wolframe/singleton.hpp
@@ -133,7 +134,6 @@ usr/local/include/wolframe/protocol/parser.hpp
 @dirrm usr/local/include/wolframe/protocol
 usr/local/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
-usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/local/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
@@ -141,6 +141,7 @@ usr/local/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/lineCommandHandler.hpp
+usr/local/include/wolframe/cmdbind/commandHandlerConstructor.hpp
 @dirrm usr/local/include/wolframe/cmdbind
 usr/local/include/wolframe/database/DBprovider.hpp
 usr/local/include/wolframe/database/bindStatementParams.hpp
@@ -152,6 +153,7 @@ usr/local/include/wolframe/database/transaction.hpp
 usr/local/include/wolframe/database/transactionFunction.hpp
 usr/local/include/wolframe/database/transactionInput.hpp
 usr/local/include/wolframe/database/transactionOutput.hpp
+usr/local/include/wolframe/database/transactionExecStatemachine.hpp
 @dirrm usr/local/include/wolframe/database
 usr/local/include/wolframe/prnt/pdfPrinter.hpp
 usr/local/include/wolframe/prnt/pdfPrinterDocument.hpp
@@ -186,6 +188,7 @@ usr/local/include/wolframe/utils/stringUtils.hpp
 usr/local/include/wolframe/serialize/mapContext.hpp
 usr/local/include/wolframe/serialize/structOptionParser.hpp
 usr/local/include/wolframe/serialize/tostringUtils.hpp
+usr/local/include/wolframe/serialize/serializationErrorException.hpp
 usr/local/include/wolframe/serialize/struct/filtermapBase.hpp
 usr/local/include/wolframe/serialize/struct/filtermapDescription.hpp
 usr/local/include/wolframe/serialize/struct/filtermapParse.hpp
@@ -211,7 +214,6 @@ usr/local/include/wolframe/processor/userInterface.hpp
 @dirrm usr/local/include/wolframe/processor
 usr/local/include/wolframe/filter/bufferingfilter.hpp
 usr/local/include/wolframe/filter/contentfilterAttributes.hpp
-usr/local/include/wolframe/filter/dotnetfilter.hpp
 usr/local/include/wolframe/filter/filter.hpp
 usr/local/include/wolframe/filter/filterbase.hpp
 usr/local/include/wolframe/filter/inputfilter.hpp
@@ -269,6 +271,7 @@ usr/local/include/wolframe/prgbind/printProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp
 usr/local/include/wolframe/prgbind/programLibrary.hpp
 usr/local/include/wolframe/prgbind/transactionProgram.hpp
+usr/local/include/wolframe/prgbind/runtimeEnvironmentConstructor.hpp
 @dirrm usr/local/include/wolframe/prgbind
 usr/local/include/wolframe/crypto/HMAC.h
 usr/local/include/wolframe/crypto/HMAC.hpp
@@ -291,4 +294,3 @@ usr/local/share/man/man8/wolframed.8.gz
 usr/local/share/man/man1/wolfpasswd.1.gz
 @mode 0775
 usr/local/etc/rc.d/wolframed
-@mode
