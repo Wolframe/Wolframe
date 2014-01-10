@@ -107,9 +107,22 @@
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_call_return.directmap" parse="text" />
 				</programlisting>
-				The same you can specify for the output in the <code>RETURN</code> declaration:
+				The same you can specify for the output with a <code>SKIP</code> 
+				following the <code>RETURN</code> of the output declaration:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
+				</programlisting>
+				A second optional parameter of the <code>RETURN SKIP</code> declaration
+				specifies the root element of the returned data object. In this case
+				the form definition does not have to exist in a DDL form definition.
+				The output can be built without a form definition defined in a DDL.
+				The following example shows such a definition with 'list' 
+				as root element defined. Such a command definition makes sense
+				for strongly typed languages like .NET or native C++ where data 
+				validation can be delagated completely to the strongly typed 
+				structure definition of the called function.
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip_with_rootelem.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect3>

@@ -84,9 +84,31 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		const types::FormDescription* df = m_provider->formDescription( m_cmd->outputform);
 		if (!df)
 		{
-			throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
+			if (m_cmd->outputrootelem.empty())
+			{
+				throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
+			}
 		}
-		m_outputform.reset( new types::Form( df));
+		else
+		{
+			if (m_cmd->outputrootelem.empty())
+			{
+				if (df->xmlRoot())
+				{
+					m_outputform.reset( new types::Form( df));
+				}
+			}
+			else
+			{
+				if (df->xmlRoot())
+				{
+					if (m_cmd->outputrootelem != df->xmlRoot())
+					{
+						throw std::runtime_error( std::string( "root element of output form does not match '") + m_cmd->outputform + "'");
+					}
+				}
+			}
+		}
 	}
 	std::string input_filtername;
 	std::vector<langbind::FilterArgument> input_filterarg;
@@ -178,7 +200,14 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		{
 			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->description()->name(), m_outputform->description()->ddlname(), xmlroot);
 			m_outputfilter->setDocType( xmlDoctype);
+			m_output_rootelement = xmlroot;
 		}
+	}
+	else if (!m_cmd->outputrootelem.empty())
+	{
+		std::string xmlDoctype = m_provider->xmlDoctypeString( m_cmd->outputform, "", m_cmd->outputrootelem);
+		m_outputfilter->setDocType( xmlDoctype);
+		m_output_rootelement = m_cmd->outputrootelem;
 	}
 	// synchronize attributes:
 	m_outputfilter->setAttributes( m_inputfilter.get());
@@ -285,8 +314,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
 				if (m_outputform.get() && !m_skipvalidation_output)
 				{
-					const char* xmlroot = m_outputform->description()->xmlRoot();
-					types::VariantStruct* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
+					types::VariantStruct* substructure = (m_output_rootelement.size())?m_outputform->select(m_output_rootelement.c_str()):m_outputform.get();
 					substructure->setInitialized();
 					serialize::DDLStructParser formparser( substructure);
 					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
@@ -296,16 +324,72 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 					m_outputform_serialize.reset( new serialize::DDLStructSerializer( m_outputform.get()));
 					m_outputprinter.init( m_outputform_serialize, m_output);
+					m_state = 5;
 				}
-				else
+				else 
 				{
 					m_outputprinter.init( m_functionclosure->result(), m_output);
+					if (!m_output_rootelement.empty())
+					{
+						m_state = 51;
+						break;
+					}
+					else
+					{
+						m_state = 5;
+					}
 				}
-				m_state = 5;
 				/* no break here ! */
 			case 5:
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
+				m_state = 6;
+				return IOFilterCommandHandler::Ok;
+			}
+			case 51:
+			{
+				// Print open tag for root element
+				if (!m_output->print( FilterBase::OpenTag, m_cmd->outputrootelem))
+				{
+					switch (m_outputfilter->state())
+					{
+						case OutputFilter::Open:
+							throw std::runtime_error( "unknown error in output filter");
+	
+						case OutputFilter::EndOfBuffer:
+							return IOFilterCommandHandler::Yield;
+	
+						case OutputFilter::Error:
+							throw std::runtime_error( m_outputfilter->getError());
+					}
+				}
+				m_state = 52;
+				/* no break here ! */
+			}
+			case 52:
+			{
+				// same as state 5 in print with root element context
+				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
+				m_state = 53;
+				/* no break here ! */
+			}
+			case 53:
+			{
+				// Print close tag for root element
+				if (!m_output->print( FilterBase::CloseTag, types::Variant()))
+				{
+					switch (m_outputfilter->state())
+					{
+						case OutputFilter::Open:
+							throw std::runtime_error( "unknown error in output filter");
+	
+						case OutputFilter::EndOfBuffer:
+							return IOFilterCommandHandler::Yield;
+	
+						case OutputFilter::Error:
+							throw std::runtime_error( m_outputfilter->getError());
+					}
+				}
 				m_state = 6;
 				return IOFilterCommandHandler::Ok;
 			}
