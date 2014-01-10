@@ -11,18 +11,20 @@
 	<para>
 		Let's copy the <filename>customer_edit.ui</filename> to
 		<filename>customer_add.ui</filename>. We remove the
-		'initAction' and the other dynamic properties from the form itself as
-		we don't want to read anything when creating a new customer. But of course
-		we could execute here a "Get new customer initial data" request too which
-		initializes certain values.
+		'action' and 'answer' on from the form itself as
+		we don't want to read anything when we create a new customer.
+		But of course we could execute here a "Get new customer initial data"
+		request which initializes certain values in the form.
 	</para>
 	
 	<para>
-		We change the "Save" button and rename it to "Add". We also change the
-		attribute 'doctype' there from 'CustomerUpdate' to 'CustomerCreate' and we remove
-		the 'id' property (as this one is automatically choosen by the sequence
-		in the database). We also have to change the 'action' from 'update' to
-		'create':
+		We change the "Save" button and rename it to "Add". We also change 'CustomerUpdate'
+		to 'CustomerCreate' in the 'action' attribute and we remove the id property
+		as this one is automatically choosen by the sequence in the database:
+
+		<programlisting language='shell'>
+		CustomerCreate customer {name {{main.name}}; address {{main.address}} }
+		</programlisting>
 	</para>
 
 	<screenshot>
@@ -74,41 +76,30 @@
 
 	<para>
 		Now for the server side. We add a new mapping for customer creation
-		in <filename>tutorial.directmap</filename>:
+		in <filename>tutorial.dmap</filename>:
 
 	<programlisting language='shell'>
-	editCustomerUpdate = UpdateCustomer( xml );
-	createCustomerCreate = CreateCustomer( xml );
+	COMMAND CustomerCreate CALL CreateCustomer;
 	</programlisting>
 	
-		We also have to add the simple form <filename>CustomerCreate.simpleform</filename>:
+		We also have to add the form 'CustomerCreate' to <filename>Customer.sfrm</filename>:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerCreate.simpleform" parse="text" />
 	</programlisting>
 
-		This is the same as <filename>CustomerUpdate.simpleform</filename> with the exception that
+		This is the same as the 'CustomerUpdate' form with the exception that
 		we don't accept an 'id' attribute to be passed to the server.
 	</para>
-
-	<para>
-		We register this form in <filename>tutorial.conf</filename>:
-
-	<programlisting language='shell'>
-	Processor {
-		..
-		program CustomerCreate.simpleform
-		..
-	}
-	</programlisting>
 	
+	<para>
 		Last we add a 'CreateCustomer' transaction function:
 
 	<programlisting language='sql'>
 	TRANSACTION CreateCustomer
 	BEGIN
 		DO INSERT INTO Customer( name, address )
-			VALUES( $(customer/name), $(customer/address) );
+			VALUES( $(name), $(address) );
 	END
 	</programlisting>
 	

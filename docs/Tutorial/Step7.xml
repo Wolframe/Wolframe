@@ -80,7 +80,7 @@
 	</programlisting>
 
 		We also add a simple form 'CustomerUpdate' to <filename>Customer.sfrm</filename>
-		which looks very similar to the 'Customer.' form:
+		which looks very similar to the 'Customer' form:
 	</para>
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.sfrm" parse="text" />
