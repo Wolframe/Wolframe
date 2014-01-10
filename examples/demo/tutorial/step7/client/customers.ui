@@ -19,11 +19,11 @@
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
-     <property name="doctype" stdset="0">
-      <string>CustomerListRequest</string>
+     <property name="action" stdset="0">
+      <string>CustomerListRequest customer { }</string>
      </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
+     <property name="answer" stdset="0">
+      <string>Customer list {customer[] {id={row.id}; name{{row.name}}; address{{row.address}} } }</string>
      </property>
      <column>
       <property name="text">
@@ -58,10 +58,7 @@
         <string>Edit</string>
        </property>
        <property name="form" stdset="0">
-        <string>customer_edit</string>
-       </property>
-       <property name="global.id" stdset="0">
-        <string>{customer.id}</string>
+        <string>customer_edit?id={customer.selected}</string>
        </property>
       </widget>
      </item>
@@ -71,10 +68,7 @@
         <string>Show</string>
        </property>
        <property name="form" stdset="0">
-        <string>customer_show</string>
-       </property>
-       <property name="global.id" stdset="0">
-        <string>{customer.id}</string>
+        <string>customer_show?id={customer.selected}</string>
        </property>
       </widget>
      </item>
