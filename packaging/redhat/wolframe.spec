@@ -103,7 +103,7 @@
 %define with_sqlite	1
 %define with_pgsql	1
 # careful with license issues if you enable Oracle!
-%define with_oracle	1
+%define with_oracle	0
 %define with_lua	1
 %define with_python	1
 %define with_pam	1
