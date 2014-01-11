@@ -148,6 +148,17 @@ Project Wolframe.
 			<filename>primary.db</filename>
 <!--			<filename>/var/lib/wolframe/primary.db</filename> -->
 		</SQLite>
+		
+<!--
+		<Oracle>
+			<identifier>oracledb</identifier>
+			<host>localhost</host>
+			<port>1521</port>
+			<database>orcl</database>
+			<user>wolframe</user>
+			<password>wolfpwd</password>
+		</Oracle>
+-->
 	</database>
 
 	<!--	Logging parameters -->

@@ -102,6 +102,8 @@
 %define with_ssl	1
 %define with_sqlite	1
 %define with_pgsql	1
+# careful with license issues if you enable Oracle!
+%define with_oracle	1
 %define with_lua	1
 %define with_python	1
 %define with_pam	1
@@ -464,6 +466,11 @@ BuildRequires: sqlite >= 3.0
 %endif
 %endif
 
+# Oracle database module
+%if %{with_oracle}
+BuildRequires: oracle-instantclient12.1-devel
+%endif
+
 # build local version of libharu/libpdf
 %define build_libhpdf 1
 %if %{with_libhpdf}
@@ -564,6 +571,18 @@ Requires: sqlite >= 3.0
 %endif
 %endif
 
+%endif
+
+%if %{with_oracle}
+%package oracle
+Summary: Wolframe Oracle database module
+Group: Application/Business
+
+%description oracle
+The Wolframe database module for Oracle (OCI).
+
+Requires: %{name} >= %{version}-%{release}
+Requires: oracle-instantclient12.1-basic
 %endif
 
 %if %{with_pam}
@@ -853,6 +872,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -908,6 +928,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -960,6 +981,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -1013,6 +1035,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make all \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -1071,6 +1094,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make test \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -1122,6 +1146,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_ORACLE=%{with_oracle} \
 %if %{with_textwolf}
 	WITH_TEXTWOLF=%{with_textwolf} \
 %endif
@@ -1459,6 +1484,14 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_sqlite3.so
+%endif
+
+%if %{with_oracle}
+%files oracle
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_db_oracle.so
 %endif
 
 %if %{with_pam}
