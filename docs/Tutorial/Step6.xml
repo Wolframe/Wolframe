@@ -108,7 +108,12 @@
 		in the 'customers.ui' form:
 
 		<programlisting language='shell'>
-	Customer list {customer[] {id={row.id}; name{{row.name}}; address{{row.address}} } }
+	CustomerList list {
+	    customer[] {
+	        id={row.id};
+	        name{{row.name}};
+	        address{{row.address}}
+	    }}
 		</programlisting>
 		
 		'id={row.id}' maps the 'id' attribute to the 'id' property of each row.
@@ -132,8 +137,10 @@
 	</programlisting>
 
 	<para>
-		We have to declare a new output form validation 'CustomerList'
-		in <filename>tutorial.dmap</filename> as well:
+		We change now the command in <filename>tutorial.dmap</filename> 
+		again to switch on validation. The SKIP attribute is removed and
+		the root element does not have to be specified because it is defined now
+		in the form declaration:
 
 	<programlisting language='shell'>
 	COMMAND CustomerListRequest CALL SelectCustomerList RETURN CustomerList;

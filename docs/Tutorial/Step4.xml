@@ -127,7 +127,9 @@
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	COMMAND CustomerListRequest CALL SelectCustomerList RETURN STANDALONE list;
+	COMMAND CustomerListRequest
+	       CALL SelectCustomerList
+	       RETURN STANDALONE list;
 		</programlisting>
 
 		This means that we map the 'CustomerListRequest' request to a function 'SelectCustomerList'

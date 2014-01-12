@@ -192,7 +192,13 @@
 		dynamic property 'answer' similar to the 'action' property:
 		
 		<programlisting language='shell'>
-	Customer list {customer[] {id={?}; name{{row.name}}; address{{row.address}} } }
+	CustomerList list {
+		customer[] {
+			id={?};
+			name{{row.name}};
+			address{{row.address}}
+		}
+	}
 		</programlisting>
 		
 		The '?' is used for elements in the XML we don't need at the moment.
@@ -216,7 +222,7 @@
 		
 	<para>
 		When we reexecute the wolfclient and click on the customer list we
-		see that everything went ok this time:
+		see that the customer list is shown as expected:
 	</para>
 
 	<screenshot>
@@ -230,5 +236,35 @@
 			</imageobject>
 		</mediaobject>
 	</screenshot>
-	
+
+	<para>
+		But when we look at the contents of the debug window we still see an error reported:
+	</para>
+	<screeninfo>Step 5 undefined document type</screeninfo>
+	<mediaobject>
+		<imageobject role="html"> 
+			<imagedata fileref="images/Tutorial/step5_customers_undefined_doctype.png" format="PNG"/>
+		</imageobject> 
+		<imageobject role="fo"> 
+			<imagedata fileref="images/Tutorial/step5_customers_undefined_doctype.png" format="PNG" width="100%" scalefit="1"/>
+		</imageobject>
+	</mediaobject>
+	<para>
+		For simplicity we defined the document type returned from the server as STANDALONE.
+		But the client expects a document type declaration. For this we have to change the
+		definition in the file <filename>tutorial.dmap</filename> that we created in step 4.
+		Here folows the changed transaction definitions:
+	</para>
+
+	<programlisting language='shell'>
+	COMMAND CustomerListRequest
+	        CALL SelectCustomerList
+	        RETURN SKIP CustomerList list;
+	</programlisting>
+
+	<para>
+	The definition RETURN SKIP CustomerList list tells that a document of type 'CustomerList'
+	with the root element 'list' is returned without validation. 
+	We omit a validation on purpose for now to get to the next step.
+	</para>
 </sect1>
