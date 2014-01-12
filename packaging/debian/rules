@@ -21,7 +21,7 @@ export DH_OPTIONS
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
+export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 WITH_ORACLE=1 RELEASE=1 DEFAULT_MODULE_LOAD_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/modules
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -166,6 +166,13 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
+
+	# module database oracle
+	cd src/modules/database/oracle; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-oracle; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
 
 	# authentication module for PAM
 	cd src/modules/authentication/pam; $(MAKE) install $(WOLFRAME_PARAMS) \

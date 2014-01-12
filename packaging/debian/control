@@ -37,6 +37,12 @@ Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
 Description: Postgresql database bindings
  The Wolframe database module for Postgresql (libpq).
 
+Package: wolframe-oracle
+Architecture: any
+Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
+Description: Oracle database bindings
+ The Wolframe database module for Oracle (OCI).
+
 Package: wolframe-pam
 Architecture: any
 Depends: wolframe, ${shlibs:Depends}, ${misc:Depends}
