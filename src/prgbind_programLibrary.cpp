@@ -330,7 +330,7 @@ public:
 		std::vector< std::pair<Program*, std::string> >::const_iterator ti = typed_filenames.begin(), te = typed_filenames.end();
 		for (; ti != te; ++ti)
 		{
-			LOG_TRACE << "Loading program '" << ti->second << "'";
+			LOG_DEBUG << "Loading program '" << ti->second << "'";
 			ti->first->loadProgram( library, transactionDB, m_curfile=ti->second);
 		}
 	}

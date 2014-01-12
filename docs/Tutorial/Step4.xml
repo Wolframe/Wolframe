@@ -130,10 +130,11 @@
 	COMMAND CustomerListRequest CALL SelectCustomerList RETURN STANDALONE list;
 		</programlisting>
 
-		This means that we map the 'CustomerListRequest' request to the TDL transaction 'SelectCustomerList'
-		that returns us a standalone document without document type assigned with the
-		root element 'list'. The returned content will be a list of customers. 
-		The function will be implemented in a TDL program in the server. We first add the
+		This means that we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		that is executed to perform the request. It will returns us document 
+		without a document type assigned (standalone) and with the root element 'list'. 
+		The returned content will be a list of customers. The function will be implemented 
+		in a TDL program in the server. We first add the
 		TDL program declaration to the processor configuration section:
 
 		<programlisting language='shell'>
