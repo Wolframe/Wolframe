@@ -97,6 +97,7 @@ clients/cli/wolfcli
 docs/Tutorial.epub
 docs/Tutorial.html
 docs/Tutorial.pdf
+docs/html-tutorial/*.html
 docs/WolfBook.epub
 docs/WolfBook.html
 docs/WolfBook.pdf

@@ -69,7 +69,6 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	{
 		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
 	}
-	m_skipvalidation_output = m_cmd->skipvalidation_output;
 	if (!m_cmd->inputform.empty())
 	{
 		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
@@ -205,8 +204,11 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	else if (!m_cmd->outputrootelem.empty())
 	{
-		std::string xmlDoctype = m_provider->xmlDoctypeString( m_cmd->outputform, "", m_cmd->outputrootelem);
-		m_outputfilter->setDocType( xmlDoctype);
+		if (!m_cmd->output_doctype_standalone)
+		{
+			std::string xmlDoctype = m_provider->xmlDoctypeString( m_cmd->outputform, "", m_cmd->outputrootelem);
+			m_outputfilter->setDocType( xmlDoctype);
+		}
 		m_output_rootelement = m_cmd->outputrootelem;
 	}
 	// synchronize attributes:
@@ -312,7 +314,23 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				/* no break here ! */
 			case 4:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
-				if (m_outputform.get() && !m_skipvalidation_output)
+				if (!m_cmd->command_has_result)
+				{
+					langbind::TypedInputFilterR res = m_functionclosure->result();
+					langbind::InputFilter::ElementType typ;
+					types::VariantConst element;
+
+					if (res.get() && res->getNext( typ, element))
+					{
+						if (typ != langbind::FilterBase::CloseTag)
+						{
+							LOG_WARNING << "Function called is returning a result but no RETURN declared in command. The function result is ignored";
+						}
+					}
+					m_state = 6;
+					return IOFilterCommandHandler::Ok;
+				}
+				if (m_outputform.get() && !m_cmd->skipvalidation_output)
 				{
 					types::VariantStruct* substructure = (m_output_rootelement.size())?m_outputform->select(m_output_rootelement.c_str()):m_outputform.get();
 					substructure->setInitialized();
@@ -336,6 +354,10 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 					else
 					{
+						if (!m_cmd->output_doctype_standalone)
+						{
+							throw std::runtime_error("RETURN with no valid output form (RETURN doctype, RETURN SKIP doctype [root]) defined and document is not standalone (RETURN STANDALONE root)");
+						}
 						m_state = 5;
 					}
 				}

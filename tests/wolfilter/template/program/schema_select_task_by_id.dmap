@@ -1,1 +1,1 @@
-COMMAND(schema_select_task_by_id) CALL(test_transaction);
+COMMAND(schema_select_task_by_id) CALL(test_transaction) RETURN STANDALONE doc;

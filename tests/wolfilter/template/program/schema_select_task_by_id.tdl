@@ -1,5 +1,4 @@
 TRANSACTION test_transaction
-RESULT INTO doc
 BEGIN
 	INTO task FOREACH //task DO SELECT * FROM task WHERE id=$(id) ORDER BY id ASC;
 END

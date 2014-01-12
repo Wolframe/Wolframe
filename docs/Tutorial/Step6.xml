@@ -148,24 +148,6 @@
 		we get now:
 
 	<programlisting language='xml'>
-	ERR REQUEST unknown tag  (list)-.. candidates are {customer}
-	</programlisting>
-	
-	If using validated output, the wolframe server adds automatically the
-	root element 'list' as declared in the form definition to the result.
-	So we can remove the 'RESULT INTO list' in the TDL function
-	'SelectCustomerList':
-	
-	<programlisting language='xml'>
-	TRANSACTION SelectCustomerList
-	BEGIN
-		INTO customer DO SELECT * from Customer;
-	END
-	</programlisting>
-	
-		Now we get the desired result:
-	
-	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListWithIdAttributes.xml" parse="text" />
 	</programlisting>
 

@@ -215,94 +215,102 @@ static std::vector<langbind::FilterArgument> parseFilterArguments( std::string::
 	}
 }
 
+enum Lexem
+{
+	IDENTIFIER,SKIP,STANDALONE,RETURN,CALL,FILTER,INPUT,OUTPUT
+};
+static const char* lexemName( Lexem i)
+{
+	static const char* ar[] = {"IDENTIFIER","SKIP","STANDALONE","RETURN","CALL","FILTER","INPUT","OUTPUT",0};
+	return ar[ (int)i];
+}
+Lexem lexemId( const std::string& id)
+{
+	const char* nam;
+	for (int ii=1; (0!=(nam=lexemName((Lexem)ii))); ++ii)
+	{
+		if (boost::iequals( id, nam)) return (Lexem)ii;
+	}
+	return IDENTIFIER;
+}
+
+static bool parseNextLexem( Lexem& lexem, std::vector<std::string>& toklist, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	static const utils::CharTable optab( ";()");
+	std::string tok;
+	Lexem follow;
+
+	char ch = utils::parseNextToken( tok, si, se, optab);
+	if (!ch) throw std::runtime_error( "missing ';' at end of expression");
+	if (ch == ';') return false;
+
+	lexem = IDENTIFIER;
+	toklist.clear();
+
+	if (ch == '(')
+	{
+		for (;;)
+		{
+			ch = utils::parseNextToken( tok, si, se, optab);
+			if (ch == ')') break;
+			if (!ch) throw std::runtime_error( "unexpected end of expression: argument list not closed with ')'");
+			if (optab[ch]) throw std::runtime_error("expected identifier or string as argument of COMMAND");
+			toklist.push_back( tok);
+		}
+		return true;
+	}
+	if (ch != '\'' && ch != '"')
+	{
+		lexem = lexemId( tok);
+		if (lexem != IDENTIFIER) return true;
+	}
+	if (tok.empty())
+	{
+		throw std::runtime_error( "empty string as token is not allowed");
+	}
+	toklist.push_back( tok);
+	std::string::const_iterator start = si;
+
+	for (ch = utils::parseNextToken( tok, start, se, optab); ch && ch != ';';ch = utils::parseNextToken( tok, start, se, optab))
+	{
+		follow = lexemId( tok);
+		if (follow != IDENTIFIER) break;
+		si = start;
+		toklist.push_back( tok);
+	}
+	if (!ch) throw std::runtime_error( "missing ';' at end of expression");
+	return true;
+}
+
 static DirectmapCommandDescription parseCommandDescription( std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	DirectmapCommandDescription rt;
-	static const utils::CharTable optab( ";()");
 	static const utils::CharTable fchartab( "a..zA..Z_0..9.");
-	std::string tok;
+	static const utils::CharTable fcharoptab( ";()");
+	DirectmapCommandDescription rt;
 	std::vector<std::string> toklist;
 	std::string cmdname;
 	std::string in_doctype;
 	std::string call_arg;
 	std::string return_arg;
 	std::string return_root;
-	bool validate = true;
+	bool validate_input = true;
 	bool call_arg_set = false;
 	bool return_arg_set = false;
 	bool return_skip = false;
+	bool return_standalone = false;
 	bool input_filter_set = false;
 	bool output_filter_set = false;
-	enum Lexem {SKIP,RETURN,CALL,IDENTIFIER,FILTER,INPUT,OUTPUT};
-	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseCallArg,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
+	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
 	State state = ParseCommand;
 	char ch;
+	Lexem lexem;
 
-	ch = utils::parseNextToken( tok, si, se, optab);
-	for (; ch != ';' && ch; ch = utils::parseNextToken( tok, si, se, optab))
+	while (parseNextLexem( lexem, toklist, si, se))
 	{
-		Lexem lexem = IDENTIFIER;
-		toklist.clear();
-		if (ch == '(')
-		{
-			for (;;)
-			{
-				if (state == ParseCallArg)
-				{
-					ch = utils::parseNextToken( tok, si, se, optab, fchartab);
-				}
-				else
-				{
-					ch = utils::parseNextToken( tok, si, se, optab);
-				}
-				if (ch == ')') break;
-				if (!ch) throw std::runtime_error( "unexpected end of expression: argument list not closed with ')'");
-				if (optab[ch]) throw std::runtime_error("expected identifier or string as argument of COMMAND");
-				toklist.push_back( tok);
-			}
-			if (toklist.size())
-			{
-				tok = toklist.at(0);
-			}
-			else
-			{
-				tok.clear();
-			}
-		}
-		else if (ch != '\'' && ch != '"')
-		{
-			if (boost::iequals( tok, "SKIP"))
-			{
-				if (!validate) throw std::runtime_error("duplicate definition of SKIP");
-				lexem = SKIP;
-			}
-			else if (boost::iequals( tok, "RETURN"))
-			{
-				if (return_arg_set) throw std::runtime_error("duplicate definition of RETURN");
-				lexem = RETURN;
-			}
-			else if (boost::iequals( tok, "CALL"))
-			{
-				if (call_arg_set) throw std::runtime_error("duplicate definition of CALL");
-				lexem = CALL;
-			}
-			else if (boost::iequals( tok, "FILTER"))
-			{
-				lexem = FILTER;
-			}
-			else if (boost::iequals( tok, "INPUT"))
-			{
-				lexem = INPUT;
-			}
-			else if (boost::iequals( tok, "OUTPUT"))
-			{
-				lexem = OUTPUT;
-			}
-		}
 		switch (state)
 		{
 			case ParseCommand:
-				if (lexem != IDENTIFIER) throw std::runtime_error( std::string("expected identifier after command and got keyword '") + tok + "'");
+				if (lexem != IDENTIFIER) throw std::runtime_error( std::string("expected identifier after command and got keyword '") + lexemName(lexem) + "'");
 				if (toklist.size() > 2) throw std::runtime_error( "to many arguments for COMMAND");
 				if (toklist.size() == 2)
 				{
@@ -311,13 +319,13 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					state = ParseAttribute;
 					break;
 				}
-				else if (tok.empty())
+				else if (toklist.empty())
 				{
 					throw std::runtime_error( "expected nonempty argument for COMMAND");
 				}
 				else
 				{
-					cmdname = tok;
+					cmdname = toklist.at(0);
 					state = ParseInputDoctype;
 				}
 				break;
@@ -330,7 +338,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					state = ParseAttribute;
 					/*no break here!*/
 				}
-				else if (tok.empty())
+				else if (toklist.empty())
 				{
 					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for COMMAND");
 					throw std::runtime_error( "expected nonempty argument for document type of command");
@@ -338,7 +346,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				else
 				{
 					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for COMMAND");
-					in_doctype = tok;
+					in_doctype = toklist.at(0);
 					state = ParseAttribute;
 					break;
 				}
@@ -361,20 +369,42 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				switch (lexem)
 				{
 					case SKIP:
-						validate = false;
+						if (!validate_input) throw std::runtime_error( "SKIP (input) specified twice");
+						validate_input = false;
 						state = ParseAttribute;
 						continue;
 					case RETURN:
+						if (return_arg_set || return_standalone) throw std::runtime_error( "RETURN specified twice");
 						state = ParseReturnArg;
 						continue;
 					case CALL:
-						state = ParseCallArg;
+						if (call_arg_set) throw std::runtime_error( "CALL specified twice");
+						ch = utils::parseNextToken( call_arg, si, se, fcharoptab, fchartab);
+						if (ch == '(')
+						{
+							ch = utils::parseNextToken( call_arg, si, se, fcharoptab, fchartab);
+							if (!ch || ch == ';') throw std::runtime_error("brackets '(' not closed in argument of 'CALL'");
+							if (ch == ')') throw std::runtime_error("empty argument of 'CALL'");
+							ch = utils::gotoNextToken( si, se);
+							if (!ch || ch == ';') throw std::runtime_error("brackets '(' not closed in argument of 'CALL'");
+							if (ch != ')') throw std::runtime_error("expected ')' after '(' and function name argument of 'CALL'");
+							++si;
+						}
+						else
+						{
+							if (!ch || ch == ';') throw std::runtime_error("function name expected as argument of 'CALL'");
+							if (ch != '\'' && ch != '"' && lexemId(call_arg) != IDENTIFIER) throw std::runtime_error("keyword instead of function name used as argument of 'CALL'");
+						}
+						call_arg_set = true;
+						state = ParseAttribute;
 						continue;
+					case STANDALONE:
 					case IDENTIFIER:
 					case INPUT:
 					case OUTPUT:
 						break;
 					case FILTER:
+						if (input_filter_set || output_filter_set) throw std::runtime_error( "FILTER specified twice");
 						state = ParseFilter;
 						continue;
 				}
@@ -383,29 +413,51 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 			case ParseReturnArg:
 				if (lexem == SKIP)
 				{
+					if (return_standalone) throw std::runtime_error( "SKIP specified after STANDALONE in RETURN");
 					if (return_skip) throw std::runtime_error( "SKIP specified twice after RETURN");
 					return_skip = true;
 					continue;
 				}
-				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or SKIP expected as argument of RETURN");
-				if (toklist.size() > 2) throw std::runtime_error( "to many arguments for RETURN");
-				if (toklist.size() > 1)
+				else if (lexem == STANDALONE)
 				{
-					return_root = toklist.at(1);
-					if (return_root.empty()) throw std::runtime_error( "expected nonempty document root element as second argument for RETURN");
+					if (return_standalone) throw std::runtime_error( "STANDALONE specified twice after RETURN");
+					return_standalone = true;
+					return_skip = true;
+					continue;
 				}
-				if (tok.empty()) throw std::runtime_error( "expected nonempty document type name (with optional root element) as argument for RETURN");
-				return_arg = tok;
-				return_arg_set = true;
-				state = ParseAttribute;
-				continue;
-
-			case ParseCallArg:
-				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of CALL");
-				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for CALL");
-				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for CALL");
-				call_arg_set = true;
-				call_arg = tok;
+				if (lexem != IDENTIFIER) throw std::runtime_error("identifier or SKIP expected as argument of RETURN");
+				if (return_standalone)
+				{
+					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
+					if (toklist.size() > 0)
+					{
+						return_root = toklist.at(0);
+						if (return_root.empty()) throw std::runtime_error( "expected nonempty document root element as argument for RETURN STANDALONE");
+					}
+					else
+					{
+						throw std::runtime_error( "missing root element as argument for RETURN STANDALONE");
+					}
+				}
+				else if (return_skip)
+				{
+					if (toklist.size() > 2) throw std::runtime_error( "to many arguments for RETURN SKIP");
+					if (toklist.size() > 1)
+					{
+						return_root = toklist.at(1);
+						if (return_root.empty()) throw std::runtime_error( "expected nonempty document root element as second argument for RETURN SKIP");
+					}
+					if (toklist.empty()) throw std::runtime_error( "expected nonempty document type name (with optional root element) as argument for RETURN SKIP");
+					return_arg = toklist.at(0);
+					return_arg_set = true;
+				}
+				else
+				{
+					if (toklist.size() > 1) throw std::runtime_error( "to many arguments for RETURN");
+					if (toklist.empty()) throw std::runtime_error( "expected nonempty document type name (with optional root element) as argument for RETURN");
+					return_arg = toklist.at(0);
+					return_arg_set = true;
+				}
 				state = ParseAttribute;
 				continue;
 
@@ -424,11 +476,11 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER");
 				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER");
 				if (output_filter_set) throw std::runtime_error("duplicate definition of FILTER");
-				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER");
+				if (toklist.empty()) throw std::runtime_error( "expected nonempty argument for FILTER");
 				input_filter_set = true;
-				rt.inputfilter = tok;
+				rt.inputfilter = toklist.at(0);
 				output_filter_set = true;
-				rt.outputfilter = tok;
+				rt.outputfilter = toklist.at(0);
 				state = ParseAttribute;
 				continue;
 
@@ -436,9 +488,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER INPUT");
 				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER INPUT");
 				if (input_filter_set) throw std::runtime_error("duplicate definition of FILTER INPUT");
-				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER INPUT");
+				if (toklist.empty()) throw std::runtime_error( "expected nonempty argument for FILTER INPUT");
 				input_filter_set = true;
-				rt.inputfilter = tok;
+				rt.inputfilter = toklist.at(0);
 				state = ParseAttributeFilter;
 				ch = utils::gotoNextToken( si, se);
 				if (ch == '(')
@@ -452,9 +504,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 				if (lexem != IDENTIFIER) throw std::runtime_error("identifier expected as argument of FILTER OUTPUT");
 				if (toklist.size() > 1) throw std::runtime_error( "to many arguments for FILTER OUTPUT");
 				if (output_filter_set) throw std::runtime_error("duplicate definition of FILTER OUTPUT");
-				if (tok.empty()) throw std::runtime_error( "expected nonempty argument for FILTER OUTPUT");
+				if (toklist.empty()) throw std::runtime_error( "expected nonempty argument for FILTER OUTPUT");
 				output_filter_set = true;
-				rt.outputfilter = tok;
+				rt.outputfilter = toklist.at(0);
 				state = ParseAttributeFilter;
 				ch = utils::gotoNextToken( si, se);
 				if (ch == '(')
@@ -476,23 +528,18 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	{
 		rt.call = rt.name;
 	}
-	if (validate)
+	if (validate_input)
 	{
 		rt.inputform = in_doctype;
 	}
 	if (return_arg_set)
 	{
 		rt.outputform = return_arg;
-		rt.outputrootelem = return_root;
 	}
-	if (return_skip)
-	{
-		rt.skipvalidation_output = return_skip;
-		if (!return_root.empty())
-		{
-			throw std::runtime_error("root element (2nd argument of RETURN) only allowed when SKIP is specified");
-		}
-	}
+	rt.outputrootelem = return_root;
+	rt.skipvalidation_output = return_skip;
+	rt.output_doctype_standalone = return_standalone;
+	rt.command_has_result = (return_arg_set || return_standalone);
 	return rt;
 }
 

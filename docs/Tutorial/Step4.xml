@@ -127,12 +127,14 @@
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	COMMAND CustomerListRequest CALL SelectCustomerList;
+	COMMAND CustomerListRequest CALL SelectCustomerList RETURN STANDALONE list;
 		</programlisting>
 
-		This means that we map the 'CustomerListRequest' request which gives us a list
-		of customers to the TDL transaction 'SelectCustomerList'. This also means
-		we need to configure a TDL program in the server:
+		This means that we map the 'CustomerListRequest' request to the TDL transaction 'SelectCustomerList'
+		that returns us a standalone document without document type assigned with the
+		root element 'list'. The returned content will be a list of customers. 
+		The function will be implemented in a TDL program in the server. We first add the
+		TDL program declaration to the processor configuration section:
 
 		<programlisting language='shell'>
 	Processor {
@@ -146,7 +148,6 @@
 
 		<programlisting language='shell'>
 	TRANSACTION SelectCustomerList
-	RESULT INTO list
 	BEGIN
 		INTO customer DO SELECT * from Customer;
 	END
