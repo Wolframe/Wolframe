@@ -1,5 +1,5 @@
 namespace _Wolframe {
-namespace langbind {
+namespace types {
 
 struct NormalizeFunction
 {

@@ -7,7 +7,7 @@
 	<sect1>
 	<title>Variant Type</title>
 	<para>The variant data type describes an atomic value of any scalar or string type.
-	It is the basic type for interfaces to all language bindings for writing wolframe
+	It is the basic type for interfaces to all language bindings for writing <application>Wolframe</application>
 	applications. The type <code>Variant</code> is defined in <code>types/variant.hpp</code> and 
 	has the following interface:
 

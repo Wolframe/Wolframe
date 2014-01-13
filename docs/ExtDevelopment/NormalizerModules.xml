@@ -68,7 +68,7 @@ NORMALIZER_MODULE_END
 
 	<sect1>
 	<title>Building the Module</title>
-	<para>For building the module you need to reference the wolframe core library (-lwolframe), that's all.
+	<para>For building the module you need to reference the <application>Wolframe</application> core library (-lwolframe), that's all.
 	You will find example makefiles in the examples of the project. But you are free to use your own build
 	mechanism.
 	</para>
