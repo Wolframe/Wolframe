@@ -31,47 +31,19 @@
 
 ************************************************************************/
 ///\file mod_normalize_number.hpp
-///\brief Module for number normalization and validating functions
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+///\brief Module for number normalization and validation functions
+#include "appDevel.hpp"
 #include "numberNormalize.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
+using namespace _Wolframe::langbind;
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+NORMALIZER_MODULE("number", "normalizers and validators for numbers")
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
+NORMALIZER_FUNCTION(	"integer",	createIntegerNormalizeFunction)
+NORMALIZER_FUNCTION(	"unsigned",	createUnsignedNormalizeFunction)
+NORMALIZER_FUNCTION(	"float",	createFloatNormalizeFunction)
+NORMALIZER_FUNCTION(	"fixedpoint",	createFixedpointNormalizeFunction)
 
-static langbind::ResourceHandle numberResource;
+NORMALIZER_MODULE_END
 
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"integer", &langbind::createIntegerNormalizeFunction},
-	{"unsigned", &langbind::createUnsignedNormalizeFunction},
-	{"float", &langbind::createFloatNormalizeFunction},
-	{"fixedpoint", &langbind::createFixedpointNormalizeFunction},
-	{0,0}
-};
-
-namespace {
-struct NormalizeProcessor
-{
-	static SimpleBuilder* constructor()
-	{
-		return new NormalizeFunctionBuilder( "NumberNormalizer", "number", normalizeFunctions);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", setModuleLogger, 0, 0, NofObjects, objdef);
 

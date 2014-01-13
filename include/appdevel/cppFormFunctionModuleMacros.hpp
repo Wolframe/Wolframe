@@ -30,12 +30,28 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appDevel.hpp
-///\brief Macros and templates for building Wolframe extensions. This is the main include file for writing Wolframe application extensions in native C++.
-#ifndef _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
-#define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
-#include "appdevel/cppFormFunctionModuleMacros.hpp"
-#include "appdevel/normalizeModuleMacros.hpp"
-#endif
+///\file appdevel/cppFormFunctionModuleMacros.hpp
+///\brief Macros and templates for building C++ an application form function module
+#include "appdevel/cppFormFunctionTemplate.hpp"
+#include "logger-v1.hpp"
 
+//\brief Marks the start if the Wolframe C++ form function module after the includes section.
+#define CPP_APPLICATION_FORM_FUNCTION_MODULE(NAME)\
+	_Wolframe::log::LogBackend* logBackendPtr;\
+	\
+	static void setModuleLogger( void* logger )\
+	{\
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
+	}\
+	\
+	static const char* _Wolframe__moduleName()\
+	{\
+	return NAME;\
+	}\
+
+//\brief Marks the end if the Wolframe C++ form function module.
+//\param[in] NofObjects Number of functions to export from the module
+//\param[in] Objects Array of function declarations to export from the module
+#define CPP_APPLICATION_FORM_FUNCTION_MODULE_END( NofObjects, Objects)\
+	module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), setModuleLogger, 0, 0, NofObjects, Objects);
 

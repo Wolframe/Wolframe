@@ -54,7 +54,7 @@ public:
 
 	virtual ~NormalizeFunctionConstructor()
 	{
-		delete m_resource;
+		if (m_resource) delete m_resource;
 	}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
