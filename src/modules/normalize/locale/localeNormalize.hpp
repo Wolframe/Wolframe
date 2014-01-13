@@ -59,8 +59,6 @@ private:
 	boost::locale::generator m_gen;
 };
 
-langbind::ResourceHandle* createLocaleResourceHandle()	{return new LocaleResourceHandle();}
-
 types::NormalizeFunction* create_tolower_NormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
 types::NormalizeFunction* create_toupper_NormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
 types::NormalizeFunction* create_totitle_NormalizeFunction( ResourceHandle& reshnd, const std::string& arg);

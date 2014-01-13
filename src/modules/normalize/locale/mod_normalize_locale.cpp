@@ -46,7 +46,7 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static langbind::ResourceHandle* createLocaleResource()
+static langbind::ResourceHandle* createLocaleResourceHandle()
 {
 	return new langbind::LocaleResourceHandle();
 }
@@ -72,7 +72,7 @@ struct NormalizeProcessor
 {
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", normalizeFunctions, &createLocaleResource);
+		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", normalizeFunctions, &createLocaleResourceHandle);
 	}
 };
 }//anonymous namespace
