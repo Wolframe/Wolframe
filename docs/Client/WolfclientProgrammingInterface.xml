@@ -299,6 +299,47 @@
 						related to a dataslot declaration of this widget named with IDENTIFIER.</para></entry>
 					</row>
 					<row>
+						<entry>dropmove</entry>
+						<entry><para>Defines a action request that is issued on a
+							drop request moving an object inside a widget or
+							between widgets of the same type (same object name).
+							The request is an action request without other
+							answer than success or failure. Refresh after the action 
+							completed is triggered via a datasignal 'datasignal:drop' 
+							defined in the drop widget and a 'datasignal:drag' defined in the drag widget.
+						</para></entry>
+					</row>
+					<row>
+						<entry>dropmove:OBJECTNAME</entry>
+						<entry><para>
+						Defines a server request that is issued on a
+						drop request moving an object from a widget with object name
+						OBJECTNAME. The request is an action request without other
+						answer than success or failure. Refresh after the action 
+						completed is triggered via a datasignal 'datasignal:drop' 
+						defined in the drop widget and a 'datasignal:drag' defined 
+						in the drag widget.
+						</para></entry>
+					</row>
+					<row>
+						<entry>dropcopy</entry>
+						<entry><para>Defines a action request that is issued on a
+							drop request copying an object inside a widget or
+							between widgets of the same type (same object name).
+							The kind of request and the signaling after completion
+							is the same for a 'dropmove' action.
+						</para></entry>
+					</row>
+					<row>
+						<entry>dropcopy:OBJECTNAME</entry>
+						<entry><para>
+						Defines a server request that is issued on a
+						drop request copying an object from a widget with object name
+						OBJECTNAME. The kind of request and the signaling after completion
+						is the same for a 'dropmove:OBJECTNAME' action.
+						</para></entry>
+					</row>
+					<row>
 						<entry>answer</entry>
 						<entry><para>Defines the format of the action request answer linked to the widget activation (for example a click on a push button).
 						</para></entry>
@@ -416,11 +457,15 @@
 					<row>
 						<entry>datasignal:IDENTIFIER</entry>
 						<entry><para>
-						Defines a signal of type IDENTIFIER (clicked,doubleclicked,destroyed,signaled,loaded) with the slot name and destination address defined as property value of "datasignal:IDENTIFIER"
-						Datasignal destinations can be defined as follows: As widgetid, as slot identifier (declared with 'dataslot'), as widget path.
-						A preceding identifier followed by '@' specifies what to do with the widget of the target slot.
-						If you specify 'close' there in a form top level widget then the form is closed. Every other identifier
-						causes a reload of the widget.
+						Defines a signal of type IDENTIFIER (clicked, doubleclicked, destroyed, signaled, loaded, drag, drop) 
+						with the slot name and destination address defined as property value of "datasignal:IDENTIFIER"
+						Datasignal destinations can be defined as follows: As widgetid, as slot 
+						identifier (declared with 'dataslot'), as widget path.
+						A preceding identifier followed by '@' specifies what
+						to do with the widget of the target slot.
+						If you specify 'close' there in a form top level 
+						widget then the form is closed. Every other 
+						identifier causes a reload of the widget.
 						</para></entry>
 					</row>
 					<row>
@@ -431,6 +476,37 @@
 				</tbody>
 				</tgroup>
 			</table>
+			</sect4>
+			<sect4>
+			<title>Drag and Drop</title>
+			<para>
+				Drag and Drop events are defined with the properties 'dropmove' and 'dropcopy'
+				that define the action requests issued on a drop event.
+				See description of the properties in "Defining Server Request/Answer".
+				For using drag and drop the property 'acceptDrops' has to be enabled and the
+				Widget has to be capable to do drag and drop. Drag and drop is currently only possible
+				for the Qt standard list widgets, tree widgets and table widgets or for
+				user defined widgets that delegate the mouse events accordingly. We do not describe
+				here how user defined widgets can implement this mechanism of drag and drop.
+			</para>
+			<para>
+				What happens when an object is dragged from one object and dropped at another
+				object is a request sent to the server. To address the elements involved in
+				drag and drop some variables are set before issueing the request. These
+				Variables can therefore be used in the request to specify the operation
+				to implement the drag and drop.
+				One of these variables is a widget link 'dragobj' that points the origin 
+				widget of the drag. With {dragobj.selected} we can address the item or set 
+				of items selected with the drag. The other variable is 'dropid' that selects the
+				value or id of the target widget of the drop. What this value means is 
+				dependent on the widget class. 
+			</para>
+			<para>
+				Besides the 'dropmove' and 'dropcopy' there are the datasignal properties
+				'datasignal:drag' and 'datasignal:drop' that can be used to specify the needed
+				widget refresh signals that have to be performed after the drag and drop
+				operation.
+			</para>
 			</sect4>
 		</sect3>
 	</sect2>
