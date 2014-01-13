@@ -11,6 +11,9 @@
 	<!ENTITY % AppDevelEntities	SYSTEM	"AppDevelopment/AppDevelopment.ent">
 	%AppDevelEntities;
 
+	<!ENTITY % ExtDevelEntities	SYSTEM	"ExtDevelopment/ExtDevelopment.ent">
+	%ExtDevelEntities;
+
 	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
 	%CommonEntities;
 
@@ -87,4 +90,34 @@
 			<title>Index</title>
 		</index>
 	</book>
+
+	<book id="book_ExtDevelopment" lang="en">
+		<title>Wolframe Server Extension Modules</title>
+		<subtitle>Write your own modules in C++</subtitle>
+		<bookinfo>
+			<date>&BookSetPublicationDate;</date>
+			<issuenum>Version &BookSetVersion;</issuenum>
+			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
+			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
+
+			<copyright>
+				<year>2010 - 2013</year>
+				<holder>Project Wolframe</holder>
+			</copyright>
+			&WolframeLegalNotice;
+		</bookinfo>
+
+		&ExtPreface;
+		&ExtIntroduction;
+		&ExtBasicDataTypes;
+		&ExtNormalizerModules;
+		&ExtGlossary;
+
+		<index>
+			<title>Index</title>
+		</index>
+		&ExtAppendix;
+	</book>
 </set>
+
+

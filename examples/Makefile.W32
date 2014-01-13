@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho tproc
+SUBDIRS = echo pecho tproc modules
 
 !IFDEF WITH_TEXTWOLF
 SUBDIRS = \

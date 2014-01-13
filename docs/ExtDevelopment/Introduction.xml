@@ -1,0 +1,11 @@
+<!-- Introduction -->
+<chapter>
+	<title>Introduction</title>
+	<para>
+	First we introduce the basic C++ data structures you have to understand 
+	in order to develop your own <application>Wolframe</application>
+	modules. Later we will introduce the different module types
+	and the building blocks used to build them.
+	</para>
+</chapter>
+

@@ -1,0 +1,33 @@
+<chapter>
+	<title>Basic Data Types</title>
+	<para>In this chapter we give a survey of the basic data types used in the 
+	<application>Wolframe</application> module interfaces.
+	</para>
+
+	<sect1>
+	<title>Variant Type</title>
+	<para>The variant data type describes an atomic value of any scalar or string type.
+	It is the basic type for interfaces to all language bindings for writing wolframe
+	applications. The type <code>Variant</code> is defined in <code>types/variant.hpp</code> and 
+	has the following interface:
+
+		<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/variant.hpp" parse="text" />
+		</programlisting>
+	</para>
+	<para>Certain interfaces like filters use the type <code>VariantConst</code> that is the same as a
+	variant but does not hold ownership on the value it references. <code>VariantConst</code> is defined
+	to avoid unnecessary string copies mainly in filters. It inherits the properties of the type <code>Variant</code>
+	and adds or overwrites some methods.
+	<code>VariantConst</code> has to be used carefully because we have to ensure on our own that the 
+	referenced value exists as long as the <code>VariantConst</code> variable
+	exists. The mechanisms of C++ do not support you here. You have to know what you do. 
+	The type <code>VariantConst</code> is also defined in <code>types/variant.hpp</code> and 
+	has the following interface:
+
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/variantConst.hpp" parse="text" />
+	</programlisting>
+	</para>
+	</sect1>
+</chapter>

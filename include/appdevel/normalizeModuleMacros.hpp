@@ -66,7 +66,7 @@
 #define NORMALIZER_MODULE_WITH_RESOURCE(DOMAIN,DESCRIPTION,RESOURCECLASS)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
-	static void setModuleLogger( void* logger )\
+	static void _Wolframe__setModuleLogger( void* logger )\
 	{\
 		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
 	}\

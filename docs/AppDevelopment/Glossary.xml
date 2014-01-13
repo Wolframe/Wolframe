@@ -1,15 +1,10 @@
 <glossary>
 	<title>Glossary</title>
 	<para>
-		This is the glossary for the Wolframe Service Development Kit. Although it
+		This is the glossary for the Wolframe Application Building Manual. Although it
 		covers most of the terms used in the Wolframe world, some terms might be skipped
 		if they are rarely used in this context. These terms are explained in the
-		Application Building Manual
-	</para>
-	<para>
-		This is the glossary for the Wolframe Application Building Manual.
-		It covers most of the terms used in a Wolframe application,
-		although some of the terms might be found only in this manual.
+		Application Building Manual.
 	</para>
 
 
@@ -87,9 +82,14 @@
 			</para>
 		</glossdef>
 	</glossentry>
-	<glossentry><glossterm>Direct Map</glossterm>
+	<glossentry><glossterm>Direct Map Command Handler</glossterm>
 		<glossdef>
-			<para>A direct map is a program described by a form for the input, a form for the output, and a transaction function. The input of a direct map transaction function is the object deserialization of the input xml defined by the input form. The result of the transaction function is returned as xml serialization of the transaction result defined by the output form. It is called direct map because no scripting is involved in this case.
+			<para>The direct map command handler, also refered to as the standard comand handle
+			is a command handler describing how server requsts are executed.
+			It describes requests by a form for the input, a form for the output, and a function called. 
+			The input of a direct map function is the object deserialization of the input 
+			defined in the input form. The result of the function is returned as serialization of 
+			the transaction result defined in the output form. 
 			</para>
 		</glossdef>
 	</glossentry>
@@ -114,14 +114,19 @@
 	</glossentry>
 	<glossentry><glossterm>Provider</glossterm>
 		<glossdef>
-			<para>An entity providing objects of a kind. Some providers are factories, but not all of them (e.g. the database provider)
+			<para>An entity providing objects of a kind. Some providers are factories, 
+			but not all of them (e.g. the database provider)
 			</para>
 		</glossdef>
 	</glossentry>
 	<glossentry id="EoD"><glossterm>End Of Data (EoD)</glossterm>
 		<abbrev>EoD</abbrev>
 		<glossdef>
-			<para>Marks the end of the data to be processed by a processor. End of data is marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at the start of a content line, the client has to escape an LF dot in the content with LF dot dot. This escaping applies also to the result returned to the client. So client has to unescape LF dot sequences by replacing them by a LF.
+			<para>Marks the end of the data to be processed by a processor. End of data is 
+			marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at 
+			the start of a content line, the client has to escape an LF dot in the content with 
+			LF dot dot. This escaping applies also to the result returned to the client. 
+			So client has to unescape LF dot sequences by replacing them by a LF.
 			</para>
 		</glossdef>
 	</glossentry>
