@@ -161,7 +161,7 @@ struct LocaleConvNormalizeFunction
 	virtual const char* name() const {return m_name;}
 
 private:
-	ResourceHandle* m_reshnd;
+	LocaleResourceHandle* m_reshnd;
 	LocaleConv m_func;
 	std::string m_lc;
 	const char* m_name;
