@@ -2,23 +2,32 @@
 use strict;
 
 # GLOBALS
-my @subroutines = ();		# MAP subroutine index to subroutine name
+my @subroutines = ();			# MAP subroutine index to subroutine name
 my @subroutineArgs = ();		# MAP subroutine index to number of subroutine arguments
-my @subroutineResults = ();	# MAP subroutine index to number of subroutine results
-my @subroutineResultActions = ();	# MAP subroutine index to number of subroutine results
+my @subroutineResult = ();		# MAP subroutine index to number of subroutine results
 my %subroutineStart = ();		# MAP subroutine name to address (index) in @instructions
 my @actions = ();			# MAP action index to (dbcall) name
-my @actionArgs = ();		# MAP action index to number of action arguments
-my @actionResults = ();		# MAP action index to number of action results
-my @tags = ();			# MAP input tag index to name
+my @actionArgs = ();			# MAP action index to number of action arguments
+my @actionResultColumns = ();		# MAP action index to number of action result columns
+my @actionResultRows = ();		# MAP action index to number of action result rows
+my @tags = ();				# MAP input tag index to name
 my @tagElems = ();			# MAP input tag index to number of input elements
-my @intos = ();			# MAP result index (INTO output) to name
+my @intos = ();				# MAP result index (INTO output) to name
 my @vmInstructions = ();		# database instructions to execute:
+my $vmStartAddress = -1;		# start address of the VM code to execute to print simulation of result
 #vmInstructions Element Format:
-#	into index#(T|R)#tag/result index#(S|A)#subroutine/action index
-
+#	into index#(T|R)#tag/result index#(S|A|R)#subroutine/action index
+#		     ^ T=tag,R=Result
+#					     ^ S=subroutine,A=Action,R=Return
 my $testSize = $ARGV[0];
 my $testSeed = $ARGV[1];
+my $testInputSize = $testSize;
+if ($#ARGV >= 2)
+{
+	$testInputSize = $ARGV[2]+1;
+}
+my $intosSize = 100;
+my $actionsSize = 100;
 
 # INIT
 srand($testSeed);
@@ -39,7 +48,7 @@ sub createSubroutineName {
 	my $rt = createName( "proc_", $#subroutines + 1);
 	push( @subroutines, $rt);
 	push( @subroutineArgs, int( rand( 4)));
-	push( @subroutineResults, 0);
+	push( @subroutineResult, 0);
 	return $rt;
 }
 
@@ -58,16 +67,17 @@ sub createActionName {
 	my $rt = createName( "dbcall_", $#actions + 1);
 	push( @actions, $rt);
 	push( @actionArgs, int( rand( 4)));
-	push( @actionResults, int( rand( 4)));
+	push( @actionResultRows, int( rand( 4)));
+	push( @actionResultColumns, int( rand( 4)));
 	return $rt;
 }
 
-for (my $ii=0; $ii<100; ++$ii) {
+for (my $ii=0; $ii<$actionsSize; ++$ii) {
 	createActionName();
 }
 
 sub getActionIdx {
-	return int( rand( 100));
+	return int( rand( $actionsSize));
 }
 
 sub getActionName {
@@ -75,10 +85,21 @@ sub getActionName {
 	return $actions[ $idx];
 }
 
-sub getActionResults {
+sub getActionResultRows {
 	my ($idx) = (@_);
-	return $actionResults[ $idx];
+	return $actionResultRows[ $idx];
 }
+
+sub getActionNofResultColumns {
+	my ($idx) = (@_);
+	return $actionResultColumns[ $idx];
+}
+
+sub getActionResultColumn {
+	my ($idx) = (@_);
+	return int( rand( $actionResultColumns[ $idx]));
+}
+
 
 # INPUT TAG
 sub createTagName {
@@ -88,13 +109,13 @@ sub createTagName {
 	return $rt;
 }
 
-for (my $ii=0; $ii<100; ++$ii)
+for (my $ii=0; $ii<$testInputSize; ++$ii)
 {
 	createTagName();
 }
 
 sub getTagIdx {
-	my $idx = int( rand( 100));
+	my $idx = int( rand( $testInputSize));
 	return $idx;
 }
 
@@ -121,13 +142,13 @@ sub createIntoName {
 	return $rt;
 }
 
-for (my $ii=0; $ii<100; ++$ii)
+for (my $ii=0; $ii<$intosSize; ++$ii)
 {
 	createIntoName();
 }
 
 sub getIntoIdx {
-	my $idx = int( rand( 100));
+	my $idx = int( rand( $intosSize));
 	return $idx;
 }
 
@@ -150,59 +171,96 @@ sub createVirtualMachineInstruction
 	push( @vmInstructions, "$intoIndex:$ForeachClass:$ForeachIndex:$InstructionClass:$InstructionIndex");
 }
 
+sub createVirtualMachineOpReturn
+{
+	push( @vmInstructions, ":::R:");
+}
+
+sub setVirtualMachineExecutionStartAddress
+{
+	$vmStartAddress = $#vmInstructions+1;
+}
+
+sub executeVirtualMachine
+{
+	my @stack = ();
+	my $ip = $vmStartAddress;
+
+	while ($ip <= $#vmInstructions)
+	{
+		$instr = $@vmInstructions[ $ip];
+		my ($intoI,$ForeachC,$ForeachI,$InstC,$InstI) = split(/:/, $instr);
+		if ($InstC eq 'R')
+		{
+			$ip = pop @stack;
+		} elsif ($InstC eq 'A') {
+			
+		} elsif ($InstC eq 'S') {
+			
+		} else {
+			die "Illegal instruction in VM: $InstC ($instr)";
+		}
+	}
+}
 
 
 # SUBROUTINE DATA
-my @instructionResults = ();
-my @instructionResultColumns = ();
-my @instructionResultNofRows = ();
+my @instructionResultName = ();
 my @instructionResultAction = ();
 
 # INSTRUCTION RESULT
 sub createResultName {
 	my ($nofRows) = (@_);
-	my $rt = createName( "res_", $#instructionResults + 1);
-	push( @instructionResults, $rt);
-	push( @instructionResultColumns, int( rand( 4)));
-	push( @instructionResultNofRows, $nofRows);
+	my $rt = createName( "res_", $#instructionResultName + 1);
+	push( @instructionResultName, $rt);
+	push( @instructionResultAction, int( rand( $#actions+1)));
 	return $rt;
 }
 
 sub getResultIdx {
-	my $idx = int( rand($#instructionResults+1));
+	my $idx = int( rand($#instructionResultName+1));
 	return $idx;
 }
 
 sub getLastResultIdx {
-	return $#instructionResults;
+	return $#instructionResultName;
 }
 
 sub getResultName {
 	my ($idx) = (@_);
-	if ($idx == $#instructionResults)
+	if ($idx == $#instructionResultName)
 	{
 		return "RESULT";
 	} else {
-		return $instructionResults[ $idx];
+		return $instructionResultName[ $idx];
 	}
+}
+
+sub getResultNofColumns {
+	my ($idx) = (@_);
+	my $actionidx = $instructionResultAction[ $idx];
+	return $actionResultColumns[ $idx];
 }
 
 sub getResultColumn {
 	my ($idx) = (@_);
-	return int( rand( $instructionResultColumns[ $idx])) + 1;
+	my $actionidx = $instructionResultAction[ $idx];
+	return int( rand( $actionResultColumns[ $idx]));
 }
 
 sub getResultNofRows {
 	my ($idx) = (@_);
-	return $instructionResultNofRows[ $idx];
+	my $actionidx = $instructionResultAction[ $idx];
+	return $actionResultRows[ $idx];
 }
+
 
 # INSTRUCTION/SUBROUTINE ARGUMENT
 sub getArg {
 	my ($fidx,$tidx) = (@_);
 	my $rt = "";
 	my $rnd = int( rand( 8));
-	if ($#instructionResults < 0 || $rnd < 1) {
+	if ($#instructionResultName < 0 || $rnd < 1) {
 		$rt = '$(.)';
 	} elsif ($rnd < 3 && $subroutineArgs[ $#subroutineArgs] > 0) {
 		my $argno = int( rand( $subroutineArgs[ $#subroutineArgs])) + 1;
@@ -210,20 +268,20 @@ sub getArg {
 	} else {
 		if (getLastResultIdx() < 0 || $rnd < 6) {
 			my $idx = getResultIdx();
-			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($idx) > 1)) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofColumns($idx) >= 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultName($idx) . "." . getResultColumn($idx);
 			}
 		} elsif ($fidx >= 0) {
-			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($fidx) > 1)) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofColumns($fidx) >= 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultColumn($fidx);
 			}
 		} else {
 			my $idx = getLastResultIdx();
-			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofRows($idx) > 1)) {
+			if ($tidx >= 0 && ($tagElems[$tidx] > 1 || getResultNofColumns($idx) >= 1)) {
 				$rt = '$(.)';
 			} else {
 				$rt = '$' . getResultColumn($idx);
@@ -246,9 +304,9 @@ sub getArgs {
 	return $rt;
 }
 
-sub getSubroutineResults {
+sub getSubroutineResult {
 	my ($idx) = (@_);
-	return $subroutineResults[ $idx];
+	return $subroutineResult[ $idx];
 }
 
 sub createInstruction {
@@ -260,7 +318,7 @@ sub createInstruction {
 	my $rt = "";
 	my $foreach_result_idx = getResultIdx();
 	my $foreach_tag_idx = -1;
-	if ($instructionResultColumns[ $foreach_result_idx] <= 0 || int(rand(10)) > 5)
+	if (getResultNofColumns( $foreach_result_idx) <= 0 || int(rand(10)) > 5)
 	{
 		$foreach_result_idx = -1;
 	}
@@ -288,7 +346,7 @@ sub createInstruction {
 	if ($#subroutines >= 0 && int(rand(5)) > 3) {
 		my $idx = getSubroutineIdx();
 		$rt = $rt . "DO " . getSubroutineName( $idx) . "(" . getArgs($foreach_result_idx,$foreach_tag_idx) . ")";
-		$subroutineResults[ $#subroutineResults] = getSubroutineResults( $idx);
+		$subroutineResult[ $#subroutineResult] = getSubroutineResult( $idx);
 		$vm_instruction_class = "S";
 		$vm_instruction_index = $idx;
 	}
@@ -296,9 +354,8 @@ sub createInstruction {
 	{
 		my $idx = getActionIdx();
 		$rt = $rt . "DO " . getActionName($idx) . "(" . getArgs($foreach_result_idx,$foreach_tag_idx) . ")";
-		$nofRows = getActionResults( $idx);
-		if ($#subroutineResults >= 0) {
-			$subroutineResults[ $#subroutineResults] = $nofRows;
+		if ($#subroutineResult >= 0) {
+			$subroutineResult[ $#subroutineResult] = $idx;
 		}
 		$vm_instruction_class = "A";
 		$vm_instruction_index = $idx;
@@ -334,8 +391,25 @@ sub createSubroutine {
 	}
 	$rt = $rt . "\n";
 	$rt = $rt . "BEGIN\n";
-	@instructionResults = ();
-	@instructionResultColumns = ();
+	@instructionResultName = ();
+	@instructionResultAction = ();
+	my $nn = int(rand(12))+1;
+	my $ii;
+	for ($ii=0; $ii<$nn; ++$ii) {
+		$rt = $rt . createInstruction();
+	}
+	$rt = $rt . "END\n";
+	createVirtualMachineOpReturn();
+	return $rt;
+}
+
+sub createTransaction
+{
+	my $rt = "TRANSACTION test_transaction\n"; 
+	$rt = $rt . "BEGIN\n";
+	@instructionResultName = ();
+	@instructionResultAction = ();
+	setVirtualMachineExecutionStartAddress();
 	my $nn = int(rand(12))+1;
 	my $ii;
 	for ($ii=0; $ii<$nn; ++$ii) {
@@ -345,19 +419,8 @@ sub createSubroutine {
 	return $rt;
 }
 
-sub createTransaction
+sub executeVirtualMachine
 {
-	my $rt = "TRANSACTION test_transaction\n"; 
-	$rt = $rt . "BEGIN\n";
-	@instructionResults = ();
-	@instructionResultColumns = ();
-	my $nn = int(rand(12))+1;
-	my $ii;
-	for ($ii=0; $ii<$nn; ++$ii) {
-		$rt = $rt . createInstruction();
-	}
-	$rt = $rt . "END\n";
-	return $rt;
 }
 
 my $ii;
