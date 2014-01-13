@@ -36,6 +36,7 @@ Project Wolframe.
 #include "langbind/normalizeFunction.hpp"
 #include "processor/moduleInterface.hpp"
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
 #include "module/constructor.hpp"
 
 namespace _Wolframe {
@@ -44,14 +45,17 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::ResourceHandle* rh, langbind::CreateNormalizeFunction createFunc_)
+	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<langbind::CreateNormalizeFunction>& functionmap_, langbind::CreateResourceHandleFunction createResourceHandle)
 		:m_classname(classname_)
 		,m_name(name_)
-		,m_resource(rh)
-		,m_createFunc(createFunc_)
-		,m_getNormalizeFunctions(getNormalizeFunctions_) {}
+		,m_resource(createResourceHandle())
+		,m_functionmap(functionmap_)
+		{}
 
-	virtual ~NormalizeFunctionConstructor(){}
+	virtual ~NormalizeFunctionConstructor()
+	{
+		delete m_resource;
+	}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -65,12 +69,14 @@ public:
 
 	virtual types::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
 	{
-		return m_createFunc( *m_resource, name_, arg_);
+		FunctionMap::const_iterator fi = m_functionmap.find( name_);
+		if (fi == m_functionmap.end()) return 0;
+		return fi->second( *m_resource, arg_);
 	}
 
-	const std::vector<std::string>& functions() const
+	std::vector<std::string> functions() const
 	{
-		return m_getNormalizeFunctions();
+		return m_functionmap.getkeys<std::vector<std::string> >();
 	}
 
 	const char* domain() const
@@ -82,22 +88,35 @@ private:
 	const char* m_classname;
 	const char* m_name;
 	langbind::ResourceHandle* m_resource;
-	langbind::CreateNormalizeFunction m_createFunc;
-	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
+	typedef types::keymap<langbind::CreateNormalizeFunction> FunctionMap;
+	FunctionMap m_functionmap;
 };
+
 
 typedef types::CountedReference<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
 
+struct NormalizeFunctionDef
+{
+	const char* name;
+	langbind::CreateNormalizeFunction createFunc;
+};
 
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
-	NormalizeFunctionBuilder( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::CreateNormalizeFunction createFunc_, langbind::ResourceHandle* r=0)
+	//\brief Constructor
+	//\param[in] functions {0,0} terminated array of function definitions
+	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, langbind::CreateResourceHandleFunction createResourceHandle_=0)
 		:SimpleBuilder( classname_)
 		,m_name(name_)
-		,m_getNormalizeFunctions(getNormalizeFunctions_)
-		,m_createFunc(createFunc_)
-		,m_resource(r){}
+		,m_createResourceHandle(createResourceHandle_?createResourceHandle_:&langbind::ResourceHandle::create)
+	{
+		std::size_t fi = 0;
+		for (; functions[fi].name && functions[fi].createFunc; ++fi)
+		{
+			m_functionmap.insert( std::string(functions[fi].name), functions[fi].createFunc);
+		}
+	}
 
 	virtual ~NormalizeFunctionBuilder()
 	{}
@@ -109,14 +128,13 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_name, m_getNormalizeFunctions, m_resource, m_createFunc);
+		return new NormalizeFunctionConstructor( m_className, m_name, m_functionmap, m_createResourceHandle);
 	}
 
 private:
 	const char* m_name;
-	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
-	langbind::CreateNormalizeFunction m_createFunc;
-	langbind::ResourceHandle* m_resource;
+	types::keymap<langbind::CreateNormalizeFunction> m_functionmap;
+	langbind::CreateResourceHandleFunction m_createResourceHandle;
 };
 
 }}//namespace

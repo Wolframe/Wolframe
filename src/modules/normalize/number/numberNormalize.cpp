@@ -114,104 +114,107 @@ static types::Variant::Data::UInt getMax( std::size_t digits)
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
+
+types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( ResourceHandle&, const std::string& arg)
 {
 	try
 	{
 		std::string::const_iterator ii = arg.begin(), ee = arg.end();
-		std::string type = boost::algorithm::to_lower_copy( name);
-		if (boost::algorithm::iequals( type, "integer"))
-		{
-			typedef types::Variant::Data::UInt UInt;
-			std::size_t dim;
-			UInt maxval;
+		typedef types::Variant::Data::UInt UInt;
+		std::size_t dim;
+		UInt maxval;
 
-			if (utils::gotoNextToken( ii, ee))
-			{
-				dim = parseIntegerDescription( ii, ee);
-				maxval = getMax( dim)-1;
-			}
-			else
-			{
-				dim = std::numeric_limits<std::size_t>::max();
-				maxval = std::numeric_limits<UInt>::max();
-			}
-			return new IntegerNormalizeFunction( true, dim, maxval);
-		}
-		else if (boost::algorithm::iequals( type, "unsigned"))
+		if (utils::gotoNextToken( ii, ee))
 		{
-			typedef types::Variant::Data::UInt UInt;
-			std::size_t dim;
-			UInt maxval;
-
-			if (utils::gotoNextToken( ii, ee))
-			{
-				dim = parseIntegerDescription( ii, ee);
-				maxval = getMax( dim)-1;
-			}
-			else
-			{
-				dim = std::numeric_limits<std::size_t>::max();
-				maxval = std::numeric_limits<UInt>::max();
-			}
-			return new IntegerNormalizeFunction( false, dim, maxval);
-		}
-		else if (boost::algorithm::iequals( type, "float"))
-		{
-			std::pair<std::size_t,std::size_t> dim;
-			double maxval;
-
-			if (utils::gotoNextToken( ii, ee))
-			{
-				dim = parseFloatDescription( ii, ee);
-				maxval = (double)getMax( dim.first);
-			}
-			else
-			{
-				dim = std::pair<std::size_t,std::size_t>( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
-				maxval = std::numeric_limits<double>::max();
-			}
-			return new FloatNormalizeFunction( dim.first, dim.second, maxval);
-		}
-		else if (boost::algorithm::iequals( type, "fixedpoint"))
-		{
-			std::pair<std::size_t,std::size_t> dim;
-
-			if (utils::gotoNextToken( ii, ee))
-			{
-				dim = parseFloatDescription( ii, ee);
-				return new FixedpointNormalizeFunction( dim.first, dim.second);
-			}
-			else
-			{
-				return new FixedpointNormalizeFunction( 12, 3);
-			}
+			dim = parseIntegerDescription( ii, ee);
+			maxval = getMax( dim)-1;
 		}
 		else
 		{
-			throw std::runtime_error( std::string( "unknown number type '") + name + "'");
+			dim = std::numeric_limits<std::size_t>::max();
+			maxval = std::numeric_limits<UInt>::max();
+		}
+		return new IntegerNormalizeFunction( true, dim, maxval);
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in number:integer normalize function description: ") + e.what());
+	}
+}
+
+types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( ResourceHandle&, const std::string& arg)
+{
+	try
+	{
+		std::string::const_iterator ii = arg.begin(), ee = arg.end();
+		typedef types::Variant::Data::UInt UInt;
+		std::size_t dim;
+		UInt maxval;
+
+		if (utils::gotoNextToken( ii, ee))
+		{
+			dim = parseIntegerDescription( ii, ee);
+			maxval = getMax( dim)-1;
+		}
+		else
+		{
+			dim = std::numeric_limits<std::size_t>::max();
+			maxval = std::numeric_limits<UInt>::max();
+		}
+		return new IntegerNormalizeFunction( false, dim, maxval);
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in number:unsigned normalize function description: ") + e.what());
+	}
+}
+
+types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( ResourceHandle&, const std::string& arg)
+{
+	try
+	{
+		std::string::const_iterator ii = arg.begin(), ee = arg.end();
+		std::pair<std::size_t,std::size_t> dim;
+		double maxval;
+
+		if (utils::gotoNextToken( ii, ee))
+		{
+			dim = parseFloatDescription( ii, ee);
+			maxval = (double)getMax( dim.first);
+		}
+		else
+		{
+			dim = std::pair<std::size_t,std::size_t>( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
+			maxval = std::numeric_limits<double>::max();
+		}
+		return new FloatNormalizeFunction( dim.first, dim.second, maxval);
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in number:float normalize function description: ") + e.what());
+	}
+}
+
+types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( ResourceHandle&, const std::string& arg)
+{
+	try
+	{
+		std::string::const_iterator ii = arg.begin(), ee = arg.end();
+		std::pair<std::size_t,std::size_t> dim;
+
+		if (utils::gotoNextToken( ii, ee))
+		{
+			dim = parseFloatDescription( ii, ee);
+			return new FixedpointNormalizeFunction( dim.first, dim.second);
+		}
+		else
+		{
+			return new FixedpointNormalizeFunction( 12, 3);
 		}
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw std::runtime_error( std::string( "error in number normalize function description: ") + e.what());
+		throw std::runtime_error( std::string( "error in number:float normalize function description: ") + e.what());
 	}
-}
-
-
-const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
-{
-	struct NormalizeFunctions :public std::vector<std::string>
-	{
-		NormalizeFunctions()
-		{
-			push_back( "integer");
-			push_back( "unsigned");
-			push_back( "float");
-			push_back( "fixedpoint");
-		}
-	};
-	static NormalizeFunctions rt;
-	return rt;
 }
 

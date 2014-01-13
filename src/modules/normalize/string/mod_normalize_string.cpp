@@ -48,13 +48,22 @@ static void setModuleLogger( void* logger )
 
 static langbind::ResourceHandle stringResource;
 
+static NormalizeFunctionDef normalizeFunctions[] =
+{
+	{"trim", &langbind::createTrimNormalizeFunction},
+	{"ucname", &langbind::createUcnameNormalizeFunction},
+	{"lcname", &langbind::createLcnameNormalizeFunction},
+	{"convdia", &langbind::createConvdiaNormalizeFunction},
+	{0,0}
+};
+
 namespace {
 struct NormalizeProcessor
 {
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "StringNormalizer", "string", langbind::normalizeFunctions, langbind::createStringNormalizeFunction, &stringResource);
+		return new NormalizeFunctionBuilder( "StringNormalizer", "string", normalizeFunctions);
 	}
 };
 }//anonymous namespace

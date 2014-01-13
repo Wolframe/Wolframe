@@ -40,44 +40,30 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-types::NormalizeFunction* _Wolframe::langbind::createBase64NormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createEncodeNormalizeFunction( ResourceHandle&, const std::string& arg)
 {
 	try
 	{
-		std::string type = boost::algorithm::to_lower_copy( name);
-		if (boost::algorithm::iequals( type, "encode"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new Base64EncodeFunction();
-		}
-		else if (boost::algorithm::iequals( type, "decode"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new Base64DecodeFunction();
-		}
-		else
-		{
-			throw std::runtime_error( std::string( "unknown number type '") + name + "'");
-		}
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'base64:encode'");
+		return new Base64EncodeFunction();
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw std::runtime_error( std::string( "error in base64 normalize function description: ") + e.what());
+		throw std::runtime_error( std::string( "error in 'base64:encode' normalize function description: ") + e.what());
 	}
 }
 
-
-const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
+types::NormalizeFunction* _Wolframe::langbind::createDecodeNormalizeFunction( ResourceHandle&, const std::string& arg)
 {
-	struct NormalizeFunctions :public std::vector<std::string>
+	try
 	{
-		NormalizeFunctions()
-		{
-			push_back( "encode");
-			push_back( "decode");
-		}
-	};
-	static NormalizeFunctions rt;
-	return rt;
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'base64:decode'");
+		return new Base64DecodeFunction();
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in 'base64:decode' normalize function description: ") + e.what());
+	}
 }
+
 

@@ -46,10 +46,23 @@ namespace _Wolframe {
 namespace langbind {
 
 class ResourceHandle;
+typedef langbind::ResourceHandle* (*CreateResourceHandleFunction)();
+
+class ResourceHandle
+{
+public:
+	ResourceHandle(){}
+	virtual ~ResourceHandle(){}
+
+	static langbind::ResourceHandle* create()
+	{
+		return new langbind::ResourceHandle();
+	}
+};
 
 ///\param[in,out] rshnd normalization resources handle
 ///\param[in] description transaction description source
-typedef types::NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+typedef types::NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& arg);
 typedef const std::vector<std::string>& (*GetNormalizeFunctions)();
 
 }}

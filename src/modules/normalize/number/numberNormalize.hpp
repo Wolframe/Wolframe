@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/numberNormalize.hpp
+///\file numberNormalize.hpp
 ///\brief Interface for normalization functions of simple ASCII numbers
 #ifndef _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
@@ -40,14 +40,10 @@
 namespace _Wolframe {
 namespace langbind {
 
-class ResourceHandle
-{
-public:
-	ResourceHandle(){}
-};
-
-types::NormalizeFunction* createNumberNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
-const std::vector<std::string>& normalizeFunctions();
+types::NormalizeFunction* createIntegerNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createUnsignedNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createFloatNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createFixedpointNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
 
 }}//namespace
 #endif

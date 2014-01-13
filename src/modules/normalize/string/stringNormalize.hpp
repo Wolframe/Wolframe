@@ -40,14 +40,10 @@
 namespace _Wolframe {
 namespace langbind {
 
-class ResourceHandle
-{
-public:
-	ResourceHandle(){}
-};
-
-types::NormalizeFunction* createStringNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
-const std::vector<std::string>& normalizeFunctions();
+types::NormalizeFunction* createTrimNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createUcnameNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createLcnameNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createConvdiaNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
 
 }}//namespace
 #endif

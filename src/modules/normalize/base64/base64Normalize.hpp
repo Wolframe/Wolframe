@@ -40,14 +40,8 @@
 namespace _Wolframe {
 namespace langbind {
 
-class ResourceHandle
-{
-public:
-	ResourceHandle(){}
-};
-
-types::NormalizeFunction* createBase64NormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
-const std::vector<std::string>& normalizeFunctions();
+types::NormalizeFunction* createEncodeNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createDecodeNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
 
 }}//namespace
 #endif

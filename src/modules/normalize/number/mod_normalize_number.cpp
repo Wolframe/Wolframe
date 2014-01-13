@@ -48,13 +48,21 @@ static void setModuleLogger( void* logger )
 
 static langbind::ResourceHandle numberResource;
 
+static NormalizeFunctionDef normalizeFunctions[] =
+{
+	{"integer", &langbind::createIntegerNormalizeFunction},
+	{"unsigned", &langbind::createUnsignedNormalizeFunction},
+	{"float", &langbind::createFloatNormalizeFunction},
+	{"fixedpoint", &langbind::createFixedpointNormalizeFunction},
+	{0,0}
+};
+
 namespace {
 struct NormalizeProcessor
 {
-
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "NumberNormalizer", "number", langbind::normalizeFunctions, langbind::createNumberNormalizeFunction, &numberResource);
+		return new NormalizeFunctionBuilder( "NumberNormalizer", "number", normalizeFunctions);
 	}
 };
 }//anonymous namespace
