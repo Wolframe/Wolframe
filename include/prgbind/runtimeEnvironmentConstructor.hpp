@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file prgbind/runtimeEnvironmentConstructor.hpp
-///\brief Interface to constructors of runtime environment for executing functions that need it
+//\file prgbind/runtimeEnvironmentConstructor.hpp
+//\brief Interface to constructors of runtime environment for executing functions that need it
 #ifndef _Wolframe_PRGBIND_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_PRGBIND_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #include "module/constructor.hpp"
@@ -42,20 +42,24 @@
 
 namespace _Wolframe {
 namespace proc {
-	///\brief Forward declaration
+	//\brief Forward declaration
 	class ProcessorProvider;
 }
 namespace prgbind {
 
-///\class RuntimeEnvironment
+//\class RuntimeEnvironment
 //\brief Runtime environment for functions that need it. (for example as structure hosting the CLR for .NET function calls)
 class RuntimeEnvironment
 {
 public:
+	//\brief Destructor
 	virtual ~RuntimeEnvironment(){}
-	///\param [in] env runtime environment
-	///\remark On success transfer ownership [delete] of 'this' to returned closure !
+	//\brief createClosure create a closure to execute function with name 'funcname'
+	//\param [in] funcname function name
 	virtual langbind::FormFunctionClosure* createClosure( const std::string& funcname) const=0;
+
+	//\brief Get the names of the functions implemented
+	//\return the function names	
 	virtual std::vector<std::string> functions() const=0;
 private:
 };
@@ -64,15 +68,17 @@ private:
 typedef types::CountedReference<RuntimeEnvironment> RuntimeEnvironmentR;
 
 
-///\class RuntimeEnvironmentConstructor
-///\brief Constructor of a runtime environment for executing functions
+//\class RuntimeEnvironmentConstructor
+//\brief Constructor of a runtime environment for executing functions
 class RuntimeEnvironmentConstructor
 	:public ConfiguredObjectConstructor<RuntimeEnvironment>
 {
 public:
-	///\brief destructor
+	//\brief Destructor
 	virtual ~RuntimeEnvironmentConstructor(){}
 
+	//\brief Get the module object type
+	//\return the object type
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
 		return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;
@@ -82,32 +88,43 @@ public:
 typedef types::CountedReference<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
 
 
-///\class RuntimeEnvironmentDef
-///\brief Definition of a runtime environment for executing functions
+//\class RuntimeEnvironmentDef
+//\brief Definition of a runtime environment for executing functions
 class RuntimeEnvironmentDef
 {
 public:
+	//\brief Constructor
 	RuntimeEnvironmentDef()
 		:constructor(0),configuration(0){}
+	//\brief Copy constructor
+	//\param[in] o object to copy
 	RuntimeEnvironmentDef( const RuntimeEnvironmentDef& o)
 		:constructor(o.constructor),configuration(o.configuration){}
+	//\brief Constructor
+	//\param[in] constructor_ constructor of the runtime environment
+	//\param[in] configuration_ runtime environment configuration
 	RuntimeEnvironmentDef( const RuntimeEnvironmentConstructorR& constructor_, const config::NamedConfiguration* configuration_)
 		:constructor(constructor_),configuration(configuration_){}
 
 public:
-	RuntimeEnvironmentConstructorR constructor;
-	const config::NamedConfiguration* configuration;
+	RuntimeEnvironmentConstructorR constructor;		//< constructor of the runtime environment
+	const config::NamedConfiguration* configuration;	//< runtime environment configuration
 };
 
-///\class RuntimeEnvironmentFormFunction
-///\brief Form function that needs an execution environment
+//\class RuntimeEnvironmentFormFunction
+//\brief Form function that needs an execution environment
 class RuntimeEnvironmentFormFunction
 	:public langbind::FormFunction
 {
 public:
+	//\brief Constructor
+	//\param[in] funcname_ name of the function
+	//\param[in] env_ runtime environment of the function
 	RuntimeEnvironmentFormFunction( const std::string& funcname_, const RuntimeEnvironment* env_)
 		:m_env(env_),m_funcname(funcname_){}
 
+	//\brief Create a function closure for execution with help of the runtime environment
+	//\return created closure
 	virtual langbind::FormFunctionClosure* createClosure() const
 	{
 		langbind::FormFunctionClosure* rt = m_env->createClosure( m_funcname);
@@ -115,8 +132,8 @@ public:
 	}
 
 private:
-	const RuntimeEnvironment* m_env;
-	std::string m_funcname;
+	const RuntimeEnvironment* m_env;	//< runtime environment reference
+	std::string m_funcname;			//< name of the function
 };
 
 
