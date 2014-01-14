@@ -188,15 +188,15 @@ sub executeVirtualMachine
 
 	while ($ip <= $#vmInstructions)
 	{
-		$instr = $@vmInstructions[ $ip];
+		my $instr = $vmInstructions[ $ip];
 		my ($intoI,$ForeachC,$ForeachI,$InstC,$InstI) = split(/:/, $instr);
 		if ($InstC eq 'R')
 		{
 			$ip = pop @stack;
 		} elsif ($InstC eq 'A') {
-			
+			++$ip;
 		} elsif ($InstC eq 'S') {
-			
+			++$ip;
 		} else {
 			die "Illegal instruction in VM: $InstC ($instr)";
 		}
@@ -419,10 +419,6 @@ sub createTransaction
 	return $rt;
 }
 
-sub executeVirtualMachine
-{
-}
-
 my $ii;
 print "**\n";
 print "**file:DBRES\n";
@@ -457,5 +453,6 @@ for ($ii=0; $ii<=$#tags; ++$ii) {
 }
 print "<doc\n";
 print "**outputfile:DBOUT\n";
+executeVirtualMachine();
 print "**output\n";
 print "**end\n";
