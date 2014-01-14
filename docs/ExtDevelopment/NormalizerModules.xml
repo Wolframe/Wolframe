@@ -20,17 +20,17 @@
 	<programlisting language='C++'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/normalizeFunctionConstructor.hpp" parse="text" />
 	</programlisting>
-	The resource handle parameter is the module singleton object instance that is declared as class in the 
-	module building blocks (see following section). The argument (<code>arg</code>) is a string that has to 
-	be parsed by the normalize function constructor function. What the function gets as argument is the string 
-	declared as argument string in '(' brackets ')' when the function is referenced in a 
-	<code>.wnmp</code> file (type normalization declaration file, see section "Data Types in DDLs" in 
-	the chapter "Forms" of the "Application Development Manual").
+	The resource handle parameter (<code>reshnd</code>) is the module singleton object instance that is 
+	declared as class in the module building blocks (see following section). The argument (<code>arg</code>) 
+	is a string that has to be parsed by the normalize function constructor function. What the function 
+	gets as argument is the string declared as argument string in '(' brackets ')' when the function 
+	is referenced in a <code>.wnmp</code> file (type normalization declaration file, see section 
+	"Data Types in DDLs" in the chapter "Forms" of the "Application Development Manual").
 	</para>
 	</sect1>
 
 	<sect1>
-	<title>Module Building blocks</title>
+	<title>Module Building Blocks</title>
 	<para>
 	When you include "appdevel/normalizeModuleMacros.hpp" or simply "appDevel.hpp" you get the building
 	blocks declared to build a normalization module. These building blocks will be exmplained in this section.
