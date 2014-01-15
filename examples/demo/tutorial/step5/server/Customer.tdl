@@ -1,5 +1,4 @@
 TRANSACTION SelectCustomerList
-RESULT INTO list
 BEGIN
 	INTO customer DO SELECT * from Customer;
 END

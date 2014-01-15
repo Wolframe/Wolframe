@@ -149,7 +149,7 @@
 		Checking with:
 
 	<programlisting language='shell'>
-	netcat -v --wait=2 localhost 7661 &lt; CustomerListRequest.netcat
+	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 	</programlisting>
 	
 		we get now:

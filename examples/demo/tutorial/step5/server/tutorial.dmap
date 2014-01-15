@@ -1,1 +1,1 @@
-COMMAND CustomerListRequest CALL SelectCustomerList;
+COMMAND CustomerListRequest CALL SelectCustomerList RETURN SKIP CustomerList list;

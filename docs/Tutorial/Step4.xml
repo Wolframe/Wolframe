@@ -8,7 +8,7 @@
 		tell the server to load the database module for Sqlite:
 		<programlisting language='shell'>
 	LoadModules {
-		module mod_db_sqlite3
+		<emphasis role="bold">module mod_db_sqlite3</emphasis>
 	}
 		</programlisting>
 	</para>
@@ -59,13 +59,12 @@
 	
 	<para>
 		Now we want to use some XML filters to send/receive XML over the protocol,
-		so we have to add the following module to tutorial.conf:
+		so we have to add the following module to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_filter_libxml2
-		..
+		module mod_db_sqlite3
+		<emphasis role="bold">module mod_filter_libxml2</emphasis>
 	}
 		</programlisting>
 	</para>
@@ -98,12 +97,12 @@
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_command_directmap
-		..
+		module mod_db_sqlite3
+		module mod_filter_libxml2
+		<emphasis role="bold">module mod_command_directmap</emphasis>
 	}
 		</programlisting>
-		and 
+		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
 	Processor {
 		database sqlitedb
@@ -137,7 +136,7 @@
 		without a document type assigned (standalone) and with the root element 'list'. 
 		The returned content will be a list of customers. The function will be implemented 
 		in a TDL program in the server. We first add the
-		TDL program declaration to the processor configuration section:
+		TDL program declaration to a new 'Processor' configuration section:
 
 		<programlisting language='shell'>
 	Processor {
@@ -157,19 +156,20 @@
 		</programlisting>
 
 	We also need a validator for the input when the client sends a 'CustomerListRequest'.
-	we install the simple form DDL compilter in <filename>tutorial.conf</filename> and
-	register the simpleform program to the list of programs:
+	We load the simple form DDL compiler in the 'LoadModules' section of the <filename>tutorial.conf</filename> and
+	register the simpleform program <filename>Customer.sfrm</filename> to the list of programs in the same file:
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_ddlcompiler_simpleform
+		module mod_db_sqlite3
+		module mod_filter_libxml2
+		module mod_command_directmap
+		<emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
 	}
 
 	Processor {
-		..
-		program Customer.sfrm	
-		..
+		program Customer.tdl
+		<emphasis role="bold">program Customer.sfrm</emphasis>	
 	}
 		</programlisting>
 
@@ -184,6 +184,19 @@
 		}
 	}
 		</programlisting>
+	</para>
+	
+	<para>
+		We have to restart the wolframe daemon now and restart it with
+		<programlisting language='shell'>
+	pkill wolframed
+	/usr/sbin/wolframed -f -c tutorial.conf			
+		</programlisting>	
+	
+		This we have to do <emphasis role="bold">every time</emphasis> we
+		change the configuration file <filename>tutorial.conf</filename>
+		or one of the files referenced there as <filename>tutorial.dmap</filename>,
+		<filename>Customer.tdl</filename> or <filename>Customer.sfrm</filename>.
 	</para>
 	
 	<para>
@@ -207,7 +220,7 @@
 		This we can execute with:
 
 		<programlisting language='shell'>
-	netcat -v --wait=2 localhost 7661 &lt; CustomerListRequest.netcat
+	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 		</programlisting>
 
 		and we get:
