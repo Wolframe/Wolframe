@@ -14,13 +14,14 @@ makedepends=('docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
-  "${pkgname}_${pkgver}.tar.gz"
+  "http://sourceforge.net/projects/wolframe/files/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz"
   'wolframe.conf'
   'wolframed.service'
 )
-md5sums=('31966cc7391951dceee599bffcd241d4'
+
+md5sums=('68b6fd14c81367ee90a8a603ee017fc2'
          '2fde608c00c6d098683db533cbaab07b'
-         '66bdff0de795380ecafa48edda8d470e')
+         'cc146a28908aad55f156860340934095')
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
