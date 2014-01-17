@@ -65,6 +65,9 @@ public:
 	Date()
 		:m_date(boost::gregorian::day_clock::local_day()){}
 
+	///\brief Assignment operator
+	Date& operator=( const Date& o)			{m_date = o.m_date; return *this;}
+
 	///\brief Get the difference in days
 	long operator - (const Date& o) const;
 	///\brief Add number of days

@@ -64,9 +64,9 @@ public:
 	const AbstractDataType* type() const			{return m_type;}
 	const AbstractDataInitializer* initializer() const	{return m_initializer;}
 
-	virtual int compare( const AbstractDataValue& o)=0;
+	virtual int compare( const AbstractDataValue& o) const=0;
 	virtual std::string tostring() const=0;
-	virtual void assign( const Variant& o) const=0;
+	virtual void assign( const Variant& o)=0;
 
 private:
 	friend class AbstractDataType;
@@ -103,8 +103,8 @@ public:
 	enum {NofDimensionOperators=1};
 	enum DimensionOperatorType {Length};
 
-	typedef void (*UnaryOperator)( AbstractDataValue& operand);
-	typedef void (*BinaryOperator)( AbstractDataValue& operand, const Variant& arg);
+	typedef types::Variant (*UnaryOperator)( const AbstractDataValue& operand);
+	typedef types::Variant (*BinaryOperator)( const AbstractDataValue& operand, const Variant& arg);
 	typedef std::size_t (*DimensionOperator)( const AbstractDataValue& arg);
 
 public:
