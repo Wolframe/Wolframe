@@ -305,7 +305,6 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 			break;
 		case types::Variant::Int:
 		case types::Variant::UInt:
-		case types::Variant::Bool:
 		case types::Variant::Double:
 			m_statement.bind( idx, value.tostring());
 			break;
@@ -323,6 +322,13 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 			m_statement.bind( idx, bindval);
 			break;
 		}
+		case types::Variant::Bool:
+			if( value.tobool( ) ) {
+				m_statement.bind( idx, "'t'" );
+			} else {
+				m_statement.bind( idx, "'f'" );
+			}
+			break;
 	}
 	m_state = CommandReady;
 	return true;
@@ -400,6 +406,17 @@ const DatabaseError* TransactionExecStatemachine_postgres::getLastError()
 	return m_lasterror.get();
 }
 
+// OIDs from the PostgreSQL system catalog pg_type. For system types
+// those constants are fix, so we hard-code them here. For user-defined
+// types and special conversions (even variant plugins) we need a differnt
+// mechanism..
+enum PostgreSQLfieldTypes
+{
+	PGSQL_FIELD_TYPE_BOOLEAN	= 16,	// boolean
+	PGSQL_FIELD_TYPE_INT4		= 23,	// int4
+	PGSQL_FIELD_TYPE_TEXT		= 25	// text
+};
+
 types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 {
 	if (m_state != Executed)
@@ -413,16 +430,51 @@ types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	if (m_idx_row >= m_nof_rows) return types::VariantConst();
+	
+	// no matter the type, NULL is indicated with PQgetisnull, in this case
+	// resval[0] is 0 (empty string).
+	// TODO: handle binary data for blobs and user-defined types, we
+	// cannot simply force it to a string! In this case there should be
+	// an extension mechanism for the variant type..?
 	char* resval = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
-	if (!resval || resval[0] == '\0')
+	if( PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1 ) )
 	{
-		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
-		{
-			LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => NULL";
-			return types::VariantConst();
-		}
+		LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => NULL";
+		return types::VariantConst();
 	}
-	types::VariantConst rt( resval);
+
+	// depending on the system type we try to keep as much type information
+	// as possible in the next upper layer
+	Oid type = PQftype( m_lastresult, (int)idx-1);
+	types::VariantConst rt;
+	switch( type )
+	{
+		case PGSQL_FIELD_TYPE_BOOLEAN:
+			if( strcmp( resval, "t" ) == 0 ) {
+				rt = types::VariantConst( true );
+			} else if( strcmp( resval, "f" ) == 0 ) {
+				rt = types::VariantConst( false );
+			} else {
+				// tertium non datur
+				errorStatus( std::string( "unexpected value '" ) + resval + "' for boolean type" );
+				rt = types::VariantConst();
+			}
+			break;
+				
+		case PGSQL_FIELD_TYPE_INT4:
+			rt = types::VariantConst( resval );
+			rt = types::VariantConst( rt.toint( ) );
+			break;
+			
+		case PGSQL_FIELD_TYPE_TEXT:
+			rt = types::VariantConst( resval );
+			break;
+			
+		default:
+			LOG_DATA << "[postgresql statement] unknown Postgresql type '" << type << "' in column " << idx << ", assuming string";
+			rt = types::VariantConst( resval );
+	}
+		
 	LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => " << rt.typeName() << " '" << rt.tostring() << "'";
 	return rt;
 }

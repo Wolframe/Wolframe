@@ -77,13 +77,15 @@ static void executeInsertStatements( Transaction* trans)
 		std::vector<types::Variant> values;
 		values.push_back( 1);
 		values.push_back( "xyz");
-		trans->executeStatement( "INSERT INTO TestTest (id, name) VALUES ($1,$2);", values);
+		values.push_back( true);
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active) VALUES ($1,$2,$3);", values);
 	}
 	{
 		std::vector<types::Variant> values;
 		values.push_back( 2);
 		values.push_back( "abc");
-		trans->executeStatement( "INSERT INTO TestTest (id, name) VALUES ($1,$2);", values);
+		values.push_back( false);
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active) VALUES ($1,$2,$3);", values);
 	}
 }
 
@@ -113,7 +115,7 @@ TEST_F( PQmoduleFixture, Transaction )
 	// ok transaction create table statement with commit
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT);");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN);");
 	trans->commit( );
 
 	// ok transaction with statements with rollback
@@ -137,15 +139,18 @@ TEST_F( PQmoduleFixture, Transaction )
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id ASC;");
 	trans->commit( );
 	EXPECT_EQ( res.size(), 2);
-	EXPECT_EQ( res.colnames().size(), 2);
+	EXPECT_EQ( res.colnames().size(), 3);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "name", res.colnames().at(1).c_str());
+	EXPECT_STREQ( "active", res.colnames().at(2).c_str());
 	std::vector<Transaction::Result::Row>::const_iterator ri = res.begin(), re = res.end();
 	for (types::Variant::Data::Int idx=1; ri!= re; ++ri,++idx)
 	{
 		EXPECT_EQ( idx, ri->at(0).toint());
 		std::string name( ri->at(1).tostring());
+		bool active( ri->at(2).tobool());
 		EXPECT_STREQ( (idx==2?"abc":"xyz"), name.c_str());
+		EXPECT_EQ( ( idx==2?false:true), active);
 	}
 
 	trans->close( );

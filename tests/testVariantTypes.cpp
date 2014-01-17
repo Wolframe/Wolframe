@@ -89,7 +89,15 @@ TEST( variantTypeFixture, initialized )
 {
 	Variant v;
 
+	// excepting not initialized and not defined
 	ASSERT_FALSE( v.initialized( ) );
+	ASSERT_FALSE( v.defined( ) );
+	
+	v = 2;
+
+	// expecting initialized and defined, why is initialized false?!
+	//ASSERT_TRUE( v.initialized( ) );	
+	ASSERT_TRUE( v.defined( ) );
 }
 
 TEST( variantTypeFixture, output )
