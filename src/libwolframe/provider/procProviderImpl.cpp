@@ -41,6 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
+#include "module/abstractDataTypeBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
@@ -256,6 +257,29 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
+			case ObjectConstructorBase::ABSTRACT_DATA_TYPE_OBJECT:
+			{
+				module::AbstractDataTypeConstructorR constructor( dynamic_cast< module::AbstractDataTypeConstructor* >((*it)->constructor()));
+				if ( !constructor.get() )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "'' is not an abstract data type constructor";
+					throw std::logic_error( "Object is not an abstract data type constructor. See log." );
+				}
+				else
+				{
+					try {
+						m_adtmap.insert( constructor->name(), types::AbstractDataTypeR( new types::AbstractDataType( constructor->object())));
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' abstract data type '" << constructor->name() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading abstract data type '" << constructor->name() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
 			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
 			{	// object is a print function compiler
 				module::PrintFunctionConstructorR constructor( dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor()));
@@ -377,6 +401,13 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
 {
 	return m_programs->getNormalizeFunction( name);
+}
+
+const types::AbstractDataType* ProcessorProvider::ProcessorProvider_Impl::abstractDataType( const std::string& name) const
+{
+	types::keymap<types::AbstractDataTypeR>::const_iterator ai = m_adtmap.find( name);
+	if (ai == m_adtmap.end()) return 0;
+	return ai->second.get();
 }
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const

@@ -216,6 +216,7 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			case types::VariantStruct::Int:
 			case types::VariantStruct::UInt:
 			case types::VariantStruct::String:
+			case types::VariantStruct::ADT:
 			{
 				return fetchAtom( ctx, stk);
 			}

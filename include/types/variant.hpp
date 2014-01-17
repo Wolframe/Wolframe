@@ -43,6 +43,16 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+///\class AbstractDataType
+///\brief Forward declaration
+class AbstractDataType;
+///\class AbstractDataValue
+///\brief Forward declaration
+class AbstractDataValue;
+///\class AbstractDataInitializer
+///\brief Forward declaration
+class AbstractDataInitializer;
+
 ///\class Variant
 ///\brief Variant value type
 class Variant
@@ -52,23 +62,24 @@ public:
 	///\brief Type of the variant
 	enum Type
 	{
-		Null,					//< value undefined (NULL)
-		Int,					//< C++ int
-		UInt,					//< C++ unsigned int
-		Bool,					//< C++ bool
-		Double,					//< C++ double
-		String					//< null terminated UTF-8 string
+		Null,			//< value undefined (NULL)
+		ADT,			//< abstract data type (types::AbstractDataType)
+		Double,			//< C++ double
+		Int,			//< C++ int
+		UInt,			//< C++ unsigned int
+		Bool,			//< C++ bool
+		String			//< null terminated UTF-8 string
 	};
 	enum Flags
 	{
-		Initialized	=0x1,			//< value is initialized (meaning depends on the user of this value)
-		Constant	=0x2			//< value is a reference that is not owned and freed by this)
+		Initialized	=0x1,	//< value is initialized (meaning depends on the user of this value)
+		Constant	=0x2	//< value is a reference that is not owned and freed by this)
 	};
 
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"null","int","uint","bool","double","string","array","struct","indirection","unresolved"};
+		static const char* ar[] = {"null","ADT","double","int","uint","bool","string","array","struct","indirection","unresolved"};
 		return ar[ (int)i];
 	}
 	///\brief Get the type name of 'this' as string constant for logging
@@ -90,69 +101,73 @@ public:
 			Data::Int Int;
 			Data::UInt UInt;
 			char* String;
+			AbstractDataValue* AdtRef;
 			void* Ref;
 		} value;
 		union
 		{
-			const void* metadata;		//< unused by base variant type
-			std::size_t size;		//< size of a string
+			const void* metadata;			//< unused by base variant type
+			std::size_t size;			//< size of a string
 		} dim;
 	};
 	///\brief Constructor
-	Variant( Type type_)				{init(type_);}
-	Variant()					{init();}
-	Variant( bool o)				{init(Bool); m_data.value.Bool = o;}
-	Variant( double o)				{init(Double); m_data.value.Double = o;}
-	Variant( float o)				{init(Double); m_data.value.Double = o;}
+	Variant( Type type_)					{init(type_);}
+	Variant()						{init();}
+	Variant( bool o)					{init(Bool); m_data.value.Bool = o;}
+	Variant( double o)					{init(Double); m_data.value.Double = o;}
+	Variant( float o)					{init(Double); m_data.value.Double = o;}
 #if !_WOLFRAME_INTEGER_IS_INT
-	Variant( int o)					{init(Int); m_data.value.Int = o;}
-	Variant( unsigned int o)			{init(UInt); m_data.value.UInt = o;}
+	Variant( int o)						{init(Int); m_data.value.Int = o;}
+	Variant( unsigned int o)				{init(UInt); m_data.value.UInt = o;}
 #endif
-	Variant( Data::Int o)				{init(Int); m_data.value.Int = o;}
-	Variant( Data::UInt o)				{init(UInt); m_data.value.UInt = o;}
-	Variant( const char* o)				{initString( o, std::strlen(o));}
-	Variant( const char* o, std::size_t n)		{initString( o, n);}
-	Variant( const std::string& o)			{initString( o.c_str(), o.size());}
-	Variant( const Variant& o)			{initCopy( o);}
+	Variant( Data::Int o)					{init(Int); m_data.value.Int = o;}
+	Variant( Data::UInt o)					{init(UInt); m_data.value.UInt = o;}
+	Variant( const char* o)					{initString( o, std::strlen(o));}
+	Variant( const char* o, std::size_t n)			{initString( o, n);}
+	Variant( const std::string& o)				{initString( o.c_str(), o.size());}
+	Variant( const types::AbstractDataType* typ,
+		 const types::AbstractDataInitializer* dsc=0)	{initADT( typ, dsc);}
+	Variant( const types::AbstractDataValue& o)		{initADT( o);}
+	Variant( const Variant& o)				{initCopy( o);}
 	///\brief Destructor
-	~Variant()					{release();}
+	~Variant()						{release();}
 
 	///\brief Assignment operator, keeping the initialization flag of this
-	Variant& operator=( const Variant& o)		{bool init_=initialized(); release(); initCopy( o); setInitialized(init_); return *this;}
-	Variant& operator=( bool o)			{bool init_=initialized(); release(); init(Bool); m_data.value.Bool = o; setInitialized(init_); return *this;}
-	Variant& operator=( double o)			{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
-	Variant& operator=( float o)			{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
+	Variant& operator=( const Variant& o)			{bool init_=initialized(); release(); initCopy( o); setInitialized(init_); return *this;}
+	Variant& operator=( bool o)				{bool init_=initialized(); release(); init(Bool); m_data.value.Bool = o; setInitialized(init_); return *this;}
+	Variant& operator=( double o)				{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
+	Variant& operator=( float o)				{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
 #if !_WOLFRAME_INTEGER_IS_INT
-	Variant& operator=( int o)			{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
-	Variant& operator=( unsigned int o)		{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
+	Variant& operator=( int o)				{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
+	Variant& operator=( unsigned int o)			{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
 #endif
-	Variant& operator=( Data::Int o)		{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
-	Variant& operator=( Data::UInt o)		{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
-	Variant& operator=( const char* o)		{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
-	Variant& operator=( const std::string& o)	{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
+	Variant& operator=( Data::Int o)			{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
+	Variant& operator=( Data::UInt o)			{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
+	Variant& operator=( const char* o)			{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
+	Variant& operator=( const std::string& o)		{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
 	///\brief Initialization as string constant (Constant flag set, data not owned by this)
 	void initConstant( const char* o, std::size_t l);
-	void initConstant( const std::string& o)	{initConstant( o.c_str(),o.size());}
-	void initConstant( const char* o)		{initConstant( o, std::strlen(o));}
+	void initConstant( const std::string& o)		{initConstant( o.c_str(),o.size());}
+	void initConstant( const char* o)			{initConstant( o, std::strlen(o));}
 
 	///\brief Compare data with conversion (value with different types is converted first)
-	bool operator==( const Variant& o) const	{return compare( o) == 0;}
-	bool operator!=( const Variant& o) const	{int cv = compare( o); return cv != 0 && cv != -2;}
-	bool operator>( const Variant& o) const		{int cv = compare( o); return cv > 0;}
-	bool operator>=( const Variant& o) const	{int cv = compare( o); return cv >= 0;}
-	bool operator<=( const Variant& o) const	{int cv = compare( o); return cv <= 0 && cv != -2;}
-	bool operator<( const Variant& o) const		{int cv = compare( o); return cv == -1;}
+	bool operator==( const Variant& o) const		{return compare( o) == 0;}
+	bool operator!=( const Variant& o) const		{int cv = compare( o); return cv != 0 && cv != -2;}
+	bool operator>( const Variant& o) const			{int cv = compare( o); return cv > 0;}
+	bool operator>=( const Variant& o) const		{int cv = compare( o); return cv >= 0;}
+	bool operator<=( const Variant& o) const		{int cv = compare( o); return cv <= 0 && cv != -2;}
+	bool operator<( const Variant& o) const			{int cv = compare( o); return cv == -1;}
 
 	///\brief Get the type of this
-	Type type() const				{return (Type)m_type;}
+	Type type() const					{return (Type)m_type;}
 	///\brief Get the internal representation of the data of this
-	const Data& data() const			{return m_data;}
+	const Data& data() const				{return m_data;}
 
 	///\brief Get the pointer to the C representation of a string (throws for non string)
-	char* charptr() const				{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.String;}
+	char* charptr() const					{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.String;}
 	///\brief Get the size of a string (throws for non string)
-	std::size_t charsize() const			{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.dim.size;}
+	std::size_t charsize() const				{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.dim.size;}
 
 	///\brief Getter with value conversion
 	std::string tostring() const;
@@ -163,27 +178,27 @@ public:
 	Data::UInt touint() const;
 
 	///\brief Get the size of a string
-	std::size_t size() const			{return (type() == String)?m_data.dim.size:1;}
+	std::size_t size() const				{return (type() == String)?m_data.dim.size:1;}
 
 	///\brief Test if this value is initialized
-	bool initialized() const			{return flags( Initialized);}
+	bool initialized() const				{return flags( Initialized);}
 	///\brief Set the value to be initialized
-	void setInitialized( bool v=true)		{setFlags( Initialized, v);}
+	void setInitialized( bool v=true)			{setFlags( Initialized, v);}
 
 	///\brief Test if this value is constant (owned by this)
-	bool constant() const				{return flags( Constant);}
+	bool constant() const					{return flags( Constant);}
 	///\brief Set the value to be constant
 	///\remark Setting this flag for a value owned by this can cause memory leaks
-	void setConstant( bool v=true)			{setFlags( Constant, v);}
+	void setConstant( bool v=true)				{setFlags( Constant, v);}
 
 	///\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
-	bool atomic() const				{return m_type <= (unsigned char)String;}
+	bool atomic() const					{return m_type <= (unsigned char)String;}
 
 	///\brief Test if this value is defined (not null)
-	bool defined() const				{return m_type != (unsigned char)Null;}
+	bool defined() const					{return m_type != (unsigned char)Null;}
 
 	///\brief Reseting the content of this
-	void clear()					{release(); init();}
+	void clear()						{release(); init();}
 
 	///\brief Converting the value of this to a defined type
 	void convert( Type type_);
@@ -192,13 +207,16 @@ public:
 	void move( Variant& o);
 
 protected:
-	bool flags( Flags flags_) const			{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
-	void setFlags( Flags flags_, bool v=true)	{if (v) m_flags = (Flags)((unsigned char)m_flags | (unsigned char)flags_); else m_flags = (Flags)((unsigned char)m_flags - ((unsigned char)m_flags & (unsigned char)flags_));}
+	bool flags( Flags flags_) const				{return ((unsigned char)m_flags & (unsigned char)flags_) == (unsigned char)flags_;}
+	void setFlags( Flags flags_, bool v=true)		{if (v) m_flags = (Flags)((unsigned char)m_flags | (unsigned char)flags_); else m_flags = (Flags)((unsigned char)m_flags - ((unsigned char)m_flags & (unsigned char)flags_));}
 
 	void init( Type type_);
 	void init();
 	void release();
 	void initString( const char* str_, std::size_t strsize_);
+	void initADT( const types::AbstractDataType* typ,
+			const AbstractDataInitializer* dsc=0);
+	void initADT( const types::AbstractDataValue& o);
 	void initCopy( const Variant& o);
 	void initConstCopy( const Variant& o);
 

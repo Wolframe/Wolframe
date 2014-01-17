@@ -30,6 +30,7 @@
 
 ************************************************************************/
 #include "types/variant.hpp"
+#include "types/abstractDataType.hpp"
 #include "types/malloc.hpp"
 #include "utils/conversions.hpp"
 #include <cstdlib>
@@ -55,6 +56,7 @@ void Variant::init( Type type_)
 		case Bool: return;
 		case Double: m_data.value.Double = 0.0; return;
 		case String: m_data.value.String = strinit; setConstant(); return;
+		case ADT: throw std::runtime_error("cannot initialize ADT without instance defined");
 	}
 	throw std::logic_error( "invalid initialzation of atomic type (from structure)");
 }
@@ -71,6 +73,11 @@ void Variant::release()
 		if (m_type == String && m_data.value.String)
 		{
 			wolframe_free( m_data.value.String);
+			std::memset( this, 0, sizeof( *this));
+		}
+		else if (m_type == ADT && m_data.value.AdtRef)
+		{
+			delete m_data.value.AdtRef;
 			std::memset( this, 0, sizeof( *this));
 		}
 		else if (!atomic())
@@ -102,11 +109,30 @@ void Variant::initString( const char* str_, std::size_t strsize_)
 	m_data.value.String[ strsize_] = 0;
 }
 
+void Variant::initADT( const types::AbstractDataType* typ, const types::AbstractDataInitializer* dsc)
+{
+	std::memset( this, 0, sizeof( *this));
+	m_type = ADT;
+	m_data.value.AdtRef = typ->createValue( dsc);
+}
+
+void Variant::initADT( const types::AbstractDataValue& o)
+{
+	std::memset( this, 0, sizeof( *this));
+	m_type = ADT;
+	m_data.value.AdtRef = o.type()->copyValue( o);
+}
+
 void Variant::initCopy( const Variant& o)
 {
 	if (o.m_type == String)
 	{
 		initString( o.m_data.value.String, o.m_data.dim.size);
+		setInitialized( o.initialized());
+	}
+	else if (o.m_type == ADT)
+	{
+		initADT( *o.m_data.value.AdtRef);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())
@@ -166,6 +192,8 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 			{
 				return std::memcmp( d1.value.String, d2.value.String, d2.dim.size);
 			}
+		case Variant::ADT:
+			return d1.value.AdtRef->compare( *d1.value.AdtRef);
 	}
 	return -2;
 }
@@ -187,6 +215,8 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 			return o.data().value.UInt;
 		case Variant::String:
 			return utils::touint_cast( std::string( o.data().value.String));
+		case Variant::ADT:
+			throw std::logic_error( "cannot cast ADT to unsinged integer type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -208,6 +238,8 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 			return o.data().value.UInt;
 		case Variant::String:
 			return utils::toint_cast( std::string( o.data().value.String));
+		case Variant::ADT:
+			throw std::logic_error( "cannot cast ADT to integer type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -229,6 +261,8 @@ static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type
 			return boost::numeric_cast<TYPE>( o.data().value.UInt);
 		case Variant::String:
 			return boost::lexical_cast<TYPE>( std::string( o.data().value.String));
+		case Variant::ADT:
+			throw std::logic_error( "cannot cast ADT to arithmetic type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -250,6 +284,8 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 			return utils::tostring_cast( o.data().value.UInt);
 		case Variant::String:
 			return std::string( o.data().value.String, o.data().dim.size);
+		case Variant::ADT:
+			return o.data().value.AdtRef->tostring();
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -270,6 +306,13 @@ int Variant::compare( const Variant& o) const
 		{
 			case Variant::Null:
 				return -1;
+			case Variant::ADT:
+			{
+				const AbstractDataInitializer* ini = m_data.value.AdtRef->initializer();
+				AbstractDataValueR val( m_data.value.AdtRef->type()->createValue( ini));
+				val->assign( o);
+				return m_data.value.AdtRef->compare( *val);
+			}
 			case Variant::Double:
 				return compare_double( variant_cast<double>( o), m_data.value.Double);
 			case Variant::Int:
@@ -338,6 +381,7 @@ void Variant::convert( Type type_)
 	switch (type_)
 	{
 		case Null: release(); init(); return;
+		case ADT: throw std::runtime_error( "cannot convert to unspecified ADT");
 		case Bool: *this = tobool(); return;
 		case Int: *this = toint(); return;
 		case UInt: *this = touint(); return;

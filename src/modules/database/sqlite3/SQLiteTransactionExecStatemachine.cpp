@@ -335,6 +335,11 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), CommandReady);
 		case types::Variant::String:
 			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), CommandReady);
+		case types::Variant::ADT:
+		{
+			std::string strval( value.tostring());
+			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), CommandReady);
+		}
 	}
 	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
 }

@@ -31,6 +31,7 @@
 ************************************************************************/
 #include "types/variantStructDescription.hpp"
 #include "types/variantStruct.hpp"
+#include "types/abstractDataType.hpp"
 #include "types/malloc.hpp"
 #include <cstdlib>
 #include <limits>
@@ -578,6 +579,12 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 					case Variant::UInt: cmp = value->compare( default_uint); break;
 					case Variant::Double: cmp = value->compare( default_double); break;
 					case Variant::String: cmp = value->compare( default_string); break;
+					case Variant::ADT:
+					{
+						types::Variant default_adt( value->data().value.AdtRef->type(), value->data().value.AdtRef->initializer());
+						cmp = value->compare( default_adt);
+						break;
+					}
 				}
 				if (cmp != 0)
 				{

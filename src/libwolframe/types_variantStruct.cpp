@@ -189,6 +189,7 @@ void VariantStruct::initCopy( const VariantStruct& o)
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
 		case VariantStruct::String:
+		case VariantStruct::ADT:
 			Variant::initCopy( o);
 			break;
 
@@ -304,6 +305,7 @@ void VariantStruct::release()
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
 			break;
+		case VariantStruct::ADT:
 		case VariantStruct::String:
 			Variant::release();
 			break;

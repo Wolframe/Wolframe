@@ -53,6 +53,7 @@ ADT_OBJS = \
 	types_bcdArithmetic.o \
 	types_dateArithmetic.o \
 	types_doctype.o \
+	types_abstractDataType.o \
 	types_variant.o \
 	types_variantStructDescription.o \
 	types_variantStruct.o
