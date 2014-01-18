@@ -451,11 +451,27 @@ types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	int restype = sqlite3_column_type( m_stm, (int)idx-1);
+	const char *dbtype = sqlite3_column_decltype( m_stm, (int)idx-1);
 	if (restype == SQLITE_INTEGER)
 	{
+		types::VariantConst rt;
+		
 		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
-		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER " << resval;
-		return types::VariantConst( (types::Variant::Data::Int)resval);
+		if( dbtype != NULL && strcmp( dbtype, "BOOLEAN" ) == 0 ) {
+			if( resval == 1 ) {
+				rt = types::VariantConst( true );
+			} else if( resval == 0 ) {
+				rt = types::VariantConst( false );
+			} else {
+				// tertium non datur
+				errorStatus( std::string( "unexpected value '" ) + boost::lexical_cast<std::string>(resval) + "' for boolean type" );
+				rt = types::VariantConst();
+			}
+		} else {
+			rt = (types::Variant::Data::Int)resval;
+		}
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER(" << dbtype <<  ") " << rt;
+		return rt;
 	}
 	else if (restype == SQLITE_FLOAT)
 	{

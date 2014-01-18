@@ -132,8 +132,8 @@ public:
 		return &langdescr;
 	}
 
-	///\brief Get a user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const;
+	//~ ///\brief Get a user interface library
+	//~ virtual const UI::UserInterfaceLibrary* UIlibrary() const;
 private:
 	SQLiteDBunit*	m_unit;			///< parent database unit
 };
@@ -142,7 +142,7 @@ private:
 class SQLiteDBunit : public DatabaseUnit
 {
 	friend class SQLiteTransaction;
-	friend class SQLiteUIlibrary;
+	//~ friend class SQLiteUIlibrary;
 public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      bool foreignKeys, bool profiling,
@@ -176,33 +176,33 @@ private:
 	std::list<std::string>	m_extensionFiles;
 };
 
-
-class SQLiteUIlibrary : public UI::UserInterfaceLibrary
-{
-public:
-	SQLiteUIlibrary( const SQLiteDatabase& database );
-	~SQLiteUIlibrary()			{}
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::list< std::string >& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::string& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void addObject( const UI::InterfaceObject& newObject ) const;
-
-	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void close()			{ delete this; }
-private:
-	SQLiteDBunit&		m_unit;		///< parent database unit
-};
+// Aba: should be deleted IMHO, doesn't belong here
+//~ class SQLiteUIlibrary : public UI::UserInterfaceLibrary
+//~ {
+//~ public:
+	//~ SQLiteUIlibrary( const SQLiteDatabase& database );
+	//~ ~SQLiteUIlibrary()			{}
+//~ 
+	//~ virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
+									//~ const std::list< std::string >& roles,
+									//~ const std::string& culture,
+									//~ const std::string& tag = "" ) const;
+//~ 
+	//~ virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
+									//~ const std::string& roles,
+									//~ const std::string& culture,
+									//~ const std::string& tag = "" ) const;
+//~ 
+	//~ virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
+//~ 
+	//~ virtual void addObject( const UI::InterfaceObject& newObject ) const;
+//~ 
+	//~ virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
+//~ 
+	//~ virtual void close()			{ delete this; }
+//~ private:
+	//~ SQLiteDBunit&		m_unit;		///< parent database unit
+//~ };
 
 
 //\class SQLiteConstructor
