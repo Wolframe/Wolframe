@@ -85,18 +85,14 @@ TEST( variantTypeFixture, uint64 )
 	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, initialized )
+TEST( variantTypeFixture, defined )
 {
 	Variant v;
 
-	// excepting not initialized and not defined
-	ASSERT_FALSE( v.initialized( ) );
 	ASSERT_FALSE( v.defined( ) );
 	
 	v = 2;
 
-	// expecting initialized and defined, why is initialized false?!
-	//ASSERT_TRUE( v.initialized( ) );	
 	ASSERT_TRUE( v.defined( ) );
 }
 
