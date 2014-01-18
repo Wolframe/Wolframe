@@ -34,7 +34,7 @@
 ///\brief Normalizer for triming ascii strings
 #ifndef _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <string>
 
 namespace _Wolframe {

@@ -42,7 +42,7 @@
 #include "database/transactionFunction.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "prnt/printFunction.hpp"
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"

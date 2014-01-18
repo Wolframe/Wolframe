@@ -112,4 +112,11 @@ AbstractDataValue* AbstractDataType::copyValue( const AbstractDataValue& o) cons
 }
 
 
+Variant AbstractDataNormalizer::execute( const Variant& i) const
+{
+	Variant rt( m_type, m_initializer);
+	rt.data().value.AdtRef->assign( i);
+	return rt;
+}
+
 

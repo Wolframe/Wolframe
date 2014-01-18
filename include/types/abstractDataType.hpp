@@ -37,6 +37,7 @@ Project Wolframe.
 #include <string>
 #include <cstring>
 #include "types/countedReference.hpp"
+#include "types/normalizeFunction.hpp"
 
 namespace _Wolframe {
 namespace proc
@@ -64,9 +65,9 @@ public:
 	const AbstractDataType* type() const			{return m_type;}
 	const AbstractDataInitializer* initializer() const	{return m_initializer;}
 
-	virtual int compare( const AbstractDataValue& o)=0;
+	virtual int compare( const AbstractDataValue& o) const=0;
 	virtual std::string tostring() const=0;
-	virtual void assign( const Variant& o) const=0;
+	virtual void assign( const Variant& o)=0;
 
 private:
 	friend class AbstractDataType;
@@ -103,8 +104,8 @@ public:
 	enum {NofDimensionOperators=1};
 	enum DimensionOperatorType {Length};
 
-	typedef void (*UnaryOperator)( AbstractDataValue& operand);
-	typedef void (*BinaryOperator)( AbstractDataValue& operand, const Variant& arg);
+	typedef types::Variant (*UnaryOperator)( const AbstractDataValue& operand);
+	typedef types::Variant (*BinaryOperator)( const AbstractDataValue& operand, const Variant& arg);
 	typedef std::size_t (*DimensionOperator)( const AbstractDataValue& arg);
 
 public:
@@ -157,6 +158,32 @@ typedef types::CountedReference<AbstractDataType> AbstractDataTypeR;
 
 
 typedef AbstractDataType (*CreateAbstractDataType)( const std::string& name);
+
+
+
+class AbstractDataNormalizer
+	:public types::NormalizeFunction
+{
+public:
+	AbstractDataNormalizer( const std::string& name_, const AbstractDataType* type_, const AbstractDataInitializer* initializer_)
+		:m_name(name_)
+		,m_type(type_)
+		,m_initializer(initializer_){}
+
+	virtual ~AbstractDataNormalizer(){}
+
+	virtual const char* name() const
+	{
+		return m_name.c_str();
+	}
+
+	virtual Variant execute( const Variant& i) const;
+
+private:
+	std::string m_name;
+	const AbstractDataType* m_type;
+	const AbstractDataInitializer* m_initializer;
+};
 
 }}//namespace
 #endif

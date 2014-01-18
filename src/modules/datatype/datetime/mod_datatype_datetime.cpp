@@ -30,42 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "types/countedReference.hpp"
-#include "types/keymap.hpp"
-#include "types/variant.hpp"
-#include "types/normalizeFunction.hpp"
-#include <string>
-#include <vector>
+///\file mod_datatype_datetime.cpp
+///\brief Extension module for date and time arithmetic
+#include "module/abstractDataTypeBuilder.hpp"
+#include "logger-v1.hpp"
+#include "dateTime.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+_Wolframe::log::LogBackend* logBackendPtr;
 
-class ResourceHandle;
-typedef langbind::ResourceHandle* (*CreateResourceHandleFunction)();
+using namespace _Wolframe;
+using namespace _Wolframe::module;
 
-class ResourceHandle
+static void setModuleLogger( void* logger )
 {
-public:
-	ResourceHandle(){}
-	virtual ~ResourceHandle(){}
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+}
 
-	static langbind::ResourceHandle* create()
+namespace {
+struct DateTimeBuilder
+{
+	static SimpleBuilder* constructor()
 	{
-		return new langbind::ResourceHandle();
+		return new AbstractDataTypeBuilder( "AbstractDataType:datetime", "datetime", types::DateDataType::create);
 	}
 };
+}//anonymous namespace
 
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef types::NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& arg);
-typedef const std::vector<std::string>& (*GetNormalizeFunctions)();
+enum {NofObjects=1};
+static createBuilderFunc objdef[ NofObjects] =
+{
+	DateTimeBuilder::constructor
+};
 
-}}
-#endif
-
+ModuleEntryPoint entryPoint( 0, "Extension module for date and time arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);
 

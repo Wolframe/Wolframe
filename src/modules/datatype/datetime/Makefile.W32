@@ -1,0 +1,45 @@
+TOPDIR = ..\..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\src \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	kernel32.lib advapi32.lib Ws2_32.lib
+
+DYNAMIC_MODULE = \
+	mod_datatype_datetime.dll
+
+CPP_OBJS = \
+	dateTime.obj \
+	mod_datatype_datetime.obj
+
+all: $(DYNAMIC_MODULE)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /def:ModDateTime.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+
+

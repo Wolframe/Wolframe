@@ -34,7 +34,7 @@
 ///\brief Interface for normalization functions based on boost locale (ICU)
 #ifndef _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 #include <boost/locale/generator.hpp>
 

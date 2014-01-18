@@ -34,7 +34,7 @@
 ///\brief Normalizer for names without locale (ICU)
 #ifndef _LANGBIND_NAME_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_NAME_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <string>
 
 namespace _Wolframe {

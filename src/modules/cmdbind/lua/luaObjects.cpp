@@ -37,7 +37,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaCppCall.hpp"
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"

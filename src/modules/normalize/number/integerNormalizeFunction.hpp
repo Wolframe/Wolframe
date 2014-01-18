@@ -34,7 +34,8 @@
 ///\brief Normalizer for signed or unsigned integer numbers
 #ifndef _LANGBIND_INTEGER_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_INTEGER_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
 #include <string>
 
 namespace _Wolframe {

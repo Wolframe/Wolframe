@@ -1,6 +1,7 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler \
+SUBDIRS = audit authentication authorization \
+	database datatype filter ddlcompiler \
 	normalize prnt cmdbind functions jobSchedule
 
 ifeq ($(WITH_LUA),1)

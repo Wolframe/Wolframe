@@ -34,16 +34,16 @@
 ///\brief Interface for normalization functions of strings without using ICU
 #ifndef _LANGBIND_STRING_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_STRING_NORMALIZE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-types::NormalizeFunction* createTrimNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createUcnameNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createLcnameNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createConvdiaNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createTrimNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createUcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createLcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createConvdiaNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

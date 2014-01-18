@@ -32,6 +32,7 @@
 ************************************************************************/
 ///\file trimNormalizeFunction.cpp
 #include "trimNormalizeFunction.hpp"
+#include "types/variant.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;

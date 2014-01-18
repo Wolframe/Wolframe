@@ -115,7 +115,7 @@ static types::Variant::Data::UInt getMax( std::size_t digits)
 }
 
 
-types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( ResourceHandle&, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
 	try
 	{
@@ -142,7 +142,7 @@ types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( R
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( ResourceHandle&, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
 	try
 	{
@@ -169,7 +169,7 @@ types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( 
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( ResourceHandle&, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
 	try
 	{
@@ -195,7 +195,7 @@ types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( Res
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( ResourceHandle&, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
 	try
 	{
