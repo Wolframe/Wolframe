@@ -43,15 +43,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\class AbstractDataType
+///\class CustomDataType
 ///\brief Forward declaration
-class AbstractDataType;
-///\class AbstractDataValue
+class CustomDataType;
+///\class CustomDataValue
 ///\brief Forward declaration
-class AbstractDataValue;
-///\class AbstractDataInitializer
+class CustomDataValue;
+///\class CustomDataInitializer
 ///\brief Forward declaration
-class AbstractDataInitializer;
+class CustomDataInitializer;
 
 ///\class Variant
 ///\brief Variant value type
@@ -63,7 +63,7 @@ public:
 	enum Type
 	{
 		Null,			//< value undefined (NULL)
-		ADT,			//< abstract data type (types::AbstractDataType)
+		Custom,			//< custom data type (types::CustomDataType)
 		Double,			//< C++ double
 		Int,			//< C++ int
 		UInt,			//< C++ unsigned int
@@ -79,7 +79,7 @@ public:
 	///\brief Get the type name as string constant for logging
 	static const char* typeName( Type i)
 	{
-		static const char* ar[] = {"null","ADT","double","int","uint","bool","string","array","struct","indirection","unresolved"};
+		static const char* ar[] = {"null","custom","double","int","uint","bool","string","array","struct","indirection","unresolved"};
 		return ar[ (int)i];
 	}
 	///\brief Get the type name of 'this' as string constant for logging
@@ -101,7 +101,7 @@ public:
 			Data::Int Int;
 			Data::UInt UInt;
 			char* String;
-			AbstractDataValue* AdtRef;
+			CustomDataValue* CustomRef;
 			void* Ref;
 		} value;
 		union
@@ -125,9 +125,9 @@ public:
 	Variant( const char* o)					{initString( o, std::strlen(o));}
 	Variant( const char* o, std::size_t n)			{initString( o, n);}
 	Variant( const std::string& o)				{initString( o.c_str(), o.size());}
-	Variant( const types::AbstractDataType* typ,
-		 const types::AbstractDataInitializer* dsc=0)	{initADT( typ, dsc);}
-	Variant( const types::AbstractDataValue& o)		{initADT( o);}
+	Variant( const types::CustomDataType* typ,
+		 const types::CustomDataInitializer* dsc=0)	{initCustom( typ, dsc);}
+	Variant( const types::CustomDataValue& o)		{initCustom( o);}
 	Variant( const Variant& o)				{initCopy( o);}
 	///\brief Destructor
 	~Variant()						{release();}
@@ -214,9 +214,9 @@ protected:
 	void init();
 	void release();
 	void initString( const char* str_, std::size_t strsize_);
-	void initADT( const types::AbstractDataType* typ,
-			const AbstractDataInitializer* dsc=0);
-	void initADT( const types::AbstractDataValue& o);
+	void initCustom( const types::CustomDataType* typ,
+			const CustomDataInitializer* dsc=0);
+	void initCustom( const types::CustomDataValue& o);
 	void initCopy( const Variant& o);
 	void initConstCopy( const Variant& o);
 

@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_datatype_datetime.cpp
 ///\brief Extension module for date and time arithmetic
-#include "module/abstractDataTypeBuilder.hpp"
+#include "module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
 #include "dateTime.hpp"
 
@@ -51,7 +51,7 @@ struct DateTimeBuilder
 {
 	static SimpleBuilder* constructor()
 	{
-		return new AbstractDataTypeBuilder( "AbstractDataType:datetime", "datetime", types::DateDataType::create);
+		return new CustomDataTypeBuilder( "CustomDataType:datetime", "datetime", types::DateDataType::create);
 	}
 };
 }//anonymous namespace

@@ -35,7 +35,7 @@ Project Wolframe.
 #define _Wolframe_MODULE_LUA_LANGUAGE_EXTENSION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "processor/moduleInterface.hpp"
 #include "module/constructor.hpp"
-#include "types/abstractDataType.hpp"
+#include "types/customDataType.hpp"
 #include <string>
 #include <cstring>
 #include <stdexcept>
@@ -44,23 +44,23 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class AbstractDataTypeConstructor :public SimpleObjectConstructor<types::AbstractDataType>
+class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
-	AbstractDataTypeConstructor( const char* classname_, const std::string& typename_, types::CreateAbstractDataType adt_constructor_)
+	CustomDataTypeConstructor( const char* classname_, const std::string& typename_, types::CreateCustomDataType cdt_constructor_)
 		:m_classname(classname_)
 		,m_typename(typename_)
-		,m_adt_constructor(adt_constructor_) {}
+		,m_cdt_constructor(cdt_constructor_) {}
 
-	virtual ~AbstractDataTypeConstructor(){}
+	virtual ~CustomDataTypeConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return ABSTRACT_DATA_TYPE_OBJECT;
+		return CUSTOM_DATA_TYPE_OBJECT;
 	}
-	virtual types::AbstractDataType object() const
+	virtual types::CustomDataType object() const
 	{
-		return (*m_adt_constructor)( m_typename);
+		return (*m_cdt_constructor)( m_typename);
 	}
 	virtual const char* objectClassName() const
 	{
@@ -75,36 +75,36 @@ public:
 private:
 	const char* m_classname;
 	std::string m_typename;
-	types::CreateAbstractDataType m_adt_constructor;
+	types::CreateCustomDataType m_cdt_constructor;
 };
 
-typedef boost::shared_ptr<AbstractDataTypeConstructor> AbstractDataTypeConstructorR;
+typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;
 
 
-class AbstractDataTypeBuilder :public SimpleBuilder
+class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:
-	AbstractDataTypeBuilder( const char* classname_, const char* typename_, types::CreateAbstractDataType adt_constructor_)
+	CustomDataTypeBuilder( const char* classname_, const char* typename_, types::CreateCustomDataType cdt_constructor_)
 		:SimpleBuilder(classname_)
 		,m_typename(typename_)
-		,m_adt_constructor(adt_constructor_)
+		,m_cdt_constructor(cdt_constructor_)
 	{}
 
-	virtual ~AbstractDataTypeBuilder(){}
+	virtual ~CustomDataTypeBuilder(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return ObjectConstructorBase::ABSTRACT_DATA_TYPE_OBJECT;
+		return ObjectConstructorBase::CUSTOM_DATA_TYPE_OBJECT;
 	}
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new AbstractDataTypeConstructor( objectClassName(), m_typename, m_adt_constructor);
+		return new CustomDataTypeConstructor( objectClassName(), m_typename, m_cdt_constructor);
 	}
 
 private:
 	std::string m_typename;
-	types::CreateAbstractDataType m_adt_constructor;
+	types::CreateCustomDataType m_cdt_constructor;
 };
 
 }}//namespace

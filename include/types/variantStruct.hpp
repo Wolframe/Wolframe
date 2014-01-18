@@ -60,7 +60,7 @@ public:
 	enum Type
 	{
 		Null = Variant::Null,		//< undefined value
-		ADT = Variant::ADT,		//< atomic abstract data type (ADT)
+		Custom = Variant::Custom,	//< atomic custom data type
 		Double = Variant::Double,	//< atomic double
 		Int = Variant::Int,		//< atomic signed int
 		UInt = Variant::UInt,		//< atomic unsigned int

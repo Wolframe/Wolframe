@@ -41,7 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
-#include "module/abstractDataTypeBuilder.hpp"
+#include "module/customDataTypeBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
@@ -257,24 +257,24 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
-			case ObjectConstructorBase::ABSTRACT_DATA_TYPE_OBJECT:
+			case ObjectConstructorBase::CUSTOM_DATA_TYPE_OBJECT:
 			{
-				module::AbstractDataTypeConstructorR constructor( dynamic_cast< module::AbstractDataTypeConstructor* >((*it)->constructor()));
+				module::CustomDataTypeConstructorR constructor( dynamic_cast< module::CustomDataTypeConstructor* >((*it)->constructor()));
 				if ( !constructor.get() )
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not an abstract data type constructor";
-					throw std::logic_error( "Object is not an abstract data type constructor. See log." );
+						  << "'' is not a custom data type constructor";
+					throw std::logic_error( "Object is not a custom data type constructor. See log." );
 				}
 				else
 				{
 					try {
-						m_adtmap.insert( constructor->name(), types::AbstractDataTypeR( new types::AbstractDataType( constructor->object())));
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' abstract data type '" << constructor->name() << "'";
+						m_cdtmap.insert( constructor->name(), types::CustomDataTypeR( new types::CustomDataType( constructor->object())));
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->name() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading abstract data type '" << constructor->name() << "':" << e.what();
+						LOG_FATAL << "Error loading custom data type '" << constructor->name() << "':" << e.what();
 					}
 				}
 				break;
@@ -403,10 +403,10 @@ const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::norma
 	return m_programs->getNormalizeFunction( name);
 }
 
-const types::AbstractDataType* ProcessorProvider::ProcessorProvider_Impl::abstractDataType( const std::string& name) const
+const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& name) const
 {
-	types::keymap<types::AbstractDataTypeR>::const_iterator ai = m_adtmap.find( name);
-	if (ai == m_adtmap.end()) return 0;
+	types::keymap<types::CustomDataTypeR>::const_iterator ai = m_cdtmap.find( name);
+	if (ai == m_cdtmap.end()) return 0;
 	return ai->second.get();
 }
 

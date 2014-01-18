@@ -29,20 +29,20 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/abstractDataType.hpp
-///\brief Implementation of abstract data type (ADT) for variant
-#include "types/abstractDataType.hpp"
+///\file types/customDataType.hpp
+///\brief Implementation of custom data type for variant
+#include "types/customDataType.hpp"
 #include "types/variant.hpp"
 #include "processor/procProvider.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-AbstractDataType::AbstractDataType(
+CustomDataType::CustomDataType(
 			const std::string& name_,
-			AbstractDataValueConstructor constructor_,
-			AbstractDataValueCopyConstructor copyconstructor_,
-			CreateAbstractDataInitializer initializerconstructor_)
+			CustomDataValueConstructor constructor_,
+			CustomDataValueCopyConstructor copyconstructor_,
+			CreateCustomDataInitializer initializerconstructor_)
 	:m_name(name_),m_id(0)
 {
 	std::memset( &m_vmt, 0, sizeof( m_vmt));
@@ -51,71 +51,71 @@ AbstractDataType::AbstractDataType(
 	m_vmt.opCopyConstructor = copyconstructor_;
 }
 
-AbstractDataType::AbstractDataType( const AbstractDataType& o)
+CustomDataType::CustomDataType( const CustomDataType& o)
 	:m_name(o.m_name),m_id(o.m_id)
 {
 	std::memcpy( &m_vmt, &o.m_vmt, sizeof( m_vmt));
 }
 
-void AbstractDataType::define( UnaryOperatorType type, UnaryOperator op)
+void CustomDataType::define( UnaryOperatorType type, UnaryOperator op)
 {
 	if (m_vmt.opUnary[ (int)type]) throw std::logic_error("duplicate definition of unary operator");
 	m_vmt.opUnary[ (int)type] = op;
 }
 
-void AbstractDataType::define( BinaryOperatorType type, BinaryOperator op)
+void CustomDataType::define( BinaryOperatorType type, BinaryOperator op)
 {
 	if (m_vmt.opBinary[ (int)type]) throw std::logic_error("duplicate definition of binary operator");
 	m_vmt.opBinary[ (int)type] = op;
 }
 
-void AbstractDataType::define( DimensionOperatorType type, DimensionOperator op)
+void CustomDataType::define( DimensionOperatorType type, DimensionOperator op)
 {
 	if (m_vmt.opDimension[ (int)type]) throw std::logic_error("duplicate definition of dimension operator");
 	m_vmt.opDimension[ (int)type] = op;
 }
 
-AbstractDataType::UnaryOperator AbstractDataType::getOperator( AbstractDataType::UnaryOperatorType type) const
+CustomDataType::UnaryOperator CustomDataType::getOperator( CustomDataType::UnaryOperatorType type) const
 {
 	return m_vmt.opUnary[ (int)type];
 }
 
-AbstractDataType::BinaryOperator AbstractDataType::getOperator( AbstractDataType::BinaryOperatorType type) const
+CustomDataType::BinaryOperator CustomDataType::getOperator( CustomDataType::BinaryOperatorType type) const
 {
 	return m_vmt.opBinary[ (int)type];
 }
 
-AbstractDataType::DimensionOperator AbstractDataType::getOperator( AbstractDataType::DimensionOperatorType type) const
+CustomDataType::DimensionOperator CustomDataType::getOperator( CustomDataType::DimensionOperatorType type) const
 {
 	return m_vmt.opDimension[ (int)type];
 }
 
-AbstractDataInitializer* AbstractDataType::createInitializer( const std::string& d) const
+CustomDataInitializer* CustomDataType::createInitializer( const std::string& d) const
 {
 	return (*m_vmt.opInitializerConstructor)( d);
 }
 
-AbstractDataValue* AbstractDataType::createValue( const AbstractDataInitializer* i) const
+CustomDataValue* CustomDataType::createValue( const CustomDataInitializer* i) const
 {
-	AbstractDataValue* rt = (*m_vmt.opConstructor)( i);
+	CustomDataValue* rt = (*m_vmt.opConstructor)( i);
 	rt->m_type = this;
 	rt->m_initializer = i;
 	return rt;
 }
 
-AbstractDataValue* AbstractDataType::copyValue( const AbstractDataValue& o) const
+CustomDataValue* CustomDataType::copyValue( const CustomDataValue& o) const
 {
-	AbstractDataValue* rt = (*m_vmt.opCopyConstructor)( &o);
+	CustomDataValue* rt = (*m_vmt.opCopyConstructor)( &o);
 	rt->m_type = this;
 	rt->m_initializer = o.m_initializer;
 	return rt;
 }
 
 
-Variant AbstractDataNormalizer::execute( const Variant& i) const
+Variant CustomDataNormalizer::execute( const Variant& i) const
 {
 	Variant rt( m_type, m_initializer);
-	rt.data().value.AdtRef->assign( i);
+	rt.data().value.CustomRef->assign( i);
 	return rt;
 }
 

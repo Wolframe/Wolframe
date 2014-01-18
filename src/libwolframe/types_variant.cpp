@@ -30,7 +30,7 @@
 
 ************************************************************************/
 #include "types/variant.hpp"
-#include "types/abstractDataType.hpp"
+#include "types/customDataType.hpp"
 #include "types/malloc.hpp"
 #include "utils/conversions.hpp"
 #include <cstdlib>
@@ -56,7 +56,7 @@ void Variant::init( Type type_)
 		case Bool: return;
 		case Double: m_data.value.Double = 0.0; return;
 		case String: m_data.value.String = strinit; setConstant(); return;
-		case ADT: throw std::runtime_error("cannot initialize ADT without instance defined");
+		case Custom: throw std::runtime_error("cannot initialize custom data type without instance defined");
 	}
 	throw std::logic_error( "invalid initialzation of atomic type (from structure)");
 }
@@ -75,9 +75,9 @@ void Variant::release()
 			wolframe_free( m_data.value.String);
 			std::memset( this, 0, sizeof( *this));
 		}
-		else if (m_type == ADT && m_data.value.AdtRef)
+		else if (m_type == Custom && m_data.value.CustomRef)
 		{
-			delete m_data.value.AdtRef;
+			delete m_data.value.CustomRef;
 			std::memset( this, 0, sizeof( *this));
 		}
 		else if (!atomic())
@@ -109,18 +109,18 @@ void Variant::initString( const char* str_, std::size_t strsize_)
 	m_data.value.String[ strsize_] = 0;
 }
 
-void Variant::initADT( const types::AbstractDataType* typ, const types::AbstractDataInitializer* dsc)
+void Variant::initCustom( const types::CustomDataType* typ, const types::CustomDataInitializer* dsc)
 {
 	std::memset( this, 0, sizeof( *this));
-	m_type = ADT;
-	m_data.value.AdtRef = typ->createValue( dsc);
+	m_type = Custom;
+	m_data.value.CustomRef = typ->createValue( dsc);
 }
 
-void Variant::initADT( const types::AbstractDataValue& o)
+void Variant::initCustom( const types::CustomDataValue& o)
 {
 	std::memset( this, 0, sizeof( *this));
-	m_type = ADT;
-	m_data.value.AdtRef = o.type()->copyValue( o);
+	m_type = Custom;
+	m_data.value.CustomRef = o.type()->copyValue( o);
 }
 
 void Variant::initCopy( const Variant& o)
@@ -130,9 +130,9 @@ void Variant::initCopy( const Variant& o)
 		initString( o.m_data.value.String, o.m_data.dim.size);
 		setInitialized( o.initialized());
 	}
-	else if (o.m_type == ADT)
+	else if (o.m_type == Custom)
 	{
-		initADT( *o.m_data.value.AdtRef);
+		initCustom( *o.m_data.value.CustomRef);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())
@@ -192,8 +192,8 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 			{
 				return std::memcmp( d1.value.String, d2.value.String, d2.dim.size);
 			}
-		case Variant::ADT:
-			return d1.value.AdtRef->compare( *d1.value.AdtRef);
+		case Variant::Custom:
+			return d1.value.CustomRef->compare( *d1.value.CustomRef);
 	}
 	return -2;
 }
@@ -215,8 +215,8 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 			return o.data().value.UInt;
 		case Variant::String:
 			return utils::touint_cast( std::string( o.data().value.String));
-		case Variant::ADT:
-			throw std::logic_error( "cannot cast ADT to unsinged integer type");
+		case Variant::Custom:
+			throw std::logic_error( "cannot cast custom data type to unsinged integer type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -238,8 +238,8 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 			return o.data().value.UInt;
 		case Variant::String:
 			return utils::toint_cast( std::string( o.data().value.String));
-		case Variant::ADT:
-			throw std::logic_error( "cannot cast ADT to integer type");
+		case Variant::Custom:
+			throw std::logic_error( "cannot cast custom data type to integer type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -261,8 +261,8 @@ static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type
 			return boost::numeric_cast<TYPE>( o.data().value.UInt);
 		case Variant::String:
 			return boost::lexical_cast<TYPE>( std::string( o.data().value.String));
-		case Variant::ADT:
-			throw std::logic_error( "cannot cast ADT to arithmetic type");
+		case Variant::Custom:
+			throw std::logic_error( "cannot cast custom data type to arithmetic type");
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -284,8 +284,8 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 			return utils::tostring_cast( o.data().value.UInt);
 		case Variant::String:
 			return std::string( o.data().value.String, o.data().dim.size);
-		case Variant::ADT:
-			return o.data().value.AdtRef->tostring();
+		case Variant::Custom:
+			return o.data().value.CustomRef->tostring();
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -306,12 +306,12 @@ int Variant::compare( const Variant& o) const
 		{
 			case Variant::Null:
 				return -1;
-			case Variant::ADT:
+			case Variant::Custom:
 			{
-				const AbstractDataInitializer* ini = m_data.value.AdtRef->initializer();
-				AbstractDataValueR val( m_data.value.AdtRef->type()->createValue( ini));
+				const CustomDataInitializer* ini = m_data.value.CustomRef->initializer();
+				CustomDataValueR val( m_data.value.CustomRef->type()->createValue( ini));
 				val->assign( o);
-				return m_data.value.AdtRef->compare( *val);
+				return m_data.value.CustomRef->compare( *val);
 			}
 			case Variant::Double:
 				return compare_double( variant_cast<double>( o), m_data.value.Double);
@@ -381,7 +381,7 @@ void Variant::convert( Type type_)
 	switch (type_)
 	{
 		case Null: release(); init(); return;
-		case ADT: throw std::runtime_error( "cannot convert to unspecified ADT");
+		case Custom: throw std::runtime_error( "cannot convert to unspecified custom data type");
 		case Bool: *this = tobool(); return;
 		case Int: *this = toint(); return;
 		case UInt: *this = touint(); return;
