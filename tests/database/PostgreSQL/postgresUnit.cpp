@@ -87,6 +87,13 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( false);
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active) VALUES ($1,$2,$3);", values);
 	}
+	{
+		std::vector<types::Variant> values;
+		values.push_back( types::VariantConst( ));
+		values.push_back( types::VariantConst( ));
+		values.push_back( types::VariantConst( ));
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active) VALUES ($1,$2,$3);", values);
+	}
 }
 
 TEST_F( PQmoduleFixture, Transaction )
@@ -136,9 +143,9 @@ TEST_F( PQmoduleFixture, Transaction )
 
 	// ok select result that must contain the elements inserted in the previous transaction
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id ASC;");
+	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id is null, id ASC;");
 	trans->commit( );
-	EXPECT_EQ( res.size(), 2);
+	EXPECT_EQ( res.size(), 3);
 	EXPECT_EQ( res.colnames().size(), 3);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "name", res.colnames().at(1).c_str());
@@ -146,11 +153,17 @@ TEST_F( PQmoduleFixture, Transaction )
 	std::vector<Transaction::Result::Row>::const_iterator ri = res.begin(), re = res.end();
 	for (types::Variant::Data::Int idx=1; ri!= re; ++ri,++idx)
 	{
-		EXPECT_EQ( idx, ri->at(0).toint());
-		std::string name( ri->at(1).tostring());
-		bool active( ri->at(2).tobool());
-		EXPECT_STREQ( (idx==2?"abc":"xyz"), name.c_str());
-		EXPECT_EQ( ( idx==2?false:true), active);
+		if( idx == 3 ) {
+			ASSERT_FALSE( ri->at(0).defined( ) );
+			ASSERT_FALSE( ri->at(1).defined( ) );
+			ASSERT_FALSE( ri->at(2).defined( ) );
+		} else {
+			EXPECT_EQ( idx, ri->at(0).toint());
+			std::string name( ri->at(1).tostring());
+			bool active( ri->at(2).tobool());
+			EXPECT_STREQ( (idx==2?"abc":"xyz"), name.c_str());
+			EXPECT_EQ( ( idx==2?false:true), active);
+		}
 	}
 
 	trans->close( );
