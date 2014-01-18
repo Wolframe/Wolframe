@@ -268,7 +268,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				case types::VariantStruct::Int:
 				case types::VariantStruct::UInt:
 				case types::VariantStruct::String:
-				case types::VariantStruct::ADT:
+				case types::VariantStruct::Custom:
 					setAtomValue( *elem, element, stk.back().normalizer());
 					return true;
 
@@ -333,7 +333,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		case types::VariantStruct::Int:
 		case types::VariantStruct::UInt:
 		case types::VariantStruct::String:
-		case types::VariantStruct::ADT:
+		case types::VariantStruct::Custom:
 		{
 			return parseAtom( *stk.back().value(), inp, ctx, stk);
 		}

@@ -44,7 +44,7 @@
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/authCommandHandler.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "types/abstractDataType.hpp"
+#include "types/customDataType.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -114,7 +114,7 @@ public:
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
-	const types::AbstractDataType* abstractDataType( const std::string& name) const;
+	const types::CustomDataType* customDataType( const std::string& name) const;
 
 private:
 	class ProcessorProvider_Impl;

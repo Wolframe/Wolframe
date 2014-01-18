@@ -73,7 +73,7 @@ public:
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
-	const types::AbstractDataType* abstractDataType( const std::string& name) const;
+	const types::CustomDataType* customDataType( const std::string& name) const;
 
 	bool loadPrograms();
 	bool checkReferences( const ProcessorProvider* provider) const;
@@ -100,7 +100,7 @@ private:
 	typedef std::map<std::string,std::size_t> CmdMap;
 	CmdMap m_cmdMap;
 
-	types::keymap<types::AbstractDataTypeR> m_adtmap;
+	types::keymap<types::CustomDataTypeR> m_cdtmap;
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;
 	std::vector<prgbind::RuntimeEnvironmentDef> m_runtime_environment_defs;

@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/abstractDataType.hpp
-///\brief Abstract data type (ADT) interface for variant
+///\file types/customDataType.hpp
+///\brief Custom data type interface for variant
 
-#ifndef _Wolframe_TYPES_ABSTRACT_DATA_TYPE_HPP_INCLUDED
-#define _Wolframe_TYPES_ABSTRACT_DATA_TYPE_HPP_INCLUDED
+#ifndef _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
+#define _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #include <string>
 #include <cstring>
 #include "types/countedReference.hpp"
@@ -50,50 +50,50 @@ namespace types {
 //\brief Forward declaration
 class Variant;
 //\brief Forward declaration
-class AbstractDataType;
+class CustomDataType;
 //\brief Forward declaration
-class AbstractDataInitializer;
+class CustomDataInitializer;
 
 
-class AbstractDataValue
+class CustomDataValue
 {
 public:
-	AbstractDataValue()
+	CustomDataValue()
 		:m_type(0),m_initializer(0){}
-	virtual ~AbstractDataValue(){};
+	virtual ~CustomDataValue(){};
 
-	const AbstractDataType* type() const			{return m_type;}
-	const AbstractDataInitializer* initializer() const	{return m_initializer;}
+	const CustomDataType* type() const			{return m_type;}
+	const CustomDataInitializer* initializer() const	{return m_initializer;}
 
-	virtual int compare( const AbstractDataValue& o) const=0;
+	virtual int compare( const CustomDataValue& o) const=0;
 	virtual std::string tostring() const=0;
 	virtual void assign( const Variant& o)=0;
 
 private:
-	friend class AbstractDataType;
-	const AbstractDataType* m_type;
-	const AbstractDataInitializer* m_initializer;
+	friend class CustomDataType;
+	const CustomDataType* m_type;
+	const CustomDataInitializer* m_initializer;
 };
 
-typedef types::CountedReference<AbstractDataValue> AbstractDataValueR;
+typedef types::CountedReference<CustomDataValue> CustomDataValueR;
 
 
-class AbstractDataInitializer
+class CustomDataInitializer
 {
 public:
-	AbstractDataInitializer(){}
-	virtual ~AbstractDataInitializer(){};
+	CustomDataInitializer(){}
+	virtual ~CustomDataInitializer(){};
 };
 
-typedef types::CountedReference<AbstractDataInitializer> AbstractDataInitializerR;
+typedef types::CountedReference<CustomDataInitializer> CustomDataInitializerR;
 
 
-typedef AbstractDataInitializer* (*CreateAbstractDataInitializer)( const std::string& description);
-typedef AbstractDataValue* (*AbstractDataValueConstructor)( const AbstractDataInitializer* initializer);
-typedef AbstractDataValue* (*AbstractDataValueCopyConstructor)( const AbstractDataValue* o);
+typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::string& description);
+typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
+typedef CustomDataValue* (*CustomDataValueCopyConstructor)( const CustomDataValue* o);
 
 
-class AbstractDataType
+class CustomDataType
 {
 public:
 	typedef unsigned int ID;
@@ -104,23 +104,23 @@ public:
 	enum {NofDimensionOperators=1};
 	enum DimensionOperatorType {Length};
 
-	typedef types::Variant (*UnaryOperator)( const AbstractDataValue& operand);
-	typedef types::Variant (*BinaryOperator)( const AbstractDataValue& operand, const Variant& arg);
-	typedef std::size_t (*DimensionOperator)( const AbstractDataValue& arg);
+	typedef types::Variant (*UnaryOperator)( const CustomDataValue& operand);
+	typedef types::Variant (*BinaryOperator)( const CustomDataValue& operand, const Variant& arg);
+	typedef std::size_t (*DimensionOperator)( const CustomDataValue& arg);
 
 public:
-	AbstractDataType()
+	CustomDataType()
 		:m_name("null"),m_id(0)
 	{
 		std::memset( &m_vmt, 0, sizeof( m_vmt));
 	}
 
-	AbstractDataType( const std::string& name_,
-				AbstractDataValueConstructor constructor_,
-				AbstractDataValueCopyConstructor copyconstructor_,
-				CreateAbstractDataInitializer initializerconstructor_);
+	CustomDataType( const std::string& name_,
+				CustomDataValueConstructor constructor_,
+				CustomDataValueCopyConstructor copyconstructor_,
+				CreateCustomDataInitializer initializerconstructor_);
 
-	AbstractDataType( const AbstractDataType& o);
+	CustomDataType( const CustomDataType& o);
 
 	void define( UnaryOperatorType type, UnaryOperator op);
 	void define( BinaryOperatorType type, BinaryOperator op);
@@ -130,9 +130,9 @@ public:
 	BinaryOperator getOperator( BinaryOperatorType type) const;
 	DimensionOperator getOperator( DimensionOperatorType type) const;
 
-	AbstractDataInitializer* createInitializer( const std::string& d) const;
-	AbstractDataValue* createValue( const AbstractDataInitializer* i=0) const;
-	AbstractDataValue* copyValue( const AbstractDataValue& o) const;
+	CustomDataInitializer* createInitializer( const std::string& d) const;
+	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
+	CustomDataValue* copyValue( const CustomDataValue& o) const;
 
 	const ID& id() const			{return m_id;}
 	const std::string& name() const		{return m_name;}
@@ -147,30 +147,30 @@ private:
 		UnaryOperator opUnary[ NofUnaryOperators];
 		BinaryOperator opBinary[ NofBinaryOperators];
 		DimensionOperator opDimension[ NofDimensionOperators];
-		CreateAbstractDataInitializer opInitializerConstructor;
-		AbstractDataValueConstructor opConstructor;
-		AbstractDataValueCopyConstructor opCopyConstructor;
+		CreateCustomDataInitializer opInitializerConstructor;
+		CustomDataValueConstructor opConstructor;
+		CustomDataValueCopyConstructor opCopyConstructor;
 	}
 	m_vmt;
 };
 
-typedef types::CountedReference<AbstractDataType> AbstractDataTypeR;
+typedef types::CountedReference<CustomDataType> CustomDataTypeR;
 
 
-typedef AbstractDataType (*CreateAbstractDataType)( const std::string& name);
+typedef CustomDataType (*CreateCustomDataType)( const std::string& name);
 
 
 
-class AbstractDataNormalizer
+class CustomDataNormalizer
 	:public types::NormalizeFunction
 {
 public:
-	AbstractDataNormalizer( const std::string& name_, const AbstractDataType* type_, const AbstractDataInitializer* initializer_)
+	CustomDataNormalizer( const std::string& name_, const CustomDataType* type_, const CustomDataInitializer* initializer_)
 		:m_name(name_)
 		,m_type(type_)
 		,m_initializer(initializer_){}
 
-	virtual ~AbstractDataNormalizer(){}
+	virtual ~CustomDataNormalizer(){}
 
 	virtual const char* name() const
 	{
@@ -181,8 +181,8 @@ public:
 
 private:
 	std::string m_name;
-	const AbstractDataType* m_type;
-	const AbstractDataInitializer* m_initializer;
+	const CustomDataType* m_type;
+	const CustomDataInitializer* m_initializer;
 };
 
 }}//namespace

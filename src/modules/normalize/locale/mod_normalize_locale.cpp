@@ -46,7 +46,7 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static langbind::ResourceHandle* createLocaleResourceHandle()
+static types::NormalizeResourceHandle* createLocaleResourceHandle()
 {
 	return new langbind::LocaleResourceHandle();
 }

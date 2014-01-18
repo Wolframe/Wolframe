@@ -308,7 +308,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 		case types::Variant::Double:
 			m_statement.bind( idx, value.tostring());
 			break;
-		case types::Variant::ADT:
+		case types::Variant::Custom:
 		case types::Variant::String:
 		{
 			std::string strval = value.tostring();

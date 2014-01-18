@@ -31,10 +31,10 @@
 
 ************************************************************************/
 ///\file types/dateTime.hpp
-///\brief ADT Interface to date arithmetic functions
-#ifndef _ADT_DATETIME_HPP_INCLUDED
-#define _ADT_DATETIME_HPP_INCLUDED
-#include "types/abstractDataType.hpp"
+///\brief Custom data type interface to date arithmetic functions
+#ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
+#define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
+#include "types/customDataType.hpp"
 #include "types/dateArithmetic.hpp"
 #include "types/variant.hpp"
 #include <boost/algorithm/string.hpp>
@@ -43,7 +43,7 @@ namespace _Wolframe {
 namespace types {
 
 class DateDataInitializer
-	:public AbstractDataInitializer
+	:public CustomDataInitializer
 {
 public:
 	DateDataInitializer( const std::string& description_)
@@ -55,7 +55,7 @@ public:
 
 	const char* format() const	{return m_format;}
 
-	static AbstractDataInitializer* create( const std::string& description_)
+	static CustomDataInitializer* create( const std::string& description_)
 	{
 		return new DateDataInitializer( description_);
 	}
@@ -67,7 +67,7 @@ private:
 
 
 class DateDataValue
-	:public AbstractDataValue
+	:public CustomDataValue
 	,public types::Date
 {
 public:
@@ -86,12 +86,12 @@ public:
 
 	const char* format() const
 	{
-		return dynamic_cast<const DateDataInitializer*>(AbstractDataValue::initializer())->format();
+		return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
 	}
 
 	virtual ~DateDataValue(){};
 
-	virtual int compare( const AbstractDataValue& o) const
+	virtual int compare( const CustomDataValue& o) const
 	{
 		if (o.type() != type())
 		{
@@ -124,12 +124,12 @@ public:
 		}
 	}
 
-	static AbstractDataValue* create( const AbstractDataInitializer*)
+	static CustomDataValue* create( const CustomDataInitializer*)
 	{
 		return new DateDataValue();
 	}
 
-	static AbstractDataValue* copy( const AbstractDataValue* o)
+	static CustomDataValue* copy( const CustomDataValue* o)
 	{
 		const DateDataValue* odt = dynamic_cast<const DateDataValue*>(o);
 		return new DateDataValue(*odt);
@@ -138,12 +138,12 @@ public:
 
 
 class DateDataType
-	:public AbstractDataType
+	:public CustomDataType
 	,public Date
 {
 public:
 	DateDataType( const std::string& name_)
-		:AbstractDataType(name_,&DateDataValue::create,&DateDataValue::copy,&DateDataInitializer::create)
+		:CustomDataType(name_,&DateDataValue::create,&DateDataValue::copy,&DateDataInitializer::create)
 	{
 		define( Increment, &increment);
 		define( Decrement, &decrement);
@@ -151,46 +151,46 @@ public:
 		define( Subtract, &subtract);
 	}
 
-	static AbstractDataType create( const std::string& name)
+	static CustomDataType create( const std::string& name)
 	{
 		return DateDataType( name);
 	}
 
 private:
-	static types::Variant increment( const AbstractDataValue& operand)
+	static types::Variant increment( const CustomDataValue& operand)
 	{
 		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.AdtRef);
+		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
 		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator+( 1));
 		return rt;
 	}
 
-	static types::Variant decrement( const AbstractDataValue& operand)
+	static types::Variant decrement( const CustomDataValue& operand)
 	{
 		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.AdtRef);
+		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
 		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator-( 1));
 		return rt;
 	}
 
-	static types::Variant add( const AbstractDataValue& operand, const Variant& arg)
+	static types::Variant add( const CustomDataValue& operand, const Variant& arg)
 	{
 		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.AdtRef);
+		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
 		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
 		return rt;
 	}
 
-	static types::Variant subtract( const AbstractDataValue& operand, const Variant& arg)
+	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg)
 	{
-		if (arg.type() == types::Variant::ADT)
+		if (arg.type() == types::Variant::Custom)
 		{
-			if (arg.data().value.AdtRef->type() == operand.type())
+			if (arg.data().value.CustomRef->type() == operand.type())
 			{
-				long daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.AdtRef));
+				long daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.CustomRef));
 				return types::Variant( daydiff);
 			}
 			else
@@ -202,7 +202,7 @@ private:
 		{
 			const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 			types::Variant rt( op->type(), op->initializer());
-			DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.AdtRef);
+			DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
 			res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
 			return rt;
 		}
