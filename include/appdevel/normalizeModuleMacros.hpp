@@ -56,7 +56,7 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::langbind::ResourceHandle* _Wolframe__createResourceHandle()\
+	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
 	{\
 		return 0;\
 	}\
@@ -83,7 +83,7 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::langbind::ResourceHandle* _Wolframe__createResourceHandle()\
+	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
 	{\
 		return new RESOURCECLASS();\
 	}\

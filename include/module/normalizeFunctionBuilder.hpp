@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of normalize functions from a description
 #ifndef _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "processor/moduleInterface.hpp"
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
@@ -45,10 +45,10 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<langbind::CreateNormalizeFunction>& functionmap_, langbind::CreateResourceHandleFunction createResourceHandle)
+	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateNormalizeFunction>& functionmap_, types::CreateNormalizeResourceHandleFunction createResourceHandle)
 		:m_classname(classname_)
 		,m_name(name_)
-		,m_resource(createResourceHandle())
+		,m_resource(createResourceHandle?createResourceHandle():0)
 		,m_functionmap(functionmap_)
 		{}
 
@@ -71,7 +71,7 @@ public:
 	{
 		FunctionMap::const_iterator fi = m_functionmap.find( name_);
 		if (fi == m_functionmap.end()) return 0;
-		return fi->second( *m_resource, arg_);
+		return fi->second( m_resource, arg_);
 	}
 
 	std::vector<std::string> functions() const
@@ -87,8 +87,8 @@ public:
 private:
 	const char* m_classname;
 	const char* m_name;
-	langbind::ResourceHandle* m_resource;
-	typedef types::keymap<langbind::CreateNormalizeFunction> FunctionMap;
+	types::NormalizeResourceHandle* m_resource;
+	typedef types::keymap<types::CreateNormalizeFunction> FunctionMap;
 	FunctionMap m_functionmap;
 };
 
@@ -98,7 +98,7 @@ typedef types::CountedReference<NormalizeFunctionConstructor> NormalizeFunctionC
 struct NormalizeFunctionDef
 {
 	const char* name;
-	langbind::CreateNormalizeFunction createFunc;
+	types::CreateNormalizeFunction createFunc;
 };
 
 class NormalizeFunctionBuilder :public SimpleBuilder
@@ -106,10 +106,10 @@ class NormalizeFunctionBuilder :public SimpleBuilder
 public:
 	//\brief Constructor
 	//\param[in] functions {0,0} terminated array of function definitions
-	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, langbind::CreateResourceHandleFunction createResourceHandle_=0)
+	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandleFunction createResourceHandle_=0)
 		:SimpleBuilder( classname_)
 		,m_name(name_)
-		,m_createResourceHandle(createResourceHandle_?createResourceHandle_:&langbind::ResourceHandle::create)
+		,m_createResourceHandle(createResourceHandle_)
 	{
 		std::size_t fi = 0;
 		for (; functions[fi].name && functions[fi].createFunc; ++fi)
@@ -133,8 +133,8 @@ public:
 
 private:
 	const char* m_name;
-	types::keymap<langbind::CreateNormalizeFunction> m_functionmap;
-	langbind::CreateResourceHandleFunction m_createResourceHandle;
+	types::keymap<types::CreateNormalizeFunction> m_functionmap;
+	types::CreateNormalizeResourceHandleFunction m_createResourceHandle;
 };
 
 }}//namespace

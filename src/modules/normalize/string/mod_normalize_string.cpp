@@ -46,8 +46,6 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static langbind::ResourceHandle stringResource;
-
 static NormalizeFunctionDef normalizeFunctions[] =
 {
 	{"trim", &langbind::createTrimNormalizeFunction},

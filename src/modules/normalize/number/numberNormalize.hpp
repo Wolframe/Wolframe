@@ -34,16 +34,16 @@
 ///\brief Interface for normalization functions of simple ASCII numbers
 #ifndef _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-types::NormalizeFunction* createIntegerNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createUnsignedNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createFloatNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
-types::NormalizeFunction* createFixedpointNormalizeFunction( ResourceHandle& reshnd, const std::string& arg);
+types::NormalizeFunction* createIntegerNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createUnsignedNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createFloatNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createFixedpointNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

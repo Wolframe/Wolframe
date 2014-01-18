@@ -33,8 +33,11 @@
 ///\file base64NormalizeFunction.cpp
 #include "base64NormalizeFunction.hpp"
 #include "types/base64.hpp"
+#include "types/variant.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <cstdlib>
+#include <sstream>
+#include <iostream>
 
 using namespace _Wolframe;
 using namespace langbind;

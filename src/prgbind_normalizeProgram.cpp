@@ -34,7 +34,7 @@
 ///\file prgbind_normalizeProgram.cpp
 
 #include "prgbind/normalizeProgram.hpp"
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
