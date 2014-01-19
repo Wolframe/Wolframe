@@ -190,7 +190,7 @@ private:
 		{
 			if (arg.data().value.CustomRef->type() == operand.type())
 			{
-				long daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.CustomRef));
+				types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.CustomRef));
 				return types::Variant( daydiff);
 			}
 			else
