@@ -268,7 +268,16 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 	if (value.defined())
 	{
 		// TODO: replace this with OracleStatement.. use type binding..
-		m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
+		if( value.type( ) == types::Variant::Bool ) {
+			if( value.tobool( ) ) {
+				// TODO: hard-wired to a NUMBER(1) with 0 and 1 for now
+				m_statement.bind( idx, "0" );
+			} else {
+				m_statement.bind( idx, "1" );
+			}
+		} else {
+			m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
+		}
 	}
 	else
 	{
@@ -599,9 +608,17 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 			boolean isInt = 0;
 			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descr.buf, &isInt );
 			if( !isInt ) {
+				double doubleval = 0;
+				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descr.buf,
+					(ub4)sizeof( doubleval ), (void *)&doubleval );
+				if( status( status_, Executed ) ) {
+					rt = doubleval;
+				} else {
+					rt = types::VariantConst( );
+				}					
 				// a NULL value, should have indicated NULL state above,
 				// but doesn't
-				rt = types::VariantConst( );
+				//~ rt = types::VariantConst( );
 			} else {
 				status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descr.buf,
 					(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );

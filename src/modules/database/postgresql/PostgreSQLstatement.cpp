@@ -94,6 +94,10 @@ void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 		case types::Variant::String:
 			bindString( value.charptr(), value.charsize());
 			break;
+
+		case types::Variant::Custom:
+			bindString( value.charptr(), value.charsize());
+			break;
 	}
 }
 

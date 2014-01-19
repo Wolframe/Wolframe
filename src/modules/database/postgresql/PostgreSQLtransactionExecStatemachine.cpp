@@ -414,7 +414,8 @@ enum PostgreSQLfieldTypes
 {
 	PGSQL_FIELD_TYPE_BOOLEAN	= 16,	// boolean
 	PGSQL_FIELD_TYPE_INT4		= 23,	// int4
-	PGSQL_FIELD_TYPE_TEXT		= 25	// text
+	PGSQL_FIELD_TYPE_TEXT		= 25,	// text
+	PGSQL_FIELD_TYPE_REAL		= 700	// real
 };
 
 types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
@@ -464,6 +465,11 @@ types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 		case PGSQL_FIELD_TYPE_INT4:
 			rt = types::VariantConst( resval );
 			rt = types::VariantConst( rt.toint( ) );
+			break;
+		
+		case PGSQL_FIELD_TYPE_REAL:
+			rt = types::VariantConst( resval );
+			rt = types::VariantConst( rt.todouble( ) );
 			break;
 			
 		case PGSQL_FIELD_TYPE_TEXT:
