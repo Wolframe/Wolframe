@@ -41,13 +41,4 @@ Project Wolframe.
 #define _WOLFRAME_INTEGER	boost::int64_t
 #define _WOLFRAME_UINTEGER	boost::uint64_t
 
-#ifndef UINT_MAX
-#error Undefined UINT_MAX
-#endif
-#if UINT_MAX == 4294967295U
-#define _WOLFRAME_INTEGER_IS_INT 0
-#else
-#define _WOLFRAME_INTEGER_IS_INT 1
-#endif
-
 #endif
