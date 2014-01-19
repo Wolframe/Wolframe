@@ -67,6 +67,8 @@ TEST( variantTypeFixture, type )
 	ASSERT_EQ( v.type( ), Variant::Int );
 	v = 47.0;
 	ASSERT_EQ( v.type( ), Variant::Double );
+	v = false;
+	ASSERT_EQ( v.type( ), Variant::Bool );
 }
 
 TEST( variantTypeFixture, casts )
@@ -79,6 +81,9 @@ TEST( variantTypeFixture, casts )
 	ASSERT_EQ( 47, v.touint( ) );
 	v.convert( Variant::Double );
 	ASSERT_DOUBLE_EQ( 47.0, v.todouble( ) );
+	v = 1;
+	v.convert( Variant::Bool );
+	ASSERT_EQ( true, v.tobool( ) );
 }
 
 TEST( variantTypeFixture, uint32 )
