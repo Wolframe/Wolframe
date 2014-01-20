@@ -592,6 +592,10 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 		case types::Variant::Null:
 			lua_pushnil( ls);
 			break;
+// MBa hack: eliminate compiler warning
+		case types::Variant::Custom:
+			throw std::logic_error("internal: Custom type in lua object");
+			break;
 
 		case types::Variant::Bool:
 			lua_pushboolean( ls, val.tobool());
