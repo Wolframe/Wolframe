@@ -30,14 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file types/dateTime.hpp
+///\file dateTime.hpp
 ///\brief Custom data type interface to date arithmetic functions
 #ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #include "types/customDataType.hpp"
 #include "types/dateArithmetic.hpp"
 #include "types/variant.hpp"
-#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -47,7 +46,7 @@ class DateDataInitializer
 {
 public:
 	DateDataInitializer( const std::string& description_)
-		:m_description( boost::trim_copy( description_))
+		:m_description( description_)
 	{
 		m_format = m_description.c_str();
 	}

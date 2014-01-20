@@ -30,19 +30,52 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of loading programs for token normalization
-///\file prgbind_normalizeProgram.cpp
+//\brief Implementation of loading programs for token normalization
+//\file prgbind_normalizeProgram.cpp
 
 #include "prgbind/normalizeProgram.hpp"
 #include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
+#include "types/customDataType.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <string>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
+
+class CustomDataNormalizer
+	:public types::NormalizeFunction
+{
+public:
+	CustomDataNormalizer( const std::string& name_, const std::string& arg, const types::CustomDataType* type_)
+		:m_name(name_)
+		,m_type(type_)
+		,m_initializer(type_->createInitializer(arg))
+	{}
+
+	virtual ~CustomDataNormalizer(){}
+
+	virtual const char* name() const
+	{
+		return m_name.c_str();
+	}
+
+	types::Variant execute( const types::Variant& i) const
+	{
+		types::Variant rt( m_type, m_initializer);
+		rt.data().value.CustomRef->assign( i);
+		return rt;
+	}
+
+private:
+	std::string m_name;
+	const types::CustomDataType* m_type;
+	types::CustomDataInitializer* m_initializer;
+};
 
 static types::NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
 {

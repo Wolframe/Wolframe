@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs for token normalization
-///\file prgbind/normalizeProgram.hpp
+//\brief Interface for loading programs for token normalization
+//\file prgbind/normalizeProgram.hpp
 
 #ifndef _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED

@@ -50,8 +50,10 @@ struct throws_exception
 		Unknown,			//< uknown error
 		DimOutOfRange,			//< memory reserved for statically allocated table or memory block is too small. Increase the size of memory block passed to the XML path select automaton. Usage error !
 		StateNumbersNotAscending,	//< XML scanner automaton definition check failed. Labels of states must be equal to their indices. Internal textwold error !
-		InvalidParam,			//< parameter check in automaton definition failed. Internal textwold error !
-		InvalidState,			//< invalied state definition in automaton. Internal textwold error !
+		InvalidParamState,		//< parameter check (for state) in automaton definition failed. Internal textwold error !
+		InvalidParamChar,		//< parameter check (for control character) in automaton definition failed. Internal textwold error !
+		DuplicateStateTransition,	//< duplicate transition definition in automaton. Internal textwold error !
+		InvalidState,			//< invalid state definition in automaton. Internal textwold error !
 		IllegalParam,			//< parameter check in automaton definition failed. Internal textwold error !
 		IllegalAttributeName,		//< invalid string for a tag or attribute in the automaton definition. Usage error !
 		OutOfMem,			//< out of memory in the automaton definition. System error (std::bad_alloc) !
@@ -88,10 +90,10 @@ struct exception	:public std::exception
 	virtual const char* what() const throw()
 	{
 		// enumeration of exception causes as strings
-		static const char* nameCause[ 10] = {
-			"Unknown","DimOutOfRange","StateNumbersNotAscending","InvalidParam",
-			"InvalidState","IllegalParam","IllegalAttributeName","OutOfMem",
-			"ArrayBoundsReadWrite","NotAllowedOperation"
+		static const char* nameCause[ 12] = {
+			"Unknown","DimOutOfRange","StateNumbersNotAscending","InvalidParamState",
+			"InvalidParamChar","DuplicateStateTransition","InvalidState","IllegalParam",
+			"IllegalAttributeName","OutOfMem","ArrayBoundsReadWrite","NotAllowedOperation"
 		};
 		return nameCause[ (unsigned int) cause];
 	}

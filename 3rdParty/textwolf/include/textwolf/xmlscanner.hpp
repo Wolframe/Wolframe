@@ -105,7 +105,7 @@ private:
 	void addOtherTransition( int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
-		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParam);
+		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParamState);
 		for (unsigned int inputchr=0; inputchr<NofControlCharacter; inputchr++)
 		{
 			if (tab[ size-1].next[ inputchr] == -1) tab[ size-1].next[ inputchr] = (unsigned char)nextState;
@@ -119,10 +119,9 @@ private:
 	void addTransition( ControlCharacter inputchr, int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
-		if ((unsigned int)inputchr >= (unsigned int)NofControlCharacter)  throw exception( InvalidParam);
-		if (nextState < 0 || nextState > MaxNofStates)  throw exception( InvalidParam);
-		if (tab[ size-1].next[ inputchr] != -1)  throw exception( InvalidParam);
-		if (size == 0)  throw exception( InvalidState);
+		if (inputchr >= NofControlCharacter) throw exception( InvalidParamChar);
+		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParamState);
+		if (tab[ size-1].next[ inputchr] != -1) throw exception( DuplicateStateTransition);
 		tab[ size-1].next[ inputchr] = (unsigned char)nextState;
 		tab[ size-1].nofnext += 1;
 	}
@@ -160,7 +159,7 @@ private:
 	{
 		if (size == 0) throw exception( InvalidState);
 		if (tab[ size-1].fallbackState != -1) throw exception( InvalidState);
-		if (stateIdx < 0 || stateIdx > MaxNofStates) throw exception( InvalidParam);
+		if (stateIdx < 0 || stateIdx > MaxNofStates) throw exception( InvalidParamState);
 		tab[ size-1].fallbackState = stateIdx;
 	}
 public:

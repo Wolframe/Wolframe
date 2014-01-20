@@ -37,7 +37,6 @@ Project Wolframe.
 #include <string>
 #include <cstring>
 #include "types/countedReference.hpp"
-#include "types/normalizeFunction.hpp"
 
 namespace _Wolframe {
 namespace proc
@@ -159,31 +158,6 @@ typedef types::CountedReference<CustomDataType> CustomDataTypeR;
 
 typedef CustomDataType (*CreateCustomDataType)( const std::string& name);
 
-
-
-class CustomDataNormalizer
-	:public types::NormalizeFunction
-{
-public:
-	CustomDataNormalizer( const std::string& name_, const CustomDataType* type_, const CustomDataInitializer* initializer_)
-		:m_name(name_)
-		,m_type(type_)
-		,m_initializer(initializer_){}
-
-	virtual ~CustomDataNormalizer(){}
-
-	virtual const char* name() const
-	{
-		return m_name.c_str();
-	}
-
-	virtual Variant execute( const Variant& i) const;
-
-private:
-	std::string m_name;
-	const CustomDataType* m_type;
-	const CustomDataInitializer* m_initializer;
-};
 
 }}//namespace
 #endif

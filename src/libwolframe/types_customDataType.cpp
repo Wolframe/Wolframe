@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Implementation of custom data type for variant
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
-#include "processor/procProvider.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
@@ -108,14 +107,6 @@ CustomDataValue* CustomDataType::copyValue( const CustomDataValue& o) const
 	CustomDataValue* rt = (*m_vmt.opCopyConstructor)( &o);
 	rt->m_type = this;
 	rt->m_initializer = o.m_initializer;
-	return rt;
-}
-
-
-Variant CustomDataNormalizer::execute( const Variant& i) const
-{
-	Variant rt( m_type, m_initializer);
-	rt.data().value.CustomRef->assign( i);
 	return rt;
 }
 
