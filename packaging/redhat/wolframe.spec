@@ -1391,6 +1391,8 @@ fi
 %{_libdir}/wolframe/modules/mod_normalize_number.so
 %{_libdir}/wolframe/modules/mod_normalize_base64.so
 
+%{_libdir}/wolframe/modules/mod_datatype_datetime.so
+
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
 %endif

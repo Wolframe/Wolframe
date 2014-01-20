@@ -132,6 +132,8 @@ static void setAtomicElemAttributes( Header& hdr, const types::VariantStruct& st
 		case types::VariantStruct::Int:
 		case types::VariantStruct::UInt:
 		case types::VariantStruct::String:
+// MBa hack: eliminate compiler warning
+		case types::VariantStruct::Custom:
 		{
 			hdr.define( "value", ((const types::Variant)st).tostring());
 			break;
@@ -214,6 +216,8 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 			case types::VariantStruct::Int:
 			case types::VariantStruct::UInt:
 			case types::VariantStruct::String:
+// MBa hack: eliminate compiler warning
+			case types::VariantStruct::Custom:
 				hdr.define( "attribute", stk.back().itr->attribute()?"yes":"no");
 				if (stk.back().itr->initvalue)
 				{

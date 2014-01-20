@@ -44,12 +44,16 @@ void PostgreSQLstatement::init( const std::string& stmstr)
 
 void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 {
-	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("iternal: wrong order of bind param in postgreSQL database module");
+	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
 
 	switch (value.type())
 	{
 		case types::Variant::Null:
 			bindNull();
+			break;
+// MBa hack: eliminate compiler warning
+		case types::Variant::Custom:
+			throw std::logic_error("internal: Custom type in postgreSQL database module");
 			break;
 
 		case types::Variant::Int:
@@ -287,7 +291,7 @@ PGresult* PostgreSQLstatement::execute( PGconn *conn) const
 	getParams( params);
 
 	return PQexecParams(
-			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/, 
+			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
 			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
 }
 
