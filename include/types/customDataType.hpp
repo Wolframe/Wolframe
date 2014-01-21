@@ -100,9 +100,12 @@ public:
 	enum UnaryOperatorType {Increment,Decrement,Negation};
 	enum {NofBinaryOperators=6};
 	enum BinaryOperatorType {Add,Subtract,Multiply,Divide,Power,Concat};
+	enum {NofConversionOperators=5};
+	enum ConversionOperatorType {ToString,ToInt,ToUInt,ToNumber,ToDate};
 	enum {NofDimensionOperators=1};
 	enum DimensionOperatorType {Length};
 
+	typedef types::Variant (*ConversionOperator)( const CustomDataValue& operand);
 	typedef types::Variant (*UnaryOperator)( const CustomDataValue& operand);
 	typedef types::Variant (*BinaryOperator)( const CustomDataValue& operand, const Variant& arg);
 	typedef std::size_t (*DimensionOperator)( const CustomDataValue& arg);
@@ -123,8 +126,10 @@ public:
 
 	void define( UnaryOperatorType type, UnaryOperator op);
 	void define( BinaryOperatorType type, BinaryOperator op);
+	void define( ConversionOperatorType type, ConversionOperator op);
 	void define( DimensionOperatorType type, DimensionOperator op);
 
+	ConversionOperator getOperator( ConversionOperatorType type) const;
 	UnaryOperator getOperator( UnaryOperatorType type) const;
 	BinaryOperator getOperator( BinaryOperatorType type) const;
 	DimensionOperator getOperator( DimensionOperatorType type) const;
@@ -146,6 +151,7 @@ private:
 		UnaryOperator opUnary[ NofUnaryOperators];
 		BinaryOperator opBinary[ NofBinaryOperators];
 		DimensionOperator opDimension[ NofDimensionOperators];
+		ConversionOperator opConversion[ NofConversionOperators];
 		CreateCustomDataInitializer opInitializerConstructor;
 		CustomDataValueConstructor opConstructor;
 		CustomDataValueCopyConstructor opCopyConstructor;
@@ -156,7 +162,7 @@ private:
 typedef types::CountedReference<CustomDataType> CustomDataTypeR;
 
 
-typedef CustomDataType (*CreateCustomDataType)( const std::string& name);
+typedef CustomDataType* (*CreateCustomDataType)( const std::string& name);
 
 
 }}//namespace

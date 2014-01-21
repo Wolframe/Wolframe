@@ -29,13 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file module/luaExtensionBuilder.hpp
+///\file module/customDataTypeBuilder.hpp
 ///\brief Interface template for object builder of form functions
-#ifndef _Wolframe_MODULE_LUA_LANGUAGE_EXTENSION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_LUA_LANGUAGE_EXTENSION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#ifndef _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
+#define _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
 #include "processor/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include "types/customDataType.hpp"
+#include "types/keymap.hpp"
 #include <string>
 #include <cstring>
 #include <stdexcept>
@@ -47,10 +48,17 @@ namespace module {
 class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
-	CustomDataTypeConstructor( const char* classname_, const std::string& typename_, types::CreateCustomDataType cdt_constructor_)
+	CustomDataTypeConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateCustomDataType>& constructormap_)
 		:m_classname(classname_)
-		,m_typename(typename_)
-		,m_cdt_constructor(cdt_constructor_) {}
+		,m_name(name_)
+	{
+		types::keymap<types::CreateCustomDataType>::const_iterator ci = constructormap_.begin(), ce = constructormap_.end();
+		for (; ci != ce; ++ci)
+		{
+			types::CustomDataTypeR dt( ci->second( ci->first));
+			m_typemap.insert( ci->first, dt);
+		}
+	}
 
 	virtual ~CustomDataTypeConstructor(){}
 
@@ -58,37 +66,58 @@ public:
 	{
 		return CUSTOM_DATA_TYPE_OBJECT;
 	}
-	virtual types::CustomDataType object() const
+
+	const types::CustomDataType* object( const std::string& name_) const
 	{
-		return (*m_cdt_constructor)( m_typename);
+		ConstructorMap::const_iterator fi = m_typemap.find( name_);
+		if (fi == m_typemap.end()) return 0;
+		return fi->second.get();
 	}
+
+	std::vector<std::string> types() const
+	{
+		return m_typemap.getkeys<std::vector<std::string> >();
+	}
+
 	virtual const char* objectClassName() const
 	{
 		return m_classname;
 	}
 
-	const std::string& name() const
+	const char* domain() const
 	{
-		return m_typename;
+		return m_name;
 	}
 
 private:
 	const char* m_classname;
-	std::string m_typename;
-	types::CreateCustomDataType m_cdt_constructor;
+	const char* m_name;
+	typedef types::keymap<types::CustomDataTypeR> ConstructorMap;
+	ConstructorMap m_typemap;
 };
 
 typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;
 
 
+struct CustomDataTypeDef
+{
+	const char* name;
+	types::CreateCustomDataType createFunc;
+};
+
 class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:
-	CustomDataTypeBuilder( const char* classname_, const char* typename_, types::CreateCustomDataType cdt_constructor_)
+	CustomDataTypeBuilder( const char* classname_, const char* name_, const CustomDataTypeDef* typedefs)
 		:SimpleBuilder(classname_)
-		,m_typename(typename_)
-		,m_cdt_constructor(cdt_constructor_)
-	{}
+		,m_name(name_)
+	{
+		std::size_t ti = 0;
+		for (; typedefs[ti].name && typedefs[ti].createFunc; ++ti)
+		{
+			m_constructormap.insert( std::string(typedefs[ti].name), typedefs[ti].createFunc);
+		}
+	}
 
 	virtual ~CustomDataTypeBuilder(){}
 
@@ -99,12 +128,13 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CustomDataTypeConstructor( objectClassName(), m_typename, m_cdt_constructor);
+		return new CustomDataTypeConstructor( objectClassName(), m_name, m_constructormap);
 	}
 
 private:
-	std::string m_typename;
-	types::CreateCustomDataType m_cdt_constructor;
+	const char* m_name;
+	typedef types::keymap<types::CreateCustomDataType> ConstructorMap;
+	ConstructorMap m_constructormap;
 };
 
 }}//namespace

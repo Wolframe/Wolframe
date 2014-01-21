@@ -46,12 +46,18 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
+static CustomDataTypeDef customDataTypes[] =
+{
+	{"datetime", &types::DateDataType::create},
+	{0,0}
+};
+
 namespace {
 struct DateTimeBuilder
 {
 	static SimpleBuilder* constructor()
 	{
-		return new CustomDataTypeBuilder( "CustomDataType:datetime", "datetime", types::DateDataType::create);
+		return new CustomDataTypeBuilder( "DateTimeArithmeticTypes", "dta", customDataTypes);
 	}
 };
 }//anonymous namespace
