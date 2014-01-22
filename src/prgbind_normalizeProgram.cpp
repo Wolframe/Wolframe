@@ -70,7 +70,7 @@ public:
 	types::Variant execute( const types::Variant& i) const
 	{
 		types::Variant rt( m_type, m_initializer);
-		rt.data().value.CustomRef->assign( i);
+		rt.data().value.Custom->assign( i);
 		return rt;
 	}
 

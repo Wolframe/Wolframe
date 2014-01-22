@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file dateTime.hpp
+///\file datatypeDate.hpp
 ///\brief Custom data type interface to date arithmetic functions
 #ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
@@ -78,7 +78,7 @@ public:
 
 	///\brief Copy constructor
 	DateDataValue( const DateDataValue& o)
-		:Date(o){}
+		:CustomDataValue(o),Date(o){}
 
 	DateDataValue()
 		{}
@@ -123,15 +123,14 @@ public:
 		}
 	}
 
+	virtual CustomDataValue* copy() const
+	{
+		return new DateDataValue(*this);
+	}
+
 	static CustomDataValue* create( const CustomDataInitializer*)
 	{
 		return new DateDataValue();
-	}
-
-	static CustomDataValue* copy( const CustomDataValue* o)
-	{
-		const DateDataValue* odt = dynamic_cast<const DateDataValue*>(o);
-		return new DateDataValue(*odt);
 	}
 };
 
@@ -142,12 +141,14 @@ class DateDataType
 {
 public:
 	DateDataType( const std::string& name_)
-		:CustomDataType(name_,&DateDataValue::create,&DateDataValue::copy,&DateDataInitializer::create)
+		:CustomDataType(name_,&DateDataValue::create,&DateDataInitializer::create)
 	{
 		define( Increment, &increment);
 		define( Decrement, &decrement);
 		define( Add, &add);
 		define( Subtract, &subtract);
+		define( ToTimestamp, &toTimestamp);
+		define( ToInt, &toInt);
 	}
 
 	static CustomDataType* create( const std::string& name)
@@ -156,56 +157,12 @@ public:
 	}
 
 private:
-	static types::Variant increment( const CustomDataValue& operand)
-	{
-		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
-		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
-		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator+( 1));
-		return rt;
-	}
-
-	static types::Variant decrement( const CustomDataValue& operand)
-	{
-		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
-		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
-		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator-( 1));
-		return rt;
-	}
-
-	static types::Variant add( const CustomDataValue& operand, const Variant& arg)
-	{
-		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
-		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
-		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
-		return rt;
-	}
-
-	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg)
-	{
-		if (arg.type() == types::Variant::Custom)
-		{
-			if (arg.data().value.CustomRef->type() == operand.type())
-			{
-				types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.CustomRef));
-				return types::Variant( daydiff);
-			}
-			else
-			{
-				throw std::runtime_error("illegal argument for date subtraction");
-			}
-		}
-		else 
-		{
-			const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
-			types::Variant rt( op->type(), op->initializer());
-			DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
-			res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
-			return rt;
-		}
-	}
+	static types::Variant increment( const CustomDataValue& operand);
+	static types::Variant decrement( const CustomDataValue& operand);
+	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant toTimestamp( const CustomDataValue& operand);
+	static types::Variant toInt( const CustomDataValue& operand);
 };
 
 }}//namespace

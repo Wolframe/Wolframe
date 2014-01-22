@@ -40,14 +40,12 @@ using namespace _Wolframe::types;
 CustomDataType::CustomDataType(
 			const std::string& name_,
 			CustomDataValueConstructor constructor_,
-			CustomDataValueCopyConstructor copyconstructor_,
 			CreateCustomDataInitializer initializerconstructor_)
 	:m_name(name_),m_id(0)
 {
 	std::memset( &m_vmt, 0, sizeof( m_vmt));
 	m_vmt.opInitializerConstructor = initializerconstructor_;
 	m_vmt.opConstructor = constructor_;
-	m_vmt.opCopyConstructor = copyconstructor_;
 }
 
 CustomDataType::CustomDataType( const CustomDataType& o)
@@ -113,12 +111,5 @@ CustomDataValue* CustomDataType::createValue( const CustomDataInitializer* i) co
 	return rt;
 }
 
-CustomDataValue* CustomDataType::copyValue( const CustomDataValue& o) const
-{
-	CustomDataValue* rt = (*m_vmt.opCopyConstructor)( &o);
-	rt->m_type = this;
-	rt->m_initializer = o.m_initializer;
-	return rt;
-}
 
 
