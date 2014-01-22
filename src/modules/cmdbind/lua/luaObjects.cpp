@@ -71,6 +71,7 @@ namespace luaname
 	static const char* Filter = "wolframe.Filter";
 	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
 	static const char* Form = "wolframe.Form";
+	static const char* Custom = "wolframe.Custom";
 	static const char* DDLFormParser = "wolframe.DDLFormParser";
 	static const char* DDLFormSerializer = "wolframe.DDLFormSerializer";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
@@ -93,6 +94,7 @@ template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
 template <> const char* metaTableName<types::FormR>()			{return luaname::Form;}
+template <> const char* metaTableName<types::CustomDataValueR>()	{return luaname::Custom;}
 template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
 template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
@@ -195,8 +197,6 @@ struct LuaObject
 		try
 		{
 			const char* mt = metaTableName<ObjectType>();
-// MBa: this generates an warning. Maybe the fix is wrong...
-//			LuaObject* THIS = (LuaObject*)(void*)new (ls,mt) LuaObject( o);
 			new (ls,mt) LuaObject( o);
 		}
 		catch (const std::bad_alloc&)
@@ -333,16 +333,16 @@ static void check_parameters( lua_State* ls, int si, int nn, ...)
 		if (anum > nn+si) throw std::runtime_error( "too many arguments");
 		if (anum < nn+si) throw std::runtime_error( "too few arguments");
 	}
-	for (int ii = si; ii < nn; ++ii)
+	for (int ii = 0; ii < nn; ++ii)
 	{
 		int expect = va_arg( aa, int);
-		int typ = lua_type( ls, -ii-1);
+		int typ = lua_type( ls, si+ii+1);
 		if (typ != expect)
 		{
 			const char* expectname = lua_typename( ls, expect);
 			const char* typname = lua_typename( ls, typ);
 			std::ostringstream msg;
-			msg << "expected " << (expectname?expectname:"?") << " instead of " << (typname?typname:"?") << " as argument " << (ii-si+1);
+			msg << "expected " << (expectname?expectname:"?") << " instead of " << (typname?typname:"?") << " as argument " << (ii+1);
 			throw std::runtime_error( msg.str());
 		}
 	}
@@ -560,7 +560,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 	throw std::runtime_error( "illegal state when fetching next element");
 }
 
-static void getVariantValue( lua_State* ls, types::Variant& val, int idx)
+static void getVariantValue( lua_State* ls, types::VariantConst& val, int idx)
 {
 	std::size_t val_len;
 	const char* val_str;
@@ -576,9 +576,19 @@ static void getVariantValue( lua_State* ls, types::Variant& val, int idx)
 
 		case LUA_TSTRING:
 			val_str = lua_tolstring( ls, idx, &val_len);
-			val.initConstant( val_str, val_len);
+			val.init( val_str, val_len);
 			break;
 
+		case LUA_TUSERDATA:
+		{
+			types::CustomDataValueR* custom = LuaObject<types::CustomDataValueR>::get( ls, idx);
+			if (!custom)
+			{
+				throw std::runtime_error( "custom data type expected in case of user defined type for atomic 'variant type' argument");
+			}
+			val.init( custom->get());
+			break;
+		}
 		default:
 			throw std::runtime_error( "atomic value expected for 'variant type' argument");
 	}
@@ -592,9 +602,9 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 		case types::Variant::Null:
 			lua_pushnil( ls);
 			break;
-// MBa hack: eliminate compiler warning
+
 		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in lua object");
+			LuaObject<types::CustomDataValueR>::push_luastack( ls, types::CustomDataValueR( val.data().value.Custom->copy()));
 			break;
 
 		case types::Variant::Bool:
@@ -642,7 +652,7 @@ LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
 		throw std::runtime_error( "atomic value expected for 'variant type' argument");
 
 	}
-	types::Variant param;
+	types::VariantConst param;
 	getVariantValue( ls, param, 1);
 	types::Variant result = func->execute( param);
 	pushVariantValue( ls, result);
@@ -1942,6 +1952,163 @@ LUA_FUNCTION_THROWS( "input:form()", function_input_form)
 }
 
 
+static int callUnaryOperator( lua_State* ls, types::CustomDataType::UnaryOperatorType optype, const types::CustomDataValue* operand)
+{
+	check_parameters( ls, 1, 0);
+	types::CustomDataType::UnaryOperator opfunc = operand->type()->getOperator( optype);
+	if (!opfunc) throw std::runtime_error( std::string( "undefined unary operator '") + types::CustomDataType::unaryOperatorTypeName( optype) + "' for custom data type '" + operand->type()->name() + "'");
+	pushVariantValue( ls, opfunc( *operand));
+	return 1;
+}
+
+static int callBinaryOperator( lua_State* ls, types::CustomDataType::BinaryOperatorType optype, const types::CustomDataValue* operand)
+{
+	int nofarg = lua_gettop( ls);
+	if (nofarg < 2)
+	{
+		throw std::runtime_error( "too few arguments");
+	}
+	else if (nofarg > 2)
+	{
+		throw std::runtime_error( "too many arguments");
+	}
+	types::VariantConst arg;
+	getVariantValue( ls, arg, 2);
+	types::CustomDataType::BinaryOperator opfunc = operand->type()->getOperator( optype);
+	if (!opfunc) throw std::runtime_error( std::string( "undefined binary operator '") + types::CustomDataType::binaryOperatorTypeName( optype) + "' for custom data type '" + operand->type()->name() + "'");
+	pushVariantValue( ls, (*opfunc)( *operand, arg));
+	return 1;
+}
+
+static int callConversionOperator( lua_State* ls, types::CustomDataType::ConversionOperatorType optype, const types::CustomDataValue* operand)
+{
+	types::CustomDataType::ConversionOperator opfunc = operand->type()->getOperator( optype);
+	if (!opfunc) throw std::runtime_error( std::string( "undefined conversion operator '") + types::CustomDataType::conversionOperatorTypeName( optype) + "' for custom data type '" + operand->type()->name() + "'");
+	pushVariantValue( ls, (*opfunc)( *operand));
+	return 1;
+}
+
+static int callDimensionOperator( lua_State* ls, types::CustomDataType::DimensionOperatorType optype, const types::CustomDataValue* operand)
+{
+	types::CustomDataType::DimensionOperator opfunc = operand->type()->getOperator( optype);
+	if (!opfunc) throw std::runtime_error( std::string( "undefined dimension operator '") + types::CustomDataType::dimensionOperatorTypeName( optype) + "' for custom data type '" + operand->type()->name() + "'");
+	lua_pushinteger( ls, (*opfunc)( *operand));
+	return 1;
+}
+
+static int callCompare( lua_State* ls, const types::CustomDataValue* operand)
+{
+	int nofarg = lua_gettop( ls);
+	if (nofarg < 2)
+	{
+		throw std::runtime_error( "too few arguments");
+	}
+	else if (nofarg > 2)
+	{
+		throw std::runtime_error( "too many arguments");
+	}
+	types::VariantConst arg;
+	getVariantValue( ls, arg, 2);
+	if (arg.type() == types::Variant::Custom)
+	{
+		if (arg.data().value.Custom->type() == operand->type())
+		{
+			return operand->compare( *arg.data().value.Custom);
+		}
+		else
+		{
+			throw  std::runtime_error("different custom data type values are uncomparable");
+		}
+	}
+	else
+	{
+		types::CustomDataValueR cstarg( operand->type()->createValue( operand->initializer()));
+		cstarg->assign( arg);
+		return operand->compare( *cstarg.get());
+	}
+}
+
+LUA_FUNCTION_THROWS( "custom:__unm()", function_customtype_unm)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__unm");
+	return callUnaryOperator( ls, types::CustomDataType::Negation, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__add()", function_customtype_add)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__add");
+	return callBinaryOperator( ls, types::CustomDataType::Add, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__sub()", function_customtype_sub)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__sub");
+	return callBinaryOperator( ls, types::CustomDataType::Subtract, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__mul()", function_customtype_mul)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__mul");
+	return callBinaryOperator( ls, types::CustomDataType::Multiply, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__div()", function_customtype_div)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__div");
+	return callBinaryOperator( ls, types::CustomDataType::Divide, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__pow()", function_customtype_pow)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__pow");
+	return callBinaryOperator( ls, types::CustomDataType::Power, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__concat()", function_customtype_concat)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__concat");
+	return callBinaryOperator( ls, types::CustomDataType::Concat, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__tostring()", function_customtype_tostring)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__tostring");
+	std::string val( (*operand)->tostring());
+	lua_pushlstring( ls, val.c_str(), val.size());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "custom:tonumber()", function_customtype_tonumber)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "tonumber");
+	return callConversionOperator( ls, types::CustomDataType::ToNumber, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__len()", function_customtype_len)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__len");
+	return callDimensionOperator( ls, types::CustomDataType::Length, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:__eq()", function_customtype_eq)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__eq");
+	return (0==callCompare( ls, operand->get()));
+}
+
+LUA_FUNCTION_THROWS( "custom:__lt()", function_customtype_lt)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__lt");
+	return (0>callCompare( ls, operand->get()));
+}
+
+LUA_FUNCTION_THROWS( "custom:__le()", function_customtype_le)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__le");
+	return (0>=callCompare( ls, operand->get()));
+}
+
+
 LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 {
 	/* first parameter maps to a log level, rest gets printed depending on
@@ -2005,7 +2172,6 @@ LUA_FUNCTION_THROWS( "logger.printc(..)", function_logger_printc)
 	std::cerr << logmsg << "\n";
 	return 0;
 }
-
 
 static const luaL_Reg logger_methodtable[ 3] =
 {
@@ -2071,6 +2237,24 @@ static const luaL_Reg provider_methodtable[ 5] =
 	{"form",&function_form},
 	{"formfunction",&function_formfunction},
 	{"normalizer",&function_normalizer},
+	{0,0}
+};
+
+static const luaL_Reg customtype_methodtable[ 14] =
+{
+	{"__unm", &function_customtype_unm},
+	{"__add", &function_customtype_add},
+	{"__sub", &function_customtype_sub},
+	{"__mul", &function_customtype_mul},
+	{"__div", &function_customtype_div},
+	{"__pow", &function_customtype_pow},
+	{"__concat", &function_customtype_concat},
+	{"__tostring", &function_customtype_tostring},
+	{"__len", &function_customtype_len},
+	{"__eq", &function_customtype_eq},
+	{"__lt", &function_customtype_lt},
+	{"__le", &function_customtype_le},
+	{"tonumber", &function_customtype_tonumber},
 	{0,0}
 };
 

@@ -55,7 +55,7 @@ public:
 		types::keymap<types::CreateCustomDataType>::const_iterator ci = constructormap_.begin(), ce = constructormap_.end();
 		for (; ci != ce; ++ci)
 		{
-			types::CustomDataTypeR dt( ci->second( ci->first));
+			types::CustomDataTypeR dt( ci->second( std::string(m_name) + ":" + ci->first));
 			m_typemap.insert( ci->first, dt);
 		}
 	}
@@ -79,6 +79,15 @@ public:
 		return m_typemap.getkeys<std::vector<std::string> >();
 	}
 
+	void getTypeReferences( std::vector<const types::CustomDataType*>& result) const
+	{
+		ConstructorMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
+		for (; ti != te; ++ti)
+		{
+			result.push_back( ti->second.get());
+		}
+	}
+	
 	virtual const char* objectClassName() const
 	{
 		return m_classname;

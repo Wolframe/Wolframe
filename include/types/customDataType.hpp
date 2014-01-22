@@ -59,14 +59,17 @@ class CustomDataValue
 public:
 	CustomDataValue()
 		:m_type(0),m_initializer(0){}
+	CustomDataValue( const CustomDataValue& o)
+		:m_type(o.m_type),m_initializer(o.m_initializer){}
 	virtual ~CustomDataValue(){};
 
-	const CustomDataType* type() const			{return m_type;}
-	const CustomDataInitializer* initializer() const	{return m_initializer;}
+	const CustomDataType* type() const				{return m_type;}
+	const CustomDataInitializer* initializer() const		{return m_initializer;}
 
 	virtual int compare( const CustomDataValue& o) const=0;
 	virtual std::string tostring() const=0;
 	virtual void assign( const Variant& o)=0;
+	virtual CustomDataValue* copy() const=0;
 
 private:
 	friend class CustomDataType;
@@ -89,7 +92,6 @@ typedef types::CountedReference<CustomDataInitializer> CustomDataInitializerR;
 
 typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::string& description);
 typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
-typedef CustomDataValue* (*CustomDataValueCopyConstructor)( const CustomDataValue* o);
 
 
 class CustomDataType
@@ -98,12 +100,32 @@ public:
 	typedef unsigned int ID;
 	enum {NofUnaryOperators=3};
 	enum UnaryOperatorType {Increment,Decrement,Negation};
+	static const char* unaryOperatorTypeName( UnaryOperatorType i)
+	{
+		static const char* ar[] = {"increment","decrement","negation"};
+		return ar[(int)i];
+	}
 	enum {NofBinaryOperators=6};
 	enum BinaryOperatorType {Add,Subtract,Multiply,Divide,Power,Concat};
+	static const char* binaryOperatorTypeName( BinaryOperatorType i)
+	{
+		static const char* ar[] = {"add","subtract","multiply","divide","power","concat"};
+		return ar[(int)i];
+	}
 	enum {NofConversionOperators=5};
-	enum ConversionOperatorType {ToString,ToInt,ToUInt,ToNumber,ToDate};
+	enum ConversionOperatorType {ToString,ToInt,ToUInt,ToNumber,ToTimestamp};
+	static const char* conversionOperatorTypeName( ConversionOperatorType i)
+	{
+		static const char* ar[] = {"tostring","toint","touint","tonumber","totimestamp"};
+		return ar[(int)i];
+	}
 	enum {NofDimensionOperators=1};
 	enum DimensionOperatorType {Length};
+	static const char* dimensionOperatorTypeName( DimensionOperatorType i)
+	{
+		static const char* ar[] = {"length"};
+		return ar[(int)i];
+	}
 
 	typedef types::Variant (*ConversionOperator)( const CustomDataValue& operand);
 	typedef types::Variant (*UnaryOperator)( const CustomDataValue& operand);
@@ -112,14 +134,13 @@ public:
 
 public:
 	CustomDataType()
-		:m_name("null"),m_id(0)
+		:m_id(0)
 	{
 		std::memset( &m_vmt, 0, sizeof( m_vmt));
 	}
 
 	CustomDataType( const std::string& name_,
 				CustomDataValueConstructor constructor_,
-				CustomDataValueCopyConstructor copyconstructor_,
 				CreateCustomDataInitializer initializerconstructor_);
 
 	CustomDataType( const CustomDataType& o);
@@ -136,7 +157,6 @@ public:
 
 	CustomDataInitializer* createInitializer( const std::string& d) const;
 	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
-	CustomDataValue* copyValue( const CustomDataValue& o) const;
 
 	const ID& id() const			{return m_id;}
 	const std::string& name() const		{return m_name;}
@@ -154,7 +174,6 @@ private:
 		ConversionOperator opConversion[ NofConversionOperators];
 		CreateCustomDataInitializer opInitializerConstructor;
 		CustomDataValueConstructor opConstructor;
-		CustomDataValueCopyConstructor opCopyConstructor;
 	}
 	m_vmt;
 };
