@@ -249,10 +249,10 @@ void SQLiteDatabase::closeTransaction( Transaction *t )
 }
 
 
-//~ const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
-//~ {
-	//~ return new SQLiteUIlibrary( *this );
-//~ }
+const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
+{
+	return new SQLiteUIlibrary( *this );
+}
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::string& name_)
@@ -261,118 +261,117 @@ SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::strin
 
 
 /*****  SQLite user interface library  ********************************/
-// Aba: should be deleted IMHO, doesn't belong here
-//~ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
-	//~ : m_unit( database.dbUnit() )
-//~ {}
-//~ 
-//~ 
-//~ const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
-									 //~ const std::string& role,
-									 //~ const std::string& culture,
-									 //~ const std::string& tag ) const
-//~ {
-	//~ std::list< std::string > roles;
-	//~ roles.push_back( role );
-	//~ return userInterface( platform, roles, culture, tag );
-//~ }
-//~ 
-//~ const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
-									 //~ const std::list< std::string >& roles,
-									 //~ const std::string& culture,
-									 //~ const std::string& /*tag*/ ) const
-//~ {
-	//~ std::list< UI::InterfaceObject::Info >	objs;
-//~ 
-	//~ bool condition = false;
-	//~ PoolObject< sqlite3* > conn( m_unit.m_connPool );
-	//~ sqlite3_stmt* ppStmt = NULL;
-	//~ std::ostringstream errMsg;
-	//~ bool success = true;
-//~ 
-	//~ std::string query = "SELECT platform.name, locale, typeName "
-			//~ "FROM UIobject JOIN Platform ON Platform.ID = UIobject.platformID "
-			//~ "JOIN UIobjectType ON UIobject.typeID=UIobjectType.ID";
-//~ 
-	//~ std::string cond = " WHERE ";
-	//~ if ( ! platform.empty() )	{
-		//~ cond += "upper( Platform.name ) = "
-				//~ + boost::algorithm::to_upper_copy( platform );
-		//~ condition = true;
-	//~ }
-//~ 
-	//~ if ( ! roles.empty() )	{
-		//~ if ( condition )
-			//~ cond += "AND upper( Platform.name ) = "
-					//~ + boost::algorithm::to_upper_copy( platform );
-		//~ else	{
-			//~ cond += "";
-			//~ condition = true;
-		//~ }
-	//~ }
-//~ 
-	//~ if ( ! culture.empty() )	{
-		//~ if ( condition )
-			//~ cond += "AND upper( culture ) = "
-					//~ + boost::algorithm::to_upper_copy( culture );
-		//~ else	{
-			//~ cond += "upper( culture ) = "
-					//~ + boost::algorithm::to_upper_copy( culture );
-			//~ condition = true;
-		//~ }
-	//~ }
-//~ 
-	//~ if ( condition )
-		//~ query += cond;
-	//~ int rc = sqlite3_prepare_v2( *conn, query.c_str(), -1, &ppStmt, NULL );
-	//~ if ( rc != SQLITE_OK )	{
-		//~ const char* str = sqlite3_errmsg( *conn );
-		//~ int errcode = sqlite3_errcode( *conn );
-		//~ errMsg << "SQLite error " << errcode << ": " << str;
-		//~ success = false;
-	//~ }
-	//~ else	{
-		//~ assert ( ppStmt != NULL );
-		//~ while ( success )	{
-			//~ rc = sqlite3_step( ppStmt );
-			//~ if ( rc == SQLITE_ROW )	{
-				//~ const unsigned char* text;
-				//~ text = sqlite3_column_text ( ppStmt, 0 );
-				//~ std::cout << text << ", ";
-//~ //				UI::InterfaceObject::Info info();
-//~ //				objs.push_back( info );
-			//~ }
-			//~ else if ( rc == SQLITE_DONE )
-				//~ break;
-			//~ else	{
-				//~ const char* str = sqlite3_errmsg( *conn );
-				//~ int errcode = sqlite3_errcode( *conn );
-				//~ errMsg << "SQLite error " << errcode << ": " << str;
-				//~ success = false;
-			//~ }
-		//~ }
-	//~ }
-	//~ sqlite3_finalize( ppStmt );
-	//~ if ( !success )
-		//~ throw std::runtime_error( errMsg.str() );
-//~ 
-	//~ return objs;
-//~ }
-//~ 
-//~ const UI::InterfaceObject SQLiteUIlibrary::object( const UI::InterfaceObject::Info& /*info*/ ) const
-//~ {
-	//~ UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
-				     //~ "Dummy form for now", "" );
-	//~ return obj;
-//~ }
-//~ 
-//~ void SQLiteUIlibrary::addObject( const UI::InterfaceObject& /*newObject*/ ) const
-//~ {
-//~ }
-//~ 
-//~ bool SQLiteUIlibrary::deleteObject( const UI::InterfaceObject::Info& /*info*/ ) const
-//~ {
-	//~ return true;
-//~ }
+SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
+	: m_unit( database.dbUnit() )
+{}
+
+
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
+									 const std::string& role,
+									 const std::string& culture,
+									 const std::string& tag ) const
+{
+	std::list< std::string > roles;
+	roles.push_back( role );
+	return userInterface( platform, roles, culture, tag );
+}
+
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
+									 const std::list< std::string >& roles,
+									 const std::string& culture,
+									 const std::string& /*tag*/ ) const
+{
+	std::list< UI::InterfaceObject::Info >	objs;
+
+	bool condition = false;
+	PoolObject< sqlite3* > conn( m_unit.m_connPool );
+	sqlite3_stmt* ppStmt = NULL;
+	std::ostringstream errMsg;
+	bool success = true;
+
+	std::string query = "SELECT platform.name, locale, typeName "
+			"FROM UIobject JOIN Platform ON Platform.ID = UIobject.platformID "
+			"JOIN UIobjectType ON UIobject.typeID=UIobjectType.ID";
+
+	std::string cond = " WHERE ";
+	if ( ! platform.empty() )	{
+		cond += "upper( Platform.name ) = "
+				+ boost::algorithm::to_upper_copy( platform );
+		condition = true;
+	}
+
+	if ( ! roles.empty() )	{
+		if ( condition )
+			cond += "AND upper( Platform.name ) = "
+					+ boost::algorithm::to_upper_copy( platform );
+		else	{
+			cond += "";
+			condition = true;
+		}
+	}
+
+	if ( ! culture.empty() )	{
+		if ( condition )
+			cond += "AND upper( culture ) = "
+					+ boost::algorithm::to_upper_copy( culture );
+		else	{
+			cond += "upper( culture ) = "
+					+ boost::algorithm::to_upper_copy( culture );
+			condition = true;
+		}
+	}
+
+	if ( condition )
+		query += cond;
+	int rc = sqlite3_prepare_v2( *conn, query.c_str(), -1, &ppStmt, NULL );
+	if ( rc != SQLITE_OK )	{
+		const char* str = sqlite3_errmsg( *conn );
+		int errcode = sqlite3_errcode( *conn );
+		errMsg << "SQLite error " << errcode << ": " << str;
+		success = false;
+	}
+	else	{
+		assert ( ppStmt != NULL );
+		while ( success )	{
+			rc = sqlite3_step( ppStmt );
+			if ( rc == SQLITE_ROW )	{
+				const unsigned char* text;
+				text = sqlite3_column_text ( ppStmt, 0 );
+				std::cout << text << ", ";
+//				UI::InterfaceObject::Info info();
+//				objs.push_back( info );
+			}
+			else if ( rc == SQLITE_DONE )
+				break;
+			else	{
+				const char* str = sqlite3_errmsg( *conn );
+				int errcode = sqlite3_errcode( *conn );
+				errMsg << "SQLite error " << errcode << ": " << str;
+				success = false;
+			}
+		}
+	}
+	sqlite3_finalize( ppStmt );
+	if ( !success )
+		throw std::runtime_error( errMsg.str() );
+
+	return objs;
+}
+
+const UI::InterfaceObject SQLiteUIlibrary::object( const UI::InterfaceObject::Info& /*info*/ ) const
+{
+	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
+				     "Dummy form for now", "" );
+	return obj;
+}
+
+void SQLiteUIlibrary::addObject( const UI::InterfaceObject& /*newObject*/ ) const
+{
+}
+
+bool SQLiteUIlibrary::deleteObject( const UI::InterfaceObject::Info& /*info*/ ) const
+{
+	return true;
+}
 
 }} // _Wolframe::db
