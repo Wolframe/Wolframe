@@ -107,6 +107,16 @@ TEST_F( SQLiteModuleFixture, Transaction )
 	
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
+	
+	trans->close( );
+}
+
+TEST_F( SQLiteModuleFixture, ExecuteInstruction )
+{	
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
 
 	// ok transaction create table statement with commit
 	trans->begin( );
@@ -165,19 +175,42 @@ TEST_F( SQLiteModuleFixture, Transaction )
 	trans->close( );
 }
 
-// Aba: should be deleted IMHO
-//~ TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
-//~ {
-	//~ SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
-			     //~ std::list<std::string>(), std::list<std::string>() );
-//~ 
-	//~ Database* db = dbUnit.database();
-	//~ const UserInterfaceLibrary* lib = db->UIlibrary();
-//~ 
-	//~ std::list< InterfaceObject::Info > objs = lib->userInterface( "", "", "" );
-	//~ EXPECT_TRUE( objs.empty() );
-	//~ delete lib;
-//~ }
+TEST_F( SQLiteModuleFixture, SQLErrors )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+
+	// execute an illegal SQL statement, must throw
+	try {
+		trans->executeStatement( "SELCT 1" );
+	} catch( DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( );
+		ASSERT_EQ( e.statement, "SELCT 1" );
+		ASSERT_EQ( e.errorclass, "SYNTAX" );
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	
+	// auto rollback
+	// auto close transaction
+}
+
+TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+
+	Database* db = dbUnit.database();
+	const UserInterfaceLibrary* lib = db->UIlibrary();
+
+	std::list< InterfaceObject::Info > objs = lib->userInterface( "", "", "" );
+	EXPECT_TRUE( objs.empty() );
+	delete lib;
+}
 
 int main( int argc, char **argv )
 {

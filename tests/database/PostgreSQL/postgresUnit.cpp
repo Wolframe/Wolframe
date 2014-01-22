@@ -71,6 +71,32 @@ TEST_F( PQmoduleFixture, WrongDatabase )
 					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
+TEST_F( PQmoduleFixture, Transaction )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+
+	// ok transaction
+	trans->begin( );
+	trans->commit( );
+	
+	// rollback transaction
+	trans->begin( );
+	trans->rollback( );
+	
+	// error, commit without begin
+	EXPECT_THROW( trans->commit( ), std::runtime_error );
+	
+	// error, rollback without begin
+	EXPECT_THROW( trans->rollback( ), std::runtime_error );
+	
+	trans->close( );
+}
+
 static void executeInsertStatements( Transaction* trans)
 {
 	{
@@ -99,29 +125,14 @@ static void executeInsertStatements( Transaction* trans)
 	}
 }
 
-TEST_F( PQmoduleFixture, Transaction )
-{
+TEST_F( PQmoduleFixture, ExecuteInstruction )
+{	
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
-
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
-	// ok transaction
-	trans->begin( );
-	trans->commit( );
-	
-	// rollback transaction
-	trans->begin( );
-	trans->rollback( );
-	
-	// error, commit without begin
-	EXPECT_THROW( trans->commit( ), std::runtime_error );
-	
-	// error, rollback without begin
-	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-	
 	// ok transaction create table statement with commit
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
@@ -178,6 +189,31 @@ TEST_F( PQmoduleFixture, Transaction )
 	}
 
 	trans->close( );
+}
+
+TEST_F( PQmoduleFixture, SQLErrors )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+
+	// execute an illegal SQL statement, must throw
+	try {
+		trans->executeStatement( "SELCT 1" );
+	} catch( DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( );
+		ASSERT_EQ( e.statement, "SELCT 1" );
+		ASSERT_EQ( e.errorclass, "SYNTAX" );
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	
+	// auto rollback
+	// auto close transaction	
 }
 
 int main( int argc, char **argv )

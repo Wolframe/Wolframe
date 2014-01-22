@@ -89,6 +89,8 @@ static const char* getErrorType( sword errorcode )
 	switch( errorcode ) {
 		case 1:
 			return "CONSTRAINT";
+		case 900:
+			return "SYNTAX";
 		case 1017:
 			return "PRIVILEGE";
 		default:

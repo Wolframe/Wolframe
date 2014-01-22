@@ -123,6 +123,8 @@ void TransactionExecStatemachine_sqlite3::clear()
 
 void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 {
+	// Aba: we cannot map those globally! They depende on
+	// the function which was called before..
 	int errcode = sqlite3_errcode( **m_conn);
 #if SQLITE_VERSION_NUMBER >= 3006005
 	int extcode = sqlite3_extended_errcode( **m_conn);
@@ -133,7 +135,8 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 	const char* errtype = 0;
 	switch (errcode)
 	{
-		case SQLITE_ERROR: errtype = "DATABASE"; break;
+		// Aba: HACK for now "SYNTAX", not "DATABASE".
+		case SQLITE_ERROR: errtype = "SYNTAX"; break;
 		case SQLITE_INTERNAL: errtype = "INTERNAL"; break;
 		case SQLITE_PERM: errtype = "PRIVILEGE"; break;
 		case SQLITE_ABORT: errtype = "EXCEPTION"; break;
