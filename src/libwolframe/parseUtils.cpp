@@ -75,7 +75,7 @@ char utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, 
 {
 	char rt = '\0';
 	tok.clear();
-	while (itr != end && *itr <= 32 && *itr >= 0) ++itr;
+	while (itr != end && (unsigned char)*itr <= 32) ++itr;
 	if (itr == end) return '\0';
 	rt = *itr;
 	if (*itr == '\'' || *itr == '\"')
@@ -149,7 +149,7 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 
 char _Wolframe::utils::gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end)
 {
-	while (itr != end && *itr <= 32) ++itr;
+	while (itr != end && (unsigned char)*itr <= 32) ++itr;
 	return (itr == end)?0:*itr;
 }
 
@@ -167,7 +167,7 @@ std::string _Wolframe::utils::parseNextLine( std::string::const_iterator& itr, s
 				rt.push_back( '\\');
 				rt.push_back( *itr);
 				std::string::const_iterator next = itr;
-				for (;next != end && *next != '\n' && *next > 0 && *next <= 32; ++next);
+				for (;next != end && *next != '\n' && (unsigned char)*next <= 32; ++next);
 				if (next != end && *next == '\n') std::runtime_error( "found spaces after a '\\' at end of a line");
 			}
 		}
