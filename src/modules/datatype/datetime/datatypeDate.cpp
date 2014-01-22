@@ -8,7 +8,7 @@ types::Variant DateDataType::increment( const CustomDataValue& operand)
 {
 	const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
+	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.Custom);
 	res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator+( 1));
 	return rt;
 }
@@ -17,7 +17,7 @@ types::Variant DateDataType::decrement( const CustomDataValue& operand)
 {
 	const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
+	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.Custom);
 	res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator-( 1));
 	return rt;
 }
@@ -26,7 +26,7 @@ types::Variant DateDataType::add( const CustomDataValue& operand, const Variant&
 {
 	const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
+	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.Custom);
 	res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
 	return rt;
 }
@@ -35,9 +35,9 @@ types::Variant DateDataType::subtract( const CustomDataValue& operand, const Var
 {
 	if (arg.type() == types::Variant::Custom)
 	{
-		if (arg.data().value.CustomRef->type() == operand.type())
+		if (arg.data().value.Custom->type() == operand.type())
 		{
-			types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.CustomRef));
+			types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.Custom));
 			return types::Variant( daydiff);
 		}
 		else
@@ -49,7 +49,7 @@ types::Variant DateDataType::subtract( const CustomDataValue& operand, const Var
 	{
 		const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 		types::Variant rt( op->type(), op->initializer());
-		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.CustomRef);
+		DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.Custom);
 		res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
 		return rt;
 	}

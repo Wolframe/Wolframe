@@ -102,7 +102,7 @@ public:
 			Data::Int Int;
 			Data::UInt UInt;
 			char* String;
-			CustomDataValue* CustomRef;
+			CustomDataValue* Custom;
 			void* Ref;
 		} value;
 		union

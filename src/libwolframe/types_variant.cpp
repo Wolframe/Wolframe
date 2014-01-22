@@ -75,9 +75,9 @@ void Variant::release()
 			wolframe_free( m_data.value.String);
 			std::memset( this, 0, sizeof( *this));
 		}
-		else if (m_type == Custom && m_data.value.CustomRef)
+		else if (m_type == Custom && m_data.value.Custom)
 		{
-			delete m_data.value.CustomRef;
+			delete m_data.value.Custom;
 			std::memset( this, 0, sizeof( *this));
 		}
 		else if (!atomic())
@@ -94,7 +94,7 @@ void Variant::initConstant( const types::CustomDataValue* o)
 	release();
 	std::memset( this, 0, sizeof( *this));
 	m_type = (unsigned char)Custom;
-	m_data.value.CustomRef = const_cast<types::CustomDataValue*>(o);
+	m_data.value.Custom = const_cast<types::CustomDataValue*>(o);
 	setInitialized(init_);
 	setConstant();
 }
@@ -125,14 +125,14 @@ void Variant::initCustom( const types::CustomDataType* typ, const types::CustomD
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = Custom;
-	m_data.value.CustomRef = typ->createValue( dsc);
+	m_data.value.Custom = typ->createValue( dsc);
 }
 
 void Variant::initCustom( const types::CustomDataValue* o)
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = Custom;
-	m_data.value.CustomRef = o->copy();
+	m_data.value.Custom = o->copy();
 }
 
 void Variant::initCopy( const Variant& o)
@@ -144,7 +144,7 @@ void Variant::initCopy( const Variant& o)
 	}
 	else if (o.m_type == Custom)
 	{
-		initCustom( o.m_data.value.CustomRef);
+		initCustom( o.m_data.value.Custom);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())
@@ -205,7 +205,7 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 				return std::memcmp( d1.value.String, d2.value.String, d2.dim.size);
 			}
 		case Variant::Custom:
-			return d1.value.CustomRef->compare( *d1.value.CustomRef);
+			return d1.value.Custom->compare( *d1.value.Custom);
 	}
 	return -2;
 }
@@ -297,7 +297,7 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 		case Variant::String:
 			return std::string( o.data().value.String, o.data().dim.size);
 		case Variant::Custom:
-			return o.data().value.CustomRef->tostring();
+			return o.data().value.Custom->tostring();
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -320,10 +320,10 @@ int Variant::compare( const Variant& o) const
 				return -1;
 			case Variant::Custom:
 			{
-				const CustomDataInitializer* ini = m_data.value.CustomRef->initializer();
-				CustomDataValueR val( m_data.value.CustomRef->type()->createValue( ini));
+				const CustomDataInitializer* ini = m_data.value.Custom->initializer();
+				CustomDataValueR val( m_data.value.Custom->type()->createValue( ini));
 				val->assign( o);
-				return m_data.value.CustomRef->compare( *val);
+				return m_data.value.Custom->compare( *val);
 			}
 			case Variant::Double:
 				return compare_double( variant_cast<double>( o), m_data.value.Double);
