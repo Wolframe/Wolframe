@@ -190,7 +190,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 	trans->close( );
 }
 
-TEST_F( OracleFixture, SQLErrors )
+TEST_F( OracleFixture, ExceptionSyntaxError )
 {	
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
@@ -203,10 +203,10 @@ TEST_F( OracleFixture, SQLErrors )
 
 	// execute an illegal SQL statement, must throw
 	try {
-		trans->executeStatement( "SELCT 1" );
+		trans->executeStatement( "SELCT 1 FROM DUAL" );
 	} catch( DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( );
-		ASSERT_EQ( e.statement, "SELCT 1" );
+		std::cout << e.what( ) << std::endl;
+		ASSERT_EQ( e.statement, "SELCT 1 FROM DUAL" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
@@ -214,6 +214,67 @@ TEST_F( OracleFixture, SQLErrors )
 	
 	// auto rollback
 	// auto close transaction	
+}
+
+TEST_F( OracleFixture, TooFewBindParameter )
+{
+	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	// intentionally ommiting values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+// why is this another excpetion?
+	} catch( std::runtime_error &e ) {
+		std::cout << e.what( ) << std::endl;
+//	} catch( DatabaseTransactionErrorException &e ) {
+//		std::cout << e.what( );
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
+}
+
+TEST_F( OracleFixture, TooManyBindParameter )
+{
+	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	values.push_back( 4.782);
+	values.push_back( "too much");
+	// intentionally adding too many values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+	} catch( DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
 }
 
 int main( int argc, char **argv )

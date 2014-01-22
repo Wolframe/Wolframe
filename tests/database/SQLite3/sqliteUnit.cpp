@@ -175,7 +175,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 	trans->close( );
 }
 
-TEST_F( SQLiteModuleFixture, SQLErrors )
+TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 {
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
 			     std::list<std::string>(), std::list<std::string>() );
@@ -188,7 +188,7 @@ TEST_F( SQLiteModuleFixture, SQLErrors )
 	try {
 		trans->executeStatement( "SELCT 1" );
 	} catch( DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( );
+		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
 	} catch( ... ) {
@@ -197,6 +197,65 @@ TEST_F( SQLiteModuleFixture, SQLErrors )
 	
 	// auto rollback
 	// auto close transaction
+}
+
+TEST_F( SQLiteModuleFixture, TooFewBindParameter )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	// intentionally ommiting values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+// why is this another exception?
+	} catch( std::runtime_error &e ) {
+		std::cout << e.what( ) << std::endl;
+//	} catch( DatabaseTransactionErrorException &e ) {
+//		std::cout << e.what( );
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
+}
+
+TEST_F( SQLiteModuleFixture, TooManyBindParameter )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	values.push_back( 4.782);
+	values.push_back( "too much");
+	// intentionally adding too many values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+	} catch( DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
 }
 
 TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )

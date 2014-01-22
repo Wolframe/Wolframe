@@ -191,7 +191,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 	trans->close( );
 }
 
-TEST_F( PQmoduleFixture, SQLErrors )
+TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
@@ -205,15 +205,76 @@ TEST_F( PQmoduleFixture, SQLErrors )
 	try {
 		trans->executeStatement( "SELCT 1" );
 	} catch( DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( );
+		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	
-	// auto rollback
-	// auto close transaction	
+	// auto rollback?
+	// auto close transaction?
+}
+
+TEST_F( PQmoduleFixture, TooFewBindParameter )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	// intentionally ommiting values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+// why is this another excpetion?
+	} catch( std::runtime_error &e ) {
+		std::cout << e.what( ) << std::endl;
+//	} catch( DatabaseTransactionErrorException &e ) {
+//		std::cout << e.what( );
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
+}
+
+TEST_F( PQmoduleFixture, TooManyBindParameter )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( true);
+	values.push_back( 4.782);
+	values.push_back( "too much");
+	// intentionally adding too many values here, must throw an error
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+	} catch( DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+
+	// auto rollback?
+	// auto close transaction?
 }
 
 int main( int argc, char **argv )
