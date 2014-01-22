@@ -10,6 +10,12 @@ SUBDIRS = \
 	$(SUBDIRS) PostgreSQL
 !ENDIF
 
+# Oracle
+!IFDEF WITH_ORACLE
+SUBDIRS = \
+	$(SUBDIRS) Oracle
+!ENDIF
+
 # sqlite3
 !IFDEF WITH_SQLITE3
 SUBDIRS = \
