@@ -333,16 +333,16 @@ static void check_parameters( lua_State* ls, int si, int nn, ...)
 		if (anum > nn+si) throw std::runtime_error( "too many arguments");
 		if (anum < nn+si) throw std::runtime_error( "too few arguments");
 	}
-	for (int ii = si; ii < nn; ++ii)
+	for (int ii = 0; ii < nn; ++ii)
 	{
 		int expect = va_arg( aa, int);
-		int typ = lua_type( ls, -ii-1);
+		int typ = lua_type( ls, si+ii+1);
 		if (typ != expect)
 		{
 			const char* expectname = lua_typename( ls, expect);
 			const char* typname = lua_typename( ls, typ);
 			std::ostringstream msg;
-			msg << "expected " << (expectname?expectname:"?") << " instead of " << (typname?typname:"?") << " as argument " << (ii-si+1);
+			msg << "expected " << (expectname?expectname:"?") << " instead of " << (typname?typname:"?") << " as argument " << (ii+1);
 			throw std::runtime_error( msg.str());
 		}
 	}
