@@ -333,7 +333,7 @@ static void check_parameters( lua_State* ls, int si, int nn, ...)
 		if (anum > nn+si) throw std::runtime_error( "too many arguments");
 		if (anum < nn+si) throw std::runtime_error( "too few arguments");
 	}
-	for (int ii = si; ii < anum; ++ii)
+	for (int ii = si; ii < nn; ++ii)
 	{
 		int expect = va_arg( aa, int);
 		int typ = lua_type( ls, -ii-1);
