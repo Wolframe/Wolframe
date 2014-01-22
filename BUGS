@@ -5,10 +5,9 @@
 		2) Or put initialization/deinitialization into functions and call deinitialization in a catchg in the DB constructor
 
 [2]- Errors on ARM because char defaults to unsigned char instead of signed char:
-	1) Tons of warnings about superflous comparisons in parseUtils.cpp
-	3) base64Test fails in base64 decoding
-	4) iproc fails throwing std::bad_allocation
-	5) textwolf always throws an InvalidParam
+	1) Tons of warnings about superflous comparisons of unsigned chars
+	2) base64Test fails in base64 decoding
+	3) textwolf always throws an InvalidParam
 
 [3]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
 	(too difficult at the moment and most databases are case insensitive anyway) !
