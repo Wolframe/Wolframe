@@ -112,7 +112,7 @@ public:
 
 	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;

@@ -759,7 +759,7 @@ public:
 				if (chr <= 0xD)
 				{
 					//handling W3C requirements for end of line translation in XML:
-					char aa = m_src.ascii();
+					unsigned char aa = m_src.ascii();
 					if (aa == '\r')
 					{
 						push( (unsigned char)'\n');

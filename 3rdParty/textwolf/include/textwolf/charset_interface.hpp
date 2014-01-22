@@ -87,7 +87,7 @@ struct Interface
 	///\param [in,out] itr iterator on the source
 	///\return the value of the ascii character or -1
 	template <class Iterator>
-	static char asciichar( char* buf, unsigned int& bufpos, Iterator& itr);
+	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr);
 
 	///\brief Fetches the unicode character representation of the current character
 	///\param [in] buf buffer for the parses character data
