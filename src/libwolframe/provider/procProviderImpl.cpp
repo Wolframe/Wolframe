@@ -251,7 +251,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading normalize function object '" << constructor->domain() << "':" << e.what();
+						LOG_FATAL << "Error loading normalize function object domain '" << constructor->domain() << "':" << e.what();
 					}
 				}
 				break;
@@ -269,12 +269,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						m_cdtmap.insert( constructor->name(), types::CustomDataTypeR( new types::CustomDataType( constructor->object())));
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->name() << "'";
+						m_programs->defineCustomDataTypeConstructor( constructor);
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type constructor for domain '" << constructor->domain() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading custom data type '" << constructor->name() << "':" << e.what();
+						LOG_FATAL << "Error loading custom data type domain '" << constructor->domain() << "':" << e.what();
 					}
 				}
 				break;
@@ -401,13 +401,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
 {
 	return m_programs->getNormalizeFunction( name);
-}
-
-const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& name) const
-{
-	types::keymap<types::CustomDataTypeR>::const_iterator ai = m_cdtmap.find( name);
-	if (ai == m_cdtmap.end()) return 0;
-	return ai->second.get();
 }
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const

@@ -150,9 +150,9 @@ public:
 		define( Subtract, &subtract);
 	}
 
-	static CustomDataType create( const std::string& name)
+	static CustomDataType* create( const std::string& name)
 	{
-		return DateDataType( name);
+		return new DateDataType( name);
 	}
 
 private:

@@ -74,6 +74,17 @@ void CustomDataType::define( DimensionOperatorType type, DimensionOperator op)
 	m_vmt.opDimension[ (int)type] = op;
 }
 
+void CustomDataType::define( ConversionOperatorType type, ConversionOperator op)
+{
+	if (m_vmt.opConversion[ (int)type]) throw std::logic_error("duplicate definition of conversion operator");
+	m_vmt.opConversion[ (int)type] = op;
+}
+
+CustomDataType::ConversionOperator CustomDataType::getOperator( CustomDataType::ConversionOperatorType type) const
+{
+	return m_vmt.opConversion[ (int)type];
+}
+
 CustomDataType::UnaryOperator CustomDataType::getOperator( CustomDataType::UnaryOperatorType type) const
 {
 	return m_vmt.opUnary[ (int)type];
