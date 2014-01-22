@@ -216,6 +216,9 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 	// intentionally ommiting values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		// we should not get here, just in case we close the transaction properly
+		trans->commit( );
+		trans->close( );
 // why is this another exception?
 	} catch( std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
@@ -248,6 +251,9 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 	// intentionally adding too many values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		// we should not get here, just in case we close the transaction properly
+		trans->commit( );
+		trans->close( );
 	} catch( DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 	} catch( ... ) {
