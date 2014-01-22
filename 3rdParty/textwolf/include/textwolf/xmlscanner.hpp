@@ -50,25 +50,25 @@ class ScannerStatemachine :public throws_exception
 public:
 	enum
 	{
-		MaxNofStates=64			//< maximum number of states (fixed allocated array for state machine)
+		MaxNofStates=64				//< maximum number of states (fixed allocated array for state machine)
 	};
 	///\class Element
 	///\brief One state in the state machine
 	struct Element
 	{
-		int fallbackState;		//< state transition if the event does not match (it belongs to the next state = fallbackState)
-		int missError;			//< error code in case of an event that does not match and there is no fallback
+		int fallbackState;			//< state transition if the event does not match (it belongs to the next state = fallbackState)
+		int missError;				//< error code in case of an event that does not match and there is no fallback
 
 		///\class Action
 		///\brief Definition of action fired by the state machine
 		struct Action
 		{
-			int op;			//< action operand
-			int arg;		//< action argument
+			int op;				//< action operand
+			int arg;			//< action argument
 		};
-		Action action;			//< action executed after entering this state
-		char nofnext;			//< number of follow states defined
-		char next[ NofControlCharacter];//< follow state fired by an event (control character type parsed)
+		Action action;				//< action executed after entering this state
+		unsigned char nofnext;			//< number of follow states defined
+		signed char next[ NofControlCharacter];	//< follow state fired by an event (control character type parsed)
 
 		///\brief Constructor
 		Element() :fallbackState(-1),missError(-1),nofnext(0)
