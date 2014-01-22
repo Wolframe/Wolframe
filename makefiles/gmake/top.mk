@@ -92,6 +92,8 @@ else
 endif
 	@echo "C++ Compiler: $(COMPILER)"
 	@echo "Optimization flags: $(OPTFLAGS)"
+	@echo "Full C compilation flags: $(ALL_CFLAGS)"
+	@echo "Full C++ compilation flags: $(ALL_CXXFLAGS)"
 	@echo
 	@echo "Required Dependencies:"
 	@echo
