@@ -24,7 +24,7 @@ DYNAMIC_MODULE = \
 	mod_datatype_datetime.dll
 
 CPP_OBJS = \
-	dateTime.obj \
+	datatypeDate.obj \
 	mod_datatype_datetime.obj
 
 all: $(DYNAMIC_MODULE)

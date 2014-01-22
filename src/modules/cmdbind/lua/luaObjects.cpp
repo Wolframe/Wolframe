@@ -71,6 +71,7 @@ namespace luaname
 	static const char* Filter = "wolframe.Filter";
 	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
 	static const char* Form = "wolframe.Form";
+	static const char* Custom = "wolframe.Custom";
 	static const char* DDLFormParser = "wolframe.DDLFormParser";
 	static const char* DDLFormSerializer = "wolframe.DDLFormSerializer";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
@@ -93,6 +94,7 @@ template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
 template <> const char* metaTableName<types::FormR>()			{return luaname::Form;}
+template <> const char* metaTableName<types::CustomDataValueR>()	{return luaname::Custom;}
 template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
 template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
@@ -195,8 +197,6 @@ struct LuaObject
 		try
 		{
 			const char* mt = metaTableName<ObjectType>();
-// MBa: this generates an warning. Maybe the fix is wrong...
-//			LuaObject* THIS = (LuaObject*)(void*)new (ls,mt) LuaObject( o);
 			new (ls,mt) LuaObject( o);
 		}
 		catch (const std::bad_alloc&)
@@ -560,7 +560,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 	throw std::runtime_error( "illegal state when fetching next element");
 }
 
-static void getVariantValue( lua_State* ls, types::Variant& val, int idx)
+static void getVariantValue( lua_State* ls, types::VariantConst& val, int idx)
 {
 	std::size_t val_len;
 	const char* val_str;
@@ -576,9 +576,19 @@ static void getVariantValue( lua_State* ls, types::Variant& val, int idx)
 
 		case LUA_TSTRING:
 			val_str = lua_tolstring( ls, idx, &val_len);
-			val.initConstant( val_str, val_len);
+			val.init( val_str, val_len);
 			break;
 
+		case LUA_TUSERDATA:
+		{
+			types::CustomDataValueR* custom = LuaObject<types::CustomDataValueR>::get( ls, idx);
+			if (!custom)
+			{
+				throw std::runtime_error( "custom data type expected in case of user defined type for atomic 'variant type' argument");
+			}
+			val.init( custom->get());
+			break;
+		}
 		default:
 			throw std::runtime_error( "atomic value expected for 'variant type' argument");
 	}
@@ -592,9 +602,9 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 		case types::Variant::Null:
 			lua_pushnil( ls);
 			break;
-// MBa hack: eliminate compiler warning
+
 		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in lua object");
+			LuaObject<types::CustomDataValueR>::push_luastack( ls, types::CustomDataValueR( val.data().value.CustomRef->copy()));
 			break;
 
 		case types::Variant::Bool:
@@ -642,7 +652,7 @@ LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
 		throw std::runtime_error( "atomic value expected for 'variant type' argument");
 
 	}
-	types::Variant param;
+	types::VariantConst param;
 	getVariantValue( ls, param, 1);
 	types::Variant result = func->execute( param);
 	pushVariantValue( ls, result);

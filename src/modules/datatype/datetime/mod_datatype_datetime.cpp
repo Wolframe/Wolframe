@@ -34,7 +34,7 @@
 ///\brief Extension module for date and time arithmetic
 #include "module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
-#include "dateTime.hpp"
+#include "datatypeDate.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

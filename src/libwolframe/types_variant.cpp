@@ -87,6 +87,18 @@ void Variant::release()
 	}
 }
 
+
+void Variant::initConstant( const types::CustomDataValue* o)
+{
+	bool init_ = initialized();
+	release();
+	std::memset( this, 0, sizeof( *this));
+	m_type = (unsigned char)Custom;
+	m_data.value.CustomRef = const_cast<types::CustomDataValue*>(o);
+	setInitialized(init_);
+	setConstant();
+}
+
 void Variant::initConstant( const char* o, std::size_t l)
 {
 	bool init_ = initialized();
@@ -116,11 +128,11 @@ void Variant::initCustom( const types::CustomDataType* typ, const types::CustomD
 	m_data.value.CustomRef = typ->createValue( dsc);
 }
 
-void Variant::initCustom( const types::CustomDataValue& o)
+void Variant::initCustom( const types::CustomDataValue* o)
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = Custom;
-	m_data.value.CustomRef = o.type()->copyValue( o);
+	m_data.value.CustomRef = o->copy();
 }
 
 void Variant::initCopy( const Variant& o)
@@ -132,7 +144,7 @@ void Variant::initCopy( const Variant& o)
 	}
 	else if (o.m_type == Custom)
 	{
-		initCustom( *o.m_data.value.CustomRef);
+		initCustom( o.m_data.value.CustomRef);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())

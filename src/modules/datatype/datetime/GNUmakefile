@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_datatype_datetime.so
 
 CPP_OBJS = \
-	dateTime.o \
+	datatypeDate.o \
 	mod_datatype_datetime.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

@@ -64,7 +64,7 @@ public:
 	enum Type
 	{
 		Null,			//< value undefined (NULL)
-		Custom,			//< custom data type (types::CustomDataType)
+		Custom,			//< custom data type (types::CustomDataValue)
 		Double,			//< C++ double
 		Int,			//< C++ int
 		UInt,			//< C++ unsigned int
@@ -130,7 +130,7 @@ public:
 	Variant( const std::string& o)				{initString( o.c_str(), o.size());}
 	Variant( const types::CustomDataType* typ,
 		 const types::CustomDataInitializer* dsc=0)	{initCustom( typ, dsc);}
-	Variant( const types::CustomDataValue& o)		{initCustom( o);}
+	Variant( const types::CustomDataValue* o)		{initCustom( o);}
 	Variant( const Variant& o)				{initCopy( o);}
 	///\brief Destructor
 	~Variant()						{release();}
@@ -148,6 +148,7 @@ public:
 	Variant& operator=( boost::int16_t o)			{bool init_=initialized(); release(); init(Int); m_data.value.Int = o; setInitialized(init_); return *this;}
 	Variant& operator=( boost::uint16_t o)			{bool init_=initialized(); release(); init(UInt); m_data.value.UInt = o; setInitialized(init_); return *this;}
 
+	Variant& operator=( const types::CustomDataValue* o)	{bool init_=initialized(); release(); initCustom(o); setInitialized(init_); return *this;}
 	Variant& operator=( const char* o)			{bool init_=initialized(); release(); initString( o, std::strlen(o)); setInitialized(init_); return *this;}
 	Variant& operator=( const std::string& o)		{bool init_=initialized(); release(); initString( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
@@ -155,6 +156,7 @@ public:
 	void initConstant( const char* o, std::size_t l);
 	void initConstant( const std::string& o)		{initConstant( o.c_str(),o.size());}
 	void initConstant( const char* o)			{initConstant( o, std::strlen(o));}
+	void initConstant( const types::CustomDataValue* o);
 
 	///\brief Compare data with conversion (value with different types is converted first)
 	bool operator==( const Variant& o) const		{return compare( o) == 0;}
@@ -221,7 +223,7 @@ protected:
 	void initString( const char* str_, std::size_t strsize_);
 	void initCustom( const types::CustomDataType* typ,
 			const CustomDataInitializer* dsc=0);
-	void initCustom( const types::CustomDataValue& o);
+	void initCustom( const types::CustomDataValue* o);
 	void initCopy( const Variant& o);
 	void initConstCopy( const Variant& o);
 
@@ -255,10 +257,10 @@ struct VariantConst :public Variant
 	VariantConst( boost::uint32_t o)		:Variant(UInt){m_data.value.UInt = o; setConstant();}
 	VariantConst( boost::int16_t o)			:Variant(Int){m_data.value.Int = o; setConstant();}
 	VariantConst( boost::uint16_t o)		:Variant(UInt){m_data.value.UInt = o; setConstant();}
-
-	VariantConst( const char* o)			:Variant(){initConstant( o, std::strlen(o));}
-	VariantConst( const char* o, std::size_t n)	:Variant(){initConstant( o, n);}
-	VariantConst( const std::string& o)		:Variant(){initConstant( o.c_str(), o.size());}
+	VariantConst( const types::CustomDataValue* o)	:Variant(){Variant::initConstant( o);}
+	VariantConst( const char* o)			:Variant(){Variant::initConstant( o, std::strlen(o));}
+	VariantConst( const char* o, std::size_t n)	:Variant(){Variant::initConstant( o, n);}
+	VariantConst( const std::string& o)		:Variant(){Variant::initConstant( o.c_str(), o.size());}
 	///\brief Destructor
 	~VariantConst(){}
 
@@ -276,6 +278,7 @@ struct VariantConst :public Variant
 	VariantConst& operator=( boost::int16_t o)		{bool init_=initialized(); Variant::init(Variant::Int); m_data.value.Int = o; setInitialized(init_); setConstant(); return *this;}
 	VariantConst& operator=( boost::uint16_t o)		{bool init_=initialized(); Variant::init(Variant::UInt); m_data.value.UInt = o; setInitialized(init_); setConstant(); return *this;}
 
+	VariantConst& operator=( const types::CustomDataValue* o){bool init_=initialized(); initConstant( o); setInitialized(init_); return *this;}
 	VariantConst& operator=( const char* o)			{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantConst& operator=( const std::string& o)		{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
@@ -283,6 +286,7 @@ struct VariantConst :public Variant
 	void init( const char* o, std::size_t len)		{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
 	void init( const char* o)				{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
 	void init( const std::string& o)			{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
+	void init( const types::CustomDataValue* o)		{bool init_=initialized(); initConstant( o); setInitialized(init_);}
 
 	///\brief Empty initialization
 	void init()						{Variant::init(); setConstant();}

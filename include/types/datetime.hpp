@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace types {
 
 //\brief Timestamp equivalent to a date time value for variant type
-typedef boost::uint64_t Timestamp;
+typedef boost::int64_t Timestamp;
 
 //\class DateTime
 //\brief Data type for normalized date time (absolute time without time zone info)
@@ -65,7 +65,7 @@ public:
 	{}
 
 	DateTime( const Timestamp& t)
-		:Impl(t)
+		:m_impl(t)
 	{}
 
 	Timestamp value() const
@@ -105,8 +105,7 @@ private:
 			unsigned short mm,
 			unsigned short ss,
 			unsigned short ll=0,
-			unsigned short cc=0,
-			unsigned short nn=0)
+			unsigned short cc=0)
 			:year(YY),month(MM),day(DD),hour(hh),minute(mm),second(ss),millisecond(ll),microsecond(cc)
 		{}
 
