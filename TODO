@@ -1,0 +1,10 @@
+Variant: User defined data types (method table defined by the provider)
+Add namespaces to TDL,Lua (special global variable in Lua script)
+Python (check how module names = namespaces are set when embeding python)
+.NET (tests)
+Python (impl + documentation)
+Printing (impl + documentation)
+TDL (untested things inventory)
+
+
+

@@ -10,4 +10,7 @@
 	4) iproc fails throwing std::bad_allocation
 	5) textwolf always throws an InvalidParam
 
+[3]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
+	(too difficult at the moment and most databases are case insensitive anyway) !
+
 
