@@ -443,5 +443,3 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 	return rt;
 }
 
-
-
