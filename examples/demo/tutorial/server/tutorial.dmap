@@ -1,0 +1,5 @@
+COMMAND CustomerListRequest CALL SelectCustomerList RETURN CustomerList;
+COMMAND CustomerRequest CALL SelectCustomer RETURN Customer;
+COMMAND CustomerUpdate CALL UpdateCustomer;
+COMMAND CustomerCreate CALL CreateCustomer;
+COMMAND CustomerDelete CALL DeleteCustomer;

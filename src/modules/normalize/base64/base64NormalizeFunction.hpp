@@ -34,7 +34,7 @@
 ///\brief Normalize function for endode/decode for base64
 #ifndef _LANGBIND_BASE64_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_BASE64_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <string>
 
 namespace _Wolframe {

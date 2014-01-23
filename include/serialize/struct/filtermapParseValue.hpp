@@ -137,6 +137,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const type
 					return true;
 				}
 				return false;
+
+			case types::Variant::Custom:
+				throw std::runtime_error( "cannot convert custom data type to boolean type");
 		}
 	}
 	catch (const boost::bad_lexical_cast&){}
@@ -172,6 +175,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::Arithmetic&, cons
 			case types::Variant::String:
 				val = boost::lexical_cast<ValueType>( element.tostring());
 				return true;
+
+			case types::Variant::Custom:
+				throw std::runtime_error( "cannot convert custom data type to arithmetic type");
 		}
 	}
 	catch (const boost::bad_lexical_cast&){}

@@ -41,6 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
+#include "module/customDataTypeBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
@@ -250,7 +251,30 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading normalize function object '" << constructor->domain() << "':" << e.what();
+						LOG_FATAL << "Error loading normalize function object domain '" << constructor->domain() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::CUSTOM_DATA_TYPE_OBJECT:
+			{
+				module::CustomDataTypeConstructorR constructor( dynamic_cast< module::CustomDataTypeConstructor* >((*it)->constructor()));
+				if ( !constructor.get() )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "'' is not a custom data type constructor";
+					throw std::logic_error( "Object is not a custom data type constructor. See log." );
+				}
+				else
+				{
+					try {
+						m_programs->defineCustomDataTypeConstructor( constructor);
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type constructor for domain '" << constructor->domain() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading custom data type domain '" << constructor->domain() << "':" << e.what();
 					}
 				}
 				break;
@@ -409,6 +433,17 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 	return m_programs->createFilter( name, arg);
 }
 
+const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& domain, const std::string& name) const
+{
+	LOG_TRACE << "[provider] get custom data type '" << domain << ":" << name << "'";
+	types::keymap<module::CustomDataTypeConstructorR>::const_iterator ci = m_programs->customDataTypeConstructorMap().find( domain);
+	if (ci == m_programs->customDataTypeConstructorMap().end()) return 0;
+	{
+		const types::CustomDataType* rt = ci->second->object( name);
+		return rt;
+	}
+}
+
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
@@ -464,7 +499,14 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 std::string ProcessorProvider::ProcessorProvider_Impl::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
 {
 	std::ostringstream rt;
-	rt << xmlroot << " SYSTEM \"" << formname << "." << ddlname << "\"";
+	if (ddlname.empty())
+	{
+		rt << xmlroot << " SYSTEM \"" << formname << "\"";
+	}
+	else
+	{
+		rt << xmlroot << " SYSTEM \"" << formname << "." << ddlname << "\"";
+	}
 	return rt.str();
 }
 

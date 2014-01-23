@@ -26,7 +26,7 @@ docin=employee_assignment_print				# input document name
 docout=map_transaction					# output document name
 testdata="
 **file: test.dmap
-COMMAND(employee_assignment_print) CALL(test_transaction);
+COMMAND(employee_assignment_print) CALL(test_transaction) RETURN STANDALONE doc;
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBRES
@@ -35,7 +35,6 @@ COMMAND(employee_assignment_print) CALL(test_transaction);
 #id task start end#31 'hula hop' '19:14:38 1/4/2012' '20:01:12 1/4/2012'#32 'hula hip' '11:31:01 1/3/2012' '12:07:55 1/3/2012'#33 'hula hup' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
 BEGIN
 	INTO task FOREACH //task DO run( title);
 END"

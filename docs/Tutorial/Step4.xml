@@ -8,7 +8,7 @@
 		tell the server to load the database module for Sqlite:
 		<programlisting language='shell'>
 	LoadModules {
-		module mod_db_sqlite3
+		<emphasis role="bold">module mod_db_sqlite3</emphasis>
 	}
 		</programlisting>
 	</para>
@@ -59,13 +59,12 @@
 	
 	<para>
 		Now we want to use some XML filters to send/receive XML over the protocol,
-		so we have to add the following module to tutorial.conf:
+		so we have to add the following module to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_filter_libxml2
-		..
+		module mod_db_sqlite3
+		<emphasis role="bold">module mod_filter_libxml2</emphasis>
 	}
 		</programlisting>
 	</para>
@@ -98,12 +97,12 @@
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_command_directmap
-		..
+		module mod_db_sqlite3
+		module mod_filter_libxml2
+		<emphasis role="bold">module mod_command_directmap</emphasis>
 	}
 		</programlisting>
-		and 
+		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
 	Processor {
 		database sqlitedb
@@ -118,8 +117,8 @@
 	</para>
 
 	<para>
-		The "filter" directory specifies that the command handler should
-		use the libxml2 module to parse XML requests.
+		The "filter" directive denotes that the command handler should
+		use the "libxml2" module to parse XML requests.
 	</para>
 	
 	<para>
@@ -127,12 +126,17 @@
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	COMMAND CustomerListRequest CALL SelectCustomerList;
+	COMMAND CustomerListRequest
+	       CALL SelectCustomerList
+	       RETURN STANDALONE list;
 		</programlisting>
 
-		This means that we map the 'CustomerListRequest' request which gives us a list
-		of customers to the TDL transaction 'SelectCustomerList'. This also means
-		we need to configure the TDL program in the server:
+		This means that we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		that is executed to perform the request. It will returns us document 
+		without a document type assigned (standalone) and with the root element 'list'. 
+		The returned content will be a list of customers. The function will be implemented 
+		in a TDL program in the server. We first add the
+		TDL program declaration to a new 'Processor' configuration section:
 
 		<programlisting language='shell'>
 	Processor {
@@ -146,31 +150,32 @@
 
 		<programlisting language='shell'>
 	TRANSACTION SelectCustomerList
-	RESULT INTO list
 	BEGIN
 		INTO customer DO SELECT * from Customer;
 	END
 		</programlisting>
 
 	We also need a validator for the input when the client sends a 'CustomerListRequest'.
-	we install the simple form DDL compilter in <filename>tutorial.conf</filename> and
-	register the simpleform program to the list of programs:
+	We load the simple form DDL compiler in the 'LoadModules' section of the <filename>tutorial.conf</filename> and
+	register the simpleform program <filename>Customer.sfrm</filename> to the list of programs in the same file:
 
 		<programlisting language='shell'>
 	LoadModules {
-		..
-		module mod_ddlcompiler_simpleform
+		module mod_db_sqlite3
+		module mod_filter_libxml2
+		module mod_command_directmap
+		<emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
 	}
 
 	Processor {
-		..
-		program CustomerListRequest.sfrm	
-		..
+		program Customer.tdl
+		<emphasis role="bold">program Customer.sfrm</emphasis>	
 	}
 		</programlisting>
 
-	and we add a simple form file <filename>CustomerListRequest.sfrm</filename>,
-	for now we can leave it empty but for the root element:
+	and we add a simple form file <filename>Customer.sfrm</filename>.
+	We add a form called 'CustomerListRequest' which is empty for now 
+	but for the root element 'customer':
 
 		<programlisting language='shell'>
 	FORM CustomerListRequest
@@ -179,6 +184,19 @@
 		}
 	}
 		</programlisting>
+	</para>
+	
+	<para>
+		We have to restart the wolframe daemon now and restart it with
+		<programlisting language='shell'>
+	pkill wolframed
+	/usr/sbin/wolframed -f -c tutorial.conf			
+		</programlisting>	
+	
+		This we have to do <emphasis role="bold">every time</emphasis> we
+		change the configuration file <filename>tutorial.conf</filename>
+		or one of the files referenced there as <filename>tutorial.dmap</filename>,
+		<filename>Customer.tdl</filename> or <filename>Customer.sfrm</filename>.
 	</para>
 	
 	<para>
@@ -202,7 +220,7 @@
 		This we can execute with:
 
 		<programlisting language='shell'>
-	netcat -v --wait=2 localhost 7661 &lt; CustomerListRequest.netcat
+	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 		</programlisting>
 
 		and we get:
@@ -218,7 +236,7 @@
 	</para>
 	
 	<para>
-		Let's also add some demo data now:
+		Let's add some customer data now:
 
 		<programlisting language='shell'>
 	cat > data.sql

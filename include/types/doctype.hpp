@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file types/doctype.hpp
-///\brief ADT for document type definition handling
+///\brief Type for document type definition handling
 
 #ifndef _Wolframe_TYPES_DOCTYPE_HPP_INCLUDED
 #define _Wolframe_TYPES_DOCTYPE_HPP_INCLUDED

@@ -44,9 +44,9 @@
 #include "types/normalizeFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "module/printFunctionBuilder.hpp"
-#include "langbind/normalizeFunction.hpp"
 #include "prgbind/program.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
+#include "module/customDataTypeBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include <string>
 #include <list>
@@ -70,6 +70,7 @@ public:
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
 	virtual void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f);
 	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
+	virtual void defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
 	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& f);
 	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
@@ -77,6 +78,7 @@ public:
 
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
 	virtual const types::keymap<module::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
+	virtual const types::keymap<module::CustomDataTypeConstructorR>& customDataTypeConstructorMap() const;
 
 	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
 	virtual std::vector<std::string> getFormNames() const;

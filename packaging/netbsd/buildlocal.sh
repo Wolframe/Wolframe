@@ -16,6 +16,15 @@ else
 fi
 fi
 
+check_for_errors( )
+{
+	RET=$?
+	if test $RET -gt 0; then
+		echo "Build failed."
+		exit 1
+	fi
+}
+
 rm -rf $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION
 
 mkdir -p $PKGBUILD $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION $PKGBUILD/PKGS/$ARCH
@@ -43,7 +52,26 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	help
+
+gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
+	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	config
+
+gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
+	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules
+check_for_errors
 
 # testing breaks at least in boost-locale and some xml filters for now
 #gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -53,6 +81,7 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 #	CC='ccache gcc' CXX='ccache g++' \
 #	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
 #	test 
+#check_for_errors
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
@@ -62,6 +91,7 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
 	prefix=/usr/pkg \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION install sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib
+check_for_errors
 
 # doxygen package currently broken
 #cd docs; gmake DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
@@ -95,8 +125,10 @@ pkg_create -v -p . -I / \
 	-i iscript \
 	-k dscript \
 	$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
+check_for_errors
 
 # rm -rf $PKGBUILD/BUILD
 # rm -rf $PKGBUILD/PKG
 
-echo "Build done."
+echo "Build succeeded."
+exit 0

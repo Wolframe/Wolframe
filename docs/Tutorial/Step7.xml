@@ -16,7 +16,11 @@
 	<para>
 		As before we add first a "Edit" button to the
 		<filename>customers.ui</filename> with 'forms'
-		set to 'customer_edit' and 'global.id' set to '{customer.id}':
+		set to:
+
+		<programlisting language='shell'>
+	customer_edit?id={customer.selected}
+		</programlisting>
 	</para>
 
 	<screenshot>
@@ -31,14 +35,20 @@
 		</mediaobject>
 	</screenshot>
 
-	<para>
+	<para>	
 		We change the form <filename>customer_edit.ui</filename>
 		and remove the line with 'ID' as we don't need it anymore
 		and because nobody should be able to edit the id of
-		a customer and change it! We also add another button and label it 'Save',
-		this button get the properties 'form' set to 'customers', 'action' set to
-		'update', 'doctype' to 'CustomerUpdate', 'rootelement' to 'customer' and
-		'id' to '{global.id}':
+		a customer and change it! We also add another button and label
+		it 'Save', for this button we set 'action' to generate a
+		'CustomerUpdate' request:
+
+		<programlisting language='shell'>
+		CustomerUpdate customer {id={main.id}; name {{main.name}}; address {{main.address}} }
+		</programlisting>
+		
+		We also set 'form' to 'customers', so the user gets taken back
+		to the changed list of customers when saving the current record:
 	</para>
 
 	<screenshot>
@@ -54,7 +64,7 @@
 	</screenshot>
 
 	<para>
-		The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
+		The resulting 'CustomerUpdate' XML request looks as follows:
 	</para>
 
 	<programlisting language='xml'>
@@ -62,50 +72,59 @@
 	</programlisting>
 
 	<para>
-		Similar to to the "show customer" case we add now a new map:
-	</para>
+		Similar to to the "show customer" case we add now a new command mapping
+		in <filename>tutorial.dmap</filename>:
 
 	<programlisting language='xml'>
-	editCustomerUpdate = UpdateCustomer( xml );
+	COMMAND CustomerUpdate CALL UpdateCustomer;
 	</programlisting>
-	<para>
-		We also add a simple form <filename>CustomerUpdate.simpleform</filename>
-		which looks very similar to the <filename>Customer.simpleform</filename>:
+
+		We also add a simple form 'CustomerUpdate' to <filename>Customer.sfrm</filename>
+		which looks very similar to the 'Customer' form:
 	</para>
 	<programlisting language='xml'>
-<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.simpleform" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.sfrm" parse="text" />
 	</programlisting>
 
 	<para>
-		add it to <filename>tutorial.conf</filename>:
-	</para>
-
-	<programlisting language='shell'>
-	Processor {
-		...
-		program CustomerUpdate.simpleform
-		...
-	}
-	</programlisting>
-
-	<para>
-		finally we write the transaction function 'CustomerUpdate' in
+		Finally we write the transaction function 'CustomerUpdate' in
 		<filename>Customer.tdl</filename>:
 	</para>
 
 	<programlisting language='sql'>
 	TRANSACTION UpdateCustomer
 	BEGIN
-		DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
-			WHERE id=$(customer/id);
+		DO UPDATE Customer SET name=$(name), address=$(address)
+			WHERE id=$(id);
 	END
 	</programlisting>
 
 	<para>
 		Note, that this time the database transaction doesn't return a result.
+
 	</para>
 
 	<para>
 		Restart server and client and start to edit the customers.
 	</para>
+	
+	<para>
+		In debug mode in wolfclient we can right-click on the "Save" button
+		and we pick the menu item "Debug: Inspect commands". Then we get
+		a dialog box which shows us the status of the widget elements and
+		how the XML request looks like which would be sent down to the server:
+	</para>
+
+	<screenshot>
+		<screeninfo>Step 7 edit customer save button debug window</screeninfo>
+		<mediaobject>
+			<imageobject role="html">
+				<imagedata fileref="images/Tutorial/step7_customer_debug_command.png" format="PNG"/>
+			</imageobject>
+			<imageobject role="fo">
+				<imagedata fileref="images/Tutorial/step7_customer_debug_command.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
+		
 </sect1>

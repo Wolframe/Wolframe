@@ -38,6 +38,7 @@
 #ifndef __TEXTWOLF_ISTREAM_ITERATOR_HPP__
 #define __TEXTWOLF_ISTREAM_ITERATOR_HPP__
 #include <iostream>
+#include <iterator>
 
 ///\namespace textwolf
 ///\brief Toplevel namespace of the library

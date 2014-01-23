@@ -4,7 +4,7 @@
 	<title>Step 5 - Implement client side customer list</title>	
 
 	<para>
-		It's time now to get something visual working, so we start to add a first
+		It's time now to get something working visually, so we start to add a first
 		simple interface to our wolfclient.
 	</para>
 	
@@ -62,8 +62,8 @@
 	</screenshot>
 
 	<para>
-		This means we have to define a new form called
-		<filename>customers.ui</filename>, which will
+		This means we have to define a new form
+		<filename>~/tutorial/client/customers.ui</filename>, which will
 		show the list of customers, for now we leave it empty. When we start the
 		wolfclient and press the "Customer List" button again, we see that
 		the form gets changed to the "customer" form (empty).
@@ -94,7 +94,7 @@
 	</para>
 	
 	<para>
-		Now we change the columns of the list (by double clicking into the widget data area):
+		Now we change the columns of the list (context menu "Edit items" in the widget data area):
 	</para>
 	
 	<screenshot>
@@ -108,55 +108,121 @@
 			</imageobject>
 		</mediaobject>
 	</screenshot>
+	
+	<para>
+		We can now open the wolfclient and press the button and the customer list
+		is loaded. But it's empty, we have first to fill it with data of our customers.
+	</para>
 
 	<para>
-		Now we add the 'doctype' and 'rootelement' dynamic properties to the
-		customer list widget, so that it loads the domain when the form is loaded.
-		The request to send is the 'CustomerListRequest' with root element 'customer'
-		we have configured before in the server:
+		So we add a string property 'action' to the widget 'customer' containing
+		the following value:
+
+		<programlisting language='shell'>
+	CustomerListRequest customer { }
+		</programlisting>
+		
+		We define the 'action' to be executed, when the form is loaded. In our
+		case we want to execute a 'CustomerListRequest'. The root element of the
+		request should be 'customer'. We currently don't want to pass any additional
+		elements, so we specify '{ }' for the empty content:
 	</para>
 
 	<screenshot>
-		<screeninfo>Step 5 customer form, doctype and root element</screeninfo>
+		<screeninfo>Step 5 CustomerListRequest as dynamic property action</screeninfo>
 		<mediaobject>
 			<imageobject role="html"> 
-				<imagedata fileref="images/Tutorial/step5_customer_doctype_rootelement.png" format="PNG"/>
+				<imagedata fileref="images/Tutorial/step5_customer_action.png" format="PNG"/>
 			</imageobject> 
 			<imageobject role="fo"> 
-				<imagedata fileref="images/Tutorial/step5_customer_doctype_rootelement.png" format="PNG" width="100%" scalefit="1"/>
+				<imagedata fileref="images/Tutorial/step5_customer_action.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
+
+	<para>
+		When we reexecute the wolfclient still nothing happens. So we
+		enable the 'Developer Mode' in the settings in the tab 'Developer'.
+		Then we see that the XML request has been constructed:
+	</para>
+
+	<screenshot>
+		<screeninfo>Step 5 debug view of the CustomerListRequest</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list_debug.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list_debug.png" format="PNG" width="100%" scalefit="1"/>
 			</imageobject>
 		</mediaobject>
 	</screenshot>
 	
 	<para>
-		When we start the wolfclient, we get a funny error message:
+		We see that the request was ok, but that answer has errors:
 	</para>
 
-	<programlisting language='shell'>
-	Error calling procedure: unknown attribute  (id) at /customer
-	</programlisting>
-
+	<screenshot>
+		<screeninfo>Step 5 debug view of the CustomerListRequest</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list_debug2.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list_debug2.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
+	
 	<para>
-		This means we have to configure the id attribute in the server in the simpleform.
-		The wolfclient adds an id automatically to the customer tag in the request.
+		The reason for this is, that we have to tell the client, how to map the
+		elements of the result structure in the XML back to widgets and properties
+		of the widgets.
 	</para>
 	
 	<para>
-		We declare the customer to have an optional 'id' attribute in
-		<filename>CustomerListRequest.simpleform</filename>:
-	</para>
-	
-	<programlisting language='shell'>
-	FORM CustomerListRequest
-	{
-		customer {
-			id ?@string
+		We want to map the following XML:
+
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerList.xml" parse="text" />
+		</programlisting>
+		
+		We reference the root element and the tag and attribute values into the properties of the list widget 'customer'
+		(in our case the rows called 'name' and 'address'). This addressing schema belongs into the 
+		dynamic property 'answer' similar to the 'action' property:
+		
+		<programlisting language='shell'>
+	CustomerList list {
+		customer[] {
+			id={?};
+			name{{row.name}};
+			address{{row.address}}
 		}
 	}
-	</programlisting>
+		</programlisting>
+		
+		The '?' is used for elements in the XML we don't need at the moment.
+		'row' is a property of the <classname>QTreeWidget</classname> widget
+		named 'customer' and iterates through all rows in the list. Each row
+		has sub-properties 'name' and 'address' which represent
+		the corresponding column:
+	</para>
 	
+	<screenshot>
+		<screeninfo>Step 5 CustomerListRequest mapping XML back via answer</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_answer.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_answer.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
+		
 	<para>
-		If we restart the server and run wolfclient again we get the desired result:
+		When we reexecute the wolfclient and click on the customer list we
+		see that the customer list is shown as expected:
 	</para>
 
 	<screenshot>
@@ -171,4 +237,34 @@
 		</mediaobject>
 	</screenshot>
 
+	<para>
+		But when we look at the contents of the debug window we still see an error reported:
+	</para>
+	<screeninfo>Step 5 undefined document type</screeninfo>
+	<mediaobject>
+		<imageobject role="html"> 
+			<imagedata fileref="images/Tutorial/step5_customers_undefined_doctype.png" format="PNG"/>
+		</imageobject> 
+		<imageobject role="fo"> 
+			<imagedata fileref="images/Tutorial/step5_customers_undefined_doctype.png" format="PNG" width="100%" scalefit="1"/>
+		</imageobject>
+	</mediaobject>
+	<para>
+		For simplicity we defined the document type returned from the server as STANDALONE.
+		But the client expects a document type declaration. For this we have to change the
+		definition in the file <filename>tutorial.dmap</filename> that we created in step 4.
+		Here folows the changed transaction definitions:
+	</para>
+
+	<programlisting language='shell'>
+	COMMAND CustomerListRequest
+	        CALL SelectCustomerList
+	        RETURN SKIP CustomerList list;
+	</programlisting>
+
+	<para>
+	The definition RETURN SKIP CustomerList list tells that a document of type 'CustomerList'
+	with the root element 'list' is returned without validation. 
+	We omit a validation on purpose for now to get to the next step.
+	</para>
 </sect1>

@@ -19,11 +19,11 @@
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
-     <property name="doctype" stdset="0">
-      <string>CustomerListRequest</string>
+     <property name="action" stdset="0">
+      <string>CustomerListRequest customer { }</string>
      </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
+     <property name="answer" stdset="0">
+      <string>Customer list {customer[] {id={?}; name{{row.name}}; address{{row.address}} } }</string>
      </property>
      <column>
       <property name="text">

@@ -60,10 +60,11 @@ public:
 	enum Type
 	{
 		Null = Variant::Null,		//< undefined value
+		Custom = Variant::Custom,	//< atomic custom data type
+		Double = Variant::Double,	//< atomic double
 		Int = Variant::Int,		//< atomic signed int
 		UInt = Variant::UInt,		//< atomic unsigned int
 		Bool = Variant::Bool,		//< atomic boolean
-		Double = Variant::Double,	//< atomic double
 		String = Variant::String,	//< atomic string
 		Array,				//< array of VariantStruct
 		Struct,				//< content of structure

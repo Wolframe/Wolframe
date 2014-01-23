@@ -1,0 +1,10 @@
+<!-- preface -->
+
+<preface>
+	<title>Foreword</title>
+	<para>
+	This manual introduces the extension modules of <application>Wolframe</application> and explains
+	how to build them. After reading this
+	you should be able to write <application>Wolframe</application> extension modules on your own.
+	</para>
+</preface>

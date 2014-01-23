@@ -2,8 +2,8 @@
 <title>XML Filter</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can use <acronym>TDL</acronym> for data filters in the logic tier of <application>Wolframe</application>.
-	There are the following variants of <acronym>TDL</acronym> filters available:
+	<para>You can use <acronym>XML</acronym> for data filters in the logic tier of <application>Wolframe</application>.
+	There are the following variants of <acronym>XML</acronym> filters available:
 	<itemizedlist>
 	<listitem><para><application>libxml2</application> (<ulink url="http://www.xmlsoft.org">http://www.xmlsoft.org</ulink>) or</para></listitem>
 	<listitem><para><application>textwolf</application> (<ulink url="http://www.textwolf.net">http://www.textwolf.net</ulink>)</para></listitem>

@@ -1,8 +1,0 @@
-FORM CustomerCreate
-{
-	customer
-	{
-		name string
-		address string
-	}
-}

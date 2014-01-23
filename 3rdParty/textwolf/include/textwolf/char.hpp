@@ -131,7 +131,7 @@ struct ControlCharacterM
 	static const char* name( ControlCharacter c)
 	{
 		static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
-		return name[ (unsigned int)c];
+		return name[ (unsigned int)(unsigned char)c];
 	}
 };
 

@@ -63,4 +63,12 @@ export CC='ccache gcc'
 export CXX='ccache g++'
 rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec
 
-echo "Build done."
+RET=$?
+if test $RET -eq 0; then
+	echo "Build succeeded."
+	exit 0
+else
+	echo "Build failed."
+	exit 1
+fi
+

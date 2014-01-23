@@ -49,7 +49,9 @@ class Configuration :public config::ConfigurationBase
 {
 public:
 	Configuration()
-		:ConfigurationBase( "tproc", 0, "tproc") {}
+		:ConfigurationBase( "tproc", 0, "tproc")
+		,m_input_bufsize(1024)
+		,m_output_bufsize(1024) {}
 
 	Configuration( const std::vector<cmdbind::ExecCommandHandler::Command>& cc, std::size_t ib, std::size_t ob)
 		:config::ConfigurationBase("tproc", 0, "tproc")

@@ -34,7 +34,8 @@
 ///\brief Normalizer for floating point numbers
 #ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
 #include <string>
 
 namespace _Wolframe {

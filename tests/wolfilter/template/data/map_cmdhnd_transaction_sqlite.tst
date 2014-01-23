@@ -27,7 +27,7 @@ docout=output_schema_select_task_by_id			# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
 **file: test.dmap
-COMMAND schema_select_task_by_id CALL test_transaction;
+COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA

@@ -54,13 +54,14 @@
 0
 1
 **file:date_calc.lua
-module "datetime"
 
 function run()
-	f = filter( "line", "UTF-8")
+	f = provider.filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
 	stack = {}
+	date = provider.type( "dta:date")
+
 	for line in input:get() do
 		for w in string.gmatch( line, "%S+") do
 			if w == '+' then
@@ -142,7 +143,7 @@ end
 
 **config
 --module ../../src/modules/filter/line/mod_filter_line
---module ../../src/modules/lua/datetime/mod_lua_datetime
 --module ../../src/modules/cmdbind/lua/mod_command_lua
+--module ../../src/modules/datatype/datetime/mod_datatype_datetime
 --cmdprogram date_calc.lua run
 **end

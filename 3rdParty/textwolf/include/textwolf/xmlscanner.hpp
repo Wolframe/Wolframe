@@ -50,25 +50,25 @@ class ScannerStatemachine :public throws_exception
 public:
 	enum
 	{
-		MaxNofStates=64			//< maximum number of states (fixed allocated array for state machine)
+		MaxNofStates=64				//< maximum number of states (fixed allocated array for state machine)
 	};
 	///\class Element
 	///\brief One state in the state machine
 	struct Element
 	{
-		int fallbackState;		//< state transition if the event does not match (it belongs to the next state = fallbackState)
-		int missError;			//< error code in case of an event that does not match and there is no fallback
+		int fallbackState;			//< state transition if the event does not match (it belongs to the next state = fallbackState)
+		int missError;				//< error code in case of an event that does not match and there is no fallback
 
 		///\class Action
 		///\brief Definition of action fired by the state machine
 		struct Action
 		{
-			int op;			//< action operand
-			int arg;		//< action argument
+			int op;				//< action operand
+			int arg;			//< action argument
 		};
-		Action action;			//< action executed after entering this state
-		char nofnext;			//< number of follow states defined
-		char next[ NofControlCharacter];//< follow state fired by an event (control character type parsed)
+		Action action;				//< action executed after entering this state
+		unsigned char nofnext;			//< number of follow states defined
+		signed char next[ NofControlCharacter];	//< follow state fired by an event (control character type parsed)
 
 		///\brief Constructor
 		Element() :fallbackState(-1),missError(-1),nofnext(0)
@@ -105,7 +105,7 @@ private:
 	void addOtherTransition( int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
-		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParam);
+		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParamState);
 		for (unsigned int inputchr=0; inputchr<NofControlCharacter; inputchr++)
 		{
 			if (tab[ size-1].next[ inputchr] == -1) tab[ size-1].next[ inputchr] = (unsigned char)nextState;
@@ -119,10 +119,9 @@ private:
 	void addTransition( ControlCharacter inputchr, int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
-		if ((unsigned int)inputchr >= (unsigned int)NofControlCharacter)  throw exception( InvalidParam);
-		if (nextState < 0 || nextState > MaxNofStates)  throw exception( InvalidParam);
-		if (tab[ size-1].next[ inputchr] != -1)  throw exception( InvalidParam);
-		if (size == 0)  throw exception( InvalidState);
+		if (inputchr >= NofControlCharacter) throw exception( InvalidParamChar);
+		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParamState);
+		if (tab[ size-1].next[ inputchr] != -1) throw exception( DuplicateStateTransition);
 		tab[ size-1].next[ inputchr] = (unsigned char)nextState;
 		tab[ size-1].nofnext += 1;
 	}
@@ -160,7 +159,7 @@ private:
 	{
 		if (size == 0) throw exception( InvalidState);
 		if (tab[ size-1].fallbackState != -1) throw exception( InvalidState);
-		if (stateIdx < 0 || stateIdx > MaxNofStates) throw exception( InvalidParam);
+		if (stateIdx < 0 || stateIdx > MaxNofStates) throw exception( InvalidParamState);
 		tab[ size-1].fallbackState = stateIdx;
 	}
 public:
@@ -760,7 +759,7 @@ public:
 				if (chr <= 0xD)
 				{
 					//handling W3C requirements for end of line translation in XML:
-					char aa = m_src.ascii();
+					unsigned char aa = m_src.ascii();
 					if (aa == '\r')
 					{
 						push( (unsigned char)'\n');

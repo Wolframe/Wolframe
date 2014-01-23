@@ -55,7 +55,7 @@ public:
 	///\param[in] dt date as string
 	///\param[in] format format definition of 'dt' in a format similar to printf
 	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
-	Date( const std::string& dt, const char* format=0);
+	explicit Date( const std::string& dt, const char* format=0);
 
 	///\brief Copy constructor
 	Date( const Date& o)
@@ -64,6 +64,16 @@ public:
 	///\brief Default constructor
 	Date()
 		:m_date(boost::gregorian::day_clock::local_day()){}
+
+	///\brief Assignment operator
+	Date& operator=( const Date& o)			{m_date = o.m_date; return *this;}
+
+	//\brief Get the year part of the date (YYYY)
+	int year() const				{return m_date.year();}
+	//\brief Get the month part of the date ( >= 1)
+	int month() const				{return m_date.month();}
+	//\brief Get the day part of the date ( >= 1)
+	int day() const					{return m_date.day();}
 
 	///\brief Get the difference in days
 	long operator - (const Date& o) const;

@@ -57,6 +57,7 @@ usr/pkg/lib/wolframe/modules/mod_command_python.so
 usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
 usr/pkg/lib/wolframe/modules/mod_lua_datetime.so
 usr/pkg/lib/wolframe/modules/mod_lua_bcdnumber.so
+usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 @dirrm usr/pkg/lib/wolframe/modules
 usr/pkg/lib/wolframe/libwolframe_client.a
@@ -120,6 +121,7 @@ usr/pkg/include/wolframe/libclient/protocol.hpp
 usr/pkg/include/wolframe/libclient/session.hpp
 @dirrm usr/pkg/include/wolframe/libclient
 usr/pkg/include/wolframe/appConfig.hpp
+usr/pkg/include/wolframe/appDevel.hpp
 usr/pkg/include/wolframe/appProperties.hpp
 usr/pkg/include/wolframe/logger-v1.hpp
 usr/pkg/include/wolframe/singleton.hpp
@@ -135,7 +137,6 @@ usr/pkg/include/wolframe/langbind/iostreamfilter.hpp
 usr/pkg/include/wolframe/langbind/luaArithmeticType.hpp
 usr/pkg/include/wolframe/langbind/luaCppCall.hpp
 usr/pkg/include/wolframe/langbind/luaException.hpp
-usr/pkg/include/wolframe/langbind/normalizeFunction.hpp
 @dirrm usr/pkg/include/wolframe/langbind
 usr/pkg/include/wolframe/protocol/buffers.hpp
 usr/pkg/include/wolframe/protocol/ioblocks.hpp
@@ -144,7 +145,6 @@ usr/pkg/include/wolframe/protocol/parser.hpp
 @dirrm usr/pkg/include/wolframe/protocol
 usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
-usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/pkg/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
@@ -152,6 +152,7 @@ usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/lineCommandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/commandHandlerConstructor.hpp
 @dirrm usr/pkg/include/wolframe/cmdbind
 usr/pkg/include/wolframe/database/DBprovider.hpp
 usr/pkg/include/wolframe/database/bindStatementParams.hpp
@@ -163,6 +164,7 @@ usr/pkg/include/wolframe/database/transaction.hpp
 usr/pkg/include/wolframe/database/transactionFunction.hpp
 usr/pkg/include/wolframe/database/transactionInput.hpp
 usr/pkg/include/wolframe/database/transactionOutput.hpp
+usr/pkg/include/wolframe/database/transactionExecStatemachine.hpp
 @dirrm usr/pkg/include/wolframe/database
 usr/pkg/include/wolframe/prnt/pdfPrinter.hpp
 usr/pkg/include/wolframe/prnt/pdfPrinterDocument.hpp
@@ -197,6 +199,7 @@ usr/pkg/include/wolframe/utils/stringUtils.hpp
 usr/pkg/include/wolframe/serialize/mapContext.hpp
 usr/pkg/include/wolframe/serialize/structOptionParser.hpp
 usr/pkg/include/wolframe/serialize/tostringUtils.hpp
+usr/pkg/include/wolframe/serialize/serializationErrorException.hpp
 usr/pkg/include/wolframe/serialize/struct/filtermapBase.hpp
 usr/pkg/include/wolframe/serialize/struct/filtermapDescription.hpp
 usr/pkg/include/wolframe/serialize/struct/filtermapParse.hpp
@@ -222,7 +225,6 @@ usr/pkg/include/wolframe/processor/userInterface.hpp
 @dirrm usr/pkg/include/wolframe/processor
 usr/pkg/include/wolframe/filter/bufferingfilter.hpp
 usr/pkg/include/wolframe/filter/contentfilterAttributes.hpp
-usr/pkg/include/wolframe/filter/dotnetfilter.hpp
 usr/pkg/include/wolframe/filter/filter.hpp
 usr/pkg/include/wolframe/filter/filterbase.hpp
 usr/pkg/include/wolframe/filter/inputfilter.hpp
@@ -255,6 +257,11 @@ usr/pkg/include/wolframe/types/typeSignature.hpp
 usr/pkg/include/wolframe/types/variant.hpp
 usr/pkg/include/wolframe/types/variantStruct.hpp
 usr/pkg/include/wolframe/types/variantStructDescription.hpp
+usr/pkg/include/wolframe/types/normalizeFunction.hpp
+usr/pkg/include/wolframe/types/customDataType.hpp
+usr/pkg/include/wolframe/types/datetime.hpp
+usr/pkg/include/wolframe/types/syncCounter.hpp
+usr/pkg/include/wolframe/types/syncObjectList.hpp
 @dirrm usr/pkg/include/wolframe/types
 usr/pkg/include/wolframe/AAAA/AAAAinformation.hpp
 usr/pkg/include/wolframe/AAAA/AAAAprovider.hpp
@@ -273,6 +280,7 @@ usr/pkg/include/wolframe/module/luaExtensionBuilder.hpp
 usr/pkg/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/printFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/programTypeBuilder.hpp
+usr/pkg/include/wolframe/module/customDataTypeBuilder.hpp
 @dirrm usr/pkg/include/wolframe/module
 usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
 usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
@@ -280,6 +288,7 @@ usr/pkg/include/wolframe/prgbind/printProgram.hpp
 usr/pkg/include/wolframe/prgbind/program.hpp
 usr/pkg/include/wolframe/prgbind/programLibrary.hpp
 usr/pkg/include/wolframe/prgbind/transactionProgram.hpp
+usr/pkg/include/wolframe/prgbind/runtimeEnvironmentConstructor.hpp
 @dirrm usr/pkg/include/wolframe/prgbind
 usr/pkg/include/wolframe/crypto/HMAC.h
 usr/pkg/include/wolframe/crypto/HMAC.hpp

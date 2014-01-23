@@ -42,6 +42,10 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\class Variant
+//\brief Forward declaration
+class Variant;
+
 //\class NormalizeFunction
 //\brief Basic normalization function for atomic values (variant type)
 struct NormalizeFunction
@@ -64,6 +68,20 @@ struct NormalizeFunctionMap
 
 //\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
 typedef types::CountedReference<NormalizeFunctionMap> NormalizeFunctionMapR;
+
+
+class NormalizeResourceHandle
+{
+public:
+	NormalizeResourceHandle(){}
+	virtual ~NormalizeResourceHandle(){}
+};
+
+typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandleFunction)();
+
+///\param[in,out] rshnd normalization resources handle
+///\param[in] description transaction description source
+typedef types::NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

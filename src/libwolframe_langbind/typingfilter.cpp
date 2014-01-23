@@ -125,6 +125,13 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 			case types::Variant::String:
 				rt = m_outputfilter->print( type, element.charptr(), element.charsize());
 				break;
+
+			case types::Variant::Custom:
+			{
+				std::string strval = element.tostring();
+				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
+				break;
+			}
 		}
 		setState( m_outputfilter->state(), m_outputfilter->getError());
 	}

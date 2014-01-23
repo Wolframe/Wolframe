@@ -464,6 +464,10 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 {
 	switch (element.type())
 	{
+// MBa hack: eliminate compiler warning
+		case types::Variant::Custom:
+			throw std::logic_error("internal: Custom type in lua output filter");
+			break;
 		case types::Variant::Null:
 			_wrap_lua_pushnil( m_ls);
 			return true;

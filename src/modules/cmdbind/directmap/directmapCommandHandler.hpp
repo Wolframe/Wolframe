@@ -91,8 +91,7 @@ public:
 		:m_ctx(ctx_)
 		,m_cmd(0)
 		,m_state(0)
-		,m_function(0)
-		,m_skipvalidation_output(false){}
+		,m_function(0){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -110,7 +109,7 @@ private:
 	const langbind::DirectmapCommandDescription* m_cmd;			//< description of command to execute
 	int m_state;								//< internal state
 	const langbind::FormFunction* m_function;				//< function to execute
-	types::FormR m_inputform;							//< (optional) form for validating and formating input
+	types::FormR m_inputform;						//< (optional) form for validating and formating input
 	types::FormR m_outputform;						//< (optional) form for validating and formating output
 	langbind::TypedInputFilterR m_input;					//< structure for input
 	langbind::TypedOutputFilterR m_output;					//< structure for output
@@ -119,7 +118,7 @@ private:
 	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
-	bool m_skipvalidation_output;						//< output is not validated but document is not standalone and is with doctype returned
+	std::string m_output_rootelement;					//< root element of non validated output
 };
 
 }}//namespace

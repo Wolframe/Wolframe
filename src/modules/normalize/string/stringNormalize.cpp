@@ -41,56 +41,56 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-types::NormalizeFunction* _Wolframe::langbind::createStringNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createTrimNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
 	try
 	{
-		std::string type = boost::algorithm::to_lower_copy( name);
-		if (boost::algorithm::iequals( type, "trim"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new TrimNormalizeFunction();
-		}
-		else if (boost::algorithm::iequals( type, "convdia"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new ConvDiaNormalizeFunction();
-		}
-		else if (boost::algorithm::iequals( type, "ucname"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new UppercaseNameNormalizeFunction();
-		}
-		else if (boost::algorithm::iequals( type, "lcname"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new LowercaseNameNormalizeFunction();
-		}
-		else
-		{
-			throw std::runtime_error( std::string( "unknown string type '") + name + "'");
-		}
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'string:trim'");
+		return new TrimNormalizeFunction();
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw std::runtime_error( std::string( "error in string normalize function description: ") + e.what());
+		throw std::runtime_error( std::string( "error in description of 'string:trim' normalize function: ") + e.what());
 	}
 }
 
-
-const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
+types::NormalizeFunction* _Wolframe::langbind::createConvdiaNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
 {
-	struct NormalizeFunctions :public std::vector<std::string>
+	try
 	{
-		NormalizeFunctions()
-		{
-			push_back( "trim");
-			push_back( "ucname");
-			push_back( "lcname");
-			push_back( "convdia");
-		}
-	};
-	static NormalizeFunctions rt;
-	return rt;
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'string:convdia'");
+		return new ConvDiaNormalizeFunction();
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in description of 'string:convdia' normalize function: ") + e.what());
+	}
 }
+
+types::NormalizeFunction* _Wolframe::langbind::createUcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+{
+	try
+	{
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'string:ucname'");
+		return new UppercaseNameNormalizeFunction();
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in description of 'string:ucname' normalize function: ") + e.what());
+	}
+}
+
+types::NormalizeFunction* _Wolframe::langbind::createLcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+{
+	try
+	{
+		if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'string:lcname'");
+		return new LowercaseNameNormalizeFunction();
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in description of 'string:lcname' normalize function: ") + e.what());
+	}
+}
+
 

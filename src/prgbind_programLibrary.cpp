@@ -40,9 +40,8 @@
 #include "prgbind/printProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
 #include "database/transactionFunction.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
 #include "prnt/printFunction.hpp"
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
@@ -167,6 +166,7 @@ class ProgramLibrary::Impl
 {
 public:
 	types::keymap<module::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
+	types::keymap<module::CustomDataTypeConstructorR> m_customDataTypeConstructorMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<module::FilterConstructorR> m_filterMap;
@@ -240,6 +240,11 @@ public:
 	void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
 	{
 		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
+	}
+
+	void defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f)
+	{
+		m_customDataTypeConstructorMap.insert( std::string(f->domain()), f);
 	}
 
 	void defineProgramType( const ProgramR& prg)
@@ -330,7 +335,7 @@ public:
 		std::vector< std::pair<Program*, std::string> >::const_iterator ti = typed_filenames.begin(), te = typed_filenames.end();
 		for (; ti != te; ++ti)
 		{
-			LOG_TRACE << "Loading program '" << ti->second << "'";
+			LOG_DEBUG << "Loading program '" << ti->second << "'";
 			ti->first->loadProgram( library, transactionDB, m_curfile=ti->second);
 		}
 	}
@@ -362,6 +367,11 @@ void ProgramLibrary::defineFormFunction( const std::string& name, langbind::Form
 void ProgramLibrary::defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
 {
 	m_impl->defineNormalizeFunctionConstructor( f);
+}
+
+void ProgramLibrary::defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f)
+{
+	m_impl->defineCustomDataTypeConstructor( f);
 }
 
 void ProgramLibrary::defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const
@@ -407,6 +417,11 @@ const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 const types::keymap<module::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
 {
 	return m_impl->m_normalizeFunctionConstructorMap;
+}
+
+const types::keymap<module::CustomDataTypeConstructorR>& ProgramLibrary::customDataTypeConstructorMap() const
+{
+	return m_impl->m_customDataTypeConstructorMap;
 }
 
 const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string& name) const

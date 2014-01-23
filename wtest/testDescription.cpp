@@ -61,11 +61,11 @@ static void splitString( std::vector<std::string>& res, const std::string& inp, 
 using namespace _Wolframe;
 using namespace wtest;
 
+#ifdef WITH_PGSQL
 static bool check_PGSQL_RUNNING()
 {
 	enum PGSQLState {Init,ConnSuccess,ConnFail};
 	static PGSQLState state = Init;
-#ifdef WITH_PGSQL
 	if (state == Init)
 	{
 		static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
@@ -88,15 +88,15 @@ static bool check_PGSQL_RUNNING()
 		}
 		PQfinish( conn );
 	}
-#endif
 	return (state == ConnSuccess);
 }
+#endif
 
+#ifdef WITH_ORACLE
 static bool check_ORACLE_RUNNING()
 {
 	static bool rt = false;
 
-#ifdef WITH_ORACLE
 	char user[10] = "wolfusr";
 	char password[10] = "wolfpwd";
 
@@ -115,13 +115,13 @@ static bool check_ORACLE_RUNNING()
 	OCISession *authp = 0;
 
 	sword status;
-	
+
 	// create an Oracle OCI environment (global per process), what
 	// options do we really need (charset, mutex, threading, pooling)?
 	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIHandleAlloc( envhp, (dvoid **)&srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 
@@ -136,16 +136,16 @@ static bool check_ORACLE_RUNNING()
 		connStr.empty( ) ? (sb4)0 : (sb4)( connStr.length( ) ),
 		OCI_DEFAULT );
 	if( status != OCI_SUCCESS ) goto cleanup;
-		
+
 	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
 		srvhp, (ub4)0, OCI_ATTR_SERVER,
-		(OCIError *)errhp );		
+		(OCIError *)errhp );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIHandleAlloc( envhp, (dvoid **)&authp,
 		OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
 		(dvoid *)user, (ub4)strlen( user ),
 		OCI_ATTR_USERNAME, errhp );
@@ -166,7 +166,7 @@ static bool check_ORACLE_RUNNING()
 
 	// success
 	rt = true;
-	
+
 cleanup:
 
 	if( srvhp && errhp && authp ) (void)OCISessionEnd( svchp, errhp, authp, OCI_DEFAULT );
@@ -176,10 +176,10 @@ cleanup:
 	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
 	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
 	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
-#endif
-	
+
 	return rt;
 }
+#endif
 
 static const char* check_flag( const std::string& flag)
 {

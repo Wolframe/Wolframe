@@ -17,6 +17,15 @@ else
 fi
 fi
 
+check_for_errors( )
+{
+	RET=$?
+	if test $RET -gt 0; then
+		echo "Build failed."
+		exit 1
+	fi
+}
+
 OS_VERSION=`uname -r`
 case $OS_VERSION in
 	8.*)
@@ -51,7 +60,26 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	help
+
+gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
+	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	config
+
+gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
+	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules
+check_for_errors
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
@@ -60,6 +88,7 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	test 
+check_for_errors
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
@@ -69,9 +98,11 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	prefix=/usr/local \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION install sysconfdir=/usr/local/etc libdir=/usr/local/lib
+check_for_errors
 
 # doxygen package currently broken
 #cd docs; gmake DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
+#check_for_errors
 
 cp packaging/freebsd/comment $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/freebsd/description $PKGBUILD/PKG/wolframe-$VERSION/.
@@ -96,8 +127,10 @@ pkg_create -S $PKGBUILD -z -v \
 	-i PKG/wolframe-$VERSION/iscript \
 	-k PKG/wolframe-$VERSION/dscript \
 	$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
+check_for_errors
 
 # rm -rf $PKGBUILD/BUILD
 # rm -rf $PKGBUILD/PKG
 
-echo "Build done."
+echo "Build succeeded."
+exit 0

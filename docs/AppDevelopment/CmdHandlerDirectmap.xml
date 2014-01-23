@@ -56,6 +56,25 @@
 		is optional. If not specified the first argument after <code>COMMAND</code> names the input document type.
 	</para>
 		<sect3>
+			<title>Keywords</title>
+			<para>
+			Conflicts with keywords and names are solved by using strings instead
+			of identifiers for names defined or alternatively by enclosing 
+			names of list of names in '(' ')' brackets.
+			The command description language has the following keywords:
+			<simplelist type="horiz" columns="1">
+			<member>COMMAND</member>
+			<member>CALL</member>
+			<member>RETURN</member>
+			<member>SKIP</member>
+			<member>STANDALONE</member>
+			<member>FILTER</member>
+			<member>INPUT</member>
+			<member>OUTPUT</member>
+			</simplelist>
+			</para>
+		</sect3>
+		<sect3>
 			<title>Simple Document Map</title>
 			<para>
 				The following example shows the simplest possible declaration. It states that documents with the
@@ -98,7 +117,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Skipping Document Validation</title>
+			<title>Skipping the Document Validation</title>
 			<para>
 				If you want to skip the input document validation, either because you are dealing
 				with legacy software where a strict definition of a schema is not possible or
@@ -107,9 +126,39 @@
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_call_return.directmap" parse="text" />
 				</programlisting>
-				The same you can specify for the output in the <code>RETURN</code> declaration:
+				The same you can specify for the output with a <code>SKIP</code> 
+				following the <code>RETURN</code> of the output declaration:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
+				</programlisting>
+				A second optional parameter of the <code>RETURN SKIP</code> declaration
+				specifies the root element of the returned data object. In this case
+				the form definition does not have to exist in a DDL form definition.
+				The output can be built without a form definition defined in a DDL.
+				The following example shows such a definition with 'list' 
+				as root element defined. Such a command definition makes sense
+				for strongly typed languages like .NET or native C++ where data 
+				validation can be delagated completely to the strongly typed 
+				structure definition of the called function.
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip_with_rootelem.directmap" parse="text" />
+				</programlisting>
+			</para>
+
+		</sect3>
+		<sect3>
+			<title>Return a Standalone Document</title>
+			<para>
+				If we want to return a document as standalone 
+				(standalone="yes" in the header in case of XML) without validation
+				(validation depends on the document type) the we have to declare
+				this with <code>RETURN STANDALONE</code> instead of <code>RETURN SKIP</code>.
+				The argument of <code>RETURN STANDALONE</code> is the document
+				root element used in document format that need a root element 
+				to be declared (XML and JSON). The following example shows such
+				a declaration:
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_return_standalone.directmap" parse="text" />
 				</programlisting>
 			</para>
 		</sect3>
@@ -117,7 +166,7 @@
 			<title>Explicit Filter Definitions for a Command</title>
 			<para>
 				For most processing it's enough to declare the standard filters in the configuration of the command handler.
-				But in certain cases you want to explicitly declare a filter for a command, for
+				But in certain cases we want to declare a filter explicitly for a command, for
 				example to preprocess a certain document type with an XSLT filter. Explicitly declared
 				filters always refer to a document format and documents of other formats have to be converted
 				first or they cannot be preprocessed. The conversions mechanisms we will explain in detail
@@ -137,8 +186,9 @@
 		<sect3>
 			<title>Using Brackets</title>
 			<para>
-				For better readability you can use optional '(' ')' brackets on the arguments. This way you can distinguish
-				better between keywords and arguments:
+				For better readability you can use optional '(' ')' brackets on 
+				the arguments. This way you can distinguish better between 
+				keywords and arguments and also avoid conflicts with keywords:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>

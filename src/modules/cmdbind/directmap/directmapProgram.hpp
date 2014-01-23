@@ -44,7 +44,10 @@ namespace langbind {
 struct DirectmapCommandDescription
 {
 	DirectmapCommandDescription()
-		:skipvalidation_output(false){}
+		:skipvalidation_output(false)
+		,output_doctype_standalone(false)
+		,command_has_result(false)
+		{}
 	DirectmapCommandDescription( const DirectmapCommandDescription& o)
 		:name(o.name)
 		,call(o.call)
@@ -54,7 +57,11 @@ struct DirectmapCommandDescription
 		,outputfilterarg(o.outputfilterarg)
 		,inputform(o.inputform)
 		,outputform(o.outputform)
-		,skipvalidation_output(o.skipvalidation_output){}
+		,outputrootelem(o.outputrootelem)
+		,skipvalidation_output(o.skipvalidation_output)
+		,output_doctype_standalone(o.output_doctype_standalone)
+		,command_has_result(o.command_has_result)
+		{}
 
 	std::string name;						//< name of program
 	std::string call;						//< name of the transaction or form function
@@ -64,15 +71,16 @@ struct DirectmapCommandDescription
 	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
+	std::string outputrootelem;					//< name of the output root element (in case of SKIP and no form defined)
 	bool skipvalidation_output;					//< output is not validated but document is not standalone and is with doctype returned
+	bool output_doctype_standalone;					//< no document type defined (only root element). document is standalone
+	bool command_has_result;					//< true, if command has a result
 
 	std::string tostring() const;
 };
 
 ///\class DirectmapProgram
 ///\brief Program describing direct mappings (many function descriptions per source file)
-//	Function description syntax: identifier = call( filter :inputform) :outputform;
-//
 class DirectmapProgram
 	:public types::keymap<DirectmapCommandDescription>
 {

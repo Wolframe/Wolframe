@@ -1,0 +1,8 @@
+<!-- Wolframe Application Development documentation -->
+
+<!ENTITY ExtPreface			SYSTEM "Preface.xml">
+<!ENTITY ExtIntroduction		SYSTEM "Introduction.xml">
+<!ENTITY ExtBasicDataTypes		SYSTEM "BasicDataTypes.xml">
+<!ENTITY ExtNormalizerModules		SYSTEM "NormalizerModules.xml">
+<!ENTITY ExtAppendix			SYSTEM "Appendix.xml">
+<!ENTITY ExtGlossary			SYSTEM "Glossary.xml">

@@ -33,9 +33,10 @@ Project Wolframe.
 ///\brief Interface template for object builder of normalize functions from a description
 #ifndef _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include "processor/moduleInterface.hpp"
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
 #include "module/constructor.hpp"
 
 namespace _Wolframe {
@@ -44,14 +45,17 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::ResourceHandle* rh, langbind::CreateNormalizeFunction createFunc_)
+	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateNormalizeFunction>& functionmap_, types::CreateNormalizeResourceHandleFunction createResourceHandle)
 		:m_classname(classname_)
 		,m_name(name_)
-		,m_resource(rh)
-		,m_createFunc(createFunc_)
-		,m_getNormalizeFunctions(getNormalizeFunctions_) {}
+		,m_resource(createResourceHandle?createResourceHandle():0)
+		,m_functionmap(functionmap_)
+		{}
 
-	virtual ~NormalizeFunctionConstructor(){}
+	virtual ~NormalizeFunctionConstructor()
+	{
+		if (m_resource) delete m_resource;
+	}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -65,12 +69,14 @@ public:
 
 	virtual types::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
 	{
-		return m_createFunc( *m_resource, name_, arg_);
+		FunctionMap::const_iterator fi = m_functionmap.find( name_);
+		if (fi == m_functionmap.end()) return 0;
+		return fi->second( m_resource, arg_);
 	}
 
-	const std::vector<std::string>& functions() const
+	std::vector<std::string> functions() const
 	{
-		return m_getNormalizeFunctions();
+		return m_functionmap.getkeys<std::vector<std::string> >();
 	}
 
 	const char* domain() const
@@ -81,23 +87,36 @@ public:
 private:
 	const char* m_classname;
 	const char* m_name;
-	langbind::ResourceHandle* m_resource;
-	langbind::CreateNormalizeFunction m_createFunc;
-	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
+	types::NormalizeResourceHandle* m_resource;
+	typedef types::keymap<types::CreateNormalizeFunction> FunctionMap;
+	FunctionMap m_functionmap;
 };
+
 
 typedef types::CountedReference<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
 
+struct NormalizeFunctionDef
+{
+	const char* name;
+	types::CreateNormalizeFunction createFunc;
+};
 
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
-	NormalizeFunctionBuilder( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::CreateNormalizeFunction createFunc_, langbind::ResourceHandle* r=0)
+	//\brief Constructor
+	//\param[in] functions {0,0} terminated array of function definitions
+	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandleFunction createResourceHandle_=0)
 		:SimpleBuilder( classname_)
 		,m_name(name_)
-		,m_getNormalizeFunctions(getNormalizeFunctions_)
-		,m_createFunc(createFunc_)
-		,m_resource(r){}
+		,m_createResourceHandle(createResourceHandle_)
+	{
+		std::size_t fi = 0;
+		for (; functions[fi].name && functions[fi].createFunc; ++fi)
+		{
+			m_functionmap.insert( std::string(functions[fi].name), functions[fi].createFunc);
+		}
+	}
 
 	virtual ~NormalizeFunctionBuilder()
 	{}
@@ -109,14 +128,13 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_name, m_getNormalizeFunctions, m_resource, m_createFunc);
+		return new NormalizeFunctionConstructor( m_className, m_name, m_functionmap, m_createResourceHandle);
 	}
 
 private:
 	const char* m_name;
-	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
-	langbind::CreateNormalizeFunction m_createFunc;
-	langbind::ResourceHandle* m_resource;
+	types::keymap<types::CreateNormalizeFunction> m_functionmap;
+	types::CreateNormalizeResourceHandleFunction m_createResourceHandle;
 };
 
 }}//namespace

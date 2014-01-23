@@ -34,20 +34,14 @@
 ///\brief Interface for base64 encode/decode
 #ifndef _LANGBIND_BASE64_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_BASE64_NORMALIZE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-class ResourceHandle
-{
-public:
-	ResourceHandle(){}
-};
-
-types::NormalizeFunction* createBase64NormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
-const std::vector<std::string>& normalizeFunctions();
+types::NormalizeFunction* createEncodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createDecodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

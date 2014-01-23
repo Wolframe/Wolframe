@@ -30,24 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/locale/localeNormalize.hpp
+///\file localeNormalize.hpp
 ///\brief Interface for normalization functions based on boost locale (ICU)
 #ifndef _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+#include "types/normalizeFunction.hpp"
 #include <vector>
 #include <boost/locale/generator.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-class ResourceHandle
+class LocaleResourceHandle
+	:public types::NormalizeResourceHandle
 {
 public:
-	ResourceHandle()
+	LocaleResourceHandle()
 	{
 		m_gen.locale_cache_enabled( true);
 	}
+	virtual ~LocaleResourceHandle(){}
 
 	std::locale getLocale( const std::string& name)
 	{
@@ -57,8 +59,17 @@ private:
 	boost::locale::generator m_gen;
 };
 
-types::NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
-const std::vector<std::string>& normalizeFunctions();
+types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_nfkc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_latinword_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_ascii_de_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

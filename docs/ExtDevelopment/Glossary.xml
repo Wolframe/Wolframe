@@ -1,0 +1,29 @@
+<glossary>
+	<title>Glossary</title>
+	<para>
+		This is the glossary for the <application>Wolframe</application> Extensions Development Manual.
+	</para>
+
+	<glossdiv><title>Wolframe glossary</title>
+		<glossentry id="NormalizationFunction"><glossterm><acronym>Normalization Function</acronym></glossterm>
+			<glossdef>
+				<para>A Normalization Function is a function taking an atomic value as
+				input and returning an atomic value as output. It validates the input
+				and throws an exception if the validation failes. It transforms the
+				value into a normalized form.</para>
+			</glossdef>
+		</glossentry>
+		<glossentry id="VariantType"><glossterm><acronym>Variant Type</acronym></glossterm>
+			<glossdef>
+				<para>A variant type represents an atomic value with its type.
+				The value can appear as an integral or floating or fixed point 
+				number or as a boolean or as a string. The variant types helps to
+				interface with interpreted non strongly typed or value typed languages.
+				The name "variant" for this type has been chosen because it is used in many other 
+				systems (Microsoft COM/.NET, Qt, boost) as name for this kind of a union type.
+				</para>
+			</glossdef>
+		</glossentry>
+	</glossdiv>
+</glossary>
+

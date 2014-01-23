@@ -129,6 +129,10 @@ Object::Object( const types::Variant& val)
 {
 	switch (val.type())
 	{
+// MBa hack: eliminate compiler warning
+		case types::Variant::Custom:
+			throw std::logic_error("internal: Custom type in python object");
+			break;
 		case types::Variant::Null:
 			m_obj = Py_None;
 			Py_INCREF( m_obj);

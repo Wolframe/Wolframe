@@ -50,7 +50,7 @@
 		Because we didn't write any user interfaces yet, we get
 		an error message:
 		<programlisting language='shell'>
-	Unable to load form plugin 'init', does the plugin exist?
+	Unable to load form or plugin 'init', does the it exist?
 		</programlisting>
 		
 		To get rid of that error message we will have to create

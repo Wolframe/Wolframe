@@ -46,7 +46,12 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static langbind::ResourceHandle base64Resource;
+static NormalizeFunctionDef normalizeFunctions[] =
+{
+	{"encode", &langbind::createEncodeNormalizeFunction},
+	{"decode", &langbind::createDecodeNormalizeFunction},
+	{0,0}
+};
 
 namespace {
 struct NormalizeProcessor
@@ -54,7 +59,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "Base64Normalizer", "base64", langbind::normalizeFunctions, langbind::createBase64NormalizeFunction, &base64Resource);
+		return new NormalizeFunctionBuilder( "Base64Normalizer", "base64", normalizeFunctions);
 	}
 };
 }//anonymous namespace
