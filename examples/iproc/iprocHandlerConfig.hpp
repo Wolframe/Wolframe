@@ -58,7 +58,9 @@ public:
 	};
 public:
 	Configuration()
-		:config::ConfigurationBase( "iproc", 0, "iproc") {}
+		:config::ConfigurationBase( "iproc", 0, "iproc")
+		,m_input_bufsize(1024)
+		,m_output_bufsize(1024) {}
 
 	Configuration( const std::vector<Command>& cc, std::size_t ib, std::size_t ob)
 		:config::ConfigurationBase("iproc", 0, "iproc")
