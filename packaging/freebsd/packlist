@@ -126,7 +126,6 @@ usr/local/include/wolframe/langbind/iostreamfilter.hpp
 usr/local/include/wolframe/langbind/luaArithmeticType.hpp
 usr/local/include/wolframe/langbind/luaCppCall.hpp
 usr/local/include/wolframe/langbind/luaException.hpp
-usr/local/include/wolframe/langbind/normalizeFunction.hpp
 @dirrm usr/local/include/wolframe/langbind
 usr/local/include/wolframe/protocol/buffers.hpp
 usr/local/include/wolframe/protocol/ioblocks.hpp
@@ -247,6 +246,11 @@ usr/local/include/wolframe/types/typeSignature.hpp
 usr/local/include/wolframe/types/variant.hpp
 usr/local/include/wolframe/types/variantStruct.hpp
 usr/local/include/wolframe/types/variantStructDescription.hpp
+usr/local/include/wolframe/types/normalizeFunction.hpp
+usr/local/include/wolframe/types/customDataType.hpp
+usr/local/include/wolframe/types/datetime.hpp
+usr/local/include/wolframe/types/syncCounter.hpp
+usr/local/include/wolframe/types/syncObjectList.hpp
 @dirrm usr/local/include/wolframe/types
 usr/local/include/wolframe/AAAA/AAAAinformation.hpp
 usr/local/include/wolframe/AAAA/AAAAprovider.hpp
@@ -265,6 +269,7 @@ usr/local/include/wolframe/module/luaExtensionBuilder.hpp
 usr/local/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/local/include/wolframe/module/printFunctionBuilder.hpp
 usr/local/include/wolframe/module/programTypeBuilder.hpp
+usr/local/include/wolframe/module/customDataTypeBuilder.hpp
 @dirrm usr/local/include/wolframe/module
 usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
