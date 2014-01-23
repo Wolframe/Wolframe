@@ -39,6 +39,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <limits>
 #include <cmath>
+#include <boost/lexical_cast.hpp>
 
 #ifdef _Wolframe_TYPES_BCD_USE_64BIT
 #define NumMask 0x0fffFFFFffffFFFFULL
@@ -1102,6 +1103,21 @@ BigNumber& BigNumber::operator=( const std::string& o)
 	format( sp, cp);
 	return *this;
 }
+
+static double multiplyPower10( double o, unsigned int p)
+{
+	while (p > 8) {p -= 8; o *= 10000000;}
+	while (p > 3) {p -= 3; o *= 1000;}
+	while (p > 1) {p -= 1; o *= 10;}
+	return o;
+}
+
+BigNumber& BigNumber::operator=( double o)
+{
+	BigBCD::init( boost::numeric_cast<_WOLFRAME_INTEGER>( multiplyPower10( o, m_calc_precision)));
+	return *this;
+}
+
 
 void BigNumber::initFromString( const std::string& numstr, unsigned int maxPrecision)
 {

@@ -206,6 +206,7 @@ public:
 
 	BigNumber& operator=( const BigNumber& o);
 	BigNumber& operator=( const std::string& o);
+	BigNumber& operator=( double o);
 
 	BigNumber operator /( const BigNumber& opr) const;
 	BigNumber operator /( _WOLFRAME_INTEGER opr) const;

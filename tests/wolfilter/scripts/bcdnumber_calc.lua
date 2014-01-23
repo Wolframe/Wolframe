@@ -1,9 +1,8 @@
-module "bcdnumber"
-
 function run()
 	f = filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
+	bigint = provider.type( "bcd:bigint")
 
 	stack = {}
 	for line in input:get() do

@@ -34404,12 +34404,11 @@
 523113432845870143891774895725038
 1416033216724766420909673978
 **file:bcdnumber_calc.lua
-module "bcdnumber"
-
 function run()
 	f = filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
+	bigint = provider.type( "bcd:bigint")
 
 	stack = {}
 	for line in input:get() do
@@ -34497,5 +34496,5 @@ end
 
 
 **config
---module ../../src/modules/filter/line/mod_filter_line --module ../../src/modules/lua/bcdnumber/mod_lua_bcdnumber --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram bcdnumber_calc.lua run
+--module ../../src/modules/filter/line/mod_filter_line --module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram bcdnumber_calc.lua run
 **end
