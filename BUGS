@@ -6,8 +6,6 @@
 
 [2]- Errors on ARM because char defaults to unsigned char instead of signed char:
 	1) Tons of warnings about superflous comparisons of unsigned chars
-	2) base64Test fails in base64 decoding
-	3) textwolf always throws an InvalidParam
 
 [3]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
 	(too difficult at the moment and most databases are case insensitive anyway) !
