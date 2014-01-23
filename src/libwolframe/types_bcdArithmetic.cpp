@@ -112,7 +112,7 @@ BigBCD::BigBCD()
 	,m_neg(false)
 	,m_allocated(false)
 {
-	init( 0);
+	init( 0, 0);
 }
 
 void BigBCD::init( const std::string& str)
@@ -128,7 +128,7 @@ void BigBCD::init( const std::string& str)
 	unsigned int tt = (((nn-ii)+(NumDigits-1)) % NumDigits) * 4;
 	if (!bb) throw std::runtime_error( std::string( "illegal bcd number string '") + str + "'");
 
-	init( bb);
+	init( bb, 0);
 	for (; ii<nn; ++ii)
 	{
 		BCDElement digit = (unsigned char)(str[ ii] - '0');
@@ -150,20 +150,7 @@ void BigBCD::init( const std::string& str)
 	normalize();
 }
 
-BigBCD::BigBCD( const std::string& numstr)
-	:m_size(0)
-	,m_ar(0)
-	,m_neg(false)
-	,m_allocated(false)
-{
-	init( numstr);
-}
-
-BigBCD::BigBCD( long num)
-	:m_size(0)
-	,m_ar(0)
-	,m_neg(false)
-	,m_allocated(false)
+void BigBCD::init( _WOLFRAME_INTEGER num)
 {
 	bool ng = false;
 	if (num < 0)
@@ -176,13 +163,31 @@ BigBCD::BigBCD( long num)
 	copy( th, 0);
 }
 
+BigBCD::BigBCD( const std::string& numstr)
+	:m_size(0)
+	,m_ar(0)
+	,m_neg(false)
+	,m_allocated(false)
+{
+	init( numstr);
+}
+
+BigBCD::BigBCD( _WOLFRAME_INTEGER num)
+	:m_size(0)
+	,m_ar(0)
+	,m_neg(false)
+	,m_allocated(false)
+{
+	BigBCD::init( num);
+}
+
 BigBCD::BigBCD( const BigBCD& o)
 	:m_size(o.m_size)
 	,m_ar(0)
 	,m_neg(o.m_neg)
 	,m_allocated(false)
 {
-	init( m_size);
+	init( m_size, 0);
 	m_neg = o.m_neg;
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
@@ -212,6 +217,47 @@ std::string BigBCD::tostring() const
 	for (; ii != ee; ++ii)
 	{
 		rt.push_back( ii->ascii());
+	}
+	return rt;
+}
+
+_WOLFRAME_INTEGER BigBCD::toint() const
+{
+	_WOLFRAME_INTEGER rt = 0;
+	int cnt = 0;
+
+	const_iterator ii = begin(), ee = end();
+	if (ii == ee) return 0;
+
+	for (; cnt < _WOLFRAME_INTEGER_DIGITS && ii != ee; ++ii)
+	{
+		rt = rt * 10 + *ii;
+	}
+	if (m_neg)
+	{
+		rt = -rt;
+	}
+	if (ii != ee)
+	{
+		throw std::runtime_error("number out of range to convert it to an int");
+	}
+	return rt;
+}
+
+double BigBCD::todouble() const
+{
+	double rt = 0.0;
+
+	const_iterator ii = begin(), ee = end();
+	if (ii == ee) return 0;
+
+	for (; ii != ee; ++ii)
+	{
+		rt = rt * 10 + *ii;
+	}
+	if (m_neg)
+	{
+		rt = -rt;
 	}
 	return rt;
 }
@@ -854,7 +900,7 @@ BigBCD BigBCD::mul( FactorType opr) const
 	return BigBCD( val);
 }
 
-BigBCD BigBCD::mul( long opr) const
+BigBCD BigBCD::mul( _WOLFRAME_INTEGER opr) const
 {
 	bool ng = false;
 	if (opr < 0)
@@ -1048,6 +1094,15 @@ void BigNumber::initFromString( const std::string& numstr)
 	initFromString( numstr, numstr.size());
 }
 
+BigNumber& BigNumber::operator=( const std::string& o)
+{
+	unsigned int cp = m_calc_precision;
+	unsigned int sp = m_show_precision;
+	initFromString( o, cp);
+	format( sp, cp);
+	return *this;
+}
+
 void BigNumber::initFromString( const std::string& numstr, unsigned int maxPrecision)
 {
 	std::string val;
@@ -1128,6 +1183,33 @@ std::string BigNumber::tostring() const
 	return rt;
 }
 
+double BigNumber::todouble() const
+{
+	double rt = 0.0;
+	if (m_calc_precision)
+	{
+		rt = 1.0;
+		unsigned int kk = 0;
+		for (; kk < m_calc_precision; ++kk)
+		{
+			rt /= 10;
+		}
+	}
+	const_iterator ii = begin(), ee = end();
+	if (ii == ee) return 0.0;
+
+	for (; ii != ee; ++ii)
+	{
+		rt = rt * 10 + *ii;
+	}
+	if (m_neg)
+	{
+		rt = -rt;
+	}
+	return rt;
+}
+
+
 bool BigNumber::isequal( const BigNumber& o) const
 {
 	if (o.m_calc_precision == m_calc_precision)
@@ -1189,12 +1271,28 @@ BigNumber BigNumber::operator /( const BigNumber& o) const
 	return rt;
 }
 
+BigNumber BigNumber::operator /( _WOLFRAME_INTEGER opr) const
+{
+	BigBCD res( *this / opr);
+	BigNumber rt( res, 0, 0);
+	rt.m_calc_precision = m_calc_precision;
+	rt.m_show_precision = m_show_precision;
+	return rt;
+}
+
 BigNumber BigNumber::operator *( const BigNumber& o) const
 {
 	BigBCD val( BigBCD(*this) * BigBCD(o));
 	BigNumber rt( val.shift( -(int)o.m_calc_precision), 0, 0);
 	rt.m_calc_precision = m_calc_precision;
 	rt.m_show_precision = m_show_precision;
+	return rt;
+}
+
+BigNumber BigNumber::operator *( _WOLFRAME_INTEGER opr) const
+{
+	BigBCD val( BigBCD(*this) * opr);
+	BigNumber rt( val, m_show_precision, m_calc_precision);
 	return rt;
 }
 
@@ -1224,6 +1322,14 @@ BigNumber BigNumber::operator +( const BigNumber& o) const
 	}
 }
 
+BigNumber BigNumber::operator +( _WOLFRAME_INTEGER opr) const
+{
+	BigBCD arg( opr);
+	BigNumber rt( *this);
+	rt.add( arg.shift( m_calc_precision));
+	return rt;
+}
+
 BigNumber BigNumber::operator -( const BigNumber& o) const
 {
 	if (o.m_calc_precision == m_calc_precision)
@@ -1250,6 +1356,14 @@ BigNumber BigNumber::operator -( const BigNumber& o) const
 	}
 }
 
+BigNumber BigNumber::operator -( _WOLFRAME_INTEGER opr) const
+{
+	BigBCD arg( opr);
+	BigNumber rt( *this);
+	rt.sub( arg.shift( m_calc_precision));
+	return rt;
+}
+
 BigNumber BigNumber::operator -() const
 {
 	BigNumber rt( *this);
@@ -1259,6 +1373,10 @@ BigNumber BigNumber::operator -() const
 
 void BigNumber::format( unsigned int show_prec, unsigned int calc_prec)
 {
+	if (calc_prec < show_prec)
+	{
+		throw std::runtime_error("illegal big bcd number format description (show precision > calc precision)");
+	}
 	if (calc_prec != m_calc_precision)
 	{
 		init( shift( (int)calc_prec - (int)m_calc_precision));

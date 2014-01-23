@@ -33,17 +33,11 @@ types::Variant DateDataType::add( const CustomDataValue& operand, const Variant&
 
 types::Variant DateDataType::subtract( const CustomDataValue& operand, const Variant& arg)
 {
-	if (arg.type() == types::Variant::Custom)
+	if (arg.type() == types::Variant::Custom
+	&&  arg.data().value.Custom->type() == operand.type())
 	{
-		if (arg.data().value.Custom->type() == operand.type())
-		{
-			types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.Custom));
-			return types::Variant( daydiff);
-		}
-		else
-		{
-			throw std::runtime_error("illegal argument for date subtraction");
-		}
+		types::Variant::Data::Int daydiff = dynamic_cast<const DateDataValue&>(operand).operator-( *(const Date*)dynamic_cast<const DateDataValue*>(arg.data().value.Custom));
+		return types::Variant( daydiff);
 	}
 	else 
 	{

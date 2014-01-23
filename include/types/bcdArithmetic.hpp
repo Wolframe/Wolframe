@@ -37,6 +37,7 @@ Project Wolframe.
 #include <string>
 #include <boost/cstdint.hpp>
 #include "types/allocators.hpp"
+#include "types/integer.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -57,16 +58,21 @@ class BigBCD
 public:
 	BigBCD();
 	BigBCD( const std::string& numstr);
-	BigBCD( long num);
+	BigBCD( _WOLFRAME_INTEGER num);
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
 	void init( const BigBCD& o)			{copy( o, 0);}
 	void init( const std::string& str);
+	void init( _WOLFRAME_INTEGER num);
+
 	std::string tostring() const;
+	_WOLFRAME_INTEGER toint() const;
+	double todouble() const;
 
 	BigBCD operator /( const BigBCD& opr) const	{return div( opr);}
 	BigBCD operator *( const BigBCD& opr) const	{return mul( opr);}
+	BigBCD operator *( _WOLFRAME_INTEGER opr) const	{return mul( opr);}
 	BigBCD operator +( const BigBCD& opr) const	{return add( opr);}
 	BigBCD operator -( const BigBCD& opr) const	{return sub( opr);}
 	BigBCD operator -() const			{return neg();}
@@ -127,7 +133,7 @@ public:
 private:
 	friend class BigNumber;
 	typedef GreedySmallChunkAllocator Allocator;
-	void init( std::size_t size_, Allocator* allocator=0);
+	void init( std::size_t size_, Allocator* allocator);
 	void copy( const BigBCD& o, Allocator* allocator);
 	void normalize();
 
@@ -147,7 +153,7 @@ private:
 	BigBCD add( const BigBCD& opr) const;
 	BigBCD sub( const BigBCD& opr) const;
 	BigBCD mul( FactorType opr) const;
-	BigBCD mul( long opr) const;
+	BigBCD mul( _WOLFRAME_INTEGER opr) const;
 	BigBCD mul( const BigBCD& opr) const;
 	BigBCD div( const BigBCD& opr) const;
 	BigBCD neg() const;
@@ -180,6 +186,10 @@ public:
 		,m_show_precision(o.m_show_precision)
 		,m_calc_precision(o.m_calc_precision){}
 
+	BigNumber( unsigned int sp, unsigned int cp)
+		:m_show_precision(sp)
+		,m_calc_precision(cp){}
+
 	BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp);
 	BigNumber( const std::string& numstr, unsigned int sp, unsigned int cp);
 	BigNumber( const std::string& numstr, unsigned int sp);
@@ -192,14 +202,19 @@ public:
 	BigNumber round( const BigNumber& gran);
 
 	std::string tostring() const;
+	double todouble() const;
 
 	BigNumber& operator=( const BigNumber& o);
+	BigNumber& operator=( const std::string& o);
 
 	BigNumber operator /( const BigNumber& opr) const;
+	BigNumber operator /( _WOLFRAME_INTEGER opr) const;
 	BigNumber operator *( const BigNumber& opr) const;
-	BigNumber operator *( unsigned int opr) const;
+	BigNumber operator *( _WOLFRAME_INTEGER opr) const;
 	BigNumber operator +( const BigNumber& opr) const;
+	BigNumber operator +( _WOLFRAME_INTEGER opr) const;
 	BigNumber operator -( const BigNumber& opr) const;
+	BigNumber operator -( _WOLFRAME_INTEGER opr) const;
 	BigNumber operator -() const;
 
 	bool operator==( const BigNumber& o) const		{return isequal(o);}

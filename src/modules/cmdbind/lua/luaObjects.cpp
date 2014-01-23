@@ -2141,7 +2141,7 @@ LUA_FUNCTION_THROWS( "custom:__tostring()", function_customtype_tostring)
 LUA_FUNCTION_THROWS( "custom:tonumber()", function_customtype_tonumber)
 {
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "tonumber");
-	return callConversionOperator( ls, types::CustomDataType::ToNumber, operand->get());
+	return callConversionOperator( ls, types::CustomDataType::ToDouble, operand->get());
 }
 
 LUA_FUNCTION_THROWS( "custom:__len()", function_customtype_len)

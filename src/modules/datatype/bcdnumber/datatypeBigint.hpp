@@ -30,71 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file datatypeDate.hpp
-///\brief Custom data type interface to date arithmetic functions
-#ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
-#define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
+///\file datatypeBigint.hpp
+///\brief Custom data type interface for arbitrary length bcd integer numbers
+#ifndef _CUSTOM_DATA_TYPE_BCD_BIGINT_HPP_INCLUDED
+#define _CUSTOM_DATA_TYPE_BCD_BIGINT_HPP_INCLUDED
 #include "types/customDataType.hpp"
-#include "types/dateArithmetic.hpp"
+#include "types/bcdArithmetic.hpp"
 #include "types/variant.hpp"
 
 namespace _Wolframe {
 namespace types {
 
-class DateDataInitializer
-	:public CustomDataInitializer
-{
-public:
-	DateDataInitializer( const std::string& description_)
-		:m_description( description_)
-	{
-		m_format = m_description.c_str();
-	}
-	virtual ~DateDataInitializer(){}
-
-	const char* format() const	{return m_format;}
-
-	static CustomDataInitializer* create( const std::string& description_)
-	{
-		return new DateDataInitializer( description_);
-	}
-
-private:
-	std::string m_description;
-	const char* m_format;
-};
-
-
-class DateDataValue
+class BigintDataValue
 	:public CustomDataValue
-	,public types::Date
+	,public types::BigBCD
 {
 public:
-	DateDataValue( unsigned short y, unsigned short m, unsigned short d)
-		:Date(y,m,d){}
-
-	explicit DateDataValue( const std::string& dt, const DateDataInitializer* ini=0)
-		:Date(dt,ini?ini->format():0){}
+	///\brief Constructor
+	BigintDataValue( _WOLFRAME_INTEGER val)
+		:types::BigBCD(val){}
+	///\brief Constructor
+	BigintDataValue( const std::string& val)
+		:types::BigBCD(val){}
 
 	///\brief Copy constructor
-	DateDataValue( const DateDataValue& o)
-		:CustomDataValue(o),Date(o){}
+	BigintDataValue( const BigintDataValue& o)
+		:CustomDataValue(o),types::BigBCD(o){}
 
-	DateDataValue(){}
+	BigintDataValue()
+		{}
 
-	const char* format() const
-	{
-		if (initializer())
-		{
-			return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	virtual ~DateDataValue(){};
+	virtual ~BigintDataValue(){};
 
 	virtual int compare( const CustomDataValue& o) const
 	{
@@ -104,71 +70,73 @@ public:
 		}
 		else
 		{
-			const DateDataValue* odt = dynamic_cast<const DateDataValue*>(&o);
+			const BigintDataValue* odt = dynamic_cast<const BigintDataValue*>(&o);
 			int rt = -1;
-			rt += (int)(Date::operator>=(*odt));
-			rt += (int)(Date::operator>(*odt));
+			rt += (int)(types::BigBCD::operator>=(*odt));
+			rt += (int)(types::BigBCD::operator>(*odt));
 			return rt;
 		}
 	}
 
 	virtual std::string tostring() const
 	{
-		return Date::tostring( format());
+		return types::BigBCD::tostring();
 	}
 
 	virtual void assign( const Variant& o)
 	{
 		if (o.type() == Variant::String)
 		{
-			Date::operator=( Date( o.tostring()));
+			types::BigBCD::init( o.tostring());
 		}
 		else
 		{
-			Date::operator=( Date(1970,1,1) + o.toint());
+			types::BigBCD::init( o.toint());
 		}
 	}
 
 	virtual CustomDataValue* copy() const
 	{
-		return new DateDataValue(*this);
+		return new BigintDataValue(*this);
 	}
 
 	static CustomDataValue* create( const CustomDataInitializer*)
 	{
-		return new DateDataValue();
+		return new BigintDataValue();
 	}
 };
 
 
-class DateDataType
+class BigintDataType
 	:public CustomDataType
-	,public Date
+	,public types::BigBCD
 {
 public:
-	DateDataType( const std::string& name_)
-		:CustomDataType(name_,&DateDataValue::create,&DateDataInitializer::create)
+	BigintDataType( const std::string& name_)
+		:CustomDataType(name_,&BigintDataValue::create)
 	{
-		define( Increment, &increment);
-		define( Decrement, &decrement);
 		define( Add, &add);
 		define( Subtract, &subtract);
-		define( ToTimestamp, &toTimestamp);
+		define( Multiply, &multiply);
+		define( Divide, &divide);
+		define( Negation, &negation);
 		define( ToInt, &toInt);
+		define( ToDouble, &toDouble);
 	}
 
 	static CustomDataType* create( const std::string& name)
 	{
-		return new DateDataType( name);
+		return new BigintDataType( name);
 	}
 
 private:
-	static types::Variant increment( const CustomDataValue& operand);
-	static types::Variant decrement( const CustomDataValue& operand);
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
-	static types::Variant toTimestamp( const CustomDataValue& operand);
+	static types::Variant multiply( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant divide( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant negation( const CustomDataValue& operand);
 	static types::Variant toInt( const CustomDataValue& operand);
+	static types::Variant toDouble( const CustomDataValue& operand);
 };
 
 }}//namespace

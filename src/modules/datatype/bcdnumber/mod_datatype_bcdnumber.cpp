@@ -34,7 +34,8 @@
 ///\brief Extension module for date and time arithmetic
 #include "module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
-#include "datatypeDate.hpp"
+#include "datatypeBigint.hpp"
+#include "datatypeBigfxp.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
@@ -48,7 +49,8 @@ static void setModuleLogger( void* logger )
 
 static CustomDataTypeDef customDataTypes[] =
 {
-	{"date", &types::DateDataType::create},
+	{"bigint", &types::BigintDataType::create},
+	{"bigfxp", &types::BigfxpDataType::create},
 	{0,0}
 };
 
@@ -57,7 +59,7 @@ struct Obj
 {
 	static SimpleBuilder* constructor()
 	{
-		return new CustomDataTypeBuilder( "DateTimeArithmeticTypes", "dta", customDataTypes);
+		return new CustomDataTypeBuilder( "BcdArithmeticTypes", "bcd", customDataTypes);
 	}
 };
 }//anonymous namespace
@@ -68,5 +70,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	Obj::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "Extension module for date and time arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", setModuleLogger, 0, 0, NofObjects, objdef);
 

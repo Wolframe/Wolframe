@@ -38,7 +38,10 @@ Project Wolframe.
 #include <limits.h>
 #include <stdint.h>
 
-#define _WOLFRAME_INTEGER	boost::int64_t
-#define _WOLFRAME_UINTEGER	boost::uint64_t
+#define _WOLFRAME_INTEGER		boost::int64_t
+#define _WOLFRAME_UINTEGER		boost::uint64_t
+
+#define _WOLFRAME_INTEGER_DIGITS	19
+#define _WOLFRAME_UINTEGER_DIGITS	20
 
 #endif

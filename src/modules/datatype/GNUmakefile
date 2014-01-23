@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = datetime
+SUBDIRS = datetime bcdnumber
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
