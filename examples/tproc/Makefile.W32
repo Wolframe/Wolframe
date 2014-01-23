@@ -123,6 +123,7 @@ local_test: $(TEST_CPP_BINS) copy_prereq
 
 run: copy_prereq
 	@-echo @echo off > test.bat
+	@-echo copy tests\*.dll >> test.bat
 	@-echo echo Running the Wolframe tproc example... >> test.bat
 	@-echo tprocd.exe -c tproc.conf >> test.bat
 	@-test.bat
