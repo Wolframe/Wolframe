@@ -85,7 +85,14 @@ public:
 
 	const char* format() const
 	{
-		return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
+		if (initializer())
+		{
+			return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	virtual ~DateDataValue(){};
@@ -100,8 +107,8 @@ public:
 		{
 			const DateDataValue* odt = dynamic_cast<const DateDataValue*>(&o);
 			int rt = -1;
-			rt += (int)(Date::operator==(*odt));
 			rt += (int)(Date::operator>=(*odt));
+			rt += (int)(Date::operator>(*odt));
 			return rt;
 		}
 	}

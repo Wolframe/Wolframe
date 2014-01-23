@@ -46,6 +46,7 @@ CustomDataType::CustomDataType(
 	std::memset( &m_vmt, 0, sizeof( m_vmt));
 	m_vmt.opInitializerConstructor = initializerconstructor_;
 	m_vmt.opConstructor = constructor_;
+	if (!m_vmt.opConstructor) throw std::logic_error( "defined custom data type without value constructor");
 }
 
 CustomDataType::CustomDataType( const CustomDataType& o)
@@ -100,6 +101,10 @@ CustomDataType::DimensionOperator CustomDataType::getOperator( CustomDataType::D
 
 CustomDataInitializer* CustomDataType::createInitializer( const std::string& d) const
 {
+	if (!m_vmt.opInitializerConstructor)
+	{
+		throw std::runtime_error( "no intializer arguments defined for this type");
+	}
 	return (*m_vmt.opInitializerConstructor)( d);
 }
 

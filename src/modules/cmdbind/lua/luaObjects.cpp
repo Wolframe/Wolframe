@@ -61,7 +61,7 @@ extern "C"
 }
 
 using namespace _Wolframe;
-using namespace langbind;
+using namespace _Wolframe::langbind;
 
 namespace luaname
 {
@@ -71,7 +71,8 @@ namespace luaname
 	static const char* Filter = "wolframe.Filter";
 	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
 	static const char* Form = "wolframe.Form";
-	static const char* Custom = "wolframe.Custom";
+	static const char* CustomValue = "wolframe.CustomValue";
+	static const char* CustomInitializer = "wolframe.CustomInitializer";
 	static const char* DDLFormParser = "wolframe.DDLFormParser";
 	static const char* DDLFormSerializer = "wolframe.DDLFormSerializer";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
@@ -94,7 +95,8 @@ template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
 template <> const char* metaTableName<types::FormR>()			{return luaname::Form;}
-template <> const char* metaTableName<types::CustomDataValueR>()	{return luaname::Custom;}
+template <> const char* metaTableName<types::CustomDataValueR>()	{return luaname::CustomValue;}
+template <> const char* metaTableName<types::CustomDataInitializerR>()	{return luaname::CustomInitializer;}
 template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
 template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
@@ -887,19 +889,77 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 
 LUA_FUNCTION_THROWS( "form()", function_form)
 {
-	if (lua_isstring( ls, 1))
-	{
-		check_parameters( ls, 0, 1, LUA_TSTRING);
+	check_parameters( ls, 0, 1, LUA_TSTRING);
 
-		const char* name = lua_tostring( ls, 1);
-		const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-		const types::FormDescription* st = ctx->formDescription( name);
-		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
-		types::FormR frm( new types::Form( st));
-		LuaObject<types::FormR>::push_luastack( ls, frm);
-		return 1;
+	const char* name = lua_tostring( ls, 1);
+	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const types::FormDescription* st = ctx->formDescription( name);
+	if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
+	types::FormR frm( new types::Form( st));
+	LuaObject<types::FormR>::push_luastack( ls, frm);
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<type>()", function_type_value_constructor)
+{
+	const types::CustomDataType* typ = (types::CustomDataType*)lua_touserdata( ls, lua_upvalueindex( 1));
+	types::CustomDataInitializerR* ini = LuaObject<types::CustomDataInitializerR>::get( ls, lua_upvalueindex( 2));
+	if (!typ || !ini) throw std::runtime_error( "invalid call of type constructor");
+
+	int nn = lua_gettop( ls);
+	if (nn > 1) throw std::runtime_error( "too many arguments");
+	types::CustomDataValueR value( typ->createValue( ini->get()));
+	if (nn == 1)
+	{
+		types::VariantConst arg;
+		getVariantValue( ls, arg, 1);
+		value->assign( arg);
 	}
-	throw std::runtime_error( "expected string as argument of form");
+	LuaObject<types::CustomDataValueR>::push_luastack( ls, value);
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "type()", function_type)
+{
+	int nn = lua_gettop( ls);
+	const char* initializerString = 0;
+	std::string arg;
+	const char* domainName = 0;
+	const char* typeName = 0;
+	if (nn > 1)
+	{
+		if (nn > 2) throw std::runtime_error( "too many arguments");
+		initializerString = lua_tostring( ls, 2);
+	}
+	else if (nn < 1)
+	{
+		throw std::runtime_error( "too few arguments");
+	}
+	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected string as first argument");
+	arg.append( lua_tostring( ls, 1));
+	std::string::iterator ai = arg.begin();
+	for (;ai != arg.end() && *ai != ':'; ++ai){}
+	if (ai == arg.end()) throw std::runtime_error( "namespace identifier missing in name of type (namespace:type)");
+	*ai = '\0';
+	domainName = arg.c_str();
+	typeName = arg.c_str() + (ai - arg.begin()) + 1;
+
+	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const types::CustomDataType* typ = ctx->customDataType( domainName, typeName);
+	if (!typ)
+	{
+		throw std::runtime_error( std::string( "type '") + domainName + ":" + typeName + "' not defined");
+	}
+	types::CustomDataInitializerR ini;
+	if (initializerString) 
+	{
+		ini.reset( typ->createInitializer( initializerString));
+	}
+	lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
+	LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
+	lua_pushcclosure( ls, function_type_value_constructor, 2);
+	return 1;
 }
 
 
@@ -2137,14 +2197,14 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 			throw std::runtime_error( "failed to map arguments to strings");
 		}
 	}
-	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
-	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
+	log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
+	if (lv == log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
 		throw std::runtime_error( "first argument is an undefined loglevel");
 	}
 	else
 	{
-		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
+		log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
 			<< logmsg;
 	}
 	return 0;
@@ -2231,16 +2291,17 @@ static const luaL_Reg form_methodtable[ 7] =
 	{0,0}
 };
 
-static const luaL_Reg provider_methodtable[ 5] =
+static const luaL_Reg provider_methodtable[ 6] =
 {
 	{"filter",&function_filter},
 	{"form",&function_form},
+	{"type",&function_type},
 	{"formfunction",&function_formfunction},
 	{"normalizer",&function_normalizer},
 	{0,0}
 };
 
-static const luaL_Reg customtype_methodtable[ 14] =
+static const luaL_Reg customvalue_methodtable[ 14] =
 {
 	{"__unm", &function_customtype_unm},
 	{"__add", &function_customtype_add},
@@ -2407,6 +2468,8 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 		}
 		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<types::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);
+		LuaObject<types::CustomDataInitializerR>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<types::CustomDataValueR>::createMetatable( m_ls, 0, 0, customvalue_methodtable);
 		LuaObject<DDLFormParser>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<DDLFormSerializer>::createMetatable( m_ls, 0, 0, 0);
 		LuaObject<serialize::StructSerializer>::createMetatable( m_ls, 0, 0, struct_methodtable);
