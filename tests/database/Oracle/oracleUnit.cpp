@@ -204,6 +204,7 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 	// execute an illegal SQL statement, must throw
 	try {
 		trans->executeStatement( "SELCT 1 FROM DUAL" );
+		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
 	} catch( DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1 FROM DUAL" );
@@ -234,8 +235,12 @@ TEST_F( OracleFixture, TooFewBindParameter )
 	// intentionally ommiting values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
-// why is this another excpetion?
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
 	} catch( std::runtime_error &e ) {
+// why is this another excpetion?
 		std::cout << e.what( ) << std::endl;
 //	} catch( DatabaseTransactionErrorException &e ) {
 //		std::cout << e.what( );
@@ -267,6 +272,10 @@ TEST_F( OracleFixture, TooManyBindParameter )
 	// intentionally adding too many values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
 	} catch( DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 	} catch( ... ) {
@@ -275,6 +284,41 @@ TEST_F( OracleFixture, TooManyBindParameter )
 
 	// auto rollback?
 	// auto close transaction?
+}
+
+TEST_F( OracleFixture, IllegalBindParameter )
+{
+	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	std::vector<types::Variant> values;
+	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( "not used");
+	values.push_back( true);
+	values.push_back( 4.782);
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5);", values);
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
+	} catch( const DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+	} catch( const std::exception &e ) {
+		std::cout << e.what( ) << std::endl;
+		FAIL( ) << "Wrong std::exception class seen in database error!";
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	// auto rollback?
+	// auto close transaction?	
 }
 
 int main( int argc, char **argv )

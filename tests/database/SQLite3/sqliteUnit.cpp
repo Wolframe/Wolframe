@@ -187,6 +187,7 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 	// execute an illegal SQL statement, must throw
 	try {
 		trans->executeStatement( "SELCT 1" );
+		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
 	} catch( DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
@@ -219,11 +220,13 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 		// we should not get here, just in case we close the transaction properly
 		trans->commit( );
 		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
 // why is this another exception?
 	} catch( std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 //	} catch( DatabaseTransactionErrorException &e ) {
 //		std::cout << e.what( );
+//		ASSERT_EQ( e.errorclass, "INTERNAL" );		
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -254,14 +257,48 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 		// we should not get here, just in case we close the transaction properly
 		trans->commit( );
 		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
 	} catch( DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
+		ASSERT_EQ( e.errorclass, "INTERNAL" );		
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 
 	// auto rollback?
 	// auto close transaction?
+}
+
+TEST_F( SQLiteModuleFixture, IllegalBindParameter )
+{
+	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+			     std::list<std::string>(), std::list<std::string>() );
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	std::vector<types::Variant> values;
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( "not used");
+	values.push_back( true);
+	values.push_back( 4.782);
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5);", values);
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
+	} catch( const DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+		ASSERT_EQ( e.errorclass, "INTERNAL" );		
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	// auto rollback?
+	// auto close transaction?	
 }
 
 TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )

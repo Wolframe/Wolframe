@@ -204,7 +204,8 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 	// execute an illegal SQL statement, must throw
 	try {
 		trans->executeStatement( "SELCT 1" );
-	} catch( DatabaseTransactionErrorException &e ) {
+		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
+	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
@@ -234,8 +235,12 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 	// intentionally ommiting values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
+	} catch( const std::runtime_error &e ) {
 // why is this another excpetion?
-	} catch( std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 //	} catch( DatabaseTransactionErrorException &e ) {
 //		std::cout << e.what( );
@@ -267,7 +272,11 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 	// intentionally adding too many values here, must throw an error
 	try {
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
-	} catch( DatabaseTransactionErrorException &e ) {
+		// we should not get here, just in case we close the transaction properly
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
+	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
@@ -275,6 +284,41 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 
 	// auto rollback?
 	// auto close transaction?
+}
+
+TEST_F( PQmoduleFixture, IllegalBindParameter )
+{
+	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	std::vector<types::Variant> values;
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL);");
+	values.push_back( 1);
+	values.push_back( "xyz");
+	values.push_back( "not used");
+	values.push_back( true);
+	values.push_back( 4.782);
+	try {
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5);", values);
+		// should actually not work
+		trans->commit( );
+		trans->close( );
+		FAIL( ) << "Reached success state, but should fail!";
+	} catch( const DatabaseTransactionErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+	} catch( const std::exception &e ) {
+		std::cout << e.what( ) << std::endl;
+		FAIL( ) << "Wrong std::exception class seen in database error!";
+	} catch( ... ) {
+		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	// auto rollback?
+	// auto close transaction?	
 }
 
 int main( int argc, char **argv )

@@ -90,6 +90,7 @@ static const char* getErrorType( sword errorcode )
 		case 1:
 			return "CONSTRAINT";
 		case 900:
+		case 933:
 			return "SYNTAX";
 		case 1017:
 			return "PRIVILEGE";
