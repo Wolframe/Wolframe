@@ -36,7 +36,7 @@
 
 #include "types/base64.h"
 
-static const char decodeTable[] = {
+static const int decodeTable[] = {
 	/* 0 - 31 / 0x00 - 0x1f */
 		-1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -2, -2, -1, -1, -2, -1, -1,	/* ... '\t', '\n','\r' */
