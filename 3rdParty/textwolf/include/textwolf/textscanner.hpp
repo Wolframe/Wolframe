@@ -53,7 +53,7 @@ private:
 	Iterator input;			//< source iterator
 	char buf[8];			//< buffer for one character (the current character parsed)
 	UChar val;			//< Unicode character representation of the current character parsed
-	char cur;			//< ASCII character representation of the current character parsed
+	signed char cur;		//< ASCII character representation of the current character parsed or -1 if not in ASCII range
 	unsigned int state;		//< current state of the text scanner
 	CharSet charset;
 
@@ -163,11 +163,11 @@ public:
 	}
 
 	///\brief Get the ASCII character representation of the current character
-	///\return the ASCII character
-	char ascii()
+	///\return the ASCII character or 0 if not defined
+	unsigned char ascii()
 	{
 		getcur();
-		return cur>=0?cur:0;
+		return cur>=0?(unsigned char)cur:0;
 	}
 
 	///\brief Skip to the next character of the source

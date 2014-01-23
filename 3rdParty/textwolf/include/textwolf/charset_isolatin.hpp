@@ -65,7 +65,7 @@ struct IsoLatin :public IsoLatinCodePage
 
 	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{

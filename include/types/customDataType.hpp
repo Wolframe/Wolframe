@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #include <string>
 #include <cstring>
-#include "types/countedReference.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc
@@ -77,7 +77,7 @@ private:
 	const CustomDataInitializer* m_initializer;
 };
 
-typedef types::CountedReference<CustomDataValue> CustomDataValueR;
+typedef boost::shared_ptr<CustomDataValue> CustomDataValueR;
 
 
 class CustomDataInitializer
@@ -87,7 +87,7 @@ public:
 	virtual ~CustomDataInitializer(){};
 };
 
-typedef types::CountedReference<CustomDataInitializer> CustomDataInitializerR;
+typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
 
 typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::string& description);
@@ -140,8 +140,8 @@ public:
 	}
 
 	CustomDataType( const std::string& name_,
-				CustomDataValueConstructor constructor_,
-				CreateCustomDataInitializer initializerconstructor_);
+			CustomDataValueConstructor constructor_,
+			CreateCustomDataInitializer initializerconstructor_=0);
 
 	CustomDataType( const CustomDataType& o);
 
@@ -178,7 +178,7 @@ private:
 	m_vmt;
 };
 
-typedef types::CountedReference<CustomDataType> CustomDataTypeR;
+typedef boost::shared_ptr<CustomDataType> CustomDataTypeR;
 
 
 typedef CustomDataType* (*CreateCustomDataType)( const std::string& name);

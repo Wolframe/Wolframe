@@ -270,4 +270,9 @@ langbind::Filter* ProcessorProvider::filter( const std::string& name, const std:
 	return m_impl->filter( name, arg);
 }
 
+const types::CustomDataType* ProcessorProvider::customDataType( const std::string& domain, const std::string& name) const
+{
+	return m_impl->customDataType( domain, name);
+}
+
 }} // namespace _Wolframe::proc

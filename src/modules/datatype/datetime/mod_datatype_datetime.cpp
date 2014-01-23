@@ -48,7 +48,7 @@ static void setModuleLogger( void* logger )
 
 static CustomDataTypeDef customDataTypes[] =
 {
-	{"datetime", &types::DateDataType::create},
+	{"date", &types::DateDataType::create},
 	{0,0}
 };
 

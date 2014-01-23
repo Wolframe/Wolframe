@@ -27,7 +27,7 @@ types::Variant DateDataType::add( const CustomDataValue& operand, const Variant&
 	const DateDataValue* op = dynamic_cast<const DateDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
 	DateDataValue* res = dynamic_cast<DateDataValue*>( rt.data().value.Custom);
-	res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator - ( arg.toint()));
+	res->Date::operator=( dynamic_cast<const DateDataValue&>(operand).operator + ( arg.toint()));
 	return rt;
 }
 
