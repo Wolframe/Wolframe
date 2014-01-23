@@ -2197,14 +2197,14 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 			throw std::runtime_error( "failed to map arguments to strings");
 		}
 	}
-	log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
-	if (lv == log::LogLevel::LOGLEVEL_UNDEFINED)
+	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
+	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
 		throw std::runtime_error( "first argument is an undefined loglevel");
 	}
 	else
 	{
-		log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
+		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
 			<< logmsg;
 	}
 	return 0;
