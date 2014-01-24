@@ -1547,8 +1547,6 @@ fi
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
-%{_libdir}/wolframe/modules/mod_lua_datetime.so
 %{_libdir}/wolframe/modules/mod_command_lua.so
 %{_libdir}/wolframe/liblua.so.5.2.0
 %{_libdir}/wolframe/liblua.so.5
