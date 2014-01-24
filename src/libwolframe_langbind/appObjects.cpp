@@ -227,45 +227,6 @@ bool CppFormFunctionClosure::call()
 }
 
 
-PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunction* f)
-	:types::TypeSignature("langbind::PrintFunctionClosure", __LINE__)
-	,m_func(f)
-	,m_state(0)
-	,m_inputstruct(f->getInput()){}
-
-PrintFunctionClosure::PrintFunctionClosure( const PrintFunctionClosure& o)
-	:types::TypeSignature(o)
-	,m_func(o.m_func)
-	,m_state(o.m_state)
-	,m_input(o.m_input)
-	,m_inputstruct(o.m_inputstruct)
-	,m_result(o.m_result){}
-
-bool PrintFunctionClosure::call()
-{
-	switch (m_state)
-	{
-		case 0:
-			throw std::runtime_error( "input not initialized");
-		case 1:
-			if (!m_input.call()) return false;
-			m_state = 2;
-		case 2:
-			m_result = m_func->execute( m_inputstruct.get());
-			m_state = 3;
-			return true;
-		default:
-			return true;
-	}
-}
-
-void PrintFunctionClosure::init( const TypedInputFilterR& i)
-{
-	m_inputstruct = m_func->getInput();
-	m_input.init( i, m_inputstruct);
-	m_state = 1;
-}
-
 bool Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
 	if (!m_outputfilter.get())

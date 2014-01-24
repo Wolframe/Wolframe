@@ -147,7 +147,10 @@ void VariableScope::pop()
 	m_tag.resize( m_ar.back().m_tagidx);
 	m_ar.pop_back();
 	m_scopeid.pop_back();
-	if (m_ar.empty() || m_scopeid.empty()) throw std::logic_error( "non existing variable scope closed");
+	if (m_ar.empty() || m_scopeid.empty())
+	{
+		throw std::logic_error( "non existing variable scope closed");
+	}
 }
 
 void VariableScope::pushDefinitionToTagContext( Variable::Id var, std::size_t val)

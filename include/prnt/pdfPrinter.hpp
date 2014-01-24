@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Defines a prnt::PrintFunction implementation based on libhpdf with a simple document layout description
 #ifndef _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
 #define _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "prnt/printFunction.hpp"
+#include "langbind/formFunction.hpp"
 #include "prnt/pdfPrinterDocument.hpp"
 #include "types/countedReference.hpp"
 #include <string>
@@ -43,32 +43,28 @@ namespace prnt {
 
 ///\class HaruPdfPrintFunction
 ///\brief Implementation of a PrintFunction for printing PDFs with libhpdf with a simple document layout description
-class HaruPdfPrintFunction :public PrintFunction
+class HaruPdfPrintFunction
+	:public langbind::FormFunction
 {
 public:
 	///\brief Constructor
 	///\param[in] description Source of the document print description
 	///\param[in] createDocument Function to create a document
 	HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
+
 	///\brief Destructor
 	virtual ~HaruPdfPrintFunction();
 
-	virtual InputR getInput() const;
-	virtual std::string execute( const Input* i) const;
+	virtual langbind::FormFunctionClosure* createClosure() const;
 
-	virtual std::string tostring() const;
-	virtual const std::string& name() const;
+	std::string tostring() const;
+	const std::string& name() const;
 
 public:
 	struct Impl;
 private:
 	Impl* m_impl;		//< hidden implementation (PIMPL)
 };
-
-///\brief Create a print function from a description
-///\param[in] description print description source
-///\param[in] createDocument Function to create a document
-PrintFunction* createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 
 }}//namespace
 #endif

@@ -37,10 +37,8 @@
 #include "prgbind/program.hpp"
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/ddlProgram.hpp"
-#include "prgbind/printProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
 #include "database/transactionFunction.hpp"
-#include "prnt/printFunction.hpp"
 #include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
@@ -231,12 +229,6 @@ public:
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
-	void definePrintLayoutType( const module::PrintFunctionConstructorR& f)
-	{
-		PrintProgram* prg = new PrintProgram( f);
-		m_programTypes.push_back( ProgramR( prg));
-	}
-
 	void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
 	{
 		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
@@ -392,11 +384,6 @@ void ProgramLibrary::defineForm( const std::string& name, const types::FormDescr
 void ProgramLibrary::defineFormDDL( const langbind::DDLCompilerR& c)
 {
 	m_impl->defineFormDDL( c);
-}
-
-void ProgramLibrary::definePrintLayoutType( const module::PrintFunctionConstructorR& f)
-{
-	m_impl->definePrintLayoutType( f);
 }
 
 void ProgramLibrary::defineFilterConstructor( const module::FilterConstructorR& f)

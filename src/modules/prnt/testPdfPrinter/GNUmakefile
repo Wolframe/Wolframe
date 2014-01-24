@@ -20,7 +20,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_test_pdf_printer.so
 
 CPP_OBJS = \
-	prnt_pdfPrinter_testtrace.o \
 	prnt_pdfPrinterDocument_testtrace.o \
 	mod_test_pdf_printer.o
 

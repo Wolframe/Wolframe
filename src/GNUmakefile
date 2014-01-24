@@ -54,7 +54,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceBanner.o \
 	appConfig.o \
 	prgbind_transactionProgram.o \
-	prgbind_printProgram.o \
 	prgbind_normalizeProgram.o \
 	prgbind_ddlProgram.o \
 	prgbind_programLibrary.o \
