@@ -374,7 +374,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						{
 							setState( ParseXMLDoctype0);
 						}
-						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)
+						else if ((unsigned char)inp[m_inputidx] > 32)
 						{
 							throw_error( "expected '<!'");
 						}

@@ -36,7 +36,6 @@ DYNAMIC_MODULE = mod_haru_pdf_printer.so
 LIBHPDF_OBJS =
 
 CPP_OBJS = \
-	prnt_pdfPrinter_libhpdf.o \
 	prnt_pdfPrinterDocument_libhpdf.o \
 	mod_haru_pdf_printer.o
 

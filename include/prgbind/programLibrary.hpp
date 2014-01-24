@@ -42,8 +42,6 @@
 #include "langbind/ddlCompilerInterface.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
-#include "prnt/printFunction.hpp"
-#include "module/printFunctionBuilder.hpp"
 #include "prgbind/program.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/customDataTypeBuilder.hpp"
@@ -72,7 +70,6 @@ public:
 	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
 	virtual void defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
-	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& f);
 	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
 	virtual void defineProgramType( const ProgramR& prg);
 

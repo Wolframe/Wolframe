@@ -39,6 +39,7 @@ Project Wolframe.
 #include "utils/parseUtils.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
+#include "filter/singlefilter.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cstdlib>
@@ -59,7 +60,7 @@ static bool isEmpty( const std::string& line)
 {
 	std::string::const_iterator itr = line.begin();
 	const std::string::const_iterator end = line.end();
-	for (; itr != end; ++itr) if (*itr < 0 || *itr > 32) return false;
+	for (; itr != end; ++itr) if ((unsigned char)*itr > 32) return false;
 	return true;
 }
 
@@ -164,42 +165,26 @@ private:
 	std::map<std::string,std::string> m_attributes;
 };
 
-HaruPdfPrintFunction::HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
-	:m_impl( new Impl( description, createDocument)){}
-
-HaruPdfPrintFunction::~HaruPdfPrintFunction()
-{
-	delete m_impl;
-}
-
-
-class PrintInput :public langbind::TypedOutputFilter
+namespace {
+class PrintFunctionClosure
+	:public langbind::FormFunctionClosure
 {
 public:
-	PrintInput( const HaruPdfPrintFunction::Impl* func)
-		:types::TypeSignature("langbind::TypedOutputFilter (pdfPrinter)", __LINE__)
-		,m_document( func->createDocument())
-		,m_func(func)
-		,m_selectState(&func->parser())
-		,m_lasttype( langbind::FilterBase::OpenTag){}
+	explicit PrintFunctionClosure( const HaruPdfPrintFunction::Impl* func_)
+		:m_provider(0)
+		,m_flags(serialize::Context::None)
+		,m_state(0)
+		,m_document(func_->createDocument())
+		,m_func(func_)
+		,m_selectState(&func_->parser())
+		,m_lasttype(langbind::FilterBase::OpenTag)
+		,m_taglevel(0){}
+	virtual ~PrintFunctionClosure(){}
 
-	PrintInput( const PrintInput& o)
-		:types::TypeSignature("langbind::TypedOutputFilter (pdfPrinter)", __LINE__)
-		,langbind::TypedOutputFilter(o)
-		,m_document(o.m_document)
-		,m_variableScope(o.m_variableScope)
-		,m_func(o.m_func)
-		,m_selectState(o.m_selectState)
-		,m_lasttype(o.m_lasttype){}
-
-	virtual ~PrintInput(){}
-
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
-	virtual TypedOutputFilter* copy() const		{return new PrintInput(*this);}
-
-	virtual bool print( langbind::FilterBase::ElementType type, const types::VariantConst& element)
+	void pushElement( langbind::FilterBase::ElementType type, const types::VariantConst& element)
 	{
+		if (m_taglevel == -1) throw std::runtime_error( "input tags for print function call not balanced");
+
 		std::string elemstr = element.tostring();
 		textwolf::XMLScannerBase::ElementType xtype = textwolf::XMLScannerBase::None;
 		switch (type)
@@ -207,18 +192,23 @@ public:
 			case langbind::FilterBase::OpenTag:
 				xtype = textwolf::XMLScannerBase::OpenTag;
 				m_variableScope.push( elemstr);
+				++m_taglevel;
 				break;
 
 			case langbind::FilterBase::CloseTag:
 			{
-				xtype = textwolf::XMLScannerBase::CloseTag;
-				std::vector<std::size_t>::const_iterator mi = m_variableScope.begin_marker();
-				std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
-				for (; mi != me; ++mi)
+				--m_taglevel;
+				if (m_taglevel >= 0)
 				{
-					m_document->execute_leave( (Method::Id)*mi, m_variableScope);
+					xtype = textwolf::XMLScannerBase::CloseTag;
+					std::vector<std::size_t>::const_iterator mi = m_variableScope.begin_marker();
+					std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
+					for (; mi != me; ++mi)
+					{
+						m_document->execute_leave( (Method::Id)*mi, m_variableScope);
+					}
+					m_variableScope.pop();
 				}
-				m_variableScope.pop();
 				break;
 			}
 
@@ -259,33 +249,82 @@ public:
 				}
 			}
 		}
-		return true;
+	}	
+	
+	virtual bool call()
+	{
+		switch (m_state)
+		{
+			case 0:
+				throw std::runtime_error("internal: print function closure not initialized");
+			case 1:
+			{
+				langbind::TypedInputFilter::ElementType elemtype;
+				types::VariantConst elem;
+
+				while (m_input->getNext( elemtype, elem))
+				{
+					pushElement( elemtype, elem);
+				}
+				switch (m_input->state())
+				{
+					case langbind::InputFilter::Open:
+						m_resultpdfcontent = m_document->tostring();
+						m_result.reset( new langbind::SingleElementInputFilter( types::VariantConst( m_resultpdfcontent)));
+						m_state = 2;
+						return true;
+
+					case langbind::InputFilter::EndOfMessage:
+						return false;
+
+					case langbind::InputFilter::Error:
+						throw std::runtime_error( m_input->getError());
+				}
+			}
+		}
+		throw std::runtime_error( "internal: illegal state in print function closure automaton");
 	}
 
-	const Document& document() const
+	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
-		return *m_document;
+		m_provider = p;
+		m_input = i;
+		m_flags = f;
+		m_state = 1;
+	}
+
+	virtual langbind::TypedInputFilterR result() const
+	{
+		return m_result;
 	}
 
 private:
+	const proc::ProcessorProvider* m_provider;
+	langbind::TypedInputFilterR m_input;
+	std::string m_resultpdfcontent;
+	langbind::TypedInputFilterR m_result;
+	serialize::Context::Flags m_flags;
+	int m_state;
 	boost::shared_ptr<Document> m_document;
 	VariableScope m_variableScope;
 	const HaruPdfPrintFunction::Impl* m_func;
 	XMLPathSelect m_selectState;
 	langbind::FilterBase::ElementType m_lasttype;
+	int m_taglevel;
 };
+}//anonymous namespace
 
-PrintFunction::InputR HaruPdfPrintFunction::getInput() const
+HaruPdfPrintFunction::HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
+	:m_impl( new Impl( description, createDocument)){}
+
+HaruPdfPrintFunction::~HaruPdfPrintFunction()
 {
-	PrintFunction::InputR rt( new PrintInput( m_impl));
-	return rt;
+	delete m_impl;
 }
 
-std::string HaruPdfPrintFunction::execute( const Input* input_) const
+langbind::FormFunctionClosure* HaruPdfPrintFunction::createClosure() const
 {
-	const PrintInput* input = dynamic_cast<const PrintInput*>( input_);
-	if (!input) throw std::runtime_error( "calling print pdf with incompatible input");
-	return input->document().tostring();
+	return new PrintFunctionClosure( m_impl);
 }
 
 std::string HaruPdfPrintFunction::tostring() const
@@ -296,11 +335,6 @@ std::string HaruPdfPrintFunction::tostring() const
 const std::string& HaruPdfPrintFunction::name() const
 {
 	return m_impl->attribute("name");
-}
-
-PrintFunction* _Wolframe::prnt::createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
-{
-	return new HaruPdfPrintFunction( description, createDocument);
 }
 
 

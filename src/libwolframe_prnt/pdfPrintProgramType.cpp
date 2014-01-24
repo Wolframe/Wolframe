@@ -30,44 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_haru_pdf_printer.cpp
-///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
-
-#include "module/programTypeBuilder.hpp"
-#include "prnt/pdfPrinter.hpp"
-#include "prnt/pdfPrinterDocument_libhpdf.hpp"
+///\brief Program type for testing simplePDF
+///\file prnt/pdfPrintProgramType.cpp
 #include "prnt/pdfPrintProgramType.hpp"
-#include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend* logBackendPtr;
+#include "prnt/pdfPrinter.hpp"
+#include "utils/fileUtils.hpp"
+#include "langbind/formFunction.hpp"
+#include "prgbind/programLibrary.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::prnt;
 
-static void setModuleLogger( void* logger )
+bool SimplePdfPrintProgram::is_mine( const std::string& filename) const
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+	std::string ext = utils::getFileExtension( filename);
+	if (boost::algorithm::iequals( ext, ".sprn")) return true;
+	return false;
 }
 
-namespace {
-struct PdfPrinter
+void SimplePdfPrintProgram::loadProgram( prgbind::ProgramLibrary& library, db::Database*, const std::string& filename)
 {
-	static prgbind::Program* createProgram()
-	{
-		return new prnt::SimplePdfPrintProgram( prnt::createLibHpdfDocument);
-	}
-	static SimpleBuilder* constructor()
-	{
-		return new ProgramTypeBuilder( "HaruPdfPrintFunction", "simplepdf", PdfPrinter::createProgram);
-	}
-};
-}//anonymous namespace
+	std::string src( utils::readSourceFileContent( filename));
+	HaruPdfPrintFunction* prntfunc = new HaruPdfPrintFunction( src, m_createDocument);
+	langbind::FormFunctionR func( prntfunc);
+	
+	library.defineFormFunction( prntfunc->name(), func);
+}
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	PdfPrinter::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", setModuleLogger, 0, 0, NofObjects, objdef);
 

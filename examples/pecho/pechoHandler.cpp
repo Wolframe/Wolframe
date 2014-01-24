@@ -105,7 +105,7 @@ struct Connection::Private
 	//output of one character with return code true/false for success/failure
 	bool print( char ch)
 	{
-		if (ch < 0)
+		if ((unsigned char)ch > 127)
 		{
 			if (!output.print( ch)) return false;
 		}

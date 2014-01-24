@@ -30,44 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_haru_pdf_printer.cpp
-///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
+///\brief Program type for printing with simplePDF based on libhpdf (haru)
+///\file pdfPrintProgramType.hpp
 
-#include "module/programTypeBuilder.hpp"
-#include "prnt/pdfPrinter.hpp"
-#include "prnt/pdfPrinterDocument_libhpdf.hpp"
-#include "prnt/pdfPrintProgramType.hpp"
-#include "logger-v1.hpp"
+#ifndef _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
+#define _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
+#include "prgbind/program.hpp"
+#include "prnt/pdfPrinterDocument.hpp"
+#include <string>
+#include <boost/shared_ptr.hpp>
 
-_Wolframe::log::LogBackend* logBackendPtr;
+namespace _Wolframe {
+namespace prnt {
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
+///\class SimplePdfPrintProgram
+///\brief Program type for printing with simplePDF
+class SimplePdfPrintProgram
+	:public prgbind::Program
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
+public:
+	SimplePdfPrintProgram( prnt::CreateDocumentFunc createDocument_)
+		:Program(Program::Function)
+		,m_createDocument(createDocument_){}
+	virtual ~SimplePdfPrintProgram(){}
 
-namespace {
-struct PdfPrinter
-{
-	static prgbind::Program* createProgram()
-	{
-		return new prnt::SimplePdfPrintProgram( prnt::createLibHpdfDocument);
-	}
-	static SimpleBuilder* constructor()
-	{
-		return new ProgramTypeBuilder( "HaruPdfPrintFunction", "simplepdf", PdfPrinter::createProgram);
-	}
-};
-}//anonymous namespace
+	virtual bool is_mine( const std::string& filename) const;
+	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	PdfPrinter::constructor
+private:
+	prnt::CreateDocumentFunc m_createDocument;
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", setModuleLogger, 0, 0, NofObjects, objdef);
+}}//namespace
+#endif
 

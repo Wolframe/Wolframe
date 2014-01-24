@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/cppFormFunction.hpp"
-#include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "types/typeSignature.hpp"
 #include "types/variantStruct.hpp"
@@ -311,38 +310,6 @@ private:
 	serialize::StructSerializer m_result;
 	serialize::StructParser m_parser;
 	const proc::ProcessorProvider* m_provider;
-};
-
-//\class PrintFunctionClosure
-//\brief Closure with calling state of called PrintFunction
-class PrintFunctionClosure
-	:public virtual types::TypeSignature
-{
-public:
-	//\brief Constructor
-	//\param[in] f function called
-	PrintFunctionClosure( const prnt::PrintFunction* f);
-
-	//\brief Copy constructor
-	//\param[in] o copied item
-	PrintFunctionClosure( const PrintFunctionClosure& o);
-
-	//\brief Calls the transaction function with the input from the input filter specified
-	//\return true when completed
-	bool call();
-
-	//\brief Initialization of call context for a new call
-	//\param[in] i call input
-	void init( const TypedInputFilterR& i);
-
-	const std::string& result() const		{return m_result;}
-
-private:
-	const prnt::PrintFunction* m_func;		//< function to execute
-	int m_state;					//< current state of call
-	RedirectFilterClosure m_input;			//< builder of structure from input
-	prnt::PrintFunction::InputR m_inputstruct;	//< input structure
-	std::string m_result;				//< function call result
 };
 
 }} //namespace
