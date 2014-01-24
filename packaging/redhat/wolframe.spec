@@ -1392,6 +1392,7 @@ fi
 %{_libdir}/wolframe/modules/mod_normalize_base64.so
 
 %{_libdir}/wolframe/modules/mod_datatype_datetime.so
+%{_libdir}/wolframe/modules/mod_datatype_bcdnumber.so
 
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
