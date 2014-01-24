@@ -25,7 +25,6 @@ DYNAMIC_MODULE = \
 	mod_test_pdf_printer.dll
 
 CPP_OBJS = \
-	prnt_pdfPrinter_testtrace.obj \
 	prnt_pdfPrinterDocument_testtrace.obj \
 	mod_test_pdf_printer.obj
 

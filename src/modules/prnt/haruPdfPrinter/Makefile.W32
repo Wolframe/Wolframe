@@ -28,11 +28,8 @@ DYNAMIC_MODULE = \
 	mod_haru_pdf_printer.dll
 
 CPP_OBJS = \
-	prnt_pdfPrinter_libhpdf.obj \
-	prnt_pdfPrinterDocument_libhpdf.obj
-
-CPP_OBJS = \
-	$(CPP_OBJS) mod_haru_pdf_printer.obj
+	prnt_pdfPrinterDocument_libhpdf.obj \
+	mod_haru_pdf_printer.obj
 
 all: $(DYNAMIC_MODULE)
 

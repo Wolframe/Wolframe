@@ -30,12 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/prnt/mod_test_pdf_printer.cpp
+///\file mod_test_pdf_printer.cpp
 ///\brief Module for testing the printing of PDFs with a simple command interpreter logging a trace of called functions and states
-#include "module/printFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+
+#include "module/programTypeBuilder.hpp"
 #include "prnt/pdfPrinter.hpp"
-#include "prnt/pdfPrinter_testtrace.hpp"
+#include "prnt/pdfPrinterDocument_testtrace.hpp"
+#include "prnt/pdfPrintProgramType.hpp"
+#include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
@@ -50,9 +52,13 @@ static void setModuleLogger( void* logger )
 namespace {
 struct PdfPrinter
 {
+	static prgbind::Program* createProgram()
+	{
+		return new prnt::SimplePdfPrintProgram( prnt::createTestTraceDocument);
+	}
 	static SimpleBuilder* constructor()
 	{
-		return new PrintFunctionBuilder( "TestPdfPrintFunction", "simplepdf", "sprn", prnt::createHaruPdfPrintFunction);
+		return new ProgramTypeBuilder( "TestPdfPrintFunction", "simplepdf", &PdfPrinter::createProgram);
 	}
 };
 }//anonymous namespace

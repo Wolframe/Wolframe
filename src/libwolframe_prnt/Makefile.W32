@@ -25,7 +25,8 @@ CPP_OBJS = \
 	pdfPrinter.obj \
 	pdfPrinterExpression.obj \
 	pdfPrinterMethod.obj \
-	pdfPrinterVariable.obj
+	pdfPrinterVariable.obj \
+	pdfPrintProgramType.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

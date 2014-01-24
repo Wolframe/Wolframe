@@ -29,7 +29,8 @@ CPP_OBJS = \
 	pdfPrinter.o \
 	pdfPrinterExpression.o \
 	pdfPrinterMethod.o \
-	pdfPrinterVariable.o
+	pdfPrinterVariable.o \
+	pdfPrintProgramType.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
