@@ -125,9 +125,6 @@ install: build
 	cd src/modules/cmdbind/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	cd src/modules/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
-		cd ../../..
 
 	# the Python3 cmdbind module depends own Python libraries, separate package
 	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -214,9 +211,6 @@ install: build
 	cd src/modules/cmdbind/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
 		cd ../../../..
-	cd src/modules/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
-		cd ../../..
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/liblua*.so.* \
 		/usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
