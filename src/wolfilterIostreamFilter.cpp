@@ -186,7 +186,7 @@ static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
 	iflt.getRest( data.ptr_, size, end);
 	for (ii=0; ii<size; ++ii)
 	{
-		if (data.ptr[ii] < 0 || data.ptr[ii] > 32)
+		if ((unsigned char)data.ptr[ii] > 32)
 		{
 			throw std::runtime_error( "unconsumed input left");
 		}
@@ -195,7 +195,7 @@ static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
 	{
 		char ch = 0;
 		is.read( &ch, sizeof(char));
-		if (ch < 0 || ch > 32)
+		if ((unsigned char)ch > 32)
 		{
 			throw std::runtime_error( "unconsumed input left");
 		}

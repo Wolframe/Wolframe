@@ -460,7 +460,7 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 					splititr = splitstr.begin();
 				}
 			}
-			else if (chb > ' ' || chb < 0)
+			else if ((unsigned char)chb > 32)
 			{
 				throw std::runtime_error( "illegal test definition file. tag definition expected");
 			}

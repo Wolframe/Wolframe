@@ -195,18 +195,18 @@ static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_n
 	if (max_nof_elements > MAX_LINESPLIT_SIZE) throw std::logic_error( "get line split max nof elements parameter out of range");
 	for (ii=0; ii < MAX_LINESPLIT_SIZE; ++ii) split.ptr[ ii] = 0;
 	split.size = 0;
-	for (ii=0; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
+	for (ii=0; ii < split.linesize && (unsigned char)split.line[ii] <= 32; ++ii);
 	if (ii == split.linesize) return;
 	split.ptr[ split.size++] = split.line + ii;
 	if (max_nof_elements == 1) return;
 	for (; ii < split.linesize; ++ii)
 	{
-		if (split.line[ii] >= 0 && split.line[ii] <= 32)
+		if ((unsigned char)split.line[ii] <= 32)
 		{
 			if (split.size == max_nof_elements) return;
 			if (split.size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
 			split.line[ii] = 0;
-			for (; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
+			for (; ii < split.linesize && (unsigned char)split.line[ii] <= 32; ++ii);
 			if (ii == split.linesize) return;
 			split.ptr[ split.size++] = split.line + ii;
 		}

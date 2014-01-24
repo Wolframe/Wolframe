@@ -59,7 +59,7 @@ static bool isEmpty( const std::string& line)
 {
 	std::string::const_iterator itr = line.begin();
 	const std::string::const_iterator end = line.end();
-	for (; itr != end; ++itr) if (*itr < 0 || *itr > 32) return false;
+	for (; itr != end; ++itr) if ((unsigned char)*itr > 32) return false;
 	return true;
 }
 

@@ -359,7 +359,7 @@ struct FileTypeDetection
 		for (; si != se; ++si)
 		{
 			if (!*si) return UCS1Unknown;
-			if (*si < 0) ascii = false;
+			if ((unsigned char)*si > 127) ascii = false;
 			if ((*si & B11000000) != B11000000) utf8 = false;
 			if ((*si & B11100000) == B11000000) for (int ii=1; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
 			if ((*si & B11110000) == B11100000) for (int ii=2; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;

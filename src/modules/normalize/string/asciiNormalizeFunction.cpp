@@ -221,7 +221,7 @@ static std::string nameString( const std::string& str)
 	std::string asciistr = output.str();
 	std::string::const_iterator ii = asciistr.begin(), ee = asciistr.end();
 
-	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+	while (ii != ee && (unsigned char)*ii <= 32) ++ii;
 	std::string rt;
 	for (; ii != ee; ++ii)
 	{
