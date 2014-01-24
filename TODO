@@ -6,6 +6,8 @@ Core:
 	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 Processors:
+	- Implement basic DateTime type in Variant
+	- Bring up .NET to the new Variant types (tostring for custom data types for the moment)
 	- .NET tests (PF,ABa as victim)
 	- TDL tests (PF)
 	- Python (ABa, with support PF)
