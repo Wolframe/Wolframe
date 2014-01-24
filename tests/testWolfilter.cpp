@@ -32,8 +32,8 @@
 ************************************************************************/
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
-#include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
+#include "wolfilterIostreamFilter.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"
@@ -43,7 +43,6 @@
 #include "utils/fileUtils.hpp"
 #include "utils/stringUtils.hpp"
 #include "processor/procProvider.hpp"
-#include "prnt/pdfPrinter.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>

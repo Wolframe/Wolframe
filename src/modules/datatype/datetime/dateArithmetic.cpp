@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file types_dateArithmetic.cpp
+///\file dateArithmetic.cpp
 ///\brief Date arithmetic functions
-#include "types/dateArithmetic.hpp"
+#include "dateArithmetic.hpp"
 #include <stdexcept>
 #include <cstring>
 

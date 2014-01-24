@@ -34,9 +34,9 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUA_FILTER_HPP_INCLUDED
 #define _Wolframe_LUA_FILTER_HPP_INCLUDED
+#include "luaException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
-#include "langbind/luaException.hpp"
 #include <vector>
 #include <stdexcept>
 

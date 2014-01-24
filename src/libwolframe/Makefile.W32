@@ -47,8 +47,6 @@ PROVIDER_OBJS = \
 	provider\procProviderImpl.obj \
 
 ADT_OBJS = \
-	types_bcdArithmetic.obj \
-	types_dateArithmetic.obj \
 	types_doctype.obj \
 	types_customDataType.obj \
 	types_variant.obj \

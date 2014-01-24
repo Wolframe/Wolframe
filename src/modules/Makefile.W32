@@ -4,10 +4,6 @@ SUBDIRS = audit authentication authorization \
 	database datatype filter ddlcompiler \
 	normalize prnt cmdbind functions jobSchedule
 
-!IFDEF WITH_LUA
-SUBDIRS = $(SUBDIRS) lua
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

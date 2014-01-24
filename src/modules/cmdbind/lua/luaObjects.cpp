@@ -34,15 +34,15 @@ Project Wolframe.
 #include "luaDebug.hpp"
 #include "luafilter.hpp"
 #include "luaGetFunctionClosure.hpp"
+#include "luaException.hpp"
+#include "luaCppCall.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/luaException.hpp"
-#include "langbind/luaCppCall.hpp"
 #include "types/normalizeFunction.hpp"
+#include "types/doctype.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
-#include "types/doctype.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <limits>
@@ -2141,7 +2141,7 @@ LUA_FUNCTION_THROWS( "custom:__tostring()", function_customtype_tostring)
 LUA_FUNCTION_THROWS( "custom:tonumber()", function_customtype_tonumber)
 {
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "tonumber");
-	return callConversionOperator( ls, types::CustomDataType::ToNumber, operand->get());
+	return callConversionOperator( ls, types::CustomDataType::ToDouble, operand->get());
 }
 
 LUA_FUNCTION_THROWS( "custom:__len()", function_customtype_len)

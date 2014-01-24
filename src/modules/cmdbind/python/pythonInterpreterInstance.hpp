@@ -35,10 +35,10 @@ Project Wolframe.
 #define _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
 #include "pythonStructure.hpp"
 #include "types/variant.hpp"
-#include "types/countedReference.hpp"
 #include "processor/procProvider.hpp"
 #include <utility>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -58,7 +58,7 @@ public:
 	StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
 };
 
-typedef types::CountedReference<InterpreterInstance> InterpreterInstanceR;
+typedef boost::shared_ptr<InterpreterInstance> InterpreterInstanceR;
 
 }}} //namespace
 #endif

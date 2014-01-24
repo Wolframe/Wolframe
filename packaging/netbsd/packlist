@@ -58,6 +58,7 @@ usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
 usr/pkg/lib/wolframe/modules/mod_lua_datetime.so
 usr/pkg/lib/wolframe/modules/mod_lua_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
+usr/pkg/lib/wolframe/modules/mod_datatype_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 @dirrm usr/pkg/lib/wolframe/modules
 usr/pkg/lib/wolframe/libwolframe_client.a

@@ -37,7 +37,7 @@
 #include "cmdbind/commandHandler.hpp"
 #include "module/constructor.hpp"
 #include "processor/moduleInterface.hpp"
-#include "types/countedReference.hpp"
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <list>
 
@@ -67,7 +67,7 @@ public:
 };
 
 ///\brief Command handler constructor reference
-typedef types::CountedReference<CommandHandlerConstructor> CommandHandlerConstructorR;
+typedef boost::shared_ptr<CommandHandlerConstructor> CommandHandlerConstructorR;
 
 }} //namespace _Wolframe::cmdbind
 

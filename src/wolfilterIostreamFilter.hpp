@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/iostreamfilter.hpp
+///\file wolfilterIostreamFilter.hpp
 ///\brief Interface for mapping istream to ostream by filters, forms, functions
-#ifndef _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
-#define _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
+#ifndef _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
+#define _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
 #include <string>
 #include <iostream>
 #include "processor/procProvider.hpp"

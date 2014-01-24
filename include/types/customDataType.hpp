@@ -113,10 +113,10 @@ public:
 		return ar[(int)i];
 	}
 	enum {NofConversionOperators=5};
-	enum ConversionOperatorType {ToString,ToInt,ToUInt,ToNumber,ToTimestamp};
+	enum ConversionOperatorType {ToString,ToInt,ToUInt,ToDouble,ToTimestamp};
 	static const char* conversionOperatorTypeName( ConversionOperatorType i)
 	{
-		static const char* ar[] = {"tostring","toint","touint","tonumber","totimestamp"};
+		static const char* ar[] = {"tostring","toint","touint","todouble","totimestamp"};
 		return ar[(int)i];
 	}
 	enum {NofDimensionOperators=1};

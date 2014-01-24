@@ -29,20 +29,56 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaBcdNumber.hpp
-///\brief Defines the "bcdnumber" type for Lua
-#ifndef _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
-#define _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
+///\file luaException.hpp
+///\brief interface for throwing C++ exceptions for lua functions called in a C++ context (outside the interpreter)
+#ifndef _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+#include <sstream>
+#include <iostream>
+#include <stdexcept>
 
-extern "C"
-{
-#include "lua.h"
+extern "C" {
+	#include <lua.h>
+	#include <lauxlib.h>
 }
 
 namespace _Wolframe {
 namespace langbind {
 
-int initBignumModule( lua_State* ls);
+///\class LuaExceptionHandlerScope
+///\brief Class for calling a Lua function in a C++ scope. Lua longjumps are catched and translated to C++ exceptions
+class LuaExceptionHandlerScope
+{
+public:
+	explicit LuaExceptionHandlerScope( lua_State* ls)
+		:m_ls(ls)
+		,m_panicf( lua_atpanic( ls, luaException))
+	{}
 
-}} //namespace
+	LuaExceptionHandlerScope( const LuaExceptionHandlerScope& o)
+		:m_ls(o.m_ls),m_panicf(o.m_panicf){}
+
+	~LuaExceptionHandlerScope()
+	{
+		lua_atpanic( m_ls, m_panicf);
+	}
+
+
+private:
+	static int luaException( lua_State* ls)
+	{
+		const char* errmsg = lua_tostring( ls, -1);
+		throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
+		return 0;
+	}
+private:
+	lua_State* m_ls;
+	lua_CFunction m_panicf;
+};
+
+}}//namespace
 #endif
+
+
+
+

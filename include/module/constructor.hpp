@@ -58,7 +58,6 @@ public:
 		CUSTOM_DATA_TYPE_OBJECT,
 		PRINT_FUNCTION_OBJECT,
 		CMD_HANDLER_OBJECT,
-		LANGUAGE_EXTENSION_OBJECT,
 		PROGRAM_TYPE_OBJECT,
 		RUNTIME_ENVIRONMENT_OBJECT,
 		TEST_OBJECT
@@ -73,17 +72,16 @@ public:
 			"Authorization",
 			"Database",
 			"Filter",
+			"Job Schedule Object",
 			"DLL Compiler",
 			"Form Function",
 			"Normalize Function",
 			"Custom Data Type",
-			"Transaction Function",
 			"Print Function",
 			"Command Handler",
-			"Language Extension",
-			"Form Function Program Type",
+			"Program Type",
 			"Runtime Environment",
-			"Test"
+			"#Test#"
 		};
 		return ar[ (int)tp];
 	}

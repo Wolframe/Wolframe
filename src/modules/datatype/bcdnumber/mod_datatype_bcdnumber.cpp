@@ -30,11 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_lua_bcdnumber.cpp
-///\brief Lua extension module for arbitrary precision bcd number arithmetic
-#include "module/luaExtensionBuilder.hpp"
+///\file mod_datatype_datetime.cpp
+///\brief Extension module for date and time arithmetic
+#include "module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
-#include "luaBcdNumber.hpp"
+#include "datatypeBigint.hpp"
+#include "datatypeBigfxp.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
@@ -46,12 +47,19 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
+static CustomDataTypeDef customDataTypes[] =
+{
+	{"bigint", &types::BigintDataType::create},
+	{"bigfxp", &types::BigfxpDataType::create},
+	{0,0}
+};
+
 namespace {
-struct LuaBcdNumberBuilder
+struct Obj
 {
 	static SimpleBuilder* constructor()
 	{
-		return new LuaExtensionBuilder( "LuaExtension:bcdnumber", langbind::initBignumModule);
+		return new CustomDataTypeBuilder( "BcdArithmeticTypes", "bcd", customDataTypes);
 	}
 };
 }//anonymous namespace
@@ -59,8 +67,8 @@ struct LuaBcdNumberBuilder
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	LuaBcdNumberBuilder::constructor
+	Obj::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "Lua extension module for arbitrary precision bcd number arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", setModuleLogger, 0, 0, NofObjects, objdef);
 

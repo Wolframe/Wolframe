@@ -4,14 +4,10 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CXXFLAGS += \
-	-DWITH_LUA
-
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/3rdParty/lua/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
@@ -19,15 +15,16 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 
 
-DYNAMIC_MODULE = mod_lua_bcdnumber.so
+DYNAMIC_MODULE = mod_datatype_bcdnumber.so
 
 CPP_OBJS = \
-	luaBcdNumber.o \
-	mod_lua_bcdnumber.o
+	bcdArithmetic.o \
+	datatypeBigint.o \
+	datatypeBigfxp.o \
+	mod_datatype_bcdnumber.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

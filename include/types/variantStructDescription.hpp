@@ -34,14 +34,14 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
-#include <string>
-#include <map>
-#include <iostream>
-#include "types/countedReference.hpp"
-#include <stdexcept>
 #include "types/variant.hpp"
 #include "types/normalizeFunction.hpp"
 #include "utils/printFormats.hpp"
+#include <string>
+#include <map>
+#include <iostream>
+#include <stdexcept>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -225,7 +225,7 @@ private:
 	Element* m_ar;
 };
 
-typedef types::CountedReference<VariantStructDescription> VariantStructDescriptionR;
+typedef boost::shared_ptr<VariantStructDescription> VariantStructDescriptionR;
 
 }} //namespace
 #endif

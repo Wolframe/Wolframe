@@ -30,71 +30,50 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file datatypeDate.hpp
-///\brief Custom data type interface to date arithmetic functions
-#ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
-#define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
+///\file datatypeBigfxp.hpp
+///\brief Custom data type interface for arbitrary length bcd fixed point numbers
+#ifndef _CUSTOM_DATA_TYPE_BCD_BIGFXP_HPP_INCLUDED
+#define _CUSTOM_DATA_TYPE_BCD_BIGFXP_HPP_INCLUDED
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
-#include "dateArithmetic.hpp"
+#include "bcdArithmetic.hpp"
 
 namespace _Wolframe {
 namespace types {
 
-class DateDataInitializer
+class BigfxpDataInitializer
 	:public CustomDataInitializer
 {
 public:
-	DateDataInitializer( const std::string& description_)
-		:m_description( description_)
-	{
-		m_format = m_description.c_str();
-	}
-	virtual ~DateDataInitializer(){}
+	BigfxpDataInitializer( const std::string& description_);
+	virtual ~BigfxpDataInitializer(){}
 
-	const char* format() const	{return m_format;}
+	unsigned int show_precision() const	{return m_show_precision;}
+	unsigned int calc_precision() const	{return m_calc_precision;}
 
 	static CustomDataInitializer* create( const std::string& description_)
 	{
-		return new DateDataInitializer( description_);
+		return new BigfxpDataInitializer( description_);
 	}
 
 private:
-	std::string m_description;
-	const char* m_format;
+	unsigned int m_show_precision;
+	unsigned int m_calc_precision;
 };
 
-
-class DateDataValue
+class BigfxpDataValue
 	:public CustomDataValue
-	,public types::Date
+	,public types::BigNumber
 {
 public:
-	DateDataValue( unsigned short y, unsigned short m, unsigned short d)
-		:Date(y,m,d){}
-
-	explicit DateDataValue( const std::string& dt, const DateDataInitializer* ini=0)
-		:Date(dt,ini?ini->format():0){}
-
 	///\brief Copy constructor
-	DateDataValue( const DateDataValue& o)
-		:CustomDataValue(o),Date(o){}
+	BigfxpDataValue( const BigfxpDataValue& o)
+		:CustomDataValue(o),types::BigNumber(o){}
 
-	DateDataValue(){}
+	BigfxpDataValue( const BigfxpDataInitializer* ini)
+		:types::BigNumber(ini->show_precision(),ini->calc_precision()){}
 
-	const char* format() const
-	{
-		if (initializer())
-		{
-			return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	virtual ~DateDataValue(){};
+	virtual ~BigfxpDataValue(){};
 
 	virtual int compare( const CustomDataValue& o) const
 	{
@@ -104,77 +83,78 @@ public:
 		}
 		else
 		{
-			const DateDataValue* odt = dynamic_cast<const DateDataValue*>(&o);
+			const BigfxpDataValue* odt = dynamic_cast<const BigfxpDataValue*>(&o);
 			int rt = -1;
-			rt += (int)(Date::operator>=(*odt));
-			rt += (int)(Date::operator>(*odt));
+			rt += (int)(types::BigNumber::operator>=(*odt));
+			rt += (int)(types::BigNumber::operator>(*odt));
 			return rt;
 		}
 	}
 
 	virtual std::string tostring() const
 	{
-		return Date::tostring( format());
+		return types::BigNumber::tostring();
 	}
 
 	virtual void assign( const Variant& o)
 	{
 		if (o.type() == Variant::String)
 		{
-			Date::operator=( Date( o.tostring()));
+			types::BigNumber::init( o.tostring());
+		}
+		else if (o.type() == Variant::Double)
+		{
+			types::BigNumber::init( o.todouble());
 		}
 		else
 		{
-			Date::operator=( Date(1970,1,1) + o.toint());
+			types::BigNumber::init( o.toint());
 		}
 	}
 
 	virtual CustomDataValue* copy() const
 	{
-		return new DateDataValue(*this);
+		return new BigfxpDataValue( *this);
 	}
 
-	static CustomDataValue* create( const CustomDataInitializer*)
+	static CustomDataValue* create( const CustomDataInitializer* ini_)
 	{
-		return new DateDataValue();
+		const BigfxpDataInitializer* ini = dynamic_cast<const BigfxpDataInitializer*>(ini_);
+		return new BigfxpDataValue( ini);
 	}
 };
 
 
-class DateDataType
+class BigfxpDataType
 	:public CustomDataType
-	,public Date
+	,public types::BigNumber
 {
 public:
-	DateDataType( const std::string& name_)
-		:CustomDataType(name_,&DateDataValue::create,&DateDataInitializer::create)
+	BigfxpDataType( const std::string& name_)
+		:CustomDataType(name_,&BigfxpDataValue::create)
 	{
-		define( Increment, &increment);
-		define( Decrement, &decrement);
 		define( Add, &add);
 		define( Subtract, &subtract);
-		define( ToTimestamp, &toTimestamp);
-		define( ToInt, &toInt);
+		define( Multiply, &multiply);
+		define( Divide, &divide);
+		define( Negation, &negation);
+		define( ToDouble, &toDouble);
 	}
 
 	static CustomDataType* create( const std::string& name)
 	{
-		return new DateDataType( name);
+		return new BigfxpDataType( name);
 	}
 
 private:
-	static types::Variant increment( const CustomDataValue& operand);
-	static types::Variant decrement( const CustomDataValue& operand);
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
-	static types::Variant toTimestamp( const CustomDataValue& operand);
-	static types::Variant toInt( const CustomDataValue& operand);
+	static types::Variant multiply( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant divide( const CustomDataValue& operand, const Variant& arg);
+	static types::Variant negation( const CustomDataValue& operand);
+	static types::Variant toDouble( const CustomDataValue& operand);
 };
 
 }}//namespace
 #endif
-
-
-
-
 

@@ -98,7 +98,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 	const char* encodedEnd;
 	unsigned char* outByte;
 	unsigned char dataByte;
-	char fragment;
+	int fragment;
 
 	encodedEnd = encoded + encodedSize;
 	outByte = ( unsigned char *)data;
@@ -113,7 +113,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 						state->dataByte = dataByte;
 						return outByte - ( unsigned char* )data;
 					}
-					fragment = (char)base64_decodeValue( *encoded++ );
+					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				dataByte = ( fragment & 0x03f ) << 2;
 			case STEP_B:
@@ -123,7 +123,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 						state->dataByte = dataByte;
 						return outByte - ( unsigned char* )data;
 					}
-					fragment = (char)base64_decodeValue( *encoded++ );
+					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
 					return BUFFER_OVERFLOW;
@@ -137,7 +137,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 						state->dataByte = dataByte;
 						return outByte - ( unsigned char* )data;
 					}
-					fragment = (char)base64_decodeValue( *encoded++ );
+					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
 					return BUFFER_OVERFLOW;
@@ -151,7 +151,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 						state->dataByte = dataByte;
 						return outByte - ( unsigned char* )data;
 					}
-					fragment = (char)base64_decodeValue( *encoded++ );
+					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
 					return BUFFER_OVERFLOW;
@@ -169,23 +169,23 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 	const char* encodedEnd;
 	unsigned char dataByte;
 	unsigned char* outByte;
-	char fragment;
+	int fragment;
 
 	encodedEnd = encoded + encodedSize;
-	outByte = ( unsigned char *)data;
+	outByte = ( unsigned char* )data;
 
 	while ( 1 )	{
 		do {
 			if ( encoded == encodedEnd )
 				return outByte - ( unsigned char* )data;
-			fragment = (char)base64_decodeValue( *encoded++ );
+			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		dataByte = ( fragment & 0x03f ) << 2;
 
 		do {
 			if ( encoded == encodedEnd )
 				return outByte - ( unsigned char* )data;
-			fragment = (char)base64_decodeValue( *encoded++ );
+			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
 			return BUFFER_OVERFLOW;
@@ -196,7 +196,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 		do {
 			if ( encoded == encodedEnd )
 				return outByte - ( unsigned char* )data;
-			fragment = (char)base64_decodeValue( *encoded++ );
+			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
 			return BUFFER_OVERFLOW;
@@ -207,7 +207,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 		do {
 			if ( encoded == encodedEnd )
 				return outByte - ( unsigned char* )data;
-			fragment = (char)base64_decodeValue( *encoded++ );
+			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
 			return BUFFER_OVERFLOW;

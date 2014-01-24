@@ -31,7 +31,6 @@ Project Wolframe.
 ************************************************************************/
 ///\file prnt_pdfPrinterDocument_libhpdf.cpp
 #include "prnt/pdfPrinterDocument_libhpdf.hpp"
-#include "types/bcdArithmetic.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "logger-v1.hpp"

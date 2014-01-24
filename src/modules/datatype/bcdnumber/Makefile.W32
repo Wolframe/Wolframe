@@ -5,13 +5,12 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504 /DWITH_LUA
+	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR)\3rdParty\lua\src \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -19,22 +18,23 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	kernel32.lib advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\3rdParty\lua\src\lua_static.lib
+	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_lua_datetime.dll
+	mod_datatype_bcdnumber.dll
 
 CPP_OBJS = \
-	luaDateTime.obj \
-	mod_lua_datetime.obj
+	bcdArithmetic.obj \
+	datatypeBigint.obj \
+	datatypeBigfxp.obj \
+	mod_datatype_bcdnumber.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModLuaDateTime.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModBcdNumber.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

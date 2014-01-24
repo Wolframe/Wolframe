@@ -31,7 +31,6 @@ Project Wolframe.
 ************************************************************************/
 ///\file prnt_pdfPrinterVariable.cpp
 #include "prnt/pdfPrinterVariable.hpp"
-#include "types/bcdArithmetic.hpp"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>

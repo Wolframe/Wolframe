@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaCppCall.hpp
+///\file luaCppCall.hpp
 ///\brief interface for save calling of C++ functions in lua context
-#ifndef _Wolframe_langbind_LUA_CPP_CALL_HPP_INCLUDED
-#define _Wolframe_langbind_LUA_CPP_CALL_HPP_INCLUDED
+#ifndef _Wolframe_LUA_CPP_CALL_HPP_INCLUDED
+#define _Wolframe_LUA_CPP_CALL_HPP_INCLUDED
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
