@@ -34,7 +34,6 @@
 ///\file database/transactionFunction.hpp
 #ifndef _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
-#include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"
 #include "filter/typedfilter.hpp"
@@ -46,6 +45,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
@@ -67,7 +67,7 @@ class TransactionFunctionInput
 {
 public:
 	class Structure;
-	typedef types::CountedReference<Structure> StructureR;
+	typedef boost::shared_ptr<Structure> StructureR;
 
 	explicit TransactionFunctionInput( const TransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
@@ -100,7 +100,7 @@ private:
 
 ///\class TransactionFunctionR
 ///\brief Reference to transaction function
-typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
+typedef boost::shared_ptr<TransactionFunction> TransactionFunctionR;
 
 ///\class TransactionFunction
 ///\brief Transaction function definition

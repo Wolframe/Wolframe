@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types_bcdArithmetic.cpp
+///\file bcdArithmetic.cpp
 ///\brief Implements some operations on arbitrary sized packed bcd numbers
 
-#include "types/bcdArithmetic.hpp"
+#include "bcdArithmetic.hpp"
 #include "types/allocators.hpp"
 #include <cstring>
 #include <cstdlib>

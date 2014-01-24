@@ -30,7 +30,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaTypeArtithmeticType.hpp
+///\file langbind/luaArtithmeticType.hpp
 ///\brief Type Template for arithmetic type bindings in the lua modules
 /*
 	The arithmetic type should have a constructor from string, direct construction

@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind_iostreamfilter.hpp
+///\file wolfilterIostreamFilter.hpp
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
-#include "langbind/iostreamfilter.hpp"
+#include "wolfilterIostreamFilter.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/formFunction.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"

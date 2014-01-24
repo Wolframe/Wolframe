@@ -24,6 +24,7 @@ DYNAMIC_MODULE = \
 	mod_datatype_bcdnumber.dll
 
 CPP_OBJS = \
+	bcdArithmetic.obj \
 	datatypeBigint.obj \
 	datatypeBigfxp.obj \
 	mod_datatype_bcdnumber.obj

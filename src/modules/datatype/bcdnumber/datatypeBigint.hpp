@@ -35,8 +35,8 @@
 #ifndef _CUSTOM_DATA_TYPE_BCD_BIGINT_HPP_INCLUDED
 #define _CUSTOM_DATA_TYPE_BCD_BIGINT_HPP_INCLUDED
 #include "types/customDataType.hpp"
-#include "types/bcdArithmetic.hpp"
 #include "types/variant.hpp"
+#include "bcdArithmetic.hpp"
 
 namespace _Wolframe {
 namespace types {

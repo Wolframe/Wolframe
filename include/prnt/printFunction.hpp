@@ -36,6 +36,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "types/countedReference.hpp"
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace prnt {
@@ -60,7 +61,7 @@ struct PrintFunction
 };
 
 ///\brief Reference to a printing interface
-typedef types::CountedReference<PrintFunction> PrintFunctionR;
+typedef boost::shared_ptr<PrintFunction> PrintFunctionR;
 
 ///\param[in] description print description source
 typedef PrintFunction* (*CreatePrintFunction)( const std::string& description);

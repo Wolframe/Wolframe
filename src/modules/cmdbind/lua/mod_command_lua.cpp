@@ -33,9 +33,9 @@
 ///\file mod_command_lua.cpp
 ///\brief Module for command handler executing lua scripts
 #include "luaCommandHandlerBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
 #include "luaCommandHandler.hpp"
 #include "luaFunctionProgramType.hpp"
+#include "module/programTypeBuilder.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

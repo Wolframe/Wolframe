@@ -302,10 +302,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				break;
 			}
-			case ObjectConstructorBase::LANGUAGE_EXTENSION_OBJECT:
-				// ... language extension modules are not handled here
-				break;
-
 			case ObjectConstructorBase::AUDIT_OBJECT:
 			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
 			case ObjectConstructorBase::AUTHORIZATION_OBJECT:

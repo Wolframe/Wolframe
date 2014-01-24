@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/bcdArithmetic.hpp
+///\file bcdArithmetic.hpp
 ///\brief Defines some operations on arbitrary sized packed bcd numbers
 ///\note for the Addition,Subtraction and Verification we thank Douglas W. Jones for http://www.divms.uiowa.edu/~jones/bcd/bcd.html
-#ifndef _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
-#define _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
+#ifndef _Wolframe_DATATYPE_BCD_ARITHMETIC_HPP_INCLUDED
+#define _Wolframe_DATATYPE_BCD_ARITHMETIC_HPP_INCLUDED
 #include <string>
 #include <boost/cstdint.hpp>
 #include "types/allocators.hpp"

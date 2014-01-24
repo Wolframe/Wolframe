@@ -35,8 +35,8 @@
 #ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #include "types/customDataType.hpp"
-#include "types/dateArithmetic.hpp"
 #include "types/variant.hpp"
+#include "dateArithmetic.hpp"
 
 namespace _Wolframe {
 namespace types {

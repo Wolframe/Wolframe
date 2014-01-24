@@ -49,9 +49,7 @@ PROVIDER_OBJS = \
 	provider/procProvider.o \
 	provider/procProviderImpl.o
 
-ADT_OBJS = \
-	types_bcdArithmetic.o \
-	types_dateArithmetic.o \
+TYP_OBJS = \
 	types_doctype.o \
 	types_customDataType.o \
 	types_variant.o \
@@ -61,7 +59,7 @@ ADT_OBJS = \
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
-	$(ADT_OBJS) \
+	$(TYP_OBJS) \
 	malloc.o \
 	version.o \
 	getPassword.o \

@@ -32,8 +32,9 @@ Project Wolframe.
 ///\file prnt_pdfPrinterExpression.cpp
 #include "prnt/pdfPrinterExpression.hpp"
 #include "prnt/pdfPrinterVariable.hpp"
-#include "types/bcdArithmetic.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/conversions.hpp"
+#include "types/integer.hpp"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
@@ -81,7 +82,210 @@ void Expression::push_expression( const Expression& expr)
 	m_ar.insert( m_ar.end(), expr.m_ar.begin(), expr.m_ar.end());
 }
 
-typedef types::BigNumber Number;
+//\brief Number type stub. 
+///TODO To be DELETED and replaced with custom data type
+class Number
+{
+public:
+	Number( const Number& o)
+		:m_value(o.m_value),m_fracdigits(o.m_fracdigits){}
+
+	void init( const std::string& v)
+	{
+		std::string::const_iterator vi = v.begin(), ve = v.end();
+		std::string xx;
+		for (; vi != ve && *vi != '.'; ++vi) xx.push_back(*vi);
+		if (vi != ve)
+		{
+			for (++vi; vi != ve && *vi != '.'; ++vi,++m_fracdigits) xx.push_back(*vi);
+		}
+		if (vi != ve) throw std::runtime_error( "illegal variable value");
+		m_value = utils::toint_cast( xx);
+	}
+
+	explicit Number( const std::string& v)
+		:m_value(0),m_fracdigits(0)
+	{
+		init( v);
+	}
+
+	Number round( const Number& o) const
+	{
+		Number rt(*this);
+		_WOLFRAME_INTEGER factor = 1;
+		while (rt.m_fracdigits > o.m_fracdigits)
+		{
+			factor *= 10;
+			rt.m_fracdigits -= 1;
+		}
+		rt.m_value = (rt.m_value + 5) / factor;
+		return rt;
+	}
+
+	Number( const std::string& v, int precision)
+		:m_value(0),m_fracdigits(0)
+	{
+		init( v);
+		while (precision > m_fracdigits)
+		{
+			m_fracdigits += 1;
+			m_value *= 10;
+		}
+	}
+
+	Number equalizeFracDigits( const Number& o) const
+	{
+		Number rt(o);
+		if (m_fracdigits < o.m_fracdigits)
+		{
+			do
+			{
+				rt.m_value /= 10;
+				rt.m_fracdigits -= 1;
+			}
+			while (m_fracdigits < rt.m_fracdigits);
+		}
+		else if (m_fracdigits > o.m_fracdigits)
+		{
+			do
+			{
+				rt.m_value *= 10;
+				rt.m_fracdigits += 1;
+			}
+			while (m_fracdigits > rt.m_fracdigits);
+		}
+		return rt;
+	}
+
+	int compare( const Number& o) const
+	{
+		if (m_fracdigits == o.m_fracdigits)
+		{
+			return -1 + (int)(m_value > o.m_value) + (int)(m_value >= o.m_value);
+		}
+		else if (m_fracdigits > o.m_fracdigits)
+		{
+			Number xx( equalizeFracDigits( o));
+			return -1 + (int)(m_value > xx.m_value) + (int)(m_value >= xx.m_value);
+		}
+		else
+		{
+			Number xx( equalizeFracDigits( *this));
+			return -1 + (int)(xx.m_value > o.m_value) + (int)(xx.m_value >= o.m_value);
+		}
+	}
+
+	bool operator<(const Number& o) const	{return compare(o)<0;}
+	bool operator<=(const Number& o) const	{return compare(o)<=0;}
+	bool operator>(const Number& o) const	{return compare(o)>0;}
+	bool operator>=(const Number& o) const	{return compare(o)>=0;}
+	bool operator==(const Number& o) const	{return compare(o)==0;}
+	bool operator!=(const Number& o) const	{return compare(o)!=0;}
+
+	Number operator+( const Number& o) const
+	{
+		Number aa( *this);
+		Number bb( o);
+		if (aa.m_fracdigits > bb.m_fracdigits)
+		{
+			aa.equalizeFracDigits( bb);
+		}
+		else if (aa.m_fracdigits < bb.m_fracdigits)
+		{
+			bb.equalizeFracDigits( aa);
+		}
+		aa.m_value += bb.m_value;
+		return aa;
+	}
+
+	Number operator-( const Number& o) const
+	{
+		Number aa( *this);
+		Number bb( o);
+		if (aa.m_fracdigits > bb.m_fracdigits)
+		{
+			aa.equalizeFracDigits( bb);
+		}
+		else if (aa.m_fracdigits < bb.m_fracdigits)
+		{
+			bb.equalizeFracDigits( aa);
+		}
+		aa.m_value -= bb.m_value;
+		return aa;
+	}
+
+	Number operator*( const Number& o) const
+	{
+		Number rt( o);
+		rt.m_value *= m_value;
+		rt.m_fracdigits += o.m_fracdigits;
+		return rt;
+	}
+
+	Number operator/( const Number& o) const
+	{
+		Number rt( *this);
+		rt.m_value /= o.m_value;
+		rt.m_fracdigits -= o.m_fracdigits;
+		return rt;
+	}
+
+	Number operator-() const
+	{
+		Number rt( *this);
+		rt.m_value = -m_value;
+		return rt;
+	}
+
+	std::string tostring() const
+	{
+		std::string dg( utils::tostring_cast( m_value));
+		if (m_fracdigits < 0)
+		{
+			dg.append( (std::size_t)-m_fracdigits, '0');
+			return dg;
+		}
+		else if (m_fracdigits > 0)
+		{
+			int nn = dg.size() - (int)(m_value < 0);
+			if (m_fracdigits > nn)
+			{
+				std::string rt;
+				if (m_value < 0)
+				{
+					rt.push_back('-');
+					rt.append( "0.");
+					rt.append( std::string( m_fracdigits-nn-1, '0'));
+					rt.append( dg.c_str()+1);
+				}
+				else if (m_value > 0)
+				{
+					rt.append( "0.");
+					rt.append( std::string( m_fracdigits-nn-1, '0'));
+					rt.append( dg);
+				}
+				else
+				{
+					rt.append( "0");
+				}
+				return rt;
+			}
+			else
+			{
+				return dg.insert (dg.size()-m_fracdigits, 1, '.');
+			}
+		}
+		else
+		{
+			return dg;
+		}
+	}
+
+private:
+	_WOLFRAME_INTEGER m_value;
+	int m_fracdigits;
+};
+
 
 void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings) const
 {
@@ -125,8 +329,8 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 							vscope.define( var, stkval, passToSibling);
 							break;
 						}
-						types::BigNumber varval( vscope.getValue( varidx));
-						if (varval < types::BigNumber(stkval))
+						Number varval( vscope.getValue( varidx));
+						if (varval < Number(stkval))
 						{
 							vscope.define( var, stkval, passToSibling);
 							break;
@@ -147,8 +351,8 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 							vscope.define( var, stkval, passToSibling);
 							break;
 						}
-						types::BigNumber varval( vscope.getValue( varidx));
-						if (varval < types::BigNumber(stkval))
+						Number varval( vscope.getValue( varidx));
+						if (varval < Number(stkval))
 						{
 							vscope.define( var, stkval, passToSibling);
 							break;

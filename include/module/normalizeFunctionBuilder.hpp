@@ -35,9 +35,9 @@ Project Wolframe.
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "types/normalizeFunction.hpp"
 #include "processor/moduleInterface.hpp"
-#include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -93,7 +93,7 @@ private:
 };
 
 
-typedef types::CountedReference<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
+typedef boost::shared_ptr<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
 
 struct NormalizeFunctionDef
 {

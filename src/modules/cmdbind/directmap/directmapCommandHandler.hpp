@@ -37,7 +37,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/formFunction.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
-#include "types/countedReference.hpp"
+#include <boost/shared_ptr.hpp>
 #include "types/keymap.hpp"
 
 namespace _Wolframe {
@@ -115,7 +115,7 @@ private:
 	langbind::TypedOutputFilterR m_output;					//< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction
 	langbind::TypedInputFilterR m_outputform_serialize;			//< serializer of the data in the output form
-	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
+	boost::shared_ptr<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
 	std::string m_output_rootelement;					//< root element of non validated output

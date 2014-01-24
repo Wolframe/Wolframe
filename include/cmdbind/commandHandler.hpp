@@ -34,9 +34,9 @@
 ///\brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
-#include "types/countedReference.hpp"
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 ///\brief Forward declaration
 namespace _Wolframe {
@@ -141,7 +141,7 @@ protected:
 	const proc::ProcessorProvider* m_provider;	//< the reference to the global processor provider
 };
 
-typedef types::CountedReference<CommandHandler> CommandHandlerR;
+typedef boost::shared_ptr<CommandHandler> CommandHandlerR;
 
 }}
 

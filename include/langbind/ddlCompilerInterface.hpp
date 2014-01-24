@@ -36,9 +36,9 @@ Project Wolframe.
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #include "types/form.hpp"
 #include "types/variant.hpp"
-#include "types/countedReference.hpp"
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -69,7 +69,7 @@ private:
 };
 
 ///\brief Reference to a DDL compiler
-typedef types::CountedReference<DDLCompiler> DDLCompilerR;
+typedef boost::shared_ptr<DDLCompiler> DDLCompilerR;
 
 ///\brief Describes the creation of a DDL compiler object
 typedef DDLCompiler* (*CreateDDLCompilerFunc)();

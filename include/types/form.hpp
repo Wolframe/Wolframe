@@ -34,15 +34,15 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_FORM_HPP_INCLUDED
 #define _Wolframe_TYPES_FORM_HPP_INCLUDED
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
+#include "utils/printFormats.hpp"
 #include <string>
 #include <cstddef>
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
-#include "types/countedReference.hpp"
-#include "types/variantStruct.hpp"
-#include "types/variantStructDescription.hpp"
-#include "utils/printFormats.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -111,7 +111,7 @@ private:
 	std::string m_ddlname;
 };
 
-typedef types::CountedReference<FormDescription> FormDescriptionR;
+typedef boost::shared_ptr<FormDescription> FormDescriptionR;
 
 
 //\class Form
@@ -168,7 +168,7 @@ private:
 };
 
 //\brief shared ownership reference to form data structure
-typedef types::CountedReference<Form> FormR;
+typedef boost::shared_ptr<Form> FormR;
 
 }}//namespace
 #endif

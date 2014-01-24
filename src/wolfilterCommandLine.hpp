@@ -41,6 +41,7 @@
 #include "processor/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/property_tree/ptree.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace config {
@@ -89,8 +90,8 @@ private:
 	std::string m_outputfilter;
 	std::size_t m_inbufsize;
 	std::size_t m_outbufsize;
-	types::CountedReference<proc::ProcProviderConfig> m_procProviderConfig;
-	types::CountedReference<db::DBproviderConfig> m_dbProviderConfig;
+	boost::shared_ptr<proc::ProcProviderConfig> m_procProviderConfig;
+	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
 	std::string m_modulePath;

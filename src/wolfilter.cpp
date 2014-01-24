@@ -31,16 +31,16 @@
 
 ************************************************************************/
 ///\brief Program using wolframe functions to map stdin to stdout
+#include "wolfilterCommandLine.hpp"
+#include "wolfilterIostreamFilter.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "processor/moduleInterface.hpp"
+#include "processor/procProvider.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
-#include "langbind/iostreamfilter.hpp"
-#include "prgbind/programLibrary.hpp"
-#include "wolfilterCommandLine.hpp"
-#include "processor/moduleInterface.hpp"
-#include "processor/procProvider.hpp"
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;

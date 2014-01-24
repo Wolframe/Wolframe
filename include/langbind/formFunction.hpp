@@ -36,9 +36,9 @@
 #ifndef _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "types/countedReference.hpp"
 #include "serialize/mapContext.hpp"
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
@@ -67,7 +67,7 @@ struct FormFunctionClosure
 	virtual TypedInputFilterR result() const=0;
 };
 
-typedef types::CountedReference<FormFunctionClosure> FormFunctionClosureR;
+typedef boost::shared_ptr<FormFunctionClosure> FormFunctionClosureR;
 
 struct FormFunction
 {

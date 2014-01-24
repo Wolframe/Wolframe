@@ -37,7 +37,7 @@ Project Wolframe.
 #include <string>
 #include <cstring>
 #include <stdexcept>
-#include "types/countedReference.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -56,7 +56,7 @@ struct NormalizeFunction
 };
 
 //\brief Shared ownership reference to normalizatio functions for atomic values (variant type)
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
+typedef boost::shared_ptr<NormalizeFunction> NormalizeFunctionR;
 
 //\class NormalizeFunctionMap
 //\brief Map of basic normalization functions for atomic values (variant type)
@@ -67,7 +67,7 @@ struct NormalizeFunctionMap
 };
 
 //\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
-typedef types::CountedReference<NormalizeFunctionMap> NormalizeFunctionMapR;
+typedef boost::shared_ptr<NormalizeFunctionMap> NormalizeFunctionMapR;
 
 
 class NormalizeResourceHandle

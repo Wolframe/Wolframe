@@ -45,6 +45,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
+	wolfilterIostreamFilter.o \
 	wolfwizardCommandLine.o \
 	mainConnectionHandler.o \
 	interfaceCommandHandler.o \
@@ -57,7 +58,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	prgbind_normalizeProgram.o \
 	prgbind_ddlProgram.o \
 	prgbind_programLibrary.o \
-	langbind_iostreamfilter.o \
 	jobScheduler.o \
 	acceptor.o \
 	serverEndpoint.o \

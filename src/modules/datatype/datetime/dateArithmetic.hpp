@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file types/dateArithmetic.hpp
+///\file dateArithmetic.hpp
 ///\brief Interface to date arithmetic functions
-#ifndef _TYPES_DATE_ARITHMETIC_HPP_INCLUDED
-#define _TYPES_DATE_ARITHMETIC_HPP_INCLUDED
+#ifndef _TYPES_DATATYPE_DATE_ARITHMETIC_HPP_INCLUDED
+#define _TYPES_DATATYPE_DATE_ARITHMETIC_HPP_INCLUDED
 #include <string>
 #include "boost/date_time/gregorian/gregorian.hpp"
 

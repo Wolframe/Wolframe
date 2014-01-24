@@ -30,37 +30,28 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_lua_bcdnumber.cpp
-///\brief Lua extension module for arbitrary precision bcd number arithmetic
-#include "module/luaExtensionBuilder.hpp"
-#include "logger-v1.hpp"
-#include "luaBcdNumber.hpp"
+///\file wolfilterIostreamFilter.hpp
+///\brief Interface for mapping istream to ostream by filters, forms, functions
+#ifndef _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
+#define _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
+#include <string>
+#include <iostream>
+#include "processor/procProvider.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
+namespace _Wolframe {
+namespace langbind {
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+///\brief Maps input to output through a filter and a conversion procedure.
+///\remark throws exception on error
+///\param[in] provider processor provider for the execution context
+///\param[in] proc conversion procedure name. emty for no conversion
+///\param[in] ifl input filter name
+///\param[in] ib input buffer size
+///\param[in] ofl output filter name
+///\param[in] ob output buffer size
+///\param[in,out] is input stream
+///\param[in,out] os output stream
+void iostreamfilter( proc::ProcessorProvider* provider, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
-
-namespace {
-struct LuaBcdNumberBuilder
-{
-	static SimpleBuilder* constructor()
-	{
-		return new LuaExtensionBuilder( "LuaExtension:bcdnumber", langbind::initBignumModule);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	LuaBcdNumberBuilder::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "Lua extension module for arbitrary precision bcd number arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);
-
+}}//namespace
+#endif
