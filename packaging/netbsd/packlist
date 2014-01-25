@@ -269,7 +269,6 @@ usr/pkg/include/wolframe/module/cppFormFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/constructor.hpp
 usr/pkg/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/pkg/include/wolframe/module/filterBuilder.hpp
-usr/pkg/include/wolframe/module/luaExtensionBuilder.hpp
 usr/pkg/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/printFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/programTypeBuilder.hpp
