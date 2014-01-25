@@ -35,6 +35,7 @@
 
 #include "PostgreSQLtransactionExecStatemachine.hpp"
 #include "PostgreSQL.hpp"
+#include "PostgreSQLsubstitutingStatement.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -42,7 +43,6 @@
 #include <cstring>
 #include <limits>
 #include <stdexcept>
-#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
@@ -52,6 +52,7 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( cons
 	:TransactionExecStatemachine(name_)
 	,m_state(Init)
 	,m_lastresult(0)
+	,m_statement( new PostgreSQLsubstitutingStatement( ) )
 	,m_nof_rows(0)
 	,m_idx_row(0)
 	,m_hasResult(false)
@@ -61,6 +62,7 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( cons
 
 TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
+	delete m_statement;
 	if (m_conn) delete m_conn;
 	clear();
 }
@@ -73,7 +75,7 @@ void TransactionExecStatemachine_postgres::clear()
 		m_lastresult = 0;
 	}
 	m_lasterror.reset();
-	m_statement.clear();
+	m_statement->clear();
 	m_state = Init;
 	m_nof_rows = 0;
 	m_idx_row = 0;
@@ -165,7 +167,7 @@ void TransactionExecStatemachine_postgres::setDatabaseErrorMessage()
 		}
 	}
 	int errorcode = 0;
-	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement->nativeSQL().c_str(), errtype, errmsg, usermsg));
 }
 
 bool TransactionExecStatemachine_postgres::status( PGresult* res, State newstate)
@@ -207,6 +209,7 @@ bool TransactionExecStatemachine_postgres::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbunit->newConnection();
+	dynamic_cast<PostgreSQLsubstitutingStatement *>( m_statement )->setConnection( **m_conn );
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
@@ -251,7 +254,7 @@ bool TransactionExecStatemachine_postgres::errorStatus( const std::string& messa
 	if (m_state != Error)
 	{
 		const char* dbname = m_conn?PQdb(**m_conn):"POSTGRESQL";
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement->nativeSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -269,7 +272,7 @@ bool TransactionExecStatemachine_postgres::start( const std::string& statement)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	m_statement.init( statement);
+	m_statement->init( statement);
 	m_state = CommandReady;
 	return true;
 }
@@ -288,48 +291,14 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
+
+	try {
+		m_statement->bind( idx, value );
+	} catch( const std::runtime_error &e ) {
+		errorStatus( e.what( ) );
 		return false;
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
-	}
-	switch (value.type())
-	{
-		case types::Variant::Null:
-			m_statement.bind( idx, "NULL");
-			break;
-		case types::Variant::Int:
-		case types::Variant::UInt:
-		case types::Variant::Double:
-			m_statement.bind( idx, value.tostring());
-			break;
-		case types::Variant::Custom:
-		case types::Variant::String:
-		{
-			std::string strval = value.tostring();
-			char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
-			encvalue[0] = '\'';
-			boost::shared_ptr<void> encvaluer( encvalue, std::free);
-			int error = 0;
-			size_t encvaluesize = PQescapeStringConn( **m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
-			encvalue[encvaluesize+1] = '\'';
-			std::string bindval( encvalue, encvaluesize+2);
-			m_statement.bind( idx, bindval);
-			break;
-		}
-		case types::Variant::Bool:
-			if( value.tobool( ) ) {
-				m_statement.bind( idx, "'t'" );
-			} else {
-				m_statement.bind( idx, "'f'" );
-			}
-			break;
-	}
+	
 	m_state = CommandReady;
 	return true;
 }
@@ -345,9 +314,10 @@ bool TransactionExecStatemachine_postgres::execute()
 		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
-	std::string stmstr = m_statement.expanded();
+	// TODO: or another string which also works when PQexec is used?
+	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = PQexec( **m_conn, stmstr.c_str());
+	m_lastresult = dynamic_cast<PostgreSQLsubstitutingStatement *>( m_statement )->execute( );
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)

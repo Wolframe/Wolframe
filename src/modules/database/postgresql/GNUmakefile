@@ -28,6 +28,7 @@ CPP_OBJS = \
 	PostgreSQL.o \
 	PostgreSQLtransactionExecStatemachine.o \
 	PostgreSQLstatement.o \
+	PostgreSQLsubstitutingStatement.o \
 	PostgreSQLprogram.o \
 	PostgreSQLmodule.o
 

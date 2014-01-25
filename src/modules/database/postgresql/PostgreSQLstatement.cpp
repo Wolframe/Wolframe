@@ -33,13 +33,13 @@ void PostgreSQLstatement::clear()
 {
 	m_paramarsize = 0;
 	m_buf.clear();
-	m_stmstr.clear();
+	//~ m_stmstr.clear();
 }
 
 void PostgreSQLstatement::init( const std::string& stmstr)
 {
 	clear();
-	m_stmstr = stmstr;
+	//~ m_stmstr = stmstr;
 }
 
 void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
@@ -201,71 +201,72 @@ void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, cons
 	++m_paramarsize;
 }
 
+// will be nativeSQL
 std::string PostgreSQLstatement::statementString() const
 {
-	std::string rt;
-	std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
-	std::string::const_iterator chunkstart = si;
-
-	for (; si != se; ++si)
-	{
-		if (*si == '\'' || *si == '\"')
-		{
-			// ignore contents in string:
-			char eb = *si;
-			for (++si; si != se && *si != eb; ++si)
-			{
-				if (*si == '\\')
-				{
-					++si;
-					if (si == se) break;
-				}
-			}
-			if (si == se) throw std::runtime_error( "string not terminated in statement");
-		}
-		if (*si == '$')
-		{
-			if (si > chunkstart)
-			{
-				rt.append( chunkstart, si);
-				chunkstart = si;
-			}
-			int idx = 0;
-			for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			{
-				idx *= 10;
-				idx += (*si - '0');
-				if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
-			}
-			if (si != se)
-			{
-				if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
-				if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
-			}
-			if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
-			if (m_paramtype[ idx-1])
-			{
-				rt.append( "$");
-				rt.append( chunkstart, si);
-				if (m_paramtype[ idx-1][0])
-				{
-					rt.append( "::");
-					rt.append( m_paramtype[ idx-1]);
-				}
-			}
-			else
-			{
-				rt.append( "NULL");
-			}
-			chunkstart = si;
-			if (si == se) break;
-		}
-	}
-	if (si > chunkstart)
-	{
-		rt.append( chunkstart, si);
-	}
-	return rt;
+	//~ std::string rt;
+	//~ std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
+	//~ std::string::const_iterator chunkstart = si;
+//~ 
+	//~ for (; si != se; ++si)
+	//~ {
+		//~ if (*si == '\'' || *si == '\"')
+		//~ {
+			//~ // ignore contents in string:
+			//~ char eb = *si;
+			//~ for (++si; si != se && *si != eb; ++si)
+			//~ {
+				//~ if (*si == '\\')
+				//~ {
+					//~ ++si;
+					//~ if (si == se) break;
+				//~ }
+			//~ }
+			//~ if (si == se) throw std::runtime_error( "string not terminated in statement");
+		//~ }
+		//~ if (*si == '$')
+		//~ {
+			//~ if (si > chunkstart)
+			//~ {
+				//~ rt.append( chunkstart, si);
+				//~ chunkstart = si;
+			//~ }
+			//~ int idx = 0;
+			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
+			//~ {
+				//~ idx *= 10;
+				//~ idx += (*si - '0');
+				//~ if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
+			//~ }
+			//~ if (si != se)
+			//~ {
+				//~ if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
+				//~ if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
+			//~ }
+			//~ if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
+			//~ if (m_paramtype[ idx-1])
+			//~ {
+				//~ rt.append( "$");
+				//~ rt.append( chunkstart, si);
+				//~ if (m_paramtype[ idx-1][0])
+				//~ {
+					//~ rt.append( "::");
+					//~ rt.append( m_paramtype[ idx-1]);
+				//~ }
+			//~ }
+			//~ else
+			//~ {
+				//~ rt.append( "NULL");
+			//~ }
+			//~ chunkstart = si;
+			//~ if (si == se) break;
+		//~ }
+	//~ }
+	//~ if (si > chunkstart)
+	//~ {
+		//~ rt.append( chunkstart, si);
+	//~ }
+	//~ return rt;
 }
 
 void PostgreSQLstatement::getParams( Params& params) const

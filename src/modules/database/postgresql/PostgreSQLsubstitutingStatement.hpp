@@ -31,52 +31,33 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/bindStatementParams.hpp
-#ifndef _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
-#define _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
+///\file database/PostgreSQLsubstitutingStatement.hpp
+#ifndef _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#define _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#include "database/substitutingStatement.hpp"
 #include <string>
-#include <vector>
-#include <map>
-#include <utility>
-#include <cstdlib>
+#include "types/variant.hpp"
+#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
 
-class Statement
+class PostgreSQLsubstitutingStatement : public SubstitutingStatement
 {
-public:
-	Statement()
-		:m_maxparam(0){}
-	Statement( const Statement& o)
-		:m_data(o.m_data)
-		,m_maxparam(o.m_maxparam)
-		,m_bind(o.m_bind){}
-	explicit Statement( const std::string& stmstr);
+	public:
+		PostgreSQLsubstitutingStatement( );
+		PostgreSQLsubstitutingStatement( const PostgreSQLsubstitutingStatement &o );
 
-	void clear();
-	void init( const std::string& stmstr);
+		void setConnection( PGconn *conn );
+		
+		//\brief Executes the statement with substituted parameters
+		PGresult* execute( ) const;
 
-	///\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const std::string& arg);
-
-	std::string expanded() const;
-	const std::string& string() const
-	{
-		return m_string;
-	}
-
-	unsigned int maxparam() const
-	{
-		return m_maxparam;
-	}
-
-private:
-	std::string m_string;
-	typedef std::pair<unsigned int,std::string> Element;
-	std::vector<Element> m_data;
-	unsigned int m_maxparam;
-	std::map<unsigned int,std::string> m_bind;
+	protected:
+		virtual const std::string convert( const types::Variant &value ) const;
+		
+	private:
+		PGconn *m_conn;
 };
 
 

@@ -34,6 +34,7 @@
 ///\file database/PostgreSQLstatement.hpp
 #ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #define _POSTGRESQL_STATEMENT_HPP_INCLUDED
+#include "database/baseStatement.hpp"
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
@@ -41,7 +42,7 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLstatement
+class PostgreSQLstatement /*: public BaseStatement*/
 {
 public:
 	enum {MaxNofParam=99};
@@ -49,14 +50,8 @@ public:
 	PostgreSQLstatement();
 	PostgreSQLstatement( const PostgreSQLstatement& o);
 
-	void clear();
-	void init( const std::string& stmstr);
-
 	//\brief Executes the statement with the bound parameters on connection 'conn'
 	PGresult* execute( PGconn *conn) const;
-
-	//\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const types::Variant& arg);
 
 private:
 	//\remark See implementation of pq_sendint64
@@ -75,7 +70,12 @@ private:
 
 	void setNextParam( const void* ptr, unsigned int size, const char* type);
 
+	// TODO: inherit above and disappear here
+	void clear();
+	void init( const std::string& stmstr);
+	void bind( unsigned int idx, const types::Variant& value);
 	std::string statementString() const;
+
 	struct Params
 	{
 		const char* paramar[MaxNofParam];
@@ -84,7 +84,6 @@ private:
 	void getParams( Params& params) const;
 
 private:
-	std::string m_stmstr;
 	int m_paramofs[ MaxNofParam];
 	const char* m_paramtype[ MaxNofParam];
 	int m_paramlen[ MaxNofParam];

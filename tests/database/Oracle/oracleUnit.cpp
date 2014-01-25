@@ -234,7 +234,7 @@ TEST_F( OracleFixture, TooFewBindParameter )
 	values.push_back( true);
 	// intentionally ommiting values here, must throw an error
 	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
 		// should actually not work
 		trans->commit( );
 		trans->close( );
@@ -271,7 +271,7 @@ TEST_F( OracleFixture, TooManyBindParameter )
 	values.push_back( "too much");
 	// intentionally adding too many values here, must throw an error
 	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4);", values);
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
 		// should actually not work
 		trans->commit( );
 		trans->close( );
@@ -304,7 +304,7 @@ TEST_F( OracleFixture, IllegalBindParameter )
 	values.push_back( true);
 	values.push_back( 4.782);
 	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5);", values);
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5)", values);
 		// should actually not work
 		trans->commit( );
 		trans->close( );
