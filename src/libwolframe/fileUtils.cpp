@@ -302,37 +302,45 @@ struct FileTypeDetection
 			case UCS2BE:
 			{
 				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si) << 8)
-					+ ((unsigned char)(*(si+1)));
-				si += 2;
+				rt = ((unsigned int)(unsigned char)(*si) << 8);
+				++si;
+				rt += ((unsigned char)(*si));
+				++si;
 				return rt;
 			}
 			case UCS2LE:
 			{
 				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si))
-					+ ((unsigned char)(*(si+1)) << 8);
-				si += 2;
+				rt = ((unsigned int)(unsigned char)(*si));
+				++si;
+				rt += ((unsigned char)(*(si+1)) << 8);
+				++si;
 				return rt;
 			}
 			case UCS4BE:
 			{
 				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*(si+0)) << 24)
-					+ ((unsigned int)(unsigned char)(*(si+1)) << 16);
-					+ ((unsigned int)(unsigned char)(*(si+2)) << 8);
-					+ ((unsigned int)(unsigned char)(*(si+3)));
-				si += 4;
+				rt = ((unsigned int)(unsigned char)(*si) << 24);
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si) << 16);
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si) << 8);
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si));
+				++si;
 				return rt;
 			}
 			case UCS4LE:
 			{
 				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*(si+3)) << 24)
-					+ ((unsigned int)(unsigned char)(*(si+2)) << 16);
-					+ ((unsigned int)(unsigned char)(*(si+1)) << 8);
-					+ ((unsigned int)(unsigned char)(*(si+0)));
-				si += 4;
+				rt = ((unsigned int)(unsigned char)(*si));
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si) << 8);
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si) << 16);
+				++si;
+				rt += ((unsigned int)(unsigned char)(*si) << 24);
+				++si;
 				return rt;
 			}
 		}
