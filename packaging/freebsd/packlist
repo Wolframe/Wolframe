@@ -121,10 +121,6 @@ usr/local/include/wolframe/langbind/cppFormFunction.hpp
 usr/local/include/wolframe/langbind/charsetEncodings.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
-usr/local/include/wolframe/langbind/iostreamfilter.hpp
-usr/local/include/wolframe/langbind/luaArithmeticType.hpp
-usr/local/include/wolframe/langbind/luaCppCall.hpp
-usr/local/include/wolframe/langbind/luaException.hpp
 @dirrm usr/local/include/wolframe/langbind
 usr/local/include/wolframe/protocol/buffers.hpp
 usr/local/include/wolframe/protocol/ioblocks.hpp
@@ -154,6 +150,7 @@ usr/local/include/wolframe/database/transactionInput.hpp
 usr/local/include/wolframe/database/transactionOutput.hpp
 usr/local/include/wolframe/database/transactionExecStatemachine.hpp
 @dirrm usr/local/include/wolframe/database
+usr/local/include/wolframe/prnt/pdfPrintProgramType.hpp
 usr/local/include/wolframe/prnt/pdfPrinter.hpp
 usr/local/include/wolframe/prnt/pdfPrinterDocument.hpp
 usr/local/include/wolframe/prnt/pdfPrinterDocument_libhpdf.hpp
@@ -230,10 +227,8 @@ usr/local/include/wolframe/types/allocators.hpp
 usr/local/include/wolframe/types/atomicCounter.hpp
 usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
-usr/local/include/wolframe/types/bcdArithmetic.hpp
 usr/local/include/wolframe/types/byte2hex.h
 usr/local/include/wolframe/types/countedReference.hpp
-usr/local/include/wolframe/types/dateArithmetic.hpp
 usr/local/include/wolframe/types/doctype.hpp
 usr/local/include/wolframe/types/form.hpp
 usr/local/include/wolframe/types/integer.hpp
@@ -245,7 +240,6 @@ usr/local/include/wolframe/types/typeSignature.hpp
 usr/local/include/wolframe/types/variant.hpp
 usr/local/include/wolframe/types/variantStruct.hpp
 usr/local/include/wolframe/types/variantStructDescription.hpp
-usr/local/include/wolframe/types/normalizeFunction.hpp
 usr/local/include/wolframe/types/customDataType.hpp
 usr/local/include/wolframe/types/datetime.hpp
 usr/local/include/wolframe/types/syncCounter.hpp
@@ -264,7 +258,6 @@ usr/local/include/wolframe/module/cppFormFunctionBuilder.hpp
 usr/local/include/wolframe/module/constructor.hpp
 usr/local/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/local/include/wolframe/module/filterBuilder.hpp
-usr/local/include/wolframe/module/luaExtensionBuilder.hpp
 usr/local/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/local/include/wolframe/module/printFunctionBuilder.hpp
 usr/local/include/wolframe/module/programTypeBuilder.hpp

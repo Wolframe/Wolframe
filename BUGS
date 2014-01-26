@@ -4,10 +4,7 @@
 		1) Either make Object Pool exception save and let it cleanup on its own (only allowing object references of a base class with virtual destructor)
 		2) Or put initialization/deinitialization into functions and call deinitialization in a catchg in the DB constructor
 
-[2]- Errors on ARM because char defaults to unsigned char instead of signed char:
-	1) Tons of warnings about superflous comparisons of unsigned chars
-
-[3]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
+[2]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
 	(too difficult at the moment and most databases are case insensitive anyway) !
 
 [4]- Oracle propagation of caseinsensitivity does not work somehow (broken chain of propagating flags)

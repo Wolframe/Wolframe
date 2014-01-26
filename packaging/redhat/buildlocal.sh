@@ -21,6 +21,9 @@ rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD/wolframe-$VERSION \
 	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log \
 	/tmp/boost-1.48.0 /tmp/libxml2-2.9.1 /tmp/libxslt-1.1.28 /tmp/Python-3.3.2
 
+# for rhel5
+rm -rf /var/tmp/wolframe-root/
+
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 
