@@ -1118,6 +1118,12 @@ BigNumber& BigNumber::operator=( double o)
 	return *this;
 }
 
+BigNumber& BigNumber::operator=( _WOLFRAME_INTEGER o)
+{
+	BigBCD::init( o);
+	BigBCD::shift( m_calc_precision);
+	return *this;
+}
 
 void BigNumber::initFromString( const std::string& numstr, unsigned int maxPrecision)
 {
@@ -1289,7 +1295,7 @@ BigNumber BigNumber::operator /( const BigNumber& o) const
 
 BigNumber BigNumber::operator /( _WOLFRAME_INTEGER opr) const
 {
-	BigBCD res( *this / opr);
+	BigBCD res( this->BigBCD::operator/(opr));
 	BigNumber rt( res, 0, 0);
 	rt.m_calc_precision = m_calc_precision;
 	rt.m_show_precision = m_show_precision;
@@ -1298,7 +1304,7 @@ BigNumber BigNumber::operator /( _WOLFRAME_INTEGER opr) const
 
 BigNumber BigNumber::operator *( const BigNumber& o) const
 {
-	BigBCD val( BigBCD(*this) * BigBCD(o));
+	BigBCD val( this->BigBCD::operator*( o));
 	BigNumber rt( val.shift( -(int)o.m_calc_precision), 0, 0);
 	rt.m_calc_precision = m_calc_precision;
 	rt.m_show_precision = m_show_precision;
@@ -1307,7 +1313,7 @@ BigNumber BigNumber::operator *( const BigNumber& o) const
 
 BigNumber BigNumber::operator *( _WOLFRAME_INTEGER opr) const
 {
-	BigBCD val( BigBCD(*this) * opr);
+	BigBCD val( this->BigBCD::operator*( opr));
 	BigNumber rt( val, m_show_precision, m_calc_precision);
 	return rt;
 }
