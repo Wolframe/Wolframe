@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterExpression.cpp
-#include "prnt/pdfPrinterExpression.hpp"
-#include "prnt/pdfPrinterVariable.hpp"
+///\file pdfPrinterExpression.cpp
+#include "pdfPrinterExpression.hpp"
+#include "pdfPrinterVariable.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/conversions.hpp"
 #include "types/integer.hpp"

@@ -1,9 +1,9 @@
-TOPDIR = ..\..\..
+TOPDIR = ..\..\..\..
 
 !IFDEF WITH_LIBHPDF
 !IFDEF WITH_TEXTWOLF
 SUBDIRS = \
-	$(SUBDIRS) harupdfprint
+	$(SUBDIRS) fakepdfprint
 !ENDIF
 !ENDIF
 

@@ -104,7 +104,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table_textwolf.lua run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../tests/wolfilter/modules/prnt//fakepdfprint/mod_print_testpdf --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table_textwolf.lua run
 **requires:TEXTWOLF
 **file:simpleform_range.wnmp
 iNt=number:integer(10);

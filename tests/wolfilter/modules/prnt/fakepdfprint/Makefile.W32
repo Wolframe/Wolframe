@@ -1,4 +1,4 @@
-TOPDIR = ..\..\..\..
+TOPDIR = ..\..\..\..\..
 
 SUBDIRS =
 
@@ -10,6 +10,8 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\3rdParty\textwolf\include \
+	/I$(TOPDIR)\src\modules\prnt\harupdfprint \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)"
 
@@ -18,22 +20,22 @@ INCLUDE_LDFLAGS = \
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_prnt\wolframe_prnt.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_test_pdf_printer.dll
+	mod_print_testpdf.dll
 
 CPP_OBJS = \
-	prnt_pdfPrinterDocument_testtrace.obj \
-	mod_test_pdf_printer.obj
+	pdfPrinterFiles.obj \
+	pdfPrinterDocumentImpl.obj \
+	mod_print_testpdf.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModTestPdfPrinter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModTestPrintPdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

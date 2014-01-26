@@ -29,16 +29,30 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterDocument_libhpdf.hpp
-///\brief Defines an implementation of the document interface of a pdfPrinter base on libhpdf
-#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_LIBHPDF_HPP_INCLUDED
-#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_LIBHPDF_HPP_INCLUDED
-#include "prnt/pdfPrinterDocument.hpp"
+///\file pdfPrinterMethod.hpp
+///\brief Defines Methods of the simple PDF print function
+#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_METHOD_HPP_INCLUDED
+#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_METHOD_HPP_INCLUDED
+#include <string>
+#include <map>
+#include <cstdlib>
 
 namespace _Wolframe {
 namespace prnt {
 
-Document* createLibHpdfDocument();
+struct Method
+{
+	enum Id
+	{
+		AddPage,
+		PrintText,
+		DrawRectangle,
+		DrawLine
+	};
+};
+
+const char* methodName( Method::Id m);
+Method::Id methodId( const std::string& name);
 
 }}
 #endif

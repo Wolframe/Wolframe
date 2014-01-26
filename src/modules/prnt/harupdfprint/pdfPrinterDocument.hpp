@@ -29,50 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterMethod.cpp
-#include "prnt/pdfPrinterMethod.hpp"
-#include <stdexcept>
-#include <boost/algorithm/string.hpp>
+///\file pdfPrinterDocument.hpp
+///\brief Defines the document interface of a pdfPrinter
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
+#include "pdfPrinterMethod.hpp"
+#include "pdfPrinterVariable.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::prnt;
+namespace _Wolframe {
+namespace prnt {
 
-const char* _Wolframe::prnt::methodName( Method::Id m)
+struct Document
 {
-	static const char* ar[] = {
-		"AddPage",
-		"PrintText",
-		"DrawRectangle",
-		"DrawLine",
-		0};
-	return ar[ (int)m];
-}
+	Document(){}
+	virtual ~Document(){}
+	virtual void execute_enter( Method::Id method, VariableScope& vars)=0;
+	virtual void execute_leave( Method::Id method, VariableScope& vars)=0;
 
-namespace {
-struct MethodnameMap :public std::map <std::string, std::size_t>
-{
-	static std::string unifyKey( const std::string& key)
-	{
-		return boost::algorithm::to_lower_copy(key);
-	}
-
-	MethodnameMap()
-	{
-		for (std::size_t ii=0; methodName( (Method::Id)ii); ++ii)
-		{
-			(*this)[ unifyKey( methodName( (Method::Id)ii))] = ii;
-		}
-	}
+	virtual std::string tostring() const=0;
 };
-}//anonymous namespace
 
-Method::Id _Wolframe::prnt::methodId( const std::string& name)
-{
-	static MethodnameMap map;
-	std::string key( map.unifyKey( name));
-	std::map <std::string, std::size_t>::const_iterator itr = map.find( key);
-	if (itr == map.end()) throw std::runtime_error( std::string( "unknown method '") + name + "'");
-	return (Method::Id)itr->second;
-}
+typedef Document* (*CreateDocumentFunc)();
 
+}}
+#endif
 

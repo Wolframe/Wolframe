@@ -29,31 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterMethod.hpp
-///\brief Defines Methods of the simple PDF print function
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_METHOD_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_METHOD_HPP_INCLUDED
-#include <string>
-#include <map>
-#include <cstdlib>
+///\file pdfPrinterDocumentImpl.hpp
+///\brief Defines an implementation of the document interface of a pdfPrinter that outputs a function call and state trace instead of the PDF
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_TESTTRACE_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_TESTTRACE_HPP_INCLUDED
+#include "pdfPrinterDocument.hpp"
 
 namespace _Wolframe {
 namespace prnt {
 
-struct Method
-{
-	enum Id
-	{
-		AddPage,
-		PrintText,
-		DrawRectangle,
-		DrawLine
-	};
-};
-
-const char* methodName( Method::Id m);
-Method::Id methodId( const std::string& name);
+Document* createTestTraceDocument();
 
 }}
 #endif
-

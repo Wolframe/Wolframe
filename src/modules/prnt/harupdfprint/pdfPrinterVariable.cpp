@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterVariable.cpp
-#include "prnt/pdfPrinterVariable.hpp"
+///\file pdfPrinterVariable.cpp
+#include "pdfPrinterVariable.hpp"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>

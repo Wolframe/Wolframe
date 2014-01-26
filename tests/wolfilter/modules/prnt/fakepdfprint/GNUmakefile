@@ -1,4 +1,4 @@
-TOPDIR = ../../../..
+TOPDIR = ../../../../..
 
 SUBDIRS =
 
@@ -6,22 +6,23 @@ SUBDIRS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
+	-I$(TOPDIR)/3rdParty/textwolf/include \
+	-I$(TOPDIR)/src/modules/prnt/harupdfprint/ \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_prnt
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	-lwolframe_prnt
+	-lwolframe
 
-DYNAMIC_MODULE = mod_test_pdf_printer.so
+DYNAMIC_MODULE = mod_print_testpdf.so
 
 CPP_OBJS = \
-	prnt_pdfPrinterDocument_testtrace.o \
-	mod_test_pdf_printer.o
+	pdfPrinterFiles.o \
+	pdfPrinterDocumentImpl.o \
+	mod_print_testpdf.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

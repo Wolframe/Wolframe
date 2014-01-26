@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterDocument_libhpdf.cpp
-#include "prnt/pdfPrinterDocument_libhpdf.hpp"
+///\file pdfPrinterDocumentImpl.cpp
+#include "pdfPrinterDocumentImpl.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "logger-v1.hpp"

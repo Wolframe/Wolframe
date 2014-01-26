@@ -1,6 +1,10 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
-SUBDIRS = employee_assignment_convert database functions cmdbind filter prnt
+ifeq ($(WITH_LIBHPDF),1)
+ifeq ($(WITH_TEXTWOLF),1)
+SUBDIRS += fakepdfprint
+endif
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

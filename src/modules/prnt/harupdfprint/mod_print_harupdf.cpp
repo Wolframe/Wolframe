@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_test_pdf_printer.cpp
-///\brief Module for testing the printing of PDFs with a simple command interpreter logging a trace of called functions and states
+///\file mod_printer_harupdf.cpp
+///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
 
 #include "module/programTypeBuilder.hpp"
-#include "prnt/pdfPrinter.hpp"
-#include "prnt/pdfPrinterDocument_testtrace.hpp"
-#include "prnt/pdfPrintProgramType.hpp"
+#include "pdfPrinter.hpp"
+#include "pdfPrinterDocumentImpl.hpp"
+#include "pdfPrintProgramType.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -54,11 +54,11 @@ struct PdfPrinter
 {
 	static prgbind::Program* createProgram()
 	{
-		return new prnt::SimplePdfPrintProgram( prnt::createTestTraceDocument);
+		return new prnt::SimplePdfPrintProgram( prnt::createLibHpdfDocument);
 	}
 	static SimpleBuilder* constructor()
 	{
-		return new ProgramTypeBuilder( "TestPdfPrintFunction", "simplepdf", &PdfPrinter::createProgram);
+		return new ProgramTypeBuilder( "HaruPdfPrintFunction", "simplepdf", PdfPrinter::createProgram);
 	}
 };
 }//anonymous namespace
@@ -69,5 +69,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", setModuleLogger, 0, 0, NofObjects, objdef);
 

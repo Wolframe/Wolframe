@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterExpression.hpp
+///\file pdfPrinterExpression.hpp
 ///\brief Defines expressions to express variable assignements in simple PDF printing document descriptions
 #ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_EXPRESSION_HPP_INCLUDED
 #define _Wolframe_PRNT_SIMPLE_PDF_PRINT_EXPRESSION_HPP_INCLUDED
-#include "prnt/pdfPrinterMethod.hpp"
-#include "prnt/pdfPrinterVariable.hpp"
+#include "pdfPrinterMethod.hpp"
+#include "pdfPrinterVariable.hpp"
 #include <string>
 #include <map>
 #include <vector>

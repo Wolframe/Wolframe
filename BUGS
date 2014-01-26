@@ -10,4 +10,5 @@
 [3]- TransactionFunctionClosure: serialize::Context::CaseInsensitiveCompare not respected
 	(too difficult at the moment and most databases are case insensitive anyway) !
 
+[4]- Oracle propagation of caseinsensitivity does not work somehow (broken chain of propagating flags)
 

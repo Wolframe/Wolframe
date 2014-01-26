@@ -10,6 +10,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\3rdParty\textwolf\include \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(TOPDIR)\3rdParty\libhpdf\include"
@@ -19,24 +20,28 @@ INCLUDE_LDFLAGS = \
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_prnt\wolframe_prnt.lib \
 	"$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib" \
 	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_haru_pdf_printer.dll
+	mod_print_harupdf.dll
 
 CPP_OBJS = \
-	prnt_pdfPrinterDocument_libhpdf.obj \
-	mod_haru_pdf_printer.obj
+	pdfPrinter.obj \
+	pdfPrinterDocumentImpl.obj \
+	pdfPrinterExpression.obj \
+	pdfPrinterMethod.obj \
+	pdfPrinterVariable.obj \
+	pdfPrinterDocumentImpl.obj \
+	mod_print_harupdf.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModHaruPdfPrinter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModPrintHaruPdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

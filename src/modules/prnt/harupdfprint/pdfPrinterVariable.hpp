@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterVariable.hpp
+///\file pdfPrinterVariable.hpp
 ///\brief Defines Variables of the simple PDF print function
 #ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_VARIABLE_HPP_INCLUDED
 #define _Wolframe_PRNT_SIMPLE_PDF_PRINT_VARIABLE_HPP_INCLUDED

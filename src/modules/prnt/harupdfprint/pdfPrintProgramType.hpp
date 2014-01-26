@@ -30,32 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program type for testing simplePDF
-///\file prnt/pdfPrintProgramType.cpp
-#include "prnt/pdfPrintProgramType.hpp"
-#include "prnt/pdfPrinter.hpp"
-#include "utils/fileUtils.hpp"
-#include "langbind/formFunction.hpp"
-#include "prgbind/programLibrary.hpp"
-#include <boost/algorithm/string.hpp>
+///\brief Program type for printing with simplePDF based on libhpdf (haru)
+///\file pdfPrintProgramType.hpp
 
-using namespace _Wolframe;
-using namespace _Wolframe::prnt;
+#ifndef _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
+#define _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
+#include "prgbind/program.hpp"
+#include "pdfPrinterDocument.hpp"
+#include <string>
+#include <boost/shared_ptr.hpp>
 
-bool SimplePdfPrintProgram::is_mine( const std::string& filename) const
+namespace _Wolframe {
+namespace prnt {
+
+///\class SimplePdfPrintProgram
+///\brief Program type for printing with simplePDF
+class SimplePdfPrintProgram
+	:public prgbind::Program
 {
-	std::string ext = utils::getFileExtension( filename);
-	if (boost::algorithm::iequals( ext, ".sprn")) return true;
-	return false;
-}
+public:
+	SimplePdfPrintProgram( prnt::CreateDocumentFunc createDocument_)
+		:Program(Program::Function)
+		,m_createDocument(createDocument_){}
+	virtual ~SimplePdfPrintProgram(){}
 
-void SimplePdfPrintProgram::loadProgram( prgbind::ProgramLibrary& library, db::Database*, const std::string& filename)
-{
-	std::string src( utils::readSourceFileContent( filename));
-	HaruPdfPrintFunction* prntfunc = new HaruPdfPrintFunction( src, m_createDocument);
-	langbind::FormFunctionR func( prntfunc);
-	
-	library.defineFormFunction( prntfunc->name(), func);
-}
+	virtual bool is_mine( const std::string& filename) const;
+	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 
+private:
+	prnt::CreateDocumentFunc m_createDocument;
+};
+
+}}//namespace
+#endif
 

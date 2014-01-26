@@ -29,13 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinter.hpp
+///\file pdfPrinter.hpp
 ///\brief Implements the prnt::PrintFunction base on libhpdf
-#include "prnt/pdfPrinter.hpp"
-#include "prnt/pdfPrinterVariable.hpp"
-#include "prnt/pdfPrinterMethod.hpp"
-#include "prnt/pdfPrinterExpression.hpp"
-#include "prnt/pdfPrinterDocument.hpp"
+#include "pdfPrinter.hpp"
+#include "pdfPrinterVariable.hpp"
+#include "pdfPrinterMethod.hpp"
+#include "pdfPrinterExpression.hpp"
+#include "pdfPrinterDocument.hpp"
 #include "utils/parseUtils.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"

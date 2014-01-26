@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind libwolframe_prnt modules
+SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -90,21 +90,21 @@ ifdef DEFAULT_MODULE_LOAD_DIR
 INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(DEFAULT_MODULE_LOAD_DIR)
 endif
 
-modules: libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+modules: libwolframe libwolframe_serialize libwolframe_langbind
 libwolframe_serialize: libwolframe
 libwolframe_langbind: libwolframe libwolframe_serialize
 
-wolframed$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+wolframed$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
 
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
 
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfwizard$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+wolfwizard$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
 
 wolfwizard$(EXE): wolfwizard.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
@@ -141,7 +141,7 @@ local_uninstall:
 
 local_test:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database"
 
 ifeq ($(WITH_ICU),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(ICU_LIB_DIR)"

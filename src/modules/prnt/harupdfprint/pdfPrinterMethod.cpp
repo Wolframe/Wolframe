@@ -29,43 +29,50 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinter.hpp
-///\brief Defines a prnt::PrintFunction implementation based on libhpdf with a simple document layout description
-#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#define _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "langbind/formFunction.hpp"
-#include "prnt/pdfPrinterDocument.hpp"
-#include "types/countedReference.hpp"
-#include <string>
+///\file pdfPrinterMethod.cpp
+#include "pdfPrinterMethod.hpp"
+#include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
-namespace _Wolframe {
-namespace prnt {
+using namespace _Wolframe;
+using namespace _Wolframe::prnt;
 
-///\class HaruPdfPrintFunction
-///\brief Implementation of a PrintFunction for printing PDFs with libhpdf with a simple document layout description
-class HaruPdfPrintFunction
-	:public langbind::FormFunction
+const char* _Wolframe::prnt::methodName( Method::Id m)
 {
-public:
-	///\brief Constructor
-	///\param[in] description Source of the document print description
-	///\param[in] createDocument Function to create a document
-	HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
+	static const char* ar[] = {
+		"AddPage",
+		"PrintText",
+		"DrawRectangle",
+		"DrawLine",
+		0};
+	return ar[ (int)m];
+}
 
-	///\brief Destructor
-	virtual ~HaruPdfPrintFunction();
+namespace {
+struct MethodnameMap :public std::map <std::string, std::size_t>
+{
+	static std::string unifyKey( const std::string& key)
+	{
+		return boost::algorithm::to_lower_copy(key);
+	}
 
-	virtual langbind::FormFunctionClosure* createClosure() const;
-
-	std::string tostring() const;
-	const std::string& name() const;
-
-public:
-	struct Impl;
-private:
-	Impl* m_impl;		//< hidden implementation (PIMPL)
+	MethodnameMap()
+	{
+		for (std::size_t ii=0; methodName( (Method::Id)ii); ++ii)
+		{
+			(*this)[ unifyKey( methodName( (Method::Id)ii))] = ii;
+		}
+	}
 };
+}//anonymous namespace
 
-}}//namespace
-#endif
+Method::Id _Wolframe::prnt::methodId( const std::string& name)
+{
+	static MethodnameMap map;
+	std::string key( map.unifyKey( name));
+	std::map <std::string, std::size_t>::const_iterator itr = map.find( key);
+	if (itr == map.end()) throw std::runtime_error( std::string( "unknown method '") + name + "'");
+	return (Method::Id)itr->second;
+}
+
 

@@ -29,28 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterDocument.hpp
-///\brief Defines the document interface of a pdfPrinter (haru)
-#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
-#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
-#include "prnt/pdfPrinterMethod.hpp"
-#include "prnt/pdfPrinterVariable.hpp"
+///\file pdfPrinter.hpp
+///\brief Defines a langbind::FormFunction implementation based on libhpdf with a simple document layout description
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
+#include "langbind/formFunction.hpp"
+#include "pdfPrinterDocument.hpp"
+#include "types/countedReference.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace prnt {
 
-struct Document
+///\class HaruPdfPrintFunction
+///\brief Implementation of a PrintFunction for printing PDFs with libhpdf with a simple document layout description
+class HaruPdfPrintFunction
+	:public langbind::FormFunction
 {
-	Document(){}
-	virtual ~Document(){}
-	virtual void execute_enter( Method::Id method, VariableScope& vars)=0;
-	virtual void execute_leave( Method::Id method, VariableScope& vars)=0;
+public:
+	///\brief Constructor
+	///\param[in] description Source of the document print description
+	///\param[in] createDocument Function to create a document
+	HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 
-	virtual std::string tostring() const=0;
+	///\brief Destructor
+	virtual ~HaruPdfPrintFunction();
+
+	virtual langbind::FormFunctionClosure* createClosure() const;
+
+	std::string tostring() const;
+	const std::string& name() const;
+
+public:
+	struct Impl;
+private:
+	Impl* m_impl;		//< hidden implementation (PIMPL)
 };
 
-typedef Document* (*CreateDocumentFunc)();
-
-}}
+}}//namespace
 #endif
 

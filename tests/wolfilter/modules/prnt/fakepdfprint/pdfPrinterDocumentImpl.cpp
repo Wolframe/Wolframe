@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterDocument_testtrace.cpp
-#include "prnt/pdfPrinterDocument_testtrace.hpp"
+///\file pdfPrinterDocumentImpl.cpp
+#include "pdfPrinterDocumentImpl.hpp"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

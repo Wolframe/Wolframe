@@ -5,17 +5,15 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
+	-I. -I$(TOPDIR)/include -I$(TOPDIR)/3rdParty/textwolf/include \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe_prnt \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	-lwolframe_prnt
+	-lwolframe
 
 # libhpdf
 INCLUDE_CXXFLAGS += \
@@ -31,13 +29,17 @@ INCLUDE_LIBS += \
 	$(LIBHPDF_LIBS)
 
 
-DYNAMIC_MODULE = mod_haru_pdf_printer.so
+DYNAMIC_MODULE = mod_print_harupdf.so
 
 LIBHPDF_OBJS =
 
 CPP_OBJS = \
-	prnt_pdfPrinterDocument_libhpdf.o \
-	mod_haru_pdf_printer.o
+	pdfPrinter.o \
+	pdfPrinterExpression.o \
+	pdfPrinterMethod.o \
+	pdfPrinterVariable.o \
+	pdfPrinterDocumentImpl.o \
+	mod_print_harupdf.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

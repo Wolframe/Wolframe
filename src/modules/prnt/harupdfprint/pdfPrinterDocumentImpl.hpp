@@ -29,16 +29,17 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinterDocument_libhpdf.hpp
-///\brief Defines an implementation of the document interface of a pdfPrinter that outputs a function call and state trace instead of the PDF
-#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_TESTTRACE_HPP_INCLUDED
-#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_TESTTRACE_HPP_INCLUDED
-#include "prnt/pdfPrinterDocument.hpp"
+///\file pdfPrinterDocumentImpl.hpp
+///\brief Defines an implementation of the document interface of a pdfPrinter base on libhpdf
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_LIBHPDF_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_LIBHPDF_HPP_INCLUDED
+#include "pdfPrinterDocument.hpp"
 
 namespace _Wolframe {
 namespace prnt {
 
-Document* createTestTraceDocument();
+Document* createLibHpdfDocument();
 
 }}
 #endif
+

@@ -30,37 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program type for printing with simplePDF based on libhpdf (haru)
-///\file pdfPrintProgramType.hpp
+///\brief Program type for testing simplePDF
+///\file pdfPrintProgramType.cpp
+#include "pdfPrintProgramType.hpp"
+#include "pdfPrinter.hpp"
+#include "utils/fileUtils.hpp"
+#include "langbind/formFunction.hpp"
+#include "prgbind/programLibrary.hpp"
+#include <boost/algorithm/string.hpp>
 
-#ifndef _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
-#define _PRGBIND_SIMPLE_PDF_PROGRAM_TYPE_HPP_INCLUDED
-#include "prgbind/program.hpp"
-#include "prnt/pdfPrinterDocument.hpp"
-#include <string>
-#include <boost/shared_ptr.hpp>
+using namespace _Wolframe;
+using namespace _Wolframe::prnt;
 
-namespace _Wolframe {
-namespace prnt {
-
-///\class SimplePdfPrintProgram
-///\brief Program type for printing with simplePDF
-class SimplePdfPrintProgram
-	:public prgbind::Program
+bool SimplePdfPrintProgram::is_mine( const std::string& filename) const
 {
-public:
-	SimplePdfPrintProgram( prnt::CreateDocumentFunc createDocument_)
-		:Program(Program::Function)
-		,m_createDocument(createDocument_){}
-	virtual ~SimplePdfPrintProgram(){}
+	std::string ext = utils::getFileExtension( filename);
+	if (boost::algorithm::iequals( ext, ".sprn")) return true;
+	return false;
+}
 
-	virtual bool is_mine( const std::string& filename) const;
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+void SimplePdfPrintProgram::loadProgram( prgbind::ProgramLibrary& library, db::Database*, const std::string& filename)
+{
+	std::string src( utils::readSourceFileContent( filename));
+	HaruPdfPrintFunction* prntfunc = new HaruPdfPrintFunction( src, m_createDocument);
+	langbind::FormFunctionR func( prntfunc);
+	
+	library.defineFormFunction( prntfunc->name(), func);
+}
 
-private:
-	prnt::CreateDocumentFunc m_createDocument;
-};
-
-}}//namespace
-#endif
 
