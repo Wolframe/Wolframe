@@ -35,6 +35,9 @@
 
 #include "database/substitutingStatement.hpp"
 
+#include <stdexcept>
+#include <boost/lexical_cast.hpp>
+
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
@@ -44,7 +47,9 @@ SubstitutingStatement::SubstitutingStatement( )
 }
 
 SubstitutingStatement::SubstitutingStatement( const SubstitutingStatement &o )
-	: BaseStatement( o )
+	: BaseStatement( o ),
+	m_bind( o.m_bind ),
+	m_data( o.m_data )
 {
 }
 
@@ -58,6 +63,7 @@ void SubstitutingStatement::clear( )
 	BaseStatement::clear( );
 	
 	m_bind.clear( );
+	m_data.clear();
 }
 
 void SubstitutingStatement::bind( unsigned int idx, const types::Variant &value )
@@ -70,24 +76,25 @@ void SubstitutingStatement::bind( unsigned int idx, const types::Variant &value 
 
 const std::string SubstitutingStatement::nativeSQL( ) const
 {
-	// TODO: this is temporary
-	return m_stmtStr;
+	// doesn't work this way!
+	std::string rt;
+	//~ std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
+	//~ for( ; di != de; di++ ) {
+		//~ if( di->first ) {
+			//~ std::map<unsigned int, std::string>::const_iterator bi = m_bind.find( di->first );
+			//~ if( bi == m_bind.end( ) ) {
+				//~ throw std::runtime_error( std::string( "parameter $" ) + boost::lexical_cast<std::string>( di->first ) + " undefined" );
+			//~ }
+			//~ rt.append( bi->second );
+		//~ } else {
+			//~ rt.append( di->second );
+		//~ }
+	//~ }
+	return rt;
 }
 
-//~ void Statement::clear()
-//~ {
-	//~ m_string.clear();
-	//~ m_data.clear();
-//~ }
-//~ 
 //~ void BaseStatement::init( const std::string& stmstr)
 //~ {
-	//~ clear();
-	//~ m_string = stmstr;
-	//~ std::string::const_iterator si = stmstr.begin(), se = stmstr.end();
-	//~ std::string::const_iterator chunkstart = si;
-	//~ for (; si != se; ++si)
-	//~ {
 		//~ if (*si == '$')
 		//~ {
 			//~ if (si > chunkstart)
@@ -112,102 +119,3 @@ const std::string SubstitutingStatement::nativeSQL( ) const
 	//~ {
 		//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
 	//~ }
-
-// from PostgresqlStatement:
-
-	//~ std::string rt;
-	//~ std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
-	//~ std::string::const_iterator chunkstart = si;
-//~ 
-	//~ for (; si != se; ++si)
-	//~ {
-		//~ if (*si == '\'' || *si == '\"')
-		//~ {
-			//~ // ignore contents in string:
-			//~ char eb = *si;
-			//~ for (++si; si != se && *si != eb; ++si)
-			//~ {
-				//~ if (*si == '\\')
-				//~ {
-					//~ ++si;
-					//~ if (si == se) break;
-				//~ }
-			//~ }
-			//~ if (si == se) throw std::runtime_error( "string not terminated in statement");
-		//~ }
-		//~ if (*si == '$')
-		//~ {
-			//~ if (si > chunkstart)
-			//~ {
-				//~ rt.append( chunkstart, si);
-				//~ chunkstart = si;
-			//~ }
-			//~ int idx = 0;
-			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			//~ {
-				//~ idx *= 10;
-				//~ idx += (*si - '0');
-				//~ if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
-			//~ }
-			//~ if (si != se)
-			//~ {
-				//~ if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
-				//~ if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
-			//~ }
-			//~ if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
-			//~ if (m_paramtype[ idx-1])
-			//~ {
-				//~ rt.append( "$");
-				//~ rt.append( chunkstart, si);
-				//~ if (m_paramtype[ idx-1][0])
-				//~ {
-					//~ rt.append( "::");
-					//~ rt.append( m_paramtype[ idx-1]);
-				//~ }
-			//~ }
-			//~ else
-			//~ {
-				//~ rt.append( "NULL");
-			//~ }
-			//~ chunkstart = si;
-			//~ if (si == se) break;
-		//~ }
-	//~ }
-	//~ if (si > chunkstart)
-	//~ {
-		//~ rt.append( chunkstart, si);
-	//~ }
-	//~ return rt;
-
-//~ }
-//~ 
-//~ Statement::Statement( const std::string& stmstr)
-	//~ :m_maxparam(0)
-//~ {
-	//~ init( stmstr);
-//~ }
-//~ 
-//~ 
-//~ // will be nativeSQL
-//~ std::string Statement::expanded() const
-//~ {
-	//~ std::string rt;
-	//~ std::vector<Element>::const_iterator di = m_data.begin(), de = m_data.end();
-	//~ for (; di != de; di++)
-	//~ {
-		//~ if (di->first)
-		//~ {
-			//~ std::map<unsigned int, std::string>::const_iterator bi = m_bind.find( di->first);
-			//~ if (bi == m_bind.end()) throw std::runtime_error( std::string( "parameter $") + boost::lexical_cast<std::string>(di->first) + " undefined");
-			//~ rt.append( bi->second);
-		//~ }
-		//~ else
-		//~ {
-			//~ rt.append( di->second);
-		//~ }
-	//~ }
-	//~ return rt;
-//~ }
-//~ 
-//~ 
-//~ 

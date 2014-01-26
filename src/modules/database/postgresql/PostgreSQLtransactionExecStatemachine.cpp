@@ -62,9 +62,9 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( cons
 
 TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
-	delete m_statement;
 	if (m_conn) delete m_conn;
 	clear();
+	delete m_statement;
 }
 
 void TransactionExecStatemachine_postgres::clear()

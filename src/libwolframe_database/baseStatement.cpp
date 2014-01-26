@@ -45,6 +45,13 @@ BaseStatement::BaseStatement( )
 {
 }
 
+BaseStatement::BaseStatement( const BaseStatement &o )
+	: m_stmtStr( o.m_stmtStr ),
+	m_maxParam( o.m_maxParam ),
+	m_nativeStmt( o.m_nativeStmt )
+{
+}
+
 BaseStatement::BaseStatement( const std::string &stmtStr )
 	: m_stmtStr( stmtStr ),
 	m_maxParam( 0 )
@@ -59,15 +66,11 @@ void BaseStatement::init( const std::string &stmtStr )
 	parse( );
 }
 
-void BaseStatement::parse( )
-{
-	// TODO
-}
-
 void BaseStatement::clear( )
 {
 	m_stmtStr.clear( );
 	m_maxParam = 0;
+	m_nativeStmt.clear( );
 }
 
 void BaseStatement::bind( unsigned int idx, const types::Variant & /*value*/ )
@@ -88,27 +91,40 @@ const std::string BaseStatement::originalSQL( ) const
 	return m_stmtStr;
 }
 
-//~ void Statement::clear()
-//~ {
-	//~ m_string.clear();
-	//~ m_data.clear();
-	//~ m_bind.clear();
-//~ }
-//~ 
-//~ void BaseStatement::init( const std::string& stmstr)
-//~ {
-	//~ clear();
-	//~ m_string = stmstr;
-	//~ std::string::const_iterator si = stmstr.begin(), se = stmstr.end();
-	//~ std::string::const_iterator chunkstart = si;
-	//~ for (; si != se; ++si)
-	//~ {
-		//~ if (*si == '$')
-		//~ {
-			//~ if (si > chunkstart)
-			//~ {
+const std::string BaseStatement::nativeSQL( ) const
+{
+	return m_nativeStmt;
+}
+
+void BaseStatement::parse( )
+{
+	m_nativeStmt.clear( );
+	std::string::const_iterator si = m_stmtStr.begin( ), se = m_stmtStr.end( );
+	std::string::const_iterator chunkstart = si;
+	for( ; si != se; si++ ) {
+		// don't search for placeholders in strings
+		if( *si == '\'' || *si == '\"' ) {
+			char eb = *si;
+			si++;
+			for( ; si != se && *si != eb; si++ ) {
+				// allow escaping of the same quote
+				if( *si == '\\' ) {
+					si++;
+					if( si == se ) break;
+				}
+			}
+			if( si == se ) {
+				throw new std::runtime_error( "string not terminated in statement '" +
+					originalSQL( ) + "'" );
+			}
+		} else if( *si == '$' ) {
+			
+			if( si > chunkstart ) {
+				m_nativeStmt.append( chunkstart, si );
+				chunkstart = si;
 				//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
-			//~ }
+			}
+
 			//~ std::string idxstr;
 			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
 			//~ {
@@ -121,42 +137,16 @@ const std::string BaseStatement::originalSQL( ) const
 			//~ if (idx > m_maxparam) m_maxparam = idx;
 			//~ m_data.push_back( Element( idx, ""));
 			//~ if (si == se) break;
-		//~ }
-	//~ }
-	//~ if (si > chunkstart)
-	//~ {
+		}
+	}
+	if( si > chunkstart ) {
 		//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
-	//~ }
+		//~ from PostgresqlStatement:
+		//~ rt.append( chunkstart, si);
+	}
+}
 
-// from PostgresqlStatement:
 
-	//~ std::string rt;
-	//~ std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
-	//~ std::string::const_iterator chunkstart = si;
-//~ 
-	//~ for (; si != se; ++si)
-	//~ {
-		//~ if (*si == '\'' || *si == '\"')
-		//~ {
-			//~ // ignore contents in string:
-			//~ char eb = *si;
-			//~ for (++si; si != se && *si != eb; ++si)
-			//~ {
-				//~ if (*si == '\\')
-				//~ {
-					//~ ++si;
-					//~ if (si == se) break;
-				//~ }
-			//~ }
-			//~ if (si == se) throw std::runtime_error( "string not terminated in statement");
-		//~ }
-		//~ if (*si == '$')
-		//~ {
-			//~ if (si > chunkstart)
-			//~ {
-				//~ rt.append( chunkstart, si);
-				//~ chunkstart = si;
-			//~ }
 			//~ int idx = 0;
 			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
 			//~ {
@@ -186,47 +176,5 @@ const std::string BaseStatement::originalSQL( ) const
 			//~ }
 			//~ chunkstart = si;
 			//~ if (si == se) break;
-		//~ }
-	//~ }
-	//~ if (si > chunkstart)
-	//~ {
-		//~ rt.append( chunkstart, si);
-	//~ }
-	//~ return rt;
 
 //~ }
-//~ 
-//~ Statement::Statement( const std::string& stmstr)
-	//~ :m_maxparam(0)
-//~ {
-	//~ init( stmstr);
-//~ }
-//~ 
-//~ void Statement::bind( unsigned int idx, const std::string& arg)
-//~ {
-	//~ m_bind[ idx] = arg;
-//~ }
-//~ 
-//~ // will be nativeSQL
-//~ std::string Statement::expanded() const
-//~ {
-	//~ std::string rt;
-	//~ std::vector<Element>::const_iterator di = m_data.begin(), de = m_data.end();
-	//~ for (; di != de; di++)
-	//~ {
-		//~ if (di->first)
-		//~ {
-			//~ std::map<unsigned int, std::string>::const_iterator bi = m_bind.find( di->first);
-			//~ if (bi == m_bind.end()) throw std::runtime_error( std::string( "parameter $") + boost::lexical_cast<std::string>(di->first) + " undefined");
-			//~ rt.append( bi->second);
-		//~ }
-		//~ else
-		//~ {
-			//~ rt.append( di->second);
-		//~ }
-	//~ }
-	//~ return rt;
-//~ }
-//~ 
-//~ 
-//~ 

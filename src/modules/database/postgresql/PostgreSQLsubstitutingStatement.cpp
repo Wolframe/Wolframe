@@ -12,7 +12,8 @@ PostgreSQLsubstitutingStatement::PostgreSQLsubstitutingStatement( )
 }
 
 PostgreSQLsubstitutingStatement::PostgreSQLsubstitutingStatement( const PostgreSQLsubstitutingStatement &o )
-	: SubstitutingStatement( o )
+	: SubstitutingStatement( o ),
+	m_conn( 0 )
 {
 }
 

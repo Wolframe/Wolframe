@@ -49,6 +49,7 @@ class BaseStatement : public Statement
 {
 	public:
 		BaseStatement( );
+		BaseStatement( const BaseStatement &o );
 		explicit BaseStatement( const std::string &stmtStr );
 		
 		virtual void init( const std::string &stmtStr );
@@ -58,36 +59,17 @@ class BaseStatement : public Statement
 		virtual void bind( unsigned int idx, const types::Variant &value );
 
 		virtual const std::string originalSQL( ) const;
+
+		virtual const std::string nativeSQL( ) const;
 		
 	protected:
 		std::string m_stmtStr;
 		unsigned int m_maxParam;
+		std::string m_nativeStmt;
 
 	private:
 		void parse( );
 };
-		
-//~ public:
-	//~ Statement()
-		//~ :m_maxparam(0){}
-	//~ Statement( const Statement& o)
-		//~ :m_data(o.m_data)
-		//~ ,m_maxparam(o.m_maxparam)
-		//~ ,m_bind(o.m_bind){}
-	//~ explicit Statement( const std::string& stmstr);
-//~ 
-	//~ unsigned int maxparam() const
-	//~ {
-		//~ return m_maxparam;
-	//~ }
-//~ 
-//~ private:
-	//~ typedef std::pair<unsigned int,std::string> Element;
-	//~ std::vector<Element> m_data;
-	//~ unsigned int m_maxparam;
-	//~ std::map<unsigned int,std::string> m_bind;
-//~ };
-
 
 }}//namespace
 #endif

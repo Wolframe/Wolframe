@@ -42,6 +42,8 @@
 #include "database/baseStatement.hpp"
 
 #include <map>
+#include <utility>
+#include <vector>
 
 namespace _Wolframe {
 namespace db {
@@ -73,29 +75,9 @@ class SubstitutingStatement : public BaseStatement
 	
 	private:
 		std::map< unsigned int, std::string > m_bind;
+		typedef std::pair<unsigned int, std::string> Element;
+		std::vector<Element> m_data;
 };
-
-		
-//~ public:
-	//~ Statement()
-		//~ :m_maxparam(0){}
-	//~ Statement( const Statement& o)
-		//~ :m_data(o.m_data)
-		//~ ,m_maxparam(o.m_maxparam)
-		//~ ,m_bind(o.m_bind){}
-	//~ explicit Statement( const std::string& stmstr);
-//~ 
-	//~ unsigned int maxparam() const
-	//~ {
-		//~ return m_maxparam;
-	//~ }
-//~ 
-//~ private:
-	//~ typedef std::pair<unsigned int,std::string> Element;
-	//~ std::vector<Element> m_data;
-	//~ unsigned int m_maxparam;
-//~ };
-
 
 }}//namespace
 #endif
