@@ -48,8 +48,7 @@ SubstitutingStatement::SubstitutingStatement( )
 
 SubstitutingStatement::SubstitutingStatement( const SubstitutingStatement &o )
 	: BaseStatement( o ),
-	m_bind( o.m_bind ),
-	m_data( o.m_data )
+	m_bind( o.m_bind )
 {
 }
 
@@ -63,59 +62,22 @@ void SubstitutingStatement::clear( )
 	BaseStatement::clear( );
 	
 	m_bind.clear( );
-	m_data.clear();
 }
 
-void SubstitutingStatement::bind( unsigned int idx, const types::Variant &value )
+void SubstitutingStatement::bind( const unsigned int idx, const types::Variant &value )
 {
-	// does boundary check
+	// does boundary checking
 	BaseStatement::bind( idx, value );
 	
 	m_bind[idx] = convert( value );
 }
 
-const std::string SubstitutingStatement::nativeSQL( ) const
+const std::string SubstitutingStatement::replace( const unsigned int idx ) const
 {
-	// doesn't work this way!
-	std::string rt;
-	//~ std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
-	//~ for( ; di != de; di++ ) {
-		//~ if( di->first ) {
-			//~ std::map<unsigned int, std::string>::const_iterator bi = m_bind.find( di->first );
-			//~ if( bi == m_bind.end( ) ) {
-				//~ throw std::runtime_error( std::string( "parameter $" ) + boost::lexical_cast<std::string>( di->first ) + " undefined" );
-			//~ }
-			//~ rt.append( bi->second );
-		//~ } else {
-			//~ rt.append( di->second );
-		//~ }
-	//~ }
-	return rt;
+	std::map<unsigned int, std::string>::const_iterator bi = m_bind.find( idx );
+	if( bi == m_bind.end( ) ) {
+		throw std::runtime_error( std::string( "parameter $" ) + boost::lexical_cast<std::string>( idx ) + " undefined" );
+	}
+	
+	return bi->second;
 }
-
-//~ void BaseStatement::init( const std::string& stmstr)
-//~ {
-		//~ if (*si == '$')
-		//~ {
-			//~ if (si > chunkstart)
-			//~ {
-				//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
-			//~ }
-			//~ std::string idxstr;
-			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			//~ {
-				//~ idxstr.push_back( *si);
-			//~ }
-			//~ chunkstart = si;
-			//~ if (idxstr.empty()) throw std::runtime_error( "only parameters referenced by index supported until now in database statements");
-			//~ unsigned int idx = boost::lexical_cast<unsigned int>( idxstr);
-			//~ if (idx == 0) throw std::runtime_error( "parameter index out of range");
-			//~ if (idx > m_maxparam) m_maxparam = idx;
-			//~ m_data.push_back( Element( idx, ""));
-			//~ if (si == se) break;
-		//~ }
-	//~ }
-	//~ if (si > chunkstart)
-	//~ {
-		//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
-	//~ }

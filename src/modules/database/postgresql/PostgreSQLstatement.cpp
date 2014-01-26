@@ -17,7 +17,8 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
-	:m_paramarsize(o.m_paramarsize)
+	:BaseStatement( o)
+	,m_paramarsize(o.m_paramarsize)
 	,m_buf(o.m_buf)
 {
 	std::memcpy( m_paramofs, o.m_paramofs, m_paramarsize * sizeof(*m_paramofs));
@@ -26,34 +27,28 @@ PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
 
 
 PostgreSQLstatement::PostgreSQLstatement()
-	:m_paramarsize(0){}
+	:BaseStatement()
+	,m_paramarsize(0){}
 
 
 void PostgreSQLstatement::clear()
 {
+	BaseStatement::clear();
 	m_paramarsize = 0;
 	m_buf.clear();
-	//~ m_stmstr.clear();
 }
 
-void PostgreSQLstatement::init( const std::string& stmstr)
-{
-	clear();
-	//~ m_stmstr = stmstr;
-}
-
-void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
+void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& value)
 {
 	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
+
+	// the MaxNofParam is a limitation of this class, doing it here..
+	if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
 
 	switch (value.type())
 	{
 		case types::Variant::Null:
 			bindNull();
-			break;
-// MBa hack: eliminate compiler warning
-		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in postgreSQL database module");
 			break;
 
 		case types::Variant::Int:
@@ -97,6 +92,10 @@ void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 
 		case types::Variant::String:
 			bindString( value.charptr(), value.charsize());
+			break;
+
+		case types::Variant::Custom:
+			throw std::logic_error( "Custom type in PostgreSQL database module not supported yet!");
 			break;
 	}
 }
@@ -201,11 +200,6 @@ void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, cons
 	++m_paramarsize;
 }
 
-// will be nativeSQL
-std::string PostgreSQLstatement::statementString() const
-{
-}
-
 void PostgreSQLstatement::getParams( Params& params) const
 {
 	params.paramarsize = m_paramarsize;
@@ -224,7 +218,7 @@ void PostgreSQLstatement::getParams( Params& params) const
 
 PGresult* PostgreSQLstatement::execute( PGconn *conn) const
 {
-	std::string command = statementString();
+	std::string command = nativeSQL();
 	Params params;
 	getParams( params);
 
@@ -232,6 +226,3 @@ PGresult* PostgreSQLstatement::execute( PGconn *conn) const
 			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
 			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
 }
-
-
-

@@ -42,7 +42,7 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLstatement /*: public BaseStatement*/
+class PostgreSQLstatement : public BaseStatement
 {
 public:
 	enum {MaxNofParam=99};
@@ -52,6 +52,10 @@ public:
 
 	//\brief Executes the statement with the bound parameters on connection 'conn'
 	PGresult* execute( PGconn *conn) const;
+
+	virtual void clear( );
+
+	virtual void bind( const unsigned int idx, const types::Variant &value );
 
 private:
 	//\remark See implementation of pq_sendint64
@@ -69,12 +73,6 @@ private:
 	void bindNull();
 
 	void setNextParam( const void* ptr, unsigned int size, const char* type);
-
-	// TODO: inherit above and disappear here
-	void clear();
-	void init( const std::string& stmstr);
-	void bind( unsigned int idx, const types::Variant& value);
-	std::string statementString() const;
 
 	struct Params
 	{

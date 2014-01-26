@@ -51,7 +51,7 @@ class Statement
 		
 		//\remark Binds parameter at position idx with variant data
 		//        in the format with Wolframe placeholders
-		virtual void bind( unsigned int idx, const types::Variant &arg ) = 0;
+		virtual void bind( const unsigned int idx, const types::Variant &arg ) = 0;
 
 		//\remark Returns the SQL statement as passed down to the
 		//        database layer
@@ -67,6 +67,11 @@ class Statement
 		
 		//\remark Clear current statement
 		virtual void clear( ) = 0;
+
+		//\remark Funtion called when the placeholder should be put
+		//        into the final string (this is either for subsituting
+		//        data or rewrite placeholders to native syntax)
+		virtual const std::string replace(const unsigned int idx ) const = 0;
 };
 
 }}//namespace

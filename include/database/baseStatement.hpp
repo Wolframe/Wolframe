@@ -39,6 +39,9 @@
 
 #include "database/statement.hpp"
 
+#include <utility>
+#include <vector>
+
 namespace _Wolframe {
 namespace db {
 
@@ -56,19 +59,26 @@ class BaseStatement : public Statement
 
 		virtual void clear( );
 
-		virtual void bind( unsigned int idx, const types::Variant &value );
+		virtual void bind( const unsigned int idx, const types::Variant &value );
 
 		virtual const std::string originalSQL( ) const;
 
 		virtual const std::string nativeSQL( ) const;
+
+		virtual const std::string replace( const unsigned int idx ) const = 0;
 		
 	protected:
 		std::string m_stmtStr;
 		unsigned int m_maxParam;
-		std::string m_nativeStmt;
 
 	private:
 		void parse( );
+		void substitute( ) const;
+		
+	private:
+		typedef std::pair<unsigned int, std::string> Element;
+		std::vector<Element> m_data;
+		mutable std::string m_nativeStmt;	
 };
 
 }}//namespace

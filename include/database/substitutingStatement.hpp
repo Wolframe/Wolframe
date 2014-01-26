@@ -42,8 +42,6 @@
 #include "database/baseStatement.hpp"
 
 #include <map>
-#include <utility>
-#include <vector>
 
 namespace _Wolframe {
 namespace db {
@@ -62,9 +60,7 @@ class SubstitutingStatement : public BaseStatement
 
 		virtual void clear( );
 
-		virtual void bind( unsigned int idx, const types::Variant &value );
-
-		virtual const std::string nativeSQL( ) const;
+		virtual void bind( const unsigned int idx, const types::Variant &value );
 	
 	protected:
 		//\remark: function to convert and escape a variant, if single
@@ -72,11 +68,11 @@ class SubstitutingStatement : public BaseStatement
 		//         care must be taken to use the database escape functions
 		//         to escape the values here (beware of SQL code injection!)
 		virtual const std::string convert( const types::Variant &value ) const = 0;
+
+		virtual const std::string replace( const unsigned int idx ) const;
 	
 	private:
 		std::map< unsigned int, std::string > m_bind;
-		typedef std::pair<unsigned int, std::string> Element;
-		std::vector<Element> m_data;
 };
 
 }}//namespace

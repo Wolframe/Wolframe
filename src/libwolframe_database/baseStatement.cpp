@@ -36,6 +36,7 @@
 #include "database/baseStatement.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <cctype>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -48,6 +49,7 @@ BaseStatement::BaseStatement( )
 BaseStatement::BaseStatement( const BaseStatement &o )
 	: m_stmtStr( o.m_stmtStr ),
 	m_maxParam( o.m_maxParam ),
+	m_data( o.m_data ),
 	m_nativeStmt( o.m_nativeStmt )
 {
 }
@@ -70,10 +72,11 @@ void BaseStatement::clear( )
 {
 	m_stmtStr.clear( );
 	m_maxParam = 0;
+	m_data.clear();
 	m_nativeStmt.clear( );
 }
 
-void BaseStatement::bind( unsigned int idx, const types::Variant & /*value*/ )
+void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value*/ )
 {
 	if( idx < 1 || idx > m_maxParam ) {
 		throw new std::runtime_error(
@@ -93,12 +96,12 @@ const std::string BaseStatement::originalSQL( ) const
 
 const std::string BaseStatement::nativeSQL( ) const
 {
+	substitute( );
 	return m_nativeStmt;
 }
 
 void BaseStatement::parse( )
 {
-	m_nativeStmt.clear( );
 	std::string::const_iterator si = m_stmtStr.begin( ), se = m_stmtStr.end( );
 	std::string::const_iterator chunkstart = si;
 	for( ; si != se; si++ ) {
@@ -120,46 +123,37 @@ void BaseStatement::parse( )
 		} else if( *si == '$' ) {
 			
 			if( si > chunkstart ) {
-				m_nativeStmt.append( chunkstart, si );
+				m_data.push_back( Element( 0, std::string( chunkstart, si ) ) );
 				chunkstart = si;
-				//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
+			}
+			
+			si++;
+			unsigned int idx = 0;				
+			for( ; si != se && isdigit( *si ); si++ ) {
+				idx *= 10;
+				// legal to assume this, see 5.2.1 of C11..
+				idx += ( *si - '0' );
+			}
+			if( idx == 0 ) {
+				throw std::runtime_error( "parameter index out of range in statement '" +
+					originalSQL( ) + "'" );
+			}
+			if( si != se ) {
+				if( isalpha( *si ) ) {
+					throw std::runtime_error( "illegal parameter index (immediately followed by identifier) in statement '" +
+						originalSQL( ) + "'" );
+				} else if( *si == '_' ) {
+					throw std::runtime_error( "illegal parameter index (immediately followed by underscore) in statement '" +
+						originalSQL( ) + "'" );
+				} else {
+					throw std::runtime_error( "illegal parameter index seen statement '" +
+					originalSQL( ) + "'" );
+				}
 			}
 
-			//~ std::string idxstr;
-			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			//~ {
-				//~ idxstr.push_back( *si);
-			//~ }
-			//~ chunkstart = si;
-			//~ if (idxstr.empty()) throw std::runtime_error( "only parameters referenced by index supported until now in database statements");
-			//~ unsigned int idx = boost::lexical_cast<unsigned int>( idxstr);
-			//~ if (idx == 0) throw std::runtime_error( "parameter index out of range");
+// goes to 
+//~ const std::string PostgreSqlstatement::replace( unsigned int idx )
 			//~ if (idx > m_maxparam) m_maxparam = idx;
-			//~ m_data.push_back( Element( idx, ""));
-			//~ if (si == se) break;
-		}
-	}
-	if( si > chunkstart ) {
-		//~ m_data.push_back( Element( 0, std::string( chunkstart, si)));
-		//~ from PostgresqlStatement:
-		//~ rt.append( chunkstart, si);
-	}
-}
-
-
-			//~ int idx = 0;
-			//~ for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			//~ {
-				//~ idx *= 10;
-				//~ idx += (*si - '0');
-				//~ if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
-			//~ }
-			//~ if (si != se)
-			//~ {
-				//~ if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
-				//~ if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
-			//~ }
-			//~ if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
 			//~ if (m_paramtype[ idx-1])
 			//~ {
 				//~ rt.append( "$");
@@ -174,7 +168,28 @@ void BaseStatement::parse( )
 			//~ {
 				//~ rt.append( "NULL");
 			//~ }
-			//~ chunkstart = si;
-			//~ if (si == se) break;
+			
+			chunkstart = si;
+						
+			m_data.push_back( Element( idx, "" ) );
+		}
+	}
+	if( si > chunkstart ) {
+		m_data.push_back( Element( 0, std::string( chunkstart, si) ) );
+	}
+}
 
-//~ }
+void BaseStatement::substitute( ) const
+{
+	m_nativeStmt.clear( );
+	std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
+	for( ; di != de; di++ ) {
+		if( di->first ) {
+			// a placeholder
+			m_nativeStmt.append( replace( di->first ) );
+		} else {
+			// a chunk of normal SQL statement
+			m_nativeStmt.append( di->second );
+		}
+	}
+}
