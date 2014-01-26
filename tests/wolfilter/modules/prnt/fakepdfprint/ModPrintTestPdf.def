@@ -1,4 +1,4 @@
-LIBRARY mod_test_pdf_printer
+LIBRARY mod_print_testpdf
 
 EXPORTS
 entryPoint	@1
