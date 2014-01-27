@@ -278,7 +278,7 @@ comauto::DotnetFunction::Impl::Impl( comauto::CommonLanguageRuntime* clr_, const
 	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetFuncDesc( fidx, &m_funcdesc));
 	if (!m_funcdesc)
 	{
-		throw std::runtime_error("FUNCDESC not defined for .NET function")
+		throw std::runtime_error("FUNCDESC not defined for .NET function");
 	}
 	struct Local	//exception safe memory allocation of local variables
 	{
