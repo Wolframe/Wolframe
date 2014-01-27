@@ -101,11 +101,11 @@ public:
 		}
 		else if (o.type() == Variant::Double)
 		{
-			types::BigNumber::init( o.todouble());
+			types::BigNumber::operator=( o.todouble());
 		}
 		else
 		{
-			types::BigNumber::init( o.toint());
+			types::BigNumber::operator=( o.toint());
 		}
 	}
 

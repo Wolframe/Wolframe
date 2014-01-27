@@ -130,7 +130,7 @@ install: build
 		cd ../../../..
 	
 	# the libhpdf printing module depends on libhpdf, put it in a separate package
-	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd src/modules/prnt/harupdfprint; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 	cd 3rdParty/libhpdf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -230,7 +230,7 @@ install: build
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	
 	# printing module for libhpdf
-	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
+	cd src/modules/prnt/harupdfprint; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
 		cd ../../../..
 	cd 3rdParty/libhpdf; $(MAKE) install $(WOLFRAME_PARAMS) \
