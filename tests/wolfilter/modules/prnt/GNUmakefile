@@ -1,5 +1,7 @@
 TOPDIR = ../../../..
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 ifeq ($(WITH_LIBHPDF),1)
 ifeq ($(WITH_TEXTWOLF),1)
 SUBDIRS += fakepdfprint
