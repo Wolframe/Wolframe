@@ -84,7 +84,7 @@ VARIANT createVariantType( signed __int64 val);
 VARIANT createVariantType( unsigned __int64 val);
 VARIANT createVariantType( float val);
 VARIANT createVariantType( double val);
-VARIANT createVariantType( const std::string& val);
+VARIANT createVariantType( const std::string& val, VARTYPE stringtype=VT_BSTR);
 VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringtype=VT_BSTR);
 VARIANT createVariantType( const std::wstring& val);
 VARIANT createVariantType( const types::Variant& val);
