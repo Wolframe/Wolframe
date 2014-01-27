@@ -70,11 +70,8 @@ public:
 		}
 		else
 		{
-			const BigintDataValue* odt = dynamic_cast<const BigintDataValue*>(&o);
-			int rt = -1;
-			rt += (int)(types::BigBCD::operator>=(*odt));
-			rt += (int)(types::BigBCD::operator>(*odt));
-			return rt;
+			const BigintDataValue* odt = reinterpret_cast<const BigintDataValue*>(&o);
+			return types::BigBCD::compare(*odt);
 		}
 	}
 

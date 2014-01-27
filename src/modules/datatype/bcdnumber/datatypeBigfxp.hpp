@@ -83,11 +83,8 @@ public:
 		}
 		else
 		{
-			const BigfxpDataValue* odt = dynamic_cast<const BigfxpDataValue*>(&o);
-			int rt = -1;
-			rt += (int)(types::BigNumber::operator>=(*odt));
-			rt += (int)(types::BigNumber::operator>(*odt));
-			return rt;
+			const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
+			return types::BigNumber::compare(*odt);
 		}
 	}
 
@@ -119,7 +116,7 @@ public:
 
 	static CustomDataValue* create( const CustomDataInitializer* ini_)
 	{
-		const BigfxpDataInitializer* ini = dynamic_cast<const BigfxpDataInitializer*>(ini_);
+		const BigfxpDataInitializer* ini = reinterpret_cast<const BigfxpDataInitializer*>(ini_);
 		return new BigfxpDataValue( ini);
 	}
 };
