@@ -84,12 +84,13 @@ public:
 	void invert_sign()				{m_neg = !m_neg; normalize();}
 	char sign() const				{return m_neg?'-':'+';}
 
-	bool operator==( const BigBCD& o) const		{return isequal(o);}
-	bool operator!=( const BigBCD& o) const		{return !isequal(o);}
-	bool operator<=( const BigBCD& o) const		{return isle(o);}
-	bool operator<( const BigBCD& o) const		{return islt(o);}
-	bool operator>=( const BigBCD& o) const		{return !islt(o);}
-	bool operator>( const BigBCD& o) const		{return !isle(o);}
+	bool operator==( const BigBCD& o) const		{return compare(o)==0;}
+	bool operator!=( const BigBCD& o) const		{return compare(o)!=0;}
+	bool operator<=( const BigBCD& o) const		{return compare(o)<=0;}
+	bool operator<( const BigBCD& o) const		{return compare(o)<0;}
+	bool operator>=( const BigBCD& o) const		{return compare(o)>=0;}
+	bool operator>( const BigBCD& o) const		{return compare(o)>0;}
+	int compare( const BigBCD& o) const;
 
 	bool isValid() const;
 	bool isNull() const;
@@ -116,6 +117,7 @@ public:
 		bool operator<( const const_iterator& o) const	{return islt(o);}
 		bool operator>=( const const_iterator& o) const	{return !islt(o);}
 		bool operator>( const const_iterator& o) const	{return !isle(o);}
+
 	private:
 		void increment();
 		bool isequal( const const_iterator& other) const;
@@ -157,12 +159,6 @@ private:
 	BigBCD mul( const BigBCD& opr) const;
 	BigBCD div( const BigBCD& opr) const;
 	BigBCD neg() const;
-
-	bool isequal( const BigBCD& other) const;
-	bool islt( const BigBCD& other) const;
-	bool isle( const BigBCD& other) const;
-	bool isabslt( const BigBCD& other) const;
-	bool isabsle( const BigBCD& other) const;
 
 private:
 	std::size_t m_size;
@@ -219,20 +215,17 @@ public:
 	BigNumber operator -( _WOLFRAME_INTEGER opr) const;
 	BigNumber operator -() const;
 
-	bool operator==( const BigNumber& o) const		{return isequal(o);}
-	bool operator!=( const BigNumber& o) const		{return !isequal(o);}
-	bool operator<=( const BigNumber& o) const		{return isle(o);}
-	bool operator<( const BigNumber& o) const		{return islt(o);}
-	bool operator>=( const BigNumber& o) const		{return !islt(o);}
-	bool operator>( const BigNumber& o) const		{return !isle(o);}
+	bool operator==( const BigNumber& o) const		{return compare(o)==0;}
+	bool operator!=( const BigNumber& o) const		{return compare(o)!=0;}
+	bool operator<=( const BigNumber& o) const		{return compare(o)<=0;}
+	bool operator<( const BigNumber& o) const		{return compare(o)<0;}
+	bool operator>=( const BigNumber& o) const		{return compare(o)>=0;}
+	bool operator>( const BigNumber& o) const		{return compare(o)>0;}
+	int compare( const BigNumber& o) const;
 
 private:
 	void initFromString( const std::string& numstr, unsigned int maxPrecision);
 	void initFromString( const std::string& numstr);
-
-	bool isequal( const BigNumber& other) const;
-	bool islt( const BigNumber& other) const;
-	bool isle( const BigNumber& other) const;
 
 	unsigned int m_show_precision;
 	unsigned int m_calc_precision;

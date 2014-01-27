@@ -86,7 +86,7 @@ public:
 	{
 		if (initializer())
 		{
-			return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
+			return reinterpret_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
 		}
 		else
 		{
@@ -104,7 +104,7 @@ public:
 		}
 		else
 		{
-			const DateDataValue* odt = dynamic_cast<const DateDataValue*>(&o);
+			const DateDataValue* odt = reinterpret_cast<const DateDataValue*>(&o);
 			int rt = -1;
 			rt += (int)(Date::operator>=(*odt));
 			rt += (int)(Date::operator>(*odt));
