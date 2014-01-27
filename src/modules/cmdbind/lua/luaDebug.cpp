@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file luaDebug.hpp
 #include "luaDebug.hpp"
-#include "langbind/luaException.hpp"
+#include "luaException.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <string>

@@ -36,7 +36,6 @@
 #define _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
 #include "processor/procProvider.hpp"
 #include "luaObjects.hpp"
-#include "module/luaExtensionBuilder.hpp"
 #include "types/keymap.hpp"
 #include <vector>
 
@@ -49,9 +48,9 @@ struct LuaScriptContext
 	LuaFunctionMap funcmap;
 
 	LuaScriptContext() :funcmap(&modulemap){}
-	~LuaScriptContext();
+	~LuaScriptContext(){}
 
-	void loadPrograms( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
+	void loadPrograms( const std::vector<std::string>& prgfiles_);
 	std::vector<std::string> loadProgram( const std::string& prgfile);
 
 	void setDefaultFilter( const std::string& docformat, const std::string& filter_)
@@ -78,7 +77,6 @@ struct LuaScriptContext
 	}
 
 private:
-	std::vector<module::LuaExtensionConstructor*> m_objects;
 	types::keymap<std::string> m_defaultfiltermap;
 
 private:

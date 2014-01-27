@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "types/countedReference.hpp"
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include <map>
@@ -150,7 +149,7 @@ private:
 	LuaScriptInstance( const LuaScriptInstance&){} //non copyable
 };
 
-typedef types::CountedReference<LuaScriptInstance> LuaScriptInstanceR;
+typedef boost::shared_ptr<LuaScriptInstance> LuaScriptInstanceR;
 
 
 ///\class LuaFunctionMap

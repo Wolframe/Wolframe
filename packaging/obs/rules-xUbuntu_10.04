@@ -125,9 +125,6 @@ install: build
 	cd src/modules/cmdbind/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
-	cd src/modules/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
-		cd ../../..
 
 	# the Python3 cmdbind module depends own Python libraries, separate package
 	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -135,7 +132,7 @@ install: build
 		cd ../../../..
 	
 	# the libhpdf printing module depends on libhpdf, put it in a separate package
-	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd src/modules/prnt/harupdfprint; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 	cd 3rdParty/libhpdf; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
@@ -214,9 +211,6 @@ install: build
 	cd src/modules/cmdbind/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
 		cd ../../../..
-	cd src/modules/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-lua; \
-		cd ../../..
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/liblua*.so.* \
 		/usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
@@ -231,7 +225,7 @@ install: build
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	
 	# printing module for libhpdf
-	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
+	cd src/modules/prnt/harupdfprint; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
 		cd ../../../..
 	cd 3rdParty/libhpdf; $(MAKE) install $(WOLFRAME_PARAMS) \

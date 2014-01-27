@@ -35,8 +35,8 @@
 #ifndef _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #define _CUSTOM_DATA_TYPE_DATETIME_HPP_INCLUDED
 #include "types/customDataType.hpp"
-#include "types/dateArithmetic.hpp"
 #include "types/variant.hpp"
+#include "dateArithmetic.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -73,21 +73,20 @@ public:
 	DateDataValue( unsigned short y, unsigned short m, unsigned short d)
 		:Date(y,m,d){}
 
-	DateDataValue( const std::string& dt)
-		:Date(dt,format()){}
+	explicit DateDataValue( const std::string& dt, const DateDataInitializer* ini=0)
+		:Date(dt,ini?ini->format():0){}
 
 	///\brief Copy constructor
 	DateDataValue( const DateDataValue& o)
 		:CustomDataValue(o),Date(o){}
 
-	DateDataValue()
-		{}
+	DateDataValue(){}
 
 	const char* format() const
 	{
 		if (initializer())
 		{
-			return dynamic_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
+			return reinterpret_cast<const DateDataInitializer*>(CustomDataValue::initializer())->format();
 		}
 		else
 		{
@@ -105,7 +104,7 @@ public:
 		}
 		else
 		{
-			const DateDataValue* odt = dynamic_cast<const DateDataValue*>(&o);
+			const DateDataValue* odt = reinterpret_cast<const DateDataValue*>(&o);
 			int rt = -1;
 			rt += (int)(Date::operator>=(*odt));
 			rt += (int)(Date::operator>(*odt));

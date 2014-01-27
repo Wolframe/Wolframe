@@ -35,12 +35,12 @@ Project Wolframe.
 #define _Wolframe_python_STRUCTURE_HPP_INCLUDED
 #include "pythonObject.hpp"
 #include "pythonObjectIterator.hpp"
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include "utils/printFormats.hpp"
 #include <vector>
 #include <string>
 #include <ostream>
+#include <boost/shared_ptr.hpp>
 #include <Python.h>
 
 namespace _Wolframe {
@@ -76,7 +76,7 @@ public:
 };
 
 ///\brief Reference with ownership to a structure
-typedef types::CountedReference<Structure> StructureR;
+typedef boost::shared_ptr<Structure> StructureR;
 
 }}}//namespace
 #endif

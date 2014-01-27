@@ -55,9 +55,8 @@ usr/pkg/lib/wolframe/modules/mod_command_directmap.so
 usr/pkg/lib/wolframe/modules/mod_command_lua.so
 usr/pkg/lib/wolframe/modules/mod_command_python.so
 usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
-usr/pkg/lib/wolframe/modules/mod_lua_datetime.so
-usr/pkg/lib/wolframe/modules/mod_lua_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
+usr/pkg/lib/wolframe/modules/mod_datatype_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 @dirrm usr/pkg/lib/wolframe/modules
 usr/pkg/lib/wolframe/libwolframe_client.a
@@ -133,10 +132,6 @@ usr/pkg/include/wolframe/langbind/cppFormFunction.hpp
 usr/pkg/include/wolframe/langbind/charsetEncodings.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/pkg/include/wolframe/langbind/formFunction.hpp
-usr/pkg/include/wolframe/langbind/iostreamfilter.hpp
-usr/pkg/include/wolframe/langbind/luaArithmeticType.hpp
-usr/pkg/include/wolframe/langbind/luaCppCall.hpp
-usr/pkg/include/wolframe/langbind/luaException.hpp
 @dirrm usr/pkg/include/wolframe/langbind
 usr/pkg/include/wolframe/protocol/buffers.hpp
 usr/pkg/include/wolframe/protocol/ioblocks.hpp
@@ -166,6 +161,7 @@ usr/pkg/include/wolframe/database/transactionInput.hpp
 usr/pkg/include/wolframe/database/transactionOutput.hpp
 usr/pkg/include/wolframe/database/transactionExecStatemachine.hpp
 @dirrm usr/pkg/include/wolframe/database
+usr/pkg/include/wolframe/prnt/pdfPrintProgramType.hpp
 usr/pkg/include/wolframe/prnt/pdfPrinter.hpp
 usr/pkg/include/wolframe/prnt/pdfPrinterDocument.hpp
 usr/pkg/include/wolframe/prnt/pdfPrinterDocument_libhpdf.hpp
@@ -242,10 +238,8 @@ usr/pkg/include/wolframe/types/allocators.hpp
 usr/pkg/include/wolframe/types/atomicCounter.hpp
 usr/pkg/include/wolframe/types/base64.h
 usr/pkg/include/wolframe/types/base64.hpp
-usr/pkg/include/wolframe/types/bcdArithmetic.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
 usr/pkg/include/wolframe/types/countedReference.hpp
-usr/pkg/include/wolframe/types/dateArithmetic.hpp
 usr/pkg/include/wolframe/types/doctype.hpp
 usr/pkg/include/wolframe/types/form.hpp
 usr/pkg/include/wolframe/types/integer.hpp
@@ -257,7 +251,6 @@ usr/pkg/include/wolframe/types/typeSignature.hpp
 usr/pkg/include/wolframe/types/variant.hpp
 usr/pkg/include/wolframe/types/variantStruct.hpp
 usr/pkg/include/wolframe/types/variantStructDescription.hpp
-usr/pkg/include/wolframe/types/normalizeFunction.hpp
 usr/pkg/include/wolframe/types/customDataType.hpp
 usr/pkg/include/wolframe/types/datetime.hpp
 usr/pkg/include/wolframe/types/syncCounter.hpp
@@ -276,7 +269,6 @@ usr/pkg/include/wolframe/module/cppFormFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/constructor.hpp
 usr/pkg/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/pkg/include/wolframe/module/filterBuilder.hpp
-usr/pkg/include/wolframe/module/luaExtensionBuilder.hpp
 usr/pkg/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/printFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/programTypeBuilder.hpp

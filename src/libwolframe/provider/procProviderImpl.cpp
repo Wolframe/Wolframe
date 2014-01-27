@@ -39,7 +39,6 @@
 #include "module/ddlcompilerBuilder.hpp"
 #include "module/cppFormFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
-#include "module/printFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "module/customDataTypeBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
@@ -279,32 +278,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				break;
 			}
-
-			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
-			{	// object is a print function compiler
-				module::PrintFunctionConstructorR constructor( dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor()));
-				if (!constructor.get())
-				{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a print layout description compiler";
-					throw std::logic_error( "Object is not a print layout description compiler. See log." );
-				}
-				else
-				{
-					try {
-						m_programs->definePrintLayoutType( constructor);
-						LOG_TRACE << "'" << constructor->programFileType() << "' print layout description compiler registered";
-					}
-					catch (const std::runtime_error& e)
-					{
-						LOG_FATAL << "Error loading normalize function object '" << constructor->name() << "':" << e.what();
-					}
-				}
-				break;
-			}
-			case ObjectConstructorBase::LANGUAGE_EXTENSION_OBJECT:
-				// ... language extension modules are not handled here
-				break;
 
 			case ObjectConstructorBase::AUDIT_OBJECT:
 			case ObjectConstructorBase::AUTHENTICATION_OBJECT:

@@ -1,0 +1,18 @@
+TOPDIR = ..\..\..\..
+
+!IFDEF WITH_LIBHPDF
+!IFDEF WITH_TEXTWOLF
+SUBDIRS = \
+	$(SUBDIRS) fakepdfprint
+!ENDIF
+!ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

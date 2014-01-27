@@ -39,6 +39,7 @@
 #include "processor/moduleInterface.hpp"
 #include <string>
 #include <list>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
@@ -65,7 +66,7 @@ private:
 };
 
 //\brief Shared ownership reference to a runtime environment
-typedef types::CountedReference<RuntimeEnvironment> RuntimeEnvironmentR;
+typedef boost::shared_ptr<RuntimeEnvironment> RuntimeEnvironmentR;
 
 
 //\class RuntimeEnvironmentConstructor
@@ -85,7 +86,7 @@ public:
 	}
 };
 
-typedef types::CountedReference<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
+typedef boost::shared_ptr<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
 
 
 //\class RuntimeEnvironmentDef
@@ -95,7 +96,7 @@ class RuntimeEnvironmentDef
 public:
 	//\brief Constructor
 	RuntimeEnvironmentDef()
-		:constructor(0),configuration(0){}
+		:configuration(0){}
 	//\brief Copy constructor
 	//\param[in] o object to copy
 	RuntimeEnvironmentDef( const RuntimeEnvironmentDef& o)

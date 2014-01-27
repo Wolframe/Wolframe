@@ -35,9 +35,9 @@
 
 #ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_HPP_INCLUDED
-#include "types/countedReference.hpp"
 #include "database/database.hpp"
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace prgbind {
@@ -73,8 +73,10 @@ private:
 	Category m_category;
 };
 
-typedef types::CountedReference<Program> ProgramR;
+typedef boost::shared_ptr<Program> ProgramR;
 
 }}//namespace
 #endif
+
+
 

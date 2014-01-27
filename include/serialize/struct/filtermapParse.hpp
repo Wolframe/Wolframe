@@ -119,7 +119,7 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 	boost::value_initialized<Element> val;
 	((TYPE*)stk.back().value())->push_back( val);
 	stk.back().state( 1);
-	Element* ee = &((TYPE*)(char*)stk.back().value())->back();
+	Element* ee = &((TYPE*)stk.back().value())->back();
 	if (FiltermapIntrusiveProperty<Element>::type() == StructDescriptionBase::Atomic)
 	{
 		stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, 0));

@@ -53,7 +53,7 @@ static CustomDataTypeDef customDataTypes[] =
 };
 
 namespace {
-struct DateTimeBuilder
+struct Obj
 {
 	static SimpleBuilder* constructor()
 	{
@@ -65,7 +65,7 @@ struct DateTimeBuilder
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	DateTimeBuilder::constructor
+	Obj::constructor
 };
 
 ModuleEntryPoint entryPoint( 0, "Extension module for date and time arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);

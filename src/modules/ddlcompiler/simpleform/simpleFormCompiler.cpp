@@ -139,7 +139,7 @@ public:
 					st = ParseEndName;
 					/* no break here !*/
 				case ParseEndName:
-					if (*ii <= ' ' && *ii >= 0)
+					if ((unsigned char)*ii <= 32)
 					{
 						break;
 					}

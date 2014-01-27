@@ -4,10 +4,6 @@ SUBDIRS = audit authentication authorization \
 	database datatype filter ddlcompiler \
 	normalize prnt cmdbind functions jobSchedule
 
-ifeq ($(WITH_LUA),1)
-SUBDIRS += lua
-endif
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

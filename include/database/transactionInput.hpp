@@ -34,7 +34,6 @@
 ///\file database/transactionInput.hpp
 #ifndef _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include "utils/printFormats.hpp"
 #include <string>
@@ -43,6 +42,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
@@ -239,7 +239,7 @@ private:
 	std::vector<Command> m_cmd;				//< list of commands of the transaction
 };
 
-typedef types::CountedReference<TransactionInput> TransactionInputR;
+typedef boost::shared_ptr<TransactionInput> TransactionInputR;
 
 }}
 #endif

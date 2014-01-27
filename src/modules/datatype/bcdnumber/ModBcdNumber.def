@@ -1,0 +1,4 @@
+LIBRARY mod_datatype_bcdnumber
+
+EXPORTS
+entryPoint	@1

@@ -43,7 +43,7 @@ types::Variant TrimNormalizeFunction::execute( const types::Variant& inp) const
 	{
 		std::string str( inp.tostring());
 		std::string::const_iterator ii = str.begin(), ee = str.end();
-		while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+		while (ii != ee && (unsigned char)*ii <= 32) ++ii;
 		std::string::const_iterator ti = ii, te = ii;
 		for (; ii != ee; ++ii)
 		{

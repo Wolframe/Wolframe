@@ -34,11 +34,11 @@ Project Wolframe.
 #ifndef _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
 #define _Wolframe_Mylang_STRUCTURE_HPP_INCLUDED
 #include "types/variant.hpp"
-#include "types/countedReference.hpp"
 #include "utils/printFormats.hpp"
 #include <vector>
 #include <string>
 #include <ostream>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -46,7 +46,7 @@ namespace mylang {
 
 ///\brief Reference with ownership to a structure
 class Structure;
-typedef types::CountedReference<Structure> StructureR;
+typedef boost::shared_ptr<Structure> StructureR;
 
 ///\class Structure
 ///\brief Data structure for input and output of a 'Mylang' function call

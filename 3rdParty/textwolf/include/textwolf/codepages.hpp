@@ -131,7 +131,7 @@ public:
 
 	UChar ucharcode( char ch) const
 	{
-		if (ch >= 0) return ch;
+		if ((signed char)ch >= 0) return ch;
 		return m_cd[ (unsigned int)(unsigned char)ch - 128];
 	}
 

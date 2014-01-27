@@ -34,12 +34,12 @@
 ///\file database/transactionOutput.hpp
 #ifndef _DATABASE_TRANSACTION_OUTPUT_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_OUTPUT_HPP_INCLUDED
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include "utils/printFormats.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
@@ -140,7 +140,7 @@ private:
 	bool m_isCaseSensitive;							//< True if the element names in the result are case sensitive
 };
 
-typedef types::CountedReference<TransactionOutput> TransactionOutputR;
+typedef boost::shared_ptr<TransactionOutput> TransactionOutputR;
 
 }}
 #endif

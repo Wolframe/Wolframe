@@ -57,7 +57,7 @@ void LuaCommandHandlerConfig::setCanonicalPathes( const std::string& referencePa
 	{
 		*pi = utils::getCanonicalPath( *pi, referencePath);
 	}
-	m_context.loadPrograms( m_programfiles, m_modules);
+	m_context.loadPrograms( m_programfiles);
 }
 
 bool LuaCommandHandlerConfig::check() const

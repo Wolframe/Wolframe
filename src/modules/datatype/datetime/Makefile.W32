@@ -24,6 +24,7 @@ DYNAMIC_MODULE = \
 	mod_datatype_datetime.dll
 
 CPP_OBJS = \
+	dateArithmetic.obj \
 	datatypeDate.obj \
 	mod_datatype_datetime.obj
 

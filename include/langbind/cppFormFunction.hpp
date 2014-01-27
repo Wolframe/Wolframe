@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #define _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
@@ -94,7 +95,7 @@ private:
 	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
 
-typedef types::CountedReference<CppFormFunction> CppFormFunctionR;
+typedef boost::shared_ptr<CppFormFunction> CppFormFunctionR;
 
 }}//namespace
 #endif

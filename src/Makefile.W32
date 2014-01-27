@@ -5,7 +5,6 @@ SUBDIRS = \
 	libwolframe_serialize \
 	libwolframe_database \
 	libwolframe_langbind \
-	libwolframe_prnt \
 	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
@@ -53,6 +52,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
+	wolfilterIostreamFilter.obj \
 	wolfwizardCommandLine.obj \
 	mainConnectionHandler.obj \
 	interfaceCommandHandler.obj \
@@ -61,11 +61,9 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceBanner.obj \
 	appConfig.obj \
 	prgbind_transactionProgram.obj \
-	prgbind_printProgram.obj \
 	prgbind_normalizeProgram.obj \
 	prgbind_ddlProgram.obj \
 	prgbind_programLibrary.obj \
-	langbind_iostreamfilter.obj \
 	jobScheduler.obj \
 	acceptorSocket.obj \
 	acceptorSSL.obj \

@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface to the Closure of the :get int the lua binding
 
 #include "luaGetFunctionClosure.hpp"
-#include "langbind/luaException.hpp"
+#include "luaException.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
