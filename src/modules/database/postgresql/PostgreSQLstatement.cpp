@@ -226,3 +226,22 @@ PGresult* PostgreSQLstatement::execute( PGconn *conn) const
 			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
 			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
 }
+
+// goes to 
+//~ const std::string PostgreSqlstatement::replace( unsigned int idx )
+			//~ if (idx > m_maxparam) m_maxparam = idx;
+			//~ if (m_paramtype[ idx-1])
+			//~ {
+				//~ rt.append( "$");
+				//~ rt.append( chunkstart, si);
+				//~ if (m_paramtype[ idx-1][0])
+				//~ {
+					//~ rt.append( "::");
+					//~ rt.append( m_paramtype[ idx-1]);
+				//~ }
+			//~ }
+			//~ else
+			//~ {
+				//~ rt.append( "NULL");
+			//~ }
+			

@@ -35,6 +35,7 @@
 
 #include "OracleTransactionExecStatemachine.hpp"
 #include "Oracle.hpp"
+#include "OracleStatement.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -55,6 +56,7 @@ TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEn
 	,m_env(env_)
 	,m_lastresult(0)
 	,m_nof_cols(0)
+	,m_statement( new OracleStatement( m_env ) )
 	,m_hasResult(false)
 	,m_hasRow(false)
 	,m_dbUnit(dbUnit_)
@@ -77,7 +79,7 @@ void TransactionExecStatemachine_oracle::clear()
 		m_nof_cols = 0;
 	}
 	m_lasterror.reset();
-	m_statement.clear();
+	m_statement->clear();
 	m_state = Init;
 	m_hasResult = false;
 	m_hasRow = false;
@@ -144,7 +146,7 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 	// TODO: map OCI codes to severity levels, so far everything is ERROR
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
 	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement->originalSQL().c_str(), errtype, errmsg, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -216,7 +218,7 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement->originalSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -234,7 +236,7 @@ bool TransactionExecStatemachine_oracle::start( const std::string& statement)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	m_statement.init( statement);
+	m_statement->init( statement);
 	m_state = CommandReady;
 	return true;
 }
@@ -253,34 +255,26 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
-	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
-	}
-	if (value.defined())
-	{
-		// TODO: replace this with OracleStatement.. use type binding..
-		if( value.type( ) == types::Variant::Bool ) {
-			// TODO: hard-wired to a NUMBER(1) with 0 and 1 for now
-			if( value.tobool( ) ) {
-				m_statement.bind( idx, "1" );
-			} else {
-				m_statement.bind( idx, "0" );
-			}
-		} else {
-			m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
-		}
-	}
-	else
-	{
-		m_statement.bind( idx, "NULL");
-	}
+	m_statement->bind( idx, value );
+	//~ if (value.defined())
+	//~ {
+		//~ // TODO: replace this with OracleStatement.. use type binding..
+		//~ if( value.type( ) == types::Variant::Bool ) {
+			//~ // TODO: hard-wired to a NUMBER(1) with 0 and 1 for now
+			//~ if( value.tobool( ) ) {
+				//~ m_statement.bind( idx, "1" );
+			//~ } else {
+				//~ m_statement.bind( idx, "0" );
+			//~ }
+		//~ } else {
+			//~ m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
+		//~ }
+	//~ }
+	//~ else
+	//~ {
+		//~ m_statement.bind( idx, "NULL");
+	//~ }
+	
 	m_state = CommandReady;
 	return true;
 }
@@ -296,7 +290,8 @@ bool TransactionExecStatemachine_oracle::execute()
 		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
 		m_lastresult = 0;
 	}
-	std::string stmstr = m_statement.expanded();
+	m_statement->substitute( );
+	std::string stmstr = m_statement->originalSQL();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
 
 	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
@@ -418,7 +413,7 @@ bool TransactionExecStatemachine_oracle::execute()
 					break;
 					
 				default:
-					errorStatus( std::string( "unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement.string() + "'" ) );
+					errorStatus( std::string( "unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement->originalSQL() + "'" ) );
 					return false;
 			}
 			
@@ -629,7 +624,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		}
 					
 		default:
-			errorStatus( std::string( "[Oracle get] unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement.string() + "'" ) );
+			errorStatus( std::string( "[Oracle get] unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement->originalSQL() + "'" ) );
 			return types::VariantConst();
 	}
 

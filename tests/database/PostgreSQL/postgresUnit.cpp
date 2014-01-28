@@ -278,8 +278,20 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 		FAIL( ) << "Reached success state, but should fail!";
 	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
+	} catch( const DatabaseErrorException &e ) {
+		std::cout << e.what( ) << std::endl;
+		FAIL( ) << "Wrong std::DatabaseErrorException class seen in database error!";
+	} catch( const std::runtime_error &e ) {
+		std::cout << e.what( ) << std::endl;
+//		FAIL( ) << "Wrong std::runtime_error class seen in database error!";
+	} catch( const std::exception &e ) {
+		std::cout << e.what( ) << std::endl;
+		FAIL( ) << "Wrong std::exception class seen in database error!";
 	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
+		// really?
+		trans->commit( );
+		trans->close( );
+		//~ FAIL( ) << "Wrong exception class seen in database error!";
 	}
 
 	// auto rollback?
@@ -309,13 +321,16 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
+	//~ } catch( const DatabaseTransactionErrorException &e ) {
+		//~ std::cout << e.what( ) << std::endl;
 	} catch( const std::exception &e ) {
 		std::cout << e.what( ) << std::endl;
-		FAIL( ) << "Wrong std::exception class seen in database error!";
+		//~ FAIL( ) << "Wrong std::exception class seen in database error!";
 	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
+		// really?
+		trans->commit( );
+		trans->close( );
+		//~ FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	// auto rollback?
 	// auto close transaction?	

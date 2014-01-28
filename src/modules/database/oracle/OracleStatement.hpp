@@ -37,62 +37,28 @@
 #include <string>
 #include "types/variant.hpp"
 #include "Oracle.hpp"
+#include "database/baseStatement.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-class OracleStatement
+class OracleStatement : public BaseStatement
 {
-public:
-	enum {MaxNofParam=99};
+	public:
+		OracleStatement( );
+		OracleStatement( const OracleStatement &o );
+		OracleStatement( OracleEnvirenment *env );
 
-	OracleStatement();
-	OracleStatement( const OracleStatement& o);
+		virtual void bind( const unsigned int idx, const types::Variant &arg );
 
-	void clear();
-	void init( const std::string& stmstr);
+		virtual const std::string replace( const unsigned int idx ) const;
 
-	//\brief Executes the statement with the bound parameters on connection 'conn'
-	OCIStmt* execute( OracleConnection *conn) const;
+		//\brief Executes the statement with parameters
+		OCIStmt *execute( ) const;
 
-	//\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const types::Variant& arg);
-
-private:
-	//\remark See implementation of pq_sendint64
-	void bindUInt64( boost::uint64_t value, const char* type="uint8");
-	void bindInt64( boost::int64_t value);
-	void bindUInt32( boost::uint32_t value, const char* type="uint4");
-	void bindInt32( boost::int32_t value);
-	void bindUInt16( boost::uint16_t value, const char* type="uint2");
-	void bindInt16( boost::int16_t value);
-	void bindByte( boost::uint8_t value, const char* type="uint1");
-	void bindByte( boost::int8_t value);
-	void bindBool( bool value);
-	void bindDouble( double value);
-	void bindString( const char* value, std::size_t size);
-	void bindNull();
-
-	void setNextParam( const void* ptr, unsigned int size, const char* type);
-
-	std::string statementString() const;
-	struct Params
-	{
-		const char* paramar[MaxNofParam];
-		int paramarsize;
-	};
-	void getParams( Params& params) const;
-
-private:
-	std::string m_stmstr;
-	int m_paramofs[ MaxNofParam];
-	const char* m_paramtype[ MaxNofParam];
-	int m_paramlen[ MaxNofParam];
-	int m_parambinary[ MaxNofParam];
-	int m_paramarsize;
-	std::string m_buf;
+	private:
+		OracleEnvirenment *m_env;		
 };
-
 
 }}//namespace
 #endif

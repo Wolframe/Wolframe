@@ -66,8 +66,6 @@ class BaseStatement : public Statement
 		virtual const std::string originalSQL( ) const;
 
 		virtual const std::string nativeSQL( ) const;
-
-		virtual const std::string replace( const unsigned int idx ) const = 0;
 		
 	protected:
 		std::string m_stmtStr;

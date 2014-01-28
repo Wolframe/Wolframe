@@ -35,7 +35,7 @@
 #ifndef _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
-#include "database/bindStatementParams.hpp"
+#include "database/statement.hpp"
 #include "database/databaseError.hpp"
 #include "Oracle.hpp"
 #include "types/keymap.hpp"
@@ -135,7 +135,7 @@ private:
 	std::vector<OracleColumnDescriptionPtr> m_colDescr; // array of column descriptors
 	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	Statement m_statement;
+	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
 	OracleDbUnit* m_dbUnit;

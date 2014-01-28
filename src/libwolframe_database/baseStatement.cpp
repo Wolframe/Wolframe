@@ -134,11 +134,10 @@ void BaseStatement::parse( )
 				idx += ( *si - '0' );
 			}
 			if( idx == 0 ) {
-				throw std::runtime_error( "parameter index out of range in statement '" +
-					originalSQL( ) + "'" );
-			}
-			if( si != se ) {
-				if( isalpha( *si ) ) {
+				if( se == se ) {
+					throw std::runtime_error( "illegal parameter index (lonely $ at the end) in statement'" +
+						originalSQL( ) + "'" );
+				} else if( isalpha( *si ) ) {
 					throw std::runtime_error( "illegal parameter index (immediately followed by identifier) in statement '" +
 						originalSQL( ) + "'" );
 				} else if( *si == '_' ) {
@@ -146,27 +145,11 @@ void BaseStatement::parse( )
 						originalSQL( ) + "'" );
 				} else {
 					throw std::runtime_error( "illegal parameter index seen statement '" +
-					originalSQL( ) + "'" );
+					originalSQL( ) + "' at position " + boost::lexical_cast<std::string>( se -si ) );
 				}
 			}
 
-// goes to 
-//~ const std::string PostgreSqlstatement::replace( unsigned int idx )
-			//~ if (idx > m_maxparam) m_maxparam = idx;
-			//~ if (m_paramtype[ idx-1])
-			//~ {
-				//~ rt.append( "$");
-				//~ rt.append( chunkstart, si);
-				//~ if (m_paramtype[ idx-1][0])
-				//~ {
-					//~ rt.append( "::");
-					//~ rt.append( m_paramtype[ idx-1]);
-				//~ }
-			//~ }
-			//~ else
-			//~ {
-				//~ rt.append( "NULL");
-			//~ }
+			m_maxParam++;
 			
 			chunkstart = si;
 						

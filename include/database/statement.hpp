@@ -75,7 +75,7 @@ class Statement
 		//\remark Funtion called when the placeholder should be put
 		//        into the final string (this is either for subsituting
 		//        data or rewrite placeholders to native syntax)
-		virtual const std::string replace(const unsigned int idx ) const = 0;
+		virtual const std::string replace( const unsigned int idx ) const = 0;
 };
 
 }}//namespace
