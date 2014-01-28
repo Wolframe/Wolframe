@@ -11,7 +11,7 @@ if test "x$ORIG_ARCH" = "xi386"; then
 	ARCH="i686"
 	PACK_ARCH="i386"
 else
-	echo "ERROR: Unknown FreeBSD architecture '$ORIG_ARCH'"
+	echo "ERROR: Unknown NetBSD architecture '$ORIG_ARCH'"
 	exit 1
 fi
 fi
