@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/normalizeModuleMacros.hpp
-///\brief Macros for defining normalization and validaton function module
-#include "module/normalizeFunctionBuilder.hpp"
+///\file appdevel/customDataTypeModuleMacros.hpp
+///\brief Macros for defining a custom datatype module
+#include "module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
 
-//\brief Marks the start of the Wolframe C++ form function module after the includes section.
-#define NORMALIZER_MODULE(DOMAIN,DESCRIPTION)\
+//\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
+#define CUSTOM_DATATYPE_MODULE(DOMAIN,DESCRIPTION)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
 	static void _Wolframe__setModuleLogger( void* logger )\
@@ -46,7 +46,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "Normalizer";\
+		return "" #DOMAIN "CustomDataType";\
 	}\
 	static const char* _Wolframe__moduleDomain()\
 	{\
@@ -56,48 +56,15 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
-	{\
-		return 0;\
-	}\
-	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
+	static _Wolframe::module::CustomDataTypeDef _Wolframe__customDataTypes[] =\
 	{
 
-//\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
-#define NORMALIZER_MODULE_WITH_RESOURCE(DOMAIN,DESCRIPTION,RESOURCECLASS)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
-	static const char* _Wolframe__moduleName()\
-	{\
-		return "" #DOMAIN "Normalizer";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
-	}\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
-	{\
-		return new RESOURCECLASS();\
-	}\
-	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
-	{
-
-
-//\brief Defines normalization function in the NORMALIZER_MODULE section 
-#define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
+//\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section 
+#define CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
-//\brief Defines the end of the NORMALIZER_MODULE section 
-#define NORMALIZER_MODULE_END\
+//\brief Defines the end of the CUSTOM_DATATYPE_MODULE section 
+#define CUSTOM_DATATYPE_MODULE_END\
 		{0,0}\
 	};\
 	namespace {\
@@ -105,7 +72,7 @@
 	{\
 		static _Wolframe::module::SimpleBuilder* constructor()\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__moduleDomain(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
+			return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__moduleDomain(), _Wolframe__customDataTypes);\
 		}\
 	};\
 	}\

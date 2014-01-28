@@ -74,8 +74,8 @@ public:
 	virtual void defineProgramType( const ProgramR& prg);
 
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
-	virtual const types::keymap<module::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
-	virtual const types::keymap<module::CustomDataTypeConstructorR>& customDataTypeConstructorMap() const;
+	virtual types::NormalizeFunction* createBaseNormalizeFunction( const std::string& domain, const std::string& name, const std::string& arg) const;
+	virtual const types::CustomDataType* getCustomDataType( const std::string& domain, const std::string& name) const;
 
 	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
 	virtual std::vector<std::string> getFormNames() const;
