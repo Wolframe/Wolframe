@@ -31,9 +31,9 @@ Project Wolframe.
 ************************************************************************/
 ///\file pythonException.hpp
 ///\brief Interface for Translating Python Exception to C++/Wolframe exceptions
+
 #ifndef _Wolframe_python_EXCEPTION_HPP_INCLUDED
 #define _Wolframe_python_EXCEPTION_HPP_INCLUDED
-#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {
@@ -42,4 +42,5 @@ namespace python {
 void THROW_ON_ERROR( const char* usrmsg);
 
 }}}//namespace
+
 #endif

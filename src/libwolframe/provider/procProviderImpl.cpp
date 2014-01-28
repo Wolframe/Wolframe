@@ -409,12 +409,7 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& domain, const std::string& name) const
 {
 	LOG_TRACE << "[provider] get custom data type '" << domain << ":" << name << "'";
-	types::keymap<module::CustomDataTypeConstructorR>::const_iterator ci = m_programs->customDataTypeConstructorMap().find( domain);
-	if (ci == m_programs->customDataTypeConstructorMap().end()) return 0;
-	{
-		const types::CustomDataType* rt = ci->second->object( name);
-		return rt;
-	}
+	return m_programs->getCustomDataType( domain, name);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const

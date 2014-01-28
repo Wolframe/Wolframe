@@ -5,7 +5,6 @@ SUBDIRS = \
 	libwolframe_serialize \
 	libwolframe_database \
 	libwolframe_langbind \
-	libwolframe_prnt \
 	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk

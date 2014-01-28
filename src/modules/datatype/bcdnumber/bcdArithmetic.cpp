@@ -820,7 +820,7 @@ void BigBCD::digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 
 	if (opr.isNull()) throw std::runtime_error( "division by zero");
 
-	while (!reminder.isNull() && !reminder.isabslt( opr))
+	while (!reminder.isNull() && reminder.compare( opr) >= 0)
 	{
 		FactorType estimate = division_estimate( reminder, opr);
 		if (estimate == 0) throw std::runtime_error( "illegal state calculating division estimate");
@@ -924,57 +924,25 @@ BigBCD BigBCD::mul( const BigBCD& opr) const
 	return BigBCD( val);
 }
 
-bool BigBCD::isequal( const BigBCD& o) const
-{
-	BigBCD::const_iterator ii = begin(), ee = end(), oo = o.begin();
-	if (sign() != o.sign() && (ii != ee || oo != o.end())) return false;
-	if (ii.size() != oo.size()) return false;
-	for (; ii != ee; ++ii,++oo) if (*ii != *oo) return false;
-	return true;
-}
-
-bool BigBCD::isabslt( const BigBCD& o) const
-{
-	BigBCD::const_iterator ii = begin(), ee = end(), oo = o.begin();
-	if (ii.size() > oo.size()) return false;
-	if (ii.size() < oo.size()) return true;
-	for (; ii != ee; ++ii,++oo)
-	{
-		if (*ii > *oo) return false;
-		if (*ii < *oo) return true;
-	}
-	return false;
-}
-
-bool BigBCD::isabsle( const BigBCD& o) const
-{
-	BigBCD::const_iterator ii = begin(), ee = end(), oo = o.begin();
-	if (ii.size() > oo.size()) return false;
-	if (ii.size() < oo.size()) return true;
-	for (; ii != ee; ++ii,++oo)
-	{
-		if (*ii > *oo) return false;
-		if (*ii < *oo) return true;
-	}
-	return true;
-}
-
-bool BigBCD::islt( const BigBCD& o) const
+int BigBCD::compare( const BigBCD& o) const
 {
 	if (sign() != o.sign())
 	{
-		return (sign() == '-');
+		return (sign() == '-')?-1:+1;
 	}
-	return isabslt( o);
-}
-
-bool BigBCD::isle( const BigBCD& o) const
-{
-	if (sign() != o.sign())
+	else
 	{
-		return (sign() == '-');
+		int resOtherSmaller = (sign() == '-')?-1:+1;
+		BigBCD::const_iterator ii = begin(), ee = end(), oo = o.begin();
+		if (ii.size() > oo.size()) return resOtherSmaller;
+		if (ii.size() < oo.size()) return -resOtherSmaller;
+		for (; ii != ee; ++ii,++oo)
+		{
+			if (*ii > *oo) return resOtherSmaller;
+			if (*ii < *oo) return -resOtherSmaller;
+		}
+		return 0;
 	}
-	return isabsle( o);
 }
 
 static FactorType estimate_to_uint( double val)
@@ -1118,6 +1086,12 @@ BigNumber& BigNumber::operator=( double o)
 	return *this;
 }
 
+BigNumber& BigNumber::operator=( _WOLFRAME_INTEGER o)
+{
+	BigBCD::init( o);
+	BigBCD::shift( m_calc_precision);
+	return *this;
+}
 
 void BigNumber::initFromString( const std::string& numstr, unsigned int maxPrecision)
 {
@@ -1225,55 +1199,20 @@ double BigNumber::todouble() const
 	return rt;
 }
 
-
-bool BigNumber::isequal( const BigNumber& o) const
+int BigNumber::compare( const BigNumber& o) const
 {
 	if (o.m_calc_precision == m_calc_precision)
 	{
-		return BigBCD::operator == ( o);
+		return BigBCD::compare( o);
 	}
 	else if (o.m_calc_precision < m_calc_precision)
 	{
-		return BigBCD::operator == ( o.shift( m_calc_precision-o.m_calc_precision));
+		return BigBCD::compare( o.shift( m_calc_precision-o.m_calc_precision));
 	}
 	else
 	{
 		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
-		return val == o;
-	}
-}
-
-bool BigNumber::islt( const BigNumber& o) const
-{
-	if (o.m_calc_precision == m_calc_precision)
-	{
-		return BigBCD::operator < ( o);
-	}
-	else if (o.m_calc_precision < m_calc_precision)
-	{
-		return BigBCD::operator < ( o.shift( m_calc_precision-o.m_calc_precision));
-	}
-	else
-	{
-		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
-		return val < o;
-	}
-}
-
-bool BigNumber::isle( const BigNumber& o) const
-{
-	if (o.m_calc_precision == m_calc_precision)
-	{
-		return BigBCD::operator <= ( o);
-	}
-	else if (o.m_calc_precision < m_calc_precision)
-	{
-		return BigBCD::operator <= ( o.shift( m_calc_precision-o.m_calc_precision));
-	}
-	else
-	{
-		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
-		return val <= o;
+		return val.compare(o);
 	}
 }
 
@@ -1289,7 +1228,7 @@ BigNumber BigNumber::operator /( const BigNumber& o) const
 
 BigNumber BigNumber::operator /( _WOLFRAME_INTEGER opr) const
 {
-	BigBCD res( *this / opr);
+	BigBCD res( this->BigBCD::operator/(opr));
 	BigNumber rt( res, 0, 0);
 	rt.m_calc_precision = m_calc_precision;
 	rt.m_show_precision = m_show_precision;
@@ -1298,7 +1237,7 @@ BigNumber BigNumber::operator /( _WOLFRAME_INTEGER opr) const
 
 BigNumber BigNumber::operator *( const BigNumber& o) const
 {
-	BigBCD val( BigBCD(*this) * BigBCD(o));
+	BigBCD val( this->BigBCD::operator*( o));
 	BigNumber rt( val.shift( -(int)o.m_calc_precision), 0, 0);
 	rt.m_calc_precision = m_calc_precision;
 	rt.m_show_precision = m_show_precision;
@@ -1307,7 +1246,7 @@ BigNumber BigNumber::operator *( const BigNumber& o) const
 
 BigNumber BigNumber::operator *( _WOLFRAME_INTEGER opr) const
 {
-	BigBCD val( BigBCD(*this) * opr);
+	BigBCD val( this->BigBCD::operator*( opr));
 	BigNumber rt( val, m_show_precision, m_calc_precision);
 	return rt;
 }

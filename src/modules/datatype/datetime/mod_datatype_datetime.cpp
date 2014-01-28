@@ -31,42 +31,13 @@
 
 ************************************************************************/
 ///\file mod_datatype_datetime.cpp
-///\brief Extension module for date and time arithmetic
-#include "module/customDataTypeBuilder.hpp"
-#include "logger-v1.hpp"
+///\brief Module for date and datetime arithmetic
+#include "appDevel.hpp"
 #include "datatypeDate.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
-using namespace _Wolframe::module;
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
-
-static CustomDataTypeDef customDataTypes[] =
-{
-	{"date", &types::DateDataType::create},
-	{0,0}
-};
-
-namespace {
-struct Obj
-{
-	static SimpleBuilder* constructor()
-	{
-		return new CustomDataTypeBuilder( "DateTimeArithmeticTypes", "dta", customDataTypes);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	Obj::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "Extension module for date and time arithmetic", setModuleLogger, 0, 0, NofObjects, objdef);
+CUSTOM_DATATYPE_MODULE( "dta", "custom data types for date and time arithmetics")
+CUSTOM_DATATYPE( "date",	types::DateDataType::create)
+CUSTOM_DATATYPE_MODULE_END
 

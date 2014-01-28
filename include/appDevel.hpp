@@ -36,6 +36,7 @@
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #include "appdevel/cppFormFunctionModuleMacros.hpp"
 #include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/customDatatypeModuleMacros.hpp"
 #endif
 
 

@@ -60,68 +60,68 @@ BigfxpDataInitializer::BigfxpDataInitializer( const std::string& description)
 
 types::Variant BigfxpDataType::add( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = dynamic_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigfxpDataValue* bcdarg = dynamic_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator +( *bcdarg));
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
+		res->BigNumber::init( op->operator+( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).types::BigNumber::operator +( arg.toint()));
+		res->BigNumber::init( op->types::BigNumber::operator+( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigfxpDataType::subtract( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = dynamic_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigfxpDataValue* bcdarg = dynamic_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator -( *bcdarg));
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
+		res->BigNumber::init( op->operator-( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator -( arg.toint()));
+		res->BigNumber::init( op->operator-( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigfxpDataType::multiply( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = dynamic_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigfxpDataValue* bcdarg = dynamic_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator *( *bcdarg));
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
+		res->BigNumber::init( op->operator*( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator *( arg.toint()));
+		res->BigNumber::init( op->operator*( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigfxpDataType::divide( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = dynamic_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigfxpDataValue* bcdarg = dynamic_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator /( *bcdarg));
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
+		res->BigNumber::init( op->operator/( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( dynamic_cast<const BigfxpDataValue&>(operand).operator /( arg.toint()));
+		res->BigNumber::init( op->operator/( arg.toint()));
 	}
 	return rt;
 }
@@ -129,16 +129,16 @@ types::Variant BigfxpDataType::divide( const CustomDataValue& operand, const Var
 
 types::Variant BigfxpDataType::negation( const CustomDataValue& operand)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = dynamic_cast<BigfxpDataValue*>( rt.data().value.Custom);
-	res->BigBCD::operator=( dynamic_cast<const BigfxpDataValue&>(operand).operator-());
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	res->BigBCD::operator=( op->operator-());
 	return rt;
 }
 
 types::Variant BigfxpDataType::toDouble( const CustomDataValue& operand)
 {
-	const BigfxpDataValue* op = dynamic_cast<const BigfxpDataValue*>(&operand);
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	return types::Variant( op->todouble());
 }
 

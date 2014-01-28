@@ -26,10 +26,6 @@ usr/local/lib/wolframe/libwolframe_langbind.a
 usr/local/lib/wolframe/libwolframe_langbind.so.0.0.0
 usr/local/lib/wolframe/libwolframe_langbind.so.0
 usr/local/lib/wolframe/libwolframe_langbind.so
-usr/local/lib/wolframe/libwolframe_prnt.a
-usr/local/lib/wolframe/libwolframe_prnt.so.0.0.0
-usr/local/lib/wolframe/libwolframe_prnt.so.0
-usr/local/lib/wolframe/libwolframe_prnt.so
 usr/local/lib/wolframe/modules/mod_db_postgresql.so
 usr/local/lib/wolframe/modules/mod_db_sqlite3.so
 usr/local/lib/wolframe/modules/mod_audit_database.so
@@ -50,13 +46,13 @@ usr/local/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
 usr/local/lib/wolframe/modules/mod_normalize_base64.so
 usr/local/lib/wolframe/modules/mod_normalize_string.so
 usr/local/lib/wolframe/modules/mod_normalize_locale.so
-usr/local/lib/wolframe/modules/mod_haru_pdf_printer.so
 usr/local/lib/wolframe/modules/mod_command_directmap.so
 usr/local/lib/wolframe/modules/mod_command_lua.so
 usr/local/lib/wolframe/modules/mod_command_python.so
 usr/local/lib/wolframe/modules/mod_job_schedule_db.so
 usr/local/lib/wolframe/modules/mod_datatype_datetime.so
 usr/local/lib/wolframe/modules/mod_datatype_bcdnumber.so
+usr/local/lib/wolframe/modules/mod_print_harupdf.so
 usr/local/lib/wolframe/libwolframe_client.a
 usr/local/lib/wolframe/libwolframe_client.so.0.0.0
 usr/local/lib/wolframe/libwolframe_client.so.0
@@ -150,18 +146,6 @@ usr/local/include/wolframe/database/transactionInput.hpp
 usr/local/include/wolframe/database/transactionOutput.hpp
 usr/local/include/wolframe/database/transactionExecStatemachine.hpp
 @dirrm usr/local/include/wolframe/database
-usr/local/include/wolframe/prnt/pdfPrintProgramType.hpp
-usr/local/include/wolframe/prnt/pdfPrinter.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument_libhpdf.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument_testtrace.hpp
-usr/local/include/wolframe/prnt/pdfPrinterExpression.hpp
-usr/local/include/wolframe/prnt/pdfPrinterMethod.hpp
-usr/local/include/wolframe/prnt/pdfPrinterVariable.hpp
-usr/local/include/wolframe/prnt/pdfPrinter_libhpdf.hpp
-usr/local/include/wolframe/prnt/pdfPrinter_testtrace.hpp
-usr/local/include/wolframe/prnt/printFunction.hpp
-@dirrm usr/local/include/wolframe/prnt
 usr/local/include/wolframe/config/ConfigurationTree.hpp
 usr/local/include/wolframe/config/configurationBase.hpp
 usr/local/include/wolframe/config/programBase.hpp
@@ -259,13 +243,11 @@ usr/local/include/wolframe/module/constructor.hpp
 usr/local/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/local/include/wolframe/module/filterBuilder.hpp
 usr/local/include/wolframe/module/normalizeFunctionBuilder.hpp
-usr/local/include/wolframe/module/printFunctionBuilder.hpp
 usr/local/include/wolframe/module/programTypeBuilder.hpp
 usr/local/include/wolframe/module/customDataTypeBuilder.hpp
 @dirrm usr/local/include/wolframe/module
 usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
-usr/local/include/wolframe/prgbind/printProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp
 usr/local/include/wolframe/prgbind/programLibrary.hpp
 usr/local/include/wolframe/prgbind/transactionProgram.hpp

@@ -580,9 +580,9 @@ VARIANT comauto::createVariantType( const char* val, std::size_t valsize, VARTYP
 	return rt;
 }
 
-VARIANT comauto::createVariantType( const std::string& val)
+VARIANT comauto::createVariantType( const std::string& val, VARTYPE stringtype)
 {
-	return comauto::createVariantType( val.c_str(), val.size());
+	return comauto::createVariantType( val.c_str(), val.size(), stringtype);
 }
 
 VARIANT comauto::createVariantType( const types::Variant& val)
@@ -591,12 +591,13 @@ VARIANT comauto::createVariantType( const types::Variant& val)
 	rt.vt = VT_EMPTY;
 	switch (val.type())
 	{
-		case types::Variant::Null:		rt = comauto::createVariantType(); break;
-		case types::Variant::Bool:		rt = comauto::createVariantType( val.data().value.Bool); break;
+		case types::Variant::Null:	rt = comauto::createVariantType(); break;
+		case types::Variant::Bool:	rt = comauto::createVariantType( val.data().value.Bool); break;
 		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
-		case types::Variant::Int:		rt = comauto::createVariantType( val.data().value.Int); break;
-		case types::Variant::UInt:		rt = comauto::createVariantType( val.data().value.UInt); break;
+		case types::Variant::Int:	rt = comauto::createVariantType( val.data().value.Int); break;
+		case types::Variant::UInt:	rt = comauto::createVariantType( val.data().value.UInt); break;
 		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize()); break;
+		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring()); break;
 	}
 	return rt;
 }
@@ -607,12 +608,13 @@ VARIANT comauto::createVariantType( const types::Variant& val, VARTYPE dsttype)
 	rt.vt = VT_EMPTY;
 	switch (val.type())
 	{
-		case types::Variant::Null:		rt = comauto::createVariantType(); break;
-		case types::Variant::Bool:		rt = comauto::createVariantType( val.data().value.Bool); break;
+		case types::Variant::Null:	rt = comauto::createVariantType(); break;
+		case types::Variant::Bool:	rt = comauto::createVariantType( val.data().value.Bool); break;
 		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
-		case types::Variant::Int:		rt = comauto::createVariantType( val.data().value.Int); break;
-		case types::Variant::UInt:		rt = comauto::createVariantType( val.data().value.UInt); break;
+		case types::Variant::Int:	rt = comauto::createVariantType( val.data().value.Int); break;
+		case types::Variant::UInt:	rt = comauto::createVariantType( val.data().value.UInt); break;
 		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
+		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
 	}
 	if (rt.vt != dsttype)
 	{

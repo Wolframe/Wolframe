@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = employee_assignment_convert database functions cmdbind filter
+SUBDIRS = employee_assignment_convert database functions cmdbind filter prnt
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

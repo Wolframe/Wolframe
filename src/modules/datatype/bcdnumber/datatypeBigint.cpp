@@ -36,70 +36,70 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-types::Variant BigintDataType::add( const CustomDataValue& operand, const Variant& arg)
+types::Variant BigintDataType::add( const CustomDataValue& operand_, const Variant& arg)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand_);
 	types::Variant rt( op->type(), op->initializer());
-	BigintDataValue* res = dynamic_cast<BigintDataValue*>( rt.data().value.Custom);
+	BigintDataValue* res = reinterpret_cast<BigintDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigintDataValue* bcdarg = dynamic_cast<const BigintDataValue*>(arg.data().value.Custom);
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator +( *bcdarg));
+		const BigintDataValue* bcdarg = reinterpret_cast<const BigintDataValue*>(arg.data().value.Custom);
+		res->BigBCD::init( op->operator+( *bcdarg));
 	}
 	else
 	{
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator +( arg.toint()));
+		res->BigBCD::init( op->operator+( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigintDataType::subtract( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigintDataValue* res = dynamic_cast<BigintDataValue*>( rt.data().value.Custom);
+	BigintDataValue* res = reinterpret_cast<BigintDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigintDataValue* bcdarg = dynamic_cast<const BigintDataValue*>(arg.data().value.Custom);
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator -( *bcdarg));
+		const BigintDataValue* bcdarg = reinterpret_cast<const BigintDataValue*>(arg.data().value.Custom);
+		res->BigBCD::init( op->operator-( *bcdarg));
 	}
 	else
 	{
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator -( arg.toint()));
+		res->BigBCD::init( op->operator-( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigintDataType::multiply( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigintDataValue* res = dynamic_cast<BigintDataValue*>( rt.data().value.Custom);
+	BigintDataValue* res = reinterpret_cast<BigintDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigintDataValue* bcdarg = dynamic_cast<const BigintDataValue*>(arg.data().value.Custom);
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator *( *bcdarg));
+		const BigintDataValue* bcdarg = reinterpret_cast<const BigintDataValue*>(arg.data().value.Custom);
+		res->BigBCD::init( op->operator*( *bcdarg));
 	}
 	else
 	{
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator *( arg.toint()));
+		res->BigBCD::init( op->operator*( arg.toint()));
 	}
 	return rt;
 }
 
 types::Variant BigintDataType::divide( const CustomDataValue& operand, const Variant& arg)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigintDataValue* res = dynamic_cast<BigintDataValue*>( rt.data().value.Custom);
+	BigintDataValue* res = reinterpret_cast<BigintDataValue*>( rt.data().value.Custom);
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
-		const BigintDataValue* bcdarg = dynamic_cast<const BigintDataValue*>(arg.data().value.Custom);
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator /( *bcdarg));
+		const BigintDataValue* bcdarg = reinterpret_cast<const BigintDataValue*>(arg.data().value.Custom);
+		res->BigBCD::init( op->operator/( *bcdarg));
 	}
 	else
 	{
-		res->BigBCD::init( dynamic_cast<const BigintDataValue&>(operand).operator /( arg.toint()));
+		res->BigBCD::init( op->operator/( arg.toint()));
 	}
 	return rt;
 }
@@ -107,22 +107,22 @@ types::Variant BigintDataType::divide( const CustomDataValue& operand, const Var
 
 types::Variant BigintDataType::negation( const CustomDataValue& operand)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
-	BigintDataValue* res = dynamic_cast<BigintDataValue*>( rt.data().value.Custom);
-	res->BigBCD::operator=( dynamic_cast<const BigintDataValue&>(operand).operator-());
+	BigintDataValue* res = reinterpret_cast<BigintDataValue*>( rt.data().value.Custom);
+	res->BigBCD::operator=( op->operator-());
 	return rt;
 }
 
 types::Variant BigintDataType::toInt( const CustomDataValue& operand)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	return types::Variant( op->toint());
 }
 
 types::Variant BigintDataType::toDouble( const CustomDataValue& operand)
 {
-	const BigintDataValue* op = dynamic_cast<const BigintDataValue*>(&operand);
+	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand);
 	return types::Variant( op->todouble());
 }
 

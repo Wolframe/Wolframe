@@ -35,7 +35,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "logger-v1.hpp"
 
-//\brief Marks the start if the Wolframe C++ form function module after the includes section.
+//\brief Marks the start of the Wolframe C++ form function module after the includes section.
 #define NORMALIZER_MODULE(DOMAIN,DESCRIPTION)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
@@ -63,6 +63,7 @@
 	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
 	{
 
+//\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
 #define NORMALIZER_MODULE_WITH_RESOURCE(DOMAIN,DESCRIPTION,RESOURCECLASS)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
@@ -91,10 +92,11 @@
 	{
 
 
-
+//\brief Defines normalization function in the NORMALIZER_MODULE section 
 #define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
+//\brief Defines the end of the NORMALIZER_MODULE section 
 #define NORMALIZER_MODULE_END\
 		{0,0}\
 	};\

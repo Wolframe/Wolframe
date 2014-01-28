@@ -401,14 +401,18 @@ const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 	return m_impl->formtypemap();
 }
 
-const types::keymap<module::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
+types::NormalizeFunction* ProgramLibrary::createBaseNormalizeFunction( const std::string& domain, const std::string& name, const std::string& arg) const
 {
-	return m_impl->m_normalizeFunctionConstructorMap;
+	types::keymap<module::NormalizeFunctionConstructorR>::const_iterator fi = m_impl->m_normalizeFunctionConstructorMap.find( domain), fe = m_impl->m_normalizeFunctionConstructorMap.end();
+	if (fi == fe) return 0;
+	return fi->second->object( name, arg);
 }
 
-const types::keymap<module::CustomDataTypeConstructorR>& ProgramLibrary::customDataTypeConstructorMap() const
+const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& domain, const std::string& name) const
 {
-	return m_impl->m_customDataTypeConstructorMap;
+	types::keymap<module::CustomDataTypeConstructorR>::const_iterator ti = m_impl->m_customDataTypeConstructorMap.find( domain), te = m_impl->m_customDataTypeConstructorMap.end();
+	if (ti == te) return 0;
+	return ti->second->object( name);
 }
 
 const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string& name) const

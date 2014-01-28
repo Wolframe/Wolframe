@@ -1368,8 +1368,6 @@ fi
 %{_libdir}/wolframe/libwolframe_database.so.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0.0.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0
-%{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
-%{_libdir}/wolframe/libwolframe_prnt.so.0
 
 %dir %{_libdir}/wolframe/modules
 
@@ -1418,8 +1416,6 @@ fi
 %{_libdir}/wolframe/libwolframe_database.a
 %{_libdir}/wolframe/libwolframe_langbind.so
 %{_libdir}/wolframe/libwolframe_langbind.a
-%{_libdir}/wolframe/libwolframe_prnt.so
-%{_libdir}/wolframe/libwolframe_prnt.a
 %if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so
 %{_libdir}/wolframe/libhpdf.a
@@ -1442,8 +1438,6 @@ fi
 %{_includedir}/wolframe/cmdbind/*.hpp
 %dir %{_includedir}/wolframe/database/
 %{_includedir}/wolframe/database/*.hpp
-%dir %{_includedir}/wolframe/prnt/
-%{_includedir}/wolframe/prnt/*.hpp
 %dir %{_includedir}/wolframe/config/
 %{_includedir}/wolframe/config/*.hpp
 %dir %{_includedir}/wolframe/logger/
@@ -1578,7 +1572,7 @@ fi
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
+%{_libdir}/wolframe/modules/mod_print_harupdf.so
 %if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2

@@ -1,11 +1,9 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = testPdfPrinter
-
 !IFDEF WITH_LIBHPDF
 !IFDEF WITH_TEXTWOLF
 SUBDIRS = \
-	$(SUBDIRS) haruPdfPrinter
+	$(SUBDIRS) harupdfprint
 !ENDIF
 !ENDIF
 

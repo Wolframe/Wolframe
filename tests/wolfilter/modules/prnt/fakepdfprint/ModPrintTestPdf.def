@@ -1,0 +1,4 @@
+LIBRARY mod_print_testpdf
+
+EXPORTS
+entryPoint	@1

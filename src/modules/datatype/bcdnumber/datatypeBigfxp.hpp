@@ -83,11 +83,8 @@ public:
 		}
 		else
 		{
-			const BigfxpDataValue* odt = dynamic_cast<const BigfxpDataValue*>(&o);
-			int rt = -1;
-			rt += (int)(types::BigNumber::operator>=(*odt));
-			rt += (int)(types::BigNumber::operator>(*odt));
-			return rt;
+			const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
+			return types::BigNumber::compare(*odt);
 		}
 	}
 
@@ -104,11 +101,11 @@ public:
 		}
 		else if (o.type() == Variant::Double)
 		{
-			types::BigNumber::init( o.todouble());
+			types::BigNumber::operator=( o.todouble());
 		}
 		else
 		{
-			types::BigNumber::init( o.toint());
+			types::BigNumber::operator=( o.toint());
 		}
 	}
 
@@ -119,7 +116,7 @@ public:
 
 	static CustomDataValue* create( const CustomDataInitializer* ini_)
 	{
-		const BigfxpDataInitializer* ini = dynamic_cast<const BigfxpDataInitializer*>(ini_);
+		const BigfxpDataInitializer* ini = reinterpret_cast<const BigfxpDataInitializer*>(ini_);
 		return new BigfxpDataValue( ini);
 	}
 };
