@@ -315,6 +315,7 @@ bool TransactionExecStatemachine_postgres::execute()
 		m_lastresult = 0;
 	}
 	// TODO: or another string which also works when PQexec is used?
+	m_statement->substitute( );
 	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
 	m_lastresult = dynamic_cast<PostgreSQLsubstitutingStatement *>( m_statement )->execute( );

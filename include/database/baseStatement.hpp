@@ -58,6 +58,8 @@ class BaseStatement : public Statement
 		virtual void init( const std::string &stmtStr );
 
 		virtual void clear( );
+		
+		virtual void substitute( );
 
 		virtual void bind( const unsigned int idx, const types::Variant &value );
 
@@ -73,12 +75,11 @@ class BaseStatement : public Statement
 
 	private:
 		void parse( );
-		void substitute( ) const;
 		
 	private:
 		typedef std::pair<unsigned int, std::string> Element;
 		std::vector<Element> m_data;
-		mutable std::string m_nativeStmt;	
+		std::string m_nativeStmt;	
 };
 
 }}//namespace

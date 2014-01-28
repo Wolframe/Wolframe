@@ -68,6 +68,10 @@ class Statement
 		//\remark Clear current statement
 		virtual void clear( ) = 0;
 
+		//\remark Trigger substitution (nativeSQL is valid after
+		//        this call and not before!)
+		virtual void substitute( ) = 0;
+
 		//\remark Funtion called when the placeholder should be put
 		//        into the final string (this is either for subsituting
 		//        data or rewrite placeholders to native syntax)

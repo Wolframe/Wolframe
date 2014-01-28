@@ -96,7 +96,6 @@ const std::string BaseStatement::originalSQL( ) const
 
 const std::string BaseStatement::nativeSQL( ) const
 {
-	substitute( );
 	return m_nativeStmt;
 }
 
@@ -179,7 +178,7 @@ void BaseStatement::parse( )
 	}
 }
 
-void BaseStatement::substitute( ) const
+void BaseStatement::substitute( )
 {
 	m_nativeStmt.clear( );
 	std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
