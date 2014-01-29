@@ -36,6 +36,7 @@
 #include "database/baseStatement.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <algorithm>
 #include <cctype>
 
 using namespace _Wolframe;
@@ -74,17 +75,27 @@ void BaseStatement::clear( )
 	m_maxParam = 0;
 	m_data.clear();
 	m_nativeStmt.clear( );
+	m_usedIdx.reserve( 32 );
+	std::fill_n( m_usedIdx.begin( ), 32, false );
 }
 
 void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value*/ )
 {
+	std::cout << "Get " << idx << " " << m_usedIdx[idx] << std::endl;
 	if( idx < 1 || idx > m_maxParam ) {
-		throw new std::runtime_error(
-			"index of bind parameter is out of range (" +
+		throw std::runtime_error(
+			"index of bind parameter is out of range " +
 			boost::lexical_cast<std::string>( idx ) +
 			" required to be in range 1.." +
 			boost::lexical_cast<std::string>( m_maxParam ) +
-			" in statement '" + /* or nativeSQL? */ originalSQL( ) + "'"
+			" in statement '" + originalSQL( ) + "'"
+		);
+	}
+	if( !m_usedIdx[idx] ) {
+		throw std::runtime_error(
+			"setting value for undefined index " +
+			boost::lexical_cast<std::string>( idx ) +
+			" in statement '" + originalSQL( ) + "'"			
 		);
 	}
 }
@@ -100,7 +111,7 @@ const std::string BaseStatement::nativeSQL( ) const
 }
 
 void BaseStatement::parse( )
-{
+{	
 	std::string::const_iterator si = m_stmtStr.begin( ), se = m_stmtStr.end( );
 	std::string::const_iterator chunkstart = si;
 	for( ; si != se; si++ ) {
@@ -149,8 +160,11 @@ void BaseStatement::parse( )
 				}
 			}
 
-			m_maxParam++;
-			
+			m_usedIdx.reserve( idx + 1 );
+			m_usedIdx[idx] = true;
+			m_maxParam = idx;
+			std::cout << "Set " << idx << " " << m_usedIdx[idx] << std::endl;
+
 			chunkstart = si;
 						
 			m_data.push_back( Element( idx, "" ) );

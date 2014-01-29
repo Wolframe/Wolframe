@@ -323,14 +323,14 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 		FAIL( ) << "Reached success state, but should fail!";
 	//~ } catch( const DatabaseTransactionErrorException &e ) {
 		//~ std::cout << e.what( ) << std::endl;
-	} catch( const std::exception &e ) {
+	} catch( std::runtime_error const &e ) {
 		std::cout << e.what( ) << std::endl;
 		//~ FAIL( ) << "Wrong std::exception class seen in database error!";
 	} catch( ... ) {
 		// really?
 		trans->commit( );
 		trans->close( );
-		//~ FAIL( ) << "Wrong exception class seen in database error!";
+		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	// auto rollback?
 	// auto close transaction?	

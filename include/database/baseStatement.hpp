@@ -77,7 +77,8 @@ class BaseStatement : public Statement
 	private:
 		typedef std::pair<unsigned int, std::string> Element;
 		std::vector<Element> m_data;
-		std::string m_nativeStmt;	
+		std::string m_nativeStmt;
+		std::vector<bool> m_usedIdx;
 };
 
 }}//namespace
