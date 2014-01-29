@@ -81,7 +81,6 @@ void BaseStatement::clear( )
 
 void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value*/ )
 {
-	std::cout << "Get " << idx << " " << m_usedIdx[idx] << std::endl;
 	if( idx < 1 || idx > m_maxParam ) {
 		throw std::runtime_error(
 			"index of bind parameter is out of range " +
@@ -127,7 +126,7 @@ void BaseStatement::parse( )
 				}
 			}
 			if( si == se ) {
-				throw new std::runtime_error( "string not terminated in statement '" +
+				throw std::runtime_error( "string not terminated in statement '" +
 					originalSQL( ) + "'" );
 			}
 		} else if( *si == '$' ) {
@@ -160,10 +159,12 @@ void BaseStatement::parse( )
 				}
 			}
 
-			m_usedIdx.reserve( idx + 1 );
+			if( idx > m_maxParam ) {
+				m_usedIdx.reserve( idx + 1 );
+				std::fill_n( m_usedIdx.begin( ), idx+1, false );
+			}
 			m_usedIdx[idx] = true;
 			m_maxParam = idx;
-			std::cout << "Set " << idx << " " << m_usedIdx[idx] << std::endl;
 
 			chunkstart = si;
 						

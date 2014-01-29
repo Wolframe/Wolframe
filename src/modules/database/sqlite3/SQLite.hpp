@@ -99,7 +99,7 @@ struct SQLiteLanguageDescription :public LanguageDescription
 	virtual std::string stm_argument_reference( int index)
 	{
 		std::ostringstream rt;
-		rt << "?" << index;
+		rt << "$" << index;
 		return rt.str();
 	}
 };

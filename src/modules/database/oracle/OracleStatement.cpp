@@ -6,12 +6,14 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 OracleStatement::OracleStatement( )
-	: m_env( 0 )
+	: BaseStatement( ),
+	m_env( 0 )
 {
 }
 
 OracleStatement::OracleStatement( const OracleStatement &o )
-	: m_env( 0 )
+	: BaseStatement( o ),
+	m_env( o.m_env )
 {
 }
 

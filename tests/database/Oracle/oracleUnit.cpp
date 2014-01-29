@@ -309,11 +309,10 @@ TEST_F( OracleFixture, IllegalBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
+	//~ } catch( const DatabaseTransactionErrorException &e ) {
+		//~ std::cout << e.what( ) << std::endl;
+	} catch( std::runtime_error const &e ) {
 		std::cout << e.what( ) << std::endl;
-	} catch( const std::exception &e ) {
-		std::cout << e.what( ) << std::endl;
-		FAIL( ) << "Wrong std::exception class seen in database error!";
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}

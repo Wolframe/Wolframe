@@ -31,32 +31,28 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/OracleStatement.hpp
-#ifndef _ORACLE_STATEMENT_HPP_INCLUDED
-#define _ORACLE_STATEMENT_HPP_INCLUDED
+///\file database/SQLiteStatement.hpp
+#ifndef _SQLITE_STATEMENT_HPP_INCLUDED
+#define _SQLITE_STATEMENT_HPP_INCLUDED
 #include <string>
-#include "Oracle.hpp"
 #include "database/baseStatement.hpp"
+#include "sqlite3.h"
 
 namespace _Wolframe {
 namespace db {
 
-class OracleStatement : public BaseStatement
+class SQLiteStatement : public BaseStatement
 {
 	public:
-		OracleStatement( );
-		OracleStatement( const OracleStatement &o );
-		OracleStatement( OracleEnvirenment *env );
+		SQLiteStatement( );
+		SQLiteStatement( const SQLiteStatement &o );
 
 		virtual void bind( const unsigned int idx, const types::Variant &arg );
 
 		virtual const std::string replace( const unsigned int idx ) const;
 
 		//\brief Executes the statement with parameters
-		OCIStmt *execute( ) const;
-
-	private:
-		OracleEnvirenment *m_env;		
+		sqlite3_stmt *execute( ) const;
 };
 
 }}//namespace

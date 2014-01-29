@@ -34,6 +34,7 @@
 ///\file SQLiteTransactionExecStatemachine.cpp
 #include "SQLiteTransactionExecStatemachine.hpp"
 #include "SQLite.hpp"
+#include "SQLiteStatement.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -100,6 +101,7 @@ TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const 
 	,m_stm(0)
 	,m_dbunit(dbunit_)
 	,m_conn(0)
+	,m_statement( new SQLiteStatement( ) )
 {}
 
 TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
@@ -118,6 +120,7 @@ void TransactionExecStatemachine_sqlite3::clear()
 	m_hasResult = false;
 	m_hasRow = false;
 	m_curstm.clear();
+	m_statement->clear();
 	m_state = Init;
 }
 
