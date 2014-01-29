@@ -300,16 +300,10 @@ public:
 		return &m_normalizeFunctionMap;
 	}
 
-	langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+	const langbind::FilterType* getFilterType( const std::string& name) const
 	{
 		types::keymap<langbind::FilterTypeR>::const_iterator fi = m_filterTypeMap.find( name);
-		return (fi == m_filterTypeMap.end())?0:fi->second->create( arg);
-	}
-
-	bool existsFilter( const std::string& name) const
-	{
-		types::keymap<langbind::FilterTypeR>::const_iterator fi = m_filterTypeMap.find( name);
-		return (fi != m_filterTypeMap.end());
+		return (fi == m_filterTypeMap.end())?0:fi->second.get();
 	}
 
 	static bool programOrderAsc( std::pair<Program*, std::string> const& a, std::pair<Program*, std::string> const& b)
@@ -447,14 +441,9 @@ const types::NormalizeFunctionType* ProgramLibrary::getNormalizeFunctionType( co
 	return m_impl->getNormalizeFunctionType( namspace, name);
 }
 
-langbind::Filter* ProgramLibrary::createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+const langbind::FilterType* ProgramLibrary::getFilterType( const std::string& name) const
 {
-	return m_impl->createFilter( name, arg);
-}
-
-bool ProgramLibrary::existsFilter( const std::string& name) const
-{
-	return m_impl->existsFilter( name);
+	return m_impl->getFilterType( name);
 }
 
 void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames)

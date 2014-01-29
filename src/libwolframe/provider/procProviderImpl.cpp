@@ -413,7 +413,8 @@ static std::string filterargAsString( const std::vector<langbind::FilterArgument
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 {
 	LOG_TRACE << "[provider] get filter '" << name << "(" << filterargAsString(arg) << ")'";
-	return m_programs->createFilter( name, arg);
+	const langbind::FilterType* filtertype = m_programs->getFilterType( name);
+	return filtertype->create( arg);
 }
 
 const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& domain, const std::string& name) const

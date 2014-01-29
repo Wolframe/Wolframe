@@ -80,8 +80,7 @@ public:
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
 	virtual const types::NormalizeFunction* getDDLTypeNormalizer( const std::string& name) const;
-	virtual langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
-	virtual bool existsFilter( const std::string& name) const;
+	virtual const langbind::FilterType* getFilterType( const std::string& name) const;
 
 	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
 
