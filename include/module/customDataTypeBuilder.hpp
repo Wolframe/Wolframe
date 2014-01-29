@@ -67,21 +67,20 @@ public:
 		return CUSTOM_DATA_TYPE_OBJECT;
 	}
 
-	const types::CustomDataType* object( const std::string& name_) const
-	{
-		ConstructorMap::const_iterator fi = m_typemap.find( name_);
-		if (fi == m_typemap.end()) return 0;
-		return fi->second.get();
-	}
-
 	std::vector<std::string> types() const
 	{
 		return m_typemap.getkeys<std::vector<std::string> >();
 	}
 
+	typedef types::keymap<types::CustomDataTypeR> CustomDataTypeMap;
+	const CustomDataTypeMap& typemap() const
+	{
+		return m_typemap;
+	}
+
 	void getTypeReferences( std::vector<const types::CustomDataType*>& result) const
 	{
-		ConstructorMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
+		CustomDataTypeMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
 		for (; ti != te; ++ti)
 		{
 			result.push_back( ti->second.get());
@@ -101,8 +100,7 @@ public:
 private:
 	const char* m_classname;
 	const char* m_name;
-	typedef types::keymap<types::CustomDataTypeR> ConstructorMap;
-	ConstructorMap m_typemap;
+	CustomDataTypeMap m_typemap;
 };
 
 typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;

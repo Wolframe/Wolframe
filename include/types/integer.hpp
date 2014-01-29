@@ -38,10 +38,22 @@ Project Wolframe.
 #include <limits.h>
 #include <stdint.h>
 
+#ifdef SUNOS
+
+#define _WOLFRAME_INTEGER		int
+#define _WOLFRAME_UINTEGER		unsigned int
+
+#define _WOLFRAME_INTEGER_DIGITS	10
+#define _WOLFRAME_UINTEGER_DIGITS	10
+
+#else
+
 #define _WOLFRAME_INTEGER		boost::int64_t
 #define _WOLFRAME_UINTEGER		boost::uint64_t
 
 #define _WOLFRAME_INTEGER_DIGITS	19
 #define _WOLFRAME_UINTEGER_DIGITS	20
+
+#endif
 
 #endif

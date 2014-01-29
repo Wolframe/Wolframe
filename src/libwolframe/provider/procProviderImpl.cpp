@@ -245,8 +245,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						m_programs->defineNormalizeFunctionConstructor( constructor);
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function constructor for domain '" << constructor->domain() << "'";
+						module::NormalizeFunctionConstructor::FunctionTypeMap::const_iterator fi = constructor->functionmap().begin(), fe = constructor->functionmap().end();
+						for (; fi != fe; ++fi)
+						{
+							m_programs->defineNormalizeFunctionType( constructor->domain(), fi->first, fi->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << constructor->domain() << ":" << fi->first << "'";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -268,8 +272,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						m_programs->defineCustomDataTypeConstructor( constructor);
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type constructor for domain '" << constructor->domain() << "'";
+						module::CustomDataTypeConstructor::CustomDataTypeMap::const_iterator ti = constructor->typemap().begin(), te = constructor->typemap().end();
+						for (; ti != te; ++ti)
+						{
+							m_programs->defineCustomDataType( constructor->domain(), ti->first, ti->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->domain() << ":" << ti->first << "'";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -371,9 +379,9 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return rt;
 }
 
-const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::typeNormalizer( const std::string& name) const
 {
-	return m_programs->getNormalizeFunction( name);
+	return m_programs->getDDLTypeNormalizer( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const

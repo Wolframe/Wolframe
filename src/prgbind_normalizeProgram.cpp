@@ -80,31 +80,31 @@ private:
 	types::CustomDataInitializer* m_initializer;
 };
 
-static types::NormalizeFunctionR createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
+static types::NormalizeFunctionR createBaseFunction( const std::string& namspace, const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
 {
-	if (domain.empty()) throw std::runtime_error( "namespace of function not defined");
+	if (namspace.empty()) throw std::runtime_error( "namespace of function not defined");
 	try
 	{
-		types::NormalizeFunctionR rt( prglibrary.createBaseNormalizeFunction( domain, name, arg));
-		const types::CustomDataType* customtype = prglibrary.getCustomDataType( domain, name);
-		if (rt.get())
+		const types::NormalizeFunctionType* normalizer = prglibrary.getNormalizeFunctionType( namspace, name);
+		const types::CustomDataType* customtype = prglibrary.getCustomDataType( namspace, name);
+		if (normalizer)
 		{
-			if (customtype) throw std::runtime_error( std::string( "amgibuus definition of custom data type and normalize function '") + domain + ":" + name + "'");
-			return rt;
+			if (customtype) throw std::runtime_error( std::string( "amgibuus definition of custom data type and normalize function '") + namspace + ":" + name + "'");
+			return types::NormalizeFunctionR( normalizer->createFunction( arg));
+;
 		}
 		else if (customtype)
 		{
-			rt.reset( new CustomDataNormalizer( name, arg, customtype));
+			return types::NormalizeFunctionR( new CustomDataNormalizer( name, arg, customtype));
 		}
 		else
 		{
-			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + domain + ":" + name + "'");
+			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + namspace + ":" + name + "'");
 		}
-		return rt;
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string("could not build normalizer for '") + domain + ":" + name + "(" + arg + ")' :" + err.what());
+		throw std::runtime_error( std::string("could not build normalizer for '") + namspace + ":" + name + "(" + arg + ")' :" + err.what());
 	}
 }
 
@@ -178,7 +178,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
 			}
 			CombinedNormalizeFunction funcdef( prgname);
-			std::string domain;
+			std::string namspace;
 
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
@@ -198,7 +198,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 				}
 				if ((':' == utils::gotoNextToken( si, se)))
 				{
-					domain = funcname;
+					namspace = funcname;
 					funcname.clear();
 					++si;
 					switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
@@ -213,7 +213,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( domain, funcname, "", prglibrary)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( namspace, funcname, "", prglibrary)));
 						++si;
 						continue;
 					case '(':
@@ -224,7 +224,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
 							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
 						}
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( domain, funcname, std::string( argstart, si-1), prglibrary)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( namspace, funcname, std::string( argstart, si-1), prglibrary)));
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{
@@ -274,7 +274,7 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
 		for (; ni != ne; ++ni)
 		{
-			library.defineNormalizeFunction( ni->first, ni->second);
+			library.defineDDLTypeNormalizer( ni->first, ni->second);
 		}
 	}
 	catch (const config::PositionalErrorException& e)
