@@ -53,7 +53,7 @@ namespace {
 struct TextwolfXMLFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "TextwolfXMLFilter", "textwolf", lb::createTextwolfXmlFilterPtr);}
+		{return new FilterBuilder( "TextwolfXMLFilter", "textwolf", lb::createTextwolfXmlFilterType);}
 };
 
 }//anonymous namespace

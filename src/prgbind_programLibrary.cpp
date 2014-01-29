@@ -151,7 +151,6 @@ public:
 	{
 		if (m_impl.find( name) != m_impl.end())
 		{
-			LOG_ERROR << std::string("duplicate definition of normalize function '") + name + "'";
 			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
 		}
 		m_impl.insert( name, f);
@@ -167,7 +166,7 @@ public:
 	types::keymap<types::CustomDataTypeR> m_customDataTypeMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
-	types::keymap<module::FilterConstructorR> m_filterMap;
+	types::keymap<langbind::FilterTypeR> m_filterTypeMap;
 	types::keymap<types::FormDescriptionR> m_formMap;
 	std::vector<types::FormDescriptionR> m_privateFormList;
 	std::vector<ProgramR> m_programTypes;
@@ -195,7 +194,6 @@ public:
 	{
 		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
 		{
-			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
 			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
 		}
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
@@ -205,7 +203,6 @@ public:
 	{
 		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
 		{
-			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
 			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
 		}
 		m_formFunctionMap.insert( name, f);
@@ -225,7 +222,6 @@ public:
 	{
 		if (m_formMap.find( name) != m_formMap.end())
 		{
-			LOG_ERROR << std::string("duplicate definition of form '") + name + "'";
 			throw std::runtime_error( std::string("duplicate definition of form '") + name + "'");
 		}
 		m_formMap.insert( name, f);
@@ -252,14 +248,13 @@ public:
 		m_programTypes.push_back( prg);
 	}
 
-	void defineFilterConstructor( const module::FilterConstructorR& f)
+	void defineFilterType( const std::string& name, const langbind::FilterTypeR& f)
 	{
-		if (m_filterMap.find( f->name()) != m_filterMap.end())
+		if (m_filterTypeMap.find( name) != m_filterTypeMap.end())
 		{
-			LOG_ERROR << std::string("duplicate definition of filter '") + f->name() + "'";
-			throw std::runtime_error( std::string("duplicate definition of filter '") + f->name() + "'");
+			throw std::runtime_error( std::string("duplicate definition of filter type '") + name + "'");
 		}
-		m_filterMap.insert( f->name(), f);
+		m_filterTypeMap.insert( name, f);
 	}
 
 	const types::FormDescription* getFormDescription( const std::string& name) const
@@ -307,14 +302,14 @@ public:
 
 	langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 	{
-		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
-		return (fi == m_filterMap.end())?0:fi->second->object( arg);
+		types::keymap<langbind::FilterTypeR>::const_iterator fi = m_filterTypeMap.find( name);
+		return (fi == m_filterTypeMap.end())?0:fi->second->create( arg);
 	}
 
 	bool existsFilter( const std::string& name) const
 	{
-		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
-		return (fi != m_filterMap.end());
+		types::keymap<langbind::FilterTypeR>::const_iterator fi = m_filterTypeMap.find( name);
+		return (fi != m_filterTypeMap.end());
 	}
 
 	static bool programOrderAsc( std::pair<Program*, std::string> const& a, std::pair<Program*, std::string> const& b)
@@ -340,7 +335,6 @@ public:
 			}
 			if (pi == pe)
 			{
-				LOG_ERROR << std::string("unknown type of program '") + *fi + "'";
 				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
 			}
 		}
@@ -408,9 +402,9 @@ void ProgramLibrary::defineFormDDL( const langbind::DDLCompilerR& c)
 	m_impl->defineFormDDL( c);
 }
 
-void ProgramLibrary::defineFilterConstructor( const module::FilterConstructorR& f)
+void ProgramLibrary::defineFilterType( const std::string& name, const langbind::FilterTypeR& f)
 {
-	return m_impl->defineFilterConstructor( f);
+	return m_impl->defineFilterType( name, f);
 }
 
 void ProgramLibrary::defineProgramType( const ProgramR& prg)

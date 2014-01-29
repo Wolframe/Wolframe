@@ -41,6 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "module/customDataTypeBuilder.hpp"
+#include "module/filterBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
@@ -149,7 +150,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					try
 					{
-						m_programs->defineFilterConstructor( fltr);
+						langbind::FilterTypeR filtertype( fltr->object());
+						m_programs->defineFilterType( fltr->name(), filtertype);
 						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ")";
 					}
 					catch (const std::runtime_error& e)

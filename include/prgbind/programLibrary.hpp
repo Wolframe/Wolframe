@@ -36,7 +36,6 @@
 #ifndef _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "module/filterBuilder.hpp"
 #include "database/database.hpp"
 #include "langbind/cppFormFunction.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
@@ -69,7 +68,7 @@ public:
 	virtual void defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& ftype);
 	virtual void defineCustomDataType( const std::string& namspace, const std::string& name, const types::CustomDataTypeR& t);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
-	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
+	virtual void defineFilterType( const std::string& name, const langbind::FilterTypeR& f);
 	virtual void defineProgramType( const ProgramR& prg);
 
 	virtual const types::NormalizeFunctionMap* formtypemap() const;

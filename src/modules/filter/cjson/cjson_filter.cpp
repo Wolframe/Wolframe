@@ -63,28 +63,31 @@ struct CJsonFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createCJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg)
+class CJsonFilterType :public FilterType
 {
-	const char* filterbasename = "cjson";
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != filterbasename) throw std::runtime_error( "cjson filter name does not match");
-	if (arg.empty()) return CJsonFilter();
-	const char* encoding = 0;
-	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
+public:
+	CJsonFilterType(){}
+	virtual ~CJsonFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		const char* encoding = 0;
+		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+		for (; ai != ae; ++ai)
 		{
-			encoding = ai->second.c_str();
-			break;
+			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+			{
+				encoding = ai->second.c_str();
+				break;
+			}
 		}
+		return encoding?(new CJsonFilter( encoding)):(new CJsonFilter());
 	}
-	return encoding?CJsonFilter( encoding):CJsonFilter();
+};
+
+FilterType* _Wolframe::langbind::createCJsonFilterType()
+{
+	return new CJsonFilterType();
 }
 
-Filter* _Wolframe::langbind::createCJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
-{
-	return new Filter( createCJsonFilter( name, arg));
-}
 

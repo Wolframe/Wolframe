@@ -53,7 +53,7 @@ namespace {
 struct CJsonFilterObject
 {
 	static SimpleBuilder* filter_builder()
-		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterPtr);}
+		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterType);}
 };
 }//anonymous namespace
 

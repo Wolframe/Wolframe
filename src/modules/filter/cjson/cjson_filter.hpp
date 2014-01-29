@@ -39,9 +39,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-Filter createCJsonFilter( const std::string& name, const std::vector<FilterArgument>& arg);
-Filter* createCJsonFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
-
+FilterType* createCJsonFilterType();
 
 }}//namespace
 #endif

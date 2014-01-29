@@ -44,9 +44,9 @@ namespace module {
 class FilterConstructor :public SimpleObjectConstructor<langbind::Filter>
 {
 public:
-	FilterConstructor( const std::string& name_, langbind::CreateFilterPtrFunc filterFunc_ )
+	FilterConstructor( const std::string& name_, langbind::CreateFilterType createFilterType_)
 		: m_name(name_)
-		, m_function(filterFunc_) {}
+		, m_createFilterType(createFilterType_) {}
 
 	virtual ~FilterConstructor(){}
 
@@ -58,9 +58,9 @@ public:
 	{
 		return m_name.c_str();
 	}
-	virtual langbind::Filter* object( const std::vector<langbind::FilterArgument>& arg) const
+	virtual langbind::FilterType* object() const
 	{
-		return m_function( m_name, arg );
+		return m_createFilterType();
 	}
 	const std::string& name() const
 	{
@@ -69,7 +69,7 @@ public:
 
 private:
 	std::string m_name;
-	langbind::CreateFilterPtrFunc m_function;
+	langbind::CreateFilterType m_createFilterType;
 };
 
 typedef types::CountedReference<FilterConstructor> FilterConstructorR;
@@ -78,9 +78,9 @@ typedef types::CountedReference<FilterConstructor> FilterConstructorR;
 class FilterBuilder :public SimpleBuilder
 {
 public:
-	FilterBuilder( const char* className_, const char* name_, langbind::CreateFilterPtrFunc createFunc_)
+	FilterBuilder( const char* className_, const char* name_, langbind::CreateFilterType createFilterType_)
 		:SimpleBuilder( className_)
-		,m_createFunc(createFunc_)
+		,m_createFilterType(createFilterType_)
 		,m_name(name_){}
 
 	virtual ~FilterBuilder(){}
@@ -91,11 +91,11 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterConstructor( m_name, m_createFunc);
+		return new FilterConstructor( m_name, m_createFilterType);
 	}
 
 private:
-	langbind::CreateFilterPtrFunc m_createFunc;
+	langbind::CreateFilterType m_createFilterType;
 	std::string m_name;
 };
 
