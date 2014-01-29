@@ -19,6 +19,8 @@ Build&Deployment:
 
 OPEN SOURCE PRODUCT NICE TO HAVE:
 - Printing (impl + documentation)
+- Lua State Copy instead of parsing script every time
+	(http://stackoverflow.com/questions/8936369/compile-lua-code-store-bytecode-then-load-and-execute-it)
 
 
 TO THINK ABOUT IN THE FUTURE:

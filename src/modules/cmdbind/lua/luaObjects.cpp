@@ -316,7 +316,7 @@ public:
 
 	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
-		return m_provider->normalizeFunction( name);
+		return m_provider->typeNormalizer( name);
 	}
 
 private:
@@ -667,7 +667,7 @@ LUA_FUNCTION_THROWS( "normalizer(..)", function_normalizer)
 	const char* name = lua_tostring( ls, 1);
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 
-	const types::NormalizeFunction* func = ctx->normalizeFunction( name);
+	const types::NormalizeFunction* func = ctx->typeNormalizer( name);
 	if (!func) throw std::runtime_error( std::string("normalizer '") + name + "' not defined");
 
 	lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));

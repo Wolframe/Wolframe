@@ -56,7 +56,7 @@ namespace {
 struct Libxml2FilterObject
 {
 	static SimpleBuilder* xmlfilter_builder()
-		{return new FilterBuilder( "Libxml2Filter", "libxml2", lb::createLibxml2FilterPtr);}
+		{return new FilterBuilder( "Libxml2Filter", "libxml2", lb::createLibxml2FilterType);}
 #if WITH_LIBXSLT
 	static SimpleBuilder* xsltfilter_builder()
 		{return new ProgramTypeBuilder( "XsltProgramType", "xslt", langbind::createXsltProgramType);}

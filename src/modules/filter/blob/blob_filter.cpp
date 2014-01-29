@@ -207,18 +207,22 @@ struct BlobFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createBlobFilter( const std::string& name, const std::vector<FilterArgument>& arg)
+class BlobFilterType :public FilterType
 {
-	enum {namelen=4};
-	if (arg.size()) throw std::runtime_error( "filter does not have arguments");
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != "blob") throw std::runtime_error( "filter name does not match");
-	return BlobFilter();
+public:
+	BlobFilterType(){}
+	virtual ~BlobFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const
+	{
+		if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
+		return new BlobFilter();
+	}
+};
+
+FilterType* _Wolframe::langbind::createBlobFilterType()
+{
+	return new BlobFilterType();
 }
 
-Filter* _Wolframe::langbind::createBlobFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
-{
-	return new Filter( createBlobFilter( name, arg));
-}
 

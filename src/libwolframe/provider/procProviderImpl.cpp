@@ -41,6 +41,7 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "module/customDataTypeBuilder.hpp"
+#include "module/filterBuilder.hpp"
 #include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
@@ -149,7 +150,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					try
 					{
-						m_programs->defineFilterConstructor( fltr);
+						langbind::FilterTypeR filtertype( fltr->object());
+						m_programs->defineFilterType( fltr->name(), filtertype);
 						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ")";
 					}
 					catch (const std::runtime_error& e)
@@ -245,8 +247,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						m_programs->defineNormalizeFunctionConstructor( constructor);
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function constructor for domain '" << constructor->domain() << "'";
+						module::NormalizeFunctionConstructor::FunctionTypeMap::const_iterator fi = constructor->functionmap().begin(), fe = constructor->functionmap().end();
+						for (; fi != fe; ++fi)
+						{
+							m_programs->defineNormalizeFunctionType( constructor->domain(), fi->first, fi->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << constructor->domain() << ":" << fi->first << "'";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -268,8 +274,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						m_programs->defineCustomDataTypeConstructor( constructor);
-						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type constructor for domain '" << constructor->domain() << "'";
+						module::CustomDataTypeConstructor::CustomDataTypeMap::const_iterator ti = constructor->typemap().begin(), te = constructor->typemap().end();
+						for (; ti != te; ++ti)
+						{
+							m_programs->defineCustomDataType( constructor->domain(), ti->first, ti->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->domain() << ":" << ti->first << "'";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -371,9 +381,9 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return rt;
 }
 
-const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::typeNormalizer( const std::string& name) const
 {
-	return m_programs->getNormalizeFunction( name);
+	return m_programs->getDDLTypeNormalizer( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const
@@ -403,7 +413,8 @@ static std::string filterargAsString( const std::vector<langbind::FilterArgument
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
 {
 	LOG_TRACE << "[provider] get filter '" << name << "(" << filterargAsString(arg) << ")'";
-	return m_programs->createFilter( name, arg);
+	const langbind::FilterType* filtertype = m_programs->getFilterType( name);
+	return filtertype->create( arg);
 }
 
 const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& domain, const std::string& name) const

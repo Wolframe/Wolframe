@@ -48,8 +48,7 @@ enum TokenType
 	TokenNextLine='.'
 };
 
-Filter createTokenFilter( const std::string& name, const std::vector<FilterArgument>& arg);
-Filter* createTokenFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
+FilterType* createTokenFilterType();
 
 }}//namespace
 #endif

@@ -36,16 +36,14 @@
 #ifndef _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "module/filterBuilder.hpp"
 #include "database/database.hpp"
 #include "langbind/cppFormFunction.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
+#include "langbind/formFunction.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
+#include "types/customDataType.hpp"
 #include "prgbind/program.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
-#include "module/customDataTypeBuilder.hpp"
-#include "langbind/formFunction.hpp"
 #include <string>
 #include <list>
 
@@ -66,24 +64,23 @@ public:
 	virtual void defineFormFunction( const std::string& name, langbind::FormFunctionR f);
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
-	virtual void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f);
-	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
-	virtual void defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f);
+	virtual void defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const;
+	virtual void defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& ftype);
+	virtual void defineCustomDataType( const std::string& namspace, const std::string& name, const types::CustomDataTypeR& t);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
-	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
+	virtual void defineFilterType( const std::string& name, const langbind::FilterTypeR& f);
 	virtual void defineProgramType( const ProgramR& prg);
 
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
-	virtual types::NormalizeFunction* createBaseNormalizeFunction( const std::string& domain, const std::string& name, const std::string& arg) const;
-	virtual const types::CustomDataType* getCustomDataType( const std::string& domain, const std::string& name) const;
+	virtual const types::CustomDataType* getCustomDataType( const std::string& namspace, const std::string& name) const;
+	virtual const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& namspace, const std::string& name) const;
 
 	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
 	virtual std::vector<std::string> getFormNames() const;
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
-	virtual const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
-	virtual langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
-	virtual bool existsFilter( const std::string& name) const;
+	virtual const types::NormalizeFunction* getDDLTypeNormalizer( const std::string& name) const;
+	virtual const langbind::FilterType* getFilterType( const std::string& name) const;
 
 	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
 

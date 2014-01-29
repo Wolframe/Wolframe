@@ -45,17 +45,14 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateNormalizeFunction>& functionmap_, types::CreateNormalizeResourceHandleFunction createResourceHandle)
+	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<types::NormalizeFunctionType>& functionmap_)
 		:m_classname(classname_)
 		,m_name(name_)
-		,m_resource(createResourceHandle?createResourceHandle():0)
 		,m_functionmap(functionmap_)
-		{}
+	{}
 
 	virtual ~NormalizeFunctionConstructor()
-	{
-		if (m_resource) delete m_resource;
-	}
+	{}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -67,16 +64,15 @@ public:
 		return m_classname;
 	}
 
-	virtual types::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
-	{
-		FunctionMap::const_iterator fi = m_functionmap.find( name_);
-		if (fi == m_functionmap.end()) return 0;
-		return fi->second( m_resource, arg_);
-	}
-
 	std::vector<std::string> functions() const
 	{
 		return m_functionmap.getkeys<std::vector<std::string> >();
+	}
+
+	typedef types::keymap<types::NormalizeFunctionType> FunctionTypeMap;
+	const FunctionTypeMap& functionmap() const
+	{
+		return m_functionmap;
 	}
 
 	const char* domain() const
@@ -87,9 +83,7 @@ public:
 private:
 	const char* m_classname;
 	const char* m_name;
-	types::NormalizeResourceHandle* m_resource;
-	typedef types::keymap<types::CreateNormalizeFunction> FunctionMap;
-	FunctionMap m_functionmap;
+	FunctionTypeMap m_functionmap;
 };
 
 
@@ -106,15 +100,19 @@ class NormalizeFunctionBuilder :public SimpleBuilder
 public:
 	//\brief Constructor
 	//\param[in] functions {0,0} terminated array of function definitions
-	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandleFunction createResourceHandle_=0)
+	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandle createResourceHandle=0)
 		:SimpleBuilder( classname_)
 		,m_name(name_)
-		,m_createResourceHandle(createResourceHandle_)
 	{
+		if (createResourceHandle)
+		{
+			m_resource.reset( createResourceHandle());
+		}
 		std::size_t fi = 0;
 		for (; functions[fi].name && functions[fi].createFunc; ++fi)
 		{
-			m_functionmap.insert( std::string(functions[fi].name), functions[fi].createFunc);
+			types::NormalizeFunctionType functype( functions[fi].createFunc, m_resource);
+			m_functionmap.insert( std::string(functions[fi].name), functype);
 		}
 	}
 
@@ -128,13 +126,13 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_name, m_functionmap, m_createResourceHandle);
+		return new NormalizeFunctionConstructor( m_className, m_name, m_functionmap);
 	}
 
 private:
 	const char* m_name;
-	types::keymap<types::CreateNormalizeFunction> m_functionmap;
-	types::CreateNormalizeResourceHandleFunction m_createResourceHandle;
+	types::keymap<types::NormalizeFunctionType> m_functionmap;
+	types::NormalizeResourceHandleR m_resource;
 };
 
 }}//namespace
