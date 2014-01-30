@@ -318,7 +318,7 @@ bool TransactionExecStatemachine_postgres::execute()
 	m_statement->substitute( );
 	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = dynamic_cast<PostgreSQLsubstitutingStatement *>( m_statement )->execute( );
+	m_lastresult = m_statement->execute( );
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)

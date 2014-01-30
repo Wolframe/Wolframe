@@ -77,15 +77,17 @@ void BaseStatement::clear( )
 	m_nativeStmt.clear( );
 	m_usedIdx.reserve( 32 );
 	std::fill_n( m_usedIdx.begin( ), 32, false );
+	m_setIdx.reserve( 32 );
+	std::fill_n( m_setIdx.begin( ), 32, false );
 }
 
 void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value*/ )
 {
 	if( idx < 1 || idx > m_maxParam ) {
 		throw std::runtime_error(
-			"index of bind parameter is out of range " +
+			"index of bind parameter is out of range, " +
 			boost::lexical_cast<std::string>( idx ) +
-			" required to be in range 1.." +
+			" is required to be in the range of 1.." +
 			boost::lexical_cast<std::string>( m_maxParam ) +
 			" in statement '" + originalSQL( ) + "'"
 		);
@@ -97,6 +99,14 @@ void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value
 			" in statement '" + originalSQL( ) + "'"			
 		);
 	}
+	if( m_setIdx[idx] ) {
+		throw std::runtime_error(
+			"setting value for already defined index " +
+			boost::lexical_cast<std::string>( idx ) +
+			" in statement '" + originalSQL( ) + "'"			
+		);
+	}
+	m_setIdx[idx] = true;
 }
 
 const std::string BaseStatement::originalSQL( ) const
@@ -161,10 +171,16 @@ void BaseStatement::parse( )
 
 			if( idx > m_maxParam ) {
 				m_usedIdx.reserve( idx + 1 );
-				std::fill_n( m_usedIdx.begin( ), idx+1, false );
+				for( unsigned int i = m_maxParam + 1; i < idx; i++ ) {
+					m_usedIdx[i] = false;
+				}
+				m_setIdx.reserve( idx + 1 );
+				for( unsigned int i = m_maxParam + 1; i < idx; i++ ) {
+					m_setIdx[i] = false;
+				}
+				m_maxParam = idx;
 			}
 			m_usedIdx[idx] = true;
-			m_maxParam = idx;
 
 			chunkstart = si;
 						
@@ -183,6 +199,13 @@ void BaseStatement::substitute( )
 	for( ; di != de; di++ ) {
 		if( di->first ) {
 			// a placeholder
+			if( !m_setIdx[ di->first ] ) {
+				throw std::runtime_error(
+					"requested uninitialized data for index " +
+					boost::lexical_cast<std::string>( di->first ) +
+					" in statement '" + originalSQL( ) + "'"			
+				);
+			}
 			m_nativeStmt.append( replace( di->first ) );
 		} else {
 			// a chunk of normal SQL statement

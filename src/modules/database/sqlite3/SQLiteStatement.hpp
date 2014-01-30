@@ -51,8 +51,13 @@ class SQLiteStatement : public BaseStatement
 
 		virtual const std::string replace( const unsigned int idx ) const;
 
-		//\brief Executes the statement with parameters
-		sqlite3_stmt *execute( ) const;
+		void setStatement( sqlite3_stmt *stm );
+		
+		int getLastStatus( );
+	
+	private:
+		sqlite3_stmt *m_stm;
+		int m_rc;
 };
 
 }}//namespace

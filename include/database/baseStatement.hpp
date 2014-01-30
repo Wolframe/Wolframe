@@ -79,6 +79,7 @@ class BaseStatement : public Statement
 		std::vector<Element> m_data;
 		std::string m_nativeStmt;
 		std::vector<bool> m_usedIdx;
+		std::vector<bool> m_setIdx;
 };
 
 }}//namespace

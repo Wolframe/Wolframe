@@ -1,6 +1,8 @@
 #include "SQLiteStatement.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include "logger-v1.hpp"
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -15,18 +17,95 @@ SQLiteStatement::SQLiteStatement( const SQLiteStatement &o )
 {
 }
 
-void SQLiteStatement::bind( const unsigned int idx, const types::Variant &arg )
+void SQLiteStatement::setStatement( sqlite3_stmt *stm )
+{
+	m_stm = stm;
+}
+
+int SQLiteStatement::getLastStatus( )
+{
+	return m_rc;
+}
+
+static int wrap_sqlite3_bind_text( sqlite3_stmt* stm, int idx, const char* s, int n, void(*f)(void*))
+{
+	int rt = sqlite3_bind_text( stm, idx, s, n, f);
+	LOG_DATA << "call sqlite3_bind_text " << idx << " '" << ((n<0)?std::string(s):std::string(s,n)) << "' returns " << rt;
+	return rt;
+}
+static int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
+{
+	int rt = sqlite3_bind_int( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_int " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+static int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, types::Variant::Data::Int val)
+{
+	int rt = sqlite3_bind_int64( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_int64 " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+static int wrap_sqlite3_bind_double( sqlite3_stmt* stm, int idx, double val)
+{
+	int rt = sqlite3_bind_double( stm, idx, val);
+	LOG_DATA << "call sqlite3_bind_double " << idx << " " << val << " returns " << rt;
+	return rt;
+}
+static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
+{
+	int rt = sqlite3_bind_null( stm, idx);
+	LOG_DATA << "call sqlite3_bind_null " << idx << " returns " << rt;
+	return rt;
+}
+
+void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value )
 {
 	// does boundary checking
-	BaseStatement::bind( idx, arg );
+	BaseStatement::bind( idx, value );
+
+	switch (value.type())
+	{
+		case types::Variant::Null:
+			wrap_sqlite3_bind_null( m_stm, (int)idx);
+			break;
+			
+		case types::Variant::Bool:
+			wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool());
+			break;
+			
+		case types::Variant::Int:
+			wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint());
+			break;
+			
+		case types::Variant::UInt:
+			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
+			{
+				wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint());
+			}
+			else
+			{
+				std::string strval( value.tostring());
+				wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC);
+			}
+			break;
+			
+		case types::Variant::Double:
+			wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble());
+			break;
+			
+		case types::Variant::String:
+			wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC);
+			break;
+			
+		case types::Variant::Custom:
+			throw std::logic_error( "Binding custom types is not supported yet!" );
+
+		default:
+			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
+	}
 }
 
 const std::string SQLiteStatement::replace( const unsigned int idx ) const
 {
 	return "$" + boost::lexical_cast< std::string >( idx );
 }
-
-sqlite3_stmt *SQLiteStatement::execute( ) const
-{
-}
-

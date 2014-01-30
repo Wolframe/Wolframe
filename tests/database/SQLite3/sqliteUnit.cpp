@@ -120,6 +120,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 
 	// ok transaction create table statement with commit
 	trans->begin( );
+	trans->executeStatement( "DROP TABLE IF EXISTS TestTest;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL );");
 	trans->commit( );
 
