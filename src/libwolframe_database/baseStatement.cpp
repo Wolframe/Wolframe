@@ -75,10 +75,8 @@ void BaseStatement::clear( )
 	m_maxParam = 0;
 	m_data.clear();
 	m_nativeStmt.clear( );
-	m_usedIdx.reserve( 32 );
-	std::fill_n( m_usedIdx.begin( ), 32, false );
-	m_setIdx.reserve( 32 );
-	std::fill_n( m_setIdx.begin( ), 32, false );
+	m_usedIdx.reset( );
+	m_setIdx.reset( );
 }
 
 void BaseStatement::bind( const unsigned int idx, const types::Variant & /*value*/ )
@@ -169,18 +167,11 @@ void BaseStatement::parse( )
 				}
 			}
 
-			if( idx > m_maxParam ) {
-				m_usedIdx.reserve( idx + 1 );
-				for( unsigned int i = m_maxParam + 1; i < idx; i++ ) {
-					m_usedIdx[i] = false;
-				}
-				m_setIdx.reserve( idx + 1 );
-				for( unsigned int i = m_maxParam + 1; i < idx; i++ ) {
-					m_setIdx[i] = false;
-				}
-				m_maxParam = idx;
+			if( idx > 32 ) {
+				throw std::logic_error( "More than 32 parameters are not supported!" );
 			}
-			m_usedIdx[idx] = true;
+			m_usedIdx.set( idx );
+			m_maxParam = idx;
 
 			chunkstart = si;
 						

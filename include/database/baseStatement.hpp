@@ -39,8 +39,8 @@
 
 #include "database/statement.hpp"
 
-#include <utility>
 #include <vector>
+#include <bitset>
 
 namespace _Wolframe {
 namespace db {
@@ -78,8 +78,8 @@ class BaseStatement : public Statement
 		typedef std::pair<unsigned int, std::string> Element;
 		std::vector<Element> m_data;
 		std::string m_nativeStmt;
-		std::vector<bool> m_usedIdx;
-		std::vector<bool> m_setIdx;
+		std::bitset<32> m_usedIdx;
+		std::bitset<32> m_setIdx;
 };
 
 }}//namespace
