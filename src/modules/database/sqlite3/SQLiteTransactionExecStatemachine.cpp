@@ -278,7 +278,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 	try {
 		m_statement->bind( idx, value );
 		int rc = m_statement->getLastStatus( );
-		status( rc, CommandReady );
+		return status( rc, CommandReady );
 	} catch( const std::runtime_error &e ) {
 		return errorStatus( e.what( ) );
 	}

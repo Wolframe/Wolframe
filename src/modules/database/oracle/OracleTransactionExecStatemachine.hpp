@@ -38,6 +38,7 @@
 #include "database/statement.hpp"
 #include "database/databaseError.hpp"
 #include "Oracle.hpp"
+#include "OracleStatement.hpp"
 #include "types/keymap.hpp"
 #include <string>
 #include <vector>
@@ -135,7 +136,7 @@ private:
 	std::vector<OracleColumnDescriptionPtr> m_colDescr; // array of column descriptors
 	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	Statement *m_statement;
+	OracleStatement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
 	OracleDbUnit* m_dbUnit;

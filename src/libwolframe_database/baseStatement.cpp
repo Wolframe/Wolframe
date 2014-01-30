@@ -154,7 +154,7 @@ void BaseStatement::parse( )
 				idx += ( *si - '0' );
 			}
 			if( idx == 0 ) {
-				if( se == se ) {
+				if( si == se ) {
 					throw std::runtime_error( "illegal parameter index (lonely $ at the end) in statement'" +
 						originalSQL( ) + "'" );
 				} else if( isalpha( *si ) ) {
@@ -165,7 +165,7 @@ void BaseStatement::parse( )
 						originalSQL( ) + "'" );
 				} else {
 					throw std::runtime_error( "illegal parameter index seen statement '" +
-					originalSQL( ) + "' at position " + boost::lexical_cast<std::string>( se -si ) );
+					originalSQL( ) + "'" );
 				}
 			}
 
@@ -185,6 +185,8 @@ void BaseStatement::parse( )
 			chunkstart = si;
 						
 			m_data.push_back( Element( idx, "" ) );
+			
+			if( si == se ) break;
 		}
 	}
 	if( si > chunkstart ) {

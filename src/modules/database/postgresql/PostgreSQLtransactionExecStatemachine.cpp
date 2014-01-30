@@ -295,8 +295,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 	try {
 		m_statement->bind( idx, value );
 	} catch( const std::runtime_error &e ) {
-		errorStatus( e.what( ) );
-		return false;
+		return errorStatus( e.what( ) );
 	}
 	
 	m_state = CommandReady;

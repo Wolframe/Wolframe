@@ -255,25 +255,12 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	m_statement->bind( idx, value );
-	//~ if (value.defined())
-	//~ {
-		//~ // TODO: replace this with OracleStatement.. use type binding..
-		//~ if( value.type( ) == types::Variant::Bool ) {
-			//~ // TODO: hard-wired to a NUMBER(1) with 0 and 1 for now
-			//~ if( value.tobool( ) ) {
-				//~ m_statement.bind( idx, "1" );
-			//~ } else {
-				//~ m_statement.bind( idx, "0" );
-			//~ }
-		//~ } else {
-			//~ m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
-		//~ }
-	//~ }
-	//~ else
-	//~ {
-		//~ m_statement.bind( idx, "NULL");
-	//~ }
+
+	try {
+		m_statement->bind( idx, value );
+	} catch( const std::runtime_error &e ) {
+		return errorStatus( e.what( ) );
+	}
 	
 	m_state = CommandReady;
 	return true;

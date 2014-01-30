@@ -66,35 +66,35 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 	switch (value.type())
 	{
 		case types::Variant::Null:
-			wrap_sqlite3_bind_null( m_stm, (int)idx);
+			m_rc = wrap_sqlite3_bind_null( m_stm, (int)idx);
 			break;
 			
 		case types::Variant::Bool:
-			wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool());
+			m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool());
 			break;
 			
 		case types::Variant::Int:
-			wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint());
+			m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint());
 			break;
 			
 		case types::Variant::UInt:
 			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
 			{
-				wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint());
+				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint());
 			}
 			else
 			{
 				std::string strval( value.tostring());
-				wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC);
+				m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC);
 			}
 			break;
 			
 		case types::Variant::Double:
-			wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble());
+			m_rc = wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble());
 			break;
 			
 		case types::Variant::String:
-			wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC);
+			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC);
 			break;
 			
 		case types::Variant::Custom:
