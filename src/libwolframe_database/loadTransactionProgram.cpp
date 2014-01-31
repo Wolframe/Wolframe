@@ -434,6 +434,10 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, ci, ce);
 				paramlist.push_back( param);
 			}
+			else if (ch == ')' || ch == ',')
+			{
+				throw std::runtime_error( std::string("parameter expected before '") + (char)ch + "'");
+			}
 			else
 			{
 				Call::Param param = parsePathParameter( langdescr, ci, ce);
