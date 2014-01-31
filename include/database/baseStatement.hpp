@@ -73,13 +73,16 @@ class BaseStatement : public Statement
 
 	private:
 		void parse( );
+
+	public:
+		enum { MaxNofParams = 32 };
 		
 	private:
 		typedef std::pair<unsigned int, std::string> Element;
 		std::vector<Element> m_data;
 		std::string m_nativeStmt;
-		std::bitset<32> m_usedIdx;
-		std::bitset<32> m_setIdx;
+		std::bitset<MaxNofParams> m_usedIdx;
+		std::bitset<MaxNofParams> m_setIdx;
 };
 
 }}//namespace

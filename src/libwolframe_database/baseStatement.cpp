@@ -167,8 +167,8 @@ void BaseStatement::parse( )
 				}
 			}
 
-			if( idx > 32 ) {
-				throw std::logic_error( "More than 32 parameters are not supported!" );
+			if( idx > MaxNofParams ) {
+				throw std::logic_error( "More than " + boost::lexical_cast<std::string>( MaxNofParams ) + " parameters are not supported!" );
 			}
 			m_usedIdx.set( idx );
 			m_maxParam = idx;
