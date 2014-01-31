@@ -35,16 +35,6 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_INTEGER_HPP_INCLUDED
 #define _Wolframe_TYPES_INTEGER_HPP_INCLUDED
 
-#ifdef SUNOS
-#include <inttypes.h>
-
-#define _WOLFRAME_INTEGER		::int64_t
-#define _WOLFRAME_UINTEGER		::uint64_t
-
-#define _WOLFRAME_INTEGER_DIGITS	10
-#define _WOLFRAME_UINTEGER_DIGITS	10
-
-#else
 #include <boost/cstdint.hpp>
 
 #define _WOLFRAME_INTEGER		boost::int64_t
@@ -52,7 +42,5 @@ Project Wolframe.
 
 #define _WOLFRAME_INTEGER_DIGITS	19
 #define _WOLFRAME_UINTEGER_DIGITS	20
-
-#endif
 
 #endif
