@@ -41,6 +41,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cfloat>
+#include <stdint.h>
 
 using namespace _Wolframe;
 using namespace types;
@@ -131,6 +132,28 @@ TEST( variantTypeFixture, illegal_values )
 	
 	Variant v2( DBL_MAX );
 	EXPECT_THROW( v2.touint( ), boost::numeric::bad_numeric_cast );
+}
+
+template <typename T>
+bool CheckIfDataIsAligned( T *p )
+{
+	if( ( (uintptr_t)p % __alignof( T ) ) == 0 ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+TEST( variantTypeFixture, alignment )
+{
+	Variant *v = new Variant( "222" );
+	_WOLFRAME_UINTEGER i = v->touint( );
+	ASSERT_EQ( i, 222 );
+
+	std::cout << "sizeof( boost::int64_t )" << sizeof( boost::int64_t ) << std::endl;
+	std::cout << "sizeof( Variant ) " << sizeof( Variant ) << std::endl;
+	std::cout << "__alignof( Variant ) " << __alignof( Variant ) << std::endl;
+	ASSERT_TRUE( CheckIfDataIsAligned( v ) );
 }
 
 int main( int argc, char **argv )
