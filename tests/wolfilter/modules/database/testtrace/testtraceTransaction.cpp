@@ -150,7 +150,14 @@ static void printTransactionInput( std::ostream& out, const TransactionInput& in
 			switch (ai->type())
 			{
 				case TransactionInput::Command::Argument::ResultColumn:
-					out << "#[" << ai->value().touint() << "]";
+					if (ai->scope_functionidx() >= 0)
+					{
+						out << "#[" << ai->scope_functionidx() << "." << ai->value().touint() << "]";
+					}
+					else
+					{
+						out << "#[" << ai->value().touint() << "]";
+					}
 					break;
 				case TransactionInput::Command::Argument::Value:
 					if (ai->value().defined())
