@@ -154,7 +154,17 @@ TEST( variantTypeFixture, alignment )
 	std::cout << "sizeof( Variant ) " << sizeof( Variant ) << std::endl;
 	std::cout << "__alignof( Variant ) " << __alignof( Variant ) << std::endl;
 	ASSERT_TRUE( CheckIfDataIsAligned( v ) );
+	std::cout << "v" << v << std::endl;
+	std::cout << "v.m_data " << &v->data( ) << std::endl;
 
+	Variant vstack( "222" );
+	_WOLFRAME_UINTEGER istack = vstack.touint( );
+	ASSERT_EQ( istack, 222 );
+
+	ASSERT_TRUE( CheckIfDataIsAligned( &vstack ) );
+	std::cout << "vstack " << &vstack << std::endl;
+	std::cout << "vstack.m_data " << &vstack.data( ) << std::endl;
+	
 	delete v;
 }
 
