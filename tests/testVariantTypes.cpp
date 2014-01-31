@@ -41,6 +41,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cfloat>
+#include <stdint.h>
 
 using namespace _Wolframe;
 using namespace types;
@@ -131,6 +132,54 @@ TEST( variantTypeFixture, illegal_values )
 	
 	Variant v2( DBL_MAX );
 	EXPECT_THROW( v2.touint( ), boost::numeric::bad_numeric_cast );
+}
+
+// Microsoft compilers used to have a bug in __alignof!
+#ifdef _MSC_VER
+#define ALIGNOF( T ) ( sizeof( T ) - sizeof( T ) + __alignof( T ) )
+#else
+#if __GNUC__
+#define ALIGNOF( T ) __alignof( T )
+#else
+#error No alignof for this compiler!
+#endif
+#endif
+
+template <typename T>
+bool CheckIfDataIsAligned( T *p )
+{
+	if( ( (uintptr_t)p % ALIGNOF( T ) ) == 0 ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+TEST( variantTypeFixture, alignment )
+{
+	Variant *v = new Variant( "222" );
+	_WOLFRAME_UINTEGER i = v->touint( );
+	ASSERT_EQ( i, 222 );
+
+	std::cout << "sizeof( boost::int64_t )" << sizeof( boost::int64_t ) << std::endl;
+	std::cout << "sizeof( Variant ) " << sizeof( Variant ) << std::endl;
+	std::cout << "__alignof( Variant ) " << __alignof( Variant ) << std::endl;
+	std::cout << "v" << v << std::endl;
+	std::cout << "v.m_data " << &v->data( ) << std::endl;
+
+	Variant vstack( "222" );
+	_WOLFRAME_UINTEGER istack = vstack.touint( );
+	ASSERT_EQ( istack, 222 );
+
+	std::cout << "vstack " << &vstack << std::endl;
+	std::cout << "vstack.m_data " << &vstack.data( ) << std::endl;
+
+	ASSERT_TRUE( CheckIfDataIsAligned( v ) );
+#ifndef _WIN32
+	ASSERT_TRUE( CheckIfDataIsAligned( &vstack ) );
+#endif
+	
+	delete v;
 }
 
 int main( int argc, char **argv )
