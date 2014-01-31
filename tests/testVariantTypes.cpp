@@ -138,7 +138,7 @@ TEST( variantTypeFixture, illegal_values )
 #ifdef _MSC_VER
 #define ALIGNOF( T ) ( sizeof( T ) - sizeof( T ) + __alignof( T ) )
 #else
-#if __GNUCC__
+#if __GNUC__
 #define ALIGNOF( T ) __alignof( T )
 #else
 #error No alignof for this compiler!
