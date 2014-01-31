@@ -154,6 +154,8 @@ TEST( variantTypeFixture, alignment )
 	std::cout << "sizeof( Variant ) " << sizeof( Variant ) << std::endl;
 	std::cout << "__alignof( Variant ) " << __alignof( Variant ) << std::endl;
 	ASSERT_TRUE( CheckIfDataIsAligned( v ) );
+
+	delete v;
 }
 
 int main( int argc, char **argv )
