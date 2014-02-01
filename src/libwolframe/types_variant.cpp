@@ -72,7 +72,7 @@ void Variant::release()
 	{
 		if (m_type == String && m_data.value.String)
 		{
-			wolframe_free( m_data.value.String);
+			std::free( m_data.value.String);
 			std::memset( this, 0, sizeof( *this));
 		}
 		else if (m_type == Custom && m_data.value.Custom)
@@ -115,7 +115,7 @@ void Variant::initString( const char* str_, std::size_t strsize_)
 	std::memset( this, 0, sizeof( *this));
 	m_type = String;
 	m_data.dim.size = strsize_;
-	m_data.value.String = (char*)wolframe_malloc( strsize_+1);
+	m_data.value.String = (char*)std::malloc( strsize_+1);
 	if (!m_data.value.String) throw std::bad_alloc();
 	std::memcpy( m_data.value.String, str_, strsize_);
 	m_data.value.String[ strsize_] = 0;
