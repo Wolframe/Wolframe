@@ -48,15 +48,28 @@ class OracleStatement : public BaseStatement
 		OracleStatement( const OracleStatement &o );
 		OracleStatement( OracleEnvirenment *env );
 
-		virtual void bind( const unsigned int idx, const types::Variant &arg );
+		virtual void bind( const unsigned int idx, const types::Variant &value );
 
 		virtual const std::string replace( const unsigned int idx ) const;
 
-		//\brief Executes the statement with parameters
-		OCIStmt *execute( ) const;
+		void setConnection( OracleConnection *conn );
+		void setStatement( OCIStmt *stmt );
+		
+		sword getLastStatus( );
 
 	private:
-		OracleEnvirenment *m_env;		
+		void bindInt( const unsigned int idx, _WOLFRAME_INTEGER value );
+		void bindUInt( const unsigned int idx, _WOLFRAME_UINTEGER value );
+		void bindBool( const unsigned int idx, bool value );
+		void bindDouble( const unsigned int idx, double value );
+		void bindString( const unsigned int idx, const char* value, std::size_t size );
+		void bindNull( const unsigned int idx );
+	
+	private:
+		OracleEnvirenment *m_env;
+		OracleConnection *m_conn;
+		OCIStmt *m_stmt;
+		sword m_status;	
 };
 
 }}//namespace

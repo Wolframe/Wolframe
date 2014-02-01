@@ -244,7 +244,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& statement)
 
 	int rc = wrap_sqlite3_prepare_v2( **m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
 	m_statement->init( m_curstm);
-	m_statement->setStatement( m_stm );
+	static_cast<SQLiteStatement *>( m_statement )->setStatement( m_stm );
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -277,7 +277,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 
 	try {
 		m_statement->bind( idx, value );
-		int rc = m_statement->getLastStatus( );
+		int rc = static_cast<SQLiteStatement *>( m_statement )->getLastStatus( );
 		return status( rc, CommandReady );
 	} catch( const std::runtime_error &e ) {
 		return errorStatus( e.what( ) );

@@ -106,6 +106,9 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 		case types::Variant::Custom:
 			throw std::logic_error( "Custom type in PostgreSQL database module not supported yet!");
 			break;
+		
+		default:
+			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}
 }
 

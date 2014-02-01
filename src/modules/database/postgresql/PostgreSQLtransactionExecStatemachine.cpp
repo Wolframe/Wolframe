@@ -216,7 +216,7 @@ bool TransactionExecStatemachine_postgres::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbunit->newConnection();
-	dynamic_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn );
+	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn );
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
@@ -324,7 +324,7 @@ bool TransactionExecStatemachine_postgres::execute()
 	m_statement->substitute( );
 	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = dynamic_cast<STATEMENT_CLASS *>( m_statement )->execute( );
+	m_lastresult = static_cast<STATEMENT_CLASS *>( m_statement )->execute( );
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)

@@ -174,6 +174,7 @@ bool TransactionExecStatemachine_oracle::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbUnit->newConnection();
+	static_cast<OracleStatement *>( m_statement )->setConnection( m_conn->object( ) );
 
 	return status( OCITransStart( (*m_conn)->svchp, (*m_conn)->errhp, (uword)0, (ub4)OCI_TRANS_NEW ), Transaction );
 }
@@ -258,6 +259,8 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 
 	try {
 		m_statement->bind( idx, value );
+		sword status_ = static_cast<OracleStatement *>( m_statement )->getLastStatus( );
+		if( !status( status_, CommandReady ) ) return false;
 	} catch( const std::runtime_error &e ) {
 		return errorStatus( e.what( ) );
 	}
@@ -278,7 +281,7 @@ bool TransactionExecStatemachine_oracle::execute()
 		m_lastresult = 0;
 	}
 	m_statement->substitute( );
-	std::string stmstr = m_statement->originalSQL();
+	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
 
 	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
@@ -291,6 +294,8 @@ bool TransactionExecStatemachine_oracle::execute()
 		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
 	rt = status( status_, Executed );
 	if( !rt ) return rt;
+	
+	static_cast<OracleStatement *>( m_statement )->setStatement( m_lastresult );
 
 	// find out whether we have results in this statement
 	// TODO: is there another/better way to do this?

@@ -136,7 +136,7 @@ private:
 	std::vector<OracleColumnDescriptionPtr> m_colDescr; // array of column descriptors
 	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	OracleStatement *m_statement;
+	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
 	OracleDbUnit* m_dbUnit;
