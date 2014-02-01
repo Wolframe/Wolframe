@@ -45,17 +45,18 @@ namespace db {
 class PostgreSQLstatement : public BaseStatement
 {
 public:
-	enum {MaxNofParam=99};
-
 	PostgreSQLstatement();
 	PostgreSQLstatement( const PostgreSQLstatement& o);
 
-	//\brief Executes the statement with the bound parameters on connection 'conn'
-	PGresult* execute( PGconn *conn) const;
+	void setConnection( PGconn *conn );
+		
+	PGresult* execute( ) const;
 
 	virtual void clear( );
 
 	virtual void bind( const unsigned int idx, const types::Variant &value );
+
+	virtual const std::string replace( const unsigned int idx ) const;
 
 private:
 	//\remark See implementation of pq_sendint64
@@ -76,18 +77,19 @@ private:
 
 	struct Params
 	{
-		const char* paramar[MaxNofParam];
+		const char* paramar[MaxNofParams];
 		int paramarsize;
 	};
 	void getParams( Params& params) const;
 
 private:
-	int m_paramofs[ MaxNofParam];
-	const char* m_paramtype[ MaxNofParam];
-	int m_paramlen[ MaxNofParam];
-	int m_parambinary[ MaxNofParam];
+	int m_paramofs[ MaxNofParams];
+	const char* m_paramtype[ MaxNofParams];
+	int m_paramlen[ MaxNofParams];
+	int m_parambinary[ MaxNofParams];
 	int m_paramarsize;
 	std::string m_buf;
+	PGconn *m_conn;
 };
 
 

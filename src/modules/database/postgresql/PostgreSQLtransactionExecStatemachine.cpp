@@ -35,7 +35,14 @@
 
 #include "PostgreSQLtransactionExecStatemachine.hpp"
 #include "PostgreSQL.hpp"
+#undef SUBSTITUTE_STATEMENT
+#ifdef SUBSTITUTE_STATEMENT
 #include "PostgreSQLsubstitutingStatement.hpp"
+#define STATEMENT_CLASS PostgreSQLsubstitutingStatement
+#else
+#include "PostgreSQLstatement.hpp"
+#define STATEMENT_CLASS PostgreSQLstatement
+#endif
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -52,7 +59,7 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( cons
 	:TransactionExecStatemachine(name_)
 	,m_state(Init)
 	,m_lastresult(0)
-	,m_statement( new PostgreSQLsubstitutingStatement( ) )
+	,m_statement( new STATEMENT_CLASS( ) )
 	,m_nof_rows(0)
 	,m_idx_row(0)
 	,m_hasResult(false)
@@ -209,7 +216,7 @@ bool TransactionExecStatemachine_postgres::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbunit->newConnection();
-	dynamic_cast<PostgreSQLsubstitutingStatement *>( m_statement )->setConnection( **m_conn );
+	dynamic_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn );
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
@@ -317,7 +324,7 @@ bool TransactionExecStatemachine_postgres::execute()
 	m_statement->substitute( );
 	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = m_statement->execute( );
+	m_lastresult = dynamic_cast<STATEMENT_CLASS *>( m_statement )->execute( );
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)

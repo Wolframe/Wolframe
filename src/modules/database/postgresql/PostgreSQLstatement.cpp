@@ -1,6 +1,7 @@
 #include "PostgreSQLstatement.hpp"
 #include "types/variant.hpp"
 #include <boost/cstdint.hpp>
+#include <boost/lexical_cast.hpp>
 #include <cstring>
 #include <stdint.h>
 #include <libpq-fe.h>
@@ -20,6 +21,7 @@ PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
 	:BaseStatement( o)
 	,m_paramarsize(o.m_paramarsize)
 	,m_buf(o.m_buf)
+	,m_conn( 0 )
 {
 	std::memcpy( m_paramofs, o.m_paramofs, m_paramarsize * sizeof(*m_paramofs));
 	std::memcpy( m_paramtype, o.m_paramtype, m_paramarsize * sizeof(*m_paramtype));
@@ -28,7 +30,9 @@ PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
 
 PostgreSQLstatement::PostgreSQLstatement()
 	:BaseStatement()
-	,m_paramarsize(0){}
+	,m_paramarsize(0)
+	,m_conn(0)
+	{}
 
 
 void PostgreSQLstatement::clear()
@@ -38,12 +42,17 @@ void PostgreSQLstatement::clear()
 	m_buf.clear();
 }
 
+void PostgreSQLstatement::setConnection( PGconn *conn )
+{
+	m_conn = conn;
+}
+
 void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& value)
 {
+	// does boundary checking
+	BaseStatement::bind( idx, value );
+	
 	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
-
-	// the MaxNofParam is a limitation of this class, doing it here..
-	if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
 
 	switch (value.type())
 	{
@@ -151,7 +160,7 @@ void PostgreSQLstatement::bindByte( boost::int8_t value)
 
 void PostgreSQLstatement::bindBool( bool value)
 {
-	bindByte( value?1:0, "uint1");
+	bindByte( value?1:0, "bool");
 }
 
 //\remark See implementation of pq_sendfloat8
@@ -174,10 +183,6 @@ void PostgreSQLstatement::bindString( const char* value, std::size_t size)
 
 void PostgreSQLstatement::bindNull()
 {
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
 	m_paramofs[ m_paramarsize] = 0;
 	m_paramtype[ m_paramarsize] = 0;
 	m_paramlen[ m_paramarsize] = 0;
@@ -187,10 +192,6 @@ void PostgreSQLstatement::bindNull()
 
 void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, const char* type)
 {
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
 	m_paramofs[ m_paramarsize] = m_buf.size();
 	m_paramtype[ m_paramarsize] = type;
 	m_paramlen[ m_paramarsize] = size;
@@ -216,32 +217,30 @@ void PostgreSQLstatement::getParams( Params& params) const
 	}
 }
 
-PGresult* PostgreSQLstatement::execute( PGconn *conn) const
+PGresult* PostgreSQLstatement::execute( ) const
 {
 	std::string command = nativeSQL();
 	Params params;
 	getParams( params);
 
+	// KLUDGE: format text for now as the parser in the state machine
+	// expects it!
 	return PQexecParams(
-			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
-			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
+			m_conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
+			params.paramar, m_paramlen, m_parambinary, 0);
 }
 
-// goes to 
-//~ const std::string PostgreSqlstatement::replace( unsigned int idx )
-			//~ if (idx > m_maxparam) m_maxparam = idx;
-			//~ if (m_paramtype[ idx-1])
-			//~ {
-				//~ rt.append( "$");
-				//~ rt.append( chunkstart, si);
-				//~ if (m_paramtype[ idx-1][0])
-				//~ {
-					//~ rt.append( "::");
-					//~ rt.append( m_paramtype[ idx-1]);
-				//~ }
-			//~ }
-			//~ else
-			//~ {
-				//~ rt.append( "NULL");
-			//~ }
+const std::string PostgreSQLstatement::replace( const unsigned int idx ) const
+{
+	std::string rt;
+	
+	rt.append( "$" );
+	rt.append( boost::lexical_cast< std::string >( idx ) );
+	if( m_paramtype[idx-1] && m_paramtype[idx-1][0] ) {
+		rt.append( "::" );
+		rt.append( m_paramtype[idx-1] );
+	}
+	
+	return rt;
+}
 			
