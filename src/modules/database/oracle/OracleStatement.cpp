@@ -92,13 +92,19 @@ void OracleStatement::bindString( const unsigned int idx, const char* value, con
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)value, (sb4)size+1,
-		SQLT_STR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)idx, (dvoid *)value, (sb4)size,
+		SQLT_CHR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
 void OracleStatement::bindNull( const unsigned int idx )
 {
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)0, (sb4)0,
+		SQLT_CHR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
 void OracleStatement::bind( const unsigned int idx, const types::Variant &value )
@@ -142,25 +148,6 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}
-
-	//~ if (value.defined())
-	//~ {
-		//~ // TODO: replace this with OracleStatement.. use type binding..
-		//~ if( value.type( ) == types::Variant::Bool ) {
-			//~ // TODO: hard-wired to a NUMBER(1) with 0 and 1 for now
-			//~ if( value.tobool( ) ) {
-				//~ m_statement.bind( idx, "1" );
-			//~ } else {
-				//~ m_statement.bind( idx, "0" );
-			//~ }
-		//~ } else {
-			//~ m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
-		//~ }
-	//~ }
-	//~ else
-	//~ {
-		//~ m_statement.bind( idx, "NULL");
-	//~ }
 }
 
 const std::string OracleStatement::replace( const unsigned int idx ) const
