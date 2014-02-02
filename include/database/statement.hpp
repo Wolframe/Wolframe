@@ -70,7 +70,7 @@ class Statement
 
 		//\remark Trigger substitution (nativeSQL is valid after
 		//        this call and not before!)
-		virtual void substitute( ) = 0;
+		virtual void substitute( bool withPlaceholders = true ) = 0;
 
 		//\remark Funtion called when the placeholder should be put
 		//        into the final string (this is either for subsituting

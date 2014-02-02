@@ -238,7 +238,31 @@ bool TransactionExecStatemachine_oracle::start( const std::string& statement)
 	}
 	clear();
 	m_statement->init( statement);
-	m_state = CommandReady;
+
+	if (m_lastresult)
+	{
+		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
+		m_lastresult = 0;
+	}
+
+	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
+		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+	bool rt = status( status_, CommandReady );
+	if( !rt ) return rt;
+
+	// we must do it here otherwise bind doesn't know about the placeholders,
+	// this also means we must NOT depend on anything when generating our
+	// native SQL placeholders but the current index!
+	m_statement->substitute( false );
+	std::string stmstr = m_statement->nativeSQL();
+	status_ = OCIStmtPrepare( m_lastresult, (*m_conn)->errhp, 
+		(text *)const_cast<char *>( stmstr.c_str( ) ),
+		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+	rt = status( status_, CommandReady );
+	if( !rt ) return rt;
+
+	static_cast<OracleStatement *>( m_statement )->setStatement( m_lastresult );
+
 	return true;
 }
 
@@ -275,43 +299,21 @@ bool TransactionExecStatemachine_oracle::execute()
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_lastresult)
-	{
-		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
-		m_lastresult = 0;
-	}
-	m_statement->substitute( );
+
+	m_statement->substitute( true );
 	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
-
-	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
-		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
-	bool rt = status( status_, Executed );
-	if( !rt ) return rt;
-
-	status_ = OCIStmtPrepare( m_lastresult, (*m_conn)->errhp, 
-		(text *)const_cast<char *>( stmstr.c_str( ) ),
-		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
-	rt = status( status_, Executed );
-	if( !rt ) return rt;
 	
-	static_cast<OracleStatement *>( m_statement )->setStatement( m_lastresult );
-
 	// find out whether we have results in this statement
 	// TODO: is there another/better way to do this?
 	ub2 stmtTypehp;
-	status_ = OCIAttrGet( m_lastresult, OCI_HTYPE_STMT,
+	sword status_ = OCIAttrGet( m_lastresult, OCI_HTYPE_STMT,
 		(dvoid *)&stmtTypehp, (ub4 *)0, (ub4)OCI_ATTR_STMT_TYPE,
 		(*m_conn)->errhp );
-	rt = status( status_, Executed );
+	bool rt = status( status_, Executed );
 	if( !rt ) return rt;
 
 	m_hasResult = ( stmtTypehp == OCI_STMT_SELECT );
-
-	// TODO: here I would like to bind a parameter of type variant
-	// as a bind parameter, I would also like to prepare the statement
-	// above only once. Currently they are escaped and mapped into
-	// an expanded statement.
 
 	status_ = OCIStmtExecute( (*m_conn)->svchp, m_lastresult, (*m_conn)->errhp, 
 		(ub4)(m_hasResult) ? 0 : 1, (ub4)0,

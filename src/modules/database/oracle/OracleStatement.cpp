@@ -46,45 +46,55 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
-void OracleStatement::bindInt( const unsigned int idx, _WOLFRAME_INTEGER value )
+void OracleStatement::bindInt( const unsigned int idx, const int &value )
 {
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindUInt( const unsigned int idx, _WOLFRAME_UINTEGER value )
+void OracleStatement::bindUInt( const unsigned int idx, const unsigned int &value )
 {
-	OCIBind *bindh = 0;
+	OCIBind *bindhp = (OCIBind *)0;
 
-	//~ m_status = OCIDefineByPos( m_stmt, &bindh, m_conn->errhp,
-	//~ 32bit, otherwise use number!
-		//~ (ub4)idx, (dvoid)&value, sizeof( _WOLFRAME_UINTEGER ),
-
-
-//~ status_ = OCIDefineByPos( m_lastresult, &descrRef->defhp,
-	//~ (*m_conn)->errhp, counter, (dvoid *)descrRef->buf,
-	//~ (sb4)descrRef->bufsize, descrRef->fetchType,
-	//~ &descrRef->ind, &descrRef->len, &descrRef->errcode, OCI_DEFAULT );
-
- //~ if (status = OCIBindByPos(stmthp1, &bnd6p, errhp, 1,
-           //~ (dvoid *) &deptno, (sword) sizeof(deptno),SQLT_INT,
-           //~ (dvoid *) 0, (ub2 *) 0, (ub2 *) 0, (ub4) 0, (ub4 *) 0,OCI_DEFAULT))
-
-//~ OCIBindByPos(stmt->stmt, (OCIBind **) &bnd->buf.handle,
-	     //~ stmt->con->err, (ub4) index, (void *) bnd->buf.data,
-	     //~ bnd->size, bnd->code, bnd->buf.inds, (ub2 *) bnd->buf.lens,
-	     //~ bnd->plrcds, (ub4) (is_pltbl == TRUE ? nbelem : 0),
-	     //~ pnbelem, exec_mode)
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindBool( const unsigned int idx, bool value )
+// TODO: hard-wired to a NUMBER(1) with 0 and 1 for now	
+void OracleStatement::bindBool( const unsigned int idx, const bool &value )
 {
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindDouble( const unsigned int idx, double value )
+void OracleStatement::bindDouble( const unsigned int idx, const double &value )
 {
+	OCIBind *bindhp = (OCIBind *)0;
+	
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		SQLT_FLT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindString( const unsigned int idx, const char* value, std::size_t size )
+void OracleStatement::bindString( const unsigned int idx, const char* value, const std::size_t size )
 {
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)value, (sb4)size+1,
+		SQLT_STR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
 void OracleStatement::bindNull( const unsigned int idx )
@@ -96,29 +106,33 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 	// does boundary checking
 	BaseStatement::bind( idx, value );
 
+	// remember value
+	m_data.push_back( value );
+	
+	// bind it
 	switch( value.type( ) ) {
 		case types::Variant::Null:
 			bindNull( idx );
 			break;
 		
 		case types::Variant::Int:
-			bindInt( idx, value.data( ).value.Int );
+			bindInt( idx, m_data.back( ).data( ).value.Int );
 			break;
 
 		case types::Variant::UInt:
-			bindUInt( idx, value.data( ).value.UInt );
+			bindUInt( idx, m_data.back( ).data( ).value.UInt );
 			break;
 		
 		case types::Variant::Double:
-			bindDouble( idx, value.data().value.Double );
+			bindDouble( idx, m_data.back( ).data().value.Double );
 			break;
 
 		case types::Variant::Bool:
-			bindBool( idx, value.data().value.Bool );
+			bindBool( idx, m_data.back( ).data().value.Bool );
 			break;
 
 		case types::Variant::String:
-			bindString( idx, value.charptr( ), value.charsize( ) );
+			bindString( idx, m_data.back( ).charptr( ), value.charsize( ) );
 			break;
 
 		case types::Variant::Custom:

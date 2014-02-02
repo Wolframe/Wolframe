@@ -35,6 +35,7 @@
 #ifndef _ORACLE_STATEMENT_HPP_INCLUDED
 #define _ORACLE_STATEMENT_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include "Oracle.hpp"
 #include "database/baseStatement.hpp"
 
@@ -58,18 +59,19 @@ class OracleStatement : public BaseStatement
 		sword getLastStatus( );
 
 	private:
-		void bindInt( const unsigned int idx, _WOLFRAME_INTEGER value );
-		void bindUInt( const unsigned int idx, _WOLFRAME_UINTEGER value );
-		void bindBool( const unsigned int idx, bool value );
-		void bindDouble( const unsigned int idx, double value );
-		void bindString( const unsigned int idx, const char* value, std::size_t size );
+		void bindUInt( const unsigned int idx, const unsigned int &value );
+		void bindInt( const unsigned int idx, const int &value );
+		void bindBool( const unsigned int idx, const bool &value );
+		void bindDouble( const unsigned int idx, const double &value );
+		void bindString( const unsigned int idx, const char* value, const std::size_t size );
 		void bindNull( const unsigned int idx );
 	
 	private:
 		OracleEnvirenment *m_env;
 		OracleConnection *m_conn;
 		OCIStmt *m_stmt;
-		sword m_status;	
+		sword m_status;
+		std::vector<types::Variant> m_data;
 };
 
 }}//namespace
