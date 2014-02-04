@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\include\langbind\formFunction.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\customDataType.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\procProviderDispatch.hpp" />
@@ -116,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\src\libwolframe\malloc.cpp" />
     <ClCompile Include="..\..\..\..\..\src\libwolframe\typeSignature.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types_customDataType.cpp" />
     <ClCompile Include="..\..\..\..\..\src\libwolframe\types_variant.cpp" />
     <ClCompile Include="..\..\..\..\..\src\libwolframe\utils_conversions.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.cpp" />

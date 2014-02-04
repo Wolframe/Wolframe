@@ -40,9 +40,10 @@ using namespace _Wolframe;
 using namespace _Wolframe::comauto;
 
 VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
-		:types::TypeSignature( "comauto::VariantInputFilter", __LINE__)
-		,m_typelib(typelib_)
-		,m_flags(flags_)
+	:types::TypeSignature( "comauto::VariantInputFilter", __LINE__)
+	,m_typelib(typelib_)
+	,m_flags(flags_)
+	,m_done(false)
 {
 	m_stk.push_back( StackElem( "", m_typelib->getRecordInfo(typeinfo_), const_cast<ITypeInfo*>(typeinfo_), data_));
 }
@@ -52,6 +53,7 @@ VariantInputFilter::VariantInputFilter( const VariantInputFilter& o)
 	,m_stk(o.m_stk)
 	,m_elembuf(o.m_elembuf)
 	,m_typelib(o.m_typelib)
+	,m_done(o.m_done)
 {}
 
 VariantInputFilter::~VariantInputFilter()
@@ -68,11 +70,11 @@ VariantInputFilter::StackElem::StackElem( const StackElem& o)
 	try
 	{
 		data.vt = VT_EMPTY;
-		WRAP( comauto::wrapVariantCopy( &data, &o.data))
+		WRAP( comauto::wrapVariantCopy( &data, &o.data));
 		if (typeinfo)
 		{
 			typeinfo->AddRef();
-			WRAP( typeinfo->GetTypeAttr( &typeattr))
+			WRAP( typeinfo->GetTypeAttr( &typeattr));
 		}
 	}
 	catch (const std::runtime_error& e)
@@ -94,7 +96,7 @@ VariantInputFilter::StackElem::StackElem( const std::string& name_, const IRecor
 		if (typeinfo)
 		{
 			typeinfo->AddRef();
-			WRAP( typeinfo->GetTypeAttr( &typeattr))
+			WRAP( typeinfo->GetTypeAttr( &typeattr));
 		}
 	}
 	catch (const std::runtime_error& e)
@@ -126,7 +128,17 @@ AGAIN:
 	ITypeInfo* reftypeinfo = 0;
 	try
 	{
-		if (m_stk.empty()) return false;
+		if (m_stk.empty())
+		{
+			if (!m_done)
+			{
+				element = types::VariantConst();
+				type = CloseTag;
+				m_done = true;
+				return true;
+			}
+			return false;
+		}
 		StackElem& cur = m_stk.back();	//< REMARK: 'cur' only valid till next m_stk.push_back()/pop_back(). Check that push/pop return or goto AGAIN !
 		switch (cur.state)
 		{
@@ -159,7 +171,7 @@ AGAIN:
 					if (comauto::isAtomicType( elemvt))
 					{
 						data.vt = elemvt;
-						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(comauto::arithmeticTypeAddress( &data))))
+						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(comauto::arithmeticTypeAddress( &data))));
 						cur.state = VarClose;
 						m_stk.push_back( StackElem( "", 0, 0, data));
 						std::memset( &data, 0, sizeof(data));
@@ -172,13 +184,13 @@ AGAIN:
 						switch (elemvt)
 						{
 							case VT_LPSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPSTR( const_cast<VARIANT*>(&data))))
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPSTR( const_cast<VARIANT*>(&data))));
 								break;
 							case VT_LPWSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPWSTR( const_cast<VARIANT*>(&data))))
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPWSTR( const_cast<VARIANT*>(&data))));
 								break;
 							case VT_BSTR:
-								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, V_BSTR( const_cast<VARIANT*>(&data))))
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, V_BSTR( const_cast<VARIANT*>(&data))));
 								break;
 							default:
 								throw std::logic_error("internal: unknown string type");
@@ -192,10 +204,10 @@ AGAIN:
 					{
 						std::memset( &data, 0, sizeof(data));
 						data.vt = elemvt;
-						WRAP( ::SafeArrayGetRecordInfo( cur.data.parray, &data.pRecInfo))
+						WRAP( ::SafeArrayGetRecordInfo( cur.data.parray, &data.pRecInfo));
 						if (!data.pRecInfo) throw std::runtime_error( "cannot iterate on result structure without record info");
 						data.pvRecord = data.pRecInfo->RecordCreate();
-						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(data.pvRecord)))
+						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(data.pvRecord)));
 						data.pRecInfo->GetTypeInfo( &reftypeinfo);
 						cur.state = VarClose;
 						m_stk.push_back( StackElem( "", data.pRecInfo, reftypeinfo, data));
@@ -227,7 +239,7 @@ AGAIN:
 						m_stk.pop_back();
 						goto AGAIN;
 					}
-					WRAP( cur.typeinfo->GetVarDesc( idx, &vardesc))
+					WRAP( cur.typeinfo->GetVarDesc( idx, &vardesc));
 					std::wstring varname( comauto::variablename_utf16( cur.typeinfo, vardesc));
 					cur.typeinfo->ReleaseVarDesc( vardesc);
 					vardesc = 0;
