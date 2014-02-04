@@ -127,9 +127,10 @@ void (*volatile __malloc_initialize_hook)() = &this_initialize;
 
 struct MemChunkHeader
 {
-	size_t size;
-	size_t ref;
-	size_t chk;
+	size_t size;			//< size of memory block
+	size_t ref;			//< number of references for detecting double frees
+	size_t chk;			//< checksum
+	size_t _;			//< padding for satisfying context dependent memory alignment requirements (64bit integers on Solaris 32bit)
 };
 
 void* wolframe_malloc( size_t size)

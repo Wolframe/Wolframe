@@ -43,7 +43,7 @@ using namespace _Wolframe::module;
 DotnetRuntimeEnvironmentConfig::AssemblyDescription::AssemblyDescription( const std::string& description_)
 	:description(description_)
 {
-	const char* ee = std::strchr( description.c_str(), ' ');
+	const char* ee = std::strchr( description.c_str(), ',');
 	if (ee == 0) ee = description.c_str() + description.size();
 	name.append( boost::algorithm::trim_copy( std::string( description.c_str(), ee - description.c_str())));
 }

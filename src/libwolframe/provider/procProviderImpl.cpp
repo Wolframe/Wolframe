@@ -321,14 +321,12 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 		// load all locally defined programs of the database:
 		if (m_db) m_db->loadAllPrograms();
 
-		// load all globally defined programs:
-		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
-		return true;
-
 		// load functions based on a configured runtime environment:
 		std::vector<prgbind::RuntimeEnvironmentDef>::const_iterator ri = m_runtime_environment_defs.begin(), re = m_runtime_environment_defs.end();
 		for (; ri != re; ++ri)
 		{
+			LOG_DEBUG << "Create runtime environment '" << ri->constructor->objectClassName() << "'";
+
 			prgbind::RuntimeEnvironmentR env( ri->constructor->object( *ri->configuration));
 			m_runtime_environments.push_back( env);
 
@@ -341,6 +339,11 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 				LOG_TRACE << "Function '" << *fi << "' registered as '" << ri->constructor->objectClassName() << "' function";
 			}
 		}
+
+		// load all globally defined programs:
+		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
+
+		return true;
 	}
 	catch (const std::runtime_error& e)
 	{
