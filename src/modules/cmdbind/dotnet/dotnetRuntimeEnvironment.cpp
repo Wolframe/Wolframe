@@ -33,6 +33,7 @@ Project Wolframe.
 //\brief Implementation .NET runtime environment
 #include "dotnetRuntimeEnvironment.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
@@ -40,6 +41,8 @@ using namespace _Wolframe::module;
 DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironmentConfig* cfg)
 	:m_clr(cfg->clrversion())
 {
+	MOD_LOG_DEBUG << "Registering .NET functions";
+
 	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->assemblylist().begin(), le = cfg->assemblylist().end();
 	for (int typelibidx=0; li != le; ++li,++typelibidx)
 	{
@@ -55,6 +58,7 @@ DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironme
 			{
 				std::string funcname( (*fi)->classname() + "." + (*fi)->methodname());
 				m_functionmap.insert( funcname, FunctionDescr( typelibidx,*fi));
+				MOD_LOG_DEBUG << "Registered .NET function '" << funcname << "'";
 			}
 		}
 		catch (const std::runtime_error& e)

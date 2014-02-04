@@ -46,7 +46,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "CustomDataType";\
+		return "" DOMAIN "CustomDataType";\
 	}\
 	static const char* _Wolframe__moduleDomain()\
 	{\

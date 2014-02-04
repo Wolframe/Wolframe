@@ -46,7 +46,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "Normalizer";\
+		return "" DOMAIN "Normalizer";\
 	}\
 	static const char* _Wolframe__moduleDomain()\
 	{\
@@ -74,7 +74,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "Normalizer";\
+		return "" DOMAIN "Normalizer";\
 	}\
 	static const char* _Wolframe__moduleDomain()\
 	{\

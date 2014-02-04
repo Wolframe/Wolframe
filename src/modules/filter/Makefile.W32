@@ -16,7 +16,7 @@ SUBDIRS = \
 	$(SUBDIRS) libxml2
 !ENDIF
 
-# rapidjson
+# cjson
 !IFDEF WITH_CJSON
 SUBDIRS = \
 	$(SUBDIRS) cjson
