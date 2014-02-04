@@ -37,6 +37,7 @@ Project Wolframe.
 #include <vector>
 #include <map>
 #include <ostream>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
 struct IRecordInfo;
@@ -52,7 +53,8 @@ class TypeLib
 {
 public:
 	explicit TypeLib( const std::string& file);
-	virtual ~TypeLib();
+	TypeLib( const TypeLib& o)	:m_impl(o.m_impl){}
+
 	void print( std::ostream& out) const;
 	void printvalue( std::ostream& out, const std::string& name, const tagVARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt=0) const;
 
@@ -65,7 +67,7 @@ public:
 	class Impl;
 
 private:
-	Impl* m_impl;
+	boost::shared_ptr<Impl> m_impl;
 };
 
 }} //namespace

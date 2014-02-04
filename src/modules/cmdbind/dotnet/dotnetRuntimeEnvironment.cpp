@@ -34,6 +34,7 @@ Project Wolframe.
 #include "dotnetRuntimeEnvironment.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
@@ -49,14 +50,19 @@ DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironme
 		try
 		{
 			std::string path( utils::joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
+			std::replace( path.begin(), path.end(), '/', '\\'); //PF:HACK: Substitution at wrong place because path may contain 'C:/'
+
+			MOD_LOG_DEBUG << "Loading type library '" << li->name << "' from file '" << path << "'";
 			m_typelibs.push_back( comauto::TypeLib( path));
 
+			MOD_LOG_TRACE << "Loading functions from type library '" << li->name << "'";
 			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->name);
 			std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		
 			for (; fi != fe; ++fi)
 			{
 				std::string funcname( (*fi)->classname() + "." + (*fi)->methodname());
+				MOD_LOG_TRACE << "Registering .NET function '" << funcname << "'";
 				m_functionmap.insert( funcname, FunctionDescr( typelibidx,*fi));
 				MOD_LOG_DEBUG << "Registered .NET function '" << funcname << "'";
 			}
