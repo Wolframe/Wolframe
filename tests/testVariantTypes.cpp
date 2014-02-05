@@ -36,6 +36,7 @@
 
 #include "gtest/gtest.h"
 #include "types/variant.hpp"
+#include "types/malloc.hpp"
 #include <string>
 #include <sstream>
 #include <boost/cstdint.hpp>
@@ -180,6 +181,14 @@ TEST( variantTypeFixture, alignment )
 #endif
 	
 	delete v;
+	
+	Variant *v3 = (Variant *)wolframe_malloc( sizeof( Variant ) );
+	*v3 = std::string( "222" );
+	std::cout << "__alignof( v3 ) " << __alignof( v3 ) << std::endl;
+	_WOLFRAME_UINTEGER i2 = v3->touint( );
+	ASSERT_EQ( i2, 222 );
+	
+	wolframe_free( v3 );	
 }
 
 int main( int argc, char **argv )
