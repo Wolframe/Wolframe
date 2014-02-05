@@ -42,6 +42,12 @@
 namespace _Wolframe {
 namespace db {
 
+struct OracleData {
+	types::Variant v;
+	boost::uint32_t ui32;
+	boost::int32_t i32;
+};
+
 class OracleStatement : public BaseStatement
 {
 	public:
@@ -60,7 +66,7 @@ class OracleStatement : public BaseStatement
 
 	private:
 		void bindUInt( const unsigned int idx, const boost::uint32_t &value );
-		void bindInt( const unsigned int idx, const boost::uint32_t &value );
+		void bindInt( const unsigned int idx, const boost::int32_t &value );
 		void bindBool( const unsigned int idx, const bool &value );
 		void bindDouble( const unsigned int idx, const double &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
@@ -74,7 +80,7 @@ class OracleStatement : public BaseStatement
 		OracleConnection *m_conn;
 		OCIStmt *m_stmt;
 		sword m_status;
-		std::vector<types::Variant> m_data;
+		std::vector<OracleData> m_data;
 };
 
 }}//namespace
