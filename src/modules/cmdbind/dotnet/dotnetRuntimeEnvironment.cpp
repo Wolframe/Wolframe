@@ -56,15 +56,13 @@ DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironme
 			m_typelibs.push_back( comauto::TypeLib( path));
 
 			MOD_LOG_TRACE << "Loading functions from type library '" << li->name << "'";
-			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->name);
+			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->description);
 			std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		
 			for (; fi != fe; ++fi)
 			{
 				std::string funcname( (*fi)->classname() + "." + (*fi)->methodname());
-				MOD_LOG_TRACE << "Registering .NET function '" << funcname << "'";
 				m_functionmap.insert( funcname, FunctionDescr( typelibidx,*fi));
-				MOD_LOG_DEBUG << "Registered .NET function '" << funcname << "'";
 			}
 		}
 		catch (const std::runtime_error& e)

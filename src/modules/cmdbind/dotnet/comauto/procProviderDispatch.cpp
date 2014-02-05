@@ -114,7 +114,7 @@ static int compareIdentifier( LPOLESTR aa, LPOLESTR bb)
 		return (aa[0] == 0);
 }
 
-HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
+HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID , LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
 {
 	return DispGetIDsOfNames( m_typeinfo, rgszNames, cNames, rgDispId);
 }
@@ -193,7 +193,7 @@ static CLSID getUUIDfromVariantArg( const VARIANT& arg, const IRecordInfo* recor
 }
 
 
-HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID /*riid*/, LCID /*lcid*/, WORD /*wFlags*/, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* /*puArgErr*/)
 {
 	try
 	{

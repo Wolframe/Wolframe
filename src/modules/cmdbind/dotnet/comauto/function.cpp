@@ -437,7 +437,8 @@ comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
 		,m_paramidx(null_paramidx)
-		,m_providerdispatch(0){}
+		,m_providerdispatch(0)
+{}
 
 static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 {
@@ -612,7 +613,6 @@ AGAIN:
 			const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 			m_param[ pi->first] = comauto::createVariantArray( pi->second[0].vt, recinfo, pi->second);
 		}
-
 		// function signature validation:
 		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
 		{
