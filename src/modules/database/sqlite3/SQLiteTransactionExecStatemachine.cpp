@@ -264,7 +264,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << types::Variant::typeName( value.type()) << " )";
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{

@@ -270,7 +270,7 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[oracle statement] CALL bind( " << idx << ", '" << value << "' )";
+		LOG_TRACE << "[oracle statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{

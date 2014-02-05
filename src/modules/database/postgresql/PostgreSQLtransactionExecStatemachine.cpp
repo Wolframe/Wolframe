@@ -288,7 +288,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "' )";
+		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{
