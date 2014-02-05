@@ -1,1 +1,2 @@
 COMMAND GetAddress_p CALL Functions.GetAddress_p RETURN Address;
+COMMAND GetUserAddress CALL Functions.GetUserAddress;

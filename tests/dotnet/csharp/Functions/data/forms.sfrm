@@ -7,6 +7,23 @@ FORM GetAddress_p
 	}
 }
 
+FORM GetUserAddress
+{
+	doc
+	{
+		usr
+		{
+			id string
+			name string
+			place
+			{
+				street string
+				country string
+			}
+		}
+	}
+}
+
 FORM Address
 {
 	address

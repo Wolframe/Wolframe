@@ -79,6 +79,8 @@ public interface FunctionInterface
     [ComVisible(true)]
     Address GetUserAddress(Wolframe.ProcProvider provider, User usr);
     [ComVisible(true)]
+    Address GetUserAddress2(Wolframe.ProcProvider provider, User usr);
+    [ComVisible(true)]
     int GetUserXYZ(Wolframe.ProcProvider provider);
 }
 
@@ -211,7 +213,26 @@ public class Functions : FunctionInterface
 
     public Address GetUserAddress(Wolframe.ProcProvider provider, User usr)
     {
-        Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
+        Address rt;
+        rt.street = "ABC street";
+        rt.country = "XYZ country";
+        //Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
+        provider.call("GetAddress", usr, typeof(Address).GUID);
+        Console.Write("C# Street ");
+        Console.Write( rt.street);
+        Console.WriteLine();
+        return rt;
+    }
+
+    public Address GetUserAddress2(Wolframe.ProcProvider provider, User usr)
+    {
+        Address rt;
+        rt.street = "ABC street";
+        rt.country = "XYZ country";
+        provider.call("GetAddress", usr);
+        Console.Write("C# Street ");
+        Console.Write(rt.street);
+        Console.WriteLine();
         return rt;
     }
 
