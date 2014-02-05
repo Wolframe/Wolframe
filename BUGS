@@ -9,5 +9,7 @@
 
 [4]- Oracle propagation of caseinsensitivity does not work somehow (broken chain of propagating flags)
 
-[5]- Bug: Crash on windows (result of endless loop ?) if form function result filter does not return final close. Do test on linux first, if it appears also. Windows is difficult
+[5]- std::logic_error not caught by wolframed. Looks like a segfault because it crashes without logging
+
+
 
