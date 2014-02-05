@@ -84,6 +84,7 @@ private:
 	std::string m_elembuf;
 	const comauto::TypeLib* m_typelib;
 	serialize::Context::Flags m_flags;
+	bool m_done;
 };
 
 }} //namespace

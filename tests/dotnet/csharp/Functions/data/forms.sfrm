@@ -1,0 +1,17 @@
+FORM GetAddress_p
+{
+	doc
+	{
+        street string
+	    country string
+	}
+}
+
+FORM Address
+{
+	address
+	{
+        street string
+	    country string
+	}
+}

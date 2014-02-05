@@ -338,7 +338,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
 					if (!formparser.call())
 					{
-						throw std::logic_error( "output form serialization not complete");
+						throw std::runtime_error( "internal: output form serialization not complete");
 					}
 					m_outputform_serialize.reset( new serialize::DDLStructSerializer( m_outputform.get()));
 					m_outputprinter.init( m_outputform_serialize, m_output);
@@ -424,6 +424,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 		m_errormsg = e.what();
 		err = m_errormsg.c_str();
 		return IOFilterCommandHandler::Error;
+	}
+	catch (const std::logic_error& e)
+	{
+		MOD_LOG_FATAL << "logic error processing request: " << e.what();
+		throw e;
 	}
 }
 
