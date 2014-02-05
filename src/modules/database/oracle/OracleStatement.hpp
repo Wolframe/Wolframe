@@ -59,10 +59,13 @@ class OracleStatement : public BaseStatement
 		sword getLastStatus( );
 
 	private:
-		void bindUInt( const unsigned int idx, const unsigned int &value );
-		void bindInt( const unsigned int idx, const int &value );
+		void bindUInt( const unsigned int idx, const boost::uint32_t &value );
+		void bindInt( const unsigned int idx, const boost::uint32_t &value );
 		void bindBool( const unsigned int idx, const bool &value );
 		void bindDouble( const unsigned int idx, const double &value );
+		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
+		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
+		void bindNumber( const unsigned int idx, const double &value );		
 		void bindString( const unsigned int idx, const char* value, const std::size_t size );
 		void bindNull( const unsigned int idx );
 	

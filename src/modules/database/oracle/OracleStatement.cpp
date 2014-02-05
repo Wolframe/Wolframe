@@ -46,7 +46,7 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
-void OracleStatement::bindInt( const unsigned int idx, const int &value )
+void OracleStatement::bindInt( const unsigned int idx, const boost::uint32_t &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -56,7 +56,7 @@ void OracleStatement::bindInt( const unsigned int idx, const int &value )
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindUInt( const unsigned int idx, const unsigned int &value )
+void OracleStatement::bindUInt( const unsigned int idx, const boost::uint32_t &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -85,6 +85,18 @@ void OracleStatement::bindDouble( const unsigned int idx, const double &value )
 		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
 		SQLT_FLT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value )
+{
+}
+
+void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value )
+{
+}
+
+void OracleStatement::bindNumber( const unsigned int idx, const double &value )
+{
 }
 
 void OracleStatement::bindString( const unsigned int idx, const char* value, const std::size_t size )
@@ -122,13 +134,21 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 		
 		case types::Variant::Int:
-			bindInt( idx, m_data.back( ).data( ).value.Int );
+			if( value.data( ).value.Int <= 0x7FFFFFFF && value.data( ).value.Int >= -0x7FFFFFFFF ) {
+				bindInt( idx, (boost::int32_t)m_data.back( ).data( ).value.Int );
+			} else {
+				bindNumber( idx, m_data.back( ).data( ).value.Int );
+			}
 			break;
 
 		case types::Variant::UInt:
-			bindUInt( idx, m_data.back( ).data( ).value.UInt );
+			if( value.data( ).value.UInt <= 0x7FFFFFFF ) {
+				bindUInt( idx, (boost::uint32_t)m_data.back( ).data( ).value.UInt );
+			} else {
+				bindNumber( idx, m_data.back( ).data( ).value.UInt );
+			}
 			break;
-		
+
 		case types::Variant::Double:
 			bindDouble( idx, m_data.back( ).data().value.Double );
 			break;
