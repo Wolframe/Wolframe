@@ -46,7 +46,7 @@ class ProcessorProviderDispatch :public IDispatch
 {
 public:
 	//\brief DispId declarations in the ProcProviderInterface
-	enum DispID {DispID_CALL=1}; 
+	enum DispID {DispID_CALL=1, DispID_CALL_NORES=2};
 
 public:
 	ProcessorProviderDispatch( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)

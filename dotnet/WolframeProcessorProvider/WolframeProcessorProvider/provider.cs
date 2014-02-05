@@ -19,8 +19,14 @@ namespace Wolframe
             [In, MarshalAs(UnmanagedType.BStr)] string funcname,
             [In] object argument,
             [In] Guid resulttype);
-    }
 
+        //\param[in] funcname Name of Wolframe function to call
+        //\param[in] argument Structure to pass to function as input
+        [DispId(2)]
+        void call(
+            [In, MarshalAs(UnmanagedType.BStr)] string funcname,
+            [In] object argument);
+    }
 } //namespace
 
 
