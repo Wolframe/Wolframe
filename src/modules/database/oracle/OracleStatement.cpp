@@ -46,22 +46,22 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
-void OracleStatement::bindInt( const unsigned int idx, const boost::int32_t &value )
-{
-	OCIBind *bindhp = (OCIBind *)0;
-
-	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( boost::int32_t ),
-		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
-		(ub4)0, (ub4 *)0, OCI_DEFAULT );
-}
-
-void OracleStatement::bindUInt( const unsigned int idx, const boost::uint32_t &value )
+void OracleStatement::bindUInt32( const unsigned int idx, const boost::uint32_t &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
 		(ub4)idx, (dvoid *)&value, (sb4)sizeof( boost::uint32_t ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindInt32( const unsigned int idx, const boost::int32_t &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( boost::int32_t ),
 		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
@@ -72,7 +72,7 @@ void OracleStatement::bindBool( const unsigned int idx, const bool &value )
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( bool ),
 		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
@@ -82,7 +82,7 @@ void OracleStatement::bindDouble( const unsigned int idx, const double &value )
 	OCIBind *bindhp = (OCIBind *)0;
 	
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( value ),
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( double ),
 		SQLT_FLT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
@@ -92,10 +92,6 @@ void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_INTEGE
 }
 
 void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value )
-{
-}
-
-void OracleStatement::bindNumber( const unsigned int idx, const double &value )
 {
 }
 
@@ -138,7 +134,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		case types::Variant::Int:
 			if( value.data( ).value.Int <= 0x7FFFFFFF && value.data( ).value.Int >= -0x7FFFFFFFF ) {
 				m_data.back( ).i32 = (boost::int32_t)m_data.back( ).v.data( ).value.Int;
-				bindInt( idx, m_data.back( ).i32 );
+				bindInt32( idx, m_data.back( ).i32 );
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.Int );
 			}
@@ -147,7 +143,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		case types::Variant::UInt:
 			if( value.data( ).value.UInt <= 0x7FFFFFFF ) {
 				m_data.back( ).ui32 = (boost::uint32_t)m_data.back( ).v.data( ).value.UInt;
-				bindUInt( idx, m_data.back( ).ui32 );
+				bindUInt32( idx, m_data.back( ).ui32 );
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.UInt );
 			}
