@@ -255,7 +255,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 						else
 						{
-							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
+							MOD_LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
 							m_state = 11;
 						}
 						continue;
@@ -267,7 +267,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 							case InputFilter::Open:
 							{
 								m_state = 11;
-								LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
+								MOD_LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
 								break;
 							}
 							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
@@ -313,10 +313,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				m_state = 4;
 				/* no break here ! */
 			case 4:
+			{
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
+				langbind::TypedInputFilterR res = m_functionclosure->result();
 				if (!m_cmd->command_has_result)
 				{
-					langbind::TypedInputFilterR res = m_functionclosure->result();
 					langbind::InputFilter::ElementType typ;
 					types::VariantConst element;
 
@@ -324,7 +325,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						if (typ != langbind::FilterBase::CloseTag)
 						{
-							LOG_WARNING << "Function called is returning a result but no RETURN declared in command. The function result is ignored";
+							MOD_LOG_WARNING << "Function called is returning a result but no RETURN declared in command. The function result is ignored";
 						}
 					}
 					m_state = 6;
@@ -362,6 +363,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 				}
 				/* no break here ! */
+			}
 			case 5:
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;

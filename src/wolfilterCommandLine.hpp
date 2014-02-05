@@ -71,7 +71,7 @@ public:
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
 	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
-	std::vector<std::string> configModules() const;
+	std::vector<std::string> configModules( const std::string& refpath) const;
 	boost::property_tree::ptree getConfigNode( const std::string& name) const;
 
 private:

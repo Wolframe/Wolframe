@@ -98,7 +98,7 @@ boost::property_tree::ptree WolfilterCommandLine::getConfigNode( const std::stri
 	return getTreeNode( m_config, name);
 }
 
-std::vector<std::string> WolfilterCommandLine::configModules() const
+std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
 {
 	std::vector<std::string> rt;
 	boost::property_tree::ptree module_section = getConfigNode( "LoadModules");
@@ -107,7 +107,7 @@ std::vector<std::string> WolfilterCommandLine::configModules() const
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), m_modulePath));
+			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), refpath));
 		}
 	}
 	return rt;
@@ -253,7 +253,9 @@ struct WolfilterOptionStruct
 			( "help,h", "print help message" )
 			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
 			( "logfile", po::value<std::string>(), "specify a file for the log output" )
+#if defined(_WIN32) // DISABLED because Windows cannot handle boost::program_options::value multitoken this way
 			( "verbosity,t", po::value< std::vector<std::string> >()->multitoken()->zero_tokens(), "variant of option --loglevel: Raise verbosity level with (-t,-tt,-ttt,..)" )
+#endif
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
@@ -321,14 +323,13 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "config"))
 	{
 		std::string configfile = vmap["config"].as<std::string>();
-		if (configfile.size() == 0 || configfile[0] != '.')
+		if (currentPath.size() != 0)
 		{
-			configfile = utils::getCanonicalPath( vmap["config"].as<std::string>(), m_referencePath);
+			configfile = utils::getCanonicalPath( configfile, currentPath);
 		}
-		else
-		{
-			m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
-		}
+		m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
+		LOG_DEBUG << "load config file '" << configfile << "' and set reference path to '" << m_referencePath << "'";
+
 		m_config = utils::readPropertyTreeFile( configfile);
 		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
@@ -352,9 +353,12 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 			}
 		}
 	}
-	// Load modules
-	std::vector<std::string> cfgmod = configModules();
-	std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
+	else
+	{
+		// Load configured modules (--config)
+		std::vector<std::string> cfgmod = configModules( m_referencePath);
+		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
+	}
 	std::list<std::string> modfiles;
 	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
 	if (!LoadModules( m_modulesDirectory, modfiles))

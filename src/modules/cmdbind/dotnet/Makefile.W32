@@ -37,6 +37,7 @@ DOTNET_INTEROP_CPP_OBJS = \
 	comauto/typelib.obj \
 	comauto/variantAssignment.obj \
 	comauto/variantInputFilter.obj \
+	comauto/variantToString.obj \
 	comauto/procProviderDispatch.obj \
 	comauto/utils.obj
 

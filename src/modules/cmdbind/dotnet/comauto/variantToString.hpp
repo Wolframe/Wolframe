@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace comauto {
 
-std::string variantToString( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_);
+std::string variantToString( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const VARIANT& data_);
 
 }} //namespace
 #endif

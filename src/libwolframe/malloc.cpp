@@ -127,10 +127,10 @@ void (*volatile __malloc_initialize_hook)() = &this_initialize;
 
 struct MemChunkHeader
 {
+	size_t _;			//< padding for satisfying context dependent memory alignment requirements (64bit integers on Solaris 32bit)
 	size_t size;			//< size of memory block
 	size_t ref;			//< number of references for detecting double frees
 	size_t chk;			//< checksum
-	size_t _;			//< padding for satisfying context dependent memory alignment requirements (64bit integers on Solaris 32bit)
 };
 
 void* wolframe_malloc( size_t size)
@@ -139,6 +139,7 @@ void* wolframe_malloc( size_t size)
 	MemChunkHeader* hdr;
 	hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
+	hdr->_ = 0;
 	hdr->size = size;
 	hdr->ref = 1;
 	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
@@ -180,6 +181,7 @@ void* wolframe_realloc( void* oldptr, size_t size)
 {
 	MemChunkHeader* hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
+	hdr->_ = 0;
 	hdr->size = size;
 	hdr->ref = 1;
 	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;

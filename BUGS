@@ -11,5 +11,6 @@
 
 [5]- std::logic_error not caught by wolframed. Looks like a segfault because it crashes without logging
 
+[6]- Either fix logger, so that LOG_.. can be used everywhere (BETTER!) or call MOD_LOG_.. everywhere in modules (instead of LOG_..)
 
 
