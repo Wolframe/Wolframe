@@ -38,6 +38,7 @@ CPP_OBJS = \
 	pdfPrinterExpression.o \
 	pdfPrinterMethod.o \
 	pdfPrinterVariable.o \
+	pdfPrintProgramType.o \
 	pdfPrinterDocumentImpl.o \
 	mod_print_harupdf.o
 
