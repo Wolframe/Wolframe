@@ -117,6 +117,12 @@ void OracleStatement::bindNull( const unsigned int idx )
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
+void OracleStatement::clear( )
+{
+	BaseStatement::clear( );
+	m_data.clear( );
+}
+
 void OracleStatement::bind( const unsigned int idx, const types::Variant &value )
 {
 	// does boundary checking

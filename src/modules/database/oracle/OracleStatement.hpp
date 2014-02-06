@@ -60,6 +60,8 @@ class OracleStatement : public BaseStatement
 		OracleStatement( OracleEnvirenment *env );
 		~OracleStatement( );
 
+		virtual void clear( );
+
 		virtual void bind( const unsigned int idx, const types::Variant &value );
 
 		virtual const std::string replace( const unsigned int idx ) const;
