@@ -149,10 +149,6 @@ public:
 	}
 	void define( const std::string& name, types::NormalizeFunctionR f)
 	{
-		if (m_impl.find( name) != m_impl.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
-		}
 		m_impl.insert( name, f);
 	}
 private:
@@ -166,6 +162,7 @@ public:
 	types::keymap<types::CustomDataTypeR> m_customDataTypeMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
+	std::vector<langbind::RuntimeEnvironmentR> m_runtimeEnvironmentList;
 	types::keymap<langbind::FilterTypeR> m_filterTypeMap;
 	types::keymap<types::FormDescriptionR> m_formMap;
 	std::vector<types::FormDescriptionR> m_privateFormList;
@@ -192,20 +189,17 @@ public:
 
 	void defineCppFormFunction( const std::string& name, const CppFormFunction& f)
 	{
-		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
-		}
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
 	}
 
-	void defineFormFunction( const std::string& name, langbind::FormFunctionR f)
+	void defineFormFunction( const std::string& name, const langbind::FormFunctionR f)
 	{
-		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
-		}
 		m_formFunctionMap.insert( name, f);
+	}
+
+	void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env)
+	{
+		m_runtimeEnvironmentList.push_back( env);
 	}
 
 	void defineDDLTypeNormalizer( const std::string& name, types::NormalizeFunctionR f)
@@ -220,10 +214,6 @@ public:
 
 	void defineForm( const std::string& name, const types::FormDescriptionR& f)
 	{
-		if (m_formMap.find( name) != m_formMap.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of form '") + name + "'");
-		}
 		m_formMap.insert( name, f);
 	}
 
@@ -250,10 +240,6 @@ public:
 
 	void defineFilterType( const std::string& name, const langbind::FilterTypeR& f)
 	{
-		if (m_filterTypeMap.find( name) != m_filterTypeMap.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of filter type '") + name + "'");
-		}
 		m_filterTypeMap.insert( name, f);
 	}
 
@@ -313,6 +299,22 @@ public:
 
 	void loadPrograms( ProgramLibrary& library, db::Database* transactionDB, const std::list<std::string>& filenames)
 	{
+		LOG_DEBUG << "Loading programs";
+
+		// Loading programs enclosed in a runtime environment
+		std::vector<langbind::RuntimeEnvironmentR>::const_iterator ri = m_runtimeEnvironmentList.begin(), re = m_runtimeEnvironmentList.end();
+		for (; ri != re; ++ri)
+		{
+			std::vector<std::string> functions = (*ri)->functions();
+			std::vector<std::string>::const_iterator fi = functions.begin(), fe = functions.end();
+			for (; fi != fe; ++fi)
+			{
+				LOG_TRACE << "Function '" << *fi << "' registered in '" << (*ri)->name() << "' environment";
+				m_formFunctionMap.insert( *fi, langbind::FormFunctionR( new langbind::RuntimeEnvironmentFormFunction( *fi, ri->get())));
+			}
+		}
+
+		// Loading scripts
 		std::vector< std::pair<Program*, std::string> > typed_filenames;
 
 		std::list<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
@@ -364,6 +366,11 @@ void ProgramLibrary::defineCppFormFunction( const std::string& name, const langb
 void ProgramLibrary::defineFormFunction( const std::string& name, langbind::FormFunctionR f)
 {
 	m_impl->defineFormFunction( name, f);
+}
+
+void ProgramLibrary::defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env)
+{
+	m_impl->defineRuntimeEnvironment( env);
 }
 
 void ProgramLibrary::defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& f)

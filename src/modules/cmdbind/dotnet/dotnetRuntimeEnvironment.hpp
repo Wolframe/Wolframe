@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #include "dotnetRuntimeEnvironmentConfig.hpp"
-#include "langbind/formFunction.hpp"
+#include "langbind/runtimeEnvironment.hpp"
 #include "types/keymap.hpp"
 #include "comauto/clr.hpp"
 #include "comauto/typelib.hpp"
@@ -47,7 +47,7 @@ namespace module {
 
 //\class DotnetRuntimeEnvironment
 class DotnetRuntimeEnvironment
-	:public prgbind::RuntimeEnvironment
+	:public langbind::RuntimeEnvironment
 {
 public:
 	DotnetRuntimeEnvironment( const DotnetRuntimeEnvironmentConfig* cfg);
@@ -58,6 +58,11 @@ public:
 	virtual std::vector<std::string> functions() const
 	{
 		return m_functionmap.getkeys<std::vector<std::string> >();
+	}
+
+	virtual const char* name() const
+	{
+		return ".NET CLR";
 	}
 
 private:

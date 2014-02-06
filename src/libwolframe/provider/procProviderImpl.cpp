@@ -42,7 +42,7 @@
 #include "module/programTypeBuilder.hpp"
 #include "module/customDataTypeBuilder.hpp"
 #include "module/filterBuilder.hpp"
-#include "prgbind/runtimeEnvironmentConstructor.hpp"
+#include "module/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -69,7 +69,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		m_dbLabel = conf->m_dbLabel;
 	m_programfiles = conf->programFiles();
 
-	// Build the list of command handlers
+	// Build the list of command handlers and runtime environments (configured objects)
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
@@ -111,18 +111,19 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			}
 			else if (builder->objectType() == ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT)
 			{
-				prgbind::RuntimeEnvironmentConstructor* constructor =
-					dynamic_cast<prgbind::RuntimeEnvironmentConstructor*>( builder->constructor());
-
-				if (!constructor)	{
+				module::RuntimeEnvironmentConstructorR constructor( dynamic_cast<module::RuntimeEnvironmentConstructor*>( builder->constructor()));
+				if (!constructor.get())
+				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << builder->objectClassName()
 						  << "' is not a runtime environment constructor";
 					throw std::logic_error( "Object is not a runtime environment constructor. See log." );
 				}
 				else
 				{
-					prgbind::RuntimeEnvironmentConstructorR cref( constructor);
-					m_runtime_environment_defs.push_back( prgbind::RuntimeEnvironmentDef( cref, *it));
+					langbind::RuntimeEnvironmentR env( constructor->object( **it));
+					m_programs->defineRuntimeEnvironment( env);
+
+					LOG_TRACE << "Registered runtime environment '" << env->name() << "'";
 				}
 			}
 			else	{
@@ -320,25 +321,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	{
 		// load all locally defined programs of the database:
 		if (m_db) m_db->loadAllPrograms();
-
-		// load functions based on a configured runtime environment:
-		std::vector<prgbind::RuntimeEnvironmentDef>::const_iterator ri = m_runtime_environment_defs.begin(), re = m_runtime_environment_defs.end();
-		for (; ri != re; ++ri)
-		{
-			LOG_DEBUG << "Create runtime environment '" << ri->constructor->objectClassName() << "'";
-
-			prgbind::RuntimeEnvironmentR env( ri->constructor->object( *ri->configuration));
-			m_runtime_environments.push_back( env);
-
-			std::vector<std::string> functionlist = env->functions();
-			std::vector<std::string>::const_iterator fi = functionlist.begin(), fe = functionlist.end();
-			for (; fi != fe; ++fi)
-			{
-				langbind::FormFunctionR func( new prgbind::RuntimeEnvironmentFormFunction( *fi, env.get()));
-				m_programs->defineFormFunction( *fi, func);
-				LOG_TRACE << "Function '" << *fi << "' registered as '" << ri->constructor->objectClassName() << "' function";
-			}
-		}
 
 		// load all globally defined programs:
 		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);

@@ -259,6 +259,8 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				if (resultarg)
 				{
 					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
+					/*[-]*/std::cout << "RESULT TYPE INFO " << std::hex << (unsigned int)(resultTypeInfo) << std::dec << std::endl;
+					/*[-]*/std::cout << "RESULT TYPE LIB " << std::hex << (unsigned int)(m_typelib) << std::dec << std::endl;
 					AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
 					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					VARIANT res;
@@ -269,9 +271,13 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 						/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 						throw std::runtime_error( "failed to assign result of processor provider call");
 					}
+					/*[-]*/std::cout << "RESULT VT " << (int)res.vt << std::endl;
+					/*[-]*/std::cout << "RESULT pvRecord " << std::hex << (int)res.pvRecord << " pRecInfo " << (int)res.pRecInfo << std::dec << std::endl;
 					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					*pVarResult = res;
 				}
+				/*[-]*/std::cout << "RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *pVarResult) << std::endl;
+
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();
