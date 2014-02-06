@@ -357,7 +357,7 @@ TEST_F( OracleFixture, ReusedBindParameter )
 	trans->close( );
 }
 
-TEST_F( OracleFixture, ExpressionWithParameter )
+TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
@@ -369,7 +369,7 @@ TEST_F( OracleFixture, ExpressionWithParameter )
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
 	std::vector<types::Variant> values;
-	values.push_back( 47);
+	values.push_back( std::string( "47"));
 	values.push_back( 47);
 	values.push_back( 47);
 	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values);

@@ -338,7 +338,7 @@ TEST_F( SQLiteModuleFixture, ReusedBindParameter )
 	trans->close( );
 }
 
-TEST_F( SQLiteModuleFixture, ExpressionWithParameter )
+TEST_F( SQLiteModuleFixture, ExpressionWithParametersAndTypeCoercion )
 {
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
 			     std::list<std::string>(), std::list<std::string>() );
@@ -349,7 +349,7 @@ TEST_F( SQLiteModuleFixture, ExpressionWithParameter )
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
 	std::vector<types::Variant> values;
-	values.push_back( 47);
+	values.push_back( std::string("47"));
 	values.push_back( 47);
 	values.push_back( 47);
 	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values);
