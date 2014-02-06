@@ -15,6 +15,9 @@ Call "\Program Files\Microsoft SDKs\Windows\v7.1\Bin\gacutil.exe"  /if <assembly
 Register the TypeLibrary:
 Call "C:\Windows\Microsoft.NET\Framework\v4.0.30319\regtlibv12.exe"  <tlbfilepath>
 
+Register the Types in the TypeLibrary:
+Call "C:\Windows\Microsoft.NET\Framework\v4.0.30319\regasm.exe"  <assemblypath>
+
 Documentation about COM/.NET interop is gathered in Links.txt
 
 

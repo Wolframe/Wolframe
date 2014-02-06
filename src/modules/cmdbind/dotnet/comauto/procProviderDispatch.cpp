@@ -197,15 +197,12 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 {
 	try
 	{
-		/*[-]*/std::cout << "++++ CALL comauto::ProcessorProviderDispatch::Invoke " << (int)dispIdMember << std::endl;
 		if (dispIdMember == (DISPID)DispID_CALL || dispIdMember == (DISPID)DispID_CALL_NORES)
 		{
-			/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 			if (pDispParams->cNamedArgs != 0)
 			{
 				throw std::runtime_error( "handling of named parameters not implemented");
 			}
-			/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 			std::string funcname;
 			VARIANT* inputarg = 0;
 			VARIANT* resultarg = 0;
@@ -237,14 +234,12 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 
 			try
 			{
-				/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 				hr = inputarg->pRecInfo->GetTypeInfo( &inputTypeInfo);
 				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of input (is it declared as public ?)");
 				if (resultarg)
 				{
 					hr = resultarg->pRecInfo->GetTypeInfo( &resultGuidTypeInfo);
 					if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of result (is it declared as public ?)");
-					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					CLSID resultUUID = getUUIDfromVariantArg( *resultarg, resultarg->pRecInfo, resultGuidTypeInfo);
 					WRAP (const_cast<ITypeLib*>(m_typelib->typelib())->GetTypeInfoOfGuid( resultUUID, &resultTypeInfo));
 				}
@@ -252,32 +247,20 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
 				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
 
-				/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
 				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
 
 				if (resultarg)
 				{
-					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
-					/*[-]*/std::cout << "RESULT TYPE INFO " << std::hex << (unsigned int)(resultTypeInfo) << std::dec << std::endl;
-					/*[-]*/std::cout << "RESULT TYPE LIB " << std::hex << (unsigned int)(m_typelib) << std::dec << std::endl;
 					AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
-					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					VARIANT res;
 					res.vt = VT_EMPTY;
-					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					if (!resultassign.call( res))
 					{
-						/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 						throw std::runtime_error( "failed to assign result of processor provider call");
 					}
-					/*[-]*/std::cout << "RESULT VT " << (int)res.vt << std::endl;
-					/*[-]*/std::cout << "RESULT pvRecord " << std::hex << (int)res.pvRecord << " pRecInfo " << (int)res.pRecInfo << std::dec << std::endl;
-					/*[-]*/std::cout << "++++ LINE " << (int)__LINE__ << std::endl;
 					*pVarResult = res;
 				}
-				/*[-]*/std::cout << "RESULT " << comauto::variantToString( m_typelib, resultTypeInfo, *pVarResult) << std::endl;
-
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();
@@ -290,7 +273,6 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				throw e;
 			}
 		}
-		/*[-]*/std::cout << "++++ DONE comauto::ProcessorProviderDispatch::Invoke" << std::endl;
 		return S_OK;
 	}
 	catch (const std::runtime_error& e)

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE "doc" SYSTEM "GetUserIdPair">
+<doc>
+  <usr>
+    <id>123</id>
+    <name>Paul Frey</name>
+    <place>
+      <street>Korneliusstrasse 12</street>
+      <country>Schweiz</country>
+    </place>
+  </usr>
+</doc>

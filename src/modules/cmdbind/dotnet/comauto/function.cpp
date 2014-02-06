@@ -586,10 +586,6 @@ AGAIN:
 					goto AGAIN;
 				}
 				case langbind::InputFilter::CloseTag:
-					if (m_input->getNext( elemtype, elemvalue))
-					{
-						throw std::runtime_error( "unexpected close tag (tags not balanced)");
-					}
 					parameters_consumed = true;
 					// ... got final close
 					break;

@@ -82,6 +82,8 @@ public interface FunctionInterface
     Address GetUserAddress2(Wolframe.ProcProvider provider, User usr);
     [ComVisible(true)]
     int GetUserXYZ(Wolframe.ProcProvider provider);
+    [ComVisible(true)]
+    IdPair GetUserIdPair(Wolframe.ProcProvider provider, User usr);
 }
 
 [ComVisible(true)]
@@ -213,14 +215,13 @@ public class Functions : FunctionInterface
 
     public Address GetUserAddress(Wolframe.ProcProvider provider, User usr)
     {
-        Address rt;
-        rt.street = "ABC street";
-        rt.country = "XYZ country";
-        //Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
-        provider.call("GetAddress", usr, typeof(Address).GUID);
-        Console.Write("C# Street ");
-        Console.Write( rt.street);
-        Console.WriteLine();
+        Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
+        return rt;
+    }
+
+    public IdPair GetUserIdPair(Wolframe.ProcProvider provider, User usr)
+    {
+        IdPair rt = (IdPair)provider.call("GetIdPair", usr, typeof(IdPair).GUID);
         return rt;
     }
 
@@ -230,9 +231,6 @@ public class Functions : FunctionInterface
         rt.street = "ABC street";
         rt.country = "XYZ country";
         provider.call("GetAddress", usr);
-        Console.Write("C# Street ");
-        Console.Write(rt.street);
-        Console.WriteLine();
         return rt;
     }
 
@@ -240,7 +238,6 @@ public class Functions : FunctionInterface
     {
         User usr = new User();
         Address rt = (Address)provider.call("GetAddress", usr, typeof(Address).GUID);
-        Console.WriteLine("street='{0}', country='{1}'", rt.street, rt.country);
         return 1;
     }
 }
