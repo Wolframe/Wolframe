@@ -34,6 +34,7 @@
 ///\file database/PostgreSQLstatement.hpp
 #ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #define _POSTGRESQL_STATEMENT_HPP_INCLUDED
+#include "database/baseStatement.hpp"
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
@@ -41,22 +42,21 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLstatement
+class PostgreSQLstatement : public BaseStatement
 {
 public:
-	enum {MaxNofParam=99};
-
 	PostgreSQLstatement();
 	PostgreSQLstatement( const PostgreSQLstatement& o);
 
-	void clear();
-	void init( const std::string& stmstr);
+	void setConnection( PGconn *conn );
+		
+	PGresult* execute( ) const;
 
-	//\brief Executes the statement with the bound parameters on connection 'conn'
-	PGresult* execute( PGconn *conn) const;
+	virtual void clear( );
 
-	//\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const types::Variant& arg);
+	virtual void bind( const unsigned int idx, const types::Variant &value );
+
+	virtual const std::string replace( const unsigned int idx ) const;
 
 private:
 	//\remark See implementation of pq_sendint64
@@ -75,22 +75,21 @@ private:
 
 	void setNextParam( const void* ptr, unsigned int size, const char* type);
 
-	std::string statementString() const;
 	struct Params
 	{
-		const char* paramar[MaxNofParam];
+		const char* paramar[MaxNofParams];
 		int paramarsize;
 	};
 	void getParams( Params& params) const;
 
 private:
-	std::string m_stmstr;
-	int m_paramofs[ MaxNofParam];
-	const char* m_paramtype[ MaxNofParam];
-	int m_paramlen[ MaxNofParam];
-	int m_parambinary[ MaxNofParam];
+	int m_paramofs[ MaxNofParams];
+	const char* m_paramtype[ MaxNofParams];
+	int m_paramlen[ MaxNofParams];
+	int m_parambinary[ MaxNofParams];
 	int m_paramarsize;
 	std::string m_buf;
+	PGconn *m_conn;
 };
 
 

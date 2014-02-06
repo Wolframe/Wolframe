@@ -59,6 +59,20 @@ TEST( variantTypeFixture, prerequisites )
 #endif
 }
 
+TEST( variantTypeFixture, type )
+{
+	Variant v( "test" );
+	ASSERT_EQ( v.type( ), Variant::String );
+	v = (unsigned int)47;
+	ASSERT_EQ( v.type( ), Variant::UInt );
+	v = -47;
+	ASSERT_EQ( v.type( ), Variant::Int );
+	v = 47.0;
+	ASSERT_EQ( v.type( ), Variant::Double );
+	v = false;
+	ASSERT_EQ( v.type( ), Variant::Bool );
+}
+
 TEST( variantTypeFixture, casts )
 {
 	string s = "47";
@@ -67,6 +81,11 @@ TEST( variantTypeFixture, casts )
 	ASSERT_EQ( "47", v.tostring( ) );
 	v.convert( Variant::UInt );
 	ASSERT_EQ( 47, v.touint( ) );
+	v.convert( Variant::Double );
+	ASSERT_DOUBLE_EQ( 47.0, v.todouble( ) );
+	v = 1;
+	v.convert( Variant::Bool );
+	ASSERT_EQ( true, v.tobool( ) );
 }
 
 TEST( variantTypeFixture, uint32 )
@@ -87,11 +106,15 @@ TEST( variantTypeFixture, uint64 )
 	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, initialized )
+TEST( variantTypeFixture, defined )
 {
 	Variant v;
 
-	ASSERT_FALSE( v.initialized( ) );
+	ASSERT_FALSE( v.defined( ) );
+	
+	v = 2;
+
+	ASSERT_TRUE( v.defined( ) );
 }
 
 TEST( variantTypeFixture, output )

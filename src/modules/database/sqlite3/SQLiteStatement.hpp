@@ -31,60 +31,33 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/OracleStatement.hpp
-#ifndef _ORACLE_STATEMENT_HPP_INCLUDED
-#define _ORACLE_STATEMENT_HPP_INCLUDED
+///\file database/SQLiteStatement.hpp
+#ifndef _SQLITE_STATEMENT_HPP_INCLUDED
+#define _SQLITE_STATEMENT_HPP_INCLUDED
 #include <string>
-#include <vector>
-#include "Oracle.hpp"
 #include "database/baseStatement.hpp"
+#include "sqlite3.h"
 
 namespace _Wolframe {
 namespace db {
 
-struct OracleData {
-	types::Variant v;
-	unsigned int ui;
-	signed int i;
-	double d;
-	char *s;
-	
-	OracleData( ) { s = 0; }
-};
-
-class OracleStatement : public BaseStatement
+class SQLiteStatement : public BaseStatement
 {
 	public:
-		OracleStatement( );
-		OracleStatement( const OracleStatement &o );
-		OracleStatement( OracleEnvirenment *env );
-		~OracleStatement( );
+		SQLiteStatement( );
+		SQLiteStatement( const SQLiteStatement &o );
 
-		virtual void bind( const unsigned int idx, const types::Variant &value );
+		virtual void bind( const unsigned int idx, const types::Variant &arg );
 
 		virtual const std::string replace( const unsigned int idx ) const;
 
-		void setConnection( OracleConnection *conn );
-		void setStatement( OCIStmt *stmt );
+		void setStatement( sqlite3_stmt *stm );
 		
-		sword getLastStatus( );
-
-	private:
-		void bindUInt( const unsigned int idx, unsigned int &value );
-		void bindInt( const unsigned int idx, signed int &value );
-		void bindBool( const unsigned int idx, signed int &value );
-		void bindDouble( const unsigned int idx, double &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
-		void bindString( const unsigned int idx, char* value, const std::size_t size );
-		void bindNull( const unsigned int idx );
+		int getLastStatus( );
 	
 	private:
-		OracleEnvirenment *m_env;
-		OracleConnection *m_conn;
-		OCIStmt *m_stmt;
-		sword m_status;
-		std::vector<OracleData> m_data;
+		sqlite3_stmt *m_stm;
+		int m_rc;
 };
 
 }}//namespace

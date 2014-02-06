@@ -31,61 +31,35 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/OracleStatement.hpp
-#ifndef _ORACLE_STATEMENT_HPP_INCLUDED
-#define _ORACLE_STATEMENT_HPP_INCLUDED
+///\file database/PostgreSQLsubstitutingStatement.hpp
+#ifndef _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#define _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#include "database/substitutingStatement.hpp"
 #include <string>
-#include <vector>
-#include "Oracle.hpp"
-#include "database/baseStatement.hpp"
+#include "types/variant.hpp"
+#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
 
-struct OracleData {
-	types::Variant v;
-	unsigned int ui;
-	signed int i;
-	double d;
-	char *s;
-	
-	OracleData( ) { s = 0; }
-};
-
-class OracleStatement : public BaseStatement
+class PostgreSQLsubstitutingStatement : public SubstitutingStatement
 {
 	public:
-		OracleStatement( );
-		OracleStatement( const OracleStatement &o );
-		OracleStatement( OracleEnvirenment *env );
-		~OracleStatement( );
+		PostgreSQLsubstitutingStatement( );
+		PostgreSQLsubstitutingStatement( const PostgreSQLsubstitutingStatement &o );
 
-		virtual void bind( const unsigned int idx, const types::Variant &value );
-
-		virtual const std::string replace( const unsigned int idx ) const;
-
-		void setConnection( OracleConnection *conn );
-		void setStatement( OCIStmt *stmt );
+		void setConnection( PGconn *conn );
 		
-		sword getLastStatus( );
+		//\brief Executes the statement with substituted parameters
+		PGresult* execute( ) const;
 
+	protected:
+		virtual const std::string convert( const types::Variant &value ) const;
+		
 	private:
-		void bindUInt( const unsigned int idx, unsigned int &value );
-		void bindInt( const unsigned int idx, signed int &value );
-		void bindBool( const unsigned int idx, signed int &value );
-		void bindDouble( const unsigned int idx, double &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
-		void bindString( const unsigned int idx, char* value, const std::size_t size );
-		void bindNull( const unsigned int idx );
-	
-	private:
-		OracleEnvirenment *m_env;
-		OracleConnection *m_conn;
-		OCIStmt *m_stmt;
-		sword m_status;
-		std::vector<OracleData> m_data;
+		PGconn *m_conn;
 };
+
 
 }}//namespace
 #endif

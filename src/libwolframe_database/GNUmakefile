@@ -45,7 +45,8 @@ CPP_OBJS = \
 	loadTransactionProgram.o \
 	databaseLanguage.o \
 	transactionExecStatemachine.o \
-	bindStatementParams.o
+	baseStatement.o \
+	substitutingStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

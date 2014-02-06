@@ -49,10 +49,13 @@ local_clean:
 
 local_distclean:
 
-local_test: $(TEST_CPP_BINS)
-	@rm -f test.db garbage.db
+test.db:
+	$(SQLITE3) test.db < testDB.sql
+
+garbage.db:
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./createRandom$(EXE) 4096 garbage.db 
-	@$(SQLITE3) test.db < testDB.sql
+
+local_test: $(TEST_CPP_BINS) test.db garbage.db
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
 
 local_longtest:

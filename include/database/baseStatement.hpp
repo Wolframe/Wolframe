@@ -30,55 +30,60 @@
  Project Wolframe.
 
 ************************************************************************/
+
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/bindStatementParams.hpp
-#ifndef _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
-#define _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
-#include <string>
+///\file database/statement.hpp
+
+#ifndef _DATABASE_BASE_STATEMENT_HPP_INCLUDED
+#define _DATABASE_BASE_STATEMENT_HPP_INCLUDED
+
+#include "database/statement.hpp"
+
 #include <vector>
-#include <map>
-#include <utility>
-#include <cstdlib>
+#include <bitset>
 
 namespace _Wolframe {
 namespace db {
 
-class Statement
+//~ //\remark Implements basic parsing of the Wolframe SQL statement with
+//~ //        placeholders, derived classes can steer how the SQL string is
+//~ //        converted to native format
+class BaseStatement : public Statement
 {
-public:
-	Statement()
-		:m_maxparam(0){}
-	Statement( const Statement& o)
-		:m_data(o.m_data)
-		,m_maxparam(o.m_maxparam)
-		,m_bind(o.m_bind){}
-	explicit Statement( const std::string& stmstr);
+	public:
+		BaseStatement( );
+		BaseStatement( const BaseStatement &o );
+		explicit BaseStatement( const std::string &stmtStr );
+		
+		virtual void init( const std::string &stmtStr );
 
-	void clear();
-	void init( const std::string& stmstr);
+		virtual void clear( );
+		
+		virtual void substitute( bool withPlaceholders = true );
 
-	///\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const std::string& arg);
+		virtual void bind( const unsigned int idx, const types::Variant &value );
 
-	std::string expanded() const;
-	const std::string& string() const
-	{
-		return m_string;
-	}
+		virtual const std::string originalSQL( ) const;
 
-	unsigned int maxparam() const
-	{
-		return m_maxparam;
-	}
+		virtual const std::string nativeSQL( ) const;
+		
+	protected:
+		std::string m_stmtStr;
+		unsigned int m_maxParam;
 
-private:
-	std::string m_string;
-	typedef std::pair<unsigned int,std::string> Element;
-	std::vector<Element> m_data;
-	unsigned int m_maxparam;
-	std::map<unsigned int,std::string> m_bind;
+	private:
+		void parse( );
+
+	public:
+		enum { MaxNofParams = 32 };
+		
+	private:
+		typedef std::pair<unsigned int, std::string> Element;
+		std::vector<Element> m_data;
+		std::string m_nativeStmt;
+		std::bitset<MaxNofParams> m_usedIdx;
+		std::bitset<MaxNofParams> m_setIdx;
 };
-
 
 }}//namespace
 #endif

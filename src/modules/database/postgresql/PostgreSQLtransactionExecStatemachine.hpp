@@ -35,7 +35,7 @@
 #ifndef _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
-#include "database/bindStatementParams.hpp"
+#include "database/statement.hpp"
 #include "database/databaseError.hpp"
 #include "system/objectPool.hpp"
 #include <string>
@@ -117,7 +117,7 @@ private:
 	State m_state;
 	PGresult* m_lastresult;
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	Statement m_statement;
+	Statement *m_statement;
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;
 	bool m_hasResult;

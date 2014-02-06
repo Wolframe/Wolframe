@@ -35,9 +35,10 @@
 #ifndef _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_ORACLE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
-#include "database/bindStatementParams.hpp"
+#include "database/statement.hpp"
 #include "database/databaseError.hpp"
 #include "Oracle.hpp"
+#include "OracleStatement.hpp"
 #include "types/keymap.hpp"
 #include <string>
 #include <vector>
@@ -57,7 +58,11 @@ struct OracleColumnDescription {
 	sb2 ind; // NULL indicator for a value in this column
 	ub2 len; // length of the returned data
 	ub2 errcode; // error code on field level
+	
+	~OracleColumnDescription( ) { free( buf ); }
 };
+
+typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
 
 ///\class TransactionExecStatemachine_oracle
 ///\brief Implementation of the standard database transaction execution statemechine for Oracle
@@ -128,10 +133,10 @@ private:
 	OracleEnvirenment *m_env;
 	std::string m_dbname;
 	OCIStmt *m_lastresult; // handle for a statement
-	std::vector<OracleColumnDescription> m_colDescr; // array of column descriptors
+	std::vector<OracleColumnDescriptionPtr> m_colDescr; // array of column descriptors
 	std::size_t m_nof_cols; // number of result columns
 	boost::shared_ptr<db::DatabaseError> m_lasterror;
-	Statement m_statement;
+	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
 	OracleDbUnit* m_dbUnit;

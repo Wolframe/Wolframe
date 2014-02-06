@@ -30,61 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/OracleStatement.hpp
-#ifndef _ORACLE_STATEMENT_HPP_INCLUDED
-#define _ORACLE_STATEMENT_HPP_INCLUDED
-#include <string>
-#include <vector>
-#include "Oracle.hpp"
+
+///\brief An abstract statement class which allows derived classes to
+///       provide a simple escaping function which encodes the data
+///       which is stored directly in the SQL statement
+///\file substitutingStatement.hpp
+
+#ifndef _DATABASE_SUBSTITUTING_STATEMENT_HPP_INCLUDED
+#define _DATABASE_SUBSTITUTING_STATEMENT_HPP_INCLUDED
+
 #include "database/baseStatement.hpp"
+
+#include <map>
 
 namespace _Wolframe {
 namespace db {
 
-struct OracleData {
-	types::Variant v;
-	unsigned int ui;
-	signed int i;
-	double d;
-	char *s;
-	
-	OracleData( ) { s = 0; }
-};
-
-class OracleStatement : public BaseStatement
+//\remark A generic statement class which takes the string and replaces
+//        the placeholders direcly with the data (more as prove of concept).
+//        To be useful a derived class has at least to implement the 'convert'
+//        method
+class SubstitutingStatement : public BaseStatement
 {
 	public:
-		OracleStatement( );
-		OracleStatement( const OracleStatement &o );
-		OracleStatement( OracleEnvirenment *env );
-		~OracleStatement( );
+		SubstitutingStatement( );
+		SubstitutingStatement( const SubstitutingStatement &o );
+		
+		virtual void init( const std::string &stmtStr );
+
+		virtual void clear( );
 
 		virtual void bind( const unsigned int idx, const types::Variant &value );
+	
+	protected:
+		//\remark: function to convert and escape a variant, if single
+		//         quotes are need, the function should also return those,
+		//         care must be taken to use the database escape functions
+		//         to escape the values here (beware of SQL code injection!)
+		virtual const std::string convert( const types::Variant &value ) const = 0;
 
 		virtual const std::string replace( const unsigned int idx ) const;
-
-		void setConnection( OracleConnection *conn );
-		void setStatement( OCIStmt *stmt );
-		
-		sword getLastStatus( );
-
-	private:
-		void bindUInt( const unsigned int idx, unsigned int &value );
-		void bindInt( const unsigned int idx, signed int &value );
-		void bindBool( const unsigned int idx, signed int &value );
-		void bindDouble( const unsigned int idx, double &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
-		void bindString( const unsigned int idx, char* value, const std::size_t size );
-		void bindNull( const unsigned int idx );
 	
 	private:
-		OracleEnvirenment *m_env;
-		OracleConnection *m_conn;
-		OCIStmt *m_stmt;
-		sword m_status;
-		std::vector<OracleData> m_data;
+		std::map< unsigned int, std::string > m_bind;
 };
 
 }}//namespace

@@ -30,61 +30,52 @@
  Project Wolframe.
 
 ************************************************************************/
+
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/OracleStatement.hpp
-#ifndef _ORACLE_STATEMENT_HPP_INCLUDED
-#define _ORACLE_STATEMENT_HPP_INCLUDED
+///\file database/statement.hpp
+
+#ifndef _DATABASE_STATEMENET_HPP_INCLUDED
+#define _DATABASE_STATEMENET_HPP_INCLUDED
+
 #include <string>
-#include <vector>
-#include "Oracle.hpp"
-#include "database/baseStatement.hpp"
+#include "types/variant.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-struct OracleData {
-	types::Variant v;
-	unsigned int ui;
-	signed int i;
-	double d;
-	char *s;
-	
-	OracleData( ) { s = 0; }
-};
-
-class OracleStatement : public BaseStatement
+//\remark The interface of a statement SQL parameter substutution class
+class Statement
 {
 	public:
-		OracleStatement( );
-		OracleStatement( const OracleStatement &o );
-		OracleStatement( OracleEnvirenment *env );
-		~OracleStatement( );
-
-		virtual void bind( const unsigned int idx, const types::Variant &value );
-
-		virtual const std::string replace( const unsigned int idx ) const;
-
-		void setConnection( OracleConnection *conn );
-		void setStatement( OCIStmt *stmt );
+		virtual ~Statement( ) { }
 		
-		sword getLastStatus( );
+		//\remark Binds parameter at position idx with variant data
+		//        in the format with Wolframe placeholders
+		virtual void bind( const unsigned int idx, const types::Variant &arg ) = 0;
 
-	private:
-		void bindUInt( const unsigned int idx, unsigned int &value );
-		void bindInt( const unsigned int idx, signed int &value );
-		void bindBool( const unsigned int idx, signed int &value );
-		void bindDouble( const unsigned int idx, double &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
-		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
-		void bindString( const unsigned int idx, char* value, const std::size_t size );
-		void bindNull( const unsigned int idx );
-	
-	private:
-		OracleEnvirenment *m_env;
-		OracleConnection *m_conn;
-		OCIStmt *m_stmt;
-		sword m_status;
-		std::vector<OracleData> m_data;
+		//\remark Returns the SQL statement as passed down to the
+		//        database layer
+		virtual const std::string originalSQL( ) const = 0;
+		
+		//\remark Returns the SQL statement with the native database
+		//        placeholders or the data filled in (this is up
+		//        to the derived classes).
+		virtual const std::string nativeSQL( ) const = 0;
+
+		//\remark Set new SQL statement
+		virtual void init( const std::string &stmtStr ) = 0;
+		
+		//\remark Clear current statement
+		virtual void clear( ) = 0;
+
+		//\remark Trigger substitution (nativeSQL is valid after
+		//        this call and not before!)
+		virtual void substitute( bool withPlaceholders = true ) = 0;
+
+		//\remark Funtion called when the placeholder should be put
+		//        into the final string (this is either for subsituting
+		//        data or rewrite placeholders to native syntax)
+		virtual const std::string replace( const unsigned int idx ) const = 0;
 };
 
 }}//namespace
