@@ -40,6 +40,7 @@
 #include "langbind/cppFormFunction.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
 #include "langbind/formFunction.hpp"
+#include "langbind/runtimeEnvironment.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/customDataType.hpp"
@@ -61,7 +62,8 @@ public:
 
 	virtual ~ProgramLibrary();
 	virtual void defineCppFormFunction( const std::string& name, const langbind::CppFormFunction& f);
-	virtual void defineFormFunction( const std::string& name, langbind::FormFunctionR f);
+	virtual void defineFormFunction( const std::string& name, const langbind::FormFunctionR f);
+	virtual void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env);
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
 	virtual void defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const;

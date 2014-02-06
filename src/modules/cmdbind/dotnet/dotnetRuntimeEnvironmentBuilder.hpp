@@ -33,8 +33,7 @@ Project Wolframe.
 ///\brief Interface .NET runtime environment builder
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
-#include "prgbind/runtimeEnvironmentConstructor.hpp"
-#include "langbind/formFunction.hpp"
+#include "module/runtimeEnvironmentConstructor.hpp"
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
 #include "processor/moduleInterface.hpp"
@@ -43,7 +42,7 @@ namespace _Wolframe {
 namespace module {
 
 class DotnetRuntimeEnvironmentConstructor
-	:public prgbind::RuntimeEnvironmentConstructor
+	:public module::RuntimeEnvironmentConstructor
 {
 public:
 	DotnetRuntimeEnvironmentConstructor(){}
