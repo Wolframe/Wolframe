@@ -357,6 +357,45 @@ TEST_F( OracleFixture, ReusedBindParameter )
 	trans->close( );
 }
 
+TEST_F( OracleFixture, ExpressionWithParameter )
+{
+	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, std::list<std::string>());
+	Database* db = dbUnit.database( );
+	Transaction* trans = db->transaction( "test" );
+	
+	trans->begin( );
+	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
+	std::vector<types::Variant> values;
+	values.push_back( 47);
+	values.push_back( 47);
+	values.push_back( 47);
+	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values);
+	trans->commit( );
+
+	trans->begin( );
+	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
+	EXPECT_EQ( res.size(), 1);
+	EXPECT_EQ( res.colnames().size(), 3);
+	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
+	EXPECT_STREQ( "ID2", res.colnames().at(1).c_str());
+	EXPECT_STREQ( "ID3", res.colnames().at(2).c_str());
+	std::vector<Transaction::Result::Row>::const_iterator ri = res.begin(), re = res.end();
+	for (types::Variant::Data::Int idx=1; ri!= re; ++ri,++idx)
+	{
+		ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
+		ASSERT_EQ( ri->at(1).type(), types::Variant::Int);
+		ASSERT_EQ( ri->at(2).type(), types::Variant::Int);
+		EXPECT_EQ( 47, ri->at(0).toint());
+		EXPECT_EQ( 48, ri->at(1).toint());
+		EXPECT_EQ( 49, ri->at(2).toint());
+	}
+	trans->commit( );
+	trans->close( );
+}
+
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
