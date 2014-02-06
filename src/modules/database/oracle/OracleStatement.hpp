@@ -46,6 +46,10 @@ struct OracleData {
 	types::Variant v;
 	unsigned int ui;
 	signed int i;
+	double d;
+	char *s;
+	
+	OracleData( ) { s = 0; }
 };
 
 class OracleStatement : public BaseStatement
@@ -54,6 +58,7 @@ class OracleStatement : public BaseStatement
 		OracleStatement( );
 		OracleStatement( const OracleStatement &o );
 		OracleStatement( OracleEnvirenment *env );
+		~OracleStatement( );
 
 		virtual void bind( const unsigned int idx, const types::Variant &value );
 
@@ -65,13 +70,13 @@ class OracleStatement : public BaseStatement
 		sword getLastStatus( );
 
 	private:
-		void bindUInt( const unsigned int idx, const unsigned int &value );
-		void bindInt( const unsigned int idx, const signed int &value );
-		void bindBool( const unsigned int idx, const signed int &value );
-		void bindDouble( const unsigned int idx, const double &value );
+		void bindUInt( const unsigned int idx, unsigned int &value );
+		void bindInt( const unsigned int idx, signed int &value );
+		void bindBool( const unsigned int idx, signed int &value );
+		void bindDouble( const unsigned int idx, double &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
-		void bindString( const unsigned int idx, const char* value, const std::size_t size );
+		void bindString( const unsigned int idx, char* value, const std::size_t size );
 		void bindNull( const unsigned int idx );
 	
 	private:

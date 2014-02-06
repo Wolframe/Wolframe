@@ -12,6 +12,7 @@ OracleStatement::OracleStatement( )
 	m_stmt( 0 ),
 	m_status( 0 )
 {
+	m_data.reserve( MaxNofParams );
 }
 
 OracleStatement::OracleStatement( const OracleStatement &o )
@@ -29,6 +30,7 @@ OracleStatement::OracleStatement( OracleEnvirenment *env )
 	m_stmt( 0 ),
 	m_status( 0 )
 {
+	m_data.reserve( MaxNofParams );
 }
 
 void OracleStatement::setConnection( OracleConnection *conn )
@@ -46,7 +48,7 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
-void OracleStatement::bindUInt( const unsigned int idx, const unsigned int &value )
+void OracleStatement::bindUInt( const unsigned int idx, unsigned int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -56,7 +58,7 @@ void OracleStatement::bindUInt( const unsigned int idx, const unsigned int &valu
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindInt( const unsigned int idx, const signed int &value )
+void OracleStatement::bindInt( const unsigned int idx, signed int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -67,7 +69,7 @@ void OracleStatement::bindInt( const unsigned int idx, const signed int &value )
 }
 
 // TODO: hard-wired to a NUMBER(1) with 0 and 1 for now	
-void OracleStatement::bindBool( const unsigned int idx, const signed int &value )
+void OracleStatement::bindBool( const unsigned int idx, signed int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -77,7 +79,7 @@ void OracleStatement::bindBool( const unsigned int idx, const signed int &value 
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindDouble( const unsigned int idx, const double &value )
+void OracleStatement::bindDouble( const unsigned int idx, double &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 	
@@ -95,7 +97,7 @@ void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_UINTEG
 {
 }
 
-void OracleStatement::bindString( const unsigned int idx, const char* value, const std::size_t size )
+void OracleStatement::bindString( const unsigned int idx, char* value, const std::size_t size )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
@@ -150,7 +152,8 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 
 		case types::Variant::Double:
-			bindDouble( idx, m_data.back( ).v.data().value.Double );
+			m_data.back( ).d = m_data.back( ).v.data().value.Double;
+			bindDouble( idx, m_data.back( ).d );
 			break;
 
 		case types::Variant::Bool:
@@ -159,7 +162,9 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 
 		case types::Variant::String:
-			bindString( idx, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
 
 		case types::Variant::Custom:
@@ -168,6 +173,14 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
+	}
+}
+
+OracleStatement::~OracleStatement( )
+{
+	std::vector<OracleData>::iterator it, end = m_data.end( );
+	for( it = m_data.begin( ); it != end; it++ ) {
+		if( (*it).s ) free( (*it).s );
 	}
 }
 
