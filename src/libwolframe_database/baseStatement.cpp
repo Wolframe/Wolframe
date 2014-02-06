@@ -38,6 +38,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <cctype>
+#include <string>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
