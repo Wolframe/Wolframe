@@ -101,9 +101,8 @@ int main( int argc, char **argv )
 		// Call the function to execute
 		if (cmdline.inputfile().size())
 		{
-			std::fstream fh;
-			fh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-			fh.open( cmdline.inputfile().c_str(), std::ios::in | std::ios::binary);
+			std::ifstream fh;
+			fh.open( cmdline.inputfile().c_str());
 
 			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
 		}

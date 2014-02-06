@@ -39,6 +39,7 @@ static void test_atomic_param_clr_call( const comauto::CommonLanguageRuntime& cl
 
 static void test_function_call( const std::map<std::string,comauto::DotnetFunctionR>& funcmap, const char* name, const test::Form& param, const char* title)
 {
+	int taglevel = 0;
 	std::map<std::string,comauto::DotnetFunctionR>::const_iterator xi = funcmap.find( name);
 	if (xi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + name + "'");
 
@@ -53,6 +54,15 @@ static void test_function_call( const std::map<std::string,comauto::DotnetFuncti
 	std::cout << std::endl << title << std::endl;
 	while (funcres->getNext( elemtype, elem))
 	{
+		if (elemtype == langbind::FilterBase::OpenTag)
+		{
+			++taglevel;
+		}
+		else if (elemtype == langbind::FilterBase::CloseTag)
+		{	
+			--taglevel;
+			if (taglevel < 0) break;
+		}
 		std::cout << langbind::FilterBase::elementTypeName( elemtype) << " '" << elem.tostring() << "'" << std::endl;
 	}
 }
@@ -217,7 +227,7 @@ int main( int , const char**)
 
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED));
 		std::string path( "C:\\Github\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
-		std::string assembly( "Functions, Version=1.0.0.60, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+		std::string assembly( "Functions, Version=1.0.0.68, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");
