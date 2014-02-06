@@ -36,6 +36,7 @@ Project Wolframe.
 #include "langbind/ddlCompilerInterface.hpp"
 #include "processor/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -76,6 +77,10 @@ private:
 	std::string m_name;
 	langbind::CreateDDLCompilerFunc m_createFunc;
 };
+
+typedef boost::shared_ptr<DDLCompilerConstructor> DDLCompilerConstructorR;
+
+
 
 class DDLCompilerBuilder :public SimpleBuilder
 {

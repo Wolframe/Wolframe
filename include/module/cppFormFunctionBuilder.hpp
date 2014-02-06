@@ -36,6 +36,7 @@ Project Wolframe.
 #include "langbind/cppFormFunction.hpp"
 #include "processor/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -66,6 +67,9 @@ private:
 	const std::string m_name;
 	const langbind::CppFormFunction m_func;
 };
+
+typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructorR;
+
 
 class CppFormFunctionBuilder :public SimpleBuilder
 {

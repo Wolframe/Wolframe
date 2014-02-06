@@ -36,6 +36,7 @@ Project Wolframe.
 #include "prgbind/program.hpp"
 #include "processor/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -77,6 +78,9 @@ private:
 	std::string m_name;
 	CreateProgramType m_createFunc;
 };
+
+typedef boost::shared_ptr<ProgramTypeConstructor> ProgramTypeConstructorR;
+
 
 class ProgramTypeBuilder :public SimpleBuilder
 {

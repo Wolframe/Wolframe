@@ -143,9 +143,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		switch( it->objectType() )	{
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
 				module::FilterConstructorR fltr( dynamic_cast< module::FilterConstructor* >((*it)->constructor()));
-				if ( fltr.get() == NULL )	{
+				if (!fltr.get())	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a filter";
+						  << "' is not a filter";
 					throw std::logic_error( "Object is not a filter. See log." );
 				}
 				else	{
@@ -165,10 +165,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 			case ObjectConstructorBase::DDL_COMPILER_OBJECT:
 			{	// object is a DDL compiler
-				module::DDLCompilerConstructor* ffo = dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor());
-				if ( ffo == NULL )	{
+				module::DDLCompilerConstructorR ffo( dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a DDL compiler";
+						  << "' is not a DDL compiler";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
 				else {
@@ -182,41 +182,39 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					{
 						LOG_FATAL << "Error loading DDL compiler '" << ffo->name() << "':" << e.what();
 					}
-					delete ffo;
 				}
 				break;
 			}
 
 			case ObjectConstructorBase::PROGRAM_TYPE_OBJECT:
 			{	// object is a form function program type
-				module::ProgramTypeConstructor* ffo = dynamic_cast< module::ProgramTypeConstructor* >((*it)->constructor());
-				if ( ffo == NULL )	{
+				module::ProgramTypeConstructorR ffo( dynamic_cast< module::ProgramTypeConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a DDL compiler";
-					throw std::logic_error( "Object is not a form function. See log." );
+						  << "' is not a program type";
+					throw std::logic_error( "Object is not a program type. See log." );
 				}
 				else {
 					try
 					{
 						prgbind::ProgramR prgtype( ffo->object());
 						m_programs->defineProgramType( prgtype);
-						LOG_TRACE << "registered '" << ffo->name() << "' form function program type";
+						LOG_TRACE << "registered '" << ffo->name() << "' program type";
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading form function program type '" << ffo->name() << "':" << e.what();
+						LOG_FATAL << "Error loading program type '" << ffo->name() << "':" << e.what();
 					}
-					delete ffo;
 				}
 				break;
 			}
 
 			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:
 			{	// object is a form function
-				module::CppFormFunctionConstructor* ffo = dynamic_cast< module::CppFormFunctionConstructor* >((*it)->constructor());
-				if ( ffo == NULL )	{
+				module::CppFormFunctionConstructorR ffo( dynamic_cast< module::CppFormFunctionConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a form function";
+						  << "' is not a form function";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
 				else	{
@@ -231,7 +229,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					{
 						LOG_FATAL << "Error loading form function object '" << ffo->objectClassName() << "':" << e.what();
 					}
-					delete ffo;
 				}
 				break;
 			}
@@ -242,7 +239,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				if ( !constructor.get() )
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a normalize function constructor";
+						  << "' is not a normalize function constructor";
 					throw std::logic_error( "Object is not a normalize function constructor. See log." );
 				}
 				else
@@ -269,7 +266,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				if ( !constructor.get() )
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a custom data type constructor";
+						  << "' is not a custom data type constructor";
 					throw std::logic_error( "Object is not a custom data type constructor. See log." );
 				}
 				else
@@ -299,13 +296,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			case ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT:
 			case ObjectConstructorBase::TEST_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is marked as '" << ObjectConstructorBase::objectTypeName( it->objectType())
+					  << "' is marked as '" << ObjectConstructorBase::objectTypeName( it->objectType())
 					  << "' object but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			default:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "'' is of an unknown object type";
+					  << "' is of an unknown object type";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}

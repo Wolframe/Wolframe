@@ -35,10 +35,17 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_INTEGER_HPP_INCLUDED
 #define _Wolframe_TYPES_INTEGER_HPP_INCLUDED
 
+#include <limits>
 #include <boost/cstdint.hpp>
 
 #define _WOLFRAME_INTEGER		boost::int64_t
 #define _WOLFRAME_UINTEGER		boost::uint64_t
+
+#define _WOLFRAME_MAX_INTEGER		std::numeric_limits<_WOLFRAME_INTEGER>::max()
+#define _WOLFRAME_MAX_UINTEGER		std::numeric_limits<_WOLFRAME_UINTEGER>::max()
+
+#define _WOLFRAME_MIN_INTEGER		std::numeric_limits<_WOLFRAME_INTEGER>::min()
+#define _WOLFRAME_MIN_UINTEGER		std::numeric_limits<_WOLFRAME_UINTEGER>::min()
 
 #define _WOLFRAME_INTEGER_DIGITS	19
 #define _WOLFRAME_UINTEGER_DIGITS	20

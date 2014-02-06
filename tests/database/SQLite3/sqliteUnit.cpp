@@ -5,13 +5,13 @@
 #include "logger-v1.hpp"
 #include "processor/moduleDirectory.hpp"
 #include "types/variant.hpp"
+#include "types/integer.hpp"
 #include "gtest/gtest.h"
 
 #include "SQLite.hpp"
 #include <vector>
 #include <string>
 #include <limits>
-#include <stdint.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -82,7 +82,7 @@ static void executeInsertStatements( Transaction* trans)
 	// some maxima
 	{
 		std::vector<types::Variant> values;
-		values.push_back( UINT64_MAX );
+		values.push_back( _WOLFRAME_MAX_UINTEGER );
 		values.push_back( "");
 		values.push_back( false);
 		values.push_back( std::numeric_limits<double>::max( ) );
@@ -91,7 +91,7 @@ static void executeInsertStatements( Transaction* trans)
 	// some minima
 	{
 		std::vector<types::Variant> values;
-		values.push_back( INT64_MIN );
+		values.push_back( _WOLFRAME_MIN_INTEGER );
 		values.push_back( "");
 		values.push_back( false);
 		values.push_back( std::numeric_limits<double>::min( ) );
@@ -181,7 +181,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				EXPECT_EQ( INT64_MIN, ri->at(0).toint());
+				EXPECT_EQ( _WOLFRAME_MIN_INTEGER, ri->at(0).toint());
 				double price( ri->at(3).todouble());
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::min( ), price );
 				break;
@@ -211,7 +211,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				//EXPECT_EQ( UINT_MAX, ri->at(0).touint());
+				//EXPECT_EQ( _WOLFRAME_MAX_UINTEGER, ri->at(0).touint());
 				ASSERT_DOUBLE_EQ( 1.8446744073709552e+19, ri->at(0).todouble( ));
 				double price( ri->at(3).todouble());
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ), price );

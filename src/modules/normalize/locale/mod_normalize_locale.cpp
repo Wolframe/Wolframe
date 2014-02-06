@@ -70,7 +70,7 @@ static NormalizeFunctionDef normalizeFunctions[] =
 namespace {
 struct NormalizeProcessor
 {
-	static SimpleBuilder* constructor()
+	static SimpleBuilder* builder()
 	{
 		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", normalizeFunctions, &createLocaleResourceHandle);
 	}
@@ -80,7 +80,7 @@ struct NormalizeProcessor
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	NormalizeProcessor::constructor
+	NormalizeProcessor::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", setModuleLogger, 0, 0, NofObjects, objdef);
