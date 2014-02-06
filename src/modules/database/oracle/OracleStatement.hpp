@@ -44,8 +44,8 @@ namespace db {
 
 struct OracleData {
 	types::Variant v;
-	boost::uint32_t ui32;
-	boost::int32_t i32;
+	unsigned int ui;
+	signed int i;
 };
 
 class OracleStatement : public BaseStatement
@@ -65,9 +65,9 @@ class OracleStatement : public BaseStatement
 		sword getLastStatus( );
 
 	private:
-		void bindUInt32( const unsigned int idx, const boost::uint32_t &value );
-		void bindInt32( const unsigned int idx, const boost::int32_t &value );
-		void bindBool( const unsigned int idx, const bool &value );
+		void bindUInt( const unsigned int idx, const unsigned int &value );
+		void bindInt( const unsigned int idx, const signed int &value );
+		void bindBool( const unsigned int idx, const signed int &value );
 		void bindDouble( const unsigned int idx, const double &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );

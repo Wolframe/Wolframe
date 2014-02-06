@@ -46,33 +46,33 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
-void OracleStatement::bindUInt32( const unsigned int idx, const boost::uint32_t &value )
+void OracleStatement::bindUInt( const unsigned int idx, const unsigned int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( boost::uint32_t ),
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( unsigned int ),
 		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
-void OracleStatement::bindInt32( const unsigned int idx, const boost::int32_t &value )
+void OracleStatement::bindInt( const unsigned int idx, const signed int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( boost::int32_t ),
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( signed int ),
 		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
 // TODO: hard-wired to a NUMBER(1) with 0 and 1 for now	
-void OracleStatement::bindBool( const unsigned int idx, const bool &value )
+void OracleStatement::bindBool( const unsigned int idx, const signed int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
-		(ub4)idx, (dvoid *)&value, (sb4)sizeof( bool ),
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( signed int ),
 		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
@@ -133,8 +133,8 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		
 		case types::Variant::Int:
 			if( value.data( ).value.Int <= 0x7FFFFFFF && value.data( ).value.Int >= -0x7FFFFFFFF ) {
-				m_data.back( ).i32 = (boost::int32_t)m_data.back( ).v.data( ).value.Int;
-				bindInt32( idx, m_data.back( ).i32 );
+				m_data.back( ).i = (signed int)m_data.back( ).v.data( ).value.Int;
+				bindInt( idx, m_data.back( ).i );
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.Int );
 			}
@@ -142,8 +142,8 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 
 		case types::Variant::UInt:
 			if( value.data( ).value.UInt <= 0x7FFFFFFF ) {
-				m_data.back( ).ui32 = (boost::uint32_t)m_data.back( ).v.data( ).value.UInt;
-				bindUInt32( idx, m_data.back( ).ui32 );
+				m_data.back( ).ui = (unsigned int)m_data.back( ).v.data( ).value.UInt;
+				bindUInt( idx, m_data.back( ).ui );
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.UInt );
 			}
@@ -154,7 +154,8 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 
 		case types::Variant::Bool:
-			bindBool( idx, m_data.back( ).v.data().value.Bool );
+			m_data.back( ).i = m_data.back( ).v.toint( );
+			bindBool( idx, m_data.back( ).i );
 			break;
 
 		case types::Variant::String:
