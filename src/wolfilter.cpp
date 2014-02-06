@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program using wolframe functions to map stdin to stdout
+//\brief Program using wolframe functions to map stdin to stdout
 #include "wolfilterCommandLine.hpp"
 #include "wolfilterIostreamFilter.hpp"
 #include "prgbind/programLibrary.hpp"
@@ -41,6 +41,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
@@ -87,6 +88,7 @@ int main( int argc, char **argv )
 		// Load the modules, scripts, etc. defined in the command line into the global context:
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary programLibrary;
+
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
 
 		if (!processorProvider.resolveDB( databaseProvider))

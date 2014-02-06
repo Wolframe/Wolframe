@@ -240,11 +240,27 @@
 		<para><application>Wolframe</application> does not accept local assemblies. In order to be addressable over
 		the type library interface assemblies need to be put into the global assembly cache (GAC).
 		Unfortunately this has to be repeated every time the assembly binary changes.
-		There is no way around. For registration in the GAC you have to call the program
+		There is no way around. For the registration in the GAC we have to call the program
 		<code>gacutil /if &lt;assemblypath&gt;</code> with the assembly path &lt;assemblypath&gt;
-		as argument. Furthermore the command <code>gacutil</code> has to be called from
-		administrator command line. Before calling <code>gacutil</code>, assemblies have to
-		be strongly signed. We refer here to the MSDN documentation for how to sign an application.
+		as argument. The command <code>gacutil</code> has to be called from
+		administrator command line. Before calling <code>gacutil</code>, assemblies
+		have to be strongly signed. We refer here to the MSDN documentation for how
+		to sign an application.
+		</para>
+		</sect3>
+
+		<sect3>
+		<title>Register the Types in the Assembly</title>
+		<para>We have to register the types declared in the assembly
+		to enable <application>Wolframe</application> to create these types.
+		An example could be a provider function returning a structure that is called
+		from a <application>Wolframe</application> .NET function. The structure
+		returned here has to be build in an unmanaged context. In order to be valid
+		in the managed context, the type has to be registered.
+		For the registration of the types in an assembly we have to call the program
+		<code>regasm &lt;assemblypath&gt;</code> with the assembly path &lt;assemblypath&gt;
+		as argument. The command <code>regasm</code> has to be called from
+		administrator command line.
 		</para>
 		</sect3>
 	</sect2>

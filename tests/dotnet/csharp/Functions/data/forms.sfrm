@@ -2,8 +2,8 @@ FORM GetAddress_p
 {
 	doc
 	{
-        street string
-	    country string
+	street string
+		country string
 	}
 }
 
@@ -28,7 +28,17 @@ FORM Address
 {
 	address
 	{
-        street string
-	    country string
+	street string
+		country string
 	}
 }
+
+FORM IdPair
+{
+	pair
+	{
+		a string
+		b string
+	}
+}
+

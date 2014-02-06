@@ -169,7 +169,6 @@ bool comauto::AssignmentClosure::Impl::call( VARIANT& output)
 	{
 		while (m_input->getNext( elemtype, elemvalue))
 		{
-			/*[-]*/std::cout << "++++ RESULT getNext " << langbind::FilterBase::elementTypeName(elemtype) << " '" << elemvalue.tostring() << "'" << std::endl;
 AGAIN:
 			cur = &m_stk.back();
 			switch (elemtype)
