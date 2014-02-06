@@ -8,7 +8,6 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/tests \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \

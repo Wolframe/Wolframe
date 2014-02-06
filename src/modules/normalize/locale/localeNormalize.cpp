@@ -168,6 +168,8 @@ private:
 	const char* m_name;
 };
 
+namespace _Wolframe {
+namespace langbind {
 
 types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
 {
@@ -197,6 +199,12 @@ types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResource
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
 	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfd");
+}
+
+types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
+{
+	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfc");
 }
 
 types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
@@ -229,3 +237,4 @@ types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeRes
 	return new LocaleConvNormalizeFunction( *myreshnd, arg, &EuropeanAsciiNormalizer::localeConv, "ascii_eu");
 }
 
+}}//namespace
