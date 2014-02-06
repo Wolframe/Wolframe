@@ -10,6 +10,8 @@
 #include "SQLite.hpp"
 #include <vector>
 #include <string>
+#include <limits>
+#include <stdint.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -60,6 +62,7 @@ TEST_F( SQLiteModuleFixture, OpenGarbage )
 
 static void executeInsertStatements( Transaction* trans)
 {
+	// some normal values
 	{
 		std::vector<types::Variant> values;
 		values.push_back( 1);
@@ -76,6 +79,25 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( -4.2344 );
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
 	}
+	// some maxima
+	{
+		std::vector<types::Variant> values;
+		values.push_back( UINT64_MAX );
+		values.push_back( "");
+		values.push_back( false);
+		values.push_back( std::numeric_limits<double>::max( ) );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	// some minima
+	{
+		std::vector<types::Variant> values;
+		values.push_back( INT64_MIN );
+		values.push_back( "");
+		values.push_back( false);
+		values.push_back( std::numeric_limits<double>::min( ) );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	// null values
 	{
 		std::vector<types::Variant> values;
 		values.push_back( types::VariantConst( ));
@@ -144,7 +166,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id is NULL, id ASC");
 	trans->commit( );
-	EXPECT_EQ( res.size(), 3);
+	EXPECT_EQ( res.size(), 5);
 	EXPECT_EQ( res.colnames().size(), 4);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "name", res.colnames().at(1).c_str());
@@ -153,23 +175,56 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 	std::vector<Transaction::Result::Row>::const_iterator ri = res.begin(), re = res.end();
 	for (types::Variant::Data::Int idx=1; ri!= re; ++ri,++idx)
 	{
-		if( idx == 3 ) {
-			ASSERT_FALSE( ri->at(0).defined( ) );
-			ASSERT_FALSE( ri->at(1).defined( ) );
-			ASSERT_FALSE( ri->at(2).defined( ) );
-			ASSERT_FALSE( ri->at(3).defined( ) );
-		} else {
-			ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
-			ASSERT_EQ( ri->at(1).type(), types::Variant::String);
-			ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
-			ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-			EXPECT_EQ( idx, ri->at(0).toint());
-			std::string name( ri->at(1).tostring());
-			bool active( ri->at(2).tobool());
-			double price( ri->at(3).todouble());
-			EXPECT_STREQ( (idx==2?"abc":"xyz"), name.c_str());
-			EXPECT_EQ( ( idx==2?false:true), active);
-			ASSERT_DOUBLE_EQ( ( idx==2?-4.2344:4.782), price);
+		switch( idx ) {
+			case 1: {
+				ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
+				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
+				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
+				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
+				EXPECT_EQ( INT64_MIN, ri->at(0).toint());
+				double price( ri->at(3).todouble());
+				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::min( ), price );
+				break;
+			}
+
+			case 2:
+			case 3:	{
+				ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
+				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
+				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
+				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
+				EXPECT_EQ( idx-1, ri->at(0).toint());
+				std::string name( ri->at(1).tostring());
+				bool active( ri->at(2).tobool());
+				double price( ri->at(3).todouble());
+				EXPECT_STREQ( (idx==3?"abc":"xyz"), name.c_str());
+				EXPECT_EQ( ( idx==3?false:true), active);
+				ASSERT_DOUBLE_EQ( ( idx==3?-4.2344:4.782), price);
+				break;
+			}
+				
+			case 4: {
+				// cannot be stored in NUMBER as INTEGER, get's stored as REAL, which is ok.
+				// See also SqliteStatement.cpp.
+				ASSERT_EQ( ri->at(0).type(), types::Variant::Double);
+				// ASSERT_EQ( ri->at(0).type(), types::Variant::UInt);
+				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
+				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
+				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
+				//EXPECT_EQ( UINT_MAX, ri->at(0).touint());
+				ASSERT_DOUBLE_EQ( 1.8446744073709552e+19, ri->at(0).todouble( ));
+				double price( ri->at(3).todouble());
+				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ), price );
+				break;
+			}
+
+			case 5: {
+				ASSERT_FALSE( ri->at(0).defined( ) );
+				ASSERT_FALSE( ri->at(1).defined( ) );
+				ASSERT_FALSE( ri->at(2).defined( ) );
+				ASSERT_FALSE( ri->at(3).defined( ) );
+				break;
+			}				
 		}
 	}
 

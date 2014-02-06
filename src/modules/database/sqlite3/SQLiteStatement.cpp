@@ -10,6 +10,7 @@ using namespace _Wolframe::db;
 SQLiteStatement::SQLiteStatement( )
 	: BaseStatement( )
 {
+	m_data.reserve( MaxNofParams );
 }
 
 SQLiteStatement::SQLiteStatement( const SQLiteStatement &o )
@@ -58,6 +59,12 @@ static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
 	return rt;
 }
 
+void SQLiteStatement::clear( )
+{
+	BaseStatement::clear( );
+	m_data.clear( );
+}
+
 void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value )
 {
 	// does boundary checking
@@ -74,18 +81,24 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 			
 		case types::Variant::Int:
-			m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint());
+			if( value.data( ).value.Int <= 0x7FFFFFFF && value.data( ).value.Int >= -0x7FFFFFFFF ) {
+				m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, (signed int)value.toint());
+			} else {
+				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.toint());
+			}
 			break;
 			
 		case types::Variant::UInt:
-			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
-			{
-				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint());
-			}
-			else
-			{
-				std::string strval( value.tostring());
-				m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC);
+			if( value.data( ).value.UInt <= 0x7FFFFFFF ) {
+				m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, (signed int)value.toint());
+			} else if ( value.data( ).value.UInt <= 0x7FFFFFFFFFFFFFFF ) {
+				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.toint());
+			} else {
+				// this is debatable: either the value gets converted to a REAL
+				// storage type (thus resulting in Variant::Double when we read it),
+				// or we have to store big unsigned integers as strings..
+				m_data.push_back( value.tostring());
+				m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
 			}
 			break;
 			

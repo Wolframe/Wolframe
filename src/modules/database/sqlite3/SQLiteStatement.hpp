@@ -35,6 +35,7 @@
 #ifndef _SQLITE_STATEMENT_HPP_INCLUDED
 #define _SQLITE_STATEMENT_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include "database/baseStatement.hpp"
 #include "sqlite3.h"
 
@@ -47,6 +48,8 @@ class SQLiteStatement : public BaseStatement
 		SQLiteStatement( );
 		SQLiteStatement( const SQLiteStatement &o );
 
+		virtual void clear( );
+
 		virtual void bind( const unsigned int idx, const types::Variant &arg );
 
 		virtual const std::string replace( const unsigned int idx ) const;
@@ -58,6 +61,7 @@ class SQLiteStatement : public BaseStatement
 	private:
 		sqlite3_stmt *m_stm;
 		int m_rc;
+		std::vector<std::string> m_data;
 };
 
 }}//namespace
