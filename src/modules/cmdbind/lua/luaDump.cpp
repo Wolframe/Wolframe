@@ -56,14 +56,18 @@ public:
 		if (m_ar) std::free( m_ar);
 	}
 
-	bool write( const void* p, std::size_t sz)
+	//\brief Append 'addsize' bytes starting at 'addptr' to buffer
+	bool write( const void* addptr, std::size_t addsize)
 	{
 		enum {StartSize=1024};
-		if (sz > m_size - m_pos)
+		if (addsize > m_size - m_pos)
 		{
-			std::size_t mm = (m_size*2)?m_size:(std::size_t)StartSize;
-			while (mm < m_size - m_pos && mm >= StartSize) mm*=2;
-			if (mm < m_size - m_pos) return false;
+			std::size_t mm = (m_size)?(m_size*2):(std::size_t)StartSize;
+			while (mm < (addsize + m_pos) && mm >= StartSize)
+			{
+				mm *= 2;
+			}
+			if (mm < StartSize) return false;
 
 			void* newar = std::realloc( m_ar, mm);
 			if (!newar) return false;
@@ -71,18 +75,28 @@ public:
 			m_ar = newar;
 			m_size = mm;
 		}
-		std::memcpy( (char*)m_ar + m_pos, p, sz);
-		m_pos += sz;
+		std::memcpy( (char*)m_ar + m_pos, addptr, addsize);
+		m_pos += addsize;
 		return true;
 	}
 
+	//\brief Adjust size of buffer to keep allocated only the number of bytes written
 	void close()
 	{
-		void* newar = std::realloc( m_ar, m_pos);
-		if (newar)
+		if (m_pos)
 		{
-			m_ar = newar;
-			m_size = m_pos;
+			void* newar = std::realloc( m_ar, m_pos?m_pos:1);
+			if (newar)
+			{
+				m_ar = newar;
+				m_size = m_pos;
+			}
+		}
+		else
+		{
+			std::free( m_ar);
+			m_ar = 0;
+			m_size = 0;
 		}
 	}
 
@@ -106,6 +120,36 @@ private:
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+namespace {
+class LuaDumpReader
+{
+public:
+	explicit LuaDumpReader( const LuaDump* d)
+		:m_dump(d),m_consumed(false){}
+	~LuaDumpReader()
+	{}
+
+	const char* read( std::size_t* size)
+	{
+		if (m_consumed)
+		{
+			*size = 0;		//... terminated
+		}
+		else
+		{
+			*size = m_dump->size();
+			m_consumed = true;	//... signal termination
+		}
+		return m_dump->baseptr();
+	}
+
+private:
+	const LuaDump* m_dump;
+	bool m_consumed;
+};
+}//anonymous namespace
+
+
 static int luaDumpWriter( lua_State*, const void* p, size_t sz, void* ud)
 {
 	langbind::LuaDump* dump = reinterpret_cast<langbind::LuaDump*>(ud);
@@ -114,21 +158,22 @@ static int luaDumpWriter( lua_State*, const void* p, size_t sz, void* ud)
 
 static const char* luaDumpReader( lua_State*, void* ud, size_t* size)
 {
-	langbind::LuaDump* dump = reinterpret_cast<langbind::LuaDump*>(ud);
-	*size = dump->size();
-	return dump->baseptr();
+	LuaDumpReader* dump = reinterpret_cast<LuaDumpReader*>(ud);
+	return dump->read( size);
 }
 
 LuaDump* langbind::luaCreateDump( lua_State *ls)
 {
 	LuaDump* dump = new LuaDump();
 	lua_dump( ls, luaDumpWriter, (void*)dump);
+	dump->close();
 	return dump;
 }
 
 void langbind::luaLoadDump( lua_State *ls, const LuaDump* dump)
 {
-	int res = lua_load( ls, luaDumpReader, (void*)const_cast<LuaDump*>(dump), dump->baseptr(), "b");
+	LuaDumpReader reader( dump);
+	int res = lua_load( ls, luaDumpReader, (void*)&reader, dump->baseptr(), "b");
 	switch (res)
 	{
 		case LUA_OK: break;

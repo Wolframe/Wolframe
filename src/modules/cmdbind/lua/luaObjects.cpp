@@ -2319,11 +2319,53 @@ static const luaL_Reg customvalue_methodtable[ 14] =
 	{0,0}
 };
 
+static std::string getLuaErrorMessage( lua_State* ls, int index, const std::string& path)
+{
+	std::string rt;
+	const char* msg = lua_tostring( ls, index);
+	if (!msg) msg = "";
+	std::string scriptfilename( utils::getFileStem( path));
+	const char* fp = std::strstr( msg, "[string \"");
+	const char* ep = 0;
+	if (fp) ep = std::strchr( fp, ']');
+
+	if (fp && ep)
+	{
+		rt.append( msg, fp - msg);
+		rt.push_back( '[');
+		rt.append( scriptfilename);
+		rt.append( ep);
+	}
+	else
+	{
+		rt.append( msg);
+	}
+	return rt;
+}
+
+static LuaDump* createLuaScriptDump( const std::string& path)
+{
+	lua_State* ls = luaL_newstate();
+	if (!ls) throw std::runtime_error( "failed to create lua state");
+	std::string content = utils::readSourceFileContent( path);
+
+	if (luaL_loadbuffer( ls, content.c_str(), content.size(), path.c_str()))
+	{
+		std::ostringstream buf;
+		buf << "Failed to load script '" << path << "':" << getLuaErrorMessage( ls, -1, path);
+		lua_close( ls);
+		throw std::runtime_error( buf.str());
+	}
+	LuaDump* rt = luaCreateDump( ls);
+	lua_close( ls);
+	return rt;
+}
+
 LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
 {
 	// Load the source of the script from file
-	m_content = utils::readSourceFileContent( m_path);
+	m_content = boost::shared_ptr<LuaDump>( createLuaScriptDump( m_path), freeLuaDump);
 	std::map<std::string,bool> sysfuncmap;
 
 	// Fill the map of all system functions to exclude them from the list of exported functions:
@@ -2372,26 +2414,7 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleM
 
 std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
 {
-	std::string rt;
-	const char* msg = lua_tostring( ls_, index);
-	if (!msg) msg = "";
-	std::string scriptfilename( utils::getFileStem( script()->path()));
-	const char* fp = std::strstr( msg, "[string \"");
-	const char* ep = 0;
-	if (fp) ep = std::strchr( fp, ']');
-
-	if (fp && ep)
-	{
-		rt.append( msg, fp - msg);
-		rt.push_back( '[');
-		rt.append( scriptfilename);
-		rt.append( ep);
-	}
-	else
-	{
-		rt.append( msg);
-	}
-	return rt;
+	return getLuaErrorMessage( ls_, index, script()->path());
 }
 
 std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
@@ -2433,12 +2456,9 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 		lua_pushvalue( m_ls, -1);
 		m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
 
-		if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
-		{
-			std::ostringstream buf;
-			buf << "Failed to load script '" << m_script->path() << "':" << luaErrorMessage( m_ls, -1);
-			throw std::runtime_error( buf.str());
-		}
+		// load script content from dump:
+		luaLoadDump( m_ls, m_script->content());
+
 		// open standard lua libraries (we load all of them):
 		luaL_openlibs( m_ls);
 
