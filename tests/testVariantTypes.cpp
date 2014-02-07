@@ -97,13 +97,37 @@ TEST( variantTypeFixture, uint32 )
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, uint64 )
+TEST( variantTypeFixture, uint64max )
 {
-	boost::uint64_t i = UINT64_C( 18446744073709551615 ); // 2^64-1
+	_WOLFRAME_UINTEGER i = UINT64_C( 18446744073709551615 ); // 2^64-1
 	Variant v( i );
 	ASSERT_EQ( i, v.touint( ) );
 	v.convert( Variant::String );
-	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
+	ASSERT_EQ( "18446744073709551615", v.tostring( ) );	
+	v.convert( Variant::UInt );
+	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, int64max )
+{
+	_WOLFRAME_INTEGER i = UINT64_C( 9223372036854775807 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "9223372036854775807", v.tostring( ) );	
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, int64min )
+{
+	_WOLFRAME_INTEGER i = UINT64_C( -9223372036854775808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-9223372036854775808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
 }
 
 TEST( variantTypeFixture, defined )
