@@ -3,7 +3,7 @@
 using namespace _Wolframe;
 
 class ConversionResources
-    :public langbind::ResourceHandle
+    :public types::NormalizeResourceHandle
 {
 public:
     ConversionResources()
@@ -26,11 +26,11 @@ public:
         {return types::Variant( i.toint());}
 
     static types::NormalizeFunction* create(
-        langbind::ResourceHandle* reshnd, const std::string&)
+        types::NormalizeResourceHandle* reshnd, const std::string&)
     {
-        ConversionResources& res
-            = dynamic_cast<ConversionResources&>(reshnd);
-        return new NormalizeInt( &res);
+        ConversionResources* res
+            = dynamic_cast<ConversionResources*>(reshnd);
+        return new NormalizeInt( res);
     }
 private:
     const ConversionResources* res;

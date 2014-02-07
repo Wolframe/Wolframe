@@ -14,7 +14,7 @@ public:
             {return types::Variant( i.toint());}
 
     static types::NormalizeFunction* create(
-            langbind::ResourceHandle&, const std::string&)
+            types::NormalizeResourceHandle*, const std::string&)
     {
         return new NormalizeInt();
     }
@@ -32,7 +32,7 @@ public:
             {return types::Variant( i.todouble());}
 
     static types::NormalizeFunction* create(
-            langbind::ResourceHandle*, const std::string&)
+            types::NormalizeResourceHandle*, const std::string&)
     {
         return new NormalizeFloat();
     }

@@ -13,4 +13,6 @@
 
 [6]- Either fix logger, so that LOG_.. can be used everywhere (BETTER!) or call MOD_LOG_.. everywhere in modules (instead of LOG_..)
 
+[7]- Logger as singleton does not work. Delete log backend and make MOD_LOG_... the master?
+
 

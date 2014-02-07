@@ -29,109 +29,46 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Alternative malloc that checks for memory corruption (only for testing)
-///\file malloc.cpp
+//\brief malloc wrapper that checks for memory corruption (only for testing)
+//\file malloc.cpp
 #include "types/malloc.hpp"
-#include <stdexcept>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
-#undef WOLFRAME_DEBUG_MALLOC
-#ifdef WOLFRAME_DEBUG_MALLOC
-#ifdef __GLIBC__
-#include <malloc.h>
-#include <dlfcn.h>
-///\link http://www.gnu.org/software/libc/manual/html_node/Hooks-for-Malloc.html
-///\link http://stackoverflow.com/questions/6083337/overriding-malloc-using-the-ld-preload-mechanism
-
-typedef void* (*real_malloc_f)(size_t);
-static void* (*real_malloc)(size_t)=0;
-typedef void* (*real_realloc_f)(void*,size_t);
-static void* (*real_realloc)(void*,size_t)=0;
-typedef void (*real_free_f)(void*);
-static void (*real_free)(void*)=0;
-
-extern "C" void* __libc_calloc( size_t, size_t);
-extern "C" void* __libc_malloc( size_t);
-extern "C" void* __libc_realloc( void*, size_t);
-extern "C" void __libc_free( void*);
-
-static void real_malloc_initialize()
-{
-	real_malloc = (real_malloc_f)(dlsym( RTLD_NEXT, "malloc"));
-	if (!real_malloc)
-	{
-		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
-		return;
-	}
-	real_realloc = (real_realloc_f)dlsym( RTLD_NEXT, "realloc");
-	if (!real_realloc)
-	{
-		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
-		return;
-	}
-	real_free = (real_free_f)dlsym( RTLD_NEXT, "free");
-	if (!real_free)
-	{
-		throw std::runtime_error( std::string("error in dlsym:") + dlerror());
-		return;
-	}
-}
-
-static void* (*system_malloc)( size_t size, const void *caller) = 0;
-static void  (*system_free)( void *ptr, const void *caller) = 0;
-static void* (*system_realloc)( void *ptr, size_t size, const void *caller) = 0;
-static void  (*system_initialize)() = 0;
-
-#define SYSTEM_MALLOC(N)	(*real_malloc)(N)
-#define SYSTEM_REALLOC(P,N)	(*real_realloc)(P,N)
-#define SYSTEM_FREE(P)		(*real_free)(P)
-
-static void* this_malloc( size_t size, const void*)
-{
-	return wolframe_malloc( size);
-}
-static void* this_realloc( void *ptr, size_t size, const void*)
-{
-	return wolframe_realloc( ptr, size);
-}
-static void this_free( void *ptr, const void*)
-{
-	wolframe_free( ptr);
-}
-static void this_initialize()
-{
-	system_malloc = __malloc_hook;
-	system_realloc = __realloc_hook;
-	system_free = __free_hook;
-
-	__malloc_hook = this_malloc;
-	__realloc_hook = this_realloc;
-	__free_hook = this_free;
-
-	real_malloc_initialize();
-}
-///\brief Installs the malloc library hooks
-void (*volatile __malloc_initialize_hook)() = &this_initialize;
-
-#else
 #define SYSTEM_MALLOC(size)		std::malloc(size)
 #define SYSTEM_FREE(ptr)		std::free(ptr)
 #define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
-#endif
-#else
-#define SYSTEM_MALLOC(size)		std::malloc(size)
-#define SYSTEM_FREE(ptr)		std::free(ptr)
-#define SYSTEM_REALLOC(ptr,size)	std::realloc(ptr,size)
-#endif
 
 struct MemChunkHeader
 {
-	size_t _;			//< padding for satisfying context dependent memory alignment requirements (64bit integers on Solaris 32bit)
-	size_t size;			//< size of memory block
-	size_t ref;			//< number of references for detecting double frees
-	size_t chk;			//< checksum
+	size_t _;	//< padding for satisfying context dependent memory alignment requirements (64bit integers on Solaris 32bit)
+	size_t size;	//< size of memory block
+	size_t ref;	//< number of references for detecting double frees
+	size_t chk;	//< checksum
 };
+
+static void wolframe_deref_memhdr( MemChunkHeader* hdr)
+{
+	if (hdr->chk != (hdr->size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/)
+	{
+		std::cout << "MEMCHECK ERROR (free): check of memory block checksum failed" << std::endl;
+	}
+	if (--hdr->ref != 0)
+	{
+		std::cout << "MEMCHECK ERROR (free): invalid or double free detected" << std::endl;
+	}
+	hdr->chk--;
+}
+
+static void wolframe_init_memhdr( MemChunkHeader* hdr, size_t size)
+{
+	hdr->_ = 0;
+	hdr->size = size;
+	hdr->ref = 1;
+	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
+}
+
 
 void* wolframe_malloc( size_t size)
 {
@@ -139,10 +76,7 @@ void* wolframe_malloc( size_t size)
 	MemChunkHeader* hdr;
 	hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
-	hdr->_ = 0;
-	hdr->size = size;
-	hdr->ref = 1;
-	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
+	wolframe_init_memhdr( hdr, size);
 	return (void*)(hdr+1);
 }
 
@@ -154,19 +88,6 @@ void* wolframe_calloc( size_t size, size_t esize)
 	void* rt = wolframe_malloc( mm);
 	std::memset( rt, 0, mm);
 	return rt;
-}
-
-static void wolframe_deref_memhdr( MemChunkHeader* hdr)
-{
-	if (--hdr->ref != 0)
-	{
-		throw std::runtime_error( "free: invalid or double free detected");
-	}
-	if (hdr->chk != (hdr->size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/)
-	{
-		throw std::runtime_error( "free: check of memory block checksum failed");
-	}
-	hdr->chk--;
 }
 
 void wolframe_free( void* ptr)
@@ -181,16 +102,13 @@ void* wolframe_realloc( void* oldptr, size_t size)
 {
 	MemChunkHeader* hdr = (MemChunkHeader*)SYSTEM_MALLOC( size + sizeof(MemChunkHeader));
 	if (!hdr) return 0;
-	hdr->_ = 0;
-	hdr->size = size;
-	hdr->ref = 1;
-	hdr->chk = (size + sizeof(MemChunkHeader)) * 2654435761U/*knuth's integer hash*/;
+	wolframe_init_memhdr( hdr, size);
 	void* ptr = (void*)(hdr+1);
 	if (oldptr)
 	{
 		MemChunkHeader* oldhdr = (MemChunkHeader*)oldptr - 1;
 		std::size_t cpsize = (oldhdr->size > hdr->size)?hdr->size:oldhdr->size;
-		std::memmove( ptr, oldptr, cpsize);
+		std::memcpy( ptr, oldptr, cpsize);
 		wolframe_deref_memhdr( oldhdr);
 		SYSTEM_FREE( oldhdr);
 	}
