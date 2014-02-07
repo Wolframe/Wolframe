@@ -166,7 +166,8 @@ TEST_CPP_BINS = \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
-	testVariantTypes$(EXE)
+	testVariantTypes$(EXE) \
+	testIntegers$(EXE)
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 
 #	stringNormalizationTest$(EXE) \
@@ -191,6 +192,7 @@ testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
 testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
 
 local_all:
 
@@ -272,6 +274,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 #	@echo
