@@ -125,6 +125,7 @@ TEST_CPP_BINS = \
 	testTimestamp.exe \
 	testWolfilter.exe \
 	testVariantTypes.exe \
+	testIntegers.exe \
 	testArrayDoublingAllocator.exe
 #DISABLED (moved to .Attic) unitLibraryTest.exe
 
@@ -168,6 +169,7 @@ testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 testVariantTypes.exe: testVariantTypes.obj $(TOPDIR)\src\wolframe.lib
+testIntegers.exe: testIntegers.obj $(TOPDIR)\src\wolframe.lib
 #DISABLED (moved to .Attic) unitLibraryTest.exe: unitLibraryTest.obj
 
 local_all:
@@ -226,6 +228,7 @@ local_test:
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testVariantStruct >> test.bat
 	@-echo testVariantTypes >> test.bat
+	@-echo testIntegers >> test.bat
 	@-echo testWolfilter >> test.bat
 #	@-echo stringNormalizationTest >> test.bat
 #DISABLED (moved to .Attic) 	@-echo unitLibraryTest >> test.bat

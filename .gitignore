@@ -79,6 +79,7 @@ tests/AAAA/sasl.db
 tests/testBoostPath
 tests/filter
 tests/testVariantTypes
+tests/testIntegers
 tests/testVariantStruct
 tests/3rdParty/libhpdf/testlibhpdf
 tests/3rdParty/libhpdf/*.pdf
