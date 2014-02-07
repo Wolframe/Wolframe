@@ -105,7 +105,7 @@ TEST( variantTypeFixture, uint64max )
 	v.convert( Variant::String );
 	ASSERT_EQ( "18446744073709551615", v.tostring( ) );	
 	v.convert( Variant::UInt );
-	ASSERT_EQ( i, v.toint( ) );
+	ASSERT_EQ( i, v.touint( ) );
 }
 
 TEST( variantTypeFixture, int64max )
