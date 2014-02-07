@@ -60,54 +60,6 @@ TEST_F( SQLiteModuleFixture, OpenGarbage )
 		      std::runtime_error );
 }
 
-static void executeInsertStatements( Transaction* trans)
-{
-	// some normal values
-	{
-		std::vector<types::Variant> values;
-		values.push_back( 1);
-		values.push_back( "xyz");
-		values.push_back( true);
-		values.push_back( 4.782 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-	}
-	{
-		std::vector<types::Variant> values;
-		values.push_back( 2);
-		values.push_back( "abc");
-		values.push_back( false);
-		values.push_back( -4.2344 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-	}
-	// some maxima
-	{
-		std::vector<types::Variant> values;
-		values.push_back( _WOLFRAME_MAX_UINTEGER );
-		values.push_back( "");
-		values.push_back( false);
-		values.push_back( std::numeric_limits<double>::max( ) );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-	}
-	// some minima
-	{
-		std::vector<types::Variant> values;
-		values.push_back( _WOLFRAME_MIN_INTEGER );
-		values.push_back( "");
-		values.push_back( false);
-		values.push_back( std::numeric_limits<double>::min( ) );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-	}
-	// null values
-	{
-		std::vector<types::Variant> values;
-		values.push_back( types::VariantConst( ));
-		values.push_back( types::VariantConst( ));
-		values.push_back( types::VariantConst( ));
-		values.push_back( types::VariantConst( ));
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-	}
-}
-
 TEST_F( SQLiteModuleFixture, Transaction )
 {
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
@@ -133,6 +85,54 @@ TEST_F( SQLiteModuleFixture, Transaction )
 	trans->close( );
 }
 
+static void executeInsertStatements( Transaction* trans)
+{
+	// some normal values
+	{
+		std::vector<types::Variant> values;
+		values.push_back( 1);
+		values.push_back( "xyz");
+		values.push_back( true);
+		values.push_back( 4.782 );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	{
+		std::vector<types::Variant> values;
+		values.push_back( 2);
+		values.push_back( "abc");
+		values.push_back( false);
+		values.push_back( -4.2344 );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	// some maxima
+	{
+		std::vector<types::Variant> values;
+		values.push_back( _WOLFRAME_MAX_INTEGER );
+		values.push_back( "");
+		values.push_back( false);
+		values.push_back( std::numeric_limits<double>::max( ) );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	// some minima
+	{
+		std::vector<types::Variant> values;
+		values.push_back( _WOLFRAME_MIN_INTEGER );
+		values.push_back( "");
+		values.push_back( false);
+		values.push_back( std::numeric_limits<double>::min( ) );
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+	// null values
+	{
+		std::vector<types::Variant> values;
+		values.push_back( types::VariantConst( ));
+		values.push_back( types::VariantConst( ));
+		values.push_back( types::VariantConst( ));
+		values.push_back( types::VariantConst( ));
+		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	}
+}
+
 TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 {	
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
@@ -143,7 +143,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 	// ok transaction create table statement with commit
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL )");
+	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
 	trans->commit( );
 
 	// ok transaction with statements with rollback
@@ -153,7 +153,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 
 	// ok select result that must not exist because of the rollback in the previous transaction
 	trans->begin( );
-	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id IS NULL, id ASC");
+	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
 	trans->commit( );
 	EXPECT_EQ( emptyres.size(), 0);
 
@@ -164,7 +164,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 
 	// ok select result that must contain the elements inserted in the previous transaction
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id is NULL, id ASC");
+	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id IS NULL, id ASC");
 	trans->commit( );
 	EXPECT_EQ( res.size(), 5);
 	EXPECT_EQ( res.colnames().size(), 4);
@@ -202,22 +202,18 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( ( idx==3?-4.2344:4.782), price);
 				break;
 			}
-				
+
 			case 4: {
-				// cannot be stored in NUMBER as INTEGER, get's stored as REAL, which is ok.
-				// See also SqliteStatement.cpp.
-				ASSERT_EQ( ri->at(0).type(), types::Variant::Double);
-				// ASSERT_EQ( ri->at(0).type(), types::Variant::UInt);
+				ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
 				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				//EXPECT_EQ( _WOLFRAME_MAX_UINTEGER, ri->at(0).touint());
-				ASSERT_DOUBLE_EQ( 1.8446744073709552e+19, ri->at(0).todouble( ));
+				EXPECT_EQ( _WOLFRAME_MAX_INTEGER, ri->at(0).touint());
 				double price( ri->at(3).todouble());
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ), price );
 				break;
 			}
-
+			
 			case 5: {
 				ASSERT_FALSE( ri->at(0).defined( ) );
 				ASSERT_FALSE( ri->at(1).defined( ) );
@@ -244,7 +240,7 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 	try {
 		trans->executeStatement( "SELCT 1" );
 		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( DatabaseTransactionErrorException &e ) {
+	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
@@ -278,9 +274,9 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
 // why is this another exception?
-	} catch( std::runtime_error &e ) {
+	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
-//	} catch( DatabaseTransactionErrorException &e ) {
+//	} catch( const DatabaseTransactionErrorException &e ) {
 //		std::cout << e.what( );
 //		ASSERT_EQ( e.errorclass, "INTERNAL" );		
 	} catch( ... ) {
@@ -314,7 +310,7 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( DatabaseTransactionErrorException &e ) {
+	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.errorclass, "INTERNAL" );		
 	} catch( ... ) {
