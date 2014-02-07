@@ -89,9 +89,9 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 			
 		case types::Variant::UInt:
-			if( value.data( ).value.UInt <= std::numeric_limits<signed int>::max( ) ) {
+			if( value.data( ).value.UInt <= (unsigned int)std::numeric_limits<signed int>::max( ) ) {
 				m_rc = wrap_sqlite3_bind_int( m_stm, (int)idx, (signed int)value.toint());
-			} else if ( value.data( ).value.UInt <= std::numeric_limits<sqlite3_int64>::max( ) ) {
+			} else if ( value.data( ).value.UInt <= (_WOLFRAME_UINTEGER)std::numeric_limits<sqlite3_int64>::max( ) ) {
 				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.toint());
 			} else {
 				// this is debatable: either the value gets converted to a REAL
