@@ -1,4 +1,5 @@
 
 _Wolframe::types::NormalizeFunction* CreateNormalizeFunction(
-        _Wolframe::langbind::ResourceHandle& reshnd,
+        _Wolframe::types::NormalizeResourceHandle* reshnd,
         const std::string& arg);
+
