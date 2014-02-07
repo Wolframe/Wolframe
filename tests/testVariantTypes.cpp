@@ -97,6 +97,17 @@ TEST( variantTypeFixture, uint32 )
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
+TEST( variantTypeFixture, int64 )
+{
+	_WOLFRAME_INTEGER i = UINT64_C( -92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
 TEST( variantTypeFixture, uint64max )
 {
 	_WOLFRAME_UINTEGER i = UINT64_C( 18446744073709551615 ); // 2^64-1
