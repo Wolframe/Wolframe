@@ -169,7 +169,7 @@ void BaseStatement::parse( )
 			}
 
 			if( idx > MaxNofParams ) {
-				throw std::logic_error( "More than " + boost::lexical_cast<std::string>( MaxNofParams ) + " parameters are not supported!" );
+				throw std::logic_error( "More than " + boost::lexical_cast<std::string>( static_cast<int>( MaxNofParams ) ) + " parameters are not supported!" );
 			}
 			m_usedIdx.set( idx );
 			m_maxParam = idx;
