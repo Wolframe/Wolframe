@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Some utility functions for handling files
 
 #include "utils/fileUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include <cstring>
 #include <cstdio>
 #include <sstream>
@@ -224,229 +225,241 @@ std::vector<std::string> utils::readSourceFileLines( const std::string& filename
 	return rt;
 }
 
+
 namespace {
 struct FileTypeDetection
 {
-	static bool atBOM_BE( std::string::const_iterator si, std::string::const_iterator se)
+	static bool skipPattern( const unsigned char* pt, std::string::const_iterator& si, std::string::const_iterator se)
 	{
-		if (si != se && *si == (char)0xFE)
+		std::string::const_iterator start = si;
+		std::size_t pi = 1;
+		std::size_t pe = pt[0]+1;
+		while (pi < pe && si != se && *si == (char)pt[pi])
 		{
-			if (si != se && *si == (char)0xFF)
-			{
-				++si;
-				return true;
-			}
+			++si;
+			++pi;
 		}
-		return false;
-	}
-	
-	static bool atBOM_LE( std::string::const_iterator si, std::string::const_iterator se)
-	{
-		if (si != se && *si == (char)0xFF)
+		if (pi < pe)
 		{
-			if (si != se && *si == (char)0xFE)
-			{
-				++si;
-				return true;
-			}
+			si = start;
+			return false;
 		}
-		return false;
-	}
-	
-	static unsigned int getNullCnt( std::string::const_iterator si, std::string::const_iterator se)
-	{
-		unsigned int rt = 0;
-		for (; rt<4 && si != se && !*si; ++si){}
-		return rt;
-	}
-	
-	enum Encoding {Empty,Binary,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE};
-	
-	static Encoding getEncoding( const std::string& source)
-	{
-		std::string::const_iterator si = source.begin(), se = source.end();
-		if (si == se) return Empty;
-		if (atBOM_BE(si,se)) return UCS2BE;
-		if (atBOM_LE(si,se))
-		{
-			if (getNullCnt( si+2, se) == 2) return UCS4LE;
-			return UCS2LE;
-		}
-		unsigned int nc = getNullCnt( si, se);
-		if (nc >= 4) return Binary;
-		if (nc == 2)
-		{
-			if (atBOM_BE(si,se)) return UCS4BE;
-		}
-		if (nc >= 2) return UCS4BE;
-		if (nc == 1) return UCS2BE;
-		if (nc == 0)
-		{
-			si++;
-			nc = getNullCnt( si, se);
-			if (nc == 0) return UCS1;
-			if (nc == 1) return UCS2LE;
-			if (nc == 3) return UCS4LE;
-		}
-		return Binary;
+		return true;
 	}
 
-	static unsigned int parseChar( Encoding enc, std::string::const_iterator& si, std::string::const_iterator se)
+	static char nextAsciiChar( std::string::const_iterator& si, std::string::const_iterator se, FileType::Encoding enc)
 	{
-		unsigned int rt = 0;
+		std::string::const_iterator start = si;
+		char rt = 0;
+
 		switch (enc)
 		{
-			case Empty: return 0;
-			case Binary: return 0;
-			case UCS1: return (si==se)?0:*si;
-			case UCS2BE:
+			case FileType::Undefined: goto FAILED;
+			case FileType::UCS1:
 			{
-				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si) << 8);
+				if (si == se || (unsigned char)*si > 127) goto FAILED;
+				return *si++;
+			}
+			case FileType::UCS2BE:
+			{
+				if (si == se || *si != 0) goto FAILED;
 				++si;
-				rt += ((unsigned char)(*si));
+				if (si == se || (unsigned char)*si > 127) goto FAILED;
+				return *si++;
+			}
+			case FileType::UCS2LE:
+			{
+				if (si == se) goto FAILED;
+				rt = *si;
 				++si;
+				if (si == se || (unsigned char)*si != 0) goto FAILED;
+				++si;
+				if ((unsigned char)rt > 127) goto FAILED;
 				return rt;
 			}
-			case UCS2LE:
+			case FileType::UCS4BE:
 			{
-				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si));
+				if (si == se || *si != 0) goto FAILED;
 				++si;
-				rt += ((unsigned char)(*(si+1)) << 8);
+				if (si == se || *si != 0) goto FAILED;
 				++si;
-				return rt;
+				if (si == se || *si != 0) goto FAILED;
+				++si;
+				if (si == se || (unsigned char)*si > 127) goto FAILED;
+				return *si++;
 			}
-			case UCS4BE:
+			case FileType::UCS4LE:
 			{
-				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si) << 24);
+				if (si == se) goto FAILED;
+				rt = *si;
 				++si;
-				rt += ((unsigned int)(unsigned char)(*si) << 16);
+				if (si == se || (unsigned char)*si != 0) goto FAILED;
 				++si;
-				rt += ((unsigned int)(unsigned char)(*si) << 8);
+				if (si == se || (unsigned char)*si != 0) goto FAILED;
 				++si;
-				rt += ((unsigned int)(unsigned char)(*si));
+				if (si == se || (unsigned char)*si != 0) goto FAILED;
 				++si;
-				return rt;
-			}
-			case UCS4LE:
-			{
-				if (si==se) return 0;
-				rt = ((unsigned int)(unsigned char)(*si));
-				++si;
-				rt += ((unsigned int)(unsigned char)(*si) << 8);
-				++si;
-				rt += ((unsigned int)(unsigned char)(*si) << 16);
-				++si;
-				rt += ((unsigned int)(unsigned char)(*si) << 24);
-				++si;
+				if ((unsigned char)rt > 127) goto FAILED;
 				return rt;
 			}
 		}
+	FAILED:
+		si = start;
 		return 0;
 	}
 
-	enum UCS1Type {UCS1Unknown,UCS1Ascii,UCS1UTF8};
-	static UCS1Type getUCS1Type( const std::string& source)
+	static char skipChar( std::string::const_iterator& si, std::string::const_iterator se, FileType::Encoding enc, const CharTable& chtab)
 	{
-		enum
+		std::string::const_iterator start = si;
+		char rt = 0;
+		while ((rt = nextAsciiChar(si,se,enc)) != 0)
 		{
-			B10000000 = 128,
-			B11000000 = 128 + 64,
-			B11100000 = 128 + 64 + 32,
-			B11110000 = 128 + 64 + 32 + 16,
-			B11111000 = 128 + 64 + 32 + 16 + 8,
-			B11111100 = 128 + 64 + 32 + 16 + 8 + 4,
-			B11111110 = 128 + 64 + 32 + 16 + 8 + 4 + 2,
-			B11111111 = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1
-		};
-		std::string::const_iterator si = source.begin(), se = source.end();
-		bool ascii = true;
-		bool utf8 = true;
-		for (; si != se; ++si)
-		{
-			if (!*si) return UCS1Unknown;
-			if ((unsigned char)*si > 127) ascii = false;
-			if ((*si & B11000000) != B11000000) utf8 = false;
-			if ((*si & B11100000) == B11000000) for (int ii=1; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-			if ((*si & B11110000) == B11100000) for (int ii=2; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-			if ((*si & B11111000) == B11110000) for (int ii=3; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-			if ((*si & B11111100) == B11111000) for (int ii=4; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-			if ((*si & B11111110) == B11111100) for (int ii=5; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
-			if ((*si & B11111111) == B11111110) for (int ii=6; ii>0 && si != se; --ii,++si) if ((*si & B11000000) != B10000000) utf8 = false;
+			if (!chtab[rt]) return rt;
 		}
-		if (ascii) return UCS1Ascii;
-		if (utf8) return UCS1UTF8;
-		return UCS1Unknown;
+		si = start;
+		return 0;
 	}
 
-	static bool isXML( Encoding enc, const std::string& source)
+	static std::size_t countZeros( std::string::const_iterator si, std::string::const_iterator se)
 	{
-		std::string::const_iterator si = source.begin(), se = source.end();
-		unsigned int fc = FileTypeDetection::parseChar( enc, si, se);
-		if (fc == 0xFEFF) fc = FileTypeDetection::parseChar( enc, si, se);
-		if (fc == (unsigned char)'<')
+		std::size_t rt = 0;
+		while (rt <= 4 && si != se && !*si)
 		{
-			return true;
+			++rt;
+			++si;
 		}
-		return false;
+		return rt;
 	}
 };
 }
 
 
-std::string utils::getFileType( const std::string& filename)
+FileType utils::getFileType( const std::string& filename)
 {
 	std::string source;
 	readFileContent( filename, source);
-	FileTypeDetection::Encoding enc = FileTypeDetection::getEncoding( source);
-	if (FileTypeDetection::isXML( enc, source)) return "XML";
 
-	switch (enc)
+	// Source: http://en.wikipedia.org/wiki/Byte_order_mark
+	static const unsigned char pt_BOM_UTF8[]  = {3, 0xEF, 0xBB, 0xBF};
+	static const unsigned char pt_BOM_UCS2BE[] = {2, 0xFE,0xFF};
+	static const unsigned char pt_BOM_UCS2LE[] = {2, 0xFF,0xFE};
+	static const unsigned char pt_BOM_UCS4BE[] = {4, 0x00,0x00,0xFE,0xFF};
+	static const unsigned char pt_BOM_UCS4LE[] = {4, 0xFF,0xFE,0x00,0x00};
+	static const unsigned char pt_UCS1_XML[]   = {1, '<'};
+	static const unsigned char pt_UCS2BE_XML[] = {2, 0x00,'<'};
+	static const unsigned char pt_UCS2LE_XML[] = {2, '<',0x00};
+	static const unsigned char pt_UCS4BE_XML[] = {4, 0x00,0x00,0x00,'<'};
+	static const unsigned char pt_UCS4LE_XML[] = {4, '<',0x00,0x00,0x00};
+	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_-\"\' ?!");
+
+	std::string::const_iterator si = source.begin(), se = source.end();
+	if (si == se) return FileType( FileType::Undefined, FileType::SourceText);
+
+	FileType rt;
+	if (FileTypeDetection::skipPattern( pt_BOM_UTF8, si, se)) rt.encoding = FileType::UCS1;
+	else if (FileTypeDetection::skipPattern( pt_BOM_UCS2BE, si, se)) rt.encoding = FileType::UCS2BE;
+	else if (FileTypeDetection::skipPattern( pt_BOM_UCS2LE, si, se)) rt.encoding = FileType::UCS2LE;
+	else if (FileTypeDetection::skipPattern( pt_BOM_UCS4BE, si, se)) rt.encoding = FileType::UCS4BE;
+	else if (FileTypeDetection::skipPattern( pt_BOM_UCS4LE, si, se)) rt.encoding = FileType::UCS4LE;
+
+	if (rt.encoding == FileType::Undefined)
 	{
-		case FileTypeDetection::UCS1:
-			switch (FileTypeDetection::getUCS1Type( source))
-			{
-				case FileTypeDetection::UCS1Unknown: return "TEXT";
-				case FileTypeDetection::UCS1Ascii: return "TEXT:ASCII";
-				case FileTypeDetection::UCS1UTF8: return "TEXT:UTF-8";
-			}
-			break;
-		case FileTypeDetection::Empty:
-			return "";
-		case FileTypeDetection::Binary:
-			return "Binary";
-		case FileTypeDetection::UCS2BE:
-			return "TEXT:UCS2-BE";
-		case FileTypeDetection::UCS2LE:
-			return "TEXT:UCS2-LE";
-		case FileTypeDetection::UCS4BE:
-			return "TEXT:UCS4-BE";
-		case FileTypeDetection::UCS4LE:
-			return "TEXT:UCS4-LE";
+		if (FileTypeDetection::skipPattern( pt_UCS1_XML, si, se))
+		{
+			rt.encoding = FileType::UCS1;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS2BE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS2BE;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS2LE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS2LE;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS4BE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS4BE;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS4LE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS4LE;
+			rt.format = FileType::XML;
+		}
 	}
-	return "";
+
+	if (rt.format == FileType::XML)
+	{
+		char ch = FileTypeDetection::skipChar( si, se, rt.encoding, xmlTagCharTab);
+		if (ch != '>')
+		{
+			return FileType( rt.encoding, FileType::SourceText);
+		}
+		return rt;
+	}
+	if (rt.encoding == FileType::Undefined)
+	{
+		if (si != se && *si == 0)
+		{
+			++si;
+			std::size_t zc = FileTypeDetection::countZeros( si, se);
+			switch (zc)
+			{
+				case 0: return FileType( FileType::UCS2BE, FileType::SourceText);
+				case 2: return FileType( FileType::UCS4BE, FileType::SourceText);
+				default: break;
+			}
+		}
+		else
+		{
+			++si;
+			std::size_t zc = FileTypeDetection::countZeros( si, se);
+			switch (zc)
+			{
+				case 0: return FileType( FileType::UCS1, FileType::SourceText);
+				case 1: return FileType( FileType::UCS2LE, FileType::SourceText);
+				case 3: return FileType( FileType::UCS4LE, FileType::SourceText);
+				default: break;
+			}
+		}
+	}
+	return FileType( FileType::Undefined, FileType::SourceText);
 }
+
 
 boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& filename)
 {
-	std::string filetype = getFileType( filename);
-	if (filetype.empty()) throw std::runtime_error( "Configuration file is not recognized as TEXT or XML");
+	FileType filetype = getFileType( filename);
 	boost::property_tree::ptree rt;
 
-	if (boost::istarts_with( filetype, "XML"))
+	switch (filetype.format)
 	{
-		namespace opt = boost::property_tree::xml_parser;
-		read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
-	}
-	else if (boost::istarts_with( filetype, "TEXT"))
-	{
-		read_info( filename, rt);
-	}
-	else
-	{
-		throw std::runtime_error( std::string( "file type not recognized for '") + filename + "'");
+		case FileType::XML:
+		{
+			if (filetype.encoding == FileType::Undefined)
+			{
+				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is unknown)");
+			}
+			namespace opt = boost::property_tree::xml_parser;
+			read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
+			break;
+		}
+		case FileType::SourceText:
+		{
+			if (filetype.encoding != FileType::UCS1)
+			{
+				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is not UTF-8)");
+			}
+			read_info( filename, rt);
+			break;
+		}
+		default:
+		{
+			throw std::runtime_error( std::string( "file type not recognized for '") + filename + "'");
+		}
 	}
 	return rt;
 }

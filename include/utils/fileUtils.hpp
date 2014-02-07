@@ -93,12 +93,26 @@ boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
 ///\remark Throws on error
 void writeFile( const std::string& filename, const std::string& content);
 
-///\brief Get the file type as string
-///\remark Very simplistic implementation for now
-///\return file type ("XML","TEXT:UTF-8","TEXT:ASCII", "" (unknown))
-std::string getFileType( const std::string& filename);
+///\brief Get the file type
+///\return the file type
+struct FileType
+{
+	enum Encoding {Undefined,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE};
+	enum Format {XML,SourceText};
 
+	Encoding encoding;
+	Format format;
+
+	FileType()
+		:encoding(Undefined),format(SourceText){}
+	FileType( const FileType& o)
+		:encoding(o.encoding),format(o.format){}
+	FileType( Encoding encoding_, Format format_)
+		:encoding(encoding_),format(format_){}
+};
+FileType getFileType( const std::string& filename);
 
 }} //namespace _Wolframe::utils
 
 #endif // _MISC_UTILS_HPP_INCLUDED
+

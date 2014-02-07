@@ -1,6 +1,6 @@
 OPEN SOURCE PRODUCT MUSTS:
 Core:
-	- Filetype recognition with libmagic (?)
+	- Filetype recognition (?)
 	- Connection handling reorganization of existing code (MBa)
 	- Context for processors in provider (MBa & PF)
 	- AAAA stuff to a certain level (MBa, support for protocol PF)
