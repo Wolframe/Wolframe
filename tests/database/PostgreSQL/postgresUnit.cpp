@@ -133,7 +133,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( _WOLFRAME_MIN_INTEGER );
 		values.push_back( "");
 		values.push_back( false);
-		values.push_back( std::numeric_limits<double>::min( ) );
+		values.push_back( std::numeric_limits<double>::min( ) / 2 );
 		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
 	}
 	// null values
@@ -198,7 +198,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
 				EXPECT_EQ( _WOLFRAME_MIN_INTEGER, ri->at(0).toint());
 				double price( ri->at(3).todouble());
-				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::min( ), price );
+				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::min( ) / 2, price );
 				break;
 			}
 
