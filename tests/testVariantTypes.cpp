@@ -97,7 +97,18 @@ TEST( variantTypeFixture, uint32 )
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, int64 )
+TEST( variantTypeFixture, int64positive )
+{
+	_WOLFRAME_INTEGER i = UINT64_C( 92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
+TEST( variantTypeFixture, int64negative )
 {
 	_WOLFRAME_INTEGER i = UINT64_C( -92233720368545808 );
 	Variant v( i );
@@ -139,6 +150,28 @@ TEST( variantTypeFixture, int64min )
 	ASSERT_EQ( "-9223372036854775808", v.tostring( ) );
 	v.convert( Variant::Int );
 	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, doublemin )
+{
+	double d = std::numeric_limits<double>::min( );
+	Variant v( d );
+	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::min( ) ), v.tostring( ) );
+	v.convert( Variant::Double );
+	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
+}
+
+TEST( variantTypeFixture, doublemax )
+{
+	double d = std::numeric_limits<double>::max( );
+	Variant v( d );
+	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::max( ) ), v.tostring( ) );
+	v.convert( Variant::Double );
+	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
 }
 
 TEST( variantTypeFixture, defined )
