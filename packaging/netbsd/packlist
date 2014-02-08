@@ -128,6 +128,7 @@ usr/pkg/include/wolframe/langbind/cppFormFunction.hpp
 usr/pkg/include/wolframe/langbind/charsetEncodings.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/pkg/include/wolframe/langbind/formFunction.hpp
+usr/pkg/include/wolframe/langbind/runtimeEnvironment.hpp
 @dirrm usr/pkg/include/wolframe/langbind
 usr/pkg/include/wolframe/protocol/buffers.hpp
 usr/pkg/include/wolframe/protocol/ioblocks.hpp
@@ -146,7 +147,6 @@ usr/pkg/include/wolframe/cmdbind/lineCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandlerConstructor.hpp
 @dirrm usr/pkg/include/wolframe/cmdbind
 usr/pkg/include/wolframe/database/DBprovider.hpp
-usr/pkg/include/wolframe/database/bindStatementParams.hpp
 usr/pkg/include/wolframe/database/database.hpp
 usr/pkg/include/wolframe/database/databaseError.hpp
 usr/pkg/include/wolframe/database/databaseLanguage.hpp
@@ -156,6 +156,9 @@ usr/pkg/include/wolframe/database/transactionFunction.hpp
 usr/pkg/include/wolframe/database/transactionInput.hpp
 usr/pkg/include/wolframe/database/transactionOutput.hpp
 usr/pkg/include/wolframe/database/transactionExecStatemachine.hpp
+usr/pkg/include/wolframe/database/statement.hpp
+usr/pkg/include/wolframe/database/baseStatement.hpp
+usr/pkg/include/wolframe/database/substitutingStatement.hpp
 @dirrm usr/pkg/include/wolframe/database
 usr/pkg/include/wolframe/config/ConfigurationTree.hpp
 usr/pkg/include/wolframe/config/configurationBase.hpp
@@ -256,13 +259,13 @@ usr/pkg/include/wolframe/module/filterBuilder.hpp
 usr/pkg/include/wolframe/module/normalizeFunctionBuilder.hpp
 usr/pkg/include/wolframe/module/programTypeBuilder.hpp
 usr/pkg/include/wolframe/module/customDataTypeBuilder.hpp
+usr/pkg/include/wolframe/module/runtimeEnvironmentConstructor.hpp
 @dirrm usr/pkg/include/wolframe/module
 usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
 usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
 usr/pkg/include/wolframe/prgbind/program.hpp
 usr/pkg/include/wolframe/prgbind/programLibrary.hpp
 usr/pkg/include/wolframe/prgbind/transactionProgram.hpp
-usr/pkg/include/wolframe/prgbind/runtimeEnvironmentConstructor.hpp
 @dirrm usr/pkg/include/wolframe/prgbind
 usr/pkg/include/wolframe/crypto/HMAC.h
 usr/pkg/include/wolframe/crypto/HMAC.hpp
