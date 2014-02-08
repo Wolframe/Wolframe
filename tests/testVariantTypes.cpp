@@ -154,22 +154,22 @@ TEST( variantTypeFixture, int64min )
 
 TEST( variantTypeFixture, doublemin )
 {
-	double d = std::numeric_limits<double>::min( );
+	double d = std::numeric_limits<double>::min( ) / 2;
 	Variant v( d );
 	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
 	v.convert( Variant::String );
-	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::min( ) ), v.tostring( ) );
+	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::min( ) ) / 2, v.tostring( ) );
 	v.convert( Variant::Double );
 	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
 }
 
 TEST( variantTypeFixture, doublemax )
 {
-	double d = std::numeric_limits<double>::max( );
+	double d = std::numeric_limits<double>::max( ) / 2;
 	Variant v( d );
 	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
 	v.convert( Variant::String );
-	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::max( ) ), v.tostring( ) );
+	ASSERT_EQ( boost::lexical_cast<std::string>( std::numeric_limits<double>::max( ) ) / 2, v.tostring( ) );
 	v.convert( Variant::Double );
 	ASSERT_DOUBLE_EQ( d, v.todouble( ) );
 }
