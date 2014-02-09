@@ -46,6 +46,8 @@ struct OracleData {
 	types::Variant v;
 	unsigned int ui;
 	signed int i;
+	oraub8 ui64;
+	orasb8 i64;
 	double d;
 	char *s;
 	
@@ -74,6 +76,10 @@ class OracleStatement : public BaseStatement
 	private:
 		void bindUInt( const unsigned int idx, unsigned int &value );
 		void bindInt( const unsigned int idx, signed int &value );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+		void bindUInt64( const unsigned int idx, oraub8 &value );
+		void bindInt64( const unsigned int idx, orasb8 &value );
+#endif
 		void bindBool( const unsigned int idx, signed int &value );
 		void bindDouble( const unsigned int idx, double &value );
 		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );

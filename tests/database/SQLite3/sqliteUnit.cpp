@@ -215,6 +215,10 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 			}
 			
 			case 5: {
+				ASSERT_EQ( ri->at(0).type(), types::Variant::Null);
+				ASSERT_EQ( ri->at(1).type(), types::Variant::Null);
+				ASSERT_EQ( ri->at(2).type(), types::Variant::Null);
+				ASSERT_EQ( ri->at(3).type(), types::Variant::Null);
 				ASSERT_FALSE( ri->at(0).defined( ) );
 				ASSERT_FALSE( ri->at(1).defined( ) );
 				ASSERT_FALSE( ri->at(2).defined( ) );
