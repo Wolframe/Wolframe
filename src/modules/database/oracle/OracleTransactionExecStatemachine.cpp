@@ -434,7 +434,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			// by funny variables like NLS_LANG en passant)
 			switch( descrRef->dataType ) {
 				case SQLT_CHR: {
-					ub2 cform = SQLCS_NCHAR;
+					ub1 cform = SQLCS_NCHAR;
 					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&cform, (ub4)0, (ub4)OCI_ATTR_CHARSET_FORM,
 						(*m_conn)->errhp );

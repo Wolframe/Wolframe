@@ -1592,6 +1592,18 @@ ORACLE_LIBS ?= -lclntsh
 endif
 endif
 
+# SunOS
+
+ifeq "$(PLATFORM)" "SUNOS"
+ORACLE_LIB_VERSION ?= 11.1
+ORACLE_DIR ?= /opt/oracle/instantclient_11_2
+ORACLE_INCLUDE_DIR ?= $(ORACLE_DIR)/sdk/include
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= $(ORACLE_LIB_DIR)/libclntsh.so.$(ORACLE_LIB_VERSION)
+endif
+
 endif
 
 # Postgresql
