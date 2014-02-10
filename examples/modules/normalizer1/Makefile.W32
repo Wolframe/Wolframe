@@ -32,7 +32,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModExampleNormalize2.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModExampleNormalize1.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
