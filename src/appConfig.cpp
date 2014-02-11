@@ -67,17 +67,6 @@ const char* MODULE_SECTION_MSG = "Module list:";
 namespace _Wolframe {
 namespace config {
 
-static bool plausibleConfig( boost::property_tree::ptree& pt )
-{
-	size_t lvl1, lvl2;
-	lvl1 = lvl2 = 0;
-	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++, lvl1++ )
-		lvl2 += it->second.size();
-	if ( lvl1 >= lvl2 || lvl1 == 0 )
-		return false;
-	return true;
-}
-
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 {
 	if ( globalFile != NULL )
@@ -142,44 +131,42 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 				return CONFIG_XML;
 
 			case CONFIG_UNDEFINED:	{
-				try	{
-					read_xml( file, pt, boost::property_tree::xml_parser::no_comments |
-						  boost::property_tree::xml_parser::trim_whitespace );
-					pt = pt.get_child( "configuration" );
-					if ( plausibleConfig( pt ) )	{
-						LOG_TRACE << "Guessed configuration file type: XML";
-						return CONFIG_XML;
-					}
-					else	{
-						LOG_FATAL << "Cannot guess configuration file type: " << file;
-						return CONFIG_UNDEFINED;
-					}
-				}
-				catch( boost::property_tree::xml_parser::xml_parser_error )	{
-					try	{
-						read_info( file, pt );
-						if ( plausibleConfig( pt ) )	{
-							LOG_TRACE << "Guessed configuration file type: INFO";
+				try
+				{
+					utils::FileType ftype = utils::getFileType( filename);
+					switch (ftype.format)
+					{
+						case utils::FileType::XML:
+						{
+							return CONFIG_XML;
+						}
+						case utils::FileType::Info:
+						{
 							return CONFIG_INFO;
 						}
-						else	{
-							LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
+						case utils::FileType::Unknown:
+						{
+							if (ftype.encoding == utils::FileType::UCS1)
+							{
+								LOG_FATAL << "Cannot guess configuration file type: " << filename;
+							}
+							else
+							{
+								LOG_FATAL << "Cannot guess configuration file type (it is neither an info format file in UTF-8 encoding nor an XML): " << filename;
+							}
 							return CONFIG_UNDEFINED;
 						}
 					}
-					catch( boost::property_tree::info_parser::info_parser_error& )	{
-						LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
-						return CONFIG_UNDEFINED;
-					}
 				}
-				catch( boost::property_tree::ptree_bad_path )	{
-					LOG_FATAL << "Invalid XML configuration file: " << file;
+				catch (const std::exception& e)
+				{
+					LOG_FATAL << "Cannot guess configuration file type of '" << filename << "' because of an error: '" << e.what() << "'";
 					return CONFIG_UNDEFINED;
 				}
 				break;
 			}
 			default:
-				LOG_FATAL << "Invalid XML configuration file: " << file;
+				LOG_FATAL << "Invalid configuration file type for '" << file << "'";
 		}
 		return CONFIG_UNDEFINED;
 	}
