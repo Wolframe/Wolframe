@@ -103,7 +103,7 @@ FORM CDCatalog
 **file:example.wnmp
 int=integer;
 uint=unsigned;
-float=float;
+float=floatingpoint;
 normname=convdia,lcname;
 **file:example.dmap
 COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);

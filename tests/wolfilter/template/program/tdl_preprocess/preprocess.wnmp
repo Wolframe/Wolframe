@@ -1,5 +1,5 @@
 int=integer;
 uint=unsigned;
-float= float;
+float= floatingpoint;
 normname= convdia,lcname;
 

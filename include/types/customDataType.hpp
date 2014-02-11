@@ -158,6 +158,7 @@ public:
 	CustomDataInitializer* createInitializer( const std::string& d) const;
 	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
 
+	bool hasInitializer() const		{return !!m_vmt.opInitializerConstructor;}
 	const ID& id() const			{return m_id;}
 	const std::string& name() const		{return m_name;}
 

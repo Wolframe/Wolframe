@@ -67,7 +67,7 @@ FORM AllDataRequest
 **file:preprocess.wnmp
 int=integer;
 uint=unsigned;
-float= float;
+float= floatingpoint;
 normname= convdia,lcname;
 **file: DBDATA
 CREATE TABLE Person

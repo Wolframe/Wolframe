@@ -9,7 +9,7 @@
 **file:simpleform_range_trim.wnmp
 int=trim,integer(10 );
 uint=trim,unsigned(10);
-float=trim, float( 10,10);
+float=trim, floatingpoint( 10,10);
 currency=fixedpoint(13, 2);
 percent_1=fixedpoint(5 ,1);
 **file: echo_input_doctype_table.lua

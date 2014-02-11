@@ -41,7 +41,7 @@ NORMALIZER_MODULE("NumberNormalizer", "normalizers and validators for numbers")
 
 NORMALIZER_FUNCTION(	"integer",	createIntegerNormalizeFunction)
 NORMALIZER_FUNCTION(	"unsigned",	createUnsignedNormalizeFunction)
-NORMALIZER_FUNCTION(	"float",	createFloatNormalizeFunction)
+NORMALIZER_FUNCTION(	"floatingpoint",createFloatNormalizeFunction)
 NORMALIZER_FUNCTION(	"fixedpoint",	createFixedpointNormalizeFunction)
 
 NORMALIZER_MODULE_END

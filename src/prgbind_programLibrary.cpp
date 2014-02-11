@@ -30,9 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implements the list of all initially defined program types
-///\file programLibrary.cpp
+//\brief Implements the list of all initially defined program types
+//\file programLibrary.cpp
 
+#include "types/customDataNormalizer.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "prgbind/program.hpp"
 #include "prgbind/transactionProgram.hpp"
@@ -218,11 +219,13 @@ public:
 	void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 	{
 		m_normalizeFunctionTypeMap.insert( name, f);
+		m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( f.createFunction( "")));
 	}
 
 	void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 	{
 		m_customDataTypeMap.insert( name, t);
+		if (!t->hasInitializer()) m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( new types::CustomDataNormalizer( name, "", t.get())));
 	}
 
 	void defineProgramType( const ProgramR& prg)

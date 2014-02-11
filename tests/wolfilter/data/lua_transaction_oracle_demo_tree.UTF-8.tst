@@ -16,7 +16,7 @@
 **file:simpleform.wnmp
 int=integer;
 uint=unsigned;
-float=float;
+float=floatingpoint;
 currency=fixedpoint(13,2);
 percent_1=fixedpoint(5,1);
 **file: DBDATA
