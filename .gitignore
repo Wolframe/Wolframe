@@ -184,6 +184,7 @@ tests/python/
 3rdParty/sqlite3/sqlite3
 tests/3rdParty/boost-locale/boostLocaleTest
 tests/testArrayDoublingAllocator
+tests/testFiletypeRecognition
 geany.c++.tags
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal

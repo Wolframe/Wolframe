@@ -350,7 +350,7 @@ FileType utils::getFileType( const std::string& filename)
 	static const unsigned char pt_UCS2LE_XML[] = {2, '<',0x00};
 	static const unsigned char pt_UCS4BE_XML[] = {4, 0x00,0x00,0x00,'<'};
 	static const unsigned char pt_UCS4LE_XML[] = {4, '<',0x00,0x00,0x00};
-	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_-\"\' ?!");
+	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
 
 	std::string::const_iterator si = source.begin(), se = source.end();
 	if (si == se) return FileType( FileType::Undefined, FileType::SourceText);

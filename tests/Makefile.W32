@@ -104,6 +104,7 @@ TEST_CPP_BINS = \
 	testMethodMemberPointerTemplate.exe \
 	counterTest.exe \
 	resolvePathTest.exe \
+	testFiletypeRecognition.exe \
 	testBoostPath.exe \
 	singletonTest.exe \
 	byte2hexTest.exe \
@@ -146,6 +147,7 @@ versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 testBoostPath.exe: testBoostPath.obj
+testFiletypeRecognition.exe : testFiletypeRecognition.obj $(TOPDIR)\src\wolframe.lib
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
@@ -209,6 +211,7 @@ local_test:
 	@-echo testNamedRetVal >> test.bat
 	@-echo testVirtualInheritance >> test.bat
 	@-echo testArrayDoublingAllocator >> test.bat
+	@-echo testFiletypeRecognition >> test.bat
 # DISABLED (only for memory corruption checks):	@-echo testTestAllocator >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
