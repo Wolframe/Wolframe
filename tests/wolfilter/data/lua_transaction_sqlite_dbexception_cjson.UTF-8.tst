@@ -17,11 +17,11 @@ error in transaction 'insertCustomer':*Customers must have a unique name.
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram=transaction_dbexception.lua --program simpleform.wnmp --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
+int=integer;
+uint=unsigned;
+float=float;
+currency=fixedpoint(13,2);
+percent_1=fixedpoint(5,1);
 **file: DBDATA
 
 CREATE TABLE Customer (

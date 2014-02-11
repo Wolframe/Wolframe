@@ -16,7 +16,7 @@ docin=$testname.in					# input document name
 docout=$testname.out					# output document name
 testdata="
 **file:$ddltypeprg
-name=string:ucname;
+name=ucname;
 "
 csetlist="UTF-8 UCS-2LE UCS-4LE"			# character set encodings to test
 . ./output_tst_textwolf.sh

@@ -45,9 +45,8 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const char* name_, const types::keymap<types::NormalizeFunctionType>& functionmap_)
+	NormalizeFunctionConstructor( const char* classname_, const types::keymap<types::NormalizeFunctionType>& functionmap_)
 		:m_classname(classname_)
-		,m_name(name_)
 		,m_functionmap(functionmap_)
 	{}
 
@@ -75,14 +74,8 @@ public:
 		return m_functionmap;
 	}
 
-	const char* domain() const
-	{
-		return m_name;
-	}
-
 private:
 	const char* m_classname;
-	const char* m_name;
 	FunctionTypeMap m_functionmap;
 };
 
@@ -100,9 +93,8 @@ class NormalizeFunctionBuilder :public SimpleBuilder
 public:
 	//\brief Constructor
 	//\param[in] functions {0,0} terminated array of function definitions
-	NormalizeFunctionBuilder( const char* classname_, const char* name_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandle createResourceHandle=0)
+	NormalizeFunctionBuilder( const char* classname_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandle createResourceHandle=0)
 		:SimpleBuilder( classname_)
-		,m_name(name_)
 	{
 		if (createResourceHandle)
 		{
@@ -126,11 +118,10 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_name, m_functionmap);
+		return new NormalizeFunctionConstructor( m_className, m_functionmap);
 	}
 
 private:
-	const char* m_name;
 	types::keymap<types::NormalizeFunctionType> m_functionmap;
 	types::NormalizeResourceHandleR m_resource;
 };

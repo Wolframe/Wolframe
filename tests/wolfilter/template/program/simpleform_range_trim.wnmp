@@ -1,6 +1,6 @@
-int=string:trim,number:integer(10);
-uint=string:trim,number:unsigned(10);
-float=string:trim,number:float(10,10);
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
+int=trim,integer(10 );
+uint=trim,unsigned(10);
+float=trim, float( 10,10);
+currency=fixedpoint(13, 2);
+percent_1=fixedpoint(5 ,1);
 

@@ -101,10 +101,10 @@ FORM CDCatalog
 	}
 }
 **file:example.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-normname=string:convdia,lcname;
+int=integer;
+uint=unsigned;
+float=float;
+normname=convdia,lcname;
 **file:example.dmap
 COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);
 **file:example.mlg

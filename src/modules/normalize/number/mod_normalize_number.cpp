@@ -37,7 +37,7 @@
 
 using namespace _Wolframe::langbind;
 
-NORMALIZER_MODULE("number", "normalizers and validators for numbers")
+NORMALIZER_MODULE("NumberNormalizer", "normalizers and validators for numbers")
 
 NORMALIZER_FUNCTION(	"integer",	createIntegerNormalizeFunction)
 NORMALIZER_FUNCTION(	"unsigned",	createUnsignedNormalizeFunction)

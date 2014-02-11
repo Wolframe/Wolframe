@@ -34408,7 +34408,7 @@ function run()
 	f = filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
-	bigint = provider.type( "bcd:bigint")
+	bigint = provider.type( "bigint")
 
 	stack = {}
 	for line in input:get() do

@@ -248,13 +248,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						module::NormalizeFunctionConstructor::FunctionTypeMap::const_iterator fi = constructor->functionmap().begin(), fe = constructor->functionmap().end();
 						for (; fi != fe; ++fi)
 						{
-							m_programs->defineNormalizeFunctionType( constructor->domain(), fi->first, fi->second);
-							LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << constructor->domain() << ":" << fi->first << "'";
+							m_programs->defineNormalizeFunctionType( fi->first, fi->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << fi->first << "'";
 						}
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading normalize function object domain '" << constructor->domain() << "':" << e.what();
+						LOG_FATAL << "Error loading normalize function object '" << constructor->objectClassName() << "':" << e.what();
 					}
 				}
 				break;
@@ -275,13 +275,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						module::CustomDataTypeConstructor::CustomDataTypeMap::const_iterator ti = constructor->typemap().begin(), te = constructor->typemap().end();
 						for (; ti != te; ++ti)
 						{
-							m_programs->defineCustomDataType( constructor->domain(), ti->first, ti->second);
-							LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->domain() << ":" << ti->first << "'";
+							m_programs->defineCustomDataType( ti->first, ti->second);
+							LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << ti->first << "'";
 						}
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_FATAL << "Error loading custom data type domain '" << constructor->domain() << "':" << e.what();
+						LOG_FATAL << "Error loading custom data type '" << constructor->objectClassName() << "':" << e.what();
 					}
 				}
 				break;
@@ -399,10 +399,10 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 	return filtertype->create( arg);
 }
 
-const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& domain, const std::string& name) const
+const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDataType( const std::string& name) const
 {
-	LOG_TRACE << "[provider] get custom data type '" << domain << ":" << name << "'";
-	return m_programs->getCustomDataType( domain, name);
+	LOG_TRACE << "[provider] get custom data type '" << name << "'";
+	return m_programs->getCustomDataType( name);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const

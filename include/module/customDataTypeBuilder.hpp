@@ -48,14 +48,13 @@ namespace module {
 class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
-	CustomDataTypeConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateCustomDataType>& constructormap_)
+	CustomDataTypeConstructor( const char* classname_, const types::keymap<types::CreateCustomDataType>& constructormap_)
 		:m_classname(classname_)
-		,m_name(name_)
 	{
 		types::keymap<types::CreateCustomDataType>::const_iterator ci = constructormap_.begin(), ce = constructormap_.end();
 		for (; ci != ce; ++ci)
 		{
-			types::CustomDataTypeR dt( ci->second( std::string(m_name) + ":" + ci->first));
+			types::CustomDataTypeR dt( ci->second( ci->first));
 			m_typemap.insert( ci->first, dt);
 		}
 	}
@@ -92,14 +91,8 @@ public:
 		return m_classname;
 	}
 
-	const char* domain() const
-	{
-		return m_name;
-	}
-
 private:
 	const char* m_classname;
-	const char* m_name;
 	CustomDataTypeMap m_typemap;
 };
 
@@ -115,9 +108,8 @@ struct CustomDataTypeDef
 class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:
-	CustomDataTypeBuilder( const char* classname_, const char* name_, const CustomDataTypeDef* typedefs)
+	CustomDataTypeBuilder( const char* classname_, const CustomDataTypeDef* typedefs)
 		:SimpleBuilder(classname_)
-		,m_name(name_)
 	{
 		std::size_t ti = 0;
 		for (; typedefs[ti].name && typedefs[ti].createFunc; ++ti)
@@ -135,11 +127,10 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CustomDataTypeConstructor( objectClassName(), m_name, m_constructormap);
+		return new CustomDataTypeConstructor( objectClassName(), m_constructormap);
 	}
 
 private:
-	const char* m_name;
 	typedef types::keymap<types::CreateCustomDataType> ConstructorMap;
 	ConstructorMap m_constructormap;
 };

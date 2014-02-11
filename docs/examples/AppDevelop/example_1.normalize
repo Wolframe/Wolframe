@@ -1,5 +1,5 @@
 
-int=string:trim,number:integer(5);
-uint=string:trim,number:unsigned;
-currency=string:trim,number:fixedpoint( 13, 2);
-name=string:trim,lcname;
+int=trim,integer(5);
+uint=trim,unsigned;
+currency=trim,fixedpoint( 13, 2);
+name=trim,lcname;

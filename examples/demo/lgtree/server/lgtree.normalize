@@ -1,6 +1,6 @@
-ID=string:trim,number:integer;
-int=string:trim,number:integer;
-uint=string:trim,number:unsigned;
-float=string:trim,number:float;
-entityname=string:trim,string:ucname;
-enumname=string:trim,string:lcname;
+ID=trim,integer;
+int=trim,integer;
+uint=trim,unsigned;
+float=trim,float;
+entityname=trim,ucname;
+enumname=trim,lcname;

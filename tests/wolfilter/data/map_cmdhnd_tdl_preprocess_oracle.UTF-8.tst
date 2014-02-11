@@ -61,10 +61,10 @@ FORM AllDataRequest
 	}
 }
 **file:preprocess.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-normname=string:convdia,lcname;
+int=integer;
+uint=unsigned;
+float= float;
+normname= convdia,lcname;
 **file: DBDATA
 CREATE TABLE Person
 (

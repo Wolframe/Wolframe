@@ -36,7 +36,7 @@
 #include "logger-v1.hpp"
 
 //\brief Marks the start of the Wolframe C++ form function module after the includes section.
-#define NORMALIZER_MODULE(DOMAIN,DESCRIPTION)\
+#define NORMALIZER_MODULE(NAME,DESCRIPTION)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
 	static void _Wolframe__setModuleLogger( void* logger )\
@@ -46,11 +46,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" DOMAIN "Normalizer";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
+		return NAME;\
 	}\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -64,7 +60,7 @@
 	{
 
 //\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
-#define NORMALIZER_MODULE_WITH_RESOURCE(DOMAIN,DESCRIPTION,RESOURCECLASS)\
+#define NORMALIZER_MODULE_WITH_RESOURCE(NAME,DESCRIPTION,RESOURCECLASS)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
 	static void _Wolframe__setModuleLogger( void* logger )\
@@ -74,11 +70,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" DOMAIN "Normalizer";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
+		return NAME;\
 	}\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -105,7 +97,7 @@
 	{\
 		static _Wolframe::module::SimpleBuilder* constructor()\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__moduleDomain(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
+			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
 		}\
 	};\
 	}\

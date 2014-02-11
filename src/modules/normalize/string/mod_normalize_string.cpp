@@ -61,7 +61,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "StringNormalizer", "string", normalizeFunctions);
+		return new NormalizeFunctionBuilder( "StringNormalizer", normalizeFunctions);
 	}
 };
 }//anonymous namespace

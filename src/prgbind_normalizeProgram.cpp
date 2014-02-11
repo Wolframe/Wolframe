@@ -80,16 +80,15 @@ private:
 	types::CustomDataInitializer* m_initializer;
 };
 
-static types::NormalizeFunctionR createBaseFunction( const std::string& namspace, const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
+static types::NormalizeFunctionR createBaseFunction( const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
 {
-	if (namspace.empty()) throw std::runtime_error( "namespace of function not defined");
 	try
 	{
-		const types::NormalizeFunctionType* normalizer = prglibrary.getNormalizeFunctionType( namspace, name);
-		const types::CustomDataType* customtype = prglibrary.getCustomDataType( namspace, name);
+		const types::NormalizeFunctionType* normalizer = prglibrary.getNormalizeFunctionType( name);
+		const types::CustomDataType* customtype = prglibrary.getCustomDataType( name);
 		if (normalizer)
 		{
-			if (customtype) throw std::runtime_error( std::string( "amgibuus definition of custom data type and normalize function '") + namspace + ":" + name + "'");
+			if (customtype) throw std::runtime_error( std::string( "amgibuus definition of custom data type and normalize function '") + name + "'");
 			return types::NormalizeFunctionR( normalizer->createFunction( arg));
 ;
 		}
@@ -99,12 +98,12 @@ static types::NormalizeFunctionR createBaseFunction( const std::string& namspace
 		}
 		else
 		{
-			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + namspace + ":" + name + "'");
+			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + name + "'");
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string("could not build normalizer for '") + namspace + ":" + name + "(" + arg + ")' :" + err.what());
+		throw std::runtime_error( std::string("could not build normalizer for '") + name + "(" + arg + ")' :" + err.what());
 	}
 }
 
@@ -178,7 +177,6 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
 			}
 			CombinedNormalizeFunction funcdef( prgname);
-			std::string namspace;
 
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
@@ -196,24 +194,12 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					default:
 						if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
 				}
-				if ((':' == utils::gotoNextToken( si, se)))
-				{
-					namspace = funcname;
-					funcname.clear();
-					++si;
-					switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
-					{
-						case '\0': throw ERROR( si, "unexpected end of program");
-						default:
-							if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
-					}
-				}
 				switch ((ch=utils::gotoNextToken( si, se)))
 				{
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( namspace, funcname, "", prglibrary)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, "", prglibrary)));
 						++si;
 						continue;
 					case '(':
@@ -224,7 +210,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
 							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
 						}
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( namspace, funcname, std::string( argstart, si-1), prglibrary)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::string( argstart, si-1), prglibrary)));
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{

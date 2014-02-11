@@ -57,10 +57,10 @@ static NormalizeFunctionDef normalizeFunctions[] =
 	{"toupper", &langbind::create_toupper_NormalizeFunction},
 	{"totitle", &langbind::create_totitle_NormalizeFunction},
 	{"foldcase", &langbind::create_foldcase_NormalizeFunction},
-	{"nfd", &langbind::create_nfd_NormalizeFunction},
-	{"nfc", &langbind::create_nfc_NormalizeFunction},
-	{"nfkd", &langbind::create_nfkd_NormalizeFunction},
-	{"nfkc", &langbind::create_nfkc_NormalizeFunction},
+	{"conv_nfd", &langbind::create_nfd_NormalizeFunction},
+	{"conv_nfc", &langbind::create_nfc_NormalizeFunction},
+	{"conv_nfkd", &langbind::create_nfkd_NormalizeFunction},
+	{"conv_nfkc", &langbind::create_nfkc_NormalizeFunction},
 	{"latinword", &langbind::create_latinword_NormalizeFunction},
 	{"ascii_de", &langbind::create_ascii_de_NormalizeFunction},
 	{"ascii_eu", &langbind::create_ascii_eu_NormalizeFunction},
@@ -72,7 +72,7 @@ struct NormalizeProcessor
 {
 	static SimpleBuilder* builder()
 	{
-		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", normalizeFunctions, &createLocaleResourceHandle);
+		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", normalizeFunctions, &createLocaleResourceHandle);
 	}
 };
 }//anonymous namespace

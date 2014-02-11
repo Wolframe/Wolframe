@@ -67,15 +67,15 @@ public:
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
 	virtual void defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const;
-	virtual void defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& ftype);
-	virtual void defineCustomDataType( const std::string& namspace, const std::string& name, const types::CustomDataTypeR& t);
+	virtual void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& ftype);
+	virtual void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
 	virtual void defineFilterType( const std::string& name, const langbind::FilterTypeR& f);
 	virtual void defineProgramType( const ProgramR& prg);
 
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
-	virtual const types::CustomDataType* getCustomDataType( const std::string& namspace, const std::string& name) const;
-	virtual const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& namspace, const std::string& name) const;
+	virtual const types::CustomDataType* getCustomDataType( const std::string& name) const;
+	virtual const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& name) const;
 
 	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
 	virtual std::vector<std::string> getFormNames() const;

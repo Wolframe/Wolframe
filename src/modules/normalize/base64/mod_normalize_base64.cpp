@@ -59,7 +59,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "Base64Normalizer", "base64", normalizeFunctions);
+		return new NormalizeFunctionBuilder( "Base64Normalizer", normalizeFunctions);
 	}
 };
 }//anonymous namespace

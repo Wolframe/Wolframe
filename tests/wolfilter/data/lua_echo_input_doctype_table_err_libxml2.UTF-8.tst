@@ -9,11 +9,11 @@ try to read input twice
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_range_trim.wnmp --program employee_assignment_print.sfrm --cmdprogram echo_input_doctype_table_err.lua run
 
 **file:simpleform_range_trim.wnmp
-int=string:trim,number:integer(10);
-uint=string:trim,number:unsigned(10);
-float=string:trim,number:float(10,10);
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
+int=trim,integer(10 );
+uint=trim,unsigned(10);
+float=trim, float( 10,10);
+currency=fixedpoint(13, 2);
+percent_1=fixedpoint(5 ,1);
 **file: echo_input_doctype_table_err.lua
 function run()
 	type = input:doctype()

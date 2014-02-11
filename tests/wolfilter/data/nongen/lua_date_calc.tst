@@ -60,7 +60,7 @@ function run()
 	input:as( f)
 	output:as( f)
 	stack = {}
-	date = provider.type( "dta:date")
+	date = provider.type( "date")
 
 	for line in input:get() do
 		for w in string.gmatch( line, "%S+") do

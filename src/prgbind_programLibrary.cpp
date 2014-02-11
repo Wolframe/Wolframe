@@ -179,14 +179,6 @@ public:
 	Impl( const Impl& o)
 		:m_programTypes(o.m_programTypes){}
 
-	static std::string aggregateName( const std::string& namspace, const std::string& name)
-	{
-		std::string rt( namspace);
-		rt.push_back(':');
-		rt.append( name);
-		return rt;
-	}
-
 	void defineCppFormFunction( const std::string& name, const CppFormFunction& f)
 	{
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
@@ -223,14 +215,14 @@ public:
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
-	void defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& f)
+	void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 	{
-		m_normalizeFunctionTypeMap.insert( aggregateName( namspace, name), f);
+		m_normalizeFunctionTypeMap.insert( name, f);
 	}
 
-	void defineCustomDataType( const std::string& namspace, const std::string& name, const types::CustomDataTypeR& t)
+	void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 	{
-		m_customDataTypeMap.insert( aggregateName( namspace, name), t);
+		m_customDataTypeMap.insert( name, t);
 	}
 
 	void defineProgramType( const ProgramR& prg)
@@ -262,9 +254,9 @@ public:
 		return fi->second.get();
 	}
 
-	const types::CustomDataType* getCustomDataType( const std::string& namspace, const std::string& name) const
+	const types::CustomDataType* getCustomDataType( const std::string& name) const
 	{
-		types::keymap<types::CustomDataTypeR>::const_iterator ti = m_customDataTypeMap.find( aggregateName( namspace, name));
+		types::keymap<types::CustomDataTypeR>::const_iterator ti = m_customDataTypeMap.find( name);
 		if (ti == m_customDataTypeMap.end()) return 0;
 		return ti->second.get();
 	}
@@ -274,9 +266,9 @@ public:
 		return m_normalizeFunctionMap.get( name);
 	}
 
-	const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& namspace, const std::string& name)
+	const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& name)
 	{
-		types::keymap<types::NormalizeFunctionType>::const_iterator fi = m_normalizeFunctionTypeMap.find( aggregateName( namspace, name));
+		types::keymap<types::NormalizeFunctionType>::const_iterator fi = m_normalizeFunctionTypeMap.find( name);
 		if  (fi == m_normalizeFunctionTypeMap.end()) return 0;
 		return &fi->second;
 	}
@@ -373,14 +365,14 @@ void ProgramLibrary::defineRuntimeEnvironment( const langbind::RuntimeEnvironmen
 	m_impl->defineRuntimeEnvironment( env);
 }
 
-void ProgramLibrary::defineNormalizeFunctionType( const std::string& namspace, const std::string& name, const types::NormalizeFunctionType& f)
+void ProgramLibrary::defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 {
-	m_impl->defineNormalizeFunctionType( namspace, name, f);
+	m_impl->defineNormalizeFunctionType( name, f);
 }
 
-void ProgramLibrary::defineCustomDataType( const std::string& namspace, const std::string& name, const types::CustomDataTypeR& t)
+void ProgramLibrary::defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 {
-	m_impl->defineCustomDataType( namspace, name, t);
+	m_impl->defineCustomDataType( name, t);
 }
 
 void ProgramLibrary::defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const
@@ -418,9 +410,9 @@ const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 	return m_impl->formtypemap();
 }
 
-const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& namspace, const std::string& name) const
+const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& name) const
 {
-	return m_impl->getCustomDataType( namspace, name);
+	return m_impl->getCustomDataType( name);
 }
 
 const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string& name) const
@@ -443,9 +435,9 @@ const types::NormalizeFunction* ProgramLibrary::getDDLTypeNormalizer( const std:
 	return m_impl->getDDLTypeNormalizer( name);
 }
 
-const types::NormalizeFunctionType* ProgramLibrary::getNormalizeFunctionType( const std::string& namspace, const std::string& name) const
+const types::NormalizeFunctionType* ProgramLibrary::getNormalizeFunctionType( const std::string& name) const
 {
-	return m_impl->getNormalizeFunctionType( namspace, name);
+	return m_impl->getNormalizeFunctionType( name);
 }
 
 const langbind::FilterType* ProgramLibrary::getFilterType( const std::string& name) const

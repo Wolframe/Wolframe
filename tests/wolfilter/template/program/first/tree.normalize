@@ -1,4 +1,4 @@
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-name=localeconv:latinword,totitle;
+int=integer;
+uint=unsigned;
+float=float;
+name=latinword,totitle;

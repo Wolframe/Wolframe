@@ -59,7 +59,7 @@ struct Obj
 {
 	static SimpleBuilder* constructor()
 	{
-		return new CustomDataTypeBuilder( "BcdArithmeticTypes", "bcd", customDataTypes);
+		return new CustomDataTypeBuilder( "BcdArithmeticTypes", customDataTypes);
 	}
 };
 }//anonymous namespace

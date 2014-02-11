@@ -59,16 +59,16 @@
 --input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.wnmp --program typed_invoice.sfrm typed_invoice
 **requires:TEXTWOLF
 **file:simpleform_complex.wnmp
-int= number: integEr( 10 );
-f_int= string :trim  ,numbeR:integer( 10);
-uint =number:uNsigned(10 );
-f_uint =string:trim, number:unsiGned( 10) ;
-float = number:float(12,12);
-f_floAt = string:trim ,Number:float(12,12);
-text_Ascii_de =  localeConv :latinword, ascii_de
-text_ascii_eu=localeconv :  latinword ,ascii_eu ;
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
+int=  integEr( 10 );
+f_int= trim  ,integer( 10);
+uint =uNsigned(10 );
+f_uint =trim, unsiGned( 10) ;
+float = float(12,12);
+f_floAt = trim ,float(12,12);
+text_Ascii_de =  latinword, ascii_de
+text_ascii_eu=Latinword ,ascii_eu ;
+currency=fixedpoint( 13,2);
+percent_1=fixedpoint (5,1);
 **file: typed_invoice.sfrm
 FORM typed_invoice
 {

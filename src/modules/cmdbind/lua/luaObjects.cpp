@@ -924,9 +924,7 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 {
 	int nn = lua_gettop( ls);
 	const char* initializerString = 0;
-	std::string arg;
-	const char* domainName = 0;
-	const char* typeName = 0;
+	std::string typeName;
 	if (nn > 1)
 	{
 		if (nn > 2) throw std::runtime_error( "too many arguments");
@@ -936,20 +934,14 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	{
 		throw std::runtime_error( "too few arguments");
 	}
-	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected string as first argument");
-	arg.append( lua_tostring( ls, 1));
-	std::string::iterator ai = arg.begin();
-	for (;ai != arg.end() && *ai != ':'; ++ai){}
-	if (ai == arg.end()) throw std::runtime_error( "namespace identifier missing in name of type (namespace:type)");
-	*ai = '\0';
-	domainName = arg.c_str();
-	typeName = arg.c_str() + (ai - arg.begin()) + 1;
+	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected typename (string) as first argument");
+	typeName.append( lua_tostring( ls, 1));
 
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-	const types::CustomDataType* typ = ctx->customDataType( domainName, typeName);
+	const types::CustomDataType* typ = ctx->customDataType( typeName);
 	if (!typ)
 	{
-		throw std::runtime_error( std::string( "type '") + domainName + ":" + typeName + "' not defined");
+		throw std::runtime_error( std::string( "type '") + typeName + "' not defined");
 	}
 	types::CustomDataInitializerR ini;
 	if (initializerString) 

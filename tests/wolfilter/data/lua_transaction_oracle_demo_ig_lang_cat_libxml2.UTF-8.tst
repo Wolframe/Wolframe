@@ -156,11 +156,11 @@
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram=transaction_demo_ig_lang_cat.lua --program simpleform.wnmp --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/oracle/mod_db_oracletest --database 'identifier=testdb,host=andreasbaumann.dyndns.org,port=1521,database=orcl,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
+int=integer;
+uint=unsigned;
+float=float;
+currency=fixedpoint(13,2);
+percent_1=fixedpoint(5,1);
 **file: DBDATA
 --
 -- Generic tree implementation for SQL databases

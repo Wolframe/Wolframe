@@ -1,1 +1,1 @@
-int=string:trim,number:integer;
+int=trim,integer;

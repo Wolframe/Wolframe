@@ -36,7 +36,7 @@
 #include "logger-v1.hpp"
 
 //\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
-#define CUSTOM_DATATYPE_MODULE(DOMAIN,DESCRIPTION)\
+#define CUSTOM_DATATYPE_MODULE(NAME,DESCRIPTION)\
 	_Wolframe::log::LogBackend* logBackendPtr;\
 	\
 	static void _Wolframe__setModuleLogger( void* logger )\
@@ -46,11 +46,7 @@
 	\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" DOMAIN "CustomDataType";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
+		return NAME;\
 	}\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -72,7 +68,7 @@
 	{\
 		static _Wolframe::module::SimpleBuilder* constructor()\
 		{\
-			return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__moduleDomain(), _Wolframe__customDataTypes);\
+			return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__customDataTypes);\
 		}\
 	};\
 	}\

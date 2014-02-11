@@ -72,7 +72,7 @@ public:
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
-	const types::CustomDataType* customDataType( const std::string& domain, const std::string& name) const;
+	const types::CustomDataType* customDataType( const std::string& name) const;
 
 	bool loadPrograms();
 	bool checkReferences( const ProcessorProvider* provider) const;
