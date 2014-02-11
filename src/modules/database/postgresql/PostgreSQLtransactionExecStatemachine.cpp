@@ -390,9 +390,11 @@ const DatabaseError* TransactionExecStatemachine_postgres::getLastError()
 enum PostgreSQLfieldTypes
 {
 	PGSQL_FIELD_TYPE_BOOLEAN	= 16,	// boolean
+	PGSQL_FIELD_TYPE_INT8		= 20,	// int8
 	PGSQL_FIELD_TYPE_INT4		= 23,	// int4
 	PGSQL_FIELD_TYPE_TEXT		= 25,	// text
-	PGSQL_FIELD_TYPE_REAL		= 700	// real
+	PGSQL_FIELD_TYPE_FLOAT4		= 700,	// float4
+	PGSQL_FIELD_TYPE_FLOAT8		= 701	// float8
 };
 
 types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
@@ -440,11 +442,14 @@ types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 			break;
 				
 		case PGSQL_FIELD_TYPE_INT4:
+		case PGSQL_FIELD_TYPE_INT8:
 			rt = types::VariantConst( resval );
-			rt = types::VariantConst( rt.toint( ) );
+			rt.convert( types::Variant::Int );
+			//~ rt = types::VariantConst( rt.toint( ) );
 			break;
 		
-		case PGSQL_FIELD_TYPE_REAL:
+		case PGSQL_FIELD_TYPE_FLOAT4:
+		case PGSQL_FIELD_TYPE_FLOAT8:
 			rt = types::VariantConst( resval );
 			rt = types::VariantConst( rt.todouble( ) );
 			break;

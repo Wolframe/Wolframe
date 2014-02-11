@@ -147,9 +147,9 @@ _WOLFRAME_INTEGER utils::toint_cast( const std::string& val)
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	if (val.at(0) == '-')
 	{
-		_WOLFRAME_INTEGER rt = (_WOLFRAME_INTEGER)string2uint( val.c_str()+1);
-		if (rt < 0) throw std::runtime_error( "string to integer conversion error: value out of range");
-		return -rt;
+		_WOLFRAME_UINTEGER rt = string2uint( val.c_str()+1);
+		if( rt > (_WOLFRAME_UINTEGER)std::numeric_limits<_WOLFRAME_INTEGER>::max( ) + 1 ) throw std::runtime_error( "string to integer conversion error: value out of range");
+		return -(_WOLFRAME_INTEGER)(rt);
 	}
 	else
 	{

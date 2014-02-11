@@ -513,7 +513,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				(dvoid *)&parmh, (ub4 *)0, (ub4)OCI_ATTR_PARAM, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;
 
-			ub4 numCols = 0;
+			ub2 numCols = 0;
 			status = OCIAttrGet( (dvoid *)parmh, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&numCols, (ub4 *)0, (ub4)OCI_ATTR_NUM_COLS, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;

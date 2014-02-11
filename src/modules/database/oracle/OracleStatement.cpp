@@ -48,13 +48,33 @@ sword OracleStatement::getLastStatus( )
 	return m_status;
 }
 
+void OracleStatement::bindUInt64( const unsigned int idx, oraub8 &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( oraub8 ),
+		SQLT_UIN, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindInt64( const unsigned int idx, orasb8 &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( orasb8 ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
 void OracleStatement::bindUInt( const unsigned int idx, unsigned int &value )
 {
 	OCIBind *bindhp = (OCIBind *)0;
 
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
 		(ub4)idx, (dvoid *)&value, (sb4)sizeof( unsigned int ),
-		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		SQLT_UIN, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
@@ -85,16 +105,22 @@ void OracleStatement::bindDouble( const unsigned int idx, double &value )
 	
 	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
 		(ub4)idx, (dvoid *)&value, (sb4)sizeof( double ),
-		SQLT_FLT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		SQLT_BDOUBLE, (dvoid *)0, (ub2 *)0, (ub2 *)0,
 		(ub4)0, (ub4 *)0, OCI_DEFAULT );
 }
 
 void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value )
 {
+	throw new std::logic_error( "bindNumber with _WOLFRAME_INTEGER not implemented for value '"
+		+ boost::lexical_cast<std::string>( value ) + "' for index "
+		+ boost::lexical_cast<std::string>( idx ) );
 }
 
 void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value )
 {
+	throw new std::logic_error( "bindNumber with _WOLFRAME_UINTEGER not implemented for value '"
+		+ boost::lexical_cast<std::string>( value ) + "' for index "
+		+ boost::lexical_cast<std::string>( idx ) );
 }
 
 void OracleStatement::bindString( const unsigned int idx, char* value, const std::size_t size )
@@ -140,20 +166,32 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			break;
 		
 		case types::Variant::Int:
-			if( value.data( ).value.Int <= 0x7FFFFFFF && value.data( ).value.Int >= -0x7FFFFFFFF ) {
+			if( value.data( ).value.Int <= std::numeric_limits<signed int>::max( ) && value.data( ).value.Int >= std::numeric_limits<signed int>::min( ) ) {
 				m_data.back( ).i = (signed int)m_data.back( ).v.data( ).value.Int;
 				bindInt( idx, m_data.back( ).i );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+			} else if( value.data( ).value.Int <= std::numeric_limits<orasb8>::max( ) ) {
+				m_data.back( ).i64 = m_data.back( ).v.data( ).value.Int;
+				bindInt64( idx, m_data.back( ).i64 );
+#else				
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.Int );
+#endif
 			}
 			break;
 
 		case types::Variant::UInt:
-			if( value.data( ).value.UInt <= 0x7FFFFFFF ) {
+			if( value.data( ).value.Int <= std::numeric_limits<signed int>::max( ) ) {
 				m_data.back( ).ui = (unsigned int)m_data.back( ).v.data( ).value.UInt;
 				bindUInt( idx, m_data.back( ).ui );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+			} else if( value.data( ).value.Int <= std::numeric_limits<orasb8>::max( ) ) {
+				m_data.back( ).ui64 = m_data.back( ).v.data( ).value.UInt;
+				bindUInt64( idx, m_data.back( ).ui64 );
+#else				
 			} else {
 				bindNumber( idx, m_data.back( ).v.data( ).value.UInt );
+#endif
 			}
 			break;
 

@@ -406,6 +406,12 @@ bool TransactionExecStatemachine_oracle::execute()
 					descrRef->len = sizeof( OCINumber );
 					break;
 					
+				case SQLT_IBDOUBLE:
+					descrRef->fetchType = SQLT_BDOUBLE;
+					descrRef->bufsize = sizeof( double );
+					descrRef->len = sizeof( double );
+					break;
+					
 				default:
 					errorStatus( std::string( "unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement->originalSQL() + "'" ) );
 					return false;
@@ -428,7 +434,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			// by funny variables like NLS_LANG en passant)
 			switch( descrRef->dataType ) {
 				case SQLT_CHR: {
-					ub2 cform = SQLCS_NCHAR;
+					ub1 cform = SQLCS_NCHAR;
 					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&cform, (ub4)0, (ub4)OCI_ATTR_CHARSET_FORM,
 						(*m_conn)->errhp );
@@ -592,9 +598,12 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		
 		case SQLT_NUM: {
 			sword status_;
-			signed int intval = 0;
-			boolean isInt = 0;
+			sword isInt = 0;		
 			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &isInt );
+			if( !status( status_, Executed ) ) {
+				errorStatus( std::string( "error in OCINumberIsInt for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+				return types::VariantConst( );
+			}
 			if( !isInt ) {
 				double doubleval = 0;
 				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
@@ -605,15 +614,46 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 					rt = types::VariantConst( );
 				}
 			} else {
-				status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
-					(ub4)sizeof( intval ), (ub4)OCI_NUMBER_SIGNED, (void *)&intval );
-				//~ LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
-				if( status( status_, Executed ) ) {
-					rt = (types::Variant::Data::Int)intval;
+				sword sign = 0;
+				status_ = OCINumberSign( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &sign );
+				if( !status( status_, Executed ) ) {
+					errorStatus( std::string( "error in OCINumberSign for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+					return types::VariantConst( );
+				}
+
+				if( sign < 0 ) {
+					_WOLFRAME_INTEGER intval = 0;
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+						(ub4)sizeof( _WOLFRAME_INTEGER ), (ub4)OCI_NUMBER_SIGNED, (void *)&intval );
+					if( status( status_, Executed ) ) {
+						//~ LOG_DATA << "[Oracle get SQLT_NUM(signed)]: " << intval;
+						rt = (types::Variant::Data::Int)intval;
+					} else {
+						errorStatus( std::string( "error in OCINumberToInt(signed) for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+						rt = types::VariantConst( );
+					}
 				} else {
-					rt = types::VariantConst( );
+					_WOLFRAME_UINTEGER uintval = 0;
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+						(ub4)sizeof( _WOLFRAME_UINTEGER ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&uintval );
+					if( status( status_, Executed ) ) {
+						//~ LOG_DATA << "[Oracle get SQLT_NUM(unsigned)]: " << uintval;
+						if( uintval <= (_WOLFRAME_UINTEGER)std::numeric_limits<_WOLFRAME_INTEGER>::max( ) ) {
+							rt = (types::Variant::Data::Int)uintval;
+						} else {
+							rt = (types::Variant::Data::UInt)uintval;
+						}
+					} else {
+						errorStatus( std::string( "error in OCINumberToInt(unsigned) for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+						rt = types::VariantConst( );
+					}
 				}
 			}
+			break;
+		}
+		
+		case SQLT_IBDOUBLE: {
+			rt = types::VariantConst( *((double *)descrRef->buf) );
 			break;
 		}
 					

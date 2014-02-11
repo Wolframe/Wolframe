@@ -97,13 +97,59 @@ TEST( variantTypeFixture, uint32 )
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, uint64 )
+TEST( variantTypeFixture, int64positive )
 {
-	boost::uint64_t i = UINT64_C( 18446744073709551615 ); // 2^64-1
+	_WOLFRAME_INTEGER i = INT64_C( 92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
+TEST( variantTypeFixture, int64negative )
+{
+	_WOLFRAME_INTEGER i = INT64_C( -92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
+TEST( variantTypeFixture, uint64max )
+{
+	_WOLFRAME_UINTEGER i = std::numeric_limits<_WOLFRAME_UINTEGER>::max( );
 	Variant v( i );
 	ASSERT_EQ( i, v.touint( ) );
 	v.convert( Variant::String );
-	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
+	ASSERT_EQ( "18446744073709551615", v.tostring( ) );	
+	v.convert( Variant::UInt );
+	ASSERT_EQ( i, v.touint( ) );
+}
+
+TEST( variantTypeFixture, int64max )
+{
+	_WOLFRAME_INTEGER i = std::numeric_limits<_WOLFRAME_INTEGER>::max( );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "9223372036854775807", v.tostring( ) );	
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, int64min )
+{
+	_WOLFRAME_INTEGER i = std::numeric_limits<_WOLFRAME_INTEGER>::min( );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-9223372036854775808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
 }
 
 TEST( variantTypeFixture, defined )

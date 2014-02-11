@@ -60,13 +60,13 @@ public:
 
 private:
 	//\remark See implementation of pq_sendint64
-	void bindUInt64( boost::uint64_t value, const char* type="uint8");
+	void bindUInt64( boost::uint64_t value, const char* type="int8");
 	void bindInt64( boost::int64_t value);
-	void bindUInt32( boost::uint32_t value, const char* type="uint4");
+	void bindUInt32( boost::uint32_t value, const char* type="int4");
 	void bindInt32( boost::int32_t value);
-	void bindUInt16( boost::uint16_t value, const char* type="uint2");
+	void bindUInt16( boost::uint16_t value, const char* type="int2");
 	void bindInt16( boost::int16_t value);
-	void bindByte( boost::uint8_t value, const char* type="uint1");
+	void bindByte( boost::uint8_t value, const char* type="int1");
 	void bindByte( boost::int8_t value);
 	void bindBool( bool value);
 	void bindDouble( double value);

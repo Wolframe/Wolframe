@@ -55,6 +55,19 @@ int main( )
             << std::dec
             << std::endl;
 
+  std::cout << "std::numeric_limits<double>::max( ): "
+            << std::numeric_limits<double>::max( ) 
+            << " " << std::hex
+            << std::numeric_limits<double>::max( )
+            << std::dec
+            << std::endl;
+  std::cout << "std::numeric_limits<double>::min( ): "
+            << std::numeric_limits<double>::min( )
+            << " " << std::hex
+            << std::numeric_limits<double>::min( )
+            << std::dec
+            << std::endl;
+
   return 0;
 }
 

@@ -1046,6 +1046,12 @@ LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	gmake \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
 
+For building the Oracle database module you need the two packages
+'oracle-instantclient-basic', 'oracle-instantclient-sdk' (both 11.2 and 12.1
+are ok, 12.1 needs a higher patchleven of the SUNW C library though).
+Unpack the ZIPs for instance to '/opt/oracle/instantclient_11_2' and set
+ORACLE_DIR accordingly (together with WITH_ORACLE=1).
+
 OpenIndiana 151a8
 -----------------
 
