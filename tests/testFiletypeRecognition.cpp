@@ -61,7 +61,7 @@ protected:
 static std::string getFileTypeString( const std::string& filename)
 {
 	static const char* encodingName[] = {"none","UTF-8","UCS-2BE","UCS-2LE","UCS-4BE","UCS-4LE"};
-	static const char* ext[] = {".xml",".txt"};
+	static const char* ext[] = {".unknown",".xml",".info"};
 
 	utils::FileType filetype = utils::getFileType( filename);
 	return std::string(encodingName[ (int)filetype.encoding]) + ext[(int)filetype.format];
@@ -78,7 +78,8 @@ TEST_F( FiletypeRecognitionTest, tests)
 	for (; ditr != dend; ++ditr)
 	{
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".xml")
-		||  boost::iequals( boost::filesystem::extension( *ditr), ".txt"))
+		||  boost::iequals( boost::filesystem::extension( *ditr), ".info")
+		||  boost::iequals( boost::filesystem::extension( *ditr), ".unknown"))
 		{
 			std::string testname = boost::filesystem::basename(*ditr);
 			tests.push_back( ditr->path().string());

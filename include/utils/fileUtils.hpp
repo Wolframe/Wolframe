@@ -98,13 +98,13 @@ void writeFile( const std::string& filename, const std::string& content);
 struct FileType
 {
 	enum Encoding {Undefined,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE};
-	enum Format {XML,SourceText};
+	enum Format {Unknown,XML,Info};
 
 	Encoding encoding;
 	Format format;
 
 	FileType()
-		:encoding(Undefined),format(SourceText){}
+		:encoding(Undefined),format(Unknown){}
 	FileType( const FileType& o)
 		:encoding(o.encoding),format(o.format){}
 	FileType( Encoding encoding_, Format format_)

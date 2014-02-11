@@ -9,7 +9,7 @@
 
 for ff in test-with-header test-without-header
 do
-	for ext in txt xml
+	for ext in unknown xml
 	do
 		for cset in UCS-2BE UCS-2BE UCS-4BE UCS-4BE
 		do

@@ -351,9 +351,10 @@ FileType utils::getFileType( const std::string& filename)
 	static const unsigned char pt_UCS4BE_XML[] = {4, 0x00,0x00,0x00,'<'};
 	static const unsigned char pt_UCS4LE_XML[] = {4, '<',0x00,0x00,0x00};
 	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
+	static const CharTable SpaceCharTab( " \t\r");
 
 	std::string::const_iterator si = source.begin(), se = source.end();
-	if (si == se) return FileType( FileType::Undefined, FileType::SourceText);
+	if (si == se) return FileType( FileType::Undefined, FileType::Info);
 
 	FileType rt;
 	if (FileTypeDetection::skipPattern( pt_BOM_UTF8, si, se)) rt.encoding = FileType::UCS1;
@@ -390,43 +391,80 @@ FileType utils::getFileType( const std::string& filename)
 			rt.format = FileType::XML;
 		}
 	}
-
 	if (rt.format == FileType::XML)
 	{
 		char ch = FileTypeDetection::skipChar( si, se, rt.encoding, xmlTagCharTab);
 		if (ch != '>')
 		{
-			return FileType( rt.encoding, FileType::SourceText);
+			return FileType( rt.encoding, FileType::Unknown);
 		}
 		return rt;
 	}
+	char ch = 0;
 	if (rt.encoding == FileType::Undefined)
 	{
 		if (si != se && *si == 0)
 		{
-			++si;
+			ch = *si++;
 			std::size_t zc = FileTypeDetection::countZeros( si, se);
 			switch (zc)
 			{
-				case 0: return FileType( FileType::UCS2BE, FileType::SourceText);
-				case 2: return FileType( FileType::UCS4BE, FileType::SourceText);
+				case 0: rt.encoding = FileType::UCS2BE; break;
+				case 2: rt.encoding = FileType::UCS4BE; break;
 				default: break;
 			}
 		}
 		else
 		{
-			++si;
+			ch = *si++;
 			std::size_t zc = FileTypeDetection::countZeros( si, se);
 			switch (zc)
 			{
-				case 0: return FileType( FileType::UCS1, FileType::SourceText);
-				case 1: return FileType( FileType::UCS2LE, FileType::SourceText);
-				case 3: return FileType( FileType::UCS4LE, FileType::SourceText);
+				case 0: rt.encoding = FileType::UCS1; break;
+				case 1: rt.encoding = FileType::UCS2LE; break;
+				case 3: rt.encoding = FileType::UCS4LE; break;
 				default: break;
 			}
 		}
 	}
-	return FileType( FileType::Undefined, FileType::SourceText);
+	try
+	{
+		if (rt.encoding == FileType::UCS1)
+		{
+			//... if encoding is UTF-8 check for info file format:
+			while (ch == ';')
+			{
+				//... skip comments
+				utils::parseLine( si, se);
+				ch = utils::gotoNextToken( si, se);
+			}
+			std::string tok;
+			ch = utils::parseNextToken( tok, si, se);
+			if (ch && !tok.empty())
+			{
+				ch = utils::gotoNextToken( si, se);
+				while (ch == ';')
+				{
+					//... skip comments
+					++si;
+					utils::parseLine( si, se);
+					ch = utils::gotoNextToken( si, se);
+				}
+				if (ch == '{')
+				{
+					//... starts with an identifier or a string followed by a '{'
+					rt.format = FileType::Info;
+				}
+			}
+		}
+	}
+	catch (std::bad_alloc& e)
+	{
+		throw e;
+	}
+	catch (std::runtime_error& e)
+	{}
+	return rt;
 }
 
 
@@ -447,7 +485,7 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 			read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
 			break;
 		}
-		case FileType::SourceText:
+		case FileType::Info:
 		{
 			if (filetype.encoding != FileType::UCS1)
 			{
@@ -456,9 +494,9 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 			read_info( filename, rt);
 			break;
 		}
-		default:
+		case FileType::Unknown:
 		{
-			throw std::runtime_error( std::string( "file type not recognized for '") + filename + "'");
+			throw std::runtime_error( std::string( "type not recognized as 'Info' or 'XML' of file '") + filename + "'");
 		}
 	}
 	return rt;
