@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = datetime
+SUBDIRS = datetime bcdnumber
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
