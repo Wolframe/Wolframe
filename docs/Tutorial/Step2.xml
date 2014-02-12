@@ -35,4 +35,16 @@
 	Connection closed by foreign host.
 		</programlisting>
 	</para>
+
+	<para>
+		The server in the shell shows the following output indicating
+		that authorization was successful:
+		
+		<programlisting language='shell'>
+	DEBUG: Connection from 127.0.0.1:47064 to 0.0.0.0:7661 authorized
+	DEBUG: Connection to 127.0.0.1:47064 closed
+		</programlisting>
+
+	</para>
+
 </sect1>
