@@ -27,7 +27,7 @@
 	<setinfo>
 		<title>Wolframe documentation</title>
 		<copyright>
-			<year>2010 - 2013</year>
+			<year>2010 - 2014</year>
 			<holder>Project Wolframe</holder>
 		</copyright>
 		<edition>version &BookSetVersion;</edition>
@@ -44,7 +44,7 @@
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
 
 			<copyright>
-				<year>2010 - 2013</year>
+				<year>2010 - 2014</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
 			&WolframeLegalNotice;
@@ -76,7 +76,7 @@
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
 
 			<copyright>
-				<year>2010 - 2013</year>
+				<year>2010 - 2014</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
 			&WolframeLegalNotice;
@@ -101,7 +101,7 @@
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
 
 			<copyright>
-				<year>2010 - 2013</year>
+				<year>2010 - 2014</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
 			&WolframeLegalNotice;

@@ -4,7 +4,6 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/doc.mk
 
-
 XSLT_MAN = \
 	$(XSLTPROC) --nonet --xinclude \
 	--param man.charmap.use.subset "0" \
@@ -18,15 +17,10 @@ XSLT_HTML = \
 	--stringparam toc.section.depth 4 \
 	output-html.xsl
 
-XSLT_WEBPAGE = \
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam toc.section.depth 4 \
-	output-html-webpage.xsl
-
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 4 \
+	--stringparam toc.section.depth 3 \
 	--stringparam fop1.extensions 1 \
 	output-pdf.xsl
 
@@ -62,20 +56,35 @@ doc-html-chunked: html/index.html html-tutorial/index.html
 
 doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
 
+doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html
+
 doc-pdf: WolfBook.pdf Tutorial.pdf
 
 .PHONY: depend
 depend:
 
-doc-epub: WolfBook.epub
-	mkdir OEBPS/images
+doc-epub: WolfBook.epub Tutorial.epub
+
+WolfBook.epub:
+	mkdir -p OEBPS/images
 	cp images/draft.png images/*.svg OEBPS/images
 	echo "application/epub+zip" > mimetype
 	zip -0Xq  WolfBook.epub mimetype
 	zip -Xr9D WolfBook.epub META-INF OEBPS
 	rm -rf mimetype META-INF OEBPS
 
+Tutorial.epub:
+	mkdir -p OEBPS/images
+	cp images/draft.png images/*.svg OEBPS/images
+	echo "application/epub+zip" > mimetype
+	zip -0Xq  Tutorial.epub mimetype
+	zip -Xr9D Tutorial.epub META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
+
 doc-towordml: WolfBook.docx
+
+%.html: %.xml
+	$(XSLT_HTML) $< > $@
 
 %.pdf: %.fop
 	fop -fo $< -pdf $@
@@ -83,30 +92,59 @@ doc-towordml: WolfBook.docx
 %.fop: %.xml
 	$(XSLT_PDF) $< > $@
 
-%.html: %.xml
-	$(XSLT_HTML) $< > $@
+WolfBook.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
 
-html/index.html: WolfBook.xml
+html/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-chunked.xsl WolfBook.xml
 
-html-webpage/index.html: WolfBook.xml
+html-webpage-chunked/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam toc.section.depth 3 \
+	-o $@ output-html-webpage-chunked.xsl WolfBook.xml
+
+html-webpage/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl WolfBook.xml
 
-html-tutorial/index.html: Tutorial.xml
+TUTORIAL_SOURCE_FILES = \
+	Tutorial.xml \
+	TutorialVersion.txt \
+	TutorialDate.txt \
+	Tutorial/Tutorial.ent \
+	Tutorial/Preface.xml \
+	Tutorial/Introduction.xml \
+	Tutorial/Step1.xml \
+	Tutorial/Step2.xml \
+	Tutorial/Step3.xml \
+	Tutorial/Step4.xml \
+	Tutorial/Step5.xml \
+	Tutorial/Step6.xml \
+	Tutorial/Step7.xml \
+	Tutorial/Step8.xml \
+	Tutorial/Step9.xml
+
+Tutorial.html: $(TUTORIAL_SOURCE_FILES)
+Tutorial.pdf: $(TUTORIAL_SOURCE_FILES)
+
+html-tutorial-chunked/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-chunked.xsl Tutorial.xml
 
-html-tutorial-webpage/index.html: Tutorial.xml
+html-tutorial-webpage/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl Tutorial.xml
+
+html-tutorial-webpage-chunked/index.html: Tutorial.xml TutorialVersion.txt TutorialDate.txt
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam toc.section.depth 3 \
+	-o $@ output-html-webpage-chunked.xsl Tutorial.xml
 
 %.epub: %.xml
 	$(XSLT_EPUB) $<
@@ -123,15 +161,15 @@ wolframe.conf.5: wolframe.conf-man.xml
 wolfpasswd.1: wolfpasswd-man.xml
 	$(XSLT_MAN) $<
 
-Tutorial.html: Tutorial.xml
-
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*.html
 	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
+	-rm -rf html-webpage-chunked/*.html
 	-rm -rf html-tutorial-webpage/*.html
+	-rm -rf html-tutorial-webpage-chunked/*.html
 	-rm -rf doxygen/html-webpage/*
 	
 local_distclean:
@@ -166,4 +204,5 @@ check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
+	xmllint --noout --xinclude --postvalid wolfpasswd.xml
 	xmllint --noout --xinclude --postvalid Tutorial.xml
