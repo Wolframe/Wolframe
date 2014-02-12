@@ -38,7 +38,7 @@
 		We can start the server now in the shell foreground with:
 
 		<programlisting language='shell'>
-	/usr/sbin/wolframed -f -c tutorial.conf -d DEBUG
+	/usr/sbin/wolframed -f -c tutorial.conf
 		</programlisting>
 	</para>
 	
