@@ -6,7 +6,7 @@
 <!ENTITY surname   "Barbos">
 <!ENTITY username  "&firstname; &surname;">
 <!ENTITY email     "mihai.barbos@gmail.com">
-<!ENTITY year      "2010-2013">
+<!ENTITY year      "2010-2014">
 <!ENTITY section   "8">
 <!-- TITLE should be something like "User commands" or similar (see
 	http://www.tldp.org/HOWTO/Man-Page/q2.html). -->

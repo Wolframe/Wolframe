@@ -3,9 +3,9 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	version="1.0">
 
-<xsl:output  method="xml"/>
-
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"/>
+
+<xsl:output  method="xml"/>
 
 	<xsl:param name="html.stylesheet" select="'wolframe.css'"/>
 	<xsl:param name="section.autolabel" select="1"/>
