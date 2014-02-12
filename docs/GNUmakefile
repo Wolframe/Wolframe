@@ -17,6 +17,12 @@ XSLT_HTML = \
 	--stringparam toc.section.depth 4 \
 	output-html.xsl
 
+XSLT_HTML_CHUNKED = \
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 4 \
+	-o $@ output-html-chunked.xsl
+
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
@@ -65,22 +71,6 @@ depend:
 
 doc-epub: WolfBook.epub Tutorial.epub
 
-WolfBook.epub:
-	mkdir -p OEBPS/images
-	cp images/draft.png images/*.svg OEBPS/images
-	echo "application/epub+zip" > mimetype
-	zip -0Xq  WolfBook.epub mimetype
-	zip -Xr9D WolfBook.epub META-INF OEBPS
-	rm -rf mimetype META-INF OEBPS
-
-Tutorial.epub:
-	mkdir -p OEBPS/images
-	cp images/draft.png images/*.svg OEBPS/images
-	echo "application/epub+zip" > mimetype
-	zip -0Xq  Tutorial.epub mimetype
-	zip -Xr9D Tutorial.epub META-INF OEBPS
-	rm -rf mimetype META-INF OEBPS
-
 doc-towordml: WolfBook.docx
 
 %.html: %.xml
@@ -92,23 +82,89 @@ doc-towordml: WolfBook.docx
 %.fop: %.xml
 	$(XSLT_PDF) $< > $@
 
-WolfBook.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
+%.epub: %.xml
+	$(XSLT_EPUB) $<
 
-html/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-chunked.xsl WolfBook.xml
+%.docx: %.xml
+	$(XSLT_TOWORDML) $< > $@
 
-html-webpage-chunked/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
+# WolfBook
+
+WOLFBOOK_SOURCE_FILES = \
+	WolfBook.xml \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
+	AppDevelopment/AppDevelopment.ent \
+	AppDevelopment/Appendix.xml \
+	AppDevelopment/CmdHandlerDirectmap.xml \
+	AppDevelopment/CmdHandlerLua.xml \
+	AppDevelopment/CmdHandlers.xml \
+	AppDevelopment/EBNF_Normalizer.xml \
+	AppDevelopment/EBNF_TransactionDefinitionLanguage.xml \
+	AppDevelopment/FilterJSON.xml \
+	AppDevelopment/FilterXML.xml \
+	AppDevelopment/FilterXSLT.xml \
+	AppDevelopment/Filters.xml \
+	AppDevelopment/Forms.xml \
+	AppDevelopment/Functions.xml \
+	AppDevelopment/Glossary.xml \
+	AppDevelopment/Introduction.xml \
+	AppDevelopment/ModelTypedFilter.xml \
+	AppDevelopment/Preface.xml \
+	AppDevelopment/ProgramCpp.xml \
+	AppDevelopment/ProgramDotNet.xml \
+	AppDevelopment/ProgramFormDataTypes.xml \
+	AppDevelopment/ProgramForms.xml \
+	AppDevelopment/ProgramLua.xml \
+	AppDevelopment/ProgramPython.xml \
+	AppDevelopment/ProgramTransactions.xml \
+	AppDevelopment/README \
+	AppDevelopment/Testing.xml \
+	Client/CLI.xml \
+	Client/Client.ent \
+	Client/Introduction.xml \
+	Client/Preface.xml \
+	Client/Wolfclient.xml \
+	Client/WolfclientArchitecture.xml \
+	Client/WolfclientArtifacts.xml \
+	Client/WolfclientDebugging.xml \
+	Client/WolfclientProgrammingInterface.xml \
+	Client/WolfclientRequestAnswer.xml \
+	Common/Common.ent \
+	Common/WolframeLegalNotice.xml \
+	Common/gpl.dbk \
+	ExtDevelopment/Appendix.xml \
+	ExtDevelopment/BasicDataTypes.xml \
+	ExtDevelopment/ExtDevelopment.ent \
+	ExtDevelopment/Glossary.xml \
+	ExtDevelopment/Introduction.xml \
+	ExtDevelopment/NormalizerModules.xml \
+	ExtDevelopment/Preface.xml
+
+WolfBook.html: $(WOLFBOOK_SOURCE_FILES)
+
+html/index.html: $(WOLFBOOK_SOURCE_FILES)
+	$(XSLT_HTML_CHUNKED) $<
+
+html-webpage-chunked/index.html: $(WOLFBOOK_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage-chunked.xsl WolfBook.xml
 
-html-webpage/index.html: WolfBook.xml WolfBookVersion.txt WolfBookDate.txt
+html-webpage/index.html: $(WOLFBOOK_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl WolfBook.xml
+
+WolfBook.epub: $(WOLFBOOK_SOURCE_FILES)
+	mkdir -p OEBPS/images
+	cp images/draft.png images/*.svg OEBPS/images
+	echo "application/epub+zip" > mimetype
+	zip -0Xq  WolfBook.epub mimetype
+	zip -Xr9D WolfBook.epub META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
+
+# tutorial
 
 TUTORIAL_SOURCE_FILES = \
 	Tutorial.xml \
@@ -130,27 +186,28 @@ TUTORIAL_SOURCE_FILES = \
 Tutorial.html: $(TUTORIAL_SOURCE_FILES)
 Tutorial.pdf: $(TUTORIAL_SOURCE_FILES)
 
-html-tutorial-chunked/index.html: $(TUTORIAL_SOURCE_FILES)
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-chunked.xsl Tutorial.xml
+html-tutorial/index.html: $(TUTORIAL_SOURCE_FILES)
+	$(XSLT_HTML_CHUNKED) $<
 
 html-tutorial-webpage/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage.xsl Tutorial.xml
 
-html-tutorial-webpage-chunked/index.html: Tutorial.xml TutorialVersion.txt TutorialDate.txt
+html-tutorial-webpage-chunked/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam toc.section.depth 3 \
 	-o $@ output-html-webpage-chunked.xsl Tutorial.xml
 
-%.epub: %.xml
-	$(XSLT_EPUB) $<
+Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
+	mkdir -p OEBPS/images
+	cp images/draft.png images/*.svg OEBPS/images
+	echo "application/epub+zip" > mimetype
+	zip -0Xq  Tutorial.epub mimetype
+	zip -Xr9D Tutorial.epub META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
 
-%.docx: %.xml
-	$(XSLT_TOWORDML) $< > $@
+# man pages
 
 wolframed.8: wolframed-man.xml
 	$(XSLT_MAN) $<
