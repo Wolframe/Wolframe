@@ -1,2 +1,10 @@
+Wolframe is a modular 3-tier application server framework.
 
-The GitHub repository was created on Feb 11, 2010. Maybe we should remember the date :)
+It runs natively on Windows, Linux, Mac OSX, BSDs and Solaris.
+
+Its modular structure allows the system to be extended with new languages
+for the business logic layer (Python, Lua), new SQL database drivers (SQLite3,
+PostgreSQL, Oracle), document formats (XML, JSON), printing, etc.
+
+The project started as idea in 2008, the GitGub repository was created on
+Feb 11, 2010. 
