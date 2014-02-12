@@ -46,43 +46,44 @@ class ObjectConstructorBase
 {
 public:
 	enum ObjectType	{
-		AUTHENTICATION_OBJECT,
-		AUDIT_OBJECT,
-		AUTHORIZATION_OBJECT,
-		DATABASE_OBJECT,
-		FILTER_OBJECT,
-		JOB_SCHEDULE_OBJECT,
-		DDL_COMPILER_OBJECT,
-		FORM_FUNCTION_OBJECT,
-		NORMALIZE_FUNCTION_OBJECT,
-		CUSTOM_DATA_TYPE_OBJECT,
-		CMD_HANDLER_OBJECT,
-		PROGRAM_TYPE_OBJECT,
-		RUNTIME_ENVIRONMENT_OBJECT,
-		TEST_OBJECT
+		AUTHENTICATION_OBJECT		=0x0010,
+		AUTHORIZATION_OBJECT		=0x0020,
+		AUDIT_OBJECT			=0x0110,
+		DATABASE_OBJECT			=0x0210,
+		JOB_SCHEDULE_OBJECT		=0x0220,
+		FILTER_OBJECT			=0x0310,
+		FORM_FUNCTION_OBJECT		=0x0410,
+		NORMALIZE_FUNCTION_OBJECT	=0x0420,
+		CUSTOM_DATA_TYPE_OBJECT		=0x0430,
+		CMD_HANDLER_OBJECT		=0x0610,
+		PROGRAM_TYPE_OBJECT		=0x0710,
+		DDL_COMPILER_OBJECT		=0x0720,
+		RUNTIME_ENVIRONMENT_OBJECT	=0x0730,
+		TEST_OBJECT			=0x9990
 	};
 
 	static const char* objectTypeName( ObjectType tp)
 	{
-		static const char* ar[] =
+		switch (tp)
 		{
-			"Authentication",
-			"Audit",
-			"Authorization",
-			"Database",
-			"Filter",
-			"Job Schedule Object",
-			"DLL Compiler",
-			"Form Function",
-			"Normalize Function",
-			"Custom Data Type",
-			"Command Handler",
-			"Program Type",
-			"Runtime Environment",
-			"#Test#"
-		};
-		return ar[ (int)tp];
+			case AUTHENTICATION_OBJECT: return "Authentication";
+			case AUTHORIZATION_OBJECT: return "Authorization";
+			case AUDIT_OBJECT: return "Audit";
+			case DATABASE_OBJECT: return "Database";
+			case JOB_SCHEDULE_OBJECT: return "Job Schedule Object";
+			case FILTER_OBJECT: return "Filter";
+			case FORM_FUNCTION_OBJECT: return "Form Function";
+			case NORMALIZE_FUNCTION_OBJECT: return "Normalize Function";
+			case CUSTOM_DATA_TYPE_OBJECT: return "Custom Data Type";
+			case CMD_HANDLER_OBJECT: return "Command Handler";
+			case PROGRAM_TYPE_OBJECT: return "Program Type";
+			case DDL_COMPILER_OBJECT: return "DLL Compiler";
+			case RUNTIME_ENVIRONMENT_OBJECT: return "Runtime Environment";
+			case TEST_OBJECT: return "#Test#";
+		}
+		return "Unknown module type";
 	}
+
 	const char* objectTypeName()
 	{
 		return objectTypeName( objectType());
