@@ -174,7 +174,7 @@
 	
 	<para>
 		We start by setting the 'action' property on the <filename>customer_show.ui</filename> form
-		as follows: we want it to execute a read with a document type 'CustomerRequest'
+		as follows: we want it to execute a request with document type 'CustomerRequest'
 		which searches for a single customer by customer id:
 	</para>
 

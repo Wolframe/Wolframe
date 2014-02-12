@@ -4,7 +4,7 @@
 	<title>Step 4 - Implement server side customer list</title>	
 
 	<para>
-		We want to store the customer data in a Sqlite database, so we have to
+		We want to store the customer data in an Sqlite database, so we have to
 		tell the server to load the database module for Sqlite:
 		<programlisting language='shell'>
 	LoadModules {
@@ -53,7 +53,8 @@
 		When we restart the server we see:
 
 		<programlisting language='shell'>
-	DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutorial.db'
+	DEBUG: SQLite database unit 'sqlitedb' created with 3 connections
+		to file 'tutorial.db'
 		</programlisting>
 	</para>
 	
@@ -84,7 +85,7 @@
 		<programlisting language='shell'>
 	..
 	Module files to load:
- 	  /usr/lib/wolframe/modules/mod_db_sqlite3
+	  /usr/lib/wolframe/modules/mod_db_sqlite3
 	  /usr/lib/wolframe/modules/mod_filter_libxml2
 	..
 		</programlisting>
@@ -92,8 +93,9 @@
 	</para>
 	
 	<para>
-		For mapping the requests to programs we need the directmap module. First
-		add to <filename>tutorial.conf</filename>:
+		For mapping the requests to programs in the business layer 
+		we need the directmap module. First add to
+		<filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
 	LoadModules {
@@ -120,7 +122,7 @@
 		The "filter" directive denotes that the command handler should
 		use the "libxml2" module to parse XML requests.
 	</para>
-	
+		
 	<para>
 		Now we have to create a file <filename>tutorial.dmap</filename>.
 		This file maps the requests to the corresponding transaction definitions:
@@ -131,9 +133,9 @@
 	       RETURN STANDALONE list;
 		</programlisting>
 
-		This means that we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
-		that is executed to perform the request. It will returns us document 
-		without a document type assigned (standalone) and with the root element 'list'. 
+		This is we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		that is executed to perform the request. It will return the document 
+		without a document type assigned to it (standalone) and with the root element 'list'. 
 		The returned content will be a list of customers. The function will be implemented 
 		in a TDL program in the server. We first add the
 		TDL program declaration to a new 'Processor' configuration section:
@@ -144,9 +146,10 @@
 	}
 		</programlisting>
 
-		The <filename>Customer.tdl</filename> file contains the database transaction we want to execute.
-		We also specify that we want the result to be a 'list' which contains
-		'customer' tags with the data per customer:
+		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' we want to execute.
+		We only have to specify the enclosing tag 'customer' for each customer record we are going to
+		retrieve with 'INTO customer'. The 'list' tag gets added by the directmap and is specified there as
+		'RETURN STANDALONE list':
 
 		<programlisting language='shell'>
 	TRANSACTION SelectCustomerList

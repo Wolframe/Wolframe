@@ -159,7 +159,7 @@
 	</screenshot>
 	
 	<para>
-		We see that the request was ok, but that answer has errors:
+		We see that the request was ok but that the answer has errors:
 	</para>
 
 	<screenshot>
@@ -175,7 +175,7 @@
 	</screenshot>
 	
 	<para>
-		The reason for this is, that we have to tell the client, how to map the
+		The reason for this is, we have to tell the client how to map the
 		elements of the result structure in the XML back to widgets and properties
 		of the widgets.
 	</para>
@@ -201,6 +201,8 @@
 	}
 		</programlisting>
 		
+		The line breaks and indentation are optional and you can write the mapping
+		in a single line.
 		The '?' is used for elements in the XML we don't need at the moment.
 		'row' is a property of the <classname>QTreeWidget</classname> widget
 		named 'customer' and iterates through all rows in the list. Each row
@@ -250,10 +252,11 @@
 		</imageobject>
 	</mediaobject>
 	<para>
-		For simplicity we defined the document type returned from the server as STANDALONE.
+		For simplicity we defined before with the directive 'STANDALONE'
+		that the server should not return an explicit document type.
 		But the client expects a document type declaration. For this we have to change the
-		definition in the file <filename>tutorial.dmap</filename> that we created in step 4.
-		Here folows the changed transaction definitions:
+		definition in the file <filename>tutorial.dmap</filename> we created in step 4
+		in the following way:
 	</para>
 
 	<programlisting language='shell'>
@@ -263,8 +266,9 @@
 	</programlisting>
 
 	<para>
-	The definition RETURN SKIP CustomerList list tells that a document of type 'CustomerList'
-	with the root element 'list' is returned without validation. 
+	The directive 'RETURN SKIP CustomerList list' states that a document
+	of type 'CustomerList' with the root element 'list' is returned
+	without validation of the output. 
 	We omit a validation on purpose for now to get to the next step.
 	</para>
 </sect1>

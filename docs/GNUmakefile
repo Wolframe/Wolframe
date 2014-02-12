@@ -259,7 +259,7 @@ local_uninstall:
 
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
+	xmllint --noout --xinclude --postvalid Tutorial.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
-	xmllint --noout --xinclude --postvalid wolfpasswd.xml
-	xmllint --noout --xinclude --postvalid Tutorial.xml
+	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
