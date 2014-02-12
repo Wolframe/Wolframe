@@ -27,6 +27,7 @@ XSLT_WEBPAGE_HTML = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode no \
 	--stringparam toc.section.depth 4 \
+	--stringparam base.dir $(@D) \
 	output-html-webpage.xsl
 
 XSLT_WEBPAGE_HTML_CHUNKED = \
@@ -159,7 +160,7 @@ html/index.html: $(WOLFBOOK_SOURCE_FILES)
 	$(XSLT_HTML_CHUNKED) $<
 
 html-webpage/index.html: $(WOLFBOOK_SOURCE_FILES)
-	$(XSLT_WEBPAGE_HTML) $< > $@
+	$(XSLT_WEBPAGE_HTML) $<
 
 html-webpage-chunked/index.html: $(WOLFBOOK_SOURCE_FILES)
 	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
@@ -198,7 +199,7 @@ html-tutorial/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLT_HTML_CHUNKED) $<
 
 html-tutorial-webpage/index.html: $(TUTORIAL_SOURCE_FILES)
-	$(XSLT_WEBPAGE_HTML) $< > $@
+	$(XSLT_WEBPAGE_HTML) $<
 
 html-tutorial-webpage-chunked/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
