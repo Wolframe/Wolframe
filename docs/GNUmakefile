@@ -23,6 +23,18 @@ XSLT_HTML_CHUNKED = \
 	--stringparam toc.section.depth 4 \
 	-o $@ output-html-chunked.xsl
 
+XSLT_WEBPAGE_HTML = \
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode no \
+	--stringparam toc.section.depth 4 \
+	output-html-webpage.xsl
+
+XSLT_WEBPAGE_HTML_CHUNKED = \
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode no \
+	--stringparam toc.section.depth 4 \
+	-o $@ output-html-webpage-chunked.xsl
+
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
@@ -146,15 +158,11 @@ WolfBook.html: $(WOLFBOOK_SOURCE_FILES)
 html/index.html: $(WOLFBOOK_SOURCE_FILES)
 	$(XSLT_HTML_CHUNKED) $<
 
-html-webpage-chunked/index.html: $(WOLFBOOK_SOURCE_FILES)
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-webpage-chunked.xsl WolfBook.xml
-
 html-webpage/index.html: $(WOLFBOOK_SOURCE_FILES)
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-webpage.xsl WolfBook.xml
+	$(XSLT_WEBPAGE_HTML) $< > $@
+
+html-webpage-chunked/index.html: $(WOLFBOOK_SOURCE_FILES)
+	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
 
 WolfBook.epub: $(WOLFBOOK_SOURCE_FILES)
 	mkdir -p OEBPS/images
@@ -190,14 +198,10 @@ html-tutorial/index.html: $(TUTORIAL_SOURCE_FILES)
 	$(XSLT_HTML_CHUNKED) $<
 
 html-tutorial-webpage/index.html: $(TUTORIAL_SOURCE_FILES)
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-webpage.xsl Tutorial.xml
+	$(XSLT_WEBPAGE_HTML) $< > $@
 
 html-tutorial-webpage-chunked/index.html: $(TUTORIAL_SOURCE_FILES)
-	$(XSLTPROC) --nonet --xinclude \
-	--stringparam toc.section.depth 3 \
-	-o $@ output-html-webpage-chunked.xsl Tutorial.xml
+	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
 
 Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 	mkdir -p OEBPS/images
