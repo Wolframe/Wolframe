@@ -50,13 +50,6 @@
 %define scilin6 1
 %endif
 
-%define fedora 0
-%define fc18 0
-%if 0%{?fedora_version} == 18
-%define dist fc18
-%define fc18 1
-%define fedora 1
-%endif
 %define fc19 0
 %if 0%{?fedora_version} == 19
 %define dist fc19
@@ -143,9 +136,7 @@
 %if !%{build_boost}
 %define with_icu	0
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 %define with_icu	1
-%endif
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -302,9 +293,7 @@ BuildRequires: pwdutils >= 3.2
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 BuildRequires: systemd
-%endif
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -475,9 +464,7 @@ BuildRequires: oracle-instantclient12.1-devel
 %define build_libhpdf 1
 %if %{with_libhpdf}
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 %define build_libhpdf 0
-%endif
 %endif
 %endif
 
@@ -1206,9 +1193,7 @@ install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{n
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
-%endif
 %endif
 
 %if %{suse}
@@ -1222,9 +1207,7 @@ install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
-%endif
 %endif
 
 %clean
@@ -1254,13 +1237,11 @@ echo Wolframe server at startup
 echo
 %endif
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
 echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
 echo
-%endif
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -1314,10 +1295,8 @@ fi
 %endif
 
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
-%endif
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -1331,9 +1310,7 @@ fi
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 %if %{fedora}
-%if %{fc18} || %{fc19} || %{fc20}
 %{_prefix}/lib/firewalld/services/wolframe.xml
-%endif
 %endif
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
 %if !%{sles}

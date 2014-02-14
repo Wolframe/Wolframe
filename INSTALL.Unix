@@ -12,7 +12,6 @@ Table of Contents
   Build instructions for specific Linux Distributions
     RHEL/Centos/SL 5
     RHEL/Centos/SL 6
-    Fedora 18
     Fedora 19
     Fedora 20
     Ubuntu 10.04.1 LTS
@@ -195,46 +194,6 @@ have to install:
 oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm  
 
 You also need the 'libaio' package.
-
-Fedora 18
----------
-
-No problems with the supplied packages at all, everything builds out of the box:
-
-Required pacakges: boost-devel (1.50.0)
-Optional packages: openssl-devel (1.0.1c)
-                   pam-devel (1.1.6), cyrus-sasl-devel (2.1.23),
-                   sqlite-devel (3.7.13), postgresql-devel (9.2.3),
-                   libxml2-devel (2.9.0), libxslt-devel (1.1.27),
-                   libpng-devel (1.5.13), zlib-devel (1.2.7),
-                   libharu-devel (2.2.1), python3-devel (3.3.0)
-
-Use WITH_SYSTEM_LIBHPDF=1 for PDF support. Install libharu-devel (2.2.1) in
-this case.
-
-Use WITH_LOCAL_FREEIMAGE=1 for image manipulation support. The supplied
-version of freeimage-devel is too old.
-
-For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
-For building the PDF wolfbook install 'fop'.
-
-When rebuilding the SVG images of the documentation you also need 'dia'.
-
-For running non-gtest tests you need 'expect' (5.45).
-
-For running some tests you need 'telnet' (0.17).
-
-For running the Postgresql tests you need a fully function 'postgresql-server'
-with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
-'wolframe'.
-
-postgresql-setup initdb
-systemctl start postgresql.service
-systemctl enable postgresql.service
- 
-change auth method from 'ident' to 'md5' in pg_hba.conf
-
-For scripting in Python you have to set WITH_PYTHON=1.
 
 Fedora 19
 ---------
