@@ -1,18 +1,14 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-
-<!ENTITY username  "Wolframe Team">
-<!ENTITY email     "contact@wolframe.net">
-<!ENTITY year      "2010-2014">
-<!ENTITY section   "8">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY username "Wolframe Team">
+<!ENTITY email "contact@wolframe.net">
+<!ENTITY year "2010-2014">
+<!ENTITY section "8">
 <!-- TITLE should be something like "User commands" or similar (see
-	http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
-    <!ENTITY dhtitle     "Wolframe User Manual">
-    <!ENTITY dhucpackage "wolframe">
-    <!ENTITY dhpackage   "wolframed">
+	http://www.tldp.org/HOWTO/Man-Page/q2.html). --><!ENTITY dhtitle "Wolframe User Manual">
+<!ENTITY dhucpackage "wolframe">
+<!ENTITY dhpackage "wolframed">
 ]>
-
 <!--
 ************************************************************************
 
@@ -47,7 +43,6 @@
 
 ************************************************************************
 -->
-
 <refentry>
 	<refentryinfo>
 		<title>&dhtitle;</title>
@@ -78,242 +73,510 @@
 		<refname>&dhpackage;</refname>
 		<refpurpose>Wolframe daemon program</refpurpose>
 	</refnamediv>
-
-  <refsynopsisdiv>
-    <cmdsynopsis>
-      <command>&dhpackage;</command>
-      <!-- These are several examples, how syntaxes could look -->
-      <arg choice="plain"><option>-e <replaceable>this</replaceable></option></arg>
-      <arg choice="opt"><option>--example=<parameter>that</parameter></option></arg>
-      <arg choice="opt">
-	<group choice="req">
-	  <arg choice="plain"><option>-e</option></arg>
-	  <arg choice="plain"><option>--example</option></arg>
-	</group>
-	<replaceable class="option">this</replaceable>
-      </arg>
-      <arg choice="opt">
-	<group choice="req">
-	  <arg choice="plain"><option>-e</option></arg>
-	  <arg choice="plain"><option>--example</option></arg>
-	</group>
-	<group choice="req">
-	  <arg choice="plain"><replaceable>this</replaceable></arg>
-	  <arg choice="plain"><replaceable>that</replaceable></arg>
-	</group>
-      </arg>
-    </cmdsynopsis>
-    <cmdsynopsis>
-      <command>&dhpackage;</command>
-      <!-- Normally the help and version options make the programs stop
+	<refsynopsisdiv>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<!-- These are several examples, how syntaxes could look -->
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>-c</option>
+					</arg>
+					<arg choice="plain">
+						<option>--config-file</option>
+					</arg>
+				</group>
+				<replaceable>config-file</replaceable>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>--config-xml</option>
+					</arg>
+				</group>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>--config-info</option>
+					</arg>
+				</group>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>--use-config-logging</option>
+					</arg>
+				</group>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>-f</option>
+					</arg>
+					<arg choice="plain">
+						<option>--foreground</option>
+					</arg>
+				</group>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>-d</option>
+					</arg>
+					<arg choice="plain">
+						<option>--debug</option>
+					</arg>
+				</group>
+				<replaceable class="option">level</replaceable>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>-u</option>
+					</arg>
+					<arg choice="plain">
+						<option>--user</option>
+					</arg>
+				</group>
+				<replaceable class="option">user</replaceable>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>-g</option>
+					</arg>
+					<arg choice="plain">
+						<option>--group</option>
+					</arg>
+				</group>
+				<replaceable class="option">group</replaceable>
+			</arg>
+			<arg choice="opt">
+				<group choice="req">
+					<arg choice="plain">
+						<option>--pidfile</option>
+					</arg>
+				</group>
+				<replaceable class="option">pid-file</replaceable>
+			</arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<!-- Test functions, differ by invocation, exclusive to other option. -->
+			<group choice="opt">
+				<arg choice="plain">
+					<group choice="req">
+						<arg choice="plain">
+							<option>-p</option>
+						</arg>
+						<arg choice="plain">
+							<option>--print-config</option>
+						</arg>
+					</group>
+				</arg>
+				<arg choice="plain">
+					<group choice="req">
+						<arg choice="plain">
+							<option>-t</option>
+						</arg>
+						<arg choice="plain">
+							<option>--check-config</option>
+						</arg>
+					</group>
+				</arg>
+				<arg choice="plain">
+					<group choice="req">
+						<arg choice="plain">
+							<option>-T</option>
+						</arg>
+						<arg choice="plain">
+							<option>--test-config</option>
+						</arg>
+					</group>
+				</arg>
+			</group>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<!-- Normally the help and version options make the programs stop
 	   right after outputting the requested information. -->
-      <group choice="opt">
-	<arg choice="plain">
-	  <group choice="req">
-	    <arg choice="plain"><option>-h</option></arg>
-	    <arg choice="plain"><option>--help</option></arg>
-	  </group>
-	</arg>
-	<arg choice="plain">
-	  <group choice="req">
-	    <arg choice="plain"><option>-v</option></arg>
-	    <arg choice="plain"><option>--version</option></arg>
-	  </group>
-	</arg>
-      </group>
-    </cmdsynopsis>
-  </refsynopsisdiv>
-  <refsect1 id="description">
-    <title>DESCRIPTION</title>
-    <para>This manual page documents briefly the
-      <command>&dhpackage;</command> and <command>bar</command>
-      commands.</para>
-    <para>This manual page was written for the Debian distribution
-      because the original program does not have a manual page.
-      Instead, it has documentation in the GNU <citerefentry>
-	<refentrytitle>info</refentrytitle>
-	<manvolnum>1</manvolnum>
-      </citerefentry> format; see below.</para>
-    <para><command>&dhpackage;</command> is a program that...</para>
-  </refsect1>
-
-  <refsect1 id="options">
-    <title>OPTIONS</title>
-    <para>The program follows the usual GNU command line syntax,
-      with long options starting with two dashes (`-').  A summary of
-      options is included below.  For a complete description, see the
-      <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-      files.</para>
+			<group choice="opt">
+				<arg choice="plain">
+					<group choice="req">
+						<arg choice="plain">
+							<option>-h</option>
+						</arg>
+						<arg choice="plain">
+							<option>--help</option>
+						</arg>
+					</group>
+				</arg>
+				<arg choice="plain">
+					<group choice="req">
+						<arg choice="plain">
+							<option>-v</option>
+						</arg>
+						<arg choice="plain">
+							<option>--version</option>
+						</arg>
+					</group>
+				</arg>
+			</group>
+		</cmdsynopsis>
+	</refsynopsisdiv>
+	<refsect1 id="description">
+		<title>DESCRIPTION</title>
+		<para>This manual page documents briefly the
+      <command>&dhpackage;</command> Unix daemon.</para>
+		<para><command>&dhpackage;</command> is the Wolframe application server
+		run as Unix daemon or standalone in the shell.</para>
+	</refsect1>
+	<refsect1 id="options">
+		<title>OPTIONS</title>
+		<para>
+			The program follows the usual GNU command line syntax,
+			with long options starting with two dashes (`-'). A brief description of
+			all options is included below.
+		</para>
 		<variablelist>
-	<!--	Use the variablelist.term.separator and the
+			<!--	Use the variablelist.term.separator and the
 		variablelist.term.break.after parameters to
 		control the term elements. -->
+			<!--	Order should be from required to somewhat
+				important to exotic cases -->
 			<varlistentry>
-				<term><option>-e <replaceable>this</replaceable></option></term>
-				<term><option>--example=<replaceable>that</replaceable></option></term>
-				<listitem>
-					<para>Does this and that.</para>
-				</listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><option>-v</option></term>
-				<term><option>--version</option></term>
+				<term>
+					<option>-v</option>
+				</term>
+				<term>
+					<option>--version</option>
+				</term>
 				<listitem>
 					<para>Show version of program.</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
-				<term><option>-h</option></term>
-				<term><option>--help</option></term>
+				<term>
+					<option>-h</option>
+				</term>
+				<term>
+					<option>--help</option>
+				</term>
 				<listitem>
 					<para>Show summary of options.</para>
 				</listitem>
 			</varlistentry>
+
 			<varlistentry>
-				<term><option>-p</option></term>
-				<term><option>--print-config</option></term>
+				<term>
+					<option>-c <replaceable>config-file</replaceable></option>
+				</term>
+				<term>
+					<option>--config-file <replaceable>config-file</replaceable></option>
+				</term>
 				<listitem>
-					<para>Print the configuration.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-t</option></term>
-				<term><option>--check-config</option></term>
-				<listitem>
-					<para>Check the configuration.</para>
+					<para>
+						The location of the configuration. For further information
+						of the format of this file check out
+						<citerefentry><refentrytitle>wolframe.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>.
+					</para>
 				</listitem>
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-u <replaceable>user</replaceable></option></term>
-				<term><option>--user <replaceable>user</replaceable></option></term>
+				<term>
+					<option>-f</option>
+				</term>
+				<term>
+					<option>--foreground</option>
+				</term>
 				<listitem>
-					<para>run as user <replaceable>user</replaceable>.</para>
+					<para>
+						Run the wolframe in the shell (foreground) with
+						terminal input/ouput attached and not as Unix daemon.
+					</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
-				<term><option>-g <replaceable>group</replaceable></option></term>
-				<term><option>--group <replaceable>group</replaceable></option></term>
+				<term>
+					<option>-d <replaceable>debug-level</replaceable></option>
+				</term>
+				<term>
+					<option>--debug <replaceable>debug-level</replaceable></option>
+				</term>
 				<listitem>
-					<para>run as group <replaceable>group</replaceable>.</para>
+					<para>
+						Set debug level of the stderr logging output.
+						Default is the value configured in the 'level'
+						paramter of the 'stderr' section of the 'logging'
+						section in the configuration file. This parameter
+						is only respected if running in the foreground.
+						The <replaceable>debug-level</replaceable> is one of
+						'FATAL', 'ALERT', 'CRITICAL', 'SEVERE', 'ERROR',
+						'WARNING', 'NOTICE', 'INFO, 'DEBUG', 'TRACE',
+						'DATA' or 'DATA2'.
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>
+					<option>-p</option>
+				</term>
+				<term>
+					<option>--print-config</option>
+				</term>
+				<listitem>
+					<para>
+						Prints the configuration. This is, the server
+						lists all it can read from the configuration
+						(loaded modules, configuration options
+						for logging, the network and business layer,
+						database connection parameters, loaded programs, etc.)
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-t</option>
+				</term>
+				<term>
+					<option>--check-config</option>
+				</term>
+				<listitem>
+					<para>
+						Check the configuration.
+						Does syntax checking on the configuration file and
+						checks the sanity of the configuration without
+						actually starting the server.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-T</option>
+				</term>
+				<term>
+					<option>--test-config</option>
+				</term>
+				<listitem>
+					<para>
+						Test the configuration. Starts the server as far as
+						possible to check for further errors. 
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-u <replaceable>user</replaceable></option>
+				</term>
+				<term>
+					<option>--user <replaceable>user</replaceable></option>
+				</term>
+				<listitem>
+					<para>
+						Run as user <replaceable>user</replaceable>. This
+						makes only sense if the wolframe server is run as
+						daemon (with initial root rights) to run as
+						unpriviledged user after dropping the root rights.
+						This parameter overwrites the parameter "user" in
+						the "daemon" section of the configuration
+						and is mainly supposed to be used in startup scripts
+						(rc.d, systemd).
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-g <replaceable>group</replaceable></option>
+				</term>
+				<term>
+					<option>--group <replaceable>group</replaceable></option>
+				</term>
+				<listitem>
+					<para>
+						Run as group <replaceable>group</replaceable>. This
+						makes only sense if the wolframe server is run as
+						daemon (with initial root rights) to run as
+						unpriviledged user after dropping the root rights.
+						This parameter overwrites the parameter "group" in
+						the "daemon" section of the confiuguration and
+						is mainly supposed to be used in startup scripts
+						(rc.d, systemd).
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>--pidfile <replaceable>pid-file</replaceable></option>
+				</term>
+				<listitem>
+					<para>
+						Use <replaceable>pid-file</replaceable> as file where
+						to store the PID of the Wolframe daemon. This
+						makes only sense if the wolframe server is run as
+						daemon (with initial root rights) to run as
+						unpriviledged user after dropping the root rights.
+						This parameter overwrites the parameter "pidFile" in
+						the "daemon" section of the confiuguration and
+						is mainly supposed to be used in startup scripts
+						(rc.d, systemd).
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>
+					<option>--config-info</option>
+				</term>
+				<listitem>
+					<para>
+						Forces the configuration to be interpreted in INFO format.
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>
+					<option>--config-xml</option>
+				</term>
+				<listitem>
+					<para>
+						Forces the configuration to be interpreted in XML format.
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>
+					<option>--use-config-logging</option>
+				</term>
+				<listitem>
+					<para>
+						Log according to the configuration file (active only with --foreground).
+					</para>
+				</listitem>
+			</varlistentry>
+
+		</variablelist>
+	</refsect1>
+	<!-- see issue https://github.com/Wolframe/Wolframe/issues/72
+	     disabled for now:
+	<refsect1 id="files">
+		<title>FILES</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<filename>/etc/wolframe.conf</filename>
+				</term>
+				<listitem>
+					<para>The system-wide configuration file to control the
+	    behaviour of <application>&dhpackage;</application>. See
+	    <citerefentry><refentrytitle>wolframe.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry> for further details.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<filename>${HOME}/.wolframe.conf</filename>
+				</term>
+				<listitem>
+					<para>The per-user configuration file to control the
+	     behaviour of <application>&dhpackage;</application>. See
+	     <citerefentry><refentrytitle>wolframe.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry> for further details.</para>
 				</listitem>
 			</varlistentry>
 		</variablelist>
 	</refsect1>
-
-<!--
-  -v [ - -version ]         print version
-  -h [ - -help ]            print help message
-  -p [ - -print-config ]    print configuration
-  -t [ - -check-config ]    check the configuration
-
-  -T [ - -test-config ]     test the configuration
-  -f [ - -foreground ]      run in foreground (logs only on stderr)
-  -c [ - -config-file ] arg configuration file
-  - -config-xml             force configuration file parsing to xml
-  - -config-info            force configuration file parsing to info
-  -d [ - -debug ] arg       set debug level (active only with - -foreground)
-  - -use-config-logging     log according to the configuration file (active only
-                           with - -foreground)
-  -u [ - -user ] arg        run as <user>
-  -g [ - -group ] arg       run as <group>
-  - -pidfile arg            use daemon pidfile <pidfile>
--->
-
-<refsect1 id="files">
-    <title>FILES</title>
-    <variablelist>
-      <varlistentry>
-	<term><filename>/etc/foo.conf</filename></term>
-	<listitem>
-	  <para>The system-wide configuration file to control the
-	    behaviour of <application>&dhpackage;</application>. See
-	    <citerefentry>
-	      <refentrytitle>foo.conf</refentrytitle>
-	      <manvolnum>5</manvolnum>
-	    </citerefentry> for further details.</para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term><filename>${HOME}/.foo.conf</filename></term>
-	<listitem>
-	  <para>The per-user configuration file to control the
-	     behaviour of <application>&dhpackage;</application>. See
-	     <citerefentry>
-	       <refentrytitle>foo.conf</refentrytitle>
-	       <manvolnum>5</manvolnum>
-	     </citerefentry> for further details.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </refsect1>
-  <refsect1 id="environment">
-    <title>ENVIONMENT</title>
-    <variablelist>
-      <varlistentry>
-	<term><envar>FOO_CONF</envar></term>
-	<listitem>
-	  <para>If used, the defined file is used as configuration
+	-->
+	
+	<!-- we have no environment variables we react on, sqlite3
+	     reacts on TMPDIR, others may too
+	<refsect1 id="environment">
+		<title>ENVIONMENT</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<envar>FOO_CONF</envar>
+				</term>
+				<listitem>
+					<para>If used, the defined file is used as configuration
 	    file (see also <xref linkend="files"/>).</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </refsect1>
-  <refsect1 id="diagnostics">
-    <title>DIAGNOSTICS</title>
-    <para>The following diagnostics may be issued
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</refsect1>
+	-->
+	
+	<refsect1 id="diagnostics">
+		<title>DIAGNOSTICS</title>
+		<para>The following diagnostics may be issued
       on <filename class="devicefile">stderr</filename>:</para>
-    <variablelist>
-      <varlistentry>
-	<term><errortext>Bad configuration file. Exiting.</errortext></term>
-	<listitem>
-	  <para>The configuration file seems to contain a broken configuration
-	    line. Use the <option>--verbose</option> option, to get more info.
-	  </para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-    <para><command>&dhpackage;</command> provides some return codes, that can
+		<variablelist>
+			<varlistentry>
+				<term>
+					<errortext>FATAL: 'config-file' is not a regular file</errortext>
+				</term>
+				<listitem>
+					<para>
+						The configuration doesn't exist, is not a file or not readable or
+						has bad permissions.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		
+		<variablelist>
+			<varlistentry>
+				<term>
+					<errortext>FATAL: Cannot guess configuration file type or invalid XML:</errortext>
+				</term>
+				<listitem>
+					<para>
+						The configuration file seems to contain a broken configuration
+						line. Use --config-xml or --config-info if you think the guesser
+						got it wrong. Not closed XML tags or INFO sections are a likely
+						error cause.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para><command>&dhpackage;</command> provides some return codes, that can
       be used in scripts:</para>
-    <segmentedlist>
-      <segtitle>Code</segtitle>
-      <segtitle>Diagnostic</segtitle>
-      <seglistitem>
-	<seg><errorcode>0</errorcode></seg>
-	<seg>Program exited successfully.</seg>
-      </seglistitem>
-      <seglistitem>
-	<seg><errorcode>1</errorcode></seg>
-	<seg>The configuration file seems to be broken.</seg>
-      </seglistitem>
-    </segmentedlist>
-  </refsect1>
-  <refsect1 id="bugs">
-    <!-- Or use this section to tell about upstream BTS. -->
-    <title>BUGS</title>
-    <para>The program is currently limited to only work
-      with the <package>foobar</package> library.</para>
-    <para>The upstreams <acronym>BTS</acronym> can be found
-      at <ulink url="http://bugzilla.foo.tld"/>.</para>
-  </refsect1>
-  <refsect1 id="see_also">
-    <title>SEE ALSO</title>
-    <!-- In alpabetical order. -->
-    <para><citerefentry>
-	<refentrytitle>bar</refentrytitle>
-	<manvolnum>1</manvolnum>
-      </citerefentry>, <citerefentry>
-	<refentrytitle>baz</refentrytitle>
-	<manvolnum>1</manvolnum>
-      </citerefentry>, <citerefentry>
-	<refentrytitle>foo.conf</refentrytitle>
-	<manvolnum>5</manvolnum>
-      </citerefentry></para>
-    <para>The programs are documented fully by <citetitle>The Rise and
-      Fall of a Fooish Bar</citetitle> available via the <citerefentry>
-	<refentrytitle>info</refentrytitle>
-	<manvolnum>1</manvolnum>
-      </citerefentry> system.</para>
-  </refsect1>
+		<segmentedlist>
+			<segtitle>Code</segtitle>
+			<segtitle>Diagnostic</segtitle>
+			<seglistitem>
+				<seg>
+					<errorcode>0</errorcode>
+				</seg>
+				<seg>Program exited successfully.</seg>
+			</seglistitem>
+			<seglistitem>
+				<seg>
+					<errorcode>1</errorcode>
+				</seg>
+				<seg>The configuration file seems to be broken.</seg>
+			</seglistitem>
+		</segmentedlist>
+	</refsect1>
+	<refsect1 id="bugs">
+		<!-- Or use this section to tell about upstream BTS. -->
+		<title>BUGS</title>
+			<para>
+				Find issues and bugs on <acronym>Github</acronym> at
+				<ulink url="https://github.com/Wolframe/Wolframe/issues"/>.
+			</para>
+	</refsect1>
+	<refsect1 id="see_also">
+		<title>SEE ALSO</title>
+		<!-- In alpabetical order. -->
+		<para>
+			<citerefentry>
+				<refentrytitle>wolframe.conf</refentrytitle>
+				<manvolnum>5</manvolnum>
+			</citerefentry>
+		</para>
+	</refsect1>
 </refentry>
