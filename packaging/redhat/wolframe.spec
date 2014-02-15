@@ -50,6 +50,7 @@
 %define scilin6 1
 %endif
 
+%define fedora 0
 %define fc19 0
 %if 0%{?fedora_version} == 19
 %define dist fc19
