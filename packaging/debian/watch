@@ -17,7 +17,7 @@ version=3
 #ftp://ftp.example.com/pub/wolframe-(.*)\.tar\.gz debian uupdate
 
 # Uncomment to find new files on sourceforge, for devscripts >= 2.9
-# http://sf.net/wolframe/wolframe-(.*)\.tar\.gz
+http://sourceforge.net/projects/wolframe/files/wolframe/wolframe-(.*)\.tar\.gz
 
 # Uncomment to find new files on GooglePages
 # http://example.googlepages.com/foo.html wolframe-(.*)\.tar\.gz
