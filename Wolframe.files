@@ -14,6 +14,7 @@ makefiles/gmake/sub.mk
 makefiles/gmake/top.mk
 makefiles/nmake/clean.mk
 makefiles/nmake/compiler.mk
+makefiles/nmake/config_aba_vc10_32bit_debug_boost155_locale.mk
 makefiles/nmake/config_aba_vc10_32bit_debug_boost_locale.mk
 makefiles/nmake/config_aba_vc10_32bit_debug.mk
 makefiles/nmake/config_aba_vc10_32bit_release.mk
@@ -1144,7 +1145,6 @@ makefiles/nmake/top.mk
 .Attic/oldtutorial/step2/Tutorial-2/users.sql
 .Attic/printers.c
 .Attic/printMemory.c
-.Attic/singleton.hpp
 .Attic/SSLtest.c
 .Attic/testLeak.cpp
 .Attic/testPGleak.cpp
@@ -1192,6 +1192,8 @@ clients/lib/session.hpp
 clients/Makefile.W32
 clients/README
 contrib/create_qtcreator_files.sh
+contrib/database/oracle/create_wolframe.sql
+contrib/database/oracle/drop_wolframe.sql
 contrib/README
 database/AAAA/audit.sql
 database/AAAA/authentication.sql
@@ -1310,7 +1312,6 @@ docs/examples/ExtDevelopment/normalizeExampleWithoutResources.cpp
 docs/examples/ExtDevelopment/normalizeExampleWithResources.cpp
 docs/examples/ExtDevelopment/normalizeFunctionConstructor.hpp
 docs/examples/ExtDevelopment/normalizeFunction.hpp
-docs/examples/ExtDevelopment/normalizeModuleExample.cpp
 docs/examples/ExtDevelopment/variantConst.hpp
 docs/examples/ExtDevelopment/variant.hpp
 docs/examples/timetrack/customer_query_1.xml
@@ -1341,6 +1342,7 @@ docs/images/GNUmakefile
 docs/Makefile.W32
 docs/output-epub.xsl
 docs/output-html-chunked.xsl
+docs/output-html-webpage-chunked.xsl
 docs/output-html-webpage.xsl
 docs/output-html.xsl
 docs/output-pdf.xsl
@@ -1553,6 +1555,7 @@ include/AAAA/user.hpp
 include/appConfig.hpp
 include/appdevel/cppFormFunctionModuleMacros.hpp
 include/appdevel/cppFormFunctionTemplate.hpp
+include/appdevel/customDatatypeModuleMacros.hpp
 include/appDevel.hpp
 include/appdevel/normalizeModuleMacros.hpp
 include/appProperties.hpp
@@ -1578,12 +1581,14 @@ include/crypto/PBKDF2.h
 include/crypto/PBKDF2.hpp
 include/crypto/sha1.h
 include/crypto/sha2.h
-include/database/bindStatementParams.hpp
+include/database/baseStatement.hpp
 include/database/databaseError.hpp
 include/database/database.hpp
 include/database/databaseLanguage.hpp
 include/database/DBprovider.hpp
 include/database/loadTransactionProgram.hpp
+include/database/statement.hpp
+include/database/substitutingStatement.hpp
 include/database/transactionExecStatemachine.hpp
 include/database/transactionFunction.hpp
 include/database/transaction.hpp
@@ -1610,6 +1615,7 @@ include/langbind/charsetEncodings.hpp
 include/langbind/cppFormFunction.hpp
 include/langbind/ddlCompilerInterface.hpp
 include/langbind/formFunction.hpp
+include/langbind/runtimeEnvironment.hpp
 include/logger/logBackend.hpp
 include/logger/logError.hpp
 include/logger/logLevel.hpp
@@ -1623,11 +1629,11 @@ include/module/ddlcompilerBuilder.hpp
 include/module/filterBuilder.hpp
 include/module/normalizeFunctionBuilder.hpp
 include/module/programTypeBuilder.hpp
+include/module/runtimeEnvironmentConstructor.hpp
 include/prgbind/ddlProgram.hpp
 include/prgbind/normalizeProgram.hpp
 include/prgbind/program.hpp
 include/prgbind/programLibrary.hpp
-include/prgbind/runtimeEnvironmentConstructor.hpp
 include/prgbind/transactionProgram.hpp
 include/processor/jobSchedule.hpp
 include/processor/moduleDirectory.hpp
@@ -1673,6 +1679,7 @@ include/types/base64.h
 include/types/base64.hpp
 include/types/byte2hex.h
 include/types/countedReference.hpp
+include/types/customDataNormalizer.hpp
 include/types/customDataType.hpp
 include/types/datetime.hpp
 include/types/doctype.hpp
@@ -1763,11 +1770,12 @@ src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
-src/libwolframe_database/bindStatementParams.cpp
+src/libwolframe_database/baseStatement.cpp
 src/libwolframe_database/databaseLanguage.cpp
 src/libwolframe_database/GNUmakefile
 src/libwolframe_database/loadTransactionProgram.cpp
 src/libwolframe_database/Makefile.W32
+src/libwolframe_database/substitutingStatement.cpp
 src/libwolframe_database/transaction.cpp
 src/libwolframe_database/transactionExecStatemachine.cpp
 src/libwolframe_database/transactionFunction.cpp
@@ -1991,6 +1999,8 @@ src/modules/cmdbind/lua/luaCommandHandler.hpp
 src/modules/cmdbind/lua/luaCppCall.hpp
 src/modules/cmdbind/lua/luaDebug.cpp
 src/modules/cmdbind/lua/luaDebug.hpp
+src/modules/cmdbind/lua/luaDump.cpp
+src/modules/cmdbind/lua/luaDump.hpp
 src/modules/cmdbind/lua/luaException.hpp
 src/modules/cmdbind/lua/luafilter.cpp
 src/modules/cmdbind/lua/luafilter.hpp
@@ -2057,6 +2067,8 @@ src/modules/database/postgresql/PostgreSQLprogram.cpp
 src/modules/database/postgresql/PostgreSQLprogram.hpp
 src/modules/database/postgresql/PostgreSQLstatement.cpp
 src/modules/database/postgresql/PostgreSQLstatement.hpp
+src/modules/database/postgresql/PostgreSQLsubstitutingStatement.cpp
+src/modules/database/postgresql/PostgreSQLsubstitutingStatement.hpp
 src/modules/database/postgresql/PostgreSQLtransactionExecStatemachine.cpp
 src/modules/database/postgresql/PostgreSQLtransactionExecStatemachine.hpp
 src/modules/database/sqlite3/GNUmakefile
@@ -2069,6 +2081,8 @@ src/modules/database/sqlite3/SQLiteModule.cpp
 src/modules/database/sqlite3/SQLiteModule.def
 src/modules/database/sqlite3/SQLiteProgram.cpp
 src/modules/database/sqlite3/SQLiteProgram.hpp
+src/modules/database/sqlite3/SQLiteStatement.cpp
+src/modules/database/sqlite3/SQLiteStatement.hpp
 src/modules/database/sqlite3/SQLiteTransactionExecStatemachine.cpp
 src/modules/database/sqlite3/SQLiteTransactionExecStatemachine.hpp
 src/modules/datatype/bcdnumber/bcdArithmetic.cpp
@@ -2335,6 +2349,23 @@ tests/database/SQLite3/Makefile.W32
 tests/database/SQLite3/sqliteModuleFiles.cpp
 tests/database/SQLite3/sqliteUnit.cpp
 tests/database/SQLite3/testDB.sql
+tests/doc/filetype/generate.sh
+tests/doc/filetype/test-with-header.BOM.UCS-2BE.xml
+tests/doc/filetype/test-with-header.BOM.UCS-4BE.xml
+tests/doc/filetype/test-with-header.UCS-2BE.xml
+tests/doc/filetype/test-with-header.UCS-4BE.xml
+tests/doc/filetype/test-with-header.UTF-8.xml
+tests/doc/filetype/test-without-header.BOM.UCS-2BE.xml
+tests/doc/filetype/test-without-header.BOM.UCS-4BE.xml
+tests/doc/filetype/test-without-header.UCS-2BE.xml
+tests/doc/filetype/test-without-header.UCS-4BE.xml
+tests/doc/filetype/test-without-header.UTF-8.xml
+tests/dotnet/csharp/Functions/data/GetAddress.lua
+tests/dotnet/csharp/Functions/data/GetAddress_p.UTF-8.xml
+tests/dotnet/csharp/Functions/data/GetIdPair.lua
+tests/dotnet/csharp/Functions/data/GetUserAddress.UTF-8.xml
+tests/dotnet/csharp/Functions/data/GetUserIdPair.UTF-8.xml
+tests/dotnet/csharp/Functions/data/wolframe.conf
 tests/dotnet/csharp/Functions/README.txt
 tests/dotnet/interop/src/ddl_form.cpp
 tests/dotnet/interop/src/ddl_form.hpp
@@ -2421,6 +2452,8 @@ tests/temp/transaction_table.lua
 tests/temp/wolframe.conf
 tests/testArrayDoublingAllocator.cpp
 tests/testBoostPath.cpp
+tests/testFiletypeRecognition.cpp
+tests/testIntegers.cpp
 tests/testMD5.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp

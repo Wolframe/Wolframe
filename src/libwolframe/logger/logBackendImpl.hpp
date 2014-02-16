@@ -84,9 +84,9 @@ public:
 
 	LogLevel::Level minLogLevel() const;
 private:
-	ConsoleLogBackend consoleLogger_;
-	LogfileBackend logfileLogger_;
-	SyslogBackend syslogLogger_;
+	ConsoleLogBackend m_consoleLogger;
+	LogfileBackend m_logfileLogger;
+	SyslogBackend m_syslogLogger;
 #ifdef _WIN32
 	WinDebugLogBackend windebugLogger_;
 	EventlogBackend eventlogLogger_;

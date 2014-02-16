@@ -54,32 +54,32 @@ LogBackend::LogBackendImpl::~LogBackendImpl( )
 
 void LogBackend::LogBackendImpl::setConsoleLevel( const LogLevel::Level level )
 {
-	consoleLogger_.setLevel( level );
+	m_consoleLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 {
-	logfileLogger_.setLevel( level );
+	m_logfileLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 {
-	logfileLogger_.setFilename( filename );
+	m_logfileLogger.setFilename( filename );
 }
 
 void LogBackend::LogBackendImpl::setSyslogLevel( const LogLevel::Level level )
 {
-	syslogLogger_.setLevel( level );
+	m_syslogLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setSyslogFacility( const SyslogFacility::Facility facility )
 {
-	syslogLogger_.setFacility( facility );
+	m_syslogLogger.setFacility( facility );
 }
 
 void LogBackend::LogBackendImpl::setSyslogIdent( const std::string ident )
 {
-	syslogLogger_.setIdent( ident );
+	m_syslogLogger.setIdent( ident );
 }
 
 #if defined( _WIN32 )
@@ -107,9 +107,9 @@ void LogBackend::LogBackendImpl::setWinDebugLevel( const LogLevel::Level level )
 
 inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const std::string& msg )
 {
-	consoleLogger_.log( level, msg );
-	logfileLogger_.log( level, msg );
-	syslogLogger_.log( level, msg );
+	m_consoleLogger.log( level, msg );
+	m_logfileLogger.log( level, msg );
+	m_syslogLogger.log( level, msg );
 #if defined( _WIN32 )
 	windebugLogger_.log( level, msg );
 	eventlogLogger_.log( level, msg );
@@ -120,8 +120,8 @@ inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const 
 LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 {
 	using namespace std;
-	LogLevel::Level uLvl = min( consoleLogger_.level(),
-				    min( logfileLogger_.level(), syslogLogger_.level() ));
+	LogLevel::Level uLvl = min( m_consoleLogger.level(),
+				    min( m_logfileLogger.level(), m_syslogLogger.level() ));
 #if defined( _WIN32 )
 	uLvl = std::min ( uLvl, std::min ( windebugLogger_.level(), eventlogLogger_.level() ));
 #endif // defined( _WIN32 )
