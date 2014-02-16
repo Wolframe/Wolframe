@@ -26,6 +26,15 @@ case "$1" in
 			groupadd wolframe
 		getent passwd wolframe >/dev/null || \
 			useradd -g wolframe -c "wolframe user" wolframe
+			
+		mkdir /var/run/wolframe
+		chown wolframe:wolframe /var/run/wolframe
+		chmod 0775 /var/run/wolframe
+		
+		mkdir /var/log/wolframe
+		chown wolframe:wolframe /var/log/wolframe
+		chmod 0775 /var/log/wolframe
+	
 		;;
 	
 	abort-upgrade|abort-remove|abort-deconfigure)
