@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: wolframe
-.\"    Author: Mihai Barbos <mihai.barbos@gmail.com>
+.\"    Author:  <contact@wolframe.net>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/12/2014
+.\"      Date: 02/15/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolframed
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "8" "02/12/2014" "wolframed" "Wolframe User Manual"
+.TH "WOLFRAME" "8" "02/15/2014" "wolframed" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,36 +28,25 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-wolframed \- program to do something
+wolframed \- Wolframe daemon program
 .SH "SYNOPSIS"
 .HP \w'\fBwolframed\fR\ 'u
-\fBwolframed\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ \fIthis\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ {\fIthis\fR\ |\ \fIthat\fR}]
+\fBwolframed\fR [{\ \fB\-c\fR\ |\ \fB\-\-config\-file\fR\ }\ \fIconfig\-file\fR] [{\ \fB\-\-config\-xml\fR\ }] [{\ \fB\-\-config\-info\fR\ }] [{\ \fB\-\-use\-config\-logging\fR\ }] [{\ \fB\-f\fR\ |\ \fB\-\-foreground\fR\ }] [{\ \fB\-d\fR\ |\ \fB\-\-debug\fR\ }\ \fIlevel\fR] [{\ \fB\-u\fR\ |\ \fB\-\-user\fR\ }\ \fIuser\fR] [{\ \fB\-g\fR\ |\ \fB\-\-group\fR\ }\ \fIgroup\fR] [{\ \fB\-\-pidfile\fR\ }\ \fIpid\-file\fR]
 .HP \w'\fBwolframed\fR\ 'u
-\fBwolframed\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | {\fB\-v\fR\ |\ \fB\-\-version\fR}]
+\fBwolframed\fR [{\ \fB\-p\fR\ |\ \fB\-\-print\-config\fR\ } | {\ \fB\-t\fR\ |\ \fB\-\-check\-config\fR\ } | {\ \fB\-T\fR\ |\ \fB\-\-test\-config\fR\ }]
+.HP \w'\fBwolframed\fR\ 'u
+\fBwolframed\fR [{\ \fB\-h\fR\ |\ \fB\-\-help\fR\ } | {\ \fB\-v\fR\ |\ \fB\-\-version\fR\ }]
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
 \fBwolframed\fR
-and
-\fBbar\fR
-commands\&.
-.PP
-This manual page was written for the Debian distribution because the original program does not have a manual page\&. Instead, it has documentation in the GNU
-\fBinfo\fR(1)
-format; see below\&.
+Unix daemon\&.
 .PP
 \fBwolframed\fR
-is a program that\&.\&.\&.
+is the Wolframe application server run as Unix daemon or standalone in the shell\&.
 .SH "OPTIONS"
 .PP
-The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&. For a complete description, see the
-\fBinfo\fR(1)
-files\&.
-.PP
-\fB\-e \fR\fB\fIthis\fR\fR, \fB\-\-example=\fR\fB\fIthat\fR\fR
-.RS 4
-Does this and that\&.
-.RE
+The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A brief description of all options is included below\&.
 .PP
 \fB\-v\fR, \fB\-\-version\fR
 .RS 4
@@ -69,61 +58,85 @@ Show version of program\&.
 Show summary of options\&.
 .RE
 .PP
+\fB\-c \fR\fB\fIconfig\-file\fR\fR, \fB\-\-config\-file \fR\fB\fIconfig\-file\fR\fR
+.RS 4
+The location of the configuration\&. For further information of the format of this file check out
+\fBwolframe.conf\fR(5)\&.
+.RE
+.PP
+\fB\-f\fR, \fB\-\-foreground\fR
+.RS 4
+Run the wolframe in the shell (foreground) with terminal input/ouput attached and not as Unix daemon\&.
+.RE
+.PP
+\fB\-d \fR\fB\fIdebug\-level\fR\fR, \fB\-\-debug \fR\fB\fIdebug\-level\fR\fR
+.RS 4
+Set debug level of the stderr logging output\&. Default is the value configured in the \*(Aqlevel\*(Aq paramter of the \*(Aqstderr\*(Aq section of the \*(Aqlogging\*(Aq section in the configuration file\&. This parameter is only respected if running in the foreground\&. The
+\fIdebug\-level\fR
+is one of \*(AqFATAL\*(Aq, \*(AqALERT\*(Aq, \*(AqCRITICAL\*(Aq, \*(AqSEVERE\*(Aq, \*(AqERROR\*(Aq, \*(AqWARNING\*(Aq, \*(AqNOTICE\*(Aq, \*(AqINFO, \*(AqDEBUG\*(Aq, \*(AqTRACE\*(Aq, \*(AqDATA\*(Aq or \*(AqDATA2\*(Aq\&.
+.RE
+.PP
 \fB\-p\fR, \fB\-\-print\-config\fR
 .RS 4
-Print the configuration\&.
+Prints the configuration\&. This is, the server lists all it can read from the configuration (loaded modules, configuration options for logging, the network and business layer, database connection parameters, loaded programs, etc\&.)
 .RE
 .PP
 \fB\-t\fR, \fB\-\-check\-config\fR
 .RS 4
-Check the configuration\&.
+Check the configuration\&. Does syntax checking on the configuration file and checks the sanity of the configuration without actually starting the server\&.
+.RE
+.PP
+\fB\-T\fR, \fB\-\-test\-config\fR
+.RS 4
+Test the configuration\&. Starts the server as far as possible to check for further errors\&.
 .RE
 .PP
 \fB\-u \fR\fB\fIuser\fR\fR, \fB\-\-user \fR\fB\fIuser\fR\fR
 .RS 4
-run as user
-\fIuser\fR\&.
+Run as user
+\fIuser\fR\&. This makes only sense if the wolframe server is run as daemon (with initial root rights) to run as unpriviledged user after dropping the root rights\&. This parameter overwrites the parameter "user" in the "daemon" section of the configuration and is mainly supposed to be used in startup scripts (rc\&.d, systemd)\&.
 .RE
 .PP
 \fB\-g \fR\fB\fIgroup\fR\fR, \fB\-\-group \fR\fB\fIgroup\fR\fR
 .RS 4
-run as group
-\fIgroup\fR\&.
-.RE
-.SH "FILES"
-.PP
-/etc/foo\&.conf
-.RS 4
-The system\-wide configuration file to control the behaviour of
-wolframed\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
+Run as group
+\fIgroup\fR\&. This makes only sense if the wolframe server is run as daemon (with initial root rights) to run as unpriviledged user after dropping the root rights\&. This parameter overwrites the parameter "group" in the "daemon" section of the confiuguration and is mainly supposed to be used in startup scripts (rc\&.d, systemd)\&.
 .RE
 .PP
-${HOME}/\&.foo\&.conf
+\fB\-\-pidfile \fR\fB\fIpid\-file\fR\fR
 .RS 4
-The per\-user configuration file to control the behaviour of
-wolframed\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
+Use
+\fIpid\-file\fR
+as file where to store the PID of the Wolframe daemon\&. This makes only sense if the wolframe server is run as daemon (with initial root rights) to run as unpriviledged user after dropping the root rights\&. This parameter overwrites the parameter "pidFile" in the "daemon" section of the confiuguration and is mainly supposed to be used in startup scripts (rc\&.d, systemd)\&.
 .RE
-.SH "ENVIONMENT"
 .PP
-\fBFOO_CONF\fR
+\fB\-\-config\-info\fR
 .RS 4
-If used, the defined file is used as configuration file (see also
-the section called \(lqFILES\(rq)\&.
+Forces the configuration to be interpreted in INFO format\&.
+.RE
+.PP
+\fB\-\-config\-xml\fR
+.RS 4
+Forces the configuration to be interpreted in XML format\&.
+.RE
+.PP
+\fB\-\-use\-config\-logging\fR
+.RS 4
+Log according to the configuration file (active only with \-\-foreground)\&.
 .RE
 .SH "DIAGNOSTICS"
 .PP
 The following diagnostics may be issued on
 stderr:
 .PP
-Bad configuration file\&. Exiting\&.
+FATAL: \*(Aqconfig\-file\*(Aq is not a regular file
 .RS 4
-The configuration file seems to contain a broken configuration line\&. Use the
-\fB\-\-verbose\fR
-option, to get more info\&.
+The configuration doesn\*(Aqt exist, is not a file or not readable or has bad permissions\&.
+.RE
+.PP
+FATAL: Cannot guess configuration file type or invalid XML:
+.RS 4
+The configuration file seems to contain a broken configuration line\&. Use \-\-config\-xml or \-\-config\-info if you think the guesser got it wrong\&. Not closed XML tags or INFO sections are a likely error cause\&.
 .RE
 .PP
 \fBwolframed\fR
@@ -149,40 +162,23 @@ T}
 .sp
 .SH "BUGS"
 .PP
-The program is currently limited to only work with the
-foobar
-library\&.
-.PP
-The upstreams
-BTS
-can be found at
-\m[blue]\fB\%http://bugzilla.foo.tld\fR\m[]\&.
+Find issues and bugs on
+Github
+at
+\m[blue]\fB\%https://github.com/Wolframe/Wolframe/issues\fR\m[]\&.
 .SH "SEE ALSO"
 .PP
-\fBbar\fR(1),
-\fBbaz\fR(1),
-\fBfoo.conf\fR(5)
-.PP
-The programs are documented fully by
-The Rise and Fall of a Fooish Bar
-available via the
-\fBinfo\fR(1)
-system\&.
+\fBwolframe.conf\fR(5)
 .SH "AUTHOR"
 .PP
-\fBMihai Barbos\fR <\&mihai\&.barbos@gmail\&.com\&>
+ <\&contact@wolframe\&.net\&>
 .RS 4
-Wrote this manpage for the Debian system\&.
+This manual was written by the Wolframe Team\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2010-2014 Mihai Barbos
+Copyright \(co 2010-2014 Wolframe Team
 .br
 .PP
-This manual page was written for the Debian system (and may be used by others)\&.
-.PP
-Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 2 or (at your option) any later version published by the Free Software Foundation\&.
-.PP
-On Debian systems, the complete text of the GNU General Public License can be found in
-/usr/share/common\-licenses/GPL\&.
+The authors grant permission to copy, distribute and/or modify this manual page under the terms of the GNU General Public License Version 3 or newer (GPLv3)\&.
 .sp

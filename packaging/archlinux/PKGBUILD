@@ -14,7 +14,7 @@ makedepends=('docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
-  "http://sourceforge.net/projects/wolframe/files/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz"
+  "http://sourceforge.net/projects/wolframe/files/${pkgname}/${pkgname}-${pkgver}.tar.gz"
   'wolframe.conf'
   'wolframed.service'
 )

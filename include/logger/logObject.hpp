@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -31,8 +31,10 @@ Project Wolframe.
 ************************************************************************/
 ///\file logger/logObject.hpp
 ///\brief Provides uniform handling of logger and exception objects
-#ifndef _Wolframe_LOGGER_OBJECT_HPP_INCLUDED
-#define _Wolframe_LOGGER_OBJECT_HPP_INCLUDED
+
+#ifndef _Wolframe_LOG_OBJECT_HPP_INCLUDED
+#define _Wolframe_LOG_OBJECT_HPP_INCLUDED
+
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -128,6 +130,6 @@ public:
 };
 
 
-}} //namespace
-#endif
+}} //namespace _Wolframe::log
 
+#endif	// _Wolframe_LOG_OBJECT_HPP_INCLUDED

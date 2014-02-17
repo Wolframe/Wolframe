@@ -22,7 +22,15 @@
 set -e
 
 case "$1" in
-	remove|purge)
+	remove)
+		# keep logfiles and wolframe user (maybe we have data
+		# owned by this user), purge will clean up..
+		;;
+	
+	purge)
+		rm -rf /var/run/wolframe
+		rm -rf /var/log/wolframe
+
 		getent passwd wolframe >/dev/null && userdel wolframe
 		# implicitly removed the wolframe group too currently
 		;;
