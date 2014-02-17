@@ -1664,6 +1664,7 @@ include/serialize/struct/filtermapTraits.hpp
 include/serialize/structOptionParser.hpp
 include/serialize/tostringUtils.hpp
 include/singleton.hpp
+include/singletonInterface.hpp
 include/standardConfigs.hpp
 include/system/connectionEndpoint.hpp
 include/system/connectionHandler.hpp
@@ -1710,6 +1711,7 @@ makefiles/README
 Makefile.W32
 packaging/archlinux/wolframe.conf
 packaging/debian/README.source
+packaging/debian/wolframe.conf
 packaging/freebsd/buildlocal.sh
 packaging/freebsd/wolframe.conf
 packaging/netbsd/buildlocal.sh
