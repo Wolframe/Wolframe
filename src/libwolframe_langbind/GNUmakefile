@@ -8,17 +8,10 @@ PACKAGE_NAME = wolframe
 
 INCLUDE_CXXFLAGS =
 
-# textwolf support for module charsetEncodings
-ifeq ($(WITH_TEXTWOLF),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_TEXTWOLF
-endif
-
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/3rdParty/textwolf/include
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
@@ -47,7 +40,6 @@ CPP_OBJS = \
 	inputfilterScope.o \
 	tostringfilter.o \
 	ptreefilter.o \
-	charsetEncodings.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \

@@ -169,8 +169,11 @@ TEST_CPP_BINS = \
 	testWolfilter$(EXE) \
 	testVariantTypes$(EXE) \
 	testIntegers$(EXE)
+#	testDateTime$(EXE) \
+#	testBigNumber$(EXE) \
+#	testString$(EXE) \
+#	testStorageDataType$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
-
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
 
@@ -191,10 +194,12 @@ configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
-stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
 testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
-#testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
-
+testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testBigNumber$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testString$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testStorageDataType$(EXE):  $(TOPDIR)/src/libwolframe.a
 local_all:
 
 local_clean:
@@ -277,6 +282,14 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
+#	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
+#	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBigNumber
+#	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testString
+#	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testStorageDataType
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo

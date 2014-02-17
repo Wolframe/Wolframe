@@ -185,6 +185,8 @@ tests/python/
 tests/3rdParty/boost-locale/boostLocaleTest
 tests/testArrayDoublingAllocator
 tests/testFiletypeRecognition
+tests/testDateTime
+tests/testBigNumber
 geany.c++.tags
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal

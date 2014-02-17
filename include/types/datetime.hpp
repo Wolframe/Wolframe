@@ -45,12 +45,19 @@ typedef boost::int64_t Timestamp;
 
 //\class DateTime
 //\brief Data type for normalized date time (absolute time without time zone info)
-//\remark No date time arithmetics. Date time operations have to be implemented in a custom data type
+//\remark Only transport format. No date time arithmetics implemented here
 class DateTime
 {
 public:
+	enum SubType
+	{
+		YYYYMMDD,
+		YYYYMMDDhhmmss,
+		YYYYMMDDhhmmss_lll,
+		YYYYMMDDhhmmss_lllccc
+	};
 	DateTime( const DateTime& o)
-		:m_impl(o.m_impl)
+		:m_year(o.m_year),m_month(o.m_month),m_day(o.m_day),m_hour(o.m_hour),m_minute(o.m_minute),m_second(o.m_second),m_millisecond(o.m_millisecond),m_microsecond(o.m_microsecond),m_subtype(o.m_subtype)
 	{}
 
 	DateTime( unsigned short YY,
@@ -59,88 +66,159 @@ public:
 		  unsigned short hh,
 		  unsigned short mm,
 		  unsigned short ss,
-		  unsigned short ll=0,
-		  unsigned short cc=0)
-		:m_impl(YY,MM,DD,hh,mm,ss,ll,cc)
-	{}
+		  unsigned short ll,
+		  unsigned short cc)
+		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(ll),m_microsecond(cc),m_subtype(YYYYMMDDhhmmss_lllccc)
+	{
+		check( YY, MM, DD, hh, mm, ss, ll, cc);
+	}
+
+	DateTime( unsigned short YY,
+		  unsigned short MM,
+		  unsigned short DD,
+		  unsigned short hh,
+		  unsigned short mm,
+		  unsigned short ss,
+		  unsigned short ll)
+		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(ll),m_microsecond(0),m_subtype(YYYYMMDDhhmmss_lll)
+	{
+		check( YY, MM, DD, hh, mm, ss, ll, 0);
+	}
+
+	DateTime( unsigned short YY,
+		  unsigned short MM,
+		  unsigned short DD,
+		  unsigned short hh,
+		  unsigned short mm,
+		  unsigned short ss)
+		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDDhhmmss)
+	{
+		check( YY, MM, DD, hh, mm, ss, 0, 0);
+	}
+
+	DateTime( unsigned short YY,
+		  unsigned short MM,
+		  unsigned short DD)
+		:m_year(YY),m_month(MM),m_day(DD),m_hour(0),m_minute(0),m_second(0),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDD)
+	{
+		check( YY, MM, DD, 0, 0, 0, 0, 0);
+	}
+
+	unsigned int year() const		{return m_year;}		//< year 1000..2400
+	unsigned int month() const		{return m_month;}		//< month 1..12
+	unsigned int day() const		{return m_day;}			//< day 1..31
+	unsigned int hour() const		{return m_hour;}		//< hour
+	unsigned int minute() const		{return m_minute;}		//< minute
+	unsigned int second() const		{return m_second;}		//< second
+	unsigned int millisecond() const	{return m_millisecond;}		//< 1/1000 of second part
+	unsigned int microsecond() const	{return m_microsecond;}		//< 1/1000 of millisecond part
+	SubType subtype() const			{return (SubType)m_subtype;}	//< Granularity
 
 	DateTime( const Timestamp& t)
-		:m_impl(t)
-	{}
+	{
+		init( t);
+	}
 
 	Timestamp value() const
 	{
-		return m_impl.value();
+		Timestamp rt = 0;
+		setBits( rt, m_year, 0, 13);
+		setBits( rt, m_month, 13, 4);
+		setBits( rt, m_day, 17, 5);
+		setBits( rt, m_hour, 22, 5);
+		setBits( rt, m_minute, 27, 6);
+		setBits( rt, m_second, 33, 6);
+		setBits( rt, m_millisecond, 39, 10);
+		setBits( rt, m_millisecond, 49, 10);
+		setBits( rt, m_subtype, 59, 2);
+		return rt;
 	}
 
 	void init( Timestamp value_)
 	{
-		m_impl.init( value_);
+		m_year = getBits( value_, 0, 13);
+		m_month = getBits( value_, 13, 4);
+		m_day = getBits( value_, 17, 5);
+		m_hour = getBits( value_, 22, 5);
+		m_minute = getBits( value_, 27, 6);
+		m_second = getBits( value_, 33, 6);
+		m_millisecond = getBits( value_, 39, 10);
+		m_microsecond = getBits( value_, 49, 10);
+		m_subtype = (SubType)getBits( value_, 59, 2);
+	}
+
+	std::string tostring() const
+	{
+		std::string rt;
+		appendValue( rt, m_year, 4);
+		appendValue( rt, m_month, 2);
+		appendValue( rt, m_day, 2);
+		if ((SubType)m_subtype == YYYYMMDD) return rt;
+		appendValue( rt, m_hour, 2);
+		appendValue( rt, m_minute, 2);
+		appendValue( rt, m_second, 2);
+		if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
+		appendValue( rt, m_millisecond, 3);
+		if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
+		appendValue( rt, m_microsecond, 3);
+		return rt;
 	}
 
 private:
-	struct Impl
+	static void setBits( Timestamp& dest, unsigned int val, unsigned int bitidx, unsigned int bitrange)
 	{
-		unsigned int year:13;		//< [ 0..12]
-		unsigned int month:4;		//< [13..16]
-		unsigned int day:5;		//< [17..21]
-		unsigned int hour:5;		//< [22..26]
-		unsigned int minute:7;		//< [27..33]
-		unsigned int second:7;		//< [34..40]
-		unsigned int millisecond:10;	//< [41..50]
-		unsigned int microsecond:10;	//< [51..60]
+		dest |= ((Timestamp) val << (63-bitidx-bitrange));
+	}
+	static unsigned int getBits( const Timestamp& from, unsigned int bitidx, unsigned int bitrange)
+	{
+		return (unsigned int)(from >> (63-bitidx-bitrange)) & ((1<<(bitrange+1))-1);
+	}
 
-		Impl()
-			:year(0),month(0),day(0),hour(0),minute(0),second(0),millisecond(0),microsecond(0)
-		{}
+	static void check_range( unsigned int val, unsigned int from, unsigned int to)
+	{
+		if (val < from || val > to) throw std::runtime_error("value out of range");
+	}
+	static void check_range( unsigned int val, unsigned int maximum)
+	{
+		if (val > maximum) throw std::runtime_error("value out of range");
+	}
+	static void check( unsigned short YY, unsigned short MM, unsigned short DD, unsigned short hh, unsigned short mm, unsigned short ss, unsigned short ll, unsigned short cc)
+	{
+		check_range( YY, 1000, 2400);
+		check_range( MM, 1, 12);
+		check_range( DD, 1, 31);
+		check_range( hh, 64);
+		check_range( mm, 64);
+		check_range( ss, 64);
+		check_range( ll, 1004);
+		check_range( cc, 1004);
+	}
 
-		Impl( const Impl& o)
-			:year(o.year),month(o.month),day(o.day),hour(o.hour),minute(o.minute),second(o.second),millisecond(o.millisecond),microsecond(o.microsecond)
-		{}
-
-		Impl( unsigned short YY,
-			unsigned short MM,
-			unsigned short DD,
-			unsigned short hh,
-			unsigned short mm,
-			unsigned short ss,
-			unsigned short ll=0,
-			unsigned short cc=0)
-			:year(YY),month(MM),day(DD),hour(hh),minute(mm),second(ss),millisecond(ll),microsecond(cc)
-		{}
-
-		Impl( const Timestamp& t)
+	static void appendValue( std::string& dest, unsigned int value, unsigned int nofDigits)
+	{
+		enum {BufSize=8};
+		unsigned char buf[BufSize];
+		while (nofDigits != 0)
 		{
-			init(t);
+			--nofDigits;
+			unsigned char digit = (value % 10);
+			value /= 10;
+			buf[ nofDigits] = digit + '0';
+			if (value == 0) while (nofDigits-- != 0) buf[ nofDigits] = '0';
 		}
+		dest.append( (char*)buf);
+	}
 
-		void init( Timestamp value_)
-		{
-			year = (value_ >>	(60-12)) & ((1<<12)-1);
-			month = (value_ >>	(60-16)) & ((1<< 4)-1);
-			day = (value_ >>	(60-21)) & ((1<< 5)-1);
-			hour = (value_ >>	(60-26)) & ((1<< 5)-1);
-			minute = (value_ >>	(60-33)) & ((1<< 7)-1);
-			second = (value_ >>	(60-40)) & ((1<< 7)-1);
-			millisecond = (value_ >>(60-50)) & ((1<<10)-1);
-			microsecond = (value_ >>(60-60)) & ((1<<10)-1);
-		}
-
-		Timestamp value() const
-		{
-			Timestamp rt = 0;
-			rt += (Timestamp)year		<< (60-12);
-			rt += (Timestamp)month		<< (60-16);
-			rt += (Timestamp)day		<< (60-21);
-			rt += (Timestamp)hour		<< (60-26);
-			rt += (Timestamp)minute		<< (60-33);
-			rt += (Timestamp)second		<< (60-40);
-			rt += (Timestamp)millisecond	<< (60-50);
-			rt += (Timestamp)microsecond	<< (60-60);
-			return rt;
-		}
-	};
-	Impl m_impl;
+private:
+	unsigned int m_year:13;		//< [ 0..12]
+	unsigned int m_month:4;		//< [13..16]
+	unsigned int m_day:5;		//< [17..21]
+	unsigned int m_hour:5;		//< [22..26]
+	unsigned int m_minute:6;	//< [27..32]
+	unsigned int m_second:6;	//< [33..39]
+	unsigned int m_millisecond:10;	//< [39..49]
+	unsigned int m_microsecond:10;	//< [49..59]
+	unsigned int m_subtype:2;	//< [59..60]
 };
 
 }}//namespace

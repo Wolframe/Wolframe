@@ -37,6 +37,7 @@ Project Wolframe.
 #include "filter/outputfilter.hpp"
 #include "types/countedReference.hpp"
 #include "types/doctype.hpp"
+#include "types/string.hpp"
 extern "C"
 {
 #include "cJSON.h"
@@ -59,6 +60,7 @@ public:
 		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(attr)
 		,m_elemitr(0)
+		,m_encattr_defined(false)
 		,m_headerPrinted(false)
 	{
 		m_stk.push_back( StackElement(""));
@@ -72,7 +74,8 @@ public:
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
 		,m_doctypeid(o.m_doctypeid)
-		,m_encoding(o.m_encoding)
+		,m_encattr(o.m_encattr)
+		,m_encattr_defined(o.m_encattr_defined)
 		,m_headerPrinted(o.m_headerPrinted)
 		,m_stk(o.m_stk)
 		{}
@@ -97,12 +100,12 @@ public:
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
-	void setEncoding( const std::string& value)
+	void setEncoding( const std::string& name)
 	{
-		m_encoding = value;
+		m_encattr = types::String::getEncodingFromName( name);
 	}
 
-	const char* encoding() const;
+	void setEncoding();
 
 private:
 	void addStructValue( const std::string name, const std::string& value);
@@ -118,7 +121,8 @@ private:
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
 	std::string m_doctypeid;				//< document type
-	std::string m_encoding;					//< character set encoding
+	types::String::EncodingAttrib m_encattr;		//< character set encoding attributes
+	bool m_encattr_defined;					//< true, if character set encoding is defined
 	bool m_headerPrinted;
 
 	struct StackElement
