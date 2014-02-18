@@ -614,6 +614,6 @@ String::EncodingClass::Id String::guessEncoding( const char* content, std::size_
 
 
 String::String( const ConstQualifier&, const void* content, std::size_t contentsize, Encoding encoding_, unsigned char codepage_)
-	:m_encoding(encoding_),m_codepage(codepage_),m_isconst(true),m_size(contentsize/elementSize( encoding_)),m_ar((unsigned char*)content)
+	:m_encoding(encoding_),m_codepage(codepage_),m_isconst(true),m_size(contentsize/elementSize( encoding_)),m_ar((unsigned char*)const_cast<void*>(content))
 {}
 
