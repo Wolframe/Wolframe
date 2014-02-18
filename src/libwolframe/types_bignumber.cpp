@@ -35,6 +35,7 @@ Project Wolframe.
 #include "utils/conversions.hpp"
 #include <limits>
 #include <cstdlib>
+#include <stdexcept>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 
