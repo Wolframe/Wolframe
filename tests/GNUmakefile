@@ -283,8 +283,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testString
-	@echo
+#[-]	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testString
+#[-]	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
 #	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBigNumber
