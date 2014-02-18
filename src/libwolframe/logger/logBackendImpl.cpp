@@ -36,11 +36,30 @@
 ///
 
 #include "logBackendImpl.hpp"
-
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
 #include <algorithm>
 
 namespace _Wolframe {
 namespace log {
+
+LogBackend& LogBackend::instance()
+{
+	static boost::scoped_ptr< LogBackend >	m_t;
+	static boost::mutex			m_mutex;
+	static bool				m_initialized = false;
+
+	if ( !m_initialized )	{
+		boost::lock_guard< boost::mutex > lock( m_mutex );
+		if ( !m_initialized )	{
+			m_t.reset( new LogBackend() );
+			m_initialized = true;
+		}
+	}
+	return *m_t;
+}
+
 
 LogBackend::LogBackendImpl::LogBackendImpl( )
 {

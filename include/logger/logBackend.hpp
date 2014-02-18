@@ -38,7 +38,9 @@
 #ifndef _LOG_BACKEND_HPP_INCLUDED
 #define _LOG_BACKEND_HPP_INCLUDED
 
-#include "singleton.hpp"
+// #include "singleton.hpp"
+#include <boost/utility.hpp>
+
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 
@@ -47,12 +49,12 @@
 namespace _Wolframe {
 namespace log {
 
-class LogBackend : public Singleton< LogBackend >
+class LogBackend: private boost::noncopyable
 {
 public:
-	LogBackend( );
+	~LogBackend();
 
-	~LogBackend( );
+	static LogBackend& instance();
 
 	void setConsoleLevel( const LogLevel::Level level );
 
@@ -79,6 +81,10 @@ public:
 	void log( const LogLevel::Level level, const std::string& msg );
 
 	LogLevel::Level minLogLevel() const;
+
+protected:
+	LogBackend();
+
 private:
 	class LogBackendImpl;
 	LogBackendImpl	*impl_;
