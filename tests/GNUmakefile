@@ -170,7 +170,7 @@ TEST_CPP_BINS = \
 	testVariantTypes$(EXE) \
 	testIntegers$(EXE) \
 	testString$(EXE) \
-#	testDateTime$(EXE) \
+	testDateTime$(EXE) \
 #	testBigNumber$(EXE) \
 #	testStorageDataType$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
@@ -197,7 +197,7 @@ testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
 testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
 testString$(EXE):  $(TOPDIR)/src/libwolframe.a
-#testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
+testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
 #testBigNumber$(EXE):  $(TOPDIR)/src/libwolframe.a
 #testStorageDataType$(EXE):  $(TOPDIR)/src/libwolframe.a
 local_all:
@@ -285,7 +285,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testString
 	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
 #	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBigNumber
 #	@echo

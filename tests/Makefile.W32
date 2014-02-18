@@ -121,7 +121,7 @@ TEST_CPP_BINS = \
 	testProtocolLFdotEscaping.exe \
 	testVariantStruct.exe \
 	testString.exe \
-#	testDateTime.exe \
+	testDateTime.exe \
 #	testBigNumber.exe \
 #	testStorageDataType.exe \
 	configStructParser.exe \
@@ -171,7 +171,7 @@ configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
 testVariantStruct.exe: testVariantStruct.obj $(TOPDIR)\src\wolframe.lib
 testString.exe: testString.obj $(TOPDIR)\src\wolframe.lib
-#testDateTime.exe: testDateTime.obj $(TOPDIR)\src\wolframe.lib
+testDateTime.exe: testDateTime.obj $(TOPDIR)\src\wolframe.lib
 #testBigNumber.exe: testBigNumber.obj $(TOPDIR)\src\wolframe.lib
 #testStorageDataType.exe: testStorageDataType.obj $(TOPDIR)\src\wolframe.lib
 testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
@@ -239,7 +239,7 @@ local_test:
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testVariantStruct >> test.bat
 	@-echo testString >> test.bat
-#	@-echo testDateTime >> test.bat
+	@-echo testDateTime >> test.bat
 #	@-echo testBigNumber >> test.bat
 #	@-echo testStorageDataType >> test.bat
 	@-echo testVariantTypes >> test.bat
