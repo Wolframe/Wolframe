@@ -542,6 +542,11 @@ String::EncodingAttrib String::getEncodingFromName( const std::string& name)
 	}
 }
 
+String::EncodingClass::Id String::guessEncoding( const std::string& content)
+{
+	return guessEncoding( content.c_str(), content.size());
+}
+
 String::EncodingClass::Id String::guessEncoding( const char* content, std::size_t size)
 {
 	int maxll = 0;		//< maximum number of zeroes in a row

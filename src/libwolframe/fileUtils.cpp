@@ -34,6 +34,7 @@ Project Wolframe.
 
 #include "utils/fileUtils.hpp"
 #include "utils/parseUtils.hpp"
+#include "types/string.hpp"
 #include <cstring>
 #include <cstdio>
 #include <sstream>
@@ -213,9 +214,25 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 
 std::string utils::readSourceFileContent( const std::string& filename)
 {
-	std::string rt;
-	readFileContent( filename, rt);
-	return rt;
+	std::string src;
+	readFileContent( filename, src);
+	switch (types::String::guessEncoding( src))
+	{
+		case types::String::EncodingClass::FAIL:
+			throw std::runtime_error(std::string("failed to guess source file encoding of '") + filename + "'");
+		case types::String::EncodingClass::NONE:
+			return src;	//... empty file, assuming UTF-8 or Ascii
+		case types::String::EncodingClass::UCS1:
+			return src;	//... assuming UTF-8 or Ascii
+		case types::String::EncodingClass::UCS2LE:
+			return types::String( (const void*)src.c_str(), src.size()/2, types::String::UTF16LE).tostring();
+		case types::String::EncodingClass::UCS2BE:
+			return types::String( (const void*)src.c_str(), src.size()/2, types::String::UTF16BE).tostring();
+		case types::String::EncodingClass::UCS4LE:
+		case types::String::EncodingClass::UCS4BE:
+			throw std::runtime_error(std::string("cannot parse source file in UCS4 type encoding: '") + filename + "'");
+	}
+	return src;
 }
 
 std::vector<std::string> utils::readSourceFileLines( const std::string& filename)

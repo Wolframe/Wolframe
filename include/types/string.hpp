@@ -148,8 +148,14 @@ public:
 		enum Id {NONE,UCS1,UCS2LE,UCS2BE,UCS4LE,UCS4BE,FAIL};
 	};
 	//\brief Guess the encoding from content
+	//\param[in] content pointer to string
+	//\param[in] contentsize length of 'content' in bytes
 	//\return the encoding class that can be guessed (with 100%, no probability decision !)
 	static EncodingClass::Id guessEncoding( const char* content, std::size_t size);
+	//\brief Guess the encoding from content
+	//\param[in] content source string to gues the encoding
+	//\return the encoding class that can be guessed (with 100%, no probability decision !)
+	static EncodingClass::Id guessEncoding( const std::string& content);
 
 	//\brief Get the encoding of this string
 	//\return the encoding
