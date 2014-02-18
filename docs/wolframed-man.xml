@@ -526,22 +526,6 @@
 			</varlistentry>
 		</variablelist>
 		
-		<variablelist>
-			<varlistentry>
-				<term>
-					<errortext>FATAL: Cannot guess configuration file type or invalid XML:</errortext>
-				</term>
-				<listitem>
-					<para>
-						The configuration file seems to contain a broken configuration
-						line. Use --config-xml or --config-info if you think the guesser
-						got it wrong. Not closed XML tags or INFO sections are a likely
-						error cause.
-					</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-
 		<para><command>&dhpackage;</command> provides some return codes, that can
       be used in scripts:</para>
 		<segmentedlist>
