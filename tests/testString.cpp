@@ -35,6 +35,7 @@ Project Wolframe.
 #include "gtest/gtest.h"
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <limits>
 #include <cstdlib>
 #include <boost/cstdint.hpp>
@@ -56,6 +57,21 @@ protected:
 
 TEST_F( StringDescriptionTest, tests)
 {
+	static const char* latinUmlautStr = "äöüéè";
+	static const char* asciiStr = "abcdefghijklmnopqrstuvwxyz_";
+	std::size_t latinUmlautStrLen = std::strlen(latinUmlautStr);
+	std::size_t asciiStrLen = std::strlen(asciiStr);
+
+	types::StringConst luLatin1( latinUmlautStr, latinUmlautStrLen, types::String::ISO8859, 1);
+	types::StringConst asLatin1( asciiStr, asciiStrLen, types::String::ISO8859, 1);	
+
+	EXPECT_EQ( std::string((const char*)luLatin1.translateEncoding( types::String::UTF16BE)
+				.translateEncoding( types::String::ISO8859, 1).ptr()),
+			latinUmlautStr);
+
+	EXPECT_EQ( asLatin1.translateEncoding( types::String::UTF16BE).tostring(),
+			asLatin1.translateEncoding( types::String::UTF8).tostring());
+	std::cerr << "done" << std::endl;
 }
 
 int main( int argc, char **argv)

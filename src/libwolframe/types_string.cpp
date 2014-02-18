@@ -321,7 +321,7 @@ static StringReaderR createStringReader( String::Encoding encoding, unsigned cha
 	{
 		case String::ISO8859:
 		{
-			unsigned char maxchar = (codepage == 1)?256:127;
+			unsigned char maxchar = (codepage == 1)?0xFF:0x7F;
 			return StringReaderR( new StringReaderUCS1( content, contentsize, maxchar));
 		}
 		case String::UTF8:
@@ -348,7 +348,7 @@ static StringWriterR createStringWriter( std::string& buf, String::Encoding enco
 	{
 		case String::ISO8859:
 		{
-			unsigned char maxchar = (codepage == 1)?256:127;
+			unsigned char maxchar = (codepage == 1)?0xFF:0x7F;
 			return StringWriterR( new StringWriterUCS1( buf, maxchar));
 		}
 		case String::UTF8:

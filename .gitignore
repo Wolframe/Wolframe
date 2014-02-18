@@ -187,6 +187,7 @@ tests/testArrayDoublingAllocator
 tests/testFiletypeRecognition
 tests/testDateTime
 tests/testBigNumber
+tests/testString
 geany.c++.tags
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal
