@@ -49,7 +49,7 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --program schema_select_task_by_id.sfrm --program simpleform.wnmp --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl --cmdprogram=test.dmap schema_select_task_by_id
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --program schema_select_task_by_id.sfrm --program simpleform.wnmp --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=../../tests/wolfilter/template/program/schema_select_task_by_id_UTF16BE.tdl --cmdprogram=test.dmap schema_select_task_by_id
 
 **file: test.dmap
 COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;

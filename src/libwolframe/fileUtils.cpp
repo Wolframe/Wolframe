@@ -225,9 +225,9 @@ std::string utils::readSourceFileContent( const std::string& filename)
 		case types::String::EncodingClass::UCS1:
 			return src;	//... assuming UTF-8 or Ascii
 		case types::String::EncodingClass::UCS2LE:
-			return types::String( (const void*)src.c_str(), src.size()/2, types::String::UTF16LE).tostring();
+			return types::String( (const void*)src.c_str(), src.size(), types::String::UTF16LE).tostring();
 		case types::String::EncodingClass::UCS2BE:
-			return types::String( (const void*)src.c_str(), src.size()/2, types::String::UTF16BE).tostring();
+			return types::String( (const void*)src.c_str(), src.size(), types::String::UTF16BE).tostring();
 		case types::String::EncodingClass::UCS4LE:
 		case types::String::EncodingClass::UCS4BE:
 			throw std::runtime_error(std::string("cannot parse source file in UCS4 type encoding: '") + filename + "'");
