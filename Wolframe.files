@@ -1611,7 +1611,6 @@ include/filter/typingfilter.hpp
 include/GNUmakefile
 include/langbind/appObjects.hpp
 include/langbind/authorization.hpp
-include/langbind/charsetEncodings.hpp
 include/langbind/cppFormFunction.hpp
 include/langbind/ddlCompilerInterface.hpp
 include/langbind/formFunction.hpp
@@ -1664,7 +1663,6 @@ include/serialize/struct/filtermapTraits.hpp
 include/serialize/structOptionParser.hpp
 include/serialize/tostringUtils.hpp
 include/singleton.hpp
-include/singletonInterface.hpp
 include/standardConfigs.hpp
 include/system/connectionEndpoint.hpp
 include/system/connectionHandler.hpp
@@ -1678,6 +1676,7 @@ include/types/allocators.hpp
 include/types/atomicCounter.hpp
 include/types/base64.h
 include/types/base64.hpp
+include/types/bignumber.hpp
 include/types/byte2hex.h
 include/types/countedReference.hpp
 include/types/customDataNormalizer.hpp
@@ -1689,6 +1688,7 @@ include/types/integer.hpp
 include/types/keymap.hpp
 include/types/malloc.hpp
 include/types/normalizeFunction.hpp
+include/types/string.hpp
 include/types/syncCounter.hpp
 include/types/syncObjectList.hpp
 include/types/traits.hpp
@@ -1809,7 +1809,6 @@ src/libwolframe/HMAC.cpp
 src/libwolframe/hmac_sha1.c
 src/libwolframe/hmac_sha256.c
 src/libwolframe_langbind/appObjects.cpp
-src/libwolframe_langbind/charsetEncodings.cpp
 src/libwolframe_langbind/cmdbind_contentBufferCommandHandlerEscDLF.cpp
 src/libwolframe_langbind/cmdbind_doctypeFilterCommandHandler.cpp
 src/libwolframe_langbind/cmdbind_execCommandHandler.cpp
@@ -1880,9 +1879,11 @@ src/libwolframe/sha1.c
 src/libwolframe/sha2.c
 src/libwolframe/stringUtils.cpp
 src/libwolframe/types_allocators.cpp
+src/libwolframe/types_bignumber.cpp
 src/libwolframe/types_customDataType.cpp
 src/libwolframe/types_doctype.cpp
 src/libwolframe/typeSignature.cpp
+src/libwolframe/types_string.cpp
 src/libwolframe/types_variant.cpp
 src/libwolframe/types_variantStruct.cpp
 src/libwolframe/types_variantStructDescription.cpp
@@ -2453,7 +2454,9 @@ tests/temp/transaction_iterator.lua
 tests/temp/transaction_table.lua
 tests/temp/wolframe.conf
 tests/testArrayDoublingAllocator.cpp
+tests/testBigNumber.cpp
 tests/testBoostPath.cpp
+tests/testDateTime.cpp
 tests/testFiletypeRecognition.cpp
 tests/testIntegers.cpp
 tests/testMD5.cpp
@@ -2462,6 +2465,8 @@ tests/testNamedRetVal.cpp
 tests/testProtocolLFdotEscaping.cpp
 tests/testRand.cpp
 tests/testSHA.cpp
+tests/testStorageDataType.cpp
+tests/testString.cpp
 tests/testTestAllocator.cpp
 tests/testTimestamp.cpp
 tests/testVariantStruct.cpp
