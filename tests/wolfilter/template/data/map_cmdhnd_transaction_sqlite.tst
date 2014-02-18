@@ -18,7 +18,7 @@ opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
-opt="$opt --program=DBPRG.tdl"
+opt="$opt --program=../../tests/wolfilter/template/program/schema_select_task_by_id_UTF16BE.tdl"
 opt="$opt --cmdprogram=test.dmap"
 testscripts="$formname"					# list of scripts of the test
 testcmd="$opt schema_select_task_by_id"			# command to execute by the test
@@ -33,6 +33,6 @@ COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
 **file: DBDATA
 `cat program/schema_select_task_by_id.sql`
 **file:DBPRG.tdl
-`cat program/schema_select_task_by_id.tdl`
+`cat program/schema_select_task_by_id.tdl | recode UTF-8..UTF16BE`
 **outputfile:DBDUMP"
 . ./output_tst_all.sh
