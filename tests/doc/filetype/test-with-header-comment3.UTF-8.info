@@ -1,0 +1,8 @@
+ ;
+ doc ; root element
+{
+	user {
+		prename Hans
+		surname Muster
+	}
+}
