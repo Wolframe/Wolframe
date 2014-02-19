@@ -2,12 +2,12 @@
 .\"     Title: wolframe
 .\"    Author:  <contact@wolframe.net>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/15/2014
+.\"      Date: 02/19/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolfpasswd
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "1" "02/15/2014" "wolfpasswd" "Wolframe User Manual"
+.TH "WOLFRAME" "1" "02/19/2014" "wolfpasswd" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,99 +31,75 @@
 wolfpasswd \- Wolframe password management program
 .SH "SYNOPSIS"
 .HP \w'\fBwolfpasswd\fR\ 'u
-\fBwolfpasswd\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\ \fB\-e\fR\ |\ \fB\-\-example\fR\ }\ \fIthis\fR] [{\ \fB\-e\fR\ |\ \fB\-\-example\fR\ }\ {\ \fIthis\fR\ |\ \fIthat\fR\ }]
+\fBwolfpasswd\fR \fB\-D\ \fR\fB\fIpasswordfile\fR\fR\fB\ \fR\fB\fIusername\fR\fR
 .HP \w'\fBwolfpasswd\fR\ 'u
-\fBwolfpasswd\fR [{\ \fB\-h\fR\ |\ \fB\-\-help\fR\ } | {\ \fB\-v\fR\ |\ \fB\-\-version\fR\ }]
+\fBwolfpasswd\fR [\fB\-c\fR] [\fB\-d \fR\fB\fIdays\fR\fR] \fIpasswordfile\fR \fIusername\fR [\fIuser\ info\fR]
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR \fB\-b\fR [\fB\-c\fR] [\fB\-d \fR\fB\fIdays\fR\fR] \fIpasswordfile\fR \fIusername\fR \fIpassword\fR [\fIuser\ info\fR]
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR \fB\-n\fR [\fB\-s \fR\fB\fIsalt\fR\fR] [\fB\-d \fR\fB\fIdays\fR\fR] \fIusername\fR [\fIuser\ info\fR]
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR \fB\-n\fR \fB\-b\fR [\fB\-s \fR\fB\fIsalt\fR\fR] [\fB\-d \fR\fB\fIdays\fR\fR] \fIusername\fR \fIpassword\fR [\fIuser\ info\fR]
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR \fB\-h\fR
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
 \fBwolfpasswd\fR
-and
-\fBbar\fR
-commands\&.
-.PP
-This manual page was written for the Debian distribution because the original program does not have a manual page\&. Instead, it has documentation in the GNU
-\fBinfo\fR(1)
-format; see below\&.
+command\&.
 .PP
 \fBwolfpasswd\fR
-is a program that\&.\&.\&.
+is a tool to manage user credentials in the Wolframe system\&.
 .SH "OPTIONS"
 .PP
 The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&. For a complete description, see the
 \fBinfo\fR(1)
 files\&.
 .PP
-\fB\-e \fR\fB\fIthis\fR\fR, \fB\-\-example=\fR\fB\fIthat\fR\fR
-.RS 4
-Does this and that\&.
-.RE
-.PP
-\fB\-v\fR, \fB\-\-version\fR
-.RS 4
-Show version of program\&.
-.RE
-.PP
 \fB\-h\fR, \fB\-\-help\fR
 .RS 4
 Show summary of options\&.
 .RE
 .PP
-\fB\-p\fR, \fB\-\-print\-config\fR
+\fB\-c\fR, \fB\-\-create\fR
 .RS 4
-Print the configuration\&.
+Create the file if it doesn\*(Aqt exist\&.
 .RE
 .PP
-\fB\-t\fR, \fB\-\-check\-config\fR
+\fB\-s\fR, \fB\-\-salt \fR\fB\fIsalt\fR\fR
 .RS 4
-Check the configuration\&.
+Use the specified salt (only valid with \-\-display\-only)\&.
 .RE
 .PP
-\fB\-u \fR\fB\fIuser\fR\fR, \fB\-\-user \fR\fB\fIuser\fR\fR
+\fB\-d\fR, \fB\-\-days \fR\fB\fIdays\fR\fR
 .RS 4
-run as user
-\fIuser\fR\&.
+Set the password expiration after
+\fIdays\fR
+days\&. The default (=0) means don\*(Aqt expire\&.
 .RE
 .PP
-\fB\-g \fR\fB\fIgroup\fR\fR, \fB\-\-group \fR\fB\fIgroup\fR\fR
+\fB\-n\fR, \fB\-\-display\-only\fR
 .RS 4
-run as group
-\fIgroup\fR\&.
-.RE
-.SH "FILES"
-.PP
-/etc/foo\&.conf
-.RS 4
-The system\-wide configuration file to control the behaviour of
-wolfpasswd\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
+Don\*(Aqt update the password file; display results on stdout\&.
 .RE
 .PP
-${HOME}/\&.foo\&.conf
+\fB\-b\fR, \fB\-\-batch\fR
 .RS 4
-The per\-user configuration file to control the behaviour of
-wolfpasswd\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
+Use the password from the command line instead of prompting for it\&.
 .RE
-.SH "ENVIONMENT"
 .PP
-\fBFOO_CONF\fR
+\fB\-D\fR, \fB\-\-delete\fR
 .RS 4
-If used, the defined file is used as configuration file (see also
-the section called \(lqFILES\(rq)\&.
+Delete the specified user\&.
 .RE
 .SH "DIAGNOSTICS"
 .PP
 The following diagnostics may be issued on
 stderr:
 .PP
-Bad configuration file\&. Exiting\&.
+password file \*(Aq\fIpasswordfile\fR\*(Aq does not exist\&.
 .RS 4
-The configuration file seems to contain a broken configuration line\&. Use the
-\fB\-\-verbose\fR
-option, to get more info\&.
+The password file doesn\*(Aqt exist\&. Use \-c/\-\-create to create it first\&.
 .RE
 .PP
 \fBwolfpasswd\fR
@@ -141,7 +117,7 @@ T}
 T{
 \fB1\fR
 T}	T{
-The configuration file seems to be broken\&.
+An error occurred\&.
 T}
 .TE
 .\" line length decrease back to previous value
@@ -149,25 +125,13 @@ T}
 .sp
 .SH "BUGS"
 .PP
-The program is currently limited to only work with the
-foobar
-library\&.
-.PP
-The upstreams
-BTS
-can be found at
-\m[blue]\fB\%http://bugzilla.foo.tld\fR\m[]\&.
+Find issues and bugs on
+Github
+at
+\m[blue]\fB\%https://github.com/Wolframe/Wolframe/issues\fR\m[]\&.
 .SH "SEE ALSO"
 .PP
-\fBbar\fR(1),
-\fBbaz\fR(1),
-\fBfoo.conf\fR(5)
-.PP
-The programs are documented fully by
-The Rise and Fall of a Fooish Bar
-available via the
-\fBinfo\fR(1)
-system\&.
+\fBwolframed\fR(8)
 .SH "AUTHOR"
 .PP
  <\&contact@wolframe\&.net\&>
