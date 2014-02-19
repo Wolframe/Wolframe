@@ -2,12 +2,12 @@
 .\"     Title: wolframe
 .\"    Author:  <contact@wolframe.net>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/15/2014
+.\"      Date: 02/19/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolframe.conf
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "5" "02/15/2014" "wolframe.conf" "Wolframe User Manual"
+.TH "WOLFRAME" "5" "02/19/2014" "wolframe.conf" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -30,122 +30,152 @@
 .SH "NAME"
 wolframe.conf \- Wolframe server configuration file
 .SH "SYNOPSIS"
-.HP \w'\fBwolframe\&.conf\fR\ 'u
-\fBwolframe\&.conf\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\ \fB\-e\fR\ |\ \fB\-\-example\fR\ }\ \fIthis\fR] [{\ \fB\-e\fR\ |\ \fB\-\-example\fR\ }\ {\ \fIthis\fR\ |\ \fIthat\fR\ }]
-.HP \w'\fBwolframe\&.conf\fR\ 'u
-\fBwolframe\&.conf\fR [{\ \fB\-h\fR\ |\ \fB\-\-help\fR\ } | {\ \fB\-v\fR\ |\ \fB\-\-version\fR\ }]
+.HP \w'\fB/etc/wolframe/wolframe\&.conf\fR\ 'u
+\fB/etc/wolframe/wolframe\&.conf\fR
 .SH "DESCRIPTION"
 .PP
-This manual page documents briefly the
-\fBwolframe\&.conf\fR
-and
-\fBbar\fR
-commands\&.
+This manual page documents briefly the configuration option of the Wolframe system\&.
+.SS "Global configuration options"
 .PP
-This manual page was written for the Debian distribution because the original program does not have a manual page\&. Instead, it has documentation in the GNU
-\fBinfo\fR(1)
-format; see below\&.
+\fBServerSignature\fR
+.RS 4
+If set to \*(AqOn\*(Aq the server prints the name of the server as first element of the greeting in the protocol\&. Possible values are \*(AqOn\*(Aq or \*(AqOff\*(Aq\&.
+.RE
 .PP
-\fBwolframe\&.conf\fR
-is a program that\&.\&.\&.
+\fBServerTokens\fR
+.RS 4
+Specifies how the server signature looks like when \*(AqServerSignature\*(Aq is set to \*(AqOn\*(Aq\&. Note: In a production environment you should be careful which information you reveal over the protocol to a possible attacker!
+.sp
+Possible values are:
+.PP
+None
+.RS 4
+Print nothing in the greeting line but the name of the software \*(AqWolframe\*(Aq\&.
+.RE
+.PP
+ProductOnly
+.RS 4
+Print the name of the product implemented in Wolframe and Wolframe itself\&.
+.RE
+.PP
+Major
+.RS 4
+Print only the major version of Wolframe\&.
+.RE
+.PP
+Minor
+.RS 4
+Print major and minor version of Wolframe\&.
+.RE
+.PP
+Revision
+.RS 4
+Print major, minor and revision of Wolframe\&.
+.RE
+.PP
+OS
+.RS 4
+Print all information, including the operating system Wolframe is running on\&.
+.RE
+.sp
+.RE
 .SH "OPTIONS"
 .PP
-The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&. For a complete description, see the
-\fBinfo\fR(1)
-files\&.
+The configuration of the wolframe daemon or service is separated into sections\&. Some sections like \*(AqLoadModules\*(Aq always exist, others only exist if a module has been loaded\&.
+.SS "LoadModules"
 .PP
-\fB\-e \fR\fB\fIthis\fR\fR, \fB\-\-example=\fR\fB\fIthat\fR\fR
+The \*(AqLoadModules\*(Aq section contains directives to extend the system with loadable modules\&. Those can be new database modules, new scripting languages, document filters and processors, authentication/authorization/audit modules and other 3rdParty bindings, etc\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBdirectory \fR\fB\fImodule_directory\fR\fR
 .RS 4
-Does this and that\&.
+Load modules from directory
+\fImodule_directory\fR
+instead of searching for modules in the standard system module directory of Wolframe\&.
 .RE
 .PP
-\fB\-h\fR, \fB\-\-help\fR
+\fBmodule \fR\fB\fImodule_name\fR\fR
 .RS 4
-Show summary of options\&.
-.RE
-.PP
-\fB\-v\fR, \fB\-\-version\fR
-.RS 4
-Show version of program\&.
-.RE
-.SH "FILES"
-.PP
-/etc/foo\&.conf
-.RS 4
-The system\-wide configuration file to control the behaviour of
-wolframe\&.conf\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
-.RE
-.PP
-${HOME}/\&.foo\&.conf
-.RS 4
-The per\-user configuration file to control the behaviour of
-wolframe\&.conf\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
-.RE
-.SH "ENVIONMENT"
-.PP
-\fBFOO_CONF\fR
-.RS 4
-If used, the defined file is used as configuration file (see also
-the section called \(lqFILES\(rq)\&.
-.RE
-.SH "DIAGNOSTICS"
-.PP
-The following diagnostics may be issued on
-stderr:
-.PP
-Bad configuration file\&. Exiting\&.
-.RS 4
-The configuration file seems to contain a broken configuration line\&. Use the
-\fB\-\-verbose\fR
-option, to get more info\&.
-.RE
-.PP
-\fBwolframe\&.conf\fR
-provides some return codes, that can be used in scripts:
-.\" line length increase to cope w/ tbl weirdness
-.ll +(\n(LLu * 62u / 100u)
-.TS
-ll.
-\fICode\fR	\fIDiagnostic\fR
-T{
-\fB0\fR
-T}	T{
-Program exited successfully\&.
-T}
-T{
-\fB1\fR
-T}	T{
-The configuration file seems to be broken\&.
-T}
-.TE
-.\" line length decrease back to previous value
-.ll -(\n(LLu * 62u / 100u)
+Load module
+\fImodule_name\fR\&. Note: You don\*(Aqt have to specify the module extension like \*(Aq\&.so\*(Aq\&.
 .sp
+The
+\fImodule_name\fR
+can contain a relative path\&. The module path is always caculated relatively to the
+\fImodule_directory\fR
+or to the default installation path for Wolframe modules\&.
+.RE
+.SS "logging"
+.PP
+In the \*(Aqlogging\*(Aq section you can configure ways of the Wolframe server to log\&.
+.PP
+There are logging channels named \*(Aq\fBstderr\fR\*(Aq (for foreground mode only!), \*(Aq\fBlogFile\fR\*(Aq to log to a simple text file and \*(Aq\fBsyslog\fR\*(Aq to log to the system log\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBlevel \fR\fB\fIlog_level\fR\fR
+.RS 4
+Log only messages up to the level
+\fIlog_level\fR\&. Possible log levels are \*(AqFATAL\*(Aq, \*(AqALERT\*(Aq, \*(AqCRITICAL\*(Aq, \*(AqSEVERE\*(Aq, \*(AqERROR\*(Aq, \*(AqWARNING\*(Aq, \*(AqNOTICE\*(Aq, \*(AqINFO, \*(AqDEBUG\*(Aq, \*(AqTRACE\*(Aq, \*(AqDATA\*(Aq or \*(AqDATA2\*(Aq\&.
+.sp
+Note: This is the only directive which must be understood by all logging channels\&.
+.RE
+.PP
+\fBfilename (logFile) \fR\fB\fIfile_name\fR\fR
+.RS 4
+Write log message to the file denoted by
+\fIfile_name\fR\&.
+.RE
+.PP
+\fBident (syslog) \fR\fB\fIident\fR\fR
+.RS 4
+The syslog identifier to tag the log entries with\&.
+.RE
+.PP
+\fBfacility (syslog) \fR\fB\fIident\fR\fR
+.RS 4
+The syslog facility to tag the log entries with\&. Usual facilities are \*(AqLOCAL0\*(Aq to \*(AqLOCAL7\*(Aq, \*(AqUSER\*(Aq, \*(AqDAEMON\*(Aq or similar\&.
+.sp
+Consult the
+\fBopenlog\fR(3)
+man page to see what facilities are available on your system\&.
+.RE
+.SS "daemon"
+.PP
+The \*(Aqdaemon\*(Aq section sets the behaviour of the Wolframe server as a Unix daemon\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBuser \fR\fB\fIuser\fR\fR
+.RS 4
+Run the Wolframe daemon under permissions of the Unix user
+\fIuser\fR\&.
+.RE
+.PP
+\fBgroup \fR\fB\fIgroup\fR\fR
+.RS 4
+Run the Wolframe daemon under permissions of the Unix group
+\fIgroup\fR\&.
+.RE
+.PP
+\fBpidFile \fR\fB\fIpid_file\fR\fR
+.RS 4
+Where to store the PID daemon lock file\&. Note that
+\fIpid_file\fR
+must be in a location with enough rights for the
+\fIuser\fR
+to create the PID file!
+.RE
 .SH "BUGS"
 .PP
-The program is currently limited to only work with the
-foobar
-library\&.
-.PP
-The upstreams
-BTS
-can be found at
-\m[blue]\fB\%http://bugzilla.foo.tld\fR\m[]\&.
+Find issues and bugs on
+Github
+at
+\m[blue]\fB\%https://github.com/Wolframe/Wolframe/issues\fR\m[]\&.
 .SH "SEE ALSO"
 .PP
-\fBbar\fR(1),
-\fBbaz\fR(1),
-\fBfoo.conf\fR(5)
-.PP
-The programs are documented fully by
-The Rise and Fall of a Fooish Bar
-available via the
-\fBinfo\fR(1)
-system\&.
+\fBwolframed\fR(8)
 .SH "AUTHOR"
 .PP
  <\&contact@wolframe\&.net\&>
