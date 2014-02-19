@@ -78,78 +78,108 @@
 			<command>&dhpackage;</command>
 			<!-- These are several examples, how syntaxes could look -->
 			<arg choice="plain">
-				<option>-e <replaceable>this</replaceable></option>
+				<option>-D <replaceable>passwordfile</replaceable> <replaceable>username</replaceable></option>
+			</arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<arg choice="opt">
+				<option>-c</option>
+			</arg>			
+			<group choice="opt">
+				<option>-d <replaceable>days</replaceable></option>
+			</group>
+			<arg choice="plain">
+				<replaceable>passwordfile</replaceable> 
+			</arg>
+			<arg choice="plain">
+				<replaceable>username</replaceable>
 			</arg>
 			<arg choice="opt">
-				<option>--example=<parameter>that</parameter></option>
+				<replaceable>user info</replaceable>
+			</arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<arg choice="plain">
+				<option>-b</option>
+			</arg>			
+			<arg choice="opt">
+				<option>-c</option>
+			</arg>			
+			<group choice="opt">
+				<option>-d <replaceable>days</replaceable></option>
+			</group>
+			<arg choice="plain">
+				<replaceable>passwordfile</replaceable> 
+			</arg>
+			<arg choice="plain">
+				<replaceable>username</replaceable>
+			</arg>
+			<arg choice="plain">
+				<replaceable>password</replaceable>
 			</arg>
 			<arg choice="opt">
-				<group choice="req">
-					<arg choice="plain">
-						<option>-e</option>
-					</arg>
-					<arg choice="plain">
-						<option>--example</option>
-					</arg>
-				</group>
-				<replaceable class="option">this</replaceable>
+				<replaceable>user info</replaceable>
+			</arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<arg choice="plain">
+				<option>-n</option>
+			</arg>			
+			<group choice="opt">
+				<option>-s <replaceable>salt</replaceable></option>
+			</group>
+			<group choice="opt">
+				<option>-d <replaceable>days</replaceable></option>
+			</group>
+			<arg choice="plain">
+				<replaceable>username</replaceable>
 			</arg>
 			<arg choice="opt">
-				<group choice="req">
-					<arg choice="plain">
-						<option>-e</option>
-					</arg>
-					<arg choice="plain">
-						<option>--example</option>
-					</arg>
-				</group>
-				<group choice="req">
-					<arg choice="plain">
-						<replaceable>this</replaceable>
-					</arg>
-					<arg choice="plain">
-						<replaceable>that</replaceable>
-					</arg>
-				</group>
+				<replaceable>user info</replaceable>
+			</arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<arg choice="plain">
+				<option>-n</option>
+			</arg>			
+			<arg choice="plain">
+				<option>-b</option>
+			</arg>			
+			<group choice="opt">
+				<option>-s <replaceable>salt</replaceable></option>
+			</group>
+			<group choice="opt">
+				<option>-d <replaceable>days</replaceable></option>
+			</group>
+			<arg choice="plain">
+				<replaceable>username</replaceable>
+			</arg>
+			<arg choice="plain">
+				<replaceable>password</replaceable>
+			</arg>
+			<arg choice="opt">
+				<replaceable>user info</replaceable>
 			</arg>
 		</cmdsynopsis>
 		<cmdsynopsis>
 			<command>&dhpackage;</command>
 			<!-- Normally the help and version options make the programs stop
 	   right after outputting the requested information. -->
-			<group choice="opt">
-				<arg choice="plain">
-					<group choice="req">
-						<arg choice="plain">
-							<option>-h</option>
-						</arg>
-						<arg choice="plain">
-							<option>--help</option>
-						</arg>
-					</group>
-				</arg>
-				<arg choice="plain">
-					<group choice="req">
-						<arg choice="plain">
-							<option>-v</option>
-						</arg>
-						<arg choice="plain">
-							<option>--version</option>
-						</arg>
-					</group>
-				</arg>
-			</group>
+			<arg choice="plain">
+				<option>-h</option>
+			</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 	<refsect1 id="description">
 		<title>DESCRIPTION</title>
 		<para>This manual page documents briefly the
-      <command>&dhpackage;</command> and <command>bar</command>
-      commands.</para>
-		<para>This manual page was written for the Debian distribution
-      because the original program does not have a manual page.
-      Instead, it has documentation in the GNU <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry> format; see below.</para>
-		<para><command>&dhpackage;</command> is a program that...</para>
+		<command>&dhpackage;</command> command.</para>
+		<para><command>&dhpackage;</command> is a tool to manage
+		user credentials in the Wolframe system.</para>
 	</refsect1>
 	<refsect1 id="options">
 		<title>OPTIONS</title>
@@ -164,28 +194,6 @@
 		control the term elements. -->
 			<varlistentry>
 				<term>
-					<option>-e <replaceable>this</replaceable></option>
-				</term>
-				<term>
-					<option>--example=<replaceable>that</replaceable></option>
-				</term>
-				<listitem>
-					<para>Does this and that.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
-					<option>-v</option>
-				</term>
-				<term>
-					<option>--version</option>
-				</term>
-				<listitem>
-					<para>Show version of program.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
 					<option>-h</option>
 				</term>
 				<term>
@@ -197,68 +205,84 @@
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<option>-p</option>
+					<option>-c</option>
 				</term>
 				<term>
-					<option>--print-config</option>
+					<option>--create</option>
 				</term>
 				<listitem>
-					<para>Print the configuration.</para>
+					<para>Create the file if it doesn't exist.</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<option>-t</option>
+					<option>-s</option>
 				</term>
 				<term>
-					<option>--check-config</option>
+					<option>--salt <replaceable>salt</replaceable></option>
 				</term>
 				<listitem>
-					<para>Check the configuration.</para>
+					<para>Use the specified salt (only valid with --display-only).</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<option>-u <replaceable>user</replaceable></option>
+					<option>-d</option>
 				</term>
 				<term>
-					<option>--user <replaceable>user</replaceable></option>
+					<option>--days <replaceable>days</replaceable></option>
 				</term>
 				<listitem>
-					<para>run as user <replaceable>user</replaceable>.</para>
+					<para>
+						Set the password expiration after <replaceable>days</replaceable> days.
+						The default (=0) means don't expire.
+					</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<option>-g <replaceable>group</replaceable></option>
+					<option>-n</option>
 				</term>
 				<term>
-					<option>--group <replaceable>group</replaceable></option>
+					<option>--display-only</option>
 				</term>
 				<listitem>
-					<para>run as group <replaceable>group</replaceable>.</para>
+					<para>
+						Don't update the password file; display results on stdout.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-b</option>
+				</term>
+				<term>
+					<option>--batch</option>
+				</term>
+				<listitem>
+					<para>
+						Use the password from the command line instead of 
+						prompting for it.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-D</option>
+				</term>
+				<term>
+					<option>--delete</option>
+				</term>
+				<listitem>
+					<para>
+						Delete the specified user.
+					</para>
 				</listitem>
 			</varlistentry>
 		</variablelist>
 	</refsect1>
-	<!--
-  -v [ - -version ]         print version
-  -h [ - -help ]            print help message
-  -p [ - -print-config ]    print configuration
-  -t [ - -check-config ]    check the configuration
-
-  -T [ - -test-config ]     test the configuration
-  -f [ - -foreground ]      run in foreground (logs only on stderr)
-  -c [ - -config-file ] arg configuration file
-  - -config-xml             force configuration file parsing to xml
-  - -config-info            force configuration file parsing to info
-  -d [ - -debug ] arg       set debug level (active only with - -foreground)
-  - -use-config-logging     log according to the configuration file (active only
-                           with - -foreground)
-  -u [ - -user ] arg        run as <user>
-  -g [ - -group ] arg       run as <group>
-  - -pidfile arg            use daemon pidfile <pidfile>
--->
+	
+<!-- none, I think:
 	<refsect1 id="files">
 		<title>FILES</title>
 		<variablelist>
@@ -298,6 +322,7 @@
 			</varlistentry>
 		</variablelist>
 	</refsect1>
+-->
 	<refsect1 id="diagnostics">
 		<title>DIAGNOSTICS</title>
 		<para>The following diagnostics may be issued
@@ -305,12 +330,11 @@
 		<variablelist>
 			<varlistentry>
 				<term>
-					<errortext>Bad configuration file. Exiting.</errortext>
+					<errortext> password file '<replaceable>passwordfile</replaceable>' does not exist.</errortext>
 				</term>
 				<listitem>
-					<para>The configuration file seems to contain a broken configuration
-	    line. Use the <option>--verbose</option> option, to get more info.
-	  </para>
+					<para>The password file doesn't exist. Use -c/--create to create it first.
+					</para>
 				</listitem>
 			</varlistentry>
 		</variablelist>
@@ -329,23 +353,26 @@
 				<seg>
 					<errorcode>1</errorcode>
 				</seg>
-				<seg>The configuration file seems to be broken.</seg>
+				<seg>An error occurred.</seg>
 			</seglistitem>
 		</segmentedlist>
 	</refsect1>
 	<refsect1 id="bugs">
 		<!-- Or use this section to tell about upstream BTS. -->
 		<title>BUGS</title>
-		<para>The program is currently limited to only work
-      with the <package>foobar</package> library.</para>
-		<para>The upstreams <acronym>BTS</acronym> can be found
-      at <ulink url="http://bugzilla.foo.tld"/>.</para>
+			<para>
+				Find issues and bugs on <acronym>Github</acronym> at
+				<ulink url="https://github.com/Wolframe/Wolframe/issues"/>.
+			</para>
 	</refsect1>
 	<refsect1 id="see_also">
 		<title>SEE ALSO</title>
 		<!-- In alpabetical order. -->
-		<para><citerefentry><refentrytitle>bar</refentrytitle><manvolnum>1</manvolnum></citerefentry>, <citerefentry><refentrytitle>baz</refentrytitle><manvolnum>1</manvolnum></citerefentry>, <citerefentry><refentrytitle>foo.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry></para>
-		<para>The programs are documented fully by <citetitle>The Rise and
-      Fall of a Fooish Bar</citetitle> available via the <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry> system.</para>
+		<para>
+			<citerefentry>
+				<refentrytitle>wolframed</refentrytitle>
+				<manvolnum>8</manvolnum>
+			</citerefentry>
+		</para>
 	</refsect1>
 </refentry>
