@@ -45,8 +45,8 @@ DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& co
 	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
 
 	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << cfg.m_identifier << "'";
+	LOG_DEBUG << "Database authenticator container created for '"
+		  << cfg.m_identifier << "'";
 	return m_auth;
 }
 

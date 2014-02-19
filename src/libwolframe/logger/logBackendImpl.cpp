@@ -41,6 +41,12 @@
 #include <boost/thread/locks.hpp>
 #include <algorithm>
 
+//#define TRACE_SINGLETON
+#undef TRACE_SINGLETON
+#ifdef TRACE_SINGLETON
+#include <ostream>
+#endif
+
 namespace _Wolframe {
 namespace log {
 
@@ -148,9 +154,20 @@ LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 }
 
 // Log backend PIMPL redirection
-LogBackend::LogBackend() : impl_( new LogBackendImpl )	{}
+LogBackend::LogBackend() : impl_( new LogBackendImpl )
+{
+#ifdef TRACE_SINGLETON
+			std::cerr << "\n\n*****\nLogger backend created\n*****\n\n";
+#endif
+}
 
-LogBackend::~LogBackend()	{ delete impl_; }
+LogBackend::~LogBackend()
+{
+	delete impl_;
+#ifdef TRACE_SINGLETON
+			std::cerr << "\n\n*****\nLogger backend deleted\n*****\n\n";
+#endif
+}
 
 void LogBackend::setConsoleLevel( const LogLevel::Level level )	{ impl_->setConsoleLevel( level ); }
 
