@@ -125,7 +125,6 @@ usr/pkg/include/wolframe/version.hpp
 usr/pkg/include/wolframe/langbind/appObjects.hpp
 usr/pkg/include/wolframe/langbind/authorization.hpp
 usr/pkg/include/wolframe/langbind/cppFormFunction.hpp
-usr/pkg/include/wolframe/langbind/charsetEncodings.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/pkg/include/wolframe/langbind/formFunction.hpp
 usr/pkg/include/wolframe/langbind/runtimeEnvironment.hpp
@@ -242,6 +241,9 @@ usr/pkg/include/wolframe/types/customDataType.hpp
 usr/pkg/include/wolframe/types/datetime.hpp
 usr/pkg/include/wolframe/types/syncCounter.hpp
 usr/pkg/include/wolframe/types/syncObjectList.hpp
+usr/pkg/include/wolframe/types/bignumber.hpp
+usr/pkg/include/wolframe/types/customDataNormalizer.hpp
+usr/pkg/include/wolframe/types/string.hpp
 @dirrm usr/pkg/include/wolframe/types
 usr/pkg/include/wolframe/AAAA/AAAAinformation.hpp
 usr/pkg/include/wolframe/AAAA/AAAAprovider.hpp
