@@ -75,110 +75,331 @@
 	</refnamediv>
 	<refsynopsisdiv>
 		<cmdsynopsis>
-			<command>&dhpackage;</command>
-			<!-- These are several examples, how syntaxes could look -->
-			<arg choice="plain">
-				<option>-e <replaceable>this</replaceable></option>
-			</arg>
-			<arg choice="opt">
-				<option>--example=<parameter>that</parameter></option>
-			</arg>
-			<arg choice="opt">
-				<group choice="req">
-					<arg choice="plain">
-						<option>-e</option>
-					</arg>
-					<arg choice="plain">
-						<option>--example</option>
-					</arg>
-				</group>
-				<replaceable class="option">this</replaceable>
-			</arg>
-			<arg choice="opt">
-				<group choice="req">
-					<arg choice="plain">
-						<option>-e</option>
-					</arg>
-					<arg choice="plain">
-						<option>--example</option>
-					</arg>
-				</group>
-				<group choice="req">
-					<arg choice="plain">
-						<replaceable>this</replaceable>
-					</arg>
-					<arg choice="plain">
-						<replaceable>that</replaceable>
-					</arg>
-				</group>
-			</arg>
-		</cmdsynopsis>
-		<cmdsynopsis>
-			<command>&dhpackage;</command>
-			<!-- Normally the help and version options make the programs stop
-	   right after outputting the requested information. -->
-			<group choice="opt">
-				<arg choice="plain">
-					<group choice="req">
-						<arg choice="plain">
-							<option>-h</option>
-						</arg>
-						<arg choice="plain">
-							<option>--help</option>
-						</arg>
-					</group>
-				</arg>
-				<arg choice="plain">
-					<group choice="req">
-						<arg choice="plain">
-							<option>-v</option>
-						</arg>
-						<arg choice="plain">
-							<option>--version</option>
-						</arg>
-					</group>
-				</arg>
-			</group>
+			<command>/etc/wolframe/wolframe.conf</command>
 		</cmdsynopsis>
 	</refsynopsisdiv>
-	<!--
-;
-;Wolframe configuration file
 
+	<refsect1 id="description">
+		<title>DESCRIPTION</title>
+		<para>
+			This manual page documents briefly the configuration
+			option of the Wolframe system.
+		</para>
+		<refsect2 id="GlobalOptions">
+			<title>Global configuration options</title>
+			<variablelist>			
+
+				<varlistentry>
+					<term>
+						<option>ServerSignature</option>
+					</term>				
+					<listitem>
+						<para>
+							If set to 'On' the server prints the name of the server as
+							first element of the greeting in the protocol.
+							Possible values are 'On' or 'Off'.
+						</para>
+					</listitem>
+				</varlistentry>										
+
+				<varlistentry>
+					<term>
+						<option>ServerTokens</option>
+					</term>				
+					<listitem>
+						<para>
+							Specifies how the server signature looks like when
+							'ServerSignature' is set to 'On'. Note: In a production
+							environment you should be careful which information you
+							reveal over the protocol to a possible attacker!
+						</para>
+						<para>
+							Possible values are:
+							<variablelist>
+								<varlistentry>
+									<term>None</term>
+									<listitem>
+										<para>
+											Print nothing in the greeting line but the name of the
+											software 'Wolframe'.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
+									<term>ProductOnly</term>
+									<listitem>
+										<para>
+											Print the name of the product implemented in Wolframe
+											and Wolframe itself.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
+									<term>Major</term>
+									<listitem>
+										<para>
+											Print only the major version of Wolframe.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
+									<term>Minor</term>
+									<listitem>
+										<para>
+											Print major and minor version of Wolframe.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
+									<term>Revision</term>
+									<listitem>
+										<para>
+											Print major, minor and revision of Wolframe.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
+									<term>OS</term>
+									<listitem>
+										<para>
+											Print all information, including the operating system
+											Wolframe is running on.
+										</para>
+									</listitem>
+								</varlistentry>
+							</variablelist>
+						</para>
+					</listitem>
+				</varlistentry>
+
+			</variablelist>
+		</refsect2>
+	</refsect1>
+
+<!-- configuration options: from most to more to less to least important -->
+
+	<refsect1 id="options">
+		<title>OPTIONS</title>
+		<para>
+			The configuration of the wolframe daemon or service
+			is separated into sections. Some sections like
+			'LoadModules' always exist, others only exist
+			if a module has been loaded.
+		</para>
+		
+<!--
 LoadModules	{						; modules to be loaded by the server
-	module modules/PostgreSQL/mod_db_postgresql.so.0.0.0
-	module modules/SQLite/mod_db_sqlite3.so.0.0.0
+	module mod_db_postgresql
+-->
+		<refsect2 id="LoadModules">
+			<title>LoadModules</title>
+		<para>
+			The 'LoadModules' section contains directives to 
+			extend the system with loadable modules. Those
+			can be new database modules, new scripting languages,
+			document filters and processors,
+			authentication/authorization/audit modules
+			and other 3rdParty bindings, etc.
+		</para>
+		
+		<para>
+			The following directives are valid in this section:
+			<variablelist>
+				<varlistentry>
+					<term>
+						<option>directory <replaceable>module_directory</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Load modules from directory <replaceable>module_directory</replaceable>
+							instead of searching for modules in the standard system module directory
+							of Wolframe.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
 
-	module modules/audit/database/mod_audit_database.so.0.0.0
-	module modules/audit/textfile/mod_audit_textfile.so.0.0.0
-	module modules/authentication/database/mod_auth_database.so.0.0.0
-	module modules/authentication/textfile/mod_auth_textfile.so.0.0.0
+					<term>
+						<option>module <replaceable>module_name</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Load module <replaceable>module_name</replaceable>. Note: You
+							don't have to specify the module extension like '.so'.
+						</para>
+						<para>
+							The <replaceable>module_name</replaceable> can contain a
+							relative path. The module path is always caculated
+							relatively to the <replaceable>module_directory</replaceable>
+							or to the default installation path for Wolframe modules.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</para>
+		</refsect2>
 
-	module modules/processor/echo/mod_proc_echo.so.0.0.0
+<!--
+; Logging configuration
+logging	{
+	; log level for console (stderr) logging
+	stderr	{
+		level	INFO
+	}
 
+	; log level for file logging
+	logFile	{
+		filename	/tmp/wolframed.log
+		level		NOTICE
+	}
+
+	; syslog facility, identifier and log level
+	syslog	{
+		ident		wolframed
+		facility	LOCAL2
+		level		INFO
+	}
 }
+-->
+		<refsect2 id="logging">
+			<title>logging</title>
+		<para>
+			In the 'logging' section you can configure ways
+			of the Wolframe server to log.
+		</para>
+		
+		<para>
+			There are logging channels named '<emphasis role="bold">stderr</emphasis>' (for
+			foreground mode only!), '<emphasis role="bold">logFile</emphasis>' to log to a
+			simple text file and '<emphasis role="bold">syslog</emphasis>' to log to the
+			system log.
+		</para>
+		
+		<para>
+			The following directives are valid in this section:
+			<variablelist>
+				<varlistentry>
+					<term>
+						<option>level <replaceable>log_level</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Log only messages up to the level <replaceable>log_level</replaceable>.
+							Possible log levels are	'FATAL', 'ALERT', 'CRITICAL', 'SEVERE', 'ERROR',
+							'WARNING', 'NOTICE', 'INFO, 'DEBUG', 'TRACE',
+							'DATA' or 'DATA2'.
+						</para>
+						<para>
+							Note: This is the only directive which must be understood by all logging channels.
+						</para>
+					</listitem>				
+				</varlistentry>
+				
+				<varlistentry>
+					<term>
+						<option>filename (logFile) <replaceable>file_name</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Write log message to the file denoted by
+							<replaceable>file_name</replaceable>.
+						</para>
+					</listitem>
+				</varlistentry>
 
-ServerTokens		OS					; print the application name and
-								; version in the initial greeting
-								; allowed values are:
-								;   ProductOnly, Major, Minor,
-								;   Revision, OS, None
-ServerSignature		On					; print the name of the server as
-								; first element of the greeting
+				<varlistentry>
+					<term>
+						<option>ident (syslog) <replaceable>ident</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							The syslog identifier to tag the log entries with.
+						</para>
+					</listitem>
+				</varlistentry>
 
+				<varlistentry>
+					<term>
+						<option>facility (syslog) <replaceable>ident</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							The syslog facility to tag the log entries with. Usual
+							facilities are 'LOCAL0' to 'LOCAL7', 'USER', 'DAEMON' or similar.
+						</para>
+						<para>
+							Consult the <citerefentry><refentrytitle>openlog</refentrytitle><manvolnum>3</manvolnum></citerefentry>
+							man page to see what facilities are available on your system.
+						</para>
+					</listitem>
+				</varlistentry>
+				
+				
+			</variablelist>
+		</para>
+		
+		</refsect2>
+
+<!--
 ; Unix daemon parameters. This section is not valid for windows
 daemon {
 ;	user		nobody
 ;	group		nobody
 	pidFile		/tmp/wolframed.pid
 }
+-->		
+		<refsect2 id="daemon">
+			<title>daemon</title>
+		<para>
+			The 'daemon' section sets the behaviour of the
+			Wolframe server as a Unix daemon.
+		</para>
+		<para>
+			The following directives are valid in this section:
+			<variablelist>
+				<varlistentry>
+					<term>
+						<option>user <replaceable>user</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Run the Wolframe daemon under permissions of
+							the Unix user <replaceable>user</replaceable>.
+						</para>
+					</listitem>
+				</varlistentry>
+				
+				<varlistentry>
+					<term>
+						<option>group <replaceable>group</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Run the Wolframe daemon under permissions of
+							the Unix group <replaceable>group</replaceable>.
+						</para>
+					</listitem>
+				</varlistentry>
 
-; Windows service parameters (for service registration). This section is not valid on non-Windows OSes
-service {
-	serviceName	wolframe
-	displayName	"Wolframe Daemon"
-	description	"a daemon for howling"
-}
+				<varlistentry>
+					<term>
+						<option>pidFile <replaceable>pid_file</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Where to store the PID daemon lock file. Note that
+							<replaceable>pid_file</replaceable> must be in a location
+							with enough rights for the <replaceable>user</replaceable>
+							to create the PID file!
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</para>
+		</refsect2>
+	</refsect1>
+
+<!--
 
 
 ; Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
@@ -255,34 +476,6 @@ database	{
 }
 
 
-; Logging configuration
-logging	{
-	; log level for console (stderr) logging
-	stderr	{
-		level	INFO
-	}
-
-	; log level for file logging
-	logFile	{
-		filename	/tmp/wolframed.log
-		level		NOTICE
-	}
-
-	; syslog facility, identifier and log level
-	syslog	{
-		ident		wolframed
-		facility	LOCAL2
-		level		INFO
-	}
-
-	; eventlog source and log level. Valid only on Windows
-	eventlog	{
-		name		Wolframe
-		source		wolframed
-		level		INFO
-	}
-}
-
 ; Authentication, authorization, accounting and auditing configuration
 aaaa	{
 	authentication	{
@@ -311,148 +504,24 @@ Processor	{
 }
 
 -->
-	<refsect1 id="description">
-		<title>DESCRIPTION</title>
-		<para>This manual page documents briefly the
-      <command>&dhpackage;</command> and <command>bar</command>
-      commands.</para>
-		<para>This manual page was written for the Debian distribution
-      because the original program does not have a manual page.
-      Instead, it has documentation in the GNU <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry> format; see below.</para>
-		<para><command>&dhpackage;</command> is a program that...</para>
-	</refsect1>
-	<refsect1 id="options">
-		<title>OPTIONS</title>
-		<para>The program follows the usual GNU command line syntax,
-      with long options starting with two dashes (`-').  A summary of
-      options is included below.  For a complete description, see the
-      <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry> files.</para>
-		<variablelist>
-			<!-- Use the variablelist.term.separator and the
-	   variablelist.term.break.after parameters to
-	   control the term elements. -->
-			<varlistentry>
-				<term>
-					<option>-e <replaceable>this</replaceable></option>
-				</term>
-				<term>
-					<option>--example=<replaceable>that</replaceable></option>
-				</term>
-				<listitem>
-					<para>Does this and that.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
-					<option>-h</option>
-				</term>
-				<term>
-					<option>--help</option>
-				</term>
-				<listitem>
-					<para>Show summary of options.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
-					<option>-v</option>
-				</term>
-				<term>
-					<option>--version</option>
-				</term>
-				<listitem>
-					<para>Show version of program.</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</refsect1>
-	<refsect1 id="files">
-		<title>FILES</title>
-		<variablelist>
-			<varlistentry>
-				<term>
-					<filename>/etc/foo.conf</filename>
-				</term>
-				<listitem>
-					<para>The system-wide configuration file to control the
-	    behaviour of <application>&dhpackage;</application>. See
-	    <citerefentry><refentrytitle>foo.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry> for further details.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
-					<filename>${HOME}/.foo.conf</filename>
-				</term>
-				<listitem>
-					<para>The per-user configuration file to control the
-	     behaviour of <application>&dhpackage;</application>. See
-	     <citerefentry><refentrytitle>foo.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry> for further details.</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</refsect1>
-	<refsect1 id="environment">
-		<title>ENVIONMENT</title>
-		<variablelist>
-			<varlistentry>
-				<term>
-					<envar>FOO_CONF</envar>
-				</term>
-				<listitem>
-					<para>If used, the defined file is used as configuration
-	    file (see also <xref linkend="files"/>).</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</refsect1>
-	<refsect1 id="diagnostics">
-		<title>DIAGNOSTICS</title>
-		<para>The following diagnostics may be issued
-      on <filename class="devicefile">stderr</filename>:</para>
-		<variablelist>
-			<varlistentry>
-				<term>
-					<errortext>Bad configuration file. Exiting.</errortext>
-				</term>
-				<listitem>
-					<para>The configuration file seems to contain a broken configuration
-	    line. Use the <option>--verbose</option> option, to get more info.
-	  </para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-		<para><command>&dhpackage;</command> provides some return codes, that can
-      be used in scripts:</para>
-		<segmentedlist>
-			<segtitle>Code</segtitle>
-			<segtitle>Diagnostic</segtitle>
-			<seglistitem>
-				<seg>
-					<errorcode>0</errorcode>
-				</seg>
-				<seg>Program exited successfully.</seg>
-			</seglistitem>
-			<seglistitem>
-				<seg>
-					<errorcode>1</errorcode>
-				</seg>
-				<seg>The configuration file seems to be broken.</seg>
-			</seglistitem>
-		</segmentedlist>
-	</refsect1>
+
+
 	<refsect1 id="bugs">
 		<!-- Or use this section to tell about upstream BTS. -->
 		<title>BUGS</title>
-		<para>The program is currently limited to only work
-      with the <package>foobar</package> library.</para>
-		<para>The upstreams <acronym>BTS</acronym> can be found
-      at <ulink url="http://bugzilla.foo.tld"/>.</para>
+			<para>
+				Find issues and bugs on <acronym>Github</acronym> at
+				<ulink url="https://github.com/Wolframe/Wolframe/issues"/>.
+			</para>
 	</refsect1>
 	<refsect1 id="see_also">
 		<title>SEE ALSO</title>
 		<!-- In alpabetical order. -->
-		<para><citerefentry><refentrytitle>bar</refentrytitle><manvolnum>1</manvolnum></citerefentry>, <citerefentry><refentrytitle>baz</refentrytitle><manvolnum>1</manvolnum></citerefentry>, <citerefentry><refentrytitle>foo.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry></para>
-		<para>The programs are documented fully by <citetitle>The Rise and
-      Fall of a Fooish Bar</citetitle> available via the <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry> system.</para>
+		<para>
+			<citerefentry>
+				<refentrytitle>wolframed</refentrytitle>
+				<manvolnum>8</manvolnum>
+			</citerefentry>
+		</para>
 	</refsect1>
 </refentry>
