@@ -61,7 +61,7 @@ types::Variant DateDataType::toTimestamp( const CustomDataValue& operand)
 {
 	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
 	types::DateTime dt( op->year(), op->month()-1, op->day()-1, 0, 0, 0);
-	types::Variant::Data::Int value = dt.value();
+	types::Variant::Data::Int value = dt.timestamp();
 	return types::Variant( value);
 }
 

@@ -54,8 +54,90 @@ protected:
 	virtual void TearDown() {}
 };
 
+static types::DateTime getRandomDateTime()
+{
+	unsigned short YY = (unsigned short)(1000 + rand()%1399);
+	unsigned short MM = (unsigned short)(1+rand()%12);
+	unsigned short DD = (unsigned short)(1+rand()%31);
+	unsigned short hh = (unsigned short)(rand()%24);
+	unsigned short mm = (unsigned short)(rand()%60);
+	unsigned short ss = (unsigned short)(rand()%64);
+	unsigned short ll = (unsigned short)(rand()%1000);
+	unsigned short cc = (unsigned short)(rand()%1000);
+
+	switch (rand()%4)
+	{
+		case 0: return types::DateTime( YY,MM,DD,hh,mm,ss,ll,cc);
+		case 1: return types::DateTime( YY,MM,DD,hh,mm,ss,ll);
+		case 2: return types::DateTime( YY,MM,DD,hh,mm,ss);
+		case 3: return types::DateTime( YY,MM,DD);
+	}
+	throw std::logic_error("illegal state");
+}
+
+static types::DateTime getRandomDateTimeIncrement( const types::DateTime& dt)
+{
+	unsigned short YY = dt.year();
+	unsigned short MM = dt.month();
+	unsigned short DD = dt.day();
+	unsigned short hh = dt.hour();
+	unsigned short mm = dt.minute();
+	unsigned short ss = dt.second();
+	unsigned short ll = dt.millisecond();
+	unsigned short cc = dt.microsecond();
+
+	for (;;)
+	{
+		unsigned int st = rand() % 8;
+		switch (dt.subtype())
+		{
+			case types::DateTime::YYYYMMDD: if (st > 2) continue; break;
+			case types::DateTime::YYYYMMDDhhmmss: if (st > 5) continue; break;
+			case types::DateTime::YYYYMMDDhhmmss_lll: if (st > 6) continue; break;
+			case types::DateTime::YYYYMMDDhhmmss_lllccc: if (st > 7) continue; break;
+		}
+		switch (st)
+		{
+			case 0: if (YY >= 2400) continue; YY+=1; break;
+			case 1: if (MM >= 12) continue; MM+=1; break;
+			case 2: if (DD >= 31) continue; DD+=1; break;
+			case 3: if (hh >= 23) continue; hh+=1; break;
+			case 4: if (mm >= 59) continue; mm+=1; break;
+			case 5: if (ss >= 62) continue; ss+=1; break;
+			case 6: if (ll >= 999) continue; ll+=1; break;
+			case 7: if (cc >= 999) continue; cc+=1; break;
+		}
+		switch (dt.subtype())
+		{
+			case types::DateTime::YYYYMMDD: return types::DateTime( YY,MM,DD);
+			case types::DateTime::YYYYMMDDhhmmss: return types::DateTime( YY,MM,DD,hh,mm,ss);
+			case types::DateTime::YYYYMMDDhhmmss_lll: return types::DateTime( YY,MM,DD,hh,mm,ss,ll);
+			case types::DateTime::YYYYMMDDhhmmss_lllccc: return types::DateTime( YY,MM,DD,hh,mm,ss,ll,cc);
+		}
+		throw std::logic_error("illegal state");
+	}
+}
+
 TEST_F( DateTimeDescriptionTest, tests)
 {
+	for (unsigned int ii=0; ii<10000; ++ii)
+	{
+		types::DateTime dt1 = getRandomDateTime();
+		types::DateTime dt1inc = getRandomDateTimeIncrement( dt1);
+		types::DateTime dt2( dt1.tostring());
+		EXPECT_EQ( dt1.tostring(), dt2.tostring());
+
+		EXPECT_TRUE( dt1 == dt2);
+		EXPECT_TRUE( dt1 < dt1inc);
+		EXPECT_TRUE( dt1 <= dt1inc);
+		EXPECT_TRUE( dt1 != dt1inc);
+		EXPECT_TRUE( dt1inc > dt1);
+		EXPECT_TRUE( dt1inc >= dt1);
+		EXPECT_TRUE( dt1inc != dt1);
+
+		types::DateTime dt1tm( dt1.timestamp());
+		EXPECT_TRUE( dt1 == dt1tm);
+	}
 }
 
 int main( int argc, char **argv)

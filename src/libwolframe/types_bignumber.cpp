@@ -35,20 +35,13 @@ Project Wolframe.
 #include "utils/conversions.hpp"
 #include <limits>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
-
-static BigNumber* allocBigNumber( std::size_t size)
-{
-	if (size > std::numeric_limits<unsigned short>::max()) throw std::bad_alloc();
-	BigNumber* rt = (BigNumber*)std::calloc( 1, sizeof( BigNumber) + size-1);
-	if (!rt) throw std::bad_alloc();
-	return rt;
-}
 
 _WOLFRAME_UINTEGER BigNumber::touint() const
 {
@@ -170,32 +163,65 @@ std::string BigNumber::tostring() const
 	return rt;
 }
 
-BigNumber* BigNumber::create( double val)
+BigNumber::~BigNumber()
 {
-	return create( boost::lexical_cast<std::string>( val));
+	if (m_ar && !m_const) std::free( m_ar);
 }
 
-BigNumber* BigNumber::create( _WOLFRAME_INTEGER val)
+BigNumber::BigNumber()
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
+{}
+
+BigNumber::BigNumber( double val)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
 {
-	return create( utils::tostring_cast( val));
+	constructor( boost::lexical_cast<std::string>( val));
 }
 
-BigNumber* BigNumber::create( _WOLFRAME_UINTEGER val)
+BigNumber::BigNumber( _WOLFRAME_INTEGER val)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
 {
-	return create( utils::tostring_cast( val));
+	constructor( utils::tostring_cast( val));
 }
 
-BigNumber* BigNumber::create( const std::string& val)
+BigNumber::BigNumber( _WOLFRAME_UINTEGER val)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
 {
-	struct LocalGarbageCollect
-	{
-		BigNumber* val;
-		LocalGarbageCollect( BigNumber* val_) :val(val_){}
-		~LocalGarbageCollect() {if (val) BigNumber::destroy(val);}
-		void done() {val=0;}
-	};
-	BigNumber* rt = allocBigNumber( val.size());
-	LocalGarbageCollect localGarbageCollect(rt);
+	constructor( utils::tostring_cast( val));
+}
+
+BigNumber::BigNumber( const std::string& val)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
+{
+	constructor( val);
+}
+
+BigNumber::BigNumber( bool sign_,unsigned short precision_, signed short scale_, const unsigned char* digits_)
+	:m_scale(scale_),m_sign(sign_),m_const(false),m_size(precision_),m_ar(0)
+{
+	m_ar = (unsigned char*)std::malloc( m_size);
+	if (!m_ar) throw std::bad_alloc();
+	std::memcpy( m_ar, digits_, m_size);
+}
+
+BigNumber::BigNumber( const BigNumber& o)
+	:m_scale(o.m_scale),m_sign(o.m_sign),m_const(false),m_size(o.m_size),m_ar(o.m_ar)
+{
+	m_ar = (unsigned char*)std::malloc( m_size);
+	if (!m_ar) throw std::bad_alloc();
+	std::memcpy( m_ar, o.m_ar, m_size);
+}
+
+BigNumber::BigNumber( const ConstQualifier&, bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_)
+	:m_scale(scale_),m_sign(sign_),m_const(true),m_size(precision_),m_ar(const_cast<unsigned char*>(digits_))
+{}
+
+void BigNumber::constructor( const std::string& val)
+{
+	if (val.size() > std::numeric_limits<unsigned short>::max()) throw std::bad_alloc();
+	m_ar = (unsigned char*)std::calloc( val.size(), 1);
+	if (!m_ar) throw std::bad_alloc();
+
 	std::string::const_iterator vi = val.begin(), ve = val.end();
 	enum State {NUMS,NUM1,NUM2,EXPE,EXPS,EXP1}; //< parsing states
 	State state = NUMS;
@@ -212,7 +238,7 @@ BigNumber* BigNumber::create( const std::string& val)
 				state = NUM1;
 				if (*vi == '-')
 				{
-					rt->m_sign = true;
+					m_sign = true;
 					continue;
 				}
 				//...no break here !
@@ -224,7 +250,7 @@ BigNumber* BigNumber::create( const std::string& val)
 				}
 				if (*vi >= '0' && *vi <= '9')
 				{
-					rt->m_ar[ rt->m_size++] = *vi - '0';
+					m_ar[ m_size++] = *vi - '0';
 					continue;
 				}
 				state = EXPE;
@@ -232,8 +258,8 @@ BigNumber* BigNumber::create( const std::string& val)
 			case NUM2:
 				if (*vi >= '0' && *vi <= '9')
 				{
-					rt->m_ar[ rt->m_size++] = *vi - '0';
-					rt->m_scale++;
+					m_ar[ m_size++] = *vi - '0';
+					m_scale++;
 					continue;
 				}
 				state = EXPE;
@@ -267,23 +293,17 @@ BigNumber* BigNumber::create( const std::string& val)
 	}
 	if (expsign)
 	{
-		short prev_scale = rt->m_scale;
-		rt->m_scale += scaleinc;
-		if (prev_scale > rt->m_scale) throw std::runtime_error("conversion error: big number value in string is out of range");
+		short prev_scale = m_scale;
+		m_scale += scaleinc;
+		if (prev_scale > m_scale) throw std::runtime_error("conversion error: big number value in string is out of range");
 	}
 	else
 	{
-		short prev_scale = rt->m_scale;
-		rt->m_scale -= scaleinc;
-		if (prev_scale < rt->m_scale) throw std::runtime_error("conversion error: big number value in string is out of range");
+		short prev_scale = m_scale;
+		m_scale -= scaleinc;
+		if (prev_scale < m_scale) throw std::runtime_error("conversion error: big number value in string is out of range");
 	}
-	localGarbageCollect.done();
-	return rt;
 }
 
-void BigNumber::destroy( BigNumber* num)
-{
-	std::free( num);
-}
 
 

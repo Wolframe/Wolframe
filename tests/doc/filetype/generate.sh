@@ -11,7 +11,7 @@ for ff in test-with-header test-without-header
 do
 	for ext in unknown xml
 	do
-		for cset in UCS-2BE UCS-2BE UCS-4BE UCS-4BE
+		for cset in UCS-2BE UCS-2LE UCS-4BE UCS-4LE
 		do
 			echo "create $ff.$cset.$ext"
 			cat $ff.UTF-8.$ext | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN > $ff.$cset.$ext

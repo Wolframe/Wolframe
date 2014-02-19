@@ -54,8 +54,37 @@ protected:
 	virtual void TearDown() {}
 };
 
+static unsigned short shortRand()
+{
+	int fib[16] = {1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597};
+	int dd = rand() % fib[15];
+	int ii=0;
+	for (; fib[ii] < dd; ++ii);
+	unsigned short limit = (1 << (15-ii));
+	return (rand()%limit);
+}
+
+static types::BigNumber getRandomBigNumber()
+{
+	bool sign = (rand()%2 == 1);
+	unsigned short precision = (unsigned short)shortRand();
+	signed short scale = (signed short)shortRand();
+	std::string digits;
+
+	for (unsigned short ii=0; ii<precision; ++ii)
+	{
+		digits.push_back( '0'+(char)(rand()%10));
+	}
+	return types::BigNumber( sign, precision, scale, (const unsigned char*)digits.c_str());
+}
+
+
 TEST_F( BigNumberDescriptionTest, tests)
 {
+	for (unsigned int ii=0; ii<1; ++ii)
+	{
+		types::BigNumber num = getRandomBigNumber();
+	}
 }
 
 int main( int argc, char **argv)
