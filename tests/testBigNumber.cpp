@@ -54,36 +54,37 @@ protected:
 	virtual void TearDown() {}
 };
 
+static unsigned short shortRand()
+{
+	int fib[16] = {1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597};
+	int dd = rand() % fib[15];
+	int ii=0;
+	for (; fib[ii] < dd; ++ii);
+	unsigned short limit = (1 << (15-ii));
+	return (rand()%limit);
+}
+
 static types::BigNumber getRandomBigNumber()
 {
 	bool sign = (rand()%2 == 1);
-	unsigned short precision = (unsigned short)(rand()%(1<<15));
-	signed short scale = (signed short)(unsigned short)(rand()%(1<<15));
-	std::string 
-	BigNumber( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_);
-	
-	unsigned short YY = (unsigned short)(1000 + rand()%1399);
-	unsigned short MM = (unsigned short)(1+rand()%12);
-	unsigned short DD = (unsigned short)(1+rand()%31);
-	unsigned short hh = (unsigned short)(rand()%24);
-	unsigned short mm = (unsigned short)(rand()%60);
-	unsigned short ss = (unsigned short)(rand()%64);
-	unsigned short ll = (unsigned short)(rand()%1000);
-	unsigned short cc = (unsigned short)(rand()%1000);
+	unsigned short precision = (unsigned short)shortRand();
+	signed short scale = (signed short)shortRand();
+	std::string digits;
 
-	switch (rand()%4)
+	for (unsigned short ii=0; ii<precision; ++ii)
 	{
-		case 0: return types::DateTime( YY,MM,DD,hh,mm,ss,ll,cc);
-		case 1: return types::DateTime( YY,MM,DD,hh,mm,ss,ll);
-		case 2: return types::DateTime( YY,MM,DD,hh,mm,ss);
-		case 3: return types::DateTime( YY,MM,DD);
+		digits.push_back( '0'+(char)(rand()%10));
 	}
-	throw std::logic_error("illegal state");
+	return types::BigNumber( sign, precision, scale, (const unsigned char*)digits.c_str());
 }
 
 
 TEST_F( BigNumberDescriptionTest, tests)
 {
+	for (unsigned int ii=0; ii<1; ++ii)
+	{
+		types::BigNumber num = getRandomBigNumber();
+	}
 }
 
 int main( int argc, char **argv)

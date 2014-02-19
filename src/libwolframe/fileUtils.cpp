@@ -362,11 +362,11 @@ FileType utils::getFileType( const std::string& filename)
 	static const unsigned char pt_BOM_UCS2LE[] = {2, 0xFF,0xFE};
 	static const unsigned char pt_BOM_UCS4BE[] = {4, 0x00,0x00,0xFE,0xFF};
 	static const unsigned char pt_BOM_UCS4LE[] = {4, 0xFF,0xFE,0x00,0x00};
+	static const unsigned char pt_UCS4LE_XML[] = {4, '<',0x00,0x00,0x00};
+	static const unsigned char pt_UCS2LE_XML[] = {2, '<',0x00};
 	static const unsigned char pt_UCS1_XML[]   = {1, '<'};
 	static const unsigned char pt_UCS2BE_XML[] = {2, 0x00,'<'};
-	static const unsigned char pt_UCS2LE_XML[] = {2, '<',0x00};
 	static const unsigned char pt_UCS4BE_XML[] = {4, 0x00,0x00,0x00,'<'};
-	static const unsigned char pt_UCS4LE_XML[] = {4, '<',0x00,0x00,0x00};
 	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
 	static const CharTable SpaceCharTab( " \t\r");
 
@@ -382,7 +382,17 @@ FileType utils::getFileType( const std::string& filename)
 
 	if (rt.encoding == FileType::Undefined)
 	{
-		if (FileTypeDetection::skipPattern( pt_UCS1_XML, si, se))
+		if (FileTypeDetection::skipPattern( pt_UCS4LE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS4LE;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS2LE_XML, si, se))
+		{
+			rt.encoding = FileType::UCS2LE;
+			rt.format = FileType::XML;
+		}
+		else if (FileTypeDetection::skipPattern( pt_UCS1_XML, si, se))
 		{
 			rt.encoding = FileType::UCS1;
 			rt.format = FileType::XML;
@@ -392,19 +402,9 @@ FileType utils::getFileType( const std::string& filename)
 			rt.encoding = FileType::UCS2BE;
 			rt.format = FileType::XML;
 		}
-		else if (FileTypeDetection::skipPattern( pt_UCS2LE_XML, si, se))
-		{
-			rt.encoding = FileType::UCS2LE;
-			rt.format = FileType::XML;
-		}
 		else if (FileTypeDetection::skipPattern( pt_UCS4BE_XML, si, se))
 		{
 			rt.encoding = FileType::UCS4BE;
-			rt.format = FileType::XML;
-		}
-		else if (FileTypeDetection::skipPattern( pt_UCS4LE_XML, si, se))
-		{
-			rt.encoding = FileType::UCS4LE;
 			rt.format = FileType::XML;
 		}
 	}
@@ -422,8 +422,9 @@ FileType utils::getFileType( const std::string& filename)
 	{
 		if (si != se && *si == 0)
 		{
-			ch = *si++;
+			++si;
 			std::size_t zc = FileTypeDetection::countZeros( si, se);
+			ch = *si;
 			switch (zc)
 			{
 				case 0: rt.encoding = FileType::UCS2BE; break;
@@ -448,6 +449,10 @@ FileType utils::getFileType( const std::string& filename)
 	{
 		if (rt.encoding == FileType::UCS1)
 		{
+			if (ch > 0 && ch <= 32)
+			{
+				ch = utils::gotoNextToken( si, se);
+			}
 			//... if encoding is UTF-8 check for info file format:
 			while (ch == ';')
 			{

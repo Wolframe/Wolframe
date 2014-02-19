@@ -114,7 +114,6 @@ usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/langbind/appObjects.hpp
 usr/local/include/wolframe/langbind/authorization.hpp
 usr/local/include/wolframe/langbind/cppFormFunction.hpp
-usr/local/include/wolframe/langbind/charsetEncodings.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
 usr/local/include/wolframe/langbind/runtimeEnvironment.hpp
@@ -231,6 +230,9 @@ usr/local/include/wolframe/types/customDataType.hpp
 usr/local/include/wolframe/types/datetime.hpp
 usr/local/include/wolframe/types/syncCounter.hpp
 usr/local/include/wolframe/types/syncObjectList.hpp
+usr/local/include/wolframe/types/bignumber.hpp
+usr/local/include/wolframe/types/customDataNormalizer.hpp
+usr/local/include/wolframe/types/string.hpp
 @dirrm usr/local/include/wolframe/types
 usr/local/include/wolframe/AAAA/AAAAinformation.hpp
 usr/local/include/wolframe/AAAA/AAAAprovider.hpp
