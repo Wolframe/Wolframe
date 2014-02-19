@@ -54,6 +54,28 @@ protected:
 	virtual void TearDown() {}
 };
 
+static types::BigNumber getRandomBigNumber()
+{
+	unsigned short YY = (unsigned short)(1000 + rand()%1399);
+	unsigned short MM = (unsigned short)(1+rand()%12);
+	unsigned short DD = (unsigned short)(1+rand()%31);
+	unsigned short hh = (unsigned short)(rand()%24);
+	unsigned short mm = (unsigned short)(rand()%60);
+	unsigned short ss = (unsigned short)(rand()%64);
+	unsigned short ll = (unsigned short)(rand()%1000);
+	unsigned short cc = (unsigned short)(rand()%1000);
+
+	switch (rand()%4)
+	{
+		case 0: return types::DateTime( YY,MM,DD,hh,mm,ss,ll,cc);
+		case 1: return types::DateTime( YY,MM,DD,hh,mm,ss,ll);
+		case 2: return types::DateTime( YY,MM,DD,hh,mm,ss);
+		case 3: return types::DateTime( YY,MM,DD);
+	}
+	throw std::logic_error("illegal state");
+}
+
+
 TEST_F( BigNumberDescriptionTest, tests)
 {
 }

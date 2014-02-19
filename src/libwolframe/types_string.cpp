@@ -402,14 +402,11 @@ String::String()
 {}
 
 String::String( const String& o)
-	:m_encoding(o.m_encoding),m_codepage(o.m_codepage),m_isconst(o.m_isconst),m_size(o.m_size),m_ar(o.m_ar)
+	:m_encoding(o.m_encoding),m_codepage(o.m_codepage),m_isconst(false),m_size(o.m_size),m_ar(o.m_ar)
 {
-	if (!m_isconst)
-	{
-		m_ar = (unsigned char*)std::calloc( m_size+1, elementSize( encoding()));
-		if (!m_ar) throw std::bad_alloc();
-		std::memcpy( m_ar, o.m_ar, o.m_size * elementSize( encoding()));
-	}
+	m_ar = (unsigned char*)std::calloc( m_size+1, elementSize( encoding()));
+	if (!m_ar) throw std::bad_alloc();
+	std::memcpy( m_ar, o.m_ar, o.m_size * elementSize( encoding()));
 }
 
 String String::translateEncoding( Encoding encoding_, unsigned char codepage_) const
