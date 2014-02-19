@@ -1,0 +1,15 @@
+
+;Bla header
+;Bla
+;
+
+; Definitely this is a valid info file
+
+line	bad
+
+doc {
+	user {
+		prename Hans
+		surname Muster
+	}
+}
