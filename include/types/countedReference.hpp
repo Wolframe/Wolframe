@@ -31,9 +31,8 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
 #define _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-///\file types/countedReference.hpp
-///\brief Multiple references to an object that is freed with its last reference.
-///\remark The reference template introduced here should be replaced by an appropriate boost smart pointer. The existence of this module is due easier injection of tracing and debugging aspects
+//\file types/countedReference.hpp
+//\brief Shared reference to an object exchangeable in a single thread context
 
 #include <cstddef>
 #include <boost/shared_ptr.hpp>
@@ -41,62 +40,80 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\class CountedReference
-///\brief Multiple shared reference to an object with ownership.
-///\tparam OBJ
+//\class CountedReference
+//\brief Shared reference to an object exchangeable in a single thread context
+//\tparam OBJ
 template <class OBJ>
 class CountedReference
 {
 public:
+	//\class Pointer
+	//\brief Pointer for reference with another indirection to make the exchange of the object possible
 	struct Pointer
 	{
-		OBJ* m_ptr;
+		OBJ* m_ptr;	//< object pointer
 
+		//\brief Constructor
 		explicit Pointer( OBJ* ptr_=0)
 			:m_ptr(ptr_){}
+		//\brief Destructor
 		~Pointer()
 		{
 			if (m_ptr) delete m_ptr;
 		}
 	};
 
+	//\brief Copy constructor
+	//\param[in] o shared reference to copy
 	CountedReference( const CountedReference& o)
 		:m_ref(o.m_ref){}
 
+	//\brief Constructor
+	//\param[in] ptr object pointer
 	explicit CountedReference( OBJ* ptr=0)
 		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
 
+	//\brief Destructor
 	virtual ~CountedReference(){}
 
+	//\brief Assignment
 	CountedReference& operator =( const CountedReference& o)
 	{
 		m_ref = o.m_ref;
 		return *this;
 	}
 
+	//\brief Get the pointer to the object
+	//\return the pointer
 	OBJ* get() const
 	{
 		return m_ref->m_ptr;
 	}
 
+	//\brief Exchange the object (not thread safe access)
+	//\param[in] ptr object pointer
 	void reset( OBJ* ptr=0)
 	{
 		if (m_ref->m_ptr && m_ref->m_ptr != ptr) delete m_ref->m_ptr;
 		m_ref->m_ptr = ptr;
 	}
 
+	//\brief Pointer access operator
+	//\return the pointer
 	OBJ* operator -> () const
 	{
 		return m_ref->m_ptr;
 	}
 
+	//\brief Reference access operator
+	//\return the object reference
 	OBJ& operator *() const
 	{
 		return *m_ref->m_ptr;
 	}
 
 private:
-	boost::shared_ptr<Pointer> m_ref;
+	boost::shared_ptr<Pointer> m_ref;	//< shared reference
 };
 
 }}//namespace
