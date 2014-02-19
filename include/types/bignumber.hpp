@@ -67,7 +67,7 @@ struct BigNumber
 	//\param[in] precision_ number of significant digits (also the number of elements in digits_)
 	//\param[in] scale_ number of digits right of the comma
 	//\param[in] digits_ decimal digits of the number [0x00..0x09]
-	BigNumber( bool sign_, unsigned short precision_, signed short scale_, unsigned char* digits_);
+	BigNumber( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_);
 	//\brief Destructor
 	~BigNumber();
 
@@ -136,7 +136,7 @@ public:
 	//\param[in] precision_ number of significant digits (also the number of elements in digits_)
 	//\param[in] scale_ number of digits right of the comma
 	//\param[in] digits_ decimal digits of the number [0x00..0x09]
-	BigNumberConst( bool sign_, unsigned short precision_, signed short scale_, unsigned char* digits_)
+	BigNumberConst( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_)
 		:BigNumber(ConstC,sign_,precision_,scale_,digits_){}
 	//\brief Copy constructor
 	//\brief o big number reference to copy

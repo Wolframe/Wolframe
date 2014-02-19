@@ -56,6 +56,12 @@ protected:
 
 static types::BigNumber getRandomBigNumber()
 {
+	bool sign = (rand()%2 == 1);
+	unsigned short precision = (unsigned short)(rand()%(1<<15));
+	signed short scale = (signed short)(unsigned short)(rand()%(1<<15));
+	std::string 
+	BigNumber( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_);
+	
 	unsigned short YY = (unsigned short)(1000 + rand()%1399);
 	unsigned short MM = (unsigned short)(1+rand()%12);
 	unsigned short DD = (unsigned short)(1+rand()%31);

@@ -196,7 +196,7 @@ BigNumber::BigNumber( const std::string& val)
 	constructor( val);
 }
 
-BigNumber::BigNumber( bool sign_,unsigned short precision_, signed short scale_, unsigned char* digits_)
+BigNumber::BigNumber( bool sign_,unsigned short precision_, signed short scale_, const unsigned char* digits_)
 	:m_scale(scale_),m_sign(sign_),m_const(false),m_size(precision_),m_ar(0)
 {
 	m_ar = (unsigned char*)std::malloc( m_size);
