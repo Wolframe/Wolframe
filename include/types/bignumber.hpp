@@ -90,6 +90,9 @@ struct BigNumber
 	//\brief Get the number value as printable string
 	//\return the number as string
 	std::string tostring() const;
+	//\brief Get the number value as printable string in normalized form ([0..1] + exponent if scale < 0 or scale > precision)
+	//\return the number as string
+	std::string tostringNormalized() const;
 	//\brief Get the number value as integer if a conversion is possible
 	//\return the number as integer
 	_WOLFRAME_INTEGER toint() const;
@@ -99,6 +102,9 @@ struct BigNumber
 	//\brief Get the number value as double precision floating point number if a conversion is possible
 	//\return the number as double precision floating point number
 	double todouble() const;
+	//\brief Check if the number is valid
+	//\return true, if yes
+	bool isvalid() const;
 
 private:
 	//\brief Constructor 

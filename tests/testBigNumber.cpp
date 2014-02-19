@@ -35,21 +35,21 @@ Project Wolframe.
 #include "gtest/gtest.h"
 #include <iostream>
 #include <string>
-#include <limits>
+#include <cstring>
 #include <cstdlib>
 #include <boost/cstdint.hpp>
 
 using namespace _Wolframe;
 
-class BigNumberDescriptionTest
+class BigNumberTest
 	:public ::testing::Test
 {
 protected:
-	BigNumberDescriptionTest()
+	BigNumberTest()
 	{
 		srand(123);
 	}
-	virtual ~BigNumberDescriptionTest() {}
+	virtual ~BigNumberTest() {}
 	virtual void SetUp() {}
 	virtual void TearDown() {}
 };
@@ -66,24 +66,45 @@ static unsigned short shortRand()
 
 static types::BigNumber getRandomBigNumber()
 {
+	unsigned short precision = (unsigned short)shortRand()+1;
 	bool sign = (rand()%2 == 1);
-	unsigned short precision = (unsigned short)shortRand();
 	signed short scale = (signed short)shortRand();
-	std::string digits;
+	std::string buf;
 
 	for (unsigned short ii=0; ii<precision; ++ii)
 	{
-		digits.push_back( '0'+(char)(rand()%10));
+		buf.push_back( (char)(rand()%10));
 	}
-	return types::BigNumber( sign, precision, scale, (const unsigned char*)digits.c_str());
+	unsigned short lz=0; //...leading zeros to cut away
+	for (; lz<precision && buf[lz] == 0; ++lz){}
+	precision -= lz;
+	const unsigned char* digits = (const unsigned char*)buf.c_str() + lz;
+	if (precision == 0)
+	{
+		sign = false;
+		scale = 0;
+	}
+	return types::BigNumber( sign, precision, scale, digits);
 }
 
-
-TEST_F( BigNumberDescriptionTest, tests)
+static bool isequal( const types::BigNumber& aa, const types::BigNumber& bb)
 {
-	for (unsigned int ii=0; ii<1; ++ii)
+	if (aa.precision() != bb.precision()) return false;
+	if (aa.scale() != bb.scale()) return false;
+	if (aa.sign() != bb.sign()) return false;
+	if (0!=std::memcmp( aa.digits(), bb.digits(), aa.size())) return false;
+	return true;
+}
+
+TEST_F( BigNumberTest, tests)
+{
+	for (unsigned int ii=0; ii<40000; ++ii)
 	{
 		types::BigNumber num = getRandomBigNumber();
+		types::BigNumber oth( num.tostring());
+		EXPECT_TRUE( isequal( num, oth));
+		types::BigNumber normnum( num.tostringNormalized());
+		EXPECT_TRUE( isequal( num, normnum));
 	}
 }
 
