@@ -2,12 +2,12 @@
 .\"     Title: wolframe
 .\"    Author:  <contact@wolframe.net>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/19/2014
+.\"      Date: 02/20/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolframe.conf
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "5" "02/19/2014" "wolframe.conf" "Wolframe User Manual"
+.TH "WOLFRAME" "5" "02/20/2014" "wolframe.conf" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -82,6 +82,12 @@ Print all information, including the operating system Wolframe is running on\&.
 .SH "OPTIONS"
 .PP
 The configuration of the wolframe daemon or service is separated into sections\&. Some sections like \*(AqLoadModules\*(Aq always exist, others only exist if a module has been loaded\&.
+.PP
+We describe here only the standard settings which exist when no modules are loaded\&.
+.PP
+Check out the manpages of the wolframe modules
+\fBwolframe-module-XXXX\fR(5)
+to see the available options in \*(Aqwolframe\&.conf\*(Aq when this module is loaded\&.
 .SS "LoadModules"
 .PP
 The \*(AqLoadModules\*(Aq section contains directives to extend the system with loadable modules\&. Those can be new database modules, new scripting languages, document filters and processors, authentication/authorization/audit modules and other 3rdParty bindings, etc\&.
@@ -140,6 +146,85 @@ The syslog facility to tag the log entries with\&. Usual facilities are \*(AqLOC
 Consult the
 \fBopenlog\fR(3)
 man page to see what facilities are available on your system\&.
+.RE
+.SS "listen"
+.PP
+The \*(Aqlisten\*(Aq section deals with network settings\&.
+.PP
+You can choose between a plain socket with the \*(Aq\fBsocket\fR\*(Aq directive or an encrypted socket with \*(Aq\fBSSLsocket\fR\*(Aq\&.
+.PP
+Note: \*(Aqname\*(Aq, \*(Aqaddress\*(Aq, \*(Aqport\*(Aq and \*(AqmaxConnections\*(Aq are common directives for both plain and encrypted sockets\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+.RS 4
+Maximum number of simultaneous connections\&. This limits the number of clients which can use the server in parallel\&. If \*(Aq0\*(Aq is specified for
+\fImax_connections\fR
+or if the directive is absent, an operating system default is choosen\&.
+.RE
+.PP
+\fBthreads \fR\fB\fImax_threads\fR\fR
+.RS 4
+Size of the pool of threads serving client connections\&. The default for
+\fImax_threads\fR
+is 4\&.
+.RE
+.PP
+\fBaddress \fR\fB\fIip_address\fR\fR
+.RS 4
+IP address the server should listen to incoming connections\&.
+\fIip_address\fR
+is a valid IPv4 or IPv6 address\&. \*(Aq*\*(Aq denotes any address\&. \*(Aq0\&.0\&.0\&.0\*(Aq any IPv4 address\&. \*(Aq:::*\*(Aq any IPv6 address\&. \*(Aq127\&.0\&.0\&.1\*(Aq and \*(Aq::1\*(Aq denote the local loopback interface for IPv4 respectively IPv6\&.
+.RE
+.PP
+\fBport \fR\fB\fIport\fR\fR
+.RS 4
+Defines the port where the server listens on\&. We usually set
+\fIport\fR
+to 7661 for unencrypted connections and 7961 for encrypted connections\&.
+.RE
+.PP
+\fBname "\fR\fB\fIinterface_name\fR\fR\fB"\fR
+.RS 4
+You can give interfaces a name, so they can be identified as group (for instance in authentication, autorization, auditing)\&. Naming interfaces is not required\&.
+.RE
+.PP
+\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+.RS 4
+Sets the maximum number of simultaneous connections locally for this interface\&.
+.RE
+.PP
+\fBcertificate \fR\fB\fIserver\&.crt\fR\fR
+.RS 4
+The server certificate to use for encrypted connections\&. The format of the certificate is excepted to be
+PEM\&.
+.RE
+.PP
+\fBcertificate \fR\fB\fIserver\&.key\fR\fR
+.RS 4
+The server key to use for encrypted connections\&. The format of the key is excepted to be
+PEM\&.
+.RE
+.PP
+\fBCAdirectory \fR\fB\fICA_directory\fR\fR
+.RS 4
+A directory holding CA certificate files\&.
+.RE
+.PP
+\fBCAchainFile \fR\fB\fIchain_file\fR\fR
+.RS 4
+The
+\fIchain_file\fR
+holds the CA chain which is required to verify client certificates\&. The format of
+\fIchain_file\fR
+has to be
+PEM\&.
+.RE
+.PP
+\fBverify\fR \fION\fR | \fIOFF\fR
+.RS 4
+If switched on the server requires the client to send a valid client certificate which is checked by the server\&.
 .RE
 .SS "daemon"
 .PP
