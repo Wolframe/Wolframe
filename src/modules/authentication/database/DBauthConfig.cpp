@@ -60,8 +60,8 @@ bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 		}
 		else	{
-			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "'";
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
+				    << L1it->first << "'";
 		}
 	}
 	return retVal;
@@ -71,7 +71,7 @@ bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string
 bool DBAuthConfig::check() const
 {
 	if ( m_dbLabel.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "database label cannot be empty";
+		LOG_ERROR << logPrefix() << "database label cannot be empty";
 		return false;
 	}
 	return true;

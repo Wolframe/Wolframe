@@ -207,7 +207,7 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 		if (1 > fwrite( &ch, 1, 1, fh))
 		{
 			int ec = ferror( fh);
-			if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
+			if (ec) throw std::runtime_error( std::string( "failed to write (errno " + boost::lexical_cast<std::string>(ec) + ") to file ") + filename + "'");
 		}
 	}
 }
