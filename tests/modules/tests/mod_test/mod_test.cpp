@@ -47,12 +47,12 @@ namespace test {
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {
-	MOD_LOG_DEBUG << "Test module config created";
+	LOG_DEBUG << "Module: test module config created";
 }
 
 TestModuleConfig::~TestModuleConfig()
 {
-	MOD_LOG_DEBUG << "Test module config destroyed";
+	LOG_DEBUG << "Module: test module config destroyed";
 }
 
 bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
@@ -79,18 +79,18 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 TestUnit* TestModuleConstructor::object( const config::NamedConfiguration& /* conf */ )
 {
 	TestUnit* m_test = new TestUnitImpl( /* conf */ );
-	MOD_LOG_DEBUG << "Test module object created";
+	LOG_DEBUG << "Module: test module object created";
 	return m_test;
 }
 
 TestUnitImpl::TestUnitImpl( )
 {
-	MOD_LOG_DEBUG << "TestUnit object created";
+	LOG_DEBUG << "Module: testUnit object created";
 }
 
 TestUnitImpl::~TestUnitImpl( )
 {
-	MOD_LOG_DEBUG << "TestUnit object destroyed";
+	LOG_DEBUG << "Module: testUnit object destroyed";
 }
 
 const std::string TestUnitImpl::hello( )
