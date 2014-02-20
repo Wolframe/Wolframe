@@ -39,15 +39,8 @@
 #include "pdfPrintProgramType.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 namespace {
 struct PdfPrinter
@@ -69,5 +62,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
 

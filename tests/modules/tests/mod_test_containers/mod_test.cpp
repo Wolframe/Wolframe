@@ -38,8 +38,6 @@
 #include "logger-v1.hpp"
 #include "mod_test.hpp"
 
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 namespace _Wolframe {
 namespace module {
 namespace test_containers {
@@ -139,11 +137,6 @@ static ConfiguredBuilder* createModule2( void )
 	return &mod;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
 
 static const unsigned short nrContainers = 2;
 static ConfiguredBuilder* (*containers[ nrContainers ])() = {
@@ -151,7 +144,7 @@ static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule2
 };
 
-ModuleEntryPoint entryPoint( 0, "Test Module with containers", setModuleLogger,
+ModuleEntryPoint entryPoint( 0, "Test Module with containers",
 			     nrContainers, containers,
 			     0, NULL );
 

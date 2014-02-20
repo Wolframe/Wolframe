@@ -36,15 +36,8 @@
 #include "pythonFunctionProgramType.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 /* LATER
 static ConfiguredBuilder* createPythonCommandHandler()
@@ -74,7 +67,6 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 };
 
 ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				setModuleLogger,
 				NofConfiguredBuilder, 0, /* configuredBuilder, */
 				NofSimpleBuilder, simpleBuilder);
 

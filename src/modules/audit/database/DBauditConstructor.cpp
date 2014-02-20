@@ -45,7 +45,7 @@ DBauditor* DBauditConstructor::object( const config::NamedConfiguration& conf )
 	const DBauditConfig& cfg = dynamic_cast< const DBauditConfig& >( conf );
 
 	DBauditor* m_audit = new DBauditor( cfg.m_dbConfig );
-	MOD_LOG_TRACE << "Database auditor container created";
+	LOG_TRACE << "Database auditor container created";
 	return m_audit;
 }
 

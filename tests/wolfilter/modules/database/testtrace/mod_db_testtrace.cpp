@@ -36,8 +36,6 @@
 #include "processor/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 namespace _Wolframe {
 namespace module {
 
@@ -50,18 +48,13 @@ static ConfiguredBuilder* createTesttraceDatabaseModule()
 	return &mod;
 }
 
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast<_Wolframe::log::LogBackend*>( logger);
-}
-
 enum {NofObjects=1};
 static CreateBuilderFunc containers[ NofObjects] =
 {
 	createTesttraceDatabaseModule
 };
 
-ModuleEntryPoint entryPoint( 0, "Testtrace database", setModuleLogger, NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "Testtrace database", NofObjects, containers, 0, 0);
 
 }} // namespace _Wolframe::module
 

@@ -60,7 +60,7 @@ bool DBauditConfig::parse( const config::ConfigurationTree& pt, const std::strin
 				retVal = false;
 		}
 		else	{
-			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					<< L1it->first << "'";
 		}
 	}

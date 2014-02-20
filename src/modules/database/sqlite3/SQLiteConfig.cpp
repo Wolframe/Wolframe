@@ -104,7 +104,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			}
 		}
 		else	{
-			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					<< L1it->first << "'";
 		}
 	}
@@ -146,7 +146,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 bool SQLiteConfig::check() const
 {
 	if ( m_filename.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
+		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
 		return false;
 	}
 	return true;
@@ -158,7 +158,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = m_filename;
 		m_filename = utils::getCanonicalPath( m_filename, refPath);
 		if ( oldPath != m_filename )	{
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -167,7 +167,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
 		if ( oldPath != *it )	{
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
 				       << "' instead of '" << oldPath << "'";
 		}
 	}

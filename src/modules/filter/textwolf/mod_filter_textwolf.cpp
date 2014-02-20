@@ -37,16 +37,9 @@
 #include "logger-v1.hpp"
 #include <cstring>
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 namespace lb = _Wolframe::langbind;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 namespace {
 
@@ -65,4 +58,4 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 
-ModuleEntryPoint entryPoint( 0, "textwolf XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "textwolf XML filter", 0, 0, NofObjects, objdef);

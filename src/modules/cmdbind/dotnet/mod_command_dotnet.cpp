@@ -35,15 +35,8 @@
 #include "dotnetRuntimeEnvironmentBuilder.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 namespace {
 static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
@@ -63,7 +56,6 @@ static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
 };
 
 ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
-				setModuleLogger,
 				NofConfiguredBuilder, configuredBuilder,
 				NofSimpleBuilder, 0);
 

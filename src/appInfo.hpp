@@ -34,8 +34,8 @@
 // application wide singleton
 //
 
-#ifndef _APP_SINGLETON_HPP_INCLUDED
-#define _APP_SINGLETON_HPP_INCLUDED
+#ifndef _APP_INFO_HPP_INCLUDED
+#define _APP_INFO_HPP_INCLUDED
 
 #include "singleton.hpp"
 #include "version.hpp"
@@ -53,4 +53,4 @@ private:
 
 } // namespace _Wolframe
 
-#endif // APP_SINGLETON_HPP_INCLUDED
+#endif // _APP_INFO_HPP_INCLUDED

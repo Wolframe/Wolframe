@@ -255,7 +255,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 						else
 						{
-							MOD_LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
+							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
 							m_state = 11;
 						}
 						continue;
@@ -267,7 +267,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 							case InputFilter::Open:
 							{
 								m_state = 11;
-								MOD_LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
+								LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
 								break;
 							}
 							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
@@ -325,7 +325,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						if (typ != langbind::FilterBase::CloseTag)
 						{
-							MOD_LOG_WARNING << "Function called is returning a result but no RETURN declared in command. The function result is ignored";
+							LOG_WARNING << "Function called is returning a result but no RETURN declared in command. The function result is ignored";
 						}
 					}
 					m_state = 6;
@@ -429,7 +429,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 	}
 	catch (const std::logic_error& e)
 	{
-		MOD_LOG_FATAL << "logic error processing request: " << e.what();
+		LOG_FATAL << "logic error processing request: " << e.what();
 		throw e;
 	}
 }

@@ -37,13 +37,6 @@
 
 //\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
 #define CUSTOM_DATATYPE_MODULE(NAME,DESCRIPTION)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
 	static const char* _Wolframe__moduleName()\
 	{\
 		return NAME;\
@@ -55,11 +48,11 @@
 	static _Wolframe::module::CustomDataTypeDef _Wolframe__customDataTypes[] =\
 	{
 
-//\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section 
+//\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
 #define CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
-//\brief Defines the end of the CUSTOM_DATATYPE_MODULE section 
+//\brief Defines the end of the CUSTOM_DATATYPE_MODULE section
 #define CUSTOM_DATATYPE_MODULE_END\
 		{0,0}\
 	};\
@@ -77,5 +70,5 @@
 	{\
 		ModuleImpl::constructor\
 	};\
-	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__setModuleLogger, 0, 0, NofObjects, _Wolframe__objdef);
+	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
 

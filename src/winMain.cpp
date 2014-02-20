@@ -49,7 +49,7 @@
 #include "server.hpp"
 #include "system/errorCode.hpp"
 #include "logger-v1.hpp"
-#include "appSingleton.hpp"
+#include "appInfo.hpp"
 #include "processor/moduleDirectory.hpp"
 #include "system/connectionHandler.hpp"
 
@@ -399,8 +399,8 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		// create initial console logger, so we see things going wrong
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 
-		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
-		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+		_Wolframe::ApplicationSingleton& appInfo = _Wolframe::ApplicationSingleton::instance();
+		appInfo.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
@@ -428,7 +428,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << _Wolframe::applicationName() << " version "
-				  << appSingleton.version().toString() << std::endl << std::endl;
+				  << appInfo.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCode::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{

@@ -48,9 +48,6 @@ using namespace _Wolframe::log;
 using namespace _Wolframe;
 using namespace std;
 
-// make the logger in the modules work
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 // The fixture for testing class _Wolframe::module
 class AuthenticationFixture : public ::testing::Test
 {
@@ -63,9 +60,6 @@ protected:
 		// Initialize the global random number generator
 		_Wolframe::RandomGenerator::instance( "" );
 
-		// set temporary logger pointer to the logger instantiated
-		// in the test fixture
-		logBackendPtr = &logBack;
 //		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
 		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 	}

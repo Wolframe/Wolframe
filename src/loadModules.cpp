@@ -171,7 +171,6 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
 			break;
 		}
 
-		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
 		for ( unsigned short i = 0; i < entry->cfgdContainers; i++ )	{
 			modDir.addBuilder( entry->createCfgdBuilder[ i ]() );
 		}

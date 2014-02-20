@@ -37,7 +37,7 @@
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
-#include "appSingleton.hpp"
+#include "appInfo.hpp"
 
 #include <string>
 #include <stdexcept>

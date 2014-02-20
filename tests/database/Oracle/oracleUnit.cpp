@@ -13,8 +13,6 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::log;
 
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 // The fixture for testing Wolframe module that log
 class OracleFixture : public ::testing::Test
 {
@@ -25,7 +23,6 @@ class OracleFixture : public ::testing::Test
 			logBack( LogBackend::instance( ) )
 		{
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
-			logBackendPtr = &logBack;
 		}
 };
 
@@ -42,7 +39,7 @@ TEST_F( OracleFixture, CreateOracleUnit )
 TEST_F( OracleFixture, WrongHost )
 {
 	ASSERT_THROW( OracleDbUnit db( "testDB", "blabla", 0, "orcl",
-	                     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
 }
 
@@ -79,17 +76,17 @@ TEST_F( OracleFixture, Transaction )
 	// ok transaction
 	trans->begin( );
 	trans->commit( );
-	
+
 	// rollback transaction
 	trans->begin( );
 	trans->rollback( );
-	
+
 	// error, commit without begin
 	EXPECT_THROW( trans->commit( ), std::runtime_error );
-	
+
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-	
+
 	trans->close( );
 }
 
@@ -144,7 +141,7 @@ static void executeInsertStatements( Transaction* trans)
 }
 
 TEST_F( OracleFixture, ExecuteInstruction )
-{	
+{
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
@@ -202,7 +199,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::min( ), price );
 				break;
 			}
-			
+
 			case 2:
 			case 3: {
 				ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
@@ -219,7 +216,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( ( idx==3?-4.2344:4.782), price);
 				break;
 			}
-			
+
 			case 4: {
 				ASSERT_EQ( ri->at(0).type(), types::Variant::Int);
 				// this is Oracle violating the SQL standard for backward-compatibility
@@ -235,7 +232,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( 1.0E+126 , price );
 				break;
 			}
-			
+
 			case 5: {
 				ASSERT_EQ( ri->at(0).type(), types::Variant::Null);
 				ASSERT_EQ( ri->at(1).type(), types::Variant::Null);
@@ -254,14 +251,14 @@ TEST_F( OracleFixture, ExecuteInstruction )
 }
 
 TEST_F( OracleFixture, ExceptionSyntaxError )
-{	
+{
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
 
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 
 	// execute an illegal SQL statement, must throw
@@ -275,9 +272,9 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-	
+
 	// auto rollback
-	// auto close transaction	
+	// auto close transaction
 }
 
 TEST_F( OracleFixture, TooFewBindParameter )
@@ -287,7 +284,7 @@ TEST_F( OracleFixture, TooFewBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
@@ -322,7 +319,7 @@ TEST_F( OracleFixture, TooManyBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
@@ -356,7 +353,7 @@ TEST_F( OracleFixture, IllegalBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	std::vector<types::Variant> values;
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
@@ -380,7 +377,7 @@ TEST_F( OracleFixture, IllegalBindParameter )
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	// auto rollback?
-	// auto close transaction?	
+	// auto close transaction?
 }
 
 TEST_F( OracleFixture, ReusedBindParameter )
@@ -390,7 +387,7 @@ TEST_F( OracleFixture, ReusedBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
@@ -427,7 +424,7 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
