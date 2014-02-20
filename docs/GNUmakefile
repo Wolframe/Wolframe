@@ -101,6 +101,16 @@ doc-towordml: WolfBook.docx
 %.docx: %.xml
 	$(XSLT_TOWORDML) $< > $@
 
+# Getting Started Guide
+
+GETTING_STARTED_FILES = \
+	GettingStarted.xml \
+	GettingStartedVersion.txt \
+	GettingStartedDate.txt \
+	GettingStarted/Preface.xml
+
+GettingStarted.html: $(GETTING_STARTED_FILES)
+
 # WolfBook
 
 WOLFBOOK_SOURCE_FILES = \
@@ -226,6 +236,7 @@ wolfpasswd.1: wolfpasswd-man.xml
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
+	-rm -f GettingStarted.html GettingStarted.pdf
 	-rm -rf html/*.html
 	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
