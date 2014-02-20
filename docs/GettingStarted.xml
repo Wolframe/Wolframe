@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE set PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
 
-	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
+	<!ENTITY % xinclude			SYSTEM	"XInclude.mod">
 	%xinclude;
-	
+
+	<!ENTITY % GettingStartedEntities	SYSTEM	"GettingStarted/GettingStarted.ent">
+	%GettingStartedEntities;
+
 	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
 	%CommonEntities;
 
-	<!ENTITY % TutorialEntities	SYSTEM	"Tutorial/Tutorial.ent">
-	%TutorialEntities;
-
 <!-- book set data -->
-	<!ENTITY BookSetVersion		SYSTEM "TutorialVersion.txt">
-	<!ENTITY BookSetPublicationDate	SYSTEM "TutorialDate.txt">
+	<!ENTITY BookSetVersion		SYSTEM "GettingStartedVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "GettingStartedDate.txt">
 
 ]>
 
-<book id="book_Tutorial" lang="en">
-	<title>The Wolframe Application Server Tutorial</title>
-	<subtitle>Build your first Wolframe application</subtitle>
+<book id="book_GettingStarted" lang="en">
+	<title>Wolframe Getting Started Server</title>
+	<subtitle>Basic Installation and Configuration Guide</subtitle>
 	<bookinfo>
 		<date>&BookSetPublicationDate;</date>
 		<issuenum>Version &BookSetVersion;</issuenum>
@@ -33,7 +33,5 @@
 		&WolframeLegalNotice;
 	</bookinfo>
 
-	&TutorialPreface;
-	&TutorialIntroduction;
-	&TutorialSteps;
+	&GettingStartedPreface;
 </book>

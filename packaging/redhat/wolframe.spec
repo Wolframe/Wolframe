@@ -1,6 +1,6 @@
 # Wolframe RPM spec file
 #
-# Copyright (C) 2011-2013 Project Wolframe
+# Copyright (C) 2011-2014 Project Wolframe
 
 # Set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
