@@ -134,7 +134,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // end of i18n global stuff
 
 	try	{
-		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
+		_Wolframe::ApplicationInfo& appSingleton = _Wolframe::ApplicationInfo::instance();
 		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig   cmdLineCfg;

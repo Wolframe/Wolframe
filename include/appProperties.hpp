@@ -51,10 +51,10 @@ namespace config	{
 	const char*	defaultLocalConfig();
 
 	const char*	defaultServiceName();
-	#if defined( _WIN32 )
+#if defined( _WIN32 )
 	const char*	defaultServiceDisplayName();
 	const char*	defaultServiceDescription();
-	#endif // defined( _WIN32 )
+#endif // defined( _WIN32 )
 } // namespace config
 
 namespace net	{

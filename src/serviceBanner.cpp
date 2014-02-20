@@ -154,16 +154,16 @@ std::string ServiceBanner::toString() const
 			banner = "Wolframe";
 			break;
 		case VERSION_MAJOR:
-			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M" );
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M" );
 			break;
 		case VERSION_MINOR:
-			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m" );
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m" );
 			break;
 		case VERSION_REVISION:
-			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" );
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" );
 			break;
 		case PRODUCT_OS:
-			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" ) + " OS";
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" ) + " OS";
 			break;
 		case NONE:
 			break;

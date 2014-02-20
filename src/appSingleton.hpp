@@ -42,7 +42,7 @@
 
 namespace _Wolframe	{
 
-class ApplicationSingleton : public Singleton< ApplicationSingleton >
+class ApplicationInfo : public Singleton< ApplicationInfo >
 {
 public:
 	const Version& version() const		{ return m_version; }
