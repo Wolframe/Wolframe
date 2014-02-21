@@ -399,7 +399,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		// create initial console logger, so we see things going wrong
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 
-		_Wolframe::ApplicationSingleton& appInfo = _Wolframe::ApplicationSingleton::instance();
+		_Wolframe::ApplicationInfo& appInfo = _Wolframe::ApplicationInfo::instance();
 		appInfo.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig	cmdLineCfg;
