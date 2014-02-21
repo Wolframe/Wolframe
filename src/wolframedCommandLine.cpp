@@ -72,7 +72,11 @@ CmdLineConfig::CmdLineConfig()
 			( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
 			( "config-xml", "force configuration file parsing to xml" )
 			( "config-info", "force configuration file parsing to info" )
+#if !defined(_WIN32)
 			( "debug,d", prgOpts::value<std::string>(), "set debug level (active only with --foreground)" )
+#else
+			( "debug,d", prgOpts::value<std::string>(), "set debug level" )
+#endif
 #if !defined(_WIN32)
 			( "use-config-logging", "log according to the configuration file (active only with --foreground)" )
 			// Unix daemon options
