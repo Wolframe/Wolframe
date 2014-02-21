@@ -47,5 +47,7 @@ void TypeSignature::verify() const
 }
 #endif
 
+#ifdef BOOST_MSVC
 // avoids LNK4221 on Windows (see #69)
 namespace { char dummy; }
+#endif
