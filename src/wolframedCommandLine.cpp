@@ -59,27 +59,27 @@ CmdLineConfig::CmdLineConfig()
 			( "print-config,p", "print configuration" )
 			( "check-config,t", "check the configuration" )
 			( "test-config,T", "test the configuration" )
-		#if defined(_WIN32)
+#if defined(_WIN32)
 			// Windows Service Commands
 			( "install", "install as Windows service" )
 			( "remove", "remove registered Windows service" )
 			( "service", "run the service (don't call directly!)" )
-		#endif
+#endif
 			// Options
-		#if !defined(_WIN32)
+#if !defined(_WIN32)
 			( "foreground,f", "run in foreground (logs only on stderr)" )
-		#endif
+#endif
 			( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
 			( "config-xml", "force configuration file parsing to xml" )
 			( "config-info", "force configuration file parsing to info" )
 			( "debug,d", prgOpts::value<std::string>(), "set debug level (active only with --foreground)" )
+#if !defined(_WIN32)
 			( "use-config-logging", "log according to the configuration file (active only with --foreground)" )
-		#if !defined(_WIN32)
 			// Unix daemon options
 			( "user,u", prgOpts::value<std::string>(), "run as <user>" )
 			( "group,g", prgOpts::value<std::string>(), "run as <group>" )
 			( "pidfile", prgOpts::value<std::string>(), "use daemon pidfile <pidfile>" )
-		#endif
+#endif
 			;
 	command = DEFAULT;
 #if !defined(_WIN32)
