@@ -46,6 +46,13 @@
 
 #include <string>
 
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
+
+
 namespace _Wolframe {
 namespace log {
 
@@ -54,7 +61,7 @@ class LogBackend: private boost::noncopyable
 public:
 	~LogBackend();
 
-	static LogBackend& instance();
+	WOLFRAME_EXPORT static LogBackend& instance();
 
 	void setConsoleLevel( const LogLevel::Level level );
 

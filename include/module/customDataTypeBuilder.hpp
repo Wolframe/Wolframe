@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of form functions
 #ifndef _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
 #define _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include "types/customDataType.hpp"
 #include "types/keymap.hpp"

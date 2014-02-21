@@ -33,7 +33,7 @@
 ///\file modules/database/testtrace/mod_database_testtrace.cpp
 ///\brief Module for a fake database implementation used for tests
 #include "testtraceDatabase.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
 namespace _Wolframe {

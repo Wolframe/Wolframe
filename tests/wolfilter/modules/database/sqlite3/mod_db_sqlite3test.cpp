@@ -33,7 +33,7 @@
 ///\file modules/database/testtrace/mod_db_sqlite3test.cpp
 ///\brief Module for a database implementation used for tests based on the sqlite3 database module
 #include "SQLiteTest.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
 namespace _Wolframe {

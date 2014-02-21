@@ -39,7 +39,7 @@ Project Wolframe.
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <string>

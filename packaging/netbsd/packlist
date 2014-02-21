@@ -200,8 +200,8 @@ usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
 @dirrm usr/pkg/include/wolframe/serialize/ddl
 @dirrm usr/pkg/include/wolframe/serialize
 usr/pkg/include/wolframe/processor/jobSchedule.hpp
-usr/pkg/include/wolframe/processor/moduleDirectory.hpp
-usr/pkg/include/wolframe/processor/moduleInterface.hpp
+usr/pkg/include/wolframe/module/moduleDirectory.hpp
+usr/pkg/include/wolframe/module/moduleInterface.hpp
 usr/pkg/include/wolframe/processor/procProvider.hpp
 usr/pkg/include/wolframe/processor/userInterface.hpp
 @dirrm usr/pkg/include/wolframe/processor

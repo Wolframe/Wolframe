@@ -36,7 +36,7 @@
 #define _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #include "module/constructor.hpp"
 #include "langbind/runtimeEnvironment.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include <string>
 #include <boost/shared_ptr.hpp>
 

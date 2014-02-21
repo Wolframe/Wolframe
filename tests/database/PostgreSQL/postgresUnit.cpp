@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "gtest/gtest.h"
 
 #include "PostgreSQL.hpp"

@@ -35,7 +35,7 @@
 //
 
 #include "SaslAuth.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
 namespace _Wolframe {

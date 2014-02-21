@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include "config/ConfigurationTree.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>

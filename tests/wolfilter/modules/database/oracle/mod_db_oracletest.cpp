@@ -35,7 +35,7 @@
 ///  based on the postgres database module
 
 #include "OracleTest.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 
 namespace _Wolframe {

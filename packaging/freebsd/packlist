@@ -189,8 +189,8 @@ usr/local/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
 @dirrm usr/local/include/wolframe/serialize/ddl
 @dirrm usr/local/include/wolframe/serialize
 usr/local/include/wolframe/processor/jobSchedule.hpp
-usr/local/include/wolframe/processor/moduleDirectory.hpp
-usr/local/include/wolframe/processor/moduleInterface.hpp
+usr/local/include/wolframe/module/moduleDirectory.hpp
+usr/local/include/wolframe/module/moduleInterface.hpp
 usr/local/include/wolframe/processor/procProvider.hpp
 usr/local/include/wolframe/processor/userInterface.hpp
 @dirrm usr/local/include/wolframe/processor
