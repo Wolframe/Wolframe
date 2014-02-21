@@ -36,7 +36,7 @@ Project Wolframe.
 #include "module/runtimeEnvironmentConstructor.hpp"
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace module {

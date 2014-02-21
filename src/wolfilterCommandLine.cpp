@@ -37,7 +37,7 @@
 #include "database/DBprovider.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"

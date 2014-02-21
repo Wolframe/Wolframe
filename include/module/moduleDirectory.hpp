@@ -39,7 +39,7 @@
 
 #include <string>
 #include <list>
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace module {

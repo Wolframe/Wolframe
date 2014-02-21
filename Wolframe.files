@@ -1335,6 +1335,9 @@ docs/ExtDevelopment/Glossary.xml
 docs/ExtDevelopment/Introduction.xml
 docs/ExtDevelopment/NormalizerModules.xml
 docs/ExtDevelopment/Preface.xml
+docs/GettingStarted/GettingStarted.ent
+docs/GettingStarted/Preface.xml
+docs/GettingStarted.xml
 docs/GNUmakefile
 docs/header.txt
 docs/images/GNUmakefile
@@ -1620,6 +1623,8 @@ include/module/cppFormFunctionBuilder.hpp
 include/module/customDataTypeBuilder.hpp
 include/module/ddlcompilerBuilder.hpp
 include/module/filterBuilder.hpp
+include/module/moduleDirectory.hpp
+include/module/moduleInterface.hpp
 include/module/normalizeFunctionBuilder.hpp
 include/module/programTypeBuilder.hpp
 include/module/runtimeEnvironmentConstructor.hpp
@@ -1629,8 +1634,6 @@ include/prgbind/program.hpp
 include/prgbind/programLibrary.hpp
 include/prgbind/transactionProgram.hpp
 include/processor/jobSchedule.hpp
-include/processor/moduleDirectory.hpp
-include/processor/moduleInterface.hpp
 include/processor/procProvider.hpp
 include/processor/userInterface.hpp
 include/protocol/buffers.hpp

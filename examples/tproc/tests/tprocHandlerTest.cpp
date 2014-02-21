@@ -39,7 +39,7 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "wtest/testDescription.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "langbind/appObjects.hpp"

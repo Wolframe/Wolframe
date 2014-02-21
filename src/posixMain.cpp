@@ -50,7 +50,7 @@
 #include "system/errorCode.hpp"
 #include "logger-v1.hpp"
 #include "appInfo.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 
 #include "system/connectionHandler.hpp"
 

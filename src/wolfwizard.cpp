@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include "prgbind/programLibrary.hpp"
 #include "wolfwizardCommandLine.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
