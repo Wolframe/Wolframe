@@ -38,21 +38,38 @@
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
-#include "singleton.hpp"
+
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
 
 namespace _Wolframe	{
 
-class RandomGenerator : public Singleton< RandomGenerator >
+class WOLFRAME_EXPORT RandomGenerator
 {
 public:
-	RandomGenerator();
-	RandomGenerator( const std::string &rndDev );
+	~RandomGenerator();
 
+	static RandomGenerator& instance();
+	static RandomGenerator& instance( const std::string &rndDev );
+
+	void device( const std::string &rndDev ){ m_device = rndDev; }
 	const std::string& device() const	{ return m_device; }
 	unsigned random() const;
 	void generate( unsigned char* buffer, size_t bytes ) const;
 
+protected:
+	RandomGenerator();
+	RandomGenerator( const std::string &rndDev );
+
 private:
+	// make it noncopyable
+	RandomGenerator( const RandomGenerator& );
+	const RandomGenerator& operator= ( const RandomGenerator& );
+
+	// Real object data
 	std::string	m_device;		///< random generator device
 };
 

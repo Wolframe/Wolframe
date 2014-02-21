@@ -1144,6 +1144,8 @@ makefiles/nmake/top.mk
 .Attic/oldtutorial/step2/Tutorial-2/users.sql
 .Attic/printers.c
 .Attic/printMemory.c
+.Attic/singleton.hpp
+.Attic/singletonTest.cpp
 .Attic/SSLtest.c
 .Attic/testLeak.cpp
 .Attic/testPGleak.cpp
@@ -1555,6 +1557,7 @@ include/appdevel/cppFormFunctionTemplate.hpp
 include/appdevel/customDatatypeModuleMacros.hpp
 include/appDevel.hpp
 include/appdevel/normalizeModuleMacros.hpp
+include/appInfo.hpp
 include/appProperties.hpp
 include/cmdbind/authCommandHandler.hpp
 include/cmdbind/commandHandlerConstructor.hpp
@@ -1659,7 +1662,6 @@ include/serialize/struct/filtermapSerializeStack.hpp
 include/serialize/struct/filtermapTraits.hpp
 include/serialize/structOptionParser.hpp
 include/serialize/tostringUtils.hpp
-include/singleton.hpp
 include/standardConfigs.hpp
 include/system/connectionEndpoint.hpp
 include/system/connectionHandler.hpp
@@ -1753,7 +1755,6 @@ src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp
 src/appConfigDefinition.cpp
-src/appInfo.hpp
 src/appProperties.cpp
 src/connectionBase.hpp
 src/connection.cpp
@@ -1765,6 +1766,7 @@ src/interfaceCommandHandler.cpp
 src/interfaceCommandHandler.hpp
 src/jobScheduler.cpp
 src/jobScheduler.hpp
+src/libwolframe/appInfo.cpp
 src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
@@ -2424,7 +2426,6 @@ tests/simpleFormCompiler/src/Makefile.W32
 tests/simpleFormCompiler/src/normalizeFunctions.cpp
 tests/simpleFormCompiler/src/simpleFormCompiler.cpp
 tests/simpleFormCompiler/src/testSimpleFormCompiler.cpp
-tests/singletonTest.cpp
 tests/SSL/README.txt
 tests/stringNormalizationTest.cpp
 tests/testArrayDoublingAllocator.cpp

@@ -108,7 +108,6 @@ usr/local/include/wolframe/appConfig.hpp
 usr/local/include/wolframe/appDevel.hpp
 usr/local/include/wolframe/appProperties.hpp
 usr/local/include/wolframe/logger-v1.hpp
-usr/local/include/wolframe/singleton.hpp
 usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/langbind/appObjects.hpp

@@ -38,9 +38,6 @@
 #ifndef _LOG_BACKEND_HPP_INCLUDED
 #define _LOG_BACKEND_HPP_INCLUDED
 
-// #include "singleton.hpp"
-#include <boost/utility.hpp>
-
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 
@@ -56,12 +53,12 @@
 namespace _Wolframe {
 namespace log {
 
-class LogBackend: private boost::noncopyable
+class WOLFRAME_EXPORT LogBackend
 {
 public:
 	~LogBackend();
 
-	WOLFRAME_EXPORT static LogBackend& instance();
+	static LogBackend& instance();
 
 	void setConsoleLevel( const LogLevel::Level level );
 
@@ -93,6 +90,11 @@ protected:
 	LogBackend();
 
 private:
+	// make it noncopyable
+	LogBackend( const LogBackend& );
+	const LogBackend& operator= ( const LogBackend& );
+
+	// implemented as a PIMPL
 	class LogBackendImpl;
 	LogBackendImpl	*impl_;
 };

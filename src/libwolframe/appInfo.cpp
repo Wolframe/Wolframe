@@ -31,33 +31,49 @@
 
 ************************************************************************/
 //
-// CRAM tests
+// Application Info is an application wide singleton
 //
-#include "gtest/gtest.h"
-#include <stdexcept>
-#include "AAAA/CRAM.hpp"
-#include "system/globalRngGen.hpp"
 
-TEST( CRAM, UninitializedRandomGenerator )
+#include "appInfo.hpp"
+
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
+
+namespace _Wolframe	{
+
+ApplicationInfo& ApplicationInfo::instance()
 {
-	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge, std::logic_error );
+	static boost::scoped_ptr< ApplicationInfo >	m_t;
+	static boost::mutex				m_mutex;
+	static bool					m_initialized = false;
+
+	if ( !m_initialized )	{
+		boost::lock_guard< boost::mutex > lock( m_mutex );
+		if ( !m_initialized )	{
+			m_t.reset( new ApplicationInfo() );
+			m_initialized = true;
+		}
+	}
+	return *m_t;
 }
 
-TEST( CRAM, Challenge )
-{
-	_Wolframe::RandomGenerator::instance( "" );
+ApplicationInfo::ApplicationInfo()
+{}
 
-	const unsigned char* pwdHash = (const unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
-	_Wolframe::AAAA::CRAMchallenge	challenge;
-	std::cout << challenge.toBCD();
-	_Wolframe::AAAA::CRAMresponse	resp1( challenge, pwdHash, 224 / 8 );
-	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), pwdHash, 224 / 8 );
-	EXPECT_TRUE( resp1 == resp2 );
+ApplicationInfo::~ApplicationInfo()
+{}
+
+const Version& ApplicationInfo::version() const
+{
+	return m_version;
 }
 
-int main( int argc, char **argv )
+void ApplicationInfo::version( const Version& ver )
 {
-	::testing::InitGoogleTest( &argc, argv );
-	return RUN_ALL_TESTS();
+	m_version = ver;
 }
+
+} // namespace _Wolframe
 

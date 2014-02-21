@@ -148,7 +148,6 @@ TEST_CPP_BINS = \
 	resolvePathTest$(EXE) \
 	testBoostPath$(EXE) \
 	testFiletypeRecognition$(EXE) \
-	singletonTest$(EXE) \
 	byte2hexTest$(EXE) \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
@@ -252,8 +251,6 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBoostPath
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testFiletypeRecognition
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA
 	@echo

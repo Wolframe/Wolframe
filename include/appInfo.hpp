@@ -37,17 +37,35 @@
 #ifndef _APP_INFO_HPP_INCLUDED
 #define _APP_INFO_HPP_INCLUDED
 
-#include "singleton.hpp"
 #include "version.hpp"
+
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
 
 namespace _Wolframe	{
 
-class ApplicationInfo : public Singleton< ApplicationInfo >
+class WOLFRAME_EXPORT ApplicationInfo
 {
 public:
-	const Version& version() const		{ return m_version; }
-	void version( const Version& ver )	{ m_version = ver; }
+	~ApplicationInfo();
+
+	static ApplicationInfo& instance();
+
+	const Version& version() const;
+	void version( const Version& ver );
+
+protected:
+	ApplicationInfo();
+
 private:
+	// make it noncopyable
+	ApplicationInfo( const ApplicationInfo& );
+	const ApplicationInfo& operator= ( const ApplicationInfo& );
+
+	// Real object data
 	Version	m_version;
 };
 

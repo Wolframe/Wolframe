@@ -74,6 +74,7 @@ CPP_OBJS = \
 	$(TYPE_OBJS) \
 	malloc.obj \
 	version.obj \
+	appInfo.obj \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \

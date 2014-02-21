@@ -76,6 +76,7 @@ CPP_OBJS = \
 	$(TYP_OBJS) \
 	malloc.o \
 	version.o \
+	appInfo.o \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
