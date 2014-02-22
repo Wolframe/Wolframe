@@ -177,7 +177,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 		throw std::runtime_error( std::string("Failed to open file for reading [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
 	}
 
-	while (TRUE == (success=::ReadFile( locals.hFile, readBuffer, BUFFERSIZE, &dwBytesRead, NULL)))
+	while (TRUE == (success=::ReadFile( locals.hFile, readBuffer, BUFFERSIZE, &dwBytesRead, NULL)) && dwBytesRead > 0)
 	{
 		res.append( readBuffer, (std::size_t)dwBytesRead);
 	}
@@ -400,9 +400,11 @@ struct FileTypeDetection
 
 FileType utils::getFileType( const std::string& filename)
 {
+/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	std::string source;
 	readFileContent( filename, source);
 
+/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	// Source: http://en.wikipedia.org/wiki/Byte_order_mark
 	static const unsigned char pt_BOM_UTF8[]  = {3, 0xEF, 0xBB, 0xBF};
 	static const unsigned char pt_BOM_UCS4BE[] = {4, 0x00,0x00,0xFE,0xFF};
@@ -410,9 +412,11 @@ FileType utils::getFileType( const std::string& filename)
 	static const unsigned char pt_BOM_UCS2BE[] = {2, 0xFE,0xFF};
 	static const unsigned char pt_BOM_UCS2LE[] = {2, 0xFF,0xFE};
 
+/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
 	static const CharTable SpaceCharTab( " \t\r\n");
 
+/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	//[0] Handle special cases:
 	if (si == se)
