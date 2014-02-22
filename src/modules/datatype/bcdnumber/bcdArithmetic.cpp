@@ -53,6 +53,7 @@ Project Wolframe.
 #define MaxEstimate 1000000000
 #endif
 
+using namespace _Wolframe;
 using namespace _Wolframe::types;
 
 void BigBCD::xchg( BigBCD& a, BigBCD& b)
@@ -1088,7 +1089,7 @@ BigBCD BigBCD::neg() const
 	return rt;
 }
 
-BigFxpBCD::BigFxpBCD( const _Wolframe::types::BigNumber& num)
+BigFxpBCD::BigFxpBCD( const types::BigNumber& num)
 {
 	initFromNumber( num);
 }
