@@ -47,15 +47,15 @@
 
 namespace _Wolframe	{
 
-class WOLFRAME_EXPORT ApplicationInfo
+class ApplicationInfo
 {
 public:
 	~ApplicationInfo();
 
-	static ApplicationInfo& instance();
+	WOLFRAME_EXPORT static ApplicationInfo& instance();
 
-	const Version& version() const;
-	void version( const Version& ver );
+	WOLFRAME_EXPORT const Version& version() const;
+	WOLFRAME_EXPORT void version( const Version& ver );
 
 protected:
 	ApplicationInfo();

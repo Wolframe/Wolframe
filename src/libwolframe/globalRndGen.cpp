@@ -117,6 +117,16 @@ RandomGenerator::RandomGenerator()
 RandomGenerator::~RandomGenerator()
 {}
 
+void RandomGenerator::device( const std::string &rndDev )
+{
+	m_device = rndDev;
+}
+
+const std::string& RandomGenerator::device() const
+{
+	return m_device;
+}
+
 unsigned RandomGenerator::random() const
 {
 	unsigned ret;

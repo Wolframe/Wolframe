@@ -105,11 +105,13 @@ TestUnitImpl2::~TestUnitImpl2( )
 
 const std::string TestUnitImpl1::hello( )
 {
+	LOG_ALERT << "MODULE: hello() called";
 	return "hello";
 }
 
 const std::string TestUnitImpl2::hullo( )
 {
+	LOG_ALERT << "MODULE: hullo() called";
 	return "hullo";
 }
 

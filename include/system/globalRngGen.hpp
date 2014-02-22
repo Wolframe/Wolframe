@@ -47,18 +47,18 @@
 
 namespace _Wolframe	{
 
-class WOLFRAME_EXPORT RandomGenerator
+class RandomGenerator
 {
 public:
 	~RandomGenerator();
 
-	static RandomGenerator& instance();
-	static RandomGenerator& instance( const std::string &rndDev );
+	WOLFRAME_EXPORT static RandomGenerator& instance();
+	WOLFRAME_EXPORT static RandomGenerator& instance( const std::string &rndDev );
 
-	void device( const std::string &rndDev ){ m_device = rndDev; }
-	const std::string& device() const	{ return m_device; }
-	unsigned random() const;
-	void generate( unsigned char* buffer, size_t bytes ) const;
+	WOLFRAME_EXPORT void device( const std::string &rndDev );
+	WOLFRAME_EXPORT const std::string& device() const;
+	WOLFRAME_EXPORT unsigned random() const;
+	WOLFRAME_EXPORT void generate( unsigned char* buffer, size_t bytes ) const;
 
 protected:
 	RandomGenerator();
