@@ -218,7 +218,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		case types::Variant::Timestamp:
 		{
 			/*[PF:TODO] Implementation*/
-			m_data.back().v.convert( Variant::String);
+			m_data.back().v.convert( types::Variant::String);
 			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
 			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
@@ -227,7 +227,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 		case types::Variant::BigNumber:
 		{
 			/*[PF:TODO] Implementation*/
-			m_data.back().v.convert( Variant::String);
+			m_data.back().v.convert( types::Variant::String);
 			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
 			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
