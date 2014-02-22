@@ -38,6 +38,8 @@
 #include <boost/locale.hpp>
 #include <boost/locale/utf.hpp>
 #include <boost/locale/boundary/index.hpp>
+// not nice, but draws in auto-linking (see bug #84)
+#include <boost/thread.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;

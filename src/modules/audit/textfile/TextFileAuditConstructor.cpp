@@ -45,7 +45,7 @@ TextFileAuditor* TextFileAuditConstructor::object( const config::NamedConfigurat
 	const TextFileAuditConfig& cfg = dynamic_cast< const TextFileAuditConfig& >( conf );
 
 	TextFileAuditor* m_audit = new TextFileAuditor( cfg.m_file );
-	MOD_LOG_TRACE << "Text file auditor container created";
+	LOG_TRACE << "Text file auditor container created";
 	return m_audit;
 }
 

@@ -38,18 +38,22 @@
 #ifndef _LOG_BACKEND_HPP_INCLUDED
 #define _LOG_BACKEND_HPP_INCLUDED
 
-// #include "singleton.hpp"
-#include <boost/utility.hpp>
-
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 
 #include <string>
 
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
+
+
 namespace _Wolframe {
 namespace log {
 
-class LogBackend: private boost::noncopyable
+class WOLFRAME_EXPORT LogBackend
 {
 public:
 	~LogBackend();
@@ -86,6 +90,11 @@ protected:
 	LogBackend();
 
 private:
+	// make it noncopyable
+	LogBackend( const LogBackend& );
+	const LogBackend& operator= ( const LogBackend& );
+
+	// implemented as a PIMPL
 	class LogBackendImpl;
 	LogBackendImpl	*impl_;
 };

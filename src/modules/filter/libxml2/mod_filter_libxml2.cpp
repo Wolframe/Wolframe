@@ -41,16 +41,9 @@
 #include "logger-v1.hpp"
 #include <cstring>
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 namespace lb = _Wolframe::langbind;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 namespace {
 struct Libxml2FilterObject
@@ -80,6 +73,6 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 #endif
 
-ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", 0, 0, NofObjects, objdef);
 
 

@@ -36,19 +36,12 @@
 #include "logger-v1.hpp"
 #include "graphix.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 using namespace _Wolframe::graphix;
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger );
-}
-
 namespace {
-	
+
 struct graphix_info_func
 {
 	static SimpleBuilder* constructor()
@@ -83,5 +76,5 @@ static createBuilderFunc objdef[NofObjects] =
 	graphix_thumb_func::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );
+ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
 

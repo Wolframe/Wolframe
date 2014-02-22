@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "gtest/gtest.h"
 
 #include "PostgreSQL.hpp"
@@ -12,8 +12,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::log;
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 // The fixture for testing Wolframe module that log
 class PQmoduleFixture : public ::testing::Test
@@ -25,7 +23,6 @@ class PQmoduleFixture : public ::testing::Test
 			logBack( LogBackend::instance( ) )
 		{
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
-			logBackendPtr = &logBack;
 		}
 };
 
@@ -83,17 +80,17 @@ TEST_F( PQmoduleFixture, Transaction )
 	// ok transaction
 	trans->begin( );
 	trans->commit( );
-	
+
 	// rollback transaction
 	trans->begin( );
 	trans->rollback( );
-	
+
 	// error, commit without begin
 	EXPECT_THROW( trans->commit( ), std::runtime_error );
-	
+
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-	
+
 	trans->close( );
 }
 
@@ -148,7 +145,7 @@ static void executeInsertStatements( Transaction* trans)
 }
 
 TEST_F( PQmoduleFixture, ExecuteInstruction )
-{	
+{
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::list<std::string>());
@@ -228,7 +225,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ) / 2, price );
 				break;
 			}
-			
+
 			case 5: {
 				ASSERT_EQ( ri->at(0).type(), types::Variant::Null);
 				ASSERT_EQ( ri->at(1).type(), types::Variant::Null);
@@ -253,7 +250,7 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 
 	// execute an illegal SQL statement, must throw
@@ -267,7 +264,7 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-	
+
 	// auto rollback?
 	// auto close transaction?
 }
@@ -279,7 +276,7 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
@@ -314,7 +311,7 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
@@ -360,7 +357,7 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	std::vector<types::Variant> values;
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
@@ -388,7 +385,7 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	// auto rollback?
-	// auto close transaction?	
+	// auto close transaction?
 }
 
 TEST_F( PQmoduleFixture, ReusedBindParameter )
@@ -398,7 +395,7 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
@@ -435,7 +432,7 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 			     3, 4, 3, 10, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");

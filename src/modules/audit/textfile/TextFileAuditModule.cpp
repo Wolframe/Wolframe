@@ -35,10 +35,8 @@
 //
 
 #include "TextFileAudit.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -51,18 +49,12 @@ static ConfiguredBuilder* createModule( void )
 	return &mod;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
 static const unsigned short nrContainers = 1;
 static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 
-ModuleEntryPoint entryPoint( 0, "Text file audit", setModuleLogger,
+ModuleEntryPoint entryPoint( 0, "Text file audit",
 			     nrContainers, containers,
 			     0, NULL );
 

@@ -117,31 +117,4 @@ Logger& operator<<( Logger& logger, T t )
 #define LOG_FATAL	if ( _Wolframe::log::LogBackend::instance().minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_FATAL ) ; \
 			else _Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
 
-// temporary modules hack
-extern _Wolframe::log::LogBackend*	logBackendPtr;
-#define MOD_LOG_DATA2	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA2 ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA2 )
-#define MOD_LOG_DATA	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
-#define MOD_LOG_TRACE	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_TRACE ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_TRACE )
-#define MOD_LOG_DEBUG	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DEBUG ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DEBUG )
-#define MOD_LOG_INFO	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_INFO ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_INFO )
-#define MOD_LOG_NOTICE	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_NOTICE ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_NOTICE )
-#define MOD_LOG_WARNING	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_WARNING ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_WARNING )
-#define MOD_LOG_ERROR	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_ERROR ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ERROR )
-#define MOD_LOG_SEVERE	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_SEVERE ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_SEVERE )
-#define MOD_LOG_CRITICAL if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_CRITICAL ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_CRITICAL )
-#define MOD_LOG_ALERT	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_ALERT ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ALERT )
-#define MOD_LOG_FATAL	if ( logBackendPtr->minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_FATAL ) ; \
-			else _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
-
 #endif // _LOGGER_HPP_INCLUDED

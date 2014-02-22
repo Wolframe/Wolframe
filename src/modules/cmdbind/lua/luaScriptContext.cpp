@@ -33,8 +33,8 @@
 ///\file luaScriptContext.cpp
 ///\brief Implementation of the lua script objects configuration
 #include "luaScriptContext.hpp"
-#include "processor/moduleInterface.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleInterface.hpp"
+#include "module/moduleDirectory.hpp"
 #include <algorithm>
 
 using namespace _Wolframe;

@@ -45,7 +45,7 @@ PAMAuthenticator* PAMAuthConstructor::object( const config::NamedConfiguration& 
 	const PAMAuthConfig& cfg = dynamic_cast< const PAMAuthConfig& >( conf );
 
 	PAMAuthenticator* m_auth = new PAMAuthenticator( cfg.m_identifier, cfg.m_service );
-	MOD_LOG_NOTICE << "PAM authenticator container created";
+	LOG_NOTICE << "PAM authenticator container created";
 	return m_auth;
 }
 

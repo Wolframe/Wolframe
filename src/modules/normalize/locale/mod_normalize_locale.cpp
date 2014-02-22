@@ -36,15 +36,8 @@
 #include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static types::NormalizeResourceHandle* createLocaleResourceHandle()
 {
@@ -83,5 +76,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	NormalizeProcessor::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
 

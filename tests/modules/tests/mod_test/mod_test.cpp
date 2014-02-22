@@ -34,11 +34,9 @@
 // a test module
 //
 
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 #include "mod_test.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -47,12 +45,12 @@ namespace test {
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {
-	MOD_LOG_DEBUG << "Test module config created";
+	LOG_DEBUG << "Module: test module config created";
 }
 
 TestModuleConfig::~TestModuleConfig()
 {
-	MOD_LOG_DEBUG << "Test module config destroyed";
+	LOG_DEBUG << "Module: test module config destroyed";
 }
 
 bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
@@ -79,22 +77,23 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 TestUnit* TestModuleConstructor::object( const config::NamedConfiguration& /* conf */ )
 {
 	TestUnit* m_test = new TestUnitImpl( /* conf */ );
-	MOD_LOG_DEBUG << "Test module object created";
+	LOG_DEBUG << "Module: test module object created";
 	return m_test;
 }
 
 TestUnitImpl::TestUnitImpl( )
 {
-	MOD_LOG_DEBUG << "TestUnit object created";
+	LOG_DEBUG << "Module: testUnit object created";
 }
 
 TestUnitImpl::~TestUnitImpl( )
 {
-	MOD_LOG_DEBUG << "TestUnit object destroyed";
+	LOG_DEBUG << "Module: testUnit object destroyed";
 }
 
 const std::string TestUnitImpl::hello( )
 {
+	LOG_ALERT << "MODULE: hello() called";
 	return "hello";
 }
 
@@ -110,18 +109,13 @@ static ConfiguredBuilder* createModule( void )
 	return &mod;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
 
 static const unsigned short nrContainers = 1;
 static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 
-ModuleEntryPoint entryPoint( 0, "Test Module", setModuleLogger,
+ModuleEntryPoint entryPoint( 0, "Test Module",
 			     nrContainers, containers,
 			     0, NULL );
 

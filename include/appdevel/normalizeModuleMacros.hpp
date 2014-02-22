@@ -37,13 +37,6 @@
 
 //\brief Marks the start of the Wolframe C++ form function module after the includes section.
 #define NORMALIZER_MODULE(NAME,DESCRIPTION)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
 	static const char* _Wolframe__moduleName()\
 	{\
 		return NAME;\
@@ -61,13 +54,6 @@
 
 //\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
 #define NORMALIZER_MODULE_WITH_RESOURCE(NAME,DESCRIPTION,RESOURCECLASS)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
 	static const char* _Wolframe__moduleName()\
 	{\
 		return NAME;\
@@ -84,11 +70,11 @@
 	{
 
 
-//\brief Defines normalization function in the NORMALIZER_MODULE section 
+//\brief Defines normalization function in the NORMALIZER_MODULE section
 #define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
-//\brief Defines the end of the NORMALIZER_MODULE section 
+//\brief Defines the end of the NORMALIZER_MODULE section
 #define NORMALIZER_MODULE_END\
 		{0,0}\
 	};\
@@ -106,5 +92,5 @@
 	{\
 		ModuleImpl::constructor\
 	};\
-	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__setModuleLogger, 0, 0, NofObjects, _Wolframe__objdef);
+	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
 

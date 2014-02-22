@@ -37,8 +37,6 @@
 #include "logger-v1.hpp"
 #include <cstring>
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 namespace lb = _Wolframe::langbind;
@@ -54,17 +52,12 @@ struct CharFilterObject
 }//anonymous namespace
 
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
-
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
 	CharFilterObject::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "char filter", 0, 0, NofObjects, objdef);
 
 

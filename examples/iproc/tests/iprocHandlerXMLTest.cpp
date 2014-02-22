@@ -36,7 +36,7 @@
 #include "system/connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/procProvider.hpp"

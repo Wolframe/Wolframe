@@ -87,7 +87,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					   NULL );
 #endif
 		if( res != SQLITE_OK )	{
-			MOD_LOG_ALERT << "Unable to open SQLite database '" << filename
+			LOG_ALERT << "Unable to open SQLite database '" << filename
 				      << "': " << sqlite3_errmsg( handle );
 				sqlite3_close( handle );	// really ?!?
 			throw std::runtime_error( "Unable to open SQLite database" );
@@ -96,7 +96,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			if ( !checked )	{
 				res = sqlite3_exec( handle, "PRAGMA integrity_check", NULL, NULL, &err );
 				if( res != SQLITE_OK )	{
-					MOD_LOG_ALERT << "Corrupt SQLite database '" << filename
+					LOG_ALERT << "Corrupt SQLite database '" << filename
 						      << "': " << err;
 					sqlite3_close( handle );
 				}
@@ -111,7 +111,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			if ( foreignKeys )	{
 				res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
 				if( res != SQLITE_OK ) {
-					MOD_LOG_ALERT << "Unable to enforce integrity checks in '" << filename
+					LOG_ALERT << "Unable to enforce integrity checks in '" << filename
 						      << "': " << err;
 				}
 				if( err ) {
@@ -125,12 +125,12 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			// enable extensions in every connection
 			std::list<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
 			for( ; it != end; it++ ) {
-				MOD_LOG_DEBUG << "Loading extension '" << *it << "' for SQLite database unit '" << m_ID << "'";
+				LOG_DEBUG << "Loading extension '" << *it << "' for SQLite database unit '" << m_ID << "'";
 				// No extension file, do nothing
 				if( (*it).empty( ) ) continue;
 
 				if( !boost::filesystem::exists( (*it) ) ) {
-					MOD_LOG_ALERT << "Extension file '" << (*it) << "' does not exist (SQLite database '" << m_ID << "')";
+					LOG_ALERT << "Extension file '" << (*it) << "' does not exist (SQLite database '" << m_ID << "')";
 					continue;
 				}
 
@@ -141,14 +141,14 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				char *errmsg;
 				int rc = sqlite3_load_extension( handle, (*it).c_str( ), 0, &errmsg );
 				if( rc != SQLITE_OK ) {
-					MOD_LOG_ALERT << "Unable to load SQLite extension '" << (*it)
+					LOG_ALERT << "Unable to load SQLite extension '" << (*it)
 						      << "': " << errmsg;
 					sqlite3_free( errmsg );
 					// Aba, TOOD: throw here?
 					continue;
 				}
 			}
-			MOD_LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
+			LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
 
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
@@ -156,7 +156,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 	}
 	m_db.setUnit( this );
 
-	MOD_LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
+	LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
 		      << connections << " connections to file '" << m_filename << "'";
 }
 
@@ -168,7 +168,7 @@ SQLiteDBunit::~SQLiteDBunit( )
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
 	}
-	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
+	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
 void SQLiteDBunit::loadProgram( const std::string& filename )
@@ -177,7 +177,7 @@ void SQLiteDBunit::loadProgram( const std::string& filename )
 	if ( filename.empty())
 		return;
 	if ( !boost::filesystem::exists( filename ))	{
-		MOD_LOG_ALERT << "Program file '" << filename
+		LOG_ALERT << "Program file '" << filename
 			      << "' does not exist (SQLite database '" << m_ID << "')";
 		return;
 	}
@@ -196,10 +196,10 @@ void SQLiteDBunit::loadAllPrograms()
 	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
-		MOD_LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
+		LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
 		loadProgram( *pi);
 	}
-	MOD_LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";
+	LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";
 }
 
 Database* SQLiteDBunit::database()

@@ -20,7 +20,7 @@ source=(
 )
 
 md5sums=('68b6fd14c81367ee90a8a603ee017fc2'
-         '2fde608c00c6d098683db533cbaab07b'
+         '49ac64b1957318385c53afffffbdf912'
          'cc146a28908aad55f156860340934095')
 
 package() {

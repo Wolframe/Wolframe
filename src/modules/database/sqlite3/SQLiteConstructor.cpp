@@ -48,7 +48,7 @@ SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf 
 					       cfg.foreignKeys(), cfg.profiling(),
 					       cfg.connections(), cfg.programFiles(),
 					       cfg.extensionFiles());
-	MOD_LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
+	LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
 	return m_db;
 }
 

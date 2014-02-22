@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "types/variant.hpp"
 #include "types/integer.hpp"
 #include "gtest/gtest.h"
@@ -19,8 +19,6 @@ using namespace _Wolframe::log;
 using namespace _Wolframe::UI;
 
 
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 // The fixture for testing Wolframe module that log
 class SQLiteModuleFixture : public ::testing::Test
 {
@@ -31,7 +29,6 @@ class SQLiteModuleFixture : public ::testing::Test
 			logBack( LogBackend::instance( ) )
 		{
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
-			logBackendPtr = &logBack;
 		}
 };
 
@@ -71,17 +68,17 @@ TEST_F( SQLiteModuleFixture, Transaction )
 	// ok transaction
 	trans->begin( );
 	trans->commit( );
-	
+
 	// rollback transaction
 	trans->begin( );
 	trans->rollback( );
-	
+
 	// error, commit without begin
 	EXPECT_THROW( trans->commit( ), std::runtime_error );
-	
+
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-	
+
 	trans->close( );
 }
 
@@ -134,7 +131,7 @@ static void executeInsertStatements( Transaction* trans)
 }
 
 TEST_F( SQLiteModuleFixture, ExecuteInstruction )
-{	
+{
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
@@ -213,7 +210,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ), price );
 				break;
 			}
-			
+
 			case 5: {
 				ASSERT_EQ( ri->at(0).type(), types::Variant::Null);
 				ASSERT_EQ( ri->at(1).type(), types::Variant::Null);
@@ -224,7 +221,7 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 				ASSERT_FALSE( ri->at(2).defined( ) );
 				ASSERT_FALSE( ri->at(3).defined( ) );
 				break;
-			}				
+			}
 		}
 	}
 
@@ -237,7 +234,7 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 
 	// execute an illegal SQL statement, must throw
@@ -251,7 +248,7 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-	
+
 	// auto rollback
 	// auto close transaction
 }
@@ -262,7 +259,7 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
@@ -282,7 +279,7 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 		std::cout << e.what( ) << std::endl;
 //	} catch( const DatabaseTransactionErrorException &e ) {
 //		std::cout << e.what( );
-//		ASSERT_EQ( e.errorclass, "INTERNAL" );		
+//		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -297,7 +294,7 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
@@ -316,7 +313,7 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 		FAIL( ) << "Reached success state, but should fail!";
 	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
-		ASSERT_EQ( e.errorclass, "INTERNAL" );		
+		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -331,7 +328,7 @@ TEST_F( SQLiteModuleFixture, IllegalBindParameter )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name TEXT, active BOOLEAN, price REAL)");
@@ -349,12 +346,12 @@ TEST_F( SQLiteModuleFixture, IllegalBindParameter )
 		FAIL( ) << "Reached success state, but should fail!";
 	} catch( const DatabaseTransactionErrorException &e ) {
 		std::cout << e.what( ) << std::endl;
-		ASSERT_EQ( e.errorclass, "INTERNAL" );		
+		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 	// auto rollback?
-	// auto close transaction?	
+	// auto close transaction?
 }
 
 TEST_F( SQLiteModuleFixture, ReusedBindParameter )
@@ -363,7 +360,7 @@ TEST_F( SQLiteModuleFixture, ReusedBindParameter )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
@@ -399,7 +396,7 @@ TEST_F( SQLiteModuleFixture, ExpressionWithParametersAndTypeCoercion )
 			     std::list<std::string>(), std::list<std::string>() );
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
-	
+
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
 	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");

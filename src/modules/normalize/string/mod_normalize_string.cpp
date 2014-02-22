@@ -36,15 +36,8 @@
 #include "logger-v1.hpp"
 #include "stringNormalize.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static NormalizeFunctionDef normalizeFunctions[] =
 {
@@ -72,5 +65,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	NormalizeProcessor::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", 0, 0, NofObjects, objdef);
 

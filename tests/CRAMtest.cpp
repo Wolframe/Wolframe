@@ -40,7 +40,7 @@
 
 TEST( CRAM, UninitializedRandomGenerator )
 {
-	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge	challenge, std::logic_error );
+	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge, std::logic_error );
 }
 
 TEST( CRAM, Challenge )

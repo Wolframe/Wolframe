@@ -57,7 +57,7 @@ TextFileAuthenticator::TextFileAuthenticator( const std::string& Identifier,
 					      const std::string& filename )
 	: AuthenticationUnit( Identifier ), m_pwdFile( filename, false )
 {
-	MOD_LOG_DEBUG << "Text file authenticator '" << identifier()
+	LOG_DEBUG << "Text file authenticator '" << identifier()
 		      << "' created with file '" << m_pwdFile.filename() << "'";
 }
 

@@ -52,7 +52,7 @@ OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf 
 						       cfg.connections, cfg.acquireTimeout,
 						       cfg.statementTimeout,
 						       cfg.programFiles());
-	MOD_LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
+	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }
 

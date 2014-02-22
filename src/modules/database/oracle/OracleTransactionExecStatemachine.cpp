@@ -453,7 +453,7 @@ bool TransactionExecStatemachine_oracle::execute()
 				}
 			}
 					
-			MOD_LOG_TRACE << "Column " << counter << ", name: " << descrRef->name
+			LOG_TRACE << "Column " << counter << ", name: " << descrRef->name
 				<< ", type: " << descrRef->dataType
 				<< ", sizeInChars: " << sizeInChars
 				<< ", precision: " << precision
@@ -552,7 +552,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	
 	OracleColumnDescriptionPtr descrRef = m_colDescr[idx-1];
 
-	MOD_LOG_TRACE << "Data "
+	LOG_TRACE << "Data "
 		<< ", type: " << descrRef->dataType
 		<< ", fetchType: " << descrRef->fetchType
 		<< ", ind: " << descrRef->ind

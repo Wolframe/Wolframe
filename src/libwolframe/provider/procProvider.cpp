@@ -40,7 +40,7 @@
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/filesystem.hpp>

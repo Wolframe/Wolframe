@@ -119,7 +119,6 @@ usr/pkg/include/wolframe/appConfig.hpp
 usr/pkg/include/wolframe/appDevel.hpp
 usr/pkg/include/wolframe/appProperties.hpp
 usr/pkg/include/wolframe/logger-v1.hpp
-usr/pkg/include/wolframe/singleton.hpp
 usr/pkg/include/wolframe/standardConfigs.hpp
 usr/pkg/include/wolframe/version.hpp
 usr/pkg/include/wolframe/langbind/appObjects.hpp
@@ -200,8 +199,8 @@ usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
 @dirrm usr/pkg/include/wolframe/serialize/ddl
 @dirrm usr/pkg/include/wolframe/serialize
 usr/pkg/include/wolframe/processor/jobSchedule.hpp
-usr/pkg/include/wolframe/processor/moduleDirectory.hpp
-usr/pkg/include/wolframe/processor/moduleInterface.hpp
+usr/pkg/include/wolframe/module/moduleDirectory.hpp
+usr/pkg/include/wolframe/module/moduleInterface.hpp
 usr/pkg/include/wolframe/processor/procProvider.hpp
 usr/pkg/include/wolframe/processor/userInterface.hpp
 @dirrm usr/pkg/include/wolframe/processor

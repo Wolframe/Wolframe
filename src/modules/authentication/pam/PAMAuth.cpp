@@ -48,7 +48,7 @@ namespace AAAA {
 bool PAMAuthConfig::check() const
 {
 	if ( m_service.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "PAM authentication service cannot be empty";
+		LOG_ERROR << logPrefix() << "PAM authentication service cannot be empty";
 		return false;
 	}
 	return true;
@@ -233,7 +233,7 @@ PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
 
 	m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
 
-	MOD_LOG_DEBUG << "PAM authenticator created with PAM service '" << m_service << "'";
+	LOG_DEBUG << "PAM authenticator created with PAM service '" << m_service << "'";
 }
 
 PAMAuthenticator::~PAMAuthenticator()

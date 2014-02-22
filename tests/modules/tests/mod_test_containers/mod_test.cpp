@@ -34,11 +34,9 @@
 // a test module
 //
 
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
 #include "mod_test.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -47,7 +45,7 @@ namespace test_containers {
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {
-	MOD_LOG_DEBUG << "Test module config created";
+	LOG_DEBUG << "Module: test module config created";
 }
 
 bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
@@ -74,44 +72,46 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 TestUnit1* TestModuleContainer1::object( const config::NamedConfiguration& /* conf */ )
 {
 	TestUnit1* m_test = new TestUnitImpl1( /* conf */ );
-	MOD_LOG_DEBUG << "Test module 1 container created";
+	LOG_DEBUG << "Module: test module 1 container created";
 	return m_test;
 }
 
 TestUnit2* TestModuleContainer2::object( const config::NamedConfiguration& /*conf */ )
 {
 	TestUnit2* m_test = new TestUnitImpl2( /* conf */ );
-	MOD_LOG_DEBUG << "Test module 2 container created";
+	LOG_DEBUG << "Module: test module 2 container created";
 	return m_test;
 }
 
 TestUnitImpl1::TestUnitImpl1( )
 {
-	MOD_LOG_DEBUG << "TestUnit1 object created";
+	LOG_DEBUG << "Module: TestUnit1 object created";
 }
 
 TestUnitImpl2::TestUnitImpl2( )
 {
-	MOD_LOG_DEBUG << "TestUnit2 object created";
+	LOG_DEBUG << "Module: TestUnit2 object created";
 }
 
 TestUnitImpl1::~TestUnitImpl1( )
 {
-	MOD_LOG_DEBUG << "TestUnit1 object destroyed";
+	LOG_DEBUG << "Module: TestUnit1 object destroyed";
 }
 
 TestUnitImpl2::~TestUnitImpl2( )
 {
-	MOD_LOG_DEBUG << "TestUnit2 object destroyed";
+	LOG_DEBUG << "Module: TestUnit2 object destroyed";
 }
 
 const std::string TestUnitImpl1::hello( )
 {
+	LOG_ALERT << "MODULE: hello() called";
 	return "hello";
 }
 
 const std::string TestUnitImpl2::hullo( )
 {
+	LOG_ALERT << "MODULE: hullo() called";
 	return "hullo";
 }
 
@@ -139,11 +139,6 @@ static ConfiguredBuilder* createModule2( void )
 	return &mod;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
 
 static const unsigned short nrContainers = 2;
 static ConfiguredBuilder* (*containers[ nrContainers ])() = {
@@ -151,7 +146,7 @@ static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule2
 };
 
-ModuleEntryPoint entryPoint( 0, "Test Module with containers", setModuleLogger,
+ModuleEntryPoint entryPoint( 0, "Test Module with containers",
 			     nrContainers, containers,
 			     0, NULL );
 

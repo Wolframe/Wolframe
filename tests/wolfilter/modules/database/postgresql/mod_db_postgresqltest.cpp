@@ -35,10 +35,8 @@
 ///  based on the postgres database module
 
 #include "PostgreSQLTest.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend* logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -52,18 +50,13 @@ static ConfiguredBuilder* createDatabase()
 	return &mod;
 }
 
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast<_Wolframe::log::LogBackend*>( logger);
-}
-
 enum { NofObjects = 1 };
 static CreateBuilderFunc containers[ NofObjects] =
 {
 	createDatabase
 };
 
-ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", setModuleLogger, NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", NofObjects, containers, 0, 0);
 
 }} // namespace _Wolframe::module
 

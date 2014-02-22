@@ -152,20 +152,16 @@ struct ModuleEntryPoint
 	char signature[MODULE_SIGN_SIZE];		///< module entry point signature
 	unsigned short ifaceVersion;			///< version of the module loader interface
 	const char* name;				///< name of the module
-	void (*setLogger)(void*);			///< pointer to function that sets the
-							/// the logger for the module objects
 	unsigned short		cfgdContainers;		///< number of configured builders
 	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
 	unsigned short		containers;		///< number of simple (unconfigured) builders
 	createBuilderFunc	*createBuilder;		///< the array of functions that create the simple builders
 public:
 	ModuleEntryPoint( unsigned short iVer, const char* modName,
-			  void (*setLoggerFunc)(void*),
 			  unsigned short nrContainers, createCfgdBuilderFunc* containerFunc,
 			  unsigned short nrObjects, createBuilderFunc* objectFunc
 			  )
 		: ifaceVersion( iVer ), name( modName ),
-		  setLogger( setLoggerFunc ),
 		  cfgdContainers( nrContainers ), createCfgdBuilder( containerFunc ),
 		  containers( nrObjects ), createBuilder( objectFunc )
 	{

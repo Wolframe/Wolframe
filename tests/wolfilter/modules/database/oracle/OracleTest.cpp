@@ -219,7 +219,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 								it != tables.end(); it++ )	{
 			std::string query = "DROP TABLE " + *it;
 			
-			MOD_LOG_TRACE << "Deleting test table " << query;
+			LOG_TRACE << "Deleting test table " << query;
 
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -273,7 +273,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 								it != tables.end(); it++ )	{
 			std::string query = "DROP SEQUENCE " + *it;
 			
-			MOD_LOG_TRACE << "Deleting test sequence " << query;
+			LOG_TRACE << "Deleting test sequence " << query;
 
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -345,7 +345,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 			
 			if( dbcmd.empty( ) ) continue;
 			
-			MOD_LOG_TRACE << "Creating database SQL statement: " << dbcmd;
+			LOG_TRACE << "Creating database SQL statement: " << dbcmd;
 			
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );

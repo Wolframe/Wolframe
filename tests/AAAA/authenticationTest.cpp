@@ -22,11 +22,6 @@ using namespace _Wolframe::log;
 using namespace _Wolframe;
 using namespace std;
 
-// Aba: temporary hack to make the logger in the PAMAuthenticator work
-// (some mixup here with logging in a module of a class which would actually
-// be standalone)
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 // The fixture for testing class _Wolframe::module
 class AuthenticationFixture : public ::testing::Test
 {
@@ -37,10 +32,6 @@ class AuthenticationFixture : public ::testing::Test
 		AuthenticationFixture( ) :
 			logBack( LogBackend::instance( ) )
 		{
-			// set temporary logger pointer to the logger instantiated
-			// in the test fixture
-			logBackendPtr = &logBack;
-
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
 		}
 };

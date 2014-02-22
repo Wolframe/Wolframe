@@ -42,7 +42,7 @@ using namespace _Wolframe::module;
 DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironmentConfig* cfg)
 	:m_clr(cfg->clrversion())
 {
-	MOD_LOG_DEBUG << "Registering .NET functions";
+	LOG_DEBUG << "Registering .NET functions";
 
 	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->assemblylist().begin(), le = cfg->assemblylist().end();
 	for (int typelibidx=0; li != le; ++li,++typelibidx)
@@ -52,10 +52,10 @@ DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironme
 			std::string path( utils::joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
 			std::replace( path.begin(), path.end(), '/', '\\'); //PF:HACK: Substitution at wrong place because path may contain 'C:/'
 
-			MOD_LOG_DEBUG << "Loading type library '" << li->name << "' from file '" << path << "'";
+			LOG_DEBUG << "Loading type library '" << li->name << "' from file '" << path << "'";
 			m_typelibs.push_back( comauto::TypeLib( path));
 
-			MOD_LOG_TRACE << "Loading functions from type library '" << li->name << "'";
+			LOG_TRACE << "Loading functions from type library '" << li->name << "'";
 			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->description);
 			std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		

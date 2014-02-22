@@ -47,7 +47,7 @@ namespace AAAA {
 TextFileAuditor::TextFileAuditor( const std::string& filename )
 	: m_file( filename )
 {
-	MOD_LOG_DEBUG << "Text file auditor created with file '" << m_file << "'";
+	LOG_DEBUG << "Text file auditor created with file '" << m_file << "'";
 }
 
 TextFileAuditor::~TextFileAuditor()

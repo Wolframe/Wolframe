@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "types/normalizeFunction.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
 #include <boost/shared_ptr.hpp>

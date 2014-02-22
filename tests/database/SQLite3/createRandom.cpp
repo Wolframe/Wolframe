@@ -10,9 +10,6 @@
 
 #include "logger-v1.hpp"
 
-// to make linking in this directory possible
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace std;
 
 static int intRand( int min, int max )
@@ -27,18 +24,18 @@ int main( int argc, char *argv[] )
 	if( argc != 3 ) {
 		return 1;
 	}
-	
+
 	fstream f( argv[2], ios::out | ios::binary );
-	
+
 	int N = atoi( argv[1] );
 	char *buf = new char[N];
-	 
+
 	for( int i = 0; i < N; i++ ) {
 		buf[i] = (unsigned char )intRand( 0, 255 );
 	}
-		
+
 	f.write( buf, N );
-	
+
 	f.close( );
 
 	delete[] buf;

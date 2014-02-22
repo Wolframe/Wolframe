@@ -37,15 +37,8 @@
 #include "datatypeBigint.hpp"
 #include "datatypeBigfxp.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static CustomDataTypeDef customDataTypes[] =
 {
@@ -70,5 +63,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	Obj::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", 0, 0, NofObjects, objdef);
 

@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_PROGRAM_TYPE_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_PROGRAM_TYPE_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include <boost/shared_ptr.hpp>
 

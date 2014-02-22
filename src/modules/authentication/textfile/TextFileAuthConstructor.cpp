@@ -45,7 +45,7 @@ TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfi
 	const TextFileAuthConfig& cfg = dynamic_cast< const TextFileAuthConfig& >( conf );
 
 	TextFileAuthenticator* m_auth = new TextFileAuthenticator( cfg.m_identifier, cfg.m_file );
-	MOD_LOG_DEBUG << "Text file authenticator container created for '"
+	LOG_DEBUG << "Text file authenticator container created for '"
 		      << cfg.m_identifier << "'";
 	return m_auth;
 }
