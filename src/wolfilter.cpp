@@ -52,9 +52,6 @@ static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
 
-#define DO_STRINGIFY(x)	#x
-#define STRINGIFY(x)	DO_STRINGIFY(x)
-
 int main( int argc, char **argv )
 {
 	bool doExit = false;
@@ -67,11 +64,7 @@ int main( int argc, char **argv )
 			config::WolfilterCommandLine::print( std::cerr);
 			return 0;
 		}
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR), "");
-#else
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), execdir.string(), "");
-#endif
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";

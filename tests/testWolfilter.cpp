@@ -155,7 +155,7 @@ TEST_F( WolfilterTest, tests)
 		boost::filesystem::path refpath( g_testdir / "temp");
 		std::string outstr;
 		{
-			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), refpath.string());
+			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
 
 			// [2.5] Call iostreamfilter
 			if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;

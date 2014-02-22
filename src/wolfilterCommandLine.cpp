@@ -54,6 +54,11 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
+//\brief Macros to stringify compile options
+#define DO_STRINGIFY2(x) #x
+#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
+
+
 static bool checkNumber( const char* src)
 {
 	int ii;
@@ -272,14 +277,13 @@ struct WolfilterOptionStruct
 	}
 };
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
 	,m_inbufsize(8<<10)
 	,m_outbufsize(8<<10)
 	,m_referencePath(referencePath_)
-	,m_modulePath(modulePath)
 {
 	static const WolfilterOptionStruct ost;
 	po::variables_map vmap;
@@ -336,7 +340,24 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		if (vmap.count( "cmdprogram")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "database")) throw std::runtime_error( "incompatible options: --config specified with --database");
 	}
-	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
+	if (vmap.count( "input"))
+	{
+		m_inputfile = vmap["input"].as<std::string>();
+	}
+	std::string modulePath;
+#if defined( DEFAULT_MODULE_LOAD_DIR)
+	if (useDefaultModuleDir)
+	{
+		modulePath = DO_STRINGIFY( DEFAULT_MODULE_LOAD_DIR);
+	}
+	else
+	{
+		modulePath = m_referencePath;
+	}
+#else
+	modulePath = m_referencePath;
+#endif
+
 	if (vmap.count( "module"))
 	{
 		m_modules = vmap["module"].as<std::vector<std::string> >();
@@ -345,7 +366,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		{
 			if (itr->size() == 0 || (*itr).at(0) != '.')
 			{
-				*itr = utils::getCanonicalPath( *itr, m_modulePath);
+				*itr = utils::getCanonicalPath( *itr, modulePath);
 			}
 			else if (!currentPath.empty())
 			{
@@ -356,7 +377,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	else
 	{
 		// Load configured modules (--config)
-		std::vector<std::string> cfgmod = configModules( m_referencePath);
+		std::vector<std::string> cfgmod = configModules( modulePath);
 		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	}
 	std::list<std::string> modfiles;

@@ -279,6 +279,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 
 	if (proc.size() == 0 || proc == "-")
 	{
+		if (ifl.empty() && ofl.empty()) throw std::runtime_error( "argument for command, form or function not defined and no filter for processing specified");
+
 		const void* elem;
 		int taglevel = 0;
 		std::size_t elemsize;
@@ -402,7 +404,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			return;
 		}
 	}
-	throw std::runtime_error( "command not found");
+	throw std::runtime_error( "command, form or function not found");
 }
 
 

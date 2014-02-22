@@ -49,7 +49,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir);
 	~WolfilterCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}
@@ -94,7 +94,6 @@ private:
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
-	std::string m_modulePath;
 };
 
 }}//namespace
