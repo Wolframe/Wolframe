@@ -148,7 +148,8 @@ std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned i
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
-#if defined(_WIN32)
+//#if defined(_WIN32)
+#if 0
 	enum {BUFFERSIZE=8192};
 	char readBuffer[ BUFFERSIZE+1];
 	DWORD dwBytesRead = 0;
@@ -208,7 +209,8 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-#if defined(_WIN32)
+//#if defined(_WIN32)
+#if 0
 	DWORD dwBytesWritten;
 	BOOL success;
 	struct Locals
@@ -400,11 +402,9 @@ struct FileTypeDetection
 
 FileType utils::getFileType( const std::string& filename)
 {
-/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	std::string source;
 	readFileContent( filename, source);
 
-/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	// Source: http://en.wikipedia.org/wiki/Byte_order_mark
 	static const unsigned char pt_BOM_UTF8[]  = {3, 0xEF, 0xBB, 0xBF};
 	static const unsigned char pt_BOM_UCS4BE[] = {4, 0x00,0x00,0xFE,0xFF};
@@ -412,11 +412,9 @@ FileType utils::getFileType( const std::string& filename)
 	static const unsigned char pt_BOM_UCS2BE[] = {2, 0xFE,0xFF};
 	static const unsigned char pt_BOM_UCS2LE[] = {2, 0xFF,0xFE};
 
-/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
 	static const CharTable SpaceCharTab( " \t\r\n");
 
-/*[-]*/std::cout << "utils::getFileType " << (int)__LINE__ << std::endl;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	//[0] Handle special cases:
 	if (si == se)
