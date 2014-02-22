@@ -46,8 +46,9 @@ class Variant;
 
 //\class BigNumber
 //\brief Type for representing big numbers as binary coded decimal (BCD) numbers
-struct BigNumber
+class BigNumber
 {
+public:
 	//\brief Default constructor
 	BigNumber();
 	//\brief Copy constructor

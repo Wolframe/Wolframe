@@ -37,18 +37,16 @@ BOOST_VC_VER = vc100
 # self-compiled
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 
-# OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
-##############################################################
-# OPENSSL_DIR = C:\OpenSSL\Win32
-
 # Postgresql libpq
 # (http://www.postgresql.org/)
 ##############################
-
 PGSQL_DIR = C:\Program Files (x86)\PostgreSQL\9.3
 
-# Tcl 8.5 and Expect
-####################
 
-#TCL_DIR = C:\Program Files (x86)\Tcl8.5.9
-#EXPECT = $(TCL_DIR)\bin\tclsh.exe
+# win_iconv
+###########
+WIN_ICONV_DIR = C:\Iconv\iconv-1.9.2
+
+# libxml2
+#########
+LIBXML2_DIR = C:\LibXML2\libxml2-2.7.8
