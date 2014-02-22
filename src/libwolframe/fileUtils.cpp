@@ -148,8 +148,7 @@ std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned i
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
-//[+]#if defined(_WIN32)	
-#if 0
+#if defined(_WIN32)
 	enum {BUFFERSIZE=8192};
 	char readBuffer[ BUFFERSIZE+1];
 	DWORD dwBytesRead = 0;
@@ -175,7 +174,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 	if (locals.hFile == INVALID_HANDLE_VALUE) 
 	{
 		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Failed to open file for reading [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+		throw std::runtime_error( std::string("Failed to open file for reading [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
 	}
 
 	while (TRUE == (success=::ReadFile( locals.hFile, readBuffer, BUFFERSIZE, &dwBytesRead, NULL)))
@@ -185,7 +184,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 	if (!success)
 	{
 		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Error reading from file [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+		throw std::runtime_error( std::string("Error reading from file [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
 	}
 #else
 	unsigned char ch;
@@ -209,8 +208,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-//[+]#if defined(_WIN32)	
-#if 0
+#if defined(_WIN32)
 	DWORD dwBytesWritten;
 	BOOL success;
 	struct Locals
@@ -234,14 +232,14 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 	if (locals.hFile == INVALID_HANDLE_VALUE) 
 	{
 		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Failed to open file for writing [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+		throw std::runtime_error( std::string("Failed to open file for writing [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
 	}
 
 	success = ::WriteFile( locals.hFile, content.c_str(), content.size(), &dwBytesWritten, NULL);
 	if (!success)
 	{
 		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Error writing to file [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+		throw std::runtime_error( std::string("Error writing to file [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
 	}
 	if (dwBytesWritten != content.size())
 	{
