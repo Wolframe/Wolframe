@@ -40,15 +40,19 @@ Project Wolframe.
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>
+#if WITH_LIBXSLT
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#endif
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+#if WITH_LIBXSLT
 
 namespace {
 
@@ -130,3 +134,9 @@ prgbind::Program* langbind::createXsltProgramType()
 	return new XsltProgramType;
 }
 
+#else
+prgbind::Program* langbind::createXsltProgramType()
+{
+	return 0;
+}
+#endif

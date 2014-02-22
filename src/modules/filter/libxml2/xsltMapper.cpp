@@ -41,6 +41,8 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+#if WITH_LIBXSLT
+
 static const utils::CharTable g_op( ",=");
 
 static boost::shared_ptr<const char*> stylesheetParams( std::vector<langbind::FilterArgument>& arg)
@@ -116,4 +118,5 @@ std::string XsltMapper::apply( const std::string& o) const
 	return mapped.getContent();
 }
 
+#endif
 

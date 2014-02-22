@@ -13,7 +13,9 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
 	/I"$(LIBXML2_DIR)\include\libxml2" \
+	/I"$(LIBXML2_DIR)\include" \
 	/I"$(WIN_ICONV_DIR)" \
+	/I"$(WIN_ICONV_DIR)\include" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \

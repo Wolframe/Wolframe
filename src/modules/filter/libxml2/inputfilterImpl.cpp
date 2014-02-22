@@ -86,6 +86,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	if (!end) throw std::logic_error( "internal: need buffering input filter");
 	m_nodestk.clear();
 
+#if WITH_LIBXSLT
 	if (m_xsltMapper.defined())
 	{
 		m_doc = m_xsltMapper.apply( DocumentReader( (const char*)content, contentsize));
@@ -94,6 +95,9 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	{
 		m_doc = DocumentReader( (const char*)content, contentsize);
 	}
+#else
+	m_doc = DocumentReader( (const char*)content, contentsize);
+#endif
 	if (!m_doc.get())
 	{
 		xmlError* err = xmlGetLastError();
