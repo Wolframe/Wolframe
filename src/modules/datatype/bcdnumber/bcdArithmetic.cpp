@@ -1088,7 +1088,7 @@ BigBCD BigBCD::neg() const
 	return rt;
 }
 
-BigFxpBCD::BigFxpBCD( const types::BigNumber& num)
+BigFxpBCD::BigFxpBCD( const _Wolframe::types::BigNumber& num)
 {
 	initFromNumber( num);
 }
