@@ -20,8 +20,8 @@ INCLUDE_DIRS = \
 
 # textwolf support for module types_string
 !IFDEF WITH_TEXTWOLF
-INCLUDE_CXXFLAGS = \
-	/I$(TOPDIR)\3rdParty\textwolf\include
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\textwolf\include
 !ENDIF
 
 
