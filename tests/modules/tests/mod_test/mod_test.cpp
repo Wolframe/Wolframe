@@ -93,6 +93,7 @@ TestUnitImpl::~TestUnitImpl( )
 
 const std::string TestUnitImpl::hello( )
 {
+	LOG_ALERT << "MODULE: hello() called";
 	return "hello";
 }
 
