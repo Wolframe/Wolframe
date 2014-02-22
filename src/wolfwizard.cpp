@@ -217,7 +217,6 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 			case types::VariantStruct::Int:
 			case types::VariantStruct::UInt:
 			case types::VariantStruct::String:
-			case types::VariantStruct::Custom:
 			case types::VariantStruct::Timestamp:
 			case types::VariantStruct::BigNumber:
 			case types::VariantStruct::Custom:
