@@ -34,6 +34,9 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
+#include "types/bignumber.hpp"
+#include "types/datetime.hpp"
+#include "types/customDataType.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "logger-v1.hpp"
@@ -89,11 +92,15 @@ static void setAtomValue( types::Variant& val, const types::VariantConst& elemen
 	{
 		val = normalizer->execute( element);
 	}
+	else if (valueType == types::Variant::Custom)
+	{
+		val.customref()->assign( element);
+	}
 	else
 	{
 		val = element;
+		val.convert( valueType);
 	}
-	val.convert( valueType);
 }
 
 static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
@@ -269,6 +276,8 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				case types::VariantStruct::UInt:
 				case types::VariantStruct::String:
 				case types::VariantStruct::Custom:
+				case types::VariantStruct::Timestamp:
+				case types::VariantStruct::BigNumber:
 					setAtomValue( *elem, element, stk.back().normalizer());
 					return true;
 
@@ -334,6 +343,8 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		case types::VariantStruct::UInt:
 		case types::VariantStruct::String:
 		case types::VariantStruct::Custom:
+		case types::VariantStruct::Timestamp:
+		case types::VariantStruct::BigNumber:
 		{
 			return parseAtom( *stk.back().value(), inp, ctx, stk);
 		}

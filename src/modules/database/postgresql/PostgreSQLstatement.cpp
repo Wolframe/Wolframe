@@ -1,5 +1,8 @@
 #include "PostgreSQLstatement.hpp"
 #include "types/variant.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cstring>
@@ -103,9 +106,36 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 			bindString( value.charptr(), value.charsize());
 			break;
 
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = value.tostring();
+			bindString( strval.c_str(), strval.size());
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = value.tostring();
+			bindString( strval.c_str(), strval.size());
+		}
 		case types::Variant::Custom:
-			throw std::logic_error( "Custom type in PostgreSQL database module not supported yet!");
-			break;
+		{
+			types::Variant baseval;
+			try
+			{
+				value.customref()->getBaseTypeValue( baseval);
+				if (baseval.type() != types::Variant::Custom)
+				{
+					bind( idx, baseval);
+					break;
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			throw std::runtime_error( "cannot convert value to base type for binding");
+		}
 		
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );

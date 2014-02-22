@@ -33,6 +33,8 @@ Project Wolframe.
 ///\brief Defines the intrucsive printing of a value for serialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
@@ -46,14 +48,16 @@ namespace traits {
 ///\brief type traits for print value types
 struct PrintValueType
 {
-	struct String {};		//< atomic type category tag for string value to print
+	struct String {};		//< atomic type category tag for a string value to print
 	struct Bool {};			//< atomic type category tag for a boolean value to print
-	struct Double {};		//< atomic type category tag for double precision value to print
-	struct UInt {};			//< atomic type category tag for unsinged integer value to print
-	struct Int {};			//< atomic type category tag for integer value to print
+	struct Double {};		//< atomic type category tag for a double precision value to print
+	struct UInt {};			//< atomic type category tag for an unsinged integer value to print
+	struct Int {};			//< atomic type category tag for an integer value to print
+	struct DateTime {};		//< atomic type category tag for a datetime value to print
+	struct BigNumber {};		//< atomic type category tag for a big number value to print
 
 	///\brief get category String for a type
-	///\return String if T is a std:string
+	///\return String if T is a std::string
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,std::string>::value
@@ -86,6 +90,20 @@ struct PrintValueType
 	static typename boost::enable_if_c<
 		boost::is_arithmetic<T>::value && boost::is_unsigned<T>::value && !boost::is_floating_point<T>::value
 		,const UInt&>::type get( const T&) { static UInt rt; return rt;}
+
+	///\brief get category DateTime for a type
+	///\return DateTime if T is a types::DateTime
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,types::DateTime>::value
+		,const DateTime&>::type get( const T&) { static DateTime rt; return rt;}
+
+	///\brief get category BigNumber for a type
+	///\return BigNumber if T is a types::BigNumber
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,types::BigNumber>::value
+		,const BigNumber&>::type get( const T&) { static BigNumber rt; return rt;}
 };
 
 
@@ -139,6 +157,20 @@ bool printValue_( const ValueType& val, const PrintValueType::UInt&, types::Vari
 	}
 	catch (boost::bad_numeric_cast&){}
 	return false;
+}
+
+template <typename ValueType>
+bool printValue_( const ValueType& val, const PrintValueType::DateTime&, types::VariantConst& element)
+{
+	element = val;
+	return true;
+}
+
+template <typename ValueType>
+bool printValue_( const ValueType& val, const PrintValueType::BigNumber&, types::VariantConst& element)
+{
+	element = val;
+	return true;
 }
 
 template <typename ValueType>

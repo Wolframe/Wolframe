@@ -109,6 +109,16 @@ bool serialize::parseValue_string( std::string* val, const types::VariantConst& 
 	return parseValue( *val, element);
 }
 
+bool serialize::parseValue_datetime( types::DateTime* val, const types::VariantConst& element)
+{
+	return parseValue( *val, element);
+}
+
+bool serialize::parseValue_bignumber( types::BigNumber* val, const types::VariantConst& element)
+{
+	return parseValue( *val, element);
+}
+
 bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;

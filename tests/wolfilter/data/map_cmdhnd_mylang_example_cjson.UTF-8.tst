@@ -120,7 +120,7 @@ run
 					"COUNTRY":	"USA",
 					"COMPANY":	"COLUMBIA",
 					"PRICE":	"10.90",
-					"YEAR":	"1985"
+					"YEAR":	"1986"
 				}
 			}, {
 				"TITLE":	"EL REI EL CANTINERO",
@@ -129,7 +129,7 @@ run
 					"COUNTRY":	"MEXICO",
 					"COMPANY":	"RCA",
 					"PRICE":	"15.90",
-					"YEAR":	"1958"
+					"YEAR":	"1959"
 				}
 			}, {
 				"TITLE":	"STILL GOT THE BLUES",
@@ -138,7 +138,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"VIRGIN RECORDS",
 					"PRICE":	"10.20",
-					"YEAR":	"1990"
+					"YEAR":	"1991"
 				}
 			}, {
 				"TITLE":	"EROS",
@@ -147,7 +147,7 @@ run
 					"COUNTRY":	"EU",
 					"COMPANY":	"BMG",
 					"PRICE":	"9.90",
-					"YEAR":	"1997"
+					"YEAR":	"1998"
 				}
 			}, {
 				"TITLE":	"ONE NIGHT ONLY",
@@ -156,7 +156,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"POLYDOR",
 					"PRICE":	"10.90",
-					"YEAR":	"1998"
+					"YEAR":	"1999"
 				}
 			}, {
 				"TITLE":	"SYLVIAS MOTHER",
@@ -165,7 +165,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"CBS",
 					"PRICE":	"8.10",
-					"YEAR":	"1973"
+					"YEAR":	"1974"
 				}
 			}, {
 				"TITLE":	"ROMANZA",
@@ -174,7 +174,7 @@ run
 					"COUNTRY":	"EU",
 					"COMPANY":	"POLYDOR",
 					"PRICE":	"10.80",
-					"YEAR":	"1996"
+					"YEAR":	"1997"
 				}
 			}]
 	}

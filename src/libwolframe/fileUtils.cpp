@@ -48,6 +48,10 @@ Project Wolframe.
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#if defined(_WIN32)
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
 
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
@@ -144,6 +148,46 @@ std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned i
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
+//[+]#if defined(_WIN32)	
+#if 0
+	enum {BUFFERSIZE=8192};
+	char readBuffer[ BUFFERSIZE+1];
+	DWORD dwBytesRead = 0;
+	BOOL success;
+	struct Locals
+	{
+		HANDLE hFile;
+		Locals()
+		{
+			hFile = INVALID_HANDLE_VALUE;
+		}
+		~Locals()
+		{
+			if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
+		}
+	};
+	Locals locals;
+
+	locals.hFile = ::CreateFile( filename.c_str(), GENERIC_READ, FILE_SHARE_READ, 
+				NULL/*default security*/, OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL, NULL/*no attr. template*/);
+	
+	if (locals.hFile == INVALID_HANDLE_VALUE) 
+	{
+		unsigned int errcode = ::GetLastError();
+		throw std::runtime_error( std::string("Failed to open file for reading [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+	}
+
+	while (TRUE == (success=::ReadFile( locals.hFile, readBuffer, BUFFERSIZE, &dwBytesRead, NULL)))
+	{
+		res.append( readBuffer, (std::size_t)dwBytesRead);
+	}
+	if (!success)
+	{
+		unsigned int errcode = ::GetLastError();
+		throw std::runtime_error( std::string("Error reading from file [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+	}
+#else
 	unsigned char ch;
 	FILE* fh = fopen( filename.c_str(), "r");
 	if (!fh)
@@ -160,39 +204,50 @@ static void readFileContent( const std::string& filename, std::string& res)
 		int ec = ferror( fh);
 		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
 	}
-}
-
-static void readSourceFileLines_( const std::string& filename, std::vector<std::string>& res)
-{
-	unsigned char ch;
-	std::string ln;
-	FILE* fh = fopen( filename.c_str(), "r");
-	if (!fh)
-	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
-	}
-	boost::shared_ptr<FILE> fhr( fh, fclose);
-	while (1 == fread( &ch, 1, 1, fh))
-	{
-		if (ch == '\n')
-		{
-			res.push_back( ln);
-			ln.clear();
-		}
-		else
-		{
-			ln.push_back( ch);
-		}
-	}
-	if (!feof( fh))
-	{
-		int ec = ferror( fh);
-		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
-	}
+#endif
 }
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
+//[+]#if defined(_WIN32)	
+#if 0
+	DWORD dwBytesWritten;
+	BOOL success;
+	struct Locals
+	{
+		HANDLE hFile;
+		Locals()
+		{
+			hFile = INVALID_HANDLE_VALUE;
+		}
+		~Locals()
+		{
+			if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
+		}
+	};
+	Locals locals;
+
+	locals.hFile = ::CreateFile( filename.c_str(), GENERIC_WRITE, 0/*do not share*/, 
+				NULL/*default security*/, CREATE_NEW,
+				FILE_ATTRIBUTE_NORMAL, NULL/*no attr. template*/);
+	
+	if (locals.hFile == INVALID_HANDLE_VALUE) 
+	{
+		unsigned int errcode = ::GetLastError();
+		throw std::runtime_error( std::string("Failed to open file for writing [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+	}
+
+	success = ::WriteFile( locals.hFile, content.c_str(), content.size(), &dwBytesWritten, NULL);
+	if (!success)
+	{
+		unsigned int errcode = ::GetLastError();
+		throw std::runtime_error( std::string("Error writing to file [error code ") + boost_lexical_cast<std::string>(errcode) + "] file: " + filename);
+	}
+	if (dwBytesWritten != content.size())
+	{
+		throw std::runtime_error( std::string("Error writing to file (incomplete) file: ") + filename);
+	}
+#else
 	unsigned char ch;
 	FILE* fh = fopen( filename.c_str(), "w");
 	if (!fh)
@@ -210,6 +265,7 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 			if (ec) throw std::runtime_error( std::string( "failed to write (errno " + boost::lexical_cast<std::string>(ec) + ") to file ") + filename + "'");
 		}
 	}
+#endif
 }
 
 std::string utils::readSourceFileContent( const std::string& filename)
@@ -233,13 +289,6 @@ std::string utils::readSourceFileContent( const std::string& filename)
 			throw std::runtime_error(std::string("cannot parse source file in UCS4 type encoding: '") + filename + "'");
 	}
 	return src;
-}
-
-std::vector<std::string> utils::readSourceFileLines( const std::string& filename)
-{
-	std::vector<std::string> rt;
-	readSourceFileLines_( filename, rt);
-	return rt;
 }
 
 

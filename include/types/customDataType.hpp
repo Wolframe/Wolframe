@@ -52,6 +52,10 @@ class Variant;
 class CustomDataType;
 //\brief Forward declaration
 class CustomDataInitializer;
+//\brief Forward declaration
+class DateTime;
+//\brief Forward declaration
+class BigNumber;
 
 
 class CustomDataValue
@@ -70,6 +74,7 @@ public:
 	virtual std::string tostring() const=0;
 	virtual void assign( const Variant& o)=0;
 	virtual CustomDataValue* copy() const=0;
+	virtual void getBaseTypeValue( Variant& dest) const;
 
 private:
 	friend class CustomDataType;

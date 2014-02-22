@@ -32,6 +32,9 @@
 #include "types/variant.hpp"
 #include "types/customDataType.hpp"
 #include "types/malloc.hpp"
+#include "types/string.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
 #include "utils/conversions.hpp"
 #include <cstdlib>
 #include <limits>
@@ -45,7 +48,8 @@ using namespace _Wolframe::types;
 
 void Variant::init( Type type_)
 {
-	static char strinit[1] = "";
+	static const types::BigNumber bignuminit;
+	static const char strinit[1] = "";
 	std::memset( this, 0, sizeof( *this));
 	m_type = (unsigned char)type_;
 	switch (m_type)
@@ -55,7 +59,9 @@ void Variant::init( Type type_)
 		case UInt:
 		case Bool: return;
 		case Double: m_data.value.Double = 0.0; return;
-		case String: m_data.value.String = strinit; setConstant(); return;
+		case String: m_data.value.String = const_cast<char*>(strinit); setConstant(); return;
+		case Timestamp: m_data.value.Timestamp = 0; return;
+		case BigNumber: m_data.value.BigNumberRef = const_cast<types::BigNumber*>(&bignuminit); setConstant(); return;
 		case Custom: throw std::runtime_error("cannot initialize custom data type without instance defined");
 	}
 	throw std::logic_error( "invalid initialzation of atomic type (from structure)");
@@ -80,6 +86,11 @@ void Variant::release()
 			delete m_data.value.Custom;
 			std::memset( this, 0, sizeof( *this));
 		}
+		else if (m_type == BigNumber && m_data.value.BigNumberRef)
+		{
+			delete m_data.value.BigNumberRef;
+			std::memset( this, 0, sizeof( *this));
+		}
 		else if (!atomic())
 		{
 			throw std::logic_error( "invalid free of variant (structure)");
@@ -87,14 +98,35 @@ void Variant::release()
 	}
 }
 
+void Variant::initConstant( const types::DateTime& o)
+{
+	bool init_ = initialized();
+	release();
+	std::memset( this, 0, sizeof( *this));
+	m_type = (unsigned char)Timestamp;
+	m_data.value.Timestamp = o.timestamp();
+	setInitialized(init_);
+	setConstant();
+}
 
-void Variant::initConstant( const types::CustomDataValue* o)
+void Variant::initConstant( const types::CustomDataValue& o)
 {
 	bool init_ = initialized();
 	release();
 	std::memset( this, 0, sizeof( *this));
 	m_type = (unsigned char)Custom;
-	m_data.value.Custom = const_cast<types::CustomDataValue*>(o);
+	m_data.value.Custom = const_cast<types::CustomDataValue*>(&o);
+	setInitialized(init_);
+	setConstant();
+}
+
+void Variant::initConstant( const types::BigNumber& o)
+{
+	bool init_ = initialized();
+	release();
+	std::memset( this, 0, sizeof( *this));
+	m_type = (unsigned char)BigNumber;
+	m_data.value.BigNumberRef = const_cast<types::BigNumber*>(&o);
 	setInitialized(init_);
 	setConstant();
 }
@@ -128,11 +160,25 @@ void Variant::initCustom( const types::CustomDataType* typ, const types::CustomD
 	m_data.value.Custom = typ->createValue( dsc);
 }
 
-void Variant::initCustom( const types::CustomDataValue* o)
+void Variant::initBigNumber( const types::BigNumber& num)
+{
+	std::memset( this, 0, sizeof( *this));
+	m_type = BigNumber;
+	m_data.value.BigNumberRef = new types::BigNumber( num);
+}
+
+void Variant::initDateTime( const DateTime& dt)
+{
+	std::memset( this, 0, sizeof( *this));
+	m_type = Timestamp;
+	m_data.value.Timestamp = dt.timestamp();
+}
+
+void Variant::initCustom( const types::CustomDataValue& o)
 {
 	std::memset( this, 0, sizeof( *this));
 	m_type = Custom;
-	m_data.value.Custom = o->copy();
+	m_data.value.Custom = o.copy();
 }
 
 void Variant::initCopy( const Variant& o)
@@ -144,7 +190,7 @@ void Variant::initCopy( const Variant& o)
 	}
 	else if (o.m_type == Custom)
 	{
-		initCustom( o.m_data.value.Custom);
+		initCustom( *o.m_data.value.Custom);
 		setInitialized( o.initialized());
 	}
 	else if (!o.atomic())
@@ -205,9 +251,95 @@ static int compare_type( Variant::Type type, const Variant::Data& d1, const Vari
 				return std::memcmp( d1.value.String, d2.value.String, d2.dim.size);
 			}
 		case Variant::Custom:
-			return d1.value.Custom->compare( *d1.value.Custom);
+			return d1.value.Custom->compare( *d2.value.Custom);
+		case Variant::Timestamp:
+			return compare_int( d1.value.Timestamp, d2.value.Timestamp);
+		case Variant::BigNumber:
+			return d1.value.BigNumberRef->compare( *d2.value.BigNumberRef);
 	}
 	return -2;
+}
+
+static Variant::Data::Timestamp variant2timestamp_cast( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+			throw std::logic_error( "cannot cast NULL type to timestamp type");
+		case Variant::Bool:
+			throw std::logic_error( "cannot cast Bool type to timestamp type");
+		case Variant::Double:
+			throw std::logic_error( "cannot cast double precision floating point number type to timestamp type");
+		case Variant::Int:
+			throw std::logic_error( "cannot cast signed integer type to timestamp type");
+		case Variant::UInt:
+			throw std::logic_error( "cannot cast unsigned integer type to timestamp type");
+		case Variant::BigNumber:
+			throw std::logic_error( "cannot cast big number type to timestamp type");
+		case Variant::String:
+			return DateTime( o.charptr(), o.charsize()).timestamp();
+		case Variant::Timestamp:
+			return o.data().value.Timestamp;
+		case Variant::Custom:
+		{
+			Variant val;
+			try
+			{
+				o.customref()->getBaseTypeValue( val);
+				if (val.type() != Variant::Custom)
+				{
+					return variant2timestamp_cast( val);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::logic_error( std::string("cannot cast custom data type to timestamp type: ") + e.what());
+			}
+			throw std::logic_error( "cannot cast custom data type to timestamp type");
+		}
+	}
+	throw boost::bad_lexical_cast();
+}
+
+static BigNumber variant2bignumber_cast( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+			throw std::logic_error( "cannot cast NULL type to big number type");
+		case Variant::Bool:
+			return BigNumber( (Variant::Data::UInt)(o.data().value.Bool?1:0));
+		case Variant::Double:
+			return BigNumber( o.data().value.Double);
+		case Variant::Int:
+			return BigNumber( o.data().value.Int);
+		case Variant::UInt:
+			return BigNumber( o.data().value.UInt);
+		case Variant::BigNumber:
+			return *o.data().value.BigNumberRef;
+		case Variant::Timestamp:
+			throw std::logic_error( "cannot cast timestamp type to big number type");
+		case Variant::String:
+			return BigNumber( o.data().value.String, o.data().dim.size);
+		case Variant::Custom:
+		{
+			Variant val;
+			try
+			{
+				o.customref()->getBaseTypeValue( val);
+				if (val.type() != Variant::Custom)
+				{
+					return variant2bignumber_cast( val);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::logic_error( std::string("cannot cast custom data type to big number type: ") + e.what());
+			}
+			throw std::logic_error( "cannot cast custom data type to big number type");
+		}
+	}
+	throw boost::bad_lexical_cast();
 }
 
 static Variant::Data::UInt variant2uint_cast( const Variant& o)
@@ -215,7 +347,7 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 	switch (o.type())
 	{
 		case Variant::Null:
-			throw boost::bad_lexical_cast();
+			throw std::logic_error( "cannot cast NULL type to unsigned integer type");
 		case Variant::Bool:
 			return o.data().value.Bool?1:0;
 		case Variant::Double:
@@ -225,10 +357,29 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 			return o.data().value.Int;
 		case Variant::UInt:
 			return o.data().value.UInt;
+		case Variant::BigNumber:
+			return o.data().value.BigNumberRef->touint();
+		case Variant::Timestamp:
+			throw std::logic_error( "cannot cast timestamp type to unsigned integer type");
 		case Variant::String:
 			return utils::touint_cast( std::string( o.data().value.String));
 		case Variant::Custom:
-			throw std::logic_error( "cannot cast custom data type to unsinged integer type");
+		{
+			Variant val;
+			try
+			{
+				o.customref()->getBaseTypeValue( val);
+				if (val.type() != Variant::Custom)
+				{
+					return variant2uint_cast( val);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::logic_error( std::string("cannot cast custom data type to unsigned integer type: ") + e.what());
+			}
+			throw std::logic_error( "cannot cast custom data type to unsigned integer type");
+		}
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -238,7 +389,7 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 	switch (o.type())
 	{
 		case Variant::Null:
-			throw boost::bad_lexical_cast();
+			throw std::logic_error( "cannot cast NULL type to signed integer type");
 		case Variant::Bool:
 			return o.data().value.Bool?1:0;
 		case Variant::Double:
@@ -248,33 +399,71 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 		case Variant::UInt:
 			if (o.data().value.UInt > (Variant::Data::UInt)std::numeric_limits<Variant::Data::Int>::max()) throw boost::bad_lexical_cast();
 			return o.data().value.UInt;
+		case Variant::BigNumber:
+			return o.data().value.BigNumberRef->toint();
+		case Variant::Timestamp:
+			throw std::logic_error( "cannot cast timestamp type to signed integer type");
 		case Variant::String:
 			return utils::toint_cast( std::string( o.data().value.String));
 		case Variant::Custom:
-			throw std::logic_error( "cannot cast custom data type to integer type");
+		{
+			Variant val;
+			try
+			{
+				o.customref()->getBaseTypeValue( val);
+				if (val.type() != Variant::Custom)
+				{
+					return variant2int_cast( val);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::logic_error( std::string("cannot cast custom data type to signed integer type: ") + e.what());
+			}
+			throw std::logic_error( "cannot cast custom data type to signed integer type");
+		}
 	}
 	throw boost::bad_lexical_cast();
 }
 
 template <typename TYPE>
-static typename boost::enable_if_c<boost::is_arithmetic<TYPE>::value,TYPE>::type variant_cast( const Variant& o)
+static typename boost::enable_if_c<boost::is_same<TYPE,double>::value,TYPE>::type variant_cast( const Variant& o)
 {
 	switch (o.type())
 	{
 		case Variant::Null:
 			throw boost::bad_lexical_cast();
 		case Variant::Bool:
-			return boost::numeric_cast<TYPE>( o.data().value.Bool);
+			return boost::numeric_cast<double>( o.data().value.Bool);
 		case Variant::Double:
-			return boost::numeric_cast<TYPE>( o.data().value.Double);
+			return boost::numeric_cast<double>( o.data().value.Double);
 		case Variant::Int:
-			return boost::numeric_cast<TYPE>( o.data().value.Int);
+			return boost::numeric_cast<double>( o.data().value.Int);
 		case Variant::UInt:
-			return boost::numeric_cast<TYPE>( o.data().value.UInt);
+			return boost::numeric_cast<double>( o.data().value.UInt);
 		case Variant::String:
-			return boost::lexical_cast<TYPE>( std::string( o.data().value.String));
+			return boost::lexical_cast<double>( std::string( o.data().value.String));
+		case Variant::BigNumber:
+			return o.data().value.BigNumberRef->todouble();
+		case Variant::Timestamp:
+			throw std::logic_error( "cannot cast timestamp type to double precision number type");
 		case Variant::Custom:
-			throw std::logic_error( "cannot cast custom data type to arithmetic type");
+		{
+			Variant alt;
+			try
+			{
+				o.customref()->getBaseTypeValue( alt);
+				if (alt.type() != Variant::Custom)
+				{
+					return variant_cast<double>( alt);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::logic_error( std::string("cannot cast custom data type to timestamp type: ") + e.what());
+			}
+			throw std::logic_error( "cannot cast custom data type to double precision number type");
+		}
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -298,6 +487,10 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 			return std::string( o.data().value.String, o.data().dim.size);
 		case Variant::Custom:
 			return o.data().value.Custom->tostring();
+		case Variant::BigNumber:
+			return o.data().value.BigNumberRef->tostring();
+		case Variant::Timestamp:
+			return DateTime( o.data().value.Timestamp).tostring();
 	}
 	throw boost::bad_lexical_cast();
 }
@@ -325,6 +518,10 @@ int Variant::compare( const Variant& o) const
 				val->assign( o);
 				return m_data.value.Custom->compare( *val);
 			}
+			case Variant::Timestamp:
+				return compare_int( m_data.value.Timestamp, o.totimestamp());
+			case Variant::BigNumber:
+				return m_data.value.BigNumberRef->compare( variant2bignumber_cast(o));
 			case Variant::Double:
 				return compare_double( variant_cast<double>( o), m_data.value.Double);
 			case Variant::Int:
@@ -353,9 +550,17 @@ std::string Variant::tostring() const
 	return variant_cast<std::string>( *this);
 }
 
-double Variant::tonumber() const
+std::wstring Variant::towstring() const
 {
-	return variant_cast<double>( *this);
+	if (m_type == Variant::String)
+	{
+		return StringConst( m_data.value.String, m_data.dim.size).towstring();
+	}
+	else
+	{
+		std::string str = tostring();
+		return StringConst( str).towstring();
+	}
 }
 
 double Variant::todouble() const
@@ -376,6 +581,11 @@ Variant::Data::Int Variant::toint() const
 Variant::Data::UInt Variant::touint() const
 {
 	return variant2uint_cast( *this);
+}
+
+Variant::Data::Timestamp Variant::totimestamp() const
+{
+	return variant2timestamp_cast( *this);
 }
 
 void Variant::move( Variant& o)
@@ -399,6 +609,9 @@ void Variant::convert( Type type_)
 		case UInt: *this = touint(); return;
 		case Double: *this = todouble(); return;
 		case String: {Variant rt = tostring(); move(rt); return;}
+		case BigNumber: {*this = variant2bignumber_cast(*this);}
+		case Timestamp: {*this = variant2timestamp_cast(*this);}
+			
 	}
 	throw std::runtime_error( "illegal conversion of atomic type");
 }

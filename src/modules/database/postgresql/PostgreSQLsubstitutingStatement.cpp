@@ -1,6 +1,8 @@
 #include "PostgreSQLsubstitutingStatement.hpp"
-
-#include "boost/shared_ptr.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
+#include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -34,6 +36,12 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 		case types::Variant::Double:
 			return value.tostring( );
 			
+		case types::Variant::BigNumber:
+			/*[PF:TODO Implementation]*/
+			return value.tostring();
+		case types::Variant::Timestamp:
+			/*[PF:TODO Implementation]*/
+			return value.tostring();
 		case types::Variant::String:
 		{
 			std::string strval = value.tostring( );
@@ -48,15 +56,14 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 			encvalue[encvaluesize+1] = '\'';
 			return std::string( encvalue, encvaluesize+2 );
 		}
-		
+
 		case types::Variant::Bool:
 			if( value.tobool( ) ) return "'t'";
 			else return "'f'";
 
 		case types::Variant::Custom:
-			throw new std::logic_error( "Cannot substitute custom type directly into SQL!" );
+			return value.customref()->tostring();
 	}
-	
 	throw new std::logic_error( "Unknown variant type '" + std::string( value.typeName( ) ) + "'" );
 }
 

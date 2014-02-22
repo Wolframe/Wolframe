@@ -92,7 +92,7 @@ types::Variant FixedpointNormalizeFunction::execute( const types::Variant& inp) 
 		}
 		return rt;
 	}
-	if (inp.type() != types::Variant::String)
+	if (inp.type() != types::Variant::String && inp.type() != types::Variant::BigNumber)
 	{
 		types::Variant::Data::Int val = inp.toint();
 		if ((double)val > m_max) throw std::runtime_error( "number out of range");

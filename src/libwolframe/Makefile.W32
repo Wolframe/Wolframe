@@ -62,6 +62,7 @@ PROVIDER_OBJS = \
 TYPE_OBJS = \
 	types_string.obj \
 	types_bignumber.obj \
+	types_datetime.obj \
 	types_doctype.obj \
 	types_customDataType.obj \
 	types_variant.obj \

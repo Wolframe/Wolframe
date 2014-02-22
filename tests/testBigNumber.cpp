@@ -79,8 +79,15 @@ static types::BigNumber getRandomBigNumber()
 	for (; lz<precision && buf[lz] == 0; ++lz){}
 	precision -= lz;
 	const unsigned char* digits = (const unsigned char*)buf.c_str() + lz;
+	while (precision > 0 && scale > 0 && digits[ precision-1] == 0)
+	{
+		//... cut away superfluous ending zeros in the fractional part of the number
+		--precision;
+		--scale;
+	}
 	if (precision == 0)
 	{
+		//... map -0 to +0 (no sign for zero) 
 		sign = false;
 		scale = 0;
 	}

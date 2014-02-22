@@ -139,6 +139,8 @@ static types::Variant::Type getType( const std::string& val)
 	{
 		switch (rt)
 		{
+			case types::Variant::Timestamp:
+			case types::Variant::BigNumber:
 			case types::Variant::String:
 			case types::Variant::Bool: return rt;
 
@@ -161,6 +163,8 @@ static types::VariantConst getElement( const std::string& val)
 {
 	switch (getType( val))
 	{
+		case types::Variant::Timestamp: return types::VariantConst( val);
+		case types::Variant::BigNumber: return types::VariantConst( val);
 		case types::Variant::String: return types::VariantConst( val);
 		case types::Variant::Null: return types::VariantConst();
 		case types::Variant::Bool: return types::VariantConst( (bool)(val == "true"));

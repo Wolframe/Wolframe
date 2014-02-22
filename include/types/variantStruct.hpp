@@ -61,6 +61,8 @@ public:
 	{
 		Null = Variant::Null,		//< undefined value
 		Custom = Variant::Custom,	//< atomic custom data type
+		Timestamp = Variant::Timestamp,	//< atomic timestamp (DateTime) data type
+		BigNumber = Variant::BigNumber,	//< atomic big number data type
 		Double = Variant::Double,	//< atomic double
 		Int = Variant::Int,		//< atomic signed int
 		UInt = Variant::UInt,		//< atomic unsigned int

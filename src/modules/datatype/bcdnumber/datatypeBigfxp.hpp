@@ -63,15 +63,15 @@ private:
 
 class BigfxpDataValue
 	:public CustomDataValue
-	,public types::BigNumber
+	,public types::BigFxpBCD
 {
 public:
 	///\brief Copy constructor
 	BigfxpDataValue( const BigfxpDataValue& o)
-		:CustomDataValue(o),types::BigNumber(o){}
+		:CustomDataValue(o),types::BigFxpBCD(o){}
 
 	BigfxpDataValue( const BigfxpDataInitializer* ini)
-		:types::BigNumber(ini->show_precision(),ini->calc_precision()){}
+		:types::BigFxpBCD(ini->show_precision(),ini->calc_precision()){}
 
 	virtual ~BigfxpDataValue(){};
 
@@ -84,28 +84,28 @@ public:
 		else
 		{
 			const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
-			return types::BigNumber::compare(*odt);
+			return types::BigFxpBCD::compare(*odt);
 		}
 	}
 
 	virtual std::string tostring() const
 	{
-		return types::BigNumber::tostring();
+		return types::BigFxpBCD::tostring();
 	}
 
 	virtual void assign( const Variant& o)
 	{
 		if (o.type() == Variant::String)
 		{
-			types::BigNumber::init( o.tostring());
+			types::BigFxpBCD::init( o.tostring());
 		}
 		else if (o.type() == Variant::Double)
 		{
-			types::BigNumber::operator=( o.todouble());
+			types::BigFxpBCD::operator=( o.todouble());
 		}
 		else
 		{
-			types::BigNumber::operator=( o.toint());
+			types::BigFxpBCD::operator=( o.toint());
 		}
 	}
 
@@ -124,7 +124,6 @@ public:
 
 class BigfxpDataType
 	:public CustomDataType
-	,public types::BigNumber
 {
 public:
 	BigfxpDataType( const std::string& name_)

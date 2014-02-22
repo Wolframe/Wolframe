@@ -81,10 +81,6 @@ bool fileExists( const std::string& path);
 ///\remark Throws on error
 std::string readSourceFileContent( const std::string& filename);
 
-///\brief Reading the content of a source file as list of lines
-///\remark Throws on error
-std::vector<std::string> readSourceFileLines( const std::string& filename);
-
 ///\brief Reading the content of a source file as property tree (with property tree syntax)
 ///\remark Throws on error
 boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);

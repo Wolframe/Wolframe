@@ -66,11 +66,11 @@ types::Variant BigfxpDataType::add( const CustomDataValue& operand, const Varian
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( op->operator+( *bcdarg));
+		res->BigFxpBCD::init( op->operator+( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( op->types::BigNumber::operator+( arg.toint()));
+		res->BigFxpBCD::init( op->types::BigFxpBCD::operator+( arg.toint()));
 	}
 	return rt;
 }
@@ -83,11 +83,11 @@ types::Variant BigfxpDataType::subtract( const CustomDataValue& operand, const V
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( op->operator-( *bcdarg));
+		res->BigFxpBCD::init( op->operator-( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( op->operator-( arg.toint()));
+		res->BigFxpBCD::init( op->operator-( arg.toint()));
 	}
 	return rt;
 }
@@ -100,11 +100,11 @@ types::Variant BigfxpDataType::multiply( const CustomDataValue& operand, const V
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( op->operator*( *bcdarg));
+		res->BigFxpBCD::init( op->operator*( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( op->operator*( arg.toint()));
+		res->BigFxpBCD::init( op->operator*( arg.toint()));
 	}
 	return rt;
 }
@@ -117,11 +117,11 @@ types::Variant BigfxpDataType::divide( const CustomDataValue& operand, const Var
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigNumber::init( op->operator/( *bcdarg));
+		res->BigFxpBCD::init( op->operator/( *bcdarg));
 	}
 	else
 	{
-		res->BigNumber::init( op->operator/( arg.toint()));
+		res->BigFxpBCD::init( op->operator/( arg.toint()));
 	}
 	return rt;
 }

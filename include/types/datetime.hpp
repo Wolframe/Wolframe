@@ -43,8 +43,11 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\brief Forward declaration
+class Variant;
+
 //\brief Timestamp equivalent to a date time value for variant type
-typedef boost::int64_t Timestamp;
+typedef boost::uint64_t Timestamp;
 
 //\class DateTime
 //\brief Data type for normalized date time (absolute time without time zone info)
@@ -165,7 +168,7 @@ public:
 	unsigned int microsecond() const	{return m_microsecond;}		//< 1/1000 of millisecond part
 	//\brief Get the format (subtype) of the datetime
 	//\return the subtype
-	SubType subtype() const			{return (SubType)m_subtype;}	//< Granularity
+	SubType subtype() const			{return m_subtype;}		//< Granularity
 
 	//\brief Constructor
 	//\param[in] t timestamp value of the datetime
@@ -180,87 +183,38 @@ public:
 		init( s);
 	}
 
+	//\brief Constructor
+	//\param[in] str string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
+	//\param[in] strsize size of 'str' in bytes
+	DateTime( const char* str, std::size_t strsize)
+	{
+		init( str, strsize);
+	}
+
+	//\brief Constructor
+	//\param[in] v variant representation of the datetime
+	DateTime( const Variant& v);
+
 	//\brief Get the datetime timestamp value of the datetime
 	//\return the timestamp
-	Timestamp timestamp() const
-	{
-		Timestamp rt = 0;
-		setBits( rt, m_year, 0, 13);
-		setBits( rt, m_month, 13, 4);
-		setBits( rt, m_day, 17, 5);
-		setBits( rt, m_hour, 22, 5);
-		setBits( rt, m_minute, 27, 6);
-		setBits( rt, m_second, 33, 6);
-		setBits( rt, m_millisecond, 39, 10);
-		setBits( rt, m_microsecond, 49, 10);
-		setBits( rt, m_subtype, 59, 2);
-		return rt;
-	}
+	Timestamp timestamp() const;
 
 	//\brief Initialize the datetime with its timestamp value
 	//\param[in] timestamp_ the timestamp value
-	void init( Timestamp timestamp_)
-	{
-		m_year = getBits( timestamp_, 0, 13);
-		m_month = getBits( timestamp_, 13, 4);
-		m_day = getBits( timestamp_, 17, 5);
-		m_hour = getBits( timestamp_, 22, 5);
-		m_minute = getBits( timestamp_, 27, 6);
-		m_second = getBits( timestamp_, 33, 6);
-		m_millisecond = getBits( timestamp_, 39, 10);
-		m_microsecond = getBits( timestamp_, 49, 10);
-		m_subtype = (SubType)getBits( timestamp_, 59, 2);
-	}
+	void init( Timestamp timestamp_);
 
 	//\brief Initialize the datetime with its string value
-	//\param[in] timestamp_ string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
-	void init( const std::string& timestamp_)
-	{
-		std::memset( this, 0, sizeof(*this));
-		std::string::const_iterator ti = timestamp_.begin(), te = timestamp_.end();
-		for (;ti != te; ++ti)
-		{
-			if (*ti < '0' || *ti > '9') throw std::runtime_error("illegal datetime format (only digits expected)");
-		}
-		switch (timestamp_.size())
-		{
-			case 20: m_subtype = YYYYMMDDhhmmss_lllccc; break;
-			case 17: m_subtype = YYYYMMDDhhmmss_lll; break;
-			case 14: m_subtype = YYYYMMDDhhmmss; break;
-			case 8: m_subtype = YYYYMMDD; break;
-			default: throw std::runtime_error("illegal datetime format (size)");
-		}
-		check_range( m_year = getSubstringAsInt( timestamp_, 0, 4), 1000, 2400);
-		check_range( m_month = getSubstringAsInt( timestamp_, 4, 2), 1, 12);
-		check_range( m_day = getSubstringAsInt( timestamp_, 6, 2), 1, 31);
-		if ((SubType)m_subtype == YYYYMMDD) return;
-		check_range( m_hour = getSubstringAsInt( timestamp_, 8, 2), 0, 23);
-		check_range( m_minute = getSubstringAsInt( timestamp_, 10, 2), 0, 59);
-		check_range( m_second = getSubstringAsInt( timestamp_, 12, 2), 0, 63);	//... 59 + eventual leap seconds
-		if ((SubType)m_subtype == YYYYMMDDhhmmss) return;
-		check_range( m_millisecond = getSubstringAsInt( timestamp_, 14, 3), 0, 999);
-		if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return;
-		check_range( m_microsecond = getSubstringAsInt( timestamp_, 17, 3), 0, 999);
-	}
+	//\param[in] str string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
+	void init( const std::string& str);
 
+	//\brief Initialize the datetime with its string value
+	//\param[in] str string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
+	//\param[in] strsize size of 'str' in bytes
+	void init( const char* str, std::size_t strsize);
+	
 	//\brief Get the string value of the datetime
 	//\return the string value
-	std::string tostring() const
-	{
-		std::string rt;
-		appendValue( rt, m_year, 4);
-		appendValue( rt, m_month, 2);
-		appendValue( rt, m_day, 2);
-		if ((SubType)m_subtype == YYYYMMDD) return rt;
-		appendValue( rt, m_hour, 2);
-		appendValue( rt, m_minute, 2);
-		appendValue( rt, m_second, 2);
-		if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
-		appendValue( rt, m_millisecond, 3);
-		if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
-		appendValue( rt, m_microsecond, 3);
-		return rt;
-	}
+	std::string tostring() const;
 
 	//\brief Test argument datetime for equality
 	//\return true if yes
@@ -283,23 +237,7 @@ public:
 
 	//\brief Compare with argument datetime
 	//\return int {-1,0,+1} depending on comparison result
-	int compare( const DateTime& o) const
-	{
-		SubType cmpsubtype = (SubType)((m_subtype > o.m_subtype)?o.m_subtype:m_subtype);
-		int rt;
-		if (0!=(rt=compareValue( m_year, o.m_year))) return rt;
-		if (0!=(rt=compareValue( m_month, o.m_month))) return rt;
-		if (0!=(rt=compareValue( m_day, o.m_day))) return rt;
-		if (cmpsubtype == YYYYMMDD) return rt;
-		if (0!=(rt=compareValue( m_hour, o.m_hour))) return rt;
-		if (0!=(rt=compareValue( m_minute, o.m_minute))) return rt;
-		if (0!=(rt=compareValue( m_second, o.m_second))) return rt;
-		if (cmpsubtype == YYYYMMDDhhmmss) return rt;
-		if (0!=(rt=compareValue( m_millisecond, o.m_millisecond))) return rt;
-		if (cmpsubtype == YYYYMMDDhhmmss_lll) return rt;
-		if (0!=(rt=compareValue( m_microsecond, o.m_microsecond))) return rt;
-		return 0;
-	}
+	int compare( const DateTime& o) const;
 
 private:
 	//\brief Compare two integer values
@@ -325,15 +263,15 @@ private:
 	//\param[in] bitrange number of bits in 'from' of the value to read from
 	static unsigned int getBits( const Timestamp& from, unsigned int bitidx, unsigned int bitrange)
 	{
-		return (unsigned int)(from >> (63-bitidx-bitrange)) & ((1<<(bitrange+1))-1);
+		return (unsigned int)(from >> (63-bitidx-bitrange)) & ((1<<bitrange)-1);
 	}
 	//\brief Get the characters [idx..idx+bitrange-1] of a value as unsigned int
 	//\param[in] from value to read from
 	//\param[in] idx index of first character in 'from' starting with 0
 	//\param[in] range number of characters in 'from' of the value to read from
-	static unsigned int getSubstringAsInt( const std::string& from, unsigned int idx, unsigned int range)
+	static unsigned int getSubstringAsInt( const char* from, unsigned int idx, unsigned int range)
 	{
-		return std::atoi( std::string( from, idx, range).c_str());
+		return std::atoi( std::string( from + idx, range).c_str());
 	}
 	//\brief Check the value to be within the range of [from,to]
 	//\param[in] val value to check
@@ -367,53 +305,24 @@ private:
 	//\param[in] ss seconds part
 	//\param[in] ll milliseconds part
 	//\param[in] cc microseconds part
-	static void check( unsigned short YY, unsigned short MM, unsigned short DD, unsigned short hh, unsigned short mm, unsigned short ss, unsigned short ll, unsigned short cc)
-	{
-		check_range( YY, 1000, 2400);
-		check_range( MM, 1, 12);
-		check_range( DD, 1, 31);
-		check_range( hh, 23);
-		check_range( mm, 59);
-		check_range( ss, 63);	//... 59 + eventual leap seconds
-		check_range( ll, 999);
-		check_range( cc, 999);
-	}
+	static void check( unsigned short YY, unsigned short MM, unsigned short DD, unsigned short hh, unsigned short mm, unsigned short ss, unsigned short ll, unsigned short cc);
 
 	//\brief Append value formatted (filling zero's)
 	//\param[out] dest result string to append to
 	//\param[in] value value to append
 	//\param[in] nofDigits number of digits to append (fill with leading zero's if value is smaller)
-	static void appendValue( std::string& dest, unsigned int value, unsigned int nofDigits)
-	{
-		enum {BufSize=8};
-		unsigned char buf[BufSize];
-		buf[ nofDigits] = 0;
-
-		while (nofDigits != 0)
-		{
-			--nofDigits;
-			unsigned char digit = (value % 10);
-			value /= 10;
-			buf[ nofDigits] = digit + '0';
-			if (value == 0)
-			{
-				while (nofDigits-- != 0) buf[ nofDigits] = '0';
-				break;
-			}
-		}
-		dest.append( (char*)buf);
-	}
+	static void appendValue( std::string& dest, unsigned int value, unsigned int nofDigits);
 
 private:
-	unsigned int m_year:13;		//< [ 0..12] 4 digits year AD
-	unsigned int m_month:4;		//< [13..16] 2 digits month in year starting with 1
-	unsigned int m_day:5;		//< [17..21] 2 digits day in month starting with 1
-	unsigned int m_hour:5;		//< [22..26] hour of day [0..23]
-	unsigned int m_minute:6;	//< [27..32] minutes part
-	unsigned int m_second:6;	//< [33..39] seconds part
-	unsigned int m_millisecond:10;	//< [39..49] milliseconds part
-	unsigned int m_microsecond:10;	//< [49..59] micorseconds part
-	unsigned int m_subtype:2;	//< [59..60] subtype (format) of the datetime
+	unsigned short m_year;		//< [ 0..12] 4 digits year AD
+	unsigned char m_month;		//< [13..16] 2 digits month in year starting with 1
+	unsigned char m_day;		//< [17..21] 2 digits day in month starting with 1
+	unsigned char m_hour;		//< [22..26] hour of day [0..23]
+	unsigned char m_minute;		//< [27..32] minutes part
+	unsigned char m_second;		//< [33..39] seconds part
+	unsigned short m_millisecond;	//< [39..49] milliseconds part
+	unsigned short m_microsecond;	//< [49..59] micorseconds part
+	SubType m_subtype;		//< [59..60] subtype (format) of the datetime
 };
 
 }}//namespace

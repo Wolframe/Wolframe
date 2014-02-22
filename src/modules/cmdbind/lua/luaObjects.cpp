@@ -588,7 +588,7 @@ static void getVariantValue( lua_State* ls, types::VariantConst& val, int idx)
 			{
 				throw std::runtime_error( "custom data type expected in case of user defined type for atomic 'variant type' argument");
 			}
-			val.init( custom->get());
+			val.init( *custom->get());
 			break;
 		}
 		default:
@@ -633,11 +633,34 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 			lua_pushnumber( ls, val.todouble());
 			break;
 
+		case types::Variant::Timestamp:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				std::string strval = val.tostring();
+				lua_pushlstring( ls, strval.c_str(), strval.size());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			}
+			break;
+		}
+
+		case types::Variant::BigNumber:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				std::string strval = val.tostring();
+				lua_pushlstring( ls, strval.c_str(), strval.size());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			}
+			break;
+		}
+
 		case types::Variant::String:
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
 				lua_pushlstring( ls, val.charptr(), val.charsize());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			}
 			break;
 		}

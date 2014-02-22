@@ -1,5 +1,6 @@
 #include "mylangInterpreter.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -14,7 +15,9 @@ Interpreter::Interpreter()
 std::vector<std::string> Interpreter::loadProgram( const std::string& name)
 {
 	std::vector<std::string> rt;
-	std::vector<std::string> lns = utils::readSourceFileLines( name);
+	std::vector<std::string> lns;
+
+	utils::splitString( lns, utils::readSourceFileContent( name), "\n");
 	std::vector<std::string>::const_iterator li = lns.begin(), le = lns.end();
 	for (; li != le; ++li)
 	{

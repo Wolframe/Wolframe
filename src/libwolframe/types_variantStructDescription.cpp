@@ -509,6 +509,8 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 	static Variant default_uint( Variant::UInt);
 	static Variant default_double( Variant::Double);
 	static Variant default_string( Variant::String);
+	static Variant default_bignumber( Variant::BigNumber);
+	static Variant default_timestamp( Variant::Timestamp);
 
 	VariantStructDescription::const_iterator di = this_->begin(), de = this_->end();
 	for (; di!=de; ++di)
@@ -579,6 +581,9 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 					case Variant::UInt: cmp = value->compare( default_uint); break;
 					case Variant::Double: cmp = value->compare( default_double); break;
 					case Variant::String: cmp = value->compare( default_string); break;
+					case VariantStruct::BigNumber: cmp = value->compare( default_bignumber); break;
+					case VariantStruct::Timestamp: cmp = value->compare( default_timestamp); break;
+						
 					case Variant::Custom:
 					{
 						types::Variant default_custom( value->data().value.Custom->type(), value->data().value.Custom->initializer());

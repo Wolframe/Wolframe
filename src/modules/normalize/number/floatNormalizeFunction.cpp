@@ -64,7 +64,7 @@ types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 		if (val > m_max) throw std::runtime_error( "number out of range");
 		return inp;
 	}
-	if (inp.type() != types::Variant::String)
+	if (inp.type() != types::Variant::String && inp.type() != types::Variant::BigNumber)
 	{
 		double val = inp.todouble();
 		if (val > m_max) throw std::runtime_error( "number out of range");

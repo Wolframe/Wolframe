@@ -36,6 +36,8 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_TRAITS_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
 #include "logger/logLevel.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
@@ -98,7 +100,10 @@ typename boost::enable_if_c<
 ///\return atomic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
-	boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
+	boost::is_arithmetic<T>::value 
+	|| boost::is_same<std::string,T>::value
+	|| boost::is_same<types::DateTime,T>::value
+	|| boost::is_same<types::BigNumber,T>::value
 	,const atomic_&>::type getFiltermapCategory( const T&) { static atomic_ rt; return rt;}
 
 }}}// end namespace

@@ -82,7 +82,7 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 		}
 		return inp;
 	}
-	if (inp.type() != types::Variant::String)
+	if (inp.type() != types::Variant::String && inp.type() != types::Variant::BigNumber)
 	{
 		UInt val = inp.touint();
 		if (val >= m_max) throw std::runtime_error( "number out of range");

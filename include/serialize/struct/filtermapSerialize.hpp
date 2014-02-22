@@ -34,6 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #define _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/bignumber.hpp"
+#include "types/datetime.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/struct/filtermapSerializeStack.hpp"
@@ -74,6 +76,8 @@ bool printValue_uchar( const unsigned char*, types::VariantConst& element);
 bool printValue_float( const float*, types::VariantConst& element);
 bool printValue_double( const double*, types::VariantConst& element);
 bool printValue_string( const std::string*, types::VariantConst& element);
+bool printValue_datetime( const types::DateTime*, types::VariantConst& element);
+bool printValue_bignumber( const types::BigNumber*, types::VariantConst& element);
 
 typedef bool (*FetchElement)( Context& ctx, FiltermapSerializeStateStack& stk);
 
@@ -105,6 +109,10 @@ template <> bool printValue_<double>( const void* value, types::VariantConst& el
 {return printValue_double( (const double*)value, element);}
 template <> bool printValue_<std::string>( const void* value, types::VariantConst& element)
 {return printValue_string( (const std::string*)value, element);}
+template <> bool printValue_<types::DateTime>( const void* value, types::VariantConst& element)
+{return printValue_datetime( (const types::DateTime*)value, element);}
+template <> bool printValue_<types::BigNumber>( const void* value, types::VariantConst& element)
+{return printValue_bignumber( (const types::BigNumber*)value, element);}
 
 template <typename TYPE>
 static bool fetchObject_( const traits::struct_&, Context& ctx, FiltermapSerializeStateStack& stk)

@@ -38,6 +38,7 @@ Project Wolframe.
 #include <boost/cstdint.hpp>
 #include "types/allocators.hpp"
 #include "types/integer.hpp"
+#include "types/bignumber.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -59,12 +60,16 @@ public:
 	BigBCD();
 	BigBCD( const std::string& numstr);
 	BigBCD( _WOLFRAME_INTEGER num);
+	BigBCD( _WOLFRAME_UINTEGER num);
+	BigBCD( const BigNumber& num);
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
 	void init( const BigBCD& o)			{copy( o, 0);}
 	void init( const std::string& str);
 	void init( _WOLFRAME_INTEGER num);
+	void init( _WOLFRAME_UINTEGER num);
+	void init( const BigNumber& num);
 
 	std::string tostring() const;
 	_WOLFRAME_INTEGER toint() const;
@@ -81,8 +86,8 @@ public:
 	BigBCD cut( unsigned int digits) const;
 	BigBCD round( const BigBCD& gran) const;
 
-	void invert_sign()				{m_neg = !m_neg; normalize();}
-	char sign() const				{return m_neg?'-':'+';}
+	void invert_sign()				{m_sign = !m_sign; normalize();}
+	char sign() const				{return m_sign?'-':'+';}
 
 	bool operator==( const BigBCD& o) const		{return compare(o)==0;}
 	bool operator!=( const BigBCD& o) const		{return compare(o)!=0;}
@@ -133,7 +138,7 @@ public:
 	const_iterator end() const				{return const_iterator();}
 
 private:
-	friend class BigNumber;
+	friend class BigFxpBCD;
 	typedef GreedySmallChunkAllocator Allocator;
 	void init( std::size_t size_, Allocator* allocator);
 	void copy( const BigBCD& o, Allocator* allocator);
@@ -163,69 +168,71 @@ private:
 private:
 	std::size_t m_size;
 	BCDElement* m_ar;
-	bool m_neg;
+	bool m_sign;
 	bool m_allocated;
 };
 
 
-//\class BigBCD
+//\class BigFxpBCD
 //\brief Arbitrary size fixed point number represented as BCD plus comma position with basic arithmetic operations.
-class BigNumber :public BigBCD
+class BigFxpBCD :public BigBCD
 {
 public:
-	BigNumber()
+	BigFxpBCD()
 		:m_show_precision(0)
 		,m_calc_precision(0){}
 
-	BigNumber( const BigNumber& o)
+	BigFxpBCD( const BigFxpBCD& o)
 		:BigBCD(o)
 		,m_show_precision(o.m_show_precision)
 		,m_calc_precision(o.m_calc_precision){}
 
-	BigNumber( unsigned int sp, unsigned int cp)
+	BigFxpBCD( unsigned int sp, unsigned int cp)
 		:m_show_precision(sp)
 		,m_calc_precision(cp){}
 
-	BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp);
-	BigNumber( const std::string& numstr, unsigned int sp, unsigned int cp);
-	BigNumber( const std::string& numstr, unsigned int sp);
-	BigNumber( const std::string& numstr);
+	BigFxpBCD( const BigBCD& o, unsigned int sp, unsigned int cp);
+	BigFxpBCD( const BigNumber& num);
+	BigFxpBCD( const std::string& numstr, unsigned int sp, unsigned int cp);
+	BigFxpBCD( const std::string& numstr, unsigned int sp);
+	BigFxpBCD( const std::string& numstr);
 
 	void format( unsigned int show_prec, unsigned int calc_prec);
 	void setCalcPrecision( unsigned int p)		{format( p, m_calc_precision);}
 	void setShowPrecision( unsigned int p)		{format( m_show_precision, p);}
 
-	BigNumber round( const BigNumber& gran);
+	BigFxpBCD round( const BigFxpBCD& gran);
 
 	std::string tostring() const;
 	double todouble() const;
 
-	BigNumber& operator=( const BigNumber& o);
-	BigNumber& operator=( const std::string& o);
-	BigNumber& operator=( double o);
-	BigNumber& operator=( _WOLFRAME_INTEGER o);
+	BigFxpBCD& operator=( const BigFxpBCD& o);
+	BigFxpBCD& operator=( const std::string& o);
+	BigFxpBCD& operator=( double o);
+	BigFxpBCD& operator=( _WOLFRAME_INTEGER o);
 
-	BigNumber operator /( const BigNumber& opr) const;
-	BigNumber operator /( _WOLFRAME_INTEGER opr) const;
-	BigNumber operator *( const BigNumber& opr) const;
-	BigNumber operator *( _WOLFRAME_INTEGER opr) const;
-	BigNumber operator +( const BigNumber& opr) const;
-	BigNumber operator +( _WOLFRAME_INTEGER opr) const;
-	BigNumber operator -( const BigNumber& opr) const;
-	BigNumber operator -( _WOLFRAME_INTEGER opr) const;
-	BigNumber operator -() const;
+	BigFxpBCD operator /( const BigFxpBCD& opr) const;
+	BigFxpBCD operator /( _WOLFRAME_INTEGER opr) const;
+	BigFxpBCD operator *( const BigFxpBCD& opr) const;
+	BigFxpBCD operator *( _WOLFRAME_INTEGER opr) const;
+	BigFxpBCD operator +( const BigFxpBCD& opr) const;
+	BigFxpBCD operator +( _WOLFRAME_INTEGER opr) const;
+	BigFxpBCD operator -( const BigFxpBCD& opr) const;
+	BigFxpBCD operator -( _WOLFRAME_INTEGER opr) const;
+	BigFxpBCD operator -() const;
 
-	bool operator==( const BigNumber& o) const		{return compare(o)==0;}
-	bool operator!=( const BigNumber& o) const		{return compare(o)!=0;}
-	bool operator<=( const BigNumber& o) const		{return compare(o)<=0;}
-	bool operator<( const BigNumber& o) const		{return compare(o)<0;}
-	bool operator>=( const BigNumber& o) const		{return compare(o)>=0;}
-	bool operator>( const BigNumber& o) const		{return compare(o)>0;}
-	int compare( const BigNumber& o) const;
+	bool operator==( const BigFxpBCD& o) const		{return compare(o)==0;}
+	bool operator!=( const BigFxpBCD& o) const		{return compare(o)!=0;}
+	bool operator<=( const BigFxpBCD& o) const		{return compare(o)<=0;}
+	bool operator<( const BigFxpBCD& o) const		{return compare(o)<0;}
+	bool operator>=( const BigFxpBCD& o) const		{return compare(o)>=0;}
+	bool operator>( const BigFxpBCD& o) const		{return compare(o)>0;}
+	int compare( const BigFxpBCD& o) const;
 
 private:
 	void initFromString( const std::string& numstr, unsigned int maxPrecision);
 	void initFromString( const std::string& numstr);
+	void initFromNumber( const BigNumber& num);
 
 	unsigned int m_show_precision;
 	unsigned int m_calc_precision;

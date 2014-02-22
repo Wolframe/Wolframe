@@ -39,6 +39,7 @@
 #include "serialize/struct/filtermapDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -121,7 +122,9 @@ TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string&
 {
 	if (!resultfilename_.empty())
 	{
-		m_result = utils::readSourceFileLines( resultfilename_);
+		utils::splitString( m_result, utils::readSourceFileContent( resultfilename_), "\n");
+		std::vector<std::string>::iterator ri = m_result.begin(), re = m_result.end();
+		for (;ri != re; ++ri) boost::trim(*ri);
 	}
 }
 

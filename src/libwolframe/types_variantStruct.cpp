@@ -189,6 +189,8 @@ void VariantStruct::initCopy( const VariantStruct& o)
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
 		case VariantStruct::String:
+		case VariantStruct::Timestamp:
+		case VariantStruct::BigNumber:
 		case VariantStruct::Custom:
 			Variant::initCopy( o);
 			break;
@@ -304,9 +306,11 @@ void VariantStruct::release()
 		case VariantStruct::Double:
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
+		case VariantStruct::Timestamp:
 			break;
 		case VariantStruct::Custom:
 		case VariantStruct::String:
+		case VariantStruct::BigNumber:
 			Variant::release();
 			break;
 

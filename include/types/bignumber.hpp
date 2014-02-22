@@ -41,6 +41,9 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+//\brief Forward declaration
+class Variant;
+
 //\class BigNumber
 //\brief Type for representing big numbers as binary coded decimal (BCD) numbers
 struct BigNumber
@@ -50,6 +53,9 @@ struct BigNumber
 	//\brief Copy constructor
 	//\param[in] o number to copy
 	BigNumber( const BigNumber& o);
+	//\brief Constructor from a variant type
+	//\param[in] val number value as variant type
+	BigNumber( const Variant& v);
 	//\brief Constructor from a double
 	//\param[in] val number value as double precision floating point number
 	BigNumber( double val);
@@ -62,6 +68,10 @@ struct BigNumber
 	//\brief Constructor from a string
 	//\param[in] val number value as printable string
 	BigNumber( const std::string& val);
+	//\brief Constructor from a string
+	//\param[in] val number value as pointer to printable string
+	//\param[in] valsize size of val in bytes
+	BigNumber( const char* val, std::size_t valsize);
 	//\brief Constructor
 	//\param[in] sign_ true, if the number is negative, false if positive or 0
 	//\param[in] precision_ number of significant digits (also the number of elements in digits_)
@@ -106,9 +116,40 @@ struct BigNumber
 	//\return true, if yes
 	bool isvalid() const;
 
+	//\brief Test argument big number for equality
+	//\return true if yes
+	bool operator==( const BigNumber& o) const	{return compare(o)==0;}
+	//\brief Test argument big number for inequality
+	//\return true if yes
+	bool operator!=( const BigNumber& o) const	{return compare(o)!=0;}
+	//\brief Test if this big number is bigger or equal than argument
+	//\return true if yes
+	bool operator>=( const BigNumber& o) const	{return compare(o)>=0;}
+	//\brief Test if this big number is bigger than argument
+	//\return true if yes
+	bool operator> ( const BigNumber& o) const	{return compare(o)> 0;}
+	//\brief Test if this big number is smaller or equal than argument
+	//\return true if yes
+	bool operator<=( const BigNumber& o) const	{return compare(o)<=0;}
+	//\brief Test if this big number is smaller than argument
+	//\return true if yes
+	bool operator< ( const BigNumber& o) const	{return compare(o)< 0;}
+
+	//\brief Compare with argument
+	//\return int {-1,0,+1} depending on comparison result
+	int compare( const BigNumber& o) const;
+
 private:
-	//\brief Constructor 
+	//\brief Constructor function
+	//\param[in] val string value to construct object from
 	void constructor( const std::string& val);
+	//\brief Constructor function
+	//\param[in] val pointer to string to construct object from
+	//\param[in] valsize size of string in bytes
+	void constructor( const char* val, std::size_t valsize);
+	//\brief Constructor function
+	//\param[in] val variant value to construct object from
+	void constructor( const Variant& val);
 
 	friend class BigNumberConst;
 	enum ConstQualifier {ConstC};

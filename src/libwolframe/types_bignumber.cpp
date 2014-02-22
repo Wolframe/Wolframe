@@ -32,6 +32,8 @@ Project Wolframe.
 //\file types_bignumber.cpp
 //\brief Big number values implementation
 #include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
+#include "types/variant.hpp"
 #include "utils/conversions.hpp"
 #include <limits>
 #include <cstdlib>
@@ -189,6 +191,12 @@ std::string BigNumber::tostringNormalized() const
 		exponent = -(numscale - numsize);
 		numscale = numsize;
 	}
+	while (numsize > 0 && numscale > 0 && m_ar[numsize-1] == 0)
+	{
+		//... cut away superfluous ending zeros in the fractional part of the number
+		--numsize;
+		--numscale;
+	}
 	return numtostring( m_sign, m_ar, numsize, numscale, exponent);
 }
 
@@ -225,6 +233,18 @@ BigNumber::BigNumber( const std::string& val)
 	constructor( val);
 }
 
+BigNumber::BigNumber( const char* val, std::size_t valsize)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
+{
+	constructor( val, valsize);
+}
+
+BigNumber::BigNumber( const Variant& val)
+	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
+{
+	constructor( val);
+}
+
 BigNumber::BigNumber( bool sign_,unsigned short precision_, signed short scale_, const unsigned char* digits_)
 	:m_scale(scale_),m_sign(sign_),m_const(false),m_size(precision_),m_ar(0)
 {
@@ -245,16 +265,78 @@ BigNumber::BigNumber( const ConstQualifier&, bool sign_, unsigned short precisio
 	:m_scale(scale_),m_sign(sign_),m_const(true),m_size(precision_),m_ar(const_cast<unsigned char*>(digits_))
 {}
 
-void BigNumber::constructor( const std::string& val)
+void BigNumber::constructor( const types::Variant& val)
 {
-	std::string::const_iterator vi = val.begin(), ve = val.end();
-	std::size_t leadingZeros = 0;
-	for (; vi != ve && *vi == '0'; ++vi,++leadingZeros){}
-	std::size_t valSize = val.size() - leadingZeros;
-	if (!valSize) return;
-	if (valSize > std::numeric_limits<unsigned short>::max()) throw std::bad_alloc();
+	switch (val.type())
+	{
+		case Variant::Null:
+			throw std::runtime_error( "cannot construct big number from variant type NULL");
 
-	m_ar = (unsigned char*)std::calloc( valSize, 1);
+		case Variant::Custom:
+		{
+			types::Variant value;
+			val.customref()->getBaseTypeValue( value);
+			if (value.type() == Variant::Custom)
+			{
+				throw std::runtime_error( "cannot construct big number from variant type 'Custom'");
+			}
+			try
+			{
+				constructor( value);
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string( "failed to create big number from variant type 'Custom': ") + e.what());
+			}
+			break;
+		}
+
+		case Variant::Timestamp:
+			throw std::runtime_error( "cannot construct big number from variant type 'Timestamp'");
+
+		case Variant::BigNumber:
+		{
+			const BigNumber* bnval = val.bignumref();
+			m_scale = bnval->m_scale;
+			m_sign = bnval->m_sign;
+			m_size = bnval->m_size;
+			m_ar = (unsigned char*)std::malloc( bnval->m_size);
+			if (!m_ar) throw std::bad_alloc();
+			std::memcpy( m_ar, bnval->m_ar, m_size);
+			break;
+		}
+
+		case Variant::Double:
+			constructor( val.data().value.Double);
+			break;
+			
+		case Variant::Int:
+			constructor( val.data().value.Int);
+			break;
+
+		case Variant::UInt:
+			constructor( val.data().value.UInt);
+			break;
+
+		case Variant::Bool:
+			throw std::runtime_error( "cannot construct big number from variant type 'Bool'");
+
+		case Variant::String:
+			constructor( val.charptr(), val.charsize());
+			break;
+	}
+}
+
+void BigNumber::constructor( const char* val, std::size_t valsize)
+{
+	std::size_t vi = 0, ve = valsize;
+	std::size_t leadingZeros = 0;
+	for (; vi != ve && val[vi] == '0'; ++vi,++leadingZeros){}
+	valsize -= leadingZeros;
+	if (!valsize) return;
+	if (valsize > std::numeric_limits<unsigned short>::max()) throw std::bad_alloc();
+
+	m_ar = (unsigned char*)std::calloc( valsize, 1);
 	if (!m_ar) throw std::bad_alloc();
 
 	enum State {NUMS,NUM0,NUM1,FRC0,FRC1,EXPE,EXPS,EXP0,EXP1}; //< parsing states
@@ -270,25 +352,30 @@ void BigNumber::constructor( const std::string& val)
 		{
 			case NUMS://sign of number:
 				state = NUM0;
-				if (*vi == '-')
+				if (val[vi] == '-')
 				{
 					m_sign = true;
+					continue;
+				}
+				if (val[vi] == '+')
+				{
+					m_sign = false;
 					continue;
 				}
 				//...no break here !
 
 			case NUM0://leading zeros:
-				if (*vi == '0') continue;
+				if (val[vi] == '0') continue;
 				state = NUM1;
 				//...no break here !
 
 			case NUM1://significant pre-decimal digits:
-				if (*vi >= '0' && *vi <= '9')
+				if (val[vi] >= '0' && val[vi] <= '9')
 				{
-					m_ar[ m_size++] = *vi - '0';
+					m_ar[ m_size++] = val[vi] - '0';
 					continue;
 				}
-				if (*vi == '.')
+				if (val[vi] == '.')
 				{
 					if (m_size)
 					{
@@ -306,7 +393,7 @@ void BigNumber::constructor( const std::string& val)
 				continue;
 
 			case FRC0://leading zeros of fractional part when no significant digits found yet (only influencing scale):
-				if (*vi == '0')
+				if (val[vi] == '0')
 				{
 					m_scale++;
 					continue;
@@ -315,9 +402,9 @@ void BigNumber::constructor( const std::string& val)
 				//...no break here !
 
 			case FRC1://significant digits of fractional part:
-				if (*vi >= '0' && *vi <= '9')
+				if (val[vi] >= '0' && val[vi] <= '9')
 				{
-					m_ar[ m_size++] = *vi - '0';
+					m_ar[ m_size++] = val[vi] - '0';
 					m_scale++;
 					continue;
 				}
@@ -325,8 +412,8 @@ void BigNumber::constructor( const std::string& val)
 				//...no break here !
 
 			case EXPE://exponent marker:
-				if (*vi == ' ') continue;
-				if (*vi == 'E')
+				if (val[vi] == ' ') continue;
+				if (val[vi] == 'E')
 				{
 					state = EXPS;
 					continue;
@@ -335,22 +422,27 @@ void BigNumber::constructor( const std::string& val)
 
 			case EXPS://exponent sign:
 				state = EXP0;
-				if (*vi == '-')
+				if (val[vi] == '-')
 				{
 					expsign = true;
+					continue;
+				}
+				if (val[vi] == '+')
+				{
+					expsign = false;
 					continue;
 				}
 				//...no break here !
 
 			case EXP0://leading zeros of the exponent (ignored):
-				if (*vi == '0') continue;
+				if (val[vi] == '0') continue;
 				state = EXP1;
 				//...no break here !
 
 			case EXP1://exponent:
-				if (*vi >= '0' && *vi <= '9')
+				if (val[vi] >= '0' && val[vi] <= '9')
 				{
-					scaleinc = scaleinc * 10 + *vi - '0';
+					scaleinc = scaleinc * 10 + val[vi] - '0';
 					if (prev_scaleinc > scaleinc) throw std::runtime_error("conversion error: big number value in string is out of range");
 					prev_scaleinc = scaleinc;
 					continue;
@@ -379,6 +471,11 @@ void BigNumber::constructor( const std::string& val)
 	if (ar_) m_ar = ar_;
 }
 
+void BigNumber::constructor( const std::string& val)
+{
+	constructor( val.c_str(), val.size());
+}
+
 bool BigNumber::isvalid() const
 {
 	if (!m_size)
@@ -391,6 +488,51 @@ bool BigNumber::isvalid() const
 		if (m_ar[ii] > 9) return false;
 	}
 	return true;
+}
+
+int BigNumber::compare( const BigNumber& o) const
+{
+	if (m_sign != o.m_sign)
+	{
+		return m_sign?-1:+1;
+	}
+	int smaller = m_sign?+1:-1;
+	int bigger = m_sign?-1:+1;
+
+	int rt = (int)m_size - (int)m_scale;
+	rt -= (int)o.m_size - (int)o.m_scale;
+	if (rt < 0) return smaller;
+	if (rt > 0) return bigger;
+	std::size_t ii, nn;
+	unsigned char* rest;
+	std::size_t restsize;
+	int resrestdiff;
+	if (m_size<o.m_size)
+	{
+		nn = m_size;
+		rest = m_ar + m_size;
+		restsize = o.m_size - m_size;
+		resrestdiff = bigger;
+	}
+	else
+	{
+		nn = o.m_size;
+		rest = o.m_ar + o.m_size;
+		restsize = m_size - o.m_size;
+		resrestdiff = smaller;
+	}
+	for (ii=0; ii<nn; ++ii)
+	{
+		if (m_ar[ii] != o.m_ar[ii])
+		{
+			return (m_ar[ii] < o.m_ar[ii])?smaller:bigger;
+		}
+	}
+	for (ii=0; ii<restsize; ++ii)
+	{
+		if (rest[ii]) return resrestdiff;
+	}
+	return 0;
 }
 
 

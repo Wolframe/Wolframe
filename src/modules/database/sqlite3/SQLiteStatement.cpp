@@ -1,4 +1,8 @@
 #include "SQLiteStatement.hpp"
+#include "types/variant.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include "logger-v1.hpp"
@@ -94,9 +98,6 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			} else if ( value.data( ).value.UInt <= (_WOLFRAME_UINTEGER)std::numeric_limits<sqlite3_int64>::max( ) ) {
 				m_rc = wrap_sqlite3_bind_int64( m_stm, (int)idx, value.toint());
 			} else {
-				// this is debatable: either the value gets converted to a REAL
-				// storage type (thus resulting in Variant::Double when we read it),
-				// or we have to store big unsigned integers as strings..
 				m_data.push_back( value.tostring());
 				m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
 			}
@@ -110,9 +111,36 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC);
 			break;
 			
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO] Implementation*/
+			m_data.push_back( value.tostring());
+			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			m_data.push_back( value.tostring());
+			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+		}
 		case types::Variant::Custom:
-			throw std::logic_error( "Binding custom types is not supported yet!" );
-
+		{
+			types::Variant baseval;
+			try
+			{
+				value.customref()->getBaseTypeValue( baseval);
+				if (baseval.type() != types::Variant::Custom)
+				{
+					bind( idx, baseval);
+					break;
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			throw std::runtime_error( "cannot convert value to base type for binding");
+		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}

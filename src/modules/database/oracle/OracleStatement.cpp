@@ -1,4 +1,8 @@
 #include "OracleStatement.hpp"
+#include "types/variant.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -211,10 +215,42 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
 
-		case types::Variant::Custom:
-			throw std::logic_error( "Custom type in PostgreSQL database module not supported yet!");
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO] Implementation*/
+			m_data.back().v.convert( Variant::String);
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
-		
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			m_data.back().v.convert( Variant::String);
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
+			break;
+		}
+		case types::Variant::Custom:
+		{
+			types::Variant baseval;
+			try
+			{
+				value.customref()->getBaseTypeValue( baseval);
+				if (baseval.type() != types::Variant::Custom)
+				{
+					bind( idx, baseval);
+					break;
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			throw std::runtime_error( "cannot convert value to base type for binding");
+		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}

@@ -9,30 +9,38 @@ static void mapStructure( mylang::StructureBuilder& dest, const mylang::Structur
 {
 	if (src->atomic())
 	{
-		types::Variant val( src->getValue());
-		if (val.type() == types::Variant::UInt)
+		types::Variant element( src->getValue());
+		switch (element.type())
 		{
-			dest.setValue( val.touint() + 1);
-		}
-		else if (val.type() == types::Variant::Int)
-		{
-			dest.setValue( val.toint() + 1);
-		}
-		else if (val.type() == types::Variant::Double)
-		{
-			dest.setValue( val.todouble() + 1);
-		}
-		else if (val.type() == types::Variant::Bool)
-		{
-			dest.setValue( !val.tobool());
-		}
-		else if (val.type() == types::Variant::String)
-		{
-			dest.setValue( boost::algorithm::to_upper_copy( val.tostring()));
-		}
-		else
-		{
-			throw std::runtime_error( std::string("cannot handle this type '") + val.typeName() + "'");
+			case types::Variant::Custom:
+				dest.setValue( boost::algorithm::to_upper_copy( element.tostring()));
+				break;
+			case types::Variant::Null:
+				dest.setValue( types::Variant());
+				break;
+			case types::Variant::Bool:
+				dest.setValue( !element.tobool());
+				break;
+			case types::Variant::Double:
+				dest.setValue( element.todouble() + 1);
+				break;
+			case types::Variant::Int:
+				dest.setValue( element.toint() + 1);
+				break;
+			case types::Variant::UInt:
+				dest.setValue( element.touint() + 1);
+				break;
+			case types::Variant::String:
+				dest.setValue( boost::algorithm::to_upper_copy( element.tostring()));
+				break;
+			case types::Variant::Timestamp:
+				dest.setValue( boost::algorithm::to_upper_copy( element.tostring()));
+				break;
+			case types::Variant::BigNumber:
+				dest.setValue( boost::algorithm::to_upper_copy( element.tostring()));
+				break;
+			default:
+				throw std::runtime_error( std::string("cannot handle this type '") + element.typeName() + "'");
 		}
 	}
 	else if (src->array())
