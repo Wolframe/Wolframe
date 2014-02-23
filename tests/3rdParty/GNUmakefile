@@ -21,7 +21,9 @@ SUBDIRS += libhpdf
 endif
 
 ifeq ($(WITH_ICU),1)
+ifneq "$(PLATFORM)" "NETBSD"
 SUBDIRS += boost-locale
+endif
 endif
 
 ifeq ($(WITH_FREEIMAGE),1)
