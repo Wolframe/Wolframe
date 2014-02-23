@@ -52,7 +52,10 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	prefix=/usr/pkg \
+	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	mandir=/usr/pkg/man \
 	help
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -61,7 +64,10 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	prefix=/usr/pkg \
+	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	mandir=/usr/pkg/man \
 	config
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -70,18 +76,25 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
-	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules
+	prefix=/usr/pkg \
+	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
+	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	mandir=/usr/pkg/man \
 check_for_errors
 
 # testing breaks at least in boost-locale and some xml filters for now
-#gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
-#	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
-#	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
-#	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
-#	CC='ccache gcc' CXX='ccache g++' \
-#	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
-#	test 
-#check_for_errors
+gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
+	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	prefix=/usr/pkg \
+	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
+	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	mandir=/usr/pkg/man \
+	test 
+check_for_errors
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
@@ -90,7 +103,11 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
 	prefix=/usr/pkg \
-	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION install sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib
+	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
+	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	mandir=/usr/pkg/man \
+	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
+	install
 check_for_errors
 
 # doxygen package currently broken
