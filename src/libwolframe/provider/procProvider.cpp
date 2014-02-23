@@ -96,22 +96,11 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 							retVal = false;
 						}
 					}
-				}
-				if (!builder)
-				{
-					builder = modules->getBuilder( "processor", L1it->first );
-					if ( builder )	{
-						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-						if ( conf->parse( L1it->second, L1it->first, modules ))
-							m_procConfig.push_back( conf );
-						else	{
-							delete conf;
-							retVal = false;
-						}
-					}
 					else
-						LOG_WARNING << logPrefix() << "unknown configuration option: '"
-							    << L1it->first << "'";
+					{
+						LOG_ERROR << logPrefix() << "builder for '" << section << "' with name '" << keyword << "' in processor section not found";
+						retVal = false;
+					}
 				}
 			}
 			else
