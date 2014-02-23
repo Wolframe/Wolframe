@@ -60,7 +60,9 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	mandir=/usr/local/man
 	help
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -69,7 +71,9 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	mandir=/usr/local/man
 	config
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -78,7 +82,9 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
-	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules
+	sysconfdir=/usr/local/etc \
+	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	mandir=/usr/local/man
 check_for_errors
 
 gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -87,6 +93,9 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	sysconfdir=/usr/local/etc \
+	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	mandir=/usr/local/man \
 	test 
 check_for_errors
 
@@ -97,7 +106,11 @@ gmake WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	prefix=/usr/local \
-	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION install sysconfdir=/usr/local/etc libdir=/usr/local/lib
+	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
+	sysconfdir=/usr/local/etc \
+	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	mandir=/usr/local/man \
+	install
 check_for_errors
 
 # doxygen package currently broken
