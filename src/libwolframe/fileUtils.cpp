@@ -209,8 +209,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-//#if defined(_WIN32)
-#if 0
+#if defined(_WIN32)
 	DWORD dwBytesWritten;
 	BOOL success;
 	struct Locals
