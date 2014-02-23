@@ -74,37 +74,47 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			else
 				m_programFiles.push_back( programFile );
 		}
-		else	{
-			if ( modules )	{
-				module::ConfiguredBuilder* builder = 0;
-				boost::property_tree::ptree::const_iterator kwi=L1it->second.begin(),kwe=L1it->second.end();
-				for (; kwi != kwe; ++kwi)
-				{
-					const char* section = L1it->first.c_str();
-					const char* keyword = kwi->first.c_str();
-					builder = modules->getBuilder( section, keyword);
-					if (builder)
-					{
+		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first ) )	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									  L2it != L1it->second.end(); L2it++ )	{
+				if ( modules )	{
+					module::ConfiguredBuilder* builder = modules->getBuilder( "cmdhandler", L2it->first );
+					if ( builder )	{
 						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-						if (conf->parse( kwi->second, kwi->first, modules))
-						{
-							m_procConfig.push_back( conf);
-						}
-						else
-						{
+						if ( conf->parse( L2it->second, L2it->first, modules ))
+							m_procConfig.push_back( conf );
+						else	{
 							delete conf;
 							retVal = false;
 						}
 					}
 					else
-					{
-						LOG_ERROR << logPrefix() << "builder for '" << section << "' with name '" << keyword << "' in processor section not found";
+						LOG_WARNING << logPrefix() << "unknown cmdhandler configuration option: '"
+							    << L2it->first << "'";
+				}
+				else
+					LOG_WARNING << logPrefix() << "unknown cmdhandler configuration option: '"
+						    << L2it->first << "'";
+			}
+		}
+		else	{
+			if ( modules )	{
+				module::ConfiguredBuilder* builder = modules->getBuilder( "processor", L1it->first );
+				if ( builder )	{
+					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
+					if ( conf->parse( L1it->second, L1it->first, modules ))
+						m_procConfig.push_back( conf );
+					else	{
+						delete conf;
 						retVal = false;
 					}
 				}
+				else
+					LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
+						    << L1it->first << "'";
 			}
 			else
-				LOG_WARNING << logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
 					    << L1it->first << "'";
 		}
 	}
