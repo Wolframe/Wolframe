@@ -43,23 +43,35 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_range_trim.wnmp --program employee_assignment_print.sfrm --cmdprogram echo_input_doctype_table.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**file:simpleform_range_trim.wnmp
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program		normalize.wnmp
+	program		form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
 int=trim,integer(10 );
 uint=trim,unsigned(10);
 float=trim, floatingpoint( 10,10);
 currency=fixedpoint(13, 2);
 percent_1=fixedpoint(5 ,1);
-**requires:DISABLED NETBSD
-
-**file: echo_input_doctype_table.lua
-function run()
-	type = input:doctype()
-	output:as( filter(), type)
-	output:print( input:table())
-end
-**file: employee_assignment_print.sfrm
+**file:form.sfrm
 FORM Employee
 {
 	firstname string
@@ -84,6 +96,13 @@ FORM employee_assignment_print
 		}
 	}
 }
+**file:script.lua
+function run()
+	type = input:doctype()
+	output:as( filter(), type)
+	output:print( input:table())
+end
+**requires:DISABLED NETBSD
 
 **output
 {

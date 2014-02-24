@@ -1,35 +1,43 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=print_table_textwolf.lua
-formname="invoice.sfrm"
-opt=""
-modpath="../../src/modules"				# module directory relative from tests/temp
-opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-modpath="../../src/modules/ddlcompiler/"		# DDL compiler module directory relative from tests/temp
-mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# DDL compiler module to load
-opt="$opt --module $mod"
-modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
-mod="$modpath/number/mod_normalize_number"		# module to load
-opt="$opt --module $mod"
-mod="$modpath/string/mod_normalize_string"		# module to load
-opt="$opt --module $mod"
-modpath="../../tests/wolfilter/modules/prnt/"		# printer module directory relative from tests/temp
-mod="$modpath/fakepdfprint/mod_print_testpdf"		# printer module to load
-opt="$opt --module $mod"
-modpath="../../src/modules/filter/"			# filter module directory relative from tests/temp
-mod="$modpath/blob/mod_filter_blob"			# blob filter module for output to load
-opt="$opt --module $mod"
-ddltypeprg="simpleform_range.wnmp"
-opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
-opt="$opt --program invoice.sprn"			# layout for printing invoice
-opt="$opt --program $formname"				# form for invoice
-opt="$opt --cmdprogram $luascript"			# script to execute
-testcmd="$opt run"					# command to execute by the test
-testscripts="$luascript $formname invoice.sprn"		# list of scripts of the test
+testcmd="-c wolframe.conf run"				# command to execute by the test
 docin=invoice_example					# input document name
 docout=lua_print_table_testtrace			# output document name
 testdata="
-**file:$ddltypeprg
-`cat program/$ddltypeprg`"
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/filter/blob/mod_filter_blob
+	module ../wolfilter/modules/prnt/fakepdfprint/mod_print_testpdf
+}
+Processor
+{
+	program normalize.wnmp
+	program print.sprn
+	program form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:form.sfrm
+`cat ../scripts/invoice.sfrm`
+**file:normalize.wnmp
+`cat program/simpleform_range.wnmp`
+**file:print.sprn
+`cat ../scripts/invoice.sprn`
+**file:script.lua
+`cat ../scripts/$luascript`"
+
 csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
 . ./output_tst_textwolf.sh
+

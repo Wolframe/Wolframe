@@ -39,40 +39,20 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform.wnmp --program employee_assignment_print.sfrm employee_assignment_print
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf employee_assignment_print
 
-**file:simpleform.wnmp
-int=integer;
-uint=unsigned;
-float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
-**file: employee_assignment_print.sfrm
-FORM Employee
+**file:wolframe.conf
+LoadModules
 {
-	firstname string
-	surname string
-	phone string
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
 }
-
-FORM employee_assignment_print
+Processor
 {
-	assignmentlist
-	{
-		assignment []
-		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
-		}
-	}
+	program ../wolfilter/scripts/employee_assignment_print.sfrm
+	program ../wolfilter/template/program/simpleform.wnmp
 }
-
 **output
 {
 	"assignmentlist":	{

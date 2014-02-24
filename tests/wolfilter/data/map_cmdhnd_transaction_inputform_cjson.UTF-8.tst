@@ -39,16 +39,44 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --program employee_assignment_print.sfrm --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_range_trim.wnmp --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/testtrace/mod_db_testtrace --database 'identifier=testdb,outfile=DBOUT,file=DBRES' --program=DBIN.tdl --cmdprogram=test.dmap employee_assignment_print
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf employee_assignment_print
 
+**file:wolframe.conf
+LoadModules
+{
+	module ./../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+}
+Database
+{
+	test
+	{
+		identifier testdb
+		outfile DBOUT
+		file DBRES
+	}
+}
+Processor
+{
+	database testdb
+	program DBIN.tdl
+	program ../wolfilter/scripts/employee_assignment_print.sfrm
+	program ../wolfilter/template/program/simpleform_range_trim.wnmp
+
+	cmdhandler
+	{
+		directmap
+		{
+			program test.dmap
+			filter cjson
+		}
+	}
+}
 **file: test.dmap
 COMMAND(employee_assignment_print) CALL(test_transaction) RETURN STANDALONE doc;
-**file:simpleform_range_trim.wnmp
-int=trim,integer(10 );
-uint=trim,unsigned(10);
-float=trim, floatingpoint( 10,10);
-currency=fixedpoint(13, 2);
-percent_1=fixedpoint(5 ,1);
 **file: DBRES
 #id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'
 #id task start end#21 'gardening' '09:24:28 1/3/2012' '11:11:07 1/3/2012'#22 'helo' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
@@ -59,32 +87,6 @@ BEGIN
 	INTO task FOREACH //task DO run( title);
 END
 **requires:DISABLED NETBSD
-
-**file: employee_assignment_print.sfrm
-FORM Employee
-{
-	firstname string
-	surname string
-	phone string
-}
-
-FORM employee_assignment_print
-{
-	assignmentlist
-	{
-		assignment []
-		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
-		}
-	}
-}
 
 **output
 {

@@ -57,7 +57,10 @@ const std::string& DirectmapContext::filter( const std::string& docformat) const
 	if (ki == m_filtermap.end())
 	{
 		ki = m_filtermap.find( std::string());
-		if (ki == m_filtermap.end()) throw std::runtime_error( "document format not defined");
+		if (ki == m_filtermap.end())
+		{
+			throw std::runtime_error( std::string("filter for document format '") + docformat + "' not defined");
+		}
 	}
 	return ki->second;
 }

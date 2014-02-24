@@ -49,16 +49,45 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --program schema_select_task_by_id.sfrm --program simpleform.wnmp --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=../../tests/wolfilter/template/program/schema_select_task_by_id_UTF16BE.tdl --cmdprogram=test.dmap schema_select_task_by_id
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf schema_select_task_by_id
 
+**file:wolframe.conf
+LoadModules
+{
+	module ./../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+}
+Database
+{
+	SQliteTest
+	{
+		identifier testdb
+		file test.db
+		dumpfile DBDUMP
+		inputfile DBDATA
+	}
+}
+Processor
+{
+	database testdb
+	program ../wolfilter/template/program/schema_select_task_by_id_UTF16BE.tdl
+	program ../wolfilter/scripts/schema_select_task_by_id.sfrm
+	program ../wolfilter/template/program/simpleform.wnmp
+
+	cmdhandler
+	{
+		directmap
+		{
+			program test.dmap
+			filter cjson
+		}
+	}
+}
 **file: test.dmap
 COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
-**file:simpleform.wnmp
-int=integer;
-uint=unsigned;
-float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
 **file: DBDATA
 CREATE TABLE task
 (
@@ -78,32 +107,6 @@ BEGIN
 	INTO task FOREACH //task DO SELECT * FROM task WHERE id=$(id) ORDER BY id ASC;
 END
 **outputfile:DBDUMP
-**file: schema_select_task_by_id.sfrm
-FORM Employee
-{
-	firstname string
-	surname string
-	phone string
-}
-
-FORM schema_select_task_by_id
-{
-	assignmentlist
-	{
-		assignment []
-		{
-			task []
-			{
-				id int
-				title string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
-		}
-	}
-}
-
 **output
 {
 	"doc":	{

@@ -57,73 +57,20 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_complex.wnmp --program typed_invoice.sfrm typed_invoice
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf typed_invoice
 
-**file:simpleform_complex.wnmp
-int=  integEr( 10 );
-f_int= trim  ,integer( 10);
-uint =uNsigned(10 );
-f_uint =trim, unsiGned( 10) ;
-float = floatingpoint(12,12);
-f_floAt = trim ,floatingpoint(12,12);
-text_Ascii_de =  latinword, ascii_de
-text_ascii_eu=Latinword ,ascii_eu ;
-currency=fixedpoint( 13,2);
-percent_1=fixedpoint (5,1);
-**file: typed_invoice.sfrm
-FORM typed_invoice
+**file:wolframe.conf
+LoadModules
 {
-	invoice
-	{
-		order
-		{
-			number f_int
-			reference string
-			representative string
-			terms uint
-			issuedate string
-			duedate string
-			description text_ascii_de
-		}
-		item []
-		{
-			name text_ascii_de
-			description text_ascii_de
-			quantity f_uint
-			discount f_float
-			price
-			{
-				unit float
-				total float
-				tax
-				{
-					description @string
-					_ float
-				}
-				gross float
-			}
-		}
-		bill
-		{
-			price
-			{
-				total float
-				tax float
-				gross float
-			}
-			payed float
-			open float
-		}
-		address []
-		{
-			id @string
-			name text_ascii_eu
-			street text_ascii_de
-			postalcode uint
-			city string
-			country string
-		}
-	}
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module NOTFOUND:normalize_locale
+	module ./../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program ../wolfilter/scripts/typed_invoice.sfrm
+	program ../wolfilter/template/program/simpleform_complex.wnmp
 }
 **output
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>

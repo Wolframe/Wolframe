@@ -11,14 +11,58 @@
 <treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
 <treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram=transaction_demo_tree.lua --program simpleform.wnmp --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
 **requires:TEXTWOLF
-**file:simpleform.wnmp
+**file:wolframe.conf
+LoadModules
+{
+	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Database
+{
+	SQliteTest
+	{
+		identifier testdb
+		file test.db
+		dumpfile DBDUMP
+		inputfile DBDATA
+	}
+}
+Processor
+{
+	database testdb
+	program normalize.wnmp
+	program DBPRG.tdl
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
 int=integer;
 uint=unsigned;
 float=floatingpoint;
 currency=fixedpoint(13,2);
 percent_1=fixedpoint(5,1);
+**file:script.lua
+function run()
+	filter().empty = false
+	output:opentag( "result")			-- top level result tag
+	local itr = input:get()
+	for v,t in itr do
+		if t and t ~= "transactions" then	-- top level tag names are the transaction names
+			f = formfunction( t )		-- call the transaction
+			output:print( f( itr))		-- print the result
+		end
+	end
+	output:closetag()				-- close result
+end
 **file: DBDATA
 --
 -- Generic tree implementation for SQL databases
@@ -215,20 +259,6 @@ BEGIN
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 END
 **outputfile:DBDUMP
-**file: transaction_demo_tree.lua
-function run()
-	filter().empty = false
-	output:opentag( "result")			-- top level result tag
-	local itr = input:get()
-	for v,t in itr do
-		if t and t ~= "transactions" then	-- top level tag names are the transaction names
-			f = formfunction( t )		-- call the transaction
-			output:print( f( itr))		-- print the result
-		end
-	end
-	output:closetag()				-- close result
-end
-
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>

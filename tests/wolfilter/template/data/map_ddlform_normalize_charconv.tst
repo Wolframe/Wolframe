@@ -1,26 +1,22 @@
 #!/bin/sh
-testname=`basename $0 ".tst"`				# name of the test
-formname="typed_invoice.sfrm"
-opt=""
-modpath="../../src/modules/ddlcompiler/"		# module directory for DDL compilerds relative from tests/temp
-mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
-opt="$opt --module $mod"
-modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
-mod="$modpath/locale/mod_normalize_locale"		# module to load
-opt="$opt --module $mod"
-mod="$modpath/number/mod_normalize_number"		# module to load
-opt="$opt --module $mod"
-mod="$modpath/string/mod_normalize_string"		# module to load
-opt="$opt --module $mod"
-ddltypeprg="simpleform_complex.wnmp"
-opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
-opt="$opt --program $formname"				# form for invoice
-testcmd="$opt typed_invoice"				# command to execute by the test
-testscripts="$formname"					# list of scripts of the test
-docin=charconv_example					# input document name
-docout=$testname					# output document name
-codepage="1"
+testname=`basename $0 ".tst"`			# name of the test
+docin=charconv_example				# input document name
+docout=$testname				# output document name
+testcmd="-c wolframe.conf typed_invoice"	# command to execute by the test
 testdata="
-**file:$ddltypeprg
-`cat program/$ddltypeprg`"
+**file:wolframe.conf
+LoadModules
+{
+	module `cmd/MODULE ddlcompiler_simpleform`
+	module `cmd/MODULE normalize_number`
+	module `cmd/MODULE normalize_locale`
+	module `cmd/MODULE normalize_string`
+}
+Processor
+{
+	program `cmd/PROGRAM typed_invoice.sfrm`
+	program `cmd/PROGRAM simpleform_complex.wnmp`
+}"
+codepage="1"
 . ./output_tst_all_isolatin.sh
+

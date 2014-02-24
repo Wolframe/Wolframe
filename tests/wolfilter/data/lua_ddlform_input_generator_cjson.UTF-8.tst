@@ -40,23 +40,35 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform.wnmp --program employee_assignment_print.sfrm --cmdprogram ddlform_input_generator.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**file:simpleform.wnmp
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program		normalize.wnmp
+	program		form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
 int=integer;
 uint=unsigned;
 float=floatingpoint;
 currency=fixedpoint(13,2);
 percent_1=fixedpoint(5,1);
-**file: ddlform_input_generator.lua
-
-function run()
-	r = form("employee_assignment_print")
-	r:fill( input:get())
-	output:print( r:get())
-end
-
-**file: employee_assignment_print.sfrm
+**file:form.sfrm
 FORM Employee
 {
 	firstname string
@@ -81,7 +93,13 @@ FORM employee_assignment_print
 		}
 	}
 }
+**file:script.lua
 
+function run()
+	r = form("employee_assignment_print")
+	r:fill( input:get())
+	output:print( r:get())
+end
 **output
 {
 	"assignmentlist":	{

@@ -40,8 +40,35 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../wolfilter/modules/database/testtrace/mod_db_testtrace --database 'identifier=testdb,outfile=DBOUT,file=DBRES' --program=DBIN.tdl --cmdprogram transaction_input_generator.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf test_transaction
 
+**file:wolframe.conf
+LoadModules
+{
+	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+}
+Database
+{
+	test
+	{
+		identifier testdb
+		outfile DBOUT
+		file DBRES
+	}
+}
+Processor
+{
+	program		DBIN.tdl
+	program		script.lua
+	database	testdb
+}
+**file:script.lua
+
+function run()
+	r = formfunction("test_transaction")( input:get())
+	output:print( r:get())
+end
 **file: DBRES
 #name#job1
 #name#job2
@@ -53,13 +80,6 @@ RESULT INTO doc
 BEGIN
 	INTO title FOREACH //task DO run( title);
 END
-**file: transaction_input_generator.lua
-
-function run()
-	r = formfunction("test_transaction")( input:get())
-	output:print( r:get())
-end
-
 **output
 {
 	"doc":	{

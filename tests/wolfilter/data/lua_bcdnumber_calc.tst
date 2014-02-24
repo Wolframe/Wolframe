@@ -1,6 +1,23 @@
 **
 **requires:LUA
 **requires:TEXTWOLF
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/filter/line/mod_filter_line
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
+}
+Processor
+{
+	cmdhandler
+	{
+		lua
+		{
+			program bcdnumber_calc.lua
+		}
+	}
+}
 **input
 876439672562628717211 110162209426683 +
 28665348405019508963 264326091553179833909 +
@@ -34496,5 +34513,5 @@ end
 
 
 **config
---module ../../src/modules/filter/line/mod_filter_line --module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram bcdnumber_calc.lua run
+-c wolframe.conf run
 **end

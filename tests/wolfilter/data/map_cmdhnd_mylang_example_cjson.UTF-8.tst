@@ -79,36 +79,32 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/cmdbind/mylang/mod_command_mylang --cmdprogram=example.dmap --program=example.sfrm --program=example.wnmp --program=example.mlg getCDCatalog
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf getCDCatalog
 
-**file:example.sfrm
-FORM CDCatalog
+**file:wolframe.conf
+LoadModules
 {
-	CATALOG
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../wolfilter/modules/cmdbind/mylang/mod_command_mylang
+}
+Processor
+{
+	program ../wolfilter/template/program/mylang/example.mlg
+	program ../wolfilter/template/program/mylang/example.sfrm
+	program ../wolfilter/template/program/mylang/example.wnmp
+	
+	cmdhandler
 	{
-		CD []
+		directmap
 		{
-			TITLE string
-			ARTIST string
-			RELEASE
-			{
-				COUNTRY string
-				COMPANY string
-				PRICE string
-				YEAR int
-			}
+			program ../wolfilter/template/program/mylang/example.dmap
+			filter cjson
 		}
 	}
 }
-**file:example.wnmp
-int=integer;
-uint=unsigned;
-float=floatingpoint;
-normname=convdia,lcname;
-**file:example.dmap
-COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);
-**file:example.mlg
-run
 **output
 {
 	"doctype":	"CDCatalog.simpleform",

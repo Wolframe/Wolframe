@@ -6,12 +6,26 @@
 	<item>Im Französischen gibt es Buchstaben wie "ç" "è" "à" "ë" (e tréma)</item>
 	<item>Im Deutschen sind es die Umlate wie "Ü" "Ä" "Ö"</item>
 </doc>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/normalize//string/mod_normalize_string --program types.wnmp --cmdprogram echo_normalizer_input_iterator.lua run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
 **requires:TEXTWOLF
-**file:types.wnmp
-name=ucname;
-
-**file: echo_normalizer_input_iterator.lua
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program normalize.wnmp
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:script.lua
 function run()
 	for v,t in input:get()
 	do
@@ -22,6 +36,8 @@ function run()
 		end
 	end
 end
+**file:normalize.wnmp
+name=ucname;
 
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

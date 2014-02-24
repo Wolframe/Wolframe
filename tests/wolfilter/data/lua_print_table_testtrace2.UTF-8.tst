@@ -104,27 +104,33 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../tests/wolfilter/modules/prnt//fakepdfprint/mod_print_testpdf --module ../../src/modules/filter//blob/mod_filter_blob --program simpleform_range.wnmp --program invoice.sprn --program invoice.sfrm --cmdprogram print_table_textwolf.lua run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
 **requires:TEXTWOLF
-**file:simpleform_range.wnmp
-iNt=integer( 10);
-uint=unsigneD(10 );
-float=fLoatingpoint(10,  10);
-currency=fiXedpoint(13 ,2);
-percent_1=fixedpoint (5,1);
-**file: print_table_textwolf.lua
-
-function run()
-	f = filter( "textwolf")
-	f.empty = false
-	input:as( f)
-	output:as( filter( "blob"))
-	t = input:table()
-	f = formfunction( "print_invoice")
-	output:print( f( t):table())
-end
-
-**file: invoice.sfrm
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/filter/blob/mod_filter_blob
+	module ../wolfilter/modules/prnt/fakepdfprint/mod_print_testpdf
+}
+Processor
+{
+	program normalize.wnmp
+	program print.sprn
+	program form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:form.sfrm
 FORM Invoice
 {
 	invoice
@@ -179,11 +185,28 @@ FORM Invoice
 		}
 	}
 }
-**file: invoice.sprn
+**file:normalize.wnmp
+iNt=integer( 10);
+uint=unsigneD(10 );
+float=fLoatingpoint(10,  10);
+currency=fiXedpoint(13 ,2);
+percent_1=fixedpoint (5,1);
+**file:print.sprn
 !NAME=print_invoice
 /invoice: {Text="invoice"} PrintText()
 //name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()
 //address: {R1 ?= -1; [R1] = R1 + 1} PrintText()
+**file:script.lua
+
+function run()
+	f = filter( "textwolf")
+	f.empty = false
+	input:as( f)
+	output:as( filter( "blob"))
+	t = input:table()
+	f = formfunction( "print_invoice")
+	output:print( f( t):table())
+end
 **output
 ENTER PrintText: 1$ Text = 'invoice'
 ENTER PrintText: 2$ R1 = '0', Text = 'invoice'

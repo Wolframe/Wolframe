@@ -1,19 +1,33 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-opt=""
-modpath="../../src/modules"				# module directory relative from tests/temp
-opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
-opt="$opt --module $modpath/testtrace/mod_db_testtrace"
-opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
-opt="$opt --program=DBIN.tdl"
 luascript=`echo $testname | sed 's/lua_//'`.lua		# script to execute
-opt="$opt --cmdprogram $luascript"
-testcmd="$opt run"					# command to execute by the test
-testscripts="$luascript"				# list of scripts of the test
+testcmd="-c wolframe.conf test_transaction"		# command to execute by the test
 docin=employee_assignment_print				# input document name
 docout=$testname					# output document name
 testdata="
+**file:wolframe.conf
+LoadModules
+{
+	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+}
+Database
+{
+	test
+	{
+		identifier testdb
+		outfile DBOUT
+		file DBRES
+	}
+}
+Processor
+{
+	program		DBIN.tdl
+	program		script.lua
+	database	testdb
+}
+**file:script.lua
+`cat ../scripts/$luascript`
 **file: DBRES
 #name#job1
 #name#job2
@@ -26,3 +40,4 @@ BEGIN
 	INTO title FOREACH //task DO run( title);
 END"
 . ./output_tst_all.sh
+
