@@ -28,9 +28,9 @@ case "$2" in
 		
 	POST-INSTALL)
 		# echo a message to the installer
-		echo "Adapt and copy '/usr/pkg/share/examples/rc.d/wolframed'"
-		echo "to '/etc/rc.d'. Add wolframed=\"yes\" to '/etc/rc.conf' to"
-		echo "enable the Wolframe server at startup"
+		echo "Copy '/usr/pkg/share/examples/rc.d/wolframed' to '/etc/rc.d'"
+		echo "and adapt it. Add wolframed=YES to '/etc/rc.conf' to"
+		echo "enable the Wolframe server at startup."
 		echo
 		;;
 
