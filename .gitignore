@@ -30,7 +30,7 @@ wolframemsg.h
 *.dll.manifest
 *.pdb
 *.ilk
-*.exp
+#*.exp
 *.obj
 *.dllobj
 *.lib

@@ -32,6 +32,8 @@ TEST_CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe"
+
 local_all:
 
 local_clean:
@@ -40,6 +42,10 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./moduleTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./moduleTest
 	@echo
+ifdef EXPECT
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) checkLog.exp
+	@echo
+endif
 endif
