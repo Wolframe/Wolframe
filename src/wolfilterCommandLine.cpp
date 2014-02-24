@@ -335,7 +335,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		LOG_DEBUG << "load config file '" << configfile << "' and set reference path to '" << m_referencePath << "'";
 
 		m_config = utils::readPropertyTreeFile( configfile);
-		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "cmdprogram")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "database")) throw std::runtime_error( "incompatible options: --config specified with --database");
@@ -357,28 +356,30 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 #else
 	modulePath = m_referencePath;
 #endif
-
+	if (vmap.count( "config"))
+	{
+		std::vector<std::string> cfgmod = configModules( modulePath);
+		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
+	}
 	if (vmap.count( "module"))
 	{
-		m_modules = vmap["module"].as<std::vector<std::string> >();
-		std::vector<std::string>::iterator itr=m_modules.begin(), end=m_modules.end();
-		for (; itr != end; ++itr)
+		std::vector<std::string> mods = vmap["module"].as<std::vector<std::string> >();
+		std::vector<std::string>::iterator mi=mods.begin(), me=mods.end();
+		for (; mi != me; ++mi)
 		{
-			if (itr->size() == 0 || (*itr).at(0) != '.')
+			if (mi->size() == 0 || (*mi).at(0) != '.')
 			{
-				*itr = utils::getCanonicalPath( *itr, modulePath);
+				m_modules.push_back( utils::getCanonicalPath( *mi, modulePath));
 			}
 			else if (!currentPath.empty())
 			{
-				*itr = utils::getCanonicalPath( *itr, currentPath);
+				m_modules.push_back( utils::getCanonicalPath( *mi, currentPath));
+			}
+			else
+			{
+				m_modules.push_back( *mi);
 			}
 		}
-	}
-	else
-	{
-		// Load configured modules (--config)
-		std::vector<std::string> cfgmod = configModules( modulePath);
-		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	}
 	std::list<std::string> modfiles;
 	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
