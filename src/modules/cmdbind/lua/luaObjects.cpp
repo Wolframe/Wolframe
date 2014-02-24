@@ -231,7 +231,7 @@ struct LuaObject
 		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
-			luaL_error( ls, "reserved global variable '%s' has been changed", name);
+			luaL_error( ls, "undefined global variable '%s'", name);
 			return 0;
 		}
 		ObjectType* rt = obj->ref();

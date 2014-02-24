@@ -74,11 +74,12 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			else
 				m_programFiles.push_back( programFile );
 		}
-		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first ) )	{
+		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first )
+			|| boost::algorithm::iequals( "runtimeenv", L1it->first ) )	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									  L2it != L1it->second.end(); L2it++ )	{
 				if ( modules )	{
-					module::ConfiguredBuilder* builder = modules->getBuilder( "cmdhandler", L2it->first );
+					module::ConfiguredBuilder* builder = modules->getBuilder( L1it->first, L2it->first );
 					if ( builder )	{
 						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
@@ -89,11 +90,11 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 						}
 					}
 					else
-						LOG_WARNING << logPrefix() << "unknown cmdhandler configuration option: '"
+						LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
 							    << L2it->first << "'";
 				}
 				else
-					LOG_WARNING << logPrefix() << "unknown cmdhandler configuration option: '"
+					LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
 						    << L2it->first << "'";
 			}
 		}

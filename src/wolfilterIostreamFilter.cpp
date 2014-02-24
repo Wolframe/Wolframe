@@ -404,7 +404,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			return;
 		}
 	}
-	throw std::runtime_error( "command, form or function not found");
+	throw std::runtime_error( std::string("identifier '") + proc + "' not defined as command, form or function");
 }
 
 
