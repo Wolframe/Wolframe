@@ -284,9 +284,9 @@ usr/pkg/bin/wolframec
 usr/pkg/sbin/wolframed
 usr/pkg/etc/wolframe/wolframe.conf
 @dirrm usr/pkg/etc/wolframe
-usr/pkg/share/man/man5/wolframe.conf.5.gz
-usr/pkg/share/man/man8/wolframed.8.gz
-usr/pkg/share/man/man1/wolfpasswd.1.gz
+usr/pkg/man/man5/wolframe.conf.5.gz
+usr/pkg/man/man8/wolframed.8.gz
+usr/pkg/man/man1/wolfpasswd.1.gz
 @mode 0775
 usr/pkg/share/examples/rc.d/wolframed
 @mode

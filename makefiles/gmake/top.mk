@@ -247,6 +247,7 @@ endif
 	@echo "sysconfdir: $(sysconfdir)"
 	@echo "includedir: $(includedir)"
 	@echo "datadir: $(datadir)"
+	@echo "mandir: $(mandir)"
 	@echo "localedir: $(localedir)"
 	@echo "moduleloaddir: $(moduleloaddir)"
 	@echo

@@ -7,15 +7,12 @@ if test "x$TMPDIR" = "x"; then
 	TMPDIR=/tmp
 fi
 
-# the original package
+# the original source tarball for RHEL/Centos/OpenSUSE
 rm -f wolframe-$VERSION.tar.gz
-make \
-	WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
-	WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
-	dist-gz
+make dist-gz
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
 
-# and a nice debian version
+# the original source tarball for Debian/Ubuntu
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
 
 # the Redhat build script
@@ -30,6 +27,14 @@ CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.orig.tar.gz | cut -f 1 -d' '`
 
 # copy all Debian versions of the description files.
 cp packaging/obs/wolframe*.dsc $OSC_HOME
+
+
+# Append calculated MD5/sizes of Debian/Ubuntu-version specific patches.
+# normally 'packaging/debian' is taken, but for the files in obs where
+# there is a difference for a specific version of Debian/Ubuntu.
+# Patch 'debian/changelog' and Version in dsc file to have a build number
+# and avoid funny problems as mentionen in issue #89)
+GIT_COMMIT_COUNT=`git rev-list HEAD --count`
 for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 	echo " $CHKSUM $SIZE wolframe_$VERSION.orig.tar.gz" >> $i
 	OS_ORIG=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//'`
@@ -39,6 +44,8 @@ for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 	cp -a packaging/debian $TMPDIR/.
 	test -f packaging/obs/control-$OS_ORIG && cp -a packaging/obs/control-$OS_ORIG $TMPDIR/debian/control
 	test -f packaging/obs/rules-$OS_ORIG && cp -a packaging/obs/rules-$OS_ORIG $TMPDIR/debian/rules
+#	sed -i "s/Version: *\([0-9.]*\)\-\(.*\)/Version: \1-\2~dev$OBS_DEB_VERSION/" $i
+	sed -i "s/wolframe (\([0-9.]*\)-\([0-9]*\))/wolframe (\1-$GIT_COMMIT_COUNT)/" $TMPDIR/debian/changelog
 	OLDDIR=$PWD
 	cd $TMPDIR
 	tar zcf $TMPDIR/wolframe_$VERSION-$OS.debian.tar.gz debian

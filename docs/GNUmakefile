@@ -250,28 +250,28 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/doc/wolframe
 	-test -d doxygen/html && cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man5
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man8
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man1
-	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(datadir)/man/man5
-	gzip -f $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5
-	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(datadir)/man/man8
-	gzip -f $(DESTDIR)$(datadir)/man/man8/wolframed.8
-	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(datadir)/man/man1
-	gzip -f $(DESTDIR)$(datadir)/man/man1/wolfpasswd.1
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man5
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man8
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(mandir)/man5
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe.conf.5
+	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
+	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
+	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(mandir)/man1
+	gzip -f $(DESTDIR)$(mandir)/man1/wolfpasswd.1
 
 local_uninstall:
 	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
 	@-rmdir $(DESTDIR)$(datadir)/doc/wolframe
 	@-rmdir $(DESTDIR)$(datadir)/doc
-	@-rm $(DESTDIR)$(datadir)/man/man1/wolfpasswd.1.gz
-	@-rmdir $(DESTDIR)$(datadir)/man/man1
-	@-rm $(DESTDIR)$(datadir)/man/man8/wolframed.8.gz
-	@-rmdir $(DESTDIR)$(datadir)/man/man8
-	@-rm $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5.gz
-	@-rmdir $(DESTDIR)$(datadir)/man/man5
-	@-rmdir $(DESTDIR)$(datadir)/man
 	@-rmdir $(DESTDIR)$(datadir)
+	@-rm $(DESTDIR)$(mandir)/man1/wolfpasswd.1.gz
+	@-rmdir $(DESTDIR)$(mandir)/man1
+	@-rm $(DESTDIR)$(mandir)/man8/wolframed.8.gz
+	@-rmdir $(DESTDIR)$(mandir)/man8
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5.gz
+	@-rmdir $(DESTDIR)$(mandir)/man5
+	@-rmdir $(DESTDIR)$(mandir)
 
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml

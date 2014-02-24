@@ -273,8 +273,8 @@ usr/local/bin/wolframec
 usr/local/sbin/wolframed
 usr/local/etc/wolframe/wolframe.conf
 @dirrm usr/local/etc/wolframe
-usr/local/share/man/man5/wolframe.conf.5.gz
-usr/local/share/man/man8/wolframed.8.gz
-usr/local/share/man/man1/wolfpasswd.1.gz
+usr/local/man/man5/wolframe.conf.5.gz
+usr/local/man/man8/wolframed.8.gz
+usr/local/man/man1/wolfpasswd.1.gz
 @mode 0775
 usr/local/etc/rc.d/wolframed

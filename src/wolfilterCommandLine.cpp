@@ -277,7 +277,11 @@ struct WolfilterOptionStruct
 	}
 };
 
+#if defined( DEFAULT_MODULE_LOAD_DIR)
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
+#else
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool )
+#endif
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
