@@ -29,8 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaObjects.cpp
+//\file luaObjects.cpp
 #include "luaObjects.hpp"
+#include "luaObjectTemplate.hpp"
 #include "luaDebug.hpp"
 #include "luafilter.hpp"
 #include "luaGetFunctionClosure.hpp"
@@ -63,220 +64,20 @@ extern "C"
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-namespace luaname
-{
-	static const char* Logger = "wolframe.Logger";
-	static const char* Input = "wolframe.Input";
-	static const char* Output = "wolframe.Output";
-	static const char* Filter = "wolframe.Filter";
-	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
-	static const char* Form = "wolframe.Form";
-	static const char* CustomValue = "wolframe.CustomValue";
-	static const char* CustomInitializer = "wolframe.CustomInitializer";
-	static const char* DDLFormParser = "wolframe.DDLFormParser";
-	static const char* DDLFormSerializer = "wolframe.DDLFormSerializer";
-	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
-	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
-	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
-	static const char* FormFunctionClosureR = "wolframe.FormFunctionClosureR";
-	static const char* NormalizeFunction = "wolframe.NormalizeFunction";
-	static const char* StructSerializer = "wolframe.StructSerializer";
-	static const char* ProcessorProvider = ":wolframe.ProcessorProvider";
-	static const char* LuaModuleMap = ":wolframe.LuaModuleMap";
-}
-
-namespace
-{
-template <class ObjectType>
-const char* metaTableName()						{return 0;}
-template <> const char* metaTableName<Logger>()				{return luaname::Logger;}
-template <> const char* metaTableName<Input>()				{return luaname::Input;}
-template <> const char* metaTableName<Output>()				{return luaname::Output;}
-template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
-template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
-template <> const char* metaTableName<types::FormR>()			{return luaname::Form;}
-template <> const char* metaTableName<types::CustomDataValueR>()	{return luaname::CustomValue;}
-template <> const char* metaTableName<types::CustomDataInitializerR>()	{return luaname::CustomInitializer;}
-template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
-template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
-template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
-template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
-template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
-template <> const char* metaTableName<FormFunctionClosureR>()		{return luaname::FormFunctionClosureR;}
-template <> const char* metaTableName<types::NormalizeFunction>()	{return luaname::NormalizeFunction;}
-template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
-template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
-template <> const char* metaTableName<langbind::LuaModuleMap>()		{return luaname::LuaModuleMap;}
-}//anonymous namespace
-
-static const luaL_Reg empty_methodtable[ 1] =
-{
-	{0,0}
-};
-
-template <class ObjectType>
-struct LuaObject
-{
-	LuaObject( const ObjectType& o)
-		:m_name(metaTableName<ObjectType>())
-		,m_obj(o) {}
-	LuaObject()
-		:m_name(metaTableName<ObjectType>()) {}
-
-	static int destroy( lua_State* ls)
-	{
-		LuaObject *THIS = (LuaObject*)lua_touserdata( ls, 1);
-		if (THIS) THIS->~LuaObject();
-		return 0;
-	}
-
-	static void createMetatable( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf, const luaL_Reg* mt)
-	{
-		luaL_newmetatable( ls, metaTableName<ObjectType>());
-		lua_pushliteral( ls, "__index");
-		if (indexf)
-		{
-			lua_pushcfunction( ls, indexf);
-		}
-		else
-		{
-			lua_pushvalue( ls, -2);
-		}
-		lua_rawset( ls, -3);
-
-		lua_pushliteral( ls, "__newindex");
-		if (newindexf)
-		{
-			lua_pushcfunction( ls, newindexf);
-		}
-		else
-		{
-			lua_pushvalue( ls, -2);
-		}
-		lua_rawset( ls, -3);
-
-		lua_pushliteral( ls, "__gc");
-		lua_pushcfunction( ls, destroy);
-		lua_rawset( ls, -3);
-
-		if (mt)
-		{
-			unsigned int ii;
-			for (ii=0; mt[ii].name; ++ii)
-			{
-				lua_pushcfunction( ls, mt[ii].func);
-				lua_setfield( ls, -2, mt[ii].name);
-			}
-		}
-		lua_pop( ls, 1);
-	}
-
-	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
-	{
-		void* rt = lua_newuserdata( ls, num_bytes);
-		if (rt == 0) throw std::bad_alloc();
-		return rt;
-	}
-
-	void* operator new (std::size_t num_bytes, lua_State* ls, const char* mt) throw (std::bad_alloc)
-	{
-		void* rt = lua_newuserdata( ls, num_bytes);
-		if (rt == 0) throw std::bad_alloc();
-		luaL_getmetatable( ls, mt);
-		lua_setmetatable( ls, -2);
-		return rt;
-	}
-
-	/// \brief does nothing because the LUA garbage collector does the job.
-	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
-	/// (just avoids C4291 warning)
-	void operator delete (void *, lua_State*) {}
-	void operator delete (void *, lua_State*, const char*) {}
-
-	static void push_luastack( lua_State* ls, const ObjectType& o)
-	{
-		try
-		{
-			const char* mt = metaTableName<ObjectType>();
-			new (ls,mt) LuaObject( o);
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
-		}
-	}
-
-	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
-	{
-		createMetatable( ls, 0, 0, mt);
-		new (ls) LuaObject( instance);
-		luaL_getmetatable( ls, metaTableName<ObjectType>());
-		lua_setmetatable( ls, -2);
-		lua_setglobal( ls, name);
-	}
-
-	static bool setGlobal( lua_State* ls, const char* name, const ObjectType& instance)
-	{
-		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
-		if (!obj) return false;
-		*obj = instance;
-		return true;
-	}
-
-	static ObjectType* getGlobal( lua_State* ls, const char* name)
-	{
-		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
-		if (!obj)
-		{
-			luaL_error( ls, "undefined global variable '%s'", name);
-			return 0;
-		}
-		ObjectType* rt = obj->ref();
-		lua_pop( ls, 1);
-		return rt;
-	}
-
-	static ObjectType* getSelf( lua_State* ls, const char* name, const char* method)
-	{
-		LuaObject* self;
-		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_testudata( ls, 1, metaTableName<ObjectType>())) == 0)
-		{
-			luaL_error( ls, "'%s' (metatable '%s') needs self parameter (%s:%s() instead of %s.%s())", name, metaTableName<ObjectType>(), name, method, name, method);
-			return 0;
-		}
-		return self->ref();
-	}
-
-	static ObjectType* get( lua_State* ls, int index)
-	{
-		LuaObject* rt = (LuaObject*) luaL_testudata( ls, index, metaTableName<ObjectType>());
-		return rt?rt->ref():0;
-	}
-
-	const ObjectType* ref() const		{return &m_obj;}
-	ObjectType* ref()			{return &m_obj;}
-	const char* name() const		{return m_name;}
-private:
-	const char* m_name;
-	ObjectType m_obj;
-};
-
 template <class ObjectType>
 static void setGlobalSingletonPointer( lua_State* ls, ObjectType* obj)
 {
 	typedef typename boost::remove_cv<ObjectType>::type ObjectType_ncv;
 	ObjectType_ncv* obj_ncv = const_cast<ObjectType_ncv*>( obj);
 	lua_pushlightuserdata( ls, obj_ncv);
-	lua_setglobal( ls, metaTableName<ObjectType_ncv>());
+	lua_setglobal( ls, MetaTable<ObjectType_ncv>::name());
 }
 
 template <class ObjectType>
 static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 {
 	typedef typename boost::remove_cv<ObjectType>::type ObjectType_ncv;
-	lua_getglobal( ls, metaTableName<ObjectType_ncv>());
+	lua_getglobal( ls, MetaTable<ObjectType_ncv>::name());
 	ObjectType* rt = (ObjectType*)lua_touserdata( ls, -1);
 	if (!rt) throw std::runtime_error("global context not defined");
 	lua_pop( ls, 1);
@@ -355,7 +156,7 @@ template <class Object>
 static int function__LuaObject__index( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
-	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__index");
+	Object* obj = LuaObject<Object>::getSelf( ls, MetaTable<Object>::name(), "__index");
 	const char* key = lua_tostring( ls, 2);
 	try
 	{
@@ -394,7 +195,7 @@ template <class Object>
 static int function__LuaObject__newindex( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
-	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__newindex");
+	Object* obj = LuaObject<Object>::getSelf( ls, MetaTable<Object>::name(), "__newindex");
 	const char* key = lua_tostring( ls, 2);
 	try
 	{
@@ -2193,7 +1994,7 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 	{
 		throw std::runtime_error( "missing arguments");
 	}
-	if (luaL_testudata( ls, 1, metaTableName<Logger>()))
+	if (luaL_testudata( ls, 1, MetaTable<Logger>::name()))
 	{
 		sofs = 1;
 	}
@@ -2231,7 +2032,7 @@ LUA_FUNCTION_THROWS( "logger.printc(..)", function_logger_printc)
 	 * whether it's a string or a number
 	 */
 	int ii,sofs=0,nn = lua_gettop(ls);
-	if (nn && luaL_testudata( ls, 1, metaTableName<Logger>()))
+	if (nn && luaL_testudata( ls, 1, MetaTable<Logger>::name()))
 	{
 		sofs = 1;
 	}

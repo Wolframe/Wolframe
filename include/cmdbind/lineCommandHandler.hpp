@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/lineCommandHandler.hpp
-///\brief Interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
+//\file cmdbind/lineCommandHandler.hpp
+//\brief Interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
 #ifndef _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
@@ -47,11 +47,11 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\brief State machine definition of a LineCommandHandler
+//\brief State machine definition of a LineCommandHandler
 class LineCommandHandlerSTM
 {
 public:
-	///\return -1 for terminate or a valid state in the state machine definition
+	//\return -1 for terminate or a valid state in the state machine definition
 	typedef int (*RunCommand)( void* obj, int argc, const char** argv, std::ostream& out);
 	struct State
 	{
@@ -101,36 +101,36 @@ private:
 class LineCommandHandler :public CommandHandler
 {
 public:
-	///\brief Constructor
+	//\brief Constructor
 	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0);
-	///\brief Destructor
+	//\brief Destructor
 	virtual ~LineCommandHandler();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t)
+	//\brief See Parent::setInputBuffer(void*,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
+	//\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos=0);
 
-	///\brief See Parent::nextOperation()
+	//\brief See Parent::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See Parent::putInput(const void*,std::size_t)
+	//\brief See Parent::putInput(const void*,std::size_t)
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
+	//\brief See Parent::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
+	//\brief See Parent::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
+	//\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief See Parent::interruptDataSessionMarker()
+	//\brief See Parent::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
-	///\brief Get the current state (toplevel)
+	//\brief Get the current state (toplevel)
 	std::size_t stateidx() const			{return m_stateidx;}
 
 	const std::vector<std::string>& cmds() const	{return m_stm->get( m_stateidx).m_parser.cmds();}
@@ -139,7 +139,7 @@ public:
 protected:
 	typedef int (*DelegateHandlerEnd)( void*, CommandHandler*, std::ostream&);
 
-	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
+	//\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
 	void delegateProcessingFunction( CommandHandler* ch, DelegateHandlerEnd end)
 	{
 		if (m_delegateHandler) throw std::logic_error( "duplicate delegation of protocol processing");
@@ -147,20 +147,20 @@ protected:
 		m_delegateHandlerEnd = end;
 	}
 
-	///\brief Redirect to another command of the state machine.
-	///\remark The command cmd_ must exist, though it may fail
-	///\param[in] cmd_ command of the current state to execute
-	///\param[in] argc_ number of arguments to pass to the command
-	///\param[in] argv_ the arguments to pass to the command
-	///\param[out] out stream for protocol output of the command
+	//\brief Redirect to another command of the state machine.
+	//\remark The command cmd_ must exist, though it may fail
+	//\param[in] cmd_ command of the current state to execute
+	//\param[in] argc_ number of arguments to pass to the command
+	//\param[in] argv_ the arguments to pass to the command
+	//\param[out] out stream for protocol output of the command
 	int runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out);
 
 
-	///\brief Redirect data as input and the output buffer to a command handler
-	///\param[in] data pointer to input data for the command handler
-	///\param[in] datasize size of 'data' in bytes
-	///\param[in] toh command handler to address
-	///\param[in,out] out buffer for protocol write
+	//\brief Redirect data as input and the output buffer to a command handler
+	//\param[in] data pointer to input data for the command handler
+	//\param[in] datasize size of 'data' in bytes
+	//\param[in] toh command handler to address
+	//\param[in,out] out buffer for protocol write
 	bool redirectInput( void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& out);
 
 private:
@@ -170,8 +170,8 @@ private:
 	protocol::InputBlock::iterator m_itr;			//< iterator to scan protocol input
 	protocol::InputBlock::iterator m_end;			//< iterator pointing to end of message buffer
 
-	///\enum CommandState
-	///\brief Enumeration of command processing states
+	//\enum CommandState
+	//\brief Enumeration of command processing states
 	enum CommandState
 	{
 		Init,						//< start state, called first time in this session
@@ -183,8 +183,8 @@ private:
 		ProcessOutput,					//< prints the command output to the output buffer
 		Terminate					//< terminate application processor session (close for network)
 	};
-	///\brief Returns the state as string for logging etc.
-	///\param [in] i state to get as string
+	//\brief Returns the state as string for logging etc.
+	//\param [in] i state to get as string
 	static const char* commandStateName( CommandState i)
 	{
 		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
@@ -204,9 +204,9 @@ private:
 };
 
 
-///\brief Defines a static function calling a member function with fixed signature
-///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
-//PF:TODO make a static (enable_if) assert here for refusing virtual methods here
+//\brief Defines a static function calling a member function with fixed signature
+//\warning do not declare virtual method calls like this. It is not portable (GCC only) !
+//PF:TODO make a BOOST_ASSERT here for refusing virtual methods here
 template <class T, int (T::*TerminateDelegationMethod)( CommandHandler*, std::ostream&)>
 struct LineCommandHandlerTerminateDelegationWrapper
 {
@@ -216,19 +216,19 @@ struct LineCommandHandlerTerminateDelegationWrapper
 	}
 };
 
-///\brief Defines some template based extensions to line command handler
+//\brief Defines some template based extensions to line command handler
 // Usage: derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
 template <class LineCommandHandlerImpl>
 struct LineCommandHandlerTemplate :public LineCommandHandler
 {
-	///\brief Constructor
+	//\brief Constructor
 	explicit LineCommandHandlerTemplate( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0)
 		:LineCommandHandler( stm_,stateidx_){}
 
-	///\brief Destructor
+	//\brief Destructor
 	virtual ~LineCommandHandlerTemplate(){}
 
-	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
+	//\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
 	template <int (LineCommandHandlerImpl::*EndDelegateProcessingMethod)( CommandHandler*, std::ostream&)>
 	void delegateProcessing( CommandHandler* ch)
 	{
@@ -237,9 +237,9 @@ struct LineCommandHandlerTemplate :public LineCommandHandler
 };
 
 
-///\brief Defines a static function calling a member function with fixed signature
-///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
-//PF:TODO make a static (enable_if) assert here for refusing virtual methods here
+//\brief Defines a static function calling a member function with fixed signature
+//\warning do not declare virtual method calls like this. It is not portable (GCC only) !
+//PF:TODO make a BOOST_ASSERT here for refusing virtual methods here
 template <class T, int (T::*Method)( int argc, const char** argv, std::ostream& out)>
 struct LineCommandHandlerWrapper
 {
