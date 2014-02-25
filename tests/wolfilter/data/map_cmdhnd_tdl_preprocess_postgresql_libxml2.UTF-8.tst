@@ -10,12 +10,12 @@
 **file:wolframe.conf
 LoadModules
 {
-	module ./../wolfilter/modules/database/postgresql/mod_db_postgresqltest
-	module ./../../src/modules/cmdbind/lua/mod_command_lua
-	module ./../../src/modules/normalize/number/mod_normalize_number
-	module ./../../src/modules/normalize/string/mod_normalize_string
-	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
-	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module NOTFOUND:mod_db_postgresqltest
+	module NOTFOUND:mod_command_lua
+	module NOTFOUND:mod_normalize_number
+	module NOTFOUND:mod_normalize_string
+	module NOTFOUND:mod_command_directmap
+	module NOTFOUND:mod_ddlcompiler_simpleform
 }
 Database
 {

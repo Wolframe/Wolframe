@@ -51,6 +51,7 @@ static const unsigned short APP_MAJOR_VERSION = 0;
 static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
+enum {IOBUFFERSIZE=8192};
 
 int main( int argc, char **argv )
 {
@@ -99,11 +100,11 @@ int main( int argc, char **argv )
 			std::ifstream fh;
 			fh.open( cmdline.inputfile().c_str());
 
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
+			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout);
+			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

@@ -62,10 +62,10 @@
 **file:wolframe.conf
 LoadModules
 {
-	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
-	module ./../../src/modules/normalize/number/mod_normalize_number
+	module NOTFOUND:ddlcompiler_simpleform
+	module NOTFOUND:normalize_number
 	module NOTFOUND:normalize_locale
-	module ./../../src/modules/normalize/string/mod_normalize_string
+	module NOTFOUND:normalize_string
 }
 Processor
 {

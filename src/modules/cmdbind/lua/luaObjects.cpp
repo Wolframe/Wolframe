@@ -193,8 +193,7 @@ struct LuaObject
 	void operator delete (void *, lua_State*) {}
 	void operator delete (void *, lua_State*, const char*) {}
 
-	template <class Orig>
-	static void push_luastack( lua_State* ls, const Orig& o)
+	static void push_luastack( lua_State* ls, const ObjectType& o)
 	{
 		try
 		{

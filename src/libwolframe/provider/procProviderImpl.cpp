@@ -396,6 +396,7 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 {
 	LOG_TRACE << "[provider] get filter '" << name << "(" << filterargAsString(arg) << ")'";
 	const langbind::FilterType* filtertype = m_programs->getFilterType( name);
+	if (!filtertype) return 0;
 	return filtertype->create( arg);
 }
 
@@ -411,7 +412,7 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 	std::map<std::string, std::size_t>::const_iterator cmd = m_cmdMap.find( cmdName );
 	if ( cmd == m_cmdMap.end() )
 	{
-		return NULL;
+		return 0;
 	}
 	cmdbind::CommandHandlerConstructor* constructor = m_cmd.at( cmd->second).constructor.get();
 	const config::NamedConfiguration* cfg = m_cmd.at( cmd->second).configuration;
