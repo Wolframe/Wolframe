@@ -11,9 +11,11 @@ INCLUDE_DIRS = \
 INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwfshared
 
 INCLUDE_LIBS = \
+	-lwfshared \
 	-lwolframe
 
 DYNAMIC_MODULE = \

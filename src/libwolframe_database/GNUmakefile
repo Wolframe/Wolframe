@@ -10,7 +10,9 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/src/libwfshared \
 	-L$(TOPDIR)/src/libwolframe
+
 
 INCLUDE_DIRS = \
 	-I. \

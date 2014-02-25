@@ -14,11 +14,13 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/src/libwfshared \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfshared \
 	-lwolframe \
 	-lwolframe_database \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
@@ -52,7 +54,7 @@ local_test: $(TEST_CPP_BINS)
 		else \
 			echo "No properly configured database for tests" ; \
 		fi
-     
+
 local_longtest:
 
 showenv:

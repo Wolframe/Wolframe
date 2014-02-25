@@ -89,29 +89,6 @@ void GlobalConnectionList::removeList( SocketConnectionList< SSLconnection_ptr >
 }
 #endif // WITH_SSL
 
-bool GlobalConnectionList::isFull()
-{
-	if ( m_maxConn > 0 )	{
-		std::size_t conns = 0;
-		boost::mutex::scoped_lock lock( m_mutex );
-
-		for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
-										it != m_connList.end(); it++ )
-			conns += (*it)->size();
-#ifdef WITH_SSL
-		for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = m_SSLconnList.begin();
-										it != m_SSLconnList.end(); it++ )
-			conns += (*it)->size();
-#endif // WITH_SSL
-		LOG_DATA << "Global number of connections: " << conns << " of maximum " << m_maxConn;
-		return( conns >= m_maxConn );
-	}
-	else	{
-		LOG_DATA << "Global number of connections unlimited, not checked";
-		return( false );
-	}
-}
-
 
 connection::connection( boost::asio::io_service& IOservice,
 			SocketConnectionList< connection_ptr >* connList,

@@ -1,6 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = \
+	libwfshared \
 	libwolframe \
 	libwolframe_serialize \
 	libwolframe_database \
@@ -22,6 +23,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwfshared\wfshared.dll \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
