@@ -80,13 +80,19 @@ public:
 	{
 		boost::mutex::scoped_lock lock( m_mutex );
 		assert( m_connCount >= 0 );
-		if ( m_connCount < m_maxConn )	{
-			m_connCount++;
-			return true;
+		if ( m_maxConn > 0 )	{
+			if ( m_connCount < m_maxConn )	{
+				m_connCount++;
+				return true;
+			}
+			else	{
+				LOG_TRACE << "Maximum global number of connections (" << m_maxConn << ") exceeded. Requested " << m_connCount << "connection(s)";
+				return false;
+			}
 		}
 		else	{
-			LOG_TRACE << "Maximum global number of connections (" << m_maxConn << ") exceeded. Requested " << m_connCount << "connection(s)";
-			return false;
+			m_connCount++;
+			return true;
 		}
 	}
 
@@ -156,7 +162,7 @@ public:
 					return false;
 			}
 			noConn = m_connCount;
-			assert( m_connCount == m_connList.size() );
+			assert( m_connCount == (long int)m_connList.size() );
 		}
 		LOG_DATA << "PUSH - Connections on socket: " << noConn << " of maximum " << m_maxConn << ", " << conn->toString();
 		return true;
@@ -173,7 +179,7 @@ public:
 			m_connList.remove( conn );
 			m_globalList.decConnCount();
 			m_connCount--;
-			assert( m_connCount == m_connList.size() );
+			assert( m_connCount == (long int)m_connList.size() );
 		}
 		LOG_DATA << "REMOVE - Connections on socket: " << m_connCount << " of maximum " << m_maxConn << ", " << conn->toString();
 	}
@@ -192,7 +198,7 @@ public:
 			m_connList.pop_front();
 			m_globalList.decConnCount();
 			m_connCount--;
-			assert( m_connCount == m_connList.size() );
+			assert( m_connCount == (long int)m_connList.size() );
 		}
 		LOG_DATA << "POP - Connection " << conn->toString();
 		return conn;
