@@ -18,6 +18,7 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwfshared/libwfshared.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a
 
 # openssl

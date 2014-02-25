@@ -10,11 +10,13 @@ INCLUDE_DIRS = \
 	$(PGSQL_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwfshared \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfshared \
 	-lwolframe \
 	$(PGSQL_LIBS)
 

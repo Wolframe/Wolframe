@@ -31,22 +31,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS =
 
 LIBRARIES = \
-	wolframe.lib \
-	logger\wolframemsg.dll
-
-LOGGER_OBJS = \
-	logger\logLevel.obj \
-	logger\logSyslogFacility.obj \
-	logger\logError.obj \
-	logger\logObject.obj \
-	logger\logBackendConsole.obj \
-	logger\logBackendFile.obj \
-	logger\logBackendSyslog.obj \
-	logger\syslog_win32.obj \
-	logger\logBackendEventlog.obj \
-	logger\logBackendWinDebug.obj \
-	logger\logBackendImpl.obj \
-	logger\loggerConfig.obj
+	wolframe.lib
 
 PROVIDER_OBJS = \
 	provider\Authentication.obj \
@@ -70,12 +55,10 @@ TYPE_OBJS = \
 	types_variantStruct.obj
 
 CPP_OBJS = \
-	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(TYPE_OBJS) \
 	malloc.obj \
 	version.obj \
-	appInfo.obj \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \
@@ -87,7 +70,6 @@ CPP_OBJS = \
 	types_allocators.obj \
 	typeSignature.obj \
 	password.obj \
-	globalRndGen.obj \
 	HMAC.obj \
 	PBKDF2.obj \
 	CRAM.obj
@@ -107,21 +89,12 @@ all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-logger\wolframemsg.dll: logger\wolframemsg.res
-	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-logger\wolframemsg.res: logger\wolframemsg.rc
-logger\wolframemsg.rc: logger\wolframemsg.mc
-logger\logBackendEventlog.obj: logger\wolframemsg.rc
-
 wolframe.lib: $(OBJS) $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:
 
 local_clean:
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase logger\*.obj 2>NUL
 	@-erase provider\*.obj 2>NUL
 
 local_distclean:

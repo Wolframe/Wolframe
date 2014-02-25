@@ -76,7 +76,6 @@ public:
 	void addList( SocketConnectionList< SSLconnection_ptr >* lst );
 	void removeList( SocketConnectionList< SSLconnection_ptr >* lst );
 #endif // WITH_SSL
-	bool isFull();
 	bool incConnCount()
 	{
 		boost::mutex::scoped_lock lock( m_mutex );

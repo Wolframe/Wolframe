@@ -20,6 +20,7 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwfshared/libwfshared.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)

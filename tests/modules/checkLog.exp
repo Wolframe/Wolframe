@@ -1,4 +1,4 @@
-#!/usr/bin/expectttt
+#!/usr/bin/expect
 #
 # Start a the module test check the logged messages
 #

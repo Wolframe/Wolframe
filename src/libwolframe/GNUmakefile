@@ -30,7 +30,8 @@ endif
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lboost_filesystem
+	-lboost_filesystem \
+#	-lwfshared
 
 STATIC_LIB = libwolframe.a
 
@@ -38,17 +39,6 @@ DYNAMIC_LIB = libwolframe.so
 DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
-
-LOGGER_OBJS = \
-	logger/logLevel.o \
-	logger/logSyslogFacility.o \
-	logger/logError.o \
-	logger/logObject.o \
-	logger/logBackendConsole.o \
-	logger/logBackendFile.o \
-	logger/logBackendSyslog.o \
-	logger/logBackendImpl.o \
-	logger/loggerConfig.o
 
 PROVIDER_OBJS = \
 	provider/Authentication.o \
@@ -77,7 +67,6 @@ CPP_OBJS = \
 	$(TYP_OBJS) \
 	malloc.o \
 	version.o \
-	appInfo.o \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
@@ -89,7 +78,6 @@ CPP_OBJS = \
 	types_allocators.o \
 	typeSignature.o \
 	password.o \
-	globalRndGen.o \
 	HMAC.o \
 	PBKDF2.o \
 	CRAM.o
