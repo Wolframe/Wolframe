@@ -744,6 +744,102 @@ LUA_FUNCTION_THROWS( "<type>()", function_type_value_constructor)
 	return 1;
 }
 
+LUA_FUNCTION_THROWS( "<type>()", function_bignumber_constructor)
+{
+	int nn = lua_gettop( ls);
+	if (nn > 1) throw std::runtime_error( "too many arguments");
+	if (nn == 1)
+	{
+		if (lua_type( ls, 1) == LUA_TSTRING)
+		{
+			if (nn > 1) throw std::runtime_error( "too many arguments");
+			const char* str = lua_tostring( ls, 1);
+			LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber( str, std::strlen(str)));
+			return 1;
+		}
+		else if (lua_type( ls, 1) == LUA_TNUMBER)
+		{
+			double val = lua_tonumber( ls, 1);
+			LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber( val));
+			return 1;
+		}
+		else
+		{
+			throw std::runtime_error( "string or number expected as argument");
+		}
+	}
+	else
+	{
+		LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber());
+		return 1;
+	}
+}
+
+LUA_FUNCTION_THROWS( "<type>()", function_datetime_constructor)
+{
+	int nn = lua_gettop( ls);
+	if (nn > 1) throw std::runtime_error( "too many arguments");
+	if (nn >= 1)
+	{
+		if (lua_type( ls, 1) == LUA_TSTRING)
+		{
+			if (nn > 1) throw std::runtime_error( "too many arguments");
+			const char* str = lua_tostring( ls, 1);
+			LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( str, std::strlen(str)));
+			return 1;
+		}
+		else if (lua_type( ls, 1) == LUA_TNUMBER)
+		{
+			for (int ii=2; ii<=nn; ++ii)
+			{
+				if (lua_type( ls, ii) != LUA_TNUMBER)
+				{
+					throw std::runtime_error( "string or sequence of integers expected as arguments");
+				}
+			}
+			int YY = lua_tointeger( ls, 1);
+			if (nn < 3) throw std::runtime_error( "number of integer argument must be 3,6,7 or 8");
+			int MM = lua_tointeger( ls, 2);
+			int DD = lua_tointeger( ls, 3);
+			if (nn == 3)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD));
+				return 1;
+			}
+			if (nn < 6) throw std::runtime_error( "number of integer argument must be 3,6,7 or 8");
+			int hh = lua_tointeger( ls, 4);
+			int mm = lua_tointeger( ls, 5);
+			int ss = lua_tointeger( ls, 6);
+			if (nn == 6)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss));
+				return 1;
+			}
+			int ll = lua_tointeger( ls, 7);
+			if (nn == 7)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss, ll));
+				return 1;
+			}
+			int cc = lua_tointeger( ls, 8);
+			if (nn == 8)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss, ll, cc));
+				return 1;
+			}
+			throw std::runtime_error( "too many arguments");
+		}
+		else
+		{
+			throw std::runtime_error( "string or sequence of numbers expected as arguments");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "too few arguments");
+	}
+}
+
 LUA_FUNCTION_THROWS( "type()", function_type)
 {
 	int nn = lua_gettop( ls);
@@ -765,17 +861,37 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	const types::CustomDataType* typ = ctx->customDataType( typeName);
 	if (!typ)
 	{
-		throw std::runtime_error( std::string( "type '") + typeName + "' not defined");
+		const types::NormalizeFunction* func = ctx->typeNormalizer( typeName);
+		if (!func)
+		{
+			if (typeName == "bignumber")
+			{
+				lua_pushcfunction( ls, function_bignumber_constructor);
+				return 1;
+			}
+			if (typeName == "datetime")
+			{
+				lua_pushcfunction( ls, function_datetime_constructor);
+				return 1;
+			}
+			throw std::runtime_error( std::string( "type '") + typeName + "' not defined (neither as custom data type nor as normalizer function)"); 
+		}
+		lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
+		lua_pushcclosure( ls, function_normalizer_call, 1);
+		return 1;
 	}
-	types::CustomDataInitializerR ini;
-	if (initializerString) 
+	else
 	{
-		ini.reset( typ->createInitializer( initializerString));
+		types::CustomDataInitializerR ini;
+		if (initializerString) 
+		{
+			ini.reset( typ->createInitializer( initializerString));
+		}
+		lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
+		LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
+		lua_pushcclosure( ls, function_type_value_constructor, 2);
+		return 1;
 	}
-	lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
-	LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
-	lua_pushcclosure( ls, function_type_value_constructor, 2);
-	return 1;
 }
 
 
