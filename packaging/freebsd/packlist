@@ -209,7 +209,6 @@ usr/local/include/wolframe/filter/typedfilterScope.hpp
 usr/local/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/local/include/wolframe/filter
 usr/local/include/wolframe/types/allocators.hpp
-usr/local/include/wolframe/types/atomicCounter.hpp
 usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
@@ -227,8 +226,6 @@ usr/local/include/wolframe/types/variantStruct.hpp
 usr/local/include/wolframe/types/variantStructDescription.hpp
 usr/local/include/wolframe/types/customDataType.hpp
 usr/local/include/wolframe/types/datetime.hpp
-usr/local/include/wolframe/types/syncCounter.hpp
-usr/local/include/wolframe/types/syncObjectList.hpp
 usr/local/include/wolframe/types/bignumber.hpp
 usr/local/include/wolframe/types/customDataNormalizer.hpp
 usr/local/include/wolframe/types/string.hpp

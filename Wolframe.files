@@ -1106,6 +1106,10 @@ makefiles/nmake/top.mk
 .Attic/config/structPrinter.hpp
 .Attic/config/traits.hpp
 .Attic/config/TutorialConfiguration.xml
+.Attic/counters/atomicCounter.hpp
+.Attic/counters/counterTest.cpp
+.Attic/counters/syncCounter.hpp
+.Attic/counters/syncObjectList.hpp
 .Attic/deprecatedLuaExtensions/luaArithmeticType.hpp
 .Attic/deprecatedLuaExtensions/luaExtensionBuilder.hpp
 .Attic/dotnet/idispatch.hpp
@@ -1671,7 +1675,6 @@ include/system/objectPool.hpp
 include/system/serverEndpoint.hpp
 include/system/SSLcertificateInfo.hpp
 include/types/allocators.hpp
-include/types/atomicCounter.hpp
 include/types/base64.h
 include/types/base64.hpp
 include/types/bignumber.hpp
@@ -1687,8 +1690,6 @@ include/types/keymap.hpp
 include/types/malloc.hpp
 include/types/normalizeFunction.hpp
 include/types/string.hpp
-include/types/syncCounter.hpp
-include/types/syncObjectList.hpp
 include/types/traits.hpp
 include/types/typeSignature.hpp
 include/types/variant.hpp
@@ -2331,7 +2332,6 @@ tests/configStructParser.cpp
 tests/configValueParser.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
-tests/counterTest.cpp
 tests/CRAMtest.cpp
 tests/database/GNUmakefile
 tests/database/Makefile.W32
