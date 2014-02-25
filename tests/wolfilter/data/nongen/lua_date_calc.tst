@@ -139,11 +139,24 @@ function run()
 		end
 	end
 end
-
-
 **config
---module ../../src/modules/filter/line/mod_filter_line
---module ../../src/modules/cmdbind/lua/mod_command_lua
---module ../../src/modules/datatype/datetime/mod_datatype_datetime
---cmdprogram date_calc.lua run
+--config wolframe.conf run
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/filter/line/mod_filter_line
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/datatype/datetime/mod_datatype_datetime
+}
+Processor
+{
+	program DBIN.tdl
+	cmdhandler
+	{
+		lua
+		{
+			program date_calc.lua
+		}
+	}
+}
 **end
