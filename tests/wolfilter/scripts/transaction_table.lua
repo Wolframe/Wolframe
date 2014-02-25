@@ -1,7 +1,7 @@
 
 function run()
 	t = input:table()
-	r = formfunction("test_transaction")( t)
+	r = provider.formfunction("test_transaction")( t)
 	output:print( r:table())
 end
 

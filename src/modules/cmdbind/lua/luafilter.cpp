@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file luafilter.cpp
 ///\brief Implementation of lua filters (serialization/deserialization of lua tables)
 #include "luafilter.hpp"
+#include "luaObjectTemplate.hpp"
 #include "luaDebug.hpp"
 #include "logger-v1.hpp"
 #include "utils/printFormats.hpp"
@@ -465,13 +466,8 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 	switch (element.type())
 	{
 		case types::Variant::Custom:
-		{
-			/*[PF:TODO implementation*/
-			std::string valstr = element.tostring();
-			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
-			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			LuaObject<types::CustomDataValueR>::push_luastack( m_ls, types::CustomDataValueR( element.customref()->copy()));
 			return true;
-		}
 		case types::Variant::Null:
 			_wrap_lua_pushnil( m_ls);
 			return true;
@@ -492,21 +488,11 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 		case types::Variant::Timestamp:
-		{
-			/*[PF:TODO implementation*/
-			std::string valstr = element.tostring();
-			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
-			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			LuaObject<types::DateTime>::push_luastack( m_ls, types::DateTime( element.totimestamp()));
 			return true;
-		}
 		case types::Variant::BigNumber:
-		{
-			/*[PF:TODO implementation*/
-			std::string valstr = element.tostring();
-			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
-			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			LuaObject<types::BigNumber>::push_luastack( m_ls, types::BigNumber( *element.bignumref()));
 			return true;
-		}
 	}
 	setState( OutputFilter::Error, "illegal value type of element");
 	return false;

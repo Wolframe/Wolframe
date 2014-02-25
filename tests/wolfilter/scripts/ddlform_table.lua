@@ -75,7 +75,7 @@ end
 
 function run()
 	t = readTable( input:get())
-	r = form("employee_assignment_print")
+	r = provider.form("employee_assignment_print")
 	r:fill( t)
 	printTable( r:table())
 end

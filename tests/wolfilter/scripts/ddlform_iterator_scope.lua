@@ -6,7 +6,7 @@ function print_tree( itr)
 end
 
 function run_employee( itr)
-	local employee = form("Employee"):fill( itr)
+	local employee = provider.form("Employee"):fill( itr)
 	output:print( employee:get())
 end
 
@@ -75,7 +75,7 @@ function run_assignmentlist( itr)
 end
 
 function run()
-	r = form("employee_assignment_print")
+	r = provider.form("employee_assignment_print")
 	r:fill( input:table())
 	itr = r:get()
 	for v,t in itr do

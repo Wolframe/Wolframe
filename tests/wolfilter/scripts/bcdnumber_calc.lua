@@ -1,5 +1,5 @@
 function run()
-	f = filter( "line", "UTF-8")
+	f = provider.filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
 	bigint = provider.type( "bigint")
