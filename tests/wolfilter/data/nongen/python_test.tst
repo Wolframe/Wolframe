@@ -22,6 +22,14 @@ def run():
 
 
 **config
---module ../../src/modules/cmdbind/python/mod_command_python
---program test.py run
+--config wolframe.conf run
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/python/mod_command_python
+}
+Processor
+{
+	program test.py
+}
 **end

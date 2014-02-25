@@ -59,8 +59,6 @@ public:
 	const std::string& cmd() const					{return m_cmd;}
 	const std::string& inputfilter() const				{return m_inputfilter;}
 	const std::string& outputfilter() const				{return m_outputfilter;}
-	std::size_t inbufsize() const					{return m_inbufsize;}
-	std::size_t outbufsize() const					{return m_outbufsize;}
 	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
 	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
 	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
@@ -81,15 +79,11 @@ private:
 	std::string m_logfile;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
-	std::vector<std::string> m_programs;
-	std::vector<std::string> m_cmdprograms;
 	boost::property_tree::ptree m_dbconfig;
 	boost::property_tree::ptree m_config;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
-	std::size_t m_inbufsize;
-	std::size_t m_outbufsize;
 	boost::shared_ptr<proc::ProcProviderConfig> m_procProviderConfig;
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
