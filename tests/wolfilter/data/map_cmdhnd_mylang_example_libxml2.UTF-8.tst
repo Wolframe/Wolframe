@@ -9,11 +9,11 @@
 **file:wolframe.conf
 LoadModules
 {
-	module NOTFOUND:command_directmap
-	module NOTFOUND:ddlcompiler_simpleform
-	module NOTFOUND:normalize_number
-	module NOTFOUND:normalize_string
-	module NOTFOUND:mod_command_mylang
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../wolfilter/modules/cmdbind/mylang/mod_command_mylang
 }
 Processor
 {
