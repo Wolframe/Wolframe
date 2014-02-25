@@ -1338,6 +1338,8 @@ fi
 %endif
 
 %dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwfshared.so.0.0.0
+%{_libdir}/wolframe/libwfshared.so.0
 %{_libdir}/wolframe/libwolframe.so.0.0.0
 %{_libdir}/wolframe/libwolframe.so.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
@@ -1388,6 +1390,8 @@ fi
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so
 %{_libdir}/wolframe/libwolframe.a
+%{_libdir}/wolframe/libwfshared.so
+%{_libdir}/wolframe/libwfshared.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
 %{_libdir}/wolframe/libwolframe_database.so
