@@ -63,7 +63,7 @@ LoadModules
 {
 	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ./../../src/modules/normalize/number/mod_normalize_number
-	module NOTFOUND:normalize_locale
+	module ./../../src/modules/normalize/locale/mod_normalize_locale
 	module ./../../src/modules/normalize/string/mod_normalize_string
 }
 Processor
