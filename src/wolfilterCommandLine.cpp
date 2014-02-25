@@ -59,7 +59,7 @@ using namespace _Wolframe::config;
 #define DO_STRINGIFY2(x) #x
 #define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
 
-//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a library)
+//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframe.a -> Issue #95)
 static const char* defaultMainConfig()		{ return "/etc/wolframe.conf"; }
 static const char* defaultUserConfig()		{ return "~/wolframe.conf"; }
 static const char* defaultLocalConfig()		{ return "./wolframe.conf"; }
