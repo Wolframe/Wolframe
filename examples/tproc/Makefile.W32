@@ -44,12 +44,29 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# SQlite3
+!IFDEF WITH_SQLITE3
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SQLITE3
+!ENDIF
+
 # Postgresql
 !IFDEF WITH_PGSQL
 
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_PGSQL
+	
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
 
+!ENDIF
+
+# Oracle
+!IFDEF WITH_ORACLE
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_ORACLE
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(ORACLE_DIR)\sdk\lib\msvc\oci.lib"
 !ENDIF
 
 OBJS = \
@@ -101,6 +118,9 @@ copy_prereq:
 	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" tests\.
 	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" tests\.
 !ENDIF
+!ENDIF
+!IFDEF WITH_ORACLE
+	@-copy "$(ORACLE_DIR)\*.dll" tests\.
 !ENDIF
 !IFDEF WITH_LIBXML2
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" tests\.

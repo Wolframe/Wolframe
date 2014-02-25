@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/property_tree/ptree.hpp>
 

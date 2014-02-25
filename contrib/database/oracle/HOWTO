@@ -1,0 +1,11 @@
+setenv TNS_ADMIN /etc/tnsnames.ora
+sqlplus wolfusr/wolfpwd@orcl (with dblink in /etc/tnsnames.ora)
+
+or directly:
+
+sqlplus 'wolfusr/wolfpwd@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=euroserver)(PORT=1521))(CONNECT_DATA=(SID=orcl)))'
+
+use rlwrap to get a history in sqlplus:
+
+rlwrap sqlplus ...
+

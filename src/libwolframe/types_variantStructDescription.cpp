@@ -1,5 +1,5 @@
 /************************************************************************
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -57,7 +57,7 @@ void VariantStructDescription::Element::copy( const Element& o)
 	Element elem;
 	std::memset( &elem, 0, sizeof( elem));
 	std::size_t nn = std::strlen( o.name);
-	if (o.name) elem.name = (char*)wolframe_malloc( nn + 1);
+	if (o.name) elem.name = (char*)std::malloc( nn + 1);
 	if (!elem.name) throw std::bad_alloc();
 	std::memcpy( elem.name, o.name, nn);
 	elem.name[ nn] = 0;
@@ -67,12 +67,12 @@ void VariantStructDescription::Element::copy( const Element& o)
 	}
 	catch (const std::bad_alloc& e)
 	{
-		if (elem.name) wolframe_free( elem.name);
+		if (elem.name) std::free( elem.name);
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
-		if (elem.name) wolframe_free( elem.name);
+		if (elem.name) std::free( elem.name);
 		throw e;
 	}
 	if (o.substruct) try
@@ -82,13 +82,13 @@ void VariantStructDescription::Element::copy( const Element& o)
 	catch (const std::bad_alloc& e)
 	{
 		if (elem.initvalue) delete elem.initvalue;
-		if (elem.name) wolframe_free( elem.name);
+		if (elem.name) std::free( elem.name);
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
 		if (elem.initvalue) delete elem.initvalue;
-		if (elem.name) wolframe_free( elem.name);
+		if (elem.name) std::free( elem.name);
 		throw e;
 	}
 	elem.normalizer = o.normalizer;
@@ -99,7 +99,7 @@ void VariantStructDescription::Element::copy( const Element& o)
 	}
 	if (initvalue) delete initvalue;
 	if (substruct) delete substruct;
-	if (name) wolframe_free( name);
+	if (name) std::free( name);
 	std::memcpy( this, &elem, sizeof( elem));
 }
 
@@ -118,13 +118,13 @@ VariantStructDescription::VariantStructDescription( const VariantStructDescripti
 	std::size_t ii=0;
 	if (m_size)
 	{
-		m_ar = (Element*)wolframe_calloc( m_size, sizeof(Element));
+		m_ar = (Element*)std::calloc( m_size, sizeof(Element));
 		if (!m_ar) goto BAD_ALLOC;
 		for (; ii<m_size; ++ii)
 		{
 			if (o.m_ar[ ii].name)
 			{
-				m_ar[ ii].name = (char*)wolframe_malloc( std::strlen( o.m_ar[ ii].name)+1);
+				m_ar[ ii].name = (char*)std::malloc( std::strlen( o.m_ar[ ii].name)+1);
 				if (!m_ar[ ii].name) goto BAD_ALLOC;
 				std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
 			}
@@ -170,9 +170,9 @@ VariantStructDescription::VariantStructDescription( const VariantStructDescripti
 			{
 				if (m_ar[ ii-1].initvalue) delete m_ar[ ii-1].initvalue;
 				if (m_ar[ ii-1].substruct) delete m_ar[ ii-1].substruct;
-				if (m_ar[ ii-1].name) wolframe_free( m_ar[ ii-1].name);
+				if (m_ar[ ii-1].name) std::free( m_ar[ ii-1].name);
 			}
-			wolframe_free( m_ar);
+			std::free( m_ar);
 		}
 		if (errmsg)
 		{
@@ -192,9 +192,9 @@ VariantStructDescription::~VariantStructDescription()
 		Element* ee = m_ar+ii;
 		if (ee->initvalue) delete ee->initvalue;
 		if (ee->substruct) delete ee->substruct;
-		if (ee->name) wolframe_free( ee->name);
+		if (ee->name) std::free( ee->name);
 	}
-	if (m_ar) wolframe_free( m_ar);
+	if (m_ar) std::free( m_ar);
 }
 
 void VariantStructDescription::resolve( const ResolveMap& rmap)
@@ -215,11 +215,11 @@ int VariantStructDescription::addAtom( const std::string& name_, const Variant& 
 
 	if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
 	{
-		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 	}
-	m_ar[m_size].name = (char*)wolframe_malloc( name_.size() +1);
+	m_ar[m_size].name = (char*)std::malloc( name_.size() +1);
 	if (!m_ar[m_size].name) throw std::bad_alloc();
 	std::memcpy( m_ar[ m_size].name, name_.c_str(), name_.size());
 	m_ar[ m_size].name[ name_.size()] = 0;
@@ -229,13 +229,13 @@ int VariantStructDescription::addAtom( const std::string& name_, const Variant& 
 	}
 	catch (const std::bad_alloc& e)
 	{
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
@@ -254,11 +254,11 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 
 	if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
 	{
-		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 	}
-	m_ar[m_size].name = (char*)wolframe_malloc( name_.size() +1);
+	m_ar[m_size].name = (char*)std::malloc( name_.size() +1);
 	if (!m_ar[m_size].name) throw std::bad_alloc();
 	std::memcpy( m_ar[ m_size].name, name_.c_str(), name_.size());
 	m_ar[ m_size].name[ name_.size()] = 0;
@@ -268,13 +268,13 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	}
 	catch (const std::bad_alloc& e)
 	{
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
@@ -285,14 +285,14 @@ int VariantStructDescription::addStructure( const std::string& name_, const Vari
 	catch (const std::bad_alloc& e)
 	{
 		delete m_ar[m_size].substruct;
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
 		delete m_ar[m_size].substruct;
-		wolframe_free( m_ar[ m_size].name);
+		std::free( m_ar[ m_size].name);
 		m_ar[ m_size].name = 0;
 		throw e;
 	}
@@ -339,7 +339,7 @@ int VariantStructDescription::addElement( const Element& elem)
 	else
 	{
 		if ((std::size_t)std::numeric_limits<int>::max() <= m_size+1) throw std::bad_alloc();
-		Element* ar_ = (Element*)wolframe_realloc( m_ar, sizeof(Element) * (m_size+1));
+		Element* ar_ = (Element*)std::realloc( m_ar, sizeof(Element) * (m_size+1));
 		if (!ar_) throw std::bad_alloc();
 		m_ar = ar_;
 		std::memset( m_ar + m_size, 0, sizeof( *m_ar));
@@ -509,6 +509,8 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 	static Variant default_uint( Variant::UInt);
 	static Variant default_double( Variant::Double);
 	static Variant default_string( Variant::String);
+	static Variant default_bignumber( Variant::BigNumber);
+	static Variant default_timestamp( Variant::Timestamp);
 
 	VariantStructDescription::const_iterator di = this_->begin(), de = this_->end();
 	for (; di!=de; ++di)
@@ -579,6 +581,9 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 					case Variant::UInt: cmp = value->compare( default_uint); break;
 					case Variant::Double: cmp = value->compare( default_double); break;
 					case Variant::String: cmp = value->compare( default_string); break;
+					case VariantStruct::BigNumber: cmp = value->compare( default_bignumber); break;
+					case VariantStruct::Timestamp: cmp = value->compare( default_timestamp); break;
+						
 					case Variant::Custom:
 					{
 						types::Variant default_custom( value->data().value.Custom->type(), value->data().value.Custom->initializer());

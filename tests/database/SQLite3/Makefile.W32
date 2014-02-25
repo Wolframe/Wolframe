@@ -46,8 +46,11 @@ local_clean:
 
 local_distclean:
 
-local_test: $(TEST_CPP_BINS)
-	@-erase test.db garbage.db 2>NUL
-	@-createRandom 4096 garbage.db
-	@$(TOPDIR)\3rdParty\sqlite3\sqlite3.exe test.db < testDB.sql
+test.db:
+	$(TOPDIR)\3rdParty\sqlite3\sqlite3.exe test.db < testDB.sql
+	
+garbage.db:
+	createRandom 4096 garbage.db
+
+local_test: $(TEST_CPP_BINS) test.db garbage.db
 	@-sqliteUnit

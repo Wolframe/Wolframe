@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -39,7 +39,7 @@
 #include "AAAAproviderImpl.hpp"
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

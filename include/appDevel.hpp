@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,6 +36,7 @@
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #include "appdevel/cppFormFunctionModuleMacros.hpp"
 #include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/customDatatypeModuleMacros.hpp"
 #endif
 
 

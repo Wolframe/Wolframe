@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,7 +36,7 @@
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
 #include "module/constructor.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <list>

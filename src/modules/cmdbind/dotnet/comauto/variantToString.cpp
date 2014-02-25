@@ -1,5 +1,5 @@
 /************************************************************************
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -39,7 +39,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::comauto;
 
-std::string comauto::variantToString( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_)
+std::string comauto::variantToString( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const VARIANT& data_)
 {
 	std::ostringstream out;
 	langbind::FilterBase::ElementType type;
@@ -56,6 +56,7 @@ std::string comauto::variantToString( const comauto::TypeLib* typelib_, const IT
 				out << "<" << stk.back() << ">";
 				break;
 			case langbind::FilterBase::CloseTag:
+				if (stk.empty()) break;
 				out << "</" << stk.back() << ">";
 				stk.pop_back();
 				break;

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,22 +35,11 @@
 #include "module/normalizeFunctionBuilder.hpp"
 #include "logger-v1.hpp"
 
-//\brief Marks the start if the Wolframe C++ form function module after the includes section.
-#define NORMALIZER_MODULE(DOMAIN,DESCRIPTION)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
+//\brief Marks the start of the Wolframe C++ form function module after the includes section.
+#define NORMALIZER_MODULE(NAME,DESCRIPTION)\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "Normalizer";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
+		return NAME;\
 	}\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -63,21 +52,11 @@
 	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
 	{
 
-#define NORMALIZER_MODULE_WITH_RESOURCE(DOMAIN,DESCRIPTION,RESOURCECLASS)\
-	_Wolframe::log::LogBackend* logBackendPtr;\
-	\
-	static void _Wolframe__setModuleLogger( void* logger )\
-	{\
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);\
-	}\
-	\
+//\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
+#define NORMALIZER_MODULE_WITH_RESOURCE(NAME,DESCRIPTION,RESOURCECLASS)\
 	static const char* _Wolframe__moduleName()\
 	{\
-		return "" #DOMAIN "Normalizer";\
-	}\
-	static const char* _Wolframe__moduleDomain()\
-	{\
-		return DOMAIN;\
+		return NAME;\
 	}\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -91,10 +70,11 @@
 	{
 
 
-
+//\brief Defines normalization function in the NORMALIZER_MODULE section
 #define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
+//\brief Defines the end of the NORMALIZER_MODULE section
 #define NORMALIZER_MODULE_END\
 		{0,0}\
 	};\
@@ -103,7 +83,7 @@
 	{\
 		static _Wolframe::module::SimpleBuilder* constructor()\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__moduleDomain(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
+			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
 		}\
 	};\
 	}\
@@ -112,5 +92,5 @@
 	{\
 		ModuleImpl::constructor\
 	};\
-	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__setModuleLogger, 0, 0, NofObjects, _Wolframe__objdef);
+	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
 

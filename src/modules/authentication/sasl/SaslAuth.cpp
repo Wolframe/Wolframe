@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -52,7 +52,7 @@ namespace AAAA {
 bool SaslAuthConfig::check() const
 {
 	if ( m_service.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "a SASL service must be configured";
+		LOG_ERROR << logPrefix() << "a SASL service must be configured";
 		return false;
 	}
 	return true;
@@ -88,9 +88,9 @@ SaslAuthenticator::SaslAuthenticator( const std::string& Identifier,
 	: AuthenticationUnit( Identifier ),
 	  m_service( service ), m_confPath( confPath )
 {
-	MOD_LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
+	LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
 	if( !m_confPath.empty( ) ) {
-		MOD_LOG_DEBUG << "     and with SASL configuration '" << confPath << "'";
+		LOG_DEBUG << "     and with SASL configuration '" << confPath << "'";
 	}
 }
 

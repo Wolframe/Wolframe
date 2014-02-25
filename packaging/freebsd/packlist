@@ -26,10 +26,6 @@ usr/local/lib/wolframe/libwolframe_langbind.a
 usr/local/lib/wolframe/libwolframe_langbind.so.0.0.0
 usr/local/lib/wolframe/libwolframe_langbind.so.0
 usr/local/lib/wolframe/libwolframe_langbind.so
-usr/local/lib/wolframe/libwolframe_prnt.a
-usr/local/lib/wolframe/libwolframe_prnt.so.0.0.0
-usr/local/lib/wolframe/libwolframe_prnt.so.0
-usr/local/lib/wolframe/libwolframe_prnt.so
 usr/local/lib/wolframe/modules/mod_db_postgresql.so
 usr/local/lib/wolframe/modules/mod_db_sqlite3.so
 usr/local/lib/wolframe/modules/mod_audit_database.so
@@ -50,13 +46,13 @@ usr/local/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
 usr/local/lib/wolframe/modules/mod_normalize_base64.so
 usr/local/lib/wolframe/modules/mod_normalize_string.so
 usr/local/lib/wolframe/modules/mod_normalize_locale.so
-usr/local/lib/wolframe/modules/mod_haru_pdf_printer.so
 usr/local/lib/wolframe/modules/mod_command_directmap.so
 usr/local/lib/wolframe/modules/mod_command_lua.so
 usr/local/lib/wolframe/modules/mod_command_python.so
 usr/local/lib/wolframe/modules/mod_job_schedule_db.so
 usr/local/lib/wolframe/modules/mod_datatype_datetime.so
 usr/local/lib/wolframe/modules/mod_datatype_bcdnumber.so
+usr/local/lib/wolframe/modules/mod_print_harupdf.so
 usr/local/lib/wolframe/libwolframe_client.a
 usr/local/lib/wolframe/libwolframe_client.so.0.0.0
 usr/local/lib/wolframe/libwolframe_client.so.0
@@ -112,15 +108,14 @@ usr/local/include/wolframe/appConfig.hpp
 usr/local/include/wolframe/appDevel.hpp
 usr/local/include/wolframe/appProperties.hpp
 usr/local/include/wolframe/logger-v1.hpp
-usr/local/include/wolframe/singleton.hpp
 usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/langbind/appObjects.hpp
 usr/local/include/wolframe/langbind/authorization.hpp
 usr/local/include/wolframe/langbind/cppFormFunction.hpp
-usr/local/include/wolframe/langbind/charsetEncodings.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
+usr/local/include/wolframe/langbind/runtimeEnvironment.hpp
 @dirrm usr/local/include/wolframe/langbind
 usr/local/include/wolframe/protocol/buffers.hpp
 usr/local/include/wolframe/protocol/ioblocks.hpp
@@ -139,7 +134,6 @@ usr/local/include/wolframe/cmdbind/lineCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandlerConstructor.hpp
 @dirrm usr/local/include/wolframe/cmdbind
 usr/local/include/wolframe/database/DBprovider.hpp
-usr/local/include/wolframe/database/bindStatementParams.hpp
 usr/local/include/wolframe/database/database.hpp
 usr/local/include/wolframe/database/databaseError.hpp
 usr/local/include/wolframe/database/databaseLanguage.hpp
@@ -149,19 +143,10 @@ usr/local/include/wolframe/database/transactionFunction.hpp
 usr/local/include/wolframe/database/transactionInput.hpp
 usr/local/include/wolframe/database/transactionOutput.hpp
 usr/local/include/wolframe/database/transactionExecStatemachine.hpp
+usr/local/include/wolframe/database/statement.hpp
+usr/local/include/wolframe/database/baseStatement.hpp
+usr/local/include/wolframe/database/substitutingStatement.hpp
 @dirrm usr/local/include/wolframe/database
-usr/local/include/wolframe/prnt/pdfPrintProgramType.hpp
-usr/local/include/wolframe/prnt/pdfPrinter.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument_libhpdf.hpp
-usr/local/include/wolframe/prnt/pdfPrinterDocument_testtrace.hpp
-usr/local/include/wolframe/prnt/pdfPrinterExpression.hpp
-usr/local/include/wolframe/prnt/pdfPrinterMethod.hpp
-usr/local/include/wolframe/prnt/pdfPrinterVariable.hpp
-usr/local/include/wolframe/prnt/pdfPrinter_libhpdf.hpp
-usr/local/include/wolframe/prnt/pdfPrinter_testtrace.hpp
-usr/local/include/wolframe/prnt/printFunction.hpp
-@dirrm usr/local/include/wolframe/prnt
 usr/local/include/wolframe/config/ConfigurationTree.hpp
 usr/local/include/wolframe/config/configurationBase.hpp
 usr/local/include/wolframe/config/programBase.hpp
@@ -203,8 +188,8 @@ usr/local/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
 @dirrm usr/local/include/wolframe/serialize/ddl
 @dirrm usr/local/include/wolframe/serialize
 usr/local/include/wolframe/processor/jobSchedule.hpp
-usr/local/include/wolframe/processor/moduleDirectory.hpp
-usr/local/include/wolframe/processor/moduleInterface.hpp
+usr/local/include/wolframe/module/moduleDirectory.hpp
+usr/local/include/wolframe/module/moduleInterface.hpp
 usr/local/include/wolframe/processor/procProvider.hpp
 usr/local/include/wolframe/processor/userInterface.hpp
 @dirrm usr/local/include/wolframe/processor
@@ -244,6 +229,9 @@ usr/local/include/wolframe/types/customDataType.hpp
 usr/local/include/wolframe/types/datetime.hpp
 usr/local/include/wolframe/types/syncCounter.hpp
 usr/local/include/wolframe/types/syncObjectList.hpp
+usr/local/include/wolframe/types/bignumber.hpp
+usr/local/include/wolframe/types/customDataNormalizer.hpp
+usr/local/include/wolframe/types/string.hpp
 @dirrm usr/local/include/wolframe/types
 usr/local/include/wolframe/AAAA/AAAAinformation.hpp
 usr/local/include/wolframe/AAAA/AAAAprovider.hpp
@@ -259,17 +247,15 @@ usr/local/include/wolframe/module/constructor.hpp
 usr/local/include/wolframe/module/ddlcompilerBuilder.hpp
 usr/local/include/wolframe/module/filterBuilder.hpp
 usr/local/include/wolframe/module/normalizeFunctionBuilder.hpp
-usr/local/include/wolframe/module/printFunctionBuilder.hpp
 usr/local/include/wolframe/module/programTypeBuilder.hpp
 usr/local/include/wolframe/module/customDataTypeBuilder.hpp
+usr/local/include/wolframe/module/runtimeEnvironmentConstructor.hpp
 @dirrm usr/local/include/wolframe/module
 usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
-usr/local/include/wolframe/prgbind/printProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp
 usr/local/include/wolframe/prgbind/programLibrary.hpp
 usr/local/include/wolframe/prgbind/transactionProgram.hpp
-usr/local/include/wolframe/prgbind/runtimeEnvironmentConstructor.hpp
 @dirrm usr/local/include/wolframe/prgbind
 usr/local/include/wolframe/crypto/HMAC.h
 usr/local/include/wolframe/crypto/HMAC.hpp
@@ -287,8 +273,8 @@ usr/local/bin/wolframec
 usr/local/sbin/wolframed
 usr/local/etc/wolframe/wolframe.conf
 @dirrm usr/local/etc/wolframe
-usr/local/share/man/man5/wolframe.conf.5.gz
-usr/local/share/man/man8/wolframed.8.gz
-usr/local/share/man/man1/wolfpasswd.1.gz
+usr/local/man/man5/wolframe.conf.5.gz
+usr/local/man/man8/wolframed.8.gz
+usr/local/man/man1/wolfpasswd.1.gz
 @mode 0775
 usr/local/etc/rc.d/wolframed

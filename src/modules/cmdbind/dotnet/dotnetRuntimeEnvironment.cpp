@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -33,6 +33,8 @@ Project Wolframe.
 //\brief Implementation .NET runtime environment
 #include "dotnetRuntimeEnvironment.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
@@ -40,15 +42,21 @@ using namespace _Wolframe::module;
 DotnetRuntimeEnvironment::DotnetRuntimeEnvironment( const DotnetRuntimeEnvironmentConfig* cfg)
 	:m_clr(cfg->clrversion())
 {
+	LOG_DEBUG << "Registering .NET functions";
+
 	std::vector<DotnetRuntimeEnvironmentConfig::AssemblyDescription>::const_iterator li = cfg->assemblylist().begin(), le = cfg->assemblylist().end();
 	for (int typelibidx=0; li != le; ++li,++typelibidx)
 	{
 		try
 		{
 			std::string path( utils::joinPath( cfg->typelibpath(), std::string(li->name) + ".tlb"));
+			std::replace( path.begin(), path.end(), '/', '\\'); //PF:HACK: Substitution at wrong place because path may contain 'C:/'
+
+			LOG_DEBUG << "Loading type library '" << li->name << "' from file '" << path << "'";
 			m_typelibs.push_back( comauto::TypeLib( path));
 
-			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->name);
+			LOG_TRACE << "Loading functions from type library '" << li->name << "'";
+			std::vector<comauto::DotnetFunctionR> funcs = comauto::loadFunctions( &m_typelibs.back(), &m_clr, li->description);
 			std::vector<comauto::DotnetFunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		
 			for (; fi != fe; ++fi)

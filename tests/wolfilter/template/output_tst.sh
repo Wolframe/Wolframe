@@ -64,7 +64,7 @@ else
 	echo "--input-filter $inputfilter --output-filter $outputfilter $testcmd" >> $output
 fi
 if [ x"$testdata" != x ]; then
-	echo "$testdata" >> $output
+	echo "$testdata" | sed "s/#FILTER#/$inputfilter/g" >> $output
 fi
 for script in $testscripts
 do

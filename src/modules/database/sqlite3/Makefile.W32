@@ -31,7 +31,8 @@ CPP_OBJS = \
 	SQLiteConfig.obj \
 	SQLiteTransactionExecStatemachine.obj \
 	SQLiteProgram.obj \
-	SQLiteModule.obj
+	SQLiteModule.obj \
+	SQLiteStatement.obj
 
 all: $(DYNAMIC_MODULE)
 

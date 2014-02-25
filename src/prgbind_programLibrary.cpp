@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -30,9 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implements the list of all initially defined program types
-///\file programLibrary.cpp
+//\brief Implements the list of all initially defined program types
+//\file programLibrary.cpp
 
+#include "types/customDataNormalizer.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "prgbind/program.hpp"
 #include "prgbind/transactionProgram.hpp"
@@ -149,11 +150,6 @@ public:
 	}
 	void define( const std::string& name, types::NormalizeFunctionR f)
 	{
-		if (m_impl.find( name) != m_impl.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of normalize function '") + name + "'";
-			throw std::runtime_error( std::string("duplicate definition of normalize function '") + name + "'");
-		}
 		m_impl.insert( name, f);
 	}
 private:
@@ -163,11 +159,12 @@ private:
 class ProgramLibrary::Impl
 {
 public:
-	types::keymap<module::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
-	types::keymap<module::CustomDataTypeConstructorR> m_customDataTypeConstructorMap;
+	types::keymap<types::NormalizeFunctionType> m_normalizeFunctionTypeMap;
+	types::keymap<types::CustomDataTypeR> m_customDataTypeMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
-	types::keymap<module::FilterConstructorR> m_filterMap;
+	std::vector<langbind::RuntimeEnvironmentR> m_runtimeEnvironmentList;
+	types::keymap<langbind::FilterTypeR> m_filterTypeMap;
 	types::keymap<types::FormDescriptionR> m_formMap;
 	std::vector<types::FormDescriptionR> m_privateFormList;
 	std::vector<ProgramR> m_programTypes;
@@ -185,25 +182,20 @@ public:
 
 	void defineCppFormFunction( const std::string& name, const CppFormFunction& f)
 	{
-		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
-			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
-		}
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
 	}
 
-	void defineFormFunction( const std::string& name, langbind::FormFunctionR f)
+	void defineFormFunction( const std::string& name, const langbind::FormFunctionR f)
 	{
-		if (m_formFunctionMap.find( name) != m_formFunctionMap.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of form function '") + name + "'";
-			throw std::runtime_error( std::string("duplicate definition of form function '") + name + "'");
-		}
 		m_formFunctionMap.insert( name, f);
 	}
 
-	void defineNormalizeFunction( const std::string& name, types::NormalizeFunctionR f)
+	void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env)
+	{
+		m_runtimeEnvironmentList.push_back( env);
+	}
+
+	void defineDDLTypeNormalizer( const std::string& name, types::NormalizeFunctionR f)
 	{
 		m_normalizeFunctionMap.define( name, f);
 	}
@@ -215,11 +207,6 @@ public:
 
 	void defineForm( const std::string& name, const types::FormDescriptionR& f)
 	{
-		if (m_formMap.find( name) != m_formMap.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of form '") + name + "'";
-			throw std::runtime_error( std::string("duplicate definition of form '") + name + "'");
-		}
 		m_formMap.insert( name, f);
 	}
 
@@ -229,14 +216,16 @@ public:
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
-	void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
+	void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 	{
-		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
+		m_normalizeFunctionTypeMap.insert( name, f);
+		m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( f.createFunction( "")));
 	}
 
-	void defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f)
+	void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 	{
-		m_customDataTypeConstructorMap.insert( std::string(f->domain()), f);
+		m_customDataTypeMap.insert( name, t);
+		if (!t->hasInitializer()) m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( new types::CustomDataNormalizer( name, "", t.get())));
 	}
 
 	void defineProgramType( const ProgramR& prg)
@@ -244,14 +233,9 @@ public:
 		m_programTypes.push_back( prg);
 	}
 
-	void defineFilterConstructor( const module::FilterConstructorR& f)
+	void defineFilterType( const std::string& name, const langbind::FilterTypeR& f)
 	{
-		if (m_filterMap.find( f->name()) != m_filterMap.end())
-		{
-			LOG_ERROR << std::string("duplicate definition of filter '") + f->name() + "'";
-			throw std::runtime_error( std::string("duplicate definition of filter '") + f->name() + "'");
-		}
-		m_filterMap.insert( f->name(), f);
+		m_filterTypeMap.insert( name, f);
 	}
 
 	const types::FormDescription* getFormDescription( const std::string& name) const
@@ -273,9 +257,23 @@ public:
 		return fi->second.get();
 	}
 
-	const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const
+	const types::CustomDataType* getCustomDataType( const std::string& name) const
+	{
+		types::keymap<types::CustomDataTypeR>::const_iterator ti = m_customDataTypeMap.find( name);
+		if (ti == m_customDataTypeMap.end()) return 0;
+		return ti->second.get();
+	}
+
+	const types::NormalizeFunction* getDDLTypeNormalizer( const std::string& name) const
 	{
 		return m_normalizeFunctionMap.get( name);
+	}
+
+	const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& name)
+	{
+		types::keymap<types::NormalizeFunctionType>::const_iterator fi = m_normalizeFunctionTypeMap.find( name);
+		if  (fi == m_normalizeFunctionTypeMap.end()) return 0;
+		return &fi->second;
 	}
 
 	const types::NormalizeFunctionMap* formtypemap() const
@@ -283,16 +281,10 @@ public:
 		return &m_normalizeFunctionMap;
 	}
 
-	langbind::Filter* createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+	const langbind::FilterType* getFilterType( const std::string& name) const
 	{
-		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
-		return (fi == m_filterMap.end())?0:fi->second->object( arg);
-	}
-
-	bool existsFilter( const std::string& name) const
-	{
-		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
-		return (fi != m_filterMap.end());
+		types::keymap<langbind::FilterTypeR>::const_iterator fi = m_filterTypeMap.find( name);
+		return (fi == m_filterTypeMap.end())?0:fi->second.get();
 	}
 
 	static bool programOrderAsc( std::pair<Program*, std::string> const& a, std::pair<Program*, std::string> const& b)
@@ -302,6 +294,22 @@ public:
 
 	void loadPrograms( ProgramLibrary& library, db::Database* transactionDB, const std::list<std::string>& filenames)
 	{
+		LOG_DEBUG << "Loading programs";
+
+		// Loading programs enclosed in a runtime environment
+		std::vector<langbind::RuntimeEnvironmentR>::const_iterator ri = m_runtimeEnvironmentList.begin(), re = m_runtimeEnvironmentList.end();
+		for (; ri != re; ++ri)
+		{
+			std::vector<std::string> functions = (*ri)->functions();
+			std::vector<std::string>::const_iterator fi = functions.begin(), fe = functions.end();
+			for (; fi != fe; ++fi)
+			{
+				LOG_TRACE << "Function '" << *fi << "' registered in '" << (*ri)->name() << "' environment";
+				m_formFunctionMap.insert( *fi, langbind::FormFunctionR( new langbind::RuntimeEnvironmentFormFunction( *fi, ri->get())));
+			}
+		}
+
+		// Loading scripts
 		std::vector< std::pair<Program*, std::string> > typed_filenames;
 
 		std::list<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
@@ -318,7 +326,6 @@ public:
 			}
 			if (pi == pe)
 			{
-				LOG_ERROR << std::string("unknown type of program '") + *fi + "'";
 				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
 			}
 		}
@@ -356,19 +363,24 @@ void ProgramLibrary::defineFormFunction( const std::string& name, langbind::Form
 	m_impl->defineFormFunction( name, f);
 }
 
-void ProgramLibrary::defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
+void ProgramLibrary::defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env)
 {
-	m_impl->defineNormalizeFunctionConstructor( f);
+	m_impl->defineRuntimeEnvironment( env);
 }
 
-void ProgramLibrary::defineCustomDataTypeConstructor( const module::CustomDataTypeConstructorR& f)
+void ProgramLibrary::defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 {
-	m_impl->defineCustomDataTypeConstructor( f);
+	m_impl->defineNormalizeFunctionType( name, f);
 }
 
-void ProgramLibrary::defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const
+void ProgramLibrary::defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 {
-	m_impl->defineNormalizeFunction( name, f);
+	m_impl->defineCustomDataType( name, t);
+}
+
+void ProgramLibrary::defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const
+{
+	m_impl->defineDDLTypeNormalizer( name, f);
 }
 
 void ProgramLibrary::definePrivateForm( const types::FormDescriptionR& f)
@@ -386,9 +398,9 @@ void ProgramLibrary::defineFormDDL( const langbind::DDLCompilerR& c)
 	m_impl->defineFormDDL( c);
 }
 
-void ProgramLibrary::defineFilterConstructor( const module::FilterConstructorR& f)
+void ProgramLibrary::defineFilterType( const std::string& name, const langbind::FilterTypeR& f)
 {
-	return m_impl->defineFilterConstructor( f);
+	return m_impl->defineFilterType( name, f);
 }
 
 void ProgramLibrary::defineProgramType( const ProgramR& prg)
@@ -401,14 +413,9 @@ const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 	return m_impl->formtypemap();
 }
 
-const types::keymap<module::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
+const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& name) const
 {
-	return m_impl->m_normalizeFunctionConstructorMap;
-}
-
-const types::keymap<module::CustomDataTypeConstructorR>& ProgramLibrary::customDataTypeConstructorMap() const
-{
-	return m_impl->m_customDataTypeConstructorMap;
+	return m_impl->getCustomDataType( name);
 }
 
 const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string& name) const
@@ -426,19 +433,19 @@ std::vector<std::string> ProgramLibrary::getFormNames() const
 	return m_impl->getFormNames();
 }
 
-const types::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProgramLibrary::getDDLTypeNormalizer( const std::string& name) const
 {
-	return m_impl->getNormalizeFunction( name);
+	return m_impl->getDDLTypeNormalizer( name);
 }
 
-langbind::Filter* ProgramLibrary::createFilter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+const types::NormalizeFunctionType* ProgramLibrary::getNormalizeFunctionType( const std::string& name) const
 {
-	return m_impl->createFilter( name, arg);
+	return m_impl->getNormalizeFunctionType( name);
 }
 
-bool ProgramLibrary::existsFilter( const std::string& name) const
+const langbind::FilterType* ProgramLibrary::getFilterType( const std::string& name) const
 {
-	return m_impl->existsFilter( name);
+	return m_impl->getFilterType( name);
 }
 
 void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames)

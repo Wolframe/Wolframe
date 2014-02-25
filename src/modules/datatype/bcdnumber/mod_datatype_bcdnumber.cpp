@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -37,15 +37,8 @@
 #include "datatypeBigint.hpp"
 #include "datatypeBigfxp.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static CustomDataTypeDef customDataTypes[] =
 {
@@ -59,7 +52,7 @@ struct Obj
 {
 	static SimpleBuilder* constructor()
 	{
-		return new CustomDataTypeBuilder( "BcdArithmeticTypes", "bcd", customDataTypes);
+		return new CustomDataTypeBuilder( "BcdArithmeticTypes", customDataTypes);
 	}
 };
 }//anonymous namespace
@@ -70,5 +63,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	Obj::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", 0, 0, NofObjects, objdef);
 

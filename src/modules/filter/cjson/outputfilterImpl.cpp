@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -32,7 +32,6 @@ Project Wolframe.
 ///\file outputfilterImpl.hpp
 ///\brief Implementation of output filter abstraction for the cjson library
 #include "outputfilterImpl.hpp"
-#include "langbind/charsetEncodings.hpp"
 #include <boost/algorithm/string.hpp>
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
@@ -86,18 +85,18 @@ void OutputFilterImpl::printStructToBuffer()
 
 	boost::shared_ptr<char> contentref( content, std::free);
 
-	const char* encstr = encoding();
-	if (!encstr || boost::algorithm::iequals( encstr, "UTF-8"))
+	setEncoding();
+	if (m_encattr.encoding == types::String::UTF8)
 	{
-		CharsetEncoding enc = langbind::getCharsetEncoding( encstr);
 		m_elembuf.append( content);
-		enc->printEOLN( m_elembuf);
+		m_elembuf.push_back( '\n');
 	}
 	else
 	{
-		CharsetEncoding enc = langbind::getCharsetEncoding( encstr);
-		m_elembuf.append( langbind::convertStringUTF8ToCharset( enc, content));
-		enc->printEOLN( m_elembuf);
+		std::string res( content);
+		res.push_back( '\n');
+		types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
+		m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
 	}
 	m_stk.clear();
 	m_stk.push_back( StackElement(""));
@@ -366,19 +365,19 @@ void OutputFilterImpl::setDocType( const std::string& value)
 	m_doctypeid = doctype.systemid;
 }
 
-const char* OutputFilterImpl::encoding() const
+void OutputFilterImpl::setEncoding()
 {
-	if (m_encoding.empty())
+	if (!m_encattr_defined)
 	{
 		if (attributes())
 		{
-			return attributes()->getEncoding();
+			const char* encstr = attributes()->getEncoding();
+			if (encstr)
+			{
+				m_encattr = types::String::getEncodingFromName( encstr);
+			}
+			m_encattr_defined = true;
 		}
-		return 0;
-	}
-	else
-	{
-		return m_encoding.c_str();
 	}
 }
 
@@ -386,10 +385,9 @@ bool OutputFilterImpl::getValue( const char* name, std::string& val)
 {
 	if (std::strcmp( name, "encoding") == 0)
 	{
-		const char* ee = encoding();
-		if (ee)
+		if (m_encattr_defined)
 		{
-			val = ee;
+			val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
 			return true;
 		}
 		return false;
@@ -406,7 +404,7 @@ bool OutputFilterImpl::setValue( const char* name, const std::string& value)
 			setState( Error, "setting of the encoding not allowed after first print operation");
 			return false;
 		}
-		m_encoding = value;
+		m_encattr = types::String::getEncodingFromName( value);
 		return true;
 	}
 	return Parent::setValue( name, value);

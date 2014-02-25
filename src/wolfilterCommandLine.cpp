@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -37,7 +37,7 @@
 #include "database/DBprovider.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
@@ -53,6 +53,11 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::config;
+
+//\brief Macros to stringify compile options
+#define DO_STRINGIFY2(x) #x
+#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
+
 
 static bool checkNumber( const char* src)
 {
@@ -98,7 +103,7 @@ boost::property_tree::ptree WolfilterCommandLine::getConfigNode( const std::stri
 	return getTreeNode( m_config, name);
 }
 
-std::vector<std::string> WolfilterCommandLine::configModules() const
+std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
 {
 	std::vector<std::string> rt;
 	boost::property_tree::ptree module_section = getConfigNode( "LoadModules");
@@ -107,7 +112,7 @@ std::vector<std::string> WolfilterCommandLine::configModules() const
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), m_modulePath));
+			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), refpath));
 		}
 	}
 	return rt;
@@ -253,7 +258,9 @@ struct WolfilterOptionStruct
 			( "help,h", "print help message" )
 			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
 			( "logfile", po::value<std::string>(), "specify a file for the log output" )
+#if defined(_WIN32) // DISABLED because Windows cannot handle boost::program_options::value multitoken this way
 			( "verbosity,t", po::value< std::vector<std::string> >()->multitoken()->zero_tokens(), "variant of option --loglevel: Raise verbosity level with (-t,-tt,-ttt,..)" )
+#endif
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
@@ -270,14 +277,17 @@ struct WolfilterOptionStruct
 	}
 };
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath)
+#if defined( DEFAULT_MODULE_LOAD_DIR)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
+#else
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool )
+#endif
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
 	,m_inbufsize(8<<10)
 	,m_outbufsize(8<<10)
 	,m_referencePath(referencePath_)
-	,m_modulePath(modulePath)
 {
 	static const WolfilterOptionStruct ost;
 	po::variables_map vmap;
@@ -321,40 +331,60 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "config"))
 	{
 		std::string configfile = vmap["config"].as<std::string>();
-		if (configfile.size() == 0 || configfile[0] != '.')
+		if (currentPath.size() != 0)
 		{
-			configfile = utils::getCanonicalPath( vmap["config"].as<std::string>(), m_referencePath);
+			configfile = utils::getCanonicalPath( configfile, currentPath);
 		}
-		else
-		{
-			m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
-		}
+		m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
+		LOG_DEBUG << "load config file '" << configfile << "' and set reference path to '" << m_referencePath << "'";
+
 		m_config = utils::readPropertyTreeFile( configfile);
-		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "cmdprogram")) throw std::runtime_error( "incompatible options: --config specified with --program");
 		if (vmap.count( "database")) throw std::runtime_error( "incompatible options: --config specified with --database");
 	}
-	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
+	if (vmap.count( "input"))
+	{
+		m_inputfile = vmap["input"].as<std::string>();
+	}
+	std::string modulePath;
+#if defined( DEFAULT_MODULE_LOAD_DIR)
+	if (useDefaultModuleDir)
+	{
+		modulePath = DO_STRINGIFY( DEFAULT_MODULE_LOAD_DIR);
+	}
+	else
+	{
+		modulePath = m_referencePath;
+	}
+#else
+	modulePath = m_referencePath;
+#endif
+	if (vmap.count( "config"))
+	{
+		std::vector<std::string> cfgmod = configModules( modulePath);
+		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
+	}
 	if (vmap.count( "module"))
 	{
-		m_modules = vmap["module"].as<std::vector<std::string> >();
-		std::vector<std::string>::iterator itr=m_modules.begin(), end=m_modules.end();
-		for (; itr != end; ++itr)
+		std::vector<std::string> mods = vmap["module"].as<std::vector<std::string> >();
+		std::vector<std::string>::iterator mi=mods.begin(), me=mods.end();
+		for (; mi != me; ++mi)
 		{
-			if (itr->size() == 0 || (*itr).at(0) != '.')
+			if (mi->size() == 0 || (*mi).at(0) != '.')
 			{
-				*itr = utils::getCanonicalPath( *itr, m_modulePath);
+				m_modules.push_back( utils::getCanonicalPath( *mi, modulePath));
 			}
 			else if (!currentPath.empty())
 			{
-				*itr = utils::getCanonicalPath( *itr, currentPath);
+				m_modules.push_back( utils::getCanonicalPath( *mi, currentPath));
+			}
+			else
+			{
+				m_modules.push_back( *mi);
 			}
 		}
 	}
-	// Load modules
-	std::vector<std::string> cfgmod = configModules();
-	std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	std::list<std::string> modfiles;
 	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
 	if (!LoadModules( m_modulesDirectory, modfiles))

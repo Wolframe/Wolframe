@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -64,6 +64,8 @@ public:
 	ITypeInfo* getProviderInterface() const;
 
 private:
+	Impl( const Impl&){throw std::logic_error("try to copy comauto::TypeLib::Impl");}
+
 	comauto::TypeLib* m_this;
 	ITypeLib* m_typelib;
 	TLIBATTR* m_libattr;
@@ -80,8 +82,8 @@ void comauto::TypeLib::Impl::initProviderInterface()
 
 		for (ii = 0; ii < nn; ++ii)
 		{
-			WRAP( const_cast<ITypeLib*>(m_typelib)->GetTypeInfo( ii, &typeinfo))
-			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
+			WRAP( const_cast<ITypeLib*>(m_typelib)->GetTypeInfo( ii, &typeinfo));
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr));
 
 			if (typeattr->typekind == TKIND_DISPATCH && typeattr->guid == comauto::ProcessorProviderDispatch::uuid())
 			{
@@ -389,13 +391,7 @@ ITypeInfo* comauto::TypeLib::Impl::getProviderInterface() const
 
 
 comauto::TypeLib::TypeLib( const std::string& file)
-	:m_impl( new Impl(file,this))
-{}
-
-comauto::TypeLib::~TypeLib()
-{
-	delete m_impl;
-}
+	:m_impl( new Impl(file,this)){}
 
 void comauto::TypeLib::print( std::ostream& out) const
 {

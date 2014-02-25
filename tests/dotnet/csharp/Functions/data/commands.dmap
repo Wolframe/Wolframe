@@ -1,0 +1,3 @@
+COMMAND GetAddress_p CALL Functions.GetAddress_p RETURN Address;
+COMMAND GetUserAddress SKIP CALL Functions.GetUserAddress RETURN Address;
+COMMAND GetUserIdPair SKIP CALL Functions.GetUserIdPair RETURN IdPair;

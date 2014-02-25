@@ -61,7 +61,6 @@ public:
 
     //Getter functions with value conversion if needed:
     std::string tostring() const;
-    double tonumber() const;
     double todouble() const;
     bool tobool() const;
     Data::Int toint() const;

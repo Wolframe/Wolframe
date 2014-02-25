@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -374,28 +374,31 @@ public:
 };
 
 
-Filter _Wolframe::langbind::createLineFilter( const std::string& name, const std::vector<FilterArgument>& arg)
+class LineFilterType :public FilterType
 {
-	const char* filterbasename = "line";
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != filterbasename) throw std::runtime_error( "line filter name does not match");
-	if (arg.empty()) return LineFilter();
-	const char* encoding = 0;
-	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
+public:
+	LineFilterType(){}
+	virtual ~LineFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		const char* encoding = 0;
+		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+		for (; ai != ae; ++ai)
 		{
-			encoding = ai->second.c_str();
-			break;
+			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+			{
+				encoding = ai->second.c_str();
+				break;
+			}
 		}
+		return encoding?(new LineFilter( encoding)):(new LineFilter());
 	}
-	return encoding?LineFilter( encoding):LineFilter();
+};
+
+FilterType* _Wolframe::langbind::createLineFilterType()
+{
+	return new LineFilterType();
 }
 
-Filter* _Wolframe::langbind::createLineFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
-{
-	return new Filter( createLineFilter( name, arg));
-}
 

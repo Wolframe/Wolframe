@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,43 +38,66 @@
 #define _SINGLETON_HPP_INCLUDED
 
 #include <boost/utility.hpp>
-#include <boost/thread/once.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/scoped_ptr.hpp>
 
 // Warning: If T's constructor throws, instance() will return a null reference.
 
-// the initialized flag might not be needed but it looks like it increases performance
-
-template<class T>
+template< class T >
 class Singleton : private boost::noncopyable
 {
 public:
 	static T& instance()
 	{
-		if ( !initialized )
-			boost::call_once( init, flag );
-		return *t;
+		if ( !m_initialized )	{
+			boost::lock_guard< boost::mutex > lock( m_mutex );
+			if ( !m_initialized )	{
+				m_t.reset( new T() );
+				m_initialized = true;
+			}
+		}
+		return *m_t;
+	}
+
+	template< typename ArgType >
+	static T& instance( ArgType arg )
+	{
+		if ( !m_initialized )	{
+			boost::lock_guard< boost::mutex > lock( m_mutex );
+			if ( !m_initialized )	{
+				m_t.reset( new T( arg ) );
+				m_initialized = true;
+			}
+		}
+		return *m_t;
+	}
+
+	template< typename ArgType0, typename ArgType1 >
+	static T& instance( ArgType0 arg0, ArgType1 arg1 )
+	{
+		if ( !m_initialized )	{
+			boost::lock_guard< boost::mutex > lock( m_mutex );
+			if ( !m_initialized )	{
+				m_t.reset( new T( arg0, arg1 ) );
+				m_initialized = true;
+			}
+		}
+		return *m_t;
 	}
 
 protected:
 	Singleton()	{}
 	~Singleton()	{}
 
-	static void init() // never throws
-	{
-		t.reset( new T() );
-		initialized = true;
-	}
-
 private:
-	static boost::scoped_ptr<T>	t;
-	static boost::once_flag		flag;
-	static bool			initialized;
+	static boost::scoped_ptr< T >	m_t;
+	static boost::mutex		m_mutex;
+	static bool			m_initialized;
 };
 
-
-template<class T> boost::scoped_ptr<T> Singleton<T>::t(0);
-template<class T> boost::once_flag Singleton<T>::flag = BOOST_ONCE_INIT;
-template<class T> bool Singleton<T>::initialized = false;
+template< class T > boost::scoped_ptr< T > Singleton< T >::m_t( 0 );
+template< class T > boost::mutex Singleton< T >::m_mutex;
+template< class T > bool Singleton< T >::m_initialized = false;
 
 #endif	// _SINGLETON_HPP_INCLUDED

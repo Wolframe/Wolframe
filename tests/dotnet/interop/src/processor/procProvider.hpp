@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -53,7 +53,7 @@ public:
 	ProcessorProvider(){}
 	~ProcessorProvider(){}
 
-	const types::NormalizeFunction* normalizeFunction( const std::string& name) const
+	const types::NormalizeFunction* normalizeFunction( const std::string&) const
 	{
 		return 0;
 	}
@@ -70,12 +70,17 @@ public:
 		m_functionmap[ name_] = func_;
 	}
 
-	const types::FormDescription* formDescription( const std::string& name) const
+	const types::FormDescription* formDescription( const std::string&) const
 	{
 		return 0;
 	}
 
-	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const
+	langbind::Filter* filter( const std::string& , const std::vector<langbind::FilterArgument>&) const
+	{
+		return 0;
+	}
+
+	langbind::Filter* filter( const std::string&) const
 	{
 		return 0;
 	}

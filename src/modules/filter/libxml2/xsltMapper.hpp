@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -38,14 +38,17 @@ Project Wolframe.
 #include "filter/filter.hpp"
 #include <string>
 #include <vector>
+#if WITH_LIBXSLT
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#endif
 
 namespace _Wolframe {
 namespace langbind {
 
+#if WITH_LIBXSLT
 class XsltMapper
 {
 public:
@@ -65,6 +68,14 @@ private:
 	boost::shared_ptr<const char*> m_stylesheet_params;		//< parameter for XSLT mapper
 	std::vector<langbind::FilterArgument> m_stylesheet_params_ar;	//< memory for parameter for XSLT mapper
 };
+#else
+class XsltMapper
+{
+public:
+	XsltMapper(){}
+	XsltMapper( const XsltMapper&){}
+};
+#endif
 
 }}//namespace
 #endif

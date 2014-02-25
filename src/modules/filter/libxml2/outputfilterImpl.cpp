@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -157,6 +157,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 				}
 				else
 				{
+#if WITH_LIBXSLT
 					if (m_xsltMapper.defined())
 					{
 						m_elembuf = m_xsltMapper.apply( m_doc.getContent());
@@ -165,6 +166,9 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 					{
 						m_elembuf = m_doc.getContent();
 					}
+#else
+					m_elembuf = m_doc.getContent();
+#endif
 					m_elemitr = 0;
 					m_taglevel = 0;
 					return flushBuffer();

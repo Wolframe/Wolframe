@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -49,8 +49,8 @@
 #include "server.hpp"
 #include "system/errorCode.hpp"
 #include "logger-v1.hpp"
-#include "appSingleton.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "appInfo.hpp"
+#include "module/moduleDirectory.hpp"
 #include "system/connectionHandler.hpp"
 
 #if !defined(_WIN32)
@@ -399,8 +399,8 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		// create initial console logger, so we see things going wrong
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 
-		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
-		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+		_Wolframe::ApplicationInfo& appInfo = _Wolframe::ApplicationInfo::instance();
+		appInfo.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
@@ -428,7 +428,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << _Wolframe::applicationName() << " version "
-				  << appSingleton.version().toString() << std::endl << std::endl;
+				  << appInfo.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCode::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{

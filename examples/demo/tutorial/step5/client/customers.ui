@@ -23,7 +23,7 @@
       <string>CustomerListRequest customer { }</string>
      </property>
      <property name="answer" stdset="0">
-      <string>Customer list {customer[] {id={?}; name{{row.name}}; address{{row.address}} } }</string>
+      <string>CustomerList list {customer[] {id={?}; name{{row.name}}; address{{row.address}} } }</string>
      </property>
      <column>
       <property name="text">
@@ -37,8 +37,52 @@
      </column>
     </widget>
    </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Show</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>customer_show?id={customer.selected}</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>customer</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

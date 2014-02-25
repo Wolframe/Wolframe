@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -45,4 +45,9 @@ void TypeSignature::verify() const
 		throw std::runtime_error( std::string( "internal: memory curruption detected for object ") + m_objname + " line:" + boost::lexical_cast<std::string>(m_objid) + ")");
 	}
 }
+#endif
+
+#ifdef BOOST_MSVC
+// avoids LNK4221 on Windows (see #69)
+namespace { char dummy; }
 #endif

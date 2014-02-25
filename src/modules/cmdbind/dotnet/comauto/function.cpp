@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -437,7 +437,8 @@ comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
 		,m_paramidx(null_paramidx)
-		,m_providerdispatch(0){}
+		,m_providerdispatch(0)
+{}
 
 static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
 {
@@ -585,10 +586,6 @@ AGAIN:
 					goto AGAIN;
 				}
 				case langbind::InputFilter::CloseTag:
-					if (m_input->getNext( elemtype, elemvalue))
-					{
-						throw std::runtime_error( "unexpected close tag (tags not balanced)");
-					}
 					parameters_consumed = true;
 					// ... got final close
 					break;
@@ -612,7 +609,6 @@ AGAIN:
 			const IRecordInfo* recinfo = m_func->m_impl->typelib()->getRecordInfo( param->typeinfo);
 			m_param[ pi->first] = comauto::createVariantArray( pi->second[0].vt, recinfo, pi->second);
 		}
-
 		// function signature validation:
 		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
 		{

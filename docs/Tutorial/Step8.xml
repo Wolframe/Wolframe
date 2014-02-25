@@ -23,7 +23,10 @@
 		as this one is automatically choosen by the sequence in the database:
 
 		<programlisting language='shell'>
-		CustomerCreate customer {name {{main.name}}; address {{main.address}} }
+	CustomerCreate customer {
+	    name {{main.name}};
+	    address {{main.address}}
+	}
 		</programlisting>
 	</para>
 

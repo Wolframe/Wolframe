@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,15 +36,8 @@
 #include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static types::NormalizeResourceHandle* createLocaleResourceHandle()
 {
@@ -57,10 +50,10 @@ static NormalizeFunctionDef normalizeFunctions[] =
 	{"toupper", &langbind::create_toupper_NormalizeFunction},
 	{"totitle", &langbind::create_totitle_NormalizeFunction},
 	{"foldcase", &langbind::create_foldcase_NormalizeFunction},
-	{"nfd", &langbind::create_nfd_NormalizeFunction},
-	{"nfc", &langbind::create_nfc_NormalizeFunction},
-	{"nfkd", &langbind::create_nfkd_NormalizeFunction},
-	{"nfkc", &langbind::create_nfkc_NormalizeFunction},
+	{"conv_nfd", &langbind::create_nfd_NormalizeFunction},
+	{"conv_nfc", &langbind::create_nfc_NormalizeFunction},
+	{"conv_nfkd", &langbind::create_nfkd_NormalizeFunction},
+	{"conv_nfkc", &langbind::create_nfkc_NormalizeFunction},
 	{"latinword", &langbind::create_latinword_NormalizeFunction},
 	{"ascii_de", &langbind::create_ascii_de_NormalizeFunction},
 	{"ascii_eu", &langbind::create_ascii_eu_NormalizeFunction},
@@ -70,9 +63,9 @@ static NormalizeFunctionDef normalizeFunctions[] =
 namespace {
 struct NormalizeProcessor
 {
-	static SimpleBuilder* constructor()
+	static SimpleBuilder* builder()
 	{
-		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", normalizeFunctions, &createLocaleResourceHandle);
+		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", normalizeFunctions, &createLocaleResourceHandle);
 	}
 };
 }//anonymous namespace
@@ -80,8 +73,8 @@ struct NormalizeProcessor
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	NormalizeProcessor::constructor
+	NormalizeProcessor::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
 

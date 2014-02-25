@@ -41,16 +41,31 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram echo_input_doctype.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**requires:DISABLED NETBSD
-
-**file: echo_input_doctype.lua
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+}
+Processor
+{
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:script.lua
 function run()
 	type = input:doctype()
 	output:as( filter(), type)
 	output:print( input:get())
 end
+**requires:DISABLED NETBSD
+
 **output
 {
 	"doctype":	"employee_assignment_print",

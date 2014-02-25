@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -50,6 +50,10 @@
 #include "logger-v1.hpp"
 #include "system/globalRngGen.hpp"
 
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
 namespace _Wolframe	{
 
 #ifdef _WIN32
@@ -58,9 +62,45 @@ namespace _Wolframe	{
 	#define	DEFAULT_RANDOM_DEVICE	"/dev/urandom";
 #endif
 
+// We don't want an implicit initialized random device
+#define	NO_IMPLICIT_RANDOM_DEVICE	1
+
+static boost::scoped_ptr< RandomGenerator >	m_t;
+static boost::mutex				m_mutex;
+static bool					m_initialized = false;
+
+RandomGenerator& RandomGenerator::instance()
+{
+	if ( !m_initialized )	{
+		boost::lock_guard< boost::mutex > lock( m_mutex );
+		if ( !m_initialized )	{
+#ifdef NO_IMPLICIT_RANDOM_DEVICE
+			throw std::logic_error( "Uninitialized random generator instance called." );
+#else
+			m_t.reset( new RandomGenerator() );
+			m_initialized = true;
+#endif
+		}
+	}
+	return *m_t;
+}
+
+RandomGenerator& RandomGenerator::instance( const std::string &rndDev )
+{
+	if ( !m_initialized )	{
+		boost::lock_guard< boost::mutex > lock( m_mutex );
+		if ( !m_initialized )	{
+			m_t.reset( new RandomGenerator( rndDev ));
+			m_initialized = true;
+		}
+	}
+	return *m_t;
+}
+
 RandomGenerator::RandomGenerator( const std::string& rndDev )
 {
 	if ( rndDev.empty() )	{
+		LOG_INFO << "Empty random generator device. Using default device.";
 		m_device = DEFAULT_RANDOM_DEVICE;
 	}
 	else
@@ -70,7 +110,21 @@ RandomGenerator::RandomGenerator( const std::string& rndDev )
 
 RandomGenerator::RandomGenerator()
 {
-	throw std::logic_error( "Random generator default constructor called. This should not happen." );
+	m_device = DEFAULT_RANDOM_DEVICE;
+	LOG_DEBUG << "Random generator initialized with the default device (" << m_device << ")";
+}
+
+RandomGenerator::~RandomGenerator()
+{}
+
+void RandomGenerator::device( const std::string &rndDev )
+{
+	m_device = rndDev;
+}
+
+const std::string& RandomGenerator::device() const
+{
+	return m_device;
 }
 
 unsigned RandomGenerator::random() const

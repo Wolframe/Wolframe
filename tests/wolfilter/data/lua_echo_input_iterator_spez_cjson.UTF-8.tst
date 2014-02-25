@@ -19,8 +19,24 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --cmdprogram echo_input_iterator_spez.lua run
-**file: echo_input_iterator_spez.lua
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+}
+Processor
+{
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:script.lua
 
 local function process_image( itr)
 	for v,t in itr do
@@ -40,7 +56,6 @@ function run()
 		end
 	end
 end
-
 **output
 {
 	"doc":	{

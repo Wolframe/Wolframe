@@ -1,50 +1,61 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-opt=""
-schema=tdl_preprocess/schema_sqlite.sql
-luascript=tdl_preprocess/preprocess.lua
-direcmap=tdl_preprocess/preprocess.dmap
-ddl=tdl_preprocess/preprocess.sfrm
-tdl=tdl_preprocess/preprocess.tdl
-normalize=tdl_preprocess/preprocess.wnmp
-
-# Modules to load
-modpath="../../src/modules"				# standard module directory relative from tests/temp
-opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-opt="$opt --module $modpath/cmdbind/directmap/mod_command_directmap"
-opt="$opt --module $modpath/normalize/number/mod_normalize_number"
-opt="$opt --module $modpath/normalize/string/mod_normalize_string"
-opt="$opt --module $modpath/ddlcompiler/simpleform/mod_ddlcompiler_simpleform"
-modpath="../wolfilter/modules/database"			# test module directory relative from tests/temp
-opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
-
-# Programs to load
-opt="$opt --cmdprogram=preprocess.dmap"			# Command map
-opt="$opt --program=preprocess.sfrm"			# DDL
-opt="$opt --program=preprocess.tdl"			# TDL
-opt="$opt --program=preprocess.wnmp"			# normalization for DDL types
-opt="$opt --program=preprocess.lua"			# Lua commands
-
-opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 testcmd="$opt AllDataRequest"				# command to execute by the test
-testscripts=""						# list of scripts of the test
 docin=tdl_preprocess.in					# input document name
 docout=tdl_preprocess_sqlite.out			# output document name
 dumpout="program/tdl_preprocess/sqlite.dbdump.txt"	# resource dump to add to expected test output
-
+testcmd="-c wolframe.conf AllDataRequest"		# command to execute by the test
 testdata="
-**file:preprocess.sfrm
-`cat program/$ddl`
-**file:preprocess.wnmp
-`cat program/$normalize`
-**file: DBDATA
-`cat program/$schema`
-**file:preprocess.tdl
-`cat program/$tdl`
-**file:preprocess.dmap
-`cat program/$direcmap`
+**file:wolframe.conf
+LoadModules
+{
+	module `cmd/MODULE mod_db_sqlite3test`
+	module `cmd/MODULE mod_command_lua`
+	module `cmd/MODULE mod_normalize_number`
+	module `cmd/MODULE mod_normalize_string`
+	module `cmd/MODULE mod_command_directmap`
+	module `cmd/MODULE mod_ddlcompiler_simpleform`
+}
+Database
+{
+	SQliteTest
+	{
+		identifier testdb
+		file test.db
+		dumpfile DBDUMP
+		inputfile DBDATA
+	}
+}
+Processor
+{
+	database testdb
+	program preprocess.lua
+	program preprocess.sfrm
+	program preprocess.tdl
+	program preprocess.wnmp
+
+	cmdhandler
+	{
+		directmap
+		{
+			program preprocess.dmap
+			filter #FILTER#
+		}
+	}
+}
+**file:DBDATA
+`cat program/tdl_preprocess/schema_sqlite.sql`
 **file:preprocess.lua
-`cat program/$luascript`
+`cat program/tdl_preprocess/preprocess.lua`
+**file:preprocess.dmap
+`cat program/tdl_preprocess/preprocess.dmap`
+**file:preprocess.sfrm
+`cat program/tdl_preprocess/preprocess.sfrm`
+**file:preprocess.tdl
+`cat program/tdl_preprocess/preprocess.tdl`
+**file:preprocess.wnmp
+`cat program/tdl_preprocess/preprocess.wnmp`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh
+

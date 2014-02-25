@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -165,7 +165,7 @@ void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
 		_Wolframe::log::LogLevel::Level lv = getLogLevel( std::string( message, ii));
 		if (lv != log::LogLevel::LOGLEVEL_UNDEFINED)
 		{
-			_Wolframe::log::Logger(logBackendPtr).Get( lv) << "PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
+			_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv) << "PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
 			return;
 		}
 	}
@@ -189,12 +189,12 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
 				  connectTimeout );
-	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
 	for ( size_t i = 0; i < connections; i++ )	{
 		PGconn* conn = PQconnectdb( m_connStr.c_str() );
 		if ( conn == NULL )
-			MOD_LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
+			LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
 		else	{
 			PQsetNoticeProcessor( conn, &noticeProcessor, this);
 
@@ -204,50 +204,50 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 				err.erase( err.size() - 1 );
 			switch( stat )	{
 				case CONNECTION_OK:
-					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connected OK.";
 					break;
 				case CONNECTION_BAD:
 					if ( err.compare( 0, 6, "FATAL:" ) == 0 )	{
-						MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' (connection "
+						LOG_ALERT << "PostgreSQL database '" << m_ID << "' (connection "
 							      << i << ") error: '" << err << "'";
 						throw std::runtime_error( "Fatal error connecting to the PostgreSQL database" );
 					}
-					MOD_LOG_WARNING << "PostgreSQL database '" << m_ID << "' connection "
+					LOG_WARNING << "PostgreSQL database '" << m_ID << "' connection "
 							<< i << " error: '" << err << "'";
 					break;
 				case CONNECTION_STARTED:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection STARTED: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_STARTED in synchronous connection" );
 					break;
 				case CONNECTION_MADE:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection MADE: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_MADE in synchronous connection" );
 					break;
 				case CONNECTION_AWAITING_RESPONSE:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection AWAITING RESPONSE: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_AWAITING_RESPONSE in synchronous connection" );
 					break;
 				case CONNECTION_AUTH_OK:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection AUTH OK: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_AUTH_OK in synchronous connection" );
 					break;
 				case CONNECTION_SSL_STARTUP:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection SSL start: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_SSL_STARTUP in synchronous connection" );
 					break;
 				case CONNECTION_SETENV:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection SETENV: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_SETENV in synchronous connection" );
 					break;
 				case CONNECTION_NEEDED:
-					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connection NEEDED: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_NEEDED in synchronous connection" );
 					break;
@@ -259,7 +259,7 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 
 	m_db.setUnit( this );
 
-	MOD_LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
 
@@ -274,44 +274,44 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	while ( m_connPool.available() )	{
 		PGconn* conn = m_connPool.get();
 		if ( conn == NULL )	{
-			MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
+			LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
 			throw std::logic_error( "PostgreSQL database destructor: NULL connection from pool" );
 		}
 		PGTransactionStatusType stat = PQtransactionStatus( conn );
 		switch( stat )	{
 			case PQTRANS_IDLE:
 				PQfinish( conn );
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_ACTIVE:
 				PQfinish( conn );
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_INTRANS:
 				PQfinish( conn );
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_INERROR:
 				PQfinish( conn );
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_UNKNOWN:
 				PQfinish( conn );
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
 				m_noConnections--, connections++;
 				break;
 		}
 	}
 	if ( m_noConnections != 0 )	{
-		MOD_LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: "
+		LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: "
 			      << m_noConnections << " connections not destroyed";
 		throw std::logic_error( "PostgreSQL database unit destructor: not all connections destroyed" );
 	}
-	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
+	LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
 void PostgreSQLdbUnit::loadProgram( const std::string& filename )
@@ -320,7 +320,7 @@ void PostgreSQLdbUnit::loadProgram( const std::string& filename )
 	if ( filename.empty())
 		return;
 	if ( !boost::filesystem::exists( filename ))	{
-		MOD_LOG_ALERT << "Program file '" << filename
+		LOG_ALERT << "Program file '" << filename
 			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
 		return;
 	}
@@ -339,10 +339,10 @@ void PostgreSQLdbUnit::loadAllPrograms()
 	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
-		MOD_LOG_DEBUG << "Load Program '" << *pi << "' for PostgreSQL database unit '" << m_ID << "'";
+		LOG_DEBUG << "Load Program '" << *pi << "' for PostgreSQL database unit '" << m_ID << "'";
 		loadProgram( *pi);
 	}
-	MOD_LOG_DEBUG << "Programs for PostgreSQL database unit '" << m_ID << "' loaded";
+	LOG_DEBUG << "Programs for PostgreSQL database unit '" << m_ID << "' loaded";
 }
 
 

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -32,8 +32,10 @@
 ************************************************************************/
 ///\file appdevel/cppFunctionTemplate.hpp
 ///\brief Template for declaring C++ form function
+
 #ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
+
 #include "module/cppFormFunctionBuilder.hpp"
 #include "processor/procProvider.hpp"
 
@@ -49,7 +51,7 @@ struct CppFormFunction
 	{
 		return Definition::exec( provider, *(typename Definition::OutputType*)res, *(const typename Definition::InputType*) param);
 	}
-	
+
 	static module::SimpleBuilder* constructor()
 	{
 		static const serialize::StructDescriptionBase* param = Definition::InputType::getStructDescription();

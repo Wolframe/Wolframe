@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -29,12 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file typingfilter.cpp
-///\brief Implementation of filters that wrap untyped to typed input filters
+//\file typingfilter.cpp
+//\brief Implementation of filters that wrap untyped to typed input filters
 #include "filter/typingfilter.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
-
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -128,6 +127,21 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 
 			case types::Variant::Custom:
 			{
+				/*[PF:TODO] Implementation*/
+				std::string strval = element.tostring();
+				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
+				break;
+			}
+			case types::Variant::Timestamp:
+			{
+				/*[PF:TODO] Implementation*/
+				std::string strval = element.tostring();
+				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
+				break;
+			}
+			case types::Variant::BigNumber:
+			{
+				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;

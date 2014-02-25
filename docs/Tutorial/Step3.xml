@@ -12,6 +12,7 @@
 		We start the Qt client with:
 
 		<programlisting language='shell'>
+	cd ~/tutorial/client
 	wolfclient tutorial.conf
 		</programlisting>
 	</para>
@@ -27,7 +28,7 @@
 		You can test the connection now by pressing the "Test Connection"
 		button. 
 	</para>
-
+	
 	<para>
 		You should get a message like
 
@@ -36,6 +37,12 @@
 		</programlisting>
 		
 		in a dialog box.
+	</para>
+
+	<para>
+		Safe the connection parameters by pressing the "Ok" button.
+		You see a list of all your configured servers, the only one
+		we defined is "tutorial". Press "Ok" again.
 	</para>
 	
 	<para>

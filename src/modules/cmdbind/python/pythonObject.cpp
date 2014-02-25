@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -129,10 +129,30 @@ Object::Object( const types::Variant& val)
 {
 	switch (val.type())
 	{
-// MBa hack: eliminate compiler warning
 		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in python object");
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = val.tostring();
+			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
+			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
 			break;
+		}
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = val.tostring();
+			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
+			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
+			break;
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = val.tostring();
+			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
+			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
+			break;
+		}
 		case types::Variant::Null:
 			m_obj = Py_None;
 			Py_INCREF( m_obj);

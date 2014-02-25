@@ -43,7 +43,7 @@ NAME=wolframe             # Introduce the short server's name here
 DESC="wolframe daemon"             # Introduce a short description here
 LOGDIR=/var/log/wolframe  # Log directory to use
 
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/var/run/$NAME/${NAME}d.pid
 
 test -x $DAEMON || exit 0
 
@@ -59,7 +59,7 @@ DIETIME=10              # Time to wait for the server to die, in seconds
                         # let some servers to die gracefully and
                         # 'restart' will not work
 
-#STARTTIME=2             # Time to wait for the server to start, in seconds
+STARTTIME=2             # Time to wait for the server to start, in seconds
                         # If this value is set each time the server is
                         # started (on start or restart) the script will
                         # stall to try to determine if it is running

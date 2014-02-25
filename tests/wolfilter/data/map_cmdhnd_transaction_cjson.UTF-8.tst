@@ -39,8 +39,42 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ./../../src/modules/cmdbind/directmap/mod_command_directmap --module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ./../../src/modules/normalize/number/mod_normalize_number --module ./../../src/modules/normalize/string/mod_normalize_string --module ./../wolfilter/modules/database/testtrace/mod_db_testtrace --program ../wolfilter/scripts/employee_assignment_print.sfrm --program ../wolfilter/template/program/simpleform.wnmp --database 'identifier=testdb,outfile=DBOUT,file=DBRES' --program=DBIN.tdl --cmdprogram=test.dmap employee_assignment_print
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf employee_assignment_print
 
+**file:wolframe.conf
+LoadModules
+{
+	module ./../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+}
+Database
+{
+	test
+	{
+		identifier testdb
+		outfile DBOUT
+		file DBRES
+	}
+}
+Processor
+{
+	database testdb
+	program DBIN.tdl
+	program ../wolfilter/scripts/employee_assignment_print.sfrm
+	program ../wolfilter/template/program/simpleform.wnmp
+
+	cmdhandler
+	{
+		directmap
+		{
+			program test.dmap
+			filter cjson
+		}
+	}
+}
 **file: test.dmap
 COMMAND(employee_assignment_print) CALL(test_transaction) RETURN STANDALONE doc;
 **file: DBRES

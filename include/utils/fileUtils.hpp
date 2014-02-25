@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -81,10 +81,6 @@ bool fileExists( const std::string& path);
 ///\remark Throws on error
 std::string readSourceFileContent( const std::string& filename);
 
-///\brief Reading the content of a source file as list of lines
-///\remark Throws on error
-std::vector<std::string> readSourceFileLines( const std::string& filename);
-
 ///\brief Reading the content of a source file as property tree (with property tree syntax)
 ///\remark Throws on error
 boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
@@ -93,12 +89,26 @@ boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
 ///\remark Throws on error
 void writeFile( const std::string& filename, const std::string& content);
 
-///\brief Get the file type as string
-///\remark Very simplistic implementation for now
-///\return file type ("XML","TEXT:UTF-8","TEXT:ASCII", "" (unknown))
-std::string getFileType( const std::string& filename);
+///\brief Get the file type
+///\return the file type
+struct FileType
+{
+	enum Encoding {Undefined,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE};
+	enum Format {Unknown,XML,Info};
 
+	Encoding encoding;
+	Format format;
+
+	FileType()
+		:encoding(Undefined),format(Unknown){}
+	FileType( const FileType& o)
+		:encoding(o.encoding),format(o.format){}
+	FileType( Encoding encoding_, Format format_)
+		:encoding(encoding_),format(format_){}
+};
+FileType getFileType( const std::string& filename);
 
 }} //namespace _Wolframe::utils
 
 #endif // _MISC_UTILS_HPP_INCLUDED
+

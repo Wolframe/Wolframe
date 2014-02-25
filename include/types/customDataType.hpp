@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -52,6 +52,10 @@ class Variant;
 class CustomDataType;
 //\brief Forward declaration
 class CustomDataInitializer;
+//\brief Forward declaration
+class DateTime;
+//\brief Forward declaration
+class BigNumber;
 
 
 class CustomDataValue
@@ -70,6 +74,7 @@ public:
 	virtual std::string tostring() const=0;
 	virtual void assign( const Variant& o)=0;
 	virtual CustomDataValue* copy() const=0;
+	virtual void getBaseTypeValue( Variant& dest) const;
 
 private:
 	friend class CustomDataType;
@@ -158,6 +163,7 @@ public:
 	CustomDataInitializer* createInitializer( const std::string& d) const;
 	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
 
+	bool hasInitializer() const		{return !!m_vmt.opInitializerConstructor;}
 	const ID& id() const			{return m_id;}
 	const std::string& name() const		{return m_name;}
 

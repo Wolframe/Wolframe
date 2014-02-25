@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -40,6 +40,8 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+#if WITH_LIBXSLT
 
 static const utils::CharTable g_op( ",=");
 
@@ -116,4 +118,5 @@ std::string XsltMapper::apply( const std::string& o) const
 	return mapped.getContent();
 }
 
+#endif
 

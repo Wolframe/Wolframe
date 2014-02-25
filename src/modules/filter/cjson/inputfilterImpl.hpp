@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
 #include "filter/inputfilter.hpp"
 #include "types/countedReference.hpp"
+#include "types/string.hpp"
 #include "types/doctype.hpp"
 extern "C"
 {
@@ -55,6 +56,7 @@ struct InputFilterImpl :public InputFilter
 
 	InputFilterImpl()
 		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+		,m_encattr_defined(false)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -63,7 +65,8 @@ struct InputFilterImpl :public InputFilter
 		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,InputFilter(o)
 		,m_content(o.m_content)
-		,m_encoding(o.m_encoding)
+		,m_encattr(o.m_encattr)
+		,m_encattr_defined(o.m_encattr_defined)
 		,m_doctype(o.m_doctype)
 		,m_root(o.m_root)
 		,m_stk(o.m_stk)
@@ -108,8 +111,9 @@ private:
 
 private:
 	std::string m_content;
-	std::string m_encoding;
-	types::DocType m_doctype;
+	types::String::EncodingAttrib m_encattr;	//< character set encoding attributes
+	bool m_encattr_defined;				//< true, if character set encoding is defined
+	types::DocType m_doctype;			//< document type
 	boost::shared_ptr<cJSON> m_root;
 
 	struct StackElement

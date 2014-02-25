@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -33,17 +33,20 @@ Project Wolframe.
 //\brief Interface .NET runtime environment configuration
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
 
 namespace _Wolframe {
+namespace proc {
+	//\brief Forward declaration
+	class ProcessorProvider;
+}
 namespace module {
 
-///\brief Named configuration definition
+//\brief Named configuration definition
 class DotnetRuntimeEnvironmentConfig
 	:public config::NamedConfiguration
 {
@@ -66,13 +69,13 @@ public:
 		,m_className(className_){}
 	virtual ~DotnetRuntimeEnvironmentConfig(){}
 
-	///\brief Parse the configuration
-	///\param[in] pt configuration tree
-	///\param[in] modules module directory
+	//\brief Parse the configuration
+	//\param[in] pt configuration tree
+	//\param[in] modules module directory
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory* modules);
 
-	///\brief Set canonical path for files referenced as relative path in configuration
-	///\param[in] referencePath reference path
+	//\brief Set canonical path for files referenced as relative path in configuration
+	//\param[in] referencePath reference path
 	virtual void setCanonicalPathes( const std::string& referencePath);
 
 	virtual bool check() const;

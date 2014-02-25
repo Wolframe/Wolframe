@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -464,10 +464,14 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 {
 	switch (element.type())
 	{
-// MBa hack: eliminate compiler warning
 		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in lua output filter");
-			break;
+		{
+			/*[PF:TODO implementation*/
+			std::string valstr = element.tostring();
+			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			return true;
+		}
 		case types::Variant::Null:
 			_wrap_lua_pushnil( m_ls);
 			return true;
@@ -487,6 +491,22 @@ bool LuaTableOutputFilter::pushValue( const types::VariantConst& element)
 			_wrap_lua_pushlstring( m_ls, element.charptr(), element.charsize());
 			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO implementation*/
+			std::string valstr = element.tostring();
+			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			return true;
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO implementation*/
+			std::string valstr = element.tostring();
+			_wrap_lua_pushlstring( m_ls, valstr.c_str(), valstr.size());
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			return true;
+		}
 	}
 	setState( OutputFilter::Error, "illegal value type of element");
 	return false;

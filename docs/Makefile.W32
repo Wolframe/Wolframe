@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe modules
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\doc.mk
 

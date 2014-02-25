@@ -5,7 +5,7 @@
 
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/xhtml/chunk.xsl"/>
 
-	<xsl:param name="html.stylesheet" select="'wolframe.css'"/>
+<!-- ?	<xsl:param name="html.stylesheet" select="'wolframe.css'"/> -->
 	<xsl:param name="section.autolabel" select="1"/>
 	<xsl:param name="section.label.includes.component.label" select="1"/>
 	<xsl:param name="section.autolabel.max.depth" select="2"/>

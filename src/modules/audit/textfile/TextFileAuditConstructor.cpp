@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -45,7 +45,7 @@ TextFileAuditor* TextFileAuditConstructor::object( const config::NamedConfigurat
 	const TextFileAuditConfig& cfg = dynamic_cast< const TextFileAuditConfig& >( conf );
 
 	TextFileAuditor* m_audit = new TextFileAuditor( cfg.m_file );
-	MOD_LOG_TRACE << "Text file auditor container created";
+	LOG_TRACE << "Text file auditor container created";
 	return m_audit;
 }
 

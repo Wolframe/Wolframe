@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -91,6 +91,16 @@ bool _Wolframe::serialize::printValue_double( const double* ptr, types::VariantC
 bool _Wolframe::serialize::printValue_string( const std::string* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const std::string*)ptr, value);
+}
+
+bool _Wolframe::serialize::printValue_datetime( const types::DateTime* ptr, types::VariantConst& value)
+{
+	return traits::printValue( *(const types::DateTime*)ptr, value);
+}
+
+bool _Wolframe::serialize::printValue_bignumber( const types::BigNumber* ptr, types::VariantConst& value)
+{
+	return traits::printValue( *(const types::BigNumber*)ptr, value);
 }
 
 bool _Wolframe::serialize::fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)

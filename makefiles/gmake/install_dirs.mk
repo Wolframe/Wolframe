@@ -10,6 +10,7 @@ libdir=$(execdir)/$(LIBDIR)
 sysconfdir=$(execdir)/etc
 includedir=$(execdir)/include
 datadir=$(execdir)/share
+mandir=$(execdir)/share
 localedir=$(datadir)/locale
 
 # Wolframe specific directories

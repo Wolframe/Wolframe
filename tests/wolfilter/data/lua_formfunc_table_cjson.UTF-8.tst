@@ -40,17 +40,32 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../wolfilter/modules//employee_assignment_convert//mod_employee_assignment_convert --cmdprogram formfunc_table.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**requires:DISABLED NETBSD
-
-**file: formfunc_table.lua
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert
+}
+Processor
+{
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:script.lua
 
 function run()
 	t = input:table()
 	r = formfunction("employee_assignment_convert")( t)
 	output:print( r:table())
 end
+**requires:DISABLED NETBSD
 
 **output
 {

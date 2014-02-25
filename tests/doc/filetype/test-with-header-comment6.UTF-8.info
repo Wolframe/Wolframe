@@ -1,0 +1,16 @@
+
+;Bla header
+
+good line
+
+bad line	; with comment
+
+line	"very bad"
+
+users
+{
+	user {
+		prename Hans
+		surname Muster
+	}
+}

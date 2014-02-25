@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -33,8 +33,8 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "utils/parseUtils.hpp"
+#include "types/string.hpp"
 #include "logger-v1.hpp"
-#include "langbind/charsetEncodings.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -43,9 +43,9 @@ using namespace _Wolframe::langbind;
 
 bool InputFilterImpl::getValue( const char* name, std::string& val)
 {
-	if (std::strcmp(name,"encoding") == 0 && !m_encoding.empty())
+	if (std::strcmp(name,"encoding") == 0 && m_encattr_defined)
 	{
-		val = m_encoding;
+		val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
 		return true;
 	}
 	return false;
@@ -77,7 +77,8 @@ bool InputFilterImpl::getMetadata()
 
 const char* InputFilterImpl::getEncoding() const
 {
-	return m_encoding.empty()?0:m_encoding.c_str();
+	if (!m_encattr_defined) return 0;
+	return types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
 }
 
 bool InputFilterImpl::setValue( const char* name, const std::string& value)
@@ -85,33 +86,40 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 	return Parent::setValue( name, value);
 }
 
-static std::string guessCharsetEncoding( const void* content, std::size_t contentsize)
+static types::String::Encoding guessCharsetEncoding( const void* content, std::size_t contentsize)
 {
-	CharsetClass::Id cl = CharsetClass::guess( (const char*)content, contentsize);
+	types::String::EncodingClass::Id cl = types::String::guessEncoding( (const char*)content, contentsize);
 	switch (cl)
 	{
-		case CharsetClass::FAIL:
+		case types::String::EncodingClass::FAIL:
 			throw std::runtime_error( "failed to guess charset encoding for JSON filter");
-		case CharsetClass::NONE:
+		case types::String::EncodingClass::NONE:
 			throw std::runtime_error( "cannot guess charset encoding for JSON filter");
-		case CharsetClass::UCS1:
-			return "UTF-8";
-		case CharsetClass::UCS2BE:
-			return "UTF-16BE";
-		case CharsetClass::UCS2LE:
-			return "UTF-16LE";
-		case CharsetClass::UCS4BE:
-			return "UCS4-BE";
-		case CharsetClass::UCS4LE:
-			return "UCS4-LE";
+		case types::String::EncodingClass::UCS1:
+			return types::String::UTF8;
+		case types::String::EncodingClass::UCS2BE:
+			return types::String::UTF16BE;
+		case types::String::EncodingClass::UCS2LE:
+			return types::String::UTF16LE;
+		case types::String::EncodingClass::UCS4BE:
+			return types::String::UCS4BE;
+		case types::String::EncodingClass::UCS4LE:
+			return types::String::UCS4LE;
 	}
-	return "";
+	throw std::runtime_error( "cannot guess charset encoding for JSON filter");
 }
 
 boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 {
-	CharsetEncoding enc = langbind::getCharsetEncoding( m_encoding);
-	m_content = langbind::convertStringCharsetToUTF8( enc, content);
+	if (!m_encattr_defined || m_encattr.encoding == types::String::UTF8)
+	{
+		m_content = content;
+	}
+	else
+	{
+		m_content = types::StringConst( content.c_str(), content.size(), m_encattr.encoding, m_encattr.codepage)
+				.tostring();
+	}
 	cJSON_Context ctx;
 	cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
 	if (!pp)
@@ -137,7 +145,9 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	{
 		std::string origcontent( m_content);
 		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
+		m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
+		m_encattr.codepage = 0;
+		m_encattr_defined = true;
 		m_root = parse( origcontent);
 
 		const cJSON* first = m_root.get();
@@ -167,12 +177,13 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				else if (boost::iequals("encoding", first->string))
 				{
 					++nof_docattributes;
-					if (!boost::iequals( m_encoding, first->valuestring))
+					types::String::EncodingAttrib ea = types::String::getEncodingFromName( first->valuestring);
+					if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
 					{
 						// ... encoding different than guessed. Parse again
 						if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
 						encodingParsed = true;
-						m_encoding = first->valuestring;
+						m_encattr = ea;
 						m_root = parse( origcontent);
 						first = m_root.get();
 						while (first && nof_docattributes--) first = first->next;

@@ -44,7 +44,11 @@
 		'CustomerUpdate' request:
 
 		<programlisting language='shell'>
-		CustomerUpdate customer {id={main.id}; name {{main.name}}; address {{main.address}} }
+	CustomerUpdate customer {
+	    id={main.id};
+	    name {{main.name}};
+	    address {{main.address}}
+	}
 		</programlisting>
 		
 		We also set 'form' to 'customers', so the user gets taken back

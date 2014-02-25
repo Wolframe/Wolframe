@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,7 +38,7 @@
 #include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testDescription.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/stringUtils.hpp"
@@ -155,7 +155,7 @@ TEST_F( WolfilterTest, tests)
 		boost::filesystem::path refpath( g_testdir / "temp");
 		std::string outstr;
 		{
-			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), refpath.string());
+			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
 
 			// [2.5] Call iostreamfilter
 			if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;

@@ -1,22 +1,43 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-opt=""
-opt="$opt --module `cmd/MODULE command_directmap`"
-opt="$opt --module `cmd/MODULE ddlcompiler_simpleform`"
-opt="$opt --module `cmd/MODULE normalize_number`"
-opt="$opt --module `cmd/MODULE normalize_string`"
-opt="$opt --module `cmd/MODULE db_testtrace`"
-opt="$opt --program `cmd/PROGRAM employee_assignment_print.sfrm`"
-opt="$opt --program `cmd/PROGRAM simpleform.wnmp`"
-opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
-opt="$opt --program=DBIN.tdl"
-opt="$opt --cmdprogram=test.dmap"
-testcmd="$opt employee_assignment_print"
-
 docin=employee_assignment_print
 docout=map_transaction
-
+testcmd="-c wolframe.conf employee_assignment_print"	# command to execute by the test
 testdata="
+**file:wolframe.conf
+LoadModules
+{
+	module `cmd/MODULE mod_db_testtrace`
+	module `cmd/MODULE mod_normalize_number`
+	module `cmd/MODULE mod_normalize_string`
+	module `cmd/MODULE mod_command_directmap`
+	module `cmd/MODULE mod_ddlcompiler_simpleform`
+}
+Database
+{
+	test
+	{
+		identifier testdb
+		outfile DBOUT
+		file DBRES
+	}
+}
+Processor
+{
+	database testdb
+	program DBIN.tdl
+	program `cmd/PROGRAM employee_assignment_print.sfrm`
+	program `cmd/PROGRAM simpleform.wnmp`
+
+	cmdhandler
+	{
+		directmap
+		{
+			program test.dmap
+			filter #FILTER#
+		}
+	}
+}
 **file: test.dmap
 COMMAND(employee_assignment_print) CALL(test_transaction) RETURN STANDALONE doc;
 **file: DBRES
@@ -29,3 +50,4 @@ BEGIN
 	INTO task FOREACH //task DO run( title);
 END"
 . ./output_tst_all.sh
+

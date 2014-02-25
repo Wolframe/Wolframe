@@ -8,6 +8,12 @@ PACKAGE_NAME = wolframe
 
 INCLUDE_CXXFLAGS =
 
+# textwolf support for module types_string
+ifeq ($(WITH_TEXTWOLF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_TEXTWOLF
+endif
+
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe
@@ -15,6 +21,12 @@ INCLUDE_LDFLAGS = \
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
+
+# textwolf support for module types_string
+ifeq ($(WITH_TEXTWOLF),1)
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdParty/textwolf/include
+endif
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
@@ -50,6 +62,9 @@ PROVIDER_OBJS = \
 	provider/procProviderImpl.o
 
 TYP_OBJS = \
+	types_string.o \
+	types_bignumber.o \
+	types_datetime.o \
 	types_doctype.o \
 	types_customDataType.o \
 	types_variant.o \
@@ -62,6 +77,7 @@ CPP_OBJS = \
 	$(TYP_OBJS) \
 	malloc.o \
 	version.o \
+	appInfo.o \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \

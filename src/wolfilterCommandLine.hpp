@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,7 +38,7 @@
 #include <vector>
 #include <iostream>
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/shared_ptr.hpp>
@@ -49,7 +49,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& modulePath, const std::string& currentPath);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir);
 	~WolfilterCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}
@@ -71,7 +71,7 @@ public:
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
 	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
-	std::vector<std::string> configModules() const;
+	std::vector<std::string> configModules( const std::string& refpath) const;
 	boost::property_tree::ptree getConfigNode( const std::string& name) const;
 
 private:
@@ -94,7 +94,6 @@ private:
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
-	std::string m_modulePath;
 };
 
 }}//namespace

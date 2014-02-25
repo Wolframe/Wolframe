@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -40,7 +40,7 @@
 
 TEST( CRAM, UninitializedRandomGenerator )
 {
-	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge	challenge, std::logic_error );
+	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge, std::logic_error );
 }
 
 TEST( CRAM, Challenge )

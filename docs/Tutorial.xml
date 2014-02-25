@@ -18,7 +18,7 @@
 ]>
 
 <book id="book_Tutorial" lang="en">
-	<title>The Wolframe Application Server: Getting Started</title>
+	<title>The Wolframe Application Server Tutorial</title>
 	<subtitle>Build your first Wolframe application</subtitle>
 	<bookinfo>
 		<date>&BookSetPublicationDate;</date>

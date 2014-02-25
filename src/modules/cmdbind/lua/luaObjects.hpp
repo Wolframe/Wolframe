@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
+#include "luaDump.hpp"
 #include "filter/filter.hpp"
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
@@ -71,12 +72,12 @@ public:
 
 	const std::vector<std::string>& functions() const		{return m_functions;}
 	const std::string& path() const					{return m_path;}
-	const std::string& content() const				{return m_content;}
+	const LuaDump* content() const					{return m_content.get();}
 
 private:
 	std::vector<std::string> m_functions;
 	std::string m_path;
-	std::string m_content;
+	boost::shared_ptr<LuaDump> m_content;
 };
 
 

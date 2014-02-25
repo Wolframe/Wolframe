@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,6 +35,7 @@
 
 #include "OracleTransactionExecStatemachine.hpp"
 #include "Oracle.hpp"
+#include "OracleStatement.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -55,6 +56,7 @@ TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEn
 	,m_env(env_)
 	,m_lastresult(0)
 	,m_nof_cols(0)
+	,m_statement( new OracleStatement( m_env ) )
 	,m_hasResult(false)
 	,m_hasRow(false)
 	,m_dbUnit(dbUnit_)
@@ -73,16 +75,11 @@ void TransactionExecStatemachine_oracle::clear()
 	{
 		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
 		m_lastresult = 0;
-		std::vector<OracleColumnDescription>::iterator end = m_colDescr.end( );
-		for( std::vector<OracleColumnDescription>::iterator it = m_colDescr.begin( );
-			it != end; it++ ) {
-			free( (*it).buf );
-		}
 		m_colDescr.clear( );
 		m_nof_cols = 0;
 	}
 	m_lasterror.reset();
-	m_statement.clear();
+	m_statement->clear();
 	m_state = Init;
 	m_hasResult = false;
 	m_hasRow = false;
@@ -94,6 +91,9 @@ static const char* getErrorType( sword errorcode )
 	switch( errorcode ) {
 		case 1:
 			return "CONSTRAINT";
+		case 900:
+		case 933:
+			return "SYNTAX";
 		case 1017:
 			return "PRIVILEGE";
 		default:
@@ -146,7 +146,7 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 	// TODO: map OCI codes to severity levels, so far everything is ERROR
 	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
 	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement.string().c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement->originalSQL().c_str(), errtype, errmsg, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -174,6 +174,7 @@ bool TransactionExecStatemachine_oracle::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbUnit->newConnection();
+	static_cast<OracleStatement *>( m_statement )->setConnection( m_conn->object( ) );
 
 	return status( OCITransStart( (*m_conn)->svchp, (*m_conn)->errhp, (uword)0, (ub4)OCI_TRANS_NEW ), Transaction );
 }
@@ -218,7 +219,7 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement->originalSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -236,8 +237,32 @@ bool TransactionExecStatemachine_oracle::start( const std::string& statement)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	m_statement.init( statement);
-	m_state = CommandReady;
+	m_statement->init( statement);
+
+	if (m_lastresult)
+	{
+		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
+		m_lastresult = 0;
+	}
+
+	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
+		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
+	bool rt = status( status_, CommandReady );
+	if( !rt ) return rt;
+
+	// we must do it here otherwise bind doesn't know about the placeholders,
+	// this also means we must NOT depend on anything when generating our
+	// native SQL placeholders but the current index!
+	m_statement->substitute( false );
+	std::string stmstr = m_statement->nativeSQL();
+	status_ = OCIStmtPrepare( m_lastresult, (*m_conn)->errhp, 
+		(text *)const_cast<char *>( stmstr.c_str( ) ),
+		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
+	rt = status( status_, CommandReady );
+	if( !rt ) return rt;
+
+	static_cast<OracleStatement *>( m_statement )->setStatement( m_lastresult );
+
 	return true;
 }
 
@@ -245,7 +270,7 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[oracle statement] CALL bind( " << idx << ", '" << value << "' )";
+		LOG_TRACE << "[oracle statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{
@@ -255,25 +280,15 @@ bool TransactionExecStatemachine_oracle::bind( std::size_t idx, const types::Var
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
+
+	try {
+		m_statement->bind( idx, value );
+		sword status_ = static_cast<OracleStatement *>( m_statement )->getLastStatus( );
+		if( !status( status_, CommandReady ) ) return false;
+	} catch( const std::runtime_error &e ) {
+		return errorStatus( e.what( ) );
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
-	}
-	if (value.defined())
-	{
-		// TODO: replace this with OracleStatement.. use type binding..
-		m_statement.bind( idx, "'" + boost::replace_all_copy( value.tostring( ), "'", "''" ) + "'" );
-	}
-	else
-	{
-		m_statement.bind( idx, "NULL");
-	}
+	
 	m_state = CommandReady;
 	return true;
 }
@@ -284,40 +299,21 @@ bool TransactionExecStatemachine_oracle::execute()
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_lastresult)
-	{
-		(void)OCIHandleFree( m_lastresult, OCI_HTYPE_STMT );
-		m_lastresult = 0;
-	}
-	std::string stmstr = m_statement.expanded();
+
+	m_statement->substitute( true );
+	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[oracle statement] CALL execute(" << stmstr << ")";
-
-	sword status_ = OCIHandleAlloc( m_env->envhp, (dvoid **)&m_lastresult,
-		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
-	bool rt = status( status_, Executed );
-	if( !rt ) return rt;
-
-	status_ = OCIStmtPrepare( m_lastresult, (*m_conn)->errhp, 
-		(text *)const_cast<char *>( stmstr.c_str( ) ),
-		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
-	rt = status( status_, Executed );
-	if( !rt ) return rt;
-
+	
 	// find out whether we have results in this statement
 	// TODO: is there another/better way to do this?
 	ub2 stmtTypehp;
-	status_ = OCIAttrGet( m_lastresult, OCI_HTYPE_STMT,
+	sword status_ = OCIAttrGet( m_lastresult, OCI_HTYPE_STMT,
 		(dvoid *)&stmtTypehp, (ub4 *)0, (ub4)OCI_ATTR_STMT_TYPE,
 		(*m_conn)->errhp );
-	rt = status( status_, Executed );
+	bool rt = status( status_, Executed );
 	if( !rt ) return rt;
 
 	m_hasResult = ( stmtTypehp == OCI_STMT_SELECT );
-
-	// TODO: here I would like to bind a parameter of type variant
-	// as a bind parameter, I would also like to prepare the statement
-	// above only once. Currently they are escaped and mapped into
-	// an expanded statement.
 
 	status_ = OCIStmtExecute( (*m_conn)->svchp, m_lastresult, (*m_conn)->errhp, 
 		(ub4)(m_hasResult) ? 0 : 1, (ub4)0,
@@ -334,14 +330,14 @@ bool TransactionExecStatemachine_oracle::execute()
 		
 		while( status_ == OCI_SUCCESS ) {
 			
-			OracleColumnDescription descr;
+			OracleColumnDescriptionPtr descrRef = OracleColumnDescriptionPtr( new OracleColumnDescription( ) );
 			
 			/* data type of the result column: used to allocate the
 			 * correct size for the data container. could also be
 			 * used later to create the best-fitting type of variant..
 			 */
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
-				(dvoid *)&descr.dataType, (ub4 *)0, (ub4)OCI_ATTR_DATA_TYPE,
+				(dvoid *)&descrRef->dataType, (ub4 *)0, (ub4)OCI_ATTR_DATA_TYPE,
 				(*m_conn)->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
@@ -354,7 +350,7 @@ bool TransactionExecStatemachine_oracle::execute()
 				(*m_conn)->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
-			descr.name = std::string( colName, colNameLen );
+			descrRef->name = std::string( colName, colNameLen );
 			
 			// determine how many bytes we have to allocate to hold the
 			// data of this column in one row fetch
@@ -396,44 +392,50 @@ bool TransactionExecStatemachine_oracle::execute()
 //			ub2 char_size = (ub2) ( (OCILib.nls_utf8 == TRUE) ? UTF8_BYTES_PER_CHAR : sizeof(dtext) );
 
 			// set buffer size depending on data type of column
-			switch( descr.dataType ) {
+			switch( descrRef->dataType ) {
 				case SQLT_CHR:
-					descr.fetchType = SQLT_STR;
+					descrRef->fetchType = SQLT_STR;
 					// TODO: depends on NLS_LANG and some other things for sure
-					descr.bufsize = ( col_width + 1 ) * 4;
-					descr.len = ( col_width + 1 ) * 4;
+					descrRef->bufsize = ( col_width + 1 ) * 4;
+					descrRef->len = ( col_width + 1 ) * 4;
 					break;
 					
 				case SQLT_NUM:
-					descr.fetchType = SQLT_VNU;
-					descr.bufsize = sizeof( OCINumber );
-					descr.len = sizeof( OCINumber );
+					descrRef->fetchType = SQLT_VNU;
+					descrRef->bufsize = sizeof( OCINumber );
+					descrRef->len = sizeof( OCINumber );
+					break;
+					
+				case SQLT_IBDOUBLE:
+					descrRef->fetchType = SQLT_BDOUBLE;
+					descrRef->bufsize = sizeof( double );
+					descrRef->len = sizeof( double );
 					break;
 					
 				default:
-					errorStatus( std::string( "unknown data type '" + boost::lexical_cast<std::string>( descr.dataType ) + "' returned in statement '" + m_statement.string() + "'" ) );
+					errorStatus( std::string( "unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement->originalSQL() + "'" ) );
 					return false;
 			}
 			
 			// allocate buffer for column and register it at the column position
-			descr.buf = (char *)calloc( descr.bufsize, sizeof( char ) );
-			descr.ind = 0;
-			descr.len = 0;
-			descr.errcode = 0;
-			status_ = OCIDefineByPos( m_lastresult, &descr.defhp,
-				(*m_conn)->errhp, counter, (dvoid *)descr.buf,
-				(sb4)descr.bufsize, descr.fetchType,
-				&descr.ind, &descr.len, &descr.errcode, OCI_DEFAULT );
+			descrRef->buf = (char *)calloc( descrRef->bufsize, sizeof( char ) );
+			descrRef->ind = 0;
+			descrRef->len = 0;
+			descrRef->errcode = 0;
+			status_ = OCIDefineByPos( m_lastresult, &descrRef->defhp,
+				(*m_conn)->errhp, counter, (dvoid *)descrRef->buf,
+				(sb4)descrRef->bufsize, descrRef->fetchType,
+				&descrRef->ind, &descrRef->len, &descrRef->errcode, OCI_DEFAULT );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 
 			// some character set tweaking, convert without loss and
 			// set desired character set (one which doesn't get changed
 			// by funny variables like NLS_LANG en passant)
-			switch( descr.dataType ) {
+			switch( descrRef->dataType ) {
 				case SQLT_CHR: {
-					ub2 cform = SQLCS_NCHAR;
-					status_ = OCIAttrSet( (dvoid *)descr.defhp, (ub4)OCI_HTYPE_DEFINE,
+					ub1 cform = SQLCS_NCHAR;
+					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&cform, (ub4)0, (ub4)OCI_ATTR_CHARSET_FORM,
 						(*m_conn)->errhp );
 					rt = status( status_, Executed );
@@ -441,7 +443,7 @@ bool TransactionExecStatemachine_oracle::execute()
 					
 					//~ ub2 csid = OCI_UTF16ID;
 					ub2 csid = 871; // UTF8
-					status_ = OCIAttrSet( (dvoid *)descr.defhp, (ub4)OCI_HTYPE_DEFINE,
+					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&csid, (ub4)0, (ub4)OCI_ATTR_CHARSET_ID,
 						(*m_conn)->errhp );
 					rt = status( status_, Executed );
@@ -451,15 +453,15 @@ bool TransactionExecStatemachine_oracle::execute()
 				}
 			}
 					
-			MOD_LOG_TRACE << "Column " << counter << ", name: " << descr.name
-				<< ", type: " << descr.dataType
+			LOG_TRACE << "Column " << counter << ", name: " << descrRef->name
+				<< ", type: " << descrRef->dataType
 				<< ", sizeInChars: " << sizeInChars
 				<< ", precision: " << precision
 				<< ", scale: " << scale
-				<< ", size: " << descr.bufsize
-				<< ", len: " << descr.len;
+				<< ", size: " << descrRef->bufsize
+				<< ", len: " << descrRef->len;
 
-			m_colDescr.push_back( descr );
+			m_colDescr.push_back( descrRef );
 			
 			// get next column descriptor (if there is any)
 			counter++;
@@ -519,7 +521,7 @@ const char* TransactionExecStatemachine_oracle::columnName( std::size_t idx)
 		return 0;
 	}
 	
-	const char *rt = m_colDescr[idx-1].name.c_str( );
+	const char *rt = m_colDescr[idx-1]->name.c_str( );
 	return rt;
 }
 
@@ -548,75 +550,115 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	}
 	if( !m_hasRow ) return types::VariantConst( );
 	
-	OracleColumnDescription descr = m_colDescr[idx-1];
+	OracleColumnDescriptionPtr descrRef = m_colDescr[idx-1];
 
-	MOD_LOG_TRACE << "Data "
-		<< ", type: " << descr.dataType
-		<< ", fetchType: " << descr.fetchType
-		<< ", ind: " << descr.ind
-		<< ", errcode: " << descr.errcode;
+	LOG_TRACE << "Data "
+		<< ", type: " << descrRef->dataType
+		<< ", fetchType: " << descrRef->fetchType
+		<< ", ind: " << descrRef->ind
+		<< ", errcode: " << descrRef->errcode;
 
-	if( descr.errcode == 0 ) {
+	if( descrRef->errcode == 0 ) {
 		// ok case, handled below
-	} else if( descr.errcode == 1405 ) {
+	} else if( descrRef->errcode == 1405 ) {
 		// check for NULL value
+		LOG_DATA << "[oracle statement] CALL get(" << idx << ") => NULL";
 		return types::VariantConst();
-	} else if( descr.errcode == 1406 ) {
+	} else if( descrRef->errcode == 1406 ) {
 		// column got truncated, show a message on how
-		if( descr.ind == -2 ) {
+		if( descrRef->ind == -2 ) {
 			errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, we don not know how badly..");
 			return types::VariantConst();		
-		} else if( descr.ind > 0 ) {
-			errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, got only " + boost::lexical_cast<std::string>( descr.ind ) + " bytes, errcode: " + boost::lexical_cast<std::string>( descr.errcode ) );
+		} else if( descrRef->ind > 0 ) {
+			errorStatus( std::string( "value of column (") + boost::lexical_cast<std::string>(idx) + ") got truncated, got only " + boost::lexical_cast<std::string>( descrRef->ind ) + " bytes, errcode: " + boost::lexical_cast<std::string>( descrRef->errcode ) );
 			return types::VariantConst();		
 		} else {
 			errorStatus( std::string( "value of column (" ) + boost::lexical_cast<std::string>(idx) + ") indicated as truncated (OCI-1406), but indicator is ok?!" );
 			return types::VariantConst();		
 		}
 	} else {
-		errorStatus( std::string( "error " ) + boost::lexical_cast<std::string>( descr.errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+		errorStatus( std::string( "error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 		return types::VariantConst();		
 	}
 
 	types::VariantConst rt;
 	
-	switch( descr.dataType ) {
+	switch( descrRef->dataType ) {
 		case SQLT_CHR: {
-			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descr.buf;
-			//~ for (int i = 0; i < descr.bufsize ; i++){
-				//~ printf(" %2x", descr.buf[i]);
+			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descrRef->buf;
+			//~ for (int i = 0; i < descrRef->bufsize ; i++){
+				//~ printf(" %2x", descrRef->buf[i]);
 			//~ }
 			//~ putchar( '\n' );
 			// TODO: enforce Oracle returning UTF8 or UTF16 and then
 			// convert it, the variant takes UTF8 (also on Windows?)
-			rt = descr.buf;
+			rt = descrRef->buf;
 			break;
 		}
 		
 		case SQLT_NUM: {
 			sword status_;
-			unsigned int intval = 0;
-			boolean isInt = 0;
-			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descr.buf, &isInt );
+			sword isInt = 0;		
+			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &isInt );
+			if( !status( status_, Executed ) ) {
+				errorStatus( std::string( "error in OCINumberIsInt for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+				return types::VariantConst( );
+			}
 			if( !isInt ) {
-				// a NULL value, should have indicated NULL state above,
-				// but doesn't
-				rt = types::VariantConst( );
-			} else {
-				status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descr.buf,
-					(ub4)sizeof( intval ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&intval );
-				//~ LOG_DATA << "[Oracle get SQLT_NUM]: " << intval;
+				double doubleval = 0;
+				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+					(ub4)sizeof( doubleval ), (void *)&doubleval );
 				if( status( status_, Executed ) ) {
-					rt = (types::Variant::Data::UInt)intval;
+					rt = doubleval;
 				} else {
 					rt = types::VariantConst( );
+				}
+			} else {
+				sword sign = 0;
+				status_ = OCINumberSign( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &sign );
+				if( !status( status_, Executed ) ) {
+					errorStatus( std::string( "error in OCINumberSign for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+					return types::VariantConst( );
+				}
+
+				if( sign < 0 ) {
+					_WOLFRAME_INTEGER intval = 0;
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+						(ub4)sizeof( _WOLFRAME_INTEGER ), (ub4)OCI_NUMBER_SIGNED, (void *)&intval );
+					if( status( status_, Executed ) ) {
+						//~ LOG_DATA << "[Oracle get SQLT_NUM(signed)]: " << intval;
+						rt = (types::Variant::Data::Int)intval;
+					} else {
+						errorStatus( std::string( "error in OCINumberToInt(signed) for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+						rt = types::VariantConst( );
+					}
+				} else {
+					_WOLFRAME_UINTEGER uintval = 0;
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+						(ub4)sizeof( _WOLFRAME_UINTEGER ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&uintval );
+					if( status( status_, Executed ) ) {
+						//~ LOG_DATA << "[Oracle get SQLT_NUM(unsigned)]: " << uintval;
+						if( uintval <= (_WOLFRAME_UINTEGER)std::numeric_limits<_WOLFRAME_INTEGER>::max( ) ) {
+							rt = (types::Variant::Data::Int)uintval;
+						} else {
+							rt = (types::Variant::Data::UInt)uintval;
+						}
+					} else {
+						errorStatus( std::string( "error in OCINumberToInt(unsigned) for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
+						rt = types::VariantConst( );
+					}
 				}
 			}
 			break;
 		}
+		
+		case SQLT_IBDOUBLE: {
+			rt = types::VariantConst( *((double *)descrRef->buf) );
+			break;
+		}
 					
 		default:
-			errorStatus( std::string( "[Oracle get] unknown data type '" + boost::lexical_cast<std::string>( descr.dataType ) + "' returned in statement '" + m_statement.string() + "'" ) );
+			errorStatus( std::string( "[Oracle get] unknown data type '" + boost::lexical_cast<std::string>( descrRef->dataType ) + "' returned in statement '" + m_statement->originalSQL() + "'" ) );
 			return types::VariantConst();
 	}
 

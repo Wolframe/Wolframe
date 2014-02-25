@@ -1,4 +1,4 @@
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-name=string:trim,string:ucname;
+int=integer;
+uint=unsigned;
+float=float;
+name=trim,ucname;

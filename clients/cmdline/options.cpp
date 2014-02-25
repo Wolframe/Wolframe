@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -59,7 +59,7 @@ struct OptionStruct
 			( "help,h", "print help message")
 			( "uiformdir,u", boost::program_options::value<std::string>(), "directory containing the forms (where to write the uiforms to)")
 			( "outputfile,o", boost::program_options::value<std::string>(), "output file (where to write the request answers to)")
-			( "request,q", boost::program_options::value<std::string>(), "type of requests to process")
+			( "request,q", boost::program_options::value<std::string>(), "request command to process (command in protocol)")
 			( "document,d", boost::program_options::value<std::vector<std::string> >(), "file containing a document of a request to process")
 #ifdef WITH_SSL
 			( "ssl,S", "use SSL encryption")

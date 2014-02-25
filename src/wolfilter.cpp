@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -30,17 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program using wolframe functions to map stdin to stdout
+//\brief Program using wolframe functions to map stdin to stdout
 #include "wolfilterCommandLine.hpp"
 #include "wolfilterIostreamFilter.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
@@ -50,9 +51,6 @@ static const unsigned short APP_MAJOR_VERSION = 0;
 static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
-
-#define DO_STRINGIFY(x)	#x
-#define STRINGIFY(x)	DO_STRINGIFY(x)
 
 int main( int argc, char **argv )
 {
@@ -66,11 +64,7 @@ int main( int argc, char **argv )
 			config::WolfilterCommandLine::print( std::cerr);
 			return 0;
 		}
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR), "");
-#else
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), execdir.string(), "");
-#endif
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
@@ -87,6 +81,7 @@ int main( int argc, char **argv )
 		// Load the modules, scripts, etc. defined in the command line into the global context:
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary programLibrary;
+
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
 
 		if (!processorProvider.resolveDB( databaseProvider))
@@ -101,9 +96,8 @@ int main( int argc, char **argv )
 		// Call the function to execute
 		if (cmdline.inputfile().size())
 		{
-			std::fstream fh;
-			fh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-			fh.open( cmdline.inputfile().c_str(), std::ios::in | std::ios::binary);
+			std::ifstream fh;
+			fh.open( cmdline.inputfile().c_str());
 
 			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
 		}

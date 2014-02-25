@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -52,7 +52,7 @@ OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf 
 						       cfg.connections, cfg.acquireTimeout,
 						       cfg.statementTimeout,
 						       cfg.programFiles());
-	MOD_LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
+	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }
 

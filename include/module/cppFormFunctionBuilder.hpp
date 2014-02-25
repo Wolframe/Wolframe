@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -34,8 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "langbind/cppFormFunction.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -66,6 +67,9 @@ private:
 	const std::string m_name;
 	const langbind::CppFormFunction m_func;
 };
+
+typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructorR;
+
 
 class CppFormFunctionBuilder :public SimpleBuilder
 {

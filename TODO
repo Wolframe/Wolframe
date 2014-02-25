@@ -1,15 +1,13 @@
 OPEN SOURCE PRODUCT MUSTS:
 Core:
+	- Test filetype recognition and put it in (PF)
 	- Connection handling reorganization of existing code (MBa)
 	- Context for processors in provider (MBa & PF)
 	- AAAA stuff to a certain level (MBa, support for protocol PF)
 	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 Processors:
-	- Implement basic DateTime type in Variant
-	- Bring up .NET to the new Variant types (tostring for custom data types for the moment)
-	- .NET tests (PF,ABa as victim)
-	- TDL tests (PF)
+	- TDL tests with random programs of big complexity (PF)
 	- Python (ABa, with support PF)
 	- Custom data type documentation and BigFxp tests (PF)
 Build&Deployment:

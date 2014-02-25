@@ -79,36 +79,32 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/cmdbind/mylang/mod_command_mylang --cmdprogram=example.dmap --program=example.sfrm --program=example.wnmp --program=example.mlg getCDCatalog
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf getCDCatalog
 
-**file:example.sfrm
-FORM CDCatalog
+**file:wolframe.conf
+LoadModules
 {
-	CATALOG
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../wolfilter/modules/cmdbind/mylang/mod_command_mylang
+}
+Processor
+{
+	program ../wolfilter/template/program/mylang/example.mlg
+	program ../wolfilter/template/program/mylang/example.sfrm
+	program ../wolfilter/template/program/mylang/example.wnmp
+	
+	cmdhandler
 	{
-		CD []
+		directmap
 		{
-			TITLE string
-			ARTIST string
-			RELEASE
-			{
-				COUNTRY string
-				COMPANY string
-				PRICE string
-				YEAR int
-			}
+			program ../wolfilter/template/program/mylang/example.dmap
+			filter cjson
 		}
 	}
 }
-**file:example.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-normname=string:convdia,lcname;
-**file:example.dmap
-COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);
-**file:example.mlg
-run
 **output
 {
 	"doctype":	"CDCatalog.simpleform",
@@ -120,7 +116,7 @@ run
 					"COUNTRY":	"USA",
 					"COMPANY":	"COLUMBIA",
 					"PRICE":	"10.90",
-					"YEAR":	"1985"
+					"YEAR":	"1986"
 				}
 			}, {
 				"TITLE":	"EL REI EL CANTINERO",
@@ -129,7 +125,7 @@ run
 					"COUNTRY":	"MEXICO",
 					"COMPANY":	"RCA",
 					"PRICE":	"15.90",
-					"YEAR":	"1958"
+					"YEAR":	"1959"
 				}
 			}, {
 				"TITLE":	"STILL GOT THE BLUES",
@@ -138,7 +134,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"VIRGIN RECORDS",
 					"PRICE":	"10.20",
-					"YEAR":	"1990"
+					"YEAR":	"1991"
 				}
 			}, {
 				"TITLE":	"EROS",
@@ -147,7 +143,7 @@ run
 					"COUNTRY":	"EU",
 					"COMPANY":	"BMG",
 					"PRICE":	"9.90",
-					"YEAR":	"1997"
+					"YEAR":	"1998"
 				}
 			}, {
 				"TITLE":	"ONE NIGHT ONLY",
@@ -156,7 +152,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"POLYDOR",
 					"PRICE":	"10.90",
-					"YEAR":	"1998"
+					"YEAR":	"1999"
 				}
 			}, {
 				"TITLE":	"SYLVIAS MOTHER",
@@ -165,7 +161,7 @@ run
 					"COUNTRY":	"UK",
 					"COMPANY":	"CBS",
 					"PRICE":	"8.10",
-					"YEAR":	"1973"
+					"YEAR":	"1974"
 				}
 			}, {
 				"TITLE":	"ROMANZA",
@@ -174,7 +170,7 @@ run
 					"COUNTRY":	"EU",
 					"COMPANY":	"POLYDOR",
 					"PRICE":	"10.80",
-					"YEAR":	"1996"
+					"YEAR":	"1997"
 				}
 			}]
 	}

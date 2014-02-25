@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -37,8 +37,6 @@
 #include "logger-v1.hpp"
 #include <cstring>
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 namespace lb = _Wolframe::langbind;
@@ -48,16 +46,11 @@ namespace {
 struct CharFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder( "CharFilter", "char", lb::createCharFilterPtr);}
+		{return new FilterBuilder( "CharFilter", "char", lb::createCharFilterType);}
 };
 
 }//anonymous namespace
 
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
@@ -65,6 +58,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	CharFilterObject::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "char filter", 0, 0, NofObjects, objdef);
 
 

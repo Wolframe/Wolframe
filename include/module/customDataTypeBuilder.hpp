@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of form functions
 #ifndef _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
 #define _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include "types/customDataType.hpp"
 #include "types/keymap.hpp"
@@ -48,14 +48,13 @@ namespace module {
 class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
-	CustomDataTypeConstructor( const char* classname_, const char* name_, const types::keymap<types::CreateCustomDataType>& constructormap_)
+	CustomDataTypeConstructor( const char* classname_, const types::keymap<types::CreateCustomDataType>& constructormap_)
 		:m_classname(classname_)
-		,m_name(name_)
 	{
 		types::keymap<types::CreateCustomDataType>::const_iterator ci = constructormap_.begin(), ce = constructormap_.end();
 		for (; ci != ce; ++ci)
 		{
-			types::CustomDataTypeR dt( ci->second( std::string(m_name) + ":" + ci->first));
+			types::CustomDataTypeR dt( ci->second( ci->first));
 			m_typemap.insert( ci->first, dt);
 		}
 	}
@@ -67,21 +66,20 @@ public:
 		return CUSTOM_DATA_TYPE_OBJECT;
 	}
 
-	const types::CustomDataType* object( const std::string& name_) const
-	{
-		ConstructorMap::const_iterator fi = m_typemap.find( name_);
-		if (fi == m_typemap.end()) return 0;
-		return fi->second.get();
-	}
-
 	std::vector<std::string> types() const
 	{
 		return m_typemap.getkeys<std::vector<std::string> >();
 	}
 
+	typedef types::keymap<types::CustomDataTypeR> CustomDataTypeMap;
+	const CustomDataTypeMap& typemap() const
+	{
+		return m_typemap;
+	}
+
 	void getTypeReferences( std::vector<const types::CustomDataType*>& result) const
 	{
-		ConstructorMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
+		CustomDataTypeMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
 		for (; ti != te; ++ti)
 		{
 			result.push_back( ti->second.get());
@@ -93,16 +91,9 @@ public:
 		return m_classname;
 	}
 
-	const char* domain() const
-	{
-		return m_name;
-	}
-
 private:
 	const char* m_classname;
-	const char* m_name;
-	typedef types::keymap<types::CustomDataTypeR> ConstructorMap;
-	ConstructorMap m_typemap;
+	CustomDataTypeMap m_typemap;
 };
 
 typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;
@@ -117,9 +108,8 @@ struct CustomDataTypeDef
 class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:
-	CustomDataTypeBuilder( const char* classname_, const char* name_, const CustomDataTypeDef* typedefs)
+	CustomDataTypeBuilder( const char* classname_, const CustomDataTypeDef* typedefs)
 		:SimpleBuilder(classname_)
-		,m_name(name_)
 	{
 		std::size_t ti = 0;
 		for (; typedefs[ti].name && typedefs[ti].createFunc; ++ti)
@@ -137,11 +127,10 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CustomDataTypeConstructor( objectClassName(), m_name, m_constructormap);
+		return new CustomDataTypeConstructor( objectClassName(), m_constructormap);
 	}
 
 private:
-	const char* m_name;
 	typedef types::keymap<types::CreateCustomDataType> ConstructorMap;
 	ConstructorMap m_constructormap;
 };

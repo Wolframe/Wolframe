@@ -4,9 +4,6 @@
 
 #include "logger-v1.hpp"
 
-// to make linking in this directory possible
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 using namespace std;
 using namespace _Wolframe::log;
 
@@ -14,19 +11,16 @@ using namespace _Wolframe::log;
 
 int main( int argc, char *argv[] )
 {
-	// for modules to log (HACK)
 	LogBackend &logBack = LogBackend::instance( );
-	logBackendPtr = &logBack;
-	
 	logBack.setConsoleLevel( LogLevel::LOGLEVEL_DEBUG );
 
 	if( argc != 5 ) {
 		cerr << "Usage: dbPing <host> <user> <password> <database>" << endl;
 		return 1;
 	}
-	
+
 	int rt = 1;
-	
+
 	char *host = argv[1];
 	char *user = argv[2];
 	char *password = argv[3];
@@ -47,13 +41,13 @@ int main( int argc, char *argv[] )
 	OCISession *authp = 0;
 
 	sword status;
-	
+
 	// create an Oracle OCI environment (global per process), what
 	// options do we really need (charset, mutex, threading, pooling)?
 	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIHandleAlloc( envhp, (dvoid **)&srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 
@@ -68,16 +62,16 @@ int main( int argc, char *argv[] )
 		connStr.empty( ) ? (sb4)0 : (sb4)( connStr.length( ) ),
 		OCI_DEFAULT );
 	if( status != OCI_SUCCESS ) goto cleanup;
-		
+
 	status = OCIAttrSet( svchp, OCI_HTYPE_SVCCTX,
 		srvhp, (ub4)0, OCI_ATTR_SERVER,
-		(OCIError *)errhp );		
+		(OCIError *)errhp );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIHandleAlloc( envhp, (dvoid **)&authp,
 		OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
-	
+
 	status = OCIAttrSet( authp, OCI_HTYPE_SESSION,
 		(dvoid *)user, (ub4)strlen( user ),
 		OCI_ATTR_USERNAME, errhp );
@@ -98,7 +92,7 @@ int main( int argc, char *argv[] )
 
 	// success
 	rt = 0;
-	
+
 cleanup:
 
 	if( srvhp && errhp && authp ) (void)OCISessionEnd( svchp, errhp, authp, OCI_DEFAULT );
@@ -108,6 +102,6 @@ cleanup:
 	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
 	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
 	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
-	
+
 	return rt;
 }

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,6 +35,14 @@
 
 #include "PostgreSQLtransactionExecStatemachine.hpp"
 #include "PostgreSQL.hpp"
+#undef SUBSTITUTE_STATEMENT
+#ifdef SUBSTITUTE_STATEMENT
+#include "PostgreSQLsubstitutingStatement.hpp"
+#define STATEMENT_CLASS PostgreSQLsubstitutingStatement
+#else
+#include "PostgreSQLstatement.hpp"
+#define STATEMENT_CLASS PostgreSQLstatement
+#endif
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -42,7 +50,6 @@
 #include <cstring>
 #include <limits>
 #include <stdexcept>
-#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
@@ -52,6 +59,7 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( cons
 	:TransactionExecStatemachine(name_)
 	,m_state(Init)
 	,m_lastresult(0)
+	,m_statement( new STATEMENT_CLASS( ) )
 	,m_nof_rows(0)
 	,m_idx_row(0)
 	,m_hasResult(false)
@@ -63,6 +71,7 @@ TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
 	if (m_conn) delete m_conn;
 	clear();
+	delete m_statement;
 }
 
 void TransactionExecStatemachine_postgres::clear()
@@ -73,7 +82,7 @@ void TransactionExecStatemachine_postgres::clear()
 		m_lastresult = 0;
 	}
 	m_lasterror.reset();
-	m_statement.clear();
+	m_statement->clear();
 	m_state = Init;
 	m_nof_rows = 0;
 	m_idx_row = 0;
@@ -165,7 +174,7 @@ void TransactionExecStatemachine_postgres::setDatabaseErrorMessage()
 		}
 	}
 	int errorcode = 0;
-	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement->nativeSQL().c_str(), errtype, errmsg, usermsg));
 }
 
 bool TransactionExecStatemachine_postgres::status( PGresult* res, State newstate)
@@ -207,6 +216,7 @@ bool TransactionExecStatemachine_postgres::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbunit->newConnection();
+	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn );
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
@@ -251,7 +261,7 @@ bool TransactionExecStatemachine_postgres::errorStatus( const std::string& messa
 	if (m_state != Error)
 	{
 		const char* dbname = m_conn?PQdb(**m_conn):"POSTGRESQL";
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement->nativeSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;
@@ -269,7 +279,7 @@ bool TransactionExecStatemachine_postgres::start( const std::string& statement)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	m_statement.init( statement);
+	m_statement->init( statement);
 	m_state = CommandReady;
 	return true;
 }
@@ -278,7 +288,7 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "' )";
+		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{
@@ -288,42 +298,13 @@ bool TransactionExecStatemachine_postgres::bind( std::size_t idx, const types::V
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
+
+	try {
+		m_statement->bind( idx, value );
+	} catch( const std::runtime_error &e ) {
+		return errorStatus( e.what( ) );
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of bind parameter out of range (") + boost::lexical_cast<std::string>(idx) + " required to be in range 1.." + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return false;
-	}
-	switch (value.type())
-	{
-		case types::Variant::Null:
-			m_statement.bind( idx, "NULL");
-			break;
-		case types::Variant::Int:
-		case types::Variant::UInt:
-		case types::Variant::Bool:
-		case types::Variant::Double:
-			m_statement.bind( idx, value.tostring());
-			break;
-		case types::Variant::Custom:
-		case types::Variant::String:
-		{
-			std::string strval = value.tostring();
-			char* encvalue = (char*)std::malloc( strval.size() * 2 + 3);
-			encvalue[0] = '\'';
-			boost::shared_ptr<void> encvaluer( encvalue, std::free);
-			int error = 0;
-			size_t encvaluesize = PQescapeStringConn( **m_conn, encvalue+1, strval.c_str(), strval.size(), &error);
-			encvalue[encvaluesize+1] = '\'';
-			std::string bindval( encvalue, encvaluesize+2);
-			m_statement.bind( idx, bindval);
-			break;
-		}
-	}
+	
 	m_state = CommandReady;
 	return true;
 }
@@ -339,9 +320,11 @@ bool TransactionExecStatemachine_postgres::execute()
 		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
-	std::string stmstr = m_statement.expanded();
+	// TODO: or another string which also works when PQexec is used?
+	m_statement->substitute( );
+	std::string stmstr = m_statement->nativeSQL();
 	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
-	m_lastresult = PQexec( **m_conn, stmstr.c_str());
+	m_lastresult = static_cast<STATEMENT_CLASS *>( m_statement )->execute( );
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)
@@ -400,6 +383,20 @@ const DatabaseError* TransactionExecStatemachine_postgres::getLastError()
 	return m_lasterror.get();
 }
 
+// OIDs from the PostgreSQL system catalog pg_type. For system types
+// those constants are fix, so we hard-code them here. For user-defined
+// types and special conversions (even variant plugins) we need a differnt
+// mechanism..
+enum PostgreSQLfieldTypes
+{
+	PGSQL_FIELD_TYPE_BOOLEAN	= 16,	// boolean
+	PGSQL_FIELD_TYPE_INT8		= 20,	// int8
+	PGSQL_FIELD_TYPE_INT4		= 23,	// int4
+	PGSQL_FIELD_TYPE_TEXT		= 25,	// text
+	PGSQL_FIELD_TYPE_FLOAT4		= 700,	// float4
+	PGSQL_FIELD_TYPE_FLOAT8		= 701	// float8
+};
+
 types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 {
 	if (m_state != Executed)
@@ -413,16 +410,59 @@ types::VariantConst TransactionExecStatemachine_postgres::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	if (m_idx_row >= m_nof_rows) return types::VariantConst();
+	
+	// no matter the type, NULL is indicated with PQgetisnull, in this case
+	// resval[0] is 0 (empty string).
+	// TODO: handle binary data for blobs and user-defined types, we
+	// cannot simply force it to a string! In this case there should be
+	// an extension mechanism for the variant type..?
 	char* resval = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
-	if (!resval || resval[0] == '\0')
+	if( PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1 ) )
 	{
-		if (PQgetisnull( m_lastresult, (int)m_idx_row, (int)idx-1))
-		{
-			LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => NULL";
-			return types::VariantConst();
-		}
+		LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => NULL";
+		return types::VariantConst();
 	}
-	types::VariantConst rt( resval);
+
+	// depending on the system type we try to keep as much type information
+	// as possible in the next upper layer
+	Oid type = PQftype( m_lastresult, (int)idx-1);
+	types::VariantConst rt;
+	switch( type )
+	{
+		case PGSQL_FIELD_TYPE_BOOLEAN:
+			if( strcmp( resval, "t" ) == 0 ) {
+				rt = types::VariantConst( true );
+			} else if( strcmp( resval, "f" ) == 0 ) {
+				rt = types::VariantConst( false );
+			} else {
+				// tertium non datur
+				errorStatus( std::string( "unexpected value '" ) + resval + "' for boolean type" );
+				rt = types::VariantConst();
+			}
+			break;
+				
+		case PGSQL_FIELD_TYPE_INT4:
+		case PGSQL_FIELD_TYPE_INT8:
+			rt = types::VariantConst( resval );
+			rt.convert( types::Variant::Int );
+			//~ rt = types::VariantConst( rt.toint( ) );
+			break;
+		
+		case PGSQL_FIELD_TYPE_FLOAT4:
+		case PGSQL_FIELD_TYPE_FLOAT8:
+			rt = types::VariantConst( resval );
+			rt = types::VariantConst( rt.todouble( ) );
+			break;
+			
+		case PGSQL_FIELD_TYPE_TEXT:
+			rt = types::VariantConst( resval );
+			break;
+			
+		default:
+			LOG_DATA << "[postgresql statement] unknown Postgresql type '" << type << "' in column " << idx << ", assuming string";
+			rt = types::VariantConst( resval );
+	}
+		
 	LOG_DATA << "[postgresql statement] CALL get(" << idx << ") => " << rt.typeName() << " '" << rt.tostring() << "'";
 	return rt;
 }

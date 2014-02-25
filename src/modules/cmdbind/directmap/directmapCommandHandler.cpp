@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -57,7 +57,10 @@ const std::string& DirectmapContext::filter( const std::string& docformat) const
 	if (ki == m_filtermap.end())
 	{
 		ki = m_filtermap.find( std::string());
-		if (ki == m_filtermap.end()) throw std::runtime_error( "document format not defined");
+		if (ki == m_filtermap.end())
+		{
+			throw std::runtime_error( std::string("filter for document format '") + docformat + "' not defined");
+		}
 	}
 	return ki->second;
 }
@@ -313,10 +316,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				m_state = 4;
 				/* no break here ! */
 			case 4:
+			{
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
+				langbind::TypedInputFilterR res = m_functionclosure->result();
 				if (!m_cmd->command_has_result)
 				{
-					langbind::TypedInputFilterR res = m_functionclosure->result();
 					langbind::InputFilter::ElementType typ;
 					types::VariantConst element;
 
@@ -338,7 +342,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
 					if (!formparser.call())
 					{
-						throw std::logic_error( "output form serialization not complete");
+						throw std::runtime_error( "internal: output form serialization not complete");
 					}
 					m_outputform_serialize.reset( new serialize::DDLStructSerializer( m_outputform.get()));
 					m_outputprinter.init( m_outputform_serialize, m_output);
@@ -362,6 +366,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 				}
 				/* no break here ! */
+			}
 			case 5:
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
@@ -424,6 +429,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 		m_errormsg = e.what();
 		err = m_errormsg.c_str();
 		return IOFilterCommandHandler::Error;
+	}
+	catch (const std::logic_error& e)
+	{
+		LOG_FATAL << "logic error processing request: " << e.what();
+		throw e;
 	}
 }
 

@@ -46,22 +46,36 @@
     }
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_string.wnmp --program trees.sfrm --cmdprogram echo_input_doctype_table.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**file:simpleform_string.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
-normname=string:convdia,ucname;
-**file: echo_input_doctype_table.lua
-function run()
-	type = input:doctype()
-	output:as( filter(), type)
-	output:print( input:table())
-end
-**file: trees.sfrm
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program		normalize.wnmp
+	program		form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
+int=integer;
+uint=unsigned;
+float=floatingpoint ;
+currency= fixedpoint(13,2);
+percent_1=fixedpoint( 5 ,1);
+normname =convdia,ucname;
+**file:form.sfrm
 STRUCT MulTreeNode
 {
 	id		@int
@@ -85,8 +99,12 @@ FORM trees
 		btree	BinTreeNode
 	}
 }
-
-
+**file:script.lua
+function run()
+	type = input:doctype()
+	output:as( filter(), type)
+	output:print( input:table())
+end
 **output
 {
 	"doctype":	"trees",

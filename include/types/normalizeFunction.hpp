@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -48,15 +48,63 @@ class Variant;
 
 //\class NormalizeFunction
 //\brief Basic normalization function for atomic values (variant type)
-struct NormalizeFunction
+class NormalizeFunction
 {
+public:
 	virtual ~NormalizeFunction(){}
 	virtual const char* name() const=0;
 	virtual Variant execute( const Variant& i) const=0;
 };
 
-//\brief Shared ownership reference to normalizatio functions for atomic values (variant type)
+//\brief Shared ownership reference to normalization function for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunction> NormalizeFunctionR;
+
+
+class NormalizeResourceHandle
+{
+public:
+	NormalizeResourceHandle(){}
+	virtual ~NormalizeResourceHandle(){}
+};
+
+typedef boost::shared_ptr<NormalizeResourceHandle> NormalizeResourceHandleR;
+
+
+typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandle)();
+typedef NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::string& arg);
+
+//\class NormalizeFunctionType
+//\brief Class of basic normalization functions instantiated by arguments
+class NormalizeFunctionType
+{
+public:
+	explicit NormalizeFunctionType( CreateNormalizeFunction c=0)
+		:m_createFunction(c){}
+	explicit NormalizeFunctionType( CreateNormalizeFunction c, const NormalizeResourceHandleR& resources_)
+		:m_createFunction(c),m_resources(resources_){}
+	NormalizeFunctionType( const NormalizeFunctionType& o)
+		:m_createFunction(o.m_createFunction),m_resources(o.m_resources){}
+	~NormalizeFunctionType(){}
+
+	NormalizeFunction* createFunction( const std::string& arg) const
+	{
+		if (m_createFunction)
+		{
+			return m_createFunction( m_resources.get(), arg);
+		}
+		else
+		{
+			return 0;
+		}
+		
+	}
+private:
+	CreateNormalizeFunction m_createFunction;
+	NormalizeResourceHandleR m_resources;
+};
+
+
+
 
 //\class NormalizeFunctionMap
 //\brief Map of basic normalization functions for atomic values (variant type)
@@ -68,20 +116,6 @@ struct NormalizeFunctionMap
 
 //\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunctionMap> NormalizeFunctionMapR;
-
-
-class NormalizeResourceHandle
-{
-public:
-	NormalizeResourceHandle(){}
-	virtual ~NormalizeResourceHandle(){}
-};
-
-typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandleFunction)();
-
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef types::NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::string& arg);
 
 }}//namespace
 #endif

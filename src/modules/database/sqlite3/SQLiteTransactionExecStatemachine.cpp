@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -34,11 +34,11 @@
 ///\file SQLiteTransactionExecStatemachine.cpp
 #include "SQLiteTransactionExecStatemachine.hpp"
 #include "SQLite.hpp"
+#include "SQLiteStatement.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
-#include <limits>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
@@ -54,43 +54,6 @@ static int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_st
 	LOG_DATA << "call sqlite3_prepare_v2 '" << ((n<0)?std::string(s):std::string(s,n)) << "'";
 	return sqlite3_prepare_v2( c, s, n, stm, t);
 }
-static std::size_t wrap_sqlite3_bind_parameter_count( sqlite3_stmt* stm)
-{
-	std::size_t rt = sqlite3_bind_parameter_count(stm);
-	LOG_DATA << "call sqlite3_bind_parameter_count returns " << rt;
-	return rt;
-}
-static int wrap_sqlite3_bind_text( sqlite3_stmt* stm, int idx, const char* s, int n, void(*f)(void*))
-{
-	int rt = sqlite3_bind_text( stm, idx, s, n, f);
-	LOG_DATA << "call sqlite3_bind_text " << idx << " '" << ((n<0)?std::string(s):std::string(s,n)) << "' returns " << rt;
-	return rt;
-}
-static int wrap_sqlite3_bind_int( sqlite3_stmt* stm, int idx, int val)
-{
-	int rt = sqlite3_bind_int( stm, idx, val);
-	LOG_DATA << "call sqlite3_bind_int " << idx << " " << val << " returns " << rt;
-	return rt;
-}
-static int wrap_sqlite3_bind_int64( sqlite3_stmt* stm, int idx, types::Variant::Data::Int val)
-{
-	int rt = sqlite3_bind_int64( stm, idx, val);
-	LOG_DATA << "call sqlite3_bind_int64 " << idx << " " << val << " returns " << rt;
-	return rt;
-}
-static int wrap_sqlite3_bind_double( sqlite3_stmt* stm, int idx, double val)
-{
-	int rt = sqlite3_bind_double( stm, idx, val);
-	LOG_DATA << "call sqlite3_bind_double " << idx << " " << val << " returns " << rt;
-	return rt;
-}
-static int wrap_sqlite3_bind_null( sqlite3_stmt* stm, int idx)
-{
-	int rt = sqlite3_bind_null( stm, idx);
-	LOG_DATA << "call sqlite3_bind_null " << idx << " returns " << rt;
-	return rt;
-}
-
 
 TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_)
 	:TransactionExecStatemachine(name_)
@@ -100,6 +63,7 @@ TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const 
 	,m_stm(0)
 	,m_dbunit(dbunit_)
 	,m_conn(0)
+	,m_statement( new SQLiteStatement( ) )
 {}
 
 TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
@@ -118,11 +82,14 @@ void TransactionExecStatemachine_sqlite3::clear()
 	m_hasResult = false;
 	m_hasRow = false;
 	m_curstm.clear();
+	m_statement->clear();
 	m_state = Init;
 }
 
 void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 {
+	// Aba: we cannot map those globally! They depende on
+	// the function which was called before..
 	int errcode = sqlite3_errcode( **m_conn);
 #if SQLITE_VERSION_NUMBER >= 3006005
 	int extcode = sqlite3_extended_errcode( **m_conn);
@@ -133,7 +100,8 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 	const char* errtype = 0;
 	switch (errcode)
 	{
-		case SQLITE_ERROR: errtype = "DATABASE"; break;
+		// Aba: HACK for now "SYNTAX", not "DATABASE".
+		case SQLITE_ERROR: errtype = "SYNTAX"; break;
 		case SQLITE_INTERNAL: errtype = "INTERNAL"; break;
 		case SQLITE_PERM: errtype = "PRIVILEGE"; break;
 		case SQLITE_ABORT: errtype = "EXCEPTION"; break;
@@ -275,6 +243,8 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& statement)
 	const char *stmtail = 0;
 
 	int rc = wrap_sqlite3_prepare_v2( **m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
+	m_statement->init( m_curstm);
+	static_cast<SQLiteStatement *>( m_statement )->setStatement( m_stm );
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -294,7 +264,7 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 {
 	if (value.defined())
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << types::Variant::typeName( value.type()) << " )";
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "', " << value.typeName( ) << " )";
 	}
 	else
 	{
@@ -304,53 +274,28 @@ bool TransactionExecStatemachine_sqlite3::bind( std::size_t idx, const types::Va
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
-	{
-		return errorStatus( std::string( "bind index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
+
+	try {
+		m_statement->bind( idx, value );
+		int rc = static_cast<SQLiteStatement *>( m_statement )->getLastStatus( );
+		return status( rc, CommandReady );
+	} catch( const std::runtime_error &e ) {
+		return errorStatus( e.what( ) );
 	}
-	std::size_t stmcnt = (std::size_t)wrap_sqlite3_bind_parameter_count( m_stm);
-	if (idx > stmcnt)
-	{
-		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm + ")");
-	}
-	switch (value.type())
-	{
-		case types::Variant::Null:
-			return status( wrap_sqlite3_bind_null( m_stm, (int)idx), CommandReady);
-		case types::Variant::Bool:
-			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.tobool()), CommandReady);
-		case types::Variant::Int:
-			return status( wrap_sqlite3_bind_int( m_stm, (int)idx, value.toint()), CommandReady);
-		case types::Variant::UInt:
-			if (value.touint() < (types::Variant::Data::UInt)( std::numeric_limits<types::Variant::Data::Int>::max() ))
-			{
-				return status( wrap_sqlite3_bind_int64( m_stm, (int)idx, value.touint()), CommandReady);
-			}
-			else
-			{
-				std::string strval( value.tostring());
-				return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), CommandReady);
-			}
-		case types::Variant::Double:
-			return status( wrap_sqlite3_bind_double( m_stm, (int)idx, value.todouble()), CommandReady);
-		case types::Variant::String:
-			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, value.charptr(), value.charsize(), SQLITE_STATIC), CommandReady);
-		case types::Variant::Custom:
-		{
-			std::string strval( value.tostring());
-			return status( wrap_sqlite3_bind_text( m_stm, (int)idx, strval.c_str(), strval.size(), SQLITE_STATIC), CommandReady);
-		}
-	}
-	return errorStatus( std::string( "cannot bind parameter of this type '") + types::Variant::typeName( value.type()) + "'");
+	return true;
 }
 
 bool TransactionExecStatemachine_sqlite3::execute()
 {
-	LOG_TRACE << "[sqlite3 statement] CALL execute()";
+
+	m_statement->substitute( );
+	std::string stmstr = m_statement->nativeSQL();
+	LOG_TRACE << "[sqlite3 statement] CALL execute(" << stmstr << ")";
 	if (m_state != CommandReady)
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
+
 	int rc = sqlite3_step( m_stm);
 	if (rc == SQLITE_ROW)
 	{
@@ -451,11 +396,27 @@ types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 		return types::VariantConst();
 	}
 	int restype = sqlite3_column_type( m_stm, (int)idx-1);
+	const char *dbtype = sqlite3_column_decltype( m_stm, (int)idx-1);
 	if (restype == SQLITE_INTEGER)
 	{
+		types::VariantConst rt;
+		
 		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
-		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER " << resval;
-		return types::VariantConst( (types::Variant::Data::Int)resval);
+		if( dbtype != NULL && strcmp( dbtype, "BOOLEAN" ) == 0 ) {
+			if( resval == 1 ) {
+				rt = types::VariantConst( true );
+			} else if( resval == 0 ) {
+				rt = types::VariantConst( false );
+			} else {
+				// tertium non datur
+				errorStatus( std::string( "unexpected value '" ) + boost::lexical_cast<std::string>(resval) + "' for boolean type" );
+				rt = types::VariantConst();
+			}
+		} else {
+			rt = (types::Variant::Data::Int)resval;
+		}
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER(" << dbtype <<  ") " << rt;
+		return rt;
 	}
 	else if (restype == SQLITE_FLOAT)
 	{

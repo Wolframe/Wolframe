@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -45,8 +45,8 @@ DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& co
 	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
 
 	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << cfg.m_identifier << "'";
+	LOG_DEBUG << "Database authenticator container created for '"
+		  << cfg.m_identifier << "'";
 	return m_auth;
 }
 

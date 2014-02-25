@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -52,7 +52,7 @@ DBauditor::DBauditor( const std::string& dbLabel )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauditContainer" );
 
-	MOD_LOG_DEBUG << "Database auditor created with database reference '" << m_dbLabel << "'";
+	LOG_DEBUG << "Database auditor created with database reference '" << m_dbLabel << "'";
 }
 
 DBauditor::~DBauditor()
@@ -64,11 +64,11 @@ bool DBauditor::resolveDB( const db::DatabaseProvider& db )
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			MOD_LOG_TRACE << "Database audit: database reference '" << m_dbLabel << "' resolved";
+			LOG_TRACE << "Database audit: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
-			MOD_LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
+			LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
 	}

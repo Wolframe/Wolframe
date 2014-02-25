@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -32,8 +32,8 @@
 ************************************************************************/
 //\brief Implementation of loading programs for token normalization
 //\file prgbind_normalizeProgram.cpp
-
 #include "prgbind/normalizeProgram.hpp"
+#include "types/customDataNormalizer.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "types/customDataType.hpp"
@@ -47,74 +47,30 @@
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-class CustomDataNormalizer
-	:public types::NormalizeFunction
+static types::NormalizeFunctionR createBaseFunction( const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
 {
-public:
-	CustomDataNormalizer( const std::string& name_, const std::string& arg, const types::CustomDataType* type_)
-		:m_name(name_)
-		,m_type(type_)
-		,m_initializer(type_->createInitializer(arg))
-	{}
-
-	virtual ~CustomDataNormalizer()
-	{
-		if (m_initializer) delete m_initializer;
-	}
-
-	virtual const char* name() const
-	{
-		return m_name.c_str();
-	}
-
-	types::Variant execute( const types::Variant& i) const
-	{
-		types::Variant rt( m_type, m_initializer);
-		rt.data().value.Custom->assign( i);
-		return rt;
-	}
-
-private:
-	std::string m_name;
-	const types::CustomDataType* m_type;
-	types::CustomDataInitializer* m_initializer;
-};
-
-static types::NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<module::NormalizeFunctionConstructorR>& funConstructormap, const types::keymap<module::CustomDataTypeConstructorR>& typeConstructormap)
-{
-	if (domain.empty()) throw std::runtime_error( "namespace of function not defined");
-	types::keymap<module::NormalizeFunctionConstructorR>::const_iterator fi = funConstructormap.find( domain);
-	types::keymap<module::CustomDataTypeConstructorR>::const_iterator ti = typeConstructormap.find( domain);
 	try
 	{
-		types::NormalizeFunction* rt = 0;
-		if (fi != funConstructormap.end())
+		const types::NormalizeFunctionType* normalizer = prglibrary.getNormalizeFunctionType( name);
+		const types::CustomDataType* customtype = prglibrary.getCustomDataType( name);
+		if (normalizer)
 		{
-			rt = fi->second->object( name, arg);
-			if (!rt)
-			{
-				throw std::runtime_error( std::string("could not build normalize function '") + domain + ":" + name + "(" + arg + ")'");
-			}
+			if (customtype) throw std::runtime_error( std::string( "amgibuus definition of custom data type and normalize function '") + name + "'");
+			return types::NormalizeFunctionR( normalizer->createFunction( arg));
+;
 		}
-		if (ti != typeConstructormap.end())
+		else if (customtype)
 		{
-			if (rt) 
-			{
-				delete rt;
-				throw std::runtime_error( std::string("amgibuus definition of custom data type and normalize function '") + domain + "'");
-			}
-			const types::CustomDataType* tp = ti->second->object( name);
-			rt = new CustomDataNormalizer( name, arg, tp);
+			return types::NormalizeFunctionR( new types::CustomDataNormalizer( name, arg, customtype));
 		}
-		if (!rt)
+		else
 		{
-			throw std::runtime_error( std::string("no normalize function or custom data type constructor defined for namespace '") + domain + "'");
+			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + name + "'");
 		}
-		return rt;
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string("could not build normalizer for '") + domain + ":" + name + "(" + arg + ")' :" + err.what());
+		throw std::runtime_error( std::string("could not build normalizer for '") + name + "(" + arg + ")' :" + err.what());
 	}
 }
 
@@ -163,7 +119,7 @@ private:
 
 
 static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
-	loadSource( const std::string& source, const types::keymap<module::NormalizeFunctionConstructorR>& funcConstructormap, const types::keymap<module::CustomDataTypeConstructorR>& typeConstructormap)
+	loadSource( const std::string& source, const ProgramLibrary& prglibrary)
 {
 	std::vector<std::pair<std::string,types::NormalizeFunctionR> > rt;
 	config::PositionalErrorMessageBase ERROR(source);
@@ -188,7 +144,6 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
 			}
 			CombinedNormalizeFunction funcdef( prgname);
-			std::string domain;
 
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
@@ -206,24 +161,12 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					default:
 						if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
 				}
-				if ((':' == utils::gotoNextToken( si, se)))
-				{
-					domain = funcname;
-					funcname.clear();
-					++si;
-					switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
-					{
-						case '\0': throw ERROR( si, "unexpected end of program");
-						default:
-							if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
-					}
-				}
 				switch ((ch=utils::gotoNextToken( si, se)))
 				{
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( domain, funcname, "", funcConstructormap, typeConstructormap)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, "", prglibrary)));
 						++si;
 						continue;
 					case '(':
@@ -234,7 +177,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
 							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
 						}
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( domain, funcname, std::string( argstart, si-1), funcConstructormap, typeConstructormap)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::string( argstart, si-1), prglibrary)));
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{
@@ -279,12 +222,12 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 	try
 	{
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> > funclist
-			= loadSource( utils::readSourceFileContent( filename), library.normalizeFunctionConstructorMap(), library.customDataTypeConstructorMap());
+			= loadSource( utils::readSourceFileContent( filename), library);
 
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
 		for (; ni != ne; ++ni)
 		{
-			library.defineNormalizeFunction( ni->first, ni->second);
+			library.defineDDLTypeNormalizer( ni->first, ni->second);
 		}
 	}
 	catch (const config::PositionalErrorException& e)

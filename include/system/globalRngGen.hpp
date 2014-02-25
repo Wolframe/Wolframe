@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,21 +38,38 @@
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
-#include "singleton.hpp"
+
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
 
 namespace _Wolframe	{
 
-class RandomGenerator : public Singleton< RandomGenerator >
+class RandomGenerator
 {
 public:
+	~RandomGenerator();
+
+	WOLFRAME_EXPORT static RandomGenerator& instance();
+	WOLFRAME_EXPORT static RandomGenerator& instance( const std::string &rndDev );
+
+	WOLFRAME_EXPORT void device( const std::string &rndDev );
+	WOLFRAME_EXPORT const std::string& device() const;
+	WOLFRAME_EXPORT unsigned random() const;
+	WOLFRAME_EXPORT void generate( unsigned char* buffer, size_t bytes ) const;
+
+protected:
 	RandomGenerator();
 	RandomGenerator( const std::string &rndDev );
 
-	const std::string& device() const	{ return m_device; }
-	unsigned random() const;
-	void generate( unsigned char* buffer, size_t bytes ) const;
-
 private:
+	// make it noncopyable
+	RandomGenerator( const RandomGenerator& );
+	const RandomGenerator& operator= ( const RandomGenerator& );
+
+	// Real object data
 	std::string	m_device;		///< random generator device
 };
 

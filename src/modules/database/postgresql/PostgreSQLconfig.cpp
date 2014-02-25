@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -114,7 +114,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
 				sslMode = "verify-full";
 			else	{
-				MOD_LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
+				LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
 				retVal = false;
 			}
 		}
@@ -164,21 +164,21 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			}
 		}
 		else	{
-			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					<< L1it->first << "'";
 		}
 	}
 	if ( !sslCert.empty() && sslKey.empty() )	{
-		MOD_LOG_FATAL << logPrefix() << "SSL certificate configured but no SSL key specified";
+		LOG_FATAL << logPrefix() << "SSL certificate configured but no SSL key specified";
 		retVal = false;
 	}
 	if ( !sslCert.empty() && sslKey.empty() )	{
-		MOD_LOG_FATAL << logPrefix() << "SSL key configured but no SSL certificate specified";
+		LOG_FATAL << logPrefix() << "SSL key configured but no SSL certificate specified";
 		retVal = false;
 	}
 	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
 	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
-		MOD_LOG_FATAL << logPrefix() << "server SSL certificate requested but no root CA specified";
+		LOG_FATAL << logPrefix() << "server SSL certificate requested but no root CA specified";
 		retVal = false;
 	}
 	if ( ! connDefined )
@@ -200,7 +200,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		sslCert = utils::getCanonicalPath( sslCert, refPath);
 /* Aba: avoid "suggest explicit braces to avoid ambiguous ‘else’ [-Wparentheses]" */
 		if ( oldPath != sslCert ) {
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -208,7 +208,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslKey;
 		sslKey = utils::getCanonicalPath( sslKey, refPath );
 		if ( oldPath != sslKey ) {
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -216,7 +216,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslRootCert;
 		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
 		if ( oldPath != sslRootCert ) {
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -224,7 +224,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslCRL;
 		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
 		if ( oldPath != sslCRL ) {
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -233,7 +233,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
 		if ( oldPath != *it ) {
-/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -294,7 +294,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 bool PostgreSQLconfig::check() const
 {
 	if ( connections == 0 )	{
-		MOD_LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
 		return false;
 	}
 	return true;

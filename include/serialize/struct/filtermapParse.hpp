@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -35,6 +35,9 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
@@ -70,6 +73,8 @@ bool parseValue_uchar( unsigned char*, const types::VariantConst& element);
 bool parseValue_float( float*, const types::VariantConst& element);
 bool parseValue_double( double*, const types::VariantConst& element);
 bool parseValue_string( std::string*, const types::VariantConst& element);
+bool parseValue_datetime( types::DateTime*, const types::VariantConst& element);
+bool parseValue_bignumber( types::BigNumber*, const types::VariantConst& element);
 
 bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
 
@@ -100,6 +105,10 @@ template <> bool parseValue_<double>( void* value, const types::VariantConst& el
 {return parseValue_double( (double*)value, element);}
 template <> bool parseValue_<std::string>( void* value, const types::VariantConst& element)
 {return parseValue_string( (std::string*)value, element);}
+template <> bool parseValue_<types::DateTime>( void* value, const types::VariantConst& element)
+{return parseValue_datetime( (types::DateTime*)value, element);}
+template <> bool parseValue_<types::BigNumber>( void* value, const types::VariantConst& element)
+{return parseValue_bignumber( (types::BigNumber*)value, element);}
 
 template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)

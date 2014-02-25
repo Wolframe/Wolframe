@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -231,7 +231,7 @@ struct LuaObject
 		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
-			luaL_error( ls, "reserved global variable '%s' has been changed", name);
+			luaL_error( ls, "undefined global variable '%s'", name);
 			return 0;
 		}
 		ObjectType* rt = obj->ref();
@@ -316,7 +316,7 @@ public:
 
 	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
-		return m_provider->normalizeFunction( name);
+		return m_provider->typeNormalizer( name);
 	}
 
 private:
@@ -588,7 +588,7 @@ static void getVariantValue( lua_State* ls, types::VariantConst& val, int idx)
 			{
 				throw std::runtime_error( "custom data type expected in case of user defined type for atomic 'variant type' argument");
 			}
-			val.init( custom->get());
+			val.init( *custom->get());
 			break;
 		}
 		default:
@@ -633,11 +633,34 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 			lua_pushnumber( ls, val.todouble());
 			break;
 
+		case types::Variant::Timestamp:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				std::string strval = val.tostring();
+				lua_pushlstring( ls, strval.c_str(), strval.size());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			}
+			break;
+		}
+
+		case types::Variant::BigNumber:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				std::string strval = val.tostring();
+				lua_pushlstring( ls, strval.c_str(), strval.size());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			}
+			break;
+		}
+
 		case types::Variant::String:
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
 				lua_pushlstring( ls, val.charptr(), val.charsize());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			}
 			break;
 		}
@@ -667,7 +690,7 @@ LUA_FUNCTION_THROWS( "normalizer(..)", function_normalizer)
 	const char* name = lua_tostring( ls, 1);
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 
-	const types::NormalizeFunction* func = ctx->normalizeFunction( name);
+	const types::NormalizeFunction* func = ctx->typeNormalizer( name);
 	if (!func) throw std::runtime_error( std::string("normalizer '") + name + "' not defined");
 
 	lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
@@ -924,9 +947,7 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 {
 	int nn = lua_gettop( ls);
 	const char* initializerString = 0;
-	std::string arg;
-	const char* domainName = 0;
-	const char* typeName = 0;
+	std::string typeName;
 	if (nn > 1)
 	{
 		if (nn > 2) throw std::runtime_error( "too many arguments");
@@ -936,20 +957,14 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	{
 		throw std::runtime_error( "too few arguments");
 	}
-	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected string as first argument");
-	arg.append( lua_tostring( ls, 1));
-	std::string::iterator ai = arg.begin();
-	for (;ai != arg.end() && *ai != ':'; ++ai){}
-	if (ai == arg.end()) throw std::runtime_error( "namespace identifier missing in name of type (namespace:type)");
-	*ai = '\0';
-	domainName = arg.c_str();
-	typeName = arg.c_str() + (ai - arg.begin()) + 1;
+	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected typename (string) as first argument");
+	typeName.append( lua_tostring( ls, 1));
 
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-	const types::CustomDataType* typ = ctx->customDataType( domainName, typeName);
+	const types::CustomDataType* typ = ctx->customDataType( typeName);
 	if (!typ)
 	{
-		throw std::runtime_error( std::string( "type '") + domainName + ":" + typeName + "' not defined");
+		throw std::runtime_error( std::string( "type '") + typeName + "' not defined");
 	}
 	types::CustomDataInitializerR ini;
 	if (initializerString) 
@@ -2319,11 +2334,53 @@ static const luaL_Reg customvalue_methodtable[ 14] =
 	{0,0}
 };
 
+static std::string getLuaErrorMessage( lua_State* ls, int index, const std::string& path)
+{
+	std::string rt;
+	const char* msg = lua_tostring( ls, index);
+	if (!msg) msg = "";
+	std::string scriptfilename( utils::getFileStem( path));
+	const char* fp = std::strstr( msg, "[string \"");
+	const char* ep = 0;
+	if (fp) ep = std::strchr( fp, ']');
+
+	if (fp && ep)
+	{
+		rt.append( msg, fp - msg);
+		rt.push_back( '[');
+		rt.append( scriptfilename);
+		rt.append( ep);
+	}
+	else
+	{
+		rt.append( msg);
+	}
+	return rt;
+}
+
+static LuaDump* createLuaScriptDump( const std::string& path)
+{
+	lua_State* ls = luaL_newstate();
+	if (!ls) throw std::runtime_error( "failed to create lua state");
+	std::string content = utils::readSourceFileContent( path);
+
+	if (luaL_loadbuffer( ls, content.c_str(), content.size(), path.c_str()))
+	{
+		std::ostringstream buf;
+		buf << "Failed to load script '" << path << "':" << getLuaErrorMessage( ls, -1, path);
+		lua_close( ls);
+		throw std::runtime_error( buf.str());
+	}
+	LuaDump* rt = luaCreateDump( ls);
+	lua_close( ls);
+	return rt;
+}
+
 LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
 {
 	// Load the source of the script from file
-	m_content = utils::readSourceFileContent( m_path);
+	m_content = boost::shared_ptr<LuaDump>( createLuaScriptDump( m_path), freeLuaDump);
 	std::map<std::string,bool> sysfuncmap;
 
 	// Fill the map of all system functions to exclude them from the list of exported functions:
@@ -2372,26 +2429,7 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleM
 
 std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
 {
-	std::string rt;
-	const char* msg = lua_tostring( ls_, index);
-	if (!msg) msg = "";
-	std::string scriptfilename( utils::getFileStem( script()->path()));
-	const char* fp = std::strstr( msg, "[string \"");
-	const char* ep = 0;
-	if (fp) ep = std::strchr( fp, ']');
-
-	if (fp && ep)
-	{
-		rt.append( msg, fp - msg);
-		rt.push_back( '[');
-		rt.append( scriptfilename);
-		rt.append( ep);
-	}
-	else
-	{
-		rt.append( msg);
-	}
-	return rt;
+	return getLuaErrorMessage( ls_, index, script()->path());
 }
 
 std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
@@ -2433,12 +2471,9 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 		lua_pushvalue( m_ls, -1);
 		m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
 
-		if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
-		{
-			std::ostringstream buf;
-			buf << "Failed to load script '" << m_script->path() << "':" << luaErrorMessage( m_ls, -1);
-			throw std::runtime_error( buf.str());
-		}
+		// load script content from dump:
+		luaLoadDump( m_ls, m_script->content());
+
 		// open standard lua libraries (we load all of them):
 		luaL_openlibs( m_ls);
 

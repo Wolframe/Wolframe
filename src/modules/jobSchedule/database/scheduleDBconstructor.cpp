@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -45,7 +45,7 @@ JobScheduleDB* JobScheduleDBconstructor::object( const config::NamedConfiguratio
 	const JobScheduleDBconfig& cfg = dynamic_cast< const JobScheduleDBconfig& >( conf );
 
 	JobScheduleDB* m_schedule = new JobScheduleDB( cfg.m_dbConfig );
-	MOD_LOG_TRACE << "Schedule database container created";
+	LOG_TRACE << "Schedule database container created";
 	return m_schedule;
 }
 

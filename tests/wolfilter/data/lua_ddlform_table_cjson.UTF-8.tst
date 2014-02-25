@@ -40,15 +40,60 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_range.wnmp --program employee_assignment_print.sfrm --cmdprogram ddlform_table.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**file:simpleform_range.wnmp
-iNt=number:integer(10);
-uint=numbeR:unsigned(10);
-float=number:fLoat(10,10);
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
-**file: ddlform_table.lua
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program		normalize.wnmp
+	program		form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
+iNt=integer( 10);
+uint=unsigneD(10 );
+float=fLoatingpoint(10,  10);
+currency=fiXedpoint(13 ,2);
+percent_1=fixedpoint (5,1);
+**file:form.sfrm
+FORM Employee
+{
+	firstname string
+	surname string
+	phone string
+}
+
+FORM employee_assignment_print
+{
+	assignmentlist
+	{
+		assignment []
+		{
+			task []
+			{
+				title string
+				key string
+				customernumber int
+			}
+			employee Employee
+			issuedate string
+		}
+	}
+}
+**file:script.lua
 
 function readTable( itr)
 	local tab = {}
@@ -130,33 +175,6 @@ function run()
 	r:fill( t)
 	printTable( r:table())
 end
-
-**file: employee_assignment_print.sfrm
-FORM Employee
-{
-	firstname string
-	surname string
-	phone string
-}
-
-FORM employee_assignment_print
-{
-	assignmentlist
-	{
-		assignment []
-		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
-		}
-	}
-}
-
 **output
 {
 	"assignmentlist":	{

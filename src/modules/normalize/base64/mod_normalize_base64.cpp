@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,15 +36,8 @@
 #include "logger-v1.hpp"
 #include "base64Normalize.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static NormalizeFunctionDef normalizeFunctions[] =
 {
@@ -59,7 +52,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "Base64Normalizer", "base64", normalizeFunctions);
+		return new NormalizeFunctionBuilder( "Base64Normalizer", normalizeFunctions);
 	}
 };
 }//anonymous namespace
@@ -70,5 +63,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	NormalizeProcessor::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "base64 encode/decode as normalizer", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "base64 encode/decode as normalizer", 0, 0, NofObjects, objdef);
 

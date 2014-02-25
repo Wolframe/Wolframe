@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,15 +36,8 @@
 #include "mylangFunctionProgramType.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
-
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 static SimpleBuilder* mylangProgramTypeBuilder()
 {
@@ -59,7 +52,6 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 };
 
 ModuleEntryPoint entryPoint( 0, "form function handler for mylang",
-				setModuleLogger,
 				NofConfiguredBuilder, 0,
 				NofSimpleBuilder, simpleBuilder);
 

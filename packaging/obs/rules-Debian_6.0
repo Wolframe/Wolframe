@@ -74,6 +74,10 @@ install: build
 		sysconfdir=/etc \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
 
+	# provide our own wolframe configuration file
+	cp packaging/debian/wolframe.conf \
+		/usr/src/packages/BUILD/debian/wolframe/etc/wolframe/.
+
 	# database modules depend on the database client library, each of them in its own package
 	cd src/modules/database; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
@@ -165,6 +169,13 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
+
+	# module database oracle
+	cd src/modules/database/oracle; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-oracle; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
 
 	# authentication module for PAM
 	cd src/modules/authentication/pam; $(MAKE) install $(WOLFRAME_PARAMS) \

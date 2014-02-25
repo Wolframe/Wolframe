@@ -37,7 +37,8 @@ CPP_OBJS = \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	transactionExecStatemachine.obj \
-	bindStatementParams.obj
+	baseStatement.obj \
+	substitutingStatement.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

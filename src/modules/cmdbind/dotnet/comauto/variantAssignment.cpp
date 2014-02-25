@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -87,14 +87,14 @@ comauto::AssignmentClosure::Impl::StackElem::StackElem( ITypeInfo* typeinfo_, co
 	value.vt = VT_EMPTY;
 	try
 	{
-		WRAP( typeinfo->GetTypeAttr( &typeattr))
+		WRAP( typeinfo->GetTypeAttr( &typeattr));
 		if (typeattr->typekind == TKIND_RECORD && !recinfo)
 		{
 			throw std::logic_error( "using typeinfo of structure without recordinfo");
 		}
 		for (UINT ii=0; ii<typeattr->cVars; ++ii)
 		{
-			WRAP( typeinfo->GetVarDesc( ii, &vardesc))
+			WRAP( typeinfo->GetVarDesc( ii, &vardesc));
 			keymap[ comauto::variablename( typeinfo, vardesc)] = ii; 
 			typeinfo->ReleaseVarDesc( vardesc);
 			vardesc = 0;
@@ -185,7 +185,7 @@ AGAIN:
 						cur->key.clear();
 						throw std::runtime_error( std::string( "undefined element '") + elemvalue.tostring() + "'");
 					}
-					WRAP( cur->typeinfo->GetVarDesc( ki->second, &vardesc))
+					WRAP( cur->typeinfo->GetVarDesc( ki->second, &vardesc));
 					VARTYPE elemvartype = vardesc->elemdescVar.tdesc.vt;
 					HREFTYPE elemhreftype = vardesc->elemdescVar.tdesc.hreftype;
 
@@ -195,7 +195,7 @@ AGAIN:
 						HREFTYPE arelemhreftype = vardesc->elemdescVar.tdesc.lptdesc->hreftype;
 						if (arelemvartype == VT_USERDEFINED)
 						{
-							WRAP( cur->typeinfo->GetRefTypeInfo( arelemhreftype, &rectypeinfo))
+							WRAP( cur->typeinfo->GetRefTypeInfo( arelemhreftype, &rectypeinfo));
 							const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
 							m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
 							rectypeinfo->Release();
@@ -237,7 +237,7 @@ AGAIN:
 					std::map<std::size_t,std::vector<VARIANT> >::iterator ei = cur->elemar.begin(), ee = cur->elemar.end();
 					for (; ei != ee; ++ei)
 					{
-						WRAP( cur->typeinfo->GetVarDesc( ei->first, &vardesc))
+						WRAP( cur->typeinfo->GetVarDesc( ei->first, &vardesc));
 						std::wstring key( comauto::variablename_utf16( m_stk.back().typeinfo, vardesc));
 
 						if (vardesc->elemdescVar.tdesc.vt == VT_SAFEARRAY)

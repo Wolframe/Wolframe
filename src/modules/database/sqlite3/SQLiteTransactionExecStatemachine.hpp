@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,6 +35,7 @@
 #ifndef _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
+#include "database/statement.hpp"
 #include "system/objectPool.hpp"
 #include <string>
 #include <map>
@@ -123,6 +124,7 @@ private:
 	sqlite3_stmt* m_stm;					//< current statement
 	SQLiteDBunit* m_dbunit;					//< database unit
 	PoolObject<sqlite3*>* m_conn;				//< database connection
+	Statement *m_statement;					//< the statement parser
 };
 
 }}//namespace

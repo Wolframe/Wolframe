@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -40,15 +40,19 @@ Project Wolframe.
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>
+#if WITH_LIBXSLT
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#endif
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+#if WITH_LIBXSLT
 
 namespace {
 
@@ -64,13 +68,12 @@ struct XsltFilter :public Filter
 };
 
 
-class XsltFilterConstructor
-	:public module::FilterConstructor
+class XsltFilterType
+	:public langbind::FilterType
 {
 public:
-	XsltFilterConstructor( const std::string& sourcefile_)
-		:module::FilterConstructor( utils::getFileStem(sourcefile_), 0)
-		,m_ptr(0)
+	XsltFilterType( const std::string& sourcefile_)
+		:m_ptr(0)
 	{
 		m_ptr = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
 		if (!m_ptr)
@@ -80,19 +83,18 @@ public:
 		}
 	}
 
-	virtual ~XsltFilterConstructor()
+	virtual ~XsltFilterType()
 	{
 		if (m_ptr) xsltFreeStylesheet( m_ptr);
 	}
 
-	virtual langbind::Filter* object( const std::vector<langbind::FilterArgument>& arg) const
+	virtual langbind::Filter* create( const std::vector<langbind::FilterArgument>& arg) const
 	{
 		return new XsltFilter( m_ptr, arg);
 	}
 
 private:
-	XsltFilterConstructor( const XsltFilterConstructor& o)
-		:module::FilterConstructor(o)
+	XsltFilterType( const XsltFilterType&)
 	{
 		throw std::logic_error( "non copyable XsltFilterConstructor");
 	}
@@ -120,8 +122,9 @@ public:
 
 	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
 	{
-		module::FilterConstructorR fc( new XsltFilterConstructor( filename));
-		library.defineFilterConstructor( fc);
+		langbind::FilterTypeR fc( new XsltFilterType( filename));
+		std::string filternme( utils::getFileStem(filename));
+		library.defineFilterType( filternme, fc);
 	}
 };
 }//anonymous namespace
@@ -131,3 +134,9 @@ prgbind::Program* langbind::createXsltProgramType()
 	return new XsltProgramType;
 }
 
+#else
+prgbind::Program* langbind::createXsltProgramType()
+{
+	return 0;
+}
+#endif

@@ -1,5 +1,5 @@
 /************************************************************************
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -45,7 +45,7 @@ using namespace _Wolframe::types;
 
 void VariantStruct::makeArray()
 {
-	VariantStruct* prototype_ = (VariantStruct*)wolframe_malloc( sizeof( *this));
+	VariantStruct* prototype_ = (VariantStruct*)std::malloc( sizeof( *this));
 	if (!prototype_) throw std::bad_alloc();
 	std::memcpy( prototype_, this, sizeof( *this));
 	init();
@@ -90,7 +90,7 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 
 	if (descr->size())
 	{
-		m_data.value.Ref = (VariantStruct*)wolframe_calloc( descr->size(), sizeof(VariantStruct));
+		m_data.value.Ref = (VariantStruct*)std::calloc( descr->size(), sizeof(VariantStruct));
 		if (!m_data.value.Ref) throw std::bad_alloc();
 
 		VariantStructDescription::const_iterator si = descr->begin(), se = descr->end();
@@ -106,13 +106,13 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 		catch (const std::bad_alloc& e)
 		{
 			for (; idx>0; --idx) ((VariantStruct*)m_data.value.Ref)[idx-1].release();
-			wolframe_free( m_data.value.Ref);
+			std::free( m_data.value.Ref);
 			throw e;
 		}
 		catch (const std::runtime_error& e)
 		{
 			for (; idx>0; --idx) ((VariantStruct*)m_data.value.Ref)[idx-1].release();
-			wolframe_free( m_data.value.Ref);
+			std::free( m_data.value.Ref);
 			throw e;
 		}
 	}
@@ -128,7 +128,7 @@ void VariantStruct::initStruct( const VariantStructDescription* descr)
 void VariantStruct::initUnresolved( const std::string& name_)
 {
 	setType( Unresolved);
-	char* nm = (char*)wolframe_malloc( name_.size()+1);
+	char* nm = (char*)std::malloc( name_.size()+1);
 	if (!nm) throw std::bad_alloc();
 	std::memcpy( nm, name_.c_str(), name_.size());
 	nm[ name_.size()] = 0;
@@ -143,7 +143,7 @@ void VariantStruct::resolve( const ResolveMap& rmap)
 		const std::string rname( std::string( (const char*)m_data.value.Ref, m_data.dim.size));
 		ResolveMap::const_iterator ri = rmap.find( rname);
 		if (ri == rmap.end()) throw std::runtime_error( std::string( "failed to resolve reference to '") + rname + "'");
-		wolframe_free( m_data.value.Ref);
+		std::free( m_data.value.Ref);
 		init();
 		initIndirection( ri->second);
 	}
@@ -189,6 +189,8 @@ void VariantStruct::initCopy( const VariantStruct& o)
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
 		case VariantStruct::String:
+		case VariantStruct::Timestamp:
+		case VariantStruct::BigNumber:
 		case VariantStruct::Custom:
 			Variant::initCopy( o);
 			break;
@@ -210,7 +212,7 @@ void VariantStruct::initCopy( const VariantStruct& o)
 			}
 			if (nn)
 			{
-				m_data.value.Ref = wolframe_calloc( nn, sizeof( VariantStruct));
+				m_data.value.Ref = std::calloc( nn, sizeof( VariantStruct));
 				if (!m_data.value.Ref) throw std::bad_alloc();
 			}
 			else
@@ -229,13 +231,13 @@ void VariantStruct::initCopy( const VariantStruct& o)
 			catch (const std::bad_alloc& e)
 			{
 				for (; ii>0; --ii) ((VariantStruct*)m_data.value.Ref)[ ii-1].release();
-				wolframe_free( m_data.value.Ref);
+				std::free( m_data.value.Ref);
 				throw e;
 			}
 			catch (const std::runtime_error& e)
 			{
 				for (; ii>0; --ii) ((VariantStruct*)m_data.value.Ref)[ ii-1].release();
-				wolframe_free( m_data.value.Ref);
+				std::free( m_data.value.Ref);
 				throw e;
 			}
 			setInitialized( init_);
@@ -251,7 +253,7 @@ void VariantStruct::initCopy( const VariantStruct& o)
 		case VariantStruct::Unresolved:
 			init();
 			setType( Unresolved);
-			char* nm = (char*)wolframe_malloc( o.m_data.dim.size+1);
+			char* nm = (char*)std::malloc( o.m_data.dim.size+1);
 			if (!nm) throw std::bad_alloc();
 			std::memcpy( nm, o.m_data.value.Ref, o.m_data.dim.size);
 			nm[ o.m_data.dim.size] = 0;
@@ -265,7 +267,7 @@ void VariantStruct::initCopy( const VariantStruct& o)
 void VariantStruct::push()
 {
 	if (type() != Array) throw std::logic_error("illegal operation push on non array");
-	void* ref = wolframe_realloc( m_data.value.Ref, (m_data.dim.size+2) * sizeof( VariantStruct));
+	void* ref = std::realloc( m_data.value.Ref, (m_data.dim.size+2) * sizeof( VariantStruct));
 	if (!ref) throw std::bad_alloc();
 	m_data.value.Ref = ref;
 	std::size_t idx = m_data.dim.size;
@@ -304,9 +306,11 @@ void VariantStruct::release()
 		case VariantStruct::Double:
 		case VariantStruct::Int:
 		case VariantStruct::UInt:
+		case VariantStruct::Timestamp:
 			break;
 		case VariantStruct::Custom:
 		case VariantStruct::String:
+		case VariantStruct::BigNumber:
 			Variant::release();
 			break;
 
@@ -316,7 +320,7 @@ void VariantStruct::release()
 			{
 				((VariantStruct*)m_data.value.Ref)[ ii].release();
 			}
-			wolframe_free( m_data.value.Ref);
+			std::free( m_data.value.Ref);
 			init();
 			break;
 
@@ -326,7 +330,7 @@ void VariantStruct::release()
 			{
 				((VariantStruct*)m_data.value.Ref)[ ii].release();
 			}
-			wolframe_free( m_data.value.Ref);
+			std::free( m_data.value.Ref);
 			init();
 			break;
 
@@ -335,7 +339,7 @@ void VariantStruct::release()
 			break;
 
 		case VariantStruct::Unresolved:
-			wolframe_free( m_data.value.Ref);
+			std::free( m_data.value.Ref);
 			init();
 			break;
 	}

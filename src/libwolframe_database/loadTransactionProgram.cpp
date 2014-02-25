@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -433,6 +433,10 @@ static TransactionFunctionDescription::MainProcessingStep::Call
 				++ci;
 				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, ci, ce);
 				paramlist.push_back( param);
+			}
+			else if (ch == ')' || ch == ',')
+			{
+				throw std::runtime_error( std::string("parameter expected before '") + (char)ch + "'");
 			}
 			else
 			{

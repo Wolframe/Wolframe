@@ -12,7 +12,7 @@ Examples
 ** test_XMLScanner.cpp       :Iterating on the XML elements
 
 Projects using textwolf
-* textwolf is used in the wolframe project (see http://wolframe.net or http://github.com/mbarbos/Wolframe)
+* textwolf is used in the wolframe project (see http://wolframe.net or http://github.com/Wolframe/Wolframe)
 
 Bugreports
 * textwolf bug reports are for the time beeing collected as CSV file in BUGS.

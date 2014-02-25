@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -46,7 +46,7 @@ SaslAuthenticator* SaslAuthConstructor::object( const config::NamedConfiguration
 
 	SaslAuthenticator* m_auth = new SaslAuthenticator( cfg.m_identifier,
 							   cfg.m_service, cfg.m_confPath );
-	MOD_LOG_NOTICE << "SASL authenticator container created";
+	LOG_NOTICE << "SASL authenticator container created";
 	return m_auth;
 }
 

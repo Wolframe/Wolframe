@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include "prgbind/programLibrary.hpp"
 #include "wolfwizardCommandLine.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -132,7 +132,8 @@ static void setAtomicElemAttributes( Header& hdr, const types::VariantStruct& st
 		case types::VariantStruct::Int:
 		case types::VariantStruct::UInt:
 		case types::VariantStruct::String:
-// MBa hack: eliminate compiler warning
+		case types::VariantStruct::Timestamp:
+		case types::VariantStruct::BigNumber:
 		case types::VariantStruct::Custom:
 		{
 			hdr.define( "value", ((const types::Variant)st).tostring());
@@ -216,7 +217,8 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 			case types::VariantStruct::Int:
 			case types::VariantStruct::UInt:
 			case types::VariantStruct::String:
-// MBa hack: eliminate compiler warning
+			case types::VariantStruct::Timestamp:
+			case types::VariantStruct::BigNumber:
 			case types::VariantStruct::Custom:
 				hdr.define( "attribute", stk.back().itr->attribute()?"yes":"no");
 				if (stk.back().itr->initvalue)

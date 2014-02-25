@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,64 +35,65 @@
 #ifndef _ORACLE_STATEMENT_HPP_INCLUDED
 #define _ORACLE_STATEMENT_HPP_INCLUDED
 #include <string>
-#include "types/variant.hpp"
+#include <vector>
 #include "Oracle.hpp"
+#include "database/baseStatement.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-class OracleStatement
-{
-public:
-	enum {MaxNofParam=99};
-
-	OracleStatement();
-	OracleStatement( const OracleStatement& o);
-
-	void clear();
-	void init( const std::string& stmstr);
-
-	//\brief Executes the statement with the bound parameters on connection 'conn'
-	OCIStmt* execute( OracleConnection *conn) const;
-
-	//\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const types::Variant& arg);
-
-private:
-	//\remark See implementation of pq_sendint64
-	void bindUInt64( boost::uint64_t value, const char* type="uint8");
-	void bindInt64( boost::int64_t value);
-	void bindUInt32( boost::uint32_t value, const char* type="uint4");
-	void bindInt32( boost::int32_t value);
-	void bindUInt16( boost::uint16_t value, const char* type="uint2");
-	void bindInt16( boost::int16_t value);
-	void bindByte( boost::uint8_t value, const char* type="uint1");
-	void bindByte( boost::int8_t value);
-	void bindBool( bool value);
-	void bindDouble( double value);
-	void bindString( const char* value, std::size_t size);
-	void bindNull();
-
-	void setNextParam( const void* ptr, unsigned int size, const char* type);
-
-	std::string statementString() const;
-	struct Params
-	{
-		const char* paramar[MaxNofParam];
-		int paramarsize;
-	};
-	void getParams( Params& params) const;
-
-private:
-	std::string m_stmstr;
-	int m_paramofs[ MaxNofParam];
-	const char* m_paramtype[ MaxNofParam];
-	int m_paramlen[ MaxNofParam];
-	int m_parambinary[ MaxNofParam];
-	int m_paramarsize;
-	std::string m_buf;
+struct OracleData {
+	types::Variant v;
+	unsigned int ui;
+	signed int i;
+	oraub8 ui64;
+	orasb8 i64;
+	double d;
+	char *s;
+	
+	OracleData( ) { s = 0; }
 };
 
+class OracleStatement : public BaseStatement
+{
+	public:
+		OracleStatement( );
+		OracleStatement( const OracleStatement &o );
+		OracleStatement( OracleEnvirenment *env );
+		~OracleStatement( );
+
+		virtual void clear( );
+
+		virtual void bind( const unsigned int idx, const types::Variant &value );
+
+		virtual const std::string replace( const unsigned int idx ) const;
+
+		void setConnection( OracleConnection *conn );
+		void setStatement( OCIStmt *stmt );
+		
+		sword getLastStatus( );
+
+	private:
+		void bindUInt( const unsigned int idx, unsigned int &value );
+		void bindInt( const unsigned int idx, signed int &value );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+		void bindUInt64( const unsigned int idx, oraub8 &value );
+		void bindInt64( const unsigned int idx, orasb8 &value );
+#endif
+		void bindBool( const unsigned int idx, signed int &value );
+		void bindDouble( const unsigned int idx, double &value );
+		void bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value );
+		void bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value );
+		void bindString( const unsigned int idx, char* value, const std::size_t size );
+		void bindNull( const unsigned int idx );
+	
+	private:
+		OracleEnvirenment *m_env;
+		OracleConnection *m_conn;
+		OCIStmt *m_stmt;
+		sword m_status;
+		std::vector<OracleData> m_data;
+};
 
 }}//namespace
 #endif

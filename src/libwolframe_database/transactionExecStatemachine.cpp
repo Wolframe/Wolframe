@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -61,7 +61,8 @@ static types::VariantConst resolveResultReference( const TransactionOutput& outp
 {
 	types::VariantConst rt;
 	TransactionOutput::result_const_iterator fi = output.end();
-	std::size_t prev_functionidx = std::numeric_limits<std::size_t>::max();
+	std::size_t init_functionidx = std::numeric_limits<std::size_t>::max();
+	std::size_t prev_functionidx = init_functionidx;
 	bool found = false;
 
 	TransactionOutput::result_const_iterator ri = output.begin() + output.size();
@@ -71,6 +72,10 @@ static types::VariantConst resolveResultReference( const TransactionOutput& outp
 		if (prev_functionidx < ri->functionidx())
 		{
 			break; //... crossing operation scope border
+		}
+		if (prev_functionidx >= ri->functionidx()+2 && prev_functionidx != init_functionidx)
+		{
+			break; //... crossing command not there (not executed)
 		}
 		prev_functionidx = ri->functionidx();
 		if (result_functionidx >= ri->functionidx())

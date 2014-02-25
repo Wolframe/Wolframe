@@ -40,8 +40,25 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --program program_formfunc.lua --module ../wolfilter/modules//employee_assignment_convert//mod_employee_assignment_convert --cmdprogram formfunc_lua_table.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert
+}
+Processor
+{
+	program program_formfunc.lua
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
 **file:program_formfunc.lua
 function toupper_table( tb)
 	for i,v in pairs(tb)
@@ -58,14 +75,14 @@ end
 function toupper_formfunc( inp)
 	return toupper_table( inp:table())
 end
-**requires:DISABLED NETBSD
-
-**file: formfunc_lua_table.lua
+**file:script.lua
 
 function run()
 	res = formfunction( "toupper_formfunc")( input:table())
 	output:print( res:table())
 end
+**requires:DISABLED NETBSD
+
 **output
 {
 	"assignmentlist":	{

@@ -1,6 +1,10 @@
 #include "PostgreSQLstatement.hpp"
 #include "types/variant.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 #include <boost/cstdint.hpp>
+#include <boost/lexical_cast.hpp>
 #include <cstring>
 #include <stdint.h>
 #include <libpq-fe.h>
@@ -17,8 +21,10 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
-	:m_paramarsize(o.m_paramarsize)
+	:BaseStatement( o)
+	,m_paramarsize(o.m_paramarsize)
 	,m_buf(o.m_buf)
+	,m_conn( 0 )
 {
 	std::memcpy( m_paramofs, o.m_paramofs, m_paramarsize * sizeof(*m_paramofs));
 	std::memcpy( m_paramtype, o.m_paramtype, m_paramarsize * sizeof(*m_paramtype));
@@ -26,34 +32,35 @@ PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
 
 
 PostgreSQLstatement::PostgreSQLstatement()
-	:m_paramarsize(0){}
+	:BaseStatement()
+	,m_paramarsize(0)
+	,m_conn(0)
+	{}
 
 
 void PostgreSQLstatement::clear()
 {
+	BaseStatement::clear();
 	m_paramarsize = 0;
 	m_buf.clear();
-	m_stmstr.clear();
 }
 
-void PostgreSQLstatement::init( const std::string& stmstr)
+void PostgreSQLstatement::setConnection( PGconn *conn )
 {
-	clear();
-	m_stmstr = stmstr;
+	m_conn = conn;
 }
 
-void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
+void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& value)
 {
+	// does boundary checking
+	BaseStatement::bind( idx, value );
+	
 	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
 
 	switch (value.type())
 	{
 		case types::Variant::Null:
 			bindNull();
-			break;
-// MBa hack: eliminate compiler warning
-		case types::Variant::Custom:
-			throw std::logic_error("internal: Custom type in postgreSQL database module");
 			break;
 
 		case types::Variant::Int:
@@ -98,6 +105,40 @@ void PostgreSQLstatement::bind( unsigned int idx, const types::Variant& value)
 		case types::Variant::String:
 			bindString( value.charptr(), value.charsize());
 			break;
+
+		case types::Variant::Timestamp:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = value.tostring();
+			bindString( strval.c_str(), strval.size());
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			std::string strval = value.tostring();
+			bindString( strval.c_str(), strval.size());
+		}
+		case types::Variant::Custom:
+		{
+			types::Variant baseval;
+			try
+			{
+				value.customref()->getBaseTypeValue( baseval);
+				if (baseval.type() != types::Variant::Custom)
+				{
+					bind( idx, baseval);
+					break;
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			throw std::runtime_error( "cannot convert value to base type for binding");
+		}
+		
+		default:
+			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}
 }
 
@@ -152,7 +193,7 @@ void PostgreSQLstatement::bindByte( boost::int8_t value)
 
 void PostgreSQLstatement::bindBool( bool value)
 {
-	bindByte( value?1:0, "uint1");
+	bindByte( value?1:0, "bool");
 }
 
 //\remark See implementation of pq_sendfloat8
@@ -175,10 +216,6 @@ void PostgreSQLstatement::bindString( const char* value, std::size_t size)
 
 void PostgreSQLstatement::bindNull()
 {
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
 	m_paramofs[ m_paramarsize] = 0;
 	m_paramtype[ m_paramarsize] = 0;
 	m_paramlen[ m_paramarsize] = 0;
@@ -188,10 +225,6 @@ void PostgreSQLstatement::bindNull()
 
 void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, const char* type)
 {
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
 	m_paramofs[ m_paramarsize] = m_buf.size();
 	m_paramtype[ m_paramarsize] = type;
 	m_paramlen[ m_paramarsize] = size;
@@ -199,73 +232,6 @@ void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, cons
 
 	m_buf.append( (const char*)ptr, size);
 	++m_paramarsize;
-}
-
-std::string PostgreSQLstatement::statementString() const
-{
-	std::string rt;
-	std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
-	std::string::const_iterator chunkstart = si;
-
-	for (; si != se; ++si)
-	{
-		if (*si == '\'' || *si == '\"')
-		{
-			// ignore contents in string:
-			char eb = *si;
-			for (++si; si != se && *si != eb; ++si)
-			{
-				if (*si == '\\')
-				{
-					++si;
-					if (si == se) break;
-				}
-			}
-			if (si == se) throw std::runtime_error( "string not terminated in statement");
-		}
-		if (*si == '$')
-		{
-			if (si > chunkstart)
-			{
-				rt.append( chunkstart, si);
-				chunkstart = si;
-			}
-			int idx = 0;
-			for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			{
-				idx *= 10;
-				idx += (*si - '0');
-				if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
-			}
-			if (si != se)
-			{
-				if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
-				if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
-			}
-			if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
-			if (m_paramtype[ idx-1])
-			{
-				rt.append( "$");
-				rt.append( chunkstart, si);
-				if (m_paramtype[ idx-1][0])
-				{
-					rt.append( "::");
-					rt.append( m_paramtype[ idx-1]);
-				}
-			}
-			else
-			{
-				rt.append( "NULL");
-			}
-			chunkstart = si;
-			if (si == se) break;
-		}
-	}
-	if (si > chunkstart)
-	{
-		rt.append( chunkstart, si);
-	}
-	return rt;
 }
 
 void PostgreSQLstatement::getParams( Params& params) const
@@ -284,16 +250,30 @@ void PostgreSQLstatement::getParams( Params& params) const
 	}
 }
 
-PGresult* PostgreSQLstatement::execute( PGconn *conn) const
+PGresult* PostgreSQLstatement::execute( ) const
 {
-	std::string command = statementString();
+	std::string command = nativeSQL();
 	Params params;
 	getParams( params);
 
+	// KLUDGE: format text for now as the parser in the state machine
+	// expects it!
 	return PQexecParams(
-			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
-			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
+			m_conn, command.c_str(), params.paramarsize, 0/*no OIDs*/,
+			params.paramar, m_paramlen, m_parambinary, 0);
 }
 
-
-
+const std::string PostgreSQLstatement::replace( const unsigned int idx ) const
+{
+	std::string rt;
+	
+	rt.append( "$" );
+	rt.append( boost::lexical_cast< std::string >( idx ) );
+	if( m_paramtype[idx-1] && m_paramtype[idx-1][0] ) {
+		rt.append( "::" );
+		rt.append( m_paramtype[idx-1] );
+	}
+	
+	return rt;
+}
+			

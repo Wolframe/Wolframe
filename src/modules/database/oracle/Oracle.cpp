@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -104,7 +104,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
 	m_connStr = buildConnStr( host, port,  dbName );
-	MOD_LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";
+	LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";
 
 	sword status;
 	
@@ -113,7 +113,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 	status = OCIEnvCreate( &( m_db.m_env.envhp ), OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) {
-		MOD_LOG_ALERT << "Failed to create Oracle environment for database '" << m_ID << "'";
+		LOG_ALERT << "Failed to create Oracle environment for database '" << m_ID << "'";
 		throw std::runtime_error( "Fatal error creating an Oracle environment" );
 	}
 	
@@ -123,14 +123,14 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		// a server handle
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->srvhp, OCI_HTYPE_SERVER, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
+			LOG_ALERT << "Can't allocate OCI server handle for database '" << m_ID << "'";
 			throw std::runtime_error( "Can't allocate OCI server handle for Oracle database" );
 		}
 
 		// an error handle
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
+			LOG_ALERT << "Can't allocate OCI error handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
 			throw std::runtime_error( "Can't allocate OCI error handle for Oracle database" );
 		}
@@ -138,7 +138,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		// a service context handle
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->svchp, OCI_HTYPE_SVCCTX, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
+			LOG_ALERT << "Can't allocate OCI service context handle for database '" << m_ID << "'";
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
 			throw std::runtime_error( "Can't allocate OCI service context handle for Oracle database" );
@@ -150,7 +150,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 			m_connStr.empty( ) ? (sb4)0 : (sb4)( m_connStr.length( ) ),
 			OCI_DEFAULT );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
+			LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
 			OCIHandleFree( conn->srvhp, OCI_HTYPE_SERVER );
@@ -162,7 +162,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 			conn->srvhp, (ub4)0, OCI_ATTR_SERVER,
 			(OCIError *)conn->errhp );		
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
+			LOG_ALERT << "Can't attach to Oracle server for database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -174,7 +174,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->authp,
 			OCI_HTYPE_SESSION, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create handle for Oracle authentication credentials for database '" << m_ID << "'";
+			LOG_ALERT << "Can't create handle for Oracle authentication credentials for database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -187,7 +187,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 			(dvoid *)const_cast<char *>( user.c_str( ) ), (ub4)user.length( ),
 			OCI_ATTR_USERNAME, conn->errhp );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -198,7 +198,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 			(dvoid *)const_cast<char *>( password.c_str( ) ), (ub4)password.length( ),
 			OCI_ATTR_PASSWORD, conn->errhp );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't create handle for username for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
 			OCIHandleFree( conn->errhp, OCI_HTYPE_ERROR );
@@ -210,7 +210,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		status = OCISessionBegin( conn->svchp, conn->errhp, conn->authp,
 			OCI_CRED_RDBMS, OCI_DEFAULT );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create user session for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't create user session for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
@@ -223,7 +223,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
 			conn->authp, (ub4)0, OCI_ATTR_SESSION, conn->errhp );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't set user session in service context for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't set user session in service context for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
@@ -236,7 +236,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		status = OCIHandleAlloc( m_db.m_env.envhp, (dvoid **)&conn->transhp,
 			OCI_HTYPE_TRANS, (size_t)0, (dvoid **)0 );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't create transaction handle for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't create transaction handle for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
@@ -247,7 +247,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		status = OCIAttrSet( conn->svchp, OCI_HTYPE_SVCCTX,
 			conn->transhp, (ub4)0, OCI_ATTR_TRANS, conn->errhp );
 		if( status != OCI_SUCCESS ) {
-			MOD_LOG_ALERT << "Can't set transaction handle in service context for Oracle database '" << m_ID << "'";
+			LOG_ALERT << "Can't set transaction handle in service context for Oracle database '" << m_ID << "'";
 			OCIServerDetach( conn->srvhp, conn->errhp, OCI_DEFAULT );
 			OCIHandleFree( conn->authp, OCI_HTYPE_SESSION );
 			OCIHandleFree( conn->svchp, OCI_HTYPE_SVCCTX );
@@ -263,7 +263,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 
 	m_db.setUnit( this );
 
-	MOD_LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
 OracleDbUnit::~OracleDbUnit()
@@ -294,19 +294,19 @@ OracleDbUnit::~OracleDbUnit()
 	}
 	
 	if( hasErrors ) {
-		MOD_LOG_ALERT << "Oracle database '" << m_ID << "' destructor: NULL connection from pool";
+		LOG_ALERT << "Oracle database '" << m_ID << "' destructor: NULL connection from pool";
 		throw std::logic_error( "Oracle database destructor: NULL connection from pool" );
 	}
 
 	if ( m_noConnections != 0 )	{
-		MOD_LOG_ALERT << "Oracle database unit '" << m_ID << "' destructor: "
+		LOG_ALERT << "Oracle database unit '" << m_ID << "' destructor: "
 			      << m_noConnections << " connections not destroyed";
 		throw std::logic_error( "Oracle database unit destructor: not all connections destroyed" );
 	}
 
 	(void)OCIHandleFree( (dvoid *)m_db.m_env.envhp, OCI_HTYPE_ENV );
 	
-	MOD_LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
+	LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
 void OracleDbUnit::loadProgram( const std::string& filename )
@@ -315,7 +315,7 @@ void OracleDbUnit::loadProgram( const std::string& filename )
 	if ( filename.empty())
 		return;
 	if ( !boost::filesystem::exists( filename ))	{
-		MOD_LOG_ALERT << "Program file '" << filename
+		LOG_ALERT << "Program file '" << filename
 			      << "' does not exist (Oracle database '" << m_ID << "')";
 		return;
 	}
@@ -334,10 +334,10 @@ void OracleDbUnit::loadAllPrograms()
 	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
-		MOD_LOG_DEBUG << "Load Program '" << *pi << "' for Oracle database unit '" << m_ID << "'";
+		LOG_DEBUG << "Load Program '" << *pi << "' for Oracle database unit '" << m_ID << "'";
 		loadProgram( *pi);
 	}
-	MOD_LOG_DEBUG << "Programs for Oracle database unit '" << m_ID << "' loaded";
+	LOG_DEBUG << "Programs for Oracle database unit '" << m_ID << "' loaded";
 }
 
 

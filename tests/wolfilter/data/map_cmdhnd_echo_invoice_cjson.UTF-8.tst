@@ -128,8 +128,31 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ./../../src/modules/cmdbind/directmap/mod_command_directmap --module ./../../src/modules/cmdbind/lua/mod_command_lua --module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ./../../src/modules/normalize/number/mod_normalize_number --module ./../../src/modules/normalize/string/mod_normalize_string --cmdprogram=test.dmap --program ../wolfilter/scripts/invoice.sfrm --program ../wolfilter/template/program/simpleform.wnmp --program ../wolfilter/template/program/echo_invoice_table.lua echoInvoice
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf echoInvoice
 
+**file:wolframe.conf
+LoadModules
+{
+	module ./../../src/modules/cmdbind/lua/mod_command_lua
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program ../wolfilter/scripts/invoice.sfrm
+	program ../wolfilter/template/program/simpleform.wnmp
+	program ../wolfilter/template/program/echo_invoice_table.lua
+	cmdhandler
+	{
+		directmap
+		{
+			program test.dmap
+			filter cjson
+		}
+	}
+}
 **file: test.dmap
 COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 **output

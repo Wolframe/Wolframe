@@ -15,15 +15,15 @@ InterpreterInstanceR python::Interpreter::getInstance( const std::string&) const
 
 std::vector<std::string> python::Interpreter::loadProgram( const std::string& prgfile )
 {
-	MOD_LOG_TRACE << "[python] Loading module in file " << prgfile;
+	LOG_TRACE << "[python] Loading module in file " << prgfile;
 	if (m_modulePath.empty())
 	{
 		m_modulePath = utils::getParentPath( prgfile, 1 );
-		MOD_LOG_TRACE << "[python] Primary Python load path '" << m_modulePath << "'";
+		LOG_TRACE << "[python] Primary Python load path '" << m_modulePath << "'";
 	}
 	std::vector<std::string> rt;
 	std::string moduleName = utils::getFileStem( prgfile );
-	MOD_LOG_TRACE << "[python] module name '" << moduleName << "'";
+	LOG_TRACE << "[python] module name '" << moduleName << "'";
 	PyObject *name = PyUnicode_FromString( moduleName.c_str( ) );
 
 	PyObject *module = PyImport_Import( name );
@@ -40,7 +40,7 @@ std::vector<std::string> python::Interpreter::loadProgram( const std::string& pr
 	Py_ssize_t pos = 0;
 	while( PyDict_Next( symbols, &pos, &key, &value ) ) {
 		if( PyFunction_Check( value ) ) {
-			MOD_LOG_TRACE 	<< "[python] function found "
+			LOG_TRACE 	<< "[python] function found "
 					<< pyGetRepr( key ) << ": "
 					<< pyGetRepr( value );
 			m_functions.push_back( pyGetStr( key ) );
@@ -54,7 +54,7 @@ std::vector<std::string> python::Interpreter::loadProgram( const std::string& pr
 
 python::Interpreter::Interpreter()
 {
-	MOD_LOG_TRACE << "[python] Creating interpreter";
+	LOG_TRACE << "[python] Creating interpreter";
 
 	// should be set to what? 'python' sets it to itself, setting it
 	// to modulePath or wolframe leads to introspection problems later!

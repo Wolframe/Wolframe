@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,22 +38,15 @@
 #include "logger-v1.hpp"
 #include <cstring>
 
-_Wolframe::log::LogBackend* logBackendPtr;
-
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 namespace lb = _Wolframe::langbind;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
 
 namespace {
 struct CJsonFilterObject
 {
 	static SimpleBuilder* filter_builder()
-		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterPtr);}
+		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterType);}
 };
 }//anonymous namespace
 
@@ -63,6 +56,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	CJsonFilterObject::filter_builder
 };
 
-ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", 0, 0, NofObjects, objdef);
 
 

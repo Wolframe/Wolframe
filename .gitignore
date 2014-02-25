@@ -30,7 +30,7 @@ wolframemsg.h
 *.dll.manifest
 *.pdb
 *.ilk
-*.exp
+#*.exp
 *.obj
 *.dllobj
 *.lib
@@ -80,6 +80,7 @@ tests/AAAA/sasl.db
 tests/testBoostPath
 tests/filter
 tests/testVariantTypes
+tests/testIntegers
 tests/testVariantStruct
 tests/3rdParty/libhpdf/testlibhpdf
 tests/3rdParty/libhpdf/*.pdf
@@ -184,6 +185,10 @@ tests/python/
 3rdParty/sqlite3/sqlite3
 tests/3rdParty/boost-locale/boostLocaleTest
 tests/testArrayDoublingAllocator
+tests/testFiletypeRecognition
+tests/testDateTime
+tests/testBigNumber
+tests/testString
 geany.c++.tags
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal

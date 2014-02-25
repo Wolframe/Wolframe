@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -82,7 +82,7 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 		}
 		return inp;
 	}
-	if (inp.type() != types::Variant::String)
+	if (inp.type() != types::Variant::String && inp.type() != types::Variant::BigNumber)
 	{
 		UInt val = inp.touint();
 		if (val >= m_max) throw std::runtime_error( "number out of range");
@@ -92,7 +92,6 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 
 	UInt val = 0, pval = 0;
 	std::string::const_iterator ii = str.begin(), ee = str.end();
-	std::size_t cnt = m_size;
 	if (m_sign)
 	{
 		if (ii != ee && *ii == '-')
@@ -101,7 +100,7 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 			isSigned = true;
 		}
 	}
-	for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt)
+	for (; ii != ee && *ii >= '0' && *ii <= '9'; ++ii)
 	{
 		pval = val;
 		val = val * 10 + (*ii - '0');
@@ -109,7 +108,6 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 	}
 	if (ii != ee)
 	{
-		if (cnt) throw std::runtime_error( "number out of range");
 		throw std::runtime_error( std::string("illegal token '") + *ii + "' in number");
 	}
 	if (do_convert)

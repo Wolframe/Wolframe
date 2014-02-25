@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -99,7 +99,7 @@ struct SQLiteLanguageDescription :public LanguageDescription
 	virtual std::string stm_argument_reference( int index)
 	{
 		std::ostringstream rt;
-		rt << "?" << index;
+		rt << "$" << index;
 		return rt.str();
 	}
 };
@@ -175,7 +175,6 @@ private:
 	std::list<std::string>	m_programFiles;
 	std::list<std::string>	m_extensionFiles;
 };
-
 
 class SQLiteUIlibrary : public UI::UserInterfaceLibrary
 {

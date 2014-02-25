@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,11 +36,36 @@
 ///
 
 #include "logBackendImpl.hpp"
-
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
 #include <algorithm>
+
+//#define TRACE_SINGLETON
+#undef TRACE_SINGLETON
+#ifdef TRACE_SINGLETON
+#include <ostream>
+#endif
 
 namespace _Wolframe {
 namespace log {
+
+LogBackend& LogBackend::instance()
+{
+	static boost::scoped_ptr< LogBackend >	m_t;
+	static boost::mutex			m_mutex;
+	static bool				m_initialized = false;
+
+	if ( !m_initialized )	{
+		boost::lock_guard< boost::mutex > lock( m_mutex );
+		if ( !m_initialized )	{
+			m_t.reset( new LogBackend() );
+			m_initialized = true;
+		}
+	}
+	return *m_t;
+}
+
 
 LogBackend::LogBackendImpl::LogBackendImpl( )
 {
@@ -54,32 +79,32 @@ LogBackend::LogBackendImpl::~LogBackendImpl( )
 
 void LogBackend::LogBackendImpl::setConsoleLevel( const LogLevel::Level level )
 {
-	consoleLogger_.setLevel( level );
+	m_consoleLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 {
-	logfileLogger_.setLevel( level );
+	m_logfileLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 {
-	logfileLogger_.setFilename( filename );
+	m_logfileLogger.setFilename( filename );
 }
 
 void LogBackend::LogBackendImpl::setSyslogLevel( const LogLevel::Level level )
 {
-	syslogLogger_.setLevel( level );
+	m_syslogLogger.setLevel( level );
 }
 
 void LogBackend::LogBackendImpl::setSyslogFacility( const SyslogFacility::Facility facility )
 {
-	syslogLogger_.setFacility( facility );
+	m_syslogLogger.setFacility( facility );
 }
 
 void LogBackend::LogBackendImpl::setSyslogIdent( const std::string ident )
 {
-	syslogLogger_.setIdent( ident );
+	m_syslogLogger.setIdent( ident );
 }
 
 #if defined( _WIN32 )
@@ -107,9 +132,9 @@ void LogBackend::LogBackendImpl::setWinDebugLevel( const LogLevel::Level level )
 
 inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const std::string& msg )
 {
-	consoleLogger_.log( level, msg );
-	logfileLogger_.log( level, msg );
-	syslogLogger_.log( level, msg );
+	m_consoleLogger.log( level, msg );
+	m_logfileLogger.log( level, msg );
+	m_syslogLogger.log( level, msg );
 #if defined( _WIN32 )
 	windebugLogger_.log( level, msg );
 	eventlogLogger_.log( level, msg );
@@ -120,8 +145,8 @@ inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const 
 LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 {
 	using namespace std;
-	LogLevel::Level uLvl = min( consoleLogger_.level(),
-				    min( logfileLogger_.level(), syslogLogger_.level() ));
+	LogLevel::Level uLvl = min( m_consoleLogger.level(),
+				    min( m_logfileLogger.level(), m_syslogLogger.level() ));
 #if defined( _WIN32 )
 	uLvl = std::min ( uLvl, std::min ( windebugLogger_.level(), eventlogLogger_.level() ));
 #endif // defined( _WIN32 )
@@ -129,9 +154,20 @@ LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 }
 
 // Log backend PIMPL redirection
-LogBackend::LogBackend() : impl_( new LogBackendImpl )	{}
+LogBackend::LogBackend() : impl_( new LogBackendImpl )
+{
+#ifdef TRACE_SINGLETON
+			std::cerr << "\n\n*****\nLogger backend created\n*****\n\n";
+#endif
+}
 
-LogBackend::~LogBackend()	{ delete impl_; }
+LogBackend::~LogBackend()
+{
+	delete impl_;
+#ifdef TRACE_SINGLETON
+			std::cerr << "\n\n*****\nLogger backend deleted\n*****\n\n";
+#endif
+}
 
 void LogBackend::setConsoleLevel( const LogLevel::Level level )	{ impl_->setConsoleLevel( level ); }
 

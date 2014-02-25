@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -45,7 +45,7 @@ DBauthorizer* DBauthzConstructor::object( const config::NamedConfiguration& conf
 	const DatabaseAuthzConfig& cfg = dynamic_cast< const DatabaseAuthzConfig& >( conf );
 
 	DBauthorizer* m_authz = new DBauthorizer( cfg.m_identifier, cfg.m_dbConfig );
-	MOD_LOG_TRACE << "Database authorizer container created";
+	LOG_TRACE << "Database authorizer container created";
 	return m_authz;
 }
 

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -34,6 +34,7 @@
 ///\file database/PostgreSQLstatement.hpp
 #ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #define _POSTGRESQL_STATEMENT_HPP_INCLUDED
+#include "database/baseStatement.hpp"
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
@@ -41,32 +42,31 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLstatement
+class PostgreSQLstatement : public BaseStatement
 {
 public:
-	enum {MaxNofParam=99};
-
 	PostgreSQLstatement();
 	PostgreSQLstatement( const PostgreSQLstatement& o);
 
-	void clear();
-	void init( const std::string& stmstr);
+	void setConnection( PGconn *conn );
+		
+	PGresult* execute( ) const;
 
-	//\brief Executes the statement with the bound parameters on connection 'conn'
-	PGresult* execute( PGconn *conn) const;
+	virtual void clear( );
 
-	//\remark Does no escaping of parameter because this is dependent on the database !
-	void bind( unsigned int idx, const types::Variant& arg);
+	virtual void bind( const unsigned int idx, const types::Variant &value );
+
+	virtual const std::string replace( const unsigned int idx ) const;
 
 private:
 	//\remark See implementation of pq_sendint64
-	void bindUInt64( boost::uint64_t value, const char* type="uint8");
+	void bindUInt64( boost::uint64_t value, const char* type="int8");
 	void bindInt64( boost::int64_t value);
-	void bindUInt32( boost::uint32_t value, const char* type="uint4");
+	void bindUInt32( boost::uint32_t value, const char* type="int4");
 	void bindInt32( boost::int32_t value);
-	void bindUInt16( boost::uint16_t value, const char* type="uint2");
+	void bindUInt16( boost::uint16_t value, const char* type="int2");
 	void bindInt16( boost::int16_t value);
-	void bindByte( boost::uint8_t value, const char* type="uint1");
+	void bindByte( boost::uint8_t value, const char* type="int1");
 	void bindByte( boost::int8_t value);
 	void bindBool( bool value);
 	void bindDouble( double value);
@@ -75,22 +75,21 @@ private:
 
 	void setNextParam( const void* ptr, unsigned int size, const char* type);
 
-	std::string statementString() const;
 	struct Params
 	{
-		const char* paramar[MaxNofParam];
+		const char* paramar[MaxNofParams];
 		int paramarsize;
 	};
 	void getParams( Params& params) const;
 
 private:
-	std::string m_stmstr;
-	int m_paramofs[ MaxNofParam];
-	const char* m_paramtype[ MaxNofParam];
-	int m_paramlen[ MaxNofParam];
-	int m_parambinary[ MaxNofParam];
+	int m_paramofs[ MaxNofParams];
+	const char* m_paramtype[ MaxNofParams];
+	int m_paramlen[ MaxNofParams];
+	int m_parambinary[ MaxNofParams];
 	int m_paramarsize;
 	std::string m_buf;
+	PGconn *m_conn;
 };
 
 

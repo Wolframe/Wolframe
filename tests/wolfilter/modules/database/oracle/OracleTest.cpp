@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -219,7 +219,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 								it != tables.end(); it++ )	{
 			std::string query = "DROP TABLE " + *it;
 			
-			MOD_LOG_TRACE << "Deleting test table " << query;
+			LOG_TRACE << "Deleting test table " << query;
 
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -273,7 +273,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 								it != tables.end(); it++ )	{
 			std::string query = "DROP SEQUENCE " + *it;
 			
-			MOD_LOG_TRACE << "Deleting test sequence " << query;
+			LOG_TRACE << "Deleting test sequence " << query;
 
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -345,7 +345,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 			
 			if( dbcmd.empty( ) ) continue;
 			
-			MOD_LOG_TRACE << "Creating database SQL statement: " << dbcmd;
+			LOG_TRACE << "Creating database SQL statement: " << dbcmd;
 			
 			status = OCIHandleAlloc( envhp, (dvoid **)&stmthp,
 				OCI_HTYPE_STMT, (size_t)0, (dvoid **)0 );
@@ -513,7 +513,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 				(dvoid *)&parmh, (ub4 *)0, (ub4)OCI_ATTR_PARAM, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;
 
-			ub4 numCols = 0;
+			ub2 numCols = 0;
 			status = OCIAttrGet( (dvoid *)parmh, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&numCols, (ub4 *)0, (ub4)OCI_ATTR_NUM_COLS, errhp );
 			if( status != OCI_SUCCESS ) goto cleanup;

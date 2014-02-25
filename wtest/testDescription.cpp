@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -44,6 +44,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
 #ifdef WITH_PGSQL
@@ -345,6 +346,8 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 {
 	std::string element;
 	char chb;
+	std::size_t linecnt = 0;
+	std::size_t colcnt = 0;
 	std::fstream infh;
 	infh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
 	infh.open( pt.c_str(), std::ios::in | std::ios::binary);
@@ -361,6 +364,7 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 	while (infh.read( &chb, sizeof(chb)))
 	{
 		if (chb == '\r' || chb == '\n') break;
+		++linecnt;
 		splitstr.push_back( chb);
 	}
 	splititr = splitstr.begin();
@@ -376,8 +380,7 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 	{
 		if (chb != *splititr) break;
 		++splititr;
-	}
-	while (splititr != splitstr.end() && infh.read( &chb, sizeof(chb)));
+	} while (splititr != splitstr.end() && infh.read( &chb, sizeof(chb)));
 
 	if (splititr != splitstr.end())
 	{
@@ -385,92 +388,115 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 	}
 	splititr = splitstr.begin();
 
-	while (infh.read( &chb, sizeof(chb)))
+	try
 	{
-		if (type == PARSE_HDR)
+		while (infh.read( &chb, sizeof(chb)))
 		{
 			if (chb == '\n')
 			{
-				std::string tag( std::string( element.c_str(), element.size()));
-				boost::trim( tag);
-				if (boost::iequals( tag, "end"))
+				++linecnt;
+				colcnt = 0;
+			}
+			else
+			{
+				++colcnt;
+			}
+			if (type == PARSE_HDR)
+			{
+				if (chb == '\n')
 				{
-					infh.close();
-					return;
-				}
-				else if (boost::starts_with( tag, "outputfile:"))
-				{
-					std::size_t nn = std::strlen("outputfile:");
-					std::string filename( std::string( tag.c_str()+nn, tag.size()-nn));
-					boost::trim( filename);
-					outputfile.push_back( filename);
-					type = PARSE_NOT;
-					splititr = splitstr.begin();
-				}
-				else if (boost::starts_with( tag, "requires:"))
-				{
-					std::size_t nn = std::strlen("requires:");
-					std::string flagname( std::string( tag.c_str()+nn, tag.size()-nn));
-					boost::trim( flagname);
-					requires.append( check_flag( flagname));
-					type = PARSE_NOT;
-					splititr = splitstr.begin();
+					std::string tag( std::string( element.c_str(), element.size()));
+					boost::trim( tag);
+					if (boost::iequals( tag, "end"))
+					{
+						infh.close();
+						return;
+					}
+					else if (boost::starts_with( tag, "outputfile:"))
+					{
+						std::size_t nn = std::strlen("outputfile:");
+						std::string filename( std::string( tag.c_str()+nn, tag.size()-nn));
+						boost::trim( filename);
+						outputfile.push_back( filename);
+						type = PARSE_NOT;
+						splititr = splitstr.begin();
+					}
+					else if (boost::starts_with( tag, "requires:"))
+					{
+						std::size_t nn = std::strlen("requires:");
+						std::string flagname( std::string( tag.c_str()+nn, tag.size()-nn));
+						boost::trim( flagname);
+						requires.append( check_flag( flagname));
+						type = PARSE_NOT;
+						splititr = splitstr.begin();
+					}
+					else
+					{
+						hdr.push_back( tag);
+						element.clear();
+						type = PARSE_OUT;
+					}
 				}
 				else
 				{
-					hdr.push_back( tag);
-					element.clear();
-					type = PARSE_OUT;
+					element.push_back( chb);
 				}
 			}
-			else
+			else if (type == PARSE_OUT)
 			{
 				element.push_back( chb);
-			}
-		}
-		else if (type == PARSE_OUT)
-		{
-			element.push_back( chb);
-			if (chb == *splititr)
-			{
-				++splititr;
-				if (splititr == splitstr.end())
+				if (chb == *splititr)
 				{
-					std::string outelem( element.c_str(), element.size() - splitstr.size());
-					out.push_back( outelem);
-					element.clear();
-					type = PARSE_HDR;
+					++splititr;
+					if (splititr == splitstr.end())
+					{
+						std::string outelem( element.c_str(), element.size() - splitstr.size());
+						out.push_back( outelem);
+						element.clear();
+						type = PARSE_HDR;
+						splititr = splitstr.begin();
+					}
+				}
+				else
+				{
 					splititr = splitstr.begin();
 				}
 			}
-			else
+			else if (type == PARSE_NOT)
 			{
-				splititr = splitstr.begin();
-			}
-		}
-		else if (type == PARSE_NOT)
-		{
-			if (chb == *splititr)
-			{
-				++splititr;
-				if (splititr == splitstr.end())
+				if (chb == *splititr)
 				{
-					element.clear();
-					type = PARSE_HDR;
+					++splititr;
+					if (splititr == splitstr.end())
+					{
+						element.clear();
+						type = PARSE_HDR;
+						splititr = splitstr.begin();
+					}
+				}
+				else if ((unsigned char)chb > 32)
+				{
+					throw std::runtime_error( "illegal test definition file. tag definition expected");
+				}
+				else
+				{
 					splititr = splitstr.begin();
 				}
 			}
-			else if ((unsigned char)chb > 32)
-			{
-				throw std::runtime_error( "illegal test definition file. tag definition expected");
-			}
-			else
-			{
-				splititr = splitstr.begin();
-			}
 		}
+		throw std::runtime_error( "no end tag at end of file");
 	}
-	throw std::runtime_error( "no end tag at end of file");
+	catch (const std::runtime_error& e)
+	{
+		std::ostringstream errmsg;
+		std::string filename = boost::filesystem::path(pt).stem().string();
+
+		errmsg << "error in test description file '" << filename << "'"
+			<< " at line " << (linecnt+1) << " column " << (colcnt+1)
+			<< ": " << e.what();
+
+		throw std::runtime_error( errmsg.str());
+	}
 }
 
 static void writeFile( const std::string& pt, const std::string& content)

@@ -4,68 +4,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE data SYSTEM "AllDataRequest">
 <data/>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../../src/modules/normalize/number/mod_normalize_number --module ../../src/modules/normalize/string/mod_normalize_string --module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --cmdprogram=preprocess.dmap --program=preprocess.sfrm --program=preprocess.tdl --program=preprocess.wnmp --program=preprocess.lua --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA' AllDataRequest
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf AllDataRequest
 **requires:TEXTWOLF
-**file:preprocess.sfrm
-FORM PersonRef
+**file:wolframe.conf
+LoadModules
 {
-	prename string
-	surname string
+	module ./../wolfilter/modules/database/postgresql/mod_db_postgresqltest
+	module ./../../src/modules/cmdbind/lua/mod_command_lua
+	module ./../../src/modules/normalize/number/mod_normalize_number
+	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../../src/modules/cmdbind/directmap/mod_command_directmap
+	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 }
-
-FORM AddressRef
+Database
 {
-	street string
-	town string
-}
-
-FORM CompanyRef
-{
-	name string
-}
-
-FORM Person
-{
-	company CompanyRef[]
-	id int
-	parent ?string
-	child PersonRef[]
-	prename string
-	surname string
-	location AddressRef[]
-	tag ?int
-}
-
-FORM Company
-{
-	id int
-	parent string
-	name string
-	location AddressRef[]
-	child CompanyRef[]
-	tag int[]
-}
-
-FORM Data
-{
-	data
+	PostgreSQLTest
 	{
-		person Person[]
+		identifier testdb
+		host localhost
+		port 5432
+		database wolframe
+		user wolfusr
+		password wolfpwd
+		dumpfile DBDUMP
+		inputfile DBDATA
 	}
 }
-
-FORM AllDataRequest
+Processor
 {
-	data
+	database testdb
+	program preprocess.lua
+	program preprocess.sfrm
+	program preprocess.tdl
+	program preprocess.wnmp
+
+	cmdhandler
 	{
+		directmap
+		{
+			program preprocess.dmap
+			filter textwolf
+		}
 	}
 }
-**file:preprocess.wnmp
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
-normname=string:convdia,lcname;
-**file: DBDATA
+**file:DBDATA
 CREATE TABLE Person
 (
  ID SERIAL NOT NULL PRIMARY KEY,
@@ -234,6 +216,106 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (7,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (1,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (2,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
+**file:preprocess.lua
+function run( inp )
+	it = inp:table()
+	getData = provider.formfunction("getData")
+	res = getData( it)
+	rt = res:table()
+	insertWords = provider.formfunction("insertWords")
+	insertWords( { data = rt } )
+	getDataFiltered = provider.formfunction("getDataFiltered")
+	resfiltered = getDataFiltered( it)
+	resfilteredtab = resfiltered:table()
+	table.insert( rt, resfilteredtab)
+	return rt
+end
+
+function luanorm( inp )
+	local function luanorm_table( tb )
+		local rt = {}
+		for k,v in pairs( tb) do
+			if type(v) == "table" then
+				rt[ k] = luanorm_table( v)
+			else
+				if k == "id" or k == "tag" then
+					rt[ k] = tonumber(v) + 100
+				else
+					local nf = provider.normalizer( "normname")
+					rt[ k] = nf( v)
+				end
+			end
+		end
+		return rt
+	end
+	local intb = inp:table()
+	local outtb = luanorm_table( intb)
+	return outtb
+end
+
+function addSuffixToName( inp)
+	rec = inp:table()
+	for i,v in ipairs( rec["person"]) do
+		v[ "prename"] = v[ "prename"] .. v[ "id"]
+	end
+	return rec
+end
+**file:preprocess.dmap
+COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+**file:preprocess.sfrm
+FORM PersonRef
+{
+	prename string
+	surname string
+}
+
+FORM AddressRef
+{
+	street string
+	town string
+}
+
+FORM CompanyRef
+{
+	name string
+}
+
+FORM Person
+{
+	company CompanyRef[]
+	id int
+	parent ?string
+	child PersonRef[]
+	prename string
+	surname string
+	location AddressRef[]
+	tag ?int
+}
+
+FORM Company
+{
+	id int
+	parent string
+	name string
+	location AddressRef[]
+	child CompanyRef[]
+	tag int[]
+}
+
+FORM Data
+{
+	data
+	{
+		person Person[]
+	}
+}
+
+FORM AllDataRequest
+{
+	data
+	{
+	}
+}
 **file:preprocess.tdl
 
 SUBROUTINE getPersonPrename( id)
@@ -296,52 +378,11 @@ BEGIN
 	FOREACH /data/person/norm DO INSERT INTO NumberTable (name,"number") VALUES ('struct id', $(id));
 	FOREACH /data/person/norm/company DO INSERT INTO WordTable (name,word) VALUES ('company name', $(name));
 END
-**file:preprocess.dmap
-COMMAND (AllDataRequest) CALL(run) RETURN(Data);
-**file:preprocess.lua
-function run( inp )
-	it = inp:table()
-	getData = provider.formfunction("getData")
-	res = getData( it)
-	rt = res:table()
-	insertWords = provider.formfunction("insertWords")
-	insertWords( { data = rt } )
-	getDataFiltered = provider.formfunction("getDataFiltered")
-	resfiltered = getDataFiltered( it)
-	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
-	return rt
-end
-
-function luanorm( inp )
-	local function luanorm_table( tb )
-		local rt = {}
-		for k,v in pairs( tb) do
-			if type(v) == "table" then
-				rt[ k] = luanorm_table( v)
-			else
-				if k == "id" or k == "tag" then
-					rt[ k] = tonumber(v) + 100
-				else
-					local nf = provider.normalizer( "normname")
-					rt[ k] = nf( v)
-				end
-			end
-		end
-		return rt
-	end
-	local intb = inp:table()
-	local outtb = luanorm_table( intb)
-	return outtb
-end
-
-function addSuffixToName( inp)
-	rec = inp:table()
-	for i,v in ipairs( rec["person"]) do
-		v[ "prename"] = v[ "prename"] .. v[ "id"]
-	end
-	return rec
-end
+**file:preprocess.wnmp
+int=integer;
+uint=unsigned;
+float= floatingpoint;
+normname= convdia,lcname;
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>

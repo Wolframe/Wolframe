@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -44,7 +44,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-struct Filter
+class Filter
 {
 public:
 	Filter( const InputFilterR& i_, const OutputFilterR& o_)
@@ -90,9 +90,17 @@ protected:
 };
 
 typedef std::pair<std::string,std::string> FilterArgument;
-typedef Filter (*CreateFilterFunc)( const std::string& name, const std::vector<FilterArgument>& arg);
-typedef Filter* (*CreateFilterPtrFunc)( const std::string& name, const std::vector<FilterArgument>& arg);
 
+class FilterType
+{
+public:
+	virtual ~FilterType(){}
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const=0;
+};
+
+typedef boost::shared_ptr<FilterType> FilterTypeR;
+
+typedef FilterType* (*CreateFilterType)();
 
 }}//namespace
 #endif

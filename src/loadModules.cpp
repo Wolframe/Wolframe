@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -35,8 +35,8 @@
 //
 
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleDirectory.hpp"
+#include "module/moduleInterface.hpp"
 #include "utils/fileUtils.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
@@ -171,7 +171,6 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
 			break;
 		}
 
-		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
 		for ( unsigned short i = 0; i < entry->cfgdContainers; i++ )	{
 			modDir.addBuilder( entry->createCfgdBuilder[ i ]() );
 		}

@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -34,8 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_PROGRAM_TYPE_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_PROGRAM_TYPE_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -77,6 +78,9 @@ private:
 	std::string m_name;
 	CreateProgramType m_createFunc;
 };
+
+typedef boost::shared_ptr<ProgramTypeConstructor> ProgramTypeConstructorR;
+
 
 class ProgramTypeBuilder :public SimpleBuilder
 {

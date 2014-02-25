@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: wolframe
-.\"    Author: Mihai Barbos <mihai.barbos@gmail.com>
-.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-.\"      Date: 11/10/2011
+.\"    Author:  <contact@wolframe.net>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 02/20/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolframe.conf
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "5" "11/10/2011" "wolframe.conf" "Wolframe User Manual"
+.TH "WOLFRAME" "5" "02/20/2014" "wolframe.conf" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,139 +28,249 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-wolframe.conf \- program to do something
+wolframe.conf \- Wolframe server configuration file
 .SH "SYNOPSIS"
-.HP \w'\fBwolframe\&.conf\fR\ 'u
-\fBwolframe\&.conf\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ \fIthis\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ {\fIthis\fR\ |\ \fIthat\fR}]
-.HP \w'\fBwolframe\&.conf\fR\ 'u
-\fBwolframe\&.conf\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | {\fB\-v\fR\ |\ \fB\-\-version\fR}]
+.HP \w'\fB/etc/wolframe/wolframe\&.conf\fR\ 'u
+\fB/etc/wolframe/wolframe\&.conf\fR
 .SH "DESCRIPTION"
 .PP
-This manual page documents briefly the
-\fBwolframe\&.conf\fR
-and
-\fBbar\fR
-commands\&.
+This manual page documents briefly the configuration option of the Wolframe system\&.
+.SS "Global configuration options"
 .PP
-This manual page was written for the Debian distribution because the original program does not have a manual page\&. Instead, it has documentation in the GNU
-\fBinfo\fR(1)
-format; see below\&.
+\fBServerSignature\fR
+.RS 4
+If set to \*(AqOn\*(Aq the server prints the name of the server as first element of the greeting in the protocol\&. Possible values are \*(AqOn\*(Aq or \*(AqOff\*(Aq\&.
+.RE
 .PP
-\fBwolframe\&.conf\fR
-is a program that\&.\&.\&.
+\fBServerTokens\fR
+.RS 4
+Specifies how the server signature looks like when \*(AqServerSignature\*(Aq is set to \*(AqOn\*(Aq\&. Note: In a production environment you should be careful which information you reveal over the protocol to a possible attacker!
+.sp
+Possible values are:
+.PP
+None
+.RS 4
+Print nothing in the greeting line but the name of the software \*(AqWolframe\*(Aq\&.
+.RE
+.PP
+ProductOnly
+.RS 4
+Print the name of the product implemented in Wolframe and Wolframe itself\&.
+.RE
+.PP
+Major
+.RS 4
+Print only the major version of Wolframe\&.
+.RE
+.PP
+Minor
+.RS 4
+Print major and minor version of Wolframe\&.
+.RE
+.PP
+Revision
+.RS 4
+Print major, minor and revision of Wolframe\&.
+.RE
+.PP
+OS
+.RS 4
+Print all information, including the operating system Wolframe is running on\&.
+.RE
+.sp
+.RE
 .SH "OPTIONS"
 .PP
-The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&. For a complete description, see the
-\fBinfo\fR(1)
-files\&.
+The configuration of the wolframe daemon or service is separated into sections\&. Some sections like \*(AqLoadModules\*(Aq always exist, others only exist if a module has been loaded\&.
 .PP
-\fB\-e \fR\fB\fIthis\fR\fR, \fB\-\-example=\fR\fB\fIthat\fR\fR
+We describe here only the standard settings which exist when no modules are loaded\&.
+.PP
+Check out the manpages of the wolframe modules
+\fBwolframe-module-XXXX\fR(5)
+to see the available options in \*(Aqwolframe\&.conf\*(Aq when this module is loaded\&.
+.SS "LoadModules"
+.PP
+The \*(AqLoadModules\*(Aq section contains directives to extend the system with loadable modules\&. Those can be new database modules, new scripting languages, document filters and processors, authentication/authorization/audit modules and other 3rdParty bindings, etc\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBdirectory \fR\fB\fImodule_directory\fR\fR
 .RS 4
-Does this and that\&.
+Load modules from directory
+\fImodule_directory\fR
+instead of searching for modules in the standard system module directory of Wolframe\&.
 .RE
 .PP
-\fB\-h\fR, \fB\-\-help\fR
+\fBmodule \fR\fB\fImodule_name\fR\fR
 .RS 4
-Show summary of options\&.
-.RE
-.PP
-\fB\-v\fR, \fB\-\-version\fR
-.RS 4
-Show version of program\&.
-.RE
-.SH "FILES"
-.PP
-/etc/foo\&.conf
-.RS 4
-The system\-wide configuration file to control the behaviour of
-wolframe\&.conf\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
-.RE
-.PP
-${HOME}/\&.foo\&.conf
-.RS 4
-The per\-user configuration file to control the behaviour of
-wolframe\&.conf\&. See
-\fBfoo.conf\fR(5)
-for further details\&.
-.RE
-.SH "ENVIONMENT"
-.PP
-\fBFOO_CONF\fR
-.RS 4
-If used, the defined file is used as configuration file (see also
-the section called \(lqFILES\(rq)\&.
-.RE
-.SH "DIAGNOSTICS"
-.PP
-The following diagnostics may be issued on
-stderr:
-.PP
-Bad configuration file\&. Exiting\&.
-.RS 4
-The configuration file seems to contain a broken configuration line\&. Use the
-\fB\-\-verbose\fR
-option, to get more info\&.
-.RE
-.PP
-\fBwolframe\&.conf\fR
-provides some return codes, that can be used in scripts:
-.\" line length increase to cope w/ tbl weirdness
-.ll +(\n(LLu * 62u / 100u)
-.TS
-ll.
-\fICode\fR	\fIDiagnostic\fR
-T{
-\fB0\fR
-T}	T{
-Program exited successfully\&.
-T}
-T{
-\fB1\fR
-T}	T{
-The configuration file seems to be broken\&.
-T}
-.TE
-.\" line length decrease back to previous value
-.ll -(\n(LLu * 62u / 100u)
+Load module
+\fImodule_name\fR\&. Note: You don\*(Aqt have to specify the module extension like \*(Aq\&.so\*(Aq\&.
 .sp
+The
+\fImodule_name\fR
+can contain a relative path\&. The module path is always caculated relatively to the
+\fImodule_directory\fR
+or to the default installation path for Wolframe modules\&.
+.RE
+.SS "logging"
+.PP
+In the \*(Aqlogging\*(Aq section you can configure ways of the Wolframe server to log\&.
+.PP
+There are logging channels named \*(Aq\fBstderr\fR\*(Aq (for foreground mode only!), \*(Aq\fBlogFile\fR\*(Aq to log to a simple text file and \*(Aq\fBsyslog\fR\*(Aq to log to the system log\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBlevel \fR\fB\fIlog_level\fR\fR
+.RS 4
+Log only messages up to the level
+\fIlog_level\fR\&. Possible log levels are \*(AqFATAL\*(Aq, \*(AqALERT\*(Aq, \*(AqCRITICAL\*(Aq, \*(AqSEVERE\*(Aq, \*(AqERROR\*(Aq, \*(AqWARNING\*(Aq, \*(AqNOTICE\*(Aq, \*(AqINFO, \*(AqDEBUG\*(Aq, \*(AqTRACE\*(Aq, \*(AqDATA\*(Aq or \*(AqDATA2\*(Aq\&.
+.sp
+Note: This is the only directive which must be understood by all logging channels\&.
+.RE
+.PP
+\fBfilename (logFile) \fR\fB\fIfile_name\fR\fR
+.RS 4
+Write log message to the file denoted by
+\fIfile_name\fR\&.
+.RE
+.PP
+\fBident (syslog) \fR\fB\fIident\fR\fR
+.RS 4
+The syslog identifier to tag the log entries with\&.
+.RE
+.PP
+\fBfacility (syslog) \fR\fB\fIident\fR\fR
+.RS 4
+The syslog facility to tag the log entries with\&. Usual facilities are \*(AqLOCAL0\*(Aq to \*(AqLOCAL7\*(Aq, \*(AqUSER\*(Aq, \*(AqDAEMON\*(Aq or similar\&.
+.sp
+Consult the
+\fBopenlog\fR(3)
+man page to see what facilities are available on your system\&.
+.RE
+.SS "listen"
+.PP
+The \*(Aqlisten\*(Aq section deals with network settings\&.
+.PP
+You can choose between a plain socket with the \*(Aq\fBsocket\fR\*(Aq directive or an encrypted socket with \*(Aq\fBSSLsocket\fR\*(Aq\&.
+.PP
+Note: \*(Aqname\*(Aq, \*(Aqaddress\*(Aq, \*(Aqport\*(Aq and \*(AqmaxConnections\*(Aq are common directives for both plain and encrypted sockets\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+.RS 4
+Maximum number of simultaneous connections\&. This limits the number of clients which can use the server in parallel\&. If \*(Aq0\*(Aq is specified for
+\fImax_connections\fR
+or if the directive is absent, an operating system default is choosen\&.
+.RE
+.PP
+\fBthreads \fR\fB\fImax_threads\fR\fR
+.RS 4
+Size of the pool of threads serving client connections\&. The default for
+\fImax_threads\fR
+is 4\&.
+.RE
+.PP
+\fBaddress \fR\fB\fIip_address\fR\fR
+.RS 4
+IP address the server should listen to incoming connections\&.
+\fIip_address\fR
+is a valid IPv4 or IPv6 address\&. \*(Aq*\*(Aq denotes any address\&. \*(Aq0\&.0\&.0\&.0\*(Aq any IPv4 address\&. \*(Aq:::*\*(Aq any IPv6 address\&. \*(Aq127\&.0\&.0\&.1\*(Aq and \*(Aq::1\*(Aq denote the local loopback interface for IPv4 respectively IPv6\&.
+.RE
+.PP
+\fBport \fR\fB\fIport\fR\fR
+.RS 4
+Defines the port where the server listens on\&. We usually set
+\fIport\fR
+to 7661 for unencrypted connections and 7961 for encrypted connections\&.
+.RE
+.PP
+\fBname "\fR\fB\fIinterface_name\fR\fR\fB"\fR
+.RS 4
+You can give interfaces a name, so they can be identified as group (for instance in authentication, autorization, auditing)\&. Naming interfaces is not required\&.
+.RE
+.PP
+\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+.RS 4
+Sets the maximum number of simultaneous connections locally for this interface\&.
+.RE
+.PP
+\fBcertificate \fR\fB\fIserver\&.crt\fR\fR
+.RS 4
+The server certificate to use for encrypted connections\&. The format of the certificate is excepted to be
+PEM\&.
+.RE
+.PP
+\fBcertificate \fR\fB\fIserver\&.key\fR\fR
+.RS 4
+The server key to use for encrypted connections\&. The format of the key is excepted to be
+PEM\&.
+.RE
+.PP
+\fBCAdirectory \fR\fB\fICA_directory\fR\fR
+.RS 4
+A directory holding CA certificate files\&.
+.RE
+.PP
+\fBCAchainFile \fR\fB\fIchain_file\fR\fR
+.RS 4
+The
+\fIchain_file\fR
+holds the CA chain which is required to verify client certificates\&. The format of
+\fIchain_file\fR
+has to be
+PEM\&.
+.RE
+.PP
+\fBverify\fR \fION\fR | \fIOFF\fR
+.RS 4
+If switched on the server requires the client to send a valid client certificate which is checked by the server\&.
+.RE
+.SS "daemon"
+.PP
+The \*(Aqdaemon\*(Aq section sets the behaviour of the Wolframe server as a Unix daemon\&.
+.PP
+The following directives are valid in this section:
+.PP
+\fBuser \fR\fB\fIuser\fR\fR
+.RS 4
+Run the Wolframe daemon under permissions of the Unix user
+\fIuser\fR\&.
+.RE
+.PP
+\fBgroup \fR\fB\fIgroup\fR\fR
+.RS 4
+Run the Wolframe daemon under permissions of the Unix group
+\fIgroup\fR\&.
+.RE
+.PP
+\fBpidFile \fR\fB\fIpid_file\fR\fR
+.RS 4
+Where to store the PID daemon lock file\&. Note that
+\fIpid_file\fR
+must be in a location with enough rights for the
+\fIuser\fR
+to create the PID file!
+.RE
 .SH "BUGS"
 .PP
-The program is currently limited to only work with the
-foobar
-library\&.
-.PP
-The upstreams
-BTS
-can be found at
-\m[blue]\fB\%http://bugzilla.foo.tld\fR\m[]\&.
+Find issues and bugs on
+Github
+at
+\m[blue]\fB\%https://github.com/Wolframe/Wolframe/issues\fR\m[]\&.
 .SH "SEE ALSO"
 .PP
-\fBbar\fR(1),
-\fBbaz\fR(1),
-\fBfoo.conf\fR(5)
-.PP
-The programs are documented fully by
-The Rise and Fall of a Fooish Bar
-available via the
-\fBinfo\fR(1)
-system\&.
+\fBwolframed\fR(8)
 .SH "AUTHOR"
 .PP
-\fBMihai Barbos\fR <\&mihai\&.barbos@gmail\&.com\&>
+ <\&contact@wolframe\&.net\&>
 .RS 4
-Wrote this manpage for the Debian system\&.
+This manual was written by the Wolframe Team\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2010-2011 Mihai Barbos
+Copyright \(co 2010-2014 Wolframe Team
 .br
 .PP
-This manual page was written for the Debian system (and may be used by others)\&.
-.PP
-Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 2 or (at your option) any later version published by the Free Software Foundation\&.
-.PP
-On Debian systems, the complete text of the GNU General Public License can be found in
-/usr/share/common\-licenses/GPL\&.
+The authors grant permission to copy, distribute and/or modify this manual page under the terms of the GNU General Public License Version 3 or newer (GPLv3)\&.
 .sp

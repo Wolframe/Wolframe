@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -40,7 +40,7 @@
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
-#include "processor/moduleDirectory.hpp"
+#include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/filesystem.hpp>
@@ -74,35 +74,15 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			else
 				m_programFiles.push_back( programFile );
 		}
-		else	{
-			if ( modules )	{
-				module::ConfiguredBuilder* builder = 0;
-				boost::property_tree::ptree::const_iterator kwi=L1it->second.begin(),kwe=L1it->second.end();
-				for (; kwi != kwe; ++kwi)
-				{
-					const char* section = L1it->first.c_str();
-					const char* keyword = kwi->first.c_str();
-					builder = modules->getBuilder( section, keyword);
-					if (builder)
-					{
-						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-						if (conf->parse( kwi->second, kwi->first, modules))
-						{
-							m_procConfig.push_back( conf);
-						}
-						else
-						{
-							delete conf;
-							retVal = false;
-						}
-					}
-				}
-				if (!builder)
-				{
-					builder = modules->getBuilder( "processor", L1it->first );
+		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first )
+			|| boost::algorithm::iequals( "runtimeenv", L1it->first ) )	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									  L2it != L1it->second.end(); L2it++ )	{
+				if ( modules )	{
+					module::ConfiguredBuilder* builder = modules->getBuilder( L1it->first, L2it->first );
 					if ( builder )	{
 						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-						if ( conf->parse( L1it->second, L1it->first, modules ))
+						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_procConfig.push_back( conf );
 						else	{
 							delete conf;
@@ -110,12 +90,32 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 						}
 					}
 					else
-						LOG_WARNING << logPrefix() << "unknown configuration option: '"
-							    << L1it->first << "'";
+						LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
+							    << L2it->first << "'";
 				}
+				else
+					LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
+						    << L2it->first << "'";
+			}
+		}
+		else	{
+			if ( modules )	{
+				module::ConfiguredBuilder* builder = modules->getBuilder( "processor", L1it->first );
+				if ( builder )	{
+					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
+					if ( conf->parse( L1it->second, L1it->first, modules ))
+						m_procConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+				}
+				else
+					LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
+						    << L1it->first << "'";
 			}
 			else
-				LOG_WARNING << logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
 					    << L1it->first << "'";
 		}
 	}
@@ -250,9 +250,9 @@ db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 	return m_impl->transaction( name );
 }
 
-const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::typeNormalizer( const std::string& name) const
 {
-	return m_impl->normalizeFunction( name);
+	return m_impl->typeNormalizer( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::formFunction( const std::string& name) const
@@ -270,9 +270,9 @@ langbind::Filter* ProcessorProvider::filter( const std::string& name, const std:
 	return m_impl->filter( name, arg);
 }
 
-const types::CustomDataType* ProcessorProvider::customDataType( const std::string& domain, const std::string& name) const
+const types::CustomDataType* ProcessorProvider::customDataType( const std::string& name) const
 {
-	return m_impl->customDataType( domain, name);
+	return m_impl->customDataType( name);
 }
 
 }} // namespace _Wolframe::proc

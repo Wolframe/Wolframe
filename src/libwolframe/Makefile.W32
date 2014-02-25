@@ -7,10 +7,23 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
+# textwolf support for module types_string
+!IFDEF WITH_TEXTWOLF
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_TEXTWOLF
+!ENDIF
+
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)"
+
+# textwolf support for module types_string
+!IFDEF WITH_TEXTWOLF
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\textwolf\include
+!ENDIF
+
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -46,7 +59,10 @@ PROVIDER_OBJS = \
 	provider\procProvider.obj \
 	provider\procProviderImpl.obj \
 
-ADT_OBJS = \
+TYPE_OBJS = \
+	types_string.obj \
+	types_bignumber.obj \
+	types_datetime.obj \
 	types_doctype.obj \
 	types_customDataType.obj \
 	types_variant.obj \
@@ -56,9 +72,10 @@ ADT_OBJS = \
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
-	$(ADT_OBJS) \
+	$(TYPE_OBJS) \
 	malloc.obj \
 	version.obj \
+	appInfo.obj \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \

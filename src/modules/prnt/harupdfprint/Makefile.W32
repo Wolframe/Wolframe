@@ -29,10 +29,10 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	pdfPrinter.obj \
-	pdfPrinterDocumentImpl.obj \
 	pdfPrinterExpression.obj \
 	pdfPrinterMethod.obj \
 	pdfPrinterVariable.obj \
+	pdfPrintProgramType.obj \
 	pdfPrinterDocumentImpl.obj \
 	mod_print_harupdf.obj
 
@@ -41,7 +41,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModPrintHaruPdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModHaruPdfPrinter.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

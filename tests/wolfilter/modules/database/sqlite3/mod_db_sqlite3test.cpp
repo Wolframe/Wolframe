@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -33,10 +33,8 @@
 ///\file modules/database/testtrace/mod_db_sqlite3test.cpp
 ///\brief Module for a database implementation used for tests based on the sqlite3 database module
 #include "SQLiteTest.hpp"
-#include "processor/moduleInterface.hpp"
+#include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend* logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -50,18 +48,13 @@ static ConfiguredBuilder* createDatabase()
 	return &mod;
 }
 
-static void setModuleLogger( void* logger)
-{
-	logBackendPtr = reinterpret_cast<_Wolframe::log::LogBackend*>( logger);
-}
-
 enum {NofObjects=1};
 static CreateBuilderFunc containers[ NofObjects] =
 {
 	createDatabase
 };
 
-ModuleEntryPoint entryPoint( 0, "SQLite3 test database", setModuleLogger, NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "SQLite3 test database", NofObjects, containers, 0, 0);
 
 }} // namespace _Wolframe::module
 

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,6 +38,8 @@
 #include <boost/locale.hpp>
 #include <boost/locale/utf.hpp>
 #include <boost/locale/boundary/index.hpp>
+// not nice, but draws in auto-linking (see bug #84)
+#include <boost/thread.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -168,6 +170,8 @@ private:
 	const char* m_name;
 };
 
+namespace _Wolframe {
+namespace langbind {
 
 types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
 {
@@ -197,6 +201,12 @@ types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResource
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
 	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfd");
+}
+
+types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
+{
+	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfc");
 }
 
 types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg)
@@ -229,3 +239,4 @@ types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeRes
 	return new LocaleConvNormalizeFunction( *myreshnd, arg, &EuropeanAsciiNormalizer::localeConv, "ascii_eu");
 }
 
+}}//namespace

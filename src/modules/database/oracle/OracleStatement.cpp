@@ -1,296 +1,271 @@
 #include "OracleStatement.hpp"
 #include "types/variant.hpp"
-#include <boost/cstdint.hpp>
-#include <cstring>
-#include <stdint.h>
-//#include <libpq-fe.h>
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 
-//~ #if defined( _WIN32 )
-//~ #define WIN32_MEAN_AND_LEAN
-//~ #include <winsock2.h>
-//~ #else
-//~ #include <arpa/inet.h>
-//~ #endif
-
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-OracleStatement::OracleStatement( const OracleStatement& o)
-	:m_paramarsize(o.m_paramarsize)
-	,m_buf(o.m_buf)
+OracleStatement::OracleStatement( )
+	: BaseStatement( ),
+	m_env( 0 ),
+	m_conn( 0 ),
+	m_stmt( 0 ),
+	m_status( 0 )
 {
-	std::memcpy( m_paramofs, o.m_paramofs, m_paramarsize * sizeof(*m_paramofs));
-	std::memcpy( m_paramtype, o.m_paramtype, m_paramarsize * sizeof(*m_paramtype));
+	m_data.reserve( MaxNofParams );
 }
 
-
-OracleStatement::OracleStatement()
-	:m_paramarsize(0){}
-
-
-void OracleStatement::clear()
+OracleStatement::OracleStatement( const OracleStatement &o )
+	: BaseStatement( o ),
+	m_env( o.m_env ),
+	m_conn( o.m_conn ),
+	m_stmt( o.m_stmt ),
+	m_status( o.m_status )
 {
-	m_paramarsize = 0;
-	m_buf.clear();
-	m_stmstr.clear();
 }
 
-void OracleStatement::init( const std::string& stmstr)
+OracleStatement::OracleStatement( OracleEnvirenment *env )
+	: m_env( env ),
+	m_conn( 0 ),
+	m_stmt( 0 ),
+	m_status( 0 )
 {
-	clear();
-	m_stmstr = stmstr;
+	m_data.reserve( MaxNofParams );
 }
 
-void OracleStatement::bind( unsigned int idx, const types::Variant& value)
+void OracleStatement::setConnection( OracleConnection *conn )
 {
-	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("iternal: wrong order of bind param in postgreSQL database module");
+	m_conn = conn;
+}
 
-	switch (value.type())
-	{
+void OracleStatement::setStatement( OCIStmt *stmt )
+{
+	m_stmt = stmt;
+}
+
+sword OracleStatement::getLastStatus( )
+{
+	return m_status;
+}
+
+void OracleStatement::bindUInt64( const unsigned int idx, oraub8 &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( oraub8 ),
+		SQLT_UIN, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindInt64( const unsigned int idx, orasb8 &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( orasb8 ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindUInt( const unsigned int idx, unsigned int &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( unsigned int ),
+		SQLT_UIN, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindInt( const unsigned int idx, signed int &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( signed int ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+// TODO: hard-wired to a NUMBER(1) with 0 and 1 for now	
+void OracleStatement::bindBool( const unsigned int idx, signed int &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( signed int ),
+		SQLT_INT, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindDouble( const unsigned int idx, double &value )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+	
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)&value, (sb4)sizeof( double ),
+		SQLT_BDOUBLE, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_INTEGER &value )
+{
+	throw new std::logic_error( "bindNumber with _WOLFRAME_INTEGER not implemented for value '"
+		+ boost::lexical_cast<std::string>( value ) + "' for index "
+		+ boost::lexical_cast<std::string>( idx ) );
+}
+
+void OracleStatement::bindNumber( const unsigned int idx, const _WOLFRAME_UINTEGER &value )
+{
+	throw new std::logic_error( "bindNumber with _WOLFRAME_UINTEGER not implemented for value '"
+		+ boost::lexical_cast<std::string>( value ) + "' for index "
+		+ boost::lexical_cast<std::string>( idx ) );
+}
+
+void OracleStatement::bindString( const unsigned int idx, char* value, const std::size_t size )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)value, (sb4)size,
+		SQLT_CHR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::bindNull( const unsigned int idx )
+{
+	OCIBind *bindhp = (OCIBind *)0;
+
+	m_status = OCIBindByPos( m_stmt, &bindhp, m_conn->errhp,
+		(ub4)idx, (dvoid *)0, (sb4)0,
+		SQLT_CHR, (dvoid *)0, (ub2 *)0, (ub2 *)0,
+		(ub4)0, (ub4 *)0, OCI_DEFAULT );
+}
+
+void OracleStatement::clear( )
+{
+	BaseStatement::clear( );
+	m_data.clear( );
+}
+
+void OracleStatement::bind( const unsigned int idx, const types::Variant &value )
+{
+	// does boundary checking
+	BaseStatement::bind( idx, value );
+
+	// remember value
+	OracleData data;
+	data.v = value;
+	m_data.push_back( data );
+	
+	// bind it
+	switch( value.type( ) ) {
 		case types::Variant::Null:
-			bindNull();
+			bindNull( idx );
 			break;
-
+		
 		case types::Variant::Int:
-			// numeric_limits::max does not work with windows includes
-			if (value.data().value.Int <= 0x7FFF && value.data().value.Int >= -0x7FFF)
-			{
-				bindInt16( (boost::int16_t)value.data().value.Int);
-			}
-			else if (value.data().value.Int <= 0x7FFFffff && value.data().value.Int >= -(0x7FFFffff))
-			{
-				bindInt32( (boost::int32_t)value.data().value.Int);
-			}
-			else
-			{
-				bindInt64( value.data().value.Int);
+			if( value.data( ).value.Int <= std::numeric_limits<signed int>::max( ) && value.data( ).value.Int >= std::numeric_limits<signed int>::min( ) ) {
+				m_data.back( ).i = (signed int)m_data.back( ).v.data( ).value.Int;
+				bindInt( idx, m_data.back( ).i );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+			} else if( value.data( ).value.Int <= std::numeric_limits<orasb8>::max( ) ) {
+				m_data.back( ).i64 = m_data.back( ).v.data( ).value.Int;
+				bindInt64( idx, m_data.back( ).i64 );
+#else				
+			} else {
+				bindNumber( idx, m_data.back( ).v.data( ).value.Int );
+#endif
 			}
 			break;
 
 		case types::Variant::UInt:
-			if (value.data().value.UInt <= 0xFFff)
-			{
-				bindUInt16( (boost::uint16_t)value.data().value.UInt);
-			}
-			else if (value.data().value.UInt <= 0xFFFFffff)
-			{
-				bindUInt32( (boost::uint32_t)value.data().value.UInt);
-			}
-			else
-			{
-				bindUInt64( value.data().value.UInt);
+			if( value.data( ).value.Int <= std::numeric_limits<signed int>::max( ) ) {
+				m_data.back( ).ui = (unsigned int)m_data.back( ).v.data( ).value.UInt;
+				bindUInt( idx, m_data.back( ).ui );
+#if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )
+			} else if( value.data( ).value.Int <= std::numeric_limits<orasb8>::max( ) ) {
+				m_data.back( ).ui64 = m_data.back( ).v.data( ).value.UInt;
+				bindUInt64( idx, m_data.back( ).ui64 );
+#else				
+			} else {
+				bindNumber( idx, m_data.back( ).v.data( ).value.UInt );
+#endif
 			}
 			break;
 
 		case types::Variant::Double:
-			bindDouble( value.data().value.Double);
+			m_data.back( ).d = m_data.back( ).v.data().value.Double;
+			bindDouble( idx, m_data.back( ).d );
 			break;
 
 		case types::Variant::Bool:
-			bindBool( value.data().value.Bool);
+			m_data.back( ).i = m_data.back( ).v.toint( );
+			bindBool( idx, m_data.back( ).i );
 			break;
 
 		case types::Variant::String:
-			bindString( value.charptr(), value.charsize());
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
-	}
-}
 
-//\remark See implementation of pq_sendint64
-void OracleStatement::bindUInt64( boost::uint64_t value, const char* type)
-{
-	//~ boost::uint32_t pp[2];
-	//~ pp[0] = (boost::uint32_t) (value >> 32);
-	//~ pp[0] = htonl( pp[0]);
-	//~ pp[1] = (boost::uint32_t) (value);
-	//~ pp[1] = htonl( pp[1]);
-	//~ setNextParam( (const void*)&pp, sizeof(pp), type);
-}
-
-void OracleStatement::bindInt64( boost::int64_t value)
-{
-	bindUInt64( (boost::uint64_t)value, "int8");
-}
-
-void OracleStatement::bindUInt32( boost::uint32_t value, const char* type)
-{
-	//~ boost::uint32_t pp;
-	//~ pp = htonl( value);
-	//~ setNextParam( &pp, sizeof(pp), type);
-}
-
-void OracleStatement::bindInt32( boost::int32_t value)
-{
-	bindUInt32( (boost::uint32_t)value, "int4");
-}
-
-void OracleStatement::bindUInt16( boost::uint16_t value, const char* type)
-{
-	//~ boost::uint16_t pp = htons( value);
-	//~ setNextParam( &pp, sizeof(pp), type);
-}
-
-void OracleStatement::bindInt16( boost::int16_t value)
-{
-	bindUInt16( (boost::uint16_t)value, "int2");
-}
-
-void OracleStatement::bindByte( boost::uint8_t value, const char* type)
-{
-	setNextParam( &value, sizeof(value), type);
-}
-
-void OracleStatement::bindByte( boost::int8_t value)
-{
-	bindByte( (boost::uint8_t)value, "int1");
-}
-
-void OracleStatement::bindBool( bool value)
-{
-	bindByte( value?1:0, "uint1");
-}
-
-//\remark See implementation of pq_sendfloat8
-void OracleStatement::bindDouble( double value)
-{
-	union
-	{
-		double f;
-		boost::uint64_t i;
-	} swap;
-	swap.f = value;
-	bindUInt64( swap.i, "float8");
-}
-
-void OracleStatement::bindString( const char* value, std::size_t size)
-{
-	setNextParam( value, size, "");
-	m_buf.push_back( '\0');
-}
-
-void OracleStatement::bindNull()
-{
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
-	m_paramofs[ m_paramarsize] = 0;
-	m_paramtype[ m_paramarsize] = 0;
-	m_paramlen[ m_paramarsize] = 0;
-	m_parambinary[ m_paramarsize] = 1;
-	++m_paramarsize;
-}
-
-void OracleStatement::setNextParam( const void* ptr, unsigned int size, const char* type)
-{
-	if (m_paramarsize > (int)MaxNofParam)
-	{
-		throw std::runtime_error( "Too many parameters in statement");
-	}
-	m_paramofs[ m_paramarsize] = m_buf.size();
-	m_paramtype[ m_paramarsize] = type;
-	m_paramlen[ m_paramarsize] = size;
-	m_parambinary[ m_paramarsize] = (type && type[0])?1:0;
-
-	m_buf.append( (const char*)ptr, size);
-	++m_paramarsize;
-}
-
-std::string OracleStatement::statementString() const
-{
-	std::string rt;
-	std::string::const_iterator si = m_stmstr.begin(), se = m_stmstr.end();
-	std::string::const_iterator chunkstart = si;
-
-	for (; si != se; ++si)
-	{
-		if (*si == '\'' || *si == '\"')
+		case types::Variant::Timestamp:
 		{
-			// ignore contents in string:
-			char eb = *si;
-			for (++si; si != se && *si != eb; ++si)
+			/*[PF:TODO] Implementation*/
+			m_data.back().v.convert( types::Variant::String);
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
+			break;
+		}
+		case types::Variant::BigNumber:
+		{
+			/*[PF:TODO] Implementation*/
+			m_data.back().v.convert( types::Variant::String);
+			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
+			break;
+		}
+		case types::Variant::Custom:
+		{
+			types::Variant baseval;
+			try
 			{
-				if (*si == '\\')
+				value.customref()->getBaseTypeValue( baseval);
+				if (baseval.type() != types::Variant::Custom)
 				{
-					++si;
-					if (si == se) break;
+					bind( idx, baseval);
+					break;
 				}
 			}
-			if (si == se) throw std::runtime_error( "string not terminated in statement");
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			throw std::runtime_error( "cannot convert value to base type for binding");
 		}
-		if (*si == '$')
-		{
-			if (si > chunkstart)
-			{
-				rt.append( chunkstart, si);
-				chunkstart = si;
-			}
-			int idx = 0;
-			for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
-			{
-				idx *= 10;
-				idx += (*si - '0');
-				if (idx > MaxNofParam) throw std::runtime_error( "parameter index out of range");
-			}
-			if (si != se)
-			{
-				if ((*si|32) >= 'a' && (*si|32) <= 'z') throw std::runtime_error( "illegal parameter index (immediately followed by identifier)");
-				if (*si == '_') throw std::runtime_error( "illegal parameter index (immediately followed by underscore)");
-			}
-			if (idx == 0 || idx > m_paramarsize) throw std::runtime_error( "parameter index out of range");
-			if (m_paramtype[ idx-1])
-			{
-				rt.append( "$");
-				rt.append( chunkstart, si);
-				if (m_paramtype[ idx-1][0])
-				{
-					rt.append( "::");
-					rt.append( m_paramtype[ idx-1]);
-				}
-			}
-			else
-			{
-				rt.append( "NULL");
-			}
-			chunkstart = si;
-			if (si == se) break;
-		}
+		default:
+			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}
-	if (si > chunkstart)
-	{
-		rt.append( chunkstart, si);
-	}
-	return rt;
 }
 
-void OracleStatement::getParams( Params& params) const
+OracleStatement::~OracleStatement( )
 {
-	params.paramarsize = m_paramarsize;
-	for (int ii=0; ii<m_paramarsize; ++ii)
-	{
-		if (m_paramtype[ ii])
-		{
-			params.paramar[ ii] = (m_buf.c_str() + m_paramofs[ ii]);
-		}
-		else
-		{
-			params.paramar[ ii] = 0;
-		}
+	std::vector<OracleData>::iterator it, end = m_data.end( );
+	for( it = m_data.begin( ); it != end; it++ ) {
+		if( (*it).s ) free( (*it).s );
 	}
 }
 
-OCIStmt* OracleStatement::execute( OracleConnection *conn) const
+const std::string OracleStatement::replace( const unsigned int idx ) const
 {
-	std::string command = statementString();
-	Params params;
-	getParams( params);
-
-//	return PQexecParams(
-//			conn, command.c_str(), params.paramarsize, 0/*no OIDs*/, 
-//			params.paramar, m_paramlen, m_parambinary, 1/*result binary*/);
-	return 0;
+	return ":" + boost::lexical_cast< std::string >( idx );
 }
-
-
 

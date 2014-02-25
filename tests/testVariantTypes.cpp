@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -36,11 +36,13 @@
 
 #include "gtest/gtest.h"
 #include "types/variant.hpp"
+#include "types/malloc.hpp"
 #include <string>
 #include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cfloat>
+#include <stdint.h>
 
 using namespace _Wolframe;
 using namespace types;
@@ -57,6 +59,20 @@ TEST( variantTypeFixture, prerequisites )
 #endif
 }
 
+TEST( variantTypeFixture, type )
+{
+	Variant v( "test" );
+	ASSERT_EQ( v.type( ), Variant::String );
+	v = (unsigned int)47;
+	ASSERT_EQ( v.type( ), Variant::UInt );
+	v = -47;
+	ASSERT_EQ( v.type( ), Variant::Int );
+	v = 47.0;
+	ASSERT_EQ( v.type( ), Variant::Double );
+	v = false;
+	ASSERT_EQ( v.type( ), Variant::Bool );
+}
+
 TEST( variantTypeFixture, casts )
 {
 	string s = "47";
@@ -65,6 +81,11 @@ TEST( variantTypeFixture, casts )
 	ASSERT_EQ( "47", v.tostring( ) );
 	v.convert( Variant::UInt );
 	ASSERT_EQ( 47, v.touint( ) );
+	v.convert( Variant::Double );
+	ASSERT_DOUBLE_EQ( 47.0, v.todouble( ) );
+	v = 1;
+	v.convert( Variant::Bool );
+	ASSERT_EQ( true, v.tobool( ) );
 }
 
 TEST( variantTypeFixture, uint32 )
@@ -76,20 +97,70 @@ TEST( variantTypeFixture, uint32 )
 	ASSERT_EQ( "47", v.tostring( ) );
 }
 
-TEST( variantTypeFixture, uint64 )
+TEST( variantTypeFixture, int64positive )
 {
-	boost::uint64_t i = UINT64_C( 18446744073709551615 ); // 2^64-1
+	_WOLFRAME_INTEGER i = INT64_C( 92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
+TEST( variantTypeFixture, int64negative )
+{
+	_WOLFRAME_INTEGER i = INT64_C( -92233720368545808 );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-92233720368545808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );	
+}
+
+TEST( variantTypeFixture, uint64max )
+{
+	_WOLFRAME_UINTEGER i = std::numeric_limits<_WOLFRAME_UINTEGER>::max( );
 	Variant v( i );
 	ASSERT_EQ( i, v.touint( ) );
 	v.convert( Variant::String );
-	ASSERT_EQ( "18446744073709551615", v.tostring( ) );
+	ASSERT_EQ( "18446744073709551615", v.tostring( ) );	
+	v.convert( Variant::UInt );
+	ASSERT_EQ( i, v.touint( ) );
 }
 
-TEST( variantTypeFixture, initialized )
+TEST( variantTypeFixture, int64max )
+{
+	_WOLFRAME_INTEGER i = std::numeric_limits<_WOLFRAME_INTEGER>::max( );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "9223372036854775807", v.tostring( ) );	
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, int64min )
+{
+	_WOLFRAME_INTEGER i = std::numeric_limits<_WOLFRAME_INTEGER>::min( );
+	Variant v( i );
+	ASSERT_EQ( i, v.toint( ) );
+	v.convert( Variant::String );
+	ASSERT_EQ( "-9223372036854775808", v.tostring( ) );
+	v.convert( Variant::Int );
+	ASSERT_EQ( i, v.toint( ) );
+}
+
+TEST( variantTypeFixture, defined )
 {
 	Variant v;
 
-	ASSERT_FALSE( v.initialized( ) );
+	ASSERT_FALSE( v.defined( ) );
+	
+	v = 2;
+
+	ASSERT_TRUE( v.defined( ) );
 }
 
 TEST( variantTypeFixture, output )

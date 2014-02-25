@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2013 Project Wolframe.
+ Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -42,7 +42,6 @@
 #include "database/DBprovider.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "prgbind/runtimeEnvironmentConstructor.hpp"
 #include <list>
 #include <map>
 
@@ -69,11 +68,11 @@ public:
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
 
-	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	const types::NormalizeFunction* typeNormalizer( const std::string& name) const;
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
-	const types::CustomDataType* customDataType( const std::string& domain, const std::string& name) const;
+	const types::CustomDataType* customDataType( const std::string& name) const;
 
 	bool loadPrograms();
 	bool checkReferences( const ProcessorProvider* provider) const;
@@ -102,8 +101,6 @@ private:
 
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;
-	std::vector<prgbind::RuntimeEnvironmentDef> m_runtime_environment_defs;
-	std::vector<prgbind::RuntimeEnvironmentR> m_runtime_environments;
 };
 
 }} // namespace _Wolframe::proc

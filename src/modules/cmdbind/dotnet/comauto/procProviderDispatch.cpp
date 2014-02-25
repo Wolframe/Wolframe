@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2013 Project Wolframe.
+Copyright (C) 2011 - 2014 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -57,18 +57,18 @@ static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvid
 	const langbind::FormFunction* func = provider_->formFunction( funcname_);
 	if (func == 0)
 	{
-		throw std::runtime_error( "function not found (processor provider function call)" );
+		throw std::runtime_error( std::string( "function '") + funcname_ + "' not found (processor provider function call)");
 	}
 	langbind::FormFunctionClosureR funcexec( func->createClosure());
 	if (!funcexec.get())
 	{
-		throw std::runtime_error( "creation of function execution context failed (processor provider function call)" );
+		throw std::runtime_error( "creation of function execution context failed (processor provider function call)");
 	}
 	serialize::Context::Flags flags = serialize::Context::CaseInsensitiveCompare;
 	funcexec->init( provider_, input_, flags);
 	if (!funcexec->call())
 	{
-		throw std::runtime_error( "call of function failed (processor provider function call)" );
+		throw std::runtime_error( std::string( "call of function '") + funcname_ + "' failed (processor provider function call)");
 	}
 	return funcexec->result();
 }
@@ -114,7 +114,7 @@ static int compareIdentifier( LPOLESTR aa, LPOLESTR bb)
 		return (aa[0] == 0);
 }
 
-HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
+HRESULT comauto::ProcessorProviderDispatch::GetIDsOfNames( REFIID , LPOLESTR* rgszNames, UINT cNames, LCID /*lcid ignored*/,  DISPID* rgDispId)
 {
 	return DispGetIDsOfNames( m_typeinfo, rgszNames, cNames, rgDispId);
 }
@@ -193,39 +193,56 @@ static CLSID getUUIDfromVariantArg( const VARIANT& arg, const IRecordInfo* recor
 }
 
 
-HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID /*riid*/, LCID /*lcid*/, WORD /*wFlags*/, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* /*puArgErr*/)
 {
 	try
 	{
-		if (dispIdMember == (DISPID)DispID_CALL)
+		if (dispIdMember == (DISPID)DispID_CALL || dispIdMember == (DISPID)DispID_CALL_NORES)
 		{
 			if (pDispParams->cNamedArgs != 0)
 			{
 				throw std::runtime_error( "handling of named parameters not implemented");
 			}
-			if (pDispParams->cArgs != 3)
-			{
-				throw std::runtime_error( "illegal number of arguments (3 arguments expected)");
-			}
-			std::string funcname = utf8string( pDispParams->rgvarg[ 2].bstrVal);
-			VARIANT* inputarg  = &pDispParams->rgvarg[1];
-			VARIANT* resultarg = &pDispParams->rgvarg[0];
-
+			std::string funcname;
+			VARIANT* inputarg = 0;
+			VARIANT* resultarg = 0;
 			ITypeInfo* resultGuidTypeInfo = 0;
 			ITypeInfo* resultTypeInfo = 0;
 			ITypeInfo* inputTypeInfo = 0;
 			HRESULT hr = S_OK;
 
-			if (resultarg->vt != VT_RECORD || !resultarg->pRecInfo) throw std::runtime_error( "result parameter of provider call is not a valid structure (VT_RECORD) with public type info");
+			if (dispIdMember == (DISPID)DispID_CALL_NORES)
+			{
+				if (pDispParams->cArgs != 2)
+				{
+					throw std::runtime_error( "illegal number of arguments (2 arguments expected)");
+				}
+				funcname = utf8string( pDispParams->rgvarg[ 1].bstrVal);
+				inputarg  = &pDispParams->rgvarg[0];
+			}
+			else
+			{
+				if (pDispParams->cArgs != 3)
+				{
+					throw std::runtime_error( "illegal number of arguments (3 arguments expected)");
+				}
+				funcname = utf8string( pDispParams->rgvarg[ 2].bstrVal);
+				inputarg  = &pDispParams->rgvarg[1];
+				resultarg = &pDispParams->rgvarg[0];
+				if (resultarg->vt != VT_RECORD || !resultarg->pRecInfo) throw std::runtime_error( "result parameter of provider call is not a valid structure (VT_RECORD) with public type info");
+			}
+
 			try
 			{
 				hr = inputarg->pRecInfo->GetTypeInfo( &inputTypeInfo);
 				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of input (is it declared as public ?)");
-				hr = resultarg->pRecInfo->GetTypeInfo( &resultGuidTypeInfo);
-				if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of result (is it declared as public ?)");
-
-				CLSID resultUUID = getUUIDfromVariantArg( *resultarg, resultarg->pRecInfo, resultGuidTypeInfo);
-				WRAP (const_cast<ITypeLib*>(m_typelib->typelib())->GetTypeInfoOfGuid( resultUUID, &resultTypeInfo));
+				if (resultarg)
+				{
+					hr = resultarg->pRecInfo->GetTypeInfo( &resultGuidTypeInfo);
+					if (hr != S_OK) throw std::runtime_error( "cannot get type info from record info of result (is it declared as public ?)");
+					CLSID resultUUID = getUUIDfromVariantArg( *resultarg, resultarg->pRecInfo, resultGuidTypeInfo);
+					WRAP (const_cast<ITypeLib*>(m_typelib->typelib())->GetTypeInfoOfGuid( resultUUID, &resultTypeInfo));
+				}
 
 				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
 				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
@@ -233,15 +250,17 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
 				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
 
-				AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
-				VARIANT res;
-				res.vt = VT_EMPTY;
-				if (!resultassign.call( res))
+				if (resultarg)
 				{
-					throw std::runtime_error( "failed to assign result of processor provider call");
+					AssignmentClosure resultassign( m_typelib, result, resultTypeInfo);
+					VARIANT res;
+					res.vt = VT_EMPTY;
+					if (!resultassign.call( res))
+					{
+						throw std::runtime_error( "failed to assign result of processor provider call");
+					}
+					*pVarResult = res;
 				}
-				*pVarResult = res;
-
 				if (resultTypeInfo) resultTypeInfo->Release();
 				if (resultGuidTypeInfo) resultGuidTypeInfo->Release();
 				if (inputTypeInfo) inputTypeInfo->Release();

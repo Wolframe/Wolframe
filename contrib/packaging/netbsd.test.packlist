@@ -1,0 +1,71 @@
+#!/bin/sh
+
+VERSION=0.0.1
+PKGBUILD=$HOME/bsdbuild
+ORIG_ARCH=`uname -m`
+if test "x$ORIG_ARCH" = "xamd64"; then
+	ARCH="x86_64"
+	PACK_ARCH="x86_64"
+else
+if test "x$ORIG_ARCH" = "xi386"; then
+	ARCH="i686"
+	PACK_ARCH="i386"
+else
+	echo "ERROR: Unknown NetBSD architecture '$ORIG_ARCH'"
+	exit 1
+fi
+fi
+
+check_for_errors( )
+{
+	RET=$?
+	if test $RET -gt 0; then
+		echo "Packaging failed."
+		exit 1
+	fi
+}
+
+cp packaging/netbsd/comment $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/netbsd/description $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/netbsd/packlist $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/netbsd/iscript $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/netbsd/dscript $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/netbsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/etc/wolframe/.
+rm -rf $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d
+mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d
+cp packaging/netbsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/.
+chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/wolframed
+
+OPSYS=`uname -s`
+OS_VERSION=`uname -r`
+cat <<EOF > $PKGBUILD/PKG/wolframe-$VERSION/build-info
+MACHINE_ARCH=$PACK_ARCH
+OPSYS=$OPSYS
+OS_VERSION=$OS_VERSION
+PKGTOOLS_VERSION=20091115
+EOF
+
+cd $PKGBUILD/PKG/wolframe-$VERSION
+
+pkg_create -v -p . -I / \
+	-B build-info \
+	-c comment \
+	-d description \
+	-f packlist \
+	-i iscript \
+	-k dscript \
+	$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
+check_for_errors
+
+echo "Packaging succeeded."
+
+cd $PKGBUILD
+pkg_info -L PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz | sort > in
+cd $PKGBUILD/PKG/wolframe-$VERSION
+find . -type f | sort | sed 's|^\.||g' > ../../now
+
+echo "Differences in package and in installation root:"
+cd $PKGBUILD
+diff now in
+
+exit 0

@@ -54,28 +54,31 @@ struct Libxml2Filter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createLibxml2Filter( const std::string& name, const std::vector<FilterArgument>& arg)
-{
-	const char* filterbasename = "libxml2";
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != filterbasename) throw std::runtime_error( "libxml2 filter name does not match");
-	if (arg.empty()) return Libxml2Filter();
-	const char* encoding = 0;
-	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-		{
-			encoding = ai->second.c_str();
-			break;
-		}
-	}
-	return encoding?Libxml2Filter( encoding):Libxml2Filter();
-}
 
-Filter* _Wolframe::langbind::createLibxml2FilterPtr( const std::string& name, const std::vector<FilterArgument>& arg)
+class Libxml2FilterType :public FilterType
 {
-	return new Filter( createLibxml2Filter( name, arg));
+public:
+	Libxml2FilterType(){}
+	virtual ~Libxml2FilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const
+	{
+		const char* encoding = 0;
+		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+		for (; ai != ae; ++ai)
+		{
+			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+			{
+				encoding = ai->second.c_str();
+				break;
+			}
+		}
+		return encoding?(new Libxml2Filter( encoding)):(new Libxml2Filter());
+	}
+};
+
+FilterType* _Wolframe::langbind::createLibxml2FilterType()
+{
+	return new Libxml2FilterType();
 }
 

@@ -40,17 +40,60 @@
 			}]
 	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson  --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --program simpleform_range_trim.wnmp --program employee_assignment_print.sfrm --cmdprogram ddlform_iterator_scope.lua run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
-**file:simpleform_range_trim.wnmp
-int=string:trim,number:integer(10);
-uint=string:trim,number:unsigned(10);
-float=string:trim,number:float(10,10);
-currency=number:fixedpoint(13,2);
-percent_1=number:fixedpoint(5,1);
-**requires:DISABLED NETBSD
+**file:wolframe.conf
+LoadModules
+{
+	module ../../src/modules/cmdbind/lua/mod_command_lua
+	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
+	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/normalize/string/mod_normalize_string
+}
+Processor
+{
+	program		normalize.wnmp
+	program		form.sfrm
+	cmdhandler
+	{
+		lua
+		{
+			program script.lua
+		}
+	}
+}
+**file:normalize.wnmp
+int=trim,integer(10 );
+uint=trim,unsigned(10);
+float=trim, floatingpoint( 10,10);
+currency=fixedpoint(13, 2);
+percent_1=fixedpoint(5 ,1);
+**file:form.sfrm
+FORM Employee
+{
+	firstname string
+	surname string
+	phone string
+}
 
-**file: ddlform_iterator_scope.lua
+FORM employee_assignment_print
+{
+	assignmentlist
+	{
+		assignment []
+		{
+			task []
+			{
+				title string
+				key string
+				customernumber int
+			}
+			employee Employee
+			issuedate string
+		}
+	}
+}
+**file:script.lua
 function print_tree( itr)
 	for v,t in itr do
 		output:print( v,t)
@@ -141,32 +184,7 @@ function run()
 		end
 	end
 end
-
-**file: employee_assignment_print.sfrm
-FORM Employee
-{
-	firstname string
-	surname string
-	phone string
-}
-
-FORM employee_assignment_print
-{
-	assignmentlist
-	{
-		assignment []
-		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
-		}
-	}
-}
+**requires:DISABLED NETBSD
 
 **output
 {

@@ -148,7 +148,7 @@ TEST_CPP_BINS = \
 	connectionListTest$(EXE) \
 	resolvePathTest$(EXE) \
 	testBoostPath$(EXE) \
-	singletonTest$(EXE) \
+	testFiletypeRecognition$(EXE) \
 	byte2hexTest$(EXE) \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
@@ -167,9 +167,13 @@ TEST_CPP_BINS = \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
-	testVariantTypes$(EXE)
+	testVariantTypes$(EXE) \
+	testIntegers$(EXE) \
+	testString$(EXE) \
+	testDateTime$(EXE) \
+	testBigNumber$(EXE) \
+#	testStorageDataType$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
-
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
 
@@ -190,9 +194,12 @@ configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
-stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
 testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
-
+testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
+testString$(EXE):  $(TOPDIR)/src/libwolframe.a
+testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
+testBigNumber$(EXE):  $(TOPDIR)/src/libwolframe.a
+#testStorageDataType$(EXE):  $(TOPDIR)/src/libwolframe.a
 local_all:
 
 local_clean:
@@ -246,7 +253,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBoostPath
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./singletonTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testFiletypeRecognition
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA
 	@echo
@@ -275,6 +282,16 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testString
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBigNumber
+#	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testStorageDataType
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 #	@echo
