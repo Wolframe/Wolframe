@@ -61,6 +61,8 @@
 		<member>Custom Data Type</member><member>A custom data type defined in a module with arithmetic operators and methods</member>
 		<member>Normalization Function</member><member>A normalization function type defined in a module</member>
 		<member>DDL Data Type</member><member>A normalizer defined as sequence of normalization functions in a .wnmp source file</member>
+		<member>'bignumber' Data Type</member><member>Arbitrary precision number type</member>
+		<member>'datetime' Data Type</member><member>data type representing date and time down to a granularity of microseconds</member>
 		</simplelist>
 
 	</para>
