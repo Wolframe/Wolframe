@@ -79,7 +79,6 @@ public:
 	bool incConnCount()
 	{
 		boost::mutex::scoped_lock lock( m_mutex );
-		assert( m_connCount >= 0 );
 		if ( m_maxConn > 0 )	{
 			if ( m_connCount < m_maxConn )	{
 				m_connCount++;
@@ -99,7 +98,7 @@ public:
 	void decConnCount()
 	{
 		boost::mutex::scoped_lock lock( m_mutex );
-		assert( m_connCount >= 0 );
+		assert( m_connCount > 0 );
 			m_connCount--;
 	}
 
@@ -108,8 +107,8 @@ private:
 #ifdef WITH_SSL
 	std::list< SocketConnectionList< SSLconnection_ptr >* >	m_SSLconnList;
 #endif // WITH_SSL
-	unsigned						m_maxConn;
-	long int						m_connCount;
+	std::size_t						m_maxConn;
+	std::size_t						m_connCount;
 	boost::mutex						m_mutex;
 };
 
@@ -138,7 +137,6 @@ public:
 		long int	noConn;
 		{
 			boost::mutex::scoped_lock lock( m_mutex );
-			assert( m_connCount >= 0 );
 			if ( m_maxConn > 0 )	{
 				if ( m_connCount < m_maxConn )	{
 					if ( m_globalList.incConnCount())	{
@@ -162,7 +160,7 @@ public:
 					return false;
 			}
 			noConn = m_connCount;
-			assert( m_connCount == (long int)m_connList.size() );
+			assert( m_connCount == m_connList.size() );
 		}
 		LOG_DATA << "PUSH - Connections on socket: " << noConn << " of maximum " << m_maxConn << ", " << conn->toString();
 		return true;
@@ -179,7 +177,7 @@ public:
 			m_connList.remove( conn );
 			m_globalList.decConnCount();
 			m_connCount--;
-			assert( m_connCount == (long int)m_connList.size() );
+			assert( m_connCount == m_connList.size() );
 		}
 		LOG_DATA << "REMOVE - Connections on socket: " << m_connCount << " of maximum " << m_maxConn << ", " << conn->toString();
 	}
@@ -198,7 +196,7 @@ public:
 			m_connList.pop_front();
 			m_globalList.decConnCount();
 			m_connCount--;
-			assert( m_connCount == (long int)m_connList.size() );
+			assert( m_connCount == m_connList.size() );
 		}
 		LOG_DATA << "POP - Connection " << conn->toString();
 		return conn;
@@ -206,8 +204,8 @@ public:
 
 private:
 	std::list< T >		m_connList;
-	long int		m_connCount;
-	unsigned int		m_maxConn;
+	std::size_t		m_connCount;
+	std::size_t		m_maxConn;
 	GlobalConnectionList&	m_globalList;
 	boost::mutex		m_mutex;
 };
