@@ -248,7 +248,7 @@ function luanorm( inp )
 				if k == "id" or k == "tag" then
 					rt[ k] = tonumber(v) + 100
 				else
-					local nf = provider.normalizer( "normname")
+					local nf = provider.type( "normname")
 					rt[ k] = nf( v)
 				end
 			end

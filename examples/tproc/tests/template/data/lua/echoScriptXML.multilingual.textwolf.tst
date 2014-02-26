@@ -19,7 +19,7 @@ recode lat1..ibmpc >> $output <<!TEST
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	f.empty = false
 	input:as( f)
 	output:as( f)

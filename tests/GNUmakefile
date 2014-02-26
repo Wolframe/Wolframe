@@ -173,7 +173,6 @@ TEST_CPP_BINS = \
 	testString$(EXE) \
 	testDateTime$(EXE) \
 	testBigNumber$(EXE) \
-#	testStorageDataType$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
@@ -200,7 +199,6 @@ testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
 testString$(EXE):  $(TOPDIR)/src/libwolframe.a
 testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
 testBigNumber$(EXE):  $(TOPDIR)/src/libwolframe.a
-#testStorageDataType$(EXE):  $(TOPDIR)/src/libwolframe.a
 local_all:
 
 local_clean:
@@ -285,8 +283,6 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDateTime
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBigNumber
-#	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testStorageDataType
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo

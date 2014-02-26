@@ -1,6 +1,6 @@
 function run( )
 	-- parsing and echoing the header
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	f.empty = false
 
 	-- parsing and echoing the content

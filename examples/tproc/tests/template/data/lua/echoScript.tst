@@ -17,7 +17,7 @@ CMD3A 4
 QUIT
 --file:echo.lua
 function run( )
-	input:as( filter( "char"))
+	input:as( provider.filter( "char"))
 	for ch,t in input:get() do
 		output:print( ch,t)
 		output:print( 'X')

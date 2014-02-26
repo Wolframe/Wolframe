@@ -34,7 +34,6 @@ Project Wolframe.
 #include "luaObjectTemplate.hpp"
 #include "luaDebug.hpp"
 #include "luafilter.hpp"
-#include "luaGetFunctionClosure.hpp"
 #include "luaException.hpp"
 #include "luaCppCall.hpp"
 #include "langbind/appObjects.hpp"
@@ -45,7 +44,6 @@ Project Wolframe.
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger-v1.hpp"
 #include <limits>
 #include <fstream>
 #include <iostream>
@@ -175,6 +173,7 @@ static int function__LuaObject__index( lua_State* ls)
 			LuaExceptionHandlerScope escope(ls);
 			{
 				lua_pushlstring( ls, val.c_str(), val.size());
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 				return 1;
 			}
 		}
@@ -553,6 +552,7 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 		return 1;
 	}
 }
@@ -567,6 +567,7 @@ LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 	{
 		const types::FormDescription* descr = (*form)->description();
 		lua_pushlstring( ls, descr->name().c_str(), descr->name().size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 		return 1;
 	}
 }
@@ -743,6 +744,102 @@ LUA_FUNCTION_THROWS( "<type>()", function_type_value_constructor)
 	return 1;
 }
 
+LUA_FUNCTION_THROWS( "<type>()", function_bignumber_constructor)
+{
+	int nn = lua_gettop( ls);
+	if (nn > 1) throw std::runtime_error( "too many arguments");
+	if (nn == 1)
+	{
+		if (lua_type( ls, 1) == LUA_TSTRING)
+		{
+			if (nn > 1) throw std::runtime_error( "too many arguments");
+			const char* str = lua_tostring( ls, 1);
+			LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber( str, std::strlen(str)));
+			return 1;
+		}
+		else if (lua_type( ls, 1) == LUA_TNUMBER)
+		{
+			double val = lua_tonumber( ls, 1);
+			LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber( val));
+			return 1;
+		}
+		else
+		{
+			throw std::runtime_error( "string or number expected as argument");
+		}
+	}
+	else
+	{
+		LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber());
+		return 1;
+	}
+}
+
+LUA_FUNCTION_THROWS( "<type>()", function_datetime_constructor)
+{
+	int nn = lua_gettop( ls);
+	if (nn > 1) throw std::runtime_error( "too many arguments");
+	if (nn >= 1)
+	{
+		if (lua_type( ls, 1) == LUA_TSTRING)
+		{
+			if (nn > 1) throw std::runtime_error( "too many arguments");
+			const char* str = lua_tostring( ls, 1);
+			LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( str, std::strlen(str)));
+			return 1;
+		}
+		else if (lua_type( ls, 1) == LUA_TNUMBER)
+		{
+			for (int ii=2; ii<=nn; ++ii)
+			{
+				if (lua_type( ls, ii) != LUA_TNUMBER)
+				{
+					throw std::runtime_error( "string or sequence of integers expected as arguments");
+				}
+			}
+			int YY = lua_tointeger( ls, 1);
+			if (nn < 3) throw std::runtime_error( "number of integer argument must be 3,6,7 or 8");
+			int MM = lua_tointeger( ls, 2);
+			int DD = lua_tointeger( ls, 3);
+			if (nn == 3)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD));
+				return 1;
+			}
+			if (nn < 6) throw std::runtime_error( "number of integer argument must be 3,6,7 or 8");
+			int hh = lua_tointeger( ls, 4);
+			int mm = lua_tointeger( ls, 5);
+			int ss = lua_tointeger( ls, 6);
+			if (nn == 6)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss));
+				return 1;
+			}
+			int ll = lua_tointeger( ls, 7);
+			if (nn == 7)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss, ll));
+				return 1;
+			}
+			int cc = lua_tointeger( ls, 8);
+			if (nn == 8)
+			{
+				LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( YY, MM, DD, hh, mm, ss, ll, cc));
+				return 1;
+			}
+			throw std::runtime_error( "too many arguments");
+		}
+		else
+		{
+			throw std::runtime_error( "string or sequence of numbers expected as arguments");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "too few arguments");
+	}
+}
+
 LUA_FUNCTION_THROWS( "type()", function_type)
 {
 	int nn = lua_gettop( ls);
@@ -764,17 +861,37 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	const types::CustomDataType* typ = ctx->customDataType( typeName);
 	if (!typ)
 	{
-		throw std::runtime_error( std::string( "type '") + typeName + "' not defined");
+		const types::NormalizeFunction* func = ctx->typeNormalizer( typeName);
+		if (!func)
+		{
+			if (typeName == "bignumber")
+			{
+				lua_pushcfunction( ls, function_bignumber_constructor);
+				return 1;
+			}
+			if (typeName == "datetime")
+			{
+				lua_pushcfunction( ls, function_datetime_constructor);
+				return 1;
+			}
+			throw std::runtime_error( std::string( "type '") + typeName + "' not defined (neither as custom data type nor as normalizer function)"); 
+		}
+		lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
+		lua_pushcclosure( ls, function_normalizer_call, 1);
+		return 1;
 	}
-	types::CustomDataInitializerR ini;
-	if (initializerString) 
+	else
 	{
-		ini.reset( typ->createInitializer( initializerString));
+		types::CustomDataInitializerR ini;
+		if (initializerString) 
+		{
+			ini.reset( typ->createInitializer( initializerString));
+		}
+		lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
+		LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
+		lua_pushcclosure( ls, function_type_value_constructor, 2);
+		return 1;
 	}
-	lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
-	LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
-	lua_pushcclosure( ls, function_type_value_constructor, 2);
-	return 1;
 }
 
 
@@ -804,6 +921,7 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_struct_tostring)
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 		return 1;
 	}
 }
@@ -877,6 +995,7 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 		return 1;
 	}
 }
@@ -1190,6 +1309,7 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 			if (newEnter)
 			{
 				lua_pushlstring( ls, tag, tagsize);
+				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 				lua_pushlightuserdata( ls, output);
 			}
 			lua_yieldk( ls, 0, 1, function_output_opentag);
@@ -1201,6 +1321,7 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 		if (newEnter)
 		{
 			lua_pushlstring( ls, tag, tagsize);
+			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			lua_pushlightuserdata( ls, output);
 		}
 		lua_yieldk( ls, 0, 1, function_output_opentag);
@@ -1388,6 +1509,7 @@ LUA_FUNCTION_THROWS( "input:docformat()", function_input_docformat)
 	else
 	{
 		lua_pushlstring( ls, input->docformat().c_str(), input->docformat().size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 		return 1;
 	}
 }
@@ -1424,16 +1546,19 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 					if (!doctype.rootid.empty())
 					{
 						lua_pushlstring( ls, doctype.rootid.c_str(), doctype.rootid.size());
+						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "root");
 					}
 					if (!doctype.publicid.empty())
 					{
 						lua_pushlstring( ls, doctype.publicid.c_str(), doctype.publicid.size());
+						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "public");
 					}
 					if (!doctype.systemid.empty())
 					{
 						lua_pushlstring( ls, doctype.systemid.c_str(), doctype.systemid.size());
+						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "system");
 					}
 					return 1;
@@ -1488,6 +1613,7 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 				if (doctypeid.size())
 				{
 					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
+					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 				}
 				else
 				{
@@ -1950,6 +2076,7 @@ LUA_FUNCTION_THROWS( "custom:__tostring()", function_customtype_tostring)
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__tostring");
 	std::string val( (*operand)->tostring());
 	lua_pushlstring( ls, val.c_str(), val.size());
+	lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 	return 1;
 }
 
@@ -1957,6 +2084,15 @@ LUA_FUNCTION_THROWS( "custom:tonumber()", function_customtype_tonumber)
 {
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "tonumber");
 	return callConversionOperator( ls, types::CustomDataType::ToDouble, operand->get());
+}
+
+LUA_FUNCTION_THROWS( "custom:typename()", function_customtype_typename)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "typename");
+	const std::string& val( (*operand)->type()->name());
+	lua_pushlstring( ls, val.c_str(), val.size());
+	lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+	return 1;
 }
 
 LUA_FUNCTION_THROWS( "custom:__len()", function_customtype_len)
@@ -1983,6 +2119,115 @@ LUA_FUNCTION_THROWS( "custom:__le()", function_customtype_le)
 	return (0>=callCompare( ls, operand->get()));
 }
 
+LUA_FUNCTION_THROWS( "datetime:__tostring()", function_datetime_tostring)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	std::string val( operand->tostring());
+	lua_pushlstring( ls, val.c_str(), val.size());
+	lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:year()", function_datetime_year)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->year());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:month()", function_datetime_month)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->month());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:day()", function_datetime_day)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->day());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:hour()", function_datetime_hour)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->hour());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:minute()", function_datetime_minute)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->minute());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:second()", function_datetime_second)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->second());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:millisecond()", function_datetime_millisecond)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->millisecond());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "datetime:microsecond()", function_datetime_microsecond)
+{
+	types::DateTime* operand = LuaObject<types::DateTime>::getSelf( ls, "datetime", "__tostring");
+	lua_pushinteger( ls, operand->microsecond());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "bignumber:__tostring()", function_bignumber_tostring)
+{
+	types::BigNumber* operand = LuaObject<types::BigNumber>::getSelf( ls, "bignumber", "__tostring");
+	std::string val( operand->tostring());
+	lua_pushlstring( ls, val.c_str(), val.size());
+	lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "bignumber:precision()", function_bignumber_precision)
+{
+	types::BigNumber* operand = LuaObject<types::BigNumber>::getSelf( ls, "bignumber", "precision");
+	lua_pushinteger( ls, operand->precision());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "bignumber:scale()", function_bignumber_scale)
+{
+	types::BigNumber* operand = LuaObject<types::BigNumber>::getSelf( ls, "bignumber", "scale");
+	lua_pushinteger( ls, operand->scale());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "bignumber:digits()", function_bignumber_digits)
+{
+	types::BigNumber* operand = LuaObject<types::BigNumber>::getSelf( ls, "bignumber", "digits");
+	const unsigned char* ar = operand->digits();
+	unsigned int ii=0, nn=operand->size();
+	std::string val;
+	for (; ii<nn; ++ii)
+	{
+		val.push_back( ar[ii]+'0');
+	}
+	lua_pushlstring( ls, val.c_str(), val.size());
+	lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "bignumber:tonumber()", function_bignumber_tonumber)
+{
+	types::BigNumber* operand = LuaObject<types::BigNumber>::getSelf( ls, "bignumber", "tonumber");
+	lua_pushnumber( ls, operand->todouble());
+	return 1;
+}
 
 LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 {
@@ -2116,7 +2361,7 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{0,0}
 };
 
-static const luaL_Reg customvalue_methodtable[ 14] =
+static const luaL_Reg customvalue_methodtable[ 15] =
 {
 	{"__unm", &function_customtype_unm},
 	{"__add", &function_customtype_add},
@@ -2131,6 +2376,31 @@ static const luaL_Reg customvalue_methodtable[ 14] =
 	{"__lt", &function_customtype_lt},
 	{"__le", &function_customtype_le},
 	{"tonumber", &function_customtype_tonumber},
+	{"typename", &function_customtype_typename},
+	{0,0}
+};
+
+static const luaL_Reg datetime_methodtable[ 10] =
+{
+	{"year", &function_datetime_year},
+	{"month", &function_datetime_month},
+	{"day", &function_datetime_day},
+	{"hour", &function_datetime_hour},
+	{"minute", &function_datetime_minute},
+	{"second", &function_datetime_second},
+	{"millisecond", &function_datetime_millisecond},
+	{"microsecond", &function_datetime_microsecond},
+	{"__tostring", &function_datetime_tostring},
+	{0,0}
+};
+
+static const luaL_Reg bignumber_methodtable[ 6] =
+{
+	{"precision", &function_bignumber_precision},
+	{"scale", &function_bignumber_scale},
+	{"digits", &function_bignumber_digits},
+	{"tonumber", &function_bignumber_tonumber},
+	{"__tostring", &function_bignumber_tostring},
 	{0,0}
 };
 
@@ -2301,29 +2571,23 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 				throw std::runtime_error( buf.str());
 			}
 		}
-		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<types::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);
-		LuaObject<types::CustomDataInitializerR>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<types::CustomDataValueR>::createMetatable( m_ls, 0, 0, customvalue_methodtable);
-		LuaObject<DDLFormParser>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<DDLFormSerializer>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<serialize::StructSerializer>::createMetatable( m_ls, 0, 0, struct_methodtable);
-		LuaObject<InputFilterClosure>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<TypedInputFilterR>::createMetatable( m_ls, 0, 0, typedinputfilter_methodtable);
-		LuaObject<TypedInputFilterClosure>::createMetatable( m_ls, 0, 0, 0);
-		LuaObject<FormFunctionClosureR>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<types::FormR>::createMetatable( m_ls, 0, 0, form_methodtable, "form");
+		LuaObject<types::CustomDataInitializerR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<types::CustomDataValueR>::createMetatable( m_ls, 0, 0, customvalue_methodtable, "custom");
+		LuaObject<types::DateTime>::createMetatable( m_ls, 0, 0, datetime_methodtable, "datetime");
+		LuaObject<types::BigNumber>::createMetatable( m_ls, 0, 0, bignumber_methodtable, "bignumber");
+		LuaObject<DDLFormParser>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<DDLFormSerializer>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<serialize::StructSerializer>::createMetatable( m_ls, 0, 0, struct_methodtable, 0/*typename*/);
+		LuaObject<InputFilterClosure>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<TypedInputFilterR>::createMetatable( m_ls, 0, 0, typedinputfilter_methodtable, 0/*typename*/);
+		LuaObject<TypedInputFilterClosure>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<FormFunctionClosureR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
 		if (provider_) setProcessorProvider( m_ls, provider_);
-		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-		lua_pushcfunction( m_ls, &function_filter);
-		lua_setglobal( m_ls, "filter");
-		lua_pushcfunction( m_ls, &function_form);
-		lua_setglobal( m_ls, "form");
-		lua_pushcfunction( m_ls, &function_formfunction);
-		lua_setglobal( m_ls, "formfunction");
+		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
 		lua_pushcfunction( m_ls, &function_scope);
 		lua_setglobal( m_ls, "scope");
-		lua_pushcfunction( m_ls, &function_normalizer);
-		lua_setglobal( m_ls, "normalizer");
 
 		//Register provider context:
 		lua_newtable( m_ls);

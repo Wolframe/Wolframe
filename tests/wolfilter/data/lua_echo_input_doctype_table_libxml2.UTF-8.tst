@@ -60,7 +60,7 @@ FORM employee_assignment_print
 **file:script.lua
 function run()
 	type = input:doctype()
-	output:as( filter(), type)
+	output:as( provider.filter(), type)
 	output:print( input:table())
 end
 **output

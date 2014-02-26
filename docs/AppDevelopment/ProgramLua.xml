@@ -41,7 +41,7 @@
 		<simplelist type="horiz" columns="3">
 		<member>Name</member><member>Parameter</member><member>Returns</member>
 		<member>form</member><member>name of the form</member><member>an instance of a form</member>
-		<member>normalizer</member><member>name of the normalize function</member><member>normalize function defined in a <application>Wolframe</application> normalizer program</member>
+		<member>type</member><member>name of the atomic value type</member><member>type defined as custom data type or as a type normalizer function or one of the userdata types 'bignumber' or 'datetime'.</member>
 		<member>formfunction</member><member>name of the function</member><member>form function defined in a <application>Wolframe</application> program or module</member>
 		</simplelist>
 	</para>
@@ -316,9 +316,9 @@
 					<entry>Returns a lua function to execute the <application>Wolframe</application> function specified by name</entry>
 				</row>
 				<row>
-					<entry>provider.normalizer</entry>
-					<entry>type name</entry>
-					<entry>Returns a <application>Lua</application> function for normalizing values of the type specified (as used in forms)</entry>
+					<entry>provider.type</entry>
+					<entry>name of data type (string)</entry>
+					<entry>Returns a constructor function for the data type given by name. The name specifies either a custom data type or a normalization function as used in forms or one of the additional userdata types 'datetime' or 'bignumber'.</entry>
 				</row>
 				<row>
 					<entry>scope</entry>

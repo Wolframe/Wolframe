@@ -34422,7 +34422,7 @@ Processor
 1416033216724766420909673978
 **file:bcdnumber_calc.lua
 function run()
-	f = filter( "line", "UTF-8")
+	f = provider.filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
 	bigint = provider.type( "bigint")

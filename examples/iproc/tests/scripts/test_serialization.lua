@@ -70,7 +70,7 @@ function printTable( tab)
 end
 
 function run()
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 
 	-- a W3C conform XML parser returns by default also tokens containing only spaces.
 	-- these we eliminate to be able to create a table:

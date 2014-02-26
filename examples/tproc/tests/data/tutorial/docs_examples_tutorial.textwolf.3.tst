@@ -12,7 +12,7 @@ QUIT
 **file:example_3.lua
 
 function run( )
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	input:as(f)
 	output:as(f)
 	for c,t in input:get() do

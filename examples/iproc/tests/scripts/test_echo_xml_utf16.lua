@@ -1,6 +1,6 @@
 function run( )
-	inpf = filter( "textwolf")
-	outf = filter( "textwolf", "UTF-16BE")
+	inpf = provider.filter( "textwolf")
+	outf = provider.filter( "textwolf", "UTF-16BE")
 	inpf.empty = false
 
 	-- parsing and echoing the content as defined

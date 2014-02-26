@@ -1,11 +1,11 @@
 
 function run()
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	f.empty = false
 	input:as( f)
-	output:as( filter( "blob"))
+	output:as( provider.filter( "blob"))
 	t = input:table()
-	f = formfunction( "print_invoice")
+	f = provider.formfunction( "print_invoice")
 	output:print( f( t):table())
 end
 

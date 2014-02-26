@@ -1,6 +1,6 @@
 
 function run()
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	-- filter out tokens containing only spaces:
 	f.empty = false
 	input:as( f)

@@ -33,34 +33,26 @@ Project Wolframe.
 //\brief Template for Wolframe objects used in the Lua interpreter context
 #ifndef _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
-#include "luaObjects.hpp"
 #include "luaObjectTemplate.hpp"
-#include "luaDebug.hpp"
-#include "luafilter.hpp"
+#include "luaObjects.hpp"
 #include "luaGetFunctionClosure.hpp"
-#include "luaException.hpp"
-#include "luaCppCall.hpp"
-#include "langbind/appObjects.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/doctype.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
 #include "utils/fileUtils.hpp"
-#include "logger-v1.hpp"
 #include <limits>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <stdexcept>
-#include <cstddef>
-#include <cstdarg>
-#include <boost/type_traits/remove_cv.hpp>
 #include <string>
 
 extern "C" {
-	#include "lua.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 }
 
 namespace _Wolframe {
@@ -76,6 +68,8 @@ template <> struct MetaTable<RedirectFilterClosure> {static const char* name()		
 template <> struct MetaTable<types::FormR> {static const char* name()			{return "wolframe.Form";}};
 template <> struct MetaTable<types::CustomDataValueR> {static const char* name()	{return "wolframe.CustomValue";}};
 template <> struct MetaTable<types::CustomDataInitializerR> {static const char* name()	{return "wolframe.CustomInitializer";}};
+template <> struct MetaTable<types::DateTime> {static const char* name()		{return "wolframe.DateTime";}};
+template <> struct MetaTable<types::BigNumber> {static const char* name()		{return "wolframe.BigNumber";}};
 template <> struct MetaTable<DDLFormParser> {static const char* name()			{return "wolframe.DDLFormParser";}};
 template <> struct MetaTable<DDLFormSerializer> {static const char* name()		{return "wolframe.DDLFormSerializer";}};
 template <> struct MetaTable<InputFilterClosure> {static const char* name()		{return "wolframe.InputFilterClosure";}};
@@ -103,7 +97,7 @@ struct LuaObject
 		return 0;
 	}
 
-	static void createMetatable( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf, const luaL_Reg* mt)
+	static void createMetatable( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf, const luaL_Reg* mt, const char* tpname)
 	{
 		luaL_newmetatable( ls, MetaTable<ObjectType>::name());
 		lua_pushliteral( ls, "__index");
@@ -127,6 +121,13 @@ struct LuaObject
 			lua_pushvalue( ls, -2);
 		}
 		lua_rawset( ls, -3);
+
+		if (tpname)
+		{
+			lua_pushliteral( ls, "type");
+			lua_pushstring( ls, tpname);
+			lua_rawset( ls, -3);
+		}
 
 		lua_pushliteral( ls, "__gc");
 		lua_pushcfunction( ls, destroy);
@@ -181,7 +182,7 @@ struct LuaObject
 
 	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
 	{
-		createMetatable( ls, 0, 0, mt);
+		createMetatable( ls, 0, 0, mt, 0/*typename*/);
 		new (ls) LuaObject( instance);
 		luaL_getmetatable( ls, MetaTable<ObjectType>::name());
 		lua_setmetatable( ls, -2);
