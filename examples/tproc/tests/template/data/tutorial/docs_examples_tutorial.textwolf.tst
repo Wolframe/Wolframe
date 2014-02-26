@@ -1,6 +1,6 @@
 #!/bin/sh
 TOP=../../../../
-MAIN=$TOP/docs/examples/SDKTutorial/
+MAIN=$TOP/docs/examples/AppDevelop/
 for example in 1 2 3 5; do
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
