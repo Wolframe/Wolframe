@@ -34,3 +34,7 @@ local changes and fixes:
      E: wolframe implicit-fortify-decl Source/ZLib/gzread.c:30
      E: wolframe implicit-fortify-decl hpdf_image_png.c:284
   => gzguts.h: added include <unistd.h> for !defined _WIN32
+- Patched Source/LibOpenJPEG/opj_malloc.h:
+  #elif ( __amd64__ ) && ( __APPLE__ ) && ( _AIX ) && ( __NetBSD__ )
+   #define HAVE_MEMALIGN
+  => avoid the error message "undefined reference to `memalign'"
