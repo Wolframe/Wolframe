@@ -15,8 +15,9 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
-INCLUDE_LIBS =
-
+INCLUDE_LIBS = \
+	ws2_32.lib kernel32.lib advapi32.lib
+	
 LIBRARIES = \
 	wfshared.dll \
 	logger\wolframemsg.dll
@@ -52,8 +53,8 @@ logger\wolframemsg.res: logger\wolframemsg.rc
 logger\wolframemsg.rc: logger\wolframemsg.mc
 logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
-wolframe.lib: $(OBJS) $(CPP_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+wfshared.dll: $(OBJS) $(CPP_OBJS)
+	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
