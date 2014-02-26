@@ -49,9 +49,15 @@ public:
 		,m_size(size_)
 		,m_sign(sign_)
 		{}
+	IntegerNormalizeFunction( const IntegerNormalizeFunction& o)
+		:m_max(o.m_max)
+		,m_size(o.m_size)
+		,m_sign(o.m_sign)
+		{}
 
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return m_sign?"integer":"unsigned";}
+	virtual types::NormalizeFunction* copy() const {return new IntegerNormalizeFunction(*this);}
 
 private:
 	types::Variant::Data::UInt m_max;

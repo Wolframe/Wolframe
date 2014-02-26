@@ -68,7 +68,8 @@ public:
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
 
-	const types::NormalizeFunction* typeNormalizer( const std::string& name) const;
+	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const;
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;

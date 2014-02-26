@@ -76,7 +76,7 @@ template <> struct MetaTable<InputFilterClosure> {static const char* name()		{re
 template <> struct MetaTable<TypedInputFilterR> {static const char* name()		{return "wolframe.TypedInputFilterR";}};
 template <> struct MetaTable<TypedInputFilterClosure> {static const char* name()	{return "wolframe.TypedInputFilterClosure";}};
 template <> struct MetaTable<FormFunctionClosureR> {static const char* name()		{return "wolframe.FormFunctionClosureR";}};
-template <> struct MetaTable<types::NormalizeFunction> {static const char* name()	{return "wolframe.NormalizeFunction";}};
+template <> struct MetaTable<types::NormalizeFunctionR> {static const char* name()	{return "wolframe.NormalizeFunctionR";}};
 template <> struct MetaTable<serialize::StructSerializer> {static const char* name()	{return "wolframe.StructSerializer";}};
 template <> struct MetaTable<proc::ProcessorProvider> {static const char* name()	{return "wolframe.ProcessorProvider";}};
 template <> struct MetaTable<langbind::LuaModuleMap> {static const char* name()		{return "wolframe.LuaModuleMap";}};

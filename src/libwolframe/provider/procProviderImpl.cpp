@@ -363,9 +363,14 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return rt;
 }
 
-const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::typeNormalizer( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
 {
-	return m_programs->getDDLTypeNormalizer( name);
+	return m_programs->getNormalizeFunction( name);
+}
+
+const types::NormalizeFunctionType* ProcessorProvider::ProcessorProvider_Impl::normalizeFunctionType( const std::string& name) const
+{
+	return m_programs->getNormalizeFunctionType( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const

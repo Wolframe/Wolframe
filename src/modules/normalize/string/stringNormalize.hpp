@@ -40,10 +40,10 @@
 namespace _Wolframe {
 namespace langbind {
 
-types::NormalizeFunction* createTrimNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* createUcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* createLcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* createConvdiaNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createTrimNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* createUcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* createLcnameNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* createConvdiaNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
 }}//namespace
 #endif

@@ -35,13 +35,14 @@
 #ifndef _LANGBIND_BASE64_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_BASE64_NORMALIZE_HPP_INCLUDED
 #include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
 #include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-types::NormalizeFunction* createEncodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* createDecodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* createEncodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* createDecodeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
 }}//namespace
 #endif

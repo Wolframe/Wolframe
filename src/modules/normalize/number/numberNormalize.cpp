@@ -46,53 +46,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static utils::CharTable opTab( ",");
-static utils::CharTable numTab( "0123456789");
-
-static std::size_t parseNumber( std::string::const_iterator& ii, const std::string::const_iterator ee)
-{
-	std::string tok;
-	char ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == '\0') throw std::runtime_error( "unexpected end of dimension description");
-	if (ch == ',') throw std::runtime_error( "syntax error in dimension description");
-	return boost::lexical_cast<std::size_t>( tok);
-}
-
-static std::pair<std::size_t,std::size_t> parseDimension2Description( std::string::const_iterator& ii, const std::string::const_iterator ee)
-{
-	std::string tok;
-	std::size_t gsize=0,fsize=0;
-	char ch;
-	gsize = parseNumber( ii, ee);
-	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == '\0') return std::pair<std::size_t,std::size_t>( 0, gsize);
-	if (ch != ',') throw std::runtime_error( "syntax error in dimension description");
-	fsize = parseNumber( ii, ee);
-	if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token at end of dimension description");
-	return std::pair<std::size_t,std::size_t>( gsize, fsize);
-}
-
-static std::size_t parseDimension1Description( std::string::const_iterator& ii, const std::string::const_iterator ee)
-{
-	std::string tok;
-	std::size_t size=0;
-	size = parseNumber( ii, ee);
-	if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token at end of dimension description");
-	return size;
-}
-
-static std::pair<std::size_t,std::size_t> parseFloatDescription( std::string::const_iterator& ii, const std::string::const_iterator ee)
-{
-	std::pair<std::size_t,std::size_t> rt = parseDimension2Description( ii, ee);
-	return rt;
-}
-
-static std::size_t parseIntegerDescription( std::string::const_iterator& ii, const std::string::const_iterator ee)
-{
-	std::size_t rt = parseDimension1Description( ii, ee);
-	return rt;
-}
-
 static types::Variant::Data::UInt getMax( std::size_t digits)
 {
 	typedef types::Variant::Data::UInt UInt;
@@ -114,107 +67,95 @@ static types::Variant::Data::UInt getMax( std::size_t digits)
 	}
 }
 
-
-types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+static void getIntegerDimArgument( const std::vector<types::Variant>& arg, std::size_t& dim, types::Variant::Data::UInt& maxval)
 {
-	try
+	if (arg.size() > 1) throw std::runtime_error("too many arguments for integer normalize function");
+	dim = std::numeric_limits<std::size_t>::max();
+	if (arg.size())
 	{
-		std::string::const_iterator ii = arg.begin(), ee = arg.end();
-		typedef types::Variant::Data::UInt UInt;
-		std::size_t dim;
-		UInt maxval;
-
-		if (utils::gotoNextToken( ii, ee))
+		types::Variant::Data::UInt vdim = arg.at(0).touint();
+		if (vdim >= std::numeric_limits<std::size_t>::max())
 		{
-			dim = parseIntegerDescription( ii, ee);
-			maxval = getMax( dim)-1;
+			throw std::runtime_error( "parameter out of range for integer normalize function");
 		}
-		else
-		{
-			dim = std::numeric_limits<std::size_t>::max();
-			maxval = std::numeric_limits<UInt>::max();
-		}
-		return new IntegerNormalizeFunction( true, dim, maxval);
+		dim = (std::size_t)vdim;
+		maxval = getMax( dim)-1;
 	}
-	catch (const std::runtime_error& e)
+	else
 	{
-		throw std::runtime_error( std::string( "error in number:integer normalize function description: ") + e.what());
+		dim = std::numeric_limits<std::size_t>::max();
+		maxval = std::numeric_limits<types::Variant::Data::UInt>::max();
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createIntegerNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
-	try
-	{
-		std::string::const_iterator ii = arg.begin(), ee = arg.end();
-		typedef types::Variant::Data::UInt UInt;
-		std::size_t dim;
-		UInt maxval;
+	std::size_t dim;
+	types::Variant::Data::UInt maxval;
+	getIntegerDimArgument( arg, dim, maxval);
+	return new IntegerNormalizeFunction( true, dim, maxval);
+}
 
-		if (utils::gotoNextToken( ii, ee))
-		{
-			dim = parseIntegerDescription( ii, ee);
-			maxval = getMax( dim)-1;
-		}
-		else
-		{
-			dim = std::numeric_limits<std::size_t>::max();
-			maxval = std::numeric_limits<UInt>::max();
-		}
-		return new IntegerNormalizeFunction( false, dim, maxval);
-	}
-	catch (const std::runtime_error& e)
+types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
+{
+	std::size_t dim;
+	types::Variant::Data::UInt maxval;
+	getIntegerDimArgument( arg, dim, maxval);
+	return new IntegerNormalizeFunction( false, dim, maxval);
+}
+
+static void getFractionDimArgument( const std::vector<types::Variant>& arg, std::size_t& sizeG, std::size_t& sizeF)
+{
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for float/fixedpoint normalize function");
+	sizeG = 0;
+	sizeF = std::numeric_limits<std::size_t>::max();
+	if (arg.size() == 1)
 	{
-		throw std::runtime_error( std::string( "error in number:unsigned normalize function description: ") + e.what());
+		types::Variant::Data::UInt vsizeF = arg.at(0).touint();
+		if (vsizeF >= std::numeric_limits<std::size_t>::max())
+		{
+			throw std::runtime_error( "parameter out of range for float/fixedpoint normalize function");
+		}
+		sizeF = (std::size_t)vsizeF;
+	}
+	else if (arg.size() == 2)
+	{
+		types::Variant::Data::UInt vsizeG = arg.at(0).touint();
+		types::Variant::Data::UInt vsizeF = arg.at(1).touint();
+		if (vsizeF >= std::numeric_limits<std::size_t>::max() || vsizeG >= std::numeric_limits<std::size_t>::max())
+		{
+			throw std::runtime_error( "parameter out of range for float/fixedpoint normalize function");
+		}
+		sizeG = (std::size_t)vsizeG;
+		sizeF = (std::size_t)vsizeF;
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
-	try
+	std::size_t sizeG;
+	std::size_t sizeF;
+	getFractionDimArgument( arg, sizeG, sizeF);
+	double maxval;
+	if (sizeG)
 	{
-		std::string::const_iterator ii = arg.begin(), ee = arg.end();
-		std::pair<std::size_t,std::size_t> dim;
-		double maxval;
-
-		if (utils::gotoNextToken( ii, ee))
-		{
-			dim = parseFloatDescription( ii, ee);
-			maxval = (double)getMax( dim.first);
-		}
-		else
-		{
-			dim = std::pair<std::size_t,std::size_t>( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
-			maxval = std::numeric_limits<double>::max();
-		}
-		return new FloatNormalizeFunction( dim.first, dim.second, maxval);
+		maxval = (double)getMax( sizeG);
 	}
-	catch (const std::runtime_error& e)
+	else
 	{
-		throw std::runtime_error( std::string( "error in number:float normalize function description: ") + e.what());
+		maxval = std::numeric_limits<double>::max();
 	}
+	return new FloatNormalizeFunction( sizeG, sizeF, maxval);
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
-	try
+	std::size_t sizeG = 12;
+	std::size_t sizeF = 3;
+	if (arg.size())
 	{
-		std::string::const_iterator ii = arg.begin(), ee = arg.end();
-		std::pair<std::size_t,std::size_t> dim;
-
-		if (utils::gotoNextToken( ii, ee))
-		{
-			dim = parseFloatDescription( ii, ee);
-			return new FixedpointNormalizeFunction( dim.first, dim.second);
-		}
-		else
-		{
-			return new FixedpointNormalizeFunction( 12, 3);
-		}
+		getFractionDimArgument( arg, sizeG, sizeF);
 	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string( "error in number:float normalize function description: ") + e.what());
-	}
+	return new FixedpointNormalizeFunction( sizeG, sizeF);
 }
 

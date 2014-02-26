@@ -195,7 +195,7 @@ public:
 		m_runtimeEnvironmentList.push_back( env);
 	}
 
-	void defineDDLTypeNormalizer( const std::string& name, types::NormalizeFunctionR f)
+	void defineNormalizeFunction( const std::string& name, types::NormalizeFunctionR f)
 	{
 		m_normalizeFunctionMap.define( name, f);
 	}
@@ -219,13 +219,11 @@ public:
 	void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& f)
 	{
 		m_normalizeFunctionTypeMap.insert( name, f);
-		m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( f.createFunction( "")));
 	}
 
 	void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t)
 	{
 		m_customDataTypeMap.insert( name, t);
-		if (!t->hasInitializer()) m_normalizeFunctionMap.define( name, types::NormalizeFunctionR( new types::CustomDataNormalizer( name, "", t.get())));
 	}
 
 	void defineProgramType( const ProgramR& prg)
@@ -264,7 +262,7 @@ public:
 		return ti->second.get();
 	}
 
-	const types::NormalizeFunction* getDDLTypeNormalizer( const std::string& name) const
+	const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const
 	{
 		return m_normalizeFunctionMap.get( name);
 	}
@@ -378,9 +376,9 @@ void ProgramLibrary::defineCustomDataType( const std::string& name, const types:
 	m_impl->defineCustomDataType( name, t);
 }
 
-void ProgramLibrary::defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const
+void ProgramLibrary::defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const
 {
-	m_impl->defineDDLTypeNormalizer( name, f);
+	m_impl->defineNormalizeFunction( name, f);
 }
 
 void ProgramLibrary::definePrivateForm( const types::FormDescriptionR& f)
@@ -433,9 +431,9 @@ std::vector<std::string> ProgramLibrary::getFormNames() const
 	return m_impl->getFormNames();
 }
 
-const types::NormalizeFunction* ProgramLibrary::getDDLTypeNormalizer( const std::string& name) const
+const types::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
 {
-	return m_impl->getDDLTypeNormalizer( name);
+	return m_impl->getNormalizeFunction( name);
 }
 
 const types::NormalizeFunctionType* ProgramLibrary::getNormalizeFunctionType( const std::string& name) const

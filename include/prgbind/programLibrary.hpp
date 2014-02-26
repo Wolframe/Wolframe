@@ -66,7 +66,7 @@ public:
 	virtual void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env);
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
-	virtual void defineDDLTypeNormalizer( const std::string& name, const types::NormalizeFunctionR& f) const;
+	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
 	virtual void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& ftype);
 	virtual void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t);
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
@@ -81,7 +81,7 @@ public:
 	virtual std::vector<std::string> getFormNames() const;
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
-	virtual const types::NormalizeFunction* getDDLTypeNormalizer( const std::string& name) const;
+	virtual const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
 	virtual const langbind::FilterType* getFilterType( const std::string& name) const;
 
 	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);

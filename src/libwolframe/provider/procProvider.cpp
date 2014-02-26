@@ -250,9 +250,14 @@ db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 	return m_impl->transaction( name );
 }
 
-const types::NormalizeFunction* ProcessorProvider::typeNormalizer( const std::string& name) const
+const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
 {
-	return m_impl->typeNormalizer( name);
+	return m_impl->normalizeFunction( name);
+}
+
+const types::NormalizeFunctionType* ProcessorProvider::normalizeFunctionType( const std::string& name) const
+{
+	return m_impl->normalizeFunctionType( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::formFunction( const std::string& name) const

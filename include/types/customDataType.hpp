@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #define _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <cstring>
 #include <boost/shared_ptr.hpp>
 
@@ -95,7 +96,7 @@ public:
 typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
 
-typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::string& description);
+typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::vector<types::Variant>& arg);
 typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
 
 
@@ -160,7 +161,7 @@ public:
 	BinaryOperator getOperator( BinaryOperatorType type) const;
 	DimensionOperator getOperator( DimensionOperatorType type) const;
 
-	CustomDataInitializer* createInitializer( const std::string& d) const;
+	CustomDataInitializer* createInitializer( const std::vector<types::Variant>& arg) const;
 	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
 
 	bool hasInitializer() const		{return !!m_vmt.opInitializerConstructor;}

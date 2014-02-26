@@ -33,6 +33,7 @@
 		of the script as <code>local</code>.
 	</para>
 	</sect2>
+
 	<sect2>
 	<title>Wolframe Provider Library</title>
 	<para><application>Wolframe</application> lets you access objects of the global context through
@@ -41,9 +42,27 @@
 		<simplelist type="horiz" columns="3">
 		<member>Name</member><member>Parameter</member><member>Returns</member>
 		<member>form</member><member>name of the form</member><member>an instance of a form</member>
-		<member>type</member><member>name of the atomic value type</member><member>type defined as custom data type or as a type normalizer function or one of the userdata types 'bignumber' or 'datetime'.</member>
+		<member>type</member><member>type name and initializer list</member><member>constructor function to create a value instance of this type</member>
 		<member>formfunction</member><member>name of the function</member><member>form function defined in a <application>Wolframe</application> program or module</member>
 		</simplelist>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Using Atomic Data Types</title>
+	<para><application>Wolframe</application> lets us extend the type system consisting of Lua basic data types with our own.
+		We can create atomic data types defined in a module or in a DDL datatype definition (.wnmp file).
+		For this you call the <code>type</code> method of the provider with the type name as first argument plus the type 
+		type initializer argument list as additional parameters.
+		The function returns a constructor function that can be called with the initialization value as argument to get a
+		value instance of this type. The name of the type can refer to one of the following:
+
+		<simplelist type="horiz" columns="2">
+		<member>Custom Data Type</member><member>A custom data type defined in a module with arithmetic operators and methods</member>
+		<member>Normalization Function</member><member>A normalization function type defined in a module</member>
+		<member>DDL Data Type</member><member>A normalizer defined as sequence of normalization functions in a .wnmp source file</member>
+		</simplelist>
+
 	</para>
 	</sect2>
 
@@ -96,7 +115,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Wolframe Global Objects</title>
+	<title>Global Objects</title>
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
@@ -107,6 +126,7 @@
 		</simplelist>
 	</para>
 	</sect2>
+
 	<sect2>
 	<title>Using Forms</title>
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty

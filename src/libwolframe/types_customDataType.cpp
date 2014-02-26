@@ -104,13 +104,13 @@ CustomDataType::DimensionOperator CustomDataType::getOperator( CustomDataType::D
 	return m_vmt.opDimension[ (int)type];
 }
 
-CustomDataInitializer* CustomDataType::createInitializer( const std::string& d) const
+CustomDataInitializer* CustomDataType::createInitializer( const std::vector<types::Variant>& arg) const
 {
 	if (!m_vmt.opInitializerConstructor)
 	{
 		throw std::runtime_error( "no intializer arguments defined for this type");
 	}
-	return (*m_vmt.opInitializerConstructor)( d);
+	return (*m_vmt.opInitializerConstructor)( arg);
 }
 
 CustomDataValue* CustomDataType::createValue( const CustomDataInitializer* i) const

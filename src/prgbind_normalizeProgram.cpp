@@ -47,7 +47,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-static types::NormalizeFunctionR createBaseFunction( const std::string& name, const std::string& arg, const ProgramLibrary& prglibrary)
+static types::NormalizeFunctionR createBaseFunction( const std::string& name, const std::vector<types::Variant>& arg, const ProgramLibrary& prglibrary)
 {
 	try
 	{
@@ -68,9 +68,22 @@ static types::NormalizeFunctionR createBaseFunction( const std::string& name, co
 			throw std::runtime_error( std::string("no normalize function or custom data type defined for '") + name + "'");
 		}
 	}
+	catch (const std::bad_alloc& err)
+	{
+		throw err;
+	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string("could not build normalizer for '") + name + "(" + arg + ")' :" + err.what());
+		std::string argstr;
+		std::vector<types::Variant>::const_iterator ai = arg.begin(), ae = arg.end();
+		for (int cnt=0; ai != ae; ++ai,cnt++)
+		{
+			if (cnt) argstr.push_back( ',');
+			argstr.push_back( '"');
+			argstr.append( ai->tostring());
+			argstr.push_back( '"');
+		}
+		throw std::runtime_error( std::string("could not build normalizer for '") + name + "(" + argstr + ")' :" + err.what());
 	}
 }
 
@@ -100,6 +113,11 @@ public:
 			rt = (*fi)->execute( rt);
 		}
 		return rt;
+	}
+
+	virtual types::NormalizeFunction* copy() const
+	{
+		return new CombinedNormalizeFunction( *this);
 	}
 
 	std::size_t nofSteps() const
@@ -166,18 +184,32 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, "", prglibrary)));
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::vector<types::Variant>(), prglibrary)));
 						++si;
 						continue;
 					case '(':
-						argstart = ++si;
-						while ((ch=utils::parseNextToken( tok, si, se, optab)) != ')')
+					{
+						++si;
+						std::vector<types::Variant> arg;
+						do
 						{
+							ch = utils::parseNextToken( tok, si, se, optab);
 							if (ch == '\0') throw ERROR( si, "unexpected end of program");
 							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
+							if (ch == ')')
+							{
+								if (arg.empty()) break;
+								throw ERROR( si, "unexpected token ')', argument expected");
+							}
+							if (ch == '=') throw ERROR( si, "unexpected token '='");
 							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
+							if (ch == ',') throw ERROR( si, "unexpected token ',', argument expected");
+							arg.push_back( types::Variant( tok));
 						}
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::string( argstart, si-1), prglibrary)));
+						while ((ch=utils::parseNextToken( tok, si, se, optab)) == ',');
+						if (ch != ')') throw ERROR( si, "expected ')' or argument separator ','");
+						
+						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, arg, prglibrary)));
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{
@@ -186,6 +218,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 						}
 						if (!ch) throw ERROR( si, "unexpected end of program");
 						throw ERROR( si, "unexpected token at end of expression");
+					}
 					default:
 						throw ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
 				}
@@ -227,7 +260,7 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
 		for (; ni != ne; ++ni)
 		{
-			library.defineDDLTypeNormalizer( ni->first, ni->second);
+			library.defineNormalizeFunction( ni->first, ni->second);
 		}
 	}
 	catch (const config::PositionalErrorException& e)

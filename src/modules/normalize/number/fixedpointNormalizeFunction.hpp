@@ -59,9 +59,16 @@ public:
 		m_epsilon /= m_base;
 		m_epsilon += std::numeric_limits<double>::epsilon();
 	}
+	FixedpointNormalizeFunction( const FixedpointNormalizeFunction& o)
+		:m_sizeG(o.m_sizeG)
+		,m_sizeF(o.m_sizeF)
+		,m_base(o.m_base)
+		,m_epsilon(o.m_epsilon)
+		,m_max(o.m_max){}
 
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "fixedpoint";}
+	virtual types::NormalizeFunction* copy() const {return new FixedpointNormalizeFunction(*this);}
 
 private:
 	std::size_t m_sizeG;

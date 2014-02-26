@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-types::NormalizeFunction* _Wolframe::langbind::createEncodeNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createEncodeNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{
@@ -53,7 +53,7 @@ types::NormalizeFunction* _Wolframe::langbind::createEncodeNormalizeFunction( ty
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createDecodeNormalizeFunction( types::NormalizeResourceHandle*, const std::string& arg)
+types::NormalizeFunction* _Wolframe::langbind::createDecodeNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{

@@ -37,6 +37,7 @@ Project Wolframe.
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace types {
@@ -45,7 +46,12 @@ class CustomDataNormalizer
 	:public types::NormalizeFunction
 {
 public:
-	CustomDataNormalizer( const std::string& name_, const std::string& arg, const types::CustomDataType* type_)
+	CustomDataNormalizer( const CustomDataNormalizer& o)
+		:m_name(o.m_name)
+		,m_type(o.m_type)
+		,m_initializer(o.m_initializer)
+	{}
+	CustomDataNormalizer( const std::string& name_, const std::vector<types::Variant>& arg, const types::CustomDataType* type_)
 		:m_name(name_)
 		,m_type(type_)
 		,m_initializer(type_->hasInitializer()?type_->createInitializer(arg):0)
@@ -71,6 +77,11 @@ public:
 		types::Variant rt( m_type, m_initializer);
 		rt.data().value.Custom->assign( i);
 		return rt;
+	}
+
+	virtual types::NormalizeFunction* copy() const
+	{
+		return new CustomDataNormalizer(*this);
 	}
 
 private:

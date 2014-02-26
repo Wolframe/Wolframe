@@ -37,6 +37,8 @@
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
 #include "dateArithmetic.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace types {
@@ -45,18 +47,26 @@ class DateDataInitializer
 	:public CustomDataInitializer
 {
 public:
-	DateDataInitializer( const std::string& description_)
-		:m_description( description_)
+	DateDataInitializer( const std::vector<types::Variant>& arg)
+		:m_format(0)
 	{
-		m_format = m_description.c_str();
+		if (arg.size() > 1) throw std::runtime_error("to many arguments in date initializer");
+		if (arg.size())
+		{
+			m_description = arg.at(0).tostring();
+			m_format = m_description.c_str();
+		}
 	}
 	virtual ~DateDataInitializer(){}
 
-	const char* format() const	{return m_format;}
-
-	static CustomDataInitializer* create( const std::string& description_)
+	const char* format() const
 	{
-		return new DateDataInitializer( description_);
+		return m_format;
+	}
+
+	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
+	{
+		return new DateDataInitializer( arg);
 	}
 
 private:

@@ -114,7 +114,7 @@ public:
 
 	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
-		return m_provider->typeNormalizer( name);
+		return m_provider->normalizeFunction( name);
 	}
 
 private:
@@ -468,9 +468,9 @@ static void pushVariantValue( lua_State* ls, const types::Variant& val)
 	}
 }
 
-LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
+LUA_FUNCTION_THROWS( "<type>(..)", function_normalizer_call)
 {
-	types::NormalizeFunction* func = (types::NormalizeFunction*)lua_touserdata( ls, lua_upvalueindex( 1));
+	types::NormalizeFunctionR* func = LuaObject<types::NormalizeFunctionR>::get( ls, lua_upvalueindex( 1));
 	if (lua_gettop( ls) != 1)
 	{
 		throw std::runtime_error( "atomic value expected for 'variant type' argument");
@@ -478,25 +478,10 @@ LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
 	}
 	types::VariantConst param;
 	getVariantValue( ls, param, 1);
-	types::Variant result = func->execute( param);
+	types::Variant result = (*func)->execute( param);
 	pushVariantValue( ls, result);
 	return 1;
 }
-
-LUA_FUNCTION_THROWS( "normalizer(..)", function_normalizer)
-{
-	check_parameters( ls, 0, 1, LUA_TSTRING);
-	const char* name = lua_tostring( ls, 1);
-	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-
-	const types::NormalizeFunction* func = ctx->typeNormalizer( name);
-	if (!func) throw std::runtime_error( std::string("normalizer '") + name + "' not defined");
-
-	lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
-	lua_pushcclosure( ls, function_normalizer_call, 1);
-	return 1;
-}
-
 
 LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 {
@@ -843,55 +828,68 @@ LUA_FUNCTION_THROWS( "<type>()", function_datetime_constructor)
 LUA_FUNCTION_THROWS( "type()", function_type)
 {
 	int nn = lua_gettop( ls);
-	const char* initializerString = 0;
+	std::vector<types::Variant> initializerList;
 	std::string typeName;
-	if (nn > 1)
-	{
-		if (nn > 2) throw std::runtime_error( "too many arguments");
-		initializerString = lua_tostring( ls, 2);
-	}
-	else if (nn < 1)
+
+	if (nn < 1)
 	{
 		throw std::runtime_error( "too few arguments");
 	}
-	if (lua_type( ls, 1) != LUA_TSTRING) throw std::runtime_error( "expected typename (string) as first argument");
+	if (lua_type( ls, 1) != LUA_TSTRING)
+	{
+		throw std::runtime_error( "expected typename (string) as first argument");
+	}
 	typeName.append( lua_tostring( ls, 1));
 
+	types::VariantConst arg;
+	for (int ii=2; ii<nn; ++ii)
+	{
+		getVariantValue( ls, arg, ii);
+		initializerList.push_back( arg);
+	}
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 	const types::CustomDataType* typ = ctx->customDataType( typeName);
-	if (!typ)
-	{
-		const types::NormalizeFunction* func = ctx->typeNormalizer( typeName);
-		if (!func)
-		{
-			if (typeName == "bignumber")
-			{
-				lua_pushcfunction( ls, function_bignumber_constructor);
-				return 1;
-			}
-			if (typeName == "datetime")
-			{
-				lua_pushcfunction( ls, function_datetime_constructor);
-				return 1;
-			}
-			throw std::runtime_error( std::string( "type '") + typeName + "' not defined (neither as custom data type nor as normalizer function)"); 
-		}
-		lua_pushlightuserdata( ls, const_cast<types::NormalizeFunction*>(func));
-		lua_pushcclosure( ls, function_normalizer_call, 1);
-		return 1;
-	}
-	else
+	if (typ)
 	{
 		types::CustomDataInitializerR ini;
-		if (initializerString) 
+		if (!initializerList.empty())
 		{
-			ini.reset( typ->createInitializer( initializerString));
+			ini.reset( typ->createInitializer( initializerList));
 		}
 		lua_pushlightuserdata( ls, const_cast<types::CustomDataType*>(typ));
 		LuaObject<types::CustomDataInitializerR>::push_luastack( ls, ini);
 		lua_pushcclosure( ls, function_type_value_constructor, 2);
 		return 1;
 	}
+	const types::NormalizeFunction* func = ctx->normalizeFunction( typeName);
+	if (func)
+	{
+		if (!initializerList.empty())
+		{
+			throw std::runtime_error( "unexpected initializer argument for type (normalizer)");
+		}
+		LuaObject<types::NormalizeFunctionR>::push_luastack( ls, types::NormalizeFunctionR( func->copy()));
+		lua_pushcclosure( ls, function_normalizer_call, 1);
+		return 1;
+	}
+	const types::NormalizeFunctionType* functype = ctx->normalizeFunctionType( typeName);
+	if (functype)
+	{
+		LuaObject<types::NormalizeFunctionR>::push_luastack( ls, types::NormalizeFunctionR( functype->createFunction( initializerList)));
+		lua_pushcclosure( ls, function_normalizer_call, 1);
+		return 1;
+	}
+	if (typeName == "bignumber")
+	{
+		lua_pushcfunction( ls, function_bignumber_constructor);
+		return 1;
+	}
+	if (typeName == "datetime")
+	{
+		lua_pushcfunction( ls, function_datetime_constructor);
+		return 1;
+	}
+	throw std::runtime_error( std::string( "type name '") + typeName + "' not defined"); 
 }
 
 
@@ -2357,7 +2355,6 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{"form",&function_form},
 	{"type",&function_type},
 	{"formfunction",&function_formfunction},
-	{"normalizer",&function_normalizer},
 	{0,0}
 };
 
@@ -2584,6 +2581,8 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 		LuaObject<TypedInputFilterR>::createMetatable( m_ls, 0, 0, typedinputfilter_methodtable, 0/*typename*/);
 		LuaObject<TypedInputFilterClosure>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
 		LuaObject<FormFunctionClosureR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<types::NormalizeFunctionR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+
 		if (provider_) setProcessorProvider( m_ls, provider_);
 		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
 		lua_pushcfunction( m_ls, &function_scope);

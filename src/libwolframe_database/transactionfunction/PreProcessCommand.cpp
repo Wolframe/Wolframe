@@ -134,7 +134,7 @@ void PreProcessCommand::call( const proc::ProcessorProvider* provider, Transacti
 	try
 	{
 		ff = provider->formFunction( m_name);
-		if (!ff) nf = provider->typeNormalizer( m_name);
+		if (!ff) nf = provider->normalizeFunction( m_name);
 
 		std::vector<NodeVisitor::Index> nodearray;
 		m_selector.selectNodes( structure, structure.rootindex(), nodearray);
