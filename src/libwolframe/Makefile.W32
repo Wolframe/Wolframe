@@ -73,8 +73,6 @@ CPP_OBJS = \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \
-	utils_printFormats.obj \
-	utils_conversions.obj \
 	password.obj \
 	HMAC.obj \
 	PBKDF2.obj \
