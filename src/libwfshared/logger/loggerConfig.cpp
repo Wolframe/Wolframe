@@ -37,7 +37,7 @@
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
-#include "utils/fileUtils.hpp"
+#include "utils/resolvePath.hpp"
 #include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>

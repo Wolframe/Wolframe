@@ -41,14 +41,6 @@
 
 namespace _Wolframe {
 
-/// This will contruct a Version object having major and minor versions set to 0,
-/// no revision number and no build number.
-Version::Version()
-	: m_major( 0 ), m_minor( 0 ),
-	  m_revision( 0 ), m_hasRevision( false ),
-	  m_build( 0 ), m_hasBuild( false )
-{}
-
 Version::Version( const char* version, const char* format)
 	: m_major( 0 ), m_minor( 0 ),
 	  m_revision( 0 ), m_hasRevision( false ),

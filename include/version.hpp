@@ -51,8 +51,20 @@ private:
 	unsigned	m_build;		///< Build number.
 	bool		m_hasBuild;		///< Is build number present ?
 public:
-	/// Empty Version constructor.
-	Version();
+	//\brief Empty Version constructor.
+	// This will contruct a Version object having major and minor versions set to 0,
+	// no revision number and no build number.
+	Version()
+		: m_major( 0 ), m_minor( 0 ),
+		  m_revision( 0 ), m_hasRevision( false ),
+		  m_build( 0 ), m_hasBuild( false )
+	{}
+	Version( const Version& o)
+		: m_major( o.m_major ), m_minor( o.m_minor ),
+		  m_revision( o.m_revision ), m_hasRevision( o.m_hasRevision ),
+		  m_build( o.m_build ), m_hasBuild( o.m_hasBuild )
+	{}
+
 	///\brief Parse a version string
 	///\param[in] version the version string to parse
 	///\param[in] format the format string of the version:

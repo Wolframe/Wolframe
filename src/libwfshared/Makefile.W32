@@ -38,6 +38,7 @@ LOGGER_OBJS = \
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
+	resolvePath.obj \
 	appInfo.obj \
 	globalRndGen.obj
 
