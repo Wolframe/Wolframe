@@ -273,5 +273,6 @@ usr/local/etc/wolframe/wolframe.conf
 usr/local/man/man5/wolframe.conf.5.gz
 usr/local/man/man8/wolframed.8.gz
 usr/local/man/man1/wolfpasswd.1.gz
+usr/local/man/man5/wolframe-mod_db_sqlite3.5.gz
 @mode 0775
 usr/local/etc/rc.d/wolframed

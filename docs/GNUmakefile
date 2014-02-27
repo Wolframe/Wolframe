@@ -60,7 +60,13 @@ local_all:
 
 doc: doc-doxygen doc-html doc-html-chunked doc-pdf
 
-man: wolframed.8 wolframe.conf.5 wolfpasswd.1
+MAN_PAGES = \
+	wolframed.8 \
+	wolframe.conf.5 \
+	wolfpasswd.1 \
+	wolframe-mod_db_sqlite3.5
+	
+man: $(MAN_PAGES)
 
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
@@ -107,7 +113,9 @@ GETTING_STARTED_FILES = \
 	GettingStarted.xml \
 	GettingStartedVersion.txt \
 	GettingStartedDate.txt \
-	GettingStarted/Preface.xml
+	GettingStarted/Preface.xml \
+	GettingStarted/InstallationSource.xml \
+	GettingStarted/InstallationBinary.xml
 
 GettingStarted.html: $(GETTING_STARTED_FILES)
 
@@ -224,13 +232,13 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 
 # man pages
 
-wolframed.8: wolframed-man.xml
+%.8: %-man.xml
 	$(XSLT_MAN) $<
 
-wolframe.conf.5: wolframe.conf-man.xml
+%.5: %-man.xml
 	$(XSLT_MAN) $<
 
-wolfpasswd.1: wolfpasswd-man.xml
+%.1: %-man.xml
 	$(XSLT_MAN) $<
 
 local_clean:
@@ -255,6 +263,8 @@ local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(mandir)/man5
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe.conf.5
+	$(INSTALL) -m 0644 wolframe-mod_db_sqlite3.5 $(DESTDIR)$(mandir)/man5
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
 	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
 	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(mandir)/man1
@@ -270,6 +280,7 @@ local_uninstall:
 	@-rm $(DESTDIR)$(mandir)/man8/wolframed.8.gz
 	@-rmdir $(DESTDIR)$(mandir)/man8
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5.gz
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5.gz
 	@-rmdir $(DESTDIR)$(mandir)/man5
 	@-rmdir $(DESTDIR)$(mandir)
 

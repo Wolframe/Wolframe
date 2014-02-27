@@ -1463,6 +1463,10 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_sqlite3.so
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man5
+%endif
+%{_mandir}/man5/wolframe-mod_db_sqlite3.5.gz
 %endif
 
 %if %{with_oracle}

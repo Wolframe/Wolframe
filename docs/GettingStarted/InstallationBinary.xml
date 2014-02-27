@@ -1,0 +1,86 @@
+<!-- Introduction -->
+<chapter>
+	<title>Introduction</title>
+	<para>
+	First we describe the overall architecture and the data flow in a <application>Wolframe</application> application.
+	</para>
+
+	<sect1>
+		<title>Architecture</title>
+		<para><application>Wolframe</application> is a 3-tier application server.
+		</para>
+		<figure>
+			<title>Overview</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/3-tier.svg" format="SVG"
+						scalefit="1" width="100%" contentdepth="100%"/>
+				</imageobject>
+				<caption><para></para></caption>
+			</mediaobject>
+		</figure>
+		<para></para>
+		<sect2>
+		<title>Presentation tier</title>
+		<para>The presentation tier of <application>Wolframe</application> is implemented as a thin client.
+			It maps the presentation of the application from the request answers it gets from the server.
+			Also the data describing this mapping is loaded from the server when connecting to it.
+			So the whole application is driven by the server.
+			Special use cases are designers of user interfaces that upload the presentation data for other users
+			to the server.</para>
+		</sect2>
+		<sect2>
+		<title>Logic tier</title>
+			<para>The logic tier of <application>Wolframe</application> describes the transformation of input of the presentation tier to a set of instructions
+			for the data tier. The input to the logic tier  consists of a command name plus a
+			structured content also referred to as document. The
+			logic tier returns a single document to the presentation tier.
+			The logic tier supports scripting languages to define the input/output mapping between the
+			layers. 
+			<application>Wolframe</application> introduces three concepts as building blocks of the logic tier:
+				<itemizedlist>
+					<listitem><para><glossterm>Filters</glossterm>: Filters are transforming serialized input data (XML,JSON,CSV,etc.) to a unified serialization of hierarchically structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2, JSON filter based on cJSON) or as scripts based on a filter module (XSLT filter script for rewriting input or output)</para></listitem>
+					<listitem><para><glossterm>Forms</glossterm>: Forms are data structures defined in a data definition language (DDL). Forms are used to validate and normalize input (XML validation, token normalization, structure definition). The recommended definition of a command in the logic tier has a form to validate its input and a form to validate its output before returning it to the caller.</para></listitem>
+					<listitem><para><glossterm>Functions</glossterm>: Functions delegate processing to the data tier (transactions) or they are simple data transformations or they serve as interface to integrate with other environments (e.g. <application>.NET</application>). Functions have a unique name and are called with a structure as argument and a structure as result. Functions can call other functions for delegation, e.g. a transaction definition can call a .NET function for preprocessing its input or a .NET function can call a Python function to do parts of the processing.</para></listitem>
+				</itemizedlist>
+			You find a detailed description of the Logic tier and how to use it in this book.
+			</para>
+		</sect2>
+		<sect2>
+		<title>Data tier</title>
+			<para>The data tier of <application>Wolframe</application> defines the functions for calling a transaction.
+			The main transaction function gets a complete description of the transaction to execute as input and returns
+			all results of the transaction as output. The logic tier builds the result data structure out of this result.
+			The main transaction function is stateless and an abstraction of the transactional context. (The transaction
+			context does not exist outside this function. Explained differently: Two functions do not refer to the same
+			transaction).</para>
+		</sect2>
+	</sect1>
+
+	<sect1>
+		<title>Application Server Requests</title>
+		<para><application>Wolframe</application> application server requests consist of a named command and a structured
+		content (document) as argument.
+		</para>
+		<para>The following illustration shows the processing of one client request to the server.
+			A call of the <application>Wolframe</application> logic tier gets to a command handler
+			that calls functions given by the provider to perform the transaction
+			requested.
+		</para>
+		<figure>
+			<title>Overview</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/LogicTier.svg" format="SVG"
+						scale="300"/>
+				</imageobject>
+				<caption><para></para></caption>
+			</mediaobject>
+		</figure>
+		<para>
+			In the following chapter will describe now the <application>Wolframe</application> standard command handler and how it is configured.
+			Then we will show how to write programs that declare the functions executing the requests 
+			and how you link them to your application.
+		</para>
+	</sect1>
+</chapter>
