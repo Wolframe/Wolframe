@@ -39,7 +39,7 @@ LOGGER_OBJS = \
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
-	resolvePath.o \
+#	resolvePath.o \
 	appInfo.o \
 	globalRndGen.o
 
