@@ -165,6 +165,9 @@ public:
 		define( Subtract, &subtract);
 		define( ToTimestamp, &toTimestamp);
 		define( ToInt, &toInt);
+		define( "year", &getYear);
+		define( "month", &getMonth);
+		define( "day", &getDay);
 	}
 
 	static CustomDataType* create( const std::string& name)
@@ -173,6 +176,9 @@ public:
 	}
 
 private:
+	static types::Variant getYear( CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant getMonth( CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant getDay( CustomDataValue& operand, const std::vector<types::Variant>& arg);
 	static types::Variant increment( const CustomDataValue& operand);
 	static types::Variant decrement( const CustomDataValue& operand);
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);

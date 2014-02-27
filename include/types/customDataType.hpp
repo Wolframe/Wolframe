@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #define _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
+#include "types/keymap.hpp"
 #include <string>
 #include <vector>
 #include <cstring>
@@ -59,6 +60,8 @@ class DateTime;
 class BigNumber;
 
 
+//\class CustomDataValue
+//\brief Custom data value
 class CustomDataValue
 {
 public:
@@ -86,6 +89,8 @@ private:
 typedef boost::shared_ptr<CustomDataValue> CustomDataValueR;
 
 
+//\class CustomDataInitializer
+//\brief Initializer for a custom data value
 class CustomDataInitializer
 {
 public:
@@ -98,8 +103,10 @@ typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
 typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::vector<types::Variant>& arg);
 typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
+typedef types::Variant (*CustomDataValueMethod)( CustomDataValue& val, const std::vector<types::Variant>& arg);
 
-
+//\class CustomDataType
+//\brief Custom Data Type Definition
 class CustomDataType
 {
 public:
@@ -139,27 +146,35 @@ public:
 	typedef std::size_t (*DimensionOperator)( const CustomDataValue& arg);
 
 public:
+	//\brief Default constructor
 	CustomDataType()
 		:m_id(0)
 	{
 		std::memset( &m_vmt, 0, sizeof( m_vmt));
 	}
 
+	//\brief Constructor
+	//\param[in] name_ name of the type
+	//\param[in] constructor_ constructor of a value instance of the type
+	//\param[in] initializerconstructor_ constructor of an initializer object needed to create an instance of the type (0, if not needed)
 	CustomDataType( const std::string& name_,
 			CustomDataValueConstructor constructor_,
 			CreateCustomDataInitializer initializerconstructor_=0);
 
+	//\brief Copy constructor
 	CustomDataType( const CustomDataType& o);
 
 	void define( UnaryOperatorType type, UnaryOperator op);
 	void define( BinaryOperatorType type, BinaryOperator op);
 	void define( ConversionOperatorType type, ConversionOperator op);
 	void define( DimensionOperatorType type, DimensionOperator op);
+	void define( const char* methodname, CustomDataValueMethod method);
 
 	ConversionOperator getOperator( ConversionOperatorType type) const;
 	UnaryOperator getOperator( UnaryOperatorType type) const;
 	BinaryOperator getOperator( BinaryOperatorType type) const;
 	DimensionOperator getOperator( DimensionOperatorType type) const;
+	CustomDataValueMethod getMethod( const std::string& methodname) const;
 
 	CustomDataInitializer* createInitializer( const std::vector<types::Variant>& arg) const;
 	CustomDataValue* createValue( const CustomDataInitializer* i=0) const;
@@ -183,6 +198,7 @@ private:
 		CustomDataValueConstructor opConstructor;
 	}
 	m_vmt;
+	types::keymap<CustomDataValueMethod> m_methodmap;
 };
 
 typedef boost::shared_ptr<CustomDataType> CustomDataTypeR;

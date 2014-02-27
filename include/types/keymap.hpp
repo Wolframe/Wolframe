@@ -51,6 +51,8 @@ namespace types {
 struct keystring
 	:public std::string
 {
+	keystring( const char* o)
+		:std::string( boost::to_upper_copy( std::string(o))){}
 	keystring( const std::string& o)
 		:std::string( boost::to_upper_copy( o)){}
 	keystring( const keystring& o)

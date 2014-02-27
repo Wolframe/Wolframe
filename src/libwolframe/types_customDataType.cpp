@@ -55,7 +55,7 @@ CustomDataType::CustomDataType(
 }
 
 CustomDataType::CustomDataType( const CustomDataType& o)
-	:m_name(o.m_name),m_id(o.m_id)
+	:m_name(o.m_name),m_id(o.m_id),m_methodmap(o.m_methodmap)
 {
 	std::memcpy( &m_vmt, &o.m_vmt, sizeof( m_vmt));
 }
@@ -84,6 +84,11 @@ void CustomDataType::define( ConversionOperatorType type, ConversionOperator op)
 	m_vmt.opConversion[ (int)type] = op;
 }
 
+void CustomDataType::define( const char* methodname, CustomDataValueMethod method)
+{
+	m_methodmap.insert( methodname, method);
+}
+
 CustomDataType::ConversionOperator CustomDataType::getOperator( CustomDataType::ConversionOperatorType type) const
 {
 	return m_vmt.opConversion[ (int)type];
@@ -102,6 +107,13 @@ CustomDataType::BinaryOperator CustomDataType::getOperator( CustomDataType::Bina
 CustomDataType::DimensionOperator CustomDataType::getOperator( CustomDataType::DimensionOperatorType type) const
 {
 	return m_vmt.opDimension[ (int)type];
+}
+
+CustomDataValueMethod CustomDataType::getMethod( const std::string& methodname) const
+{
+	types::keymap<CustomDataValueMethod>::const_iterator fi = m_methodmap.find( methodname);
+	if (fi == m_methodmap.end()) return 0;
+	return fi->second;
 }
 
 CustomDataInitializer* CustomDataType::createInitializer( const std::vector<types::Variant>& arg) const

@@ -65,3 +65,28 @@ types::Variant DateDataType::toTimestamp( const CustomDataValue& operand)
 	return types::Variant( value);
 }
 
+types::Variant DateDataType::getYear( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
+	if (!arg.empty()) throw std::runtime_error("too many arguments");
+	types::Variant::Data::UInt rt = op->year();
+	return rt;
+}
+
+types::Variant DateDataType::getMonth( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
+	if (!arg.empty()) throw std::runtime_error("too many arguments");
+	types::Variant::Data::UInt rt = op->month();
+	return rt;
+}
+
+types::Variant DateDataType::getDay( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
+	if (!arg.empty()) throw std::runtime_error("too many arguments");
+	types::Variant::Data::UInt rt = op->day();
+	return rt;
+}
+
+
