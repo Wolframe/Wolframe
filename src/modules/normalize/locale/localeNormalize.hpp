@@ -59,17 +59,17 @@ private:
 	boost::locale::generator m_gen;
 };
 
-types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfkc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_latinword_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_ascii_de_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_nfkc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_latinword_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_ascii_de_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
 }}//namespace
 #endif
