@@ -881,11 +881,19 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	}
 	if (typeName == "bignumber")
 	{
+		if (!initializerList.empty())
+		{
+			throw std::runtime_error( "unexpected initializer argument for type 'bignumber'");
+		}
 		lua_pushcfunction( ls, function_bignumber_constructor);
 		return 1;
 	}
 	if (typeName == "datetime")
 	{
+		if (!initializerList.empty())
+		{
+			throw std::runtime_error( "unexpected initializer argument for type 'datetime'");
+		}
 		lua_pushcfunction( ls, function_datetime_constructor);
 		return 1;
 	}
@@ -2027,6 +2035,67 @@ static int callCompare( lua_State* ls, const types::CustomDataValue* operand)
 	}
 }
 
+struct CustomDataValueMethodDef
+{
+	const char* name;
+	types::CustomDataValueMethod call;
+};
+
+LUA_FUNCTION_THROWS( "<custom>:<method>()", function_customtype_methodcall)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::get( ls, lua_upvalueindex( 1));
+	const CustomDataValueMethodDef* methoddef = (const CustomDataValueMethodDef*)lua_touserdata( ls, lua_upvalueindex( 2));
+	if (!operand || !methoddef) throw std::runtime_error( "invalid call of method");
+	int ii=1,nn=lua_gettop(ls); 
+	std::vector<types::Variant> args;
+	for (; ii<=nn; ++ii)
+	{
+		types::VariantConst arg;
+		getVariantValue( ls, arg, ii);
+		args.push_back( arg);
+	}
+	try
+	{
+		types::Variant res = methoddef->call( **operand, args);
+		if (res.defined())
+		{
+			pushVariantValue( ls, res);
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	catch (const std::bad_alloc& e)
+	{
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error calling custom data type method '") + methoddef->name + "':" + e.what());
+	}
+}
+
+LUA_FUNCTION_THROWS( "custom:__index()", function_customtype_index)
+{
+	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__unm");
+	check_parameters( ls, 1, 1, LUA_TSTRING);
+	const char* methodname = lua_tostring( ls, 2);
+	types::CustomDataValueMethod method = (*operand)->type()->getMethod( methodname);
+	if (!method)
+	{
+		return 0; //... return NIL
+	}
+	LuaObject<types::CustomDataValueR>::push_luastack( ls, *operand);
+	CustomDataValueMethodDef* methoddef = (CustomDataValueMethodDef*)lua_newuserdata( ls, sizeof(CustomDataValueMethodDef));
+	if (!methoddef) throw std::bad_alloc();
+	methoddef->name = methodname;
+	methoddef->call = method;
+	lua_pushcclosure( ls, function_customtype_methodcall, 2);
+	return 1;
+}
+
 LUA_FUNCTION_THROWS( "custom:__unm()", function_customtype_unm)
 {
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__unm");
@@ -2358,8 +2427,9 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{0,0}
 };
 
-static const luaL_Reg customvalue_methodtable[ 15] =
+static const luaL_Reg customvalue_methodtable[ 16] =
 {
+	{"__index", &function_customtype_index},
 	{"__unm", &function_customtype_unm},
 	{"__add", &function_customtype_add},
 	{"__sub", &function_customtype_sub},

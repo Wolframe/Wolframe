@@ -39,33 +39,237 @@
 	<para><application>Wolframe</application> lets you access objects of the global context through
 		a library called <code>provider</code> offering the following functions:
 
-		<simplelist type="horiz" columns="3">
-		<member>Name</member><member>Parameter</member><member>Returns</member>
-		<member>form</member><member>name of the form</member><member>an instance of a form</member>
-		<member>type</member><member>type name and initializer list</member><member>constructor function to create a value instance of this type</member>
-		<member>formfunction</member><member>name of the function</member><member>form function defined in a <application>Wolframe</application> program or module</member>
-		</simplelist>
+		<table frame="all" width="100%">
+			<title>Method</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Parameter</entry>
+					<entry>Returns</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>form</entry>
+					<entry>Name of the form</entry>
+					<entry>An instance of the form</entry>
+				</row>
+				<row>
+					<entry>type</entry>
+					<entry>Type name and initializer list</entry>
+					<entry>A constructor function to create a value instance of this type</entry>
+				</row>
+				<row>
+					<entry>formfunction</entry>
+					<entry>Name of the function</entry>
+					<entry>Form function defined in a <application>Wolframe</application> program or module</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 	</para>
 	</sect2>
 
 	<sect2>
 	<title>Using Atomic Data Types</title>
-	<para><application>Wolframe</application> lets us extend the type system consisting of Lua basic data types with our own.
-		We can create atomic data types defined in a module or in a DDL datatype definition (.wnmp file).
-		For this you call the <code>type</code> method of the provider with the type name as first argument plus the type 
-		type initializer argument list as additional parameters.
-		The function returns a constructor function that can be called with the initialization value as argument to get a
-		value instance of this type. The name of the type can refer to one of the following:
+	<para><application>Wolframe</application> lets us extend the type system consisting 
+		of Lua basic data types with our own. We can create atomic data types 
+		defined in a module or in a DDL datatype definition program (.wnmp file).
+		For this you call the <code>type</code> method of the provider with 
+		the type name as first argument plus the type initializer argument 
+		list as additional parameters.
+		The function returns a constructor function that can be called 
+		with the initialization value as argument to get a
+		value instance of this type. The name of the type can refer to 
+		one of the following:
 
-		<simplelist type="horiz" columns="2">
-		<member>Custom Data Type</member><member>A custom data type defined in a module with arithmetic operators and methods</member>
-		<member>Normalization Function</member><member>A normalization function type defined in a module</member>
-		<member>DDL Data Type</member><member>A normalizer defined as sequence of normalization functions in a .wnmp source file</member>
-		<member>'bignumber' Data Type</member><member>Arbitrary precision number type</member>
-		<member>'datetime' Data Type</member><member>data type representing date and time down to a granularity of microseconds</member>
-		</simplelist>
+		<table frame="all" width="100%">
+			<title>List of Atomic Data Types</title>
+			<tgroup cols="3">
+			<colspec colnum="1" colwidth="1*"/>
+			<colspec colnum="2" colwidth="2*"/>
+			<colspec colnum="3" colwidth="2*"/>
+			<thead>
+				<row>
+					<entry>Class</entry>
+					<entry>Initializer Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>Custom Data Type</entry>
+					<entry>Custom Type Parameters</entry>
+					<entry>A custom data type defined in a module with arithmetic operators and methods</entry>
+				</row>
+				<row>
+					<entry>Normalization Function</entry>
+					<entry>Initializer Arguments</entry>
+					<entry>A type defined as normalization function in a module</entry>
+				</row>
+				<row>
+					<entry>DDL Data Type</entry>
+					<entry>(no arguments)</entry>
+					<entry>A normalizer defined as sequence of normalization functions in a .wnmp source file</entry>
+				</row>
+				<row>
+					<entry>Data Type 'bignumber'</entry>
+					<entry>(no arguments)</entry>
+					<entry>Arbitrary precision number type</entry>
+				</row>
+				<row>
+					<entry>Data Type 'datetime'</entry>
+					<entry>(no arguments)</entry>
+					<entry>Data type representing date and time down to a granularity of microseconds</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		</para>
 
-	</para>
+		<sect3>
+		<title>Data Type 'datetime'</title>
+		<para>
+			The data type 'datetime' is used as interface for date time values.
+			<table frame="all" width="100%">
+				<title>Methods of 'datetime'</title>
+				<tgroup cols="3">
+				<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+				</thead>
+				<tbody>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second ,millisecond, microsecond</entry>
+					<entry>Creates a date and time value with a granularity down to microseconds</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second ,millisecond</entry>
+					<entry>Creates a date and time value with a granularity down to milliseconds</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second</entry>
+					<entry>Creates a date and time value</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day</entry>
+					<entry>Creates a date value</entry>
+				</row>
+				<row>
+					<entry>year</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the year</entry>
+				</row>
+				<row>
+					<entry>month</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the month (1..12)</entry>
+				</row>
+				<row>
+					<entry>day</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the day in the month (1..31)</entry>
+				</row>
+				<row>
+					<entry>hour</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the hour in the day (0..23)</entry>
+				</row>
+				<row>
+					<entry>minute</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the minute (0..59)</entry>
+				</row>
+				<row>
+					<entry>second</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the second (0..63 : 59 + leap seconds)</entry>
+				</row>
+				<row>
+					<entry>millisecond</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the millisecond (0..1023)</entry>
+				</row>
+				<row>
+					<entry>microsecond</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the microsecond (0..1023)</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the date as string in the format YYYYMMDD, YYYYMMDDhhmmss, YYYYMMDDhhmmssll or YYYYMMDDhhmmssllcc, depending on constructor used to create the date and time value.</entry>
+				</row>
+				</tbody>
+				</tgroup>
+			</table>
+		</para>
+		</sect3>
+
+		<sect3>
+		<title>Data Type 'bignumber'</title>
+		<para>
+			The data type 'bignumber' is used to reference fixed point BCD numbers with a precision of 32767 digits between -1E32767 and +1E32767.
+			<table frame="all" width="100%">
+				<title>Methods of 'datetime'</title>
+				<tgroup cols="3">
+				<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+				</thead>
+				<tbody>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>number value as string</entry>
+					<entry>Creates a bignumber from its string representation</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>number value</entry>
+					<entry>Creates a bignumber from a lua number value (double precision floating point number)</entry>
+				</row>
+				<row>
+					<entry>precision</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number of significant digits in the number</entry>
+				</row>
+				<row>
+					<entry>scale</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number of fractional digits (may be negative, may be bigger than precision)</entry>
+				</row>
+				<row>
+					<entry>digits</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the significant digits in the number</entry>
+				</row>
+				<row>
+					<entry>tonumber</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number as lua number value (double precision floating point number) with possible lost of accurancy</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the big number value as string (not normalized).</entry>
+				</row>
+				</tbody>
+				</tgroup>
+			</table>
+		</para>
+		</sect3>
 	</sect2>
 
 	<sect2>
@@ -131,10 +335,11 @@
 
 	<sect2>
 	<title>Using Forms</title>
-	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty
-		instance of a form. It takes the name of the form as string argument.
-		If you for example have a form configured called "employee" and you want to create an
-		employee object from a <application>Lua</application> table, you call
+	<para>The provider function <code>provider.form( )</code> with the name of the form as string as 
+		parameter returns an empty instance of a form. It takes the name of 
+		the form as string argument. If you for example have a form configured 
+		called "employee" and you want to create an employee object from 
+		a <application>Lua</application> table, you call
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_usage_form_1a.lua" parse="text" />
 			</programlisting>
