@@ -44,12 +44,12 @@ using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
 class TransactionFunctionClosure
-	:public types::TypeSignature
+	:public utils::TypeSignature
 	,public langbind::FormFunctionClosure
 {
 public:
 	TransactionFunctionClosure( const db::TransactionFunction* f)
-		:types::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
+		:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
 		,m_provider(0)
 		,m_func(f)
 		,m_state(0)
@@ -58,7 +58,7 @@ public:
 		{}
 
 	TransactionFunctionClosure( const TransactionFunctionClosure& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,m_provider(o.m_provider)
 		,m_func(o.m_func)
 		,m_state(o.m_state)

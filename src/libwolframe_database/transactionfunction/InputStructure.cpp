@@ -526,7 +526,7 @@ public:
 
 	///\brief Default constructor
 	InputFilter()
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,m_structure(0)
 		,m_elementitr(0)
 	{
@@ -535,7 +535,7 @@ public:
 
 	///\brief Copy constructor
 	InputFilter( const InputFilter& o)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_structure(o.m_structure)
 		,m_nodelist(o.m_nodelist)
@@ -548,7 +548,7 @@ public:
 
 	///\brief Constructor
 	InputFilter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
 		,m_structure(structure_)
 		,m_nodelist(nodelist_)
 		,m_elementitr(0)
@@ -774,7 +774,7 @@ public:
 
 	///\brief Default constructor
 	OutputFilter()
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
 		,m_structure(0)
 		,m_lasttype( langbind::TypedInputFilter::Value)
 		,m_taglevel(0)
@@ -782,7 +782,7 @@ public:
 
 	///\brief Copy constructor
 	OutputFilter( const OutputFilter& o)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
 		,langbind::TypedOutputFilter(o)
 		,m_structure(o.m_structure)
 		,m_visitor(o.m_visitor)
@@ -793,7 +793,7 @@ public:
 
 	///\brief Constructor
 	OutputFilter( TransactionFunctionInput::Structure* structure_, const NodeVisitor& visitor_, const std::map<int, bool>& sourccetagmap_)
-		:types::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		:utils::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
 		,m_structure(structure_)
 		,m_visitor(visitor_)
 		,m_lasttype( langbind::TypedInputFilter::Value)

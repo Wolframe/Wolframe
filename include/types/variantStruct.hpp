@@ -42,6 +42,10 @@ Project Wolframe.
 #include "utils/printFormats.hpp"
 
 namespace _Wolframe {
+namespace utils {
+	//\brief Forward declaration
+	struct PrintFormat;
+}
 namespace types {
 
 ///\brief Forward declaration for VariantStruct
@@ -137,7 +141,7 @@ public:
 	void push();
 
 	///\brief Gets the value of the structure as string
-	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
+	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 	///\brief Random access (throws logic error on ABR/ABW)
 	const VariantStruct& operator[]( std::size_t idx) const;

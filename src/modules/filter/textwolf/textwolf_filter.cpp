@@ -59,7 +59,7 @@ struct InputFilterImpl
 
 	///\brief Constructor
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
@@ -67,7 +67,7 @@ struct InputFilterImpl
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
 		,InputFilter( o)
 		,m_parser( o.m_parser)
 		,m_src(o.m_src)
@@ -308,7 +308,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 	OutputFilterImpl( const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
 		,OutputFilter(attr)
 		,m_elemitr(0)
 		,m_encodingSet(false){}
@@ -316,7 +316,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)

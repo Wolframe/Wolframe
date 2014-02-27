@@ -36,7 +36,6 @@
 
 #include "gtest/gtest.h"
 #include "types/variant.hpp"
-#include "types/malloc.hpp"
 #include <string>
 #include <sstream>
 #include <boost/cstdint.hpp>

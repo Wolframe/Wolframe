@@ -50,7 +50,7 @@ class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:
 	DDLStructSerializer()
-		:types::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
+		:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
 	explicit DDLStructSerializer( const types::VariantStruct* st);
 
 	DDLStructSerializer( const DDLStructSerializer& o);

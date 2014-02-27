@@ -57,7 +57,7 @@ public:
 	typedef OutputFilter Parent;
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(attr)
 		,m_elemitr(0)
 		,m_encattr_defined(false)
@@ -68,7 +68,7 @@ public:
 	}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
 		,OutputFilter(o)
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)

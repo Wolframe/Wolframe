@@ -8,7 +8,7 @@ PACKAGE_NAME = wolframe
 
 INCLUDE_CXXFLAGS =
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 ifeq ($(WITH_TEXTWOLF),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_TEXTWOLF
@@ -22,7 +22,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 ifeq ($(WITH_TEXTWOLF),1)
 INCLUDE_DIRS += \
 	-I$(TOPDIR)/3rdParty/textwolf/include
@@ -52,31 +52,35 @@ PROVIDER_OBJS = \
 	provider/procProviderImpl.o
 
 TYP_OBJS = \
-	types_string.o \
-	types_bignumber.o \
-	types_datetime.o \
-	types_doctype.o \
-	types_customDataType.o \
-	types_variant.o \
-	types_variantStructDescription.o \
-	types_variantStruct.o
+	types/conversions.o \
+	types/string.o \
+	types/bignumber.o \
+	types/datetime.o \
+	types/doctype.o \
+	types/customDataType.o \
+	types/variant.o \
+	types/variantStructDescription.o \
+	types/variantStruct.o \
+	types/form.o
+
+UTIL_OBJS = \
+	utils/typeSignature.o \
+	utils/allocators.o \
+	utils/malloc.o \
+	utils/stringUtils.o \
+	utils/fileUtils.o \
+	utils/parseUtils.o \
+	utils/printFormats.o
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(TYP_OBJS) \
-	malloc.o \
+	$(UTIL_OBJS) \
 	version.o \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
-	utils_printFormats.o \
-	utils_conversions.o \
-	stringUtils.o \
-	parseUtils.o \
-	fileUtils.o \
-	types_allocators.o \
-	typeSignature.o \
 	password.o \
 	HMAC.o \
 	PBKDF2.o \

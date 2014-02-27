@@ -127,21 +127,18 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 
 			case types::Variant::Custom:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;
 			}
 			case types::Variant::Timestamp:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;
 			}
 			case types::Variant::BigNumber:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;

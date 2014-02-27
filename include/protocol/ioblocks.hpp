@@ -35,7 +35,7 @@ Project Wolframe.
 ///\brief Network message blocks as seen from the protocol with the input iterator classes and print functions
 #include "iterators.hpp"
 #include "buffers.hpp"
-#include "types/allocators.hpp"
+#include "utils/allocators.hpp"
 #include <stdexcept>
 #include <cstring>
 #include <cstddef>
@@ -342,7 +342,7 @@ public:
 
 //\class CharBuffer
 //\brief Buffer for an arbitrary size string (with array doubling strategy for the allocator) 
-struct CharBuffer :public types::ArrayDoublingAllocator
+struct CharBuffer :public utils::ArrayDoublingAllocator
 {
 	CharBuffer(){}
 

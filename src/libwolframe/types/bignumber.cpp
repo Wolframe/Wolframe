@@ -34,7 +34,7 @@ Project Wolframe.
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include <limits>
 #include <cstdlib>
 #include <cstring>
@@ -165,7 +165,7 @@ static std::string numtostring( bool sign, const unsigned char* digits, int nums
 	if (exponent)
 	{
 		rt.push_back( 'E');
-		rt.append( utils::tostring_cast( (_WOLFRAME_INTEGER)exponent));
+		rt.append( tostring_cast( (_WOLFRAME_INTEGER)exponent));
 	}
 	return rt;
 }
@@ -218,13 +218,13 @@ BigNumber::BigNumber( double val)
 BigNumber::BigNumber( _WOLFRAME_INTEGER val)
 	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
 {
-	constructor( utils::tostring_cast( val));
+	constructor( tostring_cast( val));
 }
 
 BigNumber::BigNumber( _WOLFRAME_UINTEGER val)
 	:m_scale(0),m_sign(false),m_const(false),m_size(0),m_ar(0)
 {
-	constructor( utils::tostring_cast( val));
+	constructor( tostring_cast( val));
 }
 
 BigNumber::BigNumber( const std::string& val)

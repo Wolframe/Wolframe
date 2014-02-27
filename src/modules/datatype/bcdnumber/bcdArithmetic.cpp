@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Implements some operations on arbitrary sized packed bcd numbers
 
 #include "bcdArithmetic.hpp"
-#include "types/allocators.hpp"
+#include "utils/allocators.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>

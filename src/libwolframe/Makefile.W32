@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 !IFDEF WITH_TEXTWOLF
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_TEXTWOLF
@@ -18,7 +18,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)"
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 !IFDEF WITH_TEXTWOLF
 INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\textwolf\include
@@ -45,30 +45,36 @@ PROVIDER_OBJS = \
 	provider\procProviderImpl.obj \
 
 TYPE_OBJS = \
-	types_string.obj \
-	types_bignumber.obj \
-	types_datetime.obj \
-	types_doctype.obj \
-	types_customDataType.obj \
-	types_variant.obj \
-	types_variantStructDescription.obj \
-	types_variantStruct.obj
+	types\conversions.obj \
+	types\string.obj \
+	types\bignumber.obj \
+	types\datetime.obj \
+	types\doctype.obj \
+	types\customDataType.obj \
+	types\variant.obj \
+	types\variantStructDescription.obj \
+	types\variantStruct.obj \
+	types\form.obj
+
+UTIL_OBJS = \
+	utils\typeSignature.obj \
+	utils\allocators.obj \
+	utils\malloc.obj \
+	utils\stringUtils.obj \
+	utils\fileUtils.obj \
+	utils\parseUtils.obj \
+	utils\printFormats.obj
 
 CPP_OBJS = \
 	$(PROVIDER_OBJS) \
 	$(TYPE_OBJS) \
-	malloc.obj \
+	$(UTIL_OBJS) \
 	version.obj \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \
 	utils_printFormats.obj \
 	utils_conversions.obj \
-	stringUtils.obj \
-	fileUtils.obj \
-	parseUtils.obj \
-	types_allocators.obj \
-	typeSignature.obj \
 	password.obj \
 	HMAC.obj \
 	PBKDF2.obj \

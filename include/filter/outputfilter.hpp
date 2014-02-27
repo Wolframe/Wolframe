@@ -61,7 +61,7 @@ public:
 
 	///\brief Default constructor
 	explicit OutputFilter( const ContentFilterAttributes* attr_=0)
-		:types::TypeSignature("langbind::OutputFilter", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
 		,m_state(Open)
 		,m_buf(0)
 		,m_size(0)
@@ -76,7 +76,7 @@ public:
 	///\brief Copy constructor
 	///\param[in] o output filter to copy
 	OutputFilter( const OutputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,FilterBase(o)
 		,m_state(o.m_state)
 		,m_buf(o.m_buf)

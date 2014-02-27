@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_TYPES_FORM_HPP_INCLUDED
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "utils/printFormats.hpp"
 #include <string>
 #include <cstddef>
 #include <stdexcept>
@@ -45,6 +44,10 @@ Project Wolframe.
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+namespace utils {
+	//\brief Forward declaration
+	struct PrintFormat;
+}
 namespace types {
 
 //\class FormDescription
@@ -92,19 +95,10 @@ public:
 		return m_ddlname;
 	}
 
-	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const
-	{
-		out << m_name << pformat->assign;
-		types::VariantStructDescription::print( out, pformat, level);
-	}
+	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const;
 
 	///\brief Gets the form as string
-	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const
-	{
-		std::ostringstream rt;
-		print( rt, pformat);
-		return rt.str();
-	}
+	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 private:
 	std::string m_name;
@@ -149,19 +143,10 @@ public:
 		return m_description;
 	}
 
-	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const
-	{
-		out << m_description->name() << pformat->assign;
-		types::VariantStruct::print( out, pformat, level);
-	}
+	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const;
 
 	///\brief Gets the form as string
-	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const
-	{
-		std::ostringstream rt;
-		print( rt, pformat);
-		return rt.str();
-	}
+	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 private:
 	const FormDescription* m_description;

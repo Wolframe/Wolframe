@@ -31,11 +31,10 @@
 ************************************************************************/
 #include "types/variant.hpp"
 #include "types/customDataType.hpp"
-#include "types/malloc.hpp"
 #include "types/string.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
@@ -362,7 +361,7 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 		case Variant::Timestamp:
 			throw std::logic_error( "cannot cast timestamp type to unsigned integer type");
 		case Variant::String:
-			return utils::touint_cast( std::string( o.data().value.String));
+			return touint_cast( std::string( o.data().value.String));
 		case Variant::Custom:
 		{
 			Variant val;
@@ -404,7 +403,7 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 		case Variant::Timestamp:
 			throw std::logic_error( "cannot cast timestamp type to signed integer type");
 		case Variant::String:
-			return utils::toint_cast( std::string( o.data().value.String));
+			return toint_cast( std::string( o.data().value.String));
 		case Variant::Custom:
 		{
 			Variant val;
@@ -480,9 +479,9 @@ static typename boost::enable_if_c<boost::is_same<TYPE,std::string>::value,TYPE>
 		case Variant::Double:
 			return boost::lexical_cast<std::string>( o.data().value.Double);
 		case Variant::Int:
-			return utils::tostring_cast( o.data().value.Int);
+			return tostring_cast( o.data().value.Int);
 		case Variant::UInt:
-			return utils::tostring_cast( o.data().value.UInt);
+			return tostring_cast( o.data().value.UInt);
 		case Variant::String:
 			return std::string( o.data().value.String, o.data().dim.size);
 		case Variant::Custom:
@@ -600,22 +599,26 @@ void Variant::move( Variant& o)
 void Variant::convert( Type type_)
 {
 	if (m_type == type_) return;
+	assign( type_, *this);
+}
+
+void Variant::assign( Type type_, const Variant& o)
+{
 	switch (type_)
 	{
 		case Null: release(); init(); return;
 		case Custom: throw std::runtime_error( "cannot convert to unspecified custom data type");
-		case Bool: *this = tobool(); return;
-		case Int: *this = toint(); return;
-		case UInt: *this = touint(); return;
-		case Double: *this = todouble(); return;
-		case String: {Variant rt = tostring(); move(rt); return;}
-		case BigNumber: {*this = variant2bignumber_cast(*this);}
-		case Timestamp: {*this = variant2timestamp_cast(*this);}
+		case Bool: *this = o.tobool(); return;
+		case Int: *this = o.toint(); return;
+		case UInt: *this = o.touint(); return;
+		case Double: *this = o.todouble(); return;
+		case String: {Variant rt = o.tostring(); move(rt); return;}
+		case BigNumber: {*this = variant2bignumber_cast(o);}
+		case Timestamp: {*this = variant2timestamp_cast(o);}
 			
 	}
 	throw std::runtime_error( "illegal conversion of atomic type");
 }
-
 
 std::ostream& std::operator << (std::ostream &os, const _Wolframe::types::Variant& o)
 {

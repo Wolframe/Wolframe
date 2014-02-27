@@ -31,14 +31,14 @@
 
 ************************************************************************/
 ///\brief Interface for special purpose memory allocators
-///\file types/allocators.hpp
-#ifndef _TYPES_ALLOCATORS_HPP_INCLUDED
-#define _TYPES_ALLOCATORS_HPP_INCLUDED
+///\file utils/allocators.hpp
+#ifndef _UTILS_ALLOCATORS_HPP_INCLUDED
+#define _UTILS_ALLOCATORS_HPP_INCLUDED
 #include <cstddef>
 #include <stdexcept>
 
 namespace _Wolframe {
-namespace types {
+namespace utils {
 
 //\class GreedySmallChunkAllocator
 //\brief Interface for an allocator for small chunks without a free. Memory is freed in the destructor of the allocator
@@ -79,16 +79,16 @@ private:
 //\class TypedArrayDoublingAllocator
 //\brief Interface for an array doubling allocator that allocates only one fixed size type of element
 template <typename Type>
-struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
+struct TypedArrayDoublingAllocator :public ArrayDoublingAllocator
 {
 	const Type* base() const
 	{
-		return (const Type*)types::ArrayDoublingAllocator::base();
+		return (const Type*)ArrayDoublingAllocator::base();
 	}
 
 	Type* base()
 	{
-		return (Type*)types::ArrayDoublingAllocator::base();
+		return (Type*)ArrayDoublingAllocator::base();
 	}
 
 	const Type& operator[]( std::size_t idx) const
@@ -97,7 +97,7 @@ struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 		{
 			throw std::logic_error( "Array bounds access");
 		}
-		return ((const Type*)types::ArrayDoublingAllocator::base())[ idx];
+		return ((const Type*)ArrayDoublingAllocator::base())[ idx];
 	}
 
 	Type& operator[]( std::size_t idx)
@@ -106,14 +106,14 @@ struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 		{
 			throw std::logic_error( "Array bounds access");
 		}
-		return ((Type*)types::ArrayDoublingAllocator::base())[ idx];
+		return ((Type*)ArrayDoublingAllocator::base())[ idx];
 	}
 
 	std::size_t alloc( unsigned int nof)
 	{
 		std::size_t mm = nof * sizeof(Type);
 		if (mm < nof) throw std::bad_alloc();
-		std::size_t idx = types::ArrayDoublingAllocator::alloc( mm);
+		std::size_t idx = ArrayDoublingAllocator::alloc( mm);
 		return idx / sizeof(Type);
 	}
 };

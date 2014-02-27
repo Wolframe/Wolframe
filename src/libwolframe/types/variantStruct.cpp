@@ -31,7 +31,7 @@
 ************************************************************************/
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "types/malloc.hpp"
+#include "utils/printFormats.hpp"
 #include <limits>
 #include <stdexcept>
 #include <cstdlib>
@@ -718,7 +718,7 @@ void VariantStruct::print( std::ostream& out, const utils::PrintFormat* pformat,
 std::string VariantStruct::tostring( const utils::PrintFormat* pformat) const
 {
 	std::ostringstream buf;
-	print( buf, pformat, 0);
+	print( buf, pformat?pformat:utils::logPrintFormat(), 0);
 	return buf.str();
 }
 

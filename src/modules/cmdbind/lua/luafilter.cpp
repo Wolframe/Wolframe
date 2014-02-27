@@ -115,7 +115,7 @@ bool wrap_lua_toboolean( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation
 
 
 LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
-	:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
 	,TypedInputFilter(o)
 	,LuaExceptionHandlerScope(o)
 	,m_ls(o.m_ls)
@@ -132,7 +132,7 @@ LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
 }
 
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
-	:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
@@ -441,7 +441,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 
 LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
-	:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_type(OpenTag)
@@ -449,7 +449,7 @@ LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2){}
 
 LuaTableOutputFilter::LuaTableOutputFilter( const LuaTableOutputFilter& o)
-	:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
 	,TypedOutputFilter(o)
 	,LuaExceptionHandlerScope(o)
 	,m_ls(o.m_ls)

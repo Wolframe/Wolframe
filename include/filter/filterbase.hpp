@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_FILTER_FILTERBASE_HPP_INCLUDED
 #include <string>
 #include <cstring>
-#include "types/typeSignature.hpp"
+#include "utils/typeSignature.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -44,18 +44,18 @@ namespace langbind {
 ///\class FilterBase
 ///\brief Base of input/ouput filter
 class FilterBase
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	FilterBase()
-		:types::TypeSignature("langbind::FilterBase", __LINE__)
+		:utils::TypeSignature("langbind::FilterBase", __LINE__)
 		,m_flags(None)
 	{
 		m_errorbuf[0] = '\0';
 	}
 
 	FilterBase( const FilterBase& o)
-		:types::TypeSignature("langbind::FilterBase", __LINE__)
+		:utils::TypeSignature("langbind::FilterBase", __LINE__)
 		,m_flags(o.m_flags)
 	{
 		setError( o.m_errorbuf);

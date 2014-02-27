@@ -93,7 +93,7 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 }
 
 PropertyTreeOutputFilter::PropertyTreeOutputFilter()
-	:types::TypeSignature("langbind::PropertyTreeOutputFilter", __LINE__)
+	:utils::TypeSignature("langbind::PropertyTreeOutputFilter", __LINE__)
 {
 	m_stk.push_back( State());
 }

@@ -55,7 +55,7 @@ namespace langbind {
 struct InputFilterImpl :public InputFilter
 {
 	explicit InputFilterImpl( const XsltMapper& xsltMapper_)
-		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,m_xsltMapper(xsltMapper_)
 		,m_node(0)
 		,m_value(0)
@@ -65,7 +65,7 @@ struct InputFilterImpl :public InputFilter
 		,m_withEmpty(false){}
 
 	explicit InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
@@ -74,7 +74,7 @@ struct InputFilterImpl :public InputFilter
 		,m_withEmpty(false){}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,InputFilter(o)
 		,m_doc(o.m_doc)
 		,m_xsltMapper(o.m_xsltMapper)

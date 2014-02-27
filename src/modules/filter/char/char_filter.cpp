@@ -56,7 +56,7 @@ struct InputFilterImpl :public InputFilter
 
 	///\brief Constructor
 	explicit InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
-		:types::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,m_itr( iocharset_)
 		,m_output(AppCharset())
 		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
@@ -68,7 +68,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,InputFilter( o)
 		,m_itr(o.m_itr)
 		,m_output(o.m_output)
@@ -163,14 +163,14 @@ struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
 	OutputFilterImpl( const IOCharset& iocharset_=IOCharset())
-		:types::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)

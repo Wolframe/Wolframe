@@ -36,7 +36,7 @@ Project Wolframe.
 #include "filter/filter.hpp"
 #include "langbind/cppFormFunction.hpp"
 #include "processor/procProvider.hpp"
-#include "types/typeSignature.hpp"
+#include "utils/typeSignature.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -63,25 +63,25 @@ struct Logger
 //\class Output
 //\brief Output as seen from scripting language binding
 class Output
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	//\brief Constructor
 	Output()
-		:types::TypeSignature("langbind::Output", __LINE__)
+		:utils::TypeSignature("langbind::Output", __LINE__)
 		,m_state(0)
 		,m_called(false){}
 	//\brief Copy constructor
 	//\param[in] o copied item
 	Output( const Output& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,m_outputfilter(o.m_outputfilter)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
 	//\brief Constructor by output filter
 	//\param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
-		:types::TypeSignature("langbind::Output", __LINE__)
+		:utils::TypeSignature("langbind::Output", __LINE__)
 		,m_outputfilter(flt)
 		,m_state(0)
 		,m_called(false){}
@@ -112,18 +112,18 @@ private:
 //\class Input
 //\brief input as seen from the application processor program
 class Input
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	//\brief Constructor
 	Input()
-		:types::TypeSignature("langbind::Input", __LINE__)
+		:utils::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false){}
 
 	//\brief Copy constructor
 	//\param[in] o copied item
 	Input( const Input& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,m_used(o.m_used)
 		,m_inputfilter(o.m_inputfilter)
 		,m_docformat(o.m_docformat){}
@@ -131,7 +131,7 @@ public:
 	//\brief Constructor by input filter
 	//\param[in] flt input filter reference
 	Input( const InputFilterR& flt, const std::string& docformat_)
-		:types::TypeSignature("langbind::Input", __LINE__)
+		:utils::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false)
 		,m_inputfilter(flt)
 		,m_docformat(docformat_){}
@@ -153,22 +153,22 @@ private:
 
 
 class DDLFormParser
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 	,public serialize::DDLStructParser
 {
 public:
 	explicit DDLFormParser( const types::FormR& form_)
-		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
+		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
 	DDLFormParser( const types::FormR& form_, types::VariantStruct* substructure)
-		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
+		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(substructure)
 		,m_form(form_){}
 
 	DDLFormParser( const DDLFormParser& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,DDLStructParser(o)
 		,m_form(o.m_form){}
 
@@ -176,7 +176,7 @@ public:
 
 	DDLFormParser& operator=( const DDLFormParser& o)
 	{
-		types::TypeSignature::operator=( o);
+		utils::TypeSignature::operator=( o);
 		DDLStructParser::operator=( o);
 		m_form = o.m_form;
 		return *this;
@@ -190,32 +190,32 @@ private:
 
 
 class DDLFormSerializer
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 	,public serialize::DDLStructSerializer
 {
 public:
 	DDLFormSerializer()
-		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
+		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
 
 	explicit DDLFormSerializer( const types::FormR& form_)
-		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
+		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
 	explicit DDLFormSerializer( const types::FormR& form_, const types::VariantStruct* substructure)
-		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
+		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(substructure)
 		,m_form(form_){}
 
 	DDLFormSerializer( const DDLFormSerializer& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,DDLStructSerializer(o)
 		,m_form(o.m_form){}
 	virtual ~DDLFormSerializer(){}
 
 	DDLFormSerializer& operator =( const DDLFormSerializer& o)
 	{
-		types::TypeSignature::operator=( o);
+		utils::TypeSignature::operator=( o);
 		DDLStructSerializer::operator=( o);
 		m_form = o.m_form;
 		return *this;
@@ -230,7 +230,7 @@ private:
 
 //\class RedirectFilterClosure
 class RedirectFilterClosure
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	RedirectFilterClosure();
@@ -262,7 +262,7 @@ private:
 
 //\class ApiFormData
 class ApiFormData
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	ApiFormData( const serialize::StructDescriptionBase* descr);
@@ -280,7 +280,7 @@ private:
 //\class CppFormFunctionClosure
 //\brief Closure with calling state of called CppFormFunction
 class CppFormFunctionClosure
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 {
 public:
 	//\brief Constructor

@@ -35,11 +35,14 @@
 
 #ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_HPP_INCLUDED
-#include "database/database.hpp"
 #include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+namespace db {
+	///\brief Forward declaration
+	class Database;
+}
 namespace prgbind {
 
 ///\brief Forward declaration

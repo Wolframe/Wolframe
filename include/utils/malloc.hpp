@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Alternative malloc that checks for memory corruption
-///\file types/malloc.hpp
+///\file utils/malloc.hpp
 #ifndef _WOLFRAME_MALLOC_HPP_INCLUDED
 #define _WOLFRAME_MALLOC_HPP_INCLUDED
 #include <stdlib.h>

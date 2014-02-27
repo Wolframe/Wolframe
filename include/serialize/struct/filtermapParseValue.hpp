@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Defines the intrusive parsing of a value in deserialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"

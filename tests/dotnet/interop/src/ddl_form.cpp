@@ -96,12 +96,12 @@ langbind::TypedInputFilterR Form::get() const
 }
 
 FormInputFilter::FormInputFilter( const FormInputFilter& o)
-	:types::TypeSignature("langbind::FormInputFilter", __LINE__)
+	:utils::TypeSignature("langbind::FormInputFilter", __LINE__)
 	,langbind::TypedInputFilter(o)
 	,m_stk(o.m_stk){}
 
 FormInputFilter::FormInputFilter( const Form* form)
-	:types::TypeSignature("langbind::FormInputFilter", __LINE__)
+	:utils::TypeSignature("langbind::FormInputFilter", __LINE__)
 {
 	if (form->isArray())
 	{

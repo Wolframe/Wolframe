@@ -114,7 +114,7 @@ bool StructParser::call()
 
 
 StructSerializer::StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr_)
-	:types::TypeSignature("serialize::StructSerializer", __LINE__)
+	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
 	,m_ptr(obj.get())
 	,m_obj(obj)
 	,m_descr(descr_)
@@ -124,7 +124,7 @@ StructSerializer::StructSerializer( const ObjectReference& obj, const StructDesc
 }
 
 StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase* descr_)
-	:types::TypeSignature("serialize::StructSerializer", __LINE__)
+	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
 	,m_ptr(obj)
 	,m_descr(descr_)
 	,m_ctx()
@@ -133,7 +133,7 @@ StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase
 }
 
 StructSerializer::StructSerializer( const StructSerializer& o)
-	:types::TypeSignature(o)
+	:utils::TypeSignature(o)
 	,TypedInputFilter(o)
 	,m_ptr(o.m_ptr)
 	,m_obj(o.m_obj)
@@ -234,11 +234,11 @@ class OneElementTypedInputFilter
 {
 public:
 	OneElementTypedInputFilter( const std::string& value)
-		:types::TypeSignature("serialize::OneElementTypedInputFilter", __LINE__)
+		:utils::TypeSignature("serialize::OneElementTypedInputFilter", __LINE__)
 		,m_value(value)
 		,m_consumed(false){}
 	OneElementTypedInputFilter( const OneElementTypedInputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,langbind::TypedInputFilter(o)
 		,m_value(o.m_value)
 		,m_consumed(o.m_consumed){}

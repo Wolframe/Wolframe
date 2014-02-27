@@ -49,14 +49,14 @@ struct InputFilterImpl :public InputFilter
 {
 	///\brief Constructor
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
 		,m_end(false)
 		,m_done(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
 		,InputFilter( o)
 		,m_elembuf( o.m_elembuf)
 		,m_end(o.m_end)
@@ -130,13 +130,13 @@ struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
 	OutputFilterImpl()
-		:types::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
 		,m_elemitr(0){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr){}

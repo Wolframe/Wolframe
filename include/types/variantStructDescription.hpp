@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #include "types/variant.hpp"
 #include "types/normalizeFunction.hpp"
-#include "utils/printFormats.hpp"
 #include <string>
 #include <map>
 #include <iostream>
@@ -44,6 +43,10 @@ Project Wolframe.
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+namespace utils {
+	//\brief Forward declaration
+	struct PrintFormat;
+}
 namespace types {
 
 ///\brief Forward declaration for VariantStructDescription
@@ -209,7 +212,7 @@ public:
 	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
 
 	///\brief Return the contents of a structure description as string (format as in print with no indent and newlines)
-	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
+	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 	void check() const;
 

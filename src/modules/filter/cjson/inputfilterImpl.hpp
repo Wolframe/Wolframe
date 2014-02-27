@@ -55,14 +55,14 @@ struct InputFilterImpl :public InputFilter
 	typedef InputFilter Parent;
 
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,m_encattr_defined(false)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,InputFilter(o)
 		,m_content(o.m_content)
 		,m_encattr(o.m_encattr)

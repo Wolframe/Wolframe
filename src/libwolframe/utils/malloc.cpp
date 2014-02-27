@@ -31,7 +31,7 @@
 ************************************************************************/
 //\brief malloc wrapper that checks for memory corruption (only for testing)
 //\file malloc.cpp
-#include "types/malloc.hpp"
+#include "utils/malloc.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>

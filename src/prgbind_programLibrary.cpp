@@ -51,12 +51,12 @@ using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
 class CppFormFunctionClosure
-	:public virtual types::TypeSignature
+	:public virtual utils::TypeSignature
 	,public langbind::FormFunctionClosure
 {
 public:
 	CppFormFunctionClosure( const langbind::CppFormFunction& f)
-		:types::TypeSignature("prgbind::CppFormFunctionClosure", __LINE__)
+		:utils::TypeSignature("prgbind::CppFormFunctionClosure", __LINE__)
 		,m_func(f)
 		,m_state(0)
 		,m_param_data(f.api_param())
@@ -67,7 +67,7 @@ public:
 		{}
 
 	CppFormFunctionClosure( const CppFormFunctionClosure& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,m_func(o.m_func)
 		,m_state(0)
 		,m_param_data(o.m_param_data)

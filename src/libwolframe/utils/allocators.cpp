@@ -31,13 +31,14 @@
 
 ************************************************************************/
 ///\brief Implementation for special purpose memory allocators
-///\file src/types_allocators.hpp
-#include "types/allocators.hpp"
+///\file types/allocators.cpp
+#include "utils/allocators.hpp"
 #include <stdexcept>
 #include <cstring>
 #include <cstdlib>
 
-using namespace _Wolframe::types;
+using namespace _Wolframe;
+using namespace _Wolframe::utils;
 
 class GreedySmallChunkAllocator::MemChunk
 {

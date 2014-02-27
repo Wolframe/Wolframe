@@ -36,8 +36,8 @@
 #define _DATABASE_TRANSACTION_FUNCTION_INPUT_STRUCTURE_HPP_INCLUDED
 #include "database/transactionFunction.hpp"
 #include "transactionfunction/TagTable.hpp"
-#include "types/allocators.hpp"
 #include "filter/typedfilter.hpp"
+#include "utils/allocators.hpp"
 #include "utils/printFormats.hpp"
 #include <string>
 #include <map>
@@ -173,7 +173,7 @@ private://create structure:
 	bool isArrayNode( const NodeVisitor& nv) const;
 
 private://data:
-	types::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
+	utils::TypedArrayDoublingAllocator<Node> m_nodemem;	//< tree nodes
 	std::vector<types::Variant> m_content;			//< tree values
 	const TagTable* m_tagmap;				//< map names used in selections to node tag identifiers
 	TagTable m_privatetagmap;				//< map unused names to node tag identifiers

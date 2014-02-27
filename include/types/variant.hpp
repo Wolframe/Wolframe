@@ -224,8 +224,10 @@ public:
 
 	//\brief Test if this value is constant (owned by this)
 	bool constant() const					{return flags( Constant);}
+
 	//\brief Set the value to be constant
 	//\remark Setting this flag for a value owned by this can cause memory leaks
+	//\param[in] v value of constant flag set
 	void setConstant( bool v=true)				{setFlags( Constant, v);}
 
 	//\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
@@ -238,9 +240,16 @@ public:
 	void clear()						{release(); init();}
 
 	//\brief Converting the value of this to a defined type
+	//\param[in] type_ type to convert this value to
 	void convert( Type type_);
 
+	//\brief Assigning o to this including a conversion to a defined type
+	//\param[in] type_ type to convert the assigned value to
+	//\param[in] o value to assign
+	void assign( Type type_, const Variant& o);
+
 	//\brief Move value from 'o' to this
+	//\param[in] o value to move
 	void move( Variant& o);
 
 protected:

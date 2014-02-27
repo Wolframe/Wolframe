@@ -75,14 +75,14 @@ struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
 	OutputFilterImpl()
-		:types::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
 		,m_elemitr(0)
 		{}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
@@ -169,7 +169,7 @@ struct InputFilterImpl :public InputFilter
 {
 	///\brief Constructor
 	InputFilterImpl( const char* encoding_)
-		:types::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,m_tag(0)
 		,m_taglevel(0)
 		,m_elemtype(OpenTag)
@@ -184,7 +184,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
+		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter(o)
 		,m_tag(o.m_tag)
 		,m_taglevel(o.m_taglevel)

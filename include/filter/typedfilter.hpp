@@ -59,14 +59,14 @@ public:
 
 	///\brief Constructor
 	TypedInputFilter()
-		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
+		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,m_state(InputFilter::Open)
 		,m_data(0){}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
-		:types::TypeSignature("langbind::TypedInputFilter", __LINE__)
+		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(o)
 		,m_state(o.m_state)
 		,m_data(o.m_data?o.m_data->copy():0){}
@@ -121,13 +121,13 @@ public:
 
 	///\brief Constructor
 	TypedOutputFilter()
-		:types::TypeSignature("langbind::TypedOutputFilter", __LINE__)
+		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
 		,m_state(OutputFilter::Open) {}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,FilterBase(o)
 		,m_state(o.m_state){}
 

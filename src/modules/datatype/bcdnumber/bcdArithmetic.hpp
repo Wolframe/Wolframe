@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_DATATYPE_BCD_ARITHMETIC_HPP_INCLUDED
 #include <string>
 #include <boost/cstdint.hpp>
-#include "types/allocators.hpp"
+#include "utils/allocators.hpp"
 #include "types/integer.hpp"
 #include "types/bignumber.hpp"
 
@@ -139,7 +139,7 @@ public:
 
 private:
 	friend class BigFxpBCD;
-	typedef GreedySmallChunkAllocator Allocator;
+	typedef utils::GreedySmallChunkAllocator Allocator;
 	void init( std::size_t size_, Allocator* allocator);
 	void copy( const BigBCD& o, Allocator* allocator);
 	void normalize();

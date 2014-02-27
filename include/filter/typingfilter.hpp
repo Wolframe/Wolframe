@@ -45,7 +45,7 @@ class TypingInputFilter :public TypedInputFilter
 public:
 	///\brief Constructor
 	explicit TypingInputFilter( const InputFilterR& inp)
-		:types::TypeSignature("langbind::TypingInputFilter", __LINE__)
+		:utils::TypeSignature("langbind::TypingInputFilter", __LINE__)
 		,m_inputfilter(inp)
 	{
 		setFlags( inp->flags());
@@ -54,7 +54,7 @@ public:
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
 	TypingInputFilter( const TypingInputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,TypedInputFilter(o)
 		,m_inputfilter(o.m_inputfilter){}
 
@@ -82,7 +82,7 @@ class TypingOutputFilter :public TypedOutputFilter
 public:
 	///\brief Constructor
 	explicit TypingOutputFilter( const OutputFilterR& outp)
-		:types::TypeSignature("langbind::TypingOutputFilter", __LINE__)
+		:utils::TypeSignature("langbind::TypingOutputFilter", __LINE__)
 		,m_outputfilter(outp)
 	{
 		setFlags( outp->flags());
@@ -91,7 +91,7 @@ public:
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypingOutputFilter( const TypingOutputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,TypedOutputFilter(o)
 		,m_outputfilter(o.m_outputfilter){}
 

@@ -109,10 +109,10 @@ class ResultIterator
 {
 public:
 	ResultIterator( const ResultStructureR& resultstruct_, const TransactionOutputR& data_)
-		:types::TypeSignature("db::ResultIterator", __LINE__)
+		:utils::TypeSignature("db::ResultIterator", __LINE__)
 		,m_resitr( resultstruct_, data_){}
 	ResultIterator( const ResultIterator& o)
-		:types::TypeSignature("db::ResultIterator", __LINE__)
+		:utils::TypeSignature("db::ResultIterator", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_resitr( o.m_resitr){}
 

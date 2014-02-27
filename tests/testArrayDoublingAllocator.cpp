@@ -31,13 +31,13 @@
 
 ************************************************************************/
 ///\file testArrayDoublingAllocator.cpp
-///\brief test program for Array Doubling Allocator (types/allocators.hpp)
+///\brief test program for Array Doubling Allocator (utils/allocators.hpp)
 
 #include "gtest/gtest.h"
-#include "types/allocators.hpp"
+#include "utils/allocators.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::types;
+using namespace _Wolframe::utils;
 
 TEST( ArrayDoublingAllocator, tests )
 {

@@ -36,7 +36,7 @@
 #include "transactionFunctionDescription.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
@@ -292,7 +292,7 @@ static TransactionFunctionDescription::MainProcessingStep::Call::Param
 					throw std::runtime_error( std::string("unknown parameter '") + paramname + "'");
 				}
 				Call::Param::Type type = Call::Param::NumericResultReference;
-				Call::Param param( type, utils::tostring_cast((_WOLFRAME_UINTEGER)pi->second), resultscope_functionidx);
+				Call::Param param( type, types::tostring_cast((_WOLFRAME_UINTEGER)pi->second), resultscope_functionidx);
 				return param;
 			}
 			else

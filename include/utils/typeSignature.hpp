@@ -31,16 +31,15 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
 #define _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
-//\file types/typeSignature.hpp
+//\file utils/typeSignature.hpp
 //\brief Interface for signature for structures to detect memory problems
 
-#include "types/malloc.hpp"
 #include <cstddef>
 #include <cstring>
 #include <stdexcept>
 
 namespace _Wolframe {
-namespace types {
+namespace utils {
 
 #undef _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG

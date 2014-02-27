@@ -59,7 +59,7 @@ public:
 	typedef OutputFilter Parent;
 
 	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 		,OutputFilter(attr)
 		,m_xsltMapper(xsltMapper_)
 		,m_nofroot(0)
@@ -68,7 +68,7 @@ public:
 		{}
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 		,OutputFilter(attr)
 		,m_nofroot(0)
 		,m_taglevel(0)
@@ -76,7 +76,7 @@ public:
 		{}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 		,OutputFilter(o)
 		,m_doc(o.m_doc)
 		,m_xsltMapper(o.m_xsltMapper)

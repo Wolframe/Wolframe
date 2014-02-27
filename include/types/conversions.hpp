@@ -29,25 +29,22 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file types/typeSignature.hpp
-//\brief Implementation of signature for structures to detect memory problems
-#include "types/typeSignature.hpp"
-#include <boost/lexical_cast.hpp>
+///\file types/conversions.hpp
+///\brief Conversions of atomic types
 
-using namespace _Wolframe;
-using namespace _Wolframe::types;
+#ifndef _Wolframe_TYPES_CONVERSIONS_HPP_INCLUDED
+#define _Wolframe_TYPES_CONVERSIONS_HPP_INCLUDED
+#include <string>
+#include "types/integer.hpp"
 
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-void TypeSignature::verify() const
-{
-	if (m_objid != m_objid || m_objinvid != getStmp(m_objid) || m_chk != chk())
-	{
-		throw std::runtime_error( std::string( "internal: memory curruption detected for object ") + m_objname + " line:" + boost::lexical_cast<std::string>(m_objid) + ")");
-	}
-}
+namespace _Wolframe {
+namespace types {
+
+std::string tostring_cast( _WOLFRAME_UINTEGER val);
+std::string tostring_cast( _WOLFRAME_INTEGER val);
+_WOLFRAME_UINTEGER touint_cast( const std::string& val);
+_WOLFRAME_INTEGER toint_cast( const std::string& val);
+
+}}//namespace
 #endif
 
-#ifdef BOOST_MSVC
-// avoids LNK4221 on Windows (see #69)
-namespace { char dummy; }
-#endif

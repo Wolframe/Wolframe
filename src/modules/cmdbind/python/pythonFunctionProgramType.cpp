@@ -57,7 +57,7 @@ class PythonResult
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:types::TypeSignature("langbind::PythonResult", __LINE__)
+		:utils::TypeSignature("langbind::PythonResult", __LINE__)
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -72,7 +72,7 @@ public:
 	}
 
 	PythonResult( const PythonResult& o)
-		:types::TypeSignature("langbind::PythonResult", __LINE__)
+		:utils::TypeSignature("langbind::PythonResult", __LINE__)
 		,TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)

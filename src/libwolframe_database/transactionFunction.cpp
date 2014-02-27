@@ -32,10 +32,9 @@
 ************************************************************************/
 ///\brief Implementation of the builder of transaction input and reader of output
 ///\file transactionFunction.cpp
-#include "types/allocators.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/printFormats.hpp"
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include "database/transactionFunction.hpp"
 #include "transactionFunctionDescription.hpp"
 #include "transactionfunction/InputStructure.hpp"
@@ -93,7 +92,7 @@ struct TransactionFunction::Impl
 
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
-	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
+	:utils::TypeSignature("database::TransactionFunctionInput", __LINE__)
 	,m_structure( new Structure( &func_->impl().m_tagmap))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
@@ -101,7 +100,7 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* f
 TransactionFunctionInput::~TransactionFunctionInput(){}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
-	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
+	:utils::TypeSignature("database::TransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter(o)
 	,m_structure( o.m_structure)
 	,m_func(o.m_func)
@@ -313,7 +312,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 			{
 				m_resultstruct->addMark( ResultElement::SelectResultFunction, printstep.argument.namspace);
 			}
-			m_resultstruct->addMark( ResultElement::SelectResultColumn, utils::touint_cast( printstep.argument.value));
+			m_resultstruct->addMark( ResultElement::SelectResultColumn, types::touint_cast( printstep.argument.value));
 			break;
 		case Param::SymbolicResultReference:
 			if (printstep.argument.namspace>=0)

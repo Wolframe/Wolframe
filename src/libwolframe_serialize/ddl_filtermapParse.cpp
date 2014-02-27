@@ -98,8 +98,7 @@ static void setAtomValue( types::Variant& val, const types::VariantConst& elemen
 	}
 	else
 	{
-		val = element;
-		val.convert( valueType);
+		val.assign( valueType, element);
 	}
 }
 

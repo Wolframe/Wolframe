@@ -57,13 +57,13 @@ InputFilterR& Input::getIterator()
 }
 
 RedirectFilterClosure::RedirectFilterClosure()
-	:types::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
+	:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 	,m_state(0)
 	,m_taglevel(0)
 	,m_elemtype(InputFilter::Value){}
 
 RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
-	:types::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
+	:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 	,m_state(0)
 	,m_taglevel(0)
 	,m_inputfilter(i)
@@ -74,7 +74,7 @@ RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const 
 	}
 
 RedirectFilterClosure::RedirectFilterClosure( const RedirectFilterClosure& o)
-	:types::TypeSignature(o)
+	:utils::TypeSignature(o)
 	,m_state(o.m_state)
 	,m_taglevel(o.m_taglevel)
 	,m_inputfilter(o.m_inputfilter)
@@ -156,7 +156,7 @@ bool RedirectFilterClosure::call()
 
 
 ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
-	:types::TypeSignature("langbind::ApiFormData", __LINE__)
+	:utils::TypeSignature("langbind::ApiFormData", __LINE__)
 	,m_descr(descr_)
 	,m_data(std::calloc( descr_->size(), 1), std::free)
 {
@@ -178,7 +178,7 @@ ApiFormData::~ApiFormData()
 
 
 CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
-	:types::TypeSignature("langbind::CppFormFunctionClosure", __LINE__)
+	:utils::TypeSignature("langbind::CppFormFunctionClosure", __LINE__)
 	,m_func(f)
 	,m_state(0)
 	,m_param_data(f.api_param())
@@ -188,7 +188,7 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
 	,m_provider(0){}
 
 CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
-	:types::TypeSignature(o)
+	:utils::TypeSignature(o)
 	,m_func(o.m_func)
 	,m_state(0)
 	,m_param_data(o.m_param_data)

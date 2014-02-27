@@ -60,13 +60,13 @@ public:
 
 	///\brief Default constructor
 	InputFilter()
-		:types::TypeSignature("langbind::InputFilter", __LINE__)
+		:utils::TypeSignature("langbind::InputFilter", __LINE__)
 		,m_state(Open){}
 
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
 	InputFilter( const InputFilter& o)
-		:types::TypeSignature(o)
+		:utils::TypeSignature(o)
 		,FilterBase(o)
 		,m_state(o.m_state){}
 

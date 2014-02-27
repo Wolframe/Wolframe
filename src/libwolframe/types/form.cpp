@@ -29,22 +29,39 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file utils/conversions.hpp
-///\brief Conversions of atomic types
+///\file types/form.cpp
+///\brief Implements the unified form data structure as defined by a DDL (data definition language). A form data structure represents the document unit of a wolframe request or answer.
 
-#ifndef _Wolframe_UTILS_CONVERSIONS_HPP_INCLUDED
-#define _Wolframe_UTILS_CONVERSIONS_HPP_INCLUDED
-#include <string>
-#include "types/integer.hpp"
+#include "types/form.hpp"
+#include "utils/printFormats.hpp"
 
-namespace _Wolframe {
-namespace utils {
+using namespace _Wolframe;
+using namespace _Wolframe::types;
 
-std::string tostring_cast( _WOLFRAME_UINTEGER val);
-std::string tostring_cast( _WOLFRAME_INTEGER val);
-_WOLFRAME_UINTEGER touint_cast( const std::string& val);
-_WOLFRAME_INTEGER toint_cast( const std::string& val);
+void FormDescription::print( std::ostream& out, const utils::PrintFormat* pformat, size_t level) const
+{
+	out << m_name << pformat->assign;
+	types::VariantStructDescription::print( out, pformat, level);
+}
 
-}}//namespace
-#endif
+std::string FormDescription::tostring( const utils::PrintFormat* pformat) const
+{
+	std::ostringstream rt;
+	print( rt, pformat?pformat:utils::logPrintFormat());
+	return rt.str();
+}
+
+void Form::print( std::ostream& out, const utils::PrintFormat* pformat, size_t level) const
+{
+	out << m_description->name() << pformat->assign;
+	types::VariantStruct::print( out, pformat, level);
+}
+
+std::string Form::tostring( const utils::PrintFormat* pformat) const
+{
+	std::ostringstream rt;
+	print( rt, pformat?pformat:utils::logPrintFormat());
+	return rt.str();
+}
+
 

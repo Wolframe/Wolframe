@@ -32,7 +32,7 @@
 #include "types/variantStructDescription.hpp"
 #include "types/variantStruct.hpp"
 #include "types/customDataType.hpp"
-#include "types/malloc.hpp"
+#include "utils/printFormats.hpp"
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
@@ -640,7 +640,7 @@ std::string VariantStructDescription::tostring( const utils::PrintFormat* pforma
 {
 	std::stringstream out;
 	out << pformat->openstruct;
-	print( out, pformat, 0);
+	print( out, pformat?pformat:utils::logPrintFormat(), 0);
 	out << pformat->closestruct;
 	return out.str();
 }

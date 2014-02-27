@@ -29,14 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file utils_conversions.cpp
+///\file types/conversions.cpp
 ///\brief Implementation of conversions of atomic types
 
 #include <stdexcept>
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::utils;
+using namespace _Wolframe::types;
 namespace {
 class NumTable
 {
@@ -122,27 +122,27 @@ static _WOLFRAME_UINTEGER string2uint( const char *pp)
 	return rt;
 }
 
-std::string utils::tostring_cast( _WOLFRAME_UINTEGER val)
+std::string types::tostring_cast( _WOLFRAME_UINTEGER val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-std::string utils::tostring_cast( _WOLFRAME_INTEGER val)
+std::string types::tostring_cast( _WOLFRAME_INTEGER val)
 {
 	std::string rt;
 	get_number_string( rt, val);
 	return rt;
 }
 
-_WOLFRAME_UINTEGER utils::touint_cast( const std::string& val)
+_WOLFRAME_UINTEGER types::touint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	return string2uint( val.c_str());
 }
 
-_WOLFRAME_INTEGER utils::toint_cast( const std::string& val)
+_WOLFRAME_INTEGER types::toint_cast( const std::string& val)
 {
 	if (val.empty()) throw std::runtime_error( "string to number conversion error: string empty");
 	if (val.at(0) == '-')
