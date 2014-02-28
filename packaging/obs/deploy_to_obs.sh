@@ -57,7 +57,9 @@ for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 done
 
 # Archlinux specific files
+# patch 'PKGBUILD' pkgver for now for ArchLinux (see above for Debian/Ubuntu)
 cat packaging/obs/PKGBUILD > $OSC_HOME/PKGBUILD
+sed -i "s/pkgrel=.*/pkgrel=$GIT_COMMIT_COUNT/" $OSC_HOME/PKGBUILD
 cp packaging/archlinux/wolframe.conf $OSC_HOME/wolframe.conf
 cp packaging/archlinux/wolframed.service $OSC_HOME/wolframed.service
 cp packaging/archlinux/wolframe.install $OSC_HOME/wolframe.install
