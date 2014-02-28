@@ -33,8 +33,8 @@ Project Wolframe.
 ///\brief Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
 #ifndef _Wolframe_python_OBJECT_HPP_INCLUDED
 #define _Wolframe_python_OBJECT_HPP_INCLUDED
-#include <Python.h>
 #include "types/variant.hpp"
+#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {
