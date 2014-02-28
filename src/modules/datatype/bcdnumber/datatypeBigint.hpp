@@ -57,40 +57,19 @@ public:
 	BigintDataValue( const BigintDataValue& o)
 		:CustomDataValue(o),types::BigBCD(o){}
 
-	BigintDataValue()
-		{}
+	BigintDataValue(){}
 
 	virtual ~BigintDataValue(){};
 
-	virtual int compare( const CustomDataValue& o) const
-	{
-		if (o.type() != type())
-		{
-			return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
-		}
-		else
-		{
-			const BigintDataValue* odt = reinterpret_cast<const BigintDataValue*>(&o);
-			return types::BigBCD::compare(*odt);
-		}
-	}
+	virtual int compare( const CustomDataValue& o) const;
 
 	virtual std::string tostring() const
 	{
 		return types::BigBCD::tostring();
 	}
 
-	virtual void assign( const Variant& o)
-	{
-		if (o.type() == Variant::String)
-		{
-			types::BigBCD::init( o.tostring());
-		}
-		else
-		{
-			types::BigBCD::init( o.toint());
-		}
-	}
+	virtual void assign( const Variant& o);
+	virtual void getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{

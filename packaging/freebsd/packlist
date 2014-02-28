@@ -106,6 +106,7 @@ usr/local/include/wolframe/libclient/session.hpp
 @dirrm usr/local/include/wolframe/libclient
 usr/local/include/wolframe/appConfig.hpp
 usr/local/include/wolframe/appDevel.hpp
+usr/local/include/wolframe/appInfo.hpp
 usr/local/include/wolframe/appProperties.hpp
 usr/local/include/wolframe/logger-v1.hpp
 usr/local/include/wolframe/standardConfigs.hpp
@@ -159,12 +160,15 @@ usr/local/include/wolframe/logger/logLevel.hpp
 usr/local/include/wolframe/logger/logObject.hpp
 usr/local/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/local/include/wolframe/logger
-usr/local/include/wolframe/utils/conversions.hpp
 usr/local/include/wolframe/utils/fileUtils.hpp
 usr/local/include/wolframe/utils/getPassword.hpp
 usr/local/include/wolframe/utils/parseUtils.hpp
 usr/local/include/wolframe/utils/printFormats.hpp
 usr/local/include/wolframe/utils/stringUtils.hpp
+usr/local/include/wolframe/utils/allocators.hpp
+usr/local/include/wolframe/utils/malloc.hpp
+usr/local/include/wolframe/utils/resolvePath.hpp
+usr/local/include/wolframe/utils/typeSignature.hpp
 @dirrm usr/local/include/wolframe/utils
 usr/local/include/wolframe/serialize/mapContext.hpp
 usr/local/include/wolframe/serialize/structOptionParser.hpp
@@ -208,19 +212,17 @@ usr/local/include/wolframe/filter/typedfilter.hpp
 usr/local/include/wolframe/filter/typedfilterScope.hpp
 usr/local/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/local/include/wolframe/filter
-usr/local/include/wolframe/types/allocators.hpp
 usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
+usr/local/include/wolframe/types/conversions.hpp
 usr/local/include/wolframe/types/countedReference.hpp
 usr/local/include/wolframe/types/doctype.hpp
 usr/local/include/wolframe/types/form.hpp
 usr/local/include/wolframe/types/integer.hpp
 usr/local/include/wolframe/types/keymap.hpp
-usr/local/include/wolframe/types/malloc.hpp
 usr/local/include/wolframe/types/normalizeFunction.hpp
 usr/local/include/wolframe/types/traits.hpp
-usr/local/include/wolframe/types/typeSignature.hpp
 usr/local/include/wolframe/types/variant.hpp
 usr/local/include/wolframe/types/variantStruct.hpp
 usr/local/include/wolframe/types/variantStructDescription.hpp

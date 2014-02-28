@@ -117,6 +117,7 @@ usr/pkg/include/wolframe/libclient/session.hpp
 @dirrm usr/pkg/include/wolframe/libclient
 usr/pkg/include/wolframe/appConfig.hpp
 usr/pkg/include/wolframe/appDevel.hpp
+usr/pkg/include/wolframe/appInfo.hpp
 usr/pkg/include/wolframe/appProperties.hpp
 usr/pkg/include/wolframe/logger-v1.hpp
 usr/pkg/include/wolframe/standardConfigs.hpp
@@ -170,12 +171,15 @@ usr/pkg/include/wolframe/logger/logLevel.hpp
 usr/pkg/include/wolframe/logger/logObject.hpp
 usr/pkg/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/pkg/include/wolframe/logger
-usr/pkg/include/wolframe/utils/conversions.hpp
 usr/pkg/include/wolframe/utils/fileUtils.hpp
 usr/pkg/include/wolframe/utils/getPassword.hpp
 usr/pkg/include/wolframe/utils/parseUtils.hpp
 usr/pkg/include/wolframe/utils/printFormats.hpp
 usr/pkg/include/wolframe/utils/stringUtils.hpp
+usr/pkg/include/wolframe/utils/allocators.hpp
+usr/pkg/include/wolframe/utils/malloc.hpp
+usr/pkg/include/wolframe/utils/resolvePath.hpp
+usr/pkg/include/wolframe/utils/typeSignature.hpp
 @dirrm usr/pkg/include/wolframe/utils
 usr/pkg/include/wolframe/serialize/mapContext.hpp
 usr/pkg/include/wolframe/serialize/structOptionParser.hpp
@@ -219,19 +223,17 @@ usr/pkg/include/wolframe/filter/typedfilter.hpp
 usr/pkg/include/wolframe/filter/typedfilterScope.hpp
 usr/pkg/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/pkg/include/wolframe/filter
-usr/pkg/include/wolframe/types/allocators.hpp
 usr/pkg/include/wolframe/types/base64.h
 usr/pkg/include/wolframe/types/base64.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
+usr/pkg/include/wolframe/types/conversions.hpp
 usr/pkg/include/wolframe/types/countedReference.hpp
 usr/pkg/include/wolframe/types/doctype.hpp
 usr/pkg/include/wolframe/types/form.hpp
 usr/pkg/include/wolframe/types/integer.hpp
 usr/pkg/include/wolframe/types/keymap.hpp
-usr/pkg/include/wolframe/types/malloc.hpp
 usr/pkg/include/wolframe/types/normalizeFunction.hpp
 usr/pkg/include/wolframe/types/traits.hpp
-usr/pkg/include/wolframe/types/typeSignature.hpp
 usr/pkg/include/wolframe/types/variant.hpp
 usr/pkg/include/wolframe/types/variantStruct.hpp
 usr/pkg/include/wolframe/types/variantStructDescription.hpp

@@ -79,7 +79,7 @@ void BigBCD::xchg( BigBCD& a, BigBCD& b)
 	tmp.m_allocated = false;
 }
 
-void BigBCD::init( std::size_t nn, Allocator* allocator)
+void BigBCD::allocate( std::size_t nn, Allocator* allocator)
 {
 	if (m_ar && m_allocated) free( m_ar);
 	m_size = nn;
@@ -114,7 +114,7 @@ BigBCD::BigBCD()
 	,m_sign(false)
 	,m_allocated(false)
 {
-	init( 0, 0);
+	allocate( 0, 0);
 }
 
 void BigBCD::init( const BigNumber& num)
@@ -147,7 +147,7 @@ void BigBCD::init( const BigNumber& num)
 	unsigned int bb = ((nn+NumDigits-1) / NumDigits);
 	unsigned int tt = ((nn+NumDigits-1) % NumDigits) * 4;
 
-	init( bb, 0);
+	allocate( bb, 0);
 	for (; ii<nn; ++ii)
 	{
 		BCDElement digit;
@@ -180,6 +180,12 @@ void BigBCD::init( const BigNumber& num)
 void BigBCD::init( const std::string& str)
 {
 	BigNumber num( str);
+	init( num);
+}
+
+void BigBCD::init( const char* str, std::size_t strsize)
+{
+	BigNumber num( str, strsize);
 	init( num);
 }
 
@@ -244,14 +250,14 @@ BigBCD::BigBCD( const BigBCD& o)
 	,m_sign(o.m_sign)
 	,m_allocated(false)
 {
-	init( m_size, 0);
+	allocate( m_size, 0);
 	m_sign = o.m_sign;
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
 
 void BigBCD::copy( const BigBCD& o, Allocator* allocator)
 {
-	init( o.m_size, allocator);
+	allocate( o.m_size, allocator);
 	m_sign = o.m_sign;
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
@@ -519,7 +525,7 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	BCDElement carry;
 	std::size_t ii=0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn+1, allocator);
+	rt.allocate( nn+1, allocator);
 	rt.m_sign = this_.m_sign;
 	carry = 0;
 	for (;ii<nn; ++ii)
@@ -546,7 +552,7 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 {
 	std::size_t ii = 0, mm = 0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn, allocator);
+	rt.allocate( nn, allocator);
 	rt.m_sign = this_.m_sign;
 	BCDElement carry = 0;
 	for (;ii<nn; ++ii)
@@ -591,7 +597,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		unsigned int sfh = (unsigned int)nof_digits % NumDigits;
 		std::size_t ii,nn;
 
-		rt.init( this_.m_size + ofs + 1, allocator);
+		rt.allocate( this_.m_size + ofs + 1, allocator);
 		rt.m_sign = this_.m_sign;
 		for (ii=0,nn=ofs; ii<nn; ++ii)
 		{
@@ -624,7 +630,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		unsigned int sfh = (unsigned int)nof_digits % NumDigits;
 		std::size_t ii,nn;
 
-		rt.init( this_.m_size - ofs + 1, allocator);
+		rt.allocate( this_.m_size - ofs + 1, allocator);
 		rt.m_sign = this_.m_sign;
 		if (sfh == 0)
 		{
@@ -658,7 +664,7 @@ void BigBCD::digits_cut( BigBCD& rt, const BigBCD& this_, unsigned int nof_digit
 	unsigned char sfh = (unsigned char)nof_digits % NumDigits;
 	std::size_t ii,nn;
 
-	rt.init( ofs + 1, allocator);
+	rt.allocate( ofs + 1, allocator);
 	rt.m_sign = this_.m_sign;
 	for (ii=0,nn=ofs; ii<nn; ++ii)
 	{
@@ -817,7 +823,7 @@ void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, FactorType 
 {
 	if (factor == 0)
 	{
-		rt.init( 0, 0);
+		rt.allocate( 0, 0);
 		return;
 	}
 	BigBCD part,fac;
@@ -1037,7 +1043,7 @@ BigBCD BigBCD::estimate_as_bcd( FactorType estimate, int estshift, Allocator* al
 {
 	unsigned int mm = (estshift>0)?(3+estshift/4):(3-estshift/4);
 	BigBCD rt;
-	rt.init( mm, allocator);
+	rt.allocate( mm, allocator);
 
 	if (estimate >= std::numeric_limits<FactorType>::max())
 	{
@@ -1148,6 +1154,13 @@ BigFxpBCD& BigFxpBCD::operator=( double o)
 }
 
 BigFxpBCD& BigFxpBCD::operator=( _WOLFRAME_INTEGER o)
+{
+	BigBCD::init( o);
+	BigBCD::shift( m_calc_precision);
+	return *this;
+}
+
+BigFxpBCD& BigFxpBCD::operator=( _WOLFRAME_UINTEGER o)
 {
 	BigBCD::init( o);
 	BigBCD::shift( m_calc_precision);

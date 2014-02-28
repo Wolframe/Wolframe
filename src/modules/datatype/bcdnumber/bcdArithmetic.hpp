@@ -67,6 +67,7 @@ public:
 
 	void init( const BigBCD& o)			{copy( o, 0);}
 	void init( const std::string& str);
+	void init( const char* str, std::size_t strsize);
 	void init( _WOLFRAME_INTEGER num);
 	void init( _WOLFRAME_UINTEGER num);
 	void init( const BigNumber& num);
@@ -140,7 +141,7 @@ public:
 private:
 	friend class BigFxpBCD;
 	typedef utils::GreedySmallChunkAllocator Allocator;
-	void init( std::size_t size_, Allocator* allocator);
+	void allocate( std::size_t size_, Allocator* allocator);
 	void copy( const BigBCD& o, Allocator* allocator);
 	void normalize();
 
@@ -210,6 +211,7 @@ public:
 	BigFxpBCD& operator=( const std::string& o);
 	BigFxpBCD& operator=( double o);
 	BigFxpBCD& operator=( _WOLFRAME_INTEGER o);
+	BigFxpBCD& operator=( _WOLFRAME_UINTEGER o);
 
 	BigFxpBCD operator /( const BigFxpBCD& opr) const;
 	BigFxpBCD operator /( _WOLFRAME_INTEGER opr) const;
