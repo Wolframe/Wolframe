@@ -18,7 +18,7 @@
 ]>
 
 <book id="book_GettingStarted" lang="en">
-	<title>Wolframe Getting Started Server</title>
+	<title>Wolframe Getting Started</title>
 	<subtitle>Basic Installation and Configuration Guide</subtitle>
 	<bookinfo>
 		<date>&BookSetPublicationDate;</date>
@@ -34,4 +34,6 @@
 	</bookinfo>
 
 	&GettingStartedPreface;
+	&GettingStartedInstallationSource;
+	&GettingStartedInstallationBinary;
 </book>
