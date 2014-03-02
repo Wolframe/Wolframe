@@ -33,13 +33,14 @@ Project Wolframe.
 //\brief Template for Wolframe objects used in the Lua interpreter context
 #ifndef _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
-#include "luaObjectTemplate.hpp"
 #include "luaObjects.hpp"
 #include "luaGetFunctionClosure.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/doctype.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
+#include "types/customDataType.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
@@ -78,7 +79,7 @@ template <> struct MetaTable<TypedInputFilterClosure> {static const char* name()
 template <> struct MetaTable<FormFunctionClosureR> {static const char* name()		{return "wolframe.FormFunctionClosureR";}};
 template <> struct MetaTable<types::NormalizeFunctionR> {static const char* name()	{return "wolframe.NormalizeFunctionR";}};
 template <> struct MetaTable<serialize::StructSerializer> {static const char* name()	{return "wolframe.StructSerializer";}};
-template <> struct MetaTable<proc::ProcessorProvider> {static const char* name()	{return "wolframe.ProcessorProvider";}};
+template <> struct MetaTable<proc::ProcessorProviderInterface> {static const char* name()	{return "wolframe.ProcessorProvider";}};
 template <> struct MetaTable<langbind::LuaModuleMap> {static const char* name()		{return "wolframe.LuaModuleMap";}};
 
 template <class ObjectType>

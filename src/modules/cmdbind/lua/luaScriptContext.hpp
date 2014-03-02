@@ -34,7 +34,6 @@
 ///\brief Objects defined by a command handler processing lua scripts
 #ifndef _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
-#include "processor/procProvider.hpp"
 #include "luaObjects.hpp"
 #include "types/keymap.hpp"
 #include <vector>

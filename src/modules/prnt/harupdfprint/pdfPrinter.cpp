@@ -285,7 +285,7 @@ public:
 		throw std::runtime_error( "internal: illegal state in print function closure automaton");
 	}
 
-	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
 		m_provider = p;
 		m_input = i;
@@ -299,7 +299,7 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 	langbind::TypedInputFilterR m_input;
 	std::string m_resultpdfcontent;
 	langbind::TypedInputFilterR m_result;

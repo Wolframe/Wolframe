@@ -99,7 +99,7 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( const proc::ProcessorProviderInterface* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
 		m_provider = provider;
 		m_parser.init( i, f);
@@ -117,7 +117,7 @@ private:
 	langbind::ApiFormData m_result_data;
 	langbind::TypedInputFilterR m_result;
 	serialize::StructParser m_parser;
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 };
 
 class CppFormFunction
@@ -133,7 +133,7 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 	langbind::CppFormFunction m_impl;
 };
 

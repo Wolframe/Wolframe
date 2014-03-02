@@ -44,8 +44,9 @@
 namespace _Wolframe {
 namespace db {
 
-struct LanguageDescription
+class LanguageDescription
 {
+public:
 	LanguageDescription(){}
 	virtual ~LanguageDescription(){}
 

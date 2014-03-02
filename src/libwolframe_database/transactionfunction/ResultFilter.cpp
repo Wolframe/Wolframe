@@ -37,7 +37,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-ResultFilter::ResultFilter( const proc::ProcessorProvider* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_)
+ResultFilter::ResultFilter( const proc::ProcessorProviderInterface* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_)
 	:m_func(0)
 {
 	m_dbres.reset( new ResultIterator( resultstruct_,data_));

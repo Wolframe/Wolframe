@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_DIRECTMAP_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
 #define _Wolframe_DIRECTMAP_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
 #include "directmapCommandHandler.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
@@ -68,7 +69,7 @@ public:
 
 	virtual bool check() const;
 
-	virtual bool checkReferences( const proc::ProcessorProvider* provider) const;
+	virtual bool checkReferences( const proc::ProcessorProviderInterface* provider) const;
 
 	virtual void print( std::ostream& os, size_t indent ) const;
 
@@ -122,13 +123,12 @@ public:
 		return cfg->commands();
 	}
 
-	virtual bool checkReferences( const config::NamedConfiguration& cfgi, const proc::ProcessorProvider* provider) const
+	virtual bool checkReferences( const config::NamedConfiguration& cfgi, const proc::ProcessorProviderInterface* provider) const
 	{
 		const DirectmapCommandHandlerConfig* cfg = dynamic_cast<const DirectmapCommandHandlerConfig*>(&cfgi);
 		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
 		return cfg->checkReferences( provider);
 	}
-
 };
 
 

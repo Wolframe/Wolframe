@@ -33,8 +33,11 @@
 ///\brief Implements the loading of programs in the transaction definition language
 ///\file prgbind_transactionProgram.cpp
 #include "prgbind/transactionProgram.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "database/transactionFunction.hpp"
 #include "database/databaseError.hpp"
+#include "database/database.hpp"
 #include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
 #include "config/programBase.hpp"
@@ -124,7 +127,7 @@ public:
 		}
 	}
 
-	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 	{
 		m_provider = p;
 		m_inputstruct.reset( m_inputstructptr = m_func->getInput());
@@ -140,14 +143,14 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;	//< processor provider to get transaction object
-	const db::TransactionFunction* m_func;		//< function to execute
-	int m_state;					//< current state of call
-	langbind::RedirectFilterClosure m_input;	//< builder of structure from input
-	db::TransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
-	langbind::TypedOutputFilterR m_inputstruct;	//< input structure
-	langbind::TypedInputFilterR m_result;		//< function call result
-	serialize::Context::Flags m_flags;		//< flags for input serialization
+	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
+	const db::TransactionFunction* m_func;			//< function to execute
+	int m_state;						//< current state of call
+	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
+	db::TransactionFunctionInput* m_inputstructptr;		//< input structure implementation interface
+	langbind::TypedOutputFilterR m_inputstruct;		//< input structure
+	langbind::TypedInputFilterR m_result;			//< function call result
+	serialize::Context::Flags m_flags;			//< flags for input serialization
 };
 
 
@@ -164,7 +167,7 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 	db::TransactionFunctionR m_impl;
 };
 

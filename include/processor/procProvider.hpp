@@ -45,6 +45,7 @@
 #include "cmdbind/authCommandHandler.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "types/customDataType.hpp"
+#include "procProviderInterface.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -77,30 +78,33 @@ private:
 };
 
 
-/// Processor provider
-class ProcessorProvider : private boost::noncopyable
+//\class ProcessorProvider
+//\brief Processor provider
+class ProcessorProvider
+	:public ProcessorProviderInterface
+	,private boost::noncopyable
 {
 public:
 	ProcessorProvider( const ProcProviderConfig* conf,
 			   const module::ModulesDirectory* modules,
 			   prgbind::ProgramLibrary* programs_);
-	~ProcessorProvider();
+	virtual ~ProcessorProvider();
 
 	bool resolveDB( const db::DatabaseProvider& db );
 	bool loadPrograms();
 
-	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
-	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
+	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
-	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
+	virtual std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
 
-	db::Database* transactionDatabase() const;
+	virtual db::Database* transactionDatabase() const;
 
 	///\brief Just and interface at the moment
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 
 	///\brief return a database transaction object for the given name
-	db::Transaction* transaction( const std::string& name ) const;
+	virtual db::Transaction* transaction( const std::string& name ) const;
 
 	///\brief Get the list of UI-forms
 	///\return map name -> uiform xml without header
@@ -110,12 +114,12 @@ public:
 		return std::map<std::string,std::string>();
 	}
 
-	const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
-	const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const;
-	const langbind::FormFunction* formFunction( const std::string& name) const;
-	const types::FormDescription* formDescription( const std::string& name) const;
-	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
-	const types::CustomDataType* customDataType( const std::string& name) const;
+	virtual const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const;
+	virtual const langbind::FormFunction* formFunction( const std::string& name) const;
+	virtual const types::FormDescription* formDescription( const std::string& name) const;
+	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
+	virtual const types::CustomDataType* customDataType( const std::string& name) const;
 
 private:
 	class ProcessorProvider_Impl;

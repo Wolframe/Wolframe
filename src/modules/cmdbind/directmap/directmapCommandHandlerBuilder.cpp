@@ -83,7 +83,7 @@ bool DirectmapCommandHandlerConfig::check() const
 	return rt;
 }
 
-bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProvider* provider) const
+bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProviderInterface* provider) const
 {
 	return m_context.checkReferences( provider);
 }

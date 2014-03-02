@@ -82,7 +82,7 @@ std::string DirectmapCommandDescription::tostring() const
 	return rt.str();
 }
 
-bool DirectmapProgram::checkReferences( const proc::ProcessorProvider* provider) const
+bool DirectmapProgram::checkReferences( const proc::ProcessorProviderInterface* provider) const
 {
 	bool rt = true;
 	types::keymap<DirectmapCommandDescription>::const_iterator di = begin(), de = end();

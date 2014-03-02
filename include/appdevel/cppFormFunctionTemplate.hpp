@@ -37,7 +37,7 @@
 #define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 
 #include "module/cppFormFunctionBuilder.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 
 namespace _Wolframe {
 namespace appdevel {
@@ -47,7 +47,7 @@ namespace appdevel {
 template <class Definition>
 struct CppFormFunction
 {
-	static int implementation( const proc::ProcessorProvider* provider, void* res, const void* param)
+	static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
 	{
 		return Definition::exec( provider, *(typename Definition::OutputType*)res, *(const typename Definition::InputType*) param);
 	}

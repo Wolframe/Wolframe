@@ -35,8 +35,9 @@ Project Wolframe.
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/cppFormFunction.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "utils/typeSignature.hpp"
+#include "types/form.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -298,7 +299,7 @@ public:
 	//\brief Initialization of call context for a new call
 	//\param[in] i call input
 	//\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
-	void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& i, serialize::Context::Flags flags);
+	void init( const proc::ProcessorProviderInterface* provider, const TypedInputFilterR& i, serialize::Context::Flags flags);
 
 	const serialize::StructSerializer& result() const	{return m_result;}
 
@@ -309,7 +310,7 @@ private:
 	ApiFormData m_result_data;
 	serialize::StructSerializer m_result;
 	serialize::StructParser m_parser;
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 };
 
 }} //namespace

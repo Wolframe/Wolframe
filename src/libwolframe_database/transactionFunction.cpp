@@ -35,7 +35,9 @@
 #include "utils/parseUtils.hpp"
 #include "utils/printFormats.hpp"
 #include "types/conversions.hpp"
+#include "types/form.hpp"
 #include "database/transactionFunction.hpp"
+#include "database/transaction.hpp"
 #include "transactionFunctionDescription.hpp"
 #include "transactionfunction/InputStructure.hpp"
 #include "transactionfunction/ResultStructure.hpp"
@@ -44,7 +46,6 @@
 #include "transactionfunction/DatabaseCommand.hpp"
 #include "transactionfunction/PreProcessCommand.hpp"
 #include "transactionfunction/Path.hpp"
-#include "database/transaction.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
@@ -132,7 +133,7 @@ bool TransactionFunctionInput::print( ElementType type, const types::VariantCons
 	return true;
 }
 
-void TransactionFunctionInput::finalize( const proc::ProcessorProvider* provider)
+void TransactionFunctionInput::finalize( const proc::ProcessorProviderInterface* provider)
 {
 	std::vector<PreProcessCommand>::const_iterator pi = m_func->impl().m_preprocs.begin(), pe = m_func->impl().m_preprocs.end();
 	for (; pi != pe; ++pi)
@@ -635,7 +636,7 @@ TransactionFunctionInput* TransactionFunction::getInput() const
 	return new TransactionFunctionInput( this);
 }
 
-langbind::TypedInputFilterR TransactionFunction::getOutput( const proc::ProcessorProvider* provider, const db::TransactionOutputR& o) const
+langbind::TypedInputFilterR TransactionFunction::getOutput( const proc::ProcessorProviderInterface* provider, const db::TransactionOutputR& o) const
 {
 	if (m_impl->m_resultfilter.empty())
 	{

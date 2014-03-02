@@ -120,12 +120,12 @@ int ImageImpl::thumb( Image &res, const ImageThumb &param )
 	return 0;
 }
 
-int _Wolframe::graphix::imageInfo( const proc::ProcessorProvider*, void *res, const void *param )
+int _Wolframe::graphix::imageInfo( const proc::ProcessorProviderInterface*, void *res, const void *param )
 {
 	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
 }
 
-int _Wolframe::graphix::imageThumb( const proc::ProcessorProvider*, void *res, const void *param )
+int _Wolframe::graphix::imageThumb( const proc::ProcessorProviderInterface*, void *res, const void *param )
 {
 	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
 }

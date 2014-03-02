@@ -37,6 +37,7 @@ Project Wolframe.
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
 #include "module/moduleInterface.hpp"
+#include "processor/procProviderInterface.hpp"
 
 namespace _Wolframe {
 namespace module {
@@ -56,7 +57,7 @@ public:
 		return "DotnetRuntimeEnvironment";
 	}
 
-	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProvider*) const
+	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const
 	{
 		return true;
 	}

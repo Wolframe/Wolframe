@@ -35,6 +35,7 @@
 #ifndef _Wolframe_LANGBIND_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #define _Wolframe_LANGBIND_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #include "langbind/formFunction.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>

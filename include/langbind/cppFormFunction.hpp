@@ -34,13 +34,10 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #define _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace proc {
-	//\brief Forward declaration
-	class ProcessorProvider;
-}
 namespace langbind {
 
 ///\class CppFormFunction
@@ -48,7 +45,7 @@ namespace langbind {
 class CppFormFunction
 {
 public:
-	typedef int (Function)( const proc::ProcessorProvider* provider, void* res, const void* param);
+	typedef int (Function)( const proc::ProcessorProviderInterface* provider, void* res, const void* param);
 
 	///\brief Default constructor
 	CppFormFunction()
@@ -86,7 +83,7 @@ public:
 	///\param[in] res pointer to structure as defined with 'api_result()' to hold the form function result
 	///\param[in] param pointer to structure as defined with 'api_param()' to hold the form function parameter
 	///\return 0 on success, error code else
-	int call( const proc::ProcessorProvider* provider, void* res, const void* param) const
+	int call( const proc::ProcessorProviderInterface* provider, void* res, const void* param) const
 		{return (*m_function)( provider, res, param);}
 
 private:

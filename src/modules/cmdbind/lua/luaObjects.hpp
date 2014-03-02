@@ -36,7 +36,7 @@ Project Wolframe.
 #include "luaDump.hpp"
 #include "filter/filter.hpp"
 #include "langbind/appObjects.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <map>
 #include <list>
 #include <boost/shared_ptr.hpp>
@@ -116,11 +116,11 @@ public:
 	//\param[in] input_ input definition for the input to process
 	//\param[in] output_ output definition for the output to print
 	//\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_);
+	void init( const Input& input_, const Output& output_, const proc::ProcessorProviderInterface* provider_);
 
 	//\brief Create the context for executing a Lua script without input/output but all other objects initialized
 	//\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const proc::ProcessorProvider* provider_);
+	void init( const proc::ProcessorProviderInterface* provider_);
 
 	//\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
 	//\param[in] idx index of the object on the lua stack
@@ -135,7 +135,7 @@ private:
 	//\brief Create the context for executing a Lua script without input/output but all other objects initialized
 	//\param[in] provider_ processor provider for allocation of objects accessed
 	//\param[in] callMain wheter to call the script for initialization of its objects or not
-	void initbase( const proc::ProcessorProvider* provider_, bool callMain);
+	void initbase( const proc::ProcessorProviderInterface* provider_, bool callMain);
 
 private:
 	friend class LuaScript;

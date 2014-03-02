@@ -32,7 +32,6 @@
 ************************************************************************/
 #include "cmdbind/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
-#include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;

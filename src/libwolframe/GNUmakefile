@@ -53,6 +53,7 @@ PROVIDER_OBJS = \
 
 TYP_OBJS = \
 	types/conversions.o \
+	types/numberBaseConversion.o \
 	types/string.o \
 	types/bignumber.o \
 	types/datetime.o \

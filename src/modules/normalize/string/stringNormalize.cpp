@@ -41,7 +41,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-types::NormalizeFunction* _Wolframe::langbind::createTrimNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
+types::NormalizeFunction* langbind::createTrimNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{
@@ -54,7 +54,7 @@ types::NormalizeFunction* _Wolframe::langbind::createTrimNormalizeFunction( type
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createConvdiaNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
+types::NormalizeFunction* langbind::createConvdiaNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{
@@ -67,7 +67,7 @@ types::NormalizeFunction* _Wolframe::langbind::createConvdiaNormalizeFunction( t
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createUcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
+types::NormalizeFunction* langbind::createUcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{
@@ -80,7 +80,7 @@ types::NormalizeFunction* _Wolframe::langbind::createUcnameNormalizeFunction( ty
 	}
 }
 
-types::NormalizeFunction* _Wolframe::langbind::createLcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
+types::NormalizeFunction* langbind::createLcnameNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
 {
 	try
 	{

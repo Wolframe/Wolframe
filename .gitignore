@@ -157,6 +157,7 @@ tests/database/SQLite3/test.db
 tests/database/SQLite3/garbage.db
 tests/database/SQLite3/createRandom
 tests/unitLibraryTest
+tests/testNumberBaseConversion
 tests/3rdParty/freeimage/freeimageTest
 tests/3rdParty/freeimage/freeimageTestCpp
 tests/3rdParty/freeimage/testmem.png

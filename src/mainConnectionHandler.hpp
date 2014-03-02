@@ -38,6 +38,7 @@
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
@@ -115,7 +116,7 @@ public:
 	virtual void signalOccured( NetworkSignal);
 
 	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProvider* provider_)
+	void setProcessorProvider( proc::ProcessorProviderInterface* provider_)
 	{
 		m_cmdhandler.setProcProvider( provider_);
 	}

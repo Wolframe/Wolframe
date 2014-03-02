@@ -70,7 +70,7 @@ public:
 
 	const std::string& filter( const std::string& docformat) const;
 
-	bool checkReferences( const proc::ProcessorProvider* provider) const
+	bool checkReferences( const proc::ProcessorProviderInterface* provider) const
 	{
 		return m_program.checkReferences( provider);
 	}

@@ -94,14 +94,14 @@ static const LuaModuleMap* getLuaModuleMap( lua_State* ls)
 	return rt;
 }
 
-static void setProcessorProvider( lua_State* ls, const proc::ProcessorProvider* provider_)
+static void setProcessorProvider( lua_State* ls, const proc::ProcessorProviderInterface* provider_)
 {
-	return setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
+	return setGlobalSingletonPointer<const proc::ProcessorProviderInterface>( ls, provider_);
 }
 
-static const proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
+static const proc::ProcessorProviderInterface* getProcessorProvider( lua_State* ls)
 {
-	const proc::ProcessorProvider* rt = getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
+	const proc::ProcessorProviderInterface* rt = getGlobalSingletonPointer<proc::ProcessorProviderInterface>( ls);
 	if (!rt) throw std::runtime_error( "processor provider undefined");
 	return rt;
 }
@@ -118,7 +118,7 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;
+	const proc::ProcessorProviderInterface* m_provider;
 };
 
 
@@ -701,7 +701,7 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
 	const char* name = lua_tostring( ls, 1);
-	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const proc::ProcessorProviderInterface* ctx = getProcessorProvider( ls);
 	const types::FormDescription* st = ctx->formDescription( name);
 	if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
 	types::FormR frm( new types::Form( st));
@@ -847,7 +847,7 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 		getVariantValue( ls, arg, ii);
 		initializerList.push_back( arg);
 	}
-	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const proc::ProcessorProviderInterface* ctx = getProcessorProvider( ls);
 	const types::CustomDataType* typ = ctx->customDataType( typeName);
 	if (typ)
 	{
@@ -1096,7 +1096,7 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
 	const char* name = lua_tostring( ls, 1);
-	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const proc::ProcessorProviderInterface* ctx = getProcessorProvider( ls);
 	const FormFunction* ff = ctx->formFunction( name);
 	if (ff)
 	{
@@ -1435,7 +1435,7 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			name = lua_tostring( ls, 1);
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
-			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+			const proc::ProcessorProviderInterface* ctx = getProcessorProvider( ls);
 			types::CountedReference<Filter> flt( ctx->filter( name, arg));
 			if (!flt.get())
 			{
@@ -1660,7 +1660,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
-			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+			const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
 			const char* doctype_form = lua_tostring( ls, ii);
 			const types::FormDescription* formdescr = gtc->formDescription( doctype_form);
 			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
@@ -1670,7 +1670,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
-			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+			const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
 			if (!doctype.empty()) throw std::runtime_error( "doctype specified twice");
 			const char* doctype_system = 0;
 			const char* doctype_public = 0;
@@ -1860,7 +1860,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			if (doctype.size())
 			{
 				std::string doctypeid( types::getIdFromDoctype( doctype));
-				const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+				const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
 				const types::FormDescription* st = gtc->formDescription( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
 				types::FormR form( new types::Form( st));
@@ -2591,12 +2591,12 @@ std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
 	return rt;
 }
 
-void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
+void LuaScriptInstance::init( const proc::ProcessorProviderInterface* provider_)
 {
 	initbase( provider_, true);
 }
 
-void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool callMain)
+void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provider_, bool callMain)
 {
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
@@ -2665,7 +2665,7 @@ void LuaScriptInstance::initbase( const proc::ProcessorProvider* provider_, bool
 	}
 }
 
-void LuaScriptInstance::init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_)
+void LuaScriptInstance::init( const Input& input_, const Output& output_, const proc::ProcessorProviderInterface* provider_)
 {
 	initbase( provider_, true);
 	LuaExceptionHandlerScope luaThrows(m_ls);

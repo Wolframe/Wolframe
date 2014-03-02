@@ -39,8 +39,9 @@
 #include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
+#include "database/databaseLanguage.hpp"
 #include "langbind/authorization.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "utils/printFormats.hpp"
 #include <string>
 #include <vector>
@@ -78,7 +79,7 @@ public:
 	virtual TypedOutputFilter* copy() const		{return new TransactionFunctionInput(*this);}
 
 	virtual bool print( ElementType type, const types::VariantConst& element);
-	void finalize( const proc::ProcessorProvider* provider);
+	void finalize( const proc::ProcessorProviderInterface* provider);
 	virtual TransactionInput get() const;
 
 	const Structure& structure() const
@@ -117,7 +118,7 @@ public:
 	///\brief Build the function input
 	virtual TransactionFunctionInput* getInput() const;
 	///\brief Build the function output
-	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProvider* provider, const db::TransactionOutputR& o) const;
+	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const db::TransactionOutputR& o) const;
 
 	///\brief Get the name of the function
 	const std::string& name() const			{return m_name;}

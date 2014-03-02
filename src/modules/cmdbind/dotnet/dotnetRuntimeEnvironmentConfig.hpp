@@ -35,15 +35,12 @@ Project Wolframe.
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include "config/ConfigurationTree.hpp"
 #include "module/moduleInterface.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
 
 namespace _Wolframe {
-namespace proc {
-	//\brief Forward declaration
-	class ProcessorProvider;
-}
 namespace module {
 
 //\brief Named configuration definition
@@ -80,7 +77,7 @@ public:
 
 	virtual bool check() const;
 
-	virtual bool checkReferences( const proc::ProcessorProvider*) const {return true;}
+	virtual bool checkReferences( const proc::ProcessorProviderInterface*) const {return true;}
 
 	virtual void print( std::ostream& os, size_t indent ) const;
 

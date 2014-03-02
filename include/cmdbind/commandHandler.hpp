@@ -34,15 +34,10 @@
 ///\brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
+#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-
-///\brief Forward declaration
-namespace _Wolframe {
-namespace proc {
-class ProcessorProvider;
-}}
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -109,14 +104,14 @@ public:
 
 	///\brief Pass the reference to the processor provider to the command handler
 	///\param[in] p the reference to the processor provider
-	void setProcProvider( const proc::ProcessorProvider* p)
+	void setProcProvider( const proc::ProcessorProviderInterface* p)
 	{
 		m_provider = p;
 	}
 
 	///\brief Get the reference to the processor provider
 	///\return the reference to the processor provider
-	const proc::ProcessorProvider* procProvider()
+	const proc::ProcessorProviderInterface* procProvider()
 	{
 		return m_provider;
 	}
@@ -135,10 +130,10 @@ public:
 	virtual const char* interruptDataSessionMarker() const	{return "";}
 
 protected:
-	std::string m_lastError;			//< error operation for the client
-	std::string m_name;				//< name of the command to execute
-	std::vector< std::string > m_argBuffer;		//< the command arguments
-	const proc::ProcessorProvider* m_provider;	//< the reference to the global processor provider
+	std::string m_lastError;				//< error operation for the client
+	std::string m_name;					//< name of the command to execute
+	std::vector< std::string > m_argBuffer;			//< the command arguments
+	const proc::ProcessorProviderInterface* m_provider;	//< the reference to the global processor provider
 };
 
 typedef boost::shared_ptr<CommandHandler> CommandHandlerR;

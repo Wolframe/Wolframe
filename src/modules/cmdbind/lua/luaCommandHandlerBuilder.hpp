@@ -41,6 +41,7 @@ Project Wolframe.
 #include "config/ConfigurationTree.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
@@ -122,7 +123,7 @@ public:
 		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
 		return cfg->commands();
 	}
-	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProvider*) const	{return true;}
+	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const	{return true;}
 };
 
 

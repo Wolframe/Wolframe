@@ -35,7 +35,7 @@
 #ifndef _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
 #define _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
 #include "serialize/struct/filtermapDescription.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 
@@ -87,9 +87,9 @@ class ImageImpl
 		static int rescale( Image &res, const ImageRescale &param );
 };
 
-int imageInfoExec( const proc::ProcessorProvider* provider, void *res, const void *param );
-int imageThumbExec( const proc::ProcessorProvider* provider, void *res, const void *param );
-int imageRescaleExec( const proc::ProcessorProvider* provider, void *res, const void *param );
+int imageInfoExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
+int imageThumbExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
+int imageRescaleExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
 
 }}
 #endif

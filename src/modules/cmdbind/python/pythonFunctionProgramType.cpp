@@ -36,7 +36,8 @@ Project Wolframe.
 #include "pythonInterpreter.hpp"
 #include "pythonObject.hpp"
 #include "langbind/formFunction.hpp"
-#include "processor/procProvider.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
@@ -334,7 +335,7 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
+	virtual void init( const proc::ProcessorProviderInterface* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
 	{
 		m_provider = provider;
 		m_arg = arg;
@@ -353,16 +354,16 @@ public:
 	}
 
 private:
-	TypedInputFilterR m_result;			//< result of the function call
-	std::string m_name;				//< name of the function called for error messages
-	TypedInputFilterR m_arg;			//< call argument as input filter
-	bool m_initialized;				//< true, if the input has been initialized
-	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
-	python::StructureBuilder m_inputbuilder;	//< structure input builder object
-	python::StructureR m_input;			//< pointer to input structure
-	python::StructureR m_output;			//< pointer to output structure
-	python::InterpreterInstanceR m_instance;	//< interpreter instance
-	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
+	TypedInputFilterR m_result;				//< result of the function call
+	std::string m_name;					//< name of the function called for error messages
+	TypedInputFilterR m_arg;				//< call argument as input filter
+	bool m_initialized;					//< true, if the input has been initialized
+	std::string m_tagbuf;					//< buffer for attribute name to handle Attribute+Value pair
+	python::StructureBuilder m_inputbuilder;		//< structure input builder object
+	python::StructureR m_input;				//< pointer to input structure
+	python::StructureR m_output;				//< pointer to output structure
+	python::InterpreterInstanceR m_instance;		//< interpreter instance
+	const proc::ProcessorProviderInterface* m_provider;	//< pointer to processor provider
 };
 
 

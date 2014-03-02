@@ -119,7 +119,7 @@ std::string PreProcessCommand::tostring( const TagTable* tagmap) const
 	return rt.str();
 }
 
-void PreProcessCommand::call( const proc::ProcessorProvider* provider, TransactionFunctionInput::Structure& structure) const
+void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, TransactionFunctionInput::Structure& structure) const
 {
 	// Select the nodes to execute the command with:
 	typedef TransactionFunctionInput::Structure Structure;

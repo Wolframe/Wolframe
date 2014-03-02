@@ -252,17 +252,17 @@ int ImageImpl::rescale( Image &res, const ImageRescale &param )
 	return 0;
 }
 
-int graphix::imageInfoExec( const proc::ProcessorProvider*, void *res, const void *param )
+int graphix::imageInfoExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
 {
 	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
 }
 
-int graphix::imageThumbExec( const proc::ProcessorProvider*, void *res, const void *param )
+int graphix::imageThumbExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
 {
 	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
 }
 
-int graphix::imageRescaleExec( const proc::ProcessorProvider*, void *res, const void *param )
+int graphix::imageRescaleExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
 {
 	return ImageImpl::rescale( *(Image *)res, *(const ImageRescale *)param );
 }

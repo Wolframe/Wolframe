@@ -198,7 +198,7 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
 	,m_provider(o.m_provider)
 	{}
 
-void CppFormFunctionClosure::init( const proc::ProcessorProvider* provider, const TypedInputFilterR& i, serialize::Context::Flags flags)
+void CppFormFunctionClosure::init( const proc::ProcessorProviderInterface* provider, const TypedInputFilterR& i, serialize::Context::Flags flags)
 {
 	m_provider = provider;
 	m_parser.init(i,flags);

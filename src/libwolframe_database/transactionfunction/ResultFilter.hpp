@@ -37,7 +37,7 @@
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
 #include "transactionfunction/ResultIterator.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 
@@ -47,7 +47,7 @@ namespace db {
 class ResultFilter
 {
 public:
-	ResultFilter( const proc::ProcessorProvider* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_);
+	ResultFilter( const proc::ProcessorProviderInterface* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_);
 	ResultFilter( const ResultFilter& o);
 	virtual ~ResultFilter(){}
 

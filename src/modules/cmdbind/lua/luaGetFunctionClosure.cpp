@@ -31,9 +31,9 @@ Project Wolframe.
 ************************************************************************/
 ///\file luaGetFunctionClosure.cpp
 ///\brief Interface to the Closure of the :get int the lua binding
-
 #include "luaGetFunctionClosure.hpp"
 #include "luaException.hpp"
+#include "types/customDataType.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

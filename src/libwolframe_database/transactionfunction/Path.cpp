@@ -33,6 +33,7 @@
 ///\brief Implementation of selector path for database transaction functions
 ///\file transactionfunction/Path.cpp
 #include "transactionfunction/Path.hpp"
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

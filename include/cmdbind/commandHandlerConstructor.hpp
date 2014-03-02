@@ -42,10 +42,6 @@
 #include <list>
 
 namespace _Wolframe {
-namespace proc {
-	///\brief Forward declaration
-	class ProcessorProvider;
-}
 namespace cmdbind {
 
 ///\class CommandHandlerConstructor
@@ -63,7 +59,7 @@ public:
 	}
 
 	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const=0;
-	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProvider*) const=0;
+	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const=0;
 };
 
 ///\brief Command handler constructor reference

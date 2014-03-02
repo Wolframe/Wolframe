@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011 - 2014 Project Wolframe.
+Copyright (C) 2011 - 2013 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -29,38 +29,32 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonInterpreterInstance.hpp
-///\brief Interface to interpreter instances created for running one form function call to python
-#ifndef _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
-#define _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
-#include "pythonStructure.hpp"
-#include "types/variant.hpp"
-#include "processor/procProviderInterface.hpp"
-#include <utility>
-#include <vector>
-#include <boost/shared_ptr.hpp>
+//\file types/numberBaseConversion.hpp
+//\brief Private interface for big number conversions from decimal to binary represention and back
+
+#ifndef _Wolframe_TYPES_NUMBER_BASE_CONVERSION_HPP_INCLUDED
+#define _Wolframe_TYPES_NUMBER_BASE_CONVERSION_HPP_INCLUDED
+#include "types/integer.hpp"
+#include <string>
 
 namespace _Wolframe {
-namespace langbind {
-namespace python {
+namespace types {
 
-///\class Instance
-///\brief Interpreter instance for executing a function
-class InterpreterInstance
+unsigned int convertBinaryToBCD( const unsigned char* uintptr, unsigned int uintsize, unsigned char* digitsbuf, unsigned int digitsbufsize);
+void convertBCDtoBinary( const unsigned char* digits, unsigned int nofdigits, unsigned char* buf, unsigned int bufsize);
+
+template <typename UINTTYPE>
+unsigned int convertBigEndianUintToBCD( const UINTTYPE& val, unsigned char* digitsbuf, unsigned int digitsbufsize)
 {
-public:
-	///\brief Constructor
-	InterpreterInstance();
-	///\brief Destructor
-	virtual ~InterpreterInstance(){}
+	return convertBinaryToBCD( (const unsigned char*)&val, sizeof(val), digitsbuf, digitsbufsize);
+}
 
-	///\brief Call a function written in 'Mylang'
-	StructureR call( const proc::ProcessorProviderInterface* provider, const StructureR& arg);
-};
+template <typename UINTTYPE>
+void convertBCDtoBigEndianUint( const unsigned char* digits, unsigned int nofdigits, UINTTYPE& val)
+{
+	convertBCDtoBinary( digits, nofdigits, (unsigned char*)&val, sizeof(val));
+}
 
-typedef boost::shared_ptr<InterpreterInstance> InterpreterInstanceR;
-
-}}} //namespace
+}}//namespace
 #endif
-
 
