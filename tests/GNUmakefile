@@ -1,6 +1,7 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter
+SUBDIRS = 3rdParty modules database simpleFormCompiler wolfilter
+#SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -34,17 +35,19 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(TOPDIR)/src/libwolframe.a \
 	-lwolftest \
-	-lwolframe \
 	-lwfshared \
 	-lwolframe \
+	$(TOPDIR)/src/libwolframe.a \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
+	$(TOPDIR)/src/libwolframe.a \
+	-lwfshared \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system -lboost_program_options
+	-lboost_filesystem -lboost_system -lboost_program_options \
+	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 
 # openssl
 
@@ -155,7 +158,6 @@ TEST_CPP_BINS = \
 	base64Utility$(EXE) \
 	testSHA$(EXE) \
 	testMD5$(EXE) \
-	CRAMtest$(EXE) \
 	HMACtest$(EXE) \
 	PBKDF2test$(EXE) \
 	poolTest$(EXE) \
@@ -173,6 +175,7 @@ TEST_CPP_BINS = \
 	testString$(EXE) \
 	testDateTime$(EXE) \
 	testBigNumber$(EXE) \
+#	CRAMtest$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
@@ -183,7 +186,7 @@ logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+# CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -262,8 +265,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
-	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
+#	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing

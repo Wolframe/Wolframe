@@ -51,7 +51,19 @@ INCLUDE_LIBS = \
 LOCAL_STATIC_LIB = \
 	wolframe.lib
 
+PROVIDER_OBJS = \
+	provider\Authentication.obj \
+	provider\Authorization.obj \
+	provider\Audit.obj \
+	provider\AAAAproviderImpl.obj \
+	provider\AAAAproviderConfig.obj \
+	provider\DBproviderImpl.obj \
+	provider\DBproviderConfig.obj \
+	provider\procProvider.obj \
+	provider\procProviderImpl.obj \
+
 LOCAL_STATIC_LIB_OBJS = \
+	$(PROVIDER_OBJS)
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	wolfilterIostreamFilter.obj \
@@ -59,6 +71,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	mainConnectionHandler.obj \
 	interfaceCommandHandler.obj \
 	loadModules.obj \
+	moduleDirectory.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \

@@ -31,7 +31,6 @@ endif
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem \
-#	-lwfshared
 
 STATIC_LIB = libwolframe.a
 
@@ -39,17 +38,6 @@ DYNAMIC_LIB = libwolframe.so
 DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
-
-PROVIDER_OBJS = \
-	provider/Authentication.o \
-	provider/Authorization.o \
-	provider/Audit.o \
-	provider/AAAAproviderImpl.o \
-	provider/AAAAproviderConfig.o \
-	provider/DBproviderImpl.o \
-	provider/DBproviderConfig.o \
-	provider/procProvider.o \
-	provider/procProviderImpl.o
 
 TYP_OBJS = \
 	types/conversions.o \
@@ -73,18 +61,15 @@ UTIL_OBJS = \
 	utils/printFormats.o
 
 CPP_OBJS = \
-	$(LOGGER_OBJS) \
-	$(PROVIDER_OBJS) \
 	$(TYP_OBJS) \
 	$(UTIL_OBJS) \
 	version.o \
 	getPassword.o \
 	user.o \
-	moduleDirectory.o \
-	password.o \
 	HMAC.o \
 	PBKDF2.o \
-	CRAM.o
+#	password.o \
+#	CRAM.o
 
 OBJS = \
 	b64encode.o \

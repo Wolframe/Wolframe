@@ -33,17 +33,6 @@ INCLUDE_LIBS =
 LIBRARIES = \
 	wolframe.lib
 
-PROVIDER_OBJS = \
-	provider\Authentication.obj \
-	provider\Authorization.obj \
-	provider\Audit.obj \
-	provider\AAAAproviderImpl.obj \
-	provider\AAAAproviderConfig.obj \
-	provider\DBproviderImpl.obj \
-	provider\DBproviderConfig.obj \
-	provider\procProvider.obj \
-	provider\procProviderImpl.obj \
-
 TYPE_OBJS = \
 	types\conversions.obj \
 	types\string.obj \
@@ -66,13 +55,11 @@ UTIL_OBJS = \
 	utils\printFormats.obj
 
 CPP_OBJS = \
-	$(PROVIDER_OBJS) \
 	$(TYPE_OBJS) \
 	$(UTIL_OBJS) \
 	version.obj \
 	getPassword.obj \
 	user.obj \
-	moduleDirectory.obj \
 	password.obj \
 	HMAC.obj \
 	PBKDF2.obj \

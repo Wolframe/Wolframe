@@ -51,4 +51,3 @@ local_uninstall:
 	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
 
 local_test:
-
