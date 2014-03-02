@@ -6,7 +6,12 @@ post_install() {
   fi
     
   # Don't enable Wolframe server at install time, just inform root how this is done
-echo
-echo Use 'systemctl enable wolframed' to enable the server at startup
-echo
+  echo
+  echo Use 'systemctl enable wolframed' to enable the server at startup
+  echo
+}
+
+pre_remove() {
+  systemctl stop wolframed
+  systemctl disable wolframed
 }

@@ -142,4 +142,70 @@ types::Variant BigfxpDataType::toDouble( const CustomDataValue& operand)
 	return types::Variant( op->todouble());
 }
 
+int BigfxpDataValue::compare( const CustomDataValue& o) const
+{
+	if (o.type() != type())
+	{
+		return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
+	}
+	else
+	{
+		const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
+		return types::BigFxpBCD::compare(*odt);
+	}
+}
+
+void BigfxpDataValue::assign( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+		case Variant::Timestamp:
+		case Variant::Bool:
+			throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd fixed point number");
+
+		case Variant::Custom:
+		{
+			const CustomDataValue* ref = o.customref();
+			if (ref->type() != type())
+			{
+				throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd fixed point number");
+			}
+			else
+			{
+				const BigfxpDataValue* val = reinterpret_cast<const BigfxpDataValue*>(ref);
+				types::BigFxpBCD::init( *val);
+			}
+			break;
+		}
+		case Variant::BigNumber:
+			types::BigFxpBCD::init( *o.bignumref());
+			break;
+
+		case Variant::Double:
+			types::BigFxpBCD::operator=( o.todouble());
+			break;
+
+		case Variant::Int:
+			types::BigFxpBCD::operator=( o.toint());
+			break;
+
+		case Variant::UInt:
+			types::BigFxpBCD::operator=( o.touint());
+			break;
+
+		case Variant::String:
+			types::BigFxpBCD::operator=( o.tostring());
+			break;
+	}
+}
+
+void BigfxpDataValue::getBaseTypeValue( Variant& dest) const
+{
+	dest = types::BigNumber( types::BigFxpBCD::tostring());
+}
+
+
+
+
 

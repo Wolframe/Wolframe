@@ -106,38 +106,15 @@ public:
 
 	virtual ~DateDataValue(){};
 
-	virtual int compare( const CustomDataValue& o) const
-	{
-		if (o.type() != type())
-		{
-			return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
-		}
-		else
-		{
-			const DateDataValue* odt = reinterpret_cast<const DateDataValue*>(&o);
-			int rt = -1;
-			rt += (int)(Date::operator>=(*odt));
-			rt += (int)(Date::operator>(*odt));
-			return rt;
-		}
-	}
+	virtual int compare( const CustomDataValue& o) const;
 
 	virtual std::string tostring() const
 	{
 		return Date::tostring( format());
 	}
 
-	virtual void assign( const Variant& o)
-	{
-		if (o.type() == Variant::String)
-		{
-			Date::operator=( Date( o.tostring()));
-		}
-		else
-		{
-			Date::operator=( Date(1970,1,1) + o.toint());
-		}
-	}
+	virtual void assign( const Variant& o);
+	virtual void getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{
@@ -163,7 +140,6 @@ public:
 		define( Decrement, &decrement);
 		define( Add, &add);
 		define( Subtract, &subtract);
-		define( ToTimestamp, &toTimestamp);
 		define( ToInt, &toInt);
 		define( "year", &getYear);
 		define( "month", &getMonth);
@@ -183,7 +159,6 @@ private:
 	static types::Variant decrement( const CustomDataValue& operand);
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
-	static types::Variant toTimestamp( const CustomDataValue& operand);
 	static types::Variant toInt( const CustomDataValue& operand);
 };
 

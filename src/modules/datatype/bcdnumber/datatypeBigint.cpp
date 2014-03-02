@@ -126,4 +126,62 @@ types::Variant BigintDataType::toDouble( const CustomDataValue& operand)
 	return types::Variant( op->todouble());
 }
 
+int BigintDataValue::compare( const CustomDataValue& o) const
+{
+	if (o.type() != type())
+	{
+		return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
+	}
+	else
+	{
+		const BigintDataValue* odt = reinterpret_cast<const BigintDataValue*>(&o);
+		return types::BigBCD::compare(*odt);
+	}
+}
 
+void BigintDataValue::getBaseTypeValue( Variant& dest) const
+{
+	dest = types::BigNumber( types::BigBCD::tostring());
+}
+
+void BigintDataValue::assign( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+		case Variant::Timestamp:
+		case Variant::Bool:
+			throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd integer");
+
+		case Variant::Custom:
+		{
+			const CustomDataValue* ref = o.customref();
+			if (ref->type() != type())
+			{
+				throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd integer");
+			}
+			else
+			{
+				const BigintDataValue* val = reinterpret_cast<const BigintDataValue*>(ref);
+				types::BigBCD::init( *val);
+			}
+			break;
+		}
+		case Variant::BigNumber:
+			types::BigBCD::init( *o.bignumref());
+			break;
+
+		case Variant::Double:
+		case Variant::Int:
+			types::BigBCD::init( o.toint());
+			break;
+
+		case Variant::UInt:
+			types::BigBCD::init( o.touint());
+			break;
+
+		case Variant::String:
+			types::BigBCD::init( o.charptr(), o.charsize());
+			break;
+	}
+}

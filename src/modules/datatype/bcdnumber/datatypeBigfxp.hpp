@@ -75,39 +75,15 @@ public:
 
 	virtual ~BigfxpDataValue(){};
 
-	virtual int compare( const CustomDataValue& o) const
-	{
-		if (o.type() != type())
-		{
-			return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
-		}
-		else
-		{
-			const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
-			return types::BigFxpBCD::compare(*odt);
-		}
-	}
+	virtual int compare( const CustomDataValue& o) const;
 
 	virtual std::string tostring() const
 	{
 		return types::BigFxpBCD::tostring();
 	}
 
-	virtual void assign( const Variant& o)
-	{
-		if (o.type() == Variant::String)
-		{
-			types::BigFxpBCD::init( o.tostring());
-		}
-		else if (o.type() == Variant::Double)
-		{
-			types::BigFxpBCD::operator=( o.todouble());
-		}
-		else
-		{
-			types::BigFxpBCD::operator=( o.toint());
-		}
-	}
+	virtual void assign( const Variant& o);
+	virtual void getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{
