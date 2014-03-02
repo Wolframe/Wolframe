@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwfshared libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind modules
+SUBDIRS = libwolframe libwfshared libwolframe_serialize libwolframe_database libwolframe_langbind modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -40,11 +40,22 @@ INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 endif
 
-
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
+PROVIDER_OBJS = \
+	provider/Authentication.o \
+	provider/Authorization.o \
+	provider/Audit.o \
+	provider/AAAAproviderImpl.o \
+	provider/AAAAproviderConfig.o \
+	provider/DBproviderImpl.o \
+	provider/DBproviderConfig.o \
+	provider/procProvider.o \
+	provider/procProviderImpl.o
+
 LOCAL_STATIC_LIB_OBJS = \
+	$(PROVIDER_OBJS) \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
 	wolfilterIostreamFilter.o \
@@ -52,6 +63,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	mainConnectionHandler.o \
 	interfaceCommandHandler.o \
 	loadModules.o \
+	moduleDirectory.o \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
@@ -71,6 +83,7 @@ ifeq ($(WITH_SSL),1)
 LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
+
 
 CPP_OBJS = \
 	appProperties.o \

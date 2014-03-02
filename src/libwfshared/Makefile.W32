@@ -9,15 +9,14 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I$(TOPDIR)\include \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I$(TOPDIR)\include
 
 INCLUDE_LDFLAGS = \
-	$(BOOST_LDFLAGS)
+	$(TOPDIR)\src\libwolframe
 
 INCLUDE_LIBS = \
-	ws2_32.lib kernel32.lib advapi32.lib
-	
+	ws2_32.lib kernel32.lib advapi32.lib wolframe.lib
+
 LIBRARIES = \
 	wfshared.dll \
 	logger\wolframemsg.dll
@@ -38,7 +37,6 @@ LOGGER_OBJS = \
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
-	resolvePath.obj \
 	appInfo.obj \
 	globalRndGen.obj
 

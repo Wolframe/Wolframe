@@ -10,8 +10,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
-	-I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(TOPDIR)/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
@@ -19,7 +18,6 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem
 
 STATIC_LIB = libwolframe_serialize.a

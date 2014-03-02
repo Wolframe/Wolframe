@@ -26,13 +26,13 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(TOPDIR)/src/libwolframe.a \
 	-lwfshared \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolftest \
+	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(LIBS_DL)
 

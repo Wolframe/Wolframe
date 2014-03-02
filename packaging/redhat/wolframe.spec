@@ -68,17 +68,17 @@
 %define osu122 0
 %define osu123 0
 %define osu131 0
-%if 0%{?suse_version} >= 1220
+%if 0%{?suse_version} == 1220
 %define dist osu122
 %define osu122 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1230
+%if 0%{?suse_version} == 1230
 %define dist osu123
 %define osu123 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1310
+%if 0%{?suse_version} == 1310
 %define dist osu131
 %define osu131 1
 %define suse 1
@@ -331,13 +331,21 @@ Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu123} || %{osu131}
+%if %{osu122} || %{osu123}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
 Requires: libboost_program_options1_49_0 >= 1.49.0
 Requires: libboost_system1_49_0 >= 1.49.0
 Requires: libboost_regex1_49_0 >= 1.49.0
+%endif
+%if %{osu131}
+Requires: libboost_thread1_53_0 >= 1.53.0
+Requires: libboost_date_time1_53_0 >= 1.53.0
+Requires: libboost_filesystem1_53_0 >= 1.53.0
+Requires: libboost_program_options1_53_0 >= 1.53.0
+Requires: libboost_system1_53_0 >= 1.53.0
+Requires: libboost_regex1_53_0 >= 1.53.0
 %endif
 %endif
 %endif
@@ -734,12 +742,20 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu123} || %{osu131}
+%if %{osu122} || %{osu123}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
 Requires: libboost_program_options1_49_0 >= 1.49.0
 Requires: libboost_system1_49_0 >= 1.49.0
+%if %{osu131}
+Requires: libboost_thread1_53_0 >= 1.53.0
+Requires: libboost_date_time1_53_0 >= 1.53.0
+Requires: libboost_filesystem1_53_0 >= 1.53.0
+Requires: libboost_program_options1_53_0 >= 1.53.0
+Requires: libboost_system1_53_0 >= 1.53.0
+Requires: libboost_regex1_53_0 >= 1.53.0
+%endif
 %endif
 %endif
 %endif

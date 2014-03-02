@@ -1,6 +1,7 @@
 TOPDIR = ../../..
 
-SUBDIRS = database textfile
+#SUBDIRS = database textfile
+SUBDIRS =
 
 # PAM
 ifeq ($(WITH_PAM),1)

@@ -10,18 +10,15 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
-	-I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(TOPDIR)/include
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwfshared \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_LIBS = \
-	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lwfshared -lwolframe -lwolframe_serialize -lwolframe_database \
 	-lboost_filesystem
 

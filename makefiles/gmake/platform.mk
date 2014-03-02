@@ -469,19 +469,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "12.2"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
-endif
-
 ifeq "$(LINUX_REV)" "12.3"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
