@@ -68,17 +68,17 @@
 %define osu122 0
 %define osu123 0
 %define osu131 0
-%if 0%{?suse_version} >= 1220
+%if 0%{?suse_version} == 1220
 %define dist osu122
 %define osu122 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1230
+%if 0%{?suse_version} == 1230
 %define dist osu123
 %define osu123 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1310
+%if 0%{?suse_version} == 1310
 %define dist osu131
 %define osu131 1
 %define suse 1
