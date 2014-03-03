@@ -139,9 +139,16 @@ int BigintDataValue::compare( const CustomDataValue& o) const
 	}
 }
 
-void BigintDataValue::getBaseTypeValue( Variant& dest) const
+bool BigintDataValue::getBaseTypeValue( Variant& dest) const
 {
-	dest = types::BigNumber( types::BigBCD::tostring());
+	try
+	{
+		dest = types::BigNumber( types::BigBCD::tostring());
+	}
+	catch (const std::runtime_error&)
+	{
+		return false;
+	}
 }
 
 void BigintDataValue::assign( const Variant& o)

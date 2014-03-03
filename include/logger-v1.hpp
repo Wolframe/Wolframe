@@ -42,7 +42,6 @@
 #include "logger/logSyslogFacility.hpp"
 #include "logger/logError.hpp"
 #include "logger/logBackend.hpp"
-#include "logger/logObject.hpp"
 
 #include <sstream>
 

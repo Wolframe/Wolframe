@@ -78,7 +78,7 @@ public:
 	virtual std::string tostring() const=0;
 	virtual void assign( const Variant& o)=0;
 	virtual CustomDataValue* copy() const=0;
-	virtual void getBaseTypeValue( Variant& dest) const;
+	virtual bool getBaseTypeValue( Variant&) const			{return false;}
 
 private:
 	friend class CustomDataType;

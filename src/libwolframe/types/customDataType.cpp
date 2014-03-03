@@ -37,11 +37,6 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-void CustomDataValue::getBaseTypeValue( Variant& dest) const
-{
-	dest = tostring();
-}
-
 CustomDataType::CustomDataType(
 			const std::string& name_,
 			CustomDataValueConstructor constructor_,

@@ -114,7 +114,7 @@ public:
 	}
 
 	virtual void assign( const Variant& o);
-	virtual void getBaseTypeValue( Variant& dest) const;
+	virtual bool getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{

@@ -238,8 +238,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			types::Variant baseval;
 			try
 			{
-				value.customref()->getBaseTypeValue( baseval);
-				if (baseval.type() != types::Variant::Custom)
+				if (value.customref()->getBaseTypeValue( baseval) && baseval.type() != types::Variant::Custom)
 				{
 					bind( idx, baseval);
 					break;
@@ -249,7 +248,7 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			throw std::runtime_error( "cannot convert value to base type for binding");
+			bind( idx, types::Variant( value.customref()->tostring()));
 		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );

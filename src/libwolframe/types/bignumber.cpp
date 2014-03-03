@@ -275,14 +275,16 @@ void BigNumber::constructor( const types::Variant& val)
 		case Variant::Custom:
 		{
 			types::Variant value;
-			val.customref()->getBaseTypeValue( value);
-			if (value.type() == Variant::Custom)
-			{
-				throw std::runtime_error( "cannot construct big number from variant type 'Custom'");
-			}
 			try
 			{
-				constructor( value);
+				if (val.customref()->getBaseTypeValue( value) && value.type() != Variant::Custom)
+				{
+					constructor( value);
+				}
+				else
+				{
+					return constructor( val.tostring());
+				}
 			}
 			catch (const std::runtime_error& e)
 			{

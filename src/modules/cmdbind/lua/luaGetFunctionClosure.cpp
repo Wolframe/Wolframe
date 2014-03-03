@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file luaGetFunctionClosure.cpp
 ///\brief Interface to the Closure of the :get int the lua binding
 #include "luaGetFunctionClosure.hpp"
+#include "luaObjectTemplate.hpp"
 #include "luaException.hpp"
 #include "types/customDataType.hpp"
 
@@ -128,23 +129,8 @@ static void push_element( lua_State* ls, const types::VariantConst& element)
 			lua_pushnil( ls);
 			break;
 		case types::Variant::Custom:
-		{
-			types::Variant baseval;
-			try
-			{
-				element.customref()->getBaseTypeValue( baseval);
-				if (baseval.type() != types::Variant::Custom)
-				{
-					push_element( ls, baseval);
-					break;
-				}
-			}
-			catch (const std::runtime_error& e)
-			{
-				throw std::runtime_error( std::string("cannot convert value to base type: ") + e.what());
-			}
-			throw std::runtime_error( "cannot convert value to base type");
-		}
+			LuaObject<types::CustomDataValueR>::push_luastack( ls, types::CustomDataValueR( element.customref()->copy()));
+			break;
 		case types::Variant::Bool:
 			lua_pushboolean( ls, element.tobool());
 			break;
@@ -158,25 +144,11 @@ static void push_element( lua_State* ls, const types::VariantConst& element)
 			lua_pushinteger( ls, (lua_Integer)element.touint());
 			break;
 		case types::Variant::Timestamp:
-		{
-			LuaExceptionHandlerScope escope(ls);
-			{
-				std::string strval = element.tostring();
-				lua_pushlstring( ls, strval.c_str(), strval.size());
-				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-			}
+			LuaObject<types::DateTime>::push_luastack( ls, types::DateTime( element.totimestamp()));
 			break;
-		}
 		case types::Variant::BigNumber:
-		{
-			LuaExceptionHandlerScope escope(ls);
-			{
-				std::string strval = element.tostring();
-				lua_pushlstring( ls, strval.c_str(), strval.size());
-				lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-			}
+			LuaObject<types::BigNumber>::push_luastack( ls, types::BigNumber( *element.bignumref()));
 			break;
-		}
 		case types::Variant::String:
 			lua_pushlstring( ls, element.charptr(), element.charsize());
 			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one

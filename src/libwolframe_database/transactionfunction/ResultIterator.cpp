@@ -34,6 +34,7 @@
 ///\file transactionfunction/ResultIterator.cpp
 #include "transactionfunction/ResultIterator.hpp"
 #include "logger-v1.hpp"
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

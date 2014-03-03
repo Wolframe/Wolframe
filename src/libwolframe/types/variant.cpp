@@ -284,8 +284,7 @@ static Variant::Data::Timestamp variant2timestamp_cast( const Variant& o)
 			Variant val;
 			try
 			{
-				o.customref()->getBaseTypeValue( val);
-				if (val.type() != Variant::Custom)
+				if (o.customref()->getBaseTypeValue( val) && val.type() != Variant::Custom)
 				{
 					return variant2timestamp_cast( val);
 				}
@@ -325,8 +324,7 @@ static BigNumber variant2bignumber_cast( const Variant& o)
 			Variant val;
 			try
 			{
-				o.customref()->getBaseTypeValue( val);
-				if (val.type() != Variant::Custom)
+				if (o.customref()->getBaseTypeValue( val) && val.type() != Variant::Custom)
 				{
 					return variant2bignumber_cast( val);
 				}
@@ -367,8 +365,7 @@ static Variant::Data::UInt variant2uint_cast( const Variant& o)
 			Variant val;
 			try
 			{
-				o.customref()->getBaseTypeValue( val);
-				if (val.type() != Variant::Custom)
+				if (o.customref()->getBaseTypeValue( val) && val.type() != Variant::Custom)
 				{
 					return variant2uint_cast( val);
 				}
@@ -409,8 +406,7 @@ static Variant::Data::Int variant2int_cast( const Variant& o)
 			Variant val;
 			try
 			{
-				o.customref()->getBaseTypeValue( val);
-				if (val.type() != Variant::Custom)
+				if (o.customref()->getBaseTypeValue( val) && val.type() != Variant::Custom)
 				{
 					return variant2int_cast( val);
 				}
@@ -451,8 +447,7 @@ static typename boost::enable_if_c<boost::is_same<TYPE,double>::value,TYPE>::typ
 			Variant alt;
 			try
 			{
-				o.customref()->getBaseTypeValue( alt);
-				if (alt.type() != Variant::Custom)
+				if (o.customref()->getBaseTypeValue( alt) && alt.type() != Variant::Custom)
 				{
 					return variant_cast<double>( alt);
 				}

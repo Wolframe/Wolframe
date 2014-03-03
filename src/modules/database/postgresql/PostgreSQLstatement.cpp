@@ -123,8 +123,8 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 			types::Variant baseval;
 			try
 			{
-				value.customref()->getBaseTypeValue( baseval);
-				if (baseval.type() != types::Variant::Custom)
+				if (value.customref()->getBaseTypeValue( baseval)
+				&&  baseval.type() != types::Variant::Custom)
 				{
 					bind( idx, baseval);
 					break;
@@ -134,7 +134,7 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			throw std::runtime_error( "cannot convert value to base type for binding");
+			bind( idx, value.tostring());
 		}
 		
 		default:

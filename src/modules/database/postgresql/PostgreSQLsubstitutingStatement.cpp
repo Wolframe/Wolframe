@@ -34,35 +34,49 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 		case types::Variant::Int:
 		case types::Variant::UInt:
 		case types::Variant::Double:
+		case types::Variant::BigNumber:
 			return value.tostring( );
 			
-		case types::Variant::BigNumber:
-			/*[PF:TODO Implementation]*/
-			return value.tostring();
+		case types::Variant::Custom:
+		{
+			types::Variant baseval;
+			try
+			{
+				if (value.customref()->getBaseTypeValue( baseval)
+				&&  baseval.type() != types::Variant::Custom)
+				{
+					return convert( baseval);
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			//... no break here - fallback to 'tostring()'
+		}
 		case types::Variant::Timestamp:
-			/*[PF:TODO Implementation]*/
-			return value.tostring();
+			//... we have to treat Timestamp same as types::Variant::String
+			//	or types::Variant::Custom (escaping content)
+			//	because the format string of the date could be possibly
+			//	used for code injection !
 		case types::Variant::String:
 		{
-			std::string strval = value.tostring( );
-			char *encvalue = (char *)std::malloc( strval.size() * 2 + 3 );
+			std::string strval = value.tostring();
+			char *encvalue = (char *)std::malloc( strval.size() * 2 + 3);
 			encvalue[0] = '\'';
-			boost::shared_ptr<void> encvaluer( encvalue, std::free );
+			boost::shared_ptr<void> encvaluer( encvalue, std::free);
 			int error = 0;
-			size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str( ), strval.size( ), &error );
+			size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, strval.c_str( ), strval.size( ), &error);
 			if( error != 0 ) {
-				throw new std::runtime_error( "Encoding error in PQescapeStringConn for string '" + strval + "'" );
+				throw new std::runtime_error( "Encoding error in PQescapeStringConn for string '" + strval + "'");
 			}
 			encvalue[encvaluesize+1] = '\'';
-			return std::string( encvalue, encvaluesize+2 );
+			return std::string( encvalue, encvaluesize+2);
 		}
 
 		case types::Variant::Bool:
 			if( value.tobool( ) ) return "'t'";
 			else return "'f'";
-
-		case types::Variant::Custom:
-			return value.customref()->tostring();
 	}
 	throw new std::logic_error( "Unknown variant type '" + std::string( value.typeName( ) ) + "'" );
 }

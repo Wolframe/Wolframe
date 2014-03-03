@@ -200,9 +200,16 @@ void BigfxpDataValue::assign( const Variant& o)
 	}
 }
 
-void BigfxpDataValue::getBaseTypeValue( Variant& dest) const
+bool BigfxpDataValue::getBaseTypeValue( Variant& dest) const
 {
-	dest = types::BigNumber( types::BigFxpBCD::tostring());
+	try
+	{
+		dest = types::BigNumber( types::BigFxpBCD::tostring());
+	}
+	catch (const std::runtime_error&)
+	{
+		return false;
+	}
 }
 
 

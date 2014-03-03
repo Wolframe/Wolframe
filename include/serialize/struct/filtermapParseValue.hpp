@@ -167,8 +167,8 @@ static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const type
 				types::Variant baseval;
 				try
 				{
-					element.customref()->getBaseTypeValue( baseval);
-					if (baseval.type() != types::Variant::Custom)
+					if (element.customref()->getBaseTypeValue( baseval)
+					&&  baseval.type() != types::Variant::Custom)
 					{
 						return parseValue_( val, ParseValueType::Bool(), baseval);
 					}
@@ -227,17 +227,18 @@ static bool parseValue_( ValueType& val, const ParseValueType::Arithmetic&, cons
 				types::Variant baseval;
 				try
 				{
-					element.customref()->getBaseTypeValue( baseval);
-					if (baseval.type() != types::Variant::Custom)
+					if (element.customref()->getBaseTypeValue( baseval)
+					&&  baseval.type() != types::Variant::Custom)
 					{
 						return parseValue_( val, ParseValueType::Arithmetic(), baseval);
 					}
+					val = boost::lexical_cast<ValueType>( element.tostring());
+					return true;
 				}
 				catch (const std::runtime_error& e)
 				{
-					throw std::runtime_error( std::string("cannot convert custom data type to boolean value: ") + e.what());
+					throw std::runtime_error( std::string("cannot convert custom data type to arithmetic value: ") + e.what());
 				}
-				throw std::runtime_error( "cannot convert custom data type to boolean value");
 			}
 		}
 	}
@@ -288,17 +289,17 @@ static bool parseValue_( ValueType& val, const ParseValueType::BigNumber&, const
 				types::Variant baseval;
 				try
 				{
-					element.customref()->getBaseTypeValue( baseval);
-					if (baseval.type() != types::Variant::Custom)
+					if (element.customref()->getBaseTypeValue( baseval)
+					&&  baseval.type() != types::Variant::Custom)
 					{
 						return parseValue_( val, ParseValueType::BigNumber(), baseval);
 					}
+					val = types::BigNumber( element.tostring());
 				}
 				catch (const std::runtime_error& e)
 				{
-					throw std::runtime_error( std::string("cannot convert custom data type to boolean value: ") + e.what());
+					throw std::runtime_error( std::string("cannot convert custom data type to bignumber value: ") + e.what());
 				}
-				throw std::runtime_error( "cannot convert custom data type to boolean value");
 			}
 		}
 	}
@@ -344,17 +345,17 @@ static bool parseValue_( ValueType& val, const ParseValueType::DateTime&, const 
 				types::Variant baseval;
 				try
 				{
-					element.customref()->getBaseTypeValue( baseval);
-					if (baseval.type() != types::Variant::Custom)
+					if (element.customref()->getBaseTypeValue( baseval)
+					&&  baseval.type() != types::Variant::Custom)
 					{
 						return parseValue_( val, ParseValueType::DateTime(), baseval);
 					}
+					val = types::DateTime( element.tostring());
 				}
 				catch (const std::runtime_error& e)
 				{
-					throw std::runtime_error( std::string("cannot convert custom data type to boolean value: ") + e.what());
+					throw std::runtime_error( std::string("cannot convert custom data type to datetime value: ") + e.what());
 				}
-				throw std::runtime_error( "cannot convert custom data type to boolean value");
 			}
 		}
 	}

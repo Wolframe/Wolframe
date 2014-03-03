@@ -27,7 +27,6 @@ LOGGER_OBJS = \
 	logger\logLevel.obj \
 	logger\logSyslogFacility.obj \
 	logger\logError.obj \
-	logger\logObject.obj \
 	logger\logBackendConsole.obj \
 	logger\logBackendFile.obj \
 	logger\logBackendSyslog.obj \

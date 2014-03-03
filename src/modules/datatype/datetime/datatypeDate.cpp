@@ -97,10 +97,11 @@ int DateDataValue::compare( const CustomDataValue& o) const
 	}
 }
 
-void DateDataValue::getBaseTypeValue( Variant& dest) const
+bool DateDataValue::getBaseTypeValue( Variant& dest) const
 {
 	types::DateTime dt( year(), month(), day());
 	dest = dt;
+	return true;
 }
 
 void DateDataValue::assign( const Variant& o)
