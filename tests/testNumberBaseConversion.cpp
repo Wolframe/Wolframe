@@ -37,6 +37,7 @@ Project Wolframe.
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <limits>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -116,38 +117,60 @@ static void reorder( UINTTYPE& num)
 	}
 }
 
-TEST_F( NumberBaseConversions, tests)
+static void testNumber( const boost::uint64_t& num)
 {
-	for (unsigned int testcnt=0; testcnt<40000; ++testcnt)
+	enum {DigitsBufSize=50};
+	unsigned char digitsbuf[ DigitsBufSize];
+
+	boost::uint64_t num_be = num;
+
+	if (g_ByteOrder == LittleEndian)
 	{
-		enum {DigitsBufSize=50};
-		unsigned char digitsbuf[ DigitsBufSize];
-
-		const boost::uint64_t num = getRandomNumber<boost::uint64_t>();
-		boost::uint64_t num_be = num;
-
-		if (g_ByteOrder == LittleEndian)
-		{
-			reorder( num_be);
-		}
-		/*[-]*/std::cout << "TEST " << num << std::endl;
-
-		unsigned int nofDigits = types::convertBigEndianUintToBCD( num_be, digitsbuf, DigitsBufSize);
-		std::string numstr;
+		reorder( num_be);
+	}
+	unsigned int nofDigits = types::convertBigEndianUintToBCD( num_be, digitsbuf, DigitsBufSize);
+	std::string numstr;
+	if (nofDigits == 0)
+	{
+		numstr.push_back( '0');
+	}
+	else
+	{
 		for (unsigned int ii=0; ii<nofDigits; ++ii)
 		{
 			numstr.push_back( '0' + digitsbuf[ii]);
 		}
-		EXPECT_EQ( boost::lexical_cast<std::string>( num), numstr);
+	}
+	EXPECT_EQ( boost::lexical_cast<std::string>( num), numstr);
 
-		boost::uint64_t num_reverted_be;
-		types::convertBCDtoBigEndianUint( digitsbuf, nofDigits, num_reverted_be);
-		boost::uint64_t num_reverted = num_reverted_be;
-		if (g_ByteOrder == LittleEndian)
+	boost::uint64_t num_reverted_be;
+	types::convertBCDtoBigEndianUint( digitsbuf, nofDigits, num_reverted_be);
+	boost::uint64_t num_reverted = num_reverted_be;
+	if (g_ByteOrder == LittleEndian)
+	{
+		reorder( num_reverted);
+	}
+	EXPECT_EQ( num_reverted, num);
+}
+
+TEST_F( NumberBaseConversions, tests)
+{
+	// Test limit cases:
+	testNumber( 0);
+	testNumber( std::numeric_limits<boost::uint64_t>::max());
+
+	// Test random cases:
+	for (unsigned int testcnt=0; testcnt<50000; ++testcnt)
+	{
+		const boost::uint64_t num = getRandomNumber<boost::uint64_t>();
+		if (num)
 		{
-			reorder( num_reverted);
+			testNumber( num);
 		}
-		EXPECT_EQ( num_reverted, num);
+		else
+		{
+			++testcnt; //... again
+		}
 	}
 }
 

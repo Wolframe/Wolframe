@@ -49,7 +49,13 @@ void types::convertBCDtoBinary( const unsigned char* digits, unsigned int nofdig
 	{
 		throw std::runtime_error("number out of decimal to binary integer conversion range");
 	}
-	unsigned int sum[ HexNumFactor::TabSize];
+	else if (nofdigits == 0)
+	{
+		std::memset( buf, 0, bufsize);
+		return;
+	}
+
+	unsigned int sum[ HexNumFactor::TabSize]; //< buffer with sum of factors for number of base 256
 	std::memset( sum, 0, sizeof(sum));
 
 	unsigned int ii = 0;
@@ -63,6 +69,7 @@ void types::convertBCDtoBinary( const unsigned char* digits, unsigned int nofdig
 		{
 			unsigned int fac = g_decnum_hexnum_factor_table[ tabidx].tab[ ofs];
 			sum[ ofs] += digit * fac;
+			//... sum the factors for each digits
 		}
 	}
 	for (ii=HexNumFactor::TabSize; ii>1; --ii)
@@ -71,14 +78,16 @@ void types::convertBCDtoBinary( const unsigned char* digits, unsigned int nofdig
 		{
 			sum[ ii-2] += sum[ ii-1] / 256;
 			sum[ ii-1] = sum[ ii-1] % 256;
+			//... forward the carry
 		}
 		else if (sum[ ii-1] == 0)
 		{
 			if (ii <= g_decnum_hexnum_factor_table[ nofdigits-1].ofs) break;
+			//... stop when no carry expected anymore
 		}
 	}
 	unsigned int hexnumsize = 0;
-	unsigned int sumstart = ii;
+	unsigned int sumstart = ii-1;
 	for (ii=sumstart; ii<HexNumFactor::TabSize; ++ii)
 	{
 		if (sum[ii])
@@ -94,7 +103,8 @@ void types::convertBCDtoBinary( const unsigned char* digits, unsigned int nofdig
 	}
 	for (ii=0; ii<bufsize; ii++)
 	{
-		buf[ ii] = (unsigned char)sum[ HexNumFactor::TabSize-ii-1];
+		buf[ bufsize-ii-1] = (unsigned char)sum[ HexNumFactor::TabSize-ii-1];
+		//... copy result to result buffer
 	}
 }
 
@@ -117,6 +127,7 @@ unsigned int types::convertBinaryToBCD( const unsigned char* uintptr, unsigned i
 
 	for (; ii<uinthexdigits; ii+=2)
 	{
+		// Calculate the table indices for low (_lo) and high (_hi) nibble of the byte:
 		unsigned int tabidx_hi = uinthexdigits - ii -1;
 		unsigned int tabidx_lo = uinthexdigits - ii -2;
 
@@ -126,6 +137,7 @@ unsigned int types::convertBinaryToBCD( const unsigned char* uintptr, unsigned i
 		unsigned int hexdigit_lo = uintptr[ii>>1] & 0x0F;
 		unsigned int hexdigit_hi = uintptr[ii>>1] >> 4;
 
+		// Sum the factors for each nibble (hexdigit):
 		for (; ofs_lo < DecNumFactor::TabSize; ++ofs_lo)
 		{
 			unsigned int fac = g_hexnum_decnum_factor_table[ tabidx_lo].tab[ ofs_lo];
@@ -139,15 +151,22 @@ unsigned int types::convertBinaryToBCD( const unsigned char* uintptr, unsigned i
 	}
 	for (ii=DecNumFactor::TabSize; ii>1; --ii)
 	{
-		if (sum[ ii-1] > 10)
+		if (sum[ ii-1] >= 10)
 		{
 			sum[ ii-2] += sum[ ii-1] / 10;
 			sum[ ii-1] = sum[ ii-1] % 10;
+			// ... forward the carry
+		}
+		else if (sum[ ii-1] == 0)
+		{
+			if (ii <= g_hexnum_decnum_factor_table[ uinthexdigits-1].ofs) break;
+			//... stop when no carry expected anymore
 		}
 	}
 
-	unsigned int decnumstart = 0;
-	for (ii=0; ii<DecNumFactor::TabSize; ++ii)
+	unsigned int sumstart = ii;
+	unsigned int decnumstart = DecNumFactor::TabSize-1;
+	for (ii=sumstart; ii<DecNumFactor::TabSize; ++ii)
 	{
 		if (sum[ii])
 		{
@@ -155,7 +174,7 @@ unsigned int types::convertBinaryToBCD( const unsigned char* uintptr, unsigned i
 			break;
 		}
 	}
-	if (sum[0] > 10) throw std::logic_error( "decimal to binary integer conversion table dimension is too small");
+	if (sum[0] >= 10) throw std::logic_error( "decimal to binary integer conversion table dimension is too small");
 	if (DecNumFactor::TabSize - decnumstart > digitsbufsize)
 	{
 		throw std::runtime_error("destination buffer too small for binary integer to BCD conversion");
@@ -164,7 +183,9 @@ unsigned int types::convertBinaryToBCD( const unsigned char* uintptr, unsigned i
 	for (ii=0; ii<nn; ii++)
 	{
 		digitsbuf[ ii] = (unsigned char)sum[ decnumstart + ii];
+		//... copy result to result buffer
 	}
 	return nn;
+	//... return size of result in digits (might be 0)
 }
 
