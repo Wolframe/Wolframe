@@ -38,13 +38,19 @@
 #ifndef _LOG_LEVEL_HPP_INCLUDED
 #define _LOG_LEVEL_HPP_INCLUDED
 
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
+
 #include <string>
 #include <iosfwd>
 
 namespace _Wolframe	{
 namespace log	{
 
-class LogLevel
+class WOLFRAME_EXPORT LogLevel
 {
 public:
 	enum Level	{

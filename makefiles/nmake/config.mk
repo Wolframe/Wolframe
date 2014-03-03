@@ -2,7 +2,7 @@
 #
 # must configure:
 # - BOOST_VERSION: version of boost
-# - BOOST_DIR: location of boost intallation
+# - BOOST_DIR: location of boost installation
 # - BOOST_INCLUDE_DIR and BOOST_LDFLAGS
 # - BOOST_VC_VER: visual studio boost version tag for libraries
 #
@@ -20,19 +20,20 @@
 # version of the boost library
 
 #BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_55
+BOOST_VERSION = 1.55.0
 
 # base dir where boost is installed
 
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Boost\boost_1_55_0
+#BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
+BOOST_DIR = C:\Boost\boost-$(BOOST_VERSION)
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_55
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\include
 #BOOST_INCLUDE_DIR = $(BOOST_DIR)
 
 # visual studio version used for compiling
@@ -45,7 +46,7 @@ BOOST_VC_VER = vc100
 BOOST_MT = -mt
 
 # preinstalled binaries
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib64"
 
 # self-compiled
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
@@ -58,22 +59,18 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 # ICU (icu4c)
 #############
 
-ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
+ICU_DIR = C:\Boost\icu
 
 # the library version (how the DLLs are tagged)
-ICU_LIB_VERSION = 49
-
-# TODO: probe!
-ICU_LIB_DIR = $(ICU_DIR)\lib
-#ICU_LIB_DIR = $(ICU_DIR)\lib64
+#ICU_LIB_VERSION = 49
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
+#OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 #OPENSSL_DIR = D:\Programme\OpenSSL
-#OPENSSL_DIR = D:\OpenSSL\Win32
+OPENSSL_DIR = C:\OpenSSL\Win64
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
 
 # Postgresql libpq
@@ -82,7 +79,7 @@ OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 
 #PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
+#PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
@@ -94,22 +91,17 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # win_iconv
 ###########
 
-WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+#WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.9.1-win32-debug
+#LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.28-win32-debug
-
-# Python 3
-##########
-
-PYTHON_DIR = C:\Python33
+#LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
 
 # Tcl 8.5 and Expect
 ####################
@@ -128,8 +120,8 @@ WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
-WIX_ARCH = x86
-#WIX_ARCH = x64
+#WIX_ARCH = x86
+WIX_ARCH = x64
 
 #PGDLL_LIBRARIES=1
 
@@ -156,10 +148,5 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-
-# Oracle
-########
-
-ORACLE_DIR = C:\Oracle\instantclient_12_1
+#CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+#CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"

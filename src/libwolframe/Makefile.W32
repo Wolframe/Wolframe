@@ -61,10 +61,10 @@ CPP_OBJS = \
 	version.obj \
 	getPassword.obj \
 	user.obj \
-	password.obj \
 	HMAC.obj \
 	PBKDF2.obj \
-	CRAM.obj
+#	password.obj \
+#	CRAM.obj
 
 OBJS = \
 	b64encode.obj \

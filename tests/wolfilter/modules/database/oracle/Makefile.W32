@@ -15,13 +15,15 @@ INCLUDE_DIRS = \
 	/I"$(ORACLE_DIR)\sdk\include"
 
 INCLUDE_LDFLAGS = \
+	LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
-	kernel32.lib advapi32.lib Ws2_32.lib
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	wfshared.lib
 
 DYNAMIC_MODULE = \
 	mod_db_oracletest.dll

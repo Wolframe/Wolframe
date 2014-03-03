@@ -16,6 +16,7 @@ INCLUDE_DIRS = \
 	/I"$(PGSQL_DIR)\include"
 
 INCLUDE_LDFLAGS = \
+	$(TOPDIR)\src\libwolframe \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -23,7 +24,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
-	kernel32.lib advapi32.lib Ws2_32.lib
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	wfshared.dll
 
 CPP_OBJS = \
 	PostgreSQLModuleFiles.obj

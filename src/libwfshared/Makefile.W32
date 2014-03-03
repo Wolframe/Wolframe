@@ -9,13 +9,15 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I$(TOPDIR)\include
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
-	$(TOPDIR)\src\libwolframe
+	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	ws2_32.lib kernel32.lib advapi32.lib wolframe.lib
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	ws2_32.lib kernel32.lib advapi32.lib
 
 LIBRARIES = \
 	wfshared.dll \

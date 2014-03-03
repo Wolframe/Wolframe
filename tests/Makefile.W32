@@ -23,6 +23,7 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -32,7 +33,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	wfshared.lib
 
 # Lua
 !IFDEF WITH_LUA
@@ -102,14 +104,12 @@ TEST_CPP_BINS = \
 	testVirtualInheritance.exe \
 	versionTest.exe \
 	testMethodMemberPointerTemplate.exe \
-	counterTest.exe \
 	resolvePathTest.exe \
 	testFiletypeRecognition.exe \
 	testBoostPath.exe \
 	byte2hexTest.exe \
 	base64Test.exe \
 	base64Utility.exe \
-	CRAMtest.exe \
 	HMACtest.exe \
 	PBKDF2test.exe \
 	testSHA.exe \
@@ -146,21 +146,20 @@ all: $(OBJS) $(CPP_BINS)
 testNamedRetVal.exe: testNamedRetVal.obj
 testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
-versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
-counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
-resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
+versionTest.exe: versionTest.obj
+resolvePathTest.exe: resolvePathTest.obj
 testBoostPath.exe: testBoostPath.obj
-testFiletypeRecognition.exe : testFiletypeRecognition.obj $(TOPDIR)\src\wolframe.lib
-poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
+testFiletypeRecognition.exe : testFiletypeRecognition.obj
+poolTest.exe: poolTest.obj
 testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+#CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
+logTest.exe: logTest.obj
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 testArrayDoublingAllocator.exe: testArrayDoublingAllocator.obj $(TOPDIR)\src\wolframe.lib
 testTestAllocator.exe: testTestAllocator.obj $(TOPDIR)\src\wolframe.lib
@@ -230,7 +229,7 @@ local_test:
 	@-echo base64Test >> test.bat
 	@-echo testRand >> test.bat
 	@-echo testTimestamp >> test.bat
-	@-echo CRAMtest >> test.bat
+#	@-echo CRAMtest >> test.bat
 	@-echo HMACtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat

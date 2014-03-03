@@ -38,10 +38,16 @@
 #ifndef _LOG_ERROR_HPP_INCLUDED
 #define _LOG_ERROR_HPP_INCLUDED
 
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
+
 namespace _Wolframe {
 namespace log {
 
-class LogError {
+class WOLFRAME_EXPORT LogError {
 public:
 	/// Internal enum representing possible error conversion
 	/// methods
