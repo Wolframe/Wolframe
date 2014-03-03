@@ -46,8 +46,9 @@ namespace _Wolframe {
 namespace db {
 
 //\brief Transaction interface
-struct Transaction
+class Transaction
 {
+public:
 	//\brief Destructor
 	virtual ~Transaction(){}
 	//\brief Configured ID of the underlaying database
