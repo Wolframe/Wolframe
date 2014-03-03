@@ -281,7 +281,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
 	@echo
-#[-]	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testNumberBaseConversion
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testNumberBaseConversion
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantTypes
 	@echo

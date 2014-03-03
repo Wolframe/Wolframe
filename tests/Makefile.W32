@@ -235,7 +235,7 @@ local_test:
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testVariantStruct >> test.bat
-#[-]	@-echo testNumberBaseConversion >> test.bat
+	@-echo testNumberBaseConversion >> test.bat
 	@-echo testString >> test.bat
 	@-echo testDateTime >> test.bat
 	@-echo testBigNumber >> test.bat
