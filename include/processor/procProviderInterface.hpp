@@ -76,19 +76,47 @@ namespace proc {
 class ProcessorProviderInterface
 {
 public:
+	//\brief Destructor
 	virtual ~ProcessorProviderInterface(){};
+	//\brief Get the user interface library
 	virtual const UI::UserInterfaceLibrary* UIlibrary() const=0;
+	//\brief Get the command handler for a specific command
+	//\param[in] command name of the command
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const=0;
+	//\brief Get the command handler for a specific command processing input/output with a filter
+	//\param[in] command name of the command
 	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const=0;
-	virtual std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const=0;
+	//\brief Get the database for transactions
+	//\return reference to database
 	virtual db::Database* transactionDatabase() const=0;
-	///\brief return a database transaction object for the given name
+	///\brief Get a database transaction object for the given name
+	//\param[in] name name of the transaction
+	//\return allocated transaction object now owned by the caller and to destroy by the caller with delete
 	virtual db::Transaction* transaction( const std::string& name) const=0;
+	//\brief Get a normalization function
+	//\param[in] name name of the function
+	//\return reference to normalization function
 	virtual const types::NormalizeFunction* normalizeFunction( const std::string& name) const=0;
+	//\brief Get a normalization function type
+	//\param[in] name name of the function type
+	//\return reference to normalization function type
 	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const=0;
+	//\brief Get a form function
+	//\param[in] name name of the function
+	//\return reference to the function
 	virtual const langbind::FormFunction* formFunction( const std::string& name) const=0;
+	//\brief Get a form description
+	//\param[in] name name of the form
+	//\return reference to the form description
 	virtual const types::FormDescription* formDescription( const std::string& name) const=0;
+	//\brief Get a filter
+	//\param[in] name name of the filter
+	//\param[in] arg initializer arguments for the filter instance
+	//\return allocated filter instance now owned by the caller and to destroy by the caller with delete
 	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const=0;
+	//\brief Get a custom data type
+	//\param[in] name name of the type
+	//\return reference to the custom data type
 	virtual const types::CustomDataType* customDataType( const std::string& name) const=0;
 };
 

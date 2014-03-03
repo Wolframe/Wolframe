@@ -54,8 +54,15 @@ PROVIDER_OBJS = \
 	provider/procProvider.o \
 	provider/procProviderImpl.o
 
+PROGRAM_OBJS = \
+	prgbind/transactionProgram.o \
+	prgbind/normalizeProgram.o \
+	prgbind/ddlProgram.o \
+	prgbind/programLibrary.o
+
 LOCAL_STATIC_LIB_OBJS = \
 	$(PROVIDER_OBJS) \
+	$(PROGRAM_OBJS) \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
 	wolfilterIostreamFilter.o \
@@ -67,10 +74,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
-	prgbind_transactionProgram.o \
-	prgbind_normalizeProgram.o \
-	prgbind_ddlProgram.o \
-	prgbind_programLibrary.o \
 	jobScheduler.o \
 	acceptor.o \
 	serverEndpoint.o \

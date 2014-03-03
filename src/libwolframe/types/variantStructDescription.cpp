@@ -633,15 +633,16 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 void VariantStructDescription::print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const
 {
 	std::vector<const VariantStructDescription*> stk;
-	print_( this, out, pformat, level, stk);
+	print_( this, out, pformat?pformat:utils::logPrintFormat(), level, stk);
 }
 
 std::string VariantStructDescription::tostring( const utils::PrintFormat* pformat) const
 {
 	std::stringstream out;
-	out << pformat->openstruct;
-	print( out, pformat?pformat:utils::logPrintFormat(), 0);
-	out << pformat->closestruct;
+	const utils::PrintFormat* pf = pformat?pformat:utils::logPrintFormat();
+	out << pf->openstruct;
+	print( out, pf, 0);
+	out << pf->closestruct;
 	return out.str();
 }
 

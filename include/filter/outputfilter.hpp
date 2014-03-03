@@ -123,7 +123,7 @@ public:
 
 	///\brief Set type of the document.
 	///\remark For some types of filters (non buffering) the type has to be set before the first print
-	virtual void setDocType( const std::string& /*doctype*/)
+	virtual void setDocType( const std::string& /*id*/, const std::string& /*rootelement*/)
 	{
 		throw std::runtime_error("document type can not be set for this type of filter");
 	}

@@ -200,8 +200,13 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		const char* xmlroot = m_outputform->description()->xmlRoot();
 		if (xmlroot)
 		{
-			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->description()->name(), m_outputform->description()->ddlname(), xmlroot);
-			m_outputfilter->setDocType( xmlDoctype);
+			std::string doctype = m_outputform->description()->name();
+			if (!m_outputform->description()->ddlname().empty())
+			{
+				doctype.push_back('.');
+				doctype.append( m_outputform->description()->ddlname());
+			}
+			m_outputfilter->setDocType( doctype, xmlroot);
 			m_output_rootelement = xmlroot;
 		}
 	}
@@ -209,8 +214,8 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	{
 		if (!m_cmd->output_doctype_standalone)
 		{
-			std::string xmlDoctype = m_provider->xmlDoctypeString( m_cmd->outputform, "", m_cmd->outputrootelem);
-			m_outputfilter->setDocType( xmlDoctype);
+			std::string doctype = m_cmd->outputform;
+			m_outputfilter->setDocType( doctype, m_cmd->outputrootelem);
 		}
 		m_output_rootelement = m_cmd->outputrootelem;
 	}

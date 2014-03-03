@@ -463,19 +463,5 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 	}
 }
 
-std::string ProcessorProvider::ProcessorProvider_Impl::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
-{
-	std::ostringstream rt;
-	if (ddlname.empty())
-	{
-		rt << xmlroot << " SYSTEM \"" << formname << "\"";
-	}
-	else
-	{
-		rt << xmlroot << " SYSTEM \"" << formname << "." << ddlname << "\"";
-	}
-	return rt.str();
-}
-
 }} // namespace _Wolframe::proc
 

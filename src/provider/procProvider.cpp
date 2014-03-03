@@ -230,11 +230,6 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::
 	return rt;
 }
 
-std::string ProcessorProvider::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
-{
-	return m_impl->xmlDoctypeString( formname, ddlname, xmlroot);
-}
-
 const UI::UserInterfaceLibrary* ProcessorProvider::UIlibrary() const
 {
 	return m_impl->UIlibrary();

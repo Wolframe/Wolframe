@@ -346,10 +346,12 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::setDocType( const std::string&)
-	virtual void setDocType( const std::string& value)
+	///\brief Implementation of OutputFilter::setDocType(const std::string&,const std::string&)
+	//\param[in] systemid SYSTEM part of XML doctype
+	//\param[in] rootelement XML root element
+	virtual void setDocType( const std::string& systemid, const std::string& rootelement)
 	{
-		types::DocType doctype( value);
+		types::DocType doctype( rootelement.c_str(), 0, systemid.c_str());
 		const char* ro = doctype.rootid.empty()?0:doctype.rootid.c_str();
 		const char* pu = doctype.publicid.empty()?0:doctype.publicid.c_str();
 		const char* sy = doctype.systemid.empty()?0:doctype.systemid.c_str();

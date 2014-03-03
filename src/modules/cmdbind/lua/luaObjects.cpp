@@ -1555,17 +1555,11 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "root");
 					}
-					if (!doctype.publicid.empty())
-					{
-						lua_pushlstring( ls, doctype.publicid.c_str(), doctype.publicid.size());
-						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "public");
-					}
 					if (!doctype.systemid.empty())
 					{
 						lua_pushlstring( ls, doctype.systemid.c_str(), doctype.systemid.size());
 						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "system");
+						lua_setfield( ls, -2, "id");
 					}
 					return 1;
 				}
@@ -1646,7 +1640,8 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
 	Filter* filter = 0;							//< 1st argument (mandatory)
-	std::string doctype;							//< 2nd argument (optional)
+	std::pair<std::string,std::string> doctype;				//< 2nd argument (optional)
+	bool doctype_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
@@ -1660,33 +1655,36 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
+			if (doctype_defined) throw std::runtime_error( "doctype specified twice");
+			doctype_defined = true;
+
 			const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
-			const char* doctype_form = lua_tostring( ls, ii);
-			const types::FormDescription* formdescr = gtc->formDescription( doctype_form);
-			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
+			const char* doctype_id = lua_tostring( ls, ii);
+			const types::FormDescription* formdescr = gtc->formDescription( doctype_id);
+			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_id + "'");
 			const char* doctype_root = formdescr->xmlRoot();
 			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
-			doctype = gtc->xmlDoctypeString( formdescr->name(), formdescr->ddlname(), doctype_root);
+			doctype = std::pair<std::string,std::string>( formdescr->name(), doctype_root);
+			if (!formdescr->ddlname().empty())
+			{
+				doctype.first.push_back('.');
+				doctype.first.append( formdescr->ddlname());
+			}
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
+			if (doctype_defined) throw std::runtime_error( "doctype specified twice");
+			doctype_defined = true;
+
 			const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
-			if (!doctype.empty()) throw std::runtime_error( "doctype specified twice");
-			const char* doctype_system = 0;
-			const char* doctype_public = 0;
 			const char* doctype_root = 0;
-			const char* doctype_form = 0;
-			lua_getfield( ls, ii, "system");
+			const char* doctype_id = 0;
+
+			lua_getfield( ls, ii, "id");
 			if (!lua_isnil( ls, -1))
 			{
-				doctype_system = lua_tostring( ls, -1);
-				if (!doctype_system) throw std::runtime_error( "in table argument doctype: doctype['system'] is not convertible to a string");
-			}
-			lua_getfield( ls, ii, "public");
-			if (!lua_isnil( ls, -1))
-			{
-				doctype_public = lua_tostring( ls, -1);
-				if (!doctype_public) throw std::runtime_error( "in table argument doctype: doctype['public'] is not convertible to a string");
+				doctype_id = lua_tostring( ls, -1);
+				if (!doctype_id) throw std::runtime_error( "in table argument doctype: doctype['system'] is not convertible to a string");
 			}
 			lua_getfield( ls, ii, "root");
 			if (!lua_isnil( ls, -1))
@@ -1694,27 +1692,28 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 				doctype_root = lua_tostring( ls, -1);
 				if (!doctype_root) throw std::runtime_error( "in table argument doctype: doctype['root'] is not convertible to a string");
 			}
-			lua_getfield( ls, ii, "form");
-			if (!lua_isnil( ls, -1))
-			{
-				doctype_form = lua_tostring( ls, -1);
-				if (!doctype_form) throw std::runtime_error( "in table argument doctype: doctype['form'] is not convertible to a string");
-			}
 			if (doctype_root)
 			{
-				doctype.append( types::DocType( doctype_root, doctype_public, doctype_system).tostring());
+				if (doctype_id)
+				{
+					doctype = std::pair<std::string,std::string>( doctype_id, doctype_root);
+				}
+				else
+				{
+					doctype = std::pair<std::string,std::string>( "", doctype_root);
+				}
 			}
-			else if (doctype_form)
+			else if (doctype_id)
 			{
-				const types::FormDescription* formdescr = gtc->formDescription( doctype_form);
-				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
+				const types::FormDescription* formdescr = gtc->formDescription( doctype_id);
+				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_id + "'");
 				doctype_root = formdescr->xmlRoot();
 				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
-				doctype = gtc->xmlDoctypeString( formdescr->name(), formdescr->ddlname(), doctype_root);
+				doctype = std::pair<std::string,std::string>( doctype_id, doctype_root);
 			}
 			else
 			{
-				std::runtime_error( "neither doctype['form'] nor doctype['root'] are defined in table passed");
+				std::runtime_error( "neither doctype['id'] nor doctype['root'] are defined in table passed");
 			}
 		}
 		else if (lua_type( ls, ii) == LUA_TUSERDATA)
@@ -1747,9 +1746,9 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			throw std::runtime_error( "called with undefined output for the argument filter object");
 		}
 	}
-	if (!doctype.empty())
+	if (doctype_defined)
 	{
-		output->outputfilter()->setDocType( doctype);
+		output->outputfilter()->setDocType( doctype.first, doctype.second);
 	}
 	return 0;
 }

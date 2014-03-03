@@ -61,8 +61,6 @@ public:
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command ) const;
 
-	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
-
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 
 	db::Database* transactionDatabase( bool suppressAlert=false) const;

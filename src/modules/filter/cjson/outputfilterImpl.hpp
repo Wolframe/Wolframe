@@ -88,8 +88,10 @@ public:
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::setDocType( const std::string&)
-	virtual void setDocType( const std::string& value);
+	///\brief Implementation of OutputFilter::setDocType(const std::string&,const std::string&)
+	//\param[in] systemid SYSTEM part of XML doctype
+	//\param[in] rootelement XML root element
+	virtual void setDocType( const std::string& systemid, const std::string& rootelement);
 
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);

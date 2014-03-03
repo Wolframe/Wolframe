@@ -96,8 +96,6 @@ public:
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
-	virtual std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
-
 	virtual db::Database* transactionDatabase() const;
 
 	///\brief Just and interface at the moment
