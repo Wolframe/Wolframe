@@ -31,25 +31,38 @@
 
 ************************************************************************/
 //\brief Interface for higher data type transformations for libpq
-//\remark The implementation of the data types are taken from libpqtype but with another interface
-//\file PostgreSQLdatatypes.hpp
-#ifndef _DATABASE_POSTGRES_DATATYPES_HPP_INCLUDED
-#define _DATABASE_POSTGRES_DATATYPES_HPP_INCLUDED
-#include "types/datetime.hpp"
-#include <boost/cstdint.hpp>
+//\file PostgreSQLserverSettings.hpp
+#ifndef _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
+#define _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
+#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
 
-typedef boost::int32_t PostgresDate;
-typedef boost::int64_t PostgresTimestamp;
+class PostgreSQLserverSettings
+{
+public:
+	PostgreSQLserverSettings()
+		:m_binaryTimestampFormat(TimestampFormatUndefined)
+	{}
+	PostgreSQLserverSettings( const PostgreSQLserverSettings& o)
+		:m_binaryTimestampFormat(o.m_binaryTimestampFormat)
+	{}
 
-PostgresDate getDateParam( const types::DateTime& dt);
-PostgresTimestamp getTimestampParam( const types::DateTime& dt);
+	enum BinaryTimestampFormat
+	{
+		TimestampFormatUndefined,
+		TimestampAsInt,
+		TimestampAsDouble
+	};
 
-types::DateTime getDateTime( const PostgresDate& in);
-types::DateTime getDateTime( const PostgresTimestamp& in);
+	BinaryTimestampFormat binaryTimestampFormat() const	{return m_binaryTimestampFormat;}
+
+	bool load( PGconn* conn);
+
+private:
+	BinaryTimestampFormat m_binaryTimestampFormat;
+};
 
 }}
 #endif
-

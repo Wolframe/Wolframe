@@ -39,7 +39,11 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 #define POSTGRES_EPOCH_JDATE	2451545		/* == date2j(2000, 1, 1) */
-#define USECS_PER_DAY		86400000000ULL	/* 60*60*24*1000000 */
+#define HRS_PER_DAY		24L
+#define MINS_PER_DAY		(60L*HRS_PER_DAY)
+#define SECS_PER_DAY		(60L*MINS_PER_DAY)
+#define MSECS_PER_DAY		(1000ULL*SECS_PER_DAY)
+#define USECS_PER_DAY		(1000ULL*MSECS_PER_DAY)
 
 //\remark Code from liubrary libpqtypes (datetime.c)
 static PostgresDate date2j(int y, int m, int d)
@@ -89,22 +93,54 @@ static void j2date(int jd, int *year, int *month, int *day)
 	*month = (quad + 10) % 12 + 1;
 }
 
-void db::writeDateParam( PostgresDate* out, const types::DateTime& dt)
+PostgresDate db::getDateParam( const types::DateTime& dt)
 {
-	*out = date2j( dt.year(), dt.month(), dt.day()) - POSTGRES_EPOCH_JDATE;
+	return date2j( dt.year(), dt.month(), dt.day()) - POSTGRES_EPOCH_JDATE;
 }
 
-void db::readDateParam( const PostgresDate* in, types::DateTime& dt)
+types::DateTime getDateTime( const PostgresDate& in)
 {
 	int year;
 	int month;
 	int day;
 
-	j2date( *in + POSTGRES_EPOCH_JDATE, &year, &month, &day);
-	dt = types::DateTime( year, month, day);
+	j2date( in + POSTGRES_EPOCH_JDATE, &year, &month, &day);
+	return types::DateTime( year, month, day);
+}
+
+PostgresTimestamp db::getTimestampParam( const types::DateTime& dt)
+{
+	PostgresTimestamp rt = date2j( dt.year(), dt.month(), dt.day()) - POSTGRES_EPOCH_JDATE;
+	rt *= USECS_PER_DAY;
+	return rt
+		+ dt.hour()		* (USECS_PER_DAY/HRS_PER_DAY)
+		+ dt.minute()		* (USECS_PER_DAY/MINS_PER_DAY)
+		+ dt.second()		* (USECS_PER_DAY/SECS_PER_DAY)
+		+ dt.millisecond()	* (USECS_PER_DAY/MSECS_PER_DAY)
+		+ dt.microsecond()	* (USECS_PER_DAY/USECS_PER_DAY);
+}
+
+types::DateTime db::getDateTime( const PostgresTimestamp& in)
+{
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+	int usecond;
+
+	j2date( (int)(in/USECS_PER_DAY) + POSTGRES_EPOCH_JDATE, &year, &month, &day);
+	PostgresTimestamp rest = in % USECS_PER_DAY;
+	usecond = rest % 1000000;
+	rest /= 1000000;
+	second = rest % 60;
+	rest /= 60;
+	minute = rest % 60;
+	rest /= 60;
+	hour = rest % 24;
+
+	return types::DateTime( year, month, day, hour, minute, second, usecond);
 }
 
 
-PGint8 time = *(PGint8 *) tbuf;
- 316     int date = date2j(year, mon, pgts->date.mday) - POSTGRES_EPOCH_JDATE;
- 317     PGint8 val = (PGint8) (date * USECS_PER_DAY + time);

@@ -44,6 +44,7 @@
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "PostgreSQLprogram.hpp"
+#include "PostgreSQLserverSettings.hpp"
 #include "config/configurationBase.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
@@ -166,7 +167,6 @@ public:
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
 	virtual void loadProgram( const std::string& filename );
-	/// MBa: I have to think a bit how to handle this
 	virtual void loadAllPrograms();
 
 	virtual void addProgram( const std::string& program )
@@ -176,15 +176,19 @@ public:
 
 	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
 
+	PostgreSQLserverSettings serverSettings() const
+						{ return m_serverSettings; }
+
 private:
-	const std::string	m_ID;			///< database ID
-	std::string		m_connStr;		///< connection string
-	size_t			m_noConnections;	///< number of connections
-	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
-	unsigned		m_statementTimeout;	///< default statement execution timeout
-	PostgreSQLdatabase	m_db;			///< real database object
-	PostgreSQLprogram	m_program;
-	std::list<std::string>	m_programFiles;
+	const std::string	m_ID;			//< database ID
+	std::string		m_connStr;		//< connection string
+	size_t			m_noConnections;	//< number of connections
+	PostgreSQLserverSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
+	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
+	unsigned		m_statementTimeout;	//< default statement execution timeout
+	PostgreSQLdatabase	m_db;			//< real database object
+	PostgreSQLprogram	m_program;		//< (not supported yet) Loader of programs (m_programFiles)
+	std::list<std::string>	m_programFiles;		//< (not supported yet) list of source files with SQL statements to load at startup
 };
 
 

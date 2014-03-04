@@ -196,6 +196,12 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 		if ( conn == NULL )
 			LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
 		else	{
+			if (i == 0)
+			{
+				//... the first connection is used to load some info
+				m_serverSettings.load( conn);
+			}
+
 			PQsetNoticeProcessor( conn, &noticeProcessor, this);
 
 			ConnStatusType stat = PQstatus( conn );

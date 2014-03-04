@@ -52,13 +52,14 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			//... no break here - fallback to 'tostring()'
+			std::string strval = value.tostring();
+			return convert( strval);
 		}
 		case types::Variant::Timestamp:
-			//... we have to treat Timestamp same as types::Variant::String
-			//	or types::Variant::Custom (escaping content)
-			//	because the format string of the date could be possibly
-			//	used for code injection !
+		{
+			std::string strval = types::DateTime(value.totimestamp()).tostring( types::DateTime::sf_ExtendedISOdateTime);
+			return convert( strval);
+		}
 		case types::Variant::String:
 		{
 			std::string strval = value.tostring();

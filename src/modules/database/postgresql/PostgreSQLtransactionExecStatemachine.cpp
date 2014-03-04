@@ -216,7 +216,7 @@ bool TransactionExecStatemachine_postgres::begin()
 	}
 	if (m_conn) delete m_conn;
 	m_conn = m_dbunit->newConnection();
-	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn );
+	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn, m_dbunit->serverSettings());
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 

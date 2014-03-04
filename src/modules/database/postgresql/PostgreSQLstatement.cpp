@@ -21,10 +21,11 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
-	:BaseStatement( o)
+	:BaseStatement(o)
 	,m_paramarsize(o.m_paramarsize)
 	,m_buf(o.m_buf)
-	,m_conn( 0 )
+	,m_conn(o.m_conn)
+	,m_settings(o.m_settings)
 {
 	std::memcpy( m_paramofs, o.m_paramofs, m_paramarsize * sizeof(*m_paramofs));
 	std::memcpy( m_paramtype, o.m_paramtype, m_paramarsize * sizeof(*m_paramtype));
@@ -45,9 +46,10 @@ void PostgreSQLstatement::clear()
 	m_buf.clear();
 }
 
-void PostgreSQLstatement::setConnection( PGconn *conn )
+void PostgreSQLstatement::setConnection( PGconn *conn, const PostgreSQLserverSettings& settings_)
 {
 	m_conn = conn;
+	m_settings = settings_;
 }
 
 void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& value)
@@ -109,7 +111,7 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 		case types::Variant::Timestamp:
 		{
 			/*[PF:TODO] Implementation*/
-			std::string strval = value.tostring();
+			std::string strval = types::DateTime( value.totimestamp()).tostring( types::DateTime::sf_ExtendedISOdateTime);
 			bindString( strval.c_str(), strval.size());
 		}
 		case types::Variant::BigNumber:

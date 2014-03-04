@@ -3,3 +3,4 @@
 #include "PostgreSQLtransactionExecStatemachine.cpp"
 #include "PostgreSQLsubstitutingStatement.cpp"
 #include "PostgreSQLstatement.cpp"
+#include "PostgreSQLserverSettings.cpp"

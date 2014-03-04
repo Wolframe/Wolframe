@@ -204,17 +204,30 @@ public:
 	void init( Timestamp timestamp_);
 
 	//\brief Initialize the datetime with its string value
+	//\remark See allowed formats in 'DateTime::init(const char*,std::size_t)'
 	//\param[in] str string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
 	void init( const std::string& str);
 
 	//\brief Initialize the datetime with its string value
-	//\param[in] str string representation of the datetime as YYYYMMDDhhmmsslllccc,YYYYMMDDhhmmsslll,YYYYMMDDhhmmss or YYYYMMDD depending on subtype (without any delimiter)
+	//	The date time value gets a subtype depending on what is specified in the string (e.g. if the granularity in the parsed string is seconds then the subtype gets YYYYMMDDhhmmss)
+	//\remark Allowed formats:
+	//	a) ISO date time 20011126T234312,123134
+	//	b) 2001-11-26 23:43:12,123134
+	//	c) 20011126234312123134
+	//\remark Timezone not respected yet
+	//\param[in] str string representation (see allowed formats)
 	//\param[in] strsize size of 'str' in bytes
 	void init( const char* str, std::size_t strsize);
-	
+
+	enum StringFormat
+	{
+		sf_YYYYMMDDhhmmssxxxxxx,
+		sf_ISOdateTime,
+		sf_ExtendedISOdateTime
+	};
 	//\brief Get the string value of the datetime
 	//\return the string value
-	std::string tostring() const;
+	std::string tostring( StringFormat sf=sf_YYYYMMDDhhmmssxxxxxx) const;
 
 	//\brief Test argument datetime for equality
 	//\return true if yes

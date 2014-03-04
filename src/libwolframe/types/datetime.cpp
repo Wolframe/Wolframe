@@ -60,7 +60,7 @@ Timestamp DateTime::timestamp() const
 	setBits( rt, m_second, 33, 6);
 	setBits( rt, m_millisecond, 39, 10);
 	setBits( rt, m_microsecond, 49, 10);
-	setBits( rt, m_subtype, 59, 2);
+	setBits( rt, m_subtype, 59, 3);
 	return rt;
 }
 
@@ -74,7 +74,7 @@ void DateTime::init( Timestamp timestamp_)
 	m_second = getBits( timestamp_, 33, 6);
 	m_millisecond = getBits( timestamp_, 39, 10);
 	m_microsecond = getBits( timestamp_, 49, 10);
-	m_subtype = (SubType)getBits( timestamp_, 59, 2);
+	m_subtype = (SubType)getBits( timestamp_, 59, 3);
 }
 
 
@@ -82,11 +82,23 @@ void DateTime::init( const char* str, std::size_t strsize)
 {
 	std::memset( this, 0, sizeof(*this));
 	std::size_t ti=0,te=strsize;
+	std::string buf;
+
 	for (;ti != te; ++ti)
 	{
-		if (str[ti] < '0' || str[ti] > '9') throw std::runtime_error("illegal datetime format (only digits expected)");
+		if (str[ti] < '0' || str[ti] > '9')
+		{
+			if (buf.size() == 8 && str[ti] == 'T') continue;
+			if ((buf.size() == 4 || buf.size() == 6) && str[ti] == '-') continue;
+			if ((buf.size() == 10 || buf.size() == 12) && str[ti] == ':') continue;
+			if ((buf.size() == 14) && str[ti] == ',') continue;
+			if (buf.size() == 8 && str[ti] == ' ') continue;
+
+			throw std::runtime_error("illegal datetime format");
+		}
+		buf.push_back( str[ti]);
 	}
-	switch (strsize)
+	switch (buf.size())
 	{
 		case 20: m_subtype = YYYYMMDDhhmmss_lllccc; break;
 		case 17: m_subtype = YYYYMMDDhhmmss_lll; break;
@@ -94,17 +106,17 @@ void DateTime::init( const char* str, std::size_t strsize)
 		case 8: m_subtype = YYYYMMDD; break;
 		default: throw std::runtime_error("illegal datetime format (size)");
 	}
-	check_range( m_year = getSubstringAsInt( str, 0, 4), 1000, 2400);
-	check_range( m_month = getSubstringAsInt( str, 4, 2), 1, 12);
-	check_range( m_day = getSubstringAsInt( str, 6, 2), 1, 31);
+	check_range( m_year = getSubstringAsInt( buf.c_str(), 0, 4), 1000, 2400);
+	check_range( m_month = getSubstringAsInt( buf.c_str(), 4, 2), 1, 12);
+	check_range( m_day = getSubstringAsInt( buf.c_str(), 6, 2), 1, 31);
 	if ((SubType)m_subtype == YYYYMMDD) return;
-	check_range( m_hour = getSubstringAsInt( str, 8, 2), 0, 23);
-	check_range( m_minute = getSubstringAsInt( str, 10, 2), 0, 59);
-	check_range( m_second = getSubstringAsInt( str, 12, 2), 0, 63);	//... 59 + eventual leap seconds
+	check_range( m_hour = getSubstringAsInt( buf.c_str(), 8, 2), 0, 23);
+	check_range( m_minute = getSubstringAsInt( buf.c_str(), 10, 2), 0, 59);
+	check_range( m_second = getSubstringAsInt( buf.c_str(), 12, 2), 0, 63);	//... 59 + eventual leap seconds
 	if ((SubType)m_subtype == YYYYMMDDhhmmss) return;
-	check_range( m_millisecond = getSubstringAsInt( str, 14, 3), 0, 999);
+	check_range( m_millisecond = getSubstringAsInt( buf.c_str(), 14, 3), 0, 999);
 	if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return;
-	check_range( m_microsecond = getSubstringAsInt( str, 17, 3), 0, 999);
+	check_range( m_microsecond = getSubstringAsInt( buf.c_str(), 17, 3), 0, 999);
 }
 
 void DateTime::init( const std::string& str_)
@@ -112,20 +124,47 @@ void DateTime::init( const std::string& str_)
 	init( str_.c_str(), str_.size());
 }
 
-std::string DateTime::tostring() const
+std::string DateTime::tostring( StringFormat sf) const
 {
+	
 	std::string rt;
-	appendValue( rt, m_year, 4);
-	appendValue( rt, m_month, 2);
-	appendValue( rt, m_day, 2);
-	if ((SubType)m_subtype == YYYYMMDD) return rt;
-	appendValue( rt, m_hour, 2);
-	appendValue( rt, m_minute, 2);
-	appendValue( rt, m_second, 2);
-	if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
-	appendValue( rt, m_millisecond, 3);
-	if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
-	appendValue( rt, m_microsecond, 3);
+	switch (sf)
+	{
+		case sf_ISOdateTime:
+		case sf_YYYYMMDDhhmmssxxxxxx:
+			appendValue( rt, m_year, 4);
+			appendValue( rt, m_month, 2);
+			appendValue( rt, m_day, 2);
+			if ((SubType)m_subtype == YYYYMMDD) return rt;
+			if (sf == sf_ISOdateTime) rt.push_back( 'T');
+			appendValue( rt, m_hour, 2);
+			appendValue( rt, m_minute, 2);
+			appendValue( rt, m_second, 2);
+			if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
+			if (sf == sf_ISOdateTime) rt.push_back( ',');
+			appendValue( rt, m_millisecond, 3);
+			if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
+			appendValue( rt, m_microsecond, 3);
+			break;
+		case sf_ExtendedISOdateTime:
+			appendValue( rt, m_year, 4);
+			rt.push_back( '-');
+			appendValue( rt, m_month, 2);
+			rt.push_back( '-');
+			appendValue( rt, m_day, 2);
+			if ((SubType)m_subtype == YYYYMMDD) return rt;
+			appendValue( rt, m_hour, 2);
+			rt.push_back( ':');
+			appendValue( rt, m_minute, 2);
+			rt.push_back( ':');
+			appendValue( rt, m_second, 2);
+			if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
+			rt.push_back( ',');
+			appendValue( rt, m_millisecond, 3);
+			if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
+			appendValue( rt, m_microsecond, 3);
+			break;
+	}
 	return rt;
 }
 

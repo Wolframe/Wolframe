@@ -25,6 +25,8 @@ NOINST_STATIC_LIB = mod_db_postgresql_lib.a
 DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
+	PostgreSQLdatatypes.o \
+	PostgreSQLserverSettings.o \
 	PostgreSQLconfig.o \
 	PostgreSQLconstructor.o \
 	PostgreSQL.o \

@@ -35,6 +35,7 @@
 #ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #define _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #include "database/baseStatement.hpp"
+#include "PostgreSQLserverSettings.hpp"
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
@@ -48,8 +49,8 @@ public:
 	PostgreSQLstatement();
 	PostgreSQLstatement( const PostgreSQLstatement& o);
 
-	void setConnection( PGconn *conn );
-		
+	void setConnection( PGconn *conn, const PostgreSQLserverSettings& settings);
+
 	PGresult* execute( ) const;
 
 	virtual void clear( );
@@ -90,6 +91,7 @@ private:
 	int m_paramarsize;
 	std::string m_buf;
 	PGconn *m_conn;
+	PostgreSQLserverSettings m_settings;
 };
 
 

@@ -27,6 +27,8 @@ DYNAMIC_MODULE = \
 	mod_db_postgresql.dll
 
 CPP_OBJS = \
+	PostgreSQLdatatypes.obj \
+	PostgreSQLserverSettings.obj \
 	PostgreSQLconfig.obj \
 	PostgreSQLconstructor.obj \
 	PostgreSQL.obj \
