@@ -205,6 +205,7 @@ bool BigfxpDataValue::getBaseTypeValue( Variant& dest) const
 	try
 	{
 		dest = types::BigNumber( types::BigFxpBCD::tostring());
+		return true;
 	}
 	catch (const std::runtime_error&)
 	{

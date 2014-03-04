@@ -144,6 +144,7 @@ bool BigintDataValue::getBaseTypeValue( Variant& dest) const
 	try
 	{
 		dest = types::BigNumber( types::BigBCD::tostring());
+		return true;
 	}
 	catch (const std::runtime_error&)
 	{
