@@ -47,7 +47,7 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./moduleTest
 	@echo
 ifdef EXPECT
-	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) checkLog.exp
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) checkLog.expect
 	@echo
 endif
 endif
