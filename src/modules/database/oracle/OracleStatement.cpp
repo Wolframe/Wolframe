@@ -211,25 +211,23 @@ void OracleStatement::bind( const unsigned int idx, const types::Variant &value 
 
 		case types::Variant::String:
 			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
-			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( )+1 );
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
 
 		case types::Variant::Timestamp:
 		{
-			/*[PF:TODO] Implementation*/
-			m_data.back().v.convert( types::Variant::String);
-			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
-			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			std::string strval = types::DateTime( m_data.back( ).v.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime);
+			m_data.back().s = (char *)malloc( strval.size() +1);
+			memcpy( m_data.back( ).s, strval.c_str(), strval.size( )+1 );
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
 		}
 		case types::Variant::BigNumber:
 		{
-			/*[PF:TODO] Implementation*/
-			m_data.back().v.convert( types::Variant::String);
-			m_data.back( ).s = (char *)malloc( m_data.back( ).v.charsize( ) + 1 );
-			memcpy( m_data.back( ).s, m_data.back( ).v.charptr( ), m_data.back( ).v.charsize( ) );
+			std::string strval = m_data.back().v.tostring();
+			m_data.back().s = (char *)malloc( strval.size() +1);
+			memcpy( m_data.back( ).s, strval.c_str(), strval.size( )+1 );
 			bindString( idx, m_data.back( ).s, m_data.back( ).v.charsize( ) );
 			break;
 		}

@@ -32,6 +32,8 @@ Project Wolframe.
 #ifndef _Wolframe_COM_AUTOMATION_UTILS_INCLUDED
 #define _Wolframe_COM_AUTOMATION_UTILS_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
 #include <cstring>
 #include <sstream>
 #include <iostream>
@@ -89,6 +91,8 @@ VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringt
 VARIANT createVariantType( const std::wstring& val);
 VARIANT createVariantType( const types::Variant& val);
 VARIANT createVariantType( const types::Variant& val, VARTYPE dsttype);
+VARIANT createVariantType( const types::DateTime& dt);
+VARIANT createVariantType( const types::BigNumber& dt);
 VARIANT createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, const std::vector<VARIANT>& ar=std::vector<VARIANT>());
 void copyVariantType( VARTYPE dsttype, void* dstfield, const types::Variant& val);
 HRESULT wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc);
@@ -102,8 +106,8 @@ bool isStringType( int vt);
 const void* arithmeticTypeAddress( const VARIANT* val);
 void* arithmeticTypeAddress( VARIANT* val);
 
-types::VariantConst getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf);
-types::VariantConst getAtomicElement( const VARIANT& val, std::string& elembuf);
+types::Variant getAtomicElement( VARTYPE vt, const void* ref);
+types::Variant getAtomicElement( const VARIANT& val);
 
 #define WRAP(SYSCALL){\
 	static const char* call = "" #SYSCALL;\

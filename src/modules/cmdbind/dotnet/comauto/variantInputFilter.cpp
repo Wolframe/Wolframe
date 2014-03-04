@@ -224,7 +224,7 @@ AGAIN:
 				}
 				else if (comauto::isAtomicType( cur.data.vt) || comauto::isStringType( cur.data.vt))
 				{
-					element = comauto::getAtomicElement( cur.data, m_elembuf);
+					element = m_elembuf = comauto::getAtomicElement( cur.data);
 					type = Value;
 					m_stk.pop_back();
 					return true;

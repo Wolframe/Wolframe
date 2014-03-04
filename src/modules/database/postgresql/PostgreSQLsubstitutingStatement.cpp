@@ -57,7 +57,7 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 		}
 		case types::Variant::Timestamp:
 		{
-			std::string strval = types::DateTime(value.totimestamp()).tostring( types::DateTime::sf_ExtendedISOdateTime);
+			std::string strval = types::DateTime(value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime);
 			return convert( strval);
 		}
 		case types::Variant::String:

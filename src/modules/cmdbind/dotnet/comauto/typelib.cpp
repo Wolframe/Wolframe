@@ -337,8 +337,7 @@ void comauto::TypeLib::Impl::printvalue( std::ostream& out, const std::string& n
 		}
 		else if (comauto::isAtomicType(val.vt) || comauto::isStringType(val.vt))
 		{
-			std::string elembuf;
-			out << std::string(indentcnt,'\t') << name << " : " << comauto::typestr(val.vt) << " '" << comauto::getAtomicElement( val, elembuf).tostring() << "'" << std::endl;
+			out << std::string(indentcnt,'\t') << name << " : " << comauto::typestr(val.vt) << " '" << comauto::getAtomicElement( val).tostring() << "'" << std::endl;
 		}
 		else
 		{

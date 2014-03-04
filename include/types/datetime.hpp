@@ -143,32 +143,35 @@ public:
 	}
 
 	//\brief Get the year AD of the datetime
-	//\return the year
-	unsigned int year() const		{return m_year;}		//< year 1000..2400
+	//\return the year (year 1000..2400)
+	unsigned int year() const		{return m_year;}
 	//\brief Get the month of the datetime in the year starting with 1
-	//\return the month
-	unsigned int month() const		{return m_month;}		//< month 1..12
+	//\return the month (1..12)
+	unsigned int month() const		{return m_month;}
 	//\brief Get the day of the datetime in the month starting with 1
-	//\return the day
-	unsigned int day() const		{return m_day;}			//< day 1..31
+	//\return the day (1..31)
+	unsigned int day() const		{return m_day;}
 	//\brief Get the hour of the datetime
 	//\return the hour
-	unsigned int hour() const		{return m_hour;}		//< hour
+	unsigned int hour() const		{return m_hour;}
 	//\brief Get the minutes part of the datetime
 	//\return the minutes part
-	unsigned int minute() const		{return m_minute;}		//< minute
+	unsigned int minute() const		{return m_minute;}
 	//\brief Get the seconds part of the datetime
 	//\return the seconds part
-	unsigned int second() const		{return m_second;}		//< second
+	unsigned int second() const		{return m_second;}
 	//\brief Get the milliseconds part of the datetime
-	//\return the milliseconds part
-	unsigned int millisecond() const	{return m_millisecond;}		//< 1/1000 of second part
+	//\return the milliseconds part (1/1000 of second part)
+	unsigned int millisecond() const	{return m_millisecond;}
 	//\brief Get the microseconds part of the datetime
-	//\return the microseconds part
-	unsigned int microsecond() const	{return m_microsecond;}		//< 1/1000 of millisecond part
+	//\return the microseconds part (1/1000 of millisecond part)
+	unsigned int microsecond() const	{return m_microsecond;}
 	//\brief Get the format (subtype) of the datetime
-	//\return the subtype
-	SubType subtype() const			{return m_subtype;}		//< Granularity
+	//\return the subtype (1/1000000 of second part)
+	unsigned int usecond() const		{return m_second * 1000 + m_microsecond;}
+	//\brief Get the format (subtype) of the datetime
+	//\return the subtype (date/time granularity)
+	SubType subtype() const			{return m_subtype;}
 
 	//\brief Constructor
 	//\param[in] t timestamp value of the datetime
@@ -219,15 +222,28 @@ public:
 	//\param[in] strsize size of 'str' in bytes
 	void init( const char* str, std::size_t strsize);
 
-	enum StringFormat
+	struct StringFormat
 	{
-		sf_YYYYMMDDhhmmssxxxxxx,
-		sf_ISOdateTime,
-		sf_ExtendedISOdateTime
+		enum Id
+		{
+			YYYYMMDDhhmmssxxxxxx,
+			ISOdateTime,
+			ExtendedISOdateTime
+		};
 	};
+
+	//\brief Get the MSDN DATE type from the date
+	//\return days with fractional part of day for time from the 30th December 1899
+	double toMSDNtimestamp();
+
+	//\brief Get the date and time from an MSDN DATE type as YYYYMMDDhhmmss
+	//\return The date and time value
+	static DateTime fromMSDNtimestamp( double tm);
+
 	//\brief Get the string value of the datetime
+	//\param[in] sf format to print the date with
 	//\return the string value
-	std::string tostring( StringFormat sf=sf_YYYYMMDDhhmmssxxxxxx) const;
+	std::string tostring( StringFormat::Id sf=StringFormat::YYYYMMDDhhmmssxxxxxx) const;
 
 	//\brief Test argument datetime for equality
 	//\return true if yes

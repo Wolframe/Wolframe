@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of date and datetime value type
 #include "types/datetime.hpp"
 #include "types/variant.hpp"
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
@@ -124,35 +125,36 @@ void DateTime::init( const std::string& str_)
 	init( str_.c_str(), str_.size());
 }
 
-std::string DateTime::tostring( StringFormat sf) const
+std::string DateTime::tostring( StringFormat::Id sf) const
 {
 	
 	std::string rt;
 	switch (sf)
 	{
-		case sf_ISOdateTime:
-		case sf_YYYYMMDDhhmmssxxxxxx:
+		case StringFormat::ISOdateTime:
+		case StringFormat::YYYYMMDDhhmmssxxxxxx:
 			appendValue( rt, m_year, 4);
 			appendValue( rt, m_month, 2);
 			appendValue( rt, m_day, 2);
 			if ((SubType)m_subtype == YYYYMMDD) return rt;
-			if (sf == sf_ISOdateTime) rt.push_back( 'T');
+			if (sf == StringFormat::ISOdateTime) rt.push_back( 'T');
 			appendValue( rt, m_hour, 2);
 			appendValue( rt, m_minute, 2);
 			appendValue( rt, m_second, 2);
 			if ((SubType)m_subtype == YYYYMMDDhhmmss) return rt;
-			if (sf == sf_ISOdateTime) rt.push_back( ',');
+			if (sf == StringFormat::ISOdateTime) rt.push_back( ',');
 			appendValue( rt, m_millisecond, 3);
 			if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return rt;
 			appendValue( rt, m_microsecond, 3);
 			break;
-		case sf_ExtendedISOdateTime:
+		case StringFormat::ExtendedISOdateTime:
 			appendValue( rt, m_year, 4);
 			rt.push_back( '-');
 			appendValue( rt, m_month, 2);
 			rt.push_back( '-');
 			appendValue( rt, m_day, 2);
 			if ((SubType)m_subtype == YYYYMMDD) return rt;
+			rt.push_back( ' ');
 			appendValue( rt, m_hour, 2);
 			rt.push_back( ':');
 			appendValue( rt, m_minute, 2);
@@ -166,6 +168,30 @@ std::string DateTime::tostring( StringFormat sf) const
 			break;
 	}
 	return rt;
+}
+
+double DateTime::toMSDNtimestamp()
+{
+	double rt = (long)(boost::gregorian::date( m_year, m_month, m_day) - boost::gregorian::date( 1899, 12, 30)).days();
+	rt += (double) m_hour / 24.0;
+	rt += (double) m_minute / (24.0 * 60);
+	rt += (double) m_second / (24.0 * 60 * 60);
+	rt += (double) m_millisecond / (24.0 * 60 * 60 * 1000);
+	rt += (double) m_microsecond / (24.0 * 60 * 60 * 1000 * 1000);
+	return rt;
+}
+
+DateTime DateTime::fromMSDNtimestamp( double tm)
+{
+	double fl = std::floor( tm);
+	long days = (long)fl;
+	double partofday = tm - fl;
+	boost::gregorian::date dt = boost::gregorian::date( 1899, 12, 30) + boost::gregorian::date_duration(days);
+	unsigned short hrs = std::floor( partofday * 24);
+	unsigned short mns = std::floor( partofday * 24 * 60);
+	unsigned short scs = std::floor( partofday * 24 * 60 * 60);
+
+	return DateTime( dt.year(), dt.month(), dt.day(), hrs, mns, scs);
 }
 
 int DateTime::compare( const DateTime& o) const

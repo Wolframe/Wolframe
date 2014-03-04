@@ -123,10 +123,15 @@ TEST_F( DateTimeDescriptionTest, tests)
 	for (unsigned int ii=0; ii<10000; ++ii)
 	{
 		types::DateTime dt1 = getRandomDateTime();
-		types::DateTime dt1inc = getRandomDateTimeIncrement( dt1);
-		types::DateTime dt2( dt1.tostring());
+		types::DateTime dt2( dt1.tostring( types::DateTime::StringFormat::YYYYMMDDhhmmssxxxxxx));
+		types::DateTime dt3( dt1.tostring( types::DateTime::StringFormat::ISOdateTime));
+		types::DateTime dt4( dt1.tostring( types::DateTime::StringFormat::ExtendedISOdateTime));
+		
 		EXPECT_EQ( dt1.tostring(), dt2.tostring());
+		EXPECT_EQ( dt1.tostring(), dt3.tostring());
+		EXPECT_EQ( dt1.tostring(), dt4.tostring());
 
+		types::DateTime dt1inc = getRandomDateTimeIncrement( dt1);
 		EXPECT_TRUE( dt1 == dt2);
 		EXPECT_TRUE( dt1 < dt1inc);
 		EXPECT_TRUE( dt1 <= dt1inc);

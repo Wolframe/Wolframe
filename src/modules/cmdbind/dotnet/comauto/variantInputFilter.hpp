@@ -81,7 +81,7 @@ private:
 		~StackElem();
 	};
 	std::vector<StackElem> m_stk;
-	std::string m_elembuf;
+	types::Variant m_elembuf;
 	const comauto::TypeLib* m_typelib;
 	serialize::Context::Flags m_flags;
 	bool m_done;

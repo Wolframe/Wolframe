@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file testNumberBaseConversion.cpp
 ///\brief Test for types/numberBaseConversion.hpp
-#include "libwolframe/types/numberBaseConversion.hpp"
+#include "types/numberBaseConversion.hpp"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <string>
@@ -104,19 +104,6 @@ static NUMTYPE getRandomNumber()
 	return rt;
 }
 
-template <typename UINTTYPE>
-static void reorder( UINTTYPE& num)
-{
-	unsigned char* ref = (unsigned char*)&num;
-	unsigned int ii=0, nn=sizeof(UINTTYPE)/2;
-	for (; ii<nn; ++ii)
-	{
-		unsigned char tmp = ref[ii];
-		ref[ii] = ref[ sizeof(UINTTYPE)-ii-1];
-		ref[ sizeof(UINTTYPE)-ii-1] = tmp;
-	}
-}
-
 static void testNumber( const boost::uint64_t& num)
 {
 	enum {DigitsBufSize=50};
@@ -126,7 +113,7 @@ static void testNumber( const boost::uint64_t& num)
 
 	if (g_ByteOrder == LittleEndian)
 	{
-		reorder( num_be);
+		types::Endian::reorder( num_be);
 	}
 	unsigned int nofDigits = types::convertBigEndianUintToBCD( num_be, digitsbuf, DigitsBufSize);
 	std::string numstr;
@@ -148,7 +135,7 @@ static void testNumber( const boost::uint64_t& num)
 	boost::uint64_t num_reverted = num_reverted_be;
 	if (g_ByteOrder == LittleEndian)
 	{
-		reorder( num_reverted);
+		types::Endian::reorder( num_reverted);
 	}
 	EXPECT_EQ( num_reverted, num);
 }

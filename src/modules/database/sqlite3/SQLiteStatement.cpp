@@ -113,13 +113,11 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			
 		case types::Variant::Timestamp:
 		{
-			/*[PF:TODO] Implementation*/
-			m_data.push_back( value.tostring());
+			m_data.push_back( types::DateTime( value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime));
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
 		}
 		case types::Variant::BigNumber:
 		{
-			/*[PF:TODO] Implementation*/
 			m_data.push_back( value.tostring());
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
 		}

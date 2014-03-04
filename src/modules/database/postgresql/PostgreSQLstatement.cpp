@@ -110,13 +110,11 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 
 		case types::Variant::Timestamp:
 		{
-			/*[PF:TODO] Implementation*/
-			std::string strval = types::DateTime( value.totimestamp()).tostring( types::DateTime::sf_ExtendedISOdateTime);
+			std::string strval = types::DateTime( value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime);
 			bindString( strval.c_str(), strval.size());
 		}
 		case types::Variant::BigNumber:
 		{
-			/*[PF:TODO] Implementation*/
 			std::string strval = value.tostring();
 			bindString( strval.c_str(), strval.size());
 		}
@@ -138,7 +136,6 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 			}
 			bind( idx, value.tostring());
 		}
-		
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
 	}

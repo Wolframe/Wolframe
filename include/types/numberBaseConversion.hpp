@@ -80,6 +80,22 @@ void convertBCDtoBigEndianUint( const unsigned char* digits, unsigned int nofdig
 	convertBCDtoBinary( digits, nofdigits, (unsigned char*)&val, sizeof(val));
 }
 
+struct Endian
+{
+	template <typename UINTTYPE>
+	static void reorder( UINTTYPE& num)
+	{
+		unsigned char* ref = (unsigned char*)&num;
+		unsigned int ii=0, nn=sizeof(UINTTYPE)/2;
+		for (; ii<nn; ++ii)
+		{
+			unsigned char tmp = ref[ii];
+			ref[ii] = ref[ sizeof(UINTTYPE)-ii-1];
+			ref[ sizeof(UINTTYPE)-ii-1] = tmp;
+		}
+	}
+};
+
 }}//namespace
 #endif
 
