@@ -15,7 +15,7 @@ INCLUDE_DIRS = \
 	/I"$(PGSQL_DIR)\include"
 
 INCLUDE_LDFLAGS = \
-	LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \

@@ -127,7 +127,7 @@ void DateTime::init( const std::string& str_)
 
 std::string DateTime::tostring( StringFormat::Id sf) const
 {
-	
+
 	std::string rt;
 	switch (sf)
 	{
@@ -187,9 +187,9 @@ DateTime DateTime::fromMSDNtimestamp( double tm)
 	long days = (long)fl;
 	double partofday = tm - fl;
 	boost::gregorian::date dt = boost::gregorian::date( 1899, 12, 30) + boost::gregorian::date_duration(days);
-	unsigned short hrs = std::floor( partofday * 24);
-	unsigned short mns = std::floor( partofday * 24 * 60);
-	unsigned short scs = std::floor( partofday * 24 * 60 * 60);
+	unsigned short hrs = (unsigned short)std::floor( partofday * 24);
+	unsigned short mns = (unsigned short)std::floor( partofday * 24 * 60);
+	unsigned short scs = (unsigned short)std::floor( partofday * 24 * 60 * 60);
 
 	return DateTime( dt.year(), dt.month(), dt.day(), hrs, mns, scs);
 }
