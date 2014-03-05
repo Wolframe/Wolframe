@@ -37,6 +37,7 @@ Project Wolframe.
 #include "comauto/utils.hpp"
 #include "comauto/typelib.hpp"
 #include "comauto/variantToString.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 
@@ -52,7 +53,7 @@ GUID comauto::ProcessorProviderDispatch::uuid()
 	return g_CLSID_ProcProvider;
 }
 
-static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvider* provider_, const std::string& funcname_, const langbind::TypedInputFilterR& input_)
+static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProviderInterface* provider_, const std::string& funcname_, const langbind::TypedInputFilterR& input_)
 {
 	const langbind::FormFunction* func = provider_->formFunction( funcname_);
 	if (func == 0)
@@ -337,7 +338,7 @@ ULONG comauto::ProcessorProviderDispatch::Release()
 	return ulRefCount;
 }
 
-IDispatch* ProcessorProviderDispatch::create(  const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+IDispatch* ProcessorProviderDispatch::create(  const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
 {
 	ProcessorProviderDispatch* inst = new ProcessorProviderDispatch( provider_, typelib_, typeinfo_);
 	IDispatch* rt = inst;

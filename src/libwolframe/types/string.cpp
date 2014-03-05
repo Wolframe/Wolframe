@@ -212,6 +212,8 @@ class StringReaderUCS1
 public:
 	StringReaderUCS1( const char* content_, std::size_t contentsize_, unsigned char maxchar_)
 		:m_content(content_),m_contentsize(contentsize_),m_pos(0),m_maxchar(maxchar_){}
+	StringReaderUCS1( const StringReaderUCS1& o)
+		:m_content(o.m_content),m_contentsize(o.m_contentsize),m_pos(o.m_pos),m_maxchar(o.m_maxchar){}
 	virtual ~StringReaderUCS1(){}
 
 	virtual unsigned int read()
@@ -243,7 +245,9 @@ class StringWriterUCS1
 {
 public:
 	StringWriterUCS1( std::string& buf_, unsigned char maxchar_)
-		:m_buf(buf_),m_maxchar(maxchar_){}
+		:m_buf(&buf_),m_maxchar(maxchar_){}
+	StringWriterUCS1( const StringWriterUCS1& o)
+		:m_buf(o.m_buf),m_maxchar(o.m_maxchar){}
 	virtual ~StringWriterUCS1(){}
 
 	virtual void write( unsigned int ch)
@@ -259,10 +263,10 @@ public:
 				throw std::runtime_error( "cannot write string containing unicode characters beyond codepage 2 in this encoding (build with WITH_TEXTWOLF=1 needed)");
 			}
 		}
-		m_buf.push_back( (char)(unsigned char)ch);
+		m_buf->push_back( (char)(unsigned char)ch);
 	}
 private:
-	std::string& m_buf;
+	std::string* m_buf;
 	unsigned int m_maxchar;
 };
 
@@ -272,6 +276,8 @@ class StringReaderUCS2BE_CP2
 public:
 	StringReaderUCS2BE_CP2( const char* content_, std::size_t contentsize_)
 		:m_content(content_),m_contentsize(contentsize_),m_pos(0){}
+	StringReaderUCS2BE_CP2( const StringReaderUCS2BE_CP2& o)
+		:m_content(o.m_content),m_contentsize(o.m_contentsize),m_pos(o.m_pos){}
 	virtual ~StringReaderUCS2BE_CP2(){}
 
 	virtual unsigned int read()
@@ -293,25 +299,27 @@ class StringWriterUCS2BE_CP2
 {
 public:
 	StringWriterUCS2BE_CP2( std::string& buf_)
-		:m_buf(buf_){}
+		:m_buf(&buf_){}
+	StringWriterUCS2BE_CP2( const StringWriterUCS2BE_CP2& o)
+		:m_buf(o.m_buf){}
 	virtual ~StringWriterUCS2BE_CP2(){}
 
 	virtual void write( unsigned int ch)
 	{
 		if (ch > 0xFF) throw std::runtime_error( "cannot write string with non ascii characters in this encoding (build flag WITH_TEXTWOLF=1 enables encoding in the core)");
-		m_buf.push_back( 0);
-		m_buf.push_back( (char)(unsigned char)ch);
+		m_buf->push_back( 0);
+		m_buf->push_back( (char)(unsigned char)ch);
 	}
 	virtual const void* content() const
 	{
-		return m_buf.c_str();
+		return m_buf->c_str();
 	}
 	virtual std::size_t contentsize() const
 	{
-		return m_buf.size();
+		return m_buf->size();
 	}
 private:
-	std::string& m_buf;
+	std::string* m_buf;
 };
 }
 
@@ -390,7 +398,7 @@ String::String( const std::wstring& val)
 }
 
 String::String( const void* content, std::size_t contentsize, Encoding encoding_, unsigned char codepage_)
-	:m_encoding(encoding_),m_codepage(codepage_),m_isconst(false),m_size(contentsize/elementSize( encoding_))
+	:m_encoding((unsigned char)encoding_),m_codepage(codepage_),m_isconst(false),m_size(contentsize/elementSize( encoding_))
 {
 	m_ar = (unsigned char*)std::calloc( m_size+1, elementSize( encoding_));
 	if (!m_ar) throw std::bad_alloc();
@@ -412,7 +420,7 @@ String::String( const String& o)
 String String::translateEncoding( Encoding encoding_, unsigned char codepage_) const
 {
 	String rt;
-	rt.m_encoding = encoding_;
+	rt.m_encoding = (unsigned char)encoding_;
 	rt.m_codepage = codepage_;
 
 	if (encoding_ == m_encoding)
@@ -486,7 +494,7 @@ static void parseEncodingName( std::string& dest, const std::string& src)
 		if (*cc <= ' ') continue;
 		if (*cc == '-') continue;
 		if (*cc == ' ') continue;
-		dest.push_back( ::tolower( *cc));
+		dest.push_back( (char)::tolower( *cc));
 	}
 }
 
@@ -616,6 +624,6 @@ String::EncodingClass::Id String::guessEncoding( const char* content, std::size_
 
 
 String::String( const ConstQualifier&, const void* content, std::size_t contentsize, Encoding encoding_, unsigned char codepage_)
-	:m_encoding(encoding_),m_codepage(codepage_),m_isconst(true),m_size(contentsize/elementSize( encoding_)),m_ar((unsigned char*)const_cast<void*>(content))
+	:m_encoding((unsigned char)encoding_),m_codepage(codepage_),m_isconst(true),m_size(contentsize/elementSize( encoding_)),m_ar((unsigned char*)const_cast<void*>(content))
 {}
 
