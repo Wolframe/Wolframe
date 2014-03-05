@@ -15,7 +15,7 @@ INCLUDE_DIRS = \
 	/I"$(ORACLE_DIR)\sdk\include"
 
 INCLUDE_LDFLAGS = \
-	LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \

@@ -61,7 +61,7 @@ PROVIDER_OBJS = \
 	provider\DBproviderImpl.obj \
 	provider\DBproviderConfig.obj \
 	provider\procProvider.obj \
-	provider\procProviderImpl.obj \
+	provider\procProviderImpl.obj
 
 PROGRAM_OBJS = \
 	prgbind\transactionProgram.obj \
@@ -117,7 +117,7 @@ dependencies:
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-modules: libwolframe libwfshared
+modules: libwolframe
 wolframed.exe: wolframed.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res
 wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res
 wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res

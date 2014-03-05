@@ -15,7 +15,7 @@ INCLUDE_DIRS = \
 	/I"$(TOPDIR)\3rdParty\sqlite3"
 
 INCLUDE_LDFLAGS = \
-	LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \

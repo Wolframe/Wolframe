@@ -20,7 +20,7 @@
 # version of the boost library
 
 #BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_52
+BOOST_VERSION = 1.55.0
 
 # base dir where boost is installed
 
@@ -59,7 +59,7 @@ BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 # ICU (icu4c)
 #############
 
-#ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
+ICU_DIR = C:\Boost\icu
 
 # the library version (how the DLLs are tagged)
 #ICU_LIB_VERSION = 49
@@ -70,7 +70,7 @@ BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
 #OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 #OPENSSL_DIR = D:\Programme\OpenSSL
-OPENSSL_DIR = D:\OpenSSL\Win64
+OPENSSL_DIR = C:\OpenSSL\Win64
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
 
 # Postgresql libpq
@@ -91,17 +91,17 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # win_iconv
 ###########
 
-WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+#WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
+#LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
+#LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
 
 # Tcl 8.5 and Expect
 ####################
@@ -120,8 +120,8 @@ WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
-WIX_ARCH = x86
-#WIX_ARCH = x64
+#WIX_ARCH = x86
+WIX_ARCH = x64
 
 #PGDLL_LIBRARIES=1
 

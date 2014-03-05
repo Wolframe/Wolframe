@@ -39,15 +39,19 @@
 #define _LOG_ERROR_HPP_INCLUDED
 
 #if defined( _MSC_VER )
-	#define WOLFRAME_EXPORT __declspec( dllexport )
+	#if defined( WFSHARED_DLL_IMPLEMENTATION )
+		#define WF_DLL_SHARED __declspec( dllexport )
+	#else
+		#define WF_DLL_SHARED __declspec( dllimport )
+	#endif
 #else
-	#define WOLFRAME_EXPORT
+	#define WF_DLL_SHARED
 #endif
 
 namespace _Wolframe {
 namespace log {
 
-class WOLFRAME_EXPORT LogError {
+class WF_DLL_SHARED LogError {
 public:
 	/// Internal enum representing possible error conversion
 	/// methods

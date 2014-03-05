@@ -127,7 +127,7 @@ void DateTime::init( const std::string& str_)
 
 std::string DateTime::tostring( StringFormat::Id sf) const
 {
-	
+
 	std::string rt;
 	switch (sf)
 	{
