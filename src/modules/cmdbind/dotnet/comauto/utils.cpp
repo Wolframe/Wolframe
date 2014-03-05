@@ -30,6 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 #include "comauto/utils.hpp"
+#include "types/numberBaseConversion.hpp"
 #include <iostream>
 #include <sstream>
 #pragma warning(disable:4996)
@@ -580,7 +581,7 @@ VARIANT comauto::createVariantType( const char* val, std::size_t valsize, VARTYP
 	return rt;
 }
 
-VARIANT createVariantType( const types::DateTime& dt)
+VARIANT comauto::createVariantType( const types::DateTime& dt)
 {
 	VARIANT rt;
 	rt.vt = VT_DATE;
@@ -588,7 +589,7 @@ VARIANT createVariantType( const types::DateTime& dt)
 	return rt;
 }
 
-VARIANT createVariantType( const types::BigNumber& dt)
+VARIANT comauto::createVariantType( const types::BigNumber& dt)
 {
 	VARIANT rt;
 	if (dt.scale() < 0 || dt.scale() > 28 || dt.size() > 28)
@@ -606,10 +607,10 @@ VARIANT createVariantType( const types::BigNumber& dt)
 	types::Endian::reorder( value.numlo);
 
 	rt.vt = VT_DECIMAL;
-	rt.decval.scale = dt.scale();
-	rt.decval.sign = dt.sign()?DECIMAL_NEG:0;
-	rt.decval.Hi32 = numhi;
-	rt.decval.Lo64 = numlo;
+	rt.decVal.scale = (BYTE)dt.scale();
+	rt.decVal.sign = dt.sign()?DECIMAL_NEG:0;
+	rt.decVal.Hi32 = value.numhi;
+	rt.decVal.Lo64 = value.numlo;
 	return rt;
 }
 
@@ -624,15 +625,15 @@ static types::BigNumber getBigNumber( const VARIANT& val)
 		ULONG numhi;
 		ULONGLONG numlo;
 	} value;
-	value.numhi = val.decval.Hi32;
-	value.numlo = val.decval.Lo64;
+	value.numhi = val.decVal.Hi32;
+	value.numlo = val.decVal.Lo64;
 	types::Endian::reorder( value.numhi);
 	types::Endian::reorder( value.numlo);
 
-	unsigned int nofdigits = types::convertBigEndianUintToBCD( value, digits, MaxNofDigits)
+	unsigned short nofdigits = (unsigned short)types::convertBigEndianUintToBCD( value, digits, MaxNofDigits);
 
-	bool sign = (val.decval.sign == DECIMAL_NEG);
-	short scale = rt.decval.scale;
+	bool sign = (val.decVal.sign == DECIMAL_NEG);
+	signed short scale = val.decVal.scale;
 	return types::BigNumber( sign, nofdigits, scale, digits);
 }
 
@@ -671,8 +672,8 @@ VARIANT comauto::createVariantType( const types::Variant& val, VARTYPE dsttype)
 		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
 		case types::Variant::Int:	rt = comauto::createVariantType( val.data().value.Int); break;
 		case types::Variant::UInt:	rt = comauto::createVariantType( val.data().value.UInt); break;
-		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
-		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
+		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR); break;
+		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR); break;
 		case types::Variant::Timestamp:	rt = comauto::createVariantType( types::DateTime( val.totimestamp())); break;
 		case types::Variant::BigNumber:	rt = comauto::createVariantType( *val.bignumref()); break;
 	}
@@ -1105,7 +1106,7 @@ types::Variant comauto::getAtomicElement( VARTYPE vt, const void* ref)
 		case VT_BSTR: return types::Variant( comauto::utf8string( *(const BSTR*)ref));
 		case VT_LPSTR: return types::Variant( comauto::utf8string( *(LPCSTR*)ref));
 		case VT_LPWSTR: return types::Variant( comauto::utf8string( *(LPCWSTR*)ref));
-		case VT_DATE: return types::Variant( types::DateTime::fromMSDNtimestamp( val.date).totimestamp());
+		case VT_DATE: return types::Variant( types::DateTime::fromMSDNtimestamp( *(DATE*)ref).timestamp());
 		default:
 		{
 			VARIANT elemorig;
@@ -1116,7 +1117,7 @@ types::Variant comauto::getAtomicElement( VARTYPE vt, const void* ref)
 				elemorig.vt = vt | VT_BYREF;
 				WRAP( comauto::wrapVariantCopyInd( &elemcopy, &elemorig))
 				WRAP( comauto::wrapVariantChangeType( &elemcopy, &elemcopy, 0, VT_BSTR))
-				return types::VariantConst( elembuf = comauto::utf8string( elemcopy.bstrVal));
+				return types::Variant( comauto::utf8string( elemcopy.bstrVal));
 			}
 			catch (const std::runtime_error& e)
 			{
@@ -1132,7 +1133,7 @@ types::Variant comauto::getAtomicElement( const VARIANT& val)
 {
 	if (val.vt == VT_DECIMAL)
 	{
-		types::BigNumber getBigNumber( val)
+		return types::Variant( getBigNumber( val));
 	}
 	else
 	{

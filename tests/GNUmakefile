@@ -36,13 +36,10 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolftest \
-	-lwfshared \
-	-lwolframe \
 	$(TOPDIR)/src/libwolframe.a \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
-	$(TOPDIR)/src/libwolframe.a \
 	-lwfshared \
 	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \

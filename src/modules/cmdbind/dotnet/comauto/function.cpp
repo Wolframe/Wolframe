@@ -59,19 +59,19 @@ public:
 	~Impl();
 	bool call();
 
-	void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+	void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
 
 	langbind::TypedInputFilterR result() const;
 
 private:
-	const proc::ProcessorProvider* m_provider;		//< processor provider reference for function called
+	const proc::ProcessorProviderInterface* m_provider;		//< processor provider reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
 	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
 	VARIANT* m_param;						//< array of function parameters to initialize
 	enum {null_paramidx=0xFFFF};
 	std::size_t m_paramidx;						//< currently selected parameter of the function [0,1,.. n-1]
-	AssignmentClosureR m_paramclosure;			//< closure for current parameter assignment
+	AssignmentClosureR m_paramclosure;				//< closure for current parameter assignment
 	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;	//< temporary buffer for parameters passed as array (with their name)
 	IDispatch* m_providerdispatch;					//< IDispatch Interface of processor provider
 	langbind::TypedInputFilterR m_result;				//< reference to result of the function call
@@ -469,7 +469,7 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 	}
 }
 
-void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
 	m_provider = p;
 	m_input = i;
@@ -713,7 +713,7 @@ bool DotnetFunctionClosure::call()
 	return m_impl->call();
 }
 
-void DotnetFunctionClosure::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void DotnetFunctionClosure::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
 	m_impl->init( p, i, f);
 }

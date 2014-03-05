@@ -235,7 +235,7 @@
 					<entry>doctype</entry>
 					<entry></entry>
 					<entry>lua table</entry>
-					<entry>Returns the input document type as structure
+					<entry>Returns the input document type as structure with the elements 'id' (document type) and 'root' (root element)
 					</entry>
 				</row>
 				<row>
@@ -294,16 +294,13 @@
 				</row>
 				<row>
 					<entry>as</entry>
-					<entry>table (doctype)</entry>
-					<entry>Attaches the document type defined in the structure doctype (*).
+					<entry>table with element 'id' (document type = name of form) and and optional element 'root'</entry>
+					<entry>Attaches the document type defined in the structure.
 					</entry>
 				</row>
 			</tbody>
 			</tgroup>
 		</table>
-		<para>
-			(*) The interpretation depends on filter attached to output. For XML the structure defines the elements 'root' (root element in XML !DOCTYPE declaration), 'public' (PUBLIC element in XML !DOCTYPE declaration), 'system' (SYSTEM element in XML !DOCTYPE declaration).
-		</para>
 
 		<table frame="all" width="100%">
 			<title>Filter object member variables and flags</title>

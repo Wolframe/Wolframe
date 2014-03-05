@@ -67,14 +67,14 @@ Timestamp DateTime::timestamp() const
 
 void DateTime::init( Timestamp timestamp_)
 {
-	m_year = getBits( timestamp_, 0, 13);
-	m_month = getBits( timestamp_, 13, 4);
-	m_day = getBits( timestamp_, 17, 5);
-	m_hour = getBits( timestamp_, 22, 5);
-	m_minute = getBits( timestamp_, 27, 6);
-	m_second = getBits( timestamp_, 33, 6);
-	m_millisecond = getBits( timestamp_, 39, 10);
-	m_microsecond = getBits( timestamp_, 49, 10);
+	m_year = (unsigned short)getBits( timestamp_, 0, 13);
+	m_month = (unsigned char)getBits( timestamp_, 13, 4);
+	m_day = (unsigned char)getBits( timestamp_, 17, 5);
+	m_hour = (unsigned char)getBits( timestamp_, 22, 5);
+	m_minute = (unsigned char)getBits( timestamp_, 27, 6);
+	m_second = (unsigned char)getBits( timestamp_, 33, 6);
+	m_millisecond = (unsigned short)getBits( timestamp_, 39, 10);
+	m_microsecond = (unsigned short)getBits( timestamp_, 49, 10);
 	m_subtype = (SubType)getBits( timestamp_, 59, 3);
 }
 
@@ -107,17 +107,17 @@ void DateTime::init( const char* str, std::size_t strsize)
 		case 8: m_subtype = YYYYMMDD; break;
 		default: throw std::runtime_error("illegal datetime format (size)");
 	}
-	check_range( m_year = getSubstringAsInt( buf.c_str(), 0, 4), 1000, 2400);
-	check_range( m_month = getSubstringAsInt( buf.c_str(), 4, 2), 1, 12);
-	check_range( m_day = getSubstringAsInt( buf.c_str(), 6, 2), 1, 31);
+	check_range( m_year = (unsigned short)getSubstringAsInt( buf.c_str(), 0, 4), 1000, 2400);
+	check_range( m_month = (unsigned char)getSubstringAsInt( buf.c_str(), 4, 2), 1, 12);
+	check_range( m_day = (unsigned char)getSubstringAsInt( buf.c_str(), 6, 2), 1, 31);
 	if ((SubType)m_subtype == YYYYMMDD) return;
-	check_range( m_hour = getSubstringAsInt( buf.c_str(), 8, 2), 0, 23);
-	check_range( m_minute = getSubstringAsInt( buf.c_str(), 10, 2), 0, 59);
-	check_range( m_second = getSubstringAsInt( buf.c_str(), 12, 2), 0, 63);	//... 59 + eventual leap seconds
+	check_range( m_hour = (unsigned char)getSubstringAsInt( buf.c_str(), 8, 2), 0, 23);
+	check_range( m_minute = (unsigned char)getSubstringAsInt( buf.c_str(), 10, 2), 0, 59);
+	check_range( m_second = (unsigned char)getSubstringAsInt( buf.c_str(), 12, 2), 0, 63);	//... 59 + eventual leap seconds
 	if ((SubType)m_subtype == YYYYMMDDhhmmss) return;
-	check_range( m_millisecond = getSubstringAsInt( buf.c_str(), 14, 3), 0, 999);
+	check_range( m_millisecond = (unsigned short)getSubstringAsInt( buf.c_str(), 14, 3), 0, 999);
 	if ((SubType)m_subtype == YYYYMMDDhhmmss_lll) return;
-	check_range( m_microsecond = getSubstringAsInt( buf.c_str(), 17, 3), 0, 999);
+	check_range( m_microsecond = (unsigned short)getSubstringAsInt( buf.c_str(), 17, 3), 0, 999);
 }
 
 void DateTime::init( const std::string& str_)
@@ -170,7 +170,7 @@ std::string DateTime::tostring( StringFormat::Id sf) const
 	return rt;
 }
 
-double DateTime::toMSDNtimestamp()
+double DateTime::toMSDNtimestamp() const
 {
 	double rt = (long)(boost::gregorian::date( m_year, m_month, m_day) - boost::gregorian::date( 1899, 12, 30)).days();
 	rt += (double) m_hour / 24.0;

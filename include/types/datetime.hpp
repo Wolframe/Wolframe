@@ -86,7 +86,7 @@ public:
 		  unsigned short ss,
 		  unsigned short ll,
 		  unsigned short cc)
-		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(ll),m_microsecond(cc),m_subtype(YYYYMMDDhhmmss_lllccc)
+		:m_year(YY),m_month((unsigned char)MM),m_day((unsigned char)DD),m_hour((unsigned char)hh),m_minute((unsigned char)mm),m_second((unsigned char)ss),m_millisecond(ll),m_microsecond(cc),m_subtype(YYYYMMDDhhmmss_lllccc)
 	{
 		check( YY, MM, DD, hh, mm, ss, ll, cc);
 	}
@@ -107,7 +107,7 @@ public:
 		  unsigned short mm,
 		  unsigned short ss,
 		  unsigned short ll)
-		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(ll),m_microsecond(0),m_subtype(YYYYMMDDhhmmss_lll)
+		:m_year(YY),m_month((unsigned char)MM),m_day((unsigned char)DD),m_hour((unsigned char)hh),m_minute((unsigned char)mm),m_second((unsigned char)ss),m_millisecond(ll),m_microsecond(0),m_subtype(YYYYMMDDhhmmss_lll)
 	{
 		check( YY, MM, DD, hh, mm, ss, ll, 0);
 	}
@@ -125,7 +125,7 @@ public:
 		  unsigned short hh,
 		  unsigned short mm,
 		  unsigned short ss)
-		:m_year(YY),m_month(MM),m_day(DD),m_hour(hh),m_minute(mm),m_second(ss),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDDhhmmss)
+		:m_year(YY),m_month((unsigned char)MM),m_day((unsigned char)DD),m_hour((unsigned char)hh),m_minute((unsigned char)mm),m_second((unsigned char)ss),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDDhhmmss)
 	{
 		check( YY, MM, DD, hh, mm, ss, 0, 0);
 	}
@@ -137,7 +137,7 @@ public:
 	DateTime( unsigned short YY,
 		  unsigned short MM,
 		  unsigned short DD)
-		:m_year(YY),m_month(MM),m_day(DD),m_hour(0),m_minute(0),m_second(0),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDD)
+		:m_year(YY),m_month((unsigned char)MM),m_day((unsigned char)DD),m_hour(0),m_minute(0),m_second(0),m_millisecond(0),m_microsecond(0),m_subtype(YYYYMMDD)
 	{
 		check( YY, MM, DD, 0, 0, 0, 0, 0);
 	}
@@ -234,7 +234,7 @@ public:
 
 	//\brief Get the MSDN DATE type from the date
 	//\return days with fractional part of day for time from the 30th December 1899
-	double toMSDNtimestamp();
+	double toMSDNtimestamp() const;
 
 	//\brief Get the date and time from an MSDN DATE type as YYYYMMDDhhmmss
 	//\return The date and time value

@@ -32,8 +32,7 @@ static void test_atomic_param_clr_call( const comauto::CommonLanguageRuntime& cl
 	clr.call( &result, assembly, "Functions", "Add", 2, param);
 
 	std::cout << std::endl << "RESULT call CLR: 13 + 2 = " << std::endl;
-	std::string buf;
-	types::VariantConst elem = comauto::getAtomicElement( result, buf);
+	types::Variant elem = comauto::getAtomicElement( result);
 	std::cout << elem.tostring() << std::endl;
 }
 

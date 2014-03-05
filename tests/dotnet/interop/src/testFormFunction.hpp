@@ -57,7 +57,7 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider*, const langbind::TypedInputFilterR&, serialize::Context::Flags)
+	virtual void init( const proc::ProcessorProviderInterface*, const langbind::TypedInputFilterR&, serialize::Context::Flags)
 	{
 	}
 

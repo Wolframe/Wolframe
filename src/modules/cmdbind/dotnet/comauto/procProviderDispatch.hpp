@@ -49,7 +49,7 @@ public:
 	enum DispID {DispID_CALL=1, DispID_CALL_NORES=2};
 
 public:
-	ProcessorProviderDispatch( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+	ProcessorProviderDispatch( const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
 		:m_provider(provider_),m_refcount(1),m_typelib(typelib_),m_typeinfo(typeinfo_)
 	{}
 
@@ -57,7 +57,7 @@ public:
 	{}
 
 	static GUID uuid();
-	static IDispatch* create( const proc::ProcessorProvider* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
+	static IDispatch* create( const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
 
 	// Interface IDispatch:
 	HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);
@@ -71,10 +71,10 @@ public:
 	ULONG STDMETHODCALLTYPE Release();
 
 private:
-	const proc::ProcessorProvider* m_provider;	//< processor provider reference
-	volatile LONG m_refcount;					//< atomic counter
-	const TypeLib* m_typelib;					//< type library reference for introspection of provider call argument types
-	ITypeInfo* m_typeinfo;						//< type info of the IDispatch interface
+	const proc::ProcessorProviderInterface* m_provider;	//< processor provider reference
+	volatile LONG m_refcount;						//< atomic counter
+	const TypeLib* m_typelib;						//< type library reference for introspection of provider call argument types
+	ITypeInfo* m_typeinfo;							//< type info of the IDispatch interface
 };
 
 }}//namespace
