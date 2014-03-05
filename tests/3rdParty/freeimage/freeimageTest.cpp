@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cassert>
 
 #include "FreeImage.h"
 
@@ -70,13 +71,14 @@ TEST_F( FreeImageFixture, ImageInfo )
 		format = FreeImage_GetFIFFromFilename( TESTFILE );
 	}
 	
-	FIBITMAP *image;
+	FIBITMAP *image = 0;
 	
 // check that the plugin has reading capabilities ...
 	if( ( format != FIF_UNKNOWN ) && FreeImage_FIFSupportsReading( format ) ) {
 // ok, let's load the file
 		image = FreeImage_Load( format, TESTFILE, 0 );
 	}
+	assert( image != 0 );
 
 // get info about the image	
 	unsigned int width = FreeImage_GetWidth( image );

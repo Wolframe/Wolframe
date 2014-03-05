@@ -217,7 +217,7 @@ static std::vector<langbind::FilterArgument> parseFilterArguments( std::string::
 
 enum Lexem
 {
-	IDENTIFIER,SKIP,STANDALONE,RETURN,CALL,FILTER,INPUT,OUTPUT
+	IDENTIFIER,SKIP,STANDALONE,RETURN,CALL,FILTER,INPUT,OUTPUT,ILLEGAL
 };
 static const char* lexemName( Lexem i)
 {
@@ -303,7 +303,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
 	State state = ParseCommand;
 	char ch;
-	Lexem lexem;
+	Lexem lexem = ILLEGAL;
 
 	while (parseNextLexem( lexem, toklist, si, se))
 	{
@@ -406,7 +406,9 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					case FILTER:
 						if (input_filter_set || output_filter_set) throw std::runtime_error( "FILTER specified twice");
 						state = ParseFilter;
-						continue;
+						continue;			
+					case ILLEGAL:
+						throw std::logic_error( "Lexem has state ILLEGAL. Should not happen!");
 				}
 				throw std::runtime_error("SKIP,FILTER,CALL or RETURN expected instead of token");
 
