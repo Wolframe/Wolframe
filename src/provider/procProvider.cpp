@@ -230,11 +230,6 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::
 	return rt;
 }
 
-const UI::UserInterfaceLibrary* ProcessorProvider::UIlibrary() const
-{
-	return m_impl->UIlibrary();
-}
-
 db::Database* ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();

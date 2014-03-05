@@ -64,10 +64,6 @@ class CommandHandler;
 //\brief Forward declaration
 class IOFilterCommandHandler;
 }
-namespace UI
-{
-class UserInterfaceLibrary;
-}
 
 namespace proc {
 
@@ -78,8 +74,6 @@ class ProcessorProviderInterface
 public:
 	//\brief Destructor
 	virtual ~ProcessorProviderInterface(){};
-	//\brief Get the user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const=0;
 	//\brief Get the command handler for a specific command
 	//\param[in] command name of the command
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const=0;

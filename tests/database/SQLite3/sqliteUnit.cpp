@@ -16,7 +16,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::log;
-using namespace _Wolframe::UI;
 
 
 // The fixture for testing Wolframe module that log
@@ -426,19 +425,6 @@ TEST_F( SQLiteModuleFixture, ExpressionWithParametersAndTypeCoercion )
 	}
 	trans->commit( );
 	trans->close( );
-}
-
-TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
-{
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
-			     std::list<std::string>(), std::list<std::string>() );
-
-	Database* db = dbUnit.database();
-	const UserInterfaceLibrary* lib = db->UIlibrary();
-
-	std::list< InterfaceObject::Info > objs = lib->userInterface( "", "", "" );
-	EXPECT_TRUE( objs.empty() );
-	delete lib;
 }
 
 int main( int argc, char **argv )

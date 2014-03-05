@@ -61,8 +61,6 @@ public:
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command ) const;
 
-	const UI::UserInterfaceLibrary* UIlibrary() const;
-
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
 

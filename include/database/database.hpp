@@ -38,7 +38,6 @@
 #define _DATABASE_HPP_INCLUDED
 #include "database/transaction.hpp"
 #include "database/databaseLanguage.hpp"
-#include "processor/userInterface.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -63,10 +62,6 @@ public:
 
 	///\brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
-
-	///\brief Get a user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const
-						{ return NULL; }
 
 	///\brief Load the database transaction programs for this database from file
 	///\remark throws std::runtime_error with position info in case of error

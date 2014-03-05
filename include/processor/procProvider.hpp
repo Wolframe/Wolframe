@@ -98,9 +98,6 @@ public:
 
 	virtual db::Database* transactionDatabase() const;
 
-	///\brief Just and interface at the moment
-	const UI::UserInterfaceLibrary* UIlibrary() const;
-
 	///\brief return a database transaction object for the given name
 	virtual db::Transaction* transaction( const std::string& name ) const;
 

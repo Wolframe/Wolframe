@@ -40,7 +40,6 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "processor/userInterface.hpp"
 #include "config/configurationBase.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
@@ -58,7 +57,7 @@ namespace db {
 
 static const char* SQLite_DB_CLASS_NAME = "SQLite";
 
-/// SQLite database configuration
+//\brief SQLite database configuration
 class SQLiteConfig : public config::NamedConfiguration
 {
 public:
@@ -132,8 +131,6 @@ public:
 		return &langdescr;
 	}
 
-	///\brief Get a user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const;
 private:
 	SQLiteDBunit*	m_unit;			///< parent database unit
 };
@@ -174,33 +171,6 @@ private:
 	SQLiteDatabase		m_db;
 	std::list<std::string>	m_programFiles;
 	std::list<std::string>	m_extensionFiles;
-};
-
-class SQLiteUIlibrary : public UI::UserInterfaceLibrary
-{
-public:
-	SQLiteUIlibrary( const SQLiteDatabase& database );
-	~SQLiteUIlibrary()			{}
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::list< std::string >& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::string& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void addObject( const UI::InterfaceObject& newObject ) const;
-
-	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void close()			{ delete this; }
-private:
-	SQLiteDBunit&		m_unit;		///< parent database unit
 };
 
 

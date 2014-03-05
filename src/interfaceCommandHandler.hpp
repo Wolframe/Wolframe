@@ -36,7 +36,6 @@
 #define _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/lineCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
-#include "processor/userInterface.hpp"
 #include <list>
 #include <string>
 
@@ -52,20 +51,8 @@ public:
 
 public:
 	int doCapabilities( int argc, const char** argv, std::ostream& out);
-	int doVersion( int argc, const char** argv, std::ostream& out);
-	int doInfo( int argc, const char** argv, std::ostream& out);
-	int doDescription( int argc, const char** argv, std::ostream& out);
-	int doBody( int argc, const char** argv, std::ostream& out);
-	int doDone( int argc, const char** argv, std::ostream& out);
-	int doDonePush( int argc, const char** argv, std::ostream& out);
-	int doAbortPush( int argc, const char** argv, std::ostream& out);
-	int doPushDescription( int argc, const char** argv, std::ostream& out);
-	int doPushBody( int argc, const char** argv, std::ostream& out);
-	int doPush( int argc, const char** argv, std::ostream& out);
-	int endPushAttribute( cmdbind::CommandHandler* ch, std::ostream& out);
 
 private:
-	bool initInterfaceObject( UI::InterfaceObject& obj, int argc, const char** argv, std::ostream& out);
 	std::list<std::string> m_roles;
 	std::vector<std::string> m_argbuf;
 	std::vector<std::pair< std::string, std::string> > m_attributes;

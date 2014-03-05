@@ -432,17 +432,6 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
 }
 
-
-const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIlibrary() const
-{
-	if ( m_db )
-		return m_db->UIlibrary();
-	else	{
-		LOG_ALERT << "No database defined for the processor provider";
-		return NULL;
-	}
-}
-
 db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase( bool suppressAlert) const
 {
 	if ( ! m_db && !suppressAlert )	{
