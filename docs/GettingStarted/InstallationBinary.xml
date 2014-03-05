@@ -286,13 +286,34 @@
 			</para>
 		</sect2>
 
-<!--
+<!-- Slackware -->
 		<sect2>
 			<title>Slackware</title>
 			<para>
+				Download the package file(s):
+				<programlisting language='shell'>
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/Slackware-14/x86_64/wolframe-0.0.1-x86_64.tgz
+				</programlisting>
+			</para>
+
+			<para>
+				You install the Wolframe package with:
+				<programlisting language='shell'>
+	installpkg wolframe-0.0.1-x86_64.tgz 
+				</programlisting>
+			
+				The Slackware packages contain the whole server and the whole client respectively.
+			</para>
+			
+			<para>
+				You can start the service with:
+
+				<programlisting language='shell'>
+	/etc/rc.d/rc.wolframed start
+				</programlisting>
 			</para>
 		</sect2>
--->
+
 	</sect1>
 
 <!--
