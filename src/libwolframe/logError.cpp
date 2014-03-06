@@ -73,7 +73,7 @@ Logger& operator<< ( Logger& logger, LogError e )
 #else
 			int res = strerror_r( errno, errbuf, 512 );
 			if( res == EINVAL ) {
-				logger.os_ << "(missing strerror translation)";
+				logger.m_os << "(missing strerror translation)";
 			} else if( res == ERANGE ) {
 				logger.m_os << "(memory allocation error in strerror translation)";
 			} else {
