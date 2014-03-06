@@ -12,7 +12,9 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
@@ -20,8 +22,8 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwfshared/libwfshared.a \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	-lwfshared \
+	-lwolframe \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 

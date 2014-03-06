@@ -37,7 +37,11 @@
 #define _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
 #include <string>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -45,27 +49,40 @@ namespace types {
 class PropertyTree
 {
 public:
+	typedef boost::shared_ptr<char> FileName;
+	static FileName getFileName( const std::string& name)
+	{
+		char* cc = (char*)std::malloc( name.size()+1);
+		if (!cc) throw std::bad_alloc();
+		std::memcpy( cc, name.c_str(), name.size()+1);
+		return boost::shared_ptr<char>( cc, std::free);
+	}
+
 	class Position
 	{
 	public:
-		unsigned int fileidx() const	{return m_fileidx;}
+
+	public:
+		const char* filename() const	{return m_filename.get();}
 		unsigned int line() const	{return m_line;}
 		unsigned int column() const	{return m_column;}
 	
 		Position()
-			:m_fileidx(0),m_line(0),m_column(0){}
+			:m_line(0),m_column(0){}
 		Position( const Position& o)
-			:m_fileidx(o.m_fileidx),m_line(o.m_line),m_column(o.m_column){}
-		Position( unsigned int fileidx_, unsigned int line_, unsigned int column_)
-			:m_fileidx(fileidx_),m_line(line_),m_column(column_){}
+			:m_filename(o.m_filename),m_line(o.m_line),m_column(o.m_column){}
+		Position( FileName filename_, unsigned int line_, unsigned int column_)
+			:m_filename(filename_),m_line(line_),m_column(column_){}
+		Position( unsigned int line_, unsigned int column_)
+			:m_line(line_),m_column(column_){}
 
-		void fileidx( unsigned int fileidx_)
+		void setFileName( const FileName& filename_)
 		{
-			m_fileidx = fileidx_;
+			m_filename = filename_;
 		}
 
 	private:
-		unsigned int m_fileidx;
+		FileName m_filename;
 		unsigned int m_line;
 		unsigned int m_column;
 	};
@@ -75,9 +92,7 @@ public:
 	{
 	public:
 		Value(){}
-		Value( const std::string& token)
-			:std::string(token){}
-		Value( const std::string& token, Position position_)
+		Value( const std::string& token, Position position_=Position())
 			:std::string(token),position(position_){}
 		Value( const Value& o)
 			:std::string(o),position(o.position){}
@@ -92,11 +107,19 @@ public:
 		typedef boost::property_tree::basic_ptree<std::string, Value> Parent;
 
 	public:
-		Node(){}
-		Node( const Parent& o)
-			:Parent(o){}
-		Node( const std::string& val)
-			:Parent(Value( val, Position())){}
+		Node( const Position& pos=Position())
+		{
+			data().position = pos;
+		}
+
+		Node( const Parent& o, const Position& pos=Position())
+			:Parent(o)
+		{
+			data().position = pos;
+		}
+
+		Node( const std::string& val, const Position& pos=Position())
+			:Parent( Value( val, pos)){}
 
 		Node( const boost::property_tree::ptree& pt)
 		{
@@ -105,31 +128,36 @@ public:
 			{
 				Parent::add_child( pi->first, Node( pi->second));
 			}
-			if (!pt.get_value<std::string>().empty())
+			if (!pt.data().empty())
 			{
-				Parent::put_value( Value( pt.data(), Position()));
+				Parent::put_value( Value( pt.data()));
 			}
 		}
 
 		void setValue( const std::string& val)
 		{
-			Parent::put_value( Value( val, Position()));
+			Parent::put_value( Value( val));
 		}
 
-		void setFileIdx( unsigned int fileidx)
+		void setPosition( const Position& p)
 		{
-			setFileIdx( *this, fileidx);
+			data().position = p;
+		}
+
+		void recursiveSetFileName( const FileName& filename)
+		{
+			recursiveSetFileName( *this, filename);
 		}
 
 	private:
-		static void setFileIdx( Parent& pt, unsigned int fileidx)
+		static void recursiveSetFileName( Parent& pt, const FileName& filename)
 		{
 			Parent::iterator pi = pt.begin(), pe = pt.end();
 			for (; pi != pe; ++pi)
 			{
-				setFileIdx( pi->second, fileidx);
+				recursiveSetFileName( pi->second, filename);
 			}
-			pt.data().position.fileidx( fileidx);
+			pt.data().position.setFileName( filename);
 		}
 	};
 
@@ -143,8 +171,11 @@ public:
 	PropertyTree( const boost::property_tree::ptree& o, const std::string& filename_)
 		:m_root(o)
 	{
-		m_filenames.push_back( filename_);
+		m_root.recursiveSetFileName( getFileName( filename_));
 	}
+
+	PropertyTree( const Node& root_)
+		:m_root(root_){}
 
 	Node root() const			{return m_root;}
 	Node::const_iterator begin() const	{return m_root.begin();}
@@ -152,7 +183,6 @@ public:
 
 private:
 	Node m_root;
-	std::vector<std::string> m_filenames;
 };
 
 }}//namespace
