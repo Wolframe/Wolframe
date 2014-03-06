@@ -79,6 +79,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \
+	loggerConfig.o \
 	server.o
 
 #SSL

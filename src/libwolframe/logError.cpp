@@ -49,7 +49,6 @@
 
 #include "logger-v1.hpp"
 #include "logger/logError.hpp"
-//#include "logBackendImpl.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -62,7 +61,7 @@ const LogError LogError::LogWinerror( LogError::LOGERROR_WINERROR );
 
 // template functions for error markers in the output stream
 // e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
-Logger& operator<<( Logger& logger, LogError e )
+Logger& operator<< ( Logger& logger, LogError e )
 {
 	switch( e.error( ) ) {
 #if !defined( _WIN32 )
@@ -113,9 +112,9 @@ Logger& operator<<( Logger& logger, LogError e )
 
 			StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
 
-			logger.os_ << errbuf;
+			logger.m_os << errbuf;
 
-			logger.os_ << " (errcode: " << last_error << ")";
+			logger.m_os << " (errcode: " << last_error << ")";
 
 			return logger;
 		}

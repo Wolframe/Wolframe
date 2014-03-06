@@ -16,7 +16,7 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\liwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \

@@ -27,15 +27,13 @@ LIBRARIES = \
 LOGGER_OBJS = \
 	logger\logLevel.obj \
 	logger\logSyslogFacility.obj \
-	logger\logError.obj \
 	logger\logBackendConsole.obj \
 	logger\logBackendFile.obj \
 	logger\logBackendSyslog.obj \
 	logger\syslog_win32.obj \
 	logger\logBackendEventlog.obj \
 	logger\logBackendWinDebug.obj \
-	logger\logBackendImpl.obj \
-	logger\loggerConfig.obj
+	logger\logBackendImpl.obj
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \

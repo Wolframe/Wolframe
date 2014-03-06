@@ -28,12 +28,10 @@ DYNAMIC_LIB_PATCH = 0
 LOGGER_OBJS = \
 	logger/logLevel.o \
 	logger/logSyslogFacility.o \
-	logger/logError.o \
 	logger/logBackendConsole.o \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \
-	logger/logBackendImpl.o \
-	logger/loggerConfig.o
+	logger/logBackendImpl.o
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
