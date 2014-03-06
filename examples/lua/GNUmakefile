@@ -12,15 +12,16 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwfshared \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfshared \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwfshared/libwfshared.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
@@ -62,7 +63,7 @@ local_install:
 local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src $(EXPECT) ./testLua
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src:$(TOPDIR)/src/libwfshared $(EXPECT) ./testLua
 endif
 endif
 
