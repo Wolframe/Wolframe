@@ -18,7 +18,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lboost_thread$(BOOST_LIBRARY_TAG)
+	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system
 
 STATIC_LIB =
 
