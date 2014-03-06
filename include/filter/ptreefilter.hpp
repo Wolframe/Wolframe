@@ -36,9 +36,9 @@
 #ifndef _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #define _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/propertyTree.hpp"
 #include <vector>
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -47,7 +47,7 @@ class PropertyTreeInputFilter :public TypedInputFilter
 {
 public:
 	///\brief Constructor
-	PropertyTreeInputFilter( const boost::property_tree::ptree& pt)
+	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
 		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
 		,m_state(0)
 	{
@@ -79,8 +79,8 @@ public:
 private:
 	struct State
 	{
-		boost::property_tree::ptree::const_iterator itr;
-		boost::property_tree::ptree::const_iterator end;
+		types::PropertyTree::Node::const_iterator itr;
+		types::PropertyTree::Node::const_iterator end;
 	};
 
 private:
@@ -107,7 +107,7 @@ public:
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
 	///\brief Get the content
-	const boost::property_tree::ptree& content() const	{return m_stk.back().m_node;}
+	const types::PropertyTree::Node& content() const	{return m_stk.back().m_node;}
 
 private:
 	struct State
@@ -119,7 +119,7 @@ private:
 			:m_name(o.m_name), m_node(o.m_node){}
 
 		std::string m_name;
-		boost::property_tree::ptree m_node;
+		types::PropertyTree::Node m_node;
 	};
 	std::vector<State> m_stk;		//< build property tree stack
 	std::string m_attribute;		//< parsed attribute name

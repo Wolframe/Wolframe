@@ -30,56 +30,29 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// echo configuration functions
-//
+//\brief Configuration tree for the configuration parser
+//\file config/configurationTree.hpp
 
-#include "handlerConfig.hpp"
-#include "config/configurationTree.hpp"
-#include "config/valueParser.hpp"
-#include "logger-v1.hpp"
-
-#include <boost/algorithm/string.hpp>
-#include <ostream>
-
-static const unsigned short DEFAULT_TIMEOUT = 180;
+#ifndef _CONFIGURATION_TREE_HPP_INCLUDED
+#define _CONFIGURATION_TREE_HPP_INCLUDED
+#include "types/propertyTree.hpp"
+#include <string>
 
 namespace _Wolframe {
+namespace config {
 
-bool pEchoConfiguration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-				const module::ModulesDirectory* /*modules*/ )
+class ConfigurationTree
+	:public types::PropertyTree
 {
-	bool retVal = true;
-	bool isSet = false;
+public:
+	ConfigurationTree(){}
+	ConfigurationTree( const boost::property_tree::ptree& pt, const std::string& filename)
+		:types::PropertyTree( pt, filename){}
+	ConfigurationTree( const types::PropertyTree& pt)
+		:types::PropertyTree( pt){}
+};
 
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, timeout ))
-				retVal = false;
-			isSet = true;
-		}
-		else
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-	if ( !isSet )
-		timeout = DEFAULT_TIMEOUT;
+typedef types::PropertyTree::Node ConfigurationNode;
 
-	return retVal;
-}
-
-
-void pEchoConfiguration::print( std::ostream& os, size_t /*indent*/ ) const
-{
-	os << sectionName() << std::endl;
-	os << "   Idle timeout: " << timeout << std::endl;
-}
-
-
-/// Check if the database configuration makes sense
-bool pEchoConfiguration::check() const
-{
-	return true;
-}
-
-} // namespace _Wolframe
+}} // namespace _Wolframe::config
+#endif // _CONFIGURATION_TREE_HPP_INCLUDED

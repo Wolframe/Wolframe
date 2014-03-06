@@ -36,7 +36,7 @@
 
 #include "Oracle.hpp"
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -58,7 +58,7 @@ OracleConfig::OracleConfig( const char* cfgName, const char* logParent, const ch
 	acquireTimeout = 0;
 }
 
-bool OracleConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
@@ -66,7 +66,7 @@ bool OracleConfig::parse( const config::ConfigurationTree& pt, const std::string
 	bool portDefined, connDefined, aTdefined, cTdefined, sTdefined;
 	portDefined = connDefined = aTdefined = cTdefined = sTdefined = false;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNodev::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
 			bool isDefined = ( !m_ID.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_ID, &isDefined ))

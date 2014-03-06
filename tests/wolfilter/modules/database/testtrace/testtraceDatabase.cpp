@@ -65,11 +65,11 @@ const serialize::StructDescriptionBase* TesttraceDatabaseConfig::Data::getStruct
 	return &rt;
 }
 
-bool TesttraceDatabaseConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
+bool TesttraceDatabaseConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory*)
 {
 	try
 	{
-		config::parseConfigStructure( m_data, (const boost::property_tree::ptree&)pt);
+		config::parseConfigStructure( m_data, (const config::ConfigurationNode&)pt);
 		return true;
 	}
 	catch (std::exception& e)

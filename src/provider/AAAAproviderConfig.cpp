@@ -37,10 +37,8 @@
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "AAAAproviderImpl.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
-
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
@@ -69,7 +67,7 @@ AAAAconfiguration::~AAAAconfiguration()
 }
 
 /// methods
-bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool AAAAconfiguration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			       const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
@@ -77,11 +75,11 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 	bool authzDfltDefined = false;
 	bool mandatoryDefined = false;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
 				boost::algorithm::iequals( L1it->first, "Auth" ))	{
 			std::string logStr = logPrefix() + "authentication: ";
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "randomDevice", L2it->first ))	{
 					bool isDefined = ( !m_randomDevice.empty() );
@@ -110,7 +108,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Authorization" ))	{
 			std::string logStr = logPrefix() + "authorization: ";
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "default", L2it->first ))	{
 					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_authzDefault,
@@ -139,7 +137,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
 			std::string logStr = logPrefix() + "audit: ";
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "mandatory", L2it->first ))	{
 					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_mandatoryAudit,

@@ -148,8 +148,7 @@ std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned i
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
-//#if defined(_WIN32)
-#if 0
+#if defined(_WIN32)
 	enum {BUFFERSIZE=8192};
 	char readBuffer[ BUFFERSIZE+1];
 	DWORD dwBytesRead = 0;
@@ -530,10 +529,10 @@ FileType utils::getFileType( const std::string& filename)
 }
 
 
-boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& filename)
+types::PropertyTree utils::readPropertyTreeFile( const std::string& filename)
 {
 	FileType filetype = getFileType( filename);
-	boost::property_tree::ptree rt;
+	types::PropertyTree rt;
 
 	switch (filetype.format)
 	{
@@ -544,7 +543,9 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is unknown)");
 			}
 			namespace opt = boost::property_tree::xml_parser;
-			read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
+			boost::property_tree::ptree xmlpt;
+			read_xml( filename, xmlpt, opt::no_comments | opt::trim_whitespace);
+			rt = types::PropertyTree( xmlpt, filename);
 			break;
 		}
 		case FileType::Info:
@@ -553,7 +554,9 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 			{
 				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is not UTF-8)");
 			}
-			read_info( filename, rt);
+			boost::property_tree::ptree infpt;
+			read_info( filename, infpt);
+			rt = types::PropertyTree( infpt, filename);
 			break;
 		}
 		case FileType::Unknown:

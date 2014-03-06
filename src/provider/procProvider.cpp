@@ -38,14 +38,12 @@
 #include "procProviderImpl.hpp"
 
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/filesystem.hpp>
-
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <ostream>
@@ -55,13 +53,13 @@ namespace _Wolframe {
 namespace proc {
 
 //***  Processor Provider Configuration  ************************************
-bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool ProcProviderConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 				const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( "database", L1it->first ))	{
 			bool isDefined = ( ! m_dbLabel.empty());
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
@@ -76,7 +74,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first )
 			|| boost::algorithm::iequals( "runtimeenv", L1it->first ) )	{
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 									  L2it != L1it->second.end(); L2it++ )	{
 				if ( modules )	{
 					module::ConfiguredBuilder* builder = modules->getBuilder( L1it->first, L2it->first );

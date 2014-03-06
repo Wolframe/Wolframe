@@ -115,7 +115,7 @@ static bool nextItem( std::string::const_iterator& ii, std::string::const_iterat
 	}
 }
 
-void _Wolframe::serialize::parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt)
+void serialize::parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt)
 {
 	std::string id;
 	std::string val;
@@ -153,7 +153,7 @@ void _Wolframe::serialize::parseStructOptionStringImpl( const serialize::StructD
 	}
 }
 
-boost::property_tree::ptree _Wolframe::serialize::structOptionTree( const::std::string& opt)
+types::PropertyTree::Node serialize::structOptionTree( const::std::string& opt)
 {
 	boost::property_tree::ptree pt;
 	std::string id;
@@ -171,7 +171,7 @@ boost::property_tree::ptree _Wolframe::serialize::structOptionTree( const::std::
 			pt.add_child( id, boost::property_tree::ptree(val));
 		}
 	}
-	return pt;
+	return types::PropertyTree::Node( pt);
 }
 
 

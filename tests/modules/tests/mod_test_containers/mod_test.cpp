@@ -48,7 +48,7 @@ TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, 
 	LOG_DEBUG << "Module: test module config created";
 }
 
-bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
+bool TestModuleConfig::parse( const config::ConfigurationNode& /*pt*/, const std::string& /*node*/,
     const module::ModulesDirectory* /*modules*/ )
 {
 	return true;

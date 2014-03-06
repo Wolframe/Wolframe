@@ -40,7 +40,7 @@
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "types/propertyTree.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -70,7 +70,7 @@ private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
 	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
 	std::vector<std::string> configModules( const std::string& refpath) const;
-	boost::property_tree::ptree getConfigNode( const std::string& name) const;
+	config::ConfigurationNode getConfigNode( const std::string& name) const;
 
 private:
 	bool m_printhelp;
@@ -79,8 +79,8 @@ private:
 	std::string m_logfile;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
-	boost::property_tree::ptree m_dbconfig;
-	boost::property_tree::ptree m_config;
+	types::PropertyTree::Node m_dbconfig;
+	types::PropertyTree m_config;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;

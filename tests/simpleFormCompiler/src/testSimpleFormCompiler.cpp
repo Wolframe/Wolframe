@@ -37,8 +37,6 @@ Project Wolframe.
 #include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
 #include "modules/normalize/number/floatNormalizeFunction.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>

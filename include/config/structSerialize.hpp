@@ -39,12 +39,14 @@ Project Wolframe.
 #include "serialize/struct/filtermapBase.hpp"
 #include "types/variantStructDescription.hpp"
 #include "types/variantStruct.hpp"
+#include "types/propertyTree.hpp"
+#include "config/configurationTree.hpp"
 
 namespace _Wolframe {
 namespace config {
 
 template <class Structure>
-void parseConfigStructure( Structure& st, const boost::property_tree::ptree& pt)
+void parseConfigStructure( Structure& st, const ConfigurationNode& pt)
 {
 	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
 	serialize::StructParser parser( (void*)&st, st.getStructDescription());
@@ -53,7 +55,7 @@ void parseConfigStructure( Structure& st, const boost::property_tree::ptree& pt)
 }
 
 template <class Structure>
-boost::property_tree::ptree structureToPropertyTree( const Structure& st)
+types::PropertyTree::Node structureToPropertyTree( const Structure& st)
 {
 	langbind::PropertyTreeOutputFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::PropertyTreeOutputFilter());

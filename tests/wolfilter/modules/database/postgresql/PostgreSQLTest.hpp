@@ -36,8 +36,7 @@
 #ifndef _POSTGRES_TEST_HPP_INCLUDED
 #define _POSTGRES_TEST_HPP_INCLUDED
 #include "PostgreSQL.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -55,7 +54,7 @@ public:
 		dump_database();
 	}
 
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string& node,
 			    const module::ModulesDirectory* modules )
 	{
 		return PostgreSQLconfig::parse( extractMyNodes( pt), node, modules );
@@ -71,7 +70,7 @@ public:
 	const std::string& dump_filename() const	{ return m_dump_filename; }
 
 private:
-	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt );
+	config::ConfigurationNode extractMyNodes( const config::ConfigurationNode& pt );
 	void setMyCanonicalPathes( const std::string& referencePath );
 	void dump_database();
 

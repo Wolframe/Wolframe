@@ -38,7 +38,7 @@
 #include "handlerConfig.hpp"
 #include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "testUtils.hpp"
@@ -63,7 +63,7 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 {
 	boost::shared_ptr<proc::ProcProviderConfig> rt( new proc::ProcProviderConfig());
 
-	boost::property_tree::ptree proccfg;
+	config::ConfigurationNode proccfg;
 	std::vector<std::pair<std::string,std::string> >
 		cmdhl = g_modulesDirectory->getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
@@ -93,12 +93,12 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 	{
 		throw std::runtime_error( std::string( "no command handler module loaded that matches to scripts selected (") + cmdhndname + ")");
 	}
-	boost::property_tree::ptree programcfg,cmdhlcfg;
-	programcfg.add_child( "program", boost::property_tree::ptree( script.string()));
+	config::ConfigurationNode programcfg,cmdhlcfg;
+	programcfg.add_child( "program", types::PropertyTree::Node( script.string()));
 	cmdhlcfg.add_child( cfgid.second, programcfg);
 	proccfg.add_child( cfgid.first, cmdhlcfg);
 
-	if (!rt->parse( (const config::ConfigurationTree&)proccfg, std::string(""), g_modulesDirectory))
+	if (!rt->parse( proccfg, std::string(""), g_modulesDirectory))
 	{
 		throw std::runtime_error( "error in test configuration");
 	}

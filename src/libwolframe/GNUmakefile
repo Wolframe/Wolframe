@@ -42,6 +42,7 @@ DYNAMIC_LIB_PATCH = 0
 TYP_OBJS = \
 	types/conversions.o \
 	types/numberBaseConversion.o \
+	types/propertyTree.o \
 	types/string.o \
 	types/bignumber.o \
 	types/datetime.o \
