@@ -9,6 +9,7 @@ PACKAGE_NAME = wolframe
 INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
 
 INCLUDE_DIRS = \
@@ -16,9 +17,10 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	-lboost_thread$(BOOST_LIBRARY_TAG)
 
-STATIC_LIB = libwfshared.a
+STATIC_LIB =
 
 DYNAMIC_LIB = libwfshared.so
 DYNAMIC_LIB_MAJOR = 0

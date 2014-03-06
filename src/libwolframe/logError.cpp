@@ -69,18 +69,18 @@ Logger& operator<< ( Logger& logger, LogError e )
 			char errbuf[512];
 #if defined( __USE_GNU )
 			char *ss = strerror_r( errno, errbuf, 512 );
-			logger.os_ << ss;
+			logger.m_os << ss;
 #else
 			int res = strerror_r( errno, errbuf, 512 );
 			if( res == EINVAL ) {
 				logger.os_ << "(missing strerror translation)";
 			} else if( res == ERANGE ) {
-				logger.os_ << "(memory allocation error in strerror translation)";
+				logger.m_os << "(memory allocation error in strerror translation)";
 			} else {
-				logger.os_ << errbuf;
+				logger.m_os << errbuf;
 			}
 #endif // defined( __USE_GNU )
-			logger.os_ << " (errno: " << errno << ")";
+			logger.m_os << " (errno: " << errno << ")";
 
 			return logger;
 		}
