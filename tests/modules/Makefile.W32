@@ -16,7 +16,6 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\liwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -24,7 +23,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\loadModules.obj \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	wfshared.lib
+	$(TOPDIR)\src\libwfshared\wfshared.lib
 
 TEST_CPP_BINS = \
 	moduleTest.exe
@@ -46,7 +45,8 @@ local_distclean:
 local_test:
 	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
 	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib;$(TOPDIR)\src\libwfshared >> test.bat
+	@-echo set PATHEXT=%PATHEXT%;.DLL >> test.bat
 	@-echo moduleTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

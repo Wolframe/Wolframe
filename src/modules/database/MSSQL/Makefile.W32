@@ -17,7 +17,9 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfshared\wfshared.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
+
 
 DYNAMIC_MODULE = \
 #	mod_db_mssql.dll

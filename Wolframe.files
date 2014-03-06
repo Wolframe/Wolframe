@@ -1692,6 +1692,7 @@ include/types/form.hpp
 include/types/integer.hpp
 include/types/keymap.hpp
 include/types/normalizeFunction.hpp
+include/types/numberBaseConversion.hpp
 include/types/string.hpp
 include/types/traits.hpp
 include/types/variant.hpp
@@ -1788,8 +1789,6 @@ src/libwfshared/logger/logBackendSyslog.cpp
 src/libwfshared/logger/logBackendSyslog.hpp
 src/libwfshared/logger/logBackendWinDebug.cpp
 src/libwfshared/logger/logBackendWinDebug.hpp
-src/libwfshared/logger/logError.cpp
-src/libwfshared/logger/loggerConfig.cpp
 src/libwfshared/logger/logLevel.cpp
 src/libwfshared/logger/logSyslogFacility.cpp
 src/libwfshared/logger/syslog_win32.c
@@ -1848,6 +1847,7 @@ src/libwolframe_langbind/ptreefilter.cpp
 src/libwolframe_langbind/tostringfilter.cpp
 src/libwolframe_langbind/typedfilterScope.cpp
 src/libwolframe_langbind/typingfilter.cpp
+src/libwolframe/logError.cpp
 src/libwolframe/logObject.cpp
 src/libwolframe/Makefile.W32
 src/libwolframe/md5.c
@@ -1878,7 +1878,6 @@ src/libwolframe/types/datetime.cpp
 src/libwolframe/types/doctype.cpp
 src/libwolframe/types/form.cpp
 src/libwolframe/types/numberBaseConversion.cpp
-src/libwolframe/types/numberBaseConversion.hpp
 src/libwolframe/types/string.cpp
 src/libwolframe/types/variant.cpp
 src/libwolframe/types/variantStruct.cpp
@@ -1893,6 +1892,7 @@ src/libwolframe/utils/stringUtils.cpp
 src/libwolframe/utils/typeSignature.cpp
 src/libwolframe/version.cpp
 src/loadModules.cpp
+src/loggerConfig.cpp
 src/mainConnectionHandler_auth.hpp
 src/mainConnectionHandler.cpp
 src/mainConnectionHandler.hpp
@@ -2073,6 +2073,8 @@ src/modules/database/postgresql/PostgreSQLmodule.cpp
 src/modules/database/postgresql/PostgreSQLmodule.def
 src/modules/database/postgresql/PostgreSQLprogram.cpp
 src/modules/database/postgresql/PostgreSQLprogram.hpp
+src/modules/database/postgresql/PostgreSQLserverSettings.cpp
+src/modules/database/postgresql/PostgreSQLserverSettings.hpp
 src/modules/database/postgresql/PostgreSQLstatement.cpp
 src/modules/database/postgresql/PostgreSQLstatement.hpp
 src/modules/database/postgresql/PostgreSQLsubstitutingStatement.cpp
@@ -2445,15 +2447,6 @@ tests/simpleFormCompiler/src/simpleFormCompiler.cpp
 tests/simpleFormCompiler/src/testSimpleFormCompiler.cpp
 tests/SSL/README.txt
 tests/stringNormalizationTest.cpp
-tests/temp/bcdnumber_calc.lua
-tests/temp/date_calc.lua
-tests/temp/DBIN.tdl
-tests/temp/DBPRG.tdl
-tests/temp/preprocess.lua
-tests/temp/preprocess.tdl
-tests/temp/program_formfunc.lua
-tests/temp/script.lua
-tests/temp/wolframe.conf
 tests/testArrayDoublingAllocator.cpp
 tests/testBigNumber.cpp
 tests/testBoostPath.cpp

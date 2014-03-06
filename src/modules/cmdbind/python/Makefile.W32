@@ -19,6 +19,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfshared\wfshared.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
@@ -29,7 +30,7 @@ INCLUDE_LIBS = $(INCLUDE_LIBS) \
 INCLUDE_LIBS = $(INCLUDE_LIBS) \
 	"$(PYTHON_DIR)\libs\python33_d.lib"
 !ENDIF
-	
+
 DYNAMIC_MODULE = \
 	mod_command_python.dll
 

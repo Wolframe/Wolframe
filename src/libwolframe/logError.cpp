@@ -49,7 +49,6 @@
 
 #include "logger-v1.hpp"
 #include "logger/logError.hpp"
-//#include "logBackendImpl.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -62,7 +61,7 @@ const LogError LogError::LogWinerror( LogError::LOGERROR_WINERROR );
 
 // template functions for error markers in the output stream
 // e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
-Logger& operator<<( Logger& logger, LogError e )
+Logger& operator<< ( Logger& logger, LogError e )
 {
 	switch( e.error( ) ) {
 #if !defined( _WIN32 )
@@ -70,18 +69,18 @@ Logger& operator<<( Logger& logger, LogError e )
 			char errbuf[512];
 #if defined( __USE_GNU )
 			char *ss = strerror_r( errno, errbuf, 512 );
-			logger.os_ << ss;
+			logger.m_os << ss;
 #else
 			int res = strerror_r( errno, errbuf, 512 );
 			if( res == EINVAL ) {
 				logger.os_ << "(missing strerror translation)";
 			} else if( res == ERANGE ) {
-				logger.os_ << "(memory allocation error in strerror translation)";
+				logger.m_os << "(memory allocation error in strerror translation)";
 			} else {
-				logger.os_ << errbuf;
+				logger.m_os << errbuf;
 			}
 #endif // defined( __USE_GNU )
-			logger.os_ << " (errno: " << errno << ")";
+			logger.m_os << " (errno: " << errno << ")";
 
 			return logger;
 		}
@@ -113,9 +112,9 @@ Logger& operator<<( Logger& logger, LogError e )
 
 			StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
 
-			logger.os_ << errbuf;
+			logger.m_os << errbuf;
 
-			logger.os_ << " (errcode: " << last_error << ")";
+			logger.m_os << " (errcode: " << last_error << ")";
 
 			return logger;
 		}
