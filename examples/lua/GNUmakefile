@@ -12,18 +12,17 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwfshared \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfshared \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
-	-lwfshared \
-	-lwolframe \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
 
@@ -61,13 +60,15 @@ local_distclean:
 
 local_install:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe"
+
 local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src $(EXPECT) ./testLua
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testLua
 endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src ./luad -c luad.conf -f -d DATA
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./luad -c luad.conf -f -d DATA

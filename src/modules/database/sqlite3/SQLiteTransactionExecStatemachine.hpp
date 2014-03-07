@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief SQLite3 interface to the standard database transaction execution statemechine
-///\file SQLiteTransactionExecStatemachine.hpp
+//\brief SQLite3 interface to the standard database transaction execution statemechine
+//\file SQLiteTransactionExecStatemachine.hpp
 #ifndef _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_SQLITE3_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
@@ -48,47 +48,47 @@ namespace db {
 
 class SQLiteDBunit;
 
-///\class TransactionExecStatemachine_sqlite3
-///\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
-///\remark The sqlite3 connection is opened, closed, created and disposed by the caller
+//\class TransactionExecStatemachine_sqlite3
+//\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
+//\remark The sqlite3 connection is opened, closed, created and disposed by the caller
 struct TransactionExecStatemachine_sqlite3
 	:public TransactionExecStatemachine
 {
-	///\brief Constructor
+	//\brief Constructor
 	TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_);
 
-	///\brief Destructor
+	//\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
 
 	//\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
-	///\brief Begin transaction
+	//\brief Begin transaction
 	virtual bool begin();
-	///\brief Commit current transaction
+	//\brief Commit current transaction
 	virtual bool commit();
-	///\brief Rollback current transaction
+	//\brief Rollback current transaction
 	virtual bool rollback();
 
-	///\brief Start new command statement
+	//\brief Start new command statement
 	virtual bool start( const std::string& statement);
-	///\brief Bind parameter value on current command statement
+	//\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value);
-	///\brief Execute instance of current statement
+	//\brief Execute instance of current statement
 	virtual bool execute();
-	///\brief Return true is the last command has at least one result row returned
+	//\brief Return true is the last command has at least one result row returned
 	virtual bool hasResult();
-	///\brief Get the number of columns of the last result
+	//\brief Get the number of columns of the last result
 	virtual std::size_t nofColumns();
-	///\brief Get a column title of the last result
+	//\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
-	///\brief Get the last database error as string
+	//\brief Get the last database error as string
 	virtual const db::DatabaseError* getLastError();
-	///\brief Get a column of the last result
+	//\brief Get a column of the last result
 	virtual types::VariantConst get( std::size_t idx);
-	///\brief Skip to the next row of the last result
+	//\brief Skip to the next row of the last result
 	virtual bool next();
-	///\brief Find out if the database is case sensitive or not
+	//\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()	{return false;}
 
 private:
@@ -115,11 +115,11 @@ private:
 	bool executeInstruction( const char* stmstr, State newstate);
 
 private:
-	State m_state;
-	std::string m_dbname;
-	std::string m_curstm;
-	bool m_hasResult;
-	bool m_hasRow;
+	State m_state;						//< command execution state
+	std::string m_dbname;					//< name of database
+	std::string m_curstm;					//< current statement executed
+	bool m_hasResult;					//< last command executed is a command that returns a result set (the result might be empty, check 'm_hasRow' for  non empty result)
+	bool m_hasRow;						//< last command executed result set has at least one result row
 	boost::shared_ptr<db::DatabaseError> m_lasterror;	//< last error occurred
 	sqlite3_stmt* m_stm;					//< current statement
 	SQLiteDBunit* m_dbunit;					//< database unit
