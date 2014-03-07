@@ -535,7 +535,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 	enum Keyword{ kw_NONE,kw_INCLUDE };
 	static const utils::IdentifierTable g_keywords_tab( false, g_keywords);
 	
-	static const utils::CharTable ptOpTab( "{}./\\;*:-");
+	static const utils::CharTable ptOpTab( "{}./\\;,*:?!#&()[]$^~=%@+-");
 	types::PropertyTree::Node node;
 	std::string content( readSourceFileContent( filename));
 	typedef std::pair<std::string,types::PropertyTree::Node> StackElem;
@@ -654,6 +654,22 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 				case '*':
 				case ':':
 				case '-':
+				case ',':
+				case '?':
+				case '!':
+				case '#':
+				case '&':
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '$':
+				case '^':
+				case '~':
+				case '=':
+				case '%':
+				case '@':
+				case '+':
 					tok.push_back( ch);
 					if (id.empty()) throw std::runtime_error( "identifier expected as key");
 					//...no break here

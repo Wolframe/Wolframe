@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file types/propertyTree.hpp
-///\brief Interface to a key value tree based on boost::property_tree::ptree with position info for better error reporting
+//\file types/propertyTree.hpp
+//\brief Interface to a key value tree based on boost::property_tree::ptree with position info for better error reporting
 
 #ifndef _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
 #define _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
@@ -50,13 +50,7 @@ class PropertyTree
 {
 public:
 	typedef boost::shared_ptr<char> FileName;
-	static FileName getFileName( const std::string& name)
-	{
-		char* cc = (char*)std::malloc( name.size()+1);
-		if (!cc) throw std::bad_alloc();
-		std::memcpy( cc, name.c_str(), name.size()+1);
-		return boost::shared_ptr<char>( cc, std::free);
-	}
+	static FileName getFileName( const std::string& name);
 
 	class Position
 	{
@@ -80,6 +74,8 @@ public:
 		{
 			m_filename = filename_;
 		}
+
+		std::string logtext() const;
 
 	private:
 		FileName m_filename;
@@ -121,18 +117,7 @@ public:
 		Node( const std::string& val, const Position& pos=Position())
 			:Parent( Value( val, pos)){}
 
-		Node( const boost::property_tree::ptree& pt)
-		{
-			boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
-			for (; pi != pe; ++pi)
-			{
-				Parent::add_child( pi->first, Node( pi->second));
-			}
-			if (!pt.data().empty())
-			{
-				Parent::put_value( Value( pt.data()));
-			}
-		}
+		Node( const boost::property_tree::ptree& pt);
 
 		void setValue( const std::string& val)
 		{
@@ -150,15 +135,7 @@ public:
 		}
 
 	private:
-		static void recursiveSetFileName( Parent& pt, const FileName& filename)
-		{
-			Parent::iterator pi = pt.begin(), pe = pt.end();
-			for (; pi != pe; ++pi)
-			{
-				recursiveSetFileName( pi->second, filename);
-			}
-			pt.data().position.setFileName( filename);
-		}
+		static void recursiveSetFileName( Parent& pt, const FileName& filename);
 	};
 
 	typedef boost::property_tree::ptree_bad_data BadDataException;

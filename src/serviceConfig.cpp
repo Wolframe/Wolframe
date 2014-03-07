@@ -98,7 +98,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 	}
 #else // #if defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))

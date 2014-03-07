@@ -10,9 +10,9 @@ using namespace _Wolframe::module;
 bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules)
 {
 	m_modules = modules;
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 	try
 	{
-		config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 		for (; pi != pe; ++pi)
 		{
 			if (boost::iequals( pi->first, "filter"))
@@ -44,7 +44,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const 
 	}
 	catch (std::runtime_error& e)
 	{
-		LOG_ERROR << e.what();
+		LOG_ERROR << "lua command handler configuration error " << pi->position.logtext() << ":" << e.what();
 		return false;
 	}
 	return true;

@@ -30,14 +30,48 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file types/propertyTree.cpp
-///\brief Implementation of a key value tree based on boost::property_tree::ptree with position info for better error reporting
-
+//\file types/propertyTree.cpp
+//\brief Implementation of a key value tree based on boost::property_tree::ptree with position info for better error reporting
 #include "types/propertyTree.hpp"
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+PropertyTree::FileName types::PropertyTree::getFileName( const std::string& name)
+{
+	char* cc = (char*)std::malloc( name.size()+1);
+	if (!cc) throw std::bad_alloc();
+	std::memcpy( cc, name.c_str(), name.size()+1);
+	return boost::shared_ptr<char>( cc, std::free);
+}
 
+std::string PropertyTree::Position::logtext() const
+{
+	if (!filename()) return std::string();
+	return std::string("in file '") + filename() + "' at line " + boost::lexical_cast<std::string>(m_line) + " column " + boost::lexical_cast<std::string>(m_column);
+}
 
+PropertyTree::Node::Node( const boost::property_tree::ptree& pt)
+{
+	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	for (; pi != pe; ++pi)
+	{
+		Parent::add_child( pi->first, Node( pi->second));
+	}
+	if (!pt.data().empty())
+	{
+		Parent::put_value( Value( pt.data()));
+	}
+}
+
+void PropertyTree::Node::recursiveSetFileName( Parent& pt, const FileName& filename)
+{
+	Parent::iterator pi = pt.begin(), pe = pt.end();
+	for (; pi != pe; ++pi)
+	{
+		recursiveSetFileName( pi->second, filename);
+	}
+	pt.data().position.setFileName( filename);
+}
 
