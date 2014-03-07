@@ -13,11 +13,13 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
+	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	kernel32.lib advapi32.lib Ws2_32.lib
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	wfshared.lib
 
 DYNAMIC_MODULE = \
 	mod_audit_textfile.dll

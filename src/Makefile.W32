@@ -87,6 +87,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \
+	loggerConfig.obj \
 	server.obj
 
 !IFDEF WITH_SSL

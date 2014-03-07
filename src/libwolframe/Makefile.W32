@@ -59,6 +59,7 @@ CPP_OBJS = \
 	$(TYPE_OBJS) \
 	$(UTIL_OBJS) \
 	logObject.obj \
+	logError.obj \
 	version.obj \
 	getPassword.obj \
 	user.obj \

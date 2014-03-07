@@ -69,6 +69,7 @@ TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const 
 TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
 	clear();
+	delete m_statement;
 }
 
 void TransactionExecStatemachine_sqlite3::clear()
