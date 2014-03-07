@@ -22,7 +22,7 @@ INCLUDE_LDFLAGS = \
 # is needed to make the module link..
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\3rdParty\libcjson\cjson.lib
 

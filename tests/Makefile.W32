@@ -25,7 +25,6 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfshared \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -36,7 +35,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
-	wfshared.lib
+	$(TOPDIR)\libwfsingleton\wfsingleton.lib
 
 # Lua
 !IFDEF WITH_LUA
@@ -192,6 +191,7 @@ local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
 	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_LIBXML2

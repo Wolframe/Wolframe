@@ -30,56 +30,48 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// echo configuration functions
-//
+//\file types/propertyTree.cpp
+//\brief Implementation of a key value tree based on boost::property_tree::ptree with position info for better error reporting
+#include "types/propertyTree.hpp"
+#include <boost/lexical_cast.hpp>
 
-#include "handlerConfig.hpp"
-#include "config/configurationTree.hpp"
-#include "config/valueParser.hpp"
-#include "logger-v1.hpp"
+using namespace _Wolframe;
+using namespace _Wolframe::types;
 
-#include <boost/algorithm/string.hpp>
-#include <ostream>
-
-static const unsigned short DEFAULT_TIMEOUT = 180;
-
-namespace _Wolframe {
-
-bool pEchoConfiguration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-				const module::ModulesDirectory* /*modules*/ )
+PropertyTree::FileName types::PropertyTree::getFileName( const std::string& name)
 {
-	bool retVal = true;
-	bool isSet = false;
+	char* cc = (char*)std::malloc( name.size()+1);
+	if (!cc) throw std::bad_alloc();
+	std::memcpy( cc, name.c_str(), name.size()+1);
+	return boost::shared_ptr<char>( cc, std::free);
+}
 
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, timeout ))
-				retVal = false;
-			isSet = true;
-		}
-		else
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+std::string PropertyTree::Position::logtext() const
+{
+	if (!filename()) return std::string();
+	return std::string("in file '") + filename() + "' at line " + boost::lexical_cast<std::string>(m_line) + " column " + boost::lexical_cast<std::string>(m_column);
+}
+
+PropertyTree::Node::Node( const boost::property_tree::ptree& pt)
+{
+	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	for (; pi != pe; ++pi)
+	{
+		Parent::add_child( pi->first, Node( pi->second));
 	}
-	if ( !isSet )
-		timeout = DEFAULT_TIMEOUT;
-
-	return retVal;
+	if (!pt.data().empty())
+	{
+		Parent::put_value( Value( pt.data()));
+	}
 }
 
-
-void pEchoConfiguration::print( std::ostream& os, size_t /*indent*/ ) const
+void PropertyTree::Node::recursiveSetFileName( Parent& pt, const FileName& filename)
 {
-	os << sectionName() << std::endl;
-	os << "   Idle timeout: " << timeout << std::endl;
+	Parent::iterator pi = pt.begin(), pe = pt.end();
+	for (; pi != pe; ++pi)
+	{
+		recursiveSetFileName( pi->second, filename);
+	}
+	pt.data().position.setFileName( filename);
 }
 
-
-/// Check if the database configuration makes sense
-bool pEchoConfiguration::check() const
-{
-	return true;
-}
-
-} // namespace _Wolframe

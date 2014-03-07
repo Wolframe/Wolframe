@@ -38,11 +38,10 @@ Project Wolframe.
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include "processor/procProviderInterface.hpp"
-#include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
 
@@ -63,7 +62,7 @@ public:
 	///\brief Parse the configuration
 	///\param[in] pt configuration tree
 	///\param[in] modules module directory
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory* modules);
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules);
 
 	///\brief Set canonical path for files referenced as relative path in configuration
 	///\param[in] referencePath reference path

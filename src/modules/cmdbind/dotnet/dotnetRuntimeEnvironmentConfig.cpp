@@ -48,22 +48,22 @@ DotnetRuntimeEnvironmentConfig::AssemblyDescription::AssemblyDescription( const 
 	name.append( boost::algorithm::trim_copy( std::string( description.c_str(), ee - description.c_str())));
 }
 
-bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory*)
+bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory*)
 {
-	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 	for (; pi != pe; ++pi)
 	{
 		if (boost::iequals( pi->first, "clrversion"))
 		{
-			m_clrversion = pi->second.get_value<std::string>();
+			m_clrversion = pi->second.data();
 		}
 		else if (boost::iequals( pi->first, "typelibpath"))
 		{
-			m_typelibpath = pi->second.get_value<std::string>();
+			m_typelibpath = pi->second.data();
 		}
 		else if (boost::iequals( pi->first, "assembly"))
 		{
-			m_assemblylist.push_back( pi->second.get_value<std::string>());
+			m_assemblylist.push_back( pi->second.data());
 		}
 		else
 		{

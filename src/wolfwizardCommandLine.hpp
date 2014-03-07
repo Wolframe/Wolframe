@@ -39,7 +39,7 @@
 #include <iostream>
 #include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "types/propertyTree.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -55,7 +55,7 @@ public:
 	const std::string& configfile() const				{return m_configfile;}
 
 	static void print( std::ostream& out);
-	const boost::property_tree::ptree& providerconfig() const	{return m_providerconfig;}
+	const config::ConfigurationNode& providerconfig()		 const	{return m_providerconfig;}
 	const std::list<std::string>& modules() const			{return m_modules;}
 	const std::string& referencePath() const			{return m_referencePath;}
 
@@ -63,7 +63,8 @@ private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_configfile;
-	boost::property_tree::ptree m_providerconfig;
+	config::ConfigurationTree m_config;
+	config::ConfigurationNode m_providerconfig;
 	std::string m_referencePath;
 	std::string m_modulePath;
 	std::list<std::string> m_modules;

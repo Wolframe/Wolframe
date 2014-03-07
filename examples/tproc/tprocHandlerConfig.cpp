@@ -70,12 +70,12 @@ const serialize::StructDescriptionBase* ConfigurationStruct::getStructDescriptio
 	return &rt;
 }
 
-bool Configuration::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
+bool Configuration::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory*)
 {
 	try
 	{
 		ConfigurationStruct data;
-		config::parseConfigStructure( data, (const boost::property_tree::ptree&)pt);
+		config::parseConfigStructure( data, pt);
 
 		std::vector<std::string>::const_iterator itr=data.cmd.begin();
 		while (itr != data.cmd.end())

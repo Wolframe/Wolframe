@@ -36,14 +36,11 @@
 
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "appProperties.hpp"
-#include "logger-v1.hpp"
-
-#include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
-
-#include <boost/property_tree/ptree.hpp>
+#include "logger-v1.hpp"
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <string>
@@ -55,7 +52,7 @@ namespace _Wolframe {
 namespace config {
 
 /// Parse the configuration
-bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string& node,
+bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std::string& node,
 				  const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
@@ -65,30 +62,34 @@ bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string
 	}
 #else // #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
 				bool isDefined = ( !user.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
 				bool isDefined = ( !group.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, group, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
 				bool isDefined = ( !pidFile.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					    << L1it->first << "'";
+					    << L1it->first << "' (" << L1it->second.data().position.logtext() << ")";
 			}
 		}
 		if ( serviceName.empty() )
@@ -101,20 +102,23 @@ bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string
 	}
 #else // #if defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
 				bool isDefined = ( !serviceDisplayName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
 				bool isDefined = ( !serviceDescription.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
 			}
 			else	{

@@ -38,9 +38,9 @@
 #define _STANDARD_CONFIGS_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
+#include "config/configurationTree.hpp"
 #include "system/serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
-
 #include "logger/logSyslogFacility.hpp"
 
 #include <string>
@@ -66,7 +66,7 @@ public:
 	Configuration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -107,7 +107,7 @@ public:
 	LoggerConfiguration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -146,7 +146,7 @@ public:
 	ServiceConfiguration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -182,7 +182,7 @@ public:
 	/// methods
 	std::string toString() const;
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

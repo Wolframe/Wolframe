@@ -34,8 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
+#include "types/propertyTree.hpp"
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace serialize {
@@ -48,7 +48,7 @@ void parseStructOptionString( Structure& st, const std::string& opt)
 	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
 }
 
-boost::property_tree::ptree structOptionTree( const std::string& opt);
+types::PropertyTree::Node structOptionTree( const std::string& opt);
 
 }}
 #endif

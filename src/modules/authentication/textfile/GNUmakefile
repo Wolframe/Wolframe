@@ -31,7 +31,7 @@ CPP_OBJS = \
 	$(PASSWD_OBJS)
 
 PASSWD_LIBS = \
-	$(TOPDIR)/src/libwfshared/libwfshared.a \
+	$(TOPDIR)/src/libwfsingleton/libwfsingleton.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_program_options \
 	-lboost_system -lboost_filesystem

@@ -208,10 +208,10 @@ std::pair<std::string,std::string> utils::parseTokenAssignement( std::string::co
 	return parseTokenAssignement( itr, end, identifierCharTable());
 }
 
-LineInfo utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
+LineInfo utils::getLineInfoIncrement( const LineInfo& lineinfo, const std::string::const_iterator& lastpos, const std::string::const_iterator& pos)
 {
-	LineInfo rt;
-	std::string::const_iterator ii = start;
+	LineInfo rt = lineinfo;
+	std::string::const_iterator ii = lastpos;
 	for (; ii!=pos; ++ii)
 	{
 		if (*ii == '\n')
@@ -224,6 +224,12 @@ LineInfo utils::getLineInfo( const std::string::const_iterator& start, const std
 		}
 	}
 	return rt;
+}
+
+LineInfo utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
+{
+	LineInfo rt;
+	return utils::getLineInfoIncrement( rt, start, pos);
 }
 
 std::string utils::parseLine( std::string::const_iterator& si, const std::string::const_iterator& se)

@@ -63,7 +63,7 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules);
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string& node, const module::ModulesDirectory* modules);
 	virtual bool check() const;
 	void print( std::ostream& os, size_t indent) const;
 	virtual void setCanonicalPathes( const std::string& referencePath);

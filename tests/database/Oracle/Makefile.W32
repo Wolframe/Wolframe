@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfshared.dll
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 CPP_OBJS = \
 	PostgreSQLModuleFiles.obj
@@ -53,6 +53,7 @@ local_distclean:
 
 local_test: dbPing.exe
 	@-echo @echo off > test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
 	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
 	@-echo dbping andreasbaumann.dyndns.org wolfusr wolfpwd orcl >> test.bat
 	@-echo if errorlevel 1 goto skip >> test.bat

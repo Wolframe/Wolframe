@@ -41,7 +41,7 @@
 #include "wtest/testDescription.hpp"
 #include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"

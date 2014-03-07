@@ -35,11 +35,15 @@
 
 #ifndef _WOLFRAME_FILE_UTILS_HPP_INCLUDED
 #define _WOLFRAME_FILE_UTILS_HPP_INCLUDED
+#include "types/propertyTree.hpp"
 #include <string>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
+namespace config
+{
+	class ConfigurationTree;
+}
 namespace utils {
 
 ///\brief Remove .. and . from a path
@@ -83,7 +87,7 @@ std::string readSourceFileContent( const std::string& filename);
 
 ///\brief Reading the content of a source file as property tree (with property tree syntax)
 ///\remark Throws on error
-boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
+types::PropertyTree readPropertyTreeFile( const std::string& filename);
 
 ///\brief Writing a file
 ///\remark Throws on error

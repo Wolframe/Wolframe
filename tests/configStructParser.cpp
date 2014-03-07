@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief test for configuration parser with wolframe example configuration
 
 #include "config/structSerialize.hpp"
+#include "utils/fileUtils.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
@@ -40,7 +41,6 @@ Project Wolframe.
 #pragma warning(disable:4127)
 #endif
 #include <iostream>
-#include <boost/property_tree/info_parser.hpp>
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
@@ -431,11 +431,10 @@ int main( int argc, const char** argv)
 	}
 
 	std::string errmsg;
-	boost::property_tree::ptree pt;
 	try
 	{
-		boost::property_tree::read_info( configfile, pt);
-		config::parseConfigStructure( cfg, pt);
+		config::ConfigurationTree pt = utils::readPropertyTreeFile( configfile);
+		config::parseConfigStructure( cfg, pt.root());
 		std::cout << config::structureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)

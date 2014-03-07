@@ -36,6 +36,7 @@
 
 #include "AAAA/audit.hpp"
 #include "module/constructor.hpp"
+#include "config/configurationTree.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
 #define _DB_AUDIT_HPP_INCLUDED
@@ -56,7 +57,7 @@ public:
 	const char* className() const		{ return DB_AUDIT_CLASS_NAME; }
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

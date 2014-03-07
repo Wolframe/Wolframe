@@ -30,28 +30,29 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// configuration tree for the configuration parser
-//
-///\note	This file is separated from configurationBase.hpp
-///		in order to keep boost/property_tree/ptree.hpp away
-///		from the dependencies of the configuration structures
+//\brief Configuration tree for the configuration parser
+//\file config/configurationTree.hpp
 
 #ifndef _CONFIGURATION_TREE_HPP_INCLUDED
 #define _CONFIGURATION_TREE_HPP_INCLUDED
-
-#include <boost/property_tree/ptree.hpp>
+#include "types/propertyTree.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace config {
 
-struct ConfigurationTree : public boost::property_tree::ptree
+class ConfigurationTree
+	:public types::PropertyTree
 {
 public:
-	ConfigurationTree( const boost::property_tree::ptree& pt )
-		: boost::property_tree::ptree( pt )	{}
+	ConfigurationTree(){}
+	ConfigurationTree( const boost::property_tree::ptree& pt, const std::string& filename)
+		:types::PropertyTree( pt, filename){}
+	ConfigurationTree( const types::PropertyTree& pt)
+		:types::PropertyTree( pt){}
 };
 
-}} // namespace _Wolframe::config
+typedef types::PropertyTree::Node ConfigurationNode;
 
+}} // namespace _Wolframe::config
 #endif // _CONFIGURATION_TREE_HPP_INCLUDED

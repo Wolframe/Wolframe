@@ -36,15 +36,13 @@
 
 #include "standardConfigs.hpp"
 #include "server.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appProperties.hpp"
 #include "logger-v1.hpp"
 
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
-
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <string>
@@ -56,7 +54,7 @@ namespace net {
 static const unsigned short DEFAULT_NOF_THREADS = 4;
 
 /// Parse the configuration
-bool Configuration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool Configuration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			   const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
@@ -64,7 +62,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 	bool threadsDefined, maxConnDefined;
 	threadsDefined = maxConnDefined = false;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
 			if ( ! config::Parser::getValue( logPrefix().c_str(), *L1it, threads,
 						 config::Parser::RangeDomain<unsigned short>( 1 ), &threadsDefined ))
@@ -83,7 +81,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 			bool portDefined, connDefined;
 			portDefined = connDefined = false;
 
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{
@@ -133,7 +131,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 			bool portDefined, connDefined, verifyDefined;
 			portDefined = connDefined = verifyDefined = false;
 
-			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{

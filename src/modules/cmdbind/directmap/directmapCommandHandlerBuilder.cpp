@@ -7,12 +7,12 @@
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
-bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
+bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory*)
 {
 	int filterDefied = 0;
 	try
 	{
-		boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+		config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 		for (; pi != pe; ++pi)
 		{
 			// optional configuration parameters:
@@ -21,7 +21,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationTree& pt, 
 				++filterDefied;
 
 				std::vector<std::string> filterdef;
-				utils::splitString( filterdef, pi->second.get_value<std::string>(), "=");
+				utils::splitString( filterdef, pi->second.data().string(), "=");
 				if (filterdef.size() == 1)
 				{
 					m_context.setFilter( "", filterdef.at(0));
@@ -38,7 +38,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationTree& pt, 
 			// required configuration parameters:
 			else if (boost::iequals( pi->first, "program"))
 			{
-				m_programfiles.push_back( pi->second.get_value<std::string>());
+				m_programfiles.push_back( pi->second.data().string());
 			}
 			else
 			{

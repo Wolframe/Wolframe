@@ -31,7 +31,6 @@
 
 ************************************************************************/
 
-///\brief Interface to substitute parameters in embedded SQL statements
 ///\file database/statement.hpp
 
 #ifndef _DATABASE_STATEMENET_HPP_INCLUDED
@@ -43,38 +42,42 @@
 namespace _Wolframe {
 namespace db {
 
-//\remark The interface of a statement SQL parameter substutution class
+///\class Statement
+///\brief The interface of a statement SQL parameter substutution class
 class Statement
 {
 	public:
 		virtual ~Statement( ) { }
 		
-		//\remark Binds parameter at position idx with variant data
-		//        in the format with Wolframe placeholders
+		///\brief Binds parameter at position idx with variant data
+		///       in the format with Wolframe placeholders
 		virtual void bind( const unsigned int idx, const types::Variant &arg ) = 0;
 
-		//\remark Returns the SQL statement as passed down to the
-		//        database layer
+		///\brief Returns the SQL statement as passed down to the
+		///       database layer
 		virtual const std::string originalSQL( ) const = 0;
 		
-		//\remark Returns the SQL statement with the native database
-		//        placeholders or the data filled in (this is up
-		//        to the derived classes).
+		///\brief Returns the SQL statement with the native database
+		///       placeholders or the data filled in (this is up
+		///       to the derived classes).
 		virtual const std::string nativeSQL( ) const = 0;
 
-		//\remark Set new SQL statement
+		///\brief Set new SQL statement
 		virtual void init( const std::string &stmtStr ) = 0;
 		
-		//\remark Clear current statement
+		///\brief Clear current statement
 		virtual void clear( ) = 0;
 
-		//\remark Trigger substitution (nativeSQL is valid after
-		//        this call and not before!)
-		virtual void substitute( bool withPlaceholders = true ) = 0;
+		///\brief Trigger substitution (nativeSQL is valid after
+		///       this call and not before!)
+		///\param[in] checkForMissingPlaceholders whether the function should
+		///           already check the validity and cardinality of the placeholders
+		///           in the SQL statement
+		virtual void substitute( bool checkForMissingPlaceholders = true ) = 0;
 
-		//\remark Funtion called when the placeholder should be put
-		//        into the final string (this is either for subsituting
-		//        data or rewrite placeholders to native syntax)
+		///\brief Funtion called when the placeholder should be put
+		///       into the final string (this is either for subsituting
+		///       data or rewrite placeholders to native syntax)
 		virtual const std::string replace( const unsigned int idx ) const = 0;
 };
 

@@ -7,18 +7,18 @@
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
-bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory* modules)
+bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules)
 {
 	m_modules = modules;
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 	try
 	{
-		boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 		for (; pi != pe; ++pi)
 		{
 			if (boost::iequals( pi->first, "filter"))
 			{
 				std::vector<std::string> filterdef;
-				utils::splitString( filterdef, pi->second.get_value<std::string>(), "=");
+				utils::splitString( filterdef, pi->second.data().string(), "=");
 				if (filterdef.size() == 1)
 				{
 					m_context.setDefaultFilter( "", filterdef.at(0));
@@ -34,7 +34,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const 
 			}
 			else if (boost::iequals( pi->first, "program"))
 			{
-				m_programfiles.push_back( pi->second.get_value<std::string>());
+				m_programfiles.push_back( pi->second.data());
 			}
 			else
 			{
@@ -44,7 +44,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationTree& pt, const 
 	}
 	catch (std::runtime_error& e)
 	{
-		LOG_ERROR << e.what();
+		LOG_ERROR << "lua command handler configuration error " << pi->second.data().position.logtext() << ":" << e.what();
 		return false;
 	}
 	return true;

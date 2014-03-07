@@ -36,7 +36,7 @@
 
 #include "SQLite.hpp"
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -48,7 +48,7 @@ namespace db {
 
 static const unsigned short DEFAULT_SQLITE_CONNECTIONS = 3;
 
-bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			  const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
@@ -57,7 +57,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 	bool connDefined = false;
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
 			bool isDefined = ( !m_ID.empty() );
 			std::string id;

@@ -37,13 +37,11 @@
 #include "DBproviderImpl.hpp"
 
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "module/moduleDirectory.hpp"
 #include "logger-v1.hpp"
-
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <ostream>
@@ -54,14 +52,14 @@
 namespace _Wolframe {
 namespace db {
 
-bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
+bool DBproviderConfig::parse( const config::ConfigurationNode& pt,
 			      const std::string& /*node*/,
 			      const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( modules )	{
 			module::ConfiguredBuilder* builder = modules->getBuilder( "database", L1it->first );
 			if ( builder )	{

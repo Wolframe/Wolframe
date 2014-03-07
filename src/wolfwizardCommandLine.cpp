@@ -40,6 +40,7 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
@@ -92,9 +93,9 @@ WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::
 		} else {
 			m_referencePath = boost::filesystem::path( m_configfile ).branch_path().string();
 		}
-		boost::property_tree::ptree ptcfg = utils::readPropertyTreeFile( m_configfile);
+		m_config = utils::readPropertyTreeFile( m_configfile);
 
-		boost::property_tree::ptree::const_iterator gi = ptcfg.begin(), ge = ptcfg.end();
+		config::ConfigurationNode::const_iterator gi = m_config.begin(), ge = m_config.end();
 		for (; gi != ge; ++gi)
 		{
 			if (boost::algorithm::iequals( gi->first, "Processor"))
@@ -104,12 +105,12 @@ WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::
 			}
 			if (boost::algorithm::iequals( gi->first, "LoadModules"))
 			{
-				boost::property_tree::ptree::const_iterator mi = gi->second.begin(), me = gi->second.end();
+				config::ConfigurationNode::const_iterator mi = gi->second.begin(), me = gi->second.end();
 				for (; mi != me; ++mi)
 				{
 					if (boost::algorithm::iequals( mi->first, "module"))
 					{
-						m_modules.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), m_modulePath));
+						m_modules.push_back( utils::getCanonicalPath( mi->second.data(), m_modulePath));
 					}
 				}
 			}

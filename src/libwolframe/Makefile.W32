@@ -36,6 +36,7 @@ LIBRARIES = \
 TYPE_OBJS = \
 	types\conversions.obj \
 	types\numberBaseConversion.obj \
+	types\propertyTree.obj \
 	types\string.obj \
 	types\bignumber.obj \
 	types\datetime.obj \

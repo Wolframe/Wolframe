@@ -149,6 +149,7 @@ struct LineInfo
 };
 
 LineInfo getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
+LineInfo getLineInfoIncrement( const LineInfo& lineinfo, const std::string::const_iterator& lastpos, const std::string::const_iterator& pos);
 
 }} //namespace _Wolframe::utils
 

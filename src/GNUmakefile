@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwfshared libwolframe_serialize libwolframe_database libwolframe_langbind modules
+SUBDIRS = libwolframe libwfsingleton libwolframe_serialize libwolframe_database libwolframe_langbind modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -13,14 +13,14 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_LIBS = \
-	-lwfshared \
+	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
@@ -41,7 +41,7 @@ INCLUDE_LIBS += \
 endif
 
 LOCAL_STATIC_LIB = \
-	libwolframe.a
+	libwolframed.a
 
 PROVIDER_OBJS = \
 	provider/Authentication.o \

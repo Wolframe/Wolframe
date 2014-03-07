@@ -101,10 +101,10 @@ void SQLiteTestConstructor::createTestDatabase( const std::string& filename, con
 	}
 }
 
-config::ConfigurationTree SQLiteTestConfig::extractMyNodes( const config::ConfigurationTree& pt)
+config::ConfigurationNode SQLiteTestConfig::extractMyNodes( const config::ConfigurationNode& pt)
 {
-	boost::property_tree::ptree rt;
-	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	config::ConfigurationNode rt;
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 
 	for (; pi != pe; ++pi)
 	{

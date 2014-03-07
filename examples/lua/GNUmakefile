@@ -12,16 +12,16 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	-lwfshared \
+	-lwfsingleton \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_date_time \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
 	$(LIBS_DL)
@@ -48,7 +48,7 @@ CPP_OBJS = \
 CPP_BINS = \
 	luad$(EXE)
 
-#luad$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+#luad$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -60,7 +60,7 @@ local_distclean:
 
 local_install:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
 
 local_test:
 ifeq ($(RUN_TESTS),1)

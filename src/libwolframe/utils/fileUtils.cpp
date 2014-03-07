@@ -92,21 +92,21 @@ std::string utils::resolvePath( const std::string& path )
 	return result.string();
 }
 
-std::string _Wolframe::utils::getFileExtension( const std::string& path)
+std::string utils::getFileExtension( const std::string& path)
 {
 	boost::filesystem::path p(path);
 	std::string rt = p.extension().string();
 	return rt;
 }
 
-std::string _Wolframe::utils::getFileStem( const std::string& path)
+std::string utils::getFileStem( const std::string& path)
 {
 	boost::filesystem::path p(path);
 	std::string rt = p.stem().string();
 	return rt;
 }
 
-std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const std::string& refPath )
+std::string utils::getCanonicalPath( const std::string& path, const std::string& refPath )
 {
 	boost::filesystem::path pt( path );
 	if ( pt.is_absolute() )
@@ -116,7 +116,7 @@ std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const s
 								 boost::filesystem::path( refPath ) ).string() );
 }
 
-bool _Wolframe::utils::fileExists( const std::string& path)
+bool utils::fileExists( const std::string& path)
 {
 	try
 	{
@@ -129,7 +129,7 @@ bool _Wolframe::utils::fileExists( const std::string& path)
 	}
 }
 
-std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned int levels)
+std::string utils::getParentPath( const std::string& path, unsigned int levels)
 {
 	boost::filesystem::path pt( path);
 	if (!pt.is_absolute())
@@ -148,8 +148,7 @@ std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned i
 
 static void readFileContent( const std::string& filename, std::string& res)
 {
-//#if defined(_WIN32)
-#if 0
+#if defined(_WIN32)
 	enum {BUFFERSIZE=8192};
 	char readBuffer[ BUFFERSIZE+1];
 	DWORD dwBytesRead = 0;
@@ -209,44 +208,13 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-#if defined(_WIN32)
-	DWORD dwBytesWritten;
-	BOOL success;
-	struct Locals
-	{
-		HANDLE hFile;
-		Locals()
-		{
-			hFile = INVALID_HANDLE_VALUE;
-		}
-		~Locals()
-		{
-			if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
-		}
-	};
-	Locals locals;
+//[PF:NOTE] Using Posix functions to write file because I did not find a better solution.
+//	a) If '::CreateFile' and '::WriteFile' are used then '\n' is implicitely converted
+//	to '\r\n'. Sometimes this is not wished. No clue how to write a blob as binary
+//	with these functions based on HANDLE.
+//	b) If '::OpenFile' and '::WriteFile' is used we get to a limitation of the file path
+//	length of 128 bytes: See OFSTRUCT definition (OFS_MAXPATHNAME = 128)
 
-	locals.hFile = ::CreateFile( filename.c_str(), GENERIC_WRITE, 0/*do not share*/, 
-				NULL/*default security*/, CREATE_NEW,
-				FILE_ATTRIBUTE_NORMAL, NULL/*no attr. template*/);
-	
-	if (locals.hFile == INVALID_HANDLE_VALUE) 
-	{
-		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Failed to open file for writing [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
-	}
-
-	success = ::WriteFile( locals.hFile, content.c_str(), content.size(), &dwBytesWritten, NULL);
-	if (!success)
-	{
-		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Error writing to file [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
-	}
-	if (dwBytesWritten != content.size())
-	{
-		throw std::runtime_error( std::string("Error writing to file (incomplete) file: ") + filename);
-	}
-#else
 	unsigned char ch;
 	FILE* fh = fopen( filename.c_str(), "w");
 	if (!fh)
@@ -264,7 +232,6 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 			if (ec) throw std::runtime_error( std::string( "failed to write (errno " + boost::lexical_cast<std::string>(ec) + ") to file ") + filename + "'");
 		}
 	}
-#endif
 }
 
 std::string utils::readSourceFileContent( const std::string& filename)
@@ -530,10 +497,203 @@ FileType utils::getFileType( const std::string& filename)
 }
 
 
-boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& filename)
+static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& filename, const std::vector<std::string>& filenamestack=std::vector<std::string>())
+{
+	static const char* g_keywords[] = {"include",0};
+	enum Keyword{ kw_NONE,kw_INCLUDE };
+	static const utils::IdentifierTable g_keywords_tab( false, g_keywords);
+	
+	static const utils::CharTable ptOpTab( "{}./\\;,*:?!#&()[]$^~=%@+-");
+	types::PropertyTree::Node node;
+	std::string content( readSourceFileContent( filename));
+	typedef std::pair<std::string,types::PropertyTree::Node> StackElem;
+	std::vector<StackElem> stk;
+	stk.push_back( StackElem( "", types::PropertyTree::Node()));
+	std::string id;
+	std::string tok;
+	LineInfo lineinfo;
+
+	std::string includepath(
+		boost::filesystem::system_complete( filename).parent_path().string());
+	types::PropertyTree::FileName filenameref( 
+		types::PropertyTree::getFileName( resolvePath( filename)));
+	std::vector<std::string> filenamestack2 = filenamestack;
+	filenamestack2.push_back( filename);
+
+	std::vector<std::string>::const_iterator fi = filenamestack.begin(), fe = filenamestack.end();
+	for (; fi != fe; ++fi)
+	{
+		if (filename == *fi)
+		{
+			std::ostringstream msg;
+			msg << "circular include file references in includes: ";
+			for (fi = filenamestack.begin(); fi != fe; ++fi)
+			{
+				msg << "'" << *fi << "' -> ";
+			}
+			msg << "'" << filename << "'";
+			throw std::runtime_error( msg.str());
+		}
+	}
+	try
+	{
+		std::string::const_iterator ci = content.begin(), ce = content.end();
+		std::string::const_iterator ca = ci;
+
+		while (!stk.empty())
+		{
+			// update current position info:
+			utils::gotoNextToken( ci, ce);
+			lineinfo = utils::getLineInfoIncrement( lineinfo, ca, ci);
+			ca = ci;
+
+			// parse next token:
+			char ch = utils::parseNextToken( tok, ci, ce, ptOpTab);
+			switch (ch)
+			{
+				case '\0':
+				{
+					//... end of file - check state, save result and return saved result if all Ok
+					if (stk.size() > 1) throw std::runtime_error( "unexpected end of info format file");
+					node = stk.back().second;
+					stk.pop_back();
+					if (!id.empty()) throw std::runtime_error( "unexpected end of info format file (single key without value)");
+					break;
+				}
+				case ';':
+				{
+					//... end of line comment
+					parseLine( ci, ce);
+					break;
+				}
+				case '{':
+				{
+					//... start of structure -> push a new open substructure on the stack to process
+					++ci;
+					if (id.empty()) throw std::runtime_error( "declared substructure {..} without preceeding name");
+					types::PropertyTree::Position stpos( lineinfo.line, lineinfo.column);
+					stk.push_back( StackElem( id,types::PropertyTree::Node( stpos)));
+					id.clear();
+					break;
+				}
+				case '}':
+				{
+					//... end of structure -> close it and define it as substructure of the enclosing structure
+					if (stk.size() == 1) throw std::runtime_error( "unexpected '}' (brackets {..} of structures not well balanced)");
+					if (id.size()) throw std::runtime_error( "unexpected '}' (declaration identifier without value followed by close bracket)");
+					id = stk.back().first;	//... save top of stack
+					node = stk.back().second;	//... save top of stack
+					stk.pop_back();		//... pop
+					stk.back().second.add_child( id, node);
+					id.clear();		//... add saved top element and clear state
+					if (stk.size() == 1)
+					{
+						stk.back().second.recursiveSetFileName( filenameref);
+					}
+					break;
+				}
+				case '.':
+				{
+					if (id.empty())
+					{
+						switch ((Keyword)utils::parseNextIdentifier( ci, ce, g_keywords_tab))
+						{
+							case kw_NONE:
+								throw std::runtime_error( std::string( "after . on first level one of {") + g_keywords_tab.tostring() + "} expected");
+							case kw_INCLUDE:
+							{
+								if (stk.size() != 1) throw std::runtime_error( "'.include'' only allowed on highest level of structure hierarchy (not in substructure)");
+								if (!utils::parseNextToken( tok, ci, ce)) throw std::runtime_error( "unexpected end of file");
+								types::PropertyTree::Node subnode = readInfoPropertyTreeFile( filename, filenamestack2);
+								types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
+
+								for (; ni != ne; ++ni)
+								{
+									stk.back().second.add_child( ni->first, ni->second);
+								}
+							}
+						}
+						break;
+					}
+					//...no break here
+				}
+				case '\\':
+				case '/':
+				case '*':
+				case ':':
+				case '-':
+				case ',':
+				case '?':
+				case '!':
+				case '#':
+				case '&':
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '$':
+				case '^':
+				case '~':
+				case '=':
+				case '%':
+				case '@':
+				case '+':
+					tok.push_back( ch);
+					if (id.empty()) throw std::runtime_error( "identifier expected as key");
+					//...no break here
+				default:
+				{
+					//... string or identifier
+					if (id.size())
+					{
+						//... 'id' has been defined before so (id,tok) is a new key value pair
+						std::string toksum = tok;
+						while (ci != ce && (unsigned char)*ci > 32 && (!ptOpTab[*ci] || *ci == '.' || *ci == '/' || *ci == '\\'))
+						{
+							if (!(ch=utils::parseNextToken( tok, ci, ce, ptOpTab))) break;
+							if (tok.empty() && *ci != '\'' && *ci != '\"')
+							{
+								toksum.push_back( ch);
+							}
+							else
+							{
+								toksum.append( tok);
+							}
+						}
+						types::PropertyTree::Position tokpos( lineinfo.line, lineinfo.column);
+						stk.back().second.add_child( id, types::PropertyTree::Node( toksum, tokpos));
+						id.clear();
+					}
+					else if (tok.size())
+					{
+						if (ch == '\'' || ch == '\"') throw std::runtime_error("identifier expected as key");
+						//... 'id' not defined yet, so define it, if not empty
+						id = tok;
+					}
+					else
+					{
+						throw std::runtime_error("non empty token expected as key of atomic element or structure");
+					}
+					break;
+				}
+			}
+		}
+		return types::PropertyTree::Node( node);
+	}
+	catch (const std::bad_alloc& e)
+	{
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lineinfo.line) + " column " + boost::lexical_cast<std::string>(lineinfo.column) + ": " + e.what());
+	}
+}
+
+types::PropertyTree utils::readPropertyTreeFile( const std::string& filename)
 {
 	FileType filetype = getFileType( filename);
-	boost::property_tree::ptree rt;
+	types::PropertyTree rt;
 
 	switch (filetype.format)
 	{
@@ -541,19 +701,21 @@ boost::property_tree::ptree utils::readPropertyTreeFile( const std::string& file
 		{
 			if (filetype.encoding == FileType::Undefined)
 			{
-				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is unknown)");
+				throw std::runtime_error( std::string( "cannot handle encoding of file as XML file '") + filename + "' (encoding is unknown)");
 			}
 			namespace opt = boost::property_tree::xml_parser;
-			read_xml( filename, rt, opt::no_comments | opt::trim_whitespace);
+			boost::property_tree::ptree xmlpt;
+			read_xml( filename, xmlpt, opt::no_comments | opt::trim_whitespace);
+			rt = types::PropertyTree( xmlpt, filename);
 			break;
 		}
 		case FileType::Info:
 		{
-			if (filetype.encoding != FileType::UCS1)
+			if (filetype.encoding == FileType::Undefined)
 			{
-				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is not UTF-8)");
+				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is unknown)");
 			}
-			read_info( filename, rt);
+			rt = types::PropertyTree( readInfoPropertyTreeFile( filename));
 			break;
 		}
 		case FileType::Unknown:

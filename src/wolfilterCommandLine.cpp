@@ -38,7 +38,8 @@
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "module/moduleInterface.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
+#include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/doctype.hpp"
@@ -59,7 +60,7 @@ using namespace _Wolframe::config;
 #define DO_STRINGIFY2(x) #x
 #define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
 
-//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframe.a -> Issue #95)
+//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
 static const char* defaultMainConfig()		{ return "/etc/wolframe.conf"; }
 static const char* defaultUserConfig()		{ return "~/wolframe.conf"; }
 static const char* defaultLocalConfig()		{ return "./wolframe.conf"; }
@@ -71,7 +72,7 @@ static const char* getDefaultConfigFile()
 	return 0;
 }
 
-static std::string configurationTree_tostring( const boost::property_tree::ptree& pt)
+static std::string configurationTree_tostring( const types::PropertyTree::Node& pt)
 {
 	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
 	langbind::ToStringFilter* res;
@@ -81,11 +82,11 @@ static std::string configurationTree_tostring( const boost::property_tree::ptree
 	return res->content();
 }
 
-static boost::property_tree::ptree getTreeNode( const boost::property_tree::ptree& tree, const std::string& name)
+static types::PropertyTree::Node getTreeNode( const types::PropertyTree::Node& tree, const std::string& name)
 {
 	bool found = false;
-	boost::property_tree::ptree rt;
-	boost::property_tree::ptree::const_iterator gi = tree.begin(), ge = tree.end();
+	types::PropertyTree::Node rt;
+	types::PropertyTree::Node::const_iterator gi = tree.begin(), ge = tree.end();
 	for (; gi != ge; ++gi)
 	{
 		if (boost::algorithm::iequals( gi->first, name))
@@ -98,21 +99,21 @@ static boost::property_tree::ptree getTreeNode( const boost::property_tree::ptre
 	return rt;
 }
 
-boost::property_tree::ptree WolfilterCommandLine::getConfigNode( const std::string& name) const
+config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	return getTreeNode( m_config, name);
+	return getTreeNode( m_config.root(), name);
 }
 
 std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
 {
 	std::vector<std::string> rt;
-	boost::property_tree::ptree module_section = getConfigNode( "LoadModules");
-	boost::property_tree::ptree::const_iterator mi = module_section.begin(), me = module_section.end();
+	types::PropertyTree::Node module_section = getConfigNode( "LoadModules");
+	types::PropertyTree::Node::const_iterator mi = module_section.begin(), me = module_section.end();
 	for (; mi != me; ++mi)
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), refpath));
+			rt.push_back( utils::getCanonicalPath( mi->second.data().string(), refpath));
 		}
 	}
 	return rt;
@@ -314,7 +315,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 
 	m_procProviderConfig.reset( new proc::ProcProviderConfig());
-	boost::property_tree::ptree ppcfg;
+	types::PropertyTree::Node ppcfg;
 	if (hasConfig)
 	{
 		ppcfg = getConfigNode( "Processor");

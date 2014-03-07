@@ -34,6 +34,7 @@
 #ifndef _CONFIGURATION_BASE_HPP_INCLUDED
 #define _CONFIGURATION_BASE_HPP_INCLUDED
 
+#include "config/configurationTree.hpp"
 #include <string>
 #include <ostream>
 #include <list>
@@ -46,8 +47,6 @@ namespace _Wolframe { namespace module {
 namespace _Wolframe {
 namespace config {
 
-// forward definition
-struct ConfigurationTree;
 
 /// Base class for the configuration structures
 class ConfigurationBase
@@ -84,7 +83,7 @@ public:
 	///\param[in]	pt		property tree node
 	///\param[in]	node		the label of the node. It should be
 	///				the same (case insensitive) as it->first
-	virtual bool parse( const ConfigurationTree& cfgTree, const std::string& node,
+	virtual bool parse( const ConfigurationNode& cfgTree, const std::string& node,
 			    const module::ModulesDirectory* modules ) = 0;
 
 	/// Set the pathes in the configuration to absolute values

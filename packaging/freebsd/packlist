@@ -10,10 +10,10 @@ usr/local/lib/wolframe/liblua.a
 usr/local/lib/wolframe/liblua.so.5.2.0
 usr/local/lib/wolframe/liblua.so.5
 usr/local/lib/wolframe/liblua.so
-usr/local/lib/wolframe/libwfshared.a
-usr/local/lib/wolframe/libwfshared.so.0.0.0
-usr/local/lib/wolframe/libwfshared.so.0
-usr/local/lib/wolframe/libwfshared.so
+usr/local/lib/wolframe/libwfsingleton.a
+usr/local/lib/wolframe/libwfsingleton.so.0.0.0
+usr/local/lib/wolframe/libwfsingleton.so.0
+usr/local/lib/wolframe/libwfsingleton.so
 usr/local/lib/wolframe/libwolframe.a
 usr/local/lib/wolframe/libwolframe.so.0.0.0
 usr/local/lib/wolframe/libwolframe.so.0

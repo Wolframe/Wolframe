@@ -18,14 +18,14 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	wfshared.lib
+	wfsingleton.lib
 
 CPP_OBJS = \
 	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \

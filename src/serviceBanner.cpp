@@ -41,13 +41,7 @@
 
 #include <string>
 #include <stdexcept>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
-
-//////// Just for temporary testing purposes ////////
-#include "config/configurationBase.hpp"
-#include "config/ConfigurationTree.hpp"
-//////// Just for temporary testing purposes ////////
 
 namespace _Wolframe {
 namespace config {
@@ -72,13 +66,13 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 
 
 /// Service signature parser
-bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
+bool ServiceBanner::parse( const config::ConfigurationNode& pt, const std::string& node,
 			   const module::ModulesDirectory* /*modules*/ )
 {
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data().string(),
 					val, &tokensDefined ))
 			return false;
 		m_tokens = strToToken( val );
@@ -89,7 +83,7 @@ bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		bool isDefined = ( !m_serverSignature.empty());
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data().string(),
 					m_serverSignature, &isDefined ))
 			return false;
 	}

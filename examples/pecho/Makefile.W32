@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
-	$(TOPDIR)\src\libwfshared\wfshared.dll \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
@@ -80,6 +80,7 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 	@-echo @echo off > test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat

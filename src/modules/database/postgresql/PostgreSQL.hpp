@@ -71,7 +71,7 @@ public:
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()			{}
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;

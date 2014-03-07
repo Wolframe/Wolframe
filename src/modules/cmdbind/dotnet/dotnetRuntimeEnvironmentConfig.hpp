@@ -33,10 +33,9 @@ Project Wolframe.
 //\brief Interface .NET runtime environment configuration
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProviderInterface.hpp"
-#include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
 
@@ -69,7 +68,7 @@ public:
 	//\brief Parse the configuration
 	//\param[in] pt configuration tree
 	//\param[in] modules module directory
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory* modules);
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory* modules);
 
 	//\brief Set canonical path for files referenced as relative path in configuration
 	//\param[in] referencePath reference path

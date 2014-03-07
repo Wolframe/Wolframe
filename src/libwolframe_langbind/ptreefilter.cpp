@@ -98,11 +98,11 @@ PropertyTreeOutputFilter::PropertyTreeOutputFilter()
 	m_stk.push_back( State());
 }
 
-static std::string ptree_tostring( const boost::property_tree::ptree& pt)
+static std::string ptree_tostring( const types::PropertyTree::Node& pt)
 {
 	std::ostringstream rt;
-	rt << "[" << pt.get_value<std::string>() << "]";
-	boost::property_tree::ptree::const_iterator ii = pt.begin(), ee = pt.end();
+	rt << "[" << pt.data().string() << "]";
+	types::PropertyTree::Node::const_iterator ii = pt.begin(), ee = pt.end();
 	for (; ii != ee; ++ii)
 	{
 		if (ii != pt.begin()) rt << ", ";
@@ -135,9 +135,9 @@ bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantCons
 			{
 				std::runtime_error( "tags not balanced in property tree output filter");
 			}
-			if (!m_stk.back().m_node.empty() || !m_stk.back().m_node.get_value<std::string>().empty())
+			if (!m_stk.back().m_node.empty() || !m_stk.back().m_node.data().empty())
 			{
-				boost::property_tree::ptree* parent = &m_stk[ m_stk.size()-2].m_node;
+				types::PropertyTree::Node* parent = &m_stk[ m_stk.size()-2].m_node;
 				parent->add_child( m_stk.back().m_name, m_stk.back().m_node);
 			}
 			m_stk.pop_back();
@@ -153,19 +153,19 @@ bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantCons
 		{
 			if (!m_attribute.empty())
 			{
-				boost::property_tree::ptree node;
-				node.put_value( elem);
+				types::PropertyTree::Node node;
+				node.setValue( elem);
 				m_stk.back().m_node.add_child( m_attribute, node);
 				m_attribute.clear();
 			}
 			else
 			{
-				boost::property_tree::ptree* cur = &m_stk.back().m_node;
-				if (!cur->get_value<std::string>().empty())
+				types::PropertyTree::Node* cur = &m_stk.back().m_node;
+				if (!cur->data().empty())
 				{
 					std::runtime_error( "duplicate value for a tag in property tree output filter");
 				}
-				cur->put_value( elem);
+				cur->setValue( elem);
 			}
 		}
 		break;

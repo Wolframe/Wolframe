@@ -343,7 +343,7 @@ int main( int argc, char **argv )
 			throw std::runtime_error( "Modules could not be loaded");
 		}
 		proc::ProcProviderConfig providerconf;
-		if (!providerconf.parse( (const config::ConfigurationTree&)cmdline.providerconfig(), "", &modDir))
+		if (!providerconf.parse( cmdline.providerconfig(), "", &modDir))
 		{
 			throw std::runtime_error( "Processor provider configuration could not be created from command line");
 		}

@@ -34,7 +34,7 @@
 // appConfig.cpp
 //
 
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appConfig.hpp"
 #include "utils/fileUtils.hpp"
@@ -120,7 +120,6 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 		return CONFIG_UNDEFINED;
 	}
 
-	boost::property_tree::ptree	pt;
 	try	{
 		switch ( type )	{
 			case CONFIG_INFO:
@@ -321,7 +320,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			std::string nodeNameLC = it->first;
 			boost::algorithm::to_lower( nodeNameLC );
 			if (( confIt = m_section.find( nodeNameLC ) ) != m_section.end() )	{
-				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationTree( it->second ),
+				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationNode( it->second ),
 									confIt->first, m_modDir ))
 					retVal = false;
 			}

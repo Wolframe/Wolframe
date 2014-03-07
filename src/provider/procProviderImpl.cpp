@@ -45,7 +45,7 @@
 #include "module/runtimeEnvironmentConstructor.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"

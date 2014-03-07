@@ -236,10 +236,10 @@ void PostgreSQLTestConstructor::createTestDatabase( const PostgreSQLTestConfig& 
 	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
 }
 
-config::ConfigurationTree PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationTree& pt )
+config::ConfigurationNode PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
 {
-	boost::property_tree::ptree rt;
-	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	config::ConfigurationNode rt;
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 
 	for ( ; pi != pe; ++pi )	{
 		if ( boost::algorithm::iequals( pi->first, "inputfile" ))

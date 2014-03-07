@@ -5,7 +5,7 @@
 # - DYNAMIC_LIB: soname and versions of the shared library
 # - DYNAMIC_MODULE: loadable module (for dlopen)
 #
-# - all others like OBJS, CPP_OBJS, LIBS, SH_OBJS, SHPP_OBJS, LDFLAGS
+# - all others like OBJS, CPP_OBJS, LIBS, LDFLAGS
 #
 # provides:
 # - targets to build the static and dynamic version of the project's library
@@ -76,8 +76,8 @@ $(NOINST_STATIC_LIB) :
 endif
 
 ifneq "$(DYNAMIC_LIB)" ""
-$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) : $(SH_OBJS) $(SHPP_OBJS)
-	$(CXX_LINK) $(SO_LIB_FLAGS) -o $@ $(ALL_LDFLAGS) $(SH_OBJS) $(SHPP_OBJS) $(LIBS)
+$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) : $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) $(SO_LIB_FLAGS) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $(LIBS)
 $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) : $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)
 	@test -z "$(DYNAMIC_LIB)" || ( \
 		rm -f "$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" && \
@@ -93,8 +93,8 @@ $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) :
 endif
 
 ifneq "$(DYNAMIC_MODULE)" ""
-$(DYNAMIC_MODULE) : $(SH_OBJS) $(SHPP_OBJS)
-	$(CXX_LINK) $(SO_MOD_FLAGS) -o $@ $(ALL_LDFLAGS) $(SH_OBJS) $(SHPP_OBJS) $(LIBS)
+$(DYNAMIC_MODULE) : $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) $(SO_MOD_FLAGS) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $(LIBS)
 else
 $(DYNAMIC_MODULE) :
 endif

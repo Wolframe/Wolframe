@@ -13,13 +13,13 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfshared.lib
+	wfsingleton.lib
 
 DYNAMIC_MODULE = \
 	mod_test.dll

@@ -39,6 +39,7 @@
 
 #include "AAAA/authentication.hpp"
 #include "module/constructor.hpp"
+#include "config/configurationTree.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -55,7 +56,7 @@ public:
 	virtual const char* className() const		{ return DB_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 
