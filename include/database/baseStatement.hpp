@@ -60,7 +60,7 @@ class BaseStatement : public Statement
 
 		virtual void clear( );
 		
-		virtual void substitute( bool withPlaceholders = true );
+		virtual void substitute( bool checkForMissingPlaceholders = true );
 
 		virtual void bind( const unsigned int idx, const types::Variant &value );
 

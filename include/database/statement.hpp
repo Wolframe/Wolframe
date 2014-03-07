@@ -70,7 +70,10 @@ class Statement
 
 		///\brief Trigger substitution (nativeSQL is valid after
 		///       this call and not before!)
-		virtual void substitute( bool withPlaceholders = true ) = 0;
+		///\param[in] checkForMissingPlaceholders whether the function should
+		///           already check the validity and cardinality of the placeholders
+		///           in the SQL statement
+		virtual void substitute( bool checkForMissingPlaceholders = true ) = 0;
 
 		///\brief Funtion called when the placeholder should be put
 		///       into the final string (this is either for subsituting

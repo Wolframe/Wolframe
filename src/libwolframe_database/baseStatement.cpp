@@ -186,7 +186,7 @@ void BaseStatement::parse( )
 	}
 }
 
-void BaseStatement::substitute( bool withPlaceholders )
+void BaseStatement::substitute( bool checkForMissingPlaceholders )
 {
 	m_nativeStmt.clear( );
 	std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
