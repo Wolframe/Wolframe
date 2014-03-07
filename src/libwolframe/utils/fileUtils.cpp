@@ -208,46 +208,15 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-#if defined(_WIN32)
-	DWORD dwBytesWritten;
-	BOOL success;
-	struct Locals
-	{
-		HANDLE hFile;
-		Locals()
-		{
-			hFile = INVALID_HANDLE_VALUE;
-		}
-		~Locals()
-		{
-			if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
-		}
-	};
-	Locals locals;
+//[PF:NOTE] Using Posix functions to write file because I did not find a better solution.
+//	a) If '::CreateFile' and '::WriteFile' are used then '\n' is implicitely converted
+//	to '\r\n'. Sometimes this is not wished. No clue how to write a blob as binary
+//	with these functions based on HANDLE.
+//	b) If '::OpenFile' and '::WriteFile' is used we get to a limitation of the file path
+//	length of 128 bytes: See OFSTRUCT definition (OFS_MAXPATHNAME = 128)
 
-	locals.hFile = ::CreateFile( filename.c_str(), GENERIC_WRITE, 0/*do not share*/, 
-				NULL/*default security*/, CREATE_NEW,
-				0/*FILE_ATTRIBUTE_..*/, NULL/*no attr. template*/);
-	
-	if (locals.hFile == INVALID_HANDLE_VALUE) 
-	{
-		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Failed to open file for writing [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
-	}
-
-	success = ::WriteFile( locals.hFile, content.c_str(), content.size(), &dwBytesWritten, NULL);
-	if (!success)
-	{
-		unsigned int errcode = ::GetLastError();
-		throw std::runtime_error( std::string("Error writing to file [error code ") + boost::lexical_cast<std::string>(errcode) + "] file: " + filename);
-	}
-	if (dwBytesWritten != content.size())
-	{
-		throw std::runtime_error( std::string("Error writing to file (incomplete) file: ") + filename);
-	}
-#else
 	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), "w");
+	FILE* fh = fopen( filename.c_str(), "wb");
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
@@ -263,7 +232,6 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 			if (ec) throw std::runtime_error( std::string( "failed to write (errno " + boost::lexical_cast<std::string>(ec) + ") to file ") + filename + "'");
 		}
 	}
-#endif
 }
 
 std::string utils::readSourceFileContent( const std::string& filename)
