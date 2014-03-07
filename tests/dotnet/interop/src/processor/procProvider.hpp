@@ -55,11 +55,6 @@ public:
 	ProcessorProvider(){}
 	virtual ~ProcessorProvider(){}
 
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const
-	{
-		throw std::logic_error( "Assertion failed: Called undefined function");
-	}
-
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& ) const
 	{
 		throw std::logic_error( "Assertion failed: Called undefined function");
