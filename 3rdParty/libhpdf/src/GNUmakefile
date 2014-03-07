@@ -86,7 +86,7 @@ OBJS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-ALL_CFLAGS = $(OPTFLAGS) -Wall -I. -I../include $(INCLUDE_DIRS) $(INCLUDE_CFLAGS)
+ALL_CFLAGS = $(OPTFLAGS) -Wall -I. -I../include $(INCLUDE_DIRS) $(INCLUDE_CFLAGS) $(SO_COMPILE_FLAGS)
 
 local_all:
 
