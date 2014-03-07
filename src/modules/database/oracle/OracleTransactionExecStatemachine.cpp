@@ -67,6 +67,7 @@ TransactionExecStatemachine_oracle::~TransactionExecStatemachine_oracle()
 {
 	if (m_conn) delete m_conn;
 	clear();
+	delete m_statement;
 }
 
 void TransactionExecStatemachine_oracle::clear()
