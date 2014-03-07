@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 	ws2_32.lib kernel32.lib advapi32.lib
 
 LIBRARIES = \
-	wfshared.dll \
+	wfsingleton.dll \
 	logger\wolframemsg.dll
 
 LOGGER_OBJS = \
@@ -52,7 +52,7 @@ logger\wolframemsg.res: logger\wolframemsg.rc
 logger\wolframemsg.rc: logger\wolframemsg.mc
 logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
-wfshared.dll: $(OBJS) $(CPP_OBJS)
+wfsingleton.dll: $(OBJS) $(CPP_OBJS)
 	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:

@@ -23,7 +23,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\loadModules.obj \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwfshared\wfshared.lib
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 TEST_CPP_BINS = \
 	moduleTest.exe
@@ -45,7 +45,7 @@ local_distclean:
 local_test:
 	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
 	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib;$(TOPDIR)\src\libwfshared >> test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib;$(TOPDIR)\src\libwfsingleton >> test.bat
 	@-echo set PATHEXT=%PATHEXT%;.DLL >> test.bat
 	@-echo moduleTest >> test.bat
 	@-echo echo off >> test.bat

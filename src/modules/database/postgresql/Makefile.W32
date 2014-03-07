@@ -17,7 +17,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)\src\libwfshared\wfshared.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	"$(PGSQL_DIR)\lib\libpq.lib" \

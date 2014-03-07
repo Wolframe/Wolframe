@@ -14,16 +14,16 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	$(ORACLE_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	-lwfshared \
+	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(ORACLE_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
@@ -39,7 +39,7 @@ TEST_CPP_BINS = \
 	oracleUnit$(EXE)
 
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(ORACLE_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(ORACLE_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

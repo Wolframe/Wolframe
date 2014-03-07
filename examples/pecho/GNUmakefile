@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
@@ -26,13 +26,13 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	-lwfshared \
+	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolftest \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(LIBS_DL)
 
@@ -72,11 +72,11 @@ CPP_BINS = \
 TEST_BINS += \
 	tests/pechoHandlerTest$(EXE)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/wtest"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/wtest"
 
-pechod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+pechod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
-tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframed.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
