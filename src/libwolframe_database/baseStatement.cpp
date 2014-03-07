@@ -193,7 +193,7 @@ void BaseStatement::substitute( bool checkForMissingPlaceholders )
 	for( ; di != de; di++ ) {
 		if( di->first ) {
 			// a placeholder
-			if( withPlaceholders && !m_setIdx[ di->first ] ) {
+			if( checkForMissingPlaceholders && !m_setIdx[ di->first ] ) {
 				throw std::runtime_error(
 					"requested uninitialized data for index " +
 					boost::lexical_cast<std::string>( di->first ) +
