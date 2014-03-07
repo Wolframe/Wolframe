@@ -570,13 +570,17 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 	try
 	{
 		std::string::const_iterator ci = content.begin(), ce = content.end();
+		std::string::const_iterator ca = ci;
+
 		while (!stk.empty())
 		{
-			// parse next token and update current position info:
-			std::string::const_iterator ca = ci;
-			char ch = utils::parseNextToken( tok, ci, ce, ptOpTab);
+			// update current position info:
+			utils::gotoNextToken( ci, ce);
 			lineinfo = utils::getLineInfoIncrement( lineinfo, ca, ci);
-	
+			ca = ci;
+
+			// parse next token:
+			char ch = utils::parseNextToken( tok, ci, ce, ptOpTab);
 			switch (ch)
 			{
 				case '\0':
@@ -592,8 +596,6 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 				{
 					//... end of line comment
 					parseLine( ci, ce);
-					lineinfo.line += 1;
-					lineinfo.column = 1;
 					break;
 				}
 				case '{':
@@ -653,7 +655,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 				case ':':
 				case '-':
 					tok.push_back( ch);
-					if (id.empty()) throw std::runtime_error( "identifier or string expected");
+					if (id.empty()) throw std::runtime_error( "identifier expected as key");
 					//...no break here
 				default:
 				{
@@ -680,6 +682,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 					}
 					else if (tok.size())
 					{
+						if (ch == '\'' || ch == '\"') throw std::runtime_error("identifier expected as key");
 						//... 'id' not defined yet, so define it, if not empty
 						id = tok;
 					}
