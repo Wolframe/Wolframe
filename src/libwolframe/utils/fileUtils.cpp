@@ -227,7 +227,7 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 
 	locals.hFile = ::CreateFile( filename.c_str(), GENERIC_WRITE, 0/*do not share*/, 
 				NULL/*default security*/, CREATE_NEW,
-				FILE_ATTRIBUTE_NORMAL, NULL/*no attr. template*/);
+				0/*FILE_ATTRIBUTE_..*/, NULL/*no attr. template*/);
 	
 	if (locals.hFile == INVALID_HANDLE_VALUE) 
 	{
