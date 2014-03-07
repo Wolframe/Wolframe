@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_serialize \
@@ -101,7 +101,7 @@ ifeq ($(WITH_PYTHON),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PYTHON_LIB_DIR)"
 endif
 
-tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

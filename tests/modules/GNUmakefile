@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/loadModules.o \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	-lwolframe -lwfsingleton \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system \

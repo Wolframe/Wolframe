@@ -36,7 +36,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolftest \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
@@ -180,27 +180,27 @@ TEST_CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-logTest$(EXE): $(TOPDIR)/src/libwolframe.a
+logTest$(EXE): $(TOPDIR)/src/libwolframed.a
 testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 # CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testVariantStruct$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testNumberBaseConversion$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
-testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
-testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframe.a
-testIntegers$(EXE):  $(TOPDIR)/src/libwolframe.a
-testString$(EXE):  $(TOPDIR)/src/libwolframe.a
-testDateTime$(EXE):  $(TOPDIR)/src/libwolframe.a
-testBigNumber$(EXE):  $(TOPDIR)/src/libwolframe.a
+protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testVariantStruct$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testNumberBaseConversion$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+configValueParser$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+configStructParser$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testWolfilter$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframed.a
+testTestAllocator$(EXE): $(TOPDIR)/src/libwolframed.a
+testVariantTypes$(EXE):  $(TOPDIR)/src/libwolframed.a
+testIntegers$(EXE):  $(TOPDIR)/src/libwolframed.a
+testString$(EXE):  $(TOPDIR)/src/libwolframed.a
+testDateTime$(EXE):  $(TOPDIR)/src/libwolframed.a
+testBigNumber$(EXE):  $(TOPDIR)/src/libwolframed.a
 local_all:
 
 local_clean:

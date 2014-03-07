@@ -41,7 +41,7 @@ INCLUDE_LIBS += \
 endif
 
 LOCAL_STATIC_LIB = \
-	libwolframe.a
+	libwolframed.a
 
 PROVIDER_OBJS = \
 	provider/Authentication.o \

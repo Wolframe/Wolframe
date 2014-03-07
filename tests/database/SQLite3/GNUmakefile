@@ -24,7 +24,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 	-lwolframe_database \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
