@@ -13,9 +13,9 @@ Build&Deployment:
 	- Build and deployment and OS support (pkg mgmt) for update process (ABa, MBa)
 
 Fixes:
-	- Take out UI in bew branch
+	- For project make Input object out of content with 'provider.document(source)'
+	- Rewrite Simpleform Compiler (Parsing)
 	- Start SDK and splitting of graphix module and others
-
 
 OPEN SOURCE PRODUCT NICE TO HAVE:
 - Printing (impl + documentation)
