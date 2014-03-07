@@ -60,13 +60,15 @@ local_distclean:
 
 local_install:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe"
+
 local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src:$(TOPDIR)/src/libwfshared $(EXPECT) ./testLua
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testLua
 endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src ./luad -c luad.conf -f -d DATA
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./luad -c luad.conf -f -d DATA

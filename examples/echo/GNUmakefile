@@ -56,13 +56,15 @@ local_distclean:
 
 local_install:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe"
+
 local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfshared $(EXPECT) ./testEcho
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testEcho
 endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./echod -c echo.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./echod -c echo.conf -f
