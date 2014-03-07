@@ -17,6 +17,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	Advapi32.lib
 
 # openssl
@@ -71,6 +72,7 @@ local_test:
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat

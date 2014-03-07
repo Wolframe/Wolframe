@@ -20,7 +20,6 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -28,8 +27,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	advapi32.lib \
-	wfsingleton.lib
 
 # openssl
 !IFDEF WITH_SSL

@@ -16,7 +16,6 @@ INCLUDE_DIRS = \
 	/I"$(PGSQL_DIR)\include"
 
 INCLUDE_LDFLAGS = \
-	$(TOPDIR)\src\libwolframe \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -25,7 +24,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfsingleton.dll
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 CPP_OBJS = \
 	PostgreSQLModuleFiles.obj
@@ -53,6 +52,7 @@ local_distclean:
 
 local_test: dbPing.exe
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" .
 !IFDEF PGDLL_WITH_I18N
 	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
 	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .

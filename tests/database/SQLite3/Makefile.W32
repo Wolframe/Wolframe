@@ -16,7 +16,6 @@ INCLUDE_DIRS = \
 	/I"$(TOPDIR)\3rdParty\sqlite3"
 
 INCLUDE_LDFLAGS = \
-	$(TOPDIR)\src\libwolframe \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -25,7 +24,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfsingleton.dll
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 CPP_OBJS = \
 	sqliteModuleFiles.obj
@@ -55,4 +54,5 @@ garbage.db:
 	createRandom 4096 garbage.db
 
 local_test: $(TEST_CPP_BINS) test.db garbage.db
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" .
 	@-sqliteUnit

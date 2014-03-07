@@ -44,7 +44,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const 
 	}
 	catch (std::runtime_error& e)
 	{
-		LOG_ERROR << "lua command handler configuration error " << pi->position.logtext() << ":" << e.what();
+		LOG_ERROR << "lua command handler configuration error " << pi->second.data().position.logtext() << ":" << e.what();
 		return false;
 	}
 	return true;

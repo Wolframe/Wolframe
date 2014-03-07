@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
-	$(TOPDIR)\src\libwfsingleton\wfsingleton.dll \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
@@ -138,6 +138,7 @@ copy_prereq:
 
 local_test: $(TEST_CPP_BINS) copy_prereq
 	@-echo mkdir tests\temp > test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
 	@-echo cd tests >> test.bat
 	@-echo tprocHandlerTest.exe >> test.bat
 	@-test.bat

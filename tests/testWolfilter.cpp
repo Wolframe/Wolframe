@@ -68,6 +68,53 @@ protected:
 
 static std::string selectedTestName;
 
+static std::string getOutputExpectedEolns( const std::string& output, const std::string& expected)
+{
+	std::string::const_iterator ei = expected.begin(), ee = expected.end();
+	std::string::const_iterator oi = output.begin(), oe = output.end();
+	std::string resultstr;
+
+	for (; ei != ee && oi != oe; ++oi,++ei)
+	{
+		if (*ei == *oi)
+		{
+			resultstr.push_back( *ei);
+		}
+		else if (*ei == '\r' && *oi == '\n')
+		{
+			++ei;
+			if (*ei == '\n')
+			{
+				resultstr.push_back( '\r');
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (*ei == '\n' && *oi == '\r')
+		{
+			++oi;
+			if (*oi == '\n')
+			{
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (oi == oe && ei == ee)
+	{
+		return resultstr;
+	}
+	else
+	{
+		return output;
+	}
+}
 
 TEST_F( WolfilterTest, tests)
 {
@@ -228,27 +275,21 @@ TEST_F( WolfilterTest, tests)
 			std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
 			outstr.append( utils::readSourceFileContent( outfile));
 		}
-
+#if defined(_WIN32)
+		//... On Windows std::endl used in stream output differs from Unix
+		outstr = getOutputExpectedEolns( outstr, td.expected);
+#endif
 		if (td.expected != outstr)
 		{
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
-			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-			oo.write( outstr.c_str(), outstr.size());
-			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
-			oo.close();
+			utils::writeFile( OUTPUT.string(), outstr);
 
 			boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
-			std::fstream ee( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
-			ee.write( td.expected.c_str(), td.expected.size());
-			if (ee.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
-			ee.close();
+			utils::writeFile( EXPECT.string(), td.expected);
 
 			boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
-			std::fstream ss( INPUT.string().c_str(), std::ios::out | std::ios::binary);
-			ss.write( td.input.c_str(), td.input.size());
-			if (ss.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
-			ss.close();
+			utils::writeFile( INPUT.string(), td.input);
 
 			std::cerr << "test output does not match for '" << *itr << "'" << std::endl;
 			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
