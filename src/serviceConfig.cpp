@@ -85,7 +85,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					    << L1it->first << "'";
+					    << L1it->first << "' (" << L1it->second.position.logtext() << ")";
 			}
 		}
 		if ( serviceName.empty() )
