@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfshared.dll
+	wfsingleton.dll
 
 CPP_OBJS = \
 	PostgreSQLModuleFiles.obj

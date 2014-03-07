@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS = \
 	libwolframe \
-	libwfshared \
+	libwfsingleton \
 	libwolframe_serialize \
 	libwolframe_database \
 	libwolframe_langbind \
@@ -20,7 +20,7 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfshared \
+	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
@@ -29,7 +29,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	advapi32.lib \
-	wfshared.lib
+	wfsingleton.lib
 
 # openssl
 !IFDEF WITH_SSL
@@ -111,7 +111,7 @@ all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
 dependencies:
 	@cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
-	@cd libwfshared & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwfsingleton & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
@@ -119,9 +119,9 @@ dependencies:
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 modules: libwolframe
-wolframed.exe: wolframed.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res
-wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res
-wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwfshared\logger\wolframemsg.res
+wolframed.exe: wolframed.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?

@@ -9,7 +9,7 @@ PACKAGE_NAME = wolframe
 INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe
 
 
@@ -18,7 +18,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include
 
 INCLUDE_LIBS = \
-	-lwfshared -lwolframe
+	-lwfsingleton -lwolframe
 
 STATIC_LIB = libwolframe_database.a
 

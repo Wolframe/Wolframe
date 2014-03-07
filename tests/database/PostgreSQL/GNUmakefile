@@ -14,13 +14,13 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
-	-lwfshared \
+	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
 	$(TOPDIR)/src/libwolframe.a \
@@ -38,7 +38,7 @@ CPP_BINS = \
 TEST_CPP_BINS = \
 	postgresUnit$(EXE) \
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwfshared:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/src/libwfshared/libwfshared.a \
+	$(TOPDIR)/src/libwfsingleton/libwfsingleton.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system \
 	$(LIBS_DL)

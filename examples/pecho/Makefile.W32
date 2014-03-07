@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
-	$(TOPDIR)\src\libwfshared\wfshared.dll \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.dll \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \

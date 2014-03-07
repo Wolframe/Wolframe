@@ -13,13 +13,13 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwfshared \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_LIBS = \
-	-lwfshared -lwolframe -lwolframe_serialize -lwolframe_database \
+	-lwfsingleton -lwolframe -lwolframe_serialize -lwolframe_database \
 	-lboost_filesystem
 
 STATIC_LIB = libwolframe_langbind.a
