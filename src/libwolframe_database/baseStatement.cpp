@@ -186,14 +186,14 @@ void BaseStatement::parse( )
 	}
 }
 
-void BaseStatement::substitute( bool withPlaceholders )
+void BaseStatement::substitute( bool checkForMissingPlaceholders )
 {
 	m_nativeStmt.clear( );
 	std::vector<Element>::const_iterator di = m_data.begin( ), de = m_data.end( );
 	for( ; di != de; di++ ) {
 		if( di->first ) {
 			// a placeholder
-			if( withPlaceholders && !m_setIdx[ di->first ] ) {
+			if( checkForMissingPlaceholders && !m_setIdx[ di->first ] ) {
 				throw std::runtime_error(
 					"requested uninitialized data for index " +
 					boost::lexical_cast<std::string>( di->first ) +
