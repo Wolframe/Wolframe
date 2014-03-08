@@ -90,7 +90,8 @@ wolframe.lib: $(OBJS) $(CPP_OBJS)
 local_all:
 
 local_clean:
-	@-erase provider\*.obj 2>NUL
+	@-erase types\*.obj 2>NUL
+	@-erase utils\*.obj 2>NUL
 
 local_distclean:
 
