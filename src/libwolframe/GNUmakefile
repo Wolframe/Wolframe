@@ -71,7 +71,7 @@ CPP_OBJS = \
 	getPassword.o \
 	user.o \
 	HMAC.o \
-	PBKDF2.o
+	PBKDF2.o \
 #	password.o \
 #	CRAM.o
 
