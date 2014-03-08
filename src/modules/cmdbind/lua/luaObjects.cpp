@@ -1492,6 +1492,7 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 			bool chunkend;
 			input->inputfilter()->getRest( chunk, chunksize, chunkend);
 			ff->putInput( chunk, chunksize, chunkend);
+			input->inputfilter().reset( ff);
 		}
 		else if (input->content().get())
 		{

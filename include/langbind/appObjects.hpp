@@ -128,7 +128,7 @@ public:
 		,m_used(o.m_used)
 		,m_inputfilter(o.m_inputfilter)
 		,m_docformat(o.m_docformat)
-		,m_content(m_content){}
+		,m_content(o.m_content){}
 
 	//\brief Constructor by input filter
 	//\param[in] inputfilter_ input filter reference
