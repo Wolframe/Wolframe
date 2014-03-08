@@ -101,20 +101,13 @@ public:
 	///\brief return a database transaction object for the given name
 	virtual db::Transaction* transaction( const std::string& name ) const;
 
-	///\brief Get the list of UI-forms
-	///\return map name -> uiform xml without header
-	std::map<std::string,std::string> uiforms( const std::string& /*auth_ticket*/, int /*min_version*/, int& /*version*/) const
-	{
-		/// make it just compile
-		return std::map<std::string,std::string>();
-	}
-
 	virtual const types::NormalizeFunction* normalizeFunction( const std::string& name) const;
 	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const;
 	virtual const langbind::FormFunction* formFunction( const std::string& name) const;
 	virtual const types::FormDescription* formDescription( const std::string& name) const;
 	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
 	virtual const types::CustomDataType* customDataType( const std::string& name) const;
+	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
 
 private:
 	class ProcessorProvider_Impl;

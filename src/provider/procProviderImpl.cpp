@@ -411,6 +411,30 @@ const types::CustomDataType* ProcessorProvider::ProcessorProvider_Impl::customDa
 	return m_programs->getCustomDataType( name);
 }
 
+bool ProcessorProvider::ProcessorProvider_Impl::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
+{
+	//PF:HACK: Currently very very simple hardcoded guesser
+	//TODO Replace by module based guessers that implement also document type recognition
+	std::size_t ii=0;
+	for (; ii<contentsize && content[ii] == 0; ++ii){}
+	if (ii == contentsize) return false;
+	if (content[ii] == '<')
+	{
+		result = "xml";
+		return true;
+	}
+	else if (content[ii] == '{')
+	{
+		result = "json";
+		return true;
+	}
+	else
+	{
+		result = "text";
+		return false;
+	}
+}
+
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );

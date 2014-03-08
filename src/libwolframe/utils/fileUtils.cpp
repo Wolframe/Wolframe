@@ -463,7 +463,12 @@ FileType utils::getFileType( const std::string& filename)
 			}
 			std::string tok;
 			ch = utils::parseNextToken( tok, si, se);
-			if (ch && !tok.empty())
+			if (ch == '{' || ch == '}')
+			{
+				//... illegal but we decide to INFO
+				rt.format = FileType::Info;
+			}
+			else if (ch && !tok.empty())
 			{
 				ch = utils::gotoNextToken( si, se);
 				while (ch == ';')
