@@ -632,7 +632,7 @@ void OracleTestConstructor::createTestDatabase( const OracleTestConfig& cfg )
 	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
 }
 
-config::ConfigurationTree OracleTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
+config::ConfigurationNode OracleTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
 {
 	config::ConfigurationNode rt;
 	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
