@@ -127,29 +127,55 @@ public:
 		:utils::TypeSignature(o)
 		,m_used(o.m_used)
 		,m_inputfilter(o.m_inputfilter)
-		,m_docformat(o.m_docformat){}
+		,m_docformat(o.m_docformat)
+		,m_content(m_content){}
 
 	//\brief Constructor by input filter
-	//\param[in] flt input filter reference
-	Input( const InputFilterR& flt, const std::string& docformat_)
+	//\param[in] inputfilter_ input filter reference
+	//\param[in] docformat_ document format
+	Input( const InputFilterR& inputfilter_, const std::string& docformat_)
 		:utils::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false)
-		,m_inputfilter(flt)
+		,m_inputfilter(inputfilter_)
 		,m_docformat(docformat_){}
+
+	//\brief Constructor by content
+	//\param[in] docformat_ document format
+	//\param[in] content_ content string
+	Input( const std::string& docformat_, const std::string& content_)
+		:utils::TypeSignature("langbind::Input", __LINE__)
+		,m_used(false)
+		,m_docformat(docformat_)
+		,m_content(new std::string(content_)){}
 
 	//\brief Destructor
 	~Input(){}
 
+	//\brief Get the input filter attached to input
+	//\return the input filter reference
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
+
+	//\brief Get the input filter attached to input
+	//\return the input filter reference
 	InputFilterR& inputfilter()			{return m_inputfilter;}
+
+	//\brief Get the document format as recognized by the document type detection as string {"xml","json",...}
+	//\return the document format as string
 	const std::string& docformat() const		{return m_docformat;}
 
+	//\brief Get the input filter attached to input and check for duplicate access
+	//\return the input filter reference
 	InputFilterR& getIterator();
+
+	//\brief Get content source string is input is not from network
+	//\return the content string or empty, if not defined
+	const boost::shared_ptr<std::string>& content() const	{return m_content;}
 
 private:
 	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
-	std::string m_docformat;
+	std::string m_docformat;			//< document format as recognized by the document type detection as string {"xml","json",...}
+	boost::shared_ptr<std::string> m_content;	//< content source string is input is not from network
 };
 
 

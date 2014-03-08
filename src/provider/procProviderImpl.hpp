@@ -70,6 +70,7 @@ public:
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
 	const types::CustomDataType* customDataType( const std::string& name) const;
+	bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
 
 	bool loadPrograms();
 	bool checkReferences( const ProcessorProvider* provider) const;

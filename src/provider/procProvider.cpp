@@ -268,4 +268,9 @@ const types::CustomDataType* ProcessorProvider::customDataType( const std::strin
 	return m_impl->customDataType( name);
 }
 
+bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
+{
+	return m_impl->guessDocumentFormat( result, content, contentsize);
+}
+
 }} // namespace _Wolframe::proc

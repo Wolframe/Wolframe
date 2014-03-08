@@ -1091,7 +1091,7 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 	return 1;
 }
 
-LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
+LUA_FUNCTION_THROWS( "provider.formfunction(..)", function_formfunction)
 {
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
@@ -1106,6 +1106,21 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	}
 	throw std::runtime_error( std::string( "form function '") + name + "' not found");
 }
+
+LUA_FUNCTION_THROWS( "provider.document(..)", function_document)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+	std::size_t contentlen;
+	const char* content = lua_tolstring( ls, 1, &contentlen);
+
+	const proc::ProcessorProviderInterface* ctx = getProcessorProvider( ls);
+	std::string docformat;
+	(void)ctx->guessDocumentFormat( docformat, content, contentlen);
+	//... if we cannot decide we define docformat as empty
+	LuaObject<Input>::push_luastack( ls, Input( docformat, std::string( content, contentlen)));
+	return 1;
+}
+
 
 static const char* userdata_tolstring( lua_State* ls, int index, std::size_t* len)
 {
@@ -1232,8 +1247,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 					if (!output->called())
 					{
 						Input* input = LuaObject<Input>::getGlobal( ls, "input");
-						bool md = input->inputfilter()->getMetadata();
-						if (!md)
+						if (input && !input->inputfilter()->getMetadata())
 						{
 							lua_pushvalue( ls, 2);			//... iterator argument
 							lua_pushlightuserdata( ls, closure);	//... redirect closure object
@@ -1264,7 +1278,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (!input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetadata())
 		{
 			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[0]));
 			lua_pushinteger( ls, itemsize[0]);
@@ -1310,7 +1324,7 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (!input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetadata())
 		{
 			if (newEnter)
 			{
@@ -1353,7 +1367,7 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (!input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetadata())
 		{
 			lua_pushlightuserdata( ls, output);
 			lua_yieldk( ls, 0, 1, function_output_closetag);
@@ -1472,14 +1486,25 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 		ff = filter->inputfilter()->copy();
 		if (input->inputfilter().get())
 		{
-			// assign the rest of the input to the new filter attached
+			//... old filter defined, then assign the rest of the input to the new filter attached
 			const void* chunk;
 			std::size_t chunksize;
 			bool chunkend;
 			input->inputfilter()->getRest( chunk, chunksize, chunkend);
 			ff->putInput( chunk, chunksize, chunkend);
 		}
-		input->inputfilter().reset( ff);
+		else if (input->content().get())
+		{
+			//... in case of a document assign its content to the processing filter
+			input->inputfilter().reset( ff);
+			const char* cstr = input->content()->c_str();
+			std::size_t csize = input->content()->size();
+			ff->putInput( cstr, csize, true);
+		}
+		else
+		{
+			input->inputfilter().reset( ff);
+		}
 		if (input == LuaObject<Input>::getGlobal( ls, "input"))
 		{
 			//... the global input and output share the attributes
@@ -2431,6 +2456,7 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{"form",&function_form},
 	{"type",&function_type},
 	{"formfunction",&function_formfunction},
+	{"document",&function_document},
 	{0,0}
 };
 

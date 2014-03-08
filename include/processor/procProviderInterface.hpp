@@ -112,6 +112,12 @@ public:
 	//\param[in] name name of the type
 	//\return reference to the custom data type
 	virtual const types::CustomDataType* customDataType( const std::string& name) const=0;
+	//\brief Guess document format ('XML','JSON', etc. based on guesser modules loaded)
+	//\param[in] content pointer to document 
+	//\param[in] contentsize size of content in bytes
+	//\param[out] result document format as string
+	//\return true, if decision was possible, false, if more data is needed
+	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const=0;
 };
 
 }}//namespace
