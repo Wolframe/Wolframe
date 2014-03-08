@@ -191,7 +191,7 @@ local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" . >> test.bat
 	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_LIBXML2

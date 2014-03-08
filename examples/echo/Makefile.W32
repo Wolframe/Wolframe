@@ -72,7 +72,7 @@ local_test:
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" . >> test.bat
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat

@@ -15,15 +15,14 @@ INCLUDE_DIRS = \
 	/I"$(PGSQL_DIR)\include"
 
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
-	kernel32.lib advapi32.lib Ws2_32.lib \
-	wfsingleton.lib
+	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_postgresqltest.dll
