@@ -16,8 +16,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\3rdParty\gtest\include
 
 INCLUDE_LDFLAGS = \
-	$(TOPDIR)\src\libwolframe \
-	$(BOOST_LDFLAGS) \
+	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
