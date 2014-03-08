@@ -66,7 +66,7 @@ bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string
 	bool portDefined, connDefined, aTdefined, cTdefined, sTdefined;
 	portDefined = connDefined = aTdefined = cTdefined = sTdefined = false;
 
-	for ( config::ConfigurationNodev::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
 			bool isDefined = ( !m_ID.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_ID, &isDefined ))
