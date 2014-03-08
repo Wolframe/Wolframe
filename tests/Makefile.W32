@@ -35,7 +35,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
-	$(TOPDIR)\libwfsingleton\wfsingleton.lib
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 # Lua
 !IFDEF WITH_LUA

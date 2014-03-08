@@ -38,6 +38,7 @@ local_all:
 
 local_clean:
 	@-erase test.bat 2>NUL
+	@-erase wfsingleton.dll 2>NUL
 
 local_distclean:
 
@@ -45,8 +46,8 @@ local_distclean:
 local_test:
 	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
 	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib;$(TOPDIR)\src\libwfsingleton >> test.bat
-	@-echo set PATHEXT=%PATHEXT%;.DLL >> test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" >> test.bat
 	@-echo moduleTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
