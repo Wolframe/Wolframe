@@ -46,8 +46,9 @@ namespace proc {
 }
 namespace langbind {
 
-struct FormFunctionClosure
+class FormFunctionClosure
 {
+public:
 	virtual ~FormFunctionClosure(){}
 
 	///\brief Calls the function with the input from the input filter specified

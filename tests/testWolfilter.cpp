@@ -68,6 +68,7 @@ protected:
 
 static std::string selectedTestName;
 
+#if defined(_WIN32)
 static std::string getOutputExpectedEolns( const std::string& output, const std::string& expected)
 {
 	std::string::const_iterator ei = expected.begin(), ee = expected.end();
@@ -115,6 +116,7 @@ static std::string getOutputExpectedEolns( const std::string& output, const std:
 		return output;
 	}
 }
+#endif
 
 TEST_F( WolfilterTest, tests)
 {
