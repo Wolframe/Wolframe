@@ -40,10 +40,6 @@
 #include <vector>
 
 namespace _Wolframe {
-namespace config
-{
-	class ConfigurationTree;
-}
 namespace utils {
 
 ///\brief Remove .. and . from a path

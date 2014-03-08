@@ -68,53 +68,55 @@ protected:
 
 static std::string selectedTestName;
 
-//static std::string getOutputExpectedEolns( const std::string& output, const std::string& expected)
-//{
-//	std::string::const_iterator ei = expected.begin(), ee = expected.end();
-//	std::string::const_iterator oi = output.begin(), oe = output.end();
-//	std::string resultstr;
+#if defined(_WIN32)
+static std::string getOutputExpectedEolns( const std::string& output, const std::string& expected)
+{
+	std::string::const_iterator ei = expected.begin(), ee = expected.end();
+	std::string::const_iterator oi = output.begin(), oe = output.end();
+	std::string resultstr;
 
-//	for (; ei != ee && oi != oe; ++oi,++ei)
-//	{
-//		if (*ei == *oi)
-//		{
-//			resultstr.push_back( *ei);
-//		}
-//		else if (*ei == '\r' && *oi == '\n')
-//		{
-//			++ei;
-//			if (*ei == '\n')
-//			{
-//				resultstr.push_back( '\r');
-//				resultstr.push_back( '\n');
-//			}
-//			else
-//			{
-//				break;
-//			}
-//		}
-//		else if (*ei == '\n' && *oi == '\r')
-//		{
-//			++oi;
-//			if (*oi == '\n')
-//			{
-//				resultstr.push_back( '\n');
-//			}
-//			else
-//			{
-//				break;
-//			}
-//		}
-//	}
-//	if (oi == oe && ei == ee)
-//	{
-//		return resultstr;
-//	}
-//	else
-//	{
-//		return output;
-//	}
-//}
+	for (; ei != ee && oi != oe; ++oi,++ei)
+	{
+		if (*ei == *oi)
+		{
+			resultstr.push_back( *ei);
+		}
+		else if (*ei == '\r' && *oi == '\n')
+		{
+			++ei;
+			if (*ei == '\n')
+			{
+				resultstr.push_back( '\r');
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (*ei == '\n' && *oi == '\r')
+		{
+			++oi;
+			if (*oi == '\n')
+			{
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (oi == oe && ei == ee)
+	{
+		return resultstr;
+	}
+	else
+	{
+		return output;
+	}
+}
+#endif
 
 TEST_F( WolfilterTest, tests)
 {

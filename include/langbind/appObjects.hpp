@@ -111,7 +111,7 @@ private:
 
 
 //\class Input
-//\brief input as seen from the application processor program
+//\brief Input as seen from the application processor program
 class Input
 	:public virtual utils::TypeSignature
 {

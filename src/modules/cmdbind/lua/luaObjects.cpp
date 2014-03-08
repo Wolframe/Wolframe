@@ -1480,10 +1480,14 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 			ff->putInput( chunk, chunksize, chunkend);
 		}
 		input->inputfilter().reset( ff);
-		Output* output = LuaObject<Output>::getGlobal( ls, "output");
-		if (output && output->outputfilter().get())
+		if (input == LuaObject<Input>::getGlobal( ls, "input"))
 		{
-			output->outputfilter()->setAttributes( ff);
+			//... the global input and output share the attributes
+			Output* output = LuaObject<Output>::getGlobal( ls, "output");
+			if (output && output->outputfilter().get())
+			{
+				output->outputfilter()->setAttributes( ff);
+			}
 		}
 	}
 	else
@@ -1735,8 +1739,12 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			ff = filter->outputfilter()->copy();
 			if (output->outputfilter().get())
 			{
-				Input* input = LuaObject<Input>::getGlobal( ls, "input");
-				ff->setAttributes( input?input->inputfilter().get():0);
+				if (output == LuaObject<Output>::getGlobal( ls, "output"))
+				{
+					//... the global input and output share the attributes
+					Input* input = LuaObject<Input>::getGlobal( ls, "input");
+					ff->setAttributes( input?input->inputfilter().get():0);
+				}
 				ff->assignState( *output->outputfilter());
 			}
 			output->outputfilter().reset( ff);
