@@ -58,8 +58,7 @@ wfsingleton.dll: $(OBJS) $(CPP_OBJS)
 local_all:
 
 local_clean:
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
+	@-erase logger\MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
 	@-erase logger\*.obj 2>NUL
 
 local_distclean:
