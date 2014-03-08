@@ -66,26 +66,34 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
 				bool isDefined = ( !user.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
 				bool isDefined = ( !group.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, group, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
 				bool isDefined = ( !pidFile.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
@@ -106,20 +114,26 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
 				bool isDefined = ( !serviceDisplayName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
 				bool isDefined = ( !serviceDescription.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
+				{
 					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
 					retVal = false;
+				}
 			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
