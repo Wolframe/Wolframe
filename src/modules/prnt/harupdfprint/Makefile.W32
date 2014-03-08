@@ -17,8 +17,10 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
+
 	
 INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	"$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib" \
 	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib" \
