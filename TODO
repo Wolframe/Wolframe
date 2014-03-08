@@ -13,7 +13,9 @@ Build&Deployment:
 	- Build and deployment and OS support (pkg mgmt) for update process (ABa, MBa)
 
 Fixes:
-	- For project make Input object out of content with 'provider.document( source)'
+	- Test Lua: provider.document() processing
+	- Document Lua: provider.document() processing
+	- Document type recognition & format guesser module
 	- Rewrite Simpleform Compiler (Parsing)
 	- Start SDK and splitting of graphix module and others
 
