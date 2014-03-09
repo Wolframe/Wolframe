@@ -48,10 +48,22 @@ namespace config {
 template <class Structure>
 void parseConfigStructure( Structure& st, const ConfigurationNode& pt)
 {
-	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
+	langbind::PropertyTreeInputFilter* filter;
+	langbind::TypedInputFilterR inp( filter=new langbind::PropertyTreeInputFilter( pt));
 	serialize::StructParser parser( (void*)&st, st.getStructDescription());
 	parser.init( inp);
-	if (!parser.call()) throw std::runtime_error( "illegal state in structure parser");
+	try
+	{
+		if (!parser.call()) throw std::runtime_error( "illegal state in structure parser");
+	}
+	catch (const std::bad_alloc& e)
+	{
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string("configuration error ") + filter->posLogText() + ": " + e.what());
+	}
 }
 
 template <class Structure>

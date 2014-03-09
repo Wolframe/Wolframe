@@ -76,6 +76,11 @@ public:
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
 	virtual bool setFlags( Flags f);
 
+	std::string posLogText() const
+	{
+		return m_position.logtext();
+	}
+
 private:
 	struct State
 	{
@@ -84,8 +89,9 @@ private:
 	};
 
 private:
-	std::vector<State> m_stk;	//< stack of iterator states
-	int m_state;			//< fetching state of current element
+	std::vector<State> m_stk;			//< stack of iterator states
+	int m_state;					//< fetching state of current element
+	types::PropertyTree::Position m_position;	//< position of current element
 };
 
 ///\class PropertyTreeOutputFilter
