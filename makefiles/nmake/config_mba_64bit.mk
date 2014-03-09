@@ -18,43 +18,23 @@
 ###########################################
 
 # version of the boost library
-
-#BOOST_VERSION = 1_46_1
 BOOST_VERSION = 1.55.0
 
 # base dir where boost is installed
-
-#BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32
-#BOOST_DIR = D:\boost\boost_1_45_0
-#BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 BOOST_DIR = C:\Boost
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-$(BOOST_VERSION)
-#BOOST_INCLUDE_DIR = $(BOOST_DIR)
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\boost-$(BOOST_VERSION)\include
 
 # visual studio version used for compiling
-
-#BOOST_VC_VER = vc80
-#BOOST_VC_VER = vc90
 BOOST_VC_VER = vc100
 
 # TODO: probe those
 BOOST_MT = -mt
 
 # preinstalled binaries
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib64"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\boost-$(BOOST_VERSION)\lib64"
 
-# self-compiled
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib\Win32"
-
-# precompiled libraries from http://boost.teeks99.com
-#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
-BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 
 # ICU (icu4c)
 #############
@@ -64,14 +44,12 @@ ICU_DIR = C:\Boost\icu
 # the library version (how the DLLs are tagged)
 #ICU_LIB_VERSION = 49
 
+
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
-#OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-#OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
-#OPENSSL_DIR = D:\Programme\OpenSSL
 OPENSSL_DIR = C:\OpenSSL\Win64
-#OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
+
 
 # Postgresql libpq
 # (http://www.postgresql.org/)

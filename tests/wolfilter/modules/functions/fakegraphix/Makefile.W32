@@ -13,14 +13,13 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
-	Ws2_32.lib advapi32.lib \
-	wfsingleton.lib
+	Ws2_32.lib advapi32.lib
 
 DYNAMIC_MODULE = \
 	mod_graphix.dll

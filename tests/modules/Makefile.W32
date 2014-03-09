@@ -38,7 +38,6 @@ local_all:
 
 local_clean:
 	@-erase test.bat 2>NUL
-	@-erase wfsingleton.dll 2>NUL
 
 local_distclean:
 

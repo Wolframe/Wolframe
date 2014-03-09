@@ -1,3 +1,4 @@
+makefiles/nmake/config.mk
 makefiles/gmake/platform.mk.vars
 makefiles/gmake/platform.vars
 makefiles/gmake/python.mk.vars
