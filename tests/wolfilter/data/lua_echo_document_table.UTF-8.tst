@@ -28,7 +28,6 @@ function run()
 	t = input:value()
 	d = provider.document( t)
 	d:as( f)
-	output:as( f)
 	output:print( d:table())
 end
 **output
