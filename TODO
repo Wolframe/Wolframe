@@ -13,8 +13,7 @@ Build&Deployment:
 	- Build and deployment and OS support (pkg mgmt) for update process (ABa, MBa)
 
 Fixes:
-	- Test Lua: provider.document() processing
-	- Document Lua: provider.document() processing
+	- Cleanup types::DocType mess
 	- Document type recognition & format guesser module
 	- Rewrite Simpleform Compiler (Parsing)
 	- Start SDK and splitting of graphix module and others

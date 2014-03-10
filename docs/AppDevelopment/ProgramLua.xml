@@ -66,6 +66,12 @@
 					<entry>Name of the function</entry>
 					<entry>Form function defined in a <application>Wolframe</application> program or module</entry>
 				</row>
+				<row>
+					<entry>document</entry>
+					<entry>Content string of the document to process</entry>
+					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
+						See description of type "document"</entry>
+				</row>
 			</tbody>
 			</tgroup>
 		</table>
@@ -400,7 +406,7 @@
 		and the fourth selects and prints the "id" element in the table.
 	</para>
 	</sect2>
-
+	
 	<sect2>
 	<title>List of <application>Lua</application> Objects</title>
 	<para>This is a list of all objects and functions declared by <application>Wolframe</application>:</para>
@@ -494,6 +500,56 @@
 			(*) See section "Serialization Iterator"
 		</para>
 
+		<table>
+		<title>Document</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>docformat</entry>
+					<entry> - </entry>
+					<entry>Returns the format of the document {'XML','JSON',etc..}</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter and/or document type table</entry>
+					<entry>Attaches a filter to the document to be used for processing</entry>
+				</row>
+				<row>
+					<entry>doctype</entry>
+					<entry> - </entry>
+					<entry>Returns the document type of the content. For retrieving the document type you have first to define a filter.</entry>
+				</row>
+				<row>
+					<entry>value</entry>
+					<entry> - </entry>
+					<entry>Returns the contents of the document as <application>Lua</application> table or atomic value</entry>
+				</row>
+				<row>
+					<entry>form</entry>
+					<entry> - </entry>
+					<entry>Returns the contents of the document as filled form instace</entry>
+				</row>
+				<row>
+					<entry>get</entry>
+					<entry> - </entry>
+					<entry>Returns a serialization iterator (*) on the form elements</entry>
+				</row>
+			</tbody>
+			</tgroup>
+
+		</table>
+		<para>
+			(*) See section "Serialization Iterator"
+		</para>
+
 		<table frame="all" width="100%">
 			<title>Logger functions</title>
 			<tgroup cols="3">
@@ -519,6 +575,7 @@
 			</tbody>
 			</tgroup>
 		</table>
+
 
 		<table frame="all" width="100%">
 			<title>Global functions</title>
@@ -546,6 +603,12 @@
 					<entry>provider.type</entry>
 					<entry>name of data type (string)</entry>
 					<entry>Returns a constructor function for the data type given by name. The name specifies either a custom data type or a normalization function as used in forms or one of the additional userdata types 'datetime' or 'bignumber'.</entry>
+				</row>
+				<row>
+					<entry>provider.document</entry>
+					<entry>Content string of the document to process</entry>
+					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
+						See description of type "document"</entry>
 				</row>
 				<row>
 					<entry>scope</entry>
