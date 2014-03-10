@@ -295,6 +295,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::BigNumber&, const
 						return parseValue_( val, ParseValueType::BigNumber(), baseval);
 					}
 					val = types::BigNumber( element.tostring());
+					return true;
 				}
 				catch (const std::runtime_error& e)
 				{
@@ -316,25 +317,18 @@ static bool parseValue_( ValueType& val, const ParseValueType::DateTime&, const 
 		switch (element.type())
 		{
 			case types::Variant::Null:
-				return false;
-
 			case types::Variant::Bool:
-				throw std::runtime_error( "cannot convert boolean to datetime");
-
 			case types::Variant::Double:
-				throw std::runtime_error( "cannot convert double precision floating point number to datetime");
-
 			case types::Variant::Int:
-				throw std::runtime_error( "cannot convert integer to datetime");
-
 			case types::Variant::UInt:
-				throw std::runtime_error( "cannot convert unsigned integer to datetime");
+				return false;
 
 			case types::Variant::Timestamp:
 				val = element.totimestamp();
+				return true;
 
 			case types::Variant::BigNumber:
-				throw std::runtime_error( "cannot convert big number to datetime");
+				return false;
 
 			case types::Variant::String:
 				val = types::DateTime( element.charptr(), element.charsize());
@@ -351,6 +345,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::DateTime&, const 
 						return parseValue_( val, ParseValueType::DateTime(), baseval);
 					}
 					val = types::DateTime( element.tostring());
+					return true;
 				}
 				catch (const std::runtime_error& e)
 				{

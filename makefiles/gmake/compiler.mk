@@ -56,7 +56,7 @@ endif
 COMMON_COMPILE_FLAGS = \
 	$(OPTFLAGS) \
 	-fstrict-aliasing -Wstrict-aliasing=2 \
-	-pedantic -Wall \
+	-pedantic -Wall -Werror \
 	-Wno-long-long \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security \

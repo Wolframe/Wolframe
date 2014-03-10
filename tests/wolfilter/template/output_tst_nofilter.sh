@@ -14,7 +14,6 @@
 # VARIABLES
 # - testname		name of the test
 # - testcmd		command to execute by the test
-# - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too

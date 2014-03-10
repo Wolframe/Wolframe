@@ -15,7 +15,6 @@
 # - testname		name of the test
 # - testcmd		command to execute by the test
 # - cset		character set encoding name
-# - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too
@@ -66,11 +65,6 @@ fi
 if [ x"$testdata" != x ]; then
 	echo "$testdata" | sed "s/#FILTER#/$inputfilter/g" >> $output
 fi
-for script in $testscripts
-do
-	echo "**file: `basename $script`" >> $output
-	cat ../scripts/$script >> $output
-done
 echo '**output' >> $output
 if [ x"$docout" != x ]; then
 	if [ -f doc/$docout.UTF-8.$docformat ]; then

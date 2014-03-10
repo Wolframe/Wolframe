@@ -84,8 +84,12 @@ static void getDescription_( lua_State *ls, int index, std::string& rt)
 			break;
 
 		case LUA_TSTRING:
-			rt.append( lua_tostring( ls, index));
+		{
+			std::size_t len;
+			const char* ptr = lua_tolstring( ls, index, &len);
+			rt.append( ptr, len);
 			break;
+		}
 
 		case LUA_TNUMBER:
 			rt.append( boost::lexical_cast<std::string>( lua_tonumber( ls, index)));

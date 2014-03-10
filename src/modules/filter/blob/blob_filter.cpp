@@ -99,8 +99,10 @@ struct InputFilterImpl :public InputFilter
 			element = m_elembuf.c_str();
 			elementsize = m_elembuf.size();
 			m_done = true;
+			setState( Open);
 			return true;
 		}
+		setState( EndOfMessage);
 		return false;
 	}
 

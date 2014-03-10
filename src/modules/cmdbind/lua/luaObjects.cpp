@@ -1406,7 +1406,7 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			{
 				Input* input = LuaObject<Input>::getGlobal( ls, "input");
 				Output* output = LuaObject<Output>::getGlobal( ls, "output");
-				Filter flt( input->inputfilter(), output->outputfilter());
+				Filter flt( langbind::InputFilterR(input->inputfilter()->copy()), langbind::OutputFilterR( output->outputfilter()->copy()));
 				LuaObject<Filter>::push_luastack( ls, flt);
 				return 1;
 			}

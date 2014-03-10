@@ -37,6 +37,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapDescription.hpp"
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
+#include "logger/logLevel.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4127)
 #endif
@@ -420,6 +421,7 @@ int main( int argc, const char** argv)
 	if (argc <= 1)
 	{
 		std::cerr << "missing argument configuration file" << std::endl;
+		return 1;
 	}
 	std::string filename( argv[1]);
 
@@ -427,7 +429,7 @@ int main( int argc, const char** argv)
 	if (!utils::fileExists( configfile))
 	{
 		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
-		return false;
+		return 2;
 	}
 
 	std::string errmsg;
@@ -444,6 +446,7 @@ int main( int argc, const char** argv)
 	if (!errmsg.empty())
 	{
 		std::cerr << "Error in configuration: " << errmsg << std::endl;
+		return 2;
 	}
 	return 0;
 }

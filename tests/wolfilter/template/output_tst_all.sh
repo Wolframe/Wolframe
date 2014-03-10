@@ -14,7 +14,7 @@
 # VARIABLES
 # - testname		name of the test
 # - testcmd		command to execute by the test
-# - testscripts		list of scripts of the test
+# - csetlist		list of character set encodings tested
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too

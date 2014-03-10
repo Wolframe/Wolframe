@@ -38,79 +38,79 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
-bool _Wolframe::serialize::printValue_int( const signed int* ptr, types::VariantConst& value)
+bool serialize::printValue_int( const signed int* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const int*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_uint( const unsigned int* ptr, types::VariantConst& value)
+bool serialize::printValue_uint( const unsigned int* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned int*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_ulong( const unsigned long* ptr, types::VariantConst& value)
+bool serialize::printValue_ulong( const unsigned long* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned long*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_long( const signed long* ptr, types::VariantConst& value)
+bool serialize::printValue_long( const signed long* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned long*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_short( const signed short* ptr, types::VariantConst& value)
+bool serialize::printValue_short( const signed short* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const signed short*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_ushort( const unsigned short* ptr, types::VariantConst& value)
+bool serialize::printValue_ushort( const unsigned short* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned short*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_char( const signed char* ptr, types::VariantConst& value)
+bool serialize::printValue_char( const signed char* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const signed char*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_uchar( const unsigned char* ptr, types::VariantConst& value)
+bool serialize::printValue_uchar( const unsigned char* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const unsigned char*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_float( const float* ptr, types::VariantConst& value)
+bool serialize::printValue_float( const float* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const float*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_double( const double* ptr, types::VariantConst& value)
+bool serialize::printValue_double( const double* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const double*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_string( const std::string* ptr, types::VariantConst& value)
+bool serialize::printValue_string( const std::string* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const std::string*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_datetime( const types::DateTime* ptr, types::VariantConst& value)
+bool serialize::printValue_datetime( const types::DateTime* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const types::DateTime*)ptr, value);
 }
 
-bool _Wolframe::serialize::printValue_bignumber( const types::BigNumber* ptr, types::VariantConst& value)
+bool serialize::printValue_bignumber( const types::BigNumber* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const types::BigNumber*)ptr, value);
 }
 
-bool _Wolframe::serialize::fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	ctx.setElem(langbind::FilterBase::CloseTag);
 	stk.pop_back();
 	return true;
 }
 
-bool _Wolframe::serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	ctx.setElem(
 		langbind::FilterBase::OpenTag,
@@ -119,7 +119,7 @@ bool _Wolframe::serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateSt
 	return true;
 }
 
-bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	bool rt = false;
 	const void* obj = stk.back().value();
@@ -180,7 +180,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 	return rt;
 }
 
-bool _Wolframe::serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	Context::ElementBuffer elem;
 	elem.m_type = langbind::FilterBase::Value;
@@ -193,7 +193,7 @@ bool _Wolframe::serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, Fil
 	return true;
 }
 
-bool _Wolframe::serialize::fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	bool rt = false;
 	std::size_t idx = stk.back().state();
