@@ -109,21 +109,23 @@ ifdef DEFAULT_MODULE_LOAD_DIR
 INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(DEFAULT_MODULE_LOAD_DIR)
 endif
 
-modules: libwolframe libwolframe_serialize libwolframe_langbind
+libwfsingleton: libwolframe
+modules: libwfsingleton libwolframe libwolframe_serialize libwolframe_langbind
 libwolframe_serialize: libwolframe
-libwolframe_langbind: libwolframe libwolframe_serialize
+libwolframe_langbind: libwolframe libwolframe_serialize libwolframe_database
+libwolframe_database: libwfsingleton libwolframe
 
-wolframed$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
+wolframed$(EXE): libwfsingleton libwolframe libwolframe_serialize libwolframe_langbind libwolframe_database
 
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
+wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_database
 
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfwizard$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
+wolfwizard$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_database
 
 wolfwizard$(EXE): wolfwizard.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
