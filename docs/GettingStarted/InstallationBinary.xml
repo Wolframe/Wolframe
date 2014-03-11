@@ -128,7 +128,7 @@
 		
 				You can start the service now with:
 				<programlisting language='shell'>
-	service wolframe start
+	service wolframed start
 				</programlisting>
 			</para>
 
