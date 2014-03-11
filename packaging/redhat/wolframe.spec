@@ -1322,7 +1322,7 @@ fi
 %endif
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
-%{_bindir}/wolfpasswd
+#%{_bindir}/wolfpasswd
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
@@ -1338,10 +1338,10 @@ fi
 %dir %attr(0755, root, root) %{_mandir}/man8
 %endif
 %{_mandir}/man8/wolframed.8.gz
-%if !%{sles}
-%dir %attr(0755, root, root) %{_mandir}/man1
-%endif
-%{_mandir}/man1/wolfpasswd.1.gz
+#%if !%{sles}
+#%dir %attr(0755, root, root) %{_mandir}/man1
+#%endif
+#%{_mandir}/man1/wolfpasswd.1.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
@@ -1370,8 +1370,8 @@ fi
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
 %{_libdir}/wolframe/modules/mod_audit_database.so
 
-%{_libdir}/wolframe/modules/mod_auth_textfile.so
-%{_libdir}/wolframe/modules/mod_auth_database.so
+#%{_libdir}/wolframe/modules/mod_auth_textfile.so
+#%{_libdir}/wolframe/modules/mod_auth_database.so
 
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
