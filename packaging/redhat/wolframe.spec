@@ -1407,7 +1407,6 @@ fi
 %{_libdir}/wolframe/libwolframe.so
 %{_libdir}/wolframe/libwolframe.a
 %{_libdir}/wolframe/libwfsingleton.so
-%{_libdir}/wolframe/libwfsingleton.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
 %{_libdir}/wolframe/libwolframe_database.so
