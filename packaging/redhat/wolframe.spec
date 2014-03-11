@@ -1245,6 +1245,12 @@ if test ! -d /var/run/wolframe; then
   chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/run/wolframe
   chmod 0755 /var/run/wolframe
 fi
+
+if test ! -d /var/log/wolframe; then
+  mkdir /var/log/wolframe
+  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/log/wolframe
+  chmod 0755 /var/log/wolframe
+fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{scilin} || %{sles}
@@ -1293,15 +1299,14 @@ systemctl stop wolframed.service
 systemctl disable wolframed.service
 %endif
 %endif
-  if test -d /var/run/wolframe; then
-    rmdir /var/run/wolframe
-  fi
-fi
 
 %postun
 if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
 fi
+
+rm -rf /var/log/wolframe
+rm -rf /var/run/wolframe
 
 %files
 %defattr( -, root, root )
