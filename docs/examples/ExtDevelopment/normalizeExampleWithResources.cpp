@@ -24,9 +24,10 @@ public:
         {return "int";}
     virtual types::Variant execute( const types::Variant& i) const
         {return types::Variant( i.toint());}
+	virtual types::NormalizeFunction* copy() const {return new NormalizeInt(*this);}
 
     static types::NormalizeFunction* create(
-        types::NormalizeResourceHandle* reshnd, const std::string&)
+        types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>&)
     {
         ConversionResources* res
             = dynamic_cast<ConversionResources*>(reshnd);
