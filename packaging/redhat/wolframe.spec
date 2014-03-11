@@ -1303,10 +1303,9 @@ systemctl disable wolframed.service
 %postun
 if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
+    rm -rf /var/log/wolframe
+    rm -rf /var/run/wolframe
 fi
-
-rm -rf /var/log/wolframe
-rm -rf /var/run/wolframe
 
 %files
 %defattr( -, root, root )
