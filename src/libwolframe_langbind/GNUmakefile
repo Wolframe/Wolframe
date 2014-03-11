@@ -20,8 +20,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_LIBS = \
-	-lwfsingleton -lwolframe -lwolframe_serialize -lwolframe_database \
-	-lboost_filesystem
+	-lwfsingleton -lwolframe -lwolframe_serialize -lwolframe_database
 
 STATIC_LIB = libwolframe_langbind.a
 
