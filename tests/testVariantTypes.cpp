@@ -79,7 +79,7 @@ TEST( variantTypeFixture, casts )
 	v.convert( Variant::String );
 	ASSERT_EQ( "47", v.tostring( ) );
 	v.convert( Variant::UInt );
-	ASSERT_EQ( 47, v.touint( ) );
+	ASSERT_EQ( 47u, v.touint( ) );
 	v.convert( Variant::Double );
 	ASSERT_DOUBLE_EQ( 47.0, v.todouble( ) );
 	v = 1;

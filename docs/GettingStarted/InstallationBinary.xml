@@ -290,7 +290,7 @@
 		<sect2>
 			<title>Slackware</title>
 			<para>
-				Download the package file(s):
+				Download the package file:
 				<programlisting language='shell'>
 	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/Slackware-14/x86_64/wolframe-0.0.1-x86_64.tgz
 				</programlisting>
@@ -316,17 +316,53 @@
 
 	</sect1>
 
-<!--
-	
 	<sect1>
 		<title>Other Unix systems</title>
 
+<!-- FreeBSD -->
 		<sect2>
 			<title>FreeBSD</title>
 			<para>
+				Download the package file:
+				<programlisting language='shell'>
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/FreeBSD-9/x86_64/wolframe-0.0.1-x86_64.tgz
+				</programlisting>
 			</para>
+
+			<para>
+				You install the Wolframe package with:
+				<programlisting language='shell'>
+	pkg_add wolframe-0.0.1-x86_64.tgz 
+				</programlisting>
+			
+				The FreeBSD packages contain the whole server and the whole client respectively.
+			</para>
+			
+			<para>
+				You can start the service with:
+
+				<programlisting language='shell'>
+	/usr/local/etc/rc.d/wolframed onestart
+				</programlisting>
+			</para>
+
+			<para>
+				To start the Wolframe service at system boot time
+				you have to edit the file <filename>/etc/rc.conf</filename>
+				and enable the wolframe daemon there with:
+				<programlisting language='shell'>
+	wolframed_enable="YES"
+				</programlisting>
+		
+				You can start the service now with:
+				<programlisting language='shell'>
+	service wolframed start
+				</programlisting>
+			</para>
+
 		</sect2>
 
+<!--
 		<sect2>
 			<title>NetBSD</title>
 			<para>
@@ -337,8 +373,10 @@
 			<title>Solaris</title>
 			<para></para>
 		</sect2>
+-->		
 	</sect1>
-	
+
+<!--	
 	<sect1>
 		<title>Windows</title>
 		<para>

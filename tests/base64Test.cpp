@@ -329,14 +329,14 @@ TEST( Base64, RandomData )
 						       encoded1 + encodeResult, encodedSize - encodeResult );
 			EXPECT_GE( partialResult, 0 );
 			encodeResult += partialResult;
-			EXPECT_LE( encodeResult, encodedSize );
+			EXPECT_LE( encodeResult, (long int)encodedSize );
 			dataUsed += chunkSize;
 		}
 		partialResult = E.encodeChunk( data + dataUsed, dataSize - dataUsed,
 					       encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 		EXPECT_GE( partialResult, 0 );
 		encodeResult += partialResult;
-		EXPECT_LE( encodeResult, encodedSize );
+		EXPECT_LE( encodeResult, (long int)encodedSize );
 		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 #ifdef _BASE64_PRINT_TEST_PARAMETRS
 		std::cout << ", encoded size: " << encodeResult << " + " << encodeEndResult << std::endl;
@@ -348,7 +348,7 @@ TEST( Base64, RandomData )
 		edata1.write(( const char *)encoded1, encodeResult );
 		edata1.close();
 #endif
-		EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( encodeResult, (long int)encodedSize );
 
 		encodeResult = base64::encode( data, dataSize, encoded2, encodedSize + 1, lineLength );
 #ifdef _BASE64_WRITE_OUTPUT
@@ -357,7 +357,7 @@ TEST( Base64, RandomData )
 		edata2.write(( const char *)encoded2, encodeResult );
 		edata2.close();
 #endif
-		EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( encodeResult, (long int)encodedSize );
 		EXPECT_EQ( 0, memcmp( encoded1, encoded2, encodedSize ));
 
 		decoded[ dataSize ] = 0x5a;
@@ -365,12 +365,12 @@ TEST( Base64, RandomData )
 		int decodeResult = 0;
 		dataUsed = 0;
 		partialResult = 0;
-		while ( dataUsed <= encodeResult - chunkSize )	{
+		while ( dataUsed <= (size_t)( encodeResult - chunkSize ))	{
 			partialResult = D.decode( encoded1 + dataUsed, chunkSize,
 						  decoded + decodeResult, dataSize - decodeResult + 1 );
 			EXPECT_GE( partialResult, 0 );
 			decodeResult += partialResult;
-			EXPECT_LE( decodeResult, dataSize );
+			EXPECT_LE( decodeResult, (long int)dataSize );
 			dataUsed += chunkSize;
 		}
 		partialResult = D.decode( encoded1 + dataUsed, encodeResult - dataUsed,
@@ -395,7 +395,7 @@ TEST( Base64, RandomData )
 		ddata2.write(( const char *)decoded, decodeResult );
 		ddata2.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult );
+		EXPECT_EQ( (long int)dataSize, decodeResult );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
 		EXPECT_EQ( decoded[ dataSize ], 0xa5 );
 
