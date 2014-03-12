@@ -332,7 +332,7 @@
 			<para>
 				You install the Wolframe package with:
 				<programlisting language='shell'>
-	pkgadd wolframe-0.0.1-x86_64.tgz 
+	pkg_add wolframe-0.0.1-x86_64.tgz 
 				</programlisting>
 			
 				The FreeBSD packages contain the whole server and the whole client respectively.
