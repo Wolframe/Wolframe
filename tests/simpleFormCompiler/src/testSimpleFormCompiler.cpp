@@ -97,7 +97,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = pp.string() + ".simpleform";
 		langbind::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		std::vector<types::FormDescriptionR> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		std::vector<types::FormDescriptionR> sr = mm.compile( srcfile, &typemap);
 		std::vector<types::FormDescriptionR>::const_iterator si = sr.begin(), se = sr.end();
 		for (; si != se; ++si)
 		{

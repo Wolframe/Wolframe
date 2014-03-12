@@ -6,7 +6,7 @@ FORM places
 			NAME string
 			ADDRESS
 			{
-				COUNTRY int(49)
+				COUNTRY int = 49
 				STREET string
 				CITY string
 				PHONE {
@@ -18,10 +18,10 @@ FORM places
 			{
 				COMMON string[]
 				BOTANICAL string
-				ZONE uint(1)
+				ZONE uint = 1
 				LIGHT string
-				PRICE string(0.0)
-				AVAILABILITY uint(0)
+				PRICE string = "0.0"
+				AVAILABILITY uint = 0
 			}
 		}
 	}
