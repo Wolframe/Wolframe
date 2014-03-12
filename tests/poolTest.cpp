@@ -151,7 +151,7 @@ public:
 // Tests the ObjectPool get & release
 TEST_F( ObjectPoolFixture, noTimeout )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -178,7 +178,7 @@ TEST_F( ObjectPoolFixture, noTimeout )	{
 
 TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -206,7 +206,7 @@ TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 TEST_F( ObjectPoolFixture, Timeout )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -234,7 +234,7 @@ TEST_F( ObjectPoolFixture, Timeout )	{
 TEST_F( ObjectPoolFixture, TimeoutSleep )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 

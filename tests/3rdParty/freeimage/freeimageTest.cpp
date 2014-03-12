@@ -46,7 +46,7 @@ class FreeImageFixture : public ::testing::Test
 TEST_F( FreeImageFixture, VersionInfo )
 {
 	//std::cout << "FreeImage " << FreeImage_GetVersion( ) << "\n";
-	//std::cout << FreeImage_GetCopyrightMessage( ) << "\n\n";	
+	//std::cout << FreeImage_GetCopyrightMessage( ) << "\n\n";
 
 	const char *version = FreeImage_GetVersion( );
 	std::ostringstream ss;
@@ -84,8 +84,8 @@ TEST_F( FreeImageFixture, ImageInfo )
 	unsigned int width = FreeImage_GetWidth( image );
 	unsigned int height = FreeImage_GetHeight( image );
 	//std::cout << "size is " << width << " x " << height << std::endl;
-	ASSERT_EQ( width, 312 );
-	ASSERT_EQ( height, 312 );
+	ASSERT_EQ( width, 312u );
+	ASSERT_EQ( height, 312u );
 
 // make thumbnail
 	FIBITMAP *thumb = FreeImage_MakeThumbnail( image, 50, true );
@@ -94,8 +94,8 @@ TEST_F( FreeImageFixture, ImageInfo )
 	unsigned int widthThumb = FreeImage_GetWidth( thumb );
 	unsigned int heightThumb = FreeImage_GetHeight( thumb );
 	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
-	ASSERT_EQ( widthThumb, 50 );
-	ASSERT_EQ( heightThumb, 50 );
+	ASSERT_EQ( widthThumb, 50u );
+	ASSERT_EQ( heightThumb, 50u );
 	
 // save image (for debugging mainly)
 	FreeImage_Save( FIF_PNG, thumb, THUMB, 0 );
