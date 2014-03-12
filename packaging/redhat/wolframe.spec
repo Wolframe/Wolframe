@@ -1221,6 +1221,9 @@ install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_u
 
 install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
+install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
+install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
+
 %if %{fedora}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
@@ -1237,18 +1240,6 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 %if %{suse} || %{sles}
 getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user"
 %endif
-
-if test ! -d /var/run/wolframe; then
-  mkdir /var/run/wolframe
-  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/run/wolframe
-  chmod 0755 /var/run/wolframe
-fi
-
-if test ! -d /var/log/wolframe; then
-  mkdir /var/log/wolframe
-  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/log/wolframe
-  chmod 0755 /var/log/wolframe
-fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{scilin} || %{sles}
@@ -1288,26 +1279,23 @@ if [ "$1" = 0 ]; then
     /sbin/chkconfig --del wolframed
 %endif
 %if %{fedora}
-systemctl stop wolframed.service   
-systemctl disable wolframed.service
+    systemctl stop wolframed.service   
+    systemctl disable wolframed.service
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
-systemctl stop wolframed.service
-systemctl disable wolframed.service
+    systemctl stop wolframed.service
+    systemctl disable wolframed.service
 %endif
 %endif
+    if test -d /var/log/wolframe; then
+       rm -rf /var/log/wolframe/*
+    fi
 fi
 
 %postun
 if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
-    if test -d /var/log/wolframe; then
-      rmdir /var/log/wolframe
-    fi
-    if test -d /var/run/wolframe; then
-      rmdir /var/run/wolframe
-    fi
 fi
 
 %files
@@ -1337,6 +1325,7 @@ fi
 %{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
+%attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/run/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif
