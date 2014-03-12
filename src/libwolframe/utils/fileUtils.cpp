@@ -522,23 +522,14 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 		boost::filesystem::system_complete( filename).parent_path().string());
 	types::PropertyTree::FileName filenameref( 
 		types::PropertyTree::getFileName( resolvePath( filename)));
+
+	// Check circular include references:
 	std::vector<std::string> filenamestack2 = filenamestack;
 	filenamestack2.push_back( filename);
-
 	std::vector<std::string>::const_iterator fi = filenamestack.begin(), fe = filenamestack.end();
 	for (; fi != fe; ++fi)
 	{
-		if (filename == *fi)
-		{
-			std::ostringstream msg;
-			msg << "circular include file references in includes: ";
-			for (fi = filenamestack.begin(); fi != fe; ++fi)
-			{
-				msg << "'" << *fi << "' -> ";
-			}
-			msg << "'" << filename << "'";
-			throw std::runtime_error( msg.str());
-		}
+		if (filename == *fi) throw std::runtime_error( std::string("circular include file reference including file '") + filename + "'");
 	}
 	try
 	{
@@ -607,9 +598,11 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 								throw std::runtime_error( std::string( "after . on first level one of {") + g_keywords_tab.tostring() + "} expected");
 							case kw_INCLUDE:
 							{
-								if (stk.size() != 1) throw std::runtime_error( "'.include'' only allowed on highest level of structure hierarchy (not in substructure)");
-								if (!utils::parseNextToken( tok, ci, ce)) throw std::runtime_error( "unexpected end of file");
-								types::PropertyTree::Node subnode = readInfoPropertyTreeFile( filename, filenamestack2);
+								if (stk.size() != 1) throw std::runtime_error( "'.include' only allowed on highest level of structure hierarchy (not in substructure)");
+								ch = utils::parseNextToken( tok, ci, ce);
+								if (!ch) throw std::runtime_error( "unexpected end of file");
+								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
+								types::PropertyTree::Node subnode = readInfoPropertyTreeFile( getCanonicalPath( tok, includepath), filenamestack2);
 								types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
 
 								for (; ni != ne; ++ni)
@@ -691,7 +684,21 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw std::runtime_error( std::string( "error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lineinfo.line) + " column " + boost::lexical_cast<std::string>(lineinfo.column) + ": " + e.what());
+		if (boost::algorithm::starts_with( e.what(), "error"))
+		{
+			if (filenamestack.size() >= 1)
+			{
+				throw std::runtime_error( std::string(e.what()) + " - file included from '" + filenamestack.back() + "'"); 
+			}
+			else
+			{
+				throw e;
+			}
+		}
+		else
+		{
+			throw std::runtime_error(std::string("error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lineinfo.line) + " column " + boost::lexical_cast<std::string>(lineinfo.column) + ": " + e.what());
+		}
 	}
 }
 

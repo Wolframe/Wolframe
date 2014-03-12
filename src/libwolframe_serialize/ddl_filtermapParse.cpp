@@ -92,6 +92,10 @@ static void setAtomValue( types::Variant& val, const types::VariantConst& elemen
 	{
 		val = normalizer->execute( element);
 	}
+	else if (valueType == types::Variant::Null)
+	{
+		val = element;
+	}
 	else if (valueType == types::Variant::Custom)
 	{
 		val.customref()->assign( element);
@@ -268,7 +272,6 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			switch (elem->type())
 			{
 				case types::VariantStruct::Null:
-					throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
 				case types::VariantStruct::Bool:
 				case types::VariantStruct::Double:
 				case types::VariantStruct::Int:
@@ -334,8 +337,6 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 	switch (elem->type())
 	{
 		case types::VariantStruct::Null:
-			throw SerializationErrorException( "try to initialize value defined as NULL", getElementPath( stk));
-
 		case types::VariantStruct::Bool:
 		case types::VariantStruct::Double:
 		case types::VariantStruct::Int:

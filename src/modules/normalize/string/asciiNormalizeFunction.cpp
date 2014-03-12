@@ -204,11 +204,18 @@ static void substDia_europe( std::istream& input, std::ostream& output)
 
 types::Variant ConvDiaNormalizeFunction::execute( const types::Variant& inp) const
 {
-	std::istringstream input( inp.tostring());
-	std::ostringstream output;
-
-	substDia_europe( input, output);
-	return output.str();
+	if (inp.type() == types::Variant::String)
+	{
+		std::istringstream input( inp.tostring());
+		std::ostringstream output;
+	
+		substDia_europe( input, output);
+		return output.str();
+	}
+	else
+	{
+		return inp;
+	}
 }
 
 static std::string nameString( const std::string& str)
@@ -246,11 +253,25 @@ static std::string nameString( const std::string& str)
 
 types::Variant UppercaseNameNormalizeFunction::execute( const types::Variant& inp) const
 {
-	return boost::to_upper_copy( nameString( inp.tostring()));
+	if (inp.type() == types::Variant::String)
+	{
+		return boost::to_upper_copy( nameString( inp.tostring()));
+	}
+	else
+	{
+		return inp;
+	}
 }
 
 types::Variant LowercaseNameNormalizeFunction::execute( const types::Variant& inp) const
 {
-	return boost::to_lower_copy( nameString( inp.tostring()));
+	if (inp.type() == types::Variant::String)
+	{
+		return boost::to_lower_copy( nameString( inp.tostring()));
+	}
+	else
+	{
+		return inp;
+	}
 }
 

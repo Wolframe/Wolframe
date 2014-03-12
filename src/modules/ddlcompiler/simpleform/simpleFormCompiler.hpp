@@ -47,8 +47,8 @@ class SimpleFormCompiler :public DDLCompiler
 public:
 	SimpleFormCompiler() :DDLCompiler( "simpleform", "sfrm") {}
 
-	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
-	virtual std::vector<types::FormDescriptionR> compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const;
+	///\brief Compile a source from a string. See langbind::DDLCompiler::compile( const std::string&, const TypeMap*) const
+	virtual std::vector<types::FormDescriptionR> compile( const std::string& filename, const types::NormalizeFunctionMap* typemap) const;
 };
 
 DDLCompiler* createSimpleFormCompilerFunc();

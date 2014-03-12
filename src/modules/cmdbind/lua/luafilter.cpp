@@ -177,6 +177,28 @@ bool LuaTableInputFilter::getElementValue( int idx, types::VariantConst& element
 			lstr = (const char*)_wrap_lua_tolstring( m_ls, idx, &lstrlen);
 			element.init( lstr, lstrlen);
 			return true;
+
+		case LUA_TUSERDATA:
+		{
+			types::BigNumber* bn = LuaObject<types::BigNumber>::get( m_ls, idx);
+			if (bn)
+			{
+				element.init( *bn);
+				return true;
+			}
+			types::DateTime* dt = LuaObject<types::DateTime>::get( m_ls, idx);
+			if (dt)
+			{
+				element.init( *dt);
+				return true;
+			}
+			types::CustomDataValueR* cv = LuaObject<types::CustomDataValueR>::get( m_ls, idx);
+			if (cv)
+			{
+				element.init( **cv);
+				return true;
+			}
+		}
 		default:
 			errelemtype = lua_typename( m_ls, lua_type( m_ls, idx));
 			return false;

@@ -6,7 +6,7 @@ float = floatingpoint(12,12);
 f_floAt = trim ,floatingpoint(12,12);
 text_Ascii_de =  latinword, ascii_de
 text_ascii_eu=Latinword ,ascii_eu ;
-currency=fixedpoint( 13,2);
-percent_1=fixedpoint (5,1);
+currency=bigfxp( 2);
+percent_1=bigfxp( 2);
 
 

@@ -36,6 +36,7 @@ Project Wolframe.
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include <datetime.h>
+#include <Python.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

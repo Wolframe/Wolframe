@@ -35,7 +35,6 @@
 #include "numberNormalize.hpp"
 #include "integerNormalizeFunction.hpp"
 #include "floatNormalizeFunction.hpp"
-#include "fixedpointNormalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "utils/parseUtils.hpp"
 #include <boost/algorithm/string.hpp>
@@ -106,7 +105,7 @@ types::NormalizeFunction* _Wolframe::langbind::createUnsignedNormalizeFunction( 
 
 static void getFractionDimArgument( const std::vector<types::Variant>& arg, std::size_t& sizeG, std::size_t& sizeF)
 {
-	if (arg.size() > 2) throw std::runtime_error("too many arguments for float/fixedpoint normalize function");
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for floating point number normalize function");
 	sizeG = 0;
 	sizeF = std::numeric_limits<std::size_t>::max();
 	if (arg.size() == 1)
@@ -114,7 +113,7 @@ static void getFractionDimArgument( const std::vector<types::Variant>& arg, std:
 		types::Variant::Data::UInt vsizeF = arg.at(0).touint();
 		if (vsizeF >= std::numeric_limits<std::size_t>::max())
 		{
-			throw std::runtime_error( "parameter out of range for float/fixedpoint normalize function");
+			throw std::runtime_error( "parameter out of range for floating point number normalize function");
 		}
 		sizeF = (std::size_t)vsizeF;
 	}
@@ -124,7 +123,7 @@ static void getFractionDimArgument( const std::vector<types::Variant>& arg, std:
 		types::Variant::Data::UInt vsizeF = arg.at(1).touint();
 		if (vsizeF >= std::numeric_limits<std::size_t>::max() || vsizeG >= std::numeric_limits<std::size_t>::max())
 		{
-			throw std::runtime_error( "parameter out of range for float/fixedpoint normalize function");
+			throw std::runtime_error( "parameter out of range for floating point number normalize function");
 		}
 		sizeG = (std::size_t)vsizeG;
 		sizeF = (std::size_t)vsizeF;
@@ -146,16 +145,5 @@ types::NormalizeFunction* _Wolframe::langbind::createFloatNormalizeFunction( typ
 		maxval = std::numeric_limits<double>::max();
 	}
 	return new FloatNormalizeFunction( sizeG, sizeF, maxval);
-}
-
-types::NormalizeFunction* _Wolframe::langbind::createFixedpointNormalizeFunction( types::NormalizeResourceHandle*, const std::vector<types::Variant>& arg)
-{
-	std::size_t sizeG = 12;
-	std::size_t sizeF = 3;
-	if (arg.size())
-	{
-		getFractionDimArgument( arg, sizeG, sizeF);
-	}
-	return new FixedpointNormalizeFunction( sizeG, sizeF);
 }
 

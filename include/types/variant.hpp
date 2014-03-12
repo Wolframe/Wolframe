@@ -333,6 +333,7 @@ struct VariantConst :public Variant
 	void init( const std::string& o)			{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
 	void init( const types::CustomDataValue& o)		{bool init_=initialized(); initConstant( o); setInitialized(init_);}
 	void init( const types::BigNumber& o)			{bool init_=initialized(); initConstant( o); setInitialized(init_);}
+	void init( const types::DateTime& o)			{bool init_=initialized(); initConstant( o); setInitialized(init_);}
 
 	//\brief Empty initialization
 	void init()						{Variant::init(); setConstant();}

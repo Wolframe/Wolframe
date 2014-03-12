@@ -62,16 +62,22 @@ const CharTable& anyCharTable();
 class IdentifierTable
 {
 public:
+	//\brief Constructor
+	//\param[in] casesensitive_ true, if the keywords inserted are case sensitive
+	//\param[in] arg NULL terminated array of identifiers to insert
 	IdentifierTable( bool casesensitive_, const char** arg);
 
+	//\brief Lookup in table
 	int operator[]( const std::string&) const;
+	//\brief Get the list of keywords defined as string for log messages
 	std::string tostring() const;
+	//\brief Get the keyword with index 'id' (starting from 1)
 	const char* idstring( int id) const;
 
 private:
-	bool m_casesensitive;
-	std::map<std::string,int> m_tab;
-	const char** m_arg;
+	bool m_casesensitive;			//< true, if the keywords inserted are case sensitive
+	std::map<std::string,int> m_tab;	//< table implementation
+	const char** m_arg;			//< original set of keywors for inverse lookups
 };
 
 
@@ -110,6 +116,7 @@ std::string parseLine( std::string::const_iterator& si, const std::string::const
 ///\param[in,out] si scanning iterator passed as start of the source to parse and returned as source position after the token parsed if it matches or start of the token not matching if not
 ///\param[in] se iterator marking the end of the source
 ///\param[in] idtab identifier table
+//\return 0 if not found, else index of identifier in table starting with 1
 int parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab);
 
 ///\brief Parse a token assignement 'identifier = token'

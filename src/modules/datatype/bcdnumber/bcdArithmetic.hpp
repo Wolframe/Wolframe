@@ -212,6 +212,7 @@ public:
 	BigFxpBCD& operator=( double o);
 	BigFxpBCD& operator=( _WOLFRAME_INTEGER o);
 	BigFxpBCD& operator=( _WOLFRAME_UINTEGER o);
+	BigFxpBCD& operator=( const BigNumber& num);
 
 	BigFxpBCD operator /( const BigFxpBCD& opr) const;
 	BigFxpBCD operator /( _WOLFRAME_INTEGER opr) const;

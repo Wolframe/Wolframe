@@ -29,12 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonObject.hpp
-///\brief Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
+//\file pythonObject.hpp
+//\brief Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
 #ifndef _Wolframe_python_OBJECT_HPP_INCLUDED
 #define _Wolframe_python_OBJECT_HPP_INCLUDED
 #include "types/variant.hpp"
-#include <Python.h>
+
+//\brief Forward declaration for Python
+struct PyObject;
 
 namespace _Wolframe {
 namespace langbind {
@@ -49,63 +51,63 @@ public:
 		Map,				//< PyDict object
 		Atomic				//< Atomic type object
 	};
-	///\brief Default constructor
+	//\brief Default constructor
 	Object()				:m_obj(0){}
-	///\brief Constructor
+	//\brief Constructor
 	explicit Object( Type type_);
-	///\brief Constructor
+	//\brief Constructor
 	explicit Object( PyObject* obj_, bool isborrowed=true);
-	///\brief Copy constructor
+	//\brief Copy constructor
 	Object( const Object& o);
-	///\brief Constructor
+	//\brief Constructor
 	Object( const types::Variant& v);
-	///\brief Constructor
+	//\brief Constructor
 	explicit Object( const char* s, bool unicode=false);
-	///\brief Constructor
+	//\brief Constructor
 	explicit Object( const char* s, std::size_t n, bool unicode=false);
-	///\brief Constructor
+	//\brief Constructor
 	Object( const std::string& s, bool unicode=false);
 
-	///\brief Destructor
+	//\brief Destructor
 	~Object();
 
-	///\brief Assign object
+	//\brief Assign object
 	Object& operator=( const Object& o);
 
-	///\brief Get the type of the objects
+	//\brief Get the type of the objects
 	Type type() const;
 
-	///\brief Get the object value as variant
+	//\brief Get the object value as variant
 	types::Variant value() const;
 
-	///\brief Get the object value of 'obj' as variant
+	//\brief Get the object value of 'obj' as variant
 	static types::Variant value( PyObject* obj);
 
-	///\brief Get the object value as std::string
+	//\brief Get the object value as std::string
 	std::string tostring() const;
 
-	///\brief Get the object value of 'obj' as std::string
+	//\brief Get the object value of 'obj' as std::string
 	static std::string tostring( PyObject* obj);
 
-	///\brief Find out if 'this' represents an atomic value
-	///\return true, if yes
+	//\brief Find out if 'this' represents an atomic value
+	//\return true, if yes
 	bool atomic() const		{return type() == Object::Atomic;}
-	///\brief Find out if 'this' represents an array of 'Structure'
-	///\return true, if yes
+	//\brief Find out if 'this' represents an array of 'Structure'
+	//\return true, if yes
 	bool array() const		{return type() == Object::Array;}
-	///\brief Find out if this object is defined
-	///\return true if yes
+	//\brief Find out if this object is defined
+	//\return true if yes
 	bool defined() const			{return m_obj != 0;}
 
-	///\brief Get a borrowed reference of a python object (without incrementing reference count)
+	//\brief Get a borrowed reference of a python object (without incrementing reference count)
 	const PyObject* borrowed() const	{return m_obj;}
 	PyObject* borrowed()			{return m_obj;}
 
-	///\brief Get a reference of a python object (with proper incrementing reference count, if the object is defined)
+	//\brief Get a reference of a python object (with proper incrementing reference count, if the object is defined)
 	const PyObject* reference() const;
 	PyObject* reference();
 
-	///\brief Release the object and set it to undefined
+	//\brief Release the object and set it to undefined
 	void clear();
 
 private:

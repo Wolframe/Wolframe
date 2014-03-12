@@ -119,9 +119,10 @@ BigBCD::BigBCD()
 
 void BigBCD::init( const BigNumber& num)
 {
+	static const unsigned char digits_zero[1] = {0};
+
 	unsigned int ii = 0, nn = num.size(), nofDigits = num.size();
 	const unsigned char* digits = num.digits();
-	const unsigned char* digits_zero = {0};
 	if (nn == 0)
 	{
 		digits = digits_zero;
@@ -1167,6 +1168,20 @@ BigFxpBCD& BigFxpBCD::operator=( _WOLFRAME_UINTEGER o)
 	return *this;
 }
 
+BigFxpBCD& BigFxpBCD::operator=( const BigNumber& num)
+{
+	initFromNumber( num);
+	return *this;
+}
+
+BigFxpBCD& BigFxpBCD::operator=( const BigFxpBCD& num)
+{
+	BigBCD::init( BigBCD(num));
+	m_show_precision = num.m_show_precision;
+	m_calc_precision = num.m_calc_precision;
+	return *this;
+}
+
 void BigFxpBCD::initFromNumber( const BigNumber& num)
 {
 	if (num.scale() > 0)
@@ -1229,9 +1244,20 @@ std::string BigFxpBCD::tostring() const
 {
 	BigBCD::const_iterator ii=begin(), ee=end();
 	unsigned int kk = ii.size();
-	if (!kk) return "0";
-
 	std::string rt;
+	if (!kk)
+	{
+		rt.push_back('0');
+		if (m_show_precision > 0)
+		{
+			rt.push_back('.');
+			for (kk=0; kk < m_show_precision; ++kk)
+			{
+				rt.push_back( '0');
+			}
+		}
+		return rt;
+	}
 	if (sign() == '-')
 	{
 		rt.push_back('-');

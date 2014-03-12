@@ -1,5 +1,6 @@
 #include "pythonStructure.hpp"
 #include <sstream>
+#include <Python.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

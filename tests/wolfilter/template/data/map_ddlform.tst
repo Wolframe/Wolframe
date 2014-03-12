@@ -10,6 +10,7 @@ LoadModules
 	module `cmd/MODULE ddlcompiler_simpleform`
 	module `cmd/MODULE normalize_number`
 	module `cmd/MODULE normalize_string`
+	module `cmd/MODULE datatype_bcdnumber`
 }
 Processor
 {

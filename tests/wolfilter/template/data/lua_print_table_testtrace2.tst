@@ -13,6 +13,7 @@ LoadModules
 	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 	module ../../src/modules/filter/blob/mod_filter_blob
 	module ../wolfilter/modules/prnt/fakepdfprint/mod_print_testpdf
 }

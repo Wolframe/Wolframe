@@ -45,15 +45,15 @@ class BigfxpDataInitializer
 	:public CustomDataInitializer
 {
 public:
-	BigfxpDataInitializer( const std::string& description_);
+	explicit BigfxpDataInitializer( const std::vector<types::Variant>& arg);
 	virtual ~BigfxpDataInitializer(){}
 
 	unsigned int show_precision() const	{return m_show_precision;}
 	unsigned int calc_precision() const	{return m_calc_precision;}
 
-	static CustomDataInitializer* create( const std::string& description_)
+	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
 	{
-		return new BigfxpDataInitializer( description_);
+		return new BigfxpDataInitializer( arg);
 	}
 
 private:
@@ -103,7 +103,7 @@ class BigfxpDataType
 {
 public:
 	BigfxpDataType( const std::string& name_)
-		:CustomDataType(name_,&BigfxpDataValue::create)
+		:CustomDataType(name_,&BigfxpDataValue::create,&BigfxpDataInitializer::create)
 	{
 		define( Add, &add);
 		define( Subtract, &subtract);

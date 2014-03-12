@@ -528,7 +528,6 @@ static void print_( const VariantStructDescription* this_, std::ostream& out, co
 			{
 				isArray = true;
 				value = value->prototype();
-
 			}
 			if (value->type() == VariantStruct::Indirection)
 			{

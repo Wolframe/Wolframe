@@ -43,7 +43,6 @@ namespace langbind {
 types::NormalizeFunction* createIntegerNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 types::NormalizeFunction* createUnsignedNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 types::NormalizeFunction* createFloatNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
-types::NormalizeFunction* createFixedpointNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
 }}//namespace
 #endif

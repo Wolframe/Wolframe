@@ -75,7 +75,7 @@ public:
 	void setValue( const types::Variant& value_);
 
 	///\brief Get the index of the last element in case of an array
-	Py_ssize_t lastArrayIndex() const;
+	std::size_t lastArrayIndex() const;
 
 	///\brief Get a reference to the structure build
 	StructureR get() const;

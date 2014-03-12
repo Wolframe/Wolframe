@@ -32,28 +32,31 @@
 ************************************************************************/
 ///\file datatypeBigfxp.cpp
 #include "datatypeBigfxp.hpp"
+#include <limits>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
 
-BigfxpDataInitializer::BigfxpDataInitializer( const std::string& description)
+BigfxpDataInitializer::BigfxpDataInitializer( const std::vector<types::Variant>& arg)
 	:m_show_precision(0),m_calc_precision(0)
 {
-	std::string::const_iterator di = description.begin(), de = description.end();
-	for (; di != de && *di >= '0' && *di <= '9'; ++di)
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for big fixed point number initializer");
+	if (arg.size() == 0) return;
+
+	types::Variant::Data::Int pr = arg.at(0).toint();
+	if (pr >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("precision argument out of range for big fixed point number initializer");
+	m_show_precision = (unsigned int)pr;
+	if (arg.size() == 1)
 	{
-		m_show_precision = (m_show_precision * 10) + *di - '0';
+		m_calc_precision = m_show_precision;
 	}
-	if (di == de) return;
-	if (*di != '+')
+	else
 	{
-		throw std::runtime_error("illegal syntax of initializer description (<show-precision>+<calc-precision>)");
-	}
-	m_calc_precision = m_show_precision;
-	for (; di != de && *di >= '0' && *di <= '9'; ++di)
-	{
-		m_calc_precision = (m_calc_precision * 10) + *di - '0';
+		pr = arg.at(1).toint();
+		if (pr >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("precision argument out of range for big fixed point number initializer");
+		if (pr + m_show_precision  >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("precision argument out of range for big fixed point number initializer");
+		m_calc_precision = (unsigned int)(pr + m_show_precision);
 	}
 }
 
@@ -174,12 +177,12 @@ void BigfxpDataValue::assign( const Variant& o)
 			else
 			{
 				const BigfxpDataValue* val = reinterpret_cast<const BigfxpDataValue*>(ref);
-				types::BigFxpBCD::init( *val);
+				types::BigFxpBCD::operator=( *val);
 			}
 			break;
 		}
 		case Variant::BigNumber:
-			types::BigFxpBCD::init( *o.bignumref());
+			types::BigFxpBCD::operator = ( *o.bignumref());
 			break;
 
 		case Variant::Double:

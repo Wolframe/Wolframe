@@ -33,507 +33,337 @@ Project Wolframe.
 ///\brief Implementation of a compiler for a self defined form DDL called 'simple form DDL'
 
 #include "simpleFormCompiler.hpp"
+#include "simpleFormLexer.hpp"
 #include "types/keymap.hpp"
-#include "types/doctype.hpp"
+#include "utils/fileUtils.hpp"
 #include <string>
 #include <vector>
 #include <cstring>
 #include <cstddef>
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+using namespace _Wolframe::langbind::simpleform;
 
-namespace
+static void compile_structure( Lexer& lexer, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, std::vector<std::string>& unresolvedSymbols)
 {
-
-class FRMAttribute
-{
-public:
-	FRMAttribute( const FRMAttribute& o)
-		:m_isVector(o.m_isVector)
-		,m_isAttribute(o.m_isAttribute)
-		,m_isOptional(o.m_isOptional)
-		,m_isMandatory(o.m_isMandatory)
-		,m_isForm(o.m_isForm)
-		,m_isFormReference(o.m_isFormReference)
-		,m_isIndirection(o.m_isIndirection)
-		,m_type(o.m_type)
-		,m_subform(o.m_subform)
-		,m_value(o.m_value){}
-
-	explicit FRMAttribute( const std::string& item, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
-		:m_isVector(false)
-		,m_isAttribute(false)
-		,m_isOptional(false)
-		,m_isMandatory(false)
-		,m_isForm(false)
-		,m_isFormReference(false)
-		,m_isIndirection(false)
-		,m_type(0)
-		,m_subform(0)
+	Lexem lx;
+	for (lx = lexer.next2(); lx.id() != Lexem::CloseStruct; lx=lexer.next2())
 	{
-		enum State
+		if (lx.id() != Lexem::Identifier) throw std::runtime_error( std::string("unexpected ") + lexer.curtoken() + ", identifier for structure element name expected");
+
+		std::string elementname( lx.value());		//< name of the element
+		bool isOptional = false;			//< element is optional (also in strict validation)
+		bool isMandatory = false;			//< element is mandatory (also in relaxed validation)
+		bool isIndirection = false;			//< element is an indirection (means it is expanded only when it exists)
+		bool isArray = false;				//< element is an array
+		bool isAttribute = false;			//< element is an attribute (for languages that know attributes like XML)
+		bool isInherited = (elementname == "_");	//< element is inherited (means it has no name and it acts as content of the enclosing element)
+
+		for (lx=lexer.next2();; lx=lexer.next2())
 		{
-			ParseStart,
-			ParseName,
-			ParseEndName,
-			ParseArOpen,
-			ParseDfOpen,
-			ParseDfValue,
-			ParseEnd
-		};
-		State st = ParseStart;
-		std::string::const_iterator ii=item.begin(), ee=item.end();
-		for (; ii != ee; ++ii)
-		{
-			switch (st)
+			if (lx.id() == Lexem::OpenStruct)
 			{
-				case ParseStart:
-					if (*ii == '@')
-					{
-						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be an attribute('@')");
-						if (m_isAttribute) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '@'");
-						m_isAttribute = true;
-						continue;
-					}
-					if (*ii == '!')
-					{
-						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be mandatory('!')");
-						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '*'");
-						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '*' and '?' set");
-						m_isMandatory = true;
-						continue;
-					}
-					if (*ii == '?')
-					{
-						if (m_isIndirection) throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be optional('?')");
-						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '?'");
-						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '?' and '*' set");
-						m_isOptional = true;
-						continue;
-					}
-					if (*ii == '^')
-					{
-						m_isIndirection = true;
-						if (m_isOptional || m_isMandatory || m_isAttribute)
-						{
-							throw std::runtime_error( "Syntax error in Simple Form: indirection cannot be optional('?'), mandatory ('!') or defined as attribute ('@')");
-						}
-						continue;
-					}
-					st = ParseName;
-					/* no break here !*/
-				case ParseName:
-					if (((*ii|32) >= 'a' && (*ii|32) <= 'z') || (*ii >= '0' && *ii <= '9') || *ii == '_')
-					{
-						m_symbol.push_back( *ii);
-						continue;
-					}
-					if (!m_isIndirection)
-					{
-						resolveType( m_symbol, typemap, formmap);
-					}
-					st = ParseEndName;
-					/* no break here !*/
-				case ParseEndName:
-					if ((unsigned char)*ii <= 32)
-					{
-						break;
-					}
-					if (*ii == '[')
-					{
-						m_isVector = true;
-						st = ParseArOpen;
-						break;
-					}
-					if (*ii == '(')
-					{
-						if (m_isIndirection)
-						{
-							throw std::runtime_error( "Syntax error in Simple Form Attribute: Indirection cannon have a default value");
-						}
-						st = ParseDfOpen;
-						break;
-					}
-					throw std::runtime_error( "Syntax error in Simple Form Attribute: '[' or '(' expected");
-
-				case ParseArOpen:
-					if (*ii <= ' ' && *ii > 0)
-					{
-						break;
-					}
-					if (*ii == ']')
-					{
-						st = ParseEnd;
-						break;
-					}
-					throw std::runtime_error( "Syntax error in Simple Form Attribute: ']' expected");
-
-				case ParseDfOpen:
-					if (*ii <= ' ' && *ii > 0)
-					{
-						break;
-					}
-					if (*ii == ')')
-					{
-						st = ParseEnd;
-						break;
-					}
-					st = ParseDfValue;
-					/* no break here !*/
-
-				case ParseDfValue:
-					if (*ii == ')')
-					{
-						st = ParseEnd;
-						break;
-					}
-					else
-					{
-						m_value.push_back( *ii);
-					}
+				types::VariantStructDescription substruct;
+				compile_structure( lexer, substruct, typemap, formmap, unresolvedSymbols);
+				int elementidx = result.addStructure( elementname, substruct);
+				if (isArray) result.at( elementidx)->makeArray();
+				if (isOptional) result.at( elementidx)->setOptional();
+				if (isMandatory) result.at( elementidx)->setMandatory();
+				if (isIndirection) throw std::runtime_error("cannot declare embedded substructure as indirection ('^')");
+				if (isAttribute) throw std::runtime_error("cannot declare structure as attribute ('@')");
+				if (isInherited) throw std::runtime_error("cannot declare embedded substructure with name \"_\" used to declare inheritance");
 				break;
-				case ParseEnd:
-					if (*ii <= ' ' && *ii > 0)
+			}
+			else if (lx.id() == Lexem::Identifier)
+			{
+				std::string elementtype( lx.value());
+				std::string defaultvalue;
+				bool hasDefault = false;
+
+				// Here we handle the case of default value assigment and postfix array marker.
+				//	Because simpleform language has no end of statement marker, we have to do forward lookups
+				//	to check when the next statement starts or the structure ends
+
+				Lexem::Id flx = lexer.forwardLookup();
+				for (; flx != Lexem::Identifier && flx != Lexem::CloseStruct; flx = lexer.forwardLookup())
+				{
+					lx = lexer.next();
+					if (lx.id() == Lexem::ArrayTag)
 					{
-						break;
+						if (hasDefault) throw std::runtime_error("unexpected array marker after default value assignment");
+						if (isArray) throw std::runtime_error("cannot handle duplicate array tag '[]'");
+						isArray = true;
 					}
-					throw std::runtime_error( "Syntax error in simple form attribute: Illegal character after end of attribute");
-			}
-		}
-		if (st == ParseName)
-		{
-			if (!m_isIndirection)
-			{
-				resolveType( m_symbol, typemap, formmap);
-			}
-		}
-		else if (st == ParseStart)
-		{
-			if (!m_isIndirection)
-			{
-				resolveType( "", typemap, formmap);
-			}
-		}
-		else if (st != ParseEnd)
-		{
-			throw std::runtime_error( "Syntax error in Simple Form Attribute: Incomplete attribute");
-		}
-	}
-
-	bool isFormReference() const				{return m_isFormReference;}
-	bool isIndirection() const				{return m_isIndirection;}
-	bool isVector() const					{return m_isVector;}
-	bool isAttribute() const				{return m_isAttribute;}
-	bool isOptional() const					{return m_isOptional;}
-	bool isMandatory() const				{return m_isMandatory;}
-	bool isForm() const					{return m_isForm;}
-	const types::NormalizeFunction* type() const		{return m_type;}
-	const std::string& value() const			{return m_value;}
-	const std::string& symbol() const			{return m_symbol;}
-	const types::VariantStructDescription* subform() const	{return m_subform;}
-
-private:
-	void resolveType( const std::string& typestr, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap)
-	{
-		types::keymap<types::FormDescriptionR>::const_iterator fmi;
-		if (typestr.size() == 0)
-		{
-			m_isForm = true;
-		}
-		else if (boost::algorithm::iequals( typestr, "string"))
-		{
-			m_type = 0;
-		}
-		else if ((fmi=formmap.find( typestr)) != formmap.end())
-		{
-			m_isFormReference = true;
-			m_subform = fmi->second.get();
-		}
-		else if (0!=(m_type = typemap->get( typestr)))
-		{
-		}
-		else
-		{
-			throw std::runtime_error( (std::string( "unknown type: '") += typestr) += "'");
-		}
-	}
-private:
-	bool m_isVector;
-	bool m_isAttribute;
-	bool m_isOptional;
-	bool m_isMandatory;
-	bool m_isForm;
-	bool m_isFormReference;
-	bool m_isIndirection;
-	const types::NormalizeFunction* m_type;
-	const types::VariantStructDescription* m_subform;
-	std::string m_symbol;
-	std::string m_value;
-};
-
-}///anonymous namespace
-
-static bool isIdentifier( const std::string& name)
-{
-	std::string::const_iterator ii=name.begin(), ee=name.end();
-	for (;ii!=ee; ++ii)
-	{
-		if (!(((*ii|32) >= 'a' && (*ii|32) <= 'z') || (*ii >= '0' && *ii <= '9') || *ii == '_'))
-		{
-			break;
-		}
-	}
-	return (ii==ee);
-}
-
-static void compile_ptree( const boost::property_tree::ptree& pt, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, std::vector<std::string>& unresolvedSymbols)
-{
-	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
-	for (;itr != end; ++itr)
-	{
-		std::string::const_iterator si = itr->first.begin(), se = itr->first.end();
-		std::string first;
-		std::string second;
-		for (; si != se; ++si)
-		{
-			if (*si == '[' || *si == '(' || *si == '@' || *si == '?' || *si == '!' || *si == '^') break;
-		}
-		if (si == se)
-		{
-			first = itr->first;
-			second = itr->second.data();
-		}
-		else
-		{
-			first = std::string( itr->first.begin(), si);
-			second = std::string( si, se);
-			second.push_back(' ');
-			second.append( itr->second.data());
-		}
-		if (!isIdentifier( first))
-		{
-			throw std::runtime_error( std::string("Semantic error: Identifier expected as variable name (") + first + ")");
-		}
-		if (itr->second.begin() == itr->second.end() && second.size())
-		{
-			FRMAttribute fa( second, typemap, formmap);
-			if (fa.isForm())
-			{
-				throw std::runtime_error( "Semantic error: illegal type specifier");
-			}
-			else if (fa.isIndirection())
-			{
-				unresolvedSymbols.push_back( fa.symbol());
-				result.addUnresolved( first, fa.symbol());
-
-				if (fa.isVector())
-				{
-					result.back().makeArray();
-				}
-				if (first == "_")
-				{
-					throw std::runtime_error( "Syntax error: Reference declared as inherited (untagged content element '_')");
-				}
-			}
-			else if (fa.isFormReference())
-			{
-				if (fa.isAttribute())
-				{
-					throw std::runtime_error( "Syntax error: Form declared as attribute");
-				}
-				const types::VariantStructDescription* val = fa.subform();
-				if (first == "_")
-				{
-					if (fa.isVector()) throw std::runtime_error( "Semantic error: try to inherit from an array ('[]')");
-					if (fa.isOptional()) throw std::runtime_error( "Semantic error: optional ('?') declaration for inherited structure");
-					if (fa.isMandatory()) throw std::runtime_error( "Semantic error: mandatory ('!') declaration for inherited structure");
-					result.inherit( *val);
-				}
-				else
-				{
-					result.addStructure( first, *val);
-					if (fa.isVector())
+					else if (lx.id() == Lexem::Assign)
 					{
-						if (fa.isOptional()) throw std::runtime_error( "Semantic error: try to define an optional array");
-						if (fa.isMandatory()) throw std::runtime_error( "Semantic error: try to define an mandatory array");
-						result.back().makeArray();
+						if (isArray) throw std::runtime_error("cannot handle default value assignment for array");
+						if (hasDefault) throw std::runtime_error("cannot handle duplicate default value assignment");
+						lx = lexer.next2();
+						if (lx.id() != Lexem::String && lx.id() != Lexem::Identifier)
+						{
+							throw std::runtime_error( "string expected for default value declaration after '='");
+						}
+						defaultvalue = lx.value();
+						hasDefault = true;
 					}
 					else
 					{
-						if (fa.isOptional()) result.back().setOptional();
-						if (fa.isMandatory()) result.back().setMandatory();
+						throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", default value assignment or array marker or following structure element declaration expected");
 					}
 				}
-			}
-			else
-			{
-				types::Variant val( fa.value());
-				int epos = -1;
-				if (fa.isAttribute())
+
+				// Resolve type:
+				types::keymap<types::FormDescriptionR>::const_iterator fmi;
+				fmi = formmap.find( elementtype);
+				if (fmi != formmap.end())
 				{
-					if (first == "_") throw std::runtime_error( "empty attribute name is illegal");
-					epos = result.addAttribute( first, val, fa.type());
-				}
-				else
-				{
-					if (first == "_")
+					// ... type referenced is a sub structure
+					if (isAttribute) throw std::runtime_error("cannot declare structure as attribute ('@')");
+
+					// Sub structure referenced by 'elementtype':
+					const types::FormDescription* substruct = fmi->second.get();
+					if (isIndirection)
 					{
-						epos = result.addAtom( "", val, fa.type());
+						// ... resolved indirection
+						int elementidx = result.addIndirection( elementname, substruct);
+						if (isArray) result.at( elementidx)->makeArray();
+					}
+					else if (isInherited)
+					{
+						// ... resolved inheritance
+						result.inherit( *substruct);
 					}
 					else
 					{
-						epos = result.addAtom( first, val, fa.type());
+						// ... resolved sub structure
+						int elementidx = result.addStructure( elementname, *substruct);
+						if (isArray) result.at( elementidx)->makeArray();
+						if (isOptional) result.at( elementidx)->setOptional();
+						if (isMandatory) result.at( elementidx)->setMandatory();
 					}
 				}
-				if (fa.isVector())
+				else if (boost::algorithm::iequals( elementtype, "string"))
 				{
-					result.at( epos)->makeArray();
+					// ... type referenced is the reserved type string (no normalizer defined)
+					if (isIndirection) throw std::runtime_error("cannot declare atomic string type as indirection ('^')");
+					int elementidx; //< index of atomic element created
+					if (isAttribute)
+					{
+						elementidx = result.addAttribute( elementname, hasDefault?types::Variant(defaultvalue):types::Variant(types::Variant::String));
+						//... atomic attribute value
+					}
+					else if (isInherited)
+					{
+						elementidx = result.addAtom( "", hasDefault?types::Variant(defaultvalue):types::Variant(types::Variant::String));
+						//... atomic unnamed (inherited) content value
+					}
+					else
+					{
+						elementidx = result.addAtom( elementname, hasDefault?types::Variant(defaultvalue):types::Variant(types::Variant::String));
+						//... atomic named content value (non attribute)
+					}
+					if (isArray) result.at( elementidx)->makeArray();
+					if (isOptional) result.at( elementidx)->setOptional();
+					if (isMandatory) result.at( elementidx)->setMandatory();
 				}
-				if (fa.isOptional())
+				else
 				{
-					result.at( epos)->setOptional();
+					// ... type referenced must be an atomic type defined in a .wnmp file or a custom data type
+					const types::NormalizeFunction* atomictype;
+					if (isIndirection)
+					{
+						// ... unresolved indirection
+						int elementidx = result.addUnresolved( elementname, elementtype);
+						if (isArray) result.at( elementidx)->makeArray();
+						unresolvedSymbols.push_back( elementtype);
+					}
+					else if (0!=(atomictype=typemap->get( elementtype)))
+					{
+						// ... type referenced is an atomic type defined in a .wnmp file or a custom data type
+						int elementidx; //< index of atomic element created
+						if (isIndirection) throw std::runtime_error("cannot declare atomic type as indirection ('^')");
+						if (isAttribute)
+						{
+							elementidx = result.addAttribute( elementname, atomictype->execute(hasDefault?types::Variant(defaultvalue):types::Variant()), atomictype);
+							//... atomic attribute value
+						}
+						else if (isInherited)
+						{
+							elementidx = result.addAtom( "", atomictype->execute(hasDefault?types::Variant(defaultvalue):types::Variant()), atomictype);
+							//... atomic unnamed (inherited) content value
+						}
+						else
+						{
+							elementidx = result.addAtom( elementname, atomictype->execute(hasDefault?types::Variant(defaultvalue):types::Variant()), atomictype);
+							//... atomic named content value (non attribute)
+						}
+						if (isArray) result.at( elementidx)->makeArray();
+						if (isOptional) result.at( elementidx)->setOptional();
+						if (isMandatory) result.at( elementidx)->setMandatory();
+					}
+					else if (isInherited)
+					{
+						// ... unresolved inheritance = error
+						throw std::runtime_error( std::string("undefined atomic data type or inherited structure '") + elementtype + "'");
+					}
+					else
+					{
+						throw std::runtime_error( std::string("cannot find type '") + elementtype + "'");
+					}
 				}
-				if (fa.isMandatory())
-				{
-					result.at( epos)->setMandatory();
-				}
+				break;
 			}
-		}
-		else
-		{
-			//...  Embedded substructure definition
-			if (!second.empty())
+			else if (lx.id() == Lexem::ArrayTag)
 			{
-				FRMAttribute fa( second, typemap, formmap);
-				if (!fa.isForm())
-				{
-					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
-				}
-				else if (fa.isIndirection())
-				{
-					throw std::runtime_error( "Syntax error: Form self indirection declared as structure");
-				}
-				else if (fa.isFormReference())
-				{
-					throw std::runtime_error( "Syntax error: Form reference declared as structure");
-				}
-				if (fa.isAttribute())
-				{
-					throw std::runtime_error( "Syntax error: Form declared as attribute");
-				}
-				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
-				compile_ptree( itr->second, *substruct, typemap, formmap, unresolvedSymbols);
-
-				result.addStructure( first, *substruct);
-
-				if (fa.isVector())
-				{
-					result.back().makeArray();
-				}
-				if (fa.isOptional())
-				{
-					result.back().setOptional();
-				}
-				if (fa.isMandatory())
-				{
-					result.back().setMandatory();
-				}
-				if (first == "_")
-				{
-					throw std::runtime_error( "Syntax error: Embedded substructure declared as untagged content element");
-				}
+				if (isInherited) throw std::runtime_error("contradicting array/inheritance tag '[]' and '_'");
+				if (isArray) throw std::runtime_error("cannot handle duplicate array tag '[]'");
+				isArray = true;
+			}
+			else if (lx.id() == Lexem::AttributeTag)
+			{
+				if (isInherited) throw std::runtime_error("contradicting attribute/inheritance tag '@' and '_'");
+				if (isAttribute) throw std::runtime_error("cannot handle duplicate attribute tag '@'");
+				isAttribute = true;
+			}
+			else if (lx.id() == Lexem::MandatoryTag)
+			{
+				if (isInherited) throw std::runtime_error("contradicting mandatory/inheritance tag '!' and '_'");
+				if (isOptional) throw std::runtime_error("contradicting optional/mandatory tag '?' and '!'");
+				if (isMandatory) throw std::runtime_error("cannot handle duplicate mandatory tag '!'");
+				isMandatory = true;
+			}
+			else if (lx.id() == Lexem::OptionalTag)
+			{
+				if (isInherited) throw std::runtime_error("contradicting optional/inheritance tag '?' and '_'");
+				if (isMandatory) throw std::runtime_error("contradicting optional/mandatory tag '?' and '!'");
+				if (isOptional) throw std::runtime_error("cannot handle duplicate optional tag '?'");
+				isOptional = true;
+			}
+			else if (lx.id() == Lexem::Indirection)
+			{
+				if (isInherited) throw std::runtime_error("contradicting indirection/inheritance tag '^' and '_'");
+				if (isOptional) throw std::runtime_error("contradicting indirection/optional tag '^' and '?'");
+				if (isMandatory) throw std::runtime_error("contradicting indirection/mandatory tag '^' and '!'");
+				if (isIndirection) throw std::runtime_error("cannot handle duplicate indirection tag '^'");
+				isIndirection = true;
 			}
 			else
 			{
-				types::VariantStructDescriptionR substruct( new types::VariantStructDescription());
-				compile_ptree( itr->second, *substruct, typemap, formmap, unresolvedSymbols);
-				result.addStructure( first, *substruct);
+				throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", attribute or type name or substructure expected");
 			}
 		}
 	}
 }
 
-static void compile_forms( const boost::property_tree::ptree& pt, std::vector<types::FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap)
+static void compile_forms( const std::string& filename, std::vector<types::FormDescriptionR>& result, const types::NormalizeFunctionMap* typemap, const std::vector<std::string>& filenamestack)
 {
-	std::vector<std::string> unresolvedSymbols;
-	types::keymap<types::FormDescriptionR> formmap;
+	std::string content( utils::readSourceFileContent( filename));
+	Lexer lexer( content.begin(), content.end());
+	std::string includepath( boost::filesystem::system_complete( filename).parent_path().string());
 
-	// Compile all forms and structures:
-	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
-	for (;itr != end; ++itr)
+	// Check circular include references:
+	std::vector<std::string> filenamestack2 = filenamestack;
+	filenamestack2.push_back( filename);
+	std::vector<std::string>::const_iterator fi = filenamestack.begin(), fe = filenamestack.end();
+	for (; fi != fe; ++fi)
 	{
-		std::string exportname;
-		bool isForm = false;
-		bool isStruct = false;
-		if (boost::algorithm::iequals( itr->first, "FORM"))
+		if (filename == *fi) throw std::runtime_error( std::string("circular include file reference including file '") + filename + "'");
+	}
+
+	Lexem lx;
+	try
+	{
+		std::vector<std::string> unresolvedSymbols;
+		types::keymap<types::FormDescriptionR> formmap;
+	
+		// Compile all forms and structures:
+		for (lx=lexer.next(); lx.id() != Lexem::EndOfFile; lx=lexer.next())
 		{
-			exportname = itr->second.data();
-			isForm = true;
-			if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-		}
-		else if (boost::algorithm::iequals( itr->first, "STRUCT"))
-		{
-			isStruct = true;
-			if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after STRUCT");
-		}
-		if (isForm || isStruct)
-		{
-			try
+			if (lx.id() == Lexem::INCLUDE)
 			{
-				types::FormDescriptionR form( new types::FormDescription( "simpleform", exportname));
-				compile_ptree( itr->second, *form, typemap, formmap, unresolvedSymbols);
-				formmap.insert( itr->second.data(), form);
-				if (isForm) result.push_back( form);
+				lx = lexer.next();
+				if (lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string expected");
+				
+				compile_forms( utils::getCanonicalPath( lx.value(), includepath), result, typemap, filenamestack2);
 			}
-			catch (const std::runtime_error& e)
+			else if (lx.id() == Lexem::FORM || lx.id() == Lexem::STRUCT)
 			{
-				throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
+				bool isExported = (lx.id() == Lexem::FORM);
+				lx = lexer.next();
+				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
+				if (lx.value().empty()) throw std::runtime_error( "non empty name expected for structure");
+				std::string structname( lx.value());				//< name of the structure in the reference table for indirections and sub structures
+				std::string formname( isExported?structname:std::string());	//< exported name of the form, empty for internal structure
+				lx = lexer.next();
+				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
+
+				types::FormDescriptionR form( new types::FormDescription( "simpleform", formname));
+				compile_structure( lexer, *form, typemap, formmap, unresolvedSymbols);
+				formmap.insert( structname, form);
+				if (isExported) result.push_back( form);
+			}
+			else
+			{
+				throw std::runtime_error(std::string("unexpected token ") + lexer.curtoken() + ", FORM or STRUCT or INCLUDE declaration expected");
+			}
+		}
+
+		// Do resolve unresolved form indirection references:
+		types::FormDescription::ResolveMap resolvemap;
+
+		std::vector<std::string>::const_iterator ui = unresolvedSymbols.begin(), ue = unresolvedSymbols.end();
+		for (; ui != ue; ++ui)
+		{
+			types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.find( *ui);
+			if (ri == formmap.end())
+			{
+				throw std::runtime_error( std::string( "could not resolve reference to STRUCT or FORM '") + *ui + "'");
+			}
+			if (ri->second->name().empty())
+			{
+				//... push referenced private STRUCT declarations.
+				// (public form declarations are already part of the result)
+				result.push_back( ri->second);
+			}
+			resolvemap[ *ui] = ri->second.get();
+		}
+
+		types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.begin(), re = formmap.end();
+		for (; ri != re; ++ri)
+		{
+			ri->second.get()->resolve( resolvemap);
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (boost::algorithm::starts_with( e.what(), "error"))
+		{
+			if (filenamestack.size() >= 1)
+			{
+				throw std::runtime_error( std::string(e.what()) + "; in file included from '" + filenamestack.back() + "'"); 
+			}
+			else
+			{
+				throw e;
 			}
 		}
 		else
 		{
-			throw std::runtime_error( "FORM or STRUCT expected as start of a structure definition");
+			throw std::runtime_error(std::string("error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lexer.position().line) + " column " + boost::lexical_cast<std::string>(lexer.position().column) + ": " + e.what());
 		}
-	}
-
-	// Do resolve unresolved form indirection references:
-	types::FormDescription::ResolveMap resolvemap;
-
-	std::vector<std::string>::const_iterator ui = unresolvedSymbols.begin(), ue = unresolvedSymbols.end();
-	for (; ui != ue; ++ui)
-	{
-		types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.find( *ui);
-		if (ri == formmap.end())
-		{
-			throw std::runtime_error( std::string("could not resolve reference to STRUCT or FORM '") + *ui + "'");
-		}
-		if (ri->second->name().empty())
-		{
-			//... push referenced private STRUCT declarations.
-			// (public form declarations are already part of the result)
-			result.push_back( ri->second);
-		}
-		resolvemap[ *ui] = ri->second.get();
-	}
-
-	types::keymap<types::FormDescriptionR>::const_iterator ri = formmap.begin(), re = formmap.end();
-	for (; ri != re; ++ri)
-	{
-		ri->second.get()->resolve( resolvemap);
 	}
 }
 
-std::vector<types::FormDescriptionR> SimpleFormCompiler::compile( const std::string& srcstring, const types::NormalizeFunctionMap* typemap) const
+std::vector<types::FormDescriptionR> SimpleFormCompiler::compile( const std::string& filename, const types::NormalizeFunctionMap* typemap) const
 {
 	std::vector<types::FormDescriptionR> rt;
-	std::istringstream src( srcstring);
-	boost::property_tree::ptree pt;
-	boost::property_tree::info_parser::read_info( src, pt);
-	compile_forms( pt, rt, typemap);
+	std::vector<std::string> filenamestack;
+	compile_forms( filename, rt, typemap, filenamestack);
 	return rt;
 }
 

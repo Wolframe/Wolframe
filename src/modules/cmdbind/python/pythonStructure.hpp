@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonStructure.hpp
-///\brief Interface to python data structure representing input/output of a python form function
+//\file pythonStructure.hpp
+//\brief Interface to python data structure representing input/output of a python form function
 #ifndef _Wolframe_python_STRUCTURE_HPP_INCLUDED
 #define _Wolframe_python_STRUCTURE_HPP_INCLUDED
 #include "pythonObject.hpp"
@@ -41,41 +41,43 @@ Project Wolframe.
 #include <string>
 #include <ostream>
 #include <boost/shared_ptr.hpp>
-#include <Python.h>
+
+//\brief Forward declaration for Python
+struct PyObject;
 
 namespace _Wolframe {
 namespace langbind {
 namespace python {
 
-///\class Structure
-///\brief Data structure for input and output of a 'python' function call
+//\class Structure
+//\brief Data structure for input and output of a 'python' function call
 class Structure
 	:public Object
 {
 public:
-	///\brief Constructor
+	//\brief Constructor
 	Structure(){}
-	///\brief Copy constructor
+	//\brief Copy constructor
 	Structure( const Structure& o)			:Object(o){}
-	///\brief Copy constructor
+	//\brief Copy constructor
 	Structure( const Object& o)			:Object(o){}
-	///\brief Constructor
+	//\brief Constructor
 	Structure( PyObject* o, bool isborrowed=true)	:Object(o,isborrowed){}
 
 	typedef ObjectIterator const_iterator;
 
-	///\brief Get the start iterator on structure or array elements
+	//\brief Get the start iterator on structure or array elements
 	const_iterator begin() const	{return const_iterator( *this);}
-	///\brief Get the end marker for a structure or and array
+	//\brief Get the end marker for a structure or and array
 	const_iterator end() const	{return const_iterator();}
 
-	///\brief Print the structure serialized as string to out
+	//\brief Print the structure serialized as string to out
 	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
-	///\brief Get the structure serialized as string for output
+	//\brief Get the structure serialized as string for output
 	std::string tostring( const utils::PrintFormat* pformat=utils::logPrintFormat()) const;
 };
 
-///\brief Reference with ownership to a structure
+//\brief Reference with ownership to a structure
 typedef boost::shared_ptr<Structure> StructureR;
 
 }}}//namespace

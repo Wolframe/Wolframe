@@ -163,8 +163,15 @@ struct LocaleConvNormalizeFunction
 
 	virtual types::Variant execute( const types::Variant& inp) const
 	{
-		std::locale loc = m_reshnd->getLocale( m_lc);
-		return m_func( inp.tostring(), loc);
+		if (inp.type() == types::Variant::String)
+		{
+			std::locale loc = m_reshnd->getLocale( m_lc);
+			return m_func( inp.tostring(), loc);
+		}
+		else
+		{
+			return inp;
+		}
 	}
 	virtual const char* name() const		{return m_name;}
 

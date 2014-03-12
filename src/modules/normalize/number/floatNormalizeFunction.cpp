@@ -39,6 +39,10 @@ using namespace langbind;
 
 types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {
+	if (!inp.defined())
+	{
+		return types::Variant( (double)0.0);
+	}
 	if (inp.type() == types::Variant::Int)
 	{
 		types::Variant::Data::Int val = inp.toint();

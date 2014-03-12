@@ -138,6 +138,7 @@ LoadModules
 	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ./../../src/modules/normalize/number/mod_normalize_number
 	module ./../../src/modules/normalize/string/mod_normalize_string
+	module ./../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Processor
 {
@@ -172,7 +173,7 @@ COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 				"name":	"Bermuda TF 3 Pool Cleaner",
 				"description":	"Advanced Suction Pool Cleaning Robot",
 				"quantity":	"1",
-				"discount":	"0",
+				"discount":	"0.00",
 				"price":	{
 					"unit":	"789.00",
 					"total":	"789.00",
@@ -186,7 +187,7 @@ COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 				"name":	"Blue Ocean Pool Lounge - Luxury edition",
 				"description":	"Swimming Seat",
 				"quantity":	"2",
-				"discount":	"10",
+				"discount":	"10.00",
 				"price":	{
 					"unit":	"79.30",
 					"total":	"142.70",
@@ -200,7 +201,7 @@ COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 				"name":	"Pooltoyland Happy Duckburg Family",
 				"description":	"Disney Rubber Ducks",
 				"quantity":	"4",
-				"discount":	"0",
+				"discount":	"0.00",
 				"price":	{
 					"unit":	"3.50",
 					"total":	"14.00",
@@ -214,7 +215,7 @@ COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 				"name":	"Beach Ball 24",
 				"description":	"Inflatable Ball",
 				"quantity":	"2",
-				"discount":	"0",
+				"discount":	"0.00",
 				"price":	{
 					"unit":	"1.95",
 					"total":	"3.90",
@@ -228,7 +229,7 @@ COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 				"name":	"Drink Holder Tahiti Sunset",
 				"description":	"Drink holder",
 				"quantity":	"6",
-				"discount":	"0",
+				"discount":	"0.00",
 				"price":	{
 					"unit":	"3.80",
 					"total":	"22.80",

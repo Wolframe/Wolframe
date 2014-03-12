@@ -26,6 +26,7 @@ DYNAMIC_MODULE = \
 	mod_ddlcompiler_simpleform.dll
 
 CPP_OBJS = \
+	simpleFormLexer.obj \
 	simpleFormCompiler.obj \
 	mod_ddlcompiler_simpleform.obj
 

@@ -75,7 +75,10 @@ public:
 	types::Variant execute( const types::Variant& i) const
 	{
 		types::Variant rt( m_type, m_initializer);
-		rt.data().value.Custom->assign( i);
+		if (i.defined())
+		{
+			rt.data().value.Custom->assign( i);
+		}
 		return rt;
 	}
 

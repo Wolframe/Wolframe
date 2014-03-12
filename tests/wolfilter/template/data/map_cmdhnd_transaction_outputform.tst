@@ -12,6 +12,7 @@ LoadModules
 	module `cmd/MODULE mod_normalize_string`
 	module `cmd/MODULE mod_command_directmap`
 	module `cmd/MODULE mod_ddlcompiler_simpleform`
+	module `cmd/MODULE mod_datatype_bcdnumber`
 }
 Database
 {

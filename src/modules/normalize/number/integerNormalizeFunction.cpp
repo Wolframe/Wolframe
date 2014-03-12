@@ -44,6 +44,17 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 	bool do_convert = true;
 	bool isSigned = false;
 
+	if (!inp.defined())
+	{
+		if (m_sign)
+		{
+			return types::Variant( (Int)0);
+		}
+		else
+		{
+			return types::Variant( (UInt)0);
+		}
+	}
 	if (inp.type() == types::Variant::Int)
 	{
 		Int val = inp.toint();
