@@ -32,6 +32,9 @@ Project Wolframe.
 ///\file pythonObjectIterator.cpp
 #include "pythonObjectIterator.hpp"
 #include "pythonException.hpp"
+extern "C" {
+#include <Python.h>
+}
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

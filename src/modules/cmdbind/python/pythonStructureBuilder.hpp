@@ -41,6 +41,10 @@ Project Wolframe.
 #include <vector>
 #include <string>
 
+//\brief Forward declaration for Python
+typedef struct _object PyObject;
+typedef long int Py_ssize_t;
+
 namespace _Wolframe {
 namespace langbind {
 namespace python {
@@ -75,7 +79,7 @@ public:
 	void setValue( const types::Variant& value_);
 
 	///\brief Get the index of the last element in case of an array
-	std::size_t lastArrayIndex() const;
+	Py_ssize_t lastArrayIndex() const;
 
 	///\brief Get a reference to the structure build
 	StructureR get() const;

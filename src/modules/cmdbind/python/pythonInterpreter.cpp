@@ -4,6 +4,10 @@
 #include <sstream>
 #include "pythonInterpreter.hpp"
 
+extern "C" {
+#include <Python.h>
+}
+
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 using namespace _Wolframe::langbind::python;

@@ -35,9 +35,10 @@ Project Wolframe.
 #include "types/customDataType.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
-#include <datetime.h>
+extern "C" {
 #include <Python.h>
-
+#include <datetime.h>
+}
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 using namespace _Wolframe::langbind::python;

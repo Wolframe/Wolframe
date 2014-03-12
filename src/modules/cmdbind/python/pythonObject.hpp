@@ -36,7 +36,7 @@ Project Wolframe.
 #include "types/variant.hpp"
 
 //\brief Forward declaration for Python
-struct PyObject;
+typedef struct _object PyObject;
 
 namespace _Wolframe {
 namespace langbind {

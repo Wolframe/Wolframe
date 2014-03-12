@@ -37,7 +37,8 @@ Project Wolframe.
 #include "types/variant.hpp"
 
 //\brief Forward declaration for Python
-struct PyObject;
+typedef struct _object PyObject;
+typedef long int Py_ssize_t;
 
 namespace _Wolframe {
 namespace langbind {
@@ -90,7 +91,7 @@ private:
 
 	Object m_obj;				//< object iterated on
 	PyObject* m_itr;			//< iterator in case of iterating on a python list
-	std::size_t m_pos;			//< iterator in case of iterating on a python dictionary
+	Py_ssize_t m_pos;			//< iterator in case of iterating on a python dictionary
 	Element m_elem;				//< currently visited element
 };
 
