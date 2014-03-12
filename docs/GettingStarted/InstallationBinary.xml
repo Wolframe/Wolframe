@@ -290,7 +290,7 @@
 		<sect2>
 			<title>Slackware</title>
 			<para>
-				Download the package file:
+				Download the package file (we choose 64-bit Slackware 14 for example):
 				<programlisting language='shell'>
 	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/Slackware-14/x86_64/wolframe-0.0.1-x86_64.tgz
 				</programlisting>
@@ -323,7 +323,7 @@
 		<sect2>
 			<title>FreeBSD</title>
 			<para>
-				Download the package file:
+				Download the package file (we choose 64-bit FreeBSD 9 for example):
 				<programlisting language='shell'>
 	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/FreeBSD-9/x86_64/wolframe-0.0.1-x86_64.tgz
 				</programlisting>
@@ -357,6 +357,55 @@
 				You can start the service now with:
 				<programlisting language='shell'>
 	service wolframed start
+				</programlisting>
+			</para>
+
+		</sect2>
+
+<!-- NetBSD -->
+		<sect2>
+			<title>NetBSD</title>
+			<para>
+				Download the package file (we choose 64-bit NetBSD 6 for example):
+				<programlisting language='shell'>
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/NetBSD-6/x86_64/wolframe-0.0.1-x86_64.tgz
+				</programlisting>
+			</para>
+
+			<para>
+				You install the Wolframe package with:
+				<programlisting language='shell'>
+	pkg_add wolframe-0.0.1-x86_64.tgz 
+				</programlisting>
+			
+				The NetBSD packages contain the whole server and the whole client respectively.
+			</para>
+			
+			<para>
+				You can start the service with:
+
+				<programlisting language='shell'>
+	/usr/pkg/share/examples/rc.d/wolframed onestart
+				</programlisting>
+			</para>
+
+			<para>
+				To start the Wolframe service at system boot time
+				you have to edit the file <filename>/etc/rc.conf</filename>
+				and enable the wolframe daemon there with:
+				<programlisting language='shell'>
+	wolframed=YES
+				</programlisting>
+				
+				Copy the example startup script to the final place:
+				
+				<programlisting language='shell'>
+	cp /usr/pkg/share/examples/rc.d/wolframed /etc/rc.d/
+				</programlisting>
+	
+				You can start the service now with:
+				<programlisting language='shell'>
+	/etc/rc.d/wolframed
 				</programlisting>
 			</para>
 
