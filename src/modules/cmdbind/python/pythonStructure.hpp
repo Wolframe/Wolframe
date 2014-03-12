@@ -42,9 +42,6 @@ Project Wolframe.
 #include <ostream>
 #include <boost/shared_ptr.hpp>
 
-//\brief Forward declaration for Python
-typedef struct _object PyObject;
-
 namespace _Wolframe {
 namespace langbind {
 namespace python {

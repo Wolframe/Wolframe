@@ -41,10 +41,6 @@ Project Wolframe.
 #include <vector>
 #include <string>
 
-//\brief Forward declaration for Python
-typedef struct _object PyObject;
-typedef long int Py_ssize_t;
-
 namespace _Wolframe {
 namespace langbind {
 namespace python {
