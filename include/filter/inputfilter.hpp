@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/doctype.hpp"
 #include "filter/filterbase.hpp"
 #include "filter/contentfilterAttributes.hpp"
 #include <string>
@@ -122,12 +123,12 @@ public:
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)=0;
 
 	///\brief Get type of the document
-	///\param [out] doctype the document type string returned
+	///\param [out] doctype the document type returned
 	///\return true, if success, false, if not.
 	///\remark Check the filter state when false is returned
-	virtual bool getDocType( std::string& doctype)
+	virtual bool getDocType( types::DocType& doctype)
 	{
-		doctype = "";
+		doctype = types::DocType();
 		return true;
 	}
 

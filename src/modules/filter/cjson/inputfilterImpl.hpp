@@ -84,7 +84,7 @@ struct InputFilterImpl :public InputFilter
 	virtual bool getValue( const char* name, std::string& val);
 
 	///\brief Implements InputFilter::getDocType(std::string&)
-	virtual bool getDocType( std::string& val);
+	virtual bool getDocType( types::DocType& doctype);
 
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
@@ -107,7 +107,6 @@ struct InputFilterImpl :public InputFilter
 private:
 	boost::shared_ptr<cJSON> parse( const std::string& content);
 	bool getNodeValue( const void*& element, std::size_t& elementsize);
-	bool getDocType( types::DocType& doctype);
 
 private:
 	std::string m_content;

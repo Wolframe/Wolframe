@@ -41,28 +41,58 @@ namespace _Wolframe {
 namespace types {
 
 //\class DocType
-//\brief Document type representation. Inspired by XML but acting as superset of all document type descriptions.
+//\brief Document type representation.
+//\remark Inspired by XML but acting as superset of all document type descriptions.
 struct DocType
 {
-	std::string rootid;
-	std::string publicid;
-	std::string systemid;
+	//\class SchemaPath
+	//\brief Elements needed besides document type id to build the URI of the document schema description
+	struct SchemaPath
+	{
+		std::string dir;	//< location directory of the schema descriptions
+		std::string ext;	//< file extension of the schema descriptions
 
-	DocType();
-	DocType( const char* r, const char* p, const char* s)
-		:rootid(r?r:""),publicid(p?p:""),systemid(s?s:""){}
-	DocType( const char* r, const char* s)
-		:rootid(r?r:""),publicid(""),systemid(s?s:""){}
-	explicit DocType( const std::string& value);
+		SchemaPath( const SchemaPath& o)
+			:dir(o.dir),ext(o.ext){}
+		SchemaPath( const std::string& dir_, const std::string& ext_)
+			:dir(dir_),ext(ext_){}
+		SchemaPath(){}
+
+		void clear()
+		{
+			dir.clear();
+			ext.clear();
+		}
+	};
+
+	std::string id;			//< document type identifier
+	std::string root;		//< document root element if defined
+	SchemaPath schemapath;		//< schema validation path description
+
+	DocType(){}
+	DocType( const std::string& id_, const std::string root_, const SchemaPath& schemapath_)
+		:id(id_),root(root_),schemapath(schemapath_){}
 	DocType( const DocType& o)
-		:rootid(o.rootid),publicid(o.publicid),systemid(o.systemid){}
+		:id(o.id),root(o.root),schemapath(o.schemapath){}
 	~DocType(){}
 
-	std::string tostring() const;
-};
+	void clear()
+	{
+		id.clear();
+		root.clear();
+		schemapath.clear();
+	}
 
-//\brief Extract the identifier from a document type. The identifier is used as dispatcher key for requests.
-std::string getIdFromDoctype( const std::string& doctype);
+	void init( const std::string& id_, const std::string& root_, const SchemaPath& schemapath_)
+	{
+		id = id_;
+		root = root_;
+		schemapath = schemapath_;
+	}
+
+	bool defined() const		{return !id.empty() && !root.empty();}
+	std::string schemaURL() const	{return schemapath.dir + id + schemapath.ext;}
+};
 
 }}//namespace
 #endif

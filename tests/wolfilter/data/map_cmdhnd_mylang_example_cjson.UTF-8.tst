@@ -107,7 +107,7 @@ Processor
 }
 **output
 {
-	"doctype":	"CDCatalog.simpleform",
+	"doctype":	"CDCatalog",
 	"CATALOG":	{
 		"CD":	[{
 				"TITLE":	"EMPIRE BURLESQUE",

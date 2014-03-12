@@ -46,7 +46,6 @@ TYP_OBJS = \
 	types/string.o \
 	types/bignumber.o \
 	types/datetime.o \
-	types/doctype.o \
 	types/customDataType.o \
 	types/variant.o \
 	types/variantStructDescription.o \

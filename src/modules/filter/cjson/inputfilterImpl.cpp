@@ -51,14 +51,14 @@ bool InputFilterImpl::getValue( const char* name, std::string& val)
 	return false;
 }
 
-bool InputFilterImpl::getDocType( std::string& val)
+bool InputFilterImpl::getDocType( types::DocType& doctype)
 {
 	if (!m_root.get())
 	{
 		setState( EndOfMessage);
 		return false;
 	}
-	val = m_doctype.tostring();
+	doctype = m_doctype;
 	return true;
 }
 
@@ -159,8 +159,8 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			//CJSON creates a toplevel object for multiple root nodes:
 			first = first->child;
 		}
-		const char* rootid = 0;
-		const char* systemid = 0;
+		const char* rootelem = 0;
+		const char* doctypeid = 0;
 		
 		for (;;)
 		{
@@ -169,8 +169,8 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				if (boost::iequals("doctype",first->string))
 				{
 					++nof_docattributes;
-					if (systemid) throw std::runtime_error("duplicate 'doctype' definition");
-					systemid = first->valuestring;
+					if (doctypeid) throw std::runtime_error("duplicate 'doctype' definition");
+					doctypeid = first->valuestring;
 					first = first->next;
 					continue;
 				}
@@ -199,13 +199,13 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		}
 		if (first->string && !first->next)
 		{
-			rootid = first->string;
+			rootelem = first->string;
 		}
-		if (systemid)
+		if (doctypeid)
 		{
-			if (rootid)
+			if (rootelem)
 			{
-				m_doctype = types::DocType( rootid, systemid);
+				m_doctype = types::DocType( doctypeid, rootelem, types::DocType::SchemaPath());
 			}
 			else
 			{

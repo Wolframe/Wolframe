@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/doctype.hpp"
 #include "filter/filterbase.hpp"
 #include "filter/contentfilterAttributes.hpp"
 #include <string>
@@ -122,8 +123,9 @@ public:
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
 	///\brief Set type of the document.
+	///\param [in] doctype type of the document
 	///\remark For some types of filters (non buffering) the type has to be set before the first print
-	virtual void setDocType( const std::string& /*id*/, const std::string& /*rootelement*/)
+	virtual void setDocType( const types::DocType&)
 	{
 		throw std::runtime_error("document type can not be set for this type of filter");
 	}

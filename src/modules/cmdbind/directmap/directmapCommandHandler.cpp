@@ -200,13 +200,14 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		const char* xmlroot = m_outputform->description()->xmlRoot();
 		if (xmlroot)
 		{
-			std::string doctype = m_outputform->description()->name();
+			std::string ext;
 			if (!m_outputform->description()->ddlname().empty())
 			{
-				doctype.push_back('.');
-				doctype.append( m_outputform->description()->ddlname());
+				ext.push_back( '.');
+				ext.append( m_outputform->description()->ddlname());
 			}
-			m_outputfilter->setDocType( doctype, xmlroot);
+			types::DocType doctype( m_outputform->description()->name(), xmlroot, types::DocType::SchemaPath( "", ext));
+			m_outputfilter->setDocType( doctype);
 			m_output_rootelement = xmlroot;
 		}
 	}
@@ -214,8 +215,8 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	{
 		if (!m_cmd->output_doctype_standalone)
 		{
-			std::string doctype = m_cmd->outputform;
-			m_outputfilter->setDocType( doctype, m_cmd->outputrootelem);
+			types::DocType doctype( m_cmd->outputform, m_cmd->outputrootelem, types::DocType::SchemaPath());
+			m_outputfilter->setDocType( doctype);
 		}
 		m_output_rootelement = m_cmd->outputrootelem;
 	}
@@ -247,12 +248,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				}
 				else
 				{
-					std::string doctype;
-					if (m_inputfilter->getDocType( doctype) && !doctype.empty())
+					types::DocType doctype;
+					if (m_inputfilter->getDocType( doctype) && doctype.defined())
 					{
 						// if no input form is defined we check for the input document type and set the form on our own:
-						std::string doctypeid( types::getIdFromDoctype( doctype));
-						const types::FormDescription* df = m_provider->formDescription( doctypeid);
+						const types::FormDescription* df = m_provider->formDescription( doctype.id);
 						if (df)
 						{
 							m_inputform.reset( new types::Form( df));
@@ -263,7 +263,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 						else
 						{
-							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
+							LOG_WARNING << "input form '" << doctype.id << "' is not defined (document type '" << doctype.id << "'). treating document as standalone (document processed with root element ignored)";
 							m_state = 11;
 						}
 						continue;

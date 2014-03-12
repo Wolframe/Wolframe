@@ -97,8 +97,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements FilterBase::getValue(const char*,std::string&)
 	virtual bool getValue( const char* name, std::string& val);
 
-	///\brief Implements InputFilter::getDocType(std::string&)
-	virtual bool getDocType( std::string& val);
+	///\brief Implements InputFilter::getDocType(types::DocType&&)
+	bool getDocType( types::DocType& doctype);
 
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
@@ -127,7 +127,6 @@ struct InputFilterImpl :public InputFilter
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);
-	bool getDocType( types::DocType& doctype);
 
 private:
 	DocumentReader m_doc;			//< document reader structure

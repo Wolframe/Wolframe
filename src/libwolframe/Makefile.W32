@@ -40,7 +40,6 @@ TYPE_OBJS = \
 	types\string.obj \
 	types\bignumber.obj \
 	types\datetime.obj \
-	types\doctype.obj \
 	types\customDataType.obj \
 	types\variant.obj \
 	types\variantStructDescription.obj \

@@ -355,14 +355,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	return flushBuffer();
 }
 
-void OutputFilterImpl::setDocType( const std::string& systemid, const std::string& rootelement)
+void OutputFilterImpl::setDocType( const types::DocType& doctype)
 {
 	if (m_headerPrinted)
 	{
 		throw std::runtime_error( "cannot set doctype anymore after elements printed");
 	}
-	types::DocType doctype( rootelement.c_str(), 0, systemid.c_str());
-	m_doctypeid = doctype.systemid;
+	m_doctypeid = doctype.id;
 }
 
 void OutputFilterImpl::setEncoding()

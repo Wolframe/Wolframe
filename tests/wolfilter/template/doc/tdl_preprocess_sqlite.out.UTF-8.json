@@ -1,5 +1,5 @@
 {
-	"doctype":	"Data.simpleform",
+	"doctype":	"Data",
 	"data":	{
 		"person":	[{
 				"company":	[{

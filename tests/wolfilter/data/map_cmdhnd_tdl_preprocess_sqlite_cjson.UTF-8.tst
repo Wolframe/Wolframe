@@ -396,7 +396,7 @@ normname= convdia,lcname;
 **outputfile:DBDUMP
 **output
 {
-	"doctype":	"Data.simpleform",
+	"doctype":	"Data",
 	"data":	{
 		"person":	[{
 				"company":	[{

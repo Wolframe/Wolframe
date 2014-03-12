@@ -105,7 +105,7 @@ end
 
 **output
 {
-	"doctype":	"employee_assignment_print.simpleform",
+	"doctype":	"employee_assignment_print",
 	"assignmentlist":	{
 		"assignment":	[{
 				"task":	[{

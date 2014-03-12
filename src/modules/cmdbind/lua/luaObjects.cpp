@@ -545,7 +545,7 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 
 LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 {
-	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "doctype");
+	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "name");
 	check_parameters( ls, 1, 0);
 
 	LuaExceptionHandlerScope escope(ls);
@@ -1572,24 +1572,35 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 	{
 		LuaExceptionHandlerScope escope(ls);
 		{
-			std::string doctypestr;
-			if (input->inputfilter()->getDocType( doctypestr))
+			types::DocType doctype;
+			if (input->inputfilter()->getDocType( doctype))
 			{
-				if (doctypestr.size())
+				if (doctype.defined())
 				{
-					types::DocType doctype( doctypestr);
 					lua_newtable( ls);
-					if (!doctype.rootid.empty())
+					if (!doctype.root.empty())
 					{
-						lua_pushlstring( ls, doctype.rootid.c_str(), doctype.rootid.size());
+						lua_pushlstring( ls, doctype.root.c_str(), doctype.root.size());
 						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "root");
 					}
-					if (!doctype.systemid.empty())
+					if (!doctype.id.empty())
 					{
-						lua_pushlstring( ls, doctype.systemid.c_str(), doctype.systemid.size());
+						lua_pushlstring( ls, doctype.id.c_str(), doctype.id.size());
 						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 						lua_setfield( ls, -2, "id");
+					}
+					if (!doctype.schemapath.dir.empty())
+					{
+						lua_pushlstring( ls, doctype.schemapath.dir.c_str(), doctype.schemapath.dir.size());
+						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+						lua_setfield( ls, -2, "dir");
+					}
+					if (!doctype.schemapath.ext.empty())
+					{
+						lua_pushlstring( ls, doctype.schemapath.ext.c_str(), doctype.schemapath.ext.size());
+						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+						lua_setfield( ls, -2, "ext");
 					}
 					return 1;
 				}
@@ -1634,15 +1645,14 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 		return 1;
 	}
 	{
-		std::string doctype;
+		types::DocType doctype;
 		if (input->inputfilter()->getDocType( doctype))
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
-				std::string doctypeid( types::getIdFromDoctype( doctype));
-				if (doctypeid.size())
+				if (doctype.id.size())
 				{
-					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
+					lua_pushlstring( ls, doctype.id.c_str(), doctype.id.size());
 					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 				}
 				else
@@ -1670,7 +1680,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
 	Filter* filter = 0;							//< 1st argument (mandatory)
-	std::pair<std::string,std::string> doctype;				//< 2nd argument (optional)
+	types::DocType doctype;				//< 2nd argument (optional)
 	bool doctype_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
@@ -1694,12 +1704,13 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_id + "'");
 			const char* doctype_root = formdescr->xmlRoot();
 			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
-			doctype = std::pair<std::string,std::string>( formdescr->name(), doctype_root);
+			std::string ext;
 			if (!formdescr->ddlname().empty())
 			{
-				doctype.first.push_back('.');
-				doctype.first.append( formdescr->ddlname());
+				ext.push_back( '.');
+				ext.append( formdescr->ddlname());
 			}
+			doctype = types::DocType( formdescr->name(), doctype_root, types::DocType::SchemaPath( "", ext));
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
@@ -1709,12 +1720,14 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
 			const char* doctype_root = 0;
 			const char* doctype_id = 0;
+			const char* doctype_dir = 0;
+			const char* doctype_ext = 0;
 
 			lua_getfield( ls, ii, "id");
 			if (!lua_isnil( ls, -1))
 			{
 				doctype_id = lua_tostring( ls, -1);
-				if (!doctype_id) throw std::runtime_error( "in table argument doctype: doctype['system'] is not convertible to a string");
+				if (!doctype_id) throw std::runtime_error( "in table argument doctype: doctype['id'] is not convertible to a string");
 			}
 			lua_getfield( ls, ii, "root");
 			if (!lua_isnil( ls, -1))
@@ -1722,15 +1735,27 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 				doctype_root = lua_tostring( ls, -1);
 				if (!doctype_root) throw std::runtime_error( "in table argument doctype: doctype['root'] is not convertible to a string");
 			}
+			lua_getfield( ls, ii, "dir");
+			if (!lua_isnil( ls, -1))
+			{
+				doctype_dir = lua_tostring( ls, -1);
+				if (!doctype_dir) throw std::runtime_error( "in table argument doctype: doctype['dir'] is not convertible to a string");
+			}
+			lua_getfield( ls, ii, "ext");
+			if (!lua_isnil( ls, -1))
+			{
+				doctype_ext = lua_tostring( ls, -1);
+				if (!doctype_ext) throw std::runtime_error( "in table argument doctype: doctype['ext'] is not convertible to a string");
+			}
 			if (doctype_root)
 			{
 				if (doctype_id)
 				{
-					doctype = std::pair<std::string,std::string>( doctype_id, doctype_root);
+					doctype = types::DocType( doctype_id, doctype_root, types::DocType::SchemaPath( doctype_dir?doctype_dir:"", doctype_ext?doctype_ext:".dtd"));
 				}
 				else
 				{
-					doctype = std::pair<std::string,std::string>( "", doctype_root);
+					doctype = types::DocType( "", doctype_root, types::DocType::SchemaPath());
 				}
 			}
 			else if (doctype_id)
@@ -1739,7 +1764,13 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_id + "'");
 				doctype_root = formdescr->xmlRoot();
 				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
-				doctype = std::pair<std::string,std::string>( doctype_id, doctype_root);
+				std::string ext;
+				if (!formdescr->ddlname().empty())
+				{
+					ext.push_back( '.');
+					ext.append( formdescr->ddlname());
+				}
+				doctype = types::DocType( doctype_id, doctype_root, types::DocType::SchemaPath( "", ext));
 			}
 			else
 			{
@@ -1754,7 +1785,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		}
 		else
 		{
-			std::runtime_error( "string (doctype) or filter expected as argument");
+			std::runtime_error( "string (doctype id), table (doctype) or filter expected as argument");
 		}
 	}
 	OutputFilter* ff = 0;
@@ -1782,7 +1813,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	}
 	if (doctype_defined)
 	{
-		output->outputfilter()->setDocType( doctype.first, doctype.second);
+		output->outputfilter()->setDocType( doctype);
 	}
 	return 0;
 }
@@ -1886,16 +1917,15 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 {
 	if (input->inputfilter().get())
 	{
-		std::string doctype;
+		types::DocType doctype;
 		// try to get 'form' for validation if the document is not standalone:
 		if (input->inputfilter()->getDocType( doctype))
 		{
-			if (doctype.size())
+			if (doctype.defined())
 			{
-				std::string doctypeid( types::getIdFromDoctype( doctype));
 				const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
-				const types::FormDescription* st = gtc->formDescription( doctypeid);
-				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
+				const types::FormDescription* st = gtc->formDescription( doctype.id);
+				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctype.id + "'");
 				types::FormR form( new types::Form( st));
 
 				DDLFormParser* closure;

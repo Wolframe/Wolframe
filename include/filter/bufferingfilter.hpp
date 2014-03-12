@@ -93,11 +93,11 @@ public:
 		}
 	}
 
-	virtual bool getDocType( std::string& val)
+	virtual bool getDocType( types::DocType& doctype)
 	{
 		if (m_end)
 		{
-			bool rt = m_ref->getDocType( val);
+			bool rt = m_ref->getDocType( doctype);
 			setState( m_ref->state(), m_ref->getError());
 			return rt;
 		}

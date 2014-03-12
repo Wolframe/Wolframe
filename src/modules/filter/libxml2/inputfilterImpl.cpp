@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file inputfilterImpl.cpp
 ///\brief Implementation of input filter abstraction for the libxml2 library
 #include "inputfilterImpl.hpp"
+#include "utils/fileUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -44,20 +45,6 @@ bool InputFilterImpl::getValue( const char* name, std::string& val)
 		return true;
 	}
 	return InputFilter::getValue( name, val);
-}
-
-bool InputFilterImpl::getDocType( std::string& val)
-{
-	types::DocType doctype;
-	if (getDocType( doctype))
-	{
-		val = doctype.tostring();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }
 
 bool InputFilterImpl::setValue( const char* name, const std::string& value)
@@ -137,15 +124,21 @@ bool InputFilterImpl::getDocType( types::DocType& doctype)
 	if (nd)
 	{
 		xmlDtdPtr dtd = (xmlDtdPtr)nd;
-		doctype.rootid = dtd->name?(const char*)dtd->name:"";
-		doctype.publicid = dtd->ExternalID?(const char*)dtd->ExternalID:"";
-		doctype.systemid = dtd->SystemID?(const char*)dtd->SystemID:"";
+		std::string systemid = dtd->SystemID?(const char*)dtd->SystemID:"";
+		std::string ext = utils::getFileExtension( systemid);
+		std::string id = utils::getFileStem( systemid);
+		std::string dir;
+		std::size_t namesize = ext.size() + id.size();
+		if (namesize < systemid.size())
+		{
+			dir = std::string( systemid.c_str(), systemid.size() - namesize);
+		}
+		const char* root = dtd->name?(const char*)dtd->name:"";
+		doctype.init( id, root, types::DocType::SchemaPath( dir, ext));
 	}
 	else
 	{
-		doctype.rootid = "";
-		doctype.publicid = "";
-		doctype.systemid = "";
+		doctype.clear();
 	}
 	return true;
 }

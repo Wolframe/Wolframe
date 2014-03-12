@@ -129,7 +129,7 @@ BEGIN
 END
 **output
 {
-	"doctype":	"map_cmdhnd_transaction_outputform.simpleform",
+	"doctype":	"map_cmdhnd_transaction_outputform",
 	"doc":	{
 		"task":	[{
 				"task":	"bla bla",

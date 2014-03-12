@@ -158,7 +158,7 @@ Processor
 COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 **output
 {
-	"doctype":	"Invoice.simpleform",
+	"doctype":	"Invoice",
 	"invoice":	{
 		"order":	{
 			"number":	"INS03-62",

@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "textwolf_filter.hpp"
 #include "types/doctype.hpp"
+#include "utils/fileUtils.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmlprinter.hpp"
@@ -92,18 +93,41 @@ struct InputFilterImpl
 	}
 
 	///\brief Implementation of InputFilter::getDocType(std::string&)
-	virtual bool getDocType( std::string& val)
+	bool getDocType( types::DocType& doctype)
 	{
-		types::DocType doctype;
-		if (getDocType( doctype))
+		try
 		{
-			val = doctype.tostring();
+			const char* err;
+			if (m_parser.state() != XMLParser::ParseSource)
+			{
+				if (!m_parser.parseHeader( err))
+				{
+					setState( Error, err);
+					return false;
+				}
+				if (m_parser.isStandalone())
+				{
+					return true;
+				}
+			}
+			std::string systemid = m_parser.getDoctypeSystem();
+			std::string ext = utils::getFileExtension( systemid);
+			std::string id = utils::getFileStem( systemid);
+			std::string dir;
+			std::size_t namesize = ext.size() + id.size();
+			if (namesize < systemid.size())
+			{
+				dir = std::string( systemid.c_str(), systemid.size() - namesize);
+			}
+			std::string root = m_parser.getDoctypeRoot();
+			doctype.init( id, root, types::DocType::SchemaPath( dir, ext));
 			return true;
 		}
-		else
+		catch (textwolf::SrcIterator::EoM)
 		{
+			setState( EndOfMessage);
 			return false;
-		}
+		};
 	}
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
@@ -242,39 +266,6 @@ struct InputFilterImpl
 	}
 
 private:
-	///\brief Get the document type definition, if available
-	///\param [out] doctype definition parsed
-	///\return true, if success, false, if not.
-	///\remark Check the state when false is returned
-	bool getDocType( types::DocType& doctype)
-	{
-		try
-		{
-			const char* err;
-			if (m_parser.state() != XMLParser::ParseSource)
-			{
-				if (!m_parser.parseHeader( err))
-				{
-					setState( Error, err);
-					return false;
-				}
-				if (m_parser.isStandalone())
-				{
-					return true;
-				}
-			}
-			doctype.rootid = m_parser.getDoctypeRoot();
-			doctype.publicid = m_parser.getDoctypePublic();
-			doctype.systemid = m_parser.getDoctypeSystem();
-			return true;
-		}
-		catch (textwolf::SrcIterator::EoM)
-		{
-			setState( EndOfMessage);
-			return false;
-		};
-	}
-
 	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
 	virtual const char* getEncoding() const
 	{
@@ -346,17 +337,13 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::setDocType(const std::string&,const std::string&)
-	//\param[in] systemid SYSTEM part of XML doctype
-	//\param[in] rootelement XML root element
-	virtual void setDocType( const std::string& systemid, const std::string& rootelement)
+	///\brief Implementation of OutputFilter::setDocType( const types::DocType&)
+	virtual void setDocType( const types::DocType& doctype)
 	{
-		types::DocType doctype( rootelement.c_str(), 0, systemid.c_str());
-		const char* ro = doctype.rootid.empty()?0:doctype.rootid.c_str();
-		const char* pu = doctype.publicid.empty()?0:doctype.publicid.c_str();
-		const char* sy = doctype.systemid.empty()?0:doctype.systemid.c_str();
-		
-		m_printer.setDocumentType( ro, pu, sy);
+		const char* ro = doctype.root.empty()?0:doctype.root.c_str();
+		std::string sy = doctype.schemaURL();
+
+		m_printer.setDocumentType( ro, 0, sy.empty()?0:sy.c_str());
 	}
 
 	void setEncoding( const std::string& value)

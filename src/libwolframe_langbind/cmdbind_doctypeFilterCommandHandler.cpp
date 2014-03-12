@@ -35,6 +35,8 @@
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "types/doctype.hpp"
+#include "utils/parseUtils.hpp"
+#include "utils/fileUtils.hpp"
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 
@@ -107,6 +109,58 @@ static bool isAlphaNum( char ch)
 static bool isSpace( char ch)
 {
 	return ((unsigned char)ch <= 32);
+}
+
+static std::string getIdFromXMLDoctype( const std::string& doctype)
+{
+	std::string rootid;
+	std::string publicid;
+	std::string systemid;
+	std::string::const_iterator itr=doctype.begin(), end=doctype.end();
+
+	if (utils::parseNextToken( rootid, itr, end))
+	{
+		if (utils::parseNextToken( publicid, itr, end))
+		{
+			if (publicid == "PUBLIC")
+			{
+				if (!utils::parseNextToken( publicid, itr, end)
+				||  !utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition (public id)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (publicid == "SYSTEM")
+			{
+				if (!utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition (system id)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (utils::parseNextToken( systemid, itr, end))
+			{
+				if (itr != end)
+				{
+					throw std::runtime_error( "illegal doctype definition (not terminated)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else
+			{
+				return utils::getFileStem( publicid);
+			}
+		}
+		else
+		{
+			return rootid;
+		}
+	}
+	else
+	{
+		return "";
+	}
 }
 
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
@@ -441,7 +495,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						else if (inp[m_inputidx] == '>')
 						{
-							m_doctypeid = types::getIdFromDoctype( m_doctype);
+							m_doctypeid = getIdFromXMLDoctype( m_doctype);
 							setState( Done);
 						}
 						else

@@ -185,12 +185,11 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	return rt;
 }
 
-void OutputFilterImpl::setDocType( const std::string& systemid, const std::string& rootelement)
+void OutputFilterImpl::setDocType( const types::DocType& doctype)
 {
-	types::DocType doctype( rootelement.c_str(), 0, systemid.c_str());	
-	m_doctype_root = doctype.rootid;
-	m_doctype_public = doctype.publicid;
-	m_doctype_system = doctype.systemid;
+	m_doctype_root = doctype.root;
+	m_doctype_public = "";
+	m_doctype_system = doctype.schemaURL();
 }
 
 const char* OutputFilterImpl::encoding() const
