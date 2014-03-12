@@ -1221,8 +1221,6 @@ install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_u
 
 install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
-install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
-
 %if %{fedora}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
@@ -1299,12 +1297,17 @@ systemctl stop wolframed.service
 systemctl disable wolframed.service
 %endif
 %endif
+fi
 
 %postun
 if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
-    rm -rf /var/log/wolframe/*
-    rm -rf /var/run/wolframe
+    if test -d /var/log/wolframe; then
+      rmdir /var/log/wolframe
+    fi
+    if test -d /var/run/wolframe; then
+      rmdir /var/run/wolframe
+    fi
 fi
 
 %files
