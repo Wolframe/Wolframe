@@ -1245,6 +1245,12 @@ if test ! -d /var/run/wolframe; then
   chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/run/wolframe
   chmod 0755 /var/run/wolframe
 fi
+
+if test ! -d /var/log/wolframe; then
+  mkdir /var/log/wolframe
+  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/log/wolframe
+  chmod 0755 /var/log/wolframe
+fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{scilin} || %{sles}
@@ -1293,14 +1299,12 @@ systemctl stop wolframed.service
 systemctl disable wolframed.service
 %endif
 %endif
-  if test -d /var/run/wolframe; then
-    rmdir /var/run/wolframe
-  fi
-fi
 
 %postun
 if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
+    rm -rf /var/log/wolframe/*
+    rm -rf /var/run/wolframe
 fi
 
 %files
@@ -1322,7 +1326,7 @@ fi
 %endif
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
-%{_bindir}/wolfpasswd
+#%{_bindir}/wolfpasswd
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
@@ -1338,10 +1342,10 @@ fi
 %dir %attr(0755, root, root) %{_mandir}/man8
 %endif
 %{_mandir}/man8/wolframed.8.gz
-%if !%{sles}
-%dir %attr(0755, root, root) %{_mandir}/man1
-%endif
-%{_mandir}/man1/wolfpasswd.1.gz
+#%if !%{sles}
+#%dir %attr(0755, root, root) %{_mandir}/man1
+#%endif
+#%{_mandir}/man1/wolfpasswd.1.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
@@ -1370,8 +1374,8 @@ fi
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
 %{_libdir}/wolframe/modules/mod_audit_database.so
 
-%{_libdir}/wolframe/modules/mod_auth_textfile.so
-%{_libdir}/wolframe/modules/mod_auth_database.so
+#%{_libdir}/wolframe/modules/mod_auth_textfile.so
+#%{_libdir}/wolframe/modules/mod_auth_database.so
 
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
@@ -1407,7 +1411,6 @@ fi
 %{_libdir}/wolframe/libwolframe.so
 %{_libdir}/wolframe/libwolframe.a
 %{_libdir}/wolframe/libwfsingleton.so
-%{_libdir}/wolframe/libwfsingleton.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
 %{_libdir}/wolframe/libwolframe_database.so

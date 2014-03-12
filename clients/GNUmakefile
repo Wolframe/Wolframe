@@ -2,6 +2,8 @@ TOPDIR = ..
 
 SUBDIRS = lib cmdline
 
+cmdline: lib
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 cmdline: lib

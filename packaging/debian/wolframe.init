@@ -23,7 +23,7 @@
 # Suite 330, Boston, MA 02111-1307 USA
 #
 ### BEGIN INIT INFO
-# Provides:          wolframe
+# Provides:          wolframed
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Should-Start:      $named
@@ -39,7 +39,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 DAEMON=/usr/sbin/wolframed # Introduce the server's location here
-NAME=wolframe             # Introduce the short server's name here
+NAME=wolframed             # Introduce the short server's name here
 DESC="wolframe daemon"             # Introduce a short description here
 LOGDIR=/var/log/wolframe  # Log directory to use
 

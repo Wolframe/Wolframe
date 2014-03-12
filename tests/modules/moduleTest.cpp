@@ -104,6 +104,48 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	delete unit2;
 }
 
+TEST_F( ModuleFixture, ModuleLogging )
+{
+	std::stringstream buffer;
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/mod_test/mod_test.so" );
+#else
+	modFiles.push_back( ".\\tests\\mod_test\\mod_test.dll" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_TRUE( res );
+
+	ConfiguredBuilder* builder = modDir.getBuilder( "TestObject" );
+	ASSERT_TRUE( builder != NULL );
+
+	config::NamedConfiguration* configuration = builder->configuration( "TestObject" );
+	ASSERT_TRUE( configuration != NULL );
+
+	// Redirect stderr
+	std::streambuf *sbuf = std::cerr.rdbuf();	// Save stderr's buffer here
+	std::cerr.rdbuf( buffer.rdbuf() );
+
+	ConfiguredObjectConstructor< test::TestUnit >* cnstrctr = dynamic_cast< ConfiguredObjectConstructor< test::TestUnit >* >( builder->constructor( ) );
+	ASSERT_TRUE( cnstrctr != NULL );
+	test::TestUnit* unit = cnstrctr->object( *configuration );
+
+	string s = unit->hello( );
+	ASSERT_EQ( s, "hello" );
+	ASSERT_EQ( buffer.rdbuf()->str(), "DEBUG: Module: testUnit object created\n"
+					"DEBUG: Module: test module object created\n"
+					"ALERT: MODULE: hello() called\n" );
+
+	std::cout << buffer.rdbuf();
+	// Restore stderr buffer
+	std::cerr.rdbuf( sbuf );
+
+	delete configuration;
+	delete unit;
+}
+
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );

@@ -12,9 +12,10 @@ public:
             {return "int";}
     virtual types::Variant execute( const types::Variant& i) const
             {return types::Variant( i.toint());}
+	virtual types::NormalizeFunction* copy() const {return new NormalizeInt(*this);}
 
     static types::NormalizeFunction* create(
-            types::NormalizeResourceHandle*, const std::string&)
+            types::NormalizeResourceHandle*, const std::vector<types::Variant>&)
     {
         return new NormalizeInt();
     }
@@ -30,9 +31,10 @@ public:
             {return "float";}
     virtual types::Variant execute( const types::Variant& i) const
             {return types::Variant( i.todouble());}
+	virtual types::NormalizeFunction* copy() const {return new NormalizeFloat(*this);}
 
     static types::NormalizeFunction* create(
-            types::NormalizeResourceHandle*, const std::string&)
+            types::NormalizeResourceHandle*, const std::vector<types::Variant>&)
     {
         return new NormalizeFloat();
     }

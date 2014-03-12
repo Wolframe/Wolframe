@@ -10,7 +10,6 @@ usr/pkg/lib/wolframe/liblua.a
 usr/pkg/lib/wolframe/liblua.so.5.2.0
 usr/pkg/lib/wolframe/liblua.so.5
 usr/pkg/lib/wolframe/liblua.so
-usr/pkg/lib/wolframe/libwfsingleton.a
 usr/pkg/lib/wolframe/libwfsingleton.so.0.0.0
 usr/pkg/lib/wolframe/libwfsingleton.so.0
 usr/pkg/lib/wolframe/libwfsingleton.so
@@ -34,8 +33,6 @@ usr/pkg/lib/wolframe/modules/mod_db_postgresql.so
 usr/pkg/lib/wolframe/modules/mod_db_sqlite3.so
 usr/pkg/lib/wolframe/modules/mod_audit_database.so
 usr/pkg/lib/wolframe/modules/mod_audit_textfile.so
-usr/pkg/lib/wolframe/modules/mod_auth_database.so
-usr/pkg/lib/wolframe/modules/mod_auth_textfile.so
 usr/pkg/lib/wolframe/modules/mod_auth_sasl.so
 usr/pkg/lib/wolframe/modules/mod_authz_database.so
 usr/pkg/lib/wolframe/modules/mod_filter_blob.so
@@ -163,7 +160,7 @@ usr/pkg/include/wolframe/database/statement.hpp
 usr/pkg/include/wolframe/database/baseStatement.hpp
 usr/pkg/include/wolframe/database/substitutingStatement.hpp
 @dirrm usr/pkg/include/wolframe/database
-usr/pkg/include/wolframe/config/ConfigurationTree.hpp
+usr/pkg/include/wolframe/config/configurationTree.hpp
 usr/pkg/include/wolframe/config/configurationBase.hpp
 usr/pkg/include/wolframe/config/programBase.hpp
 usr/pkg/include/wolframe/config/structSerialize.hpp
@@ -206,11 +203,11 @@ usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerialize.hpp
 usr/pkg/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
 @dirrm usr/pkg/include/wolframe/serialize/ddl
 @dirrm usr/pkg/include/wolframe/serialize
+usr/pkg/include/wolframe/processor/procProviderInterface.hpp
 usr/pkg/include/wolframe/processor/jobSchedule.hpp
 usr/pkg/include/wolframe/module/moduleDirectory.hpp
 usr/pkg/include/wolframe/module/moduleInterface.hpp
 usr/pkg/include/wolframe/processor/procProvider.hpp
-usr/pkg/include/wolframe/processor/userInterface.hpp
 @dirrm usr/pkg/include/wolframe/processor
 usr/pkg/include/wolframe/filter/bufferingfilter.hpp
 usr/pkg/include/wolframe/filter/contentfilterAttributes.hpp
@@ -246,6 +243,8 @@ usr/pkg/include/wolframe/types/datetime.hpp
 usr/pkg/include/wolframe/types/bignumber.hpp
 usr/pkg/include/wolframe/types/customDataNormalizer.hpp
 usr/pkg/include/wolframe/types/string.hpp
+usr/pkg/include/wolframe/types/numberBaseConversion.hpp
+usr/pkg/include/wolframe/types/propertyTree.hpp
 @dirrm usr/pkg/include/wolframe/types
 usr/pkg/include/wolframe/AAAA/AAAAinformation.hpp
 usr/pkg/include/wolframe/AAAA/AAAAprovider.hpp
@@ -280,7 +279,6 @@ usr/pkg/include/wolframe/crypto/sha1.h
 usr/pkg/include/wolframe/crypto/sha2.h
 @dirrm usr/pkg/include/wolframe/crypto
 @dirrm usr/pkg/include/wolframe
-usr/pkg/bin/wolfpasswd
 usr/pkg/bin/wolfilter
 usr/pkg/bin/wolfwizard
 usr/pkg/bin/wolframec
@@ -289,7 +287,6 @@ usr/pkg/etc/wolframe/wolframe.conf
 @dirrm usr/pkg/etc/wolframe
 usr/pkg/man/man5/wolframe.conf.5.gz
 usr/pkg/man/man8/wolframed.8.gz
-usr/pkg/man/man1/wolfpasswd.1.gz
 usr/pkg/man/man5/wolframe-mod_db_sqlite3.5.gz
 @mode 0775
 usr/pkg/share/examples/rc.d/wolframed

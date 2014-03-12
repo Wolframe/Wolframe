@@ -10,7 +10,8 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
-	-I$(TOPDIR)/include
+	-I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
