@@ -651,6 +651,14 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 						types::PropertyTree::Position tokpos( lineinfo.line, lineinfo.column);
 						stk.back().second.add_child( id, types::PropertyTree::Node( tok, tokpos));
 						id.clear();
+						std::string::const_iterator cl = ci;
+						std::string restline( utils::parseLine( cl, ce));
+						cl = restline.begin();
+						char rch = utils::gotoNextToken( cl, restline.end());
+						if (rch && rch != ';')
+						{
+							throw std::runtime_error( std::string("unexpected token on rest of line: '") + restline + "' - values containing spaces have to be quoted");
+						}
 					}
 					else if (tok.size())
 					{
