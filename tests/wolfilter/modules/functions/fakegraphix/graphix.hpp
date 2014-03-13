@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file src/modules/functions/graphix/graphix.hpp
+///\file graphix.hpp
 ///\brief Interface for graphix functions
 #ifndef _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>

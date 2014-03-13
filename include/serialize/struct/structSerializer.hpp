@@ -29,51 +29,50 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLSerialize.hpp
-///\brief Defines the DDL structure serialization for filters
-
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "types/variant.hpp"
-#include "serialize/mapContext.hpp"
-#include "serialize/ddl/filtermapDDLSerializeStack.hpp"
-#include "types/variantStruct.hpp"
-#include <cstddef>
+///\file serialize/struct/structSerializer.hpp
+///\brief Serialization interface
+#ifndef _Wolframe_SERIALIZE_STRUCT_SERIALIZER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_SERIALIZER_HPP_INCLUDED
+#include "serialize/struct/structDescriptionBase.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
-//\class DDLStructSerializer
-//\brief Iterator on a DDL structure (serializer of VariantStruct)
-class DDLStructSerializer :public langbind::TypedInputFilter
+//\class StructSerializer
+//\brief Iterator on elements of structures based on a structure description
+class StructSerializer :public langbind::TypedInputFilter
 {
 public:
-	DDLStructSerializer()
-		:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
-	explicit DDLStructSerializer( const types::VariantStruct* st);
+	typedef boost::shared_ptr<void> ObjectReference;
 
-	DDLStructSerializer( const DDLStructSerializer& o);
-	virtual ~DDLStructSerializer(){}
+	StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr);
+	StructSerializer( const void* obj, const StructDescriptionBase* descr);
 
-	DDLStructSerializer& operator =( const DDLStructSerializer& o);
+	StructSerializer( const StructSerializer& o);
+	virtual ~StructSerializer(){}
+
+	static std::string getElementPath( const SerializeStateStack& stk);
 
 	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+	void reset();
 
 	bool call();
 
 	///\brief Get a self copy
 	///\return allocated pointer to copy of this
-	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
+	virtual langbind::TypedInputFilter* copy() const;
 
+	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 	virtual bool setFlags( Flags f);
 
 private:
-	const types::VariantStruct* m_st;
+	const void* m_ptr;
+	const ObjectReference m_obj;
+	const StructDescriptionBase* m_descr;
 	Context m_ctx;
 	langbind::TypedOutputFilterR m_out;
-	FiltermapDDLSerializeStateStack m_stk;
+	SerializeStateStack m_stk;
 };
 
 }}//namespace

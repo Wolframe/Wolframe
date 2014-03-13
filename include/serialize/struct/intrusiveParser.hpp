@@ -29,43 +29,44 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParse.hpp
+///\file serialize/struct/intrusiveParser.hpp
 ///\brief Defines the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_INTRUSIVE_PARSER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_INTRUSIVE_PARSER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"
-#include "serialize/struct/filtermapTraits.hpp"
-#include "serialize/struct/filtermapBase.hpp"
-#include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapProperty.hpp"
+#include "serialize/struct/traits_getCategory.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
+#include "serialize/struct/parseStack.hpp"
+#include "serialize/struct/intrusiveProperty.hpp"
 #include <string>
 #include <cstddef>
 #include <boost/utility/value_init.hpp>
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace serialize {
 
 // forward declaration
 template <typename TYPE>
-struct FiltermapIntrusiveParser
+struct IntrusiveParser
 {
-	static bool parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
+	static bool parse( langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk);
 };
 
-bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
+bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, ParseStateStack& stk);
 
-bool parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
+bool parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk);
 
 typedef bool (*ParseValue)( void* value, const types::VariantConst& element);
 
-bool parseValue_int( signed int*, const types::VariantConst& element);
-bool parseValue_uint( unsigned int*, const types::VariantConst& element);
-bool parseValue_ulong( unsigned long*, const types::VariantConst& element);
-bool parseValue_long( signed long*, const types::VariantConst& element);
+bool parseValue_int64( boost::int64_t* value, const types::VariantConst& element);
+bool parseValue_uint64( boost::uint64_t* value, const types::VariantConst& element);
+bool parseValue_int32( boost::int32_t* value, const types::VariantConst& element);
+bool parseValue_uint32( boost::uint32_t* value, const types::VariantConst& element);
 bool parseValue_short( signed short*, const types::VariantConst& element);
 bool parseValue_ushort( unsigned short*, const types::VariantConst& element);
 bool parseValue_char( signed char*, const types::VariantConst& element);
@@ -76,21 +77,24 @@ bool parseValue_string( std::string*, const types::VariantConst& element);
 bool parseValue_datetime( types::DateTime*, const types::VariantConst& element);
 bool parseValue_bignumber( types::BigNumber*, const types::VariantConst& element);
 
-bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
+bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, ParseStateStack& stk);
 
 
 namespace {
 template <typename TYPE>
 static bool parseValue_( void*, const types::VariantConst&)
 {throw std::runtime_error( "unable to parse atomic value of this type");}
-template <> bool parseValue_<signed int>( void* value, const types::VariantConst& element)
-{return parseValue_int( (signed int*)value, element);}
-template <> bool parseValue_<unsigned int>( void* value, const types::VariantConst& element)
-{return parseValue_uint( (unsigned int*)value, element);}
-template <> bool parseValue_<signed long>( void* value, const types::VariantConst& element)
-{return parseValue_long( (signed long*)value, element);}
-template <> bool parseValue_<unsigned long>( void* value, const types::VariantConst& element)
-{return parseValue_ulong( (unsigned long*)value, element);}
+
+template <> bool parseValue_<boost::int64_t>( void* value, const types::VariantConst& element)
+{return parseValue_int64( (boost::int64_t*)value, element);}
+template <> bool parseValue_<boost::uint64_t>( void* value, const types::VariantConst& element)
+{return parseValue_uint64( (boost::uint64_t*)value, element);}
+
+template <> bool parseValue_<boost::int32_t>( void* value, const types::VariantConst& element)
+{return parseValue_int32( (boost::int32_t*)value, element);}
+template <> bool parseValue_<boost::uint32_t>( void* value, const types::VariantConst& element)
+{return parseValue_uint32( (boost::uint32_t*)value, element);}
+
 template <> bool parseValue_<signed short>( void* value, const types::VariantConst& element)
 {return parseValue_short( (signed short*)value, element);}
 template <> bool parseValue_<unsigned short>( void* value, const types::VariantConst& element)
@@ -111,13 +115,13 @@ template <> bool parseValue_<types::BigNumber>( void* value, const types::Varian
 {return parseValue_bignumber( (types::BigNumber*)value, element);}
 
 template <typename TYPE>
-bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
 {
 	return parseObjectStruct( TYPE::getStructDescription(), inp, ctx, stk);
 }
 
 template <typename TYPE>
-bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&, FiltermapParseStateStack& stk)
+bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&, ParseStateStack& stk)
 {
 	if (stk.back().state())
 	{
@@ -129,16 +133,16 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 	((TYPE*)stk.back().value())->push_back( val);
 	stk.back().state( 1);
 	Element* ee = &((TYPE*)stk.back().value())->back();
-	if (FiltermapIntrusiveProperty<Element>::type() == StructDescriptionBase::Atomic)
+	if (IntrusiveProperty<Element>::type() == StructDescriptionBase::Atomic)
 	{
-		stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, 0));
+		stk.push_back( ParseState( 0, &parseAtomicElementEndTag, 0));
 	}
-	stk.push_back( FiltermapParseState( 0, &FiltermapIntrusiveParser<Element>::parse, ee));
+	stk.push_back( ParseState( 0, &IntrusiveParser<Element>::parse, ee));
 	return true;
 }
 
 template <typename TYPE>
-static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
 {
 	return parseObjectAtomic( parseValue_<TYPE>, inp, ctx, stk);
 }
@@ -147,10 +151,10 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 
 
 template <typename TYPE>
-bool FiltermapIntrusiveParser<TYPE>::parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+bool IntrusiveParser<TYPE>::parse( langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
 {
 	static TYPE* t = 0;
-	return parseObject_<TYPE>( traits::getFiltermapCategory(*t), inp, ctx, stk);
+	return parseObject_<TYPE>( traits::getCategory(*t), inp, ctx, stk);
 }
 
 }}//namespace

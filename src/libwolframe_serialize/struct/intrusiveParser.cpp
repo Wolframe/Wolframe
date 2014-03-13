@@ -29,11 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file struct_filtermapParse.cpp
+///\file struct/intrusiveParser.cpp
 ///\brief Implements some shared helpers of the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
-#include "serialize/struct/filtermapParse.hpp"
-#include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapParseValue.hpp"
+#include "serialize/struct/intrusiveParser.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/struct/parseStack.hpp"
+#include "serialize/struct/parseValue.hpp"
 #include "serialize/serializationErrorException.hpp"
 #include "logger-v1.hpp"
 #include "utils/printFormats.hpp"
@@ -54,24 +55,24 @@ static bool emptycontent( const types::VariantConst& val)
 	return true;
 }
 
-bool serialize::parseValue_int( signed int* val, const types::VariantConst& element)
+bool serialize::parseValue_int64( boost::int64_t* value, const types::VariantConst& element)
 {
-	return parseValue( *val, element);
+	return parseValue( *value, element);
 }
 
-bool serialize::parseValue_uint( unsigned int* val, const types::VariantConst& element)
+bool serialize::parseValue_uint64( boost::uint64_t* value, const types::VariantConst& element)
 {
-	return parseValue( *val, element);
+	return parseValue( *value, element);
 }
 
-bool serialize::parseValue_ulong( unsigned long* val, const types::VariantConst& element)
+bool serialize::parseValue_int32( boost::int32_t* value, const types::VariantConst& element)
 {
-	return parseValue( *val, element);
+	return parseValue( *value, element);
 }
 
-bool serialize::parseValue_long( signed long* val, const types::VariantConst& element)
+bool serialize::parseValue_uint32( boost::uint32_t* value, const types::VariantConst& element)
 {
-	return parseValue( *val, element);
+	return parseValue( *value, element);
 }
 
 bool serialize::parseValue_short( signed short* val, const types::VariantConst& element)
@@ -119,7 +120,7 @@ bool serialize::parseValue_bignumber( types::BigNumber* val, const types::Varian
 	return parseValue( *val, element);
 }
 
-bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
+bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, ParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	types::VariantConst element;
@@ -143,7 +144,7 @@ bool serialize::parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Conte
 	return true;
 }
 
-bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	types::VariantConst element;
@@ -194,9 +195,9 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 			void* value = (char*)stk.back().value() + itr->second.ofs();
 			if (itr->second.type() == StructDescriptionBase::Atomic)
 			{
-				stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, value));
+				stk.push_back( ParseState( 0, &parseAtomicElementEndTag, value));
 			}
-			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), value));
+			stk.push_back( ParseState( itr->first.c_str(), itr->second.parse(), value));
 			return true;
 		}
 
@@ -231,7 +232,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 			{
 				throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
 			}
-			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
+			stk.push_back( ParseState( itr->first.c_str(), itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
 			return true;
 		}
 
@@ -256,7 +257,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 				}
 			}
 			void* value = (char*)stk.back().value() + itr->second.ofs();
-			stk.push_back( FiltermapParseState( "", itr->second.parse(), value));
+			stk.push_back( ParseState( "", itr->second.parse(), value));
 			stk.bufvalue( element);
 			return true;
 		}
@@ -288,7 +289,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 	throw SerializationErrorException( "illegal state in parse structure", StructParser::getElementPath( stk));
 }
 
-bool serialize::parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
+bool serialize::parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, ParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	types::VariantConst element;

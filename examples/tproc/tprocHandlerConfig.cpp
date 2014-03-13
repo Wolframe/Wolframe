@@ -38,7 +38,7 @@
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "config/structSerialize.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>

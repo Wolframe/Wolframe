@@ -33,7 +33,7 @@
 ///\file src/modules/functions/graphix/graphix.cpp
 ///\brief Implementation of graphix functions
 
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "graphix.hpp"
 #include <string>
 #include <vector>

@@ -29,47 +29,53 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapSerializeStack.hpp
-///\brief Defines the parsing stack for serialization of objects
+///\file serialize/ddl/ddlStructSerializer.hpp
+///\brief Defines the DDL structure serialization
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_STRUCT_SERIALIZER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_STRUCT_SERIALIZER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
-#include <vector>
+#include "serialize/ddl/ddlSerializeStack.hpp"
+#include "types/variantStruct.hpp"
 #include <cstddef>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace serialize {
 
-//\class FiltermapSerializeState
-//\brief State stack element for an iterator on a structure (serializer)
-class FiltermapSerializeState
+//\class DDLStructSerializer
+//\brief Iterator on a DDL structure (serializer of VariantStruct)
+class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:
-	typedef bool (*Fetch)( Context& ctx, std::vector<FiltermapSerializeState>& stk);
+	DDLStructSerializer()
+		:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
+	explicit DDLStructSerializer( const types::VariantStruct* st);
 
-public:
-	FiltermapSerializeState( const FiltermapSerializeState& o);
+	DDLStructSerializer( const DDLStructSerializer& o);
+	virtual ~DDLStructSerializer(){}
 
-	FiltermapSerializeState( const char* name_, Fetch p, const void* v);
+	DDLStructSerializer& operator =( const DDLStructSerializer& o);
 
-	const void* value() const			{return m_value;}
-	const char* name() const			{return m_name;}
-	Fetch fetch() const				{return m_fetch;}
-	std::size_t state() const			{return m_stateidx;}
-	void state( std::size_t idx)			{m_stateidx = idx;}
+	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+
+	bool call();
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
+
+	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
+	virtual bool setFlags( Flags f);
 
 private:
-	Fetch m_fetch;
-	const void* m_value;
-	const char* m_name;
-	std::size_t m_stateidx;
+	const types::VariantStruct* m_st;
+	Context m_ctx;
+	langbind::TypedOutputFilterR m_out;
+	DDLSerializeStateStack m_stk;
 };
-
-//\brief State stack for an iterator on a structure (serializer)
-typedef std::vector<FiltermapSerializeState> FiltermapSerializeStateStack;
 
 }}//namespace
 #endif
+

@@ -29,59 +29,61 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLParseStack.hpp
-///\brief Defines the Parsing STM for DDL serialization for filters
+///\file serialize/ddl/ddlSerializeStack.hpp
+///\brief Defines the Parsing STM for DDL serialization
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_STACK_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_SERIALIZE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
+#include "types/variant.hpp"
 #include "types/variantStruct.hpp"
-#include "types/normalizeFunction.hpp"
 #include <vector>
+#include <cstddef>
 #include <stdexcept>
 
 namespace _Wolframe {
 namespace serialize {
 
-//\class FiltermapDDLParseState
-//\brief State stack element for an initializer of a DDL structure from an iterator (serialization)
-class FiltermapDDLParseState
+//\class DDLSerializeState
+//\brief State stack element for an iterator on a DDL structure (serializer of VariantStruct)
+class DDLSerializeState
 {
 public:
-	FiltermapDDLParseState( const FiltermapDDLParseState& o)
-		:m_size(o.m_size)
-		,m_elemidx(o.m_elemidx)
-		,m_value(o.m_value)
-		,m_normalizer(o.m_normalizer)
-		,m_name(o.m_name)
+	DDLSerializeState( const DDLSerializeState& o)
+		:m_value(o.m_value)
 		,m_stateidx(o.m_stateidx)
+		,m_elemtype(o.m_elemtype)
+		,m_tag(o.m_tag)
 		{}
 
-	FiltermapDDLParseState( const char* name_, types::VariantStruct* v, const types::NormalizeFunction* n)
-		:m_size(0)
-		,m_elemidx(0)
-		,m_value(v)
-		,m_normalizer(n)
-		,m_name(name_)
+	DDLSerializeState( const types::VariantStruct* v, const types::VariantConst& t)
+		:m_value(v)
 		,m_stateidx(0)
+		,m_elemtype(langbind::FilterBase::Value)
+		,m_tag(t)
+		{
+			m_tag.setInitialized();
+		}
+
+	DDLSerializeState( const types::VariantStruct* v)
+		:m_value(v)
+		,m_stateidx(0)
+		,m_elemtype(langbind::FilterBase::Value)
 		{}
 
-	~FiltermapDDLParseState(){}
+	DDLSerializeState( langbind::FilterBase::ElementType typ, const types::VariantConst& elem)
+		:m_value(0)
+		,m_stateidx(0)
+		,m_elemtype(typ)
+		,m_tag(elem)
+		{
+			m_tag.setInitialized();
+		}
 
-	types::VariantStruct* value() const
+	const types::VariantStruct* value() const
 	{
 		return m_value;
-	}
-
-	const char* name() const
-	{
-		return m_name;
-	}
-
-	void state( std::size_t idx)
-	{
-		m_stateidx = idx;
 	}
 
 	std::size_t state() const
@@ -89,24 +91,30 @@ public:
 		return m_stateidx;
 	}
 
-	const types::NormalizeFunction* normalizer() const
+	void state( std::size_t idx)
 	{
-		return m_normalizer;
+		m_stateidx = idx;
+	}
+
+	langbind::FilterBase::ElementType type() const
+	{
+		return m_elemtype;
+	}
+
+	const types::VariantConst& tag() const
+	{
+		return m_tag;
 	}
 
 private:
-	std::size_t m_size;
-	std::size_t m_elemidx;
-	types::VariantStruct* m_value;
-	const types::NormalizeFunction* m_normalizer;
-	const char* m_name;
+	const types::VariantStruct* m_value;
 	std::size_t m_stateidx;
+	langbind::FilterBase::ElementType m_elemtype;
+	types::VariantConst m_tag;
 };
 
-//\brief State stack for an initializer of a DDL structure from an iterator (serialization)
-typedef std::vector<FiltermapDDLParseState> FiltermapDDLParseStateStack;
-
+//\brief State stack for an iterator on a DDL structure (serializer of VariantStruct)
+typedef std::vector<DDLSerializeState> DDLSerializeStateStack;
 
 }}//namespace
 #endif
-

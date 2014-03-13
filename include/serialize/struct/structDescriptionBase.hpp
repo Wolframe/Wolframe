@@ -29,16 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapBase.hpp
+///\file serialize/struct/structDescriptionBase.hpp
 ///\brief Defines the non intrusive base class of serialization/deserialization of objects interfaced as TypedInputFilter/TypedOutputFilter.
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
-#include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapSerializeStack.hpp"
+#include "serialize/struct/parseStack.hpp"
+#include "serialize/struct/serializeStack.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -60,8 +60,8 @@ public:
 	};
 
 	typedef std::vector<std::pair<std::string,StructDescriptionBase> > Map;
-	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, FiltermapParseStateStack& stk);
-	typedef bool (*Fetch)( Context& ctx, FiltermapSerializeStateStack& stk);
+	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, ParseStateStack& stk);
+	typedef bool (*Fetch)( Context& ctx, SerializeStateStack& stk);
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
 
@@ -79,7 +79,7 @@ public:
 	StructDescriptionBase( const StructDescriptionBase& o);
 	StructDescriptionBase();
 
-	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
+	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, ParseStateStack& stk) const;
 
 	///\brief Initializes an atomic element in a structure
 	///\remark Not very efficient implementation
@@ -169,75 +169,6 @@ private:
 	Parse m_parse;
 	Fetch m_fetch;
 	ElementRequirement m_requirement;
-};
-
-
-//\class StructSerializer
-//\brief Iterator on elements of structures based on a structure description
-class StructSerializer :public langbind::TypedInputFilter
-{
-public:
-	typedef boost::shared_ptr<void> ObjectReference;
-
-	StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr);
-	StructSerializer( const void* obj, const StructDescriptionBase* descr);
-
-	StructSerializer( const StructSerializer& o);
-	virtual ~StructSerializer(){}
-
-	static std::string getElementPath( const FiltermapSerializeStateStack& stk);
-
-	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
-	void reset();
-
-	bool call();
-
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
-	virtual langbind::TypedInputFilter* copy() const;
-
-	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
-	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
-	virtual bool setFlags( Flags f);
-
-private:
-	const void* m_ptr;
-	const ObjectReference m_obj;
-	const StructDescriptionBase* m_descr;
-	Context m_ctx;
-	langbind::TypedOutputFilterR m_out;
-	FiltermapSerializeStateStack m_stk;
-};
-
-
-//\class StructParser
-//\brief Initializer of a structure based on a structure description feeded with a serialization
-class StructParser
-{
-public:
-	typedef boost::shared_ptr<void> ObjectReference;
-
-	StructParser( void* obj, const StructDescriptionBase* descr);
-	StructParser( const ObjectReference& obj, const StructDescriptionBase* descr);
-	StructParser( const StructParser& o);
-	virtual ~StructParser(){}
-
-	static std::string getElementPath( const FiltermapParseStateStack& stk);
-
-	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
-
-	const ObjectReference& object() const					{return m_obj;}
-	const StructDescriptionBase* descr() const				{return m_descr;}
-
-	bool call();
-
-private:
-	void* m_ptr;
-	ObjectReference m_obj;
-	const StructDescriptionBase* m_descr;
-	Context m_ctx;
-	langbind::TypedInputFilterR m_inp;
-	FiltermapParseStateStack m_stk;
 };
 
 }}//namespace

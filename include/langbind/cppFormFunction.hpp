@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface to the built-in function for processor language bindings
 #ifndef _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
 #define _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <boost/shared_ptr.hpp>
 

@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_ddl_filtermapSerialize.cpp
+///\file ddl/ddlStructSerializer.cpp
 
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
 #include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
@@ -46,12 +46,12 @@ using namespace _Wolframe;
 using namespace serialize;
 
 // forward declaration
-static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk);
+static bool fetchObject( Context& ctx, std::vector<DDLSerializeState>& stk);
 
-static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
+static std::string getElementPath( const DDLSerializeStateStack& stk)
 {
 	std::string rt;
-	FiltermapDDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	DDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
 		if (itr->value() && itr->value()->type() != types::VariantStruct::Array)
@@ -67,7 +67,7 @@ static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 	return rt;
 }
 
-static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
+static bool fetchAtom( Context& ctx, std::vector<DDLSerializeState>& stk)
 {
 	bool rt = false;
 	if (stk.back().state())
@@ -85,7 +85,7 @@ static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& st
 	return rt;
 }
 
-static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
+static bool fetchStruct( Context& ctx, std::vector<DDLSerializeState>& stk)
 {
 	bool rt = false;
 	const types::VariantStruct* obj = (const types::VariantStruct*)stk.back().value();
@@ -114,7 +114,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
 			rt = true;
 			stk.back().state( ++idx);
-			stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
+			stk.push_back( DDLSerializeState( &*itr, elem));
 		}
 		else
 		{
@@ -125,7 +125,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 					throw SerializationErrorException( "non array element expected for content element", getElementPath( stk));
 				}
 				stk.back().state( ++idx);
-				stk.push_back( FiltermapDDLSerializeState( &*itr));
+				stk.push_back( DDLSerializeState( &*itr));
 			}
 			else
 			{
@@ -133,7 +133,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 				{
 					types::VariantConst elem( di->name);
 					stk.back().state( ++idx);
-					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
+					stk.push_back( DDLSerializeState( &*itr, elem));
 				}
 				else
 				{
@@ -141,8 +141,8 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 					ctx.setElem( langbind::FilterBase::OpenTag, elem);
 					rt = true;
 					stk.back().state( ++idx);
-					stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
-					stk.push_back( FiltermapDDLSerializeState( &*itr, elem));
+					stk.push_back( DDLSerializeState( langbind::FilterBase::CloseTag, elem));
+					stk.push_back( DDLSerializeState( &*itr, elem));
 				}
 			}
 		}
@@ -159,7 +159,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	return rt;
 }
 
-static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
+static bool fetchVector( Context& ctx, std::vector<DDLSerializeState>& stk)
 {
 	bool rt = false;
 	const types::VariantStruct* obj = (const types::VariantStruct*)stk.back().value();
@@ -174,8 +174,8 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	{
 		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1U));
 		stk.back().state( idx+1);
-		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, types::VariantConst( (unsigned int)idx+1U)));
-		stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
+		stk.push_back( DDLSerializeState( langbind::FilterBase::CloseTag, types::VariantConst( (unsigned int)idx+1U)));
+		stk.push_back( DDLSerializeState( &*itr, stk.back().tag()));
 		rt = true;
 	}
 	else
@@ -186,19 +186,19 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			ctx.setElem( langbind::FilterBase::OpenTag, stk.back().tag());
 			rt = true;
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, stk.back().tag()));
-			stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
+			stk.push_back( DDLSerializeState( langbind::FilterBase::CloseTag, stk.back().tag()));
+			stk.push_back( DDLSerializeState( &*itr, stk.back().tag()));
 		}
 		else
 		{
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapDDLSerializeState( &*itr, stk.back().tag()));
+			stk.push_back( DDLSerializeState( &*itr, stk.back().tag()));
 		}
 	}
 	return rt;
 }
 
-static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
+static bool fetchObject( Context& ctx, std::vector<DDLSerializeState>& stk)
 {
 	if (!stk.back().value())
 	{
@@ -306,7 +306,7 @@ DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 	,m_st(st)
 {
 	if (!m_st) throw std::runtime_error( "empty form passed to serializer");
-	m_stk.push_back( FiltermapDDLSerializeState( st));
+	m_stk.push_back( DDLSerializeState( st));
 }
 
 DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
@@ -333,7 +333,7 @@ void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context
 	m_ctx.clear();
 	m_ctx.setFlags(flags_);
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLSerializeState( m_st));
+	m_stk.push_back( DDLSerializeState( m_st));
 	m_out = out;
 }
 
