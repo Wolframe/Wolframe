@@ -523,9 +523,9 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 	enum Keyword{ kw_NONE,kw_INCLUDE };
 	static const utils::IdentifierTable g_keywords_tab( false, g_keywords);
 	
-	static const utils::CharTable ptOpTab( "{}./\\;,*:?!#&()[]$^~=%@+-");
-	static const utils::CharTable filenameOpTab( "{}");
-	static const utils::CharTable filenameAlphaTab( "a..zA..Z0..9_./\\:~=@+-");
+	static const utils::CharTable keyOpTab( "{}.;");
+	static const utils::CharTable valueOpTab( "{};");
+	static const utils::CharTable valueAlphaTab( "{};", true);
 	types::PropertyTree::Node node;
 	std::string content( readSourceFileContent( filename));
 	typedef std::pair<std::string,types::PropertyTree::Node> StackElem;
@@ -561,7 +561,17 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 			ca = ci;
 
 			// parse next token:
-			char ch = utils::parseNextToken( tok, ci, ce, ptOpTab);
+			char ch;
+			if (id.empty())
+			{
+				//... parse key
+				ch = utils::parseNextToken( tok, ci, ce, keyOpTab);
+			}
+			else
+			{
+				//... parse value
+				ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
+			}
 			switch (ch)
 			{
 				case '\0':
@@ -616,12 +626,12 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 							case kw_INCLUDE:
 							{
 								if (stk.size() != 1) throw std::runtime_error( "'.include' only allowed on highest level of structure hierarchy (not in substructure)");
-								ch = utils::parseNextToken( tok, ci, ce, filenameOpTab, filenameAlphaTab);
+								ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
 								if (!ch) throw std::runtime_error( "unexpected end of file");
 								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
 								types::PropertyTree::Node subnode = readInfoPropertyTreeFile_( getCanonicalPath( tok, includepath), filenamestack2);
 								types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
-
+	
 								for (; ni != ne; ++ni)
 								{
 									stk.back().second.add_child( ni->first, ni->second);
@@ -630,53 +640,16 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 						}
 						break;
 					}
-					//...no break here
+					//no break here!
 				}
-				case '\\':
-				case '/':
-				case '*':
-				case ':':
-				case '-':
-				case ',':
-				case '?':
-				case '!':
-				case '#':
-				case '&':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '$':
-				case '^':
-				case '~':
-				case '=':
-				case '%':
-				case '@':
-				case '+':
-					tok.push_back( ch);
-					if (id.empty()) throw std::runtime_error( "identifier expected as key");
-					//...no break here
 				default:
 				{
 					//... string or identifier
 					if (id.size())
 					{
 						//... 'id' has been defined before so (id,tok) is a new key value pair
-						std::string toksum = tok;
-						while (ci != ce && (unsigned char)*ci > 32 && (!ptOpTab[*ci] || *ci == '.' || *ci == '/' || *ci == '\\'))
-						{
-							if (!(ch=utils::parseNextToken( tok, ci, ce, ptOpTab))) break;
-							if (tok.empty() && *ci != '\'' && *ci != '\"')
-							{
-								toksum.push_back( ch);
-							}
-							else
-							{
-								toksum.append( tok);
-							}
-						}
 						types::PropertyTree::Position tokpos( lineinfo.line, lineinfo.column);
-						stk.back().second.add_child( id, types::PropertyTree::Node( toksum, tokpos));
+						stk.back().second.add_child( id, types::PropertyTree::Node( tok, tokpos));
 						id.clear();
 					}
 					else if (tok.size())
