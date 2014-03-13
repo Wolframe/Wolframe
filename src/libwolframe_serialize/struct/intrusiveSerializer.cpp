@@ -29,33 +29,34 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file struct_filtermapSerialize.cpp
+///\file struct/intrusiveSerializer.cpp
 ///\brief Helper function for the serialization of structures
-#include "serialize/struct/filtermapSerialize.hpp"
-#include "serialize/struct/filtermapPrintValue.hpp"
+#include "serialize/struct/intrusiveSerializer.hpp"
+#include "serialize/struct/structSerializer.hpp"
+#include "serialize/struct/printValue.hpp"
 #include "serialize/serializationErrorException.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
-bool serialize::printValue_int( const signed int* ptr, types::VariantConst& value)
+bool serialize::printValue_int64( const boost::int64_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const int*)ptr, value);
+	return traits::printValue( *(const boost::int64_t*)ptr, value);
 }
 
-bool serialize::printValue_uint( const unsigned int* ptr, types::VariantConst& value)
+bool serialize::printValue_uint64( const boost::uint64_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const unsigned int*)ptr, value);
+	return traits::printValue( *(const boost::uint64_t*)ptr, value);
 }
 
-bool serialize::printValue_ulong( const unsigned long* ptr, types::VariantConst& value)
+bool serialize::printValue_int32( const boost::int32_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const unsigned long*)ptr, value);
+	return traits::printValue( *(const boost::int32_t*)ptr, value);
 }
 
-bool serialize::printValue_long( const signed long* ptr, types::VariantConst& value)
+bool serialize::printValue_uint32( const boost::uint32_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const unsigned long*)ptr, value);
+	return traits::printValue( *(const boost::uint32_t*)ptr, value);
 }
 
 bool serialize::printValue_short( const signed short* ptr, types::VariantConst& value)
@@ -103,14 +104,14 @@ bool serialize::printValue_bignumber( const types::BigNumber* ptr, types::Varian
 	return traits::printValue( *(const types::BigNumber*)ptr, value);
 }
 
-bool serialize::fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchCloseTag( Context& ctx, SerializeStateStack& stk)
 {
 	ctx.setElem(langbind::FilterBase::CloseTag);
 	stk.pop_back();
 	return true;
 }
 
-bool serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchOpenTag( Context& ctx, SerializeStateStack& stk)
 {
 	ctx.setElem(
 		langbind::FilterBase::OpenTag,
@@ -119,7 +120,7 @@ bool serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk)
 	return true;
 }
 
-bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, SerializeStateStack& stk)
 {
 	bool rt = false;
 	const void* obj = stk.back().value();
@@ -139,7 +140,7 @@ bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& 
 				types::VariantConst( itr->first.c_str(), itr->first.size()));
 			rt = true;
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			stk.push_back( SerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
 		else if (itr->first.empty())
 		{
@@ -147,14 +148,14 @@ bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& 
 			{
 				throw SerializationErrorException( "non array element expected for content element", StructSerializer::getElementPath( stk));
 			}
-			stk.push_back( FiltermapSerializeState( "", itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			stk.push_back( SerializeState( "", itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
 		else
 		{
 			if (itr->second.type() == StructDescriptionBase::Vector && !ctx.flag( Context::SerializeWithIndices))
 			{
 				stk.back().state( idx+1);
-				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+				stk.push_back( SerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 			}
 			else
 			{
@@ -163,8 +164,8 @@ bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& 
 					types::VariantConst( itr->first.c_str(), itr->first.size()));
 				rt = true;
 				stk.back().state( idx+1);
-				stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
-				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+				stk.push_back( SerializeState( 0, &fetchCloseTag, itr->first.c_str()));
+				stk.push_back( SerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 			}
 		}
 	}
@@ -180,7 +181,7 @@ bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& 
 	return rt;
 }
 
-bool serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, SerializeStateStack& stk)
 {
 	Context::ElementBuffer elem;
 	elem.m_type = langbind::FilterBase::Value;
@@ -193,7 +194,7 @@ bool serialize::fetchObjectAtomic( PrintValue prnt, Context& ctx, FiltermapSeria
 	return true;
 }
 
-bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, FiltermapSerializeStateStack& stk)
+bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, SerializeStateStack& stk)
 {
 	bool rt = false;
 	std::size_t idx = stk.back().state();
@@ -202,8 +203,8 @@ bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void*
 	{
 		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1));
 		stk.back().state( idx+1);
-		stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, 0));
-		stk.push_back( FiltermapSerializeState( stk.back().name(), fetchElement, ve));
+		stk.push_back( SerializeState( 0, &fetchCloseTag, 0));
+		stk.push_back( SerializeState( stk.back().name(), fetchElement, ve));
 	}
 	else
 	{
@@ -213,13 +214,13 @@ bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void*
 			ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( tagname));
 			rt = true;
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapSerializeState( tagname, &fetchCloseTag, tagname));
-			stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
+			stk.push_back( SerializeState( tagname, &fetchCloseTag, tagname));
+			stk.push_back( SerializeState( "", fetchElement, ve));
 		}
 		else
 		{
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
+			stk.push_back( SerializeState( "", fetchElement, ve));
 		}
 	}
 	return rt;

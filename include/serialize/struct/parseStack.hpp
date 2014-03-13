@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParseStack.hpp
+///\file serialize/struct/parseStack.hpp
 ///\brief Defines the parsing stack for deserialization
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_PARSE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_PARSE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
@@ -44,19 +44,19 @@ namespace _Wolframe {
 namespace serialize {
 
 ///\brief Forward declaration
-class FiltermapParseStateStack;
+class ParseStateStack;
 
-//\class FiltermapParseState
+//\class ParseState
 //\brief State stack element for an initializer of a structure
-class FiltermapParseState
+class ParseState
 {
 public:
-	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
+	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk);
 
 public:
-	FiltermapParseState( const FiltermapParseState& o);
-	FiltermapParseState( const char* name_, Parse p, void* v);
-	~FiltermapParseState();
+	ParseState( const ParseState& o);
+	ParseState( const char* name_, Parse p, void* v);
+	~ParseState();
 
 	std::size_t selectElement( std::size_t idx, std::size_t size);
 	std::size_t initCount( std::size_t idx) const;
@@ -75,14 +75,14 @@ private:
 	std::size_t m_stateidx;
 };
 
-//\class FiltermapParseStateStack
+//\class ParseStateStack
 //\brief State stack for an initializer of a structure
-class FiltermapParseStateStack :public std::vector<FiltermapParseState>
+class ParseStateStack :public std::vector<ParseState>
 {
 public:
-	FiltermapParseStateStack(){}
-	FiltermapParseStateStack( const FiltermapParseStateStack& o)
-		:std::vector<FiltermapParseState>(o)
+	ParseStateStack(){}
+	ParseStateStack( const ParseStateStack& o)
+		:std::vector<ParseState>(o)
 		,m_valuebuf(o.m_valuebuf){}
 
 	bool hasbufvalue() const					{return m_valuebuf.initialized();}

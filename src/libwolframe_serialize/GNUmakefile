@@ -29,15 +29,17 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	ddl_filtermapParse.o \
-	ddl_filtermapSerialize.o \
+	ddl/ddlStructParser.o \
+	ddl/ddlStructSerializer.o \
 	mapContext.o \
 	serializationErrorException.o \
-	struct_filtermapBase.o \
-	struct_filtermapParse.o \
-	struct_filtermapParseStack.o \
-	struct_filtermapSerialize.o \
-	struct_filtermapSerializeStack.o \
+	struct/intrusiveParser.o \
+	struct/intrusiveSerializer.o \
+	struct/parseStack.o \
+	struct/serializeStack.o \
+	struct/structDescriptionBase.o \
+	struct/structParser.o \
+	struct/structSerializer.o \
 	structOptionParser.o \
 	tostringUtils.o
 

@@ -29,27 +29,45 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/structProgramOption.hpp
-///\brief Provides uniform handling of structures in program command line options
-#ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#include "serialize/struct/structParser.hpp"
-#include "types/propertyTree.hpp"
-#include <string>
+///\file serialize/struct/structParser.hpp
+///\brief Deserialization interface
+#ifndef _Wolframe_SERIALIZE_STRUCT_PARSER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_PARSER_HPP_INCLUDED
+#include "serialize/struct/structDescriptionBase.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
-void parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt);
-
-template <class Structure>
-void parseStructOptionString( Structure& st, const std::string& opt)
+//\class StructParser
+//\brief Initializer of a structure based on a structure description feeded with a serialization
+class StructParser
 {
-	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
-}
+public:
+	typedef boost::shared_ptr<void> ObjectReference;
 
-types::PropertyTree::Node structOptionTree( const std::string& opt);
+	StructParser( void* obj, const StructDescriptionBase* descr);
+	StructParser( const ObjectReference& obj, const StructDescriptionBase* descr);
+	StructParser( const StructParser& o);
+	virtual ~StructParser(){}
 
-}}
+	static std::string getElementPath( const ParseStateStack& stk);
+
+	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+
+	const ObjectReference& object() const					{return m_obj;}
+	const StructDescriptionBase* descr() const				{return m_descr;}
+
+	bool call();
+
+private:
+	void* m_ptr;
+	ObjectReference m_obj;
+	const StructDescriptionBase* m_descr;
+	Context m_ctx;
+	langbind::TypedInputFilterR m_inp;
+	ParseStateStack m_stk;
+};
+
+}}//namespace
 #endif
 

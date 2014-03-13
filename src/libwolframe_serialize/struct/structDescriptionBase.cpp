@@ -29,205 +29,15 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file struct_filtermapBase.cpp
+///\file struct/structDescriptionBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization
-#include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapBase.hpp"
-#include "serialize/serializationErrorException.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "filter/typingfilter.hpp"
-#include "utils/printFormats.hpp"
-#include "logger-v1.hpp"
 #include <cstring>
 #include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
-
-StructParser::StructParser( const ObjectReference& obj, const StructDescriptionBase* descr_)
-	:m_ptr(obj.get())
-	,m_obj(obj)
-	,m_descr(descr_)
-{
-	FiltermapParseState st( 0, m_descr->parse(), m_ptr);
-	m_stk.push_back( st);
-}
-
-StructParser::StructParser( void* obj, const StructDescriptionBase* descr_)
-	:m_ptr(obj)
-	,m_descr(descr_)
-{}
-
-StructParser::StructParser( const StructParser& o)
-	:m_ptr(o.m_ptr)
-	,m_obj(o.m_obj)
-	,m_descr(o.m_descr)
-	,m_ctx(o.m_ctx)
-	,m_inp(o.m_inp)
-	,m_stk(o.m_stk)
-{}
-
-std::string StructParser::getElementPath( const FiltermapParseStateStack& stk)
-{
-	std::string rt;
-	FiltermapParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
-	for (; itr != end; ++itr)
-	{
-		if (itr->name())
-		{
-			rt.append( "/");
-			rt.append( itr->name());
-		}
-	}
-	return rt;
-}
-
-void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags flags)
-{
-	m_inp = i;
-	m_ctx.clear();
-	if (i->flag( langbind::FilterBase::PropagateNoCase))
-	{
-		m_ctx.setFlags( Context::CaseInsensitiveCompare);
-	}
-	m_ctx.setFlags(flags);
-	if (i->flag( langbind::FilterBase::PropagateNoAttr))
-	{
-		m_ctx.unsetFlags( Context::ValidateAttributes);
-	}
-	m_stk.clear();
-	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
-}
-
-bool StructParser::call()
-{
-	bool rt = true;
-	if (!m_ptr) throw std::runtime_error( "try to fill null object");
-	if (!m_inp.get()) throw std::runtime_error( "no input for parse");
-
-	while (rt && m_stk.size())
-	{
-		rt = m_stk.back().parse()( *m_inp, m_ctx, m_stk);
-	}
-	return rt;
-}
-
-
-
-StructSerializer::StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr_)
-	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
-	,m_ptr(obj.get())
-	,m_obj(obj)
-	,m_descr(descr_)
-	,m_ctx()
-{
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
-}
-
-StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase* descr_)
-	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
-	,m_ptr(obj)
-	,m_descr(descr_)
-	,m_ctx()
-{
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
-}
-
-StructSerializer::StructSerializer( const StructSerializer& o)
-	:utils::TypeSignature(o)
-	,TypedInputFilter(o)
-	,m_ptr(o.m_ptr)
-	,m_obj(o.m_obj)
-	,m_descr(o.m_descr)
-	,m_ctx(o.m_ctx)
-	,m_out(o.m_out)
-	,m_stk(o.m_stk){}
-
-void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags_)
-{
-	m_ctx.clear();
-	m_ctx.setFlags(flags_);
-	m_stk.clear();
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
-	m_out = out;
-}
-
-void StructSerializer::reset()
-{
-	m_ctx.clear();
-	m_stk.clear();
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
-}
-
-langbind::TypedInputFilter* StructSerializer::copy() const
-{
-	return new StructSerializer(*this);
-}
-
-std::string StructSerializer::getElementPath( const FiltermapSerializeStateStack& stk)
-{
-	std::string rt;
-	FiltermapSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
-	for (; itr != end; ++itr)
-	{
-		if (itr->name())
-		{
-			rt.append( "/");
-			rt.append( itr->name());
-		}
-	}
-	return rt;
-}
-
-bool StructSerializer::call()
-{
-	if (!m_out.get()) throw std::runtime_error( "no output for serialize");
-	while (m_stk.size())
-	{
-		const Context::ElementBuffer* elem = m_ctx.getElem();
-		if (elem)
-		{
-			if (!m_out->print( elem->m_type, elem->m_value))
-			{
-				if (m_out->getError())
-				{
-					throw SerializationErrorException( m_out->getError(), getElementPath( m_stk));
-				}
-				m_ctx.setElementUnconsumed();
-				return false;
-			}
-			LOG_DATA << "[C++ structure serialization print] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " '" << utils::getLogString( elem->m_value) << "'";
-		}
-		m_stk.back().fetch()( m_ctx, m_stk);
-	}
-	return true;
-}
-
-bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value)
-{
-	const Context::ElementBuffer* elem;
-	while (m_stk.size() && (elem = m_ctx.getElem()) == 0)
-	{
-		m_stk.back().fetch()( m_ctx, m_stk);
-	}
-	if (!m_stk.size()) return false;
-
-	type = elem->m_type;
-	value = elem->m_value;
-	setState( langbind::InputFilter::Open);
-	LOG_DATA << "[C++ structure serialization get] element " << langbind::InputFilter::elementTypeName( elem->m_type) << " " << utils::getLogString( elem->m_value);
-	return true;
-}
-
-bool StructSerializer::setFlags( Flags f)
-{
-	bool rt = true;
-	rt &= langbind::TypedInputFilter::setFlags( f);
-	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
-	{
-		m_ctx.setFlags( Context::SerializeWithIndices);
-	}
-	return rt;
-}
 
 class OneElementTypedInputFilter
 	:public langbind::TypedInputFilter
@@ -367,9 +177,9 @@ bool StructDescriptionBase::setAtomicValue( void* obj, std::size_t idx, const st
 		throw std::runtime_error( "atomic value expected for call of set atomic value");
 	}
 	Context ctx;
-	FiltermapParseStateStack stk;
+	ParseStateStack stk;
 	OneElementTypedInputFilter inp( value);
-	stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), objelemptr));
+	stk.push_back( ParseState( itr->first.c_str(), itr->second.parse(), objelemptr));
 	return stk.back().parse()( inp, ctx, stk);
 }
 

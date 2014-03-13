@@ -29,27 +29,45 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/structProgramOption.hpp
-///\brief Provides uniform handling of structures in program command line options
-#ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#include "serialize/struct/structParser.hpp"
-#include "types/propertyTree.hpp"
-#include <string>
+///\file serialize/ddl/ddlStructParse.hpp
+///\brief Defines the DDL structure deserialization
+
+#ifndef _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
+#include "serialize/mapContext.hpp"
+#include "serialize/ddl/ddlParseStack.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
+#include <cstddef>
 
 namespace _Wolframe {
 namespace serialize {
 
-void parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt);
-
-template <class Structure>
-void parseStructOptionString( Structure& st, const std::string& opt)
+//\class DDLStructParser
+//\brief Initializer of a DDL structure from an iterator (serialization)
+class DDLStructParser
 {
-	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
-}
+public:
+	DDLStructParser(){}
+	explicit DDLStructParser( types::VariantStruct* st);
 
-types::PropertyTree::Node structOptionTree( const std::string& opt);
+	DDLStructParser( const DDLStructParser& o);
+	virtual ~DDLStructParser(){}
 
-}}
+	DDLStructParser& operator=( const DDLStructParser& o);
+
+	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+
+	bool call();
+
+private:
+	types::VariantStruct* m_st;
+	Context m_ctx;
+	langbind::TypedInputFilterR m_inp;
+	DDLParseStateStack m_stk;
+};
+
+}}//namespace
 #endif
 

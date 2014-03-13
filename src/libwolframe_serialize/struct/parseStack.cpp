@@ -29,35 +29,54 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapProperty.hpp
-///\brief Defines the intrusive implementation of some parsing element properties
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
-#include "serialize/struct/filtermapTraits.hpp"
+///\file struct/parseStack.cpp
+///\brief Implements the parsing stack for deserialization
+#include "serialize/struct/parseStack.hpp"
 
-namespace _Wolframe {
-namespace serialize {
+using namespace _Wolframe;
+using namespace _Wolframe::serialize;
 
-//\class FiltermapIntrusiveProperty
-//\brief Maps the traits based on structure element type properties to an enumeration value
-template <typename T>
-struct FiltermapIntrusiveProperty
+ParseState::ParseState( const ParseState& o)
+	:m_parse(o.m_parse)
+	,m_initar(0)
+	,m_size(o.m_size)
+	,m_value(o.m_value)
+	,m_name(o.m_name)
+	,m_stateidx(o.m_stateidx)
 {
-private:
-	static StructDescriptionBase::ElementType type_( const traits::struct_&)
-		{return StructDescriptionBase::Struct;}
-	static StructDescriptionBase::ElementType type_( const traits::vector_&)
-		{return StructDescriptionBase::Vector;}
-	static StructDescriptionBase::ElementType type_( const traits::atomic_&)
-		{return StructDescriptionBase::Atomic;}
-public:
-	static StructDescriptionBase::ElementType type()
+	if (o.m_initar)
 	{
-		const T* obj = 0;
-		return type_( traits::getFiltermapCategory(*obj));
+		m_initar = (int*)std::calloc( m_size, sizeof(*m_initar));
+		std::memcpy( m_initar, o.m_initar, m_size*sizeof(*m_initar));
 	}
-};
+}
 
-}}//namespace
-#endif
+ParseState::ParseState( const char* name_, Parse p, void* v)
+	:m_parse(p)
+	,m_initar(0)
+	,m_size(0)
+	,m_value(v)
+	,m_name(name_)
+	,m_stateidx(0)
+	{}
+
+ParseState::~ParseState()
+{
+	if (m_initar) std::free( m_initar);
+}
+
+std::size_t ParseState::selectElement( std::size_t idx, std::size_t size)
+{
+	if (!m_initar) m_initar = (int*)std::calloc( m_size=size, sizeof(*m_initar));
+	if (idx > m_size) throw std::logic_error( "ABW in intrusive filter map parser");
+	return m_initar[ idx]++;
+}
+
+std::size_t ParseState::initCount( std::size_t idx) const
+{
+	if (!m_initar) return 0;
+	if (idx > m_size) throw std::logic_error( "ABW in intrusive filter map parser");
+	return m_initar[ idx];
+}
+
 

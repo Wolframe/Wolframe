@@ -29,27 +29,47 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/structProgramOption.hpp
-///\brief Provides uniform handling of structures in program command line options
-#ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#include "serialize/struct/structParser.hpp"
-#include "types/propertyTree.hpp"
-#include <string>
+///\file serialize/struct/serializeStack.hpp
+///\brief Defines the parsing stack for serialization of objects
+
+#ifndef _Wolframe_SERIALIZE_STRUCT_SERIALIZE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_SERIALIZE_STACK_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
+#include "serialize/mapContext.hpp"
+#include <vector>
+#include <cstddef>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace serialize {
 
-void parseStructOptionStringImpl( const serialize::StructDescriptionBase* descr, void* ptr, const::std::string& opt);
-
-template <class Structure>
-void parseStructOptionString( Structure& st, const std::string& opt)
+//\class SerializeState
+//\brief State stack element for an iterator on a structure (serializer)
+class SerializeState
 {
-	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
-}
+public:
+	typedef bool (*Fetch)( Context& ctx, std::vector<SerializeState>& stk);
 
-types::PropertyTree::Node structOptionTree( const std::string& opt);
+public:
+	SerializeState( const SerializeState& o);
 
-}}
+	SerializeState( const char* name_, Fetch p, const void* v);
+
+	const void* value() const			{return m_value;}
+	const char* name() const			{return m_name;}
+	Fetch fetch() const				{return m_fetch;}
+	std::size_t state() const			{return m_stateidx;}
+	void state( std::size_t idx)			{m_stateidx = idx;}
+
+private:
+	Fetch m_fetch;
+	const void* m_value;
+	const char* m_name;
+	std::size_t m_stateidx;
+};
+
+//\brief State stack for an iterator on a structure (serializer)
+typedef std::vector<SerializeState> SerializeStateStack;
+
+}}//namespace
 #endif
-

@@ -29,26 +29,35 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file struct_filtermapSerializeStack.cpp
-///\brief Implements the parsing stack for deserialization
+///\file serialize/struct/intrusiveProperty.hpp
+///\brief Defines the intrusive implementation of some parsing element properties
+#ifndef _Wolframe_SERIALIZE_STRUCT_PROPERTY_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_PROPERTY_HPP_INCLUDED
+#include "serialize/struct/traits_getCategory.hpp"
 
-#include "serialize/struct/filtermapSerializeStack.hpp"
+namespace _Wolframe {
+namespace serialize {
 
-using namespace _Wolframe;
-using namespace _Wolframe::serialize;
+//\class IntrusiveProperty
+//\brief Maps the traits based on structure element type properties to an enumeration value
+template <typename T>
+struct IntrusiveProperty
+{
+private:
+	static StructDescriptionBase::ElementType type_( const traits::struct_&)
+		{return StructDescriptionBase::Struct;}
+	static StructDescriptionBase::ElementType type_( const traits::vector_&)
+		{return StructDescriptionBase::Vector;}
+	static StructDescriptionBase::ElementType type_( const traits::atomic_&)
+		{return StructDescriptionBase::Atomic;}
+public:
+	static StructDescriptionBase::ElementType type()
+	{
+		const T* obj = 0;
+		return type_( traits::getCategory(*obj));
+	}
+};
 
-FiltermapSerializeState::FiltermapSerializeState( const FiltermapSerializeState& o)
-	:m_fetch(o.m_fetch)
-	,m_value(o.m_value)
-	,m_name(o.m_name)
-	,m_stateidx(o.m_stateidx)
-	{}
-
-FiltermapSerializeState::FiltermapSerializeState( const char* name_, Fetch p, const void* v)
-	:m_fetch(p)
-	,m_value(v)
-	,m_name(name_)
-	,m_stateidx(0)
-	{}
-
+}}//namespace
+#endif
 

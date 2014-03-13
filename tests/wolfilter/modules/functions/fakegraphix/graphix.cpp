@@ -34,7 +34,7 @@
 ///\brief Fake implementation of graphix functions for testing
 
 #include "graphix.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <string>
 #include <vector>
 #include <sstream>

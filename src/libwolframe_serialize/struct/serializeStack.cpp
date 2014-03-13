@@ -29,45 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLParse.hpp
-///\brief Defines the DDL structure deserialization for filters
+///\file struct/serializeStack.cpp
+///\brief Implements the parsing stack for deserialization
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include "serialize/ddl/filtermapDDLParseStack.hpp"
-#include "types/variantStruct.hpp"
-#include "types/variantStructDescription.hpp"
-#include <cstddef>
+#include "serialize/struct/serializeStack.hpp"
 
-namespace _Wolframe {
-namespace serialize {
+using namespace _Wolframe;
+using namespace _Wolframe::serialize;
 
-//\class DDLStructParser
-//\brief Initializer of a DDL structure from an iterator (serialization)
-class DDLStructParser
-{
-public:
-	DDLStructParser(){}
-	explicit DDLStructParser( types::VariantStruct* st);
+SerializeState::SerializeState( const SerializeState& o)
+	:m_fetch(o.m_fetch)
+	,m_value(o.m_value)
+	,m_name(o.m_name)
+	,m_stateidx(o.m_stateidx)
+	{}
 
-	DDLStructParser( const DDLStructParser& o);
-	virtual ~DDLStructParser(){}
+SerializeState::SerializeState( const char* name_, Fetch p, const void* v)
+	:m_fetch(p)
+	,m_value(v)
+	,m_name(name_)
+	,m_stateidx(0)
+	{}
 
-	DDLStructParser& operator=( const DDLStructParser& o);
-
-	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
-
-	bool call();
-
-private:
-	types::VariantStruct* m_st;
-	Context m_ctx;
-	langbind::TypedInputFilterR m_inp;
-	FiltermapDDLParseStateStack m_stk;
-};
-
-}}//namespace
-#endif
 

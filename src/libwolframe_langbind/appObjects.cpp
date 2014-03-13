@@ -32,8 +32,8 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief Implementation of scripting language objects
 #include "langbind/appObjects.hpp"
-#include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/ddl/ddlStructParser.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
 #include "filter/filter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"

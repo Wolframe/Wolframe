@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_ddl_filtermapParse.cpp
+///\file ddl/structParser.cpp
 
-#include "serialize/ddl/filtermapDDLParse.hpp"
+#include "serialize/ddl/ddlStructParser.hpp"
 #include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/bignumber.hpp"
@@ -60,10 +60,10 @@ static bool emptycontent( const types::VariantConst& val)
 	return true;
 }
 
-static std::string getElementPath( const FiltermapDDLParseStateStack& stk)
+static std::string getElementPath( const DDLParseStateStack& stk)
 {
 	std::string rt;
-	FiltermapDDLParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	DDLParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
 		if (itr->name())
@@ -76,7 +76,7 @@ static std::string getElementPath( const FiltermapDDLParseStateStack& stk)
 }
 
 // forward declarations
-static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk);
+static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<DDLParseState>& stk);
 
 enum AtomicValueState
 {
@@ -106,7 +106,7 @@ static void setAtomValue( types::Variant& val, const types::VariantConst& elemen
 	}
 }
 
-static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
+static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Context&, std::vector<DDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	types::VariantConst element;
@@ -157,7 +157,7 @@ static bool parseAtom( types::Variant& val, langbind::TypedInputFilter& inp, Con
 	throw SerializationErrorException( "illegal state in parse DDL form atomic value", getElementPath( stk));
 }
 
-static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
+static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& inp, Context& ctx, std::vector<DDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	types::VariantConst element;
@@ -206,7 +206,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
-			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
+			stk.push_back( DDLParseState( ei->name, elem, ei->normalizer));
 			if (elem->atomic())
 			{
 				stk.back().state( TagValueOpen);
@@ -247,7 +247,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				throw SerializationErrorException( "duplicate structure attribute definition", element.tostring(), getElementPath( stk));
 			}
 			elem->setInitialized();
-			stk.push_back( FiltermapDDLParseState( ei->name, elem, ei->normalizer));
+			stk.push_back( DDLParseState( ei->name, elem, ei->normalizer));
 			stk.back().state( AttributeValueOpen);
 			return true;
 		}
@@ -331,7 +331,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 }
 
 
-static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
+static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<DDLParseState>& stk)
 {
 	types::VariantStruct* elem = stk.back().value();
 	switch (elem->type())
@@ -373,7 +373,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 			velem->setInitialized();
 			const char* velemname = stk.back().name();
 			stk.pop_back();
-			stk.push_back( FiltermapDDLParseState( velemname, velem, stk.back().normalizer()));
+			stk.push_back( DDLParseState( velemname, velem, stk.back().normalizer()));
 			return true;
 		}
 	}
@@ -383,7 +383,7 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 DDLStructParser::DDLStructParser( types::VariantStruct* st)
 	:m_st(st)
 {
-	m_stk.push_back( FiltermapDDLParseState( 0, st, 0));
+	m_stk.push_back( DDLParseState( 0, st, 0));
 }
 
 DDLStructParser::DDLStructParser( const DDLStructParser& o)
@@ -416,7 +416,7 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 		m_ctx.unsetFlags( Context::ValidateAttributes);
 	}
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLParseState( 0, m_st, 0));
+	m_stk.push_back( DDLParseState( 0, m_st, 0));
 	LOG_DATA << "[DDL structure serialization parse] init structure" << "[" << (m_st->description()?m_st->description()->tostring():m_st->tostring()) << "]";
 }
 

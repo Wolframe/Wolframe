@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParseValue.hpp
+///\file serialize/struct/parseValue.hpp
 ///\brief Defines the intrusive parsing of a value in deserialization
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_PARSE_VALUE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_PARSE_VALUE_HPP_INCLUDED
 #include "types/conversions.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"

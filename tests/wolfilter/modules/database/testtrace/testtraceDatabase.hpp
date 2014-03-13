@@ -36,7 +36,7 @@
 #define _TESTTRACE_FAKE_DATABASE_HPP_INCLUDED
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "module/constructor.hpp"
 #include <list>
 #include <string>

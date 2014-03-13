@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file employee_assignment_convert.cpp
 ///\brief Implementation wolfilter test plugin function
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "employee_assignment_convert_exec.hpp"
 #include <string>
 #include <vector>
