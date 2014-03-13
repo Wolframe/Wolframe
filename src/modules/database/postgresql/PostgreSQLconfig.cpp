@@ -38,7 +38,7 @@
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "utils/fileUtils.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

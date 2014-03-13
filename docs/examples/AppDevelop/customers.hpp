@@ -1,5 +1,5 @@
 
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include <string>
 
 namespace _Wolframe {

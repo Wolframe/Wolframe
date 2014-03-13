@@ -37,7 +37,7 @@
 #include "Oracle.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
