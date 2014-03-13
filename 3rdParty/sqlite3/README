@@ -1,5 +1,2 @@
 Embedded Sqlite3 (Amalgamation). Mainly used on Windows.
-This is version 3.7.14.1 of Sqlite3.
-
-Local patches:
-* no definition of _XOPEN_SOURCE in sqlite.c on SUNOS
+This is version 3.8.4.1 of Sqlite3.
