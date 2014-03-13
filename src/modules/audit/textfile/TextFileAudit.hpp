@@ -66,6 +66,7 @@ public:
 private:
 	bool		m_required;
 	std::string	m_file;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
