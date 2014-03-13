@@ -84,6 +84,12 @@ std::string readSourceFileContent( const std::string& filename);
 ///\brief Reading the content of a source file as property tree (with property tree syntax)
 ///\remark Throws on error
 types::PropertyTree readPropertyTreeFile( const std::string& filename);
+///\brief Reading the content of an XML source file as property tree (with property tree syntax)
+///\remark Throws on error
+types::PropertyTree readXmlPropertyTreeFile( const std::string& filename);
+///\brief Reading the content of an Info format source file as property tree (with property tree syntax)
+///\remark Throws on error
+types::PropertyTree readInfoPropertyTreeFile( const std::string& filename);
 
 ///\brief Writing a file
 ///\remark Throws on error

@@ -44,6 +44,7 @@ namespace utils {
 
 ///\class CharTable
 ///\brief Character table structure for parseNextToken( std::string&,std::string::const_iterator&, std::string::const_iterator, ...);
+//\remark A range of characters is specified with 2 dots between the first and the last character of the range (e.g. "a..z")
 class CharTable
 {
 public:

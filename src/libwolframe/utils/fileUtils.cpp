@@ -41,8 +41,6 @@ Project Wolframe.
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/thread/thread.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -501,14 +499,33 @@ FileType utils::getFileType( const std::string& filename)
 	return rt;
 }
 
+types::PropertyTree utils::readXmlPropertyTreeFile( const std::string& filename)
+{
+	namespace opt = boost::property_tree::xml_parser;
+	boost::property_tree::ptree xmlpt;
+	read_xml( filename, xmlpt, opt::no_comments | opt::trim_whitespace);
+	boost::property_tree::ptree rootpt;
 
-static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& filename, const std::vector<std::string>& filenamestack=std::vector<std::string>())
+	for ( boost::property_tree::ptree::const_iterator it = xmlpt.begin(); it != xmlpt.end(); it++)
+	{
+		if (it->first != "<xmlcomment>")
+		{
+			rootpt = it->second;
+			break;
+		}
+	}
+	return types::PropertyTree( rootpt, filename);
+}
+
+static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& filename, const std::vector<std::string>& filenamestack)
 {
 	static const char* g_keywords[] = {"include",0};
 	enum Keyword{ kw_NONE,kw_INCLUDE };
 	static const utils::IdentifierTable g_keywords_tab( false, g_keywords);
 	
 	static const utils::CharTable ptOpTab( "{}./\\;,*:?!#&()[]$^~=%@+-");
+	static const utils::CharTable filenameOpTab( "{}");
+	static const utils::CharTable filenameAlphaTab( "a..zA..Z0..9_./\\:~=@+-");
 	types::PropertyTree::Node node;
 	std::string content( readSourceFileContent( filename));
 	typedef std::pair<std::string,types::PropertyTree::Node> StackElem;
@@ -599,10 +616,10 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 							case kw_INCLUDE:
 							{
 								if (stk.size() != 1) throw std::runtime_error( "'.include' only allowed on highest level of structure hierarchy (not in substructure)");
-								ch = utils::parseNextToken( tok, ci, ce);
+								ch = utils::parseNextToken( tok, ci, ce, filenameOpTab, filenameAlphaTab);
 								if (!ch) throw std::runtime_error( "unexpected end of file");
 								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
-								types::PropertyTree::Node subnode = readInfoPropertyTreeFile( getCanonicalPath( tok, includepath), filenamestack2);
+								types::PropertyTree::Node subnode = readInfoPropertyTreeFile_( getCanonicalPath( tok, includepath), filenamestack2);
 								types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
 
 								for (; ni != ne; ++ni)
@@ -702,6 +719,12 @@ static types::PropertyTree::Node readInfoPropertyTreeFile( const std::string& fi
 	}
 }
 
+types::PropertyTree utils::readInfoPropertyTreeFile( const std::string& filename)
+{
+	std::vector<std::string> filenamestack;
+	return types::PropertyTree( readInfoPropertyTreeFile_( filename, filenamestack));
+}
+
 types::PropertyTree utils::readPropertyTreeFile( const std::string& filename)
 {
 	FileType filetype = getFileType( filename);
@@ -711,23 +734,12 @@ types::PropertyTree utils::readPropertyTreeFile( const std::string& filename)
 	{
 		case FileType::XML:
 		{
-			if (filetype.encoding == FileType::Undefined)
-			{
-				throw std::runtime_error( std::string( "cannot handle encoding of file as XML file '") + filename + "' (encoding is unknown)");
-			}
-			namespace opt = boost::property_tree::xml_parser;
-			boost::property_tree::ptree xmlpt;
-			read_xml( filename, xmlpt, opt::no_comments | opt::trim_whitespace);
-			rt = types::PropertyTree( xmlpt, filename);
+			rt = readXmlPropertyTreeFile( filename);
 			break;
 		}
 		case FileType::Info:
 		{
-			if (filetype.encoding == FileType::Undefined)
-			{
-				throw std::runtime_error( std::string( "cannot handle encoding of file as info file '") + filename + "' (encoding is unknown)");
-			}
-			rt = types::PropertyTree( readInfoPropertyTreeFile( filename));
+			rt = readInfoPropertyTreeFile( filename);
 			break;
 		}
 		case FileType::Unknown:

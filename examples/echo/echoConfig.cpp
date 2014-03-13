@@ -38,12 +38,8 @@
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "logger-v1.hpp"
-
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <ostream>
-
 
 static const unsigned short DEFAULT_TIMEOUT = 180;
 

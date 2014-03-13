@@ -33,6 +33,7 @@
 //\file types/propertyTree.cpp
 //\brief Implementation of a key value tree based on boost::property_tree::ptree with position info for better error reporting
 #include "types/propertyTree.hpp"
+#include "utils/printFormats.hpp"
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
@@ -74,4 +75,40 @@ void PropertyTree::Node::recursiveSetFileName( Parent& pt, const FileName& filen
 	}
 	pt.data().position.setFileName( filename);
 }
+
+std::string PropertyTree::Node::tostring( const utils::PrintFormat* pformat) const
+{
+	std::ostringstream out;
+	print( out, *this, 0, pformat);
+	return out.str();
+}
+
+void PropertyTree::Node::print( std::ostringstream& out, const Node& nd, int indent, const utils::PrintFormat* pformat)
+{
+	std::string indentstr;
+	for (int ii=0; ii<indent; ++ii) indentstr.append( pformat->indent);
+	for (Node::const_iterator ni=nd.begin(), ne=nd.end(); ni != ne; ++ni)
+	{
+		if (!ni->second.data().empty())
+		{
+			out << pformat->newitem << indentstr
+				<< ni->first << pformat->assign
+				<< pformat->startvalue << ni->second.data().string() << pformat->endvalue; 
+		}
+		else
+		{
+			out << indentstr << ni->first << pformat->openstruct;
+			if (ni->second.begin() == ni->second.end())
+			{
+				out << pformat->closestruct;
+			}
+			else
+			{
+				print( out, ni->second, indent+1);
+				out << pformat->newitem << indentstr << pformat->closestruct;
+			}
+		}
+	}
+}
+
 

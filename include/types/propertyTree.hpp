@@ -39,11 +39,16 @@
 #include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <iostream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
+namespace utils {
+	struct PrintFormat;
+}
 namespace types {
 
 class PropertyTree
@@ -134,7 +139,11 @@ public:
 			recursiveSetFileName( *this, filename);
 		}
 
+		std::string tostring( const utils::PrintFormat* pformat=0) const;
+
 	private:
+		static void print( std::ostringstream& out, const Node& nd, int indent, const utils::PrintFormat* pformat=0);
+
 		static void recursiveSetFileName( Parent& pt, const FileName& filename);
 	};
 

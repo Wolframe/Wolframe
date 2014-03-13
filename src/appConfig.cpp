@@ -45,12 +45,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 #include <boost/algorithm/string.hpp>
-
 #include <string>
 #include <ostream>
 #include <stdexcept>
@@ -183,29 +178,33 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
-	// Create an empty property tree object
-	boost::property_tree::ptree	pt;
 	try	{
-		switch ( type )	{
-			case CONFIG_INFO:
-				read_info( configFile, pt );
-				break;
-			case CONFIG_XML:
-				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
-					  boost::property_tree::xml_parser::trim_whitespace );
-				pt = pt.get_child( "configuration" );
-				break;
-			case CONFIG_UNDEFINED:
-				throw std::logic_error( "undefined configuration file type" );
+		types::PropertyTree pt;
+		bool isXML = false;
+
+		if (type == CONFIG_INFO)
+		{
+			pt = utils::readInfoPropertyTreeFile( configFile);
 		}
+		else if (type == CONFIG_XML)
+		{
+			isXML = true;
+			pt = utils::readXmlPropertyTreeFile( configFile);
+		}
+		else
+		{
+			isXML = (utils::getFileType( configFile).format == utils::FileType::XML);
+			pt = utils::readPropertyTreeFile( configFile);
+		}
+		types::PropertyTree::Node ptnode = pt.root();
 
 		bool retVal = true;
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+		for ( types::PropertyTree::Node::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Parse list of modules : parsing root element '" << it->first << "'";
-			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+			if ( isXML && it->first == "<xmlcomment>" )
 				continue;
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))	{
-				for ( boost::property_tree::ptree::const_iterator L2it = it->second.begin();
+				for ( types::PropertyTree::Node::const_iterator L2it = it->second.begin();
 										L2it != it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "module" ))	{
 						std::string modFile;
@@ -291,27 +290,30 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 {
 	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
+	types::PropertyTree pt;
 
-	// Create an empty property tree object
-	boost::property_tree::ptree	pt;
 	try	{
-		switch ( type )	{
-			case CONFIG_INFO:
-				read_info( configFile, pt );
-				break;
-			case CONFIG_XML:
-				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
-					  boost::property_tree::xml_parser::trim_whitespace );
-				pt = pt.get_child( "configuration" );
-				break;
-			case CONFIG_UNDEFINED:
-				throw std::logic_error( "undefined configuration file type" );
+		bool isXML = false;
+		if (type == CONFIG_INFO)
+		{
+			pt = utils::readInfoPropertyTreeFile( configFile);
 		}
+		else if (type == CONFIG_XML)
+		{
+			isXML = true;
+			pt = utils::readXmlPropertyTreeFile( configFile);
+		}
+		else
+		{
+			isXML = (utils::getFileType( configFile).format == utils::FileType::XML);
+			pt = utils::readPropertyTreeFile( configFile);
+		}
+		types::PropertyTree::Node ptnode = pt.root();
 
 		bool retVal = true;
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+		for ( types::PropertyTree::Node::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
-			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+			if ( isXML && it->first == "<xmlcomment>" )
 				continue;
 			// skip modules to load
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))
