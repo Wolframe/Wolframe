@@ -37,6 +37,7 @@
 #include "SQLite.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -46,75 +47,49 @@
 namespace _Wolframe {
 namespace db {
 
-static const unsigned short DEFAULT_SQLITE_CONNECTIONS = 3;
+enum {DEFAULT_SQLITE_CONNECTIONS = 3};
+
+SQLiteConfigStruct::SQLiteConfigStruct()
+	:m_foreignKeys(true)
+	,m_profiling(false)
+	,m_connections(DEFAULT_SQLITE_CONNECTIONS)
+{}
+
+const serialize::StructDescriptionBase* SQLiteConfigStruct::getStructDescription()
+{
+	struct ThisDescription :public serialize::StructDescription<SQLiteConfigStruct>
+	{
+	ThisDescription()
+	{
+		(*this)
+		( "identifier", &SQLiteConfigStruct::m_ID)			.mandatory()
+		( "file", &SQLiteConfigStruct::m_filename)			.mandatory()
+		( "foreignKeys", &SQLiteConfigStruct::m_foreignKeys)		.optional()
+		( "profiling", &SQLiteConfigStruct::m_profiling)		.optional()
+		( "connections", &SQLiteConfigStruct::m_connections)		.optional()
+		( "program", &SQLiteConfigStruct::m_programFiles )
+		( "extension", &SQLiteConfigStruct::m_extensionFiles )
+		;
+	}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
 
 bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			  const module::ModulesDirectory* /*modules*/ )
 {
-	using namespace _Wolframe::config;
-	bool fkDefined = false;
-	bool profilingDefined = false;
-	bool connDefined = false;
-	bool retVal = true;
-
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !m_ID.empty() );
-			std::string id;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
-				retVal = false;
-			else
-				m_ID = id;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
-			  boost::algorithm::iequals( L1it->first, "filename" ))	{
-			bool isDefined = ( !m_filename.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_filename, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "foreignKeys" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_foreignKeys,
-						Parser::BoolDomain(), &fkDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "profiling" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_profiling,
-						Parser::BoolDomain(), &profilingDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_connections,
-						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "program" ))	{
-			std::string programFile;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
-				retVal = false;
-			else	{
-				m_programFiles.push_back( programFile );
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "extension" ))	{
-			std::string extensionFile;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, extensionFile ))
-				retVal = false;
-			else	{
-				m_extensionFiles.push_back( extensionFile );
-			}
-		}
-		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "'";
-		}
+	try
+	{
+		config::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
+		m_config_pos = pt.data().position;
+		return true;
 	}
-	if ( ! connDefined )
-		m_connections = DEFAULT_SQLITE_CONNECTIONS;
-	if ( ! fkDefined )
-		m_foreignKeys = true;
-	if ( ! profilingDefined )
-		m_profiling = false;
-	return retVal;
+	catch (const std::runtime_error& e)
+	{
+		LOG_FATAL << logPrefix() << e.what();
+		return false;
+	}
 }
 
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
@@ -136,7 +111,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	else if ( m_programFiles.size() == 1 )
 		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
-		std::list< std::string >::const_iterator it = m_programFiles.begin();
+		std::vector< std::string >::const_iterator it = m_programFiles.begin();
 		os << indStr << "   Program files: " << *it++ << std::endl;
 		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;
@@ -146,7 +121,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 bool SQLiteConfig::check() const
 {
 	if ( m_filename.empty() )	{
-		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
+		LOG_ERROR << logPrefix() << " " << m_config_pos.logtext() << ": SQLite database filename cannot be empty";
 		return false;
 	}
 	return true;
@@ -162,7 +137,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );

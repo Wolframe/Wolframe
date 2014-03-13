@@ -67,22 +67,22 @@ struct PostgreSQLconfigStruct
 {
 	PostgreSQLconfigStruct();
 
-	std::string	m_ID;			///< database identifier
-	std::string	m_host;			///< server host
-	unsigned short	m_port;			///< server port
-	std::string	m_dbName;		///< database name on server
-	std::string	m_user;			///< database user
-	std::string	m_password;		///< and password
-	std::string	sslMode;		///< SSL connection mode
-	std::string	sslCert;		///< client SSL certificate file
-	std::string	sslKey;			///< client SSL key file
-	std::string	sslRootCert;		///< root SSL certificate file
-	std::string	sslCRL;			///< SSL certificate revocation list
-	unsigned short	connectTimeout;		///< connection timeout
-	unsigned short	connections;		///< number of database connection (pool size)
-	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	///< default timeout when executin a statement
-	std::vector< std::string > m_programFiles;///< list of program files
+	std::string	m_ID;			 //< database identifier
+	std::string	m_host;			 //< server host
+	unsigned short	m_port;			 //< server port
+	std::string	m_dbName;		 //< database name on server
+	std::string	m_user;			 //< database user
+	std::string	m_password;		 //< and password
+	std::string	sslMode;		 //< SSL connection mode
+	std::string	sslCert;		 //< client SSL certificate file
+	std::string	sslKey;			 //< client SSL key file
+	std::string	sslRootCert;		 //< root SSL certificate file
+	std::string	sslCRL;			 //< SSL certificate revocation list
+	unsigned short	connectTimeout;		 //< connection timeout
+	unsigned short	connections;		 //< number of database connection (pool size)
+	unsigned short	acquireTimeout;		 //< timeout when acquiring a connection from the pool
+	unsigned	statementTimeout;	 //< default timeout when executin a statement
+	std::vector< std::string > m_programFiles; //< list of program files
 
 	//\brief Structure description for serialization/parsing
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -116,6 +116,7 @@ public:
 private:
 	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
 	bool mapValueDomains();
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
@@ -158,7 +159,7 @@ public:
 	}
 
 private:
-	PostgreSQLdbUnit*	m_unit;		///< parent database unit
+	PostgreSQLdbUnit*	m_unit;		 //< parent database unit
 };
 
 

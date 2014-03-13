@@ -108,7 +108,7 @@ public:
 		typedef boost::property_tree::basic_ptree<std::string, Value> Parent;
 
 	public:
-		Node( const Position& pos=Position())
+		explicit Node( const Position& pos=Position())
 		{
 			data().position = pos;
 		}
@@ -119,10 +119,10 @@ public:
 			data().position = pos;
 		}
 
-		Node( const std::string& val, const Position& pos=Position())
+		explicit Node( const std::string& val, const Position& pos=Position())
 			:Parent( Value( val, pos)){}
 
-		Node( const boost::property_tree::ptree& pt);
+		explicit Node( const boost::property_tree::ptree& pt);
 
 		void setValue( const std::string& val)
 		{

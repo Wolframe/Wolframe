@@ -146,18 +146,45 @@ static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const type
 				return getBool( val, boost::numeric_cast<ValueType>( element.touint()));
 
 			case types::Variant::String:
-				if (element.charsize() == 4 && std::memcmp( element.charptr(), "true", 4) == 0)
+			{
+				const char* cc = element.charptr();
+				std::size_t ccsize = element.charsize();
+
+				if (ccsize == 4 && boost::algorithm::iequals( cc, "true") == 0)
 				{
 					val = true;
 					return true;
 				}
-				if (element.charsize() == 5 && std::memcmp( element.charptr(), "false", 5) == 0)
+				if (ccsize == 5 && boost::algorithm::iequals( cc, "false") == 0)
 				{
 					val = false;
 					return true;
 				}
+				if (ccsize == 3 && boost::algorithm::iequals( cc, "yes") == 0)
+				{
+					val = true;
+					return true;
+				}
+				if (ccsize == 2 && boost::algorithm::iequals( cc, "no") == 0)
+				{
+					val = false;
+					return true;
+				}
+				if (ccsize == 1)
+				{
+					if ((cc[0]|32) == 't' || (cc[0]|32) == 'y')
+					{
+						val = true;
+						return true;
+					}
+					if ((cc[0]|32) == 'f' || (cc[0]|32) == 'n')
+					{
+						val = false;
+						return true;
+					}
+				}
 				return false;
-
+			}
 			case types::Variant::BigNumber:
 				throw std::runtime_error( "cannot convert big number type to boolean value");
 			case types::Variant::Timestamp:

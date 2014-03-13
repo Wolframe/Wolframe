@@ -53,8 +53,8 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			    bool foreignKeys, bool profiling,
 			    unsigned short connections,
-			    const std::list<std::string>& programFiles_,
-			    const std::list<std::string>& extensionFiles_)
+			    const std::vector<std::string>& programFiles_,
+			    const std::vector<std::string>& extensionFiles_)
 	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_),
 	m_extensionFiles(extensionFiles_)
 {
@@ -123,7 +123,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				sqlite3_profile( handle, profiling_callback, NULL );
 
 			// enable extensions in every connection
-			std::list<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
+			std::vector<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
 			for( ; it != end; it++ ) {
 				LOG_DEBUG << "Loading extension '" << *it << "' for SQLite database unit '" << m_ID << "'";
 				// No extension file, do nothing
@@ -193,7 +193,7 @@ void SQLiteDBunit::loadProgram( const std::string& filename )
 
 void SQLiteDBunit::loadAllPrograms()
 {
-	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
+	std::vector<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
 		LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";

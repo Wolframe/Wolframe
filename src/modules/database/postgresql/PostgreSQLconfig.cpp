@@ -43,9 +43,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-static const unsigned short DEFAULT_POSTGRESQL_CONNECTIONS = 4;
-static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;
-static const unsigned short DEFAULT_STATEMENT_TIMEOUT = 30000;
+enum {
+	DEFAULT_POSTGRESQL_CONNECTIONS = 4,
+	DEFAULT_CONNECTION_TIMEOUT = 30,
+	DEFAULT_STATEMENT_TIMEOUT = 30000
+};
 
 namespace _Wolframe {
 namespace db {
@@ -65,22 +67,22 @@ const serialize::StructDescriptionBase* PostgreSQLconfigStruct::getStructDescrip
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &PostgreSQLconfig::m_ID)			.mandatory()
-		( "host", &PostgreSQLconfig::m_host )				.optional()
-		( "port", &PostgreSQLconfig::m_port )				.optional()
-		( "database", &PostgreSQLconfig::m_dbName )			.optional()
-		( "user", &PostgreSQLconfig::m_user )				.optional()
-		( "password", &PostgreSQLconfig::m_password )			.optional()
-		( "sslMode", &PostgreSQLconfig::sslMode )			.optional()
-		( "sslCert", &PostgreSQLconfig::sslCert )			.optional()
-		( "sslKey", &PostgreSQLconfig::sslKey )				.optional()
-		( "sslRootCert", &PostgreSQLconfig::sslRootCert	)		.optional()
-		( "sslCRL", &PostgreSQLconfig::sslCRL )				.optional()
-		( "connectionTimeout", &PostgreSQLconfig::connectTimeout )	.optional()
-		( "connections", &PostgreSQLconfig::connections )		.optional()
-		( "acquireTimeout", &PostgreSQLconfig::acquireTimeout )		.optional()
-		( "statementTimeout", &PostgreSQLconfig::statementTimeout )	.optional()
-		( "program", &PostgreSQLconfig::m_programFiles )		.optional()
+		( "identifier", &PostgreSQLconfigStruct::m_ID)			.mandatory()
+		( "host", &PostgreSQLconfigStruct::m_host )			.optional()
+		( "port", &PostgreSQLconfigStruct::m_port )			.optional()
+		( "database", &PostgreSQLconfigStruct::m_dbName )		.optional()
+		( "user", &PostgreSQLconfigStruct::m_user )			.optional()
+		( "password", &PostgreSQLconfigStruct::m_password )		.optional()
+		( "sslMode", &PostgreSQLconfigStruct::sslMode )			.optional()
+		( "sslCert", &PostgreSQLconfigStruct::sslCert )			.optional()
+		( "sslKey", &PostgreSQLconfigStruct::sslKey )			.optional()
+		( "sslRootCert", &PostgreSQLconfigStruct::sslRootCert	)	.optional()
+		( "sslCRL", &PostgreSQLconfigStruct::sslCRL )			.optional()
+		( "connectionTimeout", &PostgreSQLconfigStruct::connectTimeout ).optional()
+		( "connections", &PostgreSQLconfigStruct::connections )		.optional()
+		( "acquireTimeout", &PostgreSQLconfigStruct::acquireTimeout )	.optional()
+		( "statementTimeout", &PostgreSQLconfigStruct::statementTimeout ).optional()
+		( "program", &PostgreSQLconfigStruct::m_programFiles )
 		;
 	}
 	};
@@ -98,7 +100,7 @@ bool PostgreSQLconfig::mapValueDomains()
 	bool retVal = true;
 	if (m_port == 0)
 	{
-		LOG_FATAL << logPrefix() << "port must be defined as a non zero non negative number";
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": port must be defined as a non zero non negative number";
 		retVal = false;
 	}
 	if (!sslMode.empty())
@@ -116,21 +118,21 @@ bool PostgreSQLconfig::mapValueDomains()
 		else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
 			sslMode = "verify-full";
 		else	{
-			LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
+			LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": unknown SSL mode: '" << sslMode << "'";
 			retVal = false;
 		}
 	}
 	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << "SSL certificate configured but no SSL key specified";
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL certificate configured but no SSL key specified";
 		retVal = false;
 	}
 	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << "SSL key configured but no SSL certificate specified";
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL key configured but no SSL certificate specified";
 		retVal = false;
 	}
 	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
 	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
-		LOG_FATAL << logPrefix() << "server SSL certificate requested but no root CA specified";
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": server SSL certificate requested but no root CA specified";
 		retVal = false;
 	}
 	if ( sslMode.empty())
@@ -143,7 +145,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::st
 {
 	try
 	{
-		config::parseConfigStructure( *this, pt);
+		config::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
+		m_config_pos = pt.data().position;
 		return mapValueDomains();
 	}
 	catch (const std::runtime_error& e)
@@ -254,7 +257,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 bool PostgreSQLconfig::check() const
 {
 	if ( connections == 0 )	{
-		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+		LOG_ERROR << logPrefix() << " " << m_config_pos.logtext() << ": number of database connections cannot be 0";
 		return false;
 	}
 	return true;
