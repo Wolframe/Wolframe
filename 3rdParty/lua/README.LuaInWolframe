@@ -1,14 +1,16 @@
-Lua 5.2 Vanilla, unpatched
+Lua 5.2.3 vanilla, unpatched
 
-Makefile has been renamed to 'Makefile.orig'.
+* Makefile has been renamed to 'Makefile.orig'.
 
-'GNUmakefile' and 'Makefile.w32' are added for the
-Wolframe project.
+* 'GNUmakefile' and 'Makefile.w32' are added for the
+  Wolframe project.
 
-The CFLAGS should be the same as in the original Makefile.
+* The CFLAGS should be the same as in the original Makefile.
 
-The define switch for creating DLLs is called 'BUILD_SHARED' in
-Wolframe. We use it in 'luaconf.h' to trigger the correct
-DLL function markers as in:
+* The define switch for creating DLLs is called 'BUILD_SHARED' in
+  Wolframe. We use it in 'luaconf.h' to trigger the correct
+  DLL function markers as in:
 
-#if defined(LUA_BUILD_AS_DLL) || defined(BUILD_SHARED)	/* { */
+  #if defined(LUA_BUILD_AS_DLL) || defined(BUILD_SHARED)	/* { */
+
+* removed the 'doc' directory as it contains the official web page of Lua
