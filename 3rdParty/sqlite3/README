@@ -1,2 +1,10 @@
 Embedded Sqlite3 (Amalgamation). Mainly used on Windows.
 This is version 3.8.4.1 of Sqlite3.
+
+Local changes:
+
+ * Don't define _XOPEN_SOURCE on Solaris in sqlite3.c:
+
+   #if !defined(_XOPEN_SOURCE) && !defined(__DARWIN__) && !defined(__APPLE__) && !defined(__sun)
+   #  define _XOPEN_SOURCE 600
+   #endif
