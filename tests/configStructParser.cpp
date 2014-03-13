@@ -34,7 +34,7 @@ Project Wolframe.
 
 #include "config/structSerialize.hpp"
 #include "utils/fileUtils.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
 #include "logger/logLevel.hpp"

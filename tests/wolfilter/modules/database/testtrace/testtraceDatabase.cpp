@@ -36,7 +36,7 @@
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
 #include "config/programBase.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/stringUtils.hpp"

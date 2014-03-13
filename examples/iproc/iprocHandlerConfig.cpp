@@ -38,7 +38,7 @@
 #include "logger-v1.hpp"
 #include "langbind/appObjects.hpp"
 #include "config/structSerialize.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 

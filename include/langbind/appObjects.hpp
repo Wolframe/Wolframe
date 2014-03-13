@@ -40,9 +40,10 @@ Project Wolframe.
 #include "types/form.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "serialize/struct/filtermapBase.hpp"
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
-#include "serialize/ddl/filtermapDDLParse.hpp"
+#include "serialize/struct/structSerializer.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
+#include "serialize/ddl/ddlStructParser.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>

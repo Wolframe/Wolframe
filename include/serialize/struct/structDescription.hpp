@@ -29,16 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapDescription.hpp
+///\file serialize/struct/structDescription.hpp
 ///\brief Defines the bricks for the SDK to describe serialization/deserialization of objects in Wolframe.
 ///\remark This module uses intrusive building blocks to build the serialization/deserialization of the objects interfaced as TypedInputFilter/TypedOutputFilter.
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
-#include "serialize/struct/filtermapTraits.hpp"
-#include "serialize/struct/filtermapParse.hpp"
-#include "serialize/struct/filtermapSerialize.hpp"
-#include "serialize/struct/filtermapProperty.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_HPP_INCLUDED
+#include "serialize/struct/structDescriptionBase.hpp"
+#include "serialize/struct/traits_getCategory.hpp"
+#include "serialize/struct/intrusiveParser.hpp"
+#include "serialize/struct/intrusiveSerializer.hpp"
+#include "serialize/struct/intrusiveProperty.hpp"
 #include <exception>
 #include <stdexcept>
 #include <sstream>
@@ -54,7 +54,7 @@ struct StructDescription :public StructDescriptionBase
 {
 	///\brief Constructor
 	StructDescription()
-		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, NoRequirement){}
+		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), IntrusiveProperty<Structure>::type(), &IntrusiveParser<Structure>::parse, &IntrusiveSerializer<Structure>::fetch, NoRequirement){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
@@ -63,9 +63,9 @@ struct StructDescription :public StructDescriptionBase
 	template <typename Element>
 	StructDescription& operator()( const char* tag, Element Structure::*eptr)
 	{
-		StructDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
-		StructDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
-		StructDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
+		StructDescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
+		StructDescriptionBase::Fetch fetch_ = &IntrusiveSerializer<Element>::fetch;
+		StructDescriptionBase::ElementType type_ = IntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		ElementRequirement requirement_ = NoRequirement;
 		if (tag[0]=='?') requirement_ = Optional;
