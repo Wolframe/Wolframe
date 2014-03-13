@@ -38,6 +38,7 @@
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "utils/fileUtils.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -49,123 +50,74 @@ static const unsigned short DEFAULT_STATEMENT_TIMEOUT = 30000;
 namespace _Wolframe {
 namespace db {
 
+PostgreSQLconfigStruct::PostgreSQLconfigStruct()
+	:m_port(0)
+	,connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
+	,connections(DEFAULT_POSTGRESQL_CONNECTIONS)
+	,acquireTimeout(0)
+	,statementTimeout(DEFAULT_STATEMENT_TIMEOUT)
+{}
+
+const serialize::StructDescriptionBase* PostgreSQLconfigStruct::getStructDescription()
+{
+	struct ThisDescription :public serialize::StructDescription<PostgreSQLconfigStruct>
+	{
+	ThisDescription()
+	{
+		(*this)
+		( "identifier", &PostgreSQLconfig::m_ID)			.mandatory()
+		( "host", &PostgreSQLconfig::m_host )				.optional()
+		( "port", &PostgreSQLconfig::m_port )				.optional()
+		( "database", &PostgreSQLconfig::m_dbName )			.optional()
+		( "user", &PostgreSQLconfig::m_user )				.optional()
+		( "password", &PostgreSQLconfig::m_password )			.optional()
+		( "sslMode", &PostgreSQLconfig::sslMode )			.optional()
+		( "sslCert", &PostgreSQLconfig::sslCert )			.optional()
+		( "sslKey", &PostgreSQLconfig::sslKey )				.optional()
+		( "sslRootCert", &PostgreSQLconfig::sslRootCert	)		.optional()
+		( "sslCRL", &PostgreSQLconfig::sslCRL )				.optional()
+		( "connectionTimeout", &PostgreSQLconfig::connectTimeout )	.optional()
+		( "connections", &PostgreSQLconfig::connections )		.optional()
+		( "acquireTimeout", &PostgreSQLconfig::acquireTimeout )		.optional()
+		( "statementTimeout", &PostgreSQLconfig::statementTimeout )	.optional()
+		( "program", &PostgreSQLconfig::m_programFiles )		.optional()
+		;
+	}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 //***  PostgreSQL configuration functions  **********************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
-{
-	m_port = 0;
-	connections = 0;
-	acquireTimeout = 0;
-}
+{}
 
-bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-			      const module::ModulesDirectory* /*modules*/ )
+bool PostgreSQLconfig::mapValueDomains()
 {
-	using namespace _Wolframe::config;
 	bool retVal = true;
-	bool portDefined, connDefined, aTdefined, cTdefined, sTdefined;
-	portDefined = connDefined = aTdefined = cTdefined = sTdefined = false;
-
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !m_ID.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_ID, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !m_host.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_host, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_port,
-						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			bool isDefined = ( !m_dbName.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbName, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !m_user.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_user, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !m_password.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_password, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslMode" ))	{
-			bool isDefined = ( !sslMode.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslMode, &isDefined ))
-				retVal = false;
-			if ( boost::algorithm::iequals( sslMode, "disable" ))
-				sslMode = "disable";
-			else if ( boost::algorithm::iequals( sslMode, "allow" ))
-				sslMode = "allow";
-			else if ( boost::algorithm::iequals( sslMode, "prefer" ))
-				sslMode = "prefer";
-			else if ( boost::algorithm::iequals( sslMode, "require" ))
-				sslMode = "require";
-			else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
-				sslMode = "verify-ca";
-			else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
-				sslMode = "verify-full";
-			else	{
-				LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslCert" ))	{
-			bool isDefined = ( !sslCert.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCert, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslKey" ))	{
-			bool isDefined = ( !sslKey.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslKey, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslRootCert" ))	{
-			bool isDefined = ( !sslRootCert.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslRootCert, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslCRL" ))	{
-			bool isDefined = ( !sslCRL.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCRL, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connectTimeout, &cTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
-						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, acquireTimeout, &aTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "statementTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, statementTimeout, &sTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "program" ))	{
-			std::string programFile;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
-				retVal = false;
-			else	{
-				m_programFiles.push_back( programFile );
-			}
-		}
+	if (m_port == 0)
+	{
+		LOG_FATAL << logPrefix() << "port must be defined as a non zero non negative number";
+		retVal = false;
+	}
+	if (!sslMode.empty())
+	{
+		if ( boost::algorithm::iequals( sslMode, "disable" ))
+			sslMode = "disable";
+		else if ( boost::algorithm::iequals( sslMode, "allow" ))
+			sslMode = "allow";
+		else if ( boost::algorithm::iequals( sslMode, "prefer" ))
+			sslMode = "prefer";
+		else if ( boost::algorithm::iequals( sslMode, "require" ))
+			sslMode = "require";
+		else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
+			sslMode = "verify-ca";
+		else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
+			sslMode = "verify-full";
 		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "'";
+			LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
+			retVal = false;
 		}
 	}
 	if ( !sslCert.empty() && sslKey.empty() )	{
@@ -181,16 +133,24 @@ bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::st
 		LOG_FATAL << logPrefix() << "server SSL certificate requested but no root CA specified";
 		retVal = false;
 	}
-	if ( ! connDefined )
-		connections = DEFAULT_POSTGRESQL_CONNECTIONS;
-	if ( ! cTdefined )
-		connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
-	if ( ! sTdefined )
-		statementTimeout = DEFAULT_STATEMENT_TIMEOUT;
 	if ( sslMode.empty())
 		sslMode = "prefer";
-
 	return retVal;
+}
+
+bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
+			      const module::ModulesDirectory* /*modules*/ )
+{
+	try
+	{
+		config::parseConfigStructure( *this, pt);
+		return mapValueDomains();
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_FATAL << logPrefix() << e.what();
+		return false;
+	}
 }
 
 void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
@@ -228,7 +188,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
@@ -284,7 +244,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	else if ( m_programFiles.size() == 1 )
 		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
-		std::list< std::string >::const_iterator it = m_programFiles.begin();
+		std::vector< std::string >::const_iterator it = m_programFiles.begin();
 		os << indStr << "   Program files: " << *it++ << std::endl;
 		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;

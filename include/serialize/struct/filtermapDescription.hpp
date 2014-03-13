@@ -67,19 +67,29 @@ struct StructDescription :public StructDescriptionBase
 		StructDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
 		StructDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		ElementRequirement requirement_ = NoRequirement;
-		if (tag[0]=='?') requirement_ = Optional;
-		if (tag[0]=='!') requirement_ = Mandatory;
-		const char* name = (requirement_ != NoRequirement)?(tag+1):tag;
 
-		StructDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, requirement_);
-		if (find( name) != end())
+		StructDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, NoRequirement);
+		if (find( tag) != end())
 		{
 			std::ostringstream err;
-			err << "duplicate definition of " << name << " in structure";
+			err << "duplicate definition of " << tag << " in structure";
 			throw std::runtime_error( err.str().c_str());
 		}
-		define( name, e);
+		define( tag, e);
+		return *this;
+	}
+
+	StructDescription& mandatory()
+	{
+		if (last().optional()) throw std::logic_error( "ambiguous mandatory/optional declaration");
+		last().requirement( Mandatory);
+		return *this;
+	}
+
+	StructDescription& optional()
+	{
+		if (last().mandatory()) throw std::logic_error( "ambiguous mandatory/optional declaration");
+		last().requirement( Optional);
 		return *this;
 	}
 
