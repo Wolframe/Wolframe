@@ -37,160 +37,123 @@
 #include "Oracle.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "utils/fileUtils.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-static const unsigned short DEFAULT_ORACLE_CONNECTIONS = 4;
-static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;
-static const unsigned short DEFAULT_STATEMENT_TIMEOUT = 30000;
+enum {
+	DEFAULT_ORACLE_CONNECTIONS = 4,
+	DEFAULT_CONNECTION_TIMEOUT = 30,
+	DEFAULT_STATEMENT_TIMEOUT = 30000
+};
 
 namespace _Wolframe {
 namespace db {
 
+OracleConfigStruct::OracleConfigStruct()
+	:m_port(0)
+	,connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
+	,connections(DEFAULT_ORACLE_CONNECTIONS)
+	,acquireTimeout(0)
+	,statementTimeout(DEFAULT_STATEMENT_TIMEOUT)
+{}
+
+const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription()
+{
+	struct ThisDescription :public serialize::StructDescription<OracleConfigStruct>
+	{
+	ThisDescription()
+	{
+		(*this)
+		( "identifier", &OracleConfigStruct::m_ID)		.mandatory()
+		( "host", &OracleConfigStruct::m_host )			.optional()
+		( "port", &OracleConfigStruct::m_port )			.optional()
+		( "database", &OracleConfigStruct::m_dbName )		.optional()
+		( "user", &OracleConfigStruct::m_user )			.optional()
+		( "password", &OracleConfigStruct::m_password )		.optional()
+		( "sslMode", &OracleConfigStruct::sslMode )		.optional()
+		( "sslCert", &OracleConfigStruct::sslCert )		.optional()
+		( "sslKey", &OracleConfigStruct::sslKey )		.optional()
+		( "sslRootCert", &OracleConfigStruct::sslRootCert )	.optional()
+		( "sslCRL", &OracleConfigStruct::sslCRL )		.optional()
+		( "connectionTimeout", &OracleConfigStruct::connectTimeout ).optional()
+		( "connections", &OracleConfigStruct::connections )	.optional()
+		( "acquireTimeout", &OracleConfigStruct::acquireTimeout ).optional()
+		( "statementTimeout", &OracleConfigStruct::statementTimeout ).optional()
+		( "program", &OracleConfigStruct::m_programFiles )
+		;
+	}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 //***  Oracle configuration functions  **********************************
 OracleConfig::OracleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
+{}
+
+bool OracleConfig::mapValueDomains()
 {
-	m_port = 0;
-	connections = 0;
-	acquireTimeout = 0;
+	bool retVal = true;
+	if (m_port == 0)
+	{
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": port must be defined as a non zero non negative number";
+		retVal = false;
+	}
+	if (!sslMode.empty())
+	{
+		if ( boost::algorithm::iequals( sslMode, "disable" ))
+			sslMode = "disable";
+		else if ( boost::algorithm::iequals( sslMode, "allow" ))
+			sslMode = "allow";
+		else if ( boost::algorithm::iequals( sslMode, "prefer" ))
+			sslMode = "prefer";
+		else if ( boost::algorithm::iequals( sslMode, "require" ))
+			sslMode = "require";
+		else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
+			sslMode = "verify-ca";
+		else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
+			sslMode = "verify-full";
+		else	{
+			LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": unknown SSL mode: '" << sslMode << "'";
+			retVal = false;
+		}
+	}
+	if ( !sslCert.empty() && sslKey.empty() )	{
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL certificate configured but no SSL key specified";
+		retVal = false;
+	}
+	if ( !sslCert.empty() && sslKey.empty() )	{
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL key configured but no SSL certificate specified";
+		retVal = false;
+	}
+	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
+	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
+		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": server SSL certificate requested but no root CA specified";
+		retVal = false;
+	}
+	if ( sslMode.empty())
+		sslMode = "prefer";
+	return retVal;
 }
 
 bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
-	bool portDefined, connDefined, aTdefined, cTdefined, sTdefined;
-	portDefined = connDefined = aTdefined = cTdefined = sTdefined = false;
-
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !m_ID.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_ID, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !m_host.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_host, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_port,
-						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			bool isDefined = ( !m_dbName.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbName, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !m_user.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_user, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !m_password.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_password, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslMode" ))	{
-			bool isDefined = ( !sslMode.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslMode, &isDefined ))
-				retVal = false;
-			if ( boost::algorithm::iequals( sslMode, "disable" ))
-				sslMode = "disable";
-			else if ( boost::algorithm::iequals( sslMode, "allow" ))
-				sslMode = "allow";
-			else if ( boost::algorithm::iequals( sslMode, "prefer" ))
-				sslMode = "prefer";
-			else if ( boost::algorithm::iequals( sslMode, "require" ))
-				sslMode = "require";
-			else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
-				sslMode = "verify-ca";
-			else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
-				sslMode = "verify-full";
-			else	{
-				LOG_FATAL << logPrefix() << "unknown SSL mode: '" << sslMode << "'";
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslCert" ))	{
-			bool isDefined = ( !sslCert.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCert, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslKey" ))	{
-			bool isDefined = ( !sslKey.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslKey, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslRootCert" ))	{
-			bool isDefined = ( !sslRootCert.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslRootCert, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "sslCRL" ))	{
-			bool isDefined = ( !sslCRL.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCRL, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connectTimeout, &cTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
-						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, acquireTimeout, &aTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "statementTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, statementTimeout, &sTdefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "program" ))	{
-			std::string programFile;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
-				retVal = false;
-			else	{
-				m_programFiles.push_back( programFile );
-			}
-		}
-		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "'";
-		}
+	try
+	{
+		config::parseConfigStructure( *static_cast<OracleConfigStruct*>(this), pt);
+		m_config_pos = pt.data().position;
+		return mapValueDomains();
 	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << "SSL certificate configured but no SSL key specified";
-		retVal = false;
+	catch (const std::runtime_error& e)
+	{
+		LOG_FATAL << logPrefix() << e.what();
+		return false;
 	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << "SSL key configured but no SSL certificate specified";
-		retVal = false;
-	}
-	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
-	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
-		LOG_FATAL << logPrefix() << "server SSL certificate requested but no root CA specified";
-		retVal = false;
-	}
-	if ( ! connDefined )
-		connections = DEFAULT_ORACLE_CONNECTIONS;
-	if ( ! cTdefined )
-		connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
-	if ( ! sTdefined )
-		statementTimeout = DEFAULT_STATEMENT_TIMEOUT;
-	if ( sslMode.empty())
-		sslMode = "prefer";
-
-	return retVal;
 }
 
 void OracleConfig::setCanonicalPathes( const std::string& refPath )
@@ -228,7 +191,7 @@ void OracleConfig::setCanonicalPathes( const std::string& refPath )
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
@@ -284,7 +247,7 @@ void OracleConfig::print( std::ostream& os, size_t indent ) const
 	else if ( m_programFiles.size() == 1 )
 		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
-		std::list< std::string >::const_iterator it = m_programFiles.begin();
+		std::vector< std::string >::const_iterator it = m_programFiles.begin();
 		os << indStr << "   Program files: " << *it++ << std::endl;
 		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;

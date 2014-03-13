@@ -44,10 +44,10 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "config/structSerialize.hpp"
 #include "PostgreSQLprogram.hpp"
 #include "PostgreSQLserverSettings.hpp"
 #include "config/configurationBase.hpp"
+#include "config/structSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 
@@ -60,8 +60,10 @@ namespace db {
 
 static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
 
-static const unsigned int POSTGRESQL_MIN_DB_VERSION = 80400;
-static const unsigned short POSTGRESQL_MIN_PROTOCOL_VERSION = 3;
+enum {
+	POSTGRESQL_MIN_DB_VERSION = 80400,
+	POSTGRESQL_MIN_PROTOCOL_VERSION = 3
+};
 
 struct PostgreSQLconfigStruct
 {

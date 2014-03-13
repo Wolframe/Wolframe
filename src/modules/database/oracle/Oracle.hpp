@@ -36,16 +36,18 @@
 
 #ifndef _ORACLEQL_HPP_INCLUDED
 #define _ORACLEQL_HPP_INCLUDED
-
-#include "logger-v1.hpp"
-#include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "OracleProgram.hpp"
 #include "config/configurationBase.hpp"
+#include "config/structSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
+#include "logger-v1.hpp"
+#include <list>
+#include <vector>
+#include <string>
 #include <oci.h>
 
 #ifdef _WIN32
@@ -57,8 +59,35 @@ namespace db {
 
 static const char* ORACLE_DB_CLASS_NAME = "Oracle";
 
-/// Oracle server connection configuration
-class OracleConfig : public config::NamedConfiguration
+struct OracleConfigStruct
+{
+	OracleConfigStruct();
+
+	std::string	m_ID;			//< database identifier
+	std::string	m_host;			//< server host
+	unsigned short	m_port;			//< server port
+	std::string	m_dbName;		//< database name on server
+	std::string	m_user;			//< database user
+	std::string	m_password;		//< and password
+	std::string	sslMode;		//< SSL connection mode
+	std::string	sslCert;		//< client SSL certificate file
+	std::string	sslKey;			//< client SSL key file
+	std::string	sslRootCert;		//< root SSL certificate file
+	std::string	sslCRL;			//< SSL certificate revocation list
+	unsigned short	connectTimeout;		//< connection timeout
+	unsigned short	connections;		//< number of database connection (pool size)
+	unsigned short	acquireTimeout;		//< timeout when acquiring a connection from the pool
+	unsigned	statementTimeout;	//< default timeout when executin a statement
+	std::vector<std::string> m_programFiles;//< list of program files
+
+	//\brief Structure description for serialization/parsing
+	static const serialize::StructDescriptionBase* getStructDescription();
+};
+
+//\brief Oracle server connection configuration
+class OracleConfig
+	:public config::NamedConfiguration
+	,public OracleConfigStruct
 {
 	friend class OracleConstructor;
 public:
@@ -73,30 +102,17 @@ public:
 	virtual void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
-	const std::string& host() const		{return m_host;}
-	unsigned short port() const		{return m_port;}
-	const std::string& dbName() const	{return m_dbName;}
-	const std::string& user() const		{return m_user;}
-	const std::string& password() const	{return m_password;}
-	const std::list<std::string>& programFiles() const	{return m_programFiles;}
+	const std::string& host() const				{return m_host;}
+	unsigned short port() const				{return m_port;}
+	const std::string& dbName() const			{return m_dbName;}
+	const std::string& user() const				{return m_user;}
+	const std::string& password() const			{return m_password;}
+	const std::vector<std::string>& programFiles() const	{return m_programFiles;}
 
 private:
-	std::string	m_ID;			///< database identifier
-	std::string	m_host;			///< server host
-	unsigned short	m_port;			///< server port
-	std::string	m_dbName;		///< database name on server
-	std::string	m_user;			///< database user
-	std::string	m_password;		///< and password
-	std::string	sslMode;		///< SSL connection mode
-	std::string	sslCert;		///< client SSL certificate file
-	std::string	sslKey;			///< client SSL key file
-	std::string	sslRootCert;		///< root SSL certificate file
-	std::string	sslCRL;			///< SSL certificate revocation list
-	unsigned short	connectTimeout;		///< connection timeout
-	unsigned short	connections;		///< number of database connection (pool size)
-	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	///< default timeout when executin a statement
-	std::list< std::string > m_programFiles;///< list of program files
+	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
+	bool mapValueDomains();
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
@@ -145,10 +161,10 @@ public:
 	}
 
 private:
-	OracleDbUnit*	m_unit;		///< parent database unit
+	OracleDbUnit*	m_unit;		//< parent database unit
 
 public:
-	OracleEnvirenment m_env;	///< Oracle environment
+	OracleEnvirenment m_env;	//< Oracle environment
 };
 
 class OracleConnection
@@ -173,7 +189,7 @@ public:
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout,
-			  const std::list<std::string>& programFiles_);
+			  const std::vector<std::string>& programFiles_);
 	~OracleDbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -191,14 +207,14 @@ public:
 	PoolObject<OracleConnection *> *newConnection( ) { return new PoolObject<OracleConnection *>( m_connPool ); }
 
 private:
-	const std::string	m_ID;			///< database ID
-	std::string		m_connStr;		///< connection string
-	size_t			m_noConnections;	///< number of connections
-	ObjectPool< OracleConnection* >	m_connPool;		///< pool of connections
-	unsigned		m_statementTimeout;	///< default statement execution timeout
-	OracleDatabase	m_db;			///< real database object
+	const std::string	m_ID;			//< database ID
+	std::string		m_connStr;		//< connection string
+	size_t			m_noConnections;	//< number of connections
+	ObjectPool< OracleConnection* >	m_connPool;	//< pool of connections
+	unsigned		m_statementTimeout;	//< default statement execution timeout
+	OracleDatabase	m_db;				//< real database object
 	OracleProgram	m_program;
-	std::list<std::string>	m_programFiles;
+	std::vector<std::string> m_programFiles;
 };
 
 
