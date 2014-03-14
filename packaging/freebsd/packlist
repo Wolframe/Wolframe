@@ -175,21 +175,23 @@ usr/local/include/wolframe/serialize/mapContext.hpp
 usr/local/include/wolframe/serialize/structOptionParser.hpp
 usr/local/include/wolframe/serialize/tostringUtils.hpp
 usr/local/include/wolframe/serialize/serializationErrorException.hpp
-usr/local/include/wolframe/serialize/struct/filtermapBase.hpp
-usr/local/include/wolframe/serialize/struct/filtermapDescription.hpp
-usr/local/include/wolframe/serialize/struct/filtermapParse.hpp
-usr/local/include/wolframe/serialize/struct/filtermapParseStack.hpp
-usr/local/include/wolframe/serialize/struct/filtermapParseValue.hpp
-usr/local/include/wolframe/serialize/struct/filtermapPrintValue.hpp
-usr/local/include/wolframe/serialize/struct/filtermapProperty.hpp
-usr/local/include/wolframe/serialize/struct/filtermapSerialize.hpp
-usr/local/include/wolframe/serialize/struct/filtermapSerializeStack.hpp
-usr/local/include/wolframe/serialize/struct/filtermapTraits.hpp
+usr/local/include/wolframe/serialize/struct/intrusiveParser.hpp
+usr/local/include/wolframe/serialize/struct/intrusiveProperty.hpp
+usr/local/include/wolframe/serialize/struct/intrusiveSerializer.hpp
+usr/local/include/wolframe/serialize/struct/parseStack.hpp
+usr/local/include/wolframe/serialize/struct/parseValue.hpp
+usr/local/include/wolframe/serialize/struct/printValue.hpp
+usr/local/include/wolframe/serialize/struct/serializeStack.hpp
+usr/local/include/wolframe/serialize/struct/structDescription.hpp
+usr/local/include/wolframe/serialize/struct/structDescriptionBase.hpp
+usr/local/include/wolframe/serialize/struct/structParser.hpp
+usr/local/include/wolframe/serialize/struct/structSerializer.hpp
+usr/local/include/wolframe/serialize/struct/traits_getCategory.hpp
 @dirrm usr/local/include/wolframe/serialize/struct
-usr/local/include/wolframe/serialize/ddl/filtermapDDLParse.hpp
-usr/local/include/wolframe/serialize/ddl/filtermapDDLParseStack.hpp
-usr/local/include/wolframe/serialize/ddl/filtermapDDLSerialize.hpp
-usr/local/include/wolframe/serialize/ddl/filtermapDDLSerializeStack.hpp
+usr/local/include/wolframe/serialize/ddl/ddlParseStack.hpp
+usr/local/include/wolframe/serialize/ddl/ddlSerializeStack.hpp
+usr/local/include/wolframe/serialize/ddl/ddlStructParser.hpp
+usr/local/include/wolframe/serialize/ddl/ddlStructSerializer.hpp
 @dirrm usr/local/include/wolframe/serialize/ddl
 @dirrm usr/local/include/wolframe/serialize
 usr/local/include/wolframe/processor/procProviderInterface.hpp
