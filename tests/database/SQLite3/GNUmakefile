@@ -59,7 +59,9 @@ garbage.db:
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./createRandom$(EXE) 4096 garbage.db
 
 local_test: $(TEST_CPP_BINS) test.db garbage.db
+ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
+endif
 
 local_longtest:
 

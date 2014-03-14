@@ -51,12 +51,14 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 local_test: $(TEST_CPP_BINS)
+ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./dbPing andreasbaumann.dyndns.org wolfusr wolfpwd orcl; \
 		if test $$? -eq 0; then \
 			LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./oracleUnit$(EXE) ; \
 		else \
 			echo "No properly configured database for tests" ; \
 		fi
+endif
 
 local_longtest:
 
