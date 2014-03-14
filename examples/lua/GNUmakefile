@@ -13,10 +13,12 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
+	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwfsingleton \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
