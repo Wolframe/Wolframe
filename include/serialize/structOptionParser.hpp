@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Provides uniform handling of structures in program command line options
 #ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structParser.hpp"
 #include "types/propertyTree.hpp"
 #include <string>
 

@@ -33,7 +33,7 @@
 ///\brief Implementation of tostring utility functions
 ///\file tostringUtils.cpp
 #include "serialize/tostringUtils.hpp"
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
 #include "filter/tostringfilter.hpp"
 
 using namespace _Wolframe;

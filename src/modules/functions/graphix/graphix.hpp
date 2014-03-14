@@ -34,7 +34,7 @@
 ///\brief Interface for graphix functions
 #ifndef _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
 #define _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>

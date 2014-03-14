@@ -30,7 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 #include "directmapCommandHandler.hpp"
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/struct/structSerializer.hpp"
 #include "serialize/tostringUtils.hpp"
 #include "types/doctype.hpp"
 #include "types/variant.hpp"
