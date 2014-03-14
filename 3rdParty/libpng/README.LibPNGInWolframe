@@ -9,3 +9,4 @@ Local changes:
 
   * removed examples, man page, autoconf support, etc. kept only source
     and header files of libpng
+
