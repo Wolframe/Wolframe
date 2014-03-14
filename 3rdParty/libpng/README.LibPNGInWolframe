@@ -1,0 +1,11 @@
+1.6.9 Vanilla, unpatched
+
+Used on Windows only to build libpng (we have only NMAKE support here).
+Use the official libpng libraries on all other platforms.
+
+Local changes:
+
+  * Added 'Makefile.W32' to build in Wolframe style
+
+  * removed examples, man page, autoconf support, etc. kept only source
+    and header files of libpng
