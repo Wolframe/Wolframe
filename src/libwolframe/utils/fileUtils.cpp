@@ -494,7 +494,7 @@ FileType utils::getFileType( const std::string& filename)
 	{
 		throw e;
 	}
-	catch (std::runtime_error& e)
+	catch (std::runtime_error& )
 	{}
 	return rt;
 }

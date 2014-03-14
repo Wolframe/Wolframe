@@ -261,33 +261,33 @@ void md5_final( unsigned char *digest, md5_ctx *ctx )
 	memset(&ctx->buffer[used], 0, free - 8);
 
 	ctx->lo <<= 3;
-	ctx->buffer[56] = ctx->lo;
-	ctx->buffer[57] = ctx->lo >> 8;
-	ctx->buffer[58] = ctx->lo >> 16;
-	ctx->buffer[59] = ctx->lo >> 24;
-	ctx->buffer[60] = ctx->hi;
-	ctx->buffer[61] = ctx->hi >> 8;
-	ctx->buffer[62] = ctx->hi >> 16;
-	ctx->buffer[63] = ctx->hi >> 24;
+	ctx->buffer[56] = (unsigned char)( ctx->lo );
+	ctx->buffer[57] = (unsigned char)( ctx->lo >> 8 );
+	ctx->buffer[58] = (unsigned char)( ctx->lo >> 16 );
+	ctx->buffer[59] = (unsigned char)( ctx->lo >> 24 );
+	ctx->buffer[60] = (unsigned char)( ctx->hi );
+	ctx->buffer[61] = (unsigned char)( ctx->hi >> 8 );
+	ctx->buffer[62] = (unsigned char)( ctx->hi >> 16 );
+	ctx->buffer[63] = (unsigned char)( ctx->hi >> 24 );
 
 	body(ctx, ctx->buffer, 64);
 
-	digest[0] = ctx->a;
-	digest[1] = ctx->a >> 8;
-	digest[2] = ctx->a >> 16;
-	digest[3] = ctx->a >> 24;
-	digest[4] = ctx->b;
-	digest[5] = ctx->b >> 8;
-	digest[6] = ctx->b >> 16;
-	digest[7] = ctx->b >> 24;
-	digest[8] = ctx->c;
-	digest[9] = ctx->c >> 8;
-	digest[10] = ctx->c >> 16;
-	digest[11] = ctx->c >> 24;
-	digest[12] = ctx->d;
-	digest[13] = ctx->d >> 8;
-	digest[14] = ctx->d >> 16;
-	digest[15] = ctx->d >> 24;
+	digest[0] = (unsigned char)( ctx->a );
+	digest[1] = (unsigned char)( ctx->a >> 8 );
+	digest[2] = (unsigned char)( ctx->a >> 16 );
+	digest[3] = (unsigned char)( ctx->a >> 24 );
+	digest[4] = (unsigned char)( ctx->b );
+	digest[5] = (unsigned char)( ctx->b >> 8 );
+	digest[6] = (unsigned char)( ctx->b >> 16 );
+	digest[7] = (unsigned char)( ctx->b >> 24 );
+	digest[8] = (unsigned char)( ctx->c );
+	digest[9] = (unsigned char)( ctx->c >> 8 );
+	digest[10] = (unsigned char)( ctx->c >> 16 );
+	digest[11] = (unsigned char)( ctx->c >> 24 );
+	digest[12] = (unsigned char)( ctx->d );
+	digest[13] = (unsigned char)( ctx->d >> 8 );
+	digest[14] = (unsigned char)( ctx->d >> 16 );
+	digest[15] = (unsigned char)( ctx->d >> 24 );
 
 	memset(ctx, 0, sizeof(*ctx));
 }
