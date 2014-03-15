@@ -1,0 +1,23 @@
+This is the JSON parsing libarary, version 19.8.2013, SVN trunk revision 58
+
+To get the original go to http://sourceforge.net/projects/cjson/.
+
+Local changes to cJSON in Wolframe:
+
+ * renamed test.c to testit.c (avoid collision with 'test' phony target),
+   heavily fixed to pass a C compiler, reactivated file-based tests
+
+ * added a cJSON_Context and removed global variable for error position
+   to make the library thread-safe
+
+ * removed GetErrorPtr and use the variable errorptr in cJSON_Context as
+   last error info
+
+ * return Number type elements also as string transformation is done by
+   normalization in forms
+
+ * cJSON_AddItemToObject, cJSON_AddItemReferenceToArray and 
+   cJSON_AddItemReferenceToObject:
+   doing some error handling and returning an int to indicate the error
+
+ * print_number: added error handling after malloc, return 0 if malloc fails

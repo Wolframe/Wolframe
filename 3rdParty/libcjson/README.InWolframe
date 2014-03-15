@@ -1,8 +1,0 @@
-Local changes for cJSON in Wolframe
------------------------------------
-
-- renamed test.c to testit.c (avoid collision with 'test' phony target),
-  heavily fixed to pass a C compiler, reactivated file-based tests
-- added a cJSON_Context and removed global variable for error position to make the library thread-safe
-- removed GetErrorPtr and use the variable errorptr in cJSON_Context as last error info
-- return Number type elements also as string transformation is done by normalization in forms
