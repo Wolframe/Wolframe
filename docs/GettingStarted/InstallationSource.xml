@@ -3,9 +3,55 @@
 	<title>Installation from source</title>
 	<para>
 		This section describes how to build the <application>Wolframe</application> application from
-		source code.
+		the source code.
 	</para>
 
 	<sect1>
+		<title>Source Releases</title>
+		
+		<para>
+			Tarballs with release source code are available from
+			SourceForce in the directories
+		</para>
+		
+		<para>
+			<ulink url="http://openbuildservice.org">http://sourceforge.net/projects/wolframe/files/wolframe/</ulink>
+		</para>
+		
+		<para>
+		</para>
+		
+		<para>			
+			respectively
+		</para>
+		
+		<para>			
+			<ulink url="http://openbuildservice.org">http://sourceforge.net/projects/wolframe/files/wolfclient/</ulink>
+			.
+		</para>
+		
+		<para>
+			The <filename>wolframe-&WolframeVersion;.tar.gz</filename> contains the <application>Wolframe</application>
+			server, the modules and 3rdParty software needed to build the server.
+		</para>
+
+		<para>
+			The <filename>wolfclient-&WolfclientVersion;.tar.gz</filename> contains the <application>Wolframe</application>
+			client implementing the graphical user interface.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Building on Unix systems</title>
+		
+		<para>
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Building on Windows systems</title>
+		
+		<para>
+		</para>
 	</sect1>
 </chapter>
