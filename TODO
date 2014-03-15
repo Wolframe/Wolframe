@@ -6,12 +6,11 @@ Core:
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
 Processors:
-	- TDL tests with random programs of big complexity (PF)
+	- Rewrite TDL VM
 	- Python (ABa, with support PF)
 	- Custom data type documentation and BigFxp tests (PF)
 
 Fixes:
-	- Make branch with descriptive configurations for modules
 	- Start SDK and splitting of graphix module and others
 
 
