@@ -94,8 +94,8 @@ struct InputFilterImpl :public InputFilter
 		return new InputFilterImpl(*this);
 	}
 
-	///\brief Implements FilterBase::getValue(const char*,std::string&)
-	virtual bool getValue( const char* name, std::string& val);
+	///\brief Implements FilterBase::getValue(const char*,std::string&) const
+	virtual bool getValue( const char* name, std::string& val) const;
 
 	///\brief Implements InputFilter::getDocType(types::DocType&&)
 	bool getDocType( types::DocType& doctype);

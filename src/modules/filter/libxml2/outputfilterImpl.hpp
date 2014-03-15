@@ -106,7 +106,7 @@ public:
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
 	//\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val);
+	virtual bool getValue( const char* name, std::string& val) const;
 
 	//\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);

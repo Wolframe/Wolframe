@@ -109,7 +109,7 @@ public:
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val buffer for the value returned
 	///\return true on success, false, if the variable does not exist or we have to yield (check state)
-	virtual bool getValue( const char* /*name*/, std::string& /*val*/)
+	virtual bool getValue( const char* /*name*/, std::string& /*val*/) const
 	{
 		return false;
 	}

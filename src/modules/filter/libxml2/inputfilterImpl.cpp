@@ -37,7 +37,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool InputFilterImpl::getValue( const char* name, std::string& val)
+bool InputFilterImpl::getValue( const char* name, std::string& val) const
 {
 	if (std::strcmp( name, "empty") == 0)
 	{
