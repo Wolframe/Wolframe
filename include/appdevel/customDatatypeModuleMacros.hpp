@@ -70,5 +70,7 @@
 	{\
 		ModuleImpl::constructor\
 	};\
-	extern "C" _Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
+	extern "C" { \
+		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef); \
+	}
 
