@@ -108,7 +108,7 @@ class PostgreSQLdbUnit;
 
 struct PostgreSQLLanguageDescription : public LanguageDescription
 {
-	virtual std::string stm_argument_reference( int index)
+	virtual std::string stm_argument_reference( int index) const
 	{
 		std::ostringstream rt;
 		rt << "$" << index;
@@ -185,7 +185,7 @@ private:
 	size_t			m_noConnections;	//< number of connections
 	PostgreSQLserverSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
-	unsigned		m_statementTimeout;	//< default statement execution timeout
+	unsigned int		m_statementTimeout;	//< default statement execution timeout
 	PostgreSQLdatabase	m_db;			//< real database object
 	PostgreSQLprogram	m_program;		//< (not supported yet) Loader of programs (m_programFiles)
 	std::list<std::string>	m_programFiles;		//< (not supported yet) list of source files with SQL statements to load at startup
