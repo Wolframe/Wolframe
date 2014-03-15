@@ -65,8 +65,10 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 	createLuaProgramType
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "command handler and form function handler for lua",
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for lua",
 				NofConfiguredBuilder, configuredBuilder,
 				NofSimpleBuilder, simpleBuilder);
+}
 
 

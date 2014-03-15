@@ -55,5 +55,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	SimpleformDDLCompiler::constructor
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "simple form DDL compiler", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "simple form DDL compiler", 0, 0, NofObjects, objdef);
+}

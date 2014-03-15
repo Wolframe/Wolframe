@@ -89,5 +89,6 @@ static createBuilderFunc objdef[NofObjects] =
 	graphix_rescale_func::constructor
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
+}

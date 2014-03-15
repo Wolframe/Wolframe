@@ -56,6 +56,7 @@ static createBuilderFunc objdef[ NofObjects] =
 	CJsonFilterObject::filter_builder
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", 0, 0, NofObjects, objdef);
+}
 

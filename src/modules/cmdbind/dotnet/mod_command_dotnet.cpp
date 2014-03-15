@@ -55,8 +55,9 @@ static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
 	createDotnetRuntimeEnvironmentBuilder
 };
 
-ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
 				NofConfiguredBuilder, configuredBuilder,
 				NofSimpleBuilder, 0);
-
+}
 

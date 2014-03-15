@@ -76,5 +76,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	NormalizeProcessor::builder
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
+}

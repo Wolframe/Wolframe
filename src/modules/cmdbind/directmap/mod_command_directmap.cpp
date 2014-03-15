@@ -53,6 +53,8 @@ static ConfiguredBuilder* (*containers[ NofContainers])() =
 	createDirectmapCommandHandlerModule
 };
 
-extern "C" ModuleEntryPoint entryPoint( 0, "command handler for direct mappings",
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "command handler for direct mappings",
 				NofContainers, containers, 0, 0);
 
+}
