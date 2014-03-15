@@ -63,5 +63,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	NormalizeProcessor::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "base64 encode/decode as normalizer", 0, 0, NofObjects, objdef);
+extern "C" ModuleEntryPoint entryPoint( 0, "base64 encode/decode as normalizer", 0, 0, NofObjects, objdef);
 

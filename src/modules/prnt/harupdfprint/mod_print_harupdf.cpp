@@ -62,5 +62,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
+extern "C" ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
 

@@ -47,5 +47,5 @@
 //\param[in] NofObjects Number of functions to export from the module
 //\param[in] Objects Array of function declarations to export from the module
 #define CPP_APPLICATION_FORM_FUNCTION_MODULE_END( NofObjects, Objects)\
-	module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, Objects);
+	extern "C" module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, Objects);
 

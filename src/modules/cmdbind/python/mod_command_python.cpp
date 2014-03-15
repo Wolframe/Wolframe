@@ -66,7 +66,7 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 	pythonProgramTypeBuilder
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
+extern "C" ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
 				NofConfiguredBuilder, 0, /* configuredBuilder, */
 				NofSimpleBuilder, simpleBuilder);
 
