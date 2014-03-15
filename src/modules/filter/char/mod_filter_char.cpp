@@ -58,6 +58,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	CharFilterObject::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "char filter", 0, 0, NofObjects, objdef);
+extern "C" ModuleEntryPoint entryPoint( 0, "char filter", 0, 0, NofObjects, objdef);
 
 

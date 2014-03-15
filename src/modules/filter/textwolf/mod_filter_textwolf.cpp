@@ -58,4 +58,4 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 
-ModuleEntryPoint entryPoint( 0, "textwolf XML filter", 0, 0, NofObjects, objdef);
+extern "C" ModuleEntryPoint entryPoint( 0, "textwolf XML filter", 0, 0, NofObjects, objdef);

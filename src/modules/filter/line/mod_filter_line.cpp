@@ -58,5 +58,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	LineFilterObject::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "line filter", 0, 0, NofObjects, objdef);
+extern "C" ModuleEntryPoint entryPoint( 0, "line filter", 0, 0, NofObjects, objdef);
 
