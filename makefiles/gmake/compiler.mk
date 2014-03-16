@@ -184,6 +184,23 @@ endif
 
 # end of clang section
 
+# start of icc section
+
+ifeq "$(COMPILER)" "icc"
+COMMON_COMPILE_FLAGS = \
+	-Wall
+
+CXX_COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c++98
+
+COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c99
+endif
+
+# end of icc section
+
 # set flags for threading support using POSIX threads. This is completly different
 # between compiler/platforms
 ifeq "$(COMPILER)" "gcc"
