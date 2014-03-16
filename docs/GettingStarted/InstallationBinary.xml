@@ -9,25 +9,127 @@
 	<sect1>
 		<title>Linux distributions</title>
 		<para>
-			Linux distributions are current built on the <acronym>Open Build Server</acronym>
+			Linux distributions are currently built on the <acronym>Open Build Server</acronym>
 			(<ulink url="http://openbuildservice.org">http://openbuildservice.org</ulink>) and
 			on a bunch of virtual machines.
 		</para>
 		<para>
-			The resulting packages and the source code is hosted on Sourceforge
+			The resulting packages and the repository metadata is hosted on Sourceforge
 			(<ulink url="http://sourceforge.net">http://sourceforge.net</ulink>).
+		</para>
+		
+		<para>
+			The packages are always build with the default system compiler, which
+			is currently GNU gcc.
+		</para>
+		
+		<para>
+			Packages for proprietary software (like the Oracle database module) have
+			to be built manually, they can not be distributed as binary packages due
+			to license problems.
 		</para>
 
 <!-- RedHat -->
 		<sect2>
 			<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+
+			<sect3>
+				<title>Available packages</title>
+				
+				<itemizedlist>
+					<listitem>
+						<para>
+							wolframe-&WolframeVersion;.rpm: contains the <application>Wolframe</application>
+							core server with minimal 3rd party software requirements
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-sqlite3-&WolframeVersion;.rpm: the database module for Sqlite3 databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-postgresql-&WolframeVersion;.rpm: the database module for PostgreSQL databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libxml2-&WolframeVersion;.rpm: filtering module for XML and XSLT (using libxml2/libxslt)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-textwolf-&WolframeVersion;.rpm: filtering module for XML (using textwolf)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-cjson-&WolframeVersion;.rpm: filtering module for JSON (using cJSON)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-pam-&WolframeVersion;.rpm: authentication module for PAM
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-sasl-&WolframeVersion;.rpm: authentication module for SASL
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-python-&WolframeVersion;.rpm: language bindings for Python
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-lua-&WolframeVersion;.rpm: language bindings for Lua
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libhpdf-&WolframeVersion;.rpm: printing module using libhpdf
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-freeimage-&WolframeVersion;.rpm: image manipuation module using FreeImage
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libclient-&WolframeVersion;.rpm: C/C++ client library
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-client-&WolframeVersion;.rpm: command line tool
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolfclient-&WolfclientVersion;.rpm: Wolframe graphical frontend
+						</para>
+					</listitem>
+				</itemizedlist>				
+			</sect3>
 			
 			<sect3>
 				<title>Prerequisites</title>
+				
+				<para>
+					
+				</para>
 			</sect3>
 			
 			<sect3>
 				<title>Install binary packages manually</title>
+				
+				<para>
+					Installing the packages via repositories is usually the prefered way.
+				</para>	
 			</sect3>
 			
 			<sect3>

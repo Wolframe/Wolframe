@@ -131,6 +131,80 @@
 		</para>
 
 		<sect2>
+			<title>GCC compiler</title>
+			
+			<para>
+				Compilation with GNU gcc is the default on all
+				Unix platforms. It corresponds to the call:
+		        <programlisting language='shell'>
+	make CC=gcc CXX=g++
+			</programlisting>								
+			
+			</para>
+			
+			<para>
+				Per default all reasonable warnings are enabled.
+				To add your own flags you can set 'CFLAGS' or
+				'CXXFLAGS' respectively for instance to turn
+				compiler warnings into fatal errors with:
+
+		        <programlisting language='shell'>
+	make CFLAGS='-Werror' CXXFLAGS='-Werror'
+			</programlisting>	
+			
+				or
+
+		        <programlisting language='shell'>
+	make CFLAGS='-g -O0' CXXFLAGS='-g -O0'
+			</programlisting>	
+			
+				to turn off optimization and to enable debug information.
+			</para>
+			<para>
+				Certain embedded 3rdParty software may choose to
+				have it's own flags for compilation, you can't override
+				those in the make invocation.
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>clang compiler</title>
+			
+			<para>
+				Compilation with clang is possible, only set the
+				correct compiler variables:
+		        <programlisting language='shell'>
+	make CC=clang CXX=clang++
+			</programlisting>	
+			
+			</para>
+			<para>							
+			
+				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
+			</para>
+		</sect2>				
+
+		<sect2>
+			<title>Intel compiler</title>
+			
+			<para>
+				Compilation with the Intel C compiler is done with:
+		        <programlisting language='shell'>
+	make CC=/opt/intel/bin/icc CXX=/opt/intel/bin/icc
+			</programlisting>	
+			
+			</para>							
+			<para>
+				(where '/opt/intel/bin/icc' is the location of the Intel
+				compiler).
+			</para>
+			
+			<para>
+				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
+			</para>
+		</sect2>
+				
+		<sect2>
 			<title>Secure Socket Layer (SSL)</title>
 			
 			<para>
@@ -147,7 +221,7 @@
 				Currently only OpenSSL (<ulink>http://www.openssl.org</ulink>)
 				is supported. The location of the library can be overloaded with:
 		        <programlisting language='shell'>
-	make WITH_SSL=1 OPENSSL_LIBS=/usr/local/openssl-1.0.1.f
+	make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
 			</programlisting>				
 			</para>				
 			
@@ -190,6 +264,56 @@
 		</sect2>
 		
 		<sect2>
+			<title>SQLite database support</title>
+			
+			<para>
+				The <application>Wolframe</application> can use
+				an Sqlite3 database (<ulink>http://sqlite.org</ulink>)
+				as backend for data storage and for authentication,
+				autorization.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Sqlite3 database
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				If you don't have a recent Sqlite version on your
+				system you can also build the module against the
+				embedded version:
+
+		        <programlisting language='shell'>
+	make WITH_LOCAL_SQLITE3=1
+			</programlisting>				
+			
+			</para>
+
+			<para>
+				The location of the Sqlite library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=_1 SQLITE3_DIR=/usr/local/sqlite-3.4.3
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of Sqlite separatly:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=1 \
+		SQLITE3_INCLUDE_DIR=/usr/local/sqlite-3.4.3/include \
+		SQLITE3_LIB_DIR= /usr/local/sqlite-3.4.3/lib \
+		SQLITE3_LIBS=-lsqlite3
+			</programlisting>				
+			</para>
+		</sect2>
+		
+		<sect2>
 			<title>Installation</title>
 			
 			<para>
@@ -222,40 +346,49 @@
 <!--
 Prerequisites
 
-* optionally (WITH_LUA) lua 5.2
-  (integrated in subdir 'lua')
+
 * for database support (WITH_SYSTEM_SQLITE3): sqlite3
   WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
   instead of the system version
   * optionally (WITH_PGSQL)
-* for optional authentication mechanisms:
-  * optionally (WITH_PAM)
-  * optionally (WITH_SASL)
-* optionally for testing:
-  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
-* optionally (for building the documentation):
-  * xsltproc, docboox*xsl*stylesheet: for docbook
-  * fop: to produce a nice PDF documentation
-  * doxygen: for documentation for programmers
-  * dia: to convert images to svg
+* optionally (WITH_ORACLE): build Oracle database module
+
+* optionally (WITH_LUA) lua 5.2
+  (integrated in subdir 'lua')
+* optionally (WITH_PYTHON): build Python 3 module for
+  scripting Wolframe in Python
+
 * optionally (WITH_LIBXML2)
 * optionally (WITH_LIBXSLT), needs LIBXML2 too
 * optionally (WITH_CJSON): build JSON filtering module
   implemented with cjson
+
+* optionally (WITH_ICU): ICU 3.6 or later,
+  needed for boost*locale with ICU backend
+
 * optionally (WITH_SYSTEM_LIBHPDF): for PDF creation
   using the system version of libhpdf, specify
   WITH_LOCAL_LIBHPDF=1 to use the supplied version in
   the 'libhpdf' subdirectory. In this case also 
   'zlib' and 'libpng' development libraries are needed
-* optionally (WITH_ICU): ICU 3.6 or later,
-  needed for boost*locale with ICU backend
 * optionally (WITH_SYSTEM_FREEIMAGE): for image handling
   using the system version of FreeImage, specify
   WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
   the 'freeimage' subdirectory.
-* optionally (WITH_PYTHON): build Python 3 module for
-  scripting Wolframe in Python
-* optionally (WITH_ORACLE): build Oracle database module
+
+* for optional authentication mechanisms:
+  * optionally (WITH_PAM)
+  * optionally (WITH_SASL)
+
+* optionally for testing:
+  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
+
+* optionally (for building the documentation):
+  * xsltproc, docboox*xsl*stylesheet: for docbook
+  * fop: to produce a nice PDF documentation
+  * doxygen: for documentation for programmers
+  * dia: to convert images to svg
+
 -->
 
 	</sect1>
