@@ -291,8 +291,7 @@ const net::NetworkOperation Connection::nextOperation()
 }
 
 Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
-	:m_config(config)
-	,m_cmdhandler( &stm, config)
+	:m_cmdhandler( &stm, config)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
 	,m_terminated(false)
