@@ -41,6 +41,7 @@
 		</para>
 	</sect1>
 
+<!-- Unix -->
 	<sect1>
 		<title>Building on Unix systems</title>
 
@@ -130,6 +131,7 @@
 			the example with 'BOOST_DIR'.
 		</para>
 
+<!-- compilers -->
 		<sect2>
 			<title>GCC compiler</title>
 			
@@ -190,7 +192,8 @@
 			<para>
 				Compilation with the Intel C compiler is done with:
 		        <programlisting language='shell'>
-	make CC=/opt/intel/bin/icc CXX=/opt/intel/bin/icc
+	source /opt/intel/bin/iccvars.csh intel64 
+	make CC=icc CXX=icpc
 			</programlisting>	
 			
 			</para>							
@@ -203,7 +206,8 @@
 				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
 			</para>
 		</sect2>
-				
+
+<!-- SSL -->
 		<sect2>
 			<title>Secure Socket Layer (SSL)</title>
 			
@@ -239,6 +243,14 @@
 			</sect3>
 
 			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libssl-dev' package.
+				</para>
+			</sect3>
+
+			<sect3>
 				<title>openSUSE, SLES and similar Linux distributions</title>		
 				<para>
 					You need the 'openssl-devel' package.
@@ -255,21 +267,22 @@
 			<sect3>
 				<title>Slackware</title>
 				<para>
-					You need the 'openssl' package. This package is usually part
-					of the standard package sets.
+					You need the 'openssl' package. This package is
+					part of the 'n' package series.
 				</para>
 			</sect3>
 
 			
 		</sect2>
-		
+
+<!-- Sqlite3 -->		
 		<sect2>
 			<title>SQLite database support</title>
 			
 			<para>
 				The <application>Wolframe</application> can use
 				an Sqlite3 database (<ulink>http://sqlite.org</ulink>)
-				as backend for data storage and for authentication,
+				as backend for data storage and for authentication and
 				autorization.
 			</para>
 			
@@ -297,7 +310,7 @@
 			<para>
 				The location of the Sqlite library can be overloaded with:
 		        <programlisting language='shell'>
-	make WITH_SYSTEM_SQLITE3=_1 SQLITE3_DIR=/usr/local/sqlite-3.4.3
+	make WITH_SYSTEM_SQLITE3=1 SQLITE3_DIR=/usr/local/sqlite-3.4.3
 			</programlisting>				
 			</para>
 			
@@ -311,6 +324,214 @@
 		SQLITE3_LIBS=-lsqlite3
 			</programlisting>				
 			</para>
+			
+			<para>
+				When building with 'WITH_SYSTEM_SQLITE3' it is enough to install the
+				correct development library.
+			</para>
+				
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'sqlite-devel' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libsqlite3-dev' package.
+				</para>
+				
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'sqlite3' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'sqlite3-devel' package.
+				</para>
+
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'sqlite3' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'sqlite' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'sqlite' package. This package is
+					part of the 'ap' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
+
+<!-- PostgreSQL -->
+		<sect2>
+			<title>PostgreSQL database support</title>
+			
+			<para>
+				The <application>Wolframe</application> can use
+				a PostgreSQL database (<ulink>http://postgresql.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				You enable the building of a loadable PostgreSQL database
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1
+			</programlisting>
+							
+			</para>
+
+			<para>
+				The location of the PostgreSQL library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1 PGSQL_DIR=/usr/local/postgresql-9.1.3
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of PostgreSQL separatly:
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1 \
+		PGSQL_INCLUDE_DIR=/usr/local/postgresql-9.1.3/include \
+		PGSQL_LIB_DIR=/usr/local/postgresql-9.1.3/lib \
+		PGSQL_LIBS=-lpq
+			</programlisting>				
+			</para>
+							
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'postgresql-devel' package.
+				</para>
+				
+				<para>
+					For Centos/RHEL/SciLi 5 you can choose between the
+					'postgresql-devel'package (which is version 8.1)
+					or the 'postgresql84-devel' package. The 8.4
+					version is recommended over 8.1.
+				</para>
+				
+				<para>
+					For running the Postgresql tests you need a fully function 'postgresql-server'
+					with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
+					'wolframe'.
+				</para>
+				
+				<para>
+					Setting up a test user in PostgreSQL is done with:
+					<programlisting language='shell'>
+	postgresql-setup initdb
+	systemctl start postgresql.service
+	systemctl enable postgresql.service
+					</programlisting>
+					
+					change the authentication method from 'ident' to 'md5' in
+					<filename>pg_hba.conf</filename>.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libpq-dev' package.
+				</para>
+				
+				<para>
+					For running the PostgreSQL database tests you also
+					need the 'postgresql-client' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'postgresql-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'postgresql' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					A PostgreSQL package is not avaiable on Slackware,
+					build your own one with:
+					<programlisting language='shell'>
+	./configure --prefix=/usr/local/pgsql
+	make
+	make install
+	groupadd -g 990 postgres
+	useradd -g postgres -u 990 postgres
+	mkdir /usr/local/pgsql/var
+	chown -R postgres:users /usr/local/pgsql/var
+	su postgres
+	/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/var
+	exit
+	cat > /etc/rc.d/rc.postgresql
+	#!/bin/sh
+
+	case "$1" in
+		start)
+			su -l postgres -s /bin/sh -c "/usr/local/pgsql/bin/pg_ctl  -D /usr/local/pgsql/var -p /usr/local/pgsql/bin/postmaster start  > /dev/null 2>&amp;1" &lt; /dev/null
+			;;
+		stop)
+			kill `ps -efa | grep postmaster | grep -v grep | awk '{print $2}'`
+			;;
+		*)
+			echo $"Usage: $0 {start|stop}"
+			exit 1
+	esac
+
+	exit 0
+	(ctrl-D)
+	chmod 0775 /etc/rc.d/rc.postgresql 
+	usermod -d /usr/local/pgsql postgres
+					</programlisting>
+				</para>
+				
+				<para>
+					Compile <application>Wolframe</application> now with:
+					<programlisting language='shell'>
+	make WITH_PGSQL=1 \
+		PGSQL_DIR=/usr/local/pgsql
+					</programlisting>
+					
+				</para>
+				
+				<para>
+					Alternatively you can of course also build the PostgreSQL
+					package with the help of SlackBuilds.
+				</para>
+			</sect3>
+						
 		</sect2>
 		
 		<sect2>
@@ -347,10 +568,6 @@
 Prerequisites
 
 
-* for database support (WITH_SYSTEM_SQLITE3): sqlite3
-  WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
-  instead of the system version
-  * optionally (WITH_PGSQL)
 * optionally (WITH_ORACLE): build Oracle database module
 
 * optionally (WITH_LUA) lua 5.2
