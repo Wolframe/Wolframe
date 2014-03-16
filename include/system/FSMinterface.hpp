@@ -55,9 +55,9 @@ public:
 			CLOSE
 		};
 	private:
-		FSMoperation	m_op;
-		const void*	m_data;
-		std::size_t	m_dataSize;
+//		FSMoperation	m_op;
+//		const void*	m_data;
+//		std::size_t	m_dataSize;
 	};
 
 	/// Finite State Machine signals

@@ -57,4 +57,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	TokenFilterObject::builder
 };
 
+extern "C" {
 ModuleEntryPoint entryPoint( 0, "token filter", 0, 0, NofObjects, objdef);
+}

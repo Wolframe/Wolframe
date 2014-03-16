@@ -58,6 +58,7 @@ static createBuilderFunc objdef[ NofObjects] =
 	BlobFilterObject::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "blob filter", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "blob filter", 0, 0, NofObjects, objdef);
+}
 

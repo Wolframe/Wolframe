@@ -51,8 +51,9 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 	mylangProgramTypeBuilder
 };
 
+extern "C" {
 ModuleEntryPoint entryPoint( 0, "form function handler for mylang",
 				NofConfiguredBuilder, 0,
 				NofSimpleBuilder, simpleBuilder);
-
+}
 

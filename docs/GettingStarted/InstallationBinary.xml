@@ -21,6 +21,18 @@
 <!-- RedHat -->
 		<sect2>
 			<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+			
+			<sect3>
+				<title>Prerequisites</title>
+			</sect3>
+			
+			<sect3>
+				<title>Install binary packages manually</title>
+			</sect3>
+			
+			<sect3>
+				<title>Install from repository</title>
+			
 			<para>
 				First install the repository file for the corresponding distribution
 				(as example we choose Centos 6):
@@ -69,6 +81,8 @@
 				
 				on newer Fedora systems.
 			</para>
+			</sect3>
+
 		</sect2>
 
 <!-- Debian -->
@@ -131,7 +145,7 @@
 	service wolframed start
 				</programlisting>
 			</para>
-
+			
 		</sect2>
 
 <!-- OpenSUSE -->

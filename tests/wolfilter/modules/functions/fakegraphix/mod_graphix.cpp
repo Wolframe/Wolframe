@@ -76,5 +76,6 @@ static createBuilderFunc objdef[NofObjects] =
 	graphix_thumb_func::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
+}
