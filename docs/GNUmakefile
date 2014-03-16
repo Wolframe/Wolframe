@@ -58,7 +58,7 @@ XSLT_TOWORDML = \
 	
 local_all:
 
-doc: doc-doxygen doc-html doc-html-chunked doc-pdf
+doc: doc-doxygen doc-html doc-html-chunked doc-pdf doc-txt
 
 MAN_PAGES = \
 	wolframed.8 \
@@ -76,6 +76,8 @@ doc-doxygen-webpage:
 	cd $(TOPDIR); doxygen docs/doxygen-webpage.conf
 
 doc-html: WolfBook.html Tutorial.html
+
+doc-txt: GettingStarted.txt
 
 doc-html-chunked: html/index.html html-tutorial/index.html
 
@@ -107,6 +109,9 @@ doc-towordml: WolfBook.docx
 %.docx: %.xml
 	$(XSLT_TOWORDML) $< > $@
 
+%.txt: %.html
+	w3m -dump $< > $@
+
 # Getting Started Guide
 
 GETTING_STARTED_FILES = \
@@ -115,7 +120,9 @@ GETTING_STARTED_FILES = \
 	GettingStartedDate.txt \
 	GettingStarted/Preface.xml \
 	GettingStarted/InstallationSource.xml \
-	GettingStarted/InstallationBinary.xml
+	GettingStarted/InstallationBinary.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
 
 GettingStarted.html: $(GETTING_STARTED_FILES)
 
@@ -244,7 +251,7 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f GettingStarted.html GettingStarted.pdf
+	-rm -f GettingStarted.html GettingStarted.pdf GettingStarted.txt
 	-rm -rf html/*.html
 	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
@@ -287,6 +294,8 @@ local_uninstall:
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
 	xmllint --noout --xinclude --postvalid Tutorial.xml
+	xmllint --noout --xinclude --postvalid GettingStarted.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
+

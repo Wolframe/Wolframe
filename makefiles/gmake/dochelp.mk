@@ -15,6 +15,7 @@ doc-html-webpage-chunked build chunked HTML version of the manual and
 doc-pdf                  build PDF version of the manual and tutorial
 doc-epub                 build EPUB version of the manual and tutorial
 doc-towordml             convert docbook to WordML
+doc-txt                  build plain text version
 
 check                    test the validity of the documenation source and tools
 

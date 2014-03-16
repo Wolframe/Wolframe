@@ -81,15 +81,10 @@ class ImageImpl
 		static std::string encode( const std::string &data );
 		
 	public:
-		static const serialize::StructDescriptionBase *getStructDescription( );
-		static int info( ImageInfo &res, const Image &param );
-		static int thumb( Image &res, const ImageThumb &param );
-		static int rescale( Image &res, const ImageRescale &param );
+		static int info( const proc::ProcessorProviderInterface* provider, ImageInfo &res, const Image &param );
+		static int thumb( const proc::ProcessorProviderInterface* provider, Image &res, const ImageThumb &param );
+		static int rescale( const proc::ProcessorProviderInterface* provider, Image &res, const ImageRescale &param );
 };
-
-int imageInfoExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
-int imageThumbExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
-int imageRescaleExec( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
 
 }}
 #endif

@@ -42,10 +42,31 @@
 	{\
 	return NAME;\
 	}\
+	static _Wolframe::module::CppFormFunctionDef _Wolframe__cppFormFunctions[] =\
+	{
+
+#define CPP_APPLICATION_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
+	{NAME,appdevel::CppFormFunction<INPUT,OUTPUT,FUNCTION>::declaration()},
 
 //\brief Marks the end if the Wolframe C++ form function module.
-//\param[in] NofObjects Number of functions to export from the module
-//\param[in] Objects Array of function declarations to export from the module
-#define CPP_APPLICATION_FORM_FUNCTION_MODULE_END( NofObjects, Objects)\
-	module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, Objects);
+#define CPP_APPLICATION_FORM_FUNCTION_MODULE_END\
+	{0,langbind::CppFormFunction()}\
+	};\
+	namespace {\
+	struct ModuleImpl\
+	{\
+	static _Wolframe::module::SimpleBuilder* constructor()\
+	{\
+		return new _Wolframe::module::CppFormFunctionBuilder( _Wolframe__moduleName(), _Wolframe__cppFormFunctions);\
+	}\
+	};\
+	}\
+	enum {NofObjects=1};\
+	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[ NofObjects] =\
+	{\
+		ModuleImpl::constructor\
+	};\
+	extern "C" { \
+		 module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, _Wolframe__objdef); \
+	}
 

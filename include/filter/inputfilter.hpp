@@ -96,7 +96,7 @@ public:
 	}
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val)
+	virtual bool getValue( const char* name, std::string& val) const
 	{
 		if (std::strcmp( name, "encoding") == 0)
 		{

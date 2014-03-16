@@ -93,13 +93,6 @@ struct ImageRescaleDescription : public serialize::StructDescription<ImageRescal
 	}
 };
 
-struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
-{
-	ImageImplDescription( )
-	{
-	}
-};
-
 } // anonymous namespace
 
 const serialize::StructDescriptionBase *Image::getStructDescription( )
@@ -126,12 +119,6 @@ const serialize::StructDescriptionBase *ImageRescale::getStructDescription( )
 	return &rt;
 }
 
-const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
-{
-	static ImageImplDescription rt;
-	return &rt;
-}
-
 std::string ImageImpl::decode( const std::string &data )
 {
 	base64::Decoder decoder;
@@ -150,7 +137,7 @@ std::string ImageImpl::encode( const std::string &data )
 	return o.str( );
 }
 
-int ImageImpl::info( ImageInfo &res, const Image &param )
+int ImageImpl::info( const proc::ProcessorProviderInterface*, ImageInfo &res, const Image &param )
 {
 // decode
 	std::string raw;
@@ -174,7 +161,7 @@ int ImageImpl::info( ImageInfo &res, const Image &param )
 	return 0;
 }
 
-int ImageImpl::thumb( Image &res, const ImageThumb &param )
+int ImageImpl::thumb( const proc::ProcessorProviderInterface*, Image &res, const ImageThumb &param )
 {
 // decode
 	std::string raw;
@@ -213,7 +200,7 @@ int ImageImpl::thumb( Image &res, const ImageThumb &param )
 	return 0;
 }
 
-int ImageImpl::rescale( Image &res, const ImageRescale &param )
+int ImageImpl::rescale( const proc::ProcessorProviderInterface*, Image &res, const ImageRescale &param )
 {
 // decode
 	std::string raw;
@@ -251,19 +238,3 @@ int ImageImpl::rescale( Image &res, const ImageRescale &param )
 
 	return 0;
 }
-
-int graphix::imageInfoExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
-{
-	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
-}
-
-int graphix::imageThumbExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
-{
-	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
-}
-
-int graphix::imageRescaleExec( const proc::ProcessorProviderInterface*, void *res, const void *param )
-{
-	return ImageImpl::rescale( *(Image *)res, *(const ImageRescale *)param );
-}
-

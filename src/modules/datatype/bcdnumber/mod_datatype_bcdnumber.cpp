@@ -63,5 +63,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	Obj::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "Extension module for arithmetics with arbitrary length BCD numbers", 0, 0, NofObjects, objdef);
+}

@@ -30,7 +30,7 @@ TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
 {
 	PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
@@ -41,7 +41,7 @@ TEST_F( PQmoduleFixture, WrongHost )
 	// Aba: questionable! should't this be an exception?
 	PostgreSQLdbUnit db( "testDB", "blabla", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
@@ -51,28 +51,28 @@ TEST_F( PQmoduleFixture, WrongPassword )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 					   "wolfusr", "wolfpwdd", "", "", "", "", "",
-					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
+					   3, 4, 3, 30000, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongUser )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 					   "wolfusrr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
+					   3, 4, 3, 30000, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongDatabase )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframee",
 					   "wolfusr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10, std::list<std::string>()), std::runtime_error );
+					   3, 4, 3, 30000, std::list<std::string>()), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, Transaction )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
@@ -148,7 +148,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -167,7 +167,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
 	trans->commit( );
-	EXPECT_EQ( emptyres.size(), 0);
+	EXPECT_EQ( emptyres.size(), 0U);
 
 	// ok transaction with statements with commit
 	trans->begin( );
@@ -178,8 +178,8 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id IS NULL, id ASC");
 	trans->commit( );
-	EXPECT_EQ( res.size(), 5);
-	EXPECT_EQ( res.colnames().size(), 4);
+	EXPECT_EQ( res.size(), 5U);
+	EXPECT_EQ( res.colnames().size(), 4U);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "name", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "active", res.colnames().at(2).c_str());
@@ -220,7 +220,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 				ASSERT_EQ( ri->at(1).type(), types::Variant::String);
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Bool);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				EXPECT_EQ( _WOLFRAME_MAX_INTEGER, ri->at(0).touint());
+				EXPECT_EQ( (_WOLFRAME_UINTEGER)_WOLFRAME_MAX_INTEGER, ri->at(0).touint());
 				double price( ri->at(3).todouble());
 				ASSERT_DOUBLE_EQ( std::numeric_limits<double>::max( ) / 2, price );
 				break;
@@ -247,7 +247,7 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -273,7 +273,7 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -308,7 +308,7 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -354,7 +354,7 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -392,7 +392,7 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -406,8 +406,8 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
-	EXPECT_EQ( res.size(), 1);
-	EXPECT_EQ( res.colnames().size(), 3);
+	EXPECT_EQ( res.size(), 1U);
+	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "id2", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "id3", res.colnames().at(2).c_str());
@@ -429,7 +429,7 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::list<std::string>());
+			     3, 4, 3, 30000, std::list<std::string>());
 	Database* db = dbUnit.database( );
 	Transaction* trans = db->transaction( "test" );
 
@@ -445,8 +445,8 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
-	EXPECT_EQ( res.size(), 1);
-	EXPECT_EQ( res.colnames().size(), 3);
+	EXPECT_EQ( res.size(), 1U);
+	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "id2", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "id3", res.colnames().at(2).c_str());

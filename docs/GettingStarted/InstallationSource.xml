@@ -3,9 +3,267 @@
 	<title>Installation from source</title>
 	<para>
 		This section describes how to build the <application>Wolframe</application> application from
-		source code.
+		the source code.
 	</para>
 
 	<sect1>
+		<title>Source Releases</title>
+		
+		<para>
+			Tarballs with release source code are available from
+			SourceForce in the directories
+		</para>
+		
+		<para>
+			<ulink url="http://openbuildservice.org">http://sourceforge.net/projects/wolframe/files/wolframe/</ulink>
+		</para>
+		
+		<para>
+		</para>
+		
+		<para>			
+			respectively
+		</para>
+		
+		<para>			
+			<ulink url="http://openbuildservice.org">http://sourceforge.net/projects/wolframe/files/wolfclient/</ulink>
+			.
+		</para>
+		
+		<para>
+			The <filename>wolframe-&WolframeVersion;.tar.gz</filename> contains the <application>Wolframe</application>
+			server, the modules and 3rdParty software needed to build the server.
+		</para>
+
+		<para>
+			The <filename>wolfclient-&WolfclientVersion;.tar.gz</filename> contains the <application>Wolframe</application>
+			client implementing the graphical user interface.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Building on Unix systems</title>
+
+		<para>
+			For building Wolframe on Unix systems you need at least the
+			following software:
+		</para>
+		
+		<itemizedlist>
+			<listitem>
+				<para>A recent C/C++ compiler, the following ones are known to work:
+				</para>
+				
+				<itemizedlist>
+					<listitem>
+						<para>gcc 4.1.x or newer, <ulink>http://gcc.gnu.org</ulink></para>
+					</listitem>
+					<listitem>
+						<para>clang 3.4 or newer, <ulink>http://clang.llvm.org</ulink></para>
+					</listitem>
+					<listitem>
+						<para>Intel Compiler ICC 14.0 or newer, <ulink>http://software.intel.com/en-us/c-compilers</ulink></para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink>https://www.gnu.org/software/make/</ulink></para>
+			</listitem>
+			<listitem>
+				<para>boost 1.48.0 or newer from <ulink>http://www.boost.org</ulink></para>
+			</listitem>
+		</itemizedlist>
+		
+		<para>
+			<application>Wolframe</application> is build and installed by simply calling:
+
+		        <programlisting language='shell'>
+	make
+	make install
+			</programlisting>
+		</para>
+		
+		<para>
+			The makefiles understand the standard GNU targets like clean', 'distclean', 'test', 'install',
+			'uninstall', etc. Also the standard installation variables 'DESTDIR' and 'prefix' are understood.
+			The whole list of options can be seen with:
+			
+		        <programlisting language='shell'>
+	make help
+			</programlisting>
+		</para>
+
+		<para>
+			There is no configure. Porting to platforms and distributions
+			is done in the makefiles. For most platforms we provide reasonable
+			default values in <filename>makefiles/gmake/platform.mk</filename>.
+		</para>
+
+		<para>
+			Optional features are enabled by using 'WITH_XXX' variables when
+			calling make, e. g. to enable SSL support you call make like this:
+
+		        <programlisting language='shell'>
+	make WITH_SSL=1
+			</programlisting>
+		</para>
+
+		<para>
+			Additional variables can be set when 3rdParty software is not in
+			the standard location, for instance:
+			
+		        <programlisting language='shell'>
+	make BOOST_DIR=/usr/local/boost-1.55.0
+			</programlisting>
+
+		</para>
+		
+		<para>
+			You can check how your software will be build with:
+
+		        <programlisting language='shell'>
+	make config
+			</programlisting>
+			
+			If you get a 'NOT SUPPLIED ON THIS PLATFORM' you have to
+			provide the variables explicitly as mentioned above in
+			the example with 'BOOST_DIR'.
+		</para>
+
+		<sect2>
+			<title>Secure Socket Layer (SSL)</title>
+			
+			<para>
+				The <application>Wolframe</application> protocol can
+				be secured with SSL. You have to specify the following
+				when building:
+
+		        <programlisting language='shell'>
+	make WITH_SSL=1
+			</programlisting>				
+			</para>
+			
+			<para>
+				Currently only OpenSSL (<ulink>http://www.openssl.org</ulink>)
+				is supported. The location of the library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SSL=1 OPENSSL_LIBS=/usr/local/openssl-1.0.1.f
+			</programlisting>				
+			</para>				
+			
+			<para>
+				Use the most recent version of the OpenSSL library available
+				for you platform.
+			</para>
+
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'openssl-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'openssl-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'openssl' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'openssl' package. This package is usually part
+					of the standard package sets.
+				</para>
+			</sect3>
+
+			
+		</sect2>
+		
+		<sect2>
+			<title>Installation</title>
+			
+			<para>
+				The makefiles provide a 'install' and an 'uninstall'
+				target to install and uninstall the software.
+			</para>
+			
+			<para>
+				The 'DESTDIR' and 'prefix' parameters are useful for
+				packagers to reroute the destination of the installation.
+			</para>
+			
+			<para>
+				For instance:
+		        <programlisting language='shell'>
+	make DESTDIR=/var/tmp prefix=/usr/local/wolframe-&WolframeVersion; install
+			</programlisting>
+				installs the software in:
+		        <programlisting language='shell'>
+	/var/tmp/usr/local/wolframe-&WolframeVersion;/sbin/wolframed
+	/var/tmp/usr/local/wolframe-&WolframeVersion;/etc/wolframe/wolframe.conf
+	...
+			</programlisting>			
+			
+			</para>
+		</sect2>
+			
+		
+
+<!--
+Prerequisites
+
+* optionally (WITH_LUA) lua 5.2
+  (integrated in subdir 'lua')
+* for database support (WITH_SYSTEM_SQLITE3): sqlite3
+  WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
+  instead of the system version
+  * optionally (WITH_PGSQL)
+* for optional authentication mechanisms:
+  * optionally (WITH_PAM)
+  * optionally (WITH_SASL)
+* optionally for testing:
+  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
+* optionally (for building the documentation):
+  * xsltproc, docboox*xsl*stylesheet: for docbook
+  * fop: to produce a nice PDF documentation
+  * doxygen: for documentation for programmers
+  * dia: to convert images to svg
+* optionally (WITH_LIBXML2)
+* optionally (WITH_LIBXSLT), needs LIBXML2 too
+* optionally (WITH_CJSON): build JSON filtering module
+  implemented with cjson
+* optionally (WITH_SYSTEM_LIBHPDF): for PDF creation
+  using the system version of libhpdf, specify
+  WITH_LOCAL_LIBHPDF=1 to use the supplied version in
+  the 'libhpdf' subdirectory. In this case also 
+  'zlib' and 'libpng' development libraries are needed
+* optionally (WITH_ICU): ICU 3.6 or later,
+  needed for boost*locale with ICU backend
+* optionally (WITH_SYSTEM_FREEIMAGE): for image handling
+  using the system version of FreeImage, specify
+  WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
+  the 'freeimage' subdirectory.
+* optionally (WITH_PYTHON): build Python 3 module for
+  scripting Wolframe in Python
+* optionally (WITH_ORACLE): build Oracle database module
+-->
+
+	</sect1>
+
+	<sect1>
+		<title>Building on Windows systems</title>
+		
+		<para>
+		</para>
 	</sect1>
 </chapter>

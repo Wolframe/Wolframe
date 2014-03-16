@@ -303,7 +303,6 @@ private:
 
 TesttraceTransaction::TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
 	:StatemachineBasedTransaction( "TEST", new TransactionHandler( dbref_->outfilename().c_str(), result_))
-	,m_dbref(dbref_)
 	,m_result(result_)
 {}
 

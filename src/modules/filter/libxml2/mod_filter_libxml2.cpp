@@ -73,6 +73,7 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 #endif
 
-ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", 0, 0, NofObjects, objdef);
+}
 

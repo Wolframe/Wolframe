@@ -71,8 +71,8 @@ CPP_OBJS = \
 	user.o \
 	HMAC.o \
 	PBKDF2.o \
-#	password.o \
-#	CRAM.o
+	password.o \
+	CRAM.o
 
 OBJS = \
 	b64encode.o \

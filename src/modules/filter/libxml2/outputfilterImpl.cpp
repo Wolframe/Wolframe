@@ -208,7 +208,7 @@ const char* OutputFilterImpl::encoding() const
 	}
 }
 
-bool OutputFilterImpl::getValue( const char* name, std::string& val)
+bool OutputFilterImpl::getValue( const char* name, std::string& val) const
 {
 	if (std::strcmp( name, "encoding") == 0)
 	{
