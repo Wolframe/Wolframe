@@ -280,7 +280,7 @@
 			<title>SQLite database support</title>
 			
 			<para>
-				The <application>Wolframe</application> can use
+				<application>Wolframe</application> can use
 				an Sqlite3 database (<ulink>http://sqlite.org</ulink>)
 				as backend for data storage and for authentication and
 				autorization.
@@ -385,7 +385,7 @@
 			<title>PostgreSQL database support</title>
 			
 			<para>
-				The <application>Wolframe</application> can use
+				<application>Wolframe</application> can use
 				a PostgreSQL database (<ulink>http://postgresql.org</ulink>)
 				as backend for data storage and for authentication and
 				autorization.
