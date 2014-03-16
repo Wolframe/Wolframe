@@ -52,7 +52,6 @@ public:
 	virtual ~TesttraceTransaction(){}
 
 private:
-	const TesttraceDatabase* m_dbref;
 	std::vector<std::string> m_result;
 };
 
