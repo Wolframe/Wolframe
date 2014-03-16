@@ -52,7 +52,8 @@ using namespace _Wolframe::utils;
 namespace _Wolframe {
 namespace log {
 
-static const unsigned short DEFAULT_NOF_THREADS = 4;
+//unused
+//static const unsigned short DEFAULT_NOF_THREADS = 4;
 
 /// Parse the configuration
 bool LoggerConfiguration::parse( const types::PropertyTree::Node& pt, const std::string& /*node*/,
