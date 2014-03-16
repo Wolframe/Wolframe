@@ -161,13 +161,13 @@ else
 	if test $? = 0; then
 		COMPILER='icc'
 	else
-		(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i GCC ) 2>/dev/null 1>/dev/null
+		( $CC --version 2>&1 | $HEAD1 | grep 'clang' ) >/dev/null
 		if test $? = 0; then
-			COMPILER='gcc'
+			 COMPILER='clang'
 		else
-			( $CC --version 2>&1 | $HEAD1 | grep 'clang' ) >/dev/null
+			(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i GCC ) 2>/dev/null 1>/dev/null
 			if test $? = 0; then
-				COMPILER='clang'
+				COMPILER='gcc'
 			else
 				COMPILER='unknown'
 			fi
