@@ -419,12 +419,12 @@ bool TransactionExecStatemachine_oracle::execute()
 			}
 			
 			// allocate buffer for column and register it at the column position
-			descrRef->buf = (char *)calloc( descrRef->bufsize, sizeof( char ) );
+			descrRef->buf.cbuf = (char *)calloc( descrRef->bufsize, sizeof( char ) );
 			descrRef->ind = 0;
 			descrRef->len = 0;
 			descrRef->errcode = 0;
 			status_ = OCIDefineByPos( m_lastresult, &descrRef->defhp,
-				(*m_conn)->errhp, counter, (dvoid *)descrRef->buf,
+				(*m_conn)->errhp, counter, (dvoid *)descrRef->buf.cbuf,
 				(sb4)descrRef->bufsize, descrRef->fetchType,
 				&descrRef->ind, &descrRef->len, &descrRef->errcode, OCI_DEFAULT );
 			rt = status( status_, Executed );
@@ -586,28 +586,28 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	
 	switch( descrRef->dataType ) {
 		case SQLT_CHR: {
-			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descrRef->buf;
+			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descrRef->buf.cbuf;
 			//~ for (int i = 0; i < descrRef->bufsize ; i++){
-				//~ printf(" %2x", descrRef->buf[i]);
+				//~ printf(" %2x", descrRef->buf.cbuf[i]);
 			//~ }
 			//~ putchar( '\n' );
 			// TODO: enforce Oracle returning UTF8 or UTF16 and then
 			// convert it, the variant takes UTF8 (also on Windows?)
-			rt = descrRef->buf;
+			rt = descrRef->buf.cbuf;
 			break;
 		}
 		
 		case SQLT_NUM: {
 			sword status_;
 			sword isInt = 0;		
-			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &isInt );
+			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf.cbuf, &isInt );
 			if( !status( status_, Executed ) ) {
 				errorStatus( std::string( "error in OCINumberIsInt for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 				return types::VariantConst( );
 			}
 			if( !isInt ) {
 				double doubleval = 0;
-				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descrRef->buf.cbuf,
 					(ub4)sizeof( doubleval ), (void *)&doubleval );
 				if( status( status_, Executed ) ) {
 					rt = doubleval;
@@ -616,7 +616,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 				}
 			} else {
 				sword sign = 0;
-				status_ = OCINumberSign( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &sign );
+				status_ = OCINumberSign( (*m_conn)->errhp, (OCINumber *)descrRef->buf.cbuf, &sign );
 				if( !status( status_, Executed ) ) {
 					errorStatus( std::string( "error in OCINumberSign for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 					return types::VariantConst( );
@@ -624,7 +624,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 
 				if( sign < 0 ) {
 					_WOLFRAME_INTEGER intval = 0;
-					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf.cbuf,
 						(ub4)sizeof( _WOLFRAME_INTEGER ), (ub4)OCI_NUMBER_SIGNED, (void *)&intval );
 					if( status( status_, Executed ) ) {
 						//~ LOG_DATA << "[Oracle get SQLT_NUM(signed)]: " << intval;
@@ -635,7 +635,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 					}
 				} else {
 					_WOLFRAME_UINTEGER uintval = 0;
-					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf.cbuf,
 						(ub4)sizeof( _WOLFRAME_UINTEGER ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&uintval );
 					if( status( status_, Executed ) ) {
 						//~ LOG_DATA << "[Oracle get SQLT_NUM(unsigned)]: " << uintval;
@@ -654,7 +654,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		}
 		
 		case SQLT_IBDOUBLE: {
-			rt = types::VariantConst( *((double *)descrRef->buf) );
+			rt = types::VariantConst( *((double *)descrRef->buf.dbuf) );
 			break;
 		}
 					

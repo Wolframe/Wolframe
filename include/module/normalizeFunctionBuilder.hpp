@@ -79,8 +79,8 @@ private:
 	FunctionTypeMap m_functionmap;
 };
 
-
 typedef boost::shared_ptr<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
+
 
 struct NormalizeFunctionDef
 {

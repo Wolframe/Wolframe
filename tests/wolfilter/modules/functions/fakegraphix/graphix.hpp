@@ -73,12 +73,9 @@ class ImageImpl
 		
 	public:
 		static const serialize::StructDescriptionBase *getStructDescription( );
-		static int info( ImageInfo &res, const Image &param );
-		static int thumb( Image &res, const ImageThumb &param );
+		static int info( const proc::ProcessorProviderInterface* provider, ImageInfo &res, const Image &param );
+		static int thumb( const proc::ProcessorProviderInterface* provider, Image &res, const ImageThumb &param );
 };
-
-int imageInfo( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
-int imageThumb( const proc::ProcessorProviderInterface* provider, void *res, const void *param );
 
 }}
 #endif

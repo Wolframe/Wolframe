@@ -62,5 +62,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
+extern "C" {
 ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", 0, 0, NofObjects, objdef);
-
+}

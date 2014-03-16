@@ -35,16 +35,15 @@
 #include "appDevel.hpp"
 #include "employee_assignment_convert_exec.hpp"
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("test form function")
-
 using namespace _Wolframe;
+using namespace _Wolframe::test;
 
-static module::createBuilderFunc objdef[] =
-{
-	appdevel::CppFormFunction<test::AssignmentListDocConvert>::constructor
-};
+CPP_APPLICATION_FORM_FUNCTION_MODULE("test form function")
+CPP_APPLICATION_FORM_FUNCTION(
+	"employee_assignment_convert",
+	assignmentListDocConvert, AssignmentListDoc, AssignmentListDoc)
+CPP_APPLICATION_FORM_FUNCTION_MODULE_END
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END(1,objdef)
 
 
 

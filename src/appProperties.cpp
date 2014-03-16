@@ -41,7 +41,8 @@ namespace _Wolframe	{
 	static const unsigned short APP_MAJOR_VERSION = 0;
 	static const unsigned short APP_MINOR_VERSION = 0;
 	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
+//unused:
+//	static const unsigned short APP_BUILD = 0;
 
 	const char*	applicationName()			{ return "Wolframe"; }
 	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,

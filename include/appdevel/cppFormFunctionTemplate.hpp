@@ -44,21 +44,22 @@ namespace appdevel {
 
 //\class CppFormFunction
 //\brief Application development template for form functions written in C++
-template <class Definition>
+template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
 struct CppFormFunction
 {
-	static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
+	static const langbind::CppFormFunction& declaration()
 	{
-		return Definition::exec( provider, *(typename Definition::OutputType*)res, *(const typename Definition::InputType*) param);
-	}
-
-	static module::SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = Definition::InputType::getStructDescription();
-		static const serialize::StructDescriptionBase* result = Definition::OutputType::getStructDescription();
-
-		langbind::CppFormFunction func( implementation, param, result);
-		return new module::CppFormFunctionBuilder( Definition::name(), func);
+		static const serialize::StructDescriptionBase* param = InputType::getStructDescription();
+		static const serialize::StructDescriptionBase* result = OutputType::getStructDescription();
+		struct Functor
+		{
+			static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
+			{
+				return Function( provider, *(OutputType*)res, *(const InputType*) param);
+			}
+		};
+		static langbind::CppFormFunction func( Functor::implementation, param, result);
+		return func;
 	}
 };
 

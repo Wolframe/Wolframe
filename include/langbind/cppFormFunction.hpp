@@ -45,7 +45,7 @@ namespace langbind {
 class CppFormFunction
 {
 public:
-	typedef int (Function)( const proc::ProcessorProviderInterface* provider, void* res, const void* param);
+	typedef int (*Function)( const proc::ProcessorProviderInterface* provider, void* res, const void* param);
 
 	///\brief Default constructor
 	CppFormFunction()
@@ -87,7 +87,7 @@ public:
 		{return (*m_function)( provider, res, param);}
 
 private:
-	Function* m_function;						//< form function implementation
+	Function m_function;						//< form function implementation
 	const serialize::StructDescriptionBase* m_api_param;		//< api parameter description
 	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
