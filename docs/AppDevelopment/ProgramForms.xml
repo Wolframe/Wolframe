@@ -96,9 +96,9 @@
 				</row>
 
 				<row>
-					<entry>(..)</entry>
-					<entry>suffix of data type</entry>
-					<entry>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</entry>
+					<entry>='..'</entry>
+					<entry>end of data type declaration</entry>
+					<entry>Expresses that '..' is the default initialization value of this element.</entry>
 				</row>
 			</tbody>
 			</tgroup>

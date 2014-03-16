@@ -220,9 +220,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					try
 					{
 						std::string name = ffo->objectClassName();
-						langbind::CppFormFunctionR func( ffo->object());
-						m_programs->defineCppFormFunction( name, *func);
-						LOG_TRACE << "registered '" << name << "' built-in form function ";
+
+						std::vector<std::string> funclist = ffo->functions();
+						std::vector<std::string>::const_iterator fi = funclist.begin(), fe = funclist.end();
+						for (; fi != fe; ++fi)
+						{
+							m_programs->defineCppFormFunction( *fi, ffo->function( *fi));
+							LOG_TRACE << "registered '" << *fi << "' C++ form function ";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{

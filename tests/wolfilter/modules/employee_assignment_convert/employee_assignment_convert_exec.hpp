@@ -40,14 +40,7 @@
 namespace _Wolframe {
 namespace test {
 
-struct AssignmentListDocConvert
-{
-	typedef AssignmentListDoc InputType; 
-	typedef AssignmentListDoc OutputType; 
-	static const char* name() {return "employee_assignment_convert";}
-
-	static int exec( const proc::ProcessorProviderInterface* provider, InputType& res, const OutputType& param);
-};
+int assignmentListDocConvert( const proc::ProcessorProviderInterface* provider, AssignmentListDoc& res, const AssignmentListDoc& param);
 
 }} //namespace
 #endif

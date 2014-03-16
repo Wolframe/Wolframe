@@ -36,17 +36,31 @@ Project Wolframe.
 #include "langbind/cppFormFunction.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
 
+
+struct CppFormFunctionDef
+{
+	const char* name;
+	langbind::CppFormFunction func;
+};
+
 class CppFormFunctionConstructor :public SimpleObjectConstructor< langbind::CppFormFunction >
 {
 public:
-	CppFormFunctionConstructor( const char* name_, const langbind::CppFormFunction& func_)
-		: m_name(name_)
-		, m_func(func_) {}
+	CppFormFunctionConstructor( const char* name_, const CppFormFunctionDef* functions_)
+		:m_name(name_)
+	{
+		std::size_t fi = 0;
+		for (; functions_[fi].name != 0; ++fi)
+		{
+			m_functionmap.insert( std::string(functions_[fi].name), functions_[fi].func);
+		}
+	}
 
 	virtual ~CppFormFunctionConstructor(){}
 
@@ -58,14 +72,23 @@ public:
 	{
 		return m_name.c_str();
 	}
-	virtual langbind::CppFormFunction* object() const
+
+	std::vector<std::string> functions() const
 	{
-		return new langbind::CppFormFunction( m_func);
+		return m_functionmap.getkeys<std::vector<std::string> >();
+	}
+
+	const langbind::CppFormFunction function( const std::string& name) const
+	{
+		FunctionTypeMap::const_iterator fi = m_functionmap.find( name);
+		if (fi == m_functionmap.end()) throw std::runtime_error( "function not defined");
+		return fi->second;
 	}
 
 private:
 	const std::string m_name;
-	const langbind::CppFormFunction m_func;
+	typedef types::keymap<langbind::CppFormFunction> FunctionTypeMap;
+	FunctionTypeMap m_functionmap;
 };
 
 typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructorR;
@@ -74,9 +97,11 @@ typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructor
 class CppFormFunctionBuilder :public SimpleBuilder
 {
 public:
-	CppFormFunctionBuilder( const char* name_, const langbind::CppFormFunction& func_)
+	CppFormFunctionBuilder( const char* name_, const CppFormFunctionDef* functions_)
 		:SimpleBuilder( name_)
-		,m_func(func_){}
+		,m_functions(functions_)
+		  
+	{}
 
 	virtual ~CppFormFunctionBuilder(){}
 
@@ -86,10 +111,10 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CppFormFunctionConstructor( m_className, m_func);
+		return new CppFormFunctionConstructor( m_className, m_functions);
 	}
 private:
-	const langbind::CppFormFunction m_func;
+	const CppFormFunctionDef* m_functions;
 };
 
 }}//namespace

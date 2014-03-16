@@ -53,7 +53,7 @@ static void convertString( std::string& res, const std::string& param)
 	}
 }
 
-int AssignmentListDocConvert::exec( const proc::ProcessorProviderInterface* /*provider*/, AssignmentListDoc& res, const AssignmentListDoc& param)
+int test::assignmentListDocConvert( const proc::ProcessorProviderInterface*, AssignmentListDoc& res, const AssignmentListDoc& param)
 {
 	std::vector<Assignment>::const_iterator itr=param.assignmentlist.assignment.begin();
 	while (itr != param.assignmentlist.assignment.end())
