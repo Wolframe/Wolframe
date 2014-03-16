@@ -20,7 +20,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system
 
-STATIC_LIB =
+STATIC_LIB = libwfsingleton.a
 
 DYNAMIC_LIB = libwfsingleton.so
 DYNAMIC_LIB_MAJOR = 0
