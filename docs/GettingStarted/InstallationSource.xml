@@ -57,21 +57,21 @@
 				
 				<itemizedlist>
 					<listitem>
-						<para>gcc 4.1.x or newer, <ulink>http://gcc.gnu.org</ulink></para>
+						<para>gcc 4.1.x or newer, <ulink url="http://gcc.gnu.org">http://gcc.gnu.org</ulink></para>
 					</listitem>
 					<listitem>
-						<para>clang 3.4 or newer, <ulink>http://clang.llvm.org</ulink></para>
+						<para>clang 3.4 or newer, <ulink url="http://clang.llvm.org">http://clang.llvm.org</ulink></para>
 					</listitem>
 					<listitem>
-						<para>Intel Compiler ICC 14.0 or newer, <ulink>http://software.intel.com/en-us/c-compilers</ulink></para>
+						<para>Intel Compiler ICC 14.0 or newer, <ulink url="http://software.intel.com/en-us/c-compilers">http://software.intel.com/en-us/c-compilers</ulink></para>
 					</listitem>
 				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink>https://www.gnu.org/software/make/</ulink></para>
+				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink url="https://www.gnu.org/software/make/">https://www.gnu.org/software/make/</ulink></para>
 			</listitem>
 			<listitem>
-				<para>boost 1.48.0 or newer from <ulink>http://www.boost.org</ulink></para>
+				<para>boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
 			</listitem>
 		</itemizedlist>
 		
@@ -207,6 +207,189 @@
 			</para>
 		</sect2>
 
+<!-- Boost -->
+		<sect2>
+			<title>Boost</title>
+			
+				<para>
+					Boost (<ulink url="http://www.boost.or">http://www.boost.org</ulink>) is the only
+					library which is absolutly required to build
+					<application>Wolframe</application>.
+				</para>
+			
+			<sect3>
+				<title>Build your own version of Boost</title>
+			
+				<para>
+					The following libraries are required for building
+					<application>Wolframe</application>:
+
+		        <programlisting language='shell'>
+	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+		--with-libraries=thread,filesystem,system,program_options,date_time
+	./bjam install
+			</programlisting>
+
+				If you want to build the ICU normalization
+				module you will have to build 'boost-locale'
+				with ICU support and you have to enable the
+				'regex' and the 'locale' boost libraries too:
+
+		        <programlisting language='shell'>
+	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
+	./bjam install
+			</programlisting>
+
+				The location of the Boost library can be set as follow:
+				
+		        <programlisting language='shell'>
+	make BOOST_DIR=/usr/local/boost-1.48.0
+			</programlisting>				
+
+			</para>
+			
+			</sect3>
+
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>RedHat 6</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+				
+				<para>
+					On RHEL6 there is no licicu-devel on OSC currently (see
+					<ulink url="http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779">http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779</ulink>).
+					Get a Redhat developer license and build
+					your own libicu library and build your own
+					Boost library with boost-locale.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Centos/Scientific Linux 6 and similar Linux distributions</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'boost-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<sect4>
+					<title>Debian 6</title>
+				
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Debian 7</title>
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 10.04.1 LTS, Ubuntu 12.04</title>
+				
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 12.10</title>
+
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 13.04</title>
+					<para>
+						Currently libboost breaks in enable_if template, compile your own 
+						Boost version here.						
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 13.10</title>
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+
+				<sect4>
+					<title>OpenSuSE 12.3, 13.1</title>
+					<para>
+						You need the 'boost-devel' package.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>SLES 11 SP1 and SP2</title>
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'boost' and 'boost-libs' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'boost' package. This package is
+					part of the 'l' package series.
+				</para>
+			</sect3>
+			
+		</sect2>
 <!-- SSL -->
 		<sect2>
 			<title>Secure Socket Layer (SSL)</title>
@@ -222,7 +405,7 @@
 			</para>
 			
 			<para>
-				Currently only OpenSSL (<ulink>http://www.openssl.org</ulink>)
+				Currently only OpenSSL (<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
 				is supported. The location of the library can be overloaded with:
 		        <programlisting language='shell'>
 	make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
@@ -281,7 +464,7 @@
 			
 			<para>
 				<application>Wolframe</application> can use
-				an Sqlite3 database (<ulink>http://sqlite.org</ulink>)
+				an Sqlite3 database (<ulink url="http://sqlite.org">http://sqlite.org</ulink>)
 				as backend for data storage and for authentication and
 				autorization.
 			</para>
@@ -330,6 +513,15 @@
 				correct development library.
 			</para>
 				
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+				
+				<para>
+					The official Sqlite package is too old, use the
+					embedded version of Sqlite with 'WITH_SYSTEM_SQLITE3=1'.
+				</para>
+			</sect3>
+
 			<sect3>
 				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
 				
@@ -386,7 +578,7 @@
 			
 			<para>
 				<application>Wolframe</application> can use
-				a PostgreSQL database (<ulink>http://postgresql.org</ulink>)
+				a PostgreSQL database (<ulink url="http://postgresql.org">http://postgresql.org</ulink>)
 				as backend for data storage and for authentication and
 				autorization.
 			</para>
