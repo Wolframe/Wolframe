@@ -85,6 +85,7 @@ template <typename TYPE>
 static bool parseValue_( void*, const types::VariantConst&)
 {throw std::runtime_error( "unable to parse atomic value of this type");}
 
+/* clang says unused
 template <> bool parseValue_<boost::int64_t>( void* value, const types::VariantConst& element)
 {return parseValue_int64( (boost::int64_t*)value, element);}
 template <> bool parseValue_<boost::uint64_t>( void* value, const types::VariantConst& element)
@@ -113,6 +114,7 @@ template <> bool parseValue_<types::DateTime>( void* value, const types::Variant
 {return parseValue_datetime( (types::DateTime*)value, element);}
 template <> bool parseValue_<types::BigNumber>( void* value, const types::VariantConst& element)
 {return parseValue_bignumber( (types::BigNumber*)value, element);}
+*/
 
 template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
