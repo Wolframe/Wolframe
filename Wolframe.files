@@ -1570,6 +1570,7 @@ include/appdevel/cppFormFunctionTemplate.hpp
 include/appdevel/customDatatypeModuleMacros.hpp
 include/appDevel.hpp
 include/appdevel/normalizeModuleMacros.hpp
+include/appdevel/runtimeEnvironmentModuleMacros.hpp
 include/appInfo.hpp
 include/appProperties.hpp
 include/cmdbind/authCommandHandler.hpp
