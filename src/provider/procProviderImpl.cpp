@@ -36,21 +36,13 @@
 
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
-#include "module/ddlcompilerBuilder.hpp"
-#include "module/cppFormFunctionBuilder.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
-#include "module/customDataTypeBuilder.hpp"
-#include "module/filterBuilder.hpp"
-#include "module/runtimeEnvironmentConstructor.hpp"
-#include "types/doctype.hpp"
+#include "appDevel.hpp"			//... for inspecting different module type objects
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 #include <boost/algorithm/string.hpp>
-
 #include <ostream>
 #include <string>
 

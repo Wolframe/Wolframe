@@ -33,14 +33,13 @@
 ///\file appdevel/programTypeModuleMacros.hpp
 ///\brief Macros for a module for a program type for a binding language
 #include "module/moduleInterface.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 
 //\brief Defines a Wolframe command handler module after the includes section.
-#define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CLASSDEF, CREATEPRGFUNC)\
+#define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
 	static _Wolframe::module::SimpleBuilder* createProgramType()\
 	{\
-		static _Wolframe::module::ProgramTypeBuilder rt( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
-		return &rt;\
+		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
 	}\
 	enum {NofSimpleBuilder=1};\
 	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\

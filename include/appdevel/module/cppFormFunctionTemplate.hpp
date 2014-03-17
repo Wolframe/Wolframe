@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/cppFunctionTemplate.hpp
+///\file appdevel/module/cppFunctionTemplate.hpp
 ///\brief Template for declaring C++ form function
 
 #ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 
-#include "module/cppFormFunctionBuilder.hpp"
+#include "langbind/cppFormFunction.hpp"
 #include "processor/procProviderInterface.hpp"
 
 namespace _Wolframe {

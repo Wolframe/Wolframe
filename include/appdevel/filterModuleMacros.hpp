@@ -33,8 +33,8 @@
 ///\file appdevel/filterModuleMacros.hpp
 ///\brief Macros for a filter modules
 #include "module/moduleInterface.hpp"
-#include "module/filterBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/filterBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 
 //\brief Defines a Wolframe filter module after the includes section.
 #define FILTER_MODULE( DESCRIPTION, FILTER, CREATE_FILTERTYPE)\

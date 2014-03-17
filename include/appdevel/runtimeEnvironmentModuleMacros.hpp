@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file appdevel/runtimeEnvironmentModuleMacros.hpp
 ///\brief Macros for a module for a configurable runtime environment for a binding language or a binding language universe
-#include "module/runtimeEnvironmentConstructor.hpp"
+#include "appdevel/module/runtimeEnvironmentConstructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <boost/lexical_cast.hpp>

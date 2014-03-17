@@ -33,8 +33,7 @@
 ///\file appdevel/ddlCompilerModuleMacros.hpp
 ///\brief Macros for a module implementing a DDL compiler
 #include "module/moduleInterface.hpp"
-#include "module/ddlcompilerBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/ddlcompilerBuilder.hpp"
 
 //\brief Defines a Wolframe DDL compiler module after the includes section.
 #define DDLCOMPILER_MODULE( DESCRIPTION, LANGUAGE, CREATE_COMPILER)\
