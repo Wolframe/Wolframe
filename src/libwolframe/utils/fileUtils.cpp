@@ -54,6 +54,8 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
+#undef _Wolframe_LOWLEVEL_DEBUG
+
 std::string utils::joinPath( const std::string& path, const std::string& item)
 {
 	boost::filesystem::path rt( path);
@@ -572,6 +574,9 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 				//... parse value
 				ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
 			}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+			std::cout << "PROPERTY TOKEN " << (char)(ch?ch:'?') << " '" << tok << "' (" << (id.empty()?"key":"value") << " at " << lineinfo.line << ":" << lineinfo.column << ")" << std::endl;
+#endif
 			switch (ch)
 			{
 				case '\0':
