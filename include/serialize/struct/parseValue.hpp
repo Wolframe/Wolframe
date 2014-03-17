@@ -93,8 +93,6 @@ struct ParseValueType
 		,const BigNumber&>::type get( const T&) { static BigNumber rt; return rt;}
 };
 
-
-/* clang says unused
 static bool getBool( bool& val, int boolnum)
 {
 	if (boolnum == 0)
@@ -109,7 +107,6 @@ static bool getBool( bool& val, int boolnum)
 	}
 	return false;
 }
-*/
 
 template <typename ValueType>
 static bool parseValue_( ValueType& val, const ParseValueType::String&, const types::VariantConst& element)

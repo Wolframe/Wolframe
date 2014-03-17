@@ -89,7 +89,6 @@ template <typename TYPE>
 static bool printValue_( const void*, types::VariantConst&)
 {throw std::runtime_error( "unable to serialize atomic value of this type");}
 
-/* clang says unused functions
 template <> bool printValue_<boost::int64_t>( const void* value, types::VariantConst& element)
 {return printValue_int64( (const boost::int64_t*)value, element);}
 template <> bool printValue_<boost::uint64_t>( const void* value, types::VariantConst& element)
@@ -121,7 +120,6 @@ template <> bool printValue_<types::DateTime>( const void* value, types::Variant
 {return printValue_datetime( (const types::DateTime*)value, element);}
 template <> bool printValue_<types::BigNumber>( const void* value, types::VariantConst& element)
 {return printValue_bignumber( (const types::BigNumber*)value, element);}
-*/
 
 template <typename TYPE>
 static bool fetchObject_( const traits::struct_&, Context& ctx, SerializeStateStack& stk)
