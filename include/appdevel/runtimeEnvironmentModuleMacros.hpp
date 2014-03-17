@@ -1,0 +1,98 @@
+/************************************************************************
+
+ Copyright (C) 2011 - 2014 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+///\file appdevel/runtimeEnvironmentModuleMacros.hpp
+///\brief Macros for a module for a configurable runtime environment for a binding language or a binding language universe
+#include "module/runtimeEnvironmentConstructor.hpp"
+#include "module/moduleInterface.hpp"
+#include "processor/procProviderInterface.hpp"
+#include <boost/lexical_cast.hpp>
+
+//\brief Marks the start of the Wolframe C++ form function module after the includes section.
+#define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION)\
+	static const char* _Wolframe__moduleName()\
+	{\
+		return #NAME;\
+	}\
+	static const char* _Wolframe__moduleDescription()\
+	{\
+		return DESCRIPTION;\
+	}\
+	class NAME ##Constructor \
+		:public module::RuntimeEnvironmentConstructor\
+	{\
+	public:\
+		NAME ##Constructor(){}\
+		virtual ~NAME ##Constructor(){}\
+		virtual DotnetRuntimeEnvironment* object( const config::NamedConfiguration& cfgi)\
+		{\
+			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
+			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");\
+			DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);\
+			return rt;\
+		}\
+		virtual const char* objectClassName() const\
+		{\
+			return #NAME;\
+		}\
+		virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const\
+		{\
+			return true;\
+		}\
+	};\
+	class NAME ##Builder\
+		:public ConfiguredBuilder\
+	{\
+	public:\
+		NAME ##Builder()\
+			:ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #NAME)\
+		{\
+			int err;\
+			if (0!=(err=INITFUNCTION())) throw std::runtime_error(std::string("failed to initialize runtime environment (error code ") + boost::lexical_cast<std::string>(err) + ")");\
+		}\
+		virtual ~NAME ## Builder(){}\
+		virtual ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\
+		}\	
+		virtual config::NamedConfiguration* configuration( const char* logPrefix)\
+		{\
+			return new CONFIGDEF( #NAME, CONFIG_SECTION, logPrefix, CONFIG_TITLE);\
+		}\
+		virtual ObjectConstructorBase* constructor()\
+		{\
+			return new NAME ## Constructor();\
+		}\
+	};
+
+
+

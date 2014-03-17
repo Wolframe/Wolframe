@@ -33,7 +33,6 @@
 ///\file mod_command_dotnet.cpp
 ///\brief Module for calling functions as methods defined in .NET assemblies via .NET interop
 #include "dotnetRuntimeEnvironmentBuilder.hpp"
-#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;

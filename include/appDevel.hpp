@@ -37,6 +37,7 @@
 #include "appdevel/cppFormFunctionModuleMacros.hpp"
 #include "appdevel/normalizeModuleMacros.hpp"
 #include "appdevel/customDatatypeModuleMacros.hpp"
+#include "appdevel/runtimeEnvironmentModuleMacros.hpp"
 #endif
 
 
