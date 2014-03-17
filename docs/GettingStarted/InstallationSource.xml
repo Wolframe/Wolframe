@@ -252,15 +252,18 @@
 			</sect3>
 
 			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+
+			<sect4>
 				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
 				
 				<para>
 					The official Boost packages are not recent enough. Build your own
 					Boost version here.
 				</para>
-			</sect3>
+			</sect4>
 
-			<sect3>
+			<sect4>
 				<title>RedHat 6</title>
 				
 				<para>
@@ -275,25 +278,27 @@
 					your own libicu library and build your own
 					Boost library with boost-locale.
 				</para>
-			</sect3>
+			</sect4>
 			
-			<sect3>
+			<sect4>
 				<title>Centos/Scientific Linux 6 and similar Linux distributions</title>
 				
 				<para>
 					The official Boost packages are not recent enough. Build your own
 					Boost version here.
 				</para>
-			</sect3>
+			</sect4>
 
-			<sect3>
+			<sect4>
 				<title>Fedora and similar Linux distributions</title>
 				
 				<para>
 					You need the 'boost-devel' package.
 				</para>
+			</sect4>
+			
 			</sect3>
-
+			
 			<sect3>
 				<title>Debian, Ubuntu and similar Linux distributions</title>
 				
