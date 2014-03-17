@@ -83,7 +83,7 @@
 		virtual ObjectConstructorBase::ObjectType objectType() const\
 		{\
 			return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\
-		}\	
+		}\
 		virtual config::NamedConfiguration* configuration( const char* logPrefix)\
 		{\
 			return new CONFIGDEF( #NAME, CONFIG_SECTION, logPrefix, CONFIG_TITLE);\
