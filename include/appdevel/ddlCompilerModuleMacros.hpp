@@ -30,10 +30,31 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
-///\brief Module for testing form functions
-#include "appdevel/ddlCompilerModuleMacros.hpp"
-#include "simpleFormCompiler.hpp"
+///\file appdevel/ddlCompilerModuleMacros.hpp
+///\brief Macros for a module implementing a DDL compiler
+#include "module/moduleInterface.hpp"
+#include "module/ddlcompilerBuilder.hpp"
+#include "module/programTypeBuilder.hpp"
 
-DDLCOMPILER_MODULE( "simpleform DDL compiler", "simpleform", _Wolframe::langbind::createSimpleFormCompilerFunc)
+//\brief Defines a Wolframe DDL compiler module after the includes section.
+#define DDLCOMPILER_MODULE( DESCRIPTION, LANGUAGE, CREATE_COMPILER)\
+	static const char* _Wolframe__moduleDescription()\
+	{\
+		return DESCRIPTION;\
+	}\
+	static _Wolframe::module::SimpleBuilder* createCompiler()\
+	{\
+		return new _Wolframe::module::DDLCompilerBuilder( #LANGUAGE "Compiler", #LANGUAGE, CREATE_COMPILER);\
+	}\
+	enum {NofSimpleBuilder=1};\
+	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	{\
+		createCompiler\
+	};\
+	extern "C" {\
+		_Wolframe::module::ModuleEntryPoint \
+		entryPoint( 0, _Wolframe__moduleDescription(),\
+				0, 0,\
+				NofSimpleBuilder, simpleBuilder);\
+	}
 
