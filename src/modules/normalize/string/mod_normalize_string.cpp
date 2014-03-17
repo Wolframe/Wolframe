@@ -32,39 +32,15 @@
 ************************************************************************/
 ///\file mod_normalize_string.cpp
 ///\brief Module for string normalization and validating functions without using ICU
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
 #include "stringNormalize.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::langbind;
 
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"trim", &langbind::createTrimNormalizeFunction},
-	{"ucname", &langbind::createUcnameNormalizeFunction},
-	{"lcname", &langbind::createLcnameNormalizeFunction},
-	{"convdia", &langbind::createConvdiaNormalizeFunction},
-	{0,0}
-};
+NORMALIZER_MODULE( "StringNormalizer", "basic string normalizers not using ICU or another library")
+NORMALIZER_FUNCTION(	"trim",		createTrimNormalizeFunction)
+NORMALIZER_FUNCTION(	"ucname",	createUcnameNormalizeFunction)
+NORMALIZER_FUNCTION(	"lcname",	createLcnameNormalizeFunction)
+NORMALIZER_FUNCTION(	"convdia",	createConvdiaNormalizeFunction)
+NORMALIZER_MODULE_END
 
-namespace {
-struct NormalizeProcessor
-{
-
-	static SimpleBuilder* constructor()
-	{
-		return new NormalizeFunctionBuilder( "StringNormalizer", normalizeFunctions);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::constructor
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", 0, 0, NofObjects, objdef);
-}

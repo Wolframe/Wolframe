@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file directmapCommandHandlerBuilder.hpp
-///\brief Interface directmap command handler builder
-#ifndef _Wolframe_DIRECTMAP_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
+///\file directmapCommandHandlerConfig.hpp
+///\brief Interface directmap command handler configuration
+#ifndef _Wolframe_DIRECTMAP_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
+#define _Wolframe_DIRECTMAP_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
 #include "directmapCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "cmdbind/commandHandler.hpp"
@@ -45,7 +45,7 @@ Project Wolframe.
 #include <map>
 
 namespace _Wolframe {
-namespace module {
+namespace cmdbind {
 
 ///\brief Named configuration definition
 class DirectmapCommandHandlerConfig
@@ -60,7 +60,7 @@ public:
 	///\brief Parse the configuration
 	///\param[in] pt configuration tree
 	///\param[in] modules module directory
-	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory* modules);
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules);
 
 	///\brief Set canonical path for files referenced as relative path in configuration
 	///\param[in] referencePath reference path
@@ -90,73 +90,6 @@ public:
 private:
 	std::vector<std::string> m_programfiles;
 	cmdbind::DirectmapContext m_context;
-	const char* m_classname;
-};
-
-
-class DirectmapCommandHandlerConstructor
-	:public cmdbind::CommandHandlerConstructor
-{
-public:
-	DirectmapCommandHandlerConstructor(){}
-
-	virtual ~DirectmapCommandHandlerConstructor(){}
-
-	virtual cmdbind::DirectmapCommandHandler* object( const config::NamedConfiguration& cfgi)
-	{
-		const DirectmapCommandHandlerConfig* cfg = dynamic_cast<const DirectmapCommandHandlerConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
-		cmdbind::DirectmapCommandHandler* rt = new cmdbind::DirectmapCommandHandler( cfg->context());
-		return rt;
-	}
-
-	virtual const char* objectClassName() const
-	{
-		return "DirectmapCommandHandler";
-	}
-
-	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const
-	{
-		const DirectmapCommandHandlerConfig* cfg = dynamic_cast<const DirectmapCommandHandlerConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
-		return cfg->commands();
-	}
-
-	virtual bool checkReferences( const config::NamedConfiguration& cfgi, const proc::ProcessorProviderInterface* provider) const
-	{
-		const DirectmapCommandHandlerConfig* cfg = dynamic_cast<const DirectmapCommandHandlerConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
-		return cfg->checkReferences( provider);
-	}
-};
-
-
-class DirectmapCommandHandlerBuilder
-	:public ConfiguredBuilder
-{
-public:
-	DirectmapCommandHandlerBuilder( const char* classname_, const char* title, const char* section, const char* keyword, const char* id)
-		:ConfiguredBuilder( title, section, keyword, id)
-		,m_classname(classname_){}
-
-	virtual ~DirectmapCommandHandlerBuilder(){}
-
-	virtual ObjectConstructorBase::ObjectType objectType() const
-	{
-		return ObjectConstructorBase::CMD_HANDLER_OBJECT;
-	}
-
-	virtual config::NamedConfiguration* configuration( const char* logPrefix)
-	{
-		return new DirectmapCommandHandlerConfig( m_classname, m_title, logPrefix, m_keyword);
-	}
-
-	virtual ObjectConstructorBase* constructor()
-	{
-		return new DirectmapCommandHandlerConstructor();
-	}
-
-private:
 	const char* m_classname;
 };
 

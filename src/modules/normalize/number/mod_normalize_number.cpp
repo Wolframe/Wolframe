@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_normalize_number.hpp
 ///\brief Module for number normalization and validation functions
-#include "appDevel.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
 #include "numberNormalize.hpp"
 
 using namespace _Wolframe::langbind;

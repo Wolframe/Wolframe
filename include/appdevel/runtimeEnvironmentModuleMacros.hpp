@@ -37,7 +37,7 @@
 #include "processor/procProviderInterface.hpp"
 #include <boost/lexical_cast.hpp>
 
-//\brief Marks the start of the Wolframe C++ form function module after the includes section.
+//\brief Defines a Wolframe module for programs with a runtime environment (e.g. programs with shared resources) after the includes section.
 #define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION)\
 	static const char* _Wolframe__moduleName()\
 	{\
@@ -48,12 +48,12 @@
 		return DESCRIPTION;\
 	}\
 	class NAME ##Constructor \
-		:public module::RuntimeEnvironmentConstructor\
+		:public _Wolframe::module::RuntimeEnvironmentConstructor\
 	{\
 	public:\
 		NAME ##Constructor(){}\
 		virtual ~NAME ##Constructor(){}\
-		virtual DotnetRuntimeEnvironment* object( const config::NamedConfiguration& cfgi)\
+		virtual DotnetRuntimeEnvironment* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
 			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");\
@@ -64,7 +64,7 @@
 		{\
 			return #NAME;\
 		}\
-		virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const\
+		virtual bool checkReferences( const _Wolframe::config::NamedConfiguration&, const _Wolframe::proc::ProcessorProviderInterface*) const\
 		{\
 			return true;\
 		}\
@@ -80,15 +80,15 @@
 			if (0!=(err=INITFUNCTION())) throw std::runtime_error(std::string("failed to initialize runtime environment (error code ") + boost::lexical_cast<std::string>(err) + ")");\
 		}\
 		virtual ~NAME ## Builder(){}\
-		virtual ObjectConstructorBase::ObjectType objectType() const\
+		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\
-			return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\
+			return _Wolframe::ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\
 		}\
-		virtual config::NamedConfiguration* configuration( const char* logPrefix)\
+		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
 		{\
 			return new CONFIGDEF( #NAME, CONFIG_SECTION, logPrefix, CONFIG_TITLE);\
 		}\
-		virtual ObjectConstructorBase* constructor()\
+		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\
 			return new NAME ## Constructor();\
 		}\

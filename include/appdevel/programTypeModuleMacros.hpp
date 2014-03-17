@@ -30,15 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/mod_normalize_number.hpp
-///\brief Module for number normalization and validating functions
-#include "appdevel/normalizeModuleMacros.hpp"
-#include "base64Normalize.hpp"
+///\file appdevel/programTypeModuleMacros.hpp
+///\brief Macros for a module for a program type for a binding language
+#include "module/moduleInterface.hpp"
+#include "module/programTypeBuilder.hpp"
 
-using namespace _Wolframe::langbind;
-
-NORMALIZER_MODULE( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
-NORMALIZER_FUNCTION(	"encode",	createEncodeNormalizeFunction)
-NORMALIZER_FUNCTION(	"decode",	createDecodeNormalizeFunction)
-NORMALIZER_MODULE_END
-
+//\brief Defines a Wolframe command handler module after the includes section.
+#define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CLASSDEF, CREATEPRGFUNC)\
+	static _Wolframe::module::SimpleBuilder* createProgramType()\
+	{\
+		static _Wolframe::module::ProgramTypeBuilder rt( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
+		return &rt;\
+	}\
+	enum {NofSimpleBuilder=1};\
+	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	{\
+		createProgramType\
+	};\
+	extern "C" {\
+		_Wolframe::module::ModuleEntryPoint \
+		entryPoint( 0, "form function program type for " #LANGNAME,\
+				0, 0,\
+				NofSimpleBuilder, simpleBuilder);\
+	}

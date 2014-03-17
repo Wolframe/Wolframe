@@ -30,7 +30,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
-	directmapCommandHandlerBuilder.obj \
+	directmapCommandHandlerConfig.obj \
 	mod_command_directmap.obj
 
 all: $(DYNAMIC_MODULE)

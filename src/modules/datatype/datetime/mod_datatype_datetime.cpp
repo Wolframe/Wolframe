@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_datatype_datetime.cpp
 ///\brief Module for date and datetime arithmetic
-#include "appDevel.hpp"
+#include "appdevel/customDatatypeModuleMacros.hpp"
 #include "datatypeDate.hpp"
 
 using namespace _Wolframe;

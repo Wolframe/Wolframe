@@ -34,10 +34,12 @@
 ///\brief Macros and templates for building Wolframe extensions. This is the main include file for writing Wolframe application extensions in native C++.
 #ifndef _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
-#include "appdevel/cppFormFunctionModuleMacros.hpp"
-#include "appdevel/normalizeModuleMacros.hpp"
-#include "appdevel/customDatatypeModuleMacros.hpp"
-#include "appdevel/runtimeEnvironmentModuleMacros.hpp"
+#include "appdevel/cppFormFunctionModuleMacros.hpp"	//< form functions written in C++
+#include "appdevel/normalizeModuleMacros.hpp"		//< basic normalizer functions
+#include "appdevel/customDatatypeModuleMacros.hpp"	//< custom data types
+#include "appdevel/runtimeEnvironmentModuleMacros.hpp"	//< types of programs needing a configurable runtime environment
+#include "appdevel/commandHandlerModuleMacros.hpp"	//< command handlers and optionally also types of programs without configuration
+#include "appdevel/programTypeModuleMacros.hpp"		//< types of programs without configuration
 #endif
 
 
