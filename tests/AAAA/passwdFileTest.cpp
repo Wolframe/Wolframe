@@ -117,12 +117,15 @@ TEST_F( PasswdFileFixture, getUser )
 
 TEST_F( PasswdFileFixture, getHMACuser )
 {
-	PasswordFile	pwdFile( "passwd", false );
-	PwdFileUser	user;
-	PasswordHash::Salt	salt;
-	bool result;
+	PasswordFile		pwdFile( "passwd", false );
+	PwdFileUser		user;
+	bool			result;
 
-	salt.generate();
+	_Wolframe::RandomGenerator& rnd = _Wolframe::RandomGenerator::instance();
+	unsigned char saltData[ PASSWORD_SALT_SIZE ];
+	rnd.generate( saltData, PASSWORD_SALT_SIZE );
+	PasswordHash::Salt	salt( saltData, PASSWORD_SALT_SIZE );
+
 	HMAC_SHA256	hmac0( salt.salt(), salt.size(), "Admin" );
 	result = pwdFile.getHMACuser( hmac0.toString(), salt.toString(), user, true );
 	EXPECT_FALSE( result );

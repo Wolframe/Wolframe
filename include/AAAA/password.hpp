@@ -46,7 +46,6 @@ namespace AAAA {
 static const size_t PASSWORD_HASH_SIZE = 224 / 8;
 static const size_t PASSWORD_SALT_SIZE = 128 / 8;
 
-
 class PasswordHash
 {
 public:
@@ -61,8 +60,8 @@ public:
 		/// Construct a salt by setting the value from the base64 encoded string.
 		Salt( const std::string& str );
 
-		/// Construct a random salt using the global random number generator.
-		void generate();
+		/// Destructor (set all bits 0).
+		~Salt();
 
 		/// True if the 2 password salts are identical, false otherwise.
 		bool operator == ( const Salt& rhs );
@@ -93,6 +92,9 @@ public:
 		/// Construct the password hash by setting the value from the base64 encoded string.
 		Hash( const std::string& str );
 
+		/// Destruct the password hash (set all bits 0).
+		~Hash();
+
 		/// True if the 2 password hashes are identical, false otherwise
 		bool operator == ( const Hash& rhs );
 		bool operator != ( const Hash& rhs )	{ return !( *this == rhs ); }
@@ -115,7 +117,13 @@ public:
 	PasswordHash()			{}
 
 	/// Construct the password hash from salt and password (plain text)
-	/// \param pwdSalt	password salt as a base64 string
+	/// \param pwdSalt	password salt as bytes
+	/// \param bytes	password salt length in bytes
+	/// \param password	password as plain text
+	PasswordHash( const unsigned char* pwdSalt, size_t bytes, const std::string& password );
+
+	/// Construct the password hash from salt and password (plain text)
+	/// \param pwdSalt	password salt as PasswordHash::Salt
 	/// \param password	password as plain text
 	PasswordHash( const Salt& pwdSalt, const std::string& password );
 
@@ -130,10 +138,6 @@ public:
 	///		the string is considered to represent only the
 	///		password hash as base64 and the salt will be zeroed
 	PasswordHash( const std::string& str );
-
-
-	/// Generate a password salt and compute the password hash using the salt
-	void computeHash( const std::string& password );
 
 	/// The password salt
 	const Salt& salt() const	{ return m_salt; }
