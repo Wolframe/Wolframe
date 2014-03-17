@@ -186,9 +186,14 @@ endif
 
 # start of icc section
 
+# -Wno-unused-function would make sense for static functions, but
+# it croaks for normal API functions (which may not all be used)
+
 ifeq "$(COMPILER)" "icc"
 COMMON_COMPILE_FLAGS = \
 	-Wall
+
+#-Wno-unused-function
 
 CXX_COMPILE_FLAGS = \
 	$(COMMON_COMPILE_FLAGS) \
