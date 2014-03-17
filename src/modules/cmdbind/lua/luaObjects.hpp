@@ -75,9 +75,9 @@ public:
 	const LuaDump* content() const					{return m_content.get();}
 
 private:
-	std::vector<std::string> m_functions;
-	std::string m_path;
-	boost::shared_ptr<LuaDump> m_content;
+	std::vector<std::string> m_functions;	//< list of exported functions implemented in the script
+	std::string m_path;			//< path of the stript for error messages
+	boost::shared_ptr<LuaDump> m_content;	//< binary dump of the script
 };
 
 

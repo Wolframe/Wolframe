@@ -57,6 +57,9 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#if LUA_VERSION_NUM < 502
+#error Wolframe needs Lua version >= 5.2.1
+#endif
 }
 
 using namespace _Wolframe;
@@ -2625,7 +2628,11 @@ LuaScript::LuaScript( const std::string& path_)
 }
 
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleMap* modulemap_)
-	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_),m_modulemap(modulemap_)
+	:m_ls(0)
+	,m_thread(0)
+	,m_threadref(0)
+	,m_script(script_)
+	,m_modulemap(modulemap_)
 {}
 
 std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)

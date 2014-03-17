@@ -46,7 +46,7 @@ struct LuaScriptContext
 	LuaModuleMap modulemap;
 	LuaFunctionMap funcmap;
 
-	LuaScriptContext() :funcmap(&modulemap){}
+	LuaScriptContext()	:funcmap(&modulemap){}
 	~LuaScriptContext(){}
 
 	void loadPrograms( const std::vector<std::string>& prgfiles_);
