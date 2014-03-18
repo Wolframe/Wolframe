@@ -47,10 +47,25 @@
 extern "C" {
 #endif
 
+/// \brief HMAC-SHA1 message digest
+/// \param key     in
+/// \param keySize in
+/// \param msg     in
+/// \param msgSize in
+/// \param hash    out
+///
 void hmac_sha1( const unsigned char* key, size_t keySize,
 		const unsigned char* msg, size_t msgSize,
 		unsigned char hash[] );
 
+
+/// \brief HMAC-SHA256 message digest
+/// \param key     in
+/// \param keySize in
+/// \param msg	   in
+/// \param msgSize in
+/// \param hash    out
+///
 void hmac_sha256( const unsigned char* key, size_t keySize,
 		  const unsigned char* msg, size_t msgSize,
 		  unsigned char hash[] );

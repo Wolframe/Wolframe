@@ -45,7 +45,13 @@ namespace crypto {
 class PBKDF2_HMAC_SHA1
 {
 public:
-	/// Build the PBKDF2 with HMAC-SHA1
+ /// Build the PBKDF2 with HMAC-SHA1
+ /// \param	key	byte array
+ ///
+ ///
+	/// \note	All PBKDF2 constructors treat the string arguments differently.
+	///		The seed is base64 encoded while the password is plain text.
+	///		The base64 encoding can be witn padding or without
 	PBKDF2_HMAC_SHA1( const unsigned char* key, size_t keySize,
 			  const unsigned char* password, size_t pwdSize,
 			  std::size_t dkLen, unsigned int rounds );
