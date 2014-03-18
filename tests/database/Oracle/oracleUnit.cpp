@@ -164,7 +164,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
 	trans->commit( );
-	EXPECT_EQ( emptyres.size(), 0);
+	EXPECT_EQ( emptyres.size(), (unsigned int)0);
 
 	// ok transaction with statements with commit
 	trans->begin( );
@@ -226,7 +226,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 				// TODO: Bool
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Int);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				EXPECT_EQ( _WOLFRAME_MAX_INTEGER, ri->at(0).touint());
+				EXPECT_EQ( (unsigned int)_WOLFRAME_MAX_INTEGER, ri->at(0).touint());
 				double price( ri->at(3).todouble());
 				// TODO: why is the range limited?
 				ASSERT_DOUBLE_EQ( 1.0E+126 , price );
