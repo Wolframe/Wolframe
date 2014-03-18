@@ -40,10 +40,7 @@ Project Wolframe.
 #include <boost/type_traits.hpp>
 #include <string>
 
-namespace _Wolframe {
-namespace serialize {
-namespace traits {
-
+namespace {
 ///\class PrintValueType
 ///\brief type traits for print value types
 struct PrintValueType
@@ -109,21 +106,21 @@ struct PrintValueType
 
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::Bool&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::Bool&, _Wolframe::types::VariantConst& element)
 {
 	element = val;
 	return true;
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::String&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::String&, _Wolframe::types::VariantConst& element)
 {
 	element.init( val.c_str(), val.size());
 	return true;
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::Double&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::Double&, _Wolframe::types::VariantConst& element)
 {
 	try
 	{
@@ -135,7 +132,7 @@ bool printValue_( const ValueType& val, const PrintValueType::Double&, types::Va
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::Int&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::Int&, _Wolframe::types::VariantConst& element)
 {
 	try
 	{
@@ -148,7 +145,7 @@ bool printValue_( const ValueType& val, const PrintValueType::Int&, types::Varia
 
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::UInt&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::UInt&, _Wolframe::types::VariantConst& element)
 {
 	try
 	{
@@ -160,18 +157,22 @@ bool printValue_( const ValueType& val, const PrintValueType::UInt&, types::Vari
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::DateTime&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::DateTime&, _Wolframe::types::VariantConst& element)
 {
 	element = val;
 	return true;
 }
 
 template <typename ValueType>
-bool printValue_( const ValueType& val, const PrintValueType::BigNumber&, types::VariantConst& element)
+bool printValue_( const ValueType& val, const PrintValueType::BigNumber&, _Wolframe::types::VariantConst& element)
 {
 	element = val;
 	return true;
 }
+
+} //anonymous namespace
+namespace _Wolframe {
+namespace serialize {
 
 template <typename ValueType>
 bool printValue( const ValueType& val, types::VariantConst& element)
@@ -179,6 +180,6 @@ bool printValue( const ValueType& val, types::VariantConst& element)
 	return printValue_( val, PrintValueType::get(val), element);
 }
 
-}}}//namespace
+}}//namespace
 #endif
 

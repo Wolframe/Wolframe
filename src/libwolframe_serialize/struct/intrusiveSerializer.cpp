@@ -41,72 +41,72 @@ using namespace _Wolframe::serialize;
 
 bool serialize::printValue_int64( const boost::int64_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const boost::int64_t*)ptr, value);
+	return printValue( *(const boost::int64_t*)ptr, value);
 }
 
 bool serialize::printValue_uint64( const boost::uint64_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const boost::uint64_t*)ptr, value);
+	return printValue( *(const boost::uint64_t*)ptr, value);
 }
 
 bool serialize::printValue_int32( const boost::int32_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const boost::int32_t*)ptr, value);
+	return printValue( *(const boost::int32_t*)ptr, value);
 }
 
 bool serialize::printValue_uint32( const boost::uint32_t* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const boost::uint32_t*)ptr, value);
+	return printValue( *(const boost::uint32_t*)ptr, value);
 }
 
 bool serialize::printValue_short( const signed short* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const signed short*)ptr, value);
+	return printValue( *(const signed short*)ptr, value);
 }
 
 bool serialize::printValue_ushort( const unsigned short* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const unsigned short*)ptr, value);
+	return printValue( *(const unsigned short*)ptr, value);
 }
 
 bool serialize::printValue_char( const signed char* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const signed char*)ptr, value);
+	return printValue( *(const signed char*)ptr, value);
 }
 
 bool serialize::printValue_uchar( const unsigned char* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const unsigned char*)ptr, value);
+	return printValue( *(const unsigned char*)ptr, value);
 }
 
 bool serialize::printValue_bool( const bool* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const bool*)ptr, value);
+	return printValue( *(const bool*)ptr, value);
 }
 
 bool serialize::printValue_float( const float* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const float*)ptr, value);
+	return printValue( *(const float*)ptr, value);
 }
 
 bool serialize::printValue_double( const double* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const double*)ptr, value);
+	return printValue( *(const double*)ptr, value);
 }
 
 bool serialize::printValue_string( const std::string* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const std::string*)ptr, value);
+	return printValue( *(const std::string*)ptr, value);
 }
 
 bool serialize::printValue_datetime( const types::DateTime* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const types::DateTime*)ptr, value);
+	return printValue( *(const types::DateTime*)ptr, value);
 }
 
 bool serialize::printValue_bignumber( const types::BigNumber* ptr, types::VariantConst& value)
 {
-	return traits::printValue( *(const types::BigNumber*)ptr, value);
+	return printValue( *(const types::BigNumber*)ptr, value);
 }
 
 bool serialize::fetchCloseTag( Context& ctx, SerializeStateStack& stk)
