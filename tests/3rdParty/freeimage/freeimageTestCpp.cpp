@@ -51,8 +51,8 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	unsigned int width = image.getWidth( );
 	unsigned int height = image.getHeight( );
 	//std::cout << "size is " << width << " x " << height << std::endl;
-	ASSERT_EQ( width, 312 );
-	ASSERT_EQ( height, 312 );
+	ASSERT_EQ( width, (unsigned int)312 );
+	ASSERT_EQ( height, (unsigned int)312 );
 	
 // make thumbnail
 	fipImage thumb( image );
@@ -62,8 +62,8 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	unsigned int widthThumb = thumb.getWidth( );
 	unsigned int heightThumb = thumb.getHeight( );
 	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
-	ASSERT_EQ( widthThumb, 50 );
-	ASSERT_EQ( heightThumb, 50 );
+	ASSERT_EQ( widthThumb, (unsigned int)50 );
+	ASSERT_EQ( heightThumb, (unsigned int)50 );
 	
 // save image (for debugging mainly)
 	thumb.save( THUMB, 0 );
@@ -90,8 +90,8 @@ TEST_F( FreeImagePlusFixture, ImageFromMemory )
 	unsigned int width = image.getWidth( );
 	unsigned int height = image.getHeight( );
 	//std::cout << "size is " << width << " x " << height << std::endl;
-	ASSERT_EQ( width, 312 );
-	ASSERT_EQ( height, 312 );
+	ASSERT_EQ( width, (unsigned int)312 );
+	ASSERT_EQ( height, (unsigned int)312 );
 
 // create freeimage memory handle for result
 	fipMemoryIO outIO;
