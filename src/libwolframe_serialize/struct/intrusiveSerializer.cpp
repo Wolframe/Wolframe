@@ -79,6 +79,11 @@ bool serialize::printValue_uchar( const unsigned char* ptr, types::VariantConst&
 	return traits::printValue( *(const unsigned char*)ptr, value);
 }
 
+bool serialize::printValue_bool( const bool* ptr, types::VariantConst& value)
+{
+	return traits::printValue( *(const bool*)ptr, value);
+}
+
 bool serialize::printValue_float( const float* ptr, types::VariantConst& value)
 {
 	return traits::printValue( *(const float*)ptr, value);

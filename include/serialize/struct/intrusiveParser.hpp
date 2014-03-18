@@ -71,6 +71,7 @@ bool parseValue_short( signed short*, const types::VariantConst& element);
 bool parseValue_ushort( unsigned short*, const types::VariantConst& element);
 bool parseValue_char( signed char*, const types::VariantConst& element);
 bool parseValue_uchar( unsigned char*, const types::VariantConst& element);
+bool parseValue_bool( bool*, const types::VariantConst& element);
 bool parseValue_float( float*, const types::VariantConst& element);
 bool parseValue_double( double*, const types::VariantConst& element);
 bool parseValue_string( std::string*, const types::VariantConst& element);
@@ -81,39 +82,45 @@ bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Co
 
 
 namespace {
-template <typename TYPE>
-static bool parseValue_( void*, const types::VariantConst&)
-{throw std::runtime_error( "unable to parse atomic value of this type");}
+template <typename TYPE> struct Parser {};
 
-template <> bool parseValue_<boost::int64_t>( void* value, const types::VariantConst& element)
-{return parseValue_int64( (boost::int64_t*)value, element);}
-template <> bool parseValue_<boost::uint64_t>( void* value, const types::VariantConst& element)
-{return parseValue_uint64( (boost::uint64_t*)value, element);}
+template <> struct Parser<boost::int64_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_int64( (boost::int64_t*)value, element);}};
+template <> struct Parser<boost::uint64_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_uint64( (boost::uint64_t*)value, element);}};
 
-template <> bool parseValue_<boost::int32_t>( void* value, const types::VariantConst& element)
-{return parseValue_int32( (boost::int32_t*)value, element);}
-template <> bool parseValue_<boost::uint32_t>( void* value, const types::VariantConst& element)
-{return parseValue_uint32( (boost::uint32_t*)value, element);}
+template <> struct Parser<boost::int32_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_int32( (boost::int32_t*)value, element);}};
+template <> struct Parser<boost::uint32_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_uint32( (boost::uint32_t*)value, element);}};
 
-template <> bool parseValue_<signed short>( void* value, const types::VariantConst& element)
-{return parseValue_short( (signed short*)value, element);}
-template <> bool parseValue_<unsigned short>( void* value, const types::VariantConst& element)
-{return parseValue_ushort( (unsigned short*)value, element);}
-template <> bool parseValue_<signed char>( void* value, const types::VariantConst& element)
-{return parseValue_char( (signed char*)value, element);}
-template <> bool parseValue_<unsigned char>( void* value, const types::VariantConst& element)
-{return parseValue_uchar( (unsigned char*)value, element);}
-template <> bool parseValue_<float>( void* value, const types::VariantConst& element)
-{return parseValue_float( (float*)value, element);}
-template <> bool parseValue_<double>( void* value, const types::VariantConst& element)
-{return parseValue_double( (double*)value, element);}
-template <> bool parseValue_<std::string>( void* value, const types::VariantConst& element)
-{return parseValue_string( (std::string*)value, element);}
-template <> bool parseValue_<types::DateTime>( void* value, const types::VariantConst& element)
-{return parseValue_datetime( (types::DateTime*)value, element);}
-template <> bool parseValue_<types::BigNumber>( void* value, const types::VariantConst& element)
-{return parseValue_bignumber( (types::BigNumber*)value, element);}
+template <> struct Parser<boost::int16_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_short( (boost::int16_t*)value, element);}};
+template <> struct Parser<boost::uint16_t>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_ushort( (boost::uint16_t*)value, element);}};
 
+template <> struct Parser<signed char>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_char( (signed char*)value, element);}};
+template <> struct Parser<unsigned char>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_uchar( (unsigned char*)value, element);}};
+
+template <> struct Parser<float>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_float( (float*)value, element);}};
+
+template <> struct Parser<bool>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_bool( (bool*)value, element);}};
+
+template <> struct Parser<double>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_double( (double*)value, element);}};
+
+template <> struct Parser<std::string>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_string( (std::string*)value, element);}};
+
+template <> struct Parser<types::DateTime>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_datetime( (types::DateTime*)value, element);}};
+
+template <> struct Parser<types::BigNumber>
+{static bool parseValue( void* value, const types::VariantConst& element) {return parseValue_bignumber( (types::BigNumber*)value, element);}};
 
 template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
@@ -145,7 +152,7 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 template <typename TYPE>
 static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context& ctx, ParseStateStack& stk)
 {
-	return parseObjectAtomic( parseValue_<TYPE>, inp, ctx, stk);
+	return parseObjectAtomic( Parser<TYPE>::parseValue, inp, ctx, stk);
 }
 
 }//anonymous namespace

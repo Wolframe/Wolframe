@@ -81,28 +81,28 @@ struct PrintValueType
 	///\return Int if T is a signed integer number
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_arithmetic<T>::value && boost::is_signed<T>::value && !boost::is_floating_point<T>::value
+		boost::is_arithmetic<T>::value && boost::is_signed<T>::value && !boost::is_floating_point<T>::value && !boost::is_same<T,bool>::value
 		,const Int&>::type get( const T&) { static Int rt; return rt;}
 
 	///\brief get category UInt for a type
 	///\return UInt if T is an unsigned integer number
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_arithmetic<T>::value && boost::is_unsigned<T>::value && !boost::is_floating_point<T>::value
+		boost::is_arithmetic<T>::value && boost::is_unsigned<T>::value && !boost::is_floating_point<T>::value && !boost::is_same<T,bool>::value
 		,const UInt&>::type get( const T&) { static UInt rt; return rt;}
 
 	///\brief get category DateTime for a type
 	///\return DateTime if T is a types::DateTime
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_same<T,types::DateTime>::value
+		boost::is_same<T,_Wolframe::types::DateTime>::value
 		,const DateTime&>::type get( const T&) { static DateTime rt; return rt;}
 
 	///\brief get category BigNumber for a type
 	///\return BigNumber if T is a types::BigNumber
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_same<T,types::BigNumber>::value
+		boost::is_same<T,_Wolframe::types::BigNumber>::value
 		,const BigNumber&>::type get( const T&) { static BigNumber rt; return rt;}
 };
 
