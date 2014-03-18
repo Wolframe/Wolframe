@@ -1315,7 +1315,9 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	if (newEnter)
 	{
 		output = LuaObject<Output>::getSelf( ls, "output", "opentag");
-		check_parameters( ls, 1, 1, LUA_TSTRING);
+		if (lua_gettop( ls) != 2) throw std::runtime_error( "expected tag to open in ouput as argument");
+		int tp = lua_type( ls, 2);
+		if (tp != LUA_TSTRING && tp != LUA_TNUMBER) throw std::runtime_error( "expected string or number as first argument");
 		tag = lua_tostring( ls, 2);
 		tagsize = std::strlen( tag);
 	}

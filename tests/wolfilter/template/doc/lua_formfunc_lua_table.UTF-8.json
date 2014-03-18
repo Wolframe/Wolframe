@@ -1,12 +1,12 @@
 {
 	"assignmentlist":	{
 		"assignment":	[{
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"JULIA",
 					"phone":	"098 765 43 21",
 					"surname":	"TEGEL-SACHER"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"324",
 						"key":	"A123",
@@ -17,12 +17,12 @@
 						"title":	"JOB 2"
 					}]
 			}, {
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"JAKOB",
 					"phone":	"012 345 67 89",
 					"surname":	"STEGELIN"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"567",
 						"key":	"A456",

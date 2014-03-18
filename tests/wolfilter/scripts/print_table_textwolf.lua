@@ -1,11 +1,12 @@
-
 function run()
-	f = provider.filter( "textwolf")
+	local f = provider.filter( "textwolf")
 	f.empty = false
 	input:as( f)
 	output:as( provider.filter( "blob"))
-	t = input:table()
-	f = provider.formfunction( "print_invoice")
-	output:print( f( t):table())
+	local t = input:get()
+	local f = provider.formfunction( "print_invoice")
+	for val,tag in f(t):get() do
+		output:print( val)
+	end
 end
 

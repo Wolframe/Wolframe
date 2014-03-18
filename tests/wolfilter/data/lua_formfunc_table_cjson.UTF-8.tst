@@ -59,11 +59,48 @@ Processor
 	}
 }
 **file:script.lua
+function printTable( tab)
+	-- deterministic print of a table (since lua 5.2.1 table keys order is non deterministic)
+
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
+		if type(v) == "table" then
+			if v[ #v] then
+				-- print array (keys are indices)
+				for eidx,elem in ipairs( v) do
+					output:opentag( t)
+					if type(elem) == "table" then
+						printTable( elem)
+					else
+						output:print( elem)
+					end
+					output:closetag()
+				end
+			else
+				-- print table (keys are values)
+				output:opentag( t)
+				printTable( v)
+				output:closetag()
+			end
+		else
+			output:opentag( t)
+			output:print( v)
+			output:closetag()
+		end
+	end
+end
 
 function run()
 	t = input:table()
 	r = provider.formfunction("employee_assignment_convert")( t)
-	output:print( r:table())
+	printTable( r:table())
 end
 **requires:DISABLED NETBSD
 
@@ -71,36 +108,36 @@ end
 {
 	"assignmentlist":	{
 		"assignment":	[{
-				"issuedate":	"8647993",
 				"employee":	{
 					"firstname":	"juulliiaa",
 					"phone":	"901 234 56 78",
 					"surname":	"teeggeell-saacchheerr"
 				},
+				"issuedate":	"8647993",
 				"task":	[{
 						"customernumber":	"325",
-						"title":	"jjoobb 8",
-						"key":	"a876"
+						"key":	"a876",
+						"title":	"jjoobb 8"
 					}, {
 						"customernumber":	"568",
-						"title":	"jjoobb 7",
-						"key":	"v543"
+						"key":	"v543",
+						"title":	"jjoobb 7"
 					}]
 			}, {
-				"issuedate":	"8647993",
 				"employee":	{
 					"firstname":	"jaakkoobb",
 					"phone":	"987 654 32 10",
 					"surname":	"stteeggeelliinn"
 				},
+				"issuedate":	"8647993",
 				"task":	[{
 						"customernumber":	"568",
-						"title":	"jjoobb 6",
-						"key":	"a543"
+						"key":	"a543",
+						"title":	"jjoobb 6"
 					}, {
 						"customernumber":	"891",
-						"title":	"jjoobb 5",
-						"key":	"v210"
+						"key":	"v210",
+						"title":	"jjoobb 5"
 					}]
 			}]
 	}

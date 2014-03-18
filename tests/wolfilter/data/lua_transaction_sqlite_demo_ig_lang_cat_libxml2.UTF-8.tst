@@ -343,11 +343,12 @@ function get_tree( parentid)
 	local t = provider.formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+		local elem = { name=v.name, parent=tonumber(v.parent), children = {} }
+		a[ v.ID] = elem
 	end
 	for i,v in pairs( a) do
 		if v.parent and v.parent ~= 0 then
-			table.insert( a[ v.parent ].children, i )
+			table.insert( a[ v.parent ].children, tonumber( i ))
 		end
 	end
 	return a

@@ -50,6 +50,7 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 	}
 	else
 	{
+		setState( m_inputfilter->state());
 		element.init( (const char*)charptr, charsize);
 	}
 	return rt;

@@ -76,10 +76,47 @@ function toupper_formfunc( inp)
 	return toupper_table( inp:table())
 end
 **file:script.lua
+function printTable( tab)
+	-- deterministic print of a table (since lua 5.2.1 table keys order is non deterministic)
+
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
+		if type(v) == "table" then
+			if v[ #v] then
+				-- print array (keys are indices)
+				for eidx,elem in ipairs( v) do
+					output:opentag( t)
+					if type(elem) == "table" then
+						printTable( elem)
+					else
+						output:print( elem)
+					end
+					output:closetag()
+				end
+			else
+				-- print table (keys are values)
+				output:opentag( t)
+				printTable( v)
+				output:closetag()
+			end
+		else
+			output:opentag( t)
+			output:print( v)
+			output:closetag()
+		end
+	end
+end
 
 function run()
 	res = provider.formfunction( "toupper_formfunc")( input:table())
-	output:print( res:table())
+	printTable( res:table())
 end
 **requires:DISABLED NETBSD
 
@@ -87,12 +124,12 @@ end
 {
 	"assignmentlist":	{
 		"assignment":	[{
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"JULIA",
 					"phone":	"098 765 43 21",
 					"surname":	"TEGEL-SACHER"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"324",
 						"key":	"A123",
@@ -103,12 +140,12 @@ end
 						"title":	"JOB 2"
 					}]
 			}, {
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"JAKOB",
 					"phone":	"012 345 67 89",
 					"surname":	"STEGELIN"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"567",
 						"key":	"A456",
