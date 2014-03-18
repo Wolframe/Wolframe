@@ -201,25 +201,25 @@ namespace langbind {
 types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_lower<char>, "tolower");
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_lower, "tolower");
 }
 
 types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_upper<char>, "toupper");
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_upper, "toupper");
 }
 
 types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_title<char>, "totitle");
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_title, "totitle");
 }
 
 types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
 {
 	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::fold_case<char>, "foldcase");
+	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::fold_case, "foldcase");
 }
 
 types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
