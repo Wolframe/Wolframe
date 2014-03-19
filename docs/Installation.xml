@@ -2,26 +2,26 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
 
-	<!ENTITY % xinclude			SYSTEM	"XInclude.mod">
+	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
 	%xinclude;
 
-	<!ENTITY % GettingStartedEntities	SYSTEM	"GettingStarted/GettingStarted.ent">
-	%GettingStartedEntities;
+	<!ENTITY % InstallationEntities	SYSTEM	"Installation/Installation.ent">
+	%InstallationEntities;
 
 	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
 	%CommonEntities;
 
 <!-- book set data -->
-	<!ENTITY BookSetVersion		SYSTEM "GettingStartedVersion.txt">
-	<!ENTITY BookSetPublicationDate	SYSTEM "GettingStartedDate.txt">
+	<!ENTITY BookSetVersion		SYSTEM "InstallationVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "InstallationDate.txt">
 	<!ENTITY WolframeVersion	SYSTEM "WolframeVersion.txt">
 	<!ENTITY WolfclientVersion	SYSTEM "WolfclientVersion.txt">
 
 ]>
 
 <book id="book_GettingStarted" lang="en">
-	<title>Wolframe Getting Started</title>
-	<subtitle>Basic Installation and Configuration Guide</subtitle>
+	<title>Wolframe Installation</title>
+	<subtitle>Installation and Configuration Guide</subtitle>
 	<bookinfo>
 		<date>&BookSetPublicationDate;</date>
 		<issuenum>Version &BookSetVersion;</issuenum>
@@ -35,7 +35,7 @@
 		&WolframeLegalNotice;
 	</bookinfo>
 
-	&GettingStartedPreface;
-	&GettingStartedInstallationSource;
-	&GettingStartedInstallationBinary;
+	&InstallationPreface;
+	&InstallationSource;
+	&InstallationBinary;
 </book>

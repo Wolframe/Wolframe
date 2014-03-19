@@ -77,7 +77,7 @@ doc-doxygen-webpage:
 
 doc-html: WolfBook.html Tutorial.html
 
-doc-txt: GettingStarted.txt
+doc-txt: Installation.txt
 
 doc-html-chunked: html/index.html html-tutorial/index.html
 
@@ -115,12 +115,12 @@ doc-towordml: WolfBook.docx
 # Getting Started Guide
 
 GETTING_STARTED_FILES = \
-	GettingStarted.xml \
-	GettingStartedVersion.txt \
-	GettingStartedDate.txt \
-	GettingStarted/Preface.xml \
-	GettingStarted/InstallationSource.xml \
-	GettingStarted/InstallationBinary.xml \
+	Installation.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/Preface.xml \
+	Installation/InstallationSource.xml \
+	Installation/InstallationBinary.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 

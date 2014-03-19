@@ -1,5 +1,0 @@
-<!-- Wolframe Getting Started Guide -->
-
-<!ENTITY GettingStartedPreface			SYSTEM "Preface.xml">
-<!ENTITY GettingStartedInstallationBinary	SYSTEM "InstallationBinary.xml">
-<!ENTITY GettingStartedInstallationSource	SYSTEM "InstallationSource.xml">
