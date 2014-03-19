@@ -234,7 +234,7 @@
 					<application>Wolframe</application>:
 
 		        <programlisting language='shell'>
-	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+	./bootstrap.sh --prefix=/usr/local/boost-1.55.0 \
 		--with-libraries=thread,filesystem,system,program_options,date_time
 	./bjam install
 			</programlisting>
@@ -245,7 +245,7 @@
 				'regex' and the 'locale' boost libraries too:
 
 		        <programlisting language='shell'>
-	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+	./bootstrap.sh --prefix=/usr/local/boost-1.55.0 \
 		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
 	./bjam install
 			</programlisting>
@@ -281,10 +281,10 @@
 				</para>
 				
 				<para>
-					On RHEL6 there is no licicu-devel on OSC currently (see
+					On RHEL6 there is no 'libicu-devel' package on OSC (see
 					<ulink url="http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779">http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779</ulink>).
-					Get a Redhat developer license and build
-					your own libicu library and build your own
+					Get a Redhat developer license to get the 'libicu-devel'
+					package or build your own libicu library and build your own
 					Boost library with boost-locale.
 				</para>
 			</sect4>
@@ -380,7 +380,7 @@
 				</sect4>
 
 				<sect4>
-					<title>SLES 11 SP1 and SP2</title>
+					<title>SLES 11 SP1, SP2 and SP3</title>
 					<para>
 						The official Boost packages are not recent enough. Build your own
 						Boost version here.
@@ -485,7 +485,7 @@
 			
 			<para>
 				You enable the building of a loadable Sqlite3 database
-				module with
+				module with:
 
 		        <programlisting language='shell'>
 	make WITH_SYSTEM_SQLITE3=1
@@ -599,7 +599,7 @@
 			
 			<para>
 				You enable the building of a loadable PostgreSQL database
-				module with
+				module with:
 
 		        <programlisting language='shell'>
 	make WITH_PGSQL=1
@@ -760,7 +760,7 @@
 			
 			<para>
 				You enable the building of a loadable Oracle database
-				module with
+				module with:
 
 		        <programlisting language='shell'>
 	make WITH_ORACLE=1
@@ -925,12 +925,12 @@
 
 <!-- libxml2/libxslt -->
 		<sect2>
-			<title>Filtering support with libxml2 and libxslt</title>
+			<title>XML filtering support with libxml2 and libxslt</title>
 			
 			<para>
 				<application>Wolframe</application> can use
 				libxml2 and libxslt (<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>)
-				for filtering and the conversion of data.
+				for filtering and the conversion of XML data.
 			</para>
 			
 			<para>
@@ -940,7 +940,7 @@
 			
 			<para>
 				You enable the building of a loadable libxml2/libxslt filtering
-				module with
+				module with:
 
 		        <programlisting language='shell'>
 	make WITH_LIBXML2=1 WITH_LIBXSLT=1
@@ -1027,12 +1027,68 @@
 						
 		</sect2>
 
+<!-- cJSON -->
+		<sect2>
+			<title>XML filtering support with Textwolf</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				Textwolf (<ulink url="http://textwolf.net">http://textwolf.net</ulink>)
+				for filtering and the conversion of XML data.
+			</para>
+			
+			<para>
+				The textwolf library is embedded in the subdirectory
+				<filename>3rdParty/textwolf</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Textfolw filtering
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_TEXTWOLF=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: If you plan to
+				run tests when building the <application>Wolframe</application>
+				you should enable Textwolf as many tests rely on it's presence.
+			</para>						
+		</sect2>
+		
+
+<!-- cJSON -->
+		<sect2>
+			<title>JSON filtering support with cJSON</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				cJSON (<ulink url="http://sourceforge.net/projects/cjson/">http://sourceforge.net/projects/cjson/</ulink>)
+				for filtering and the conversion of JSON data.
+			</para>
+			
+			<para>
+				The cjson library is embedded in the subdirectory
+				<filename>3rdParty/libcjson</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable cJSON filtering
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_CJSON=1
+			</programlisting>
+							
+			</para>
+									
+		</sect2>
 		
 <!--
 Prerequisites
-
-* optionally (WITH_CJSON): build JSON filtering module
-  implemented with cjson
 
 * optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -1094,6 +1150,16 @@ Prerequisites
 			</programlisting>			
 			
 			</para>
+			
+			<para>
+				The 'DEFAULT_MODULE_LOAD_DIR' parameter can be used
+				by packagers to set the load directory for loadable
+				modules. For instance a Redhat SPEC file will contain
+				a line like:
+		        <programlisting language='shell'>
+	make DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules
+		        </programlisting>
+		        </para>
 		</sect2>
 
 	</sect1>
