@@ -205,6 +205,15 @@
 			<para>
 				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
 			</para>
+			
+			<para>
+				When running the tests or any binaries you have to
+				make sure that 'LD_LIBRARY_PATH' is set correctly
+				(the example is for csh/tcsh, Intel 64-bit):
+		        <programlisting language='shell'>
+	setenv LD_LIBRARY_PATH $PROD_DIR/lib/intel64
+			</programlisting>	
+			</para>
 		</sect2>
 
 <!-- Boost -->

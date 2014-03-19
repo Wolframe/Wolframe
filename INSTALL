@@ -97,7 +97,16 @@ Foreword
             ArchLinux
             Slackware
 
-        1.2.8. Installation
+        1.2.8. Oracle database support
+
+            RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.9. Installation
 
     1.3. Building on Windows systems
 
@@ -193,7 +202,16 @@ Table of Contents
         ArchLinux
         Slackware
 
-    1.2.8. Installation
+    1.2.8. Oracle database support
+
+        RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+            distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.9. Installation
 
 1.3. Building on Windows systems
 
@@ -318,6 +336,12 @@ Compilation with the Intel C compiler is done with:
 (where '/opt/intel/bin/icc' is the location of the Intel compiler).
 
 Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
+
+When running the tests or any binaries you have to make sure that
+'LD_LIBRARY_PATH' is set correctly (the example is for csh/tcsh, Intel 64-bit):
+
+        setenv LD_LIBRARY_PATH $PROD_DIR/lib/intel64
+
 
 1.2.4. Boost
 
@@ -628,7 +652,105 @@ Compile Wolframe now with:
 Alternatively you can of course also build the PostgreSQL package with the help
 of SlackBuilds.
 
-1.2.8. Installation
+1.2.8. Oracle database support
+
+Wolframe can use a Oracle database (http://www.oracle.com) as backend for data
+storage and for authentication and autorization.
+
+Import note: Make sure you have all the licenses to develop with Oracle and to
+install an Oracle database! The Wolframe team doesn't take any responsability
+if licenses are violated!
+
+You enable the building of a loadable Oracle database module with
+
+        make WITH_ORACLE=1
+
+
+The location of the Oracle instantclient library can be overloaded with:
+
+        make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+
+
+You can also override all compilation and linking flags of Oracle separatly:
+
+        make WITH_ORACLE=1 \
+                ORACLE_INCLUDE_DIR=/usr/lib/oracle/11_2/client64 \
+                ORACLE_LIB_DIR=/usr/lib/oracle/11_2/client64 \
+                ORACLE_LIBS=-lclntsh
+
+
+If you want to run the tests for Oracle you'll have to set up an Oracle
+database. Then install the 'wolframe' database and the 'wolfusr' database user.
+Sql example files can be found in contrib/database/oracle.
+
+RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions
+
+For building the Oracle database module you have to download the RPM packages
+oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm and
+oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm. You can of course also
+install the zipfiles and install those.
+
+From the system repositories you'll need the 'libaio' package.
+
+If you want to use the 'sqlplus' command line tool for manual testing you also
+have to install the package
+oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm. If you want a history
+in sqlplus it's highly recommended that you install a command line history
+wrapper like for instance 'rlwrap'.
+
+Debian, Ubuntu and similar Linux distributions
+
+For building the Oracle database module you have to download the RPM packages
+oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm and
+oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm.
+
+To install those RPM files you'll need the 'alien' tool. You can of course also
+install the zipfiles and install those.
+
+From the system repositories you'll need the 'libaio1' package.
+
+If you want to use the 'sqlplus' command line tool for manual testing you also
+have to install the package
+oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm. If you want a history
+in sqlplus it's highly recommended that you install a command line history
+wrapper like for instance 'rlwrap'.
+
+openSUSE, SLES and similar Linux distributions
+
+For building the Oracle database module you have to download the RPM packages
+oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm and
+oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm. You can of course also
+install the zipfiles and install those.
+
+From the system repositories you'll need the 'libaio1' package.
+
+If you want to use the 'sqlplus' command line tool for manual testing you also
+have to install the package
+oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm. If you want a history
+in sqlplus it's highly recommended that you install a command line history
+wrapper like for instance 'rlwrap'.
+
+ArchLinux
+
+You need the two packages 'oracle-instantclient-basic' and
+'oracle-instantclient-sdk'.
+
+Have a look at https://wiki.archlinux.org/index.php/Oracle_client on how to
+install the Oracle packages. Basically you have two options: either you use the
+'oracle' pacman repository or you download the Oracle packages by hand and run
+the build scripts from AUR.
+
+Slackware
+
+Simply download the zipfiles and install them to a directory, let's say '/opt/
+oracle/instantclient_11_2'.
+
+Call 'make' with:
+
+        make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+
+
+1.2.9. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.
