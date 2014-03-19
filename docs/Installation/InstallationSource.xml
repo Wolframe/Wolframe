@@ -733,7 +733,7 @@
 				</para>
 				
 				<para>
-					Alternatively you can of course also build the PostgreSQL
+					Alternatively you can of course also build the 'postgresql'
 					package with the help of SlackBuilds.
 				</para>
 			</sect3>
@@ -1087,22 +1087,260 @@
 									
 		</sect2>
 		
-<!--
-Prerequisites
+<!-- Lua -->
+		<sect2>
+			<title>Scripting support with Lua</title>
+			
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Lua (<ulink url="http://www.lua.org">http://www.lua.org</ulink>).
+			</para>
+			
+			<para>
+				The Lua interpreter is embedded in the subdirectory
+				<filename>3rdParty/lua</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Lua scripting
+				module with:
 
-* optionally (WITH_LUA) lua 5.2
-  (integrated in subdir 'lua')
-* optionally (WITH_PYTHON): build Python 3 module for
-  scripting Wolframe in Python
+		        <programlisting language='shell'>
+	make WITH_LUA=1
+			</programlisting>
+							
+			</para>
+									
+		</sect2>
+
+<!-- Python -->
+		<sect2>
+			<title>Scripting support with Python</title>
+			
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Python (<ulink url="https://www.python.org">https://www.python.org</ulink>).
+			</para>
+						
+			<para>
+				The module supports only version 3 of the Python interpreter,
+				version 2 is not supported.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Python scripting
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_PYTHON=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				The location of the Python library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_PYTHON=1 \
+		PYTHON_DIR=/usr/local/Python-3.3.5
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of the Python library separatly:
+		        <programlisting language='shell'>
+	make WITH_PYTHON=1 \
+		PYTHON_CFLAGS=-I/usr/include/python3.3m -I/usr/include/python3.3m \
+		PYTHON_LDFLAGS=-lpthread -Xlink -export-dynamic \
+		PYTHON_LIBS=-lpython3.3m
+			</programlisting>				
+			
+			</para>
+			<para>
+				Normally you should not change those flags by hand and
+				rely on the results of the 'python-config' script.
+			</para>
+							
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 5 and 6 and similar Linux distributions</title>
+				
+				<para>
+					There are no official Python packages for version 3 of Python.
+					Build your own version of Python. Make sure the location of
+					'python3-config' is in your path.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'python3-devel' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'python3-dev' package.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'python3-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'python' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					On Slackware you have to build your own version of Python with:
+					<programlisting language='shell'>
+	./configure --enable-shared
+	make
+	make install
+					</programlisting>
+				</para>
+
+				<para>
+					Alternatively you can of course also build the 'python3'
+					package with the help of SlackBuilds.
+				</para>
+			</sect3>
+						
+		</sect2>
+
+<!-- Python -->
+		<sect2>
+			<title>Printing support with libhpdf</title>
+			
+			<para>
+				<application>Wolframe</application> can print
+				with libhpdf (<ulink url="http://libharu.org/">http://libharu.org/</ulink>,
+				also called libharu).
+			</para>
+									
+			<para>
+				You enable the building of a loadable libhpdf printing
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_LIBHPDF=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				You can also link against the embedded version of
+				libhpdf in '3rdParty/libhpdf' instead of the one of
+				the Linux distribution:
+		        <programlisting language='shell'>
+	make WITH_LOCAL_LIBHPDF=1
+			</programlisting>
+			</para>
+			
+			<para>
+				The location of the libhpdf library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_LIBPHDF=1 \
+		LIBHPDF_DIR=/usr/local/libharu-2.2.1
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the libhpdf library separatly:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_LIBPHDF=1 \
+		LIBHPDF_INCLUDE_DIR=/usr/local/libharu-2.2.1/include \
+		LIBHPDF_LIB_DIR=/usr/local/libharu-2.2.1/lib \
+		LIBHPDF_LIBS=-lhpdf
+			</programlisting>				
+			
+			</para>
+			
+			<para>
+				Though most Linux distributions have a 'libhpdf' package we
+				recommend to use the embedded version 2.3.0RC2 as this version
+				contains many patches.
+			</para>
+			
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'zlib-devel' and 'libpng-devel' packages to
+					build libhpdf.
+				</para>				
+				
+				<para>
+					On Fedora you can also try to use the 'libhpdf-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'zlib1g-dev' and 'libnpg12-dev' packages to
+					build libhpdf.
+				</para>				
+
+				<para>
+					You can also try to use the 'libhpdf-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'zlib-devel' and 'libpng12-devel' packages to
+					build libhpdf.
+				</para>
+
+				<para>
+					You can also try to use the 'libhpdf-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'zlib' and 'libpng' packages to
+					build libhpdf.
+				</para>
+
+				<para>
+					You can also try to use the 'libharu' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					On Slackware you have to build your own version of libhpdf.
+					You need the 'zlib' and 'libpng' packages.
+					Both packages are part of the 'l' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
+		
+<!--
 
 * optionally (WITH_ICU): ICU 3.6 or later,
   needed for boost*locale with ICU backend
 
-* optionally (WITH_SYSTEM_LIBHPDF): for PDF creation
-  using the system version of libhpdf, specify
-  WITH_LOCAL_LIBHPDF=1 to use the supplied version in
-  the 'libhpdf' subdirectory. In this case also 
-  'zlib' and 'libpng' development libraries are needed
 * optionally (WITH_SYSTEM_FREEIMAGE): for image handling
   using the system version of FreeImage, specify
   WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
