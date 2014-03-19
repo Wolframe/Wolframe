@@ -740,10 +740,28 @@ install the Oracle packages. Basically you have two options: either you use the
 'oracle' pacman repository or you download the Oracle packages by hand and run
 the build scripts from AUR.
 
+If you want to use the 'sqlplus' command line tool for manual testing you also
+have to install the package 'oracle-instantclient-sqlplus'. If you want a
+history in sqlplus it's highly recommended that you install a command line
+history wrapper like for instance 'rlwrap'.
+
 Slackware
 
 Simply download the zipfiles and install them to a directory, let's say '/opt/
-oracle/instantclient_11_2'.
+oracle/instantclient_12_1':
+
+        mkdir -p /opt/oracle
+        cd /opt/oracle
+        unzip instantclient-basic-linux.x64-12.1.0.1.0.zip
+        unzip instantclient-sdk-linux.x64-12.1.0.1.0.zip
+
+
+Add the following line to /etc/ld.so.conf and reload the cached shared
+libraries:
+
+                                                echo "/opt/oracle/instantclient_12_1" >> /etc/ld.so.conf
+                                                ldconfig
+
 
 Call 'make' with:
 

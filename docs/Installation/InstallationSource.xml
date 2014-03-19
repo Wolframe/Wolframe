@@ -873,7 +873,7 @@
 					You need the two packages 'oracle-instantclient-basic'
 					and 'oracle-instantclient-sdk'.
 				</para>
-				
+
 				<para>
 					Have a look at <ulink url="https://wiki.archlinux.org/index.php/Oracle_client">https://wiki.archlinux.org/index.php/Oracle_client</ulink>
 					on how to install the Oracle packages. Basically you have two
@@ -881,19 +881,42 @@
 					download the Oracle packages by hand and run the build scripts
 					from AUR.
 				</para>
+				
+				<para>
+					If you want to use the 'sqlplus' command line tool for manual testing you also
+					have to install the package 'oracle-instantclient-sqlplus'.
+					If you want a history in sqlplus it's highly recommended that you install
+					a command line history wrapper like for instance 'rlwrap'.
+				</para>
+				
 			</sect3>
 
 			<sect3>
 				<title>Slackware</title>
 				<para>
 					Simply download the zipfiles and install them to a directory,
-					let's say '/opt/oracle/instantclient_11_2'.
+					let's say '/opt/oracle/instantclient_12_1':
+					<programlisting language='shell'>
+	mkdir -p /opt/oracle
+	cd /opt/oracle
+	unzip instantclient-basic-linux.x64-12.1.0.1.0.zip
+	unzip instantclient-sdk-linux.x64-12.1.0.1.0.zip
+					</programlisting>
+				</para>
+				
+				<para>
+					Add the following line to <filename>/etc/ld.so.conf</filename> and
+					reload the cached shared libraries:
+					<programlisting language='shell'>
+	echo "/opt/oracle/instantclient_12_1" >> /etc/ld.so.conf
+	ldconfig
+					</programlisting>				
 				</para>
 				
 				<para>
 					Call 'make' with:
 					<programlisting language='shell'>
-	make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+	make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_12_1
 					</programlisting>
 				</para>				
 			</sect3>
