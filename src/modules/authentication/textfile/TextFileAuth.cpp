@@ -70,8 +70,8 @@ AuthenticatorInstance* TextFileAuthenticator::instance()
 	return new TextFileAuthInstance( *this );
 }
 
-
-static const std::size_t PWD_LINE_SIZE = 1024;
+// clang says unused
+//static const std::size_t PWD_LINE_SIZE = 1024;
 
 User* TextFileAuthenticator::authenticatePlain( const std::string& username,
 						const std::string& password,

@@ -36,7 +36,6 @@ Project Wolframe.
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
 #include "processor/procProvider.hpp"
-#include "module/filterBuilder.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>

@@ -30,43 +30,30 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file module/runtimeEnvironmentConstructor.hpp
-//\brief Interface to constructors of runtime environment for executing functions that need it
-#ifndef _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
-#define _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
-#include "module/constructor.hpp"
-#include "langbind/runtimeEnvironment.hpp"
+///\file appdevel/ddlCompilerModuleMacros.hpp
+///\brief Macros for a module implementing a DDL compiler
 #include "module/moduleInterface.hpp"
-#include <string>
-#include <boost/shared_ptr.hpp>
+#include "appdevel/module/ddlcompilerBuilder.hpp"
 
-namespace _Wolframe {
-namespace proc {
-	//\brief Forward declaration
-	class ProcessorProvider;
-}
-namespace module {
-
-//\class RuntimeEnvironmentConstructor
-//\brief Constructor of a runtime environment for executing functions
-class RuntimeEnvironmentConstructor
-	:public ConfiguredObjectConstructor<langbind::RuntimeEnvironment>
-{
-public:
-	//\brief Destructor
-	virtual ~RuntimeEnvironmentConstructor(){}
-
-	//\brief Get the module object type
-	//\return the object type
-	virtual ObjectConstructorBase::ObjectType objectType() const
-	{
-		return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;
+//\brief Defines a Wolframe DDL compiler module after the includes section.
+#define DDLCOMPILER_MODULE( DESCRIPTION, LANGUAGE, CREATE_COMPILER)\
+	static const char* _Wolframe__moduleDescription()\
+	{\
+		return DESCRIPTION;\
+	}\
+	static _Wolframe::module::SimpleBuilder* createCompiler()\
+	{\
+		return new _Wolframe::module::DDLCompilerBuilder( #LANGUAGE "Compiler", #LANGUAGE, CREATE_COMPILER);\
+	}\
+	enum {NofSimpleBuilder=1};\
+	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	{\
+		createCompiler\
+	};\
+	extern "C" {\
+		_Wolframe::module::ModuleEntryPoint \
+		entryPoint( 0, _Wolframe__moduleDescription(),\
+				0, 0,\
+				NofSimpleBuilder, simpleBuilder);\
 	}
-};
 
-typedef boost::shared_ptr<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
-
-
-}} //namespace
-
-#endif

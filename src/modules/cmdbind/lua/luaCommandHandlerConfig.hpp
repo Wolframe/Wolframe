@@ -30,18 +30,15 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file luaCommandHandlerBuilder.hpp
-///\brief Interface lua command handler builder
-#ifndef _Wolframe_LUA_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
-#define _Wolframe_LUA_COMMAND_HANDLER_BUILDER_HPP_INCLUDED
+///\brief Interface of the lua command handler configuration
+#ifndef _Wolframe_LUA_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
+#define _Wolframe_LUA_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
 #include "luaCommandHandler.hpp"
 #include "luaScriptContext.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/configurationTree.hpp"
-#include "module/moduleInterface.hpp"
-#include "module/constructor.hpp"
-#include "processor/procProviderInterface.hpp"
+#include "config/configurationBase.hpp"
 #include <string>
 #include <map>
 
@@ -91,67 +88,6 @@ private:
 	std::vector<std::string> m_programfiles;
 	const module::ModulesDirectory* m_modules;
 	langbind::LuaScriptContext m_context;
-	const char* m_classname;
-};
-
-
-class LuaCommandHandlerConstructor
-	:public cmdbind::CommandHandlerConstructor
-{
-public:
-	LuaCommandHandlerConstructor(){}
-
-	virtual ~LuaCommandHandlerConstructor(){}
-
-	virtual cmdbind::LuaCommandHandler* object( const config::NamedConfiguration& cfgi)
-	{
-		const LuaCommandHandlerConfig* cfg = dynamic_cast<const LuaCommandHandlerConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
-		cmdbind::LuaCommandHandler* rt = new cmdbind::LuaCommandHandler( cfg->context());
-		return rt;
-	}
-
-	virtual const char* objectClassName() const
-	{
-		return "LuaCommandHandler";
-	}
-
-	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const
-	{
-		const LuaCommandHandlerConfig* cfg = dynamic_cast<const LuaCommandHandlerConfig*>(&cfgi);
-		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to command handler constructor");
-		return cfg->commands();
-	}
-	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const	{return true;}
-};
-
-
-class LuaCommandHandlerBuilder
-	:public module::ConfiguredBuilder
-{
-public:
-	LuaCommandHandlerBuilder( const char* classname_, const char* title, const char* section, const char* keyword, const char* id)
-		:ConfiguredBuilder( title, section, keyword, id)
-		,m_classname(classname_){}
-
-	virtual ~LuaCommandHandlerBuilder(){}
-
-	virtual ObjectConstructorBase::ObjectType objectType() const
-	{
-		return ObjectConstructorBase::CMD_HANDLER_OBJECT;
-	}
-
-	virtual config::NamedConfiguration* configuration( const char* logPrefix)
-	{
-		return new LuaCommandHandlerConfig( m_classname, m_title, logPrefix, m_keyword);
-	}
-
-	virtual ObjectConstructorBase* constructor()
-	{
-		return new LuaCommandHandlerConstructor();
-	}
-
-private:
 	const char* m_classname;
 };
 

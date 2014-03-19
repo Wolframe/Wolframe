@@ -30,44 +30,43 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_command_python.cpp
-///\brief Module for command handler executing python code
-#include "appdevel/module/programTypeBuilder.hpp"
-#include "pythonFunctionProgramType.hpp"
-#include "logger-v1.hpp"
+//\file appdevel/module/runtimeEnvironmentConstructor.hpp
+//\brief Interface to constructors of runtime environment for executing functions that need it
+#ifndef _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
+#define _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
+#include "module/constructor.hpp"
+#include "langbind/runtimeEnvironment.hpp"
+#include "module/moduleInterface.hpp"
+#include <string>
+#include <boost/shared_ptr.hpp>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
-{
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
-	return &mod;
+namespace _Wolframe {
+namespace proc {
+	//\brief Forward declaration
+	class ProcessorProvider;
 }
-*/
+namespace module {
 
-static SimpleBuilder* pythonProgramTypeBuilder()
+//\class RuntimeEnvironmentConstructor
+//\brief Constructor of a runtime environment for executing functions
+class RuntimeEnvironmentConstructor
+	:public ConfiguredObjectConstructor<langbind::RuntimeEnvironment>
 {
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
+public:
+	//\brief Destructor
+	virtual ~RuntimeEnvironmentConstructor(){}
 
-enum {NofConfiguredBuilder=0};
-/* LATER
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
-{
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
+	//\brief Get the module object type
+	//\return the object type
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;
+	}
 };
 
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
-}
+typedef boost::shared_ptr<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;
+
+
+}} //namespace
+
+#endif

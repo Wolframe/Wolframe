@@ -31,34 +31,9 @@
 
 ************************************************************************/
 ///\file mod_filter_char.cpp
-///\brief Module for char filters
-#include "module/filterBuilder.hpp"
+///\brief Module for a unicode character by character filter
+#include "appdevel/filterModuleMacros.hpp"
 #include "char_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
-
-namespace {
-
-struct CharFilterObject
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder( "CharFilter", "char", lb::createCharFilterType);}
-};
-
-}//anonymous namespace
-
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	CharFilterObject::builder
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "char filter", 0, 0, NofObjects, objdef);
-}
+FILTER_MODULE( "unicode character by character filter", char, _Wolframe::langbind::createCharFilterType)
 

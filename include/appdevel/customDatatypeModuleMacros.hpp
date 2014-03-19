@@ -32,8 +32,7 @@
 ************************************************************************/
 ///\file appdevel/customDataTypeModuleMacros.hpp
 ///\brief Macros for defining a custom datatype module
-#include "module/customDataTypeBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/module/customDataTypeBuilder.hpp"
 
 //\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
 #define CUSTOM_DATATYPE_MODULE(NAME,DESCRIPTION)\

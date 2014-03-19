@@ -32,37 +32,13 @@
 ************************************************************************/
 ///\file modules/normalize/number/mod_normalize_number.hpp
 ///\brief Module for number normalization and validating functions
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
 #include "base64Normalize.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::langbind;
 
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"encode", &langbind::createEncodeNormalizeFunction},
-	{"decode", &langbind::createDecodeNormalizeFunction},
-	{0,0}
-};
+NORMALIZER_MODULE( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
+NORMALIZER_FUNCTION(	"encode",	createEncodeNormalizeFunction)
+NORMALIZER_FUNCTION(	"decode",	createDecodeNormalizeFunction)
+NORMALIZER_MODULE_END
 
-namespace {
-struct NormalizeProcessor
-{
-
-	static SimpleBuilder* constructor()
-	{
-		return new NormalizeFunctionBuilder( "Base64Normalizer", normalizeFunctions);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::constructor
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "base64 encode/decode as normalizer", 0, 0, NofObjects, objdef);
-}

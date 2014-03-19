@@ -1,11 +1,11 @@
-#include "directmapCommandHandlerBuilder.hpp"
+#include "directmapCommandHandlerConfig.hpp"
 #include "logger-v1.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::cmdbind;
 
 bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory*)
 {

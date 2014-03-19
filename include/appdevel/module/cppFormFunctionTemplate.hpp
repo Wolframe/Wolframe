@@ -30,44 +30,41 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_command_python.cpp
-///\brief Module for command handler executing python code
-#include "appdevel/module/programTypeBuilder.hpp"
-#include "pythonFunctionProgramType.hpp"
-#include "logger-v1.hpp"
+///\file appdevel/module/cppFunctionTemplate.hpp
+///\brief Template for declaring C++ form function
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+#ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
-{
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
-	return &mod;
-}
-*/
+#include "langbind/cppFormFunction.hpp"
+#include "processor/procProviderInterface.hpp"
 
-static SimpleBuilder* pythonProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
+namespace _Wolframe {
+namespace appdevel {
 
-enum {NofConfiguredBuilder=0};
-/* LATER
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
+//\class CppFormFunction
+//\brief Application development template for form functions written in C++
+template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
+struct CppFormFunction
 {
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
+	static const langbind::CppFormFunction& declaration()
+	{
+		static const serialize::StructDescriptionBase* param = InputType::getStructDescription();
+		static const serialize::StructDescriptionBase* result = OutputType::getStructDescription();
+		struct Functor
+		{
+			static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
+			{
+				return Function( provider, *(OutputType*)res, *(const InputType*) param);
+			}
+		};
+		static langbind::CppFormFunction func( Functor::implementation, param, result);
+		return func;
+	}
 };
 
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
-}
+}} //namespace
+#endif
+
+
+

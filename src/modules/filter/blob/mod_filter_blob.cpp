@@ -32,33 +32,8 @@
 ************************************************************************/
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for blob filters that forward the data as binary blob as it is
-#include "module/filterBuilder.hpp"
+#include "appdevel/filterModuleMacros.hpp"
 #include "blob_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
-
-namespace {
-
-struct BlobFilterObject
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder( "BlobFilter", "blob", lb::createBlobFilterType);}
-};
-
-}//anonymous namespace
-
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	BlobFilterObject::builder
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "blob filter", 0, 0, NofObjects, objdef);
-}
+FILTER_MODULE( "single blob filter", blob, _Wolframe::langbind::createBlobFilterType)
 

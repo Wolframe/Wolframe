@@ -33,8 +33,8 @@
 ///\file appdevel/cppFormFunctionModuleMacros.hpp
 ///\brief Macros and templates for building C++ an application form function module
 
-#include "appdevel/cppFormFunctionTemplate.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/module/cppFormFunctionTemplate.hpp"
+#include "appdevel/module/cppFormFunctionBuilder.hpp"
 
 //\brief Marks the start if the Wolframe C++ form function module after the includes section.
 #define CPP_APPLICATION_FORM_FUNCTION_MODULE(NAME)\

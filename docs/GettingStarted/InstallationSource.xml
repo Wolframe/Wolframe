@@ -41,6 +41,7 @@
 		</para>
 	</sect1>
 
+<!-- Unix -->
 	<sect1>
 		<title>Building on Unix systems</title>
 
@@ -56,21 +57,21 @@
 				
 				<itemizedlist>
 					<listitem>
-						<para>gcc 4.1.x or newer, <ulink>http://gcc.gnu.org</ulink></para>
+						<para>gcc 4.1.x or newer, <ulink url="http://gcc.gnu.org">http://gcc.gnu.org</ulink></para>
 					</listitem>
 					<listitem>
-						<para>clang 3.4 or newer, <ulink>http://clang.llvm.org</ulink></para>
+						<para>clang 3.4 or newer, <ulink url="http://clang.llvm.org">http://clang.llvm.org</ulink></para>
 					</listitem>
 					<listitem>
-						<para>Intel Compiler ICC 14.0 or newer, <ulink>http://software.intel.com/en-us/c-compilers</ulink></para>
+						<para>Intel Compiler ICC 14.0 or newer, <ulink url="http://software.intel.com/en-us/c-compilers">http://software.intel.com/en-us/c-compilers</ulink></para>
 					</listitem>
 				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink>https://www.gnu.org/software/make/</ulink></para>
+				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink url="https://www.gnu.org/software/make/">https://www.gnu.org/software/make/</ulink></para>
 			</listitem>
 			<listitem>
-				<para>boost 1.48.0 or newer from <ulink>http://www.boost.org</ulink></para>
+				<para>boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
 			</listitem>
 		</itemizedlist>
 		
@@ -130,6 +131,271 @@
 			the example with 'BOOST_DIR'.
 		</para>
 
+<!-- compilers -->
+		<sect2>
+			<title>GCC compiler</title>
+			
+			<para>
+				Compilation with GNU gcc is the default on all
+				Unix platforms. It corresponds to the call:
+		        <programlisting language='shell'>
+	make CC=gcc CXX=g++
+			</programlisting>								
+			
+			</para>
+			
+			<para>
+				Per default all reasonable warnings are enabled.
+				To add your own flags you can set 'CFLAGS' or
+				'CXXFLAGS' respectively for instance to turn
+				compiler warnings into fatal errors with:
+
+		        <programlisting language='shell'>
+	make CFLAGS='-Werror' CXXFLAGS='-Werror'
+			</programlisting>	
+			
+				or
+
+		        <programlisting language='shell'>
+	make CFLAGS='-g -O0' CXXFLAGS='-g -O0'
+			</programlisting>	
+			
+				to turn off optimization and to enable debug information.
+			</para>
+			<para>
+				Certain embedded 3rdParty software may choose to
+				have it's own flags for compilation, you can't override
+				those in the make invocation.
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>clang compiler</title>
+			
+			<para>
+				Compilation with clang is possible, only set the
+				correct compiler variables:
+		        <programlisting language='shell'>
+	make CC=clang CXX=clang++
+			</programlisting>	
+			
+			</para>
+			<para>							
+			
+				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
+			</para>
+		</sect2>				
+
+		<sect2>
+			<title>Intel compiler</title>
+			
+			<para>
+				Compilation with the Intel C compiler is done with:
+		        <programlisting language='shell'>
+	source /opt/intel/bin/iccvars.csh intel64 
+	make CC=icc CXX=icpc
+			</programlisting>	
+			
+			</para>							
+			<para>
+				(where '/opt/intel/bin/icc' is the location of the Intel
+				compiler).
+			</para>
+			
+			<para>
+				Also here you can set 'CFLAGS' and 'CXXFLAGS' at will.
+			</para>
+		</sect2>
+
+<!-- Boost -->
+		<sect2>
+			<title>Boost</title>
+			
+				<para>
+					Boost (<ulink url="http://www.boost.or">http://www.boost.org</ulink>) is the only
+					library which is absolutly required to build
+					<application>Wolframe</application>.
+				</para>
+			
+			<sect3>
+				<title>Build your own version of Boost</title>
+			
+				<para>
+					The following libraries are required for building
+					<application>Wolframe</application>:
+
+		        <programlisting language='shell'>
+	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+		--with-libraries=thread,filesystem,system,program_options,date_time
+	./bjam install
+			</programlisting>
+
+				If you want to build the ICU normalization
+				module you will have to build 'boost-locale'
+				with ICU support and you have to enable the
+				'regex' and the 'locale' boost libraries too:
+
+		        <programlisting language='shell'>
+	./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
+	./bjam install
+			</programlisting>
+
+				The location of the Boost library can be set as follow:
+				
+		        <programlisting language='shell'>
+	make BOOST_DIR=/usr/local/boost-1.48.0
+			</programlisting>				
+
+			</para>
+			
+			</sect3>
+
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+
+			<sect4>
+				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+			</sect4>
+
+			<sect4>
+				<title>RedHat 6</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+				
+				<para>
+					On RHEL6 there is no licicu-devel on OSC currently (see
+					<ulink url="http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779">http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779</ulink>).
+					Get a Redhat developer license and build
+					your own libicu library and build your own
+					Boost library with boost-locale.
+				</para>
+			</sect4>
+			
+			<sect4>
+				<title>Centos/Scientific Linux 6 and similar Linux distributions</title>
+				
+				<para>
+					The official Boost packages are not recent enough. Build your own
+					Boost version here.
+				</para>
+			</sect4>
+
+			<sect4>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'boost-devel' package.
+				</para>
+			</sect4>
+			
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<sect4>
+					<title>Debian 6</title>
+				
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Debian 7</title>
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 10.04.1 LTS, Ubuntu 12.04</title>
+				
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 12.10</title>
+
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 13.04</title>
+					<para>
+						Currently libboost breaks in enable_if template, compile your own 
+						Boost version here.						
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 13.10</title>
+					<para>
+						You need the following packages:
+						'libboost-dev', 'libboost-program-options-dev',
+						'libboost-filesystem-dev', 'libboost-thread-dev',
+						'libboost-random-dev', 'libboost-locale-dev'.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+
+				<sect4>
+					<title>OpenSuSE 12.3, 13.1</title>
+					<para>
+						You need the 'boost-devel' package.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>SLES 11 SP1 and SP2</title>
+					<para>
+						The official Boost packages are not recent enough. Build your own
+						Boost version here.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'boost' and 'boost-libs' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'boost' package. This package is
+					part of the 'l' package series.
+				</para>
+			</sect3>
+			
+		</sect2>
+<!-- SSL -->
 		<sect2>
 			<title>Secure Socket Layer (SSL)</title>
 			
@@ -144,10 +410,10 @@
 			</para>
 			
 			<para>
-				Currently only OpenSSL (<ulink>http://www.openssl.org</ulink>)
+				Currently only OpenSSL (<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
 				is supported. The location of the library can be overloaded with:
 		        <programlisting language='shell'>
-	make WITH_SSL=1 OPENSSL_LIBS=/usr/local/openssl-1.0.1.f
+	make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
 			</programlisting>				
 			</para>				
 			
@@ -161,6 +427,14 @@
 				
 				<para>
 					You need the 'openssl-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libssl-dev' package.
 				</para>
 			</sect3>
 
@@ -181,12 +455,280 @@
 			<sect3>
 				<title>Slackware</title>
 				<para>
-					You need the 'openssl' package. This package is usually part
-					of the standard package sets.
+					You need the 'openssl' package. This package is
+					part of the 'n' package series.
 				</para>
 			</sect3>
 
 			
+		</sect2>
+
+<!-- Sqlite3 -->		
+		<sect2>
+			<title>SQLite database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				an Sqlite3 database (<ulink url="http://sqlite.org">http://sqlite.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Sqlite3 database
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				If you don't have a recent Sqlite version on your
+				system you can also build the module against the
+				embedded version:
+
+		        <programlisting language='shell'>
+	make WITH_LOCAL_SQLITE3=1
+			</programlisting>				
+			
+			</para>
+
+			<para>
+				The location of the Sqlite library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=1 SQLITE3_DIR=/usr/local/sqlite-3.4.3
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of Sqlite separatly:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_SQLITE3=1 \
+		SQLITE3_INCLUDE_DIR=/usr/local/sqlite-3.4.3/include \
+		SQLITE3_LIB_DIR= /usr/local/sqlite-3.4.3/lib \
+		SQLITE3_LIBS=-lsqlite3
+			</programlisting>				
+			</para>
+			
+			<para>
+				When building with 'WITH_SYSTEM_SQLITE3' it is enough to install the
+				correct development library.
+			</para>
+				
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+				
+				<para>
+					The official Sqlite package is too old, use the
+					embedded version of Sqlite with 'WITH_SYSTEM_SQLITE3=1'.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'sqlite-devel' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libsqlite3-dev' package.
+				</para>
+				
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'sqlite3' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'sqlite3-devel' package.
+				</para>
+
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'sqlite3' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'sqlite' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'sqlite' package. This package is
+					part of the 'ap' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
+
+<!-- PostgreSQL -->
+		<sect2>
+			<title>PostgreSQL database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a PostgreSQL database (<ulink url="http://postgresql.org">http://postgresql.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				You enable the building of a loadable PostgreSQL database
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1
+			</programlisting>
+							
+			</para>
+
+			<para>
+				The location of the PostgreSQL library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1 PGSQL_DIR=/usr/local/postgresql-9.1.3
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of PostgreSQL separatly:
+		        <programlisting language='shell'>
+	make WITH_PGSQL=1 \
+		PGSQL_INCLUDE_DIR=/usr/local/postgresql-9.1.3/include \
+		PGSQL_LIB_DIR=/usr/local/postgresql-9.1.3/lib \
+		PGSQL_LIBS=-lpq
+			</programlisting>				
+			</para>
+							
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'postgresql-devel' package.
+				</para>
+				
+				<para>
+					For Centos/RHEL/SciLi 5 you can choose between the
+					'postgresql-devel'package (which is version 8.1)
+					or the 'postgresql84-devel' package. The 8.4
+					version is recommended over 8.1.
+				</para>
+				
+				<para>
+					For running the Postgresql tests you need a fully function 'postgresql-server'
+					with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
+					'wolframe'.
+				</para>
+				
+				<para>
+					Setting up a test user in PostgreSQL is done with:
+					<programlisting language='shell'>
+	postgresql-setup initdb
+	systemctl start postgresql.service
+	systemctl enable postgresql.service
+					</programlisting>
+					
+					change the authentication method from 'ident' to 'md5' in
+					<filename>pg_hba.conf</filename>.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libpq-dev' package.
+				</para>
+				
+				<para>
+					For running the PostgreSQL database tests you also
+					need the 'postgresql-client' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'postgresql-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'postgresql' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					A PostgreSQL package is not avaiable on Slackware,
+					build your own one with:
+					<programlisting language='shell'>
+	./configure --prefix=/usr/local/pgsql
+	make
+	make install
+	groupadd -g 990 postgres
+	useradd -g postgres -u 990 postgres
+	mkdir /usr/local/pgsql/var
+	chown -R postgres:users /usr/local/pgsql/var
+	su postgres
+	/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/var
+	exit
+	cat > /etc/rc.d/rc.postgresql
+	#!/bin/sh
+
+	case "$1" in
+		start)
+			su -l postgres -s /bin/sh -c "/usr/local/pgsql/bin/pg_ctl  -D /usr/local/pgsql/var -p /usr/local/pgsql/bin/postmaster start  > /dev/null 2>&amp;1" &lt; /dev/null
+			;;
+		stop)
+			kill `ps -efa | grep postmaster | grep -v grep | awk '{print $2}'`
+			;;
+		*)
+			echo $"Usage: $0 {start|stop}"
+			exit 1
+	esac
+
+	exit 0
+	(ctrl-D)
+	chmod 0775 /etc/rc.d/rc.postgresql 
+	usermod -d /usr/local/pgsql postgres
+					</programlisting>
+				</para>
+				
+				<para>
+					Compile <application>Wolframe</application> now with:
+					<programlisting language='shell'>
+	make WITH_PGSQL=1 \
+		PGSQL_DIR=/usr/local/pgsql
+					</programlisting>
+					
+				</para>
+				
+				<para>
+					Alternatively you can of course also build the PostgreSQL
+					package with the help of SlackBuilds.
+				</para>
+			</sect3>
+						
 		</sect2>
 		
 		<sect2>
@@ -222,40 +764,45 @@
 <!--
 Prerequisites
 
+
+* optionally (WITH_ORACLE): build Oracle database module
+
 * optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
-* for database support (WITH_SYSTEM_SQLITE3): sqlite3
-  WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
-  instead of the system version
-  * optionally (WITH_PGSQL)
-* for optional authentication mechanisms:
-  * optionally (WITH_PAM)
-  * optionally (WITH_SASL)
-* optionally for testing:
-  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
-* optionally (for building the documentation):
-  * xsltproc, docboox*xsl*stylesheet: for docbook
-  * fop: to produce a nice PDF documentation
-  * doxygen: for documentation for programmers
-  * dia: to convert images to svg
+* optionally (WITH_PYTHON): build Python 3 module for
+  scripting Wolframe in Python
+
 * optionally (WITH_LIBXML2)
 * optionally (WITH_LIBXSLT), needs LIBXML2 too
 * optionally (WITH_CJSON): build JSON filtering module
   implemented with cjson
+
+* optionally (WITH_ICU): ICU 3.6 or later,
+  needed for boost*locale with ICU backend
+
 * optionally (WITH_SYSTEM_LIBHPDF): for PDF creation
   using the system version of libhpdf, specify
   WITH_LOCAL_LIBHPDF=1 to use the supplied version in
   the 'libhpdf' subdirectory. In this case also 
   'zlib' and 'libpng' development libraries are needed
-* optionally (WITH_ICU): ICU 3.6 or later,
-  needed for boost*locale with ICU backend
 * optionally (WITH_SYSTEM_FREEIMAGE): for image handling
   using the system version of FreeImage, specify
   WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
   the 'freeimage' subdirectory.
-* optionally (WITH_PYTHON): build Python 3 module for
-  scripting Wolframe in Python
-* optionally (WITH_ORACLE): build Oracle database module
+
+* for optional authentication mechanisms:
+  * optionally (WITH_PAM)
+  * optionally (WITH_SASL)
+
+* optionally for testing:
+  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
+
+* optionally (for building the documentation):
+  * xsltproc, docboox*xsl*stylesheet: for docbook
+  * fop: to produce a nice PDF documentation
+  * doxygen: for documentation for programmers
+  * dia: to convert images to svg
+
 -->
 
 	</sect1>

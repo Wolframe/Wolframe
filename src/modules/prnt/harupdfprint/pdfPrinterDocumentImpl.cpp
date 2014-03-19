@@ -324,6 +324,7 @@ private:
 			return m_hnd;
 		}
 
+/* currently unused, Intel CC complained:
 		void initFont( HpdfDocument& doc, const VariableScope& vscope)
 		{
 			if (m_mode != ModeText) doc.throw_error( "internal: document not in textmode");
@@ -344,7 +345,7 @@ private:
 			doc.m_vcache.m_font_varidx = fvi;
 			doc.m_vcache.m_fontsize_varidx = svi;
 		}
-
+*/
 		void initLineStyle( HpdfDocument& doc, const VariableScope& vscope)
 		{
 			if (m_mode != ModeText) doc.throw_error( "internal: document not in textmode");
@@ -526,11 +527,13 @@ private:
 		vscope.define( var, boost::lexical_cast<std::string>(value));
 	}
 
+/* icc: declared but never referenced
 	const Page& page() const
 	{
 		if (m_pagear.empty()) throw_error( "no page for output defined", methodName(m_method));
 		return m_pagear[ m_pageidx-1];
 	}
+*/
 
 	Page& page()
 	{

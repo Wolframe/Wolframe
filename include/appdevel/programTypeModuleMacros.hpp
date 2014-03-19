@@ -30,41 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/cppFunctionTemplate.hpp
-///\brief Template for declaring C++ form function
+///\file appdevel/programTypeModuleMacros.hpp
+///\brief Macros for a module for a program type for a binding language
+#include "module/moduleInterface.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 
-#ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
-
-#include "module/cppFormFunctionBuilder.hpp"
-#include "processor/procProviderInterface.hpp"
-
-namespace _Wolframe {
-namespace appdevel {
-
-//\class CppFormFunction
-//\brief Application development template for form functions written in C++
-template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
-struct CppFormFunction
-{
-	static const langbind::CppFormFunction& declaration()
-	{
-		static const serialize::StructDescriptionBase* param = InputType::getStructDescription();
-		static const serialize::StructDescriptionBase* result = OutputType::getStructDescription();
-		struct Functor
-		{
-			static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
-			{
-				return Function( provider, *(OutputType*)res, *(const InputType*) param);
-			}
-		};
-		static langbind::CppFormFunction func( Functor::implementation, param, result);
-		return func;
+//\brief Defines a Wolframe command handler module after the includes section.
+#define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
+	static _Wolframe::module::SimpleBuilder* createProgramType()\
+	{\
+		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
+	}\
+	enum {NofSimpleBuilder=1};\
+	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	{\
+		createProgramType\
+	};\
+	extern "C" {\
+		_Wolframe::module::ModuleEntryPoint \
+		entryPoint( 0, "form function program type for " #LANGNAME,\
+				0, 0,\
+				NofSimpleBuilder, simpleBuilder);\
 	}
-};
-
-}} //namespace
-#endif
-
-
-

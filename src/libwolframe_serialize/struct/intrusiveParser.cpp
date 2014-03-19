@@ -90,6 +90,11 @@ bool serialize::parseValue_char( signed char* val, const types::VariantConst& el
 	return parseValue( *val, element);
 }
 
+bool serialize::parseValue_bool( bool* val, const types::VariantConst& element)
+{
+	return parseValue( *val, element);
+}
+
 bool serialize::parseValue_uchar( unsigned char* val, const types::VariantConst& element)
 {
 	return parseValue( *val, element);

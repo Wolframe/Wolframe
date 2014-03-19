@@ -164,7 +164,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
 	trans->commit( );
-	EXPECT_EQ( emptyres.size(), 0);
+	EXPECT_EQ( emptyres.size(), (unsigned int)0);
 
 	// ok transaction with statements with commit
 	trans->begin( );
@@ -175,8 +175,8 @@ TEST_F( OracleFixture, ExecuteInstruction )
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id ASC NULLS LAST");
 	trans->commit( );
-	EXPECT_EQ( res.size(), 5);
-	EXPECT_EQ( res.colnames().size(), 4);
+	EXPECT_EQ( res.size(), 5U);
+	EXPECT_EQ( res.colnames().size(), 4U);
 	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "NAME", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "ACTIVE", res.colnames().at(2).c_str());
@@ -226,7 +226,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 				// TODO: Bool
 				ASSERT_EQ( ri->at(2).type(), types::Variant::Int);
 				ASSERT_EQ( ri->at(3).type(), types::Variant::Double);
-				EXPECT_EQ( _WOLFRAME_MAX_INTEGER, ri->at(0).touint());
+				EXPECT_EQ( (_WOLFRAME_UINTEGER)_WOLFRAME_MAX_INTEGER, ri->at(0).touint());
 				double price( ri->at(3).todouble());
 				// TODO: why is the range limited?
 				ASSERT_DOUBLE_EQ( 1.0E+126 , price );
@@ -398,8 +398,8 @@ TEST_F( OracleFixture, ReusedBindParameter )
 
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
-	EXPECT_EQ( res.size(), 1);
-	EXPECT_EQ( res.colnames().size(), 3);
+	EXPECT_EQ( res.size(), 1U);
+	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "ID2", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "ID3", res.colnames().at(2).c_str());
@@ -437,8 +437,8 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 
 	trans->begin( );
 	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
-	EXPECT_EQ( res.size(), 1);
-	EXPECT_EQ( res.colnames().size(), 3);
+	EXPECT_EQ( res.size(), 1U);
+	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
 	EXPECT_STREQ( "ID2", res.colnames().at(1).c_str());
 	EXPECT_STREQ( "ID3", res.colnames().at(2).c_str());

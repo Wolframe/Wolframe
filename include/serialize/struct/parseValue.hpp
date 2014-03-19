@@ -44,8 +44,7 @@ Project Wolframe.
 #include <boost/type_traits.hpp>
 #include <string>
 
-namespace _Wolframe {
-namespace serialize {
+namespace {
 
 ///\class ParseValueType
 ///\brief type traits for parse value types
@@ -82,287 +81,303 @@ struct ParseValueType
 	///\return DateTime if T is a datetime
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_same<T,types::DateTime>::value
+		boost::is_same<T,_Wolframe::types::DateTime>::value
 		,const DateTime&>::type get( const T&) { static DateTime rt; return rt;}
 
 	///\brief get category BigNumber for a type
 	///\return BigNumber if T is a big number
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_same<T,types::BigNumber>::value
+		boost::is_same<T,_Wolframe::types::BigNumber>::value
 		,const BigNumber&>::type get( const T&) { static BigNumber rt; return rt;}
 };
 
-
-static bool getBool( bool& val, int boolnum)
+struct ValueParser
 {
-	if (boolnum == 0)
+	static bool getBool( bool& val, int boolnum)
 	{
-		val = false;
-		return true;
-	}
-	else if (boolnum == 1)
-	{
-		val = true;
-		return true;
-	}
-	return false;
-}
-
-template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::String&, const types::VariantConst& element)
-{
-	try
-	{
-		val = element.tostring();
-		return true;
-	}
-	catch (const boost::bad_lexical_cast&){}
-	catch (const std::runtime_error&){}
-	return false;
-}
-
-template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::Bool&, const types::VariantConst& element)
-{
-	try
-	{
-		switch (element.type())
+		if (boolnum == 0)
 		{
-			case types::Variant::Null:
-				return false;
+			val = false;
+			return true;
+		}
+		else if (boolnum == 1)
+		{
+			val = true;
+			return true;
+		}
+		return false;
+	}
 
-			case types::Variant::Bool:
-				val = element.tobool();
-				return true;
+	template <typename ValueType>
+	static bool parseValue( ValueType& val, const ParseValueType::String&, const _Wolframe::types::VariantConst& element)
+	{
+		using namespace _Wolframe;
 
-			case types::Variant::Double:
-				return getBool( val, boost::numeric_cast<int>( element.todouble()));
+		try
+		{
+			val = element.tostring();
+			return true;
+		}
+		catch (const boost::bad_lexical_cast&){}
+		catch (const std::runtime_error&){}
+		return false;
+	}
+	
+	template <typename ValueType>
+	static bool parseValue( ValueType& val, const ParseValueType::Bool&, const _Wolframe::types::VariantConst& element)
+	{
+		using namespace _Wolframe;
 
-			case types::Variant::Int:
-				return getBool( val, boost::numeric_cast<ValueType>( element.toint()));
-
-			case types::Variant::UInt:
-				return getBool( val, boost::numeric_cast<ValueType>( element.touint()));
-
-			case types::Variant::String:
-				if (element.charsize() == 4 && std::memcmp( element.charptr(), "true", 4) == 0)
-				{
-					val = true;
-					return true;
-				}
-				if (element.charsize() == 5 && std::memcmp( element.charptr(), "false", 5) == 0)
-				{
-					val = false;
-					return true;
-				}
-				return false;
-
-			case types::Variant::BigNumber:
-				throw std::runtime_error( "cannot convert big number type to boolean value");
-			case types::Variant::Timestamp:
-				throw std::runtime_error( "cannot convert timestamp type to boolean value");
-			case types::Variant::Custom:
+		try
+		{
+			switch (element.type())
 			{
-				types::Variant baseval;
-				try
-				{
-					if (element.customref()->getBaseTypeValue( baseval)
-					&&  baseval.type() != types::Variant::Custom)
+				case types::Variant::Null:
+					return false;
+	
+				case types::Variant::Bool:
+					val = element.tobool();
+					return true;
+	
+				case types::Variant::Double:
+					return getBool( val, boost::numeric_cast<int>( element.todouble()));
+	
+				case types::Variant::Int:
+					return getBool( val, boost::numeric_cast<ValueType>( element.toint()));
+	
+				case types::Variant::UInt:
+					return getBool( val, boost::numeric_cast<ValueType>( element.touint()));
+	
+				case types::Variant::String:
+					if (element.charsize() == 4 && std::memcmp( element.charptr(), "true", 4) == 0)
 					{
-						return parseValue_( val, ParseValueType::Bool(), baseval);
+						val = true;
+						return true;
 					}
-				}
-				catch (const std::runtime_error& e)
+					if (element.charsize() == 5 && std::memcmp( element.charptr(), "false", 5) == 0)
+					{
+						val = false;
+						return true;
+					}
+					return false;
+	
+				case types::Variant::BigNumber:
+					throw std::runtime_error( "cannot convert big number type to boolean value");
+				case types::Variant::Timestamp:
+					throw std::runtime_error( "cannot convert timestamp type to boolean value");
+				case types::Variant::Custom:
 				{
-					throw std::runtime_error( std::string("cannot convert custom data type to boolean value: ") + e.what());
+					types::Variant baseval;
+					try
+					{
+						if (element.customref()->getBaseTypeValue( baseval)
+						&&  baseval.type() != types::Variant::Custom)
+						{
+							return ValueParser::parseValue( val, ParseValueType::Bool(), baseval);
+						}
+					}
+					catch (const std::runtime_error& e)
+					{
+						throw std::runtime_error( std::string("cannot convert custom data type to boolean value: ") + e.what());
+					}
+					throw std::runtime_error( "cannot convert custom data type to boolean value");
 				}
-				throw std::runtime_error( "cannot convert custom data type to boolean value");
 			}
 		}
+		catch (const boost::bad_lexical_cast&){}
+		return false;
 	}
-	catch (const boost::bad_lexical_cast&){}
-	return false;
-}
-
-template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::Arithmetic&, const types::VariantConst& element)
-{
-	try
+	
+	template <typename ValueType>
+	static bool parseValue( ValueType& val, const ParseValueType::Arithmetic&, const _Wolframe::types::VariantConst& element)
 	{
-		switch (element.type())
+		using namespace _Wolframe;
+
+		try
 		{
-			case types::Variant::Null:
-				return false;
-
-			case types::Variant::Bool:
-				val = boost::numeric_cast<ValueType>( element.tobool());
-				return true;
-
-			case types::Variant::Double:
-				val = boost::numeric_cast<ValueType>( element.todouble());
-				return true;
-
-			case types::Variant::Int:
-				val = boost::numeric_cast<ValueType>( element.toint());
-				return true;
-
-			case types::Variant::UInt:
-				val = boost::numeric_cast<ValueType>( element.touint());
-				return true;
-
-			case types::Variant::Timestamp:
-				throw std::runtime_error( "cannot convert timestamp to arithmetic type");
-
-			case types::Variant::BigNumber:
-				val = boost::lexical_cast<ValueType>( element.tostring());
-				return true;
-
-			case types::Variant::String:
-				val = boost::lexical_cast<ValueType>( element.tostring());
-				return true;
-
-			case types::Variant::Custom:
+			switch (element.type())
 			{
-				types::Variant baseval;
-				try
-				{
-					if (element.customref()->getBaseTypeValue( baseval)
-					&&  baseval.type() != types::Variant::Custom)
-					{
-						return parseValue_( val, ParseValueType::Arithmetic(), baseval);
-					}
+				case types::Variant::Null:
+					return false;
+	
+				case types::Variant::Bool:
+					val = boost::numeric_cast<ValueType>( element.tobool());
+					return true;
+	
+				case types::Variant::Double:
+					val = boost::numeric_cast<ValueType>( element.todouble());
+					return true;
+	
+				case types::Variant::Int:
+					val = boost::numeric_cast<ValueType>( element.toint());
+					return true;
+	
+				case types::Variant::UInt:
+					val = boost::numeric_cast<ValueType>( element.touint());
+					return true;
+	
+				case types::Variant::Timestamp:
+					throw std::runtime_error( "cannot convert timestamp to arithmetic type");
+	
+				case types::Variant::BigNumber:
 					val = boost::lexical_cast<ValueType>( element.tostring());
 					return true;
-				}
-				catch (const std::runtime_error& e)
-				{
-					throw std::runtime_error( std::string("cannot convert custom data type to arithmetic value: ") + e.what());
-				}
-			}
-		}
-	}
-	catch (const boost::bad_lexical_cast&){}
-	catch (const boost::bad_numeric_cast&){}
-	return false;
-}
-
-template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::BigNumber&, const types::VariantConst& element)
-{
-	try
-	{
-		switch (element.type())
-		{
-			case types::Variant::Null:
-				return false;
-
-			case types::Variant::Bool:
-				val = types::BigNumber( (_WOLFRAME_UINTEGER)(element.tobool()?1:0));
-				return true;
-
-			case types::Variant::Double:
-				val = types::BigNumber( element.todouble());
-				return true;
-
-			case types::Variant::Int:
-				val = types::BigNumber( element.toint());
-				return true;
-
-			case types::Variant::UInt:
-				val = types::BigNumber( element.touint());
-				return true;
-
-			case types::Variant::Timestamp:
-				throw std::runtime_error( "cannot convert timestamp to big number");
-
-			case types::Variant::BigNumber:
-				val = *element.bignumref();
-				return true;
-
-			case types::Variant::String:
-				val = types::BigNumber( element.charptr(), element.charsize());
-				return true;
-
-			case types::Variant::Custom:
-			{
-				types::Variant baseval;
-				try
-				{
-					if (element.customref()->getBaseTypeValue( baseval)
-					&&  baseval.type() != types::Variant::Custom)
-					{
-						return parseValue_( val, ParseValueType::BigNumber(), baseval);
-					}
-					val = types::BigNumber( element.tostring());
+	
+				case types::Variant::String:
+					val = boost::lexical_cast<ValueType>( element.tostring());
 					return true;
-				}
-				catch (const std::runtime_error& e)
+	
+				case types::Variant::Custom:
 				{
-					throw std::runtime_error( std::string("cannot convert custom data type to bignumber value: ") + e.what());
-				}
-			}
-		}
-	}
-	catch (const boost::bad_lexical_cast&){}
-	catch (const boost::bad_numeric_cast&){}
-	return false;
-}
-
-template <typename ValueType>
-static bool parseValue_( ValueType& val, const ParseValueType::DateTime&, const types::VariantConst& element)
-{
-	try
-	{
-		switch (element.type())
-		{
-			case types::Variant::Null:
-			case types::Variant::Bool:
-			case types::Variant::Double:
-			case types::Variant::Int:
-			case types::Variant::UInt:
-				return false;
-
-			case types::Variant::Timestamp:
-				val = element.totimestamp();
-				return true;
-
-			case types::Variant::BigNumber:
-				return false;
-
-			case types::Variant::String:
-				val = types::DateTime( element.charptr(), element.charsize());
-				return true;
-
-			case types::Variant::Custom:
-			{
-				types::Variant baseval;
-				try
-				{
-					if (element.customref()->getBaseTypeValue( baseval)
-					&&  baseval.type() != types::Variant::Custom)
+					types::Variant baseval;
+					try
 					{
-						return parseValue_( val, ParseValueType::DateTime(), baseval);
+						if (element.customref()->getBaseTypeValue( baseval)
+						&&  baseval.type() != types::Variant::Custom)
+						{
+							return ValueParser::parseValue( val, ParseValueType::Arithmetic(), baseval);
+						}
+						val = boost::lexical_cast<ValueType>( element.tostring());
+						return true;
 					}
-					val = types::DateTime( element.tostring());
-					return true;
-				}
-				catch (const std::runtime_error& e)
-				{
-					throw std::runtime_error( std::string("cannot convert custom data type to datetime value: ") + e.what());
+					catch (const std::runtime_error& e)
+					{
+						throw std::runtime_error( std::string("cannot convert custom data type to arithmetic value: ") + e.what());
+					}
 				}
 			}
 		}
+		catch (const boost::bad_lexical_cast&){}
+		catch (const boost::bad_numeric_cast&){}
+		return false;
 	}
-	catch (const boost::bad_lexical_cast&){}
-	catch (const boost::bad_numeric_cast&){}
-	return false;
-}
+	
+	template <typename ValueType>
+	static bool parseValue( ValueType& val, const ParseValueType::BigNumber&, const _Wolframe::types::VariantConst& element)
+	{
+		using namespace _Wolframe;
+
+		try
+		{
+			switch (element.type())
+			{
+				case types::Variant::Null:
+					return false;
+	
+				case types::Variant::Bool:
+					val = types::BigNumber( (_WOLFRAME_UINTEGER)(element.tobool()?1:0));
+					return true;
+	
+				case types::Variant::Double:
+					val = types::BigNumber( element.todouble());
+					return true;
+	
+				case types::Variant::Int:
+					val = types::BigNumber( element.toint());
+					return true;
+	
+				case types::Variant::UInt:
+					val = types::BigNumber( element.touint());
+					return true;
+	
+				case types::Variant::Timestamp:
+					throw std::runtime_error( "cannot convert timestamp to big number");
+	
+				case types::Variant::BigNumber:
+					val = *element.bignumref();
+					return true;
+	
+				case types::Variant::String:
+					val = types::BigNumber( element.charptr(), element.charsize());
+					return true;
+	
+				case types::Variant::Custom:
+				{
+					types::Variant baseval;
+					try
+					{
+						if (element.customref()->getBaseTypeValue( baseval)
+						&&  baseval.type() != types::Variant::Custom)
+						{
+							return ValueParser::parseValue( val, ParseValueType::BigNumber(), baseval);
+						}
+						val = types::BigNumber( element.tostring());
+						return true;
+					}
+					catch (const std::runtime_error& e)
+					{
+						throw std::runtime_error( std::string("cannot convert custom data type to bignumber value: ") + e.what());
+					}
+				}
+			}
+		}
+		catch (const boost::bad_lexical_cast&){}
+		catch (const boost::bad_numeric_cast&){}
+		return false;
+	}
+	
+	template <typename ValueType>
+	static bool parseValue( ValueType& val, const ParseValueType::DateTime&, const _Wolframe::types::VariantConst& element)
+	{
+		using namespace _Wolframe;
+
+		try
+		{
+			switch (element.type())
+			{
+				case types::Variant::Null:
+				case types::Variant::Bool:
+				case types::Variant::Double:
+				case types::Variant::Int:
+				case types::Variant::UInt:
+					return false;
+	
+				case types::Variant::Timestamp:
+					val = element.totimestamp();
+					return true;
+	
+				case types::Variant::BigNumber:
+					return false;
+	
+				case types::Variant::String:
+					val = types::DateTime( element.charptr(), element.charsize());
+					return true;
+	
+				case types::Variant::Custom:
+				{
+					types::Variant baseval;
+					try
+					{
+						if (element.customref()->getBaseTypeValue( baseval)
+						&&  baseval.type() != types::Variant::Custom)
+						{
+							return ValueParser::parseValue( val, ParseValueType::DateTime(), baseval);
+						}
+						val = types::DateTime( element.tostring());
+						return true;
+					}
+					catch (const std::runtime_error& e)
+					{
+						throw std::runtime_error( std::string("cannot convert custom data type to datetime value: ") + e.what());
+					}
+				}
+			}
+		}
+		catch (const boost::bad_lexical_cast&){}
+		catch (const boost::bad_numeric_cast&){}
+		return false;
+	}
+};
+} //anonymous namespace
+
+namespace _Wolframe {
+namespace serialize {
 
 template <typename ValueType>
 bool parseValue( ValueType& val, const types::VariantConst& element)
 {
-	return parseValue_( val, ParseValueType::get(val), element);
+	return ValueParser::parseValue( val, ParseValueType::get(val), element);
 }
 
 }}//namespace

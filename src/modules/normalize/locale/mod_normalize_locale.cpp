@@ -32,50 +32,22 @@
 ************************************************************************/
 ///\file mod_normalize_locale.hpp
 ///\brief Module for normalization functions based on boost locale (ICU)
-#include "module/normalizeFunctionBuilder.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
 #include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::langbind;
 
-static types::NormalizeResourceHandle* createLocaleResourceHandle()
-{
-	return new langbind::LocaleResourceHandle();
-}
-
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"tolower", &langbind::create_tolower_NormalizeFunction},
-	{"toupper", &langbind::create_toupper_NormalizeFunction},
-	{"totitle", &langbind::create_totitle_NormalizeFunction},
-	{"foldcase", &langbind::create_foldcase_NormalizeFunction},
-	{"conv_nfd", &langbind::create_nfd_NormalizeFunction},
-	{"conv_nfc", &langbind::create_nfc_NormalizeFunction},
-	{"conv_nfkd", &langbind::create_nfkd_NormalizeFunction},
-	{"conv_nfkc", &langbind::create_nfkc_NormalizeFunction},
-	{"latinword", &langbind::create_latinword_NormalizeFunction},
-	{"ascii_de", &langbind::create_ascii_de_NormalizeFunction},
-	{"ascii_eu", &langbind::create_ascii_eu_NormalizeFunction},
-	{0,0}
-};
-
-namespace {
-struct NormalizeProcessor
-{
-	static SimpleBuilder* builder()
-	{
-		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", normalizeFunctions, &createLocaleResourceHandle);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::builder
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
-}
+NORMALIZER_MODULE_WITH_RESOURCE( "Base64Normalizer", "base 64 encoding/decoding as normalization functions", LocaleResourceHandle)
+NORMALIZER_FUNCTION(	"tolower",	create_tolower_NormalizeFunction)
+NORMALIZER_FUNCTION(	"toupper",	create_toupper_NormalizeFunction)
+NORMALIZER_FUNCTION(	"totitle",	create_totitle_NormalizeFunction)
+NORMALIZER_FUNCTION(	"foldcase",	create_foldcase_NormalizeFunction)
+NORMALIZER_FUNCTION(	"conv_nfd",	create_nfd_NormalizeFunction)
+NORMALIZER_FUNCTION(	"conv_nfc",	create_nfc_NormalizeFunction)
+NORMALIZER_FUNCTION(	"conv_nfkd",	create_nfkd_NormalizeFunction)
+NORMALIZER_FUNCTION(	"conv_nfkc",	create_nfkc_NormalizeFunction)
+NORMALIZER_FUNCTION(	"latinword",	create_latinword_NormalizeFunction)
+NORMALIZER_FUNCTION(	"ascii_de",	create_ascii_de_NormalizeFunction)
+NORMALIZER_FUNCTION(	"ascii_eu",	create_ascii_eu_NormalizeFunction)
+NORMALIZER_MODULE_END
