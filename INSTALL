@@ -759,13 +759,13 @@ oracle/instantclient_12_1':
 Add the following line to /etc/ld.so.conf and reload the cached shared
 libraries:
 
-                                                echo "/opt/oracle/instantclient_12_1" >> /etc/ld.so.conf
-                                                ldconfig
+        echo "/opt/oracle/instantclient_12_1" >> /etc/ld.so.conf
+        ldconfig
 
 
 Call 'make' with:
 
-        make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+        make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_12_1
 
 
 1.2.9. Installation
