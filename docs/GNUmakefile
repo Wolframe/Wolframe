@@ -112,9 +112,9 @@ doc-towordml: WolfBook.docx
 %.txt: %.html
 	w3m -dump $< > $@
 
-# Getting Started Guide
+# Installation Guide
 
-GETTING_STARTED_FILES = \
+INSTALLATION_FILES = \
 	Installation.xml \
 	InstallationVersion.txt \
 	InstallationDate.txt \
@@ -124,7 +124,7 @@ GETTING_STARTED_FILES = \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
-GettingStarted.html: $(GETTING_STARTED_FILES)
+Installation.html: $(INSTALLATION_FILES)
 
 # WolfBook
 
@@ -251,7 +251,7 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f GettingStarted.html GettingStarted.pdf GettingStarted.txt
+	-rm -f Installation.html Installation.pdf Installation.txt
 	-rm -rf html/*.html
 	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
@@ -294,7 +294,7 @@ local_uninstall:
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
 	xmllint --noout --xinclude --postvalid Tutorial.xml
-	xmllint --noout --xinclude --postvalid GettingStarted.xml
+	xmllint --noout --xinclude --postvalid Installation.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
