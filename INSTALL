@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-February 20, 2014 version 0.0.1
+March 19, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ Foreword
         1.2.6. SQLite database support
 
             RedHat/Centos/Scientific Linux 5 and similar Linux distributions
-            RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+            RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
                 distributions
             Debian, Ubuntu and similar Linux distributions
             openSUSE, SLES and similar Linux distributions
@@ -106,7 +106,17 @@ Foreword
             ArchLinux
             Slackware
 
-        1.2.9. Installation
+        1.2.9. Filtering support with libxml2 and libxslt
+
+            RedHat/Centos/Scientific Linux 5 and similar Linux distributions
+            RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.10. Installation
 
     1.3. Building on Windows systems
 
@@ -186,7 +196,7 @@ Table of Contents
     1.2.6. SQLite database support
 
         RedHat/Centos/Scientific Linux 5 and similar Linux distributions
-        RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+        RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
             distributions
         Debian, Ubuntu and similar Linux distributions
         openSUSE, SLES and similar Linux distributions
@@ -211,7 +221,17 @@ Table of Contents
         ArchLinux
         Slackware
 
-    1.2.9. Installation
+    1.2.9. Filtering support with libxml2 and libxslt
+
+        RedHat/Centos/Scientific Linux 5 and similar Linux distributions
+        RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
+            distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.10. Installation
 
 1.3. Building on Windows systems
 
@@ -524,7 +544,7 @@ RedHat/Centos/Scientific Linux 5 and similar Linux distributions
 The official Sqlite package is too old, use the embedded version of Sqlite with
 'WITH_SYSTEM_SQLITE3=1'.
 
-RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions
+RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions
 
 You need the 'sqlite-devel' package.
 
@@ -610,7 +630,7 @@ You need the 'postgresql' package.
 
 Slackware
 
-A PostgreSQL package is not avaiable on Slackware, build your own one with:
+A PostgreSQL package is not available on Slackware, build your own one with:
 
         ./configure --prefix=/usr/local/pgsql
         make
@@ -768,7 +788,70 @@ Call 'make' with:
         make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_12_1
 
 
-1.2.9. Installation
+1.2.9. Filtering support with libxml2 and libxslt
+
+Wolframe can use libxml2 and libxslt (http://xmlsoft.org/) for filtering and
+the conversion of data.
+
+You can build only filtering with libxml2. But if you enable libxslt filtering
+you also have to enable libxml2 filtering.
+
+You enable the building of a loadable libxml2/libxslt filtering module with
+
+        make WITH_LIBXML2=1 WITH_LIBXSLT=1
+
+
+The location of those two libraries can be overloaded with:
+
+        make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+                LIBXML2_DIR=/usr/local/libxml2-2.9.1 \
+                LIBXSLT_DIR=/usr/local/libxslt-1.1.28
+
+
+You can also override all compilation and linking flags of libxml2 and libxslt
+separatly:
+
+        make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+                LIBXML2_INCLUDE_DIR=/usr/local/libxml2-2.9.1/include \
+                LIBXML2_LIB_DIR=/usr/local/libxml2-2.9.1/lib \
+                LIBXML2_LIBS=-lxml2 \
+                LIBXSLT_INCLUDE_DIR=/usr/local/libxslt-1.1.28/include \
+                LIBXSLT_LIB_DIR=/usr/local/libxslt-1.1.28/lib \
+                LIBXSLT_LIBS=-lxslt
+
+
+RedHat/Centos/Scientific Linux 5 and similar Linux distributions
+
+The official libxml2 and libxslt package is too old, compile your own versions.
+Make sure your own libxslt version uses the libxml2 version you compiled and
+not the system one!
+
+If you don't need working iconv support for non-UTF8 character sets you may
+also try to use the provided packages 'libxml2-devel' and 'libxslt-devel' but
+we cannot recommend this.
+
+RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions
+
+You need the 'libxml2-devel' and 'libxslt-devel' packages.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'libxml2-dev' and 'libxslt1-dev ' packages.
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'libxml2-devel' and 'libxslt-devel' packages.
+
+ArchLinux
+
+You need the 'libxml2' and 'libxslt' packages.
+
+Slackware
+
+You need the 'libxml2' and the 'libxslt' packages. Both packages are part of
+the 'l' package series.
+
+1.2.10. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.

@@ -537,7 +537,7 @@
 			</sect3>
 
 			<sect3>
-				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				<title>RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions</title>
 				
 				<para>
 					You need the 'sqlite-devel' package.
@@ -688,7 +688,7 @@
 			<sect3>
 				<title>Slackware</title>
 				<para>
-					A PostgreSQL package is not avaiable on Slackware,
+					A PostgreSQL package is not available on Slackware,
 					build your own one with:
 					<programlisting language='shell'>
 	./configure --prefix=/usr/local/pgsql
@@ -922,19 +922,122 @@
 			</sect3>
 						
 		</sect2>
+
+<!-- libxml2/libxslt -->
+		<sect2>
+			<title>Filtering support with libxml2 and libxslt</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				libxml2 and libxslt (<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>)
+				for filtering and the conversion of data.
+			</para>
+			
+			<para>
+				You can build only filtering with libxml2. But if you enable libxslt
+				filtering you also have to enable libxml2 filtering.
+			</para>
+			
+			<para>
+				You enable the building of a loadable libxml2/libxslt filtering
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_LIBXML2=1 WITH_LIBXSLT=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				The location of those two libraries can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+		LIBXML2_DIR=/usr/local/libxml2-2.9.1 \
+		LIBXSLT_DIR=/usr/local/libxslt-1.1.28
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of libxml2 and libxslt separatly:
+		        <programlisting language='shell'>
+	make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+		LIBXML2_INCLUDE_DIR=/usr/local/libxml2-2.9.1/include \
+		LIBXML2_LIB_DIR=/usr/local/libxml2-2.9.1/lib \
+		LIBXML2_LIBS=-lxml2 \
+		LIBXSLT_INCLUDE_DIR=/usr/local/libxslt-1.1.28/include \
+		LIBXSLT_LIB_DIR=/usr/local/libxslt-1.1.28/lib \
+		LIBXSLT_LIBS=-lxslt
+			</programlisting>				
+			</para>
+							
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+				
+				<para>
+					The official libxml2 and libxslt package is too old, compile
+					your own versions. Make sure your own libxslt version uses
+					the libxml2 version you compiled and not the system one!
+				</para>
+				
+				<para>
+					If you don't need working iconv support for non-UTF8 character
+					sets you may also try to use the provided packages 
+					'libxml2-devel' and 'libxslt-devel' but we cannot recommend this.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libxml2-devel' and 'libxslt-devel' packages.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libxml2-dev' and 'libxslt1-dev ' packages.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'libxml2-devel' and 'libxslt-devel' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'libxml2' and 'libxslt' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'libxml2' and the 'libxslt' packages. Both packages are
+					part of the 'l' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
+
 		
 <!--
 Prerequisites
+
+* optionally (WITH_CJSON): build JSON filtering module
+  implemented with cjson
 
 * optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
 * optionally (WITH_PYTHON): build Python 3 module for
   scripting Wolframe in Python
-
-* optionally (WITH_LIBXML2)
-* optionally (WITH_LIBXSLT), needs LIBXML2 too
-* optionally (WITH_CJSON): build JSON filtering module
-  implemented with cjson
 
 * optionally (WITH_ICU): ICU 3.6 or later,
   needed for boost*locale with ICU backend
