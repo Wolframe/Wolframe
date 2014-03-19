@@ -730,42 +730,169 @@
 			</sect3>
 						
 		</sect2>
-		
-		<sect2>
-			<title>Installation</title>
-			
-			<para>
-				The makefiles provide a 'install' and an 'uninstall'
-				target to install and uninstall the software.
-			</para>
-			
-			<para>
-				The 'DESTDIR' and 'prefix' parameters are useful for
-				packagers to reroute the destination of the installation.
-			</para>
-			
-			<para>
-				For instance:
-		        <programlisting language='shell'>
-	make DESTDIR=/var/tmp prefix=/usr/local/wolframe-&WolframeVersion; install
-			</programlisting>
-				installs the software in:
-		        <programlisting language='shell'>
-	/var/tmp/usr/local/wolframe-&WolframeVersion;/sbin/wolframed
-	/var/tmp/usr/local/wolframe-&WolframeVersion;/etc/wolframe/wolframe.conf
-	...
-			</programlisting>			
-			
-			</para>
-		</sect2>
-			
-		
 
+<!-- Oracle -->
+		<sect2>
+			<title>Oracle database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a Oracle database (<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				<emphasis role="bold">Import note</emphasis>: Make sure you
+				have all the licenses to develop with Oracle and to install an
+				Oracle database! The <application>Wolframe</application> team
+				doesn't take any responsability if licenses are violated!
+			</para>
+			
+			<para>
+				You enable the building of a loadable Oracle database
+				module with
+
+		        <programlisting language='shell'>
+	make WITH_ORACLE=1
+			</programlisting>
+							
+			</para>
+
+			<para>
+				The location of the Oracle instantclient library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+			</programlisting>				
+			</para>
+			
+			<para>
+				You can also override all compilation and linking flags
+				of Oracle separatly:
+		        <programlisting language='shell'>
+	make WITH_ORACLE=1 \
+		ORACLE_INCLUDE_DIR=/usr/lib/oracle/11_2/client64 \
+		ORACLE_LIB_DIR=/usr/lib/oracle/11_2/client64 \
+		ORACLE_LIBS=-lclntsh
+			</programlisting>				
+			</para>
+
+			<para>
+				If you want to run the tests for Oracle you'll have to set up an Oracle
+				database. Then install the 'wolframe' database and the 'wolfusr' database
+				user. Sql example files can be found in
+				<filename>contrib/database/oracle</filename>.
+			</para>
+							
+			<sect3>
+				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					For building the Oracle database module you have to download the RPM packages
+					<filename>oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm</filename> and
+					<filename>oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm</filename>.
+					You can of course also install the zipfiles and install those.
+				</para>
+
+				<para>
+					From the system repositories you'll need the 'libaio' package.
+				</para>
+				
+				<para>
+					If you want to use the 'sqlplus' command line tool for manual testing you also
+					have to install the package
+					<filename>oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm</filename>.
+					If you want a history in sqlplus it's highly recommended that you install
+					a command line history wrapper like for instance 'rlwrap'.
+				</para>
+								
+			</sect3>
+			
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+
+				<para>
+					For building the Oracle database module you have to download the RPM packages
+					<filename>oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm</filename> and
+					<filename>oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm</filename>.
+				</para>
+				
+				<para>
+					To install those RPM files you'll need the 'alien' tool. You can of course
+					also install the zipfiles and install those.
+				</para>
+
+				<para>
+					From the system repositories you'll need the 'libaio1' package.
+				</para>
+				
+				<para>
+					If you want to use the 'sqlplus' command line tool for manual testing you also
+					have to install the package
+					<filename>oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm</filename>.
+					If you want a history in sqlplus it's highly recommended that you install
+					a command line history wrapper like for instance 'rlwrap'.
+				</para>								
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+
+				<para>
+					For building the Oracle database module you have to download the RPM packages
+					<filename>oracle-instantclient12.1-basic-12.1.0.1.0-1.i386.rpm</filename> and
+					<filename>oracle-instantclient12.1-devel-12.1.0.1.0-1.i386.rpm</filename>.
+					You can of course also install the zipfiles and install those.
+				</para>
+
+				<para>
+					From the system repositories you'll need the 'libaio1' package.
+				</para>
+				
+				<para>
+					If you want to use the 'sqlplus' command line tool for manual testing you also
+					have to install the package
+					<filename>oracle-instantclient12.1-sqlplus-12.1.0.1.0-1.i386.rpm</filename>.
+					If you want a history in sqlplus it's highly recommended that you install
+					a command line history wrapper like for instance 'rlwrap'.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the two packages 'oracle-instantclient-basic'
+					and 'oracle-instantclient-sdk'.
+				</para>
+				
+				<para>
+					Have a look at <ulink url="https://wiki.archlinux.org/index.php/Oracle_client">https://wiki.archlinux.org/index.php/Oracle_client</ulink>
+					on how to install the Oracle packages. Basically you have two
+					options: either you use the 'oracle' pacman repository or you
+					download the Oracle packages by hand and run the build scripts
+					from AUR.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					Simply download the zipfiles and install them to a directory,
+					let's say '/opt/oracle/instantclient_11_2'.
+				</para>
+				
+				<para>
+					Call 'make' with:
+					<programlisting language='shell'>
+	make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
+					</programlisting>
+				</para>				
+			</sect3>
+						
+		</sect2>
+		
 <!--
 Prerequisites
-
-
-* optionally (WITH_ORACLE): build Oracle database module
 
 * optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -804,6 +931,35 @@ Prerequisites
   * dia: to convert images to svg
 
 -->
+
+<!-- Installation -->		
+		<sect2>
+			<title>Installation</title>
+			
+			<para>
+				The makefiles provide a 'install' and an 'uninstall'
+				target to install and uninstall the software.
+			</para>
+			
+			<para>
+				The 'DESTDIR' and 'prefix' parameters are useful for
+				packagers to reroute the destination of the installation.
+			</para>
+			
+			<para>
+				For instance:
+		        <programlisting language='shell'>
+	make DESTDIR=/var/tmp prefix=/usr/local/wolframe-&WolframeVersion; install
+			</programlisting>
+				installs the software in:
+		        <programlisting language='shell'>
+	/var/tmp/usr/local/wolframe-&WolframeVersion;/sbin/wolframed
+	/var/tmp/usr/local/wolframe-&WolframeVersion;/etc/wolframe/wolframe.conf
+	...
+			</programlisting>			
+			
+			</para>
+		</sect2>
 
 	</sect1>
 
