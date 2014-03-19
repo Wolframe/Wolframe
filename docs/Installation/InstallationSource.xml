@@ -681,8 +681,15 @@
 			<sect3>
 				<title>ArchLinux</title>
 				<para>
-					You need the 'postgresql' package.
+					You need the 'postgresql-libs' package.
 				</para>
+				
+				<para>
+					If you want to test you also have to set
+					up the PostgreSQL server which comes
+					in the 'postgresql' package.
+				</para>
+				
 			</sect3>
 
 			<sect3>
@@ -1220,7 +1227,7 @@
 						
 		</sect2>
 
-<!-- Python -->
+<!-- libhpdf -->
 		<sect2>
 			<title>Printing support with libhpdf</title>
 			
@@ -1292,7 +1299,7 @@
 				<title>Debian, Ubuntu and similar Linux distributions</title>
 				
 				<para>
-					You need the 'zlib1g-dev' and 'libnpg12-dev' packages to
+					You need the 'zlib1g-dev' and 'libpng12-dev' packages to
 					build libhpdf.
 				</para>				
 
@@ -1304,7 +1311,7 @@
 			<sect3>
 				<title>openSUSE, SLES and similar Linux distributions</title>		
 				<para>
-					You need the 'zlib-devel' and 'libpng12-devel' packages to
+					You need the 'zlib-devel' and 'libpng12-devel' or 'libpng15-devel' packages to
 					build libhpdf.
 				</para>
 
@@ -1335,16 +1342,143 @@
 			</sect3>
 						
 		</sect2>
+
+<!-- FreeImage -->
+		<sect2>
+			<title>Image processing with FreeImage</title>
+			
+			<para>
+				<application>Wolframe</application> can manipulate
+				various image formats with the help of
+				the FreeImage project (<ulink url="http://freeimage.sourceforge.net">http://freeimage.sourceforge.net</ulink>).
+			</para>
+									
+			<para>
+				You enable the building of a loadable FreeImage processing
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_FREEIMAGE=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				You can also link against the embedded version of
+				FreeImage in '3rdParty/freeimage' instead of the one of
+				the Linux distribution:
+		        <programlisting language='shell'>
+	make WITH_LOCAL_FREEIMAGE=1
+			</programlisting>
+			</para>
+			
+			<para>
+				The location of the FreeImage package can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_FREEIMAGE=1 \
+		FREEIMAGE_DIR=/usr/local/FreeImage-3.15.4
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the FreeImage package separatly:
+		        <programlisting language='shell'>
+	make WITH_SYSTEM_FREEIMAGE=1 \
+		FREEIMAGE_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
+		FREEIMAGE_LIB_DIR=/usr/local/FreeImage-3.15.4/lib \
+		FREEIMAGE_LIBS=-lfreeimage \
+		FREEIMAGEPLUS_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
+		FREEIMAGEPLUS_LIB_DIR=/usr/local/FreeImage-3.15.4/lib \
+		FREEIMAGEPLUS_LIBS=-lfreeimageplus
+			</programlisting>				
+			
+			</para>
+			
+			<para>
+				Though there are FreeImage packages on most Linux distributions
+				you may still want to use the locally embedded version.
+			</para>
+						
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					There are FreeImage packages, but they are usually quite old.
+					Better build you own version if FreeImage.
+				</para>
+				
+				<para>
+					You need the 'zlib-devel' and 'libpng-devel' packages to
+					build FreeImage.
+				</para>		
+			</sect3>
+
+			<sect3>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'zlib-devel' and 'libpng-devel' packages to
+					build FreeImage.
+				</para>		
+
+				<para>
+					You may also try to use 'freeimage-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'zlib1g-dev' and 'libpng12-dev' packages to
+					build FreeImage.
+				</para>				
+
+				<para>
+					You can also try to use the 'libfreeimage-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'zlib-devel' and 'libpng12-devel' or 'libpng15-devel' packages to
+					build FreeImage.
+				</para>
+
+				<para>
+					You can also try to use the 'freeimage-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'freeimage' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					On Slackware you have to build your own version of FreeImage.
+					You need the 'zlib' and 'libpng' packages.
+					Both packages are part of the 'l' package series.
+				</para>
+
+				<para>
+					Alternatively you can of course also build the 'FreeImage'
+					package with the help of SlackBuilds.
+				</para>
+			</sect3>
+						
+		</sect2>
 		
 <!--
 
 * optionally (WITH_ICU): ICU 3.6 or later,
   needed for boost*locale with ICU backend
-
-* optionally (WITH_SYSTEM_FREEIMAGE): for image handling
-  using the system version of FreeImage, specify
-  WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
-  the 'freeimage' subdirectory.
 
 * for optional authentication mechanisms:
   * optionally (WITH_PAM)

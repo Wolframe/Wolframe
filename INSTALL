@@ -138,7 +138,16 @@ Foreword
             ArchLinux
             Slackware
 
-        1.2.15. Installation
+        1.2.15. Image processing with FreeImage
+
+            RedHat/Centos/Scientific Linux and similar Linux distributions
+            Fedora and similar Linux distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.16. Installation
 
     1.3. Building on Windows systems
 
@@ -273,7 +282,16 @@ Table of Contents
         ArchLinux
         Slackware
 
-    1.2.15. Installation
+    1.2.15. Image processing with FreeImage
+
+        RedHat/Centos/Scientific Linux and similar Linux distributions
+        Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.16. Installation
 
 1.3. Building on Windows systems
 
@@ -668,7 +686,10 @@ You need the 'postgresql-devel' package.
 
 ArchLinux
 
-You need the 'postgresql' package.
+You need the 'postgresql-libs' package.
+
+If you want to test you also have to set up the PostgreSQL server which comes
+in the 'postgresql' package.
 
 Slackware
 
@@ -1035,13 +1056,14 @@ On Fedora you can also try to use the 'libhpdf-devel' package.
 
 Debian, Ubuntu and similar Linux distributions
 
-You need the 'zlib1g-dev' and 'libnpg12-dev' packages to build libhpdf.
+You need the 'zlib1g-dev' and 'libpng12-dev' packages to build libhpdf.
 
 You can also try to use the 'libhpdf-devel' package.
 
 openSUSE, SLES and similar Linux distributions
 
-You need the 'zlib-devel' and 'libpng12-devel' packages to build libhpdf.
+You need the 'zlib-devel' and 'libpng12-devel' or 'libpng15-devel' packages to
+build libhpdf.
 
 You can also try to use the 'libhpdf-devel' package.
 
@@ -1056,7 +1078,82 @@ Slackware
 On Slackware you have to build your own version of libhpdf. You need the 'zlib'
 and 'libpng' packages. Both packages are part of the 'l' package series.
 
-1.2.15. Installation
+1.2.15. Image processing with FreeImage
+
+Wolframe can manipulate various image formats with the help of the FreeImage
+project (http://freeimage.sourceforge.net).
+
+You enable the building of a loadable FreeImage processing module with:
+
+        make WITH_SYSTEM_FREEIMAGE=1
+
+
+You can also link against the embedded version of FreeImage in '3rdParty/
+freeimage' instead of the one of the Linux distribution:
+
+        make WITH_LOCAL_FREEIMAGE=1
+
+
+The location of the FreeImage package can be overloaded with:
+
+        make WITH_SYSTEM_FREEIMAGE=1 \
+                FREEIMAGE_DIR=/usr/local/FreeImage-3.15.4
+
+
+You can also override all compilation and linking flags of the FreeImage
+package separatly:
+
+        make WITH_SYSTEM_FREEIMAGE=1 \
+                FREEIMAGE_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
+                FREEIMAGE_LIB_DIR=/usr/local/FreeImage-3.15.4/lib \
+                FREEIMAGE_LIBS=-lfreeimage \
+                FREEIMAGEPLUS_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
+                FREEIMAGEPLUS_LIB_DIR=/usr/local/FreeImage-3.15.4/lib \
+                FREEIMAGEPLUS_LIBS=-lfreeimageplus
+
+
+Though there are FreeImage packages on most Linux distributions you may still
+want to use the locally embedded version.
+
+RedHat/Centos/Scientific Linux and similar Linux distributions
+
+There are FreeImage packages, but they are usually quite old. Better build you
+own version if FreeImage.
+
+You need the 'zlib-devel' and 'libpng-devel' packages to build FreeImage.
+
+Fedora and similar Linux distributions
+
+You need the 'zlib-devel' and 'libpng-devel' packages to build FreeImage.
+
+You may also try to use 'freeimage-devel' package.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'zlib1g-dev' and 'libpng12-dev' packages to build FreeImage.
+
+You can also try to use the 'libfreeimage-devel' package.
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'zlib-devel' and 'libpng12-devel' or 'libpng15-devel' packages to
+build FreeImage.
+
+You can also try to use the 'freeimage-devel' package.
+
+ArchLinux
+
+You need the 'freeimage' package.
+
+Slackware
+
+On Slackware you have to build your own version of FreeImage. You need the
+'zlib' and 'libpng' packages. Both packages are part of the 'l' package series.
+
+Alternatively you can of course also build the 'FreeImage' package with the
+help of SlackBuilds.
+
+1.2.16. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.
