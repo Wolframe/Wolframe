@@ -2415,14 +2415,14 @@
 			<sect3>
 				<title>FreeBSD</title>
 				<para>
-					We never tried do build the documentation on FreeBSD so far.
+					We never tried to build the documentation on FreeBSD so far.
 				</para>
 			</sect3>
 
 			<sect3>
 				<title>NetBSD</title>
 				<para>
-					We never tried do build the documentation on NetBSD so far.
+					We never tried to build the documentation on NetBSD so far.
 				</para>
 			</sect3>
 						
