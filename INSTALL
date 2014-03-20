@@ -1773,7 +1773,7 @@ You need the 'expect' and 'telnet' packages. Those packages are part of the
 
 FreeBSD
 
-You need the 'expecct' package.
+You need the 'expect' package.
 
 NetBSD
 
@@ -1860,11 +1860,11 @@ the 'dia' package with the help of SlackBuilds.
 
 FreeBSD
 
-We never tried do build the documentation on FreeBSD so far.
+We never tried to build the documentation on FreeBSD so far.
 
 NetBSD
 
-We never tried do build the documentation on NetBSD so far.
+We never tried to build the documentation on NetBSD so far.
 
 1.2.24. Installation
 
