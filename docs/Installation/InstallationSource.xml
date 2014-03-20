@@ -251,6 +251,43 @@
 					of your PATH.
 				</para>
 			</sect3>
+			
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					The official gcc is too old to build Boost. The Forte compiler
+					is not free and has big problems to compile modern
+					C++ code. So we must use a the modern CSW/gcc/C++ toolchain
+					for <application>Wolframe</application>.
+				</para>
+				
+				<para>
+					Install the CSW toolchain (<ulink url="http://www.opencsw.org">http://www.opencsw.org</ulink>)
+					and basic development tools:
+					<programlisting language='shell'>
+	pkgadd -d http://get.opencsw.org/now
+	pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake					
+					</programlisting>					
+				</para>
+				
+				<para>
+					You also need some system files:
+					<programlisting language='shell'>
+	pkg install pkg:/system/header
+	pkg install pkg:/developer/library/lint
+	pkg install system/library/math/header-math
+					</programlisting>
+				</para>
+
+				<para>
+					Make sure <filename>/opt/csw/bin</filename> is part of your PATH.
+				</para>
+				
+				<para>
+					Install packages with 'pkgutil --install'.
+				</para>
+			</sect3>
 		</sect2>
 
 <!-- Boost -->
@@ -504,6 +541,39 @@
 					You need the 'boost-libs' package.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+
+				<para>
+					We don't use the CSW boost packages.
+				</para>
+				
+				<para>
+					As long you don't need ICU support you can
+					build Boost as follows:
+				</para>
+				
+				<para>
+					First apply all patches found in
+					<filename>packaging/patches/Solaris/1.54.0</filename>.
+				</para>
+				
+				<para>
+					Then build boost with:
+					<programlisting language='shell'>
+	./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+		--with-libraries=thread,filesystem,system,program_options,date_time
+	./b2 -a -d2 install
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The only
+					tested version for now is version 1.54! Other
+					versions of Boost may work or not..
+				</para>
+			</sect3>
 			
 		</sect2>
 <!-- SSL -->
@@ -586,7 +656,14 @@
 					you don't have to install any special packages.
 				</para>
 			</sect3>
-			
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWlibssl-dev' package.
+				</para>
+			</sect3>
 		</sect2>
 
 <!-- Sqlite3 -->		
@@ -714,7 +791,14 @@
 					You need the 'sqlite3' package.
 				</para>
 			</sect3>
-			
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
+				</para>
+			</sect3>			
 		</sect2>
 
 <!-- PostgreSQL -->
@@ -897,7 +981,19 @@
 					For testing you also need the 'postgresql92-server' package.
 				</para>
 			</sect3>
-						
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWpostgresql-dev' package.
+				</para>
+				
+				<para>
+					For testing you also need the 'SWpostgresql91-server' package.
+				</para>
+			</sect3>			
+			
 		</sect2>
 
 <!-- Oracle -->
@@ -1094,6 +1190,14 @@
 					There are no plans for an Oracle module on NetBSD.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					There are no plans for an Oracle module on OpenIndiana.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -1212,6 +1316,14 @@
 					You need the 'libxml2' and 'libxslt' packages.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWlibxml2-dev' and 'CSWlibxslt-dev' packages.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -1420,6 +1532,25 @@
 					You need the 'python33' package.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					We cannot use 'CSWpython31-dev' because it's build
+					with the Forte compiler.
+				</para>
+				
+				<para>
+					We build our own Python 3 with:
+					<programlisting language='shell'>
+	./configure --prefix=/opt/csw/python-3.3.2/ --enable-shared
+	gmake
+	gmake install
+					</programlisting>
+				</para>
+				
+			</sect3>			
 						
 		</sect2>
 
@@ -1558,6 +1689,17 @@
 					You need the 'png' and the 'zlib' packages for this.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+				</para>
+				<para>
+					You need the 'CSWlibz-dev' package for this.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -1715,10 +1857,21 @@
 			<sect3>
 				<title>NetBSD</title>
 				<para>
-					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+					Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
 					You need the 'png' and the 'zlib' packages for this.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
+				</para>
+				<para>
+					You need the 'CSWlibz-dev' package for this.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -1949,7 +2102,59 @@
 					see also <ulink url="https://github.com/Wolframe/Wolframe/issues/59">https://github.com/Wolframe/Wolframe/issues/59</ulink>.						
 				</para>
 			</sect3>
-									
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You cannot use the 'SUNWicud/SUNWicu' and 'CSWlibicu_dev'
+					packages as they are both linked with the Forte C++ compiler.
+					You have to compile your own version compiled with the
+					gcc compiler from CSW:
+
+					<programlisting language='shell'>
+	gtar zxf icu4c-51_2-src.tgz
+					</programlisting>
+
+					apply the solaris XOPEN patch
+					(<filename>packaging/patches/Solaris/icu4c-1.51.2/icu_source_common_uposixdefs_h.patch</filename>),
+					then build ICU with:
+
+					<programlisting language='shell'>
+	cd source/icu
+	./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-51.2
+	gmake
+	gmake install
+					</programlisting>
+				</para>
+				
+				<para>
+					Then build Boost as follows:
+				</para>
+				
+				<para>
+					First apply all patches found in
+					<filename>packaging/patches/Solaris/1.54.0</filename>.
+				</para>
+				
+				<para>
+					Then build boost with:
+					<programlisting language='shell'>
+	./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+		--with-icu=/opt/csw/icu4c-51.2 \
+		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
+	./b2 -a -sICU_PATH=/opt/csw/icu4c-51.2 -d2 install
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The only
+					tested version for now is version 1.54! Other
+					versions of Boost may work or not..
+				</para>
+
+			</sect3>
+			
 		</sect2>
 
 <!-- PAM -->
@@ -2044,6 +2249,14 @@
 					don't support PAM on NetBSD.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					PAM support is available out of the box.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -2146,6 +2359,14 @@
 					You need the 'cyrus-sasl' package.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWsasl' and 'CSWsasl-dev' packages.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
@@ -2262,6 +2483,14 @@
 					You need the 'tcl-expect' package.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWexpect' package.
+				</para>
+			</sect3>			
 						
 		</sect2>
 
