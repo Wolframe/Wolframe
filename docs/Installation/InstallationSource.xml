@@ -215,6 +215,43 @@
 			</programlisting>	
 			</para>
 		</sect2>
+		
+		<sect2>
+			<title>Platform-specific build instructions</title>
+			
+			<sect3>
+				<title>FreeBSD</title>
+			
+				<para>
+					You need GNU make, BSD make doesn't work.
+					You have to install the 'gmake' package.
+				</para>
+				
+				<para>
+					Both FreeBSD 8 and FreeBSD 9 are supported.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+			
+				<para>
+					You need GNU make, BSD make doesn't work.
+					You have to install the 'gmake' package.
+				</para>
+			
+				<para>
+					NetBSD 6 is supported, NetBSD 5 not.
+				</para>
+				
+				<para>
+					Packages are installed with 'pkgin' into the
+					directory <filename>/usr/pkg</filename>. Make
+					sure <filename>/usr/pkg/bin</filename> is part
+					of your PATH.
+				</para>
+			</sect3>
+		</sect2>
 
 <!-- Boost -->
 		<sect2>
@@ -444,6 +481,30 @@
 				</para>
 			</sect3>
 			
+			<sect3>
+				<title>FreeBSD</title>
+
+				<para>
+					You need the 'boost-libs' package.
+				</para>
+
+				<para>
+					Some boost header files are broken, for patches
+					see <filename>packaging/patches/FreeBSD</filename>.
+					They can be applied to the ports directory before
+					rebuilding Boost or directly to the installed header files in
+					<filename>/usr/local/include/boost</filename>.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+
+				<para>
+					You need the 'boost-libs' package.
+				</para>
+			</sect3>
+			
 		</sect2>
 <!-- SSL -->
 		<sect2>
@@ -510,6 +571,21 @@
 				</para>
 			</sect3>
 
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					FreeBSD contains all necessary SSL libraries per default,
+					you don't have to install any special packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					NetBSD contains all necessary SSL libraries per default,
+					you don't have to install any special packages.
+				</para>
+			</sect3>
 			
 		</sect2>
 
@@ -624,7 +700,21 @@
 					part of the 'ap' package series.
 				</para>
 			</sect3>
-						
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					You need the 'sqlite3' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'sqlite3' package.
+				</para>
+			</sect3>
+			
 		</sect2>
 
 <!-- PostgreSQL -->
@@ -783,6 +873,28 @@
 				<para>
 					Alternatively you can of course also build the 'postgresql'
 					package with the help of SlackBuilds.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					You need the 'postgresql92-client' package.
+				</para>
+
+				<para>
+					For testing you also need the 'postgresql92-server' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'postgresql92-client' package.
+				</para>
+
+				<para>
+					For testing you also need the 'postgresql92-server' package.
 				</para>
 			</sect3>
 						
@@ -968,6 +1080,20 @@
 					</programlisting>
 				</para>				
 			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					There are no plans for an Oracle module on FreeBSD.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					There are no plans for an Oracle module on NetBSD.
+				</para>
+			</sect3>
 						
 		</sect2>
 
@@ -1072,10 +1198,24 @@
 					part of the 'l' package series.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					You need the 'libxml2' and 'libxslt' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'libxml2' and 'libxslt' packages.
+				</para>
+			</sect3>
 						
 		</sect2>
 
-<!-- cJSON -->
+<!-- Textwolf -->
 		<sect2>
 			<title>XML filtering support with Textwolf</title>
 			
@@ -1265,6 +1405,21 @@
 					package with the help of SlackBuilds.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					Build the BSD ports package for 'python33'.
+					There is no binary Python 3 package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'python33' package.
+				</para>
+			</sect3>
 						
 		</sect2>
 
@@ -1378,7 +1533,29 @@
 				<para>
 					On Slackware you have to build your own version of libhpdf.
 					You need the 'zlib' and 'libpng' packages.
+				</para>
+				<para>
 					Both packages are part of the 'l' package series.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+				</para>
+				<para>
+					You need the 'png'  package for this.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+				</para>
+				<para>
+					You need the 'png' and the 'zlib' packages for this.
 				</para>
 			</sect3>
 						
@@ -1513,7 +1690,70 @@
 					package with the help of SlackBuilds.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
+				</para>
+
+				<para>
+					You need the 'png'  package for this.
+				</para>
+				
+				<para>
+					There is a FreeImage port but it doesn't build the libfreeimageplus
+					library we need.
+				</para>
+
+				<para>
+					<emphasis role="bold">Note</emphasis>: FreeImage doesn't build on
+					32-bit currently because gcc doesn't support some 64-bit constants on FreeBSD.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+					You need the 'png' and the 'zlib' packages for this.
+				</para>
+			</sect3>
 						
+		</sect2>
+
+<!-- zlib and libpng -->
+		<sect2>
+			<title>zlib and libpng</title>
+			
+			<para>
+				FreeImage and libhpdf need the zlib and libpng libraries.
+			</para>
+									
+			<para>
+				The location of the zlib and libpng package can be overloaded with:
+		        <programlisting language='shell'>
+	make \
+		LIBZ_DIR=/usr/local/zlib-1.2.8 \
+		LIBPNG_DIR=/usr/local/libpng-1.6.10
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the zlib and libpng packages separately:
+		        <programlisting language='shell'>
+	make \
+		LIBZ_INCLUDE_DIR=/usr/local/zlib-1.2.8/include \
+		LIBZ_LIB_DIR=/usr/local/zlib-1.2.8/lib \
+		LIBZ_LIBS=-lz \
+		LIBPNG_INCLUDE_DIR=/usr/local/libpng-1.6.10/include \
+		LIBPNG_LIB_DIR=/usr/local/libpng-1.6.10/libs \
+		LIBPNG_LIBS=-lpng
+			</programlisting>				
+			
+			</para>
+									
 		</sect2>
 
 <!-- ICU -->
@@ -1683,6 +1923,32 @@
 					This package is	part of the 'l' package series.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					The official Boost packages don't contain a
+					boost-locale with ICU backend.
+				</para>
+				
+				<para>
+					Build Boost in this case with the patched from
+					<filename>packaging/patches/FreeBSD</filename>
+					applied.
+				</para>
+				
+				<para>
+					You also need the 'icu' package in this case.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					<emphasis role="bold">Note</emphasis>: The Boost locale and ICU support is currently broken,
+					see also <ulink url="https://github.com/Wolframe/Wolframe/issues/59">https://github.com/Wolframe/Wolframe/issues/59</ulink>.						
+				</para>
+			</sect3>
 									
 		</sect2>
 
@@ -1760,6 +2026,22 @@
 				<para>
 					On Slackware there is no official PAM package.
 					You have to build 'linux-pam' on your own.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					<emphasis role="bold">Note</emphasis>: We currently
+					don't support PAM on FreeBSD.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					<emphasis role="bold">Note</emphasis>: We currently
+					don't support PAM on NetBSD.
 				</para>
 			</sect3>
 						
@@ -1848,6 +2130,20 @@
 				<para>
 					You need the 'cyrus-sasl' package. This package is
 					part of the 'n' package series.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					You need the 'cyrus-sasl' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'cyrus-sasl' package.
 				</para>
 			</sect3>
 						
@@ -1950,6 +2246,20 @@
 				<para>
 					You need the 'expect' and 'telnet' packages. Those packages
 					are part of the 'tcl' respectively the 'n' package series.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					You need the 'expecct' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					You need the 'tcl-expect' package.
 				</para>
 			</sect3>
 						
@@ -2101,6 +2411,19 @@
 					package with the help of SlackBuilds.
 				</para>
 				
+			</sect3>
+			<sect3>
+				<title>FreeBSD</title>
+				<para>
+					We never tried do build the documentation on FreeBSD so far.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					We never tried do build the documentation on NetBSD so far.
+				</para>
 			</sect3>
 						
 		</sect2>

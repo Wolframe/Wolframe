@@ -40,7 +40,12 @@ Foreword
         1.2.1. GCC compiler
         1.2.2. clang compiler
         1.2.3. Intel compiler
-        1.2.4. Boost
+        1.2.4. Platform-specific build instructions
+
+            FreeBSD
+            NetBSD
+
+        1.2.5. Boost
 
             Build your own version of Boost
             RedHat, Fedora, CentOS, Scientific Linux and similar Linux
@@ -68,8 +73,10 @@ Foreword
 
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.5. Secure Socket Layer (SSL)
+        1.2.6. Secure Socket Layer (SSL)
 
             RedHat, Fedora, CentOS, Scientific Linux and similar Linux
                 distributions
@@ -77,8 +84,10 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.6. SQLite database support
+        1.2.7. SQLite database support
 
             RedHat/Centos/Scientific Linux 5 and similar Linux distributions
             RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
@@ -87,17 +96,10 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.7. PostgreSQL database support
-
-            RedHat, Fedora, CentOS, Scientific Linux and similar Linux
-                distributions
-            Debian, Ubuntu and similar Linux distributions
-            openSUSE, SLES and similar Linux distributions
-            ArchLinux
-            Slackware
-
-        1.2.8. Oracle database support
+        1.2.8. PostgreSQL database support
 
             RedHat, Fedora, CentOS, Scientific Linux and similar Linux
                 distributions
@@ -105,8 +107,21 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.9. XML filtering support with libxml2 and libxslt
+        1.2.9. Oracle database support
+
+            RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+            FreeBSD
+            NetBSD
+
+        1.2.10. XML filtering support with libxml2 and libxslt
 
             RedHat/Centos/Scientific Linux 5 and similar Linux distributions
             RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
@@ -115,11 +130,13 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.10. XML filtering support with Textwolf
-        1.2.11. JSON filtering support with cJSON
-        1.2.12. Scripting support with Lua
-        1.2.13. Scripting support with Python
+        1.2.11. XML filtering support with Textwolf
+        1.2.12. JSON filtering support with cJSON
+        1.2.13. Scripting support with Lua
+        1.2.14. Scripting support with Python
 
             RedHat/Centos/Scientific Linux 5 and 6 and similar Linux
                 distributions
@@ -128,8 +145,10 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.14. Printing support with libhpdf
+        1.2.15. Printing support with libhpdf
 
             RedHat/Centos/Scientific Linux, Fedora and similar Linux
                 distributions
@@ -137,8 +156,10 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.15. Image processing with FreeImage
+        1.2.16. Image processing with FreeImage
 
             RedHat/Centos/Scientific Linux and similar Linux distributions
             Fedora and similar Linux distributions
@@ -146,8 +167,11 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.16. Support for ICU
+        1.2.17. zlib and libpng
+        1.2.18. Support for ICU
 
             RedHat/Centos/Scientific Linux, Fedora and similar Linux
                 distributions
@@ -168,17 +192,10 @@ Foreword
 
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.17. Authentication support with PAM
-
-            RedHat/Centos/Scientific Linux, Fedora and similar Linux
-                distributions
-            Debian, Ubuntu and similar Linux distributions
-            openSUSE, SLES and similar Linux distributions
-            ArchLinux
-            Slackware
-
-        1.2.18. Authentication support with SASL
+        1.2.19. Authentication support with PAM
 
             RedHat/Centos/Scientific Linux, Fedora and similar Linux
                 distributions
@@ -186,9 +203,10 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.19. Testing Wolframe
-        1.2.20. Testing with Expect
+        1.2.20. Authentication support with SASL
 
             RedHat/Centos/Scientific Linux, Fedora and similar Linux
                 distributions
@@ -196,8 +214,22 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.21. Building the documentation
+        1.2.21. Testing Wolframe
+        1.2.22. Testing with Expect
+
+            RedHat/Centos/Scientific Linux, Fedora and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+            FreeBSD
+            NetBSD
+
+        1.2.23. Building the documentation
 
             RedHat/Centos/Scientific Linux and similar Linux distributions
             Fedora and similar Linux distributions
@@ -205,10 +237,12 @@ Foreword
             openSUSE, SLES and similar Linux distributions
             ArchLinux
             Slackware
+            FreeBSD
+            NetBSD
 
-        1.2.22. Installation
-        1.2.23. Manual dependency generation
-        1.2.24. Creating source tarballs
+        1.2.24. Installation
+        1.2.25. Manual dependency generation
+        1.2.26. Creating source tarballs
 
 2. Installation via binary packages
 
@@ -246,7 +280,12 @@ Table of Contents
     1.2.1. GCC compiler
     1.2.2. clang compiler
     1.2.3. Intel compiler
-    1.2.4. Boost
+    1.2.4. Platform-specific build instructions
+
+        FreeBSD
+        NetBSD
+
+    1.2.5. Boost
 
         Build your own version of Boost
         RedHat, Fedora, CentOS, Scientific Linux and similar Linux
@@ -273,8 +312,10 @@ Table of Contents
 
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.5. Secure Socket Layer (SSL)
+    1.2.6. Secure Socket Layer (SSL)
 
         RedHat, Fedora, CentOS, Scientific Linux and similar Linux
             distributions
@@ -282,8 +323,10 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.6. SQLite database support
+    1.2.7. SQLite database support
 
         RedHat/Centos/Scientific Linux 5 and similar Linux distributions
         RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
@@ -292,17 +335,10 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.7. PostgreSQL database support
-
-        RedHat, Fedora, CentOS, Scientific Linux and similar Linux
-            distributions
-        Debian, Ubuntu and similar Linux distributions
-        openSUSE, SLES and similar Linux distributions
-        ArchLinux
-        Slackware
-
-    1.2.8. Oracle database support
+    1.2.8. PostgreSQL database support
 
         RedHat, Fedora, CentOS, Scientific Linux and similar Linux
             distributions
@@ -310,8 +346,21 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.9. XML filtering support with libxml2 and libxslt
+    1.2.9. Oracle database support
+
+        RedHat, Fedora, CentOS, Scientific Linux and similar Linux
+            distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+        FreeBSD
+        NetBSD
+
+    1.2.10. XML filtering support with libxml2 and libxslt
 
         RedHat/Centos/Scientific Linux 5 and similar Linux distributions
         RedHat/Centos/Scientific Linux 6, Fedora and similar Linux
@@ -320,11 +369,13 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.10. XML filtering support with Textwolf
-    1.2.11. JSON filtering support with cJSON
-    1.2.12. Scripting support with Lua
-    1.2.13. Scripting support with Python
+    1.2.11. XML filtering support with Textwolf
+    1.2.12. JSON filtering support with cJSON
+    1.2.13. Scripting support with Lua
+    1.2.14. Scripting support with Python
 
         RedHat/Centos/Scientific Linux 5 and 6 and similar Linux distributions
         Fedora and similar Linux distributions
@@ -332,16 +383,20 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.14. Printing support with libhpdf
+    1.2.15. Printing support with libhpdf
 
         RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
         Debian, Ubuntu and similar Linux distributions
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.15. Image processing with FreeImage
+    1.2.16. Image processing with FreeImage
 
         RedHat/Centos/Scientific Linux and similar Linux distributions
         Fedora and similar Linux distributions
@@ -349,8 +404,11 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.16. Support for ICU
+    1.2.17. zlib and libpng
+    1.2.18. Support for ICU
 
         RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
         Fedora and similar Linux distributions
@@ -370,33 +428,41 @@ Table of Contents
 
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.17. Authentication support with PAM
-
-        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
-        Debian, Ubuntu and similar Linux distributions
-        openSUSE, SLES and similar Linux distributions
-        ArchLinux
-        Slackware
-
-    1.2.18. Authentication support with SASL
+    1.2.19. Authentication support with PAM
 
         RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
         Debian, Ubuntu and similar Linux distributions
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.19. Testing Wolframe
-    1.2.20. Testing with Expect
+    1.2.20. Authentication support with SASL
 
         RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
         Debian, Ubuntu and similar Linux distributions
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.21. Building the documentation
+    1.2.21. Testing Wolframe
+    1.2.22. Testing with Expect
+
+        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+        FreeBSD
+        NetBSD
+
+    1.2.23. Building the documentation
 
         RedHat/Centos/Scientific Linux and similar Linux distributions
         Fedora and similar Linux distributions
@@ -404,10 +470,12 @@ Table of Contents
         openSUSE, SLES and similar Linux distributions
         ArchLinux
         Slackware
+        FreeBSD
+        NetBSD
 
-    1.2.22. Installation
-    1.2.23. Manual dependency generation
-    1.2.24. Creating source tarballs
+    1.2.24. Installation
+    1.2.25. Manual dependency generation
+    1.2.26. Creating source tarballs
 
 This section describes how to build the Wolframe application from the source
 code.
@@ -537,7 +605,26 @@ When running the tests or any binaries you have to make sure that
         setenv LD_LIBRARY_PATH $PROD_DIR/lib/intel64
 
 
-1.2.4. Boost
+1.2.4. Platform-specific build instructions
+
+FreeBSD
+
+You need GNU make, BSD make doesn't work. You have to install the 'gmake'
+package.
+
+Both FreeBSD 8 and FreeBSD 9 are supported.
+
+NetBSD
+
+You need GNU make, BSD make doesn't work. You have to install the 'gmake'
+package.
+
+NetBSD 6 is supported, NetBSD 5 not.
+
+Packages are installed with 'pkgin' into the directory /usr/pkg. Make sure /usr
+/pkg/bin is part of your PATH.
+
+1.2.5. Boost
 
 Boost (http://www.boost.org) is the only library which is absolutely required
 in order to build Wolframe.
@@ -664,7 +751,19 @@ You need the 'boost' package. This package is part of the 'l' package series.
 The official Boost package contains support for boost-locale and the ICU
 backend.
 
-1.2.5. Secure Socket Layer (SSL)
+FreeBSD
+
+You need the 'boost-libs' package.
+
+Some boost header files are broken, for patches see packaging/patches/FreeBSD.
+They can be applied to the ports directory before rebuilding Boost or directly
+to the installed header files in /usr/local/include/boost.
+
+NetBSD
+
+You need the 'boost-libs' package.
+
+1.2.6. Secure Socket Layer (SSL)
 
 The Wolframe protocol can be secured with SSL. You have to specify the
 following when building:
@@ -700,7 +799,17 @@ Slackware
 
 You need the 'openssl' package. This package is part of the 'n' package series.
 
-1.2.6. SQLite database support
+FreeBSD
+
+FreeBSD contains all necessary SSL libraries per default, you don't have to
+install any special packages.
+
+NetBSD
+
+NetBSD contains all necessary SSL libraries per default, you don't have to
+install any special packages.
+
+1.2.7. SQLite database support
 
 Wolframe can use an Sqlite3 database (http://sqlite.org) as backend for data
 storage and for authentication and autorization.
@@ -761,7 +870,15 @@ Slackware
 
 You need the 'sqlite' package. This package is part of the 'ap' package series.
 
-1.2.7. PostgreSQL database support
+FreeBSD
+
+You need the 'sqlite3' package.
+
+NetBSD
+
+You need the 'sqlite3' package.
+
+1.2.8. PostgreSQL database support
 
 Wolframe can use a PostgreSQL database (http://postgresql.org) as backend for
 data storage and for authentication and autorization.
@@ -868,7 +985,19 @@ Compile Wolframe now with:
 Alternatively you can of course also build the 'postgresql' package with the
 help of SlackBuilds.
 
-1.2.8. Oracle database support
+FreeBSD
+
+You need the 'postgresql92-client' package.
+
+For testing you also need the 'postgresql92-server' package.
+
+NetBSD
+
+You need the 'postgresql92-client' package.
+
+For testing you also need the 'postgresql92-server' package.
+
+1.2.9. Oracle database support
 
 Wolframe can use a Oracle database (http://www.oracle.com) as backend for data
 storage and for authentication and autorization.
@@ -984,7 +1113,15 @@ Call 'make' with:
         make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_12_1
 
 
-1.2.9. XML filtering support with libxml2 and libxslt
+FreeBSD
+
+There are no plans for an Oracle module on FreeBSD.
+
+NetBSD
+
+There are no plans for an Oracle module on NetBSD.
+
+1.2.10. XML filtering support with libxml2 and libxslt
 
 Wolframe can use libxml2 and libxslt (http://xmlsoft.org/) for filtering and
 the conversion of XML data.
@@ -1047,7 +1184,15 @@ Slackware
 You need the 'libxml2' and the 'libxslt' packages. Both packages are part of
 the 'l' package series.
 
-1.2.10. XML filtering support with Textwolf
+FreeBSD
+
+You need the 'libxml2' and 'libxslt' packages.
+
+NetBSD
+
+You need the 'libxml2' and 'libxslt' packages.
+
+1.2.11. XML filtering support with Textwolf
 
 Wolframe can use Textwolf (http://textwolf.net) for filtering and the
 conversion of XML data.
@@ -1062,7 +1207,7 @@ You enable the building of a loadable Textfolw filtering module with:
 Note: If you plan to run tests when building the Wolframe you should enable
 Textwolf as many tests rely on it's presence.
 
-1.2.11. JSON filtering support with cJSON
+1.2.12. JSON filtering support with cJSON
 
 Wolframe can use cJSON (http://sourceforge.net/projects/cjson/) for filtering
 and the conversion of JSON data.
@@ -1074,7 +1219,7 @@ You enable the building of a loadable cJSON filtering module with:
         make WITH_CJSON=1
 
 
-1.2.12. Scripting support with Lua
+1.2.13. Scripting support with Lua
 
 Wolframe can be scripted with Lua (http://www.lua.org).
 
@@ -1085,7 +1230,7 @@ You enable the building of a loadable Lua scripting module with:
         make WITH_LUA=1
 
 
-1.2.13. Scripting support with Python
+1.2.14. Scripting support with Python
 
 Wolframe can be scripted with Python (https://www.python.org).
 
@@ -1148,7 +1293,16 @@ On Slackware you have to build your own version of Python with:
 Alternatively you can of course also build the 'python3' package with the help
 of SlackBuilds.
 
-1.2.14. Printing support with libhpdf
+FreeBSD
+
+Build the BSD ports package for 'python33'. There is no binary Python 3
+package.
+
+NetBSD
+
+You need the 'python33' package.
+
+1.2.15. Printing support with libhpdf
 
 Wolframe can print with libhpdf (http://libharu.org/, also called libharu).
 
@@ -1209,9 +1363,23 @@ You can also try to use the 'libharu' package.
 Slackware
 
 On Slackware you have to build your own version of libhpdf. You need the 'zlib'
-and 'libpng' packages. Both packages are part of the 'l' package series.
+and 'libpng' packages.
 
-1.2.15. Image processing with FreeImage
+Both packages are part of the 'l' package series.
+
+FreeBSD
+
+Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+
+You need the 'png' package for this.
+
+NetBSD
+
+Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+
+You need the 'png' and the 'zlib' packages for this.
+
+1.2.16. Image processing with FreeImage
 
 Wolframe can manipulate various image formats with the help of the FreeImage
 project (http://freeimage.sourceforge.net).
@@ -1286,7 +1454,47 @@ On Slackware you have to build your own version of FreeImage. You need the
 Alternatively you can of course also build the 'FreeImage' package with the
 help of SlackBuilds.
 
-1.2.16. Support for ICU
+FreeBSD
+
+Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
+
+You need the 'png' package for this.
+
+There is a FreeImage port but it doesn't build the libfreeimageplus library we
+need.
+
+Note: FreeImage doesn't build on 32-bit currently because gcc doesn't support
+some 64-bit constants on FreeBSD.
+
+NetBSD
+
+Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'. You need the
+'png' and the 'zlib' packages for this.
+
+1.2.17. zlib and libpng
+
+FreeImage and libhpdf need the zlib and libpng libraries.
+
+The location of the zlib and libpng package can be overloaded with:
+
+        make \
+                LIBZ_DIR=/usr/local/zlib-1.2.8 \
+                LIBPNG_DIR=/usr/local/libpng-1.6.10
+
+
+You can also override all compilation and linking flags of the zlib and libpng
+packages separately:
+
+        make \
+                LIBZ_INCLUDE_DIR=/usr/local/zlib-1.2.8/include \
+                LIBZ_LIB_DIR=/usr/local/zlib-1.2.8/lib \
+                LIBZ_LIBS=-lz \
+                LIBPNG_INCLUDE_DIR=/usr/local/libpng-1.6.10/include \
+                LIBPNG_LIB_DIR=/usr/local/libpng-1.6.10/libs \
+                LIBPNG_LIBS=-lpng
+
+
+1.2.18. Support for ICU
 
 Wolframe can use the International Components for Unicode (ICU, http://
 site.icu-project.org) library for text normalization and conversion.
@@ -1378,7 +1586,21 @@ Slackware
 The official Boost package contains support for boost-locale and the ICU
 backend. This package is part of the 'l' package series.
 
-1.2.17. Authentication support with PAM
+FreeBSD
+
+The official Boost packages don't contain a boost-locale with ICU backend.
+
+Build Boost in this case with the patched from packaging/patches/FreeBSD
+applied.
+
+You also need the 'icu' package in this case.
+
+NetBSD
+
+Note: The Boost locale and ICU support is currently broken, see also https://
+github.com/Wolframe/Wolframe/issues/59.
+
+1.2.19. Authentication support with PAM
 
 Wolframe can authenticate users with PAM.
 
@@ -1423,7 +1645,15 @@ Slackware
 On Slackware there is no official PAM package. You have to build 'linux-pam' on
 your own.
 
-1.2.18. Authentication support with SASL
+FreeBSD
+
+Note: We currently don't support PAM on FreeBSD.
+
+NetBSD
+
+Note: We currently don't support PAM on NetBSD.
+
+1.2.20. Authentication support with SASL
 
 Wolframe can authenticate users with the Cyrus SASL library (http://
 cyrusimap.org/).
@@ -1473,7 +1703,15 @@ Slackware
 You need the 'cyrus-sasl' package. This package is part of the 'n' package
 series.
 
-1.2.19. Testing Wolframe
+FreeBSD
+
+You need the 'cyrus-sasl' package.
+
+NetBSD
+
+You need the 'cyrus-sasl' package.
+
+1.2.21. Testing Wolframe
 
 Wolframe has tests written in Google gtest (https://code.google.com/p/
 googletest/).
@@ -1496,7 +1734,7 @@ follows:
         make test RUN_TESTS=0
 
 
-1.2.20. Testing with Expect
+1.2.22. Testing with Expect
 
 Some more complex tests are written with Expect (http://expect.sourceforge.net/
 ).
@@ -1533,7 +1771,15 @@ Slackware
 You need the 'expect' and 'telnet' packages. Those packages are part of the
 'tcl' respectively the 'n' package series.
 
-1.2.21. Building the documentation
+FreeBSD
+
+You need the 'expecct' package.
+
+NetBSD
+
+You need the 'tcl-expect' package.
+
+1.2.23. Building the documentation
 
 The documentation including the man pages is written using DocBook (http://
 www.docbook.org).
@@ -1612,7 +1858,15 @@ When rebuilding the SVG images of the documentation you also need 'dia' which
 you will have to build on your own. Alternatively you can of course also build
 the 'dia' package with the help of SlackBuilds.
 
-1.2.22. Installation
+FreeBSD
+
+We never tried do build the documentation on FreeBSD so far.
+
+NetBSD
+
+We never tried do build the documentation on NetBSD so far.
+
+1.2.24. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.
@@ -1639,7 +1893,7 @@ contain a line like:
         make DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules
 
 
-1.2.23. Manual dependency generation
+1.2.25. Manual dependency generation
 
 Usually dependencies are automatically recomputed and stored in files with
 extension '.d'.
@@ -1652,7 +1906,7 @@ can force the computation of depencies in a special make step as follows:
         make -j 4
 
 
-1.2.24. Creating source tarballs
+1.2.26. Creating source tarballs
 
 Wolframe supports the standard targets 'dist', 'dist-Z', 'dist-gz' and
 'dist-bz2' to create a tarball containg all the necessary sources.
