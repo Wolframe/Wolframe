@@ -1852,20 +1852,274 @@
 			</sect3>
 						
 		</sect2>
+
+<!-- testing -->
+		<sect2>
+			<title>Testing Wolframe</title>
+			
+			<para>
+				<application>Wolframe</application> has tests
+				written in Google gtest
+				(<ulink url="https://code.google.com/p/googletest/">https://code.google.com/p/googletest/</ulink>).
+			</para>
+			
+			<para>
+				Tests are run with:
+		        <programlisting language='shell'>
+	make test
+			</programlisting>
+			</para>
+			
+			<para>
+				Some tests run for a long time (regression and stress
+				tests). They are not run per default when calling
+				'make test', but you have to call:
+		        <programlisting language='shell'>
+	make longtest
+			</programlisting>
+			</para>
+			
+			<para>
+				Sometimes you only want to build the test programs but
+				not to run them (for instance when cross-compiling). Then
+				you can set the 'RUN_TESTS' variable as follows:
+		        <programlisting language='shell'>
+	make test RUN_TESTS=0
+			</programlisting>
+			</para>
+		</sect2>
+			
+<!-- Expect -->
+		<sect2>
+			<title>Testing with Expect</title>
+						
+			<para>
+				Some more complex tests are written with Expect
+				(<ulink url="http://expect.sourceforge.net/">http://expect.sourceforge.net/</ulink>).
+			</para>
+						
+			<para>
+				You enable testing with Expect with:
+
+		        <programlisting language='shell'>
+	make WITH_EXPECT=1
+			</programlisting>
+							
+			</para>
+						
+			<para>
+				The location of the Expect interpreter can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_EXPECT=1 \
+		EXPECT=/usr/local/bin/expect
+			</programlisting>				
+			</para>
+						
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'expect' and the 'telnet' packages.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'expect' and the 'telnet' packages.
+				</para>		
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'expect' and the 'telnet' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'expect' and 'inetutils' packages.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'expect' and 'telnet' packages. Those packages
+					are part of the 'tcl' respectively the 'n' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
+
+<!-- Documentation -->
+		<sect2>
+			<title>Building the documentation</title>
+						
+			<para>
+				The documentation including the man pages is written using
+				DocBook 
+				(<ulink url="http://www.docbook.org">http://www.docbook.org</ulink>).
+			</para>
+				
+			<para>
+				Developer documentation is generated with Doxygen
+				(<ulink url="http://www.doxygen.org">http://www.doxygen.org</ulink>).		
+			</para>
+				
+			<para>
+				All documentation is built in the 'docs' subdirectory:
+
+		        <programlisting language='shell'>
+	cd docs
+	make doc
+			</programlisting>
+			</para>
+						
+			<para>
+				<emphasis role="bold">Note</emphasis>: The various tools are
+				not able to produce the same results on all platforms. Your
+				experience in the quality of the generated artifacts may vary.
+				Generally, the newer the tools, the better.
+			</para>
+			
+			<para>
+				The validity of the XML of the documenation can be checked with:
+		        <programlisting language='shell'>
+	cd docs
+	make check
+			</programlisting>
+			</para>
+						
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages (from EPEL).
+				</para>			
+				
+				<para>
+					When generating PDFs you need the 'fop' package.
+				</para>
+
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages.
+				</para>				
+
+				<para>
+					When generating PDFs you need the 'fop' package.
+				</para>
+
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+				</para>				
+
+				<para>
+					When generating PDFs you need the 'fop' package.
+				</para>
+
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'.
+				</para>
+				
+				<para>
+					For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+
+				<para>
+					You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages.
+				</para>				
+
+				<para>
+					When generating PDFs you need the 'fop' package.
+				</para>
+
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+
+				<para>
+					You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+				</para>				
+
+				<para>
+					When generating PDFs you need the 'fop' package.
+					Newest versions run only with the SVN version of
+					'java-xmlgraphics-commons'. Install the package
+					'java-xmlgraphics-commons-svn' from the AUR.
+				</para>
+
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				
+				<para>
+					You need the 'libxslt' and 'doxygen' packages.
+					Those packages part of the 'l', 'd' package series.
+					DocBook you have to install on your own.
+				</para>
+				
+				<para>
+					When generating PDFs you have to install 'fop' on your own.
+				</para>
+				
+				<para>
+					When rebuilding the SVG images of the documentation you also need 'dia'
+					which you will have to build on your own.
+					Alternatively you can of course also build the 'dia'
+					package with the help of SlackBuilds.
+				</para>
+				
+			</sect3>
+						
+		</sect2>
 		
-<!--
+<!-- TODO:
+* RELEASE=1
 
-* optionally for testing:
-  * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
-
-* optionally (for building the documentation):
-  * xsltproc, docboox*xsl*stylesheet: for docbook
-  * fop: to produce a nice PDF documentation
-  * doxygen: for documentation for programmers
-  * dia: to convert images to svg
+Is this really necessary?
 
 -->
 
+<!-- Localization -->
+<!-- TODO:
+
+make init-po            create initial version of the gettext files
+make merge-po           merge the gettext files after changes
+make check-po           check sanity of gettext files
+-->
+		
 <!-- Installation -->		
 		<sect2>
 			<title>Installation</title>
@@ -1905,7 +2159,46 @@
 		        </para>
 		</sect2>
 
+<!-- Dependencies -->
+		<sect2>
+			<title>Manual dependency generation</title>
+			
+			<para>
+				Usually dependencies are automatically recomputed
+				and stored in files with extension '.d'.
+			</para>
+			
+			<para>
+				On some platforms and with some older versions of
+				GNU make you can run into problems, especially if
+				you build the software in parallel. For this case
+				you can force the computation of depencies in a 
+				special make step as follows:
+
+				<programlisting language='shell'>
+	make depend
+	make -j 4
+				</programlisting>
+
+		        </para>
+			
+		</sect2>
+		
+<!-- Dist -->
+		<sect2>
+			<title>Creating source tarballs</title>
+			
+			<para>
+				<application>Wolframe</application> supports the
+				standard targets 'dist', 'dist-Z', 'dist-gz' and
+				'dist-bz2' to create a tarball containg all the
+				necessary sources.
+			</para>
+		</sect2>
+
 	</sect1>
+
+<!-- TODO:
 
 	<sect1>
 		<title>Building on Windows systems</title>
@@ -1913,4 +2206,6 @@
 		<para>
 		</para>
 	</sect1>
+-->
+
 </chapter>

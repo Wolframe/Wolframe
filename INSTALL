@@ -187,9 +187,28 @@ Foreword
             ArchLinux
             Slackware
 
-        1.2.19. Installation
+        1.2.19. Testing Wolframe
+        1.2.20. Testing with Expect
 
-    1.3. Building on Windows systems
+            RedHat/Centos/Scientific Linux, Fedora and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.21. Building the documentation
+
+            RedHat/Centos/Scientific Linux and similar Linux distributions
+            Fedora and similar Linux distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.22. Installation
+        1.2.23. Manual dependency generation
+        1.2.24. Creating source tarballs
 
 2. Installation via binary packages
 
@@ -368,9 +387,27 @@ Table of Contents
         ArchLinux
         Slackware
 
-    1.2.19. Installation
+    1.2.19. Testing Wolframe
+    1.2.20. Testing with Expect
 
-1.3. Building on Windows systems
+        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.21. Building the documentation
+
+        RedHat/Centos/Scientific Linux and similar Linux distributions
+        Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.22. Installation
+    1.2.23. Manual dependency generation
+    1.2.24. Creating source tarballs
 
 This section describes how to build the Wolframe application from the source
 code.
@@ -1436,7 +1473,146 @@ Slackware
 You need the 'cyrus-sasl' package. This package is part of the 'n' package
 series.
 
-1.2.19. Installation
+1.2.19. Testing Wolframe
+
+Wolframe has tests written in Google gtest (https://code.google.com/p/
+googletest/).
+
+Tests are run with:
+
+        make test
+
+
+Some tests run for a long time (regression and stress tests). They are not run
+per default when calling 'make test', but you have to call:
+
+        make longtest
+
+
+Sometimes you only want to build the test programs but not to run them (for
+instance when cross-compiling). Then you can set the 'RUN_TESTS' variable as
+follows:
+
+        make test RUN_TESTS=0
+
+
+1.2.20. Testing with Expect
+
+Some more complex tests are written with Expect (http://expect.sourceforge.net/
+).
+
+You enable testing with Expect with:
+
+        make WITH_EXPECT=1
+
+
+The location of the Expect interpreter can be overloaded with:
+
+        make WITH_EXPECT=1 \
+                EXPECT=/usr/local/bin/expect
+
+
+RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+
+You need the 'expect' and the 'telnet' packages.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'expect' and the 'telnet' packages.
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'expect' and the 'telnet' packages.
+
+ArchLinux
+
+You need the 'expect' and 'inetutils' packages.
+
+Slackware
+
+You need the 'expect' and 'telnet' packages. Those packages are part of the
+'tcl' respectively the 'n' package series.
+
+1.2.21. Building the documentation
+
+The documentation including the man pages is written using DocBook (http://
+www.docbook.org).
+
+Developer documentation is generated with Doxygen (http://www.doxygen.org).
+
+All documentation is built in the 'docs' subdirectory:
+
+        cd docs
+        make doc
+
+
+Note: The various tools are not able to produce the same results on all
+platforms. Your experience in the quality of the generated artifacts may vary.
+Generally, the newer the tools, the better.
+
+The validity of the XML of the documenation can be checked with:
+
+        cd docs
+        make check
+
+
+RedHat/Centos/Scientific Linux and similar Linux distributions
+
+You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages (from EPEL).
+
+When generating PDFs you need the 'fop' package.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Fedora and similar Linux distributions
+
+You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages.
+
+When generating PDFs you need the 'fop' package.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+
+When generating PDFs you need the 'fop' package.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For checking the validity of various XML files you need 'libxml2-utils' (for
+xmllint).
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'libxslt', 'doxygen' and 'docbook-style-xsl' packages.
+
+When generating PDFs you need the 'fop' package.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+ArchLinux
+
+You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+
+When generating PDFs you need the 'fop' package. Newest versions run only with
+the SVN version of 'java-xmlgraphics-commons'. Install the package
+'java-xmlgraphics-commons-svn' from the AUR.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Slackware
+
+You need the 'libxslt' and 'doxygen' packages. Those packages part of the 'l',
+'d' package series. DocBook you have to install on your own.
+
+When generating PDFs you have to install 'fop' on your own.
+
+When rebuilding the SVG images of the documentation you also need 'dia' which
+you will have to build on your own. Alternatively you can of course also build
+the 'dia' package with the help of SlackBuilds.
+
+1.2.22. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.
@@ -1463,7 +1639,23 @@ contain a line like:
         make DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules
 
 
-1.3. Building on Windows systems
+1.2.23. Manual dependency generation
+
+Usually dependencies are automatically recomputed and stored in files with
+extension '.d'.
+
+On some platforms and with some older versions of GNU make you can run into
+problems, especially if you build the software in parallel. For this case you
+can force the computation of depencies in a special make step as follows:
+
+        make depend
+        make -j 4
+
+
+1.2.24. Creating source tarballs
+
+Wolframe supports the standard targets 'dist', 'dist-Z', 'dist-gz' and
+'dist-bz2' to create a tarball containg all the necessary sources.
 
 Chapter 2. Installation via binary packages
 
