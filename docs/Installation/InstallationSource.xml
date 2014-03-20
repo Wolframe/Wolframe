@@ -258,7 +258,7 @@
 				<para>
 					The official gcc is too old to build Boost. The Forte compiler
 					is not free and has big problems to compile modern
-					C++ code. So we must use a the modern CSW/gcc/C++ toolchain
+					C++ code. So we must use the CSW/gcc/C++ toolchain
 					for <application>Wolframe</application>.
 				</para>
 				
@@ -288,6 +288,69 @@
 					Install packages with 'pkgutil --install'.
 				</para>
 			</sect3>
+
+			<sect3>
+				<title>Solaris 10</title>
+
+				<para>
+					We only build for SPARC and Solaris 10 currently.
+				</para>
+
+				<para>
+					You may have to install a 'SFWgtar' or 'CSWgtar' in order to unpack the
+					sources. Make sure to rename them to 'gtar' to avoid collisions with
+					the standard 'tar'!
+				</para>
+					
+				<para>
+					The official gcc is too old to build Boost. The Forte compiler
+					is not free and has big problems to compile modern
+					C++ code. So we must use the CSW/gcc/C++ toolchain
+					for <application>Wolframe</application>.
+				</para>
+				
+				<para>
+					Install the CSW toolchain (<ulink url="http://www.opencsw.org">http://www.opencsw.org</ulink>)
+					and basic development tools:
+					<programlisting language='shell'>
+	pkgadd -d http://get.opencsw.org/now
+	pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake					
+					</programlisting>					
+				</para>
+				
+				<para>
+					Make sure the build environment is always set as follows:
+
+					<programlisting language='shell'>
+PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
+export PATH
+					</programlisting>
+				</para>
+				
+				<para>
+					Install official packages with 'pkgadd -d' and CSW packages
+					with 'pkgutil --install'.
+				</para>
+				
+				<para>
+					Building Wolframe is more complex as on other platforms, so
+					we provide this working example invocation of make:
+					<programlisting language='shell'>
+	LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
+	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
+	LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
+		WITH_EXPECT=1 WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
+		WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
+		WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
+		WITH_LOCAL_FREEIMAGE=1 \
+		WITH_PYTHON=1 \
+		gmake \
+			CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
+					</programlisting>
+				</para>
+					
+			</sect3>
+
 		</sect2>
 
 <!-- Boost -->
@@ -541,7 +604,7 @@
 					You need the 'boost-libs' package.
 				</para>
 			</sect3>
-
+			
 			<sect3>
 				<title>OpenIndiana 151a8</title>
 
@@ -570,8 +633,78 @@
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.54! Other
+					tested version for now is version 1.54.0! Other
 					versions of Boost may work or not..
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Solaris 10</title>
+				<para>
+					We don't use the CSW boost packages.
+				</para>
+				
+				<para>
+					As long you don't need ICU support you can
+					build Boost as follows:
+				</para>
+								
+				<para>
+					Apply the following patch to <filename>boost/cstdint.ppp</filename> for boost
+					(<ulink url="https://svn.boost.org/trac/boost/ticket/6158">https://svn.boost.org/trac/boost/ticket/6158</ulink>, see also
+					<filename>packaging/patches/Solaris/boost-1.48.0</filename> for patch files):
+
+					<programlisting language='shell'>
+	...
+	namespace boost
+	{
+
+	#if defined(sun) || defined(__sun) 
+		typedef signed char int8_t;
+	#else
+		using ::int8_t;             
+	#endif  
+	..
+					</programlisting>
+				</para>
+				
+				<para>
+					Patch the correct architecture (V8 is not really supported, but V8
+					is also very old) in <filename>tools/build/v2/user-config.jam</filename>:
+
+					<programlisting language='shell'>
+	using gcc : 4.6.3 : g++ : &lt;compileflags>-mcpu=v9 ; 
+					</programlisting>
+				</para>
+				
+				<para>
+					Then build boost with:
+					<programlisting language='shell'>
+	./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+		--with-libraries=thread,filesystem,system,program_options,date_time
+	./b2 -a -d2 install
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The only
+					tested version for now is version 1.48.0! Other
+					versions of Boost may work or not:
+				</para>
+
+				<para>
+					Do not use boost 1.49.0, it has a missing function fchmodat, see
+					<ulink url="http://lists.boost.org/boost-build/2012/02/25680.php">http://lists.boost.org/boost-build/2012/02/25680.php</ulink>
+					causing building of libboost_filesystem to fail!
+				</para>
+				
+				<para>
+					Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
+					use those!
+				</para>
+				
+				<para>
+					Support for 1.52.0 and later is not guaranteed.
 				</para>
 			</sect3>
 			
@@ -662,6 +795,14 @@
 				
 				<para>
 					You need the 'CSWlibssl-dev' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					You need the 'libssl_dev' package.
 				</para>
 			</sect3>
 		</sect2>
@@ -799,6 +940,15 @@
 					You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
 				</para>
 			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
+				</para>
+			</sect3>
+	
 		</sect2>
 
 <!-- PostgreSQL -->
@@ -990,9 +1140,21 @@
 				</para>
 				
 				<para>
-					For testing you also need the 'SWpostgresql91-server' package.
+					For testing you also need the 'CSWpostgresql91-server' package.
 				</para>
 			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+
+				<para>
+					You need the 'CSWpostgresql-dev' package.
+				</para>
+
+				<para>
+					For testing you also need the 'CSWpostgresql91-server' package.
+				</para>
+			</sect3>
 			
 		</sect2>
 
@@ -1197,8 +1359,24 @@
 				<para>
 					There are no plans for an Oracle module on OpenIndiana.
 				</para>
-			</sect3>			
-						
+			</sect3>
+
+			<sect3>
+				<title>Solaris 10</title>
+
+				<para>
+					For building the Oracle database module you need
+					the two packages 'oracle-instantclient-basic',
+					'oracle-instantclient-sdk' (both 11.2 and 12.1
+					are ok, 12.1 needs a higher patchlevel of the SUNW C library though).
+				</para>
+				
+				<para>
+					Unpack the ZIPs for instance to '/opt/oracle/instantclient_11_2' and build
+					set ORACLE_DIR accordingly (together with WITH_ORACLE=1).
+				</para>
+			</sect3>
+
 		</sect2>
 
 <!-- libxml2/libxslt -->
@@ -1323,6 +1501,16 @@
 				<para>
 					You need the 'CSWlibxml2-dev' and 'CSWlibxslt-dev' packages.
 				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+
+				<para>
+					Both standard packages 'SUNWlxml' and 'SUNWlxsl' are
+					too old, we use the two CSW packages 'CSWlibxml2-dev'
+					and 'CSWlibxslt-dev'.
+				</para>				
 			</sect3>			
 						
 		</sect2>
@@ -1551,7 +1739,25 @@
 				</para>
 				
 			</sect3>			
-						
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					We cannot use 'CSWpython31-dev' because it's build
+					with the Forte compiler.
+				</para>
+				
+				<para>
+					We build our own Python 3 with:
+					<programlisting language='shell'>
+	./configure --prefix=/opt/csw/python-3.3.2/ --enable-shared
+	gmake
+	gmake install
+					</programlisting>
+				</para>
+			</sect3>
+			
 		</sect2>
 
 <!-- libhpdf -->
@@ -1698,6 +1904,20 @@
 				</para>
 				<para>
 					You need the 'CSWlibz-dev' package for this.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
+				</para>
+				<para>
+					You need the 'CSWlibz-dev' package for this.
+				</para>
+				<para>
+					'SUNWzlib' is missing 64-bit support so don't use it!
 				</para>
 			</sect3>			
 						
@@ -1870,6 +2090,20 @@
 				</para>
 				<para>
 					You need the 'CSWlibz-dev' package for this.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
+				</para>
+				<para>
+					You need the 'CSWlibz-dev' package for this.
+				</para>
+				<para>
+					'SUNWzlib' is missing 64-bit support so don't use it!
 				</para>
 			</sect3>			
 						
@@ -2149,10 +2383,104 @@
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.54! Other
+					tested version for now is version 1.54.0! Other
 					versions of Boost may work or not..
 				</para>
 
+			</sect3>
+
+			<sect3>
+				<title>Solaris 10</title>
+				<para>
+					We don't use the CSW boost packages.
+				</para>
+				
+				<para>
+					You cannot use the 'SUNWicud/SUNWicu' and 'CSWlibicu_dev'
+					packages as they are both linked with the Forte C++ compiler.
+					You have to compile your own version compiled with the
+					gcc compiler from CSW:
+
+					<programlisting language='shell'>
+	gtar zxf icu4c-49_1_2-src.tgz
+					</programlisting>
+
+					apply the solaris icu_source_configure patch
+					(<filename>packaging/patches/Solaris/icu4c-1.49.2/icu_source_configure.patch</filename>),
+					then build ICU with:
+
+					<programlisting language='shell'>
+	cd source/icu
+	./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-49.1.2
+	gmake
+	gmake install
+					</programlisting>
+				</para>
+												
+				<para>
+					Apply the following patch to <filename>boost/cstdint.ppp</filename> for boost
+					(<ulink url="https://svn.boost.org/trac/boost/ticket/6158">https://svn.boost.org/trac/boost/ticket/6158</ulink>, see also
+					<filename>packaging/patches/Solaris/boost-1.48.0</filename> for patch files):
+
+					<programlisting language='shell'>
+	...
+	namespace boost
+	{
+
+	#if defined(sun) || defined(__sun) 
+		typedef signed char int8_t;
+	#else
+		using ::int8_t;             
+	#endif  
+	..
+					</programlisting>
+				</para>
+				
+				<para>
+					Patch the correct architecture (V8 is not really supported, but V8
+					is also very old) in <filename>tools/build/v2/user-config.jam</filename>:
+
+					<programlisting language='shell'>
+	using gcc : 4.6.3 : g++ : &lt;compileflags>-mcpu=v9 ; 
+					</programlisting>
+				</para>
+				
+				<para>
+					Apply all Boost compilation patches from 'packaging/patches/Solaris/boost-1.48.0' now.
+				</para>
+
+
+					
+				<para>
+					Then build boost with:
+					<programlisting language='shell'>
+	./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale \
+		--with-icu=/opt/csw/icu4c-49.1.2
+	./b2 -a -sICU_PATH=/opt/csw/icu4c-49.1.2 -d2 install
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The only
+					tested version for now is version 1.48.0! Other
+					versions of Boost may work or not:
+				</para>
+
+				<para>
+					Do not use boost 1.49.0, it has a missing function fchmodat, see
+					<ulink url="http://lists.boost.org/boost-build/2012/02/25680.php">http://lists.boost.org/boost-build/2012/02/25680.php</ulink>
+					causing building of libboost_filesystem to fail!
+				</para>
+				
+				<para>
+					Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
+					use those!
+				</para>
+				
+				<para>
+					Support for 1.52.0 and later is not guaranteed.
+				</para>
 			</sect3>
 			
 		</sect2>
@@ -2254,7 +2582,15 @@
 				<title>OpenIndiana 151a8</title>
 				
 				<para>
-					PAM support is available out of the box.
+					PAM support is available out of the box just specify 'WITH_PAM=1'.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					PAM support is available out of the box just specify 'WITH_PAM=1'.
 				</para>
 			</sect3>			
 						
@@ -2362,6 +2698,14 @@
 
 			<sect3>
 				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWsasl' and 'CSWsasl-dev' packages.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
 				
 				<para>
 					You need the 'CSWsasl' and 'CSWsasl-dev' packages.
@@ -2486,6 +2830,14 @@
 
 			<sect3>
 				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWexpect' package.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
 				
 				<para>
 					You need the 'CSWexpect' package.
