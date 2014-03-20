@@ -147,7 +147,47 @@ Foreword
             ArchLinux
             Slackware
 
-        1.2.16. Installation
+        1.2.16. Support for ICU
+
+            RedHat/Centos/Scientific Linux, Fedora and similar Linux
+                distributions
+            Fedora and similar Linux distributions
+            Debian, Ubuntu and similar Linux distributions
+
+                Debian 6
+                Debian 7
+                Ubuntu 10.04.1 LTS, Ubuntu 12.04
+                Ubuntu 12.10
+                Ubuntu 13.04
+                Ubuntu 13.10
+
+            openSUSE, SLES and similar Linux distributions
+
+                OpenSuSE 12.3, 13.1
+                SLES 11 SP1, SP2 and SP3
+
+            ArchLinux
+            Slackware
+
+        1.2.17. Authentication support with PAM
+
+            RedHat/Centos/Scientific Linux, Fedora and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.18. Authentication support with SASL
+
+            RedHat/Centos/Scientific Linux, Fedora and similar Linux
+                distributions
+            Debian, Ubuntu and similar Linux distributions
+            openSUSE, SLES and similar Linux distributions
+            ArchLinux
+            Slackware
+
+        1.2.19. Installation
 
     1.3. Building on Windows systems
 
@@ -291,7 +331,44 @@ Table of Contents
         ArchLinux
         Slackware
 
-    1.2.16. Installation
+    1.2.16. Support for ICU
+
+        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+        Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+
+            Debian 6
+            Debian 7
+            Ubuntu 10.04.1 LTS, Ubuntu 12.04
+            Ubuntu 12.10
+            Ubuntu 13.04
+            Ubuntu 13.10
+
+        openSUSE, SLES and similar Linux distributions
+
+            OpenSuSE 12.3, 13.1
+            SLES 11 SP1, SP2 and SP3
+
+        ArchLinux
+        Slackware
+
+    1.2.17. Authentication support with PAM
+
+        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.18. Authentication support with SASL
+
+        RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+        Debian, Ubuntu and similar Linux distributions
+        openSUSE, SLES and similar Linux distributions
+        ArchLinux
+        Slackware
+
+    1.2.19. Installation
 
 1.3. Building on Windows systems
 
@@ -425,28 +502,28 @@ When running the tests or any binaries you have to make sure that
 
 1.2.4. Boost
 
-Boost (http://www.boost.org) is the only library which is absolutly required to
-build Wolframe.
+Boost (http://www.boost.org) is the only library which is absolutely required
+in order to build Wolframe.
 
 Build your own version of Boost
 
-The following libraries are required for building Wolframe:
+The following Boost libraries are required for building Wolframe:
 
         ./bootstrap.sh --prefix=/usr/local/boost-1.55.0 \
                 --with-libraries=thread,filesystem,system,program_options,date_time
         ./bjam install
 
 
-If you want to build the ICU normalization module you will have to build
-'boost-locale' with ICU support and you have to enable the 'regex' and the
-'locale' boost libraries too:
+If you want to build the ICU normalization module (WITH_ICU=1) you will have to
+build 'boost-locale' with ICU support and you have to enable the 'regex' and
+the 'locale' boost libraries too:
 
         ./bootstrap.sh --prefix=/usr/local/boost-1.55.0 \
                 --with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
         ./bjam install
 
 
-The location of the Boost library can be set as follow:
+The location of the Boost library can be set when building Wolframe as follows:
 
         make BOOST_DIR=/usr/local/boost-1.48.0
 
@@ -458,24 +535,34 @@ RedHat/Centos/Scientific Linux 5 and similar Linux distributions
 The official Boost packages are not recent enough. Build your own Boost version
 here.
 
+If you want ICU support you will also need the 'libicu-devel' package.
+
 RedHat 6
 
 The official Boost packages are not recent enough. Build your own Boost version
 here.
 
-On RHEL6 there is no 'libicu-devel' package on OSC (see http://
-permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779). Get a Redhat
-developer license to get the 'libicu-devel' package or build your own libicu
-library and build your own Boost library with boost-locale.
+If you want ICU support you will also need the 'libicu-devel' package.
+
+We currently build the official packages without ICU support. The reason is
+that there is no 'libicu-devel' package available for RHEL6 on OBS (see http://
+permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779).
+
+Get a Redhat developer license to get the 'libicu-devel' package or build your
+own libicu library and build your own Boost library with boost-locale and ICU
+support.
 
 Centos/Scientific Linux 6 and similar Linux distributions
 
 The official Boost packages are not recent enough. Build your own Boost version
 here.
 
+If you want ICU support you will also need the 'libicu-devel' package.
+
 Fedora and similar Linux distributions
 
-You need the 'boost-devel' package.
+You need the 'boost-devel' package. This package contains also the boost-locale
+and ICU backend.
 
 Debian, Ubuntu and similar Linux distributions
 
@@ -488,7 +575,9 @@ Debian 7
 
 You need the following packages: 'libboost-dev',
 'libboost-program-options-dev', 'libboost-filesystem-dev',
-'libboost-thread-dev', 'libboost-random-dev', 'libboost-locale-dev'.
+'libboost-thread-dev', 'libboost-random-dev'.
+
+If you want ICU support you will also need the 'libboost-locale-dev' package.
 
 Ubuntu 10.04.1 LTS, Ubuntu 12.04
 
@@ -499,7 +588,9 @@ Ubuntu 12.10
 
 You need the following packages: 'libboost-dev',
 'libboost-program-options-dev', 'libboost-filesystem-dev',
-'libboost-thread-dev', 'libboost-random-dev', 'libboost-locale-dev'.
+'libboost-thread-dev', 'libboost-random-dev'.
+
+If you want ICU support you will also need the 'libboost-locale-dev' package.
 
 Ubuntu 13.04
 
@@ -510,7 +601,9 @@ Ubuntu 13.10
 
 You need the following packages: 'libboost-dev',
 'libboost-program-options-dev', 'libboost-filesystem-dev',
-'libboost-thread-dev', 'libboost-random-dev', 'libboost-locale-dev'.
+'libboost-thread-dev', 'libboost-random-dev'.
+
+If you want ICU support you will also need the 'libboost-locale-dev' package.
 
 openSUSE, SLES and similar Linux distributions
 
@@ -525,11 +618,14 @@ here.
 
 ArchLinux
 
-You need the 'boost' and 'boost-libs' packages.
+You need the 'boost' and 'boost-libs' packages. The official Boost packages
+contains support for boost-locale and the ICU backend.
 
 Slackware
 
 You need the 'boost' package. This package is part of the 'l' package series.
+The official Boost package contains support for boost-locale and the ICU
+backend.
 
 1.2.5. Secure Socket Layer (SSL)
 
@@ -588,7 +684,7 @@ The location of the Sqlite library can be overloaded with:
         make WITH_SYSTEM_SQLITE3=1 SQLITE3_DIR=/usr/local/sqlite-3.4.3
 
 
-You can also override all compilation and linking flags of Sqlite separatly:
+You can also override all compilation and linking flags of Sqlite separately:
 
         make WITH_SYSTEM_SQLITE3=1 \
                 SQLITE3_INCLUDE_DIR=/usr/local/sqlite-3.4.3/include \
@@ -644,7 +740,7 @@ The location of the PostgreSQL library can be overloaded with:
 
 
 You can also override all compilation and linking flags of PostgreSQL
-separatly:
+separately:
 
         make WITH_PGSQL=1 \
                 PGSQL_INCLUDE_DIR=/usr/local/postgresql-9.1.3/include \
@@ -754,7 +850,7 @@ The location of the Oracle instantclient library can be overloaded with:
         make WITH_ORACLE=1 ORACLE_DIR=/opt/oracle/instantclient_11_2
 
 
-You can also override all compilation and linking flags of Oracle separatly:
+You can also override all compilation and linking flags of Oracle separately:
 
         make WITH_ORACLE=1 \
                 ORACLE_INCLUDE_DIR=/usr/lib/oracle/11_2/client64 \
@@ -872,7 +968,7 @@ The location of those two libraries can be overloaded with:
 
 
 You can also override all compilation and linking flags of libxml2 and libxslt
-separatly:
+separately:
 
         make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
                 LIBXML2_INCLUDE_DIR=/usr/local/libxml2-2.9.1/include \
@@ -971,7 +1067,7 @@ The location of the Python library can be overloaded with:
 
 
 You can also override all compilation and linking flags of the Python library
-separatly:
+separately:
 
         make WITH_PYTHON=1 \
                 PYTHON_CFLAGS=-I/usr/include/python3.3m -I/usr/include/python3.3m \
@@ -1037,7 +1133,7 @@ The location of the libhpdf library can be overloaded with:
 
 
 You can also override all compilation and linking flags of the libhpdf library
-separatly:
+separately:
 
         make WITH_SYSTEM_LIBPHDF=1 \
                 LIBHPDF_INCLUDE_DIR=/usr/local/libharu-2.2.1/include \
@@ -1101,7 +1197,7 @@ The location of the FreeImage package can be overloaded with:
 
 
 You can also override all compilation and linking flags of the FreeImage
-package separatly:
+package separately:
 
         make WITH_SYSTEM_FREEIMAGE=1 \
                 FREEIMAGE_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
@@ -1153,7 +1249,194 @@ On Slackware you have to build your own version of FreeImage. You need the
 Alternatively you can of course also build the 'FreeImage' package with the
 help of SlackBuilds.
 
-1.2.16. Installation
+1.2.16. Support for ICU
+
+Wolframe can use the International Components for Unicode (ICU, http://
+site.icu-project.org) library for text normalization and conversion.
+
+For this to work you need the ICU library itself (ICU4C, at least version 3.6)
+and the 'boost-locale' library has to have the ICU backend enabled. This is not
+the case in all Linux distributions.
+
+Note: The Wolframe server doesn't depend directly on the ICU library, only the
+ICU normalization module does!
+
+You enable the building of a loadable ICU normalization module with:
+
+        make WITH_ICU=1
+
+
+The location of the ICU library can be overloaded with:
+
+        make WITH_ICU=1 \
+                ICU_DIR=/usr/local/icu4c-52_1
+
+
+You can also override all compilation and linking flags of the ICU library
+separately:
+
+        make WITH_ICU=1 \
+                ICU_INCLUDE_DIR=/usr/local/icu4c-52_1/include \
+                ICU_LIB_DIR=/usr/local/icu4c-52_1/lib \
+                ICU_LIBS=-licuuc -licudata -licui18n
+
+
+RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+
+Boost is too old, build your own Boost locale and ICU support.
+
+Fedora and similar Linux distributions
+
+You need the 'boost-devel' package. The official Boost packages have support
+for Boost locale and the ICU backend.
+
+Debian, Ubuntu and similar Linux distributions
+
+Debian 6
+
+The official Boost packages are too old, build your own Boost locale and ICU
+support.
+
+Debian 7
+
+You need 'libboost-locale-dev' package.
+
+Ubuntu 10.04.1 LTS, Ubuntu 12.04
+
+The official Boost packages are not recent enough. Build your own Boost version
+with ICU support here.
+
+Ubuntu 12.10
+
+You need 'libboost-locale-dev' package.
+
+Ubuntu 13.04
+
+The official Boost packages have problems. Build your own Boost version with
+ICU support here.
+
+Ubuntu 13.10
+
+You need 'libboost-locale-dev' package.
+
+openSUSE, SLES and similar Linux distributions
+
+OpenSuSE 12.3, 13.1
+
+You need the 'boost-devel' package. The official Boost packages have support
+for Boost locale and the ICU backend.
+
+SLES 11 SP1, SP2 and SP3
+
+The official Boost packages are not recent enough and lack ICU support. Build
+your own Boost with ICU support here.
+
+ArchLinux
+
+You need the 'boost-libs' package. The official Boost package have support for
+Boost locale and the ICU backend.
+
+Slackware
+
+The official Boost package contains support for boost-locale and the ICU
+backend. This package is part of the 'l' package series.
+
+1.2.17. Authentication support with PAM
+
+Wolframe can authenticate users with PAM.
+
+You enable the building of a loadable PAM authentication module with:
+
+        make WITH_PAM=1
+
+
+The location of the PAM library can be overloaded with:
+
+        make WITH_PAM=1 \
+                PAM_DIR=/usr/local/pam-1.1.8
+
+
+You can also override all compilation and linking flags of the PAM library
+separately:
+
+        make WITH_PAM=1 \
+                PAM_INCLUDE_DIR=/usr/local/pam-1.1.8/include \
+                PAM_LIB_DIR=/usr/local/pam-1.1.8/lib \
+                PAM_LIBS=-lpam
+
+
+RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+
+You need the 'pam-devel' package.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'libpam0g-dev' package.
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'pam-devel' package.
+
+ArchLinux
+
+You need the 'pam' package.
+
+Slackware
+
+On Slackware there is no official PAM package. You have to build 'linux-pam' on
+your own.
+
+1.2.18. Authentication support with SASL
+
+Wolframe can authenticate users with the Cyrus SASL library (http://
+cyrusimap.org/).
+
+Note: GNU SASL is currently not supported.
+
+You enable the building of a loadable SASL authentication module with:
+
+        make WITH_SASL=1
+
+
+The location of the Cyrus SASL library can be overloaded with:
+
+        make WITH_SASL=1 \
+                SASL_DIR=/usr/local/cyrus-sasl-2.1.26
+
+
+You can also override all compilation and linking flags of the Cyrus SASL
+library separately:
+
+        make WITH_SASL=1 \
+                SASL_INCLUDE_DIR=/usr/local/cyrus-sasl-2.1.26/include \
+                SASL_LIB_DIR=/usr/local/cyrus-sasl-2.1.26/lib \
+                SASL_LIBS=-lsasl2
+
+
+RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions
+
+You need the 'cyrus-sasl-devel' package.
+
+Debian, Ubuntu and similar Linux distributions
+
+You need the 'libsasl2-dev' package.
+
+For running the SASL tests you also need the 'sasl2-bin' package.
+
+openSUSE, SLES and similar Linux distributions
+
+You need the 'cyrus-sasl-devel' package.
+
+ArchLinux
+
+You need the 'libsasl' package.
+
+Slackware
+
+You need the 'cyrus-sasl' package. This package is part of the 'n' package
+series.
+
+1.2.19. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.

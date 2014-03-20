@@ -222,7 +222,7 @@
 			
 				<para>
 					Boost (<ulink url="http://www.boost.or">http://www.boost.org</ulink>) is the only
-					library which is absolutly required to build
+					library which is absolutely required in order to build
 					<application>Wolframe</application>.
 				</para>
 			
@@ -230,7 +230,7 @@
 				<title>Build your own version of Boost</title>
 			
 				<para>
-					The following libraries are required for building
+					The following Boost libraries are required for building
 					<application>Wolframe</application>:
 
 		        <programlisting language='shell'>
@@ -240,7 +240,7 @@
 			</programlisting>
 
 				If you want to build the ICU normalization
-				module you will have to build 'boost-locale'
+				module (WITH_ICU=1) you will have to build 'boost-locale'
 				with ICU support and you have to enable the
 				'regex' and the 'locale' boost libraries too:
 
@@ -249,8 +249,11 @@
 		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
 	./bjam install
 			</programlisting>
-
-				The location of the Boost library can be set as follow:
+			</para>
+			
+			<para>
+				The location of the Boost library can be set when
+				building <application>Wolframe</application> as follows:
 				
 		        <programlisting language='shell'>
 	make BOOST_DIR=/usr/local/boost-1.48.0
@@ -259,7 +262,7 @@
 			</para>
 			
 			</sect3>
-
+			
 			<sect3>
 				<title>RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions</title>
 
@@ -270,6 +273,10 @@
 					The official Boost packages are not recent enough. Build your own
 					Boost version here.
 				</para>
+				
+				<para>
+					If you want ICU support you will also need the 'libicu-devel' package.
+				</para>
 			</sect4>
 
 			<sect4>
@@ -279,13 +286,22 @@
 					The official Boost packages are not recent enough. Build your own
 					Boost version here.
 				</para>
+
+				<para>
+					If you want ICU support you will also need the 'libicu-devel' package.
+				</para>
 				
 				<para>
-					On RHEL6 there is no 'libicu-devel' package on OSC (see
+					We currently build the official packages without ICU support.
+					The reason is that there is no 'libicu-devel' package available
+					for RHEL6 on OBS (see
 					<ulink url="http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779">http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779</ulink>).
+				</para>
+				
+				<para>
 					Get a Redhat developer license to get the 'libicu-devel'
 					package or build your own libicu library and build your own
-					Boost library with boost-locale.
+					Boost library with boost-locale and ICU support.
 				</para>
 			</sect4>
 			
@@ -296,13 +312,18 @@
 					The official Boost packages are not recent enough. Build your own
 					Boost version here.
 				</para>
+
+				<para>
+					If you want ICU support you will also need the 'libicu-devel' package.
+				</para>
 			</sect4>
 
 			<sect4>
 				<title>Fedora and similar Linux distributions</title>
 				
 				<para>
-					You need the 'boost-devel' package.
+					You need the 'boost-devel' package. This package
+					contains also the boost-locale and ICU backend.
 				</para>
 			</sect4>
 			
@@ -326,8 +347,14 @@
 						You need the following packages:
 						'libboost-dev', 'libboost-program-options-dev',
 						'libboost-filesystem-dev', 'libboost-thread-dev',
-						'libboost-random-dev', 'libboost-locale-dev'.
+						'libboost-random-dev'.
 					</para>
+					
+					<para>
+						If you want ICU support you will also need the
+						'libboost-locale-dev' package.
+					</para>
+					
 				</sect4>
 
 				<sect4>
@@ -346,7 +373,12 @@
 						You need the following packages:
 						'libboost-dev', 'libboost-program-options-dev',
 						'libboost-filesystem-dev', 'libboost-thread-dev',
-						'libboost-random-dev', 'libboost-locale-dev'.
+						'libboost-random-dev'.
+					</para>
+
+					<para>
+						If you want ICU support you will also need the 
+						'libboost-locale-dev' package.
 					</para>
 				</sect4>
 
@@ -364,7 +396,12 @@
 						You need the following packages:
 						'libboost-dev', 'libboost-program-options-dev',
 						'libboost-filesystem-dev', 'libboost-thread-dev',
-						'libboost-random-dev', 'libboost-locale-dev'.
+						'libboost-random-dev'.
+					</para>
+
+					<para>
+						If you want ICU support you will also need the 
+						'libboost-locale-dev' package.
 					</para>
 				</sect4>
 			</sect3>
@@ -392,6 +429,8 @@
 				<title>ArchLinux</title>
 				<para>
 					You need the 'boost' and 'boost-libs' packages.
+					The official Boost packages contains support for 
+					boost-locale and the ICU backend.
 				</para>
 			</sect3>
 
@@ -400,6 +439,8 @@
 				<para>
 					You need the 'boost' package. This package is
 					part of the 'l' package series.
+					The official Boost package contains support for 
+					boost-locale and the ICU backend.
 				</para>
 			</sect3>
 			
@@ -513,7 +554,7 @@
 			
 			<para>
 				You can also override all compilation and linking flags
-				of Sqlite separatly:
+				of Sqlite separately:
 		        <programlisting language='shell'>
 	make WITH_SYSTEM_SQLITE3=1 \
 		SQLITE3_INCLUDE_DIR=/usr/local/sqlite-3.4.3/include \
@@ -616,7 +657,7 @@
 			
 			<para>
 				You can also override all compilation and linking flags
-				of PostgreSQL separatly:
+				of PostgreSQL separately:
 		        <programlisting language='shell'>
 	make WITH_PGSQL=1 \
 		PGSQL_INCLUDE_DIR=/usr/local/postgresql-9.1.3/include \
@@ -784,7 +825,7 @@
 			
 			<para>
 				You can also override all compilation and linking flags
-				of Oracle separatly:
+				of Oracle separately:
 		        <programlisting language='shell'>
 	make WITH_ORACLE=1 \
 		ORACLE_INCLUDE_DIR=/usr/lib/oracle/11_2/client64 \
@@ -966,7 +1007,7 @@
 			
 			<para>
 				You can also override all compilation and linking flags
-				of libxml2 and libxslt separatly:
+				of libxml2 and libxslt separately:
 		        <programlisting language='shell'>
 	make WITH_LIBXML2=1 WITH_LIBXSLT=1 \
 		LIBXML2_INCLUDE_DIR=/usr/local/libxml2-2.9.1/include \
@@ -1154,7 +1195,7 @@
 			
 			<para>
 				You can also override all compilation and linking flags
-				of the Python library separatly:
+				of the Python library separately:
 		        <programlisting language='shell'>
 	make WITH_PYTHON=1 \
 		PYTHON_CFLAGS=-I/usr/include/python3.3m -I/usr/include/python3.3m \
@@ -1266,7 +1307,7 @@
 
 			<para>
 				You can also override all compilation and linking flags
-				of the libhpdf library separatly:
+				of the libhpdf library separately:
 		        <programlisting language='shell'>
 	make WITH_SYSTEM_LIBPHDF=1 \
 		LIBHPDF_INCLUDE_DIR=/usr/local/libharu-2.2.1/include \
@@ -1382,7 +1423,7 @@
 
 			<para>
 				You can also override all compilation and linking flags
-				of the FreeImage package separatly:
+				of the FreeImage package separately:
 		        <programlisting language='shell'>
 	make WITH_SYSTEM_FREEIMAGE=1 \
 		FREEIMAGE_INCLUDE_DIR=/usr/local/FreeImage-3.15.4/include \
@@ -1474,15 +1515,345 @@
 			</sect3>
 						
 		</sect2>
+
+<!-- ICU -->
+		<sect2>
+			<title>Support for ICU</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				the International Components for Unicode
+				(ICU, <ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>)
+				library for text normalization and conversion.
+			</para>
+			
+			<para>
+				For this to work you need the ICU library itself
+				(ICU4C, at least version 3.6) and the 'boost-locale'
+				library has to have the	ICU backend enabled.
+				This is not the	case in all Linux distributions.
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: The
+				<application>Wolframe</application> server doesn't
+				depend directly on the ICU library, only the ICU
+				normalization module does!
+			</para>
+									
+			<para>
+				You enable the building of a loadable ICU normalization
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_ICU=1
+			</programlisting>
+							
+			</para>
+						
+			<para>
+				The location of the ICU library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_ICU=1 \
+		ICU_DIR=/usr/local/icu4c-52_1
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the ICU library separately:
+		        <programlisting language='shell'>
+	make WITH_ICU=1 \
+		ICU_INCLUDE_DIR=/usr/local/icu4c-52_1/include \
+		ICU_LIB_DIR=/usr/local/icu4c-52_1/lib \
+		ICU_LIBS=-licuuc -licudata -licui18n
+			</programlisting>				
+			
+			</para>
+			
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions</title>
+				
+				<para>
+					Boost is too old, build your own Boost locale and ICU support.
+				</para>		
+			</sect3>
+			
+			<sect3>
+				<title>Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'boost-devel' package. The
+					official Boost packages have support for
+					Boost locale and the ICU backend.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+
+				<sect4>
+					<title>Debian 6</title>
+				
+					<para>
+						The official Boost packages are too old, 
+						build your own Boost locale and ICU support.
+					</para>		
+				</sect4>
+
+				<sect4>
+					<title>Debian 7</title>
+					<para>
+						You need 'libboost-locale-dev' package.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 10.04.1 LTS, Ubuntu 12.04</title>
+				
+					<para>
+						The official Boost packages are not recent enough.
+						Build your own Boost version with ICU support here.
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 12.10</title>
+
+					<para>
+						You need 'libboost-locale-dev' package.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Ubuntu 13.04</title>
+					
+					<para>
+						The official Boost packages have problems.
+						Build your own Boost version with ICU support here.
+					</para>
+				</sect4>
+				
+				<sect4>
+					<title>Ubuntu 13.10</title>
+
+					<para>
+						You need 'libboost-locale-dev' package.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+
+				<sect4>
+					<title>OpenSuSE 12.3, 13.1</title>
+					<para>
+						You need the 'boost-devel' package. The
+						official Boost packages have support for
+						Boost locale and the ICU backend.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>SLES 11 SP1, SP2 and SP3</title>
+					<para>
+						The official Boost packages are not recent enough
+						and lack ICU support.
+						Build your own Boost with ICU support here.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'boost-libs' package. The
+					official Boost package have support for
+					Boost locale and the ICU backend.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+
+				<para>
+					The official Boost package contains support for 
+					boost-locale and the ICU backend.
+					This package is	part of the 'l' package series.
+				</para>
+			</sect3>
+									
+		</sect2>
+
+<!-- PAM -->
+		<sect2>
+			<title>Authentication support with PAM</title>
+			
+			<para>
+				<application>Wolframe</application> can authenticate
+				users with PAM.
+			</para>
+									
+			<para>
+				You enable the building of a loadable PAM authentication
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_PAM=1
+			</programlisting>
+							
+			</para>
+						
+			<para>
+				The location of the PAM library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_PAM=1 \
+		PAM_DIR=/usr/local/pam-1.1.8
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the PAM library separately:
+		        <programlisting language='shell'>
+	make WITH_PAM=1 \
+		PAM_INCLUDE_DIR=/usr/local/pam-1.1.8/include \
+		PAM_LIB_DIR=/usr/local/pam-1.1.8/lib \
+		PAM_LIBS=-lpam
+			</programlisting>				
+			
+			</para>
+						
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'pam-devel' package.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libpam0g-dev' package.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'pam-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'pam' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					On Slackware there is no official PAM package.
+					You have to build 'linux-pam' on your own.
+				</para>
+			</sect3>
+						
+		</sect2>
+
+<!-- SASL -->
+		<sect2>
+			<title>Authentication support with SASL</title>
+			
+			<para>
+				<application>Wolframe</application> can authenticate
+				users with the Cyrus SASL library
+				(<ulink url="http://cyrusimap.org">http://cyrusimap.org/</ulink>).
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: GNU SASL is currently not supported.
+			</para>
+			
+			<para>
+				You enable the building of a loadable SASL authentication
+				module with:
+
+		        <programlisting language='shell'>
+	make WITH_SASL=1
+			</programlisting>
+							
+			</para>
+						
+			<para>
+				The location of the Cyrus SASL library can be overloaded with:
+		        <programlisting language='shell'>
+	make WITH_SASL=1 \
+		SASL_DIR=/usr/local/cyrus-sasl-2.1.26
+			</programlisting>				
+			</para>
+
+			<para>
+				You can also override all compilation and linking flags
+				of the Cyrus SASL library separately:
+		        <programlisting language='shell'>
+	make WITH_SASL=1 \
+		SASL_INCLUDE_DIR=/usr/local/cyrus-sasl-2.1.26/include \
+		SASL_LIB_DIR=/usr/local/cyrus-sasl-2.1.26/lib \
+		SASL_LIBS=-lsasl2
+			</programlisting>				
+			
+			</para>
+						
+			<sect3>
+				<title>RedHat/Centos/Scientific Linux, Fedora and similar Linux distributions</title>
+				
+				<para>
+					You need the 'cyrus-sasl-devel' package.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>Debian, Ubuntu and similar Linux distributions</title>
+				
+				<para>
+					You need the 'libsasl2-dev' package.
+				</para>		
+				
+				<para>
+					For running the SASL tests you also need the 'sasl2-bin' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>openSUSE, SLES and similar Linux distributions</title>		
+				<para>
+					You need the 'cyrus-sasl-devel' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>ArchLinux</title>
+				<para>
+					You need the 'libsasl' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Slackware</title>
+				<para>
+					You need the 'cyrus-sasl' package. This package is
+					part of the 'n' package series.
+				</para>
+			</sect3>
+						
+		</sect2>
 		
 <!--
-
-* optionally (WITH_ICU): ICU 3.6 or later,
-  needed for boost*locale with ICU backend
-
-* for optional authentication mechanisms:
-  * optionally (WITH_PAM)
-  * optionally (WITH_SASL)
 
 * optionally for testing:
   * optionally (WITH_EXPECT) expect and Tcl 8.4 or later
