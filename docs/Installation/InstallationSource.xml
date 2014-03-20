@@ -2252,7 +2252,7 @@
 			<sect3>
 				<title>FreeBSD</title>
 				<para>
-					You need the 'expecct' package.
+					You need the 'expect' package.
 				</para>
 			</sect3>
 
