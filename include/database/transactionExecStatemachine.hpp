@@ -83,7 +83,7 @@ public:
 	virtual types::VariantConst get( std::size_t idx)=0;
 	///\brief Skip to the next row of the last result
 	virtual bool next()=0;
-	///\brief Get the number of rows of the last result
+	///\brief Evaluate if there is a result
 	virtual bool hasResult()=0;
 	///\brief Get the last database error as structure
 	virtual const db::DatabaseError* getLastError()=0;
