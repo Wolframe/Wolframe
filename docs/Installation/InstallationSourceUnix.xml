@@ -32,7 +32,7 @@
 				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink url="https://www.gnu.org/software/make/">https://www.gnu.org/software/make/</ulink></para>
 			</listitem>
 			<listitem>
-				<para>boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
+				<para>Boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
 			</listitem>
 		</itemizedlist>
 		
@@ -321,6 +321,43 @@
 	setenv LD_LIBRARY_PATH $PROD_DIR/lib/intel64
 			</programlisting>	
 			</para>
+		</sect2>
+		
+		<sect2>
+			<title>Using ccache and distcc</title>
+			
+			<para>
+				Ccache (<ulink url="http://ccache.samba.org/">http://ccache.samba.org/</ulink>) and
+				DistCC (<ulink url="https://code.google.com/p/distcc/">https://code.google.com/p/distcc/</ulink>)
+				can be used to cache respectively distribute the compilation of
+				<application>Wolframe</application>.
+			</para>
+			
+			<para>
+				Call make as follows:
+		        <programlisting language='shell'>
+	make CC='ccache gcc' CXX='ccache g++'
+			</programlisting>
+			
+			or
+
+		        <programlisting language='shell'>
+	make CC='distcc gcc' CXX='distcc g++'
+			</programlisting>
+			
+			</para>
+			
+			<para>
+				If you want to use ccache and distcc in parallel, use
+				the following commands:
+		        <programlisting language='shell'>
+	export DISTCC_HOSTS='server1 server2 server3'
+	export CCACHE_PREFIX=distcc
+	make CC='ccache gcc' CXX='ccache g++'
+			</programlisting>
+
+			</para>
+			
 		</sect2>
 		
 		<sect2>

@@ -1,6 +1,16 @@
 <!-- Windows -->
 	<sect1>
-		<title>Building on Windows systems</title>
+		<title>Building on Windows systems (NMAKE way)</title>
+
+		<para>
+			This is the Unix-style compilation using the Visual
+			Studio Command Line Window and NMAKE. This is the
+			preferred way currently.
+		</para>
+		
+<!-- prerequisites -->
+		<sect2>
+			<title>Prerequisites</title>
 
 		<para>
 			For building <application>Wolframe</application> on 
@@ -9,28 +19,175 @@
 		
 		<itemizedlist>
 			<listitem>
-				<para>A recent C/C++ compiler, the following ones are known to work:
+				<para>
+					Visual Studio C++ (<filename>cl.exe</filename>, <filename>rc.exe</filename>, <filename>link.exe</filename> and <filename>nmake.exe</filename>),
+					VC8 or newer
 				</para>
-				
-				<itemizedlist>
-					<listitem>
-						<para>gcc 4.1.x or newer, <ulink url="http://gcc.gnu.org">http://gcc.gnu.org</ulink></para>
-					</listitem>
-					<listitem>
-						<para>clang 3.4 or newer, <ulink url="http://clang.llvm.org">http://clang.llvm.org</ulink></para>
-					</listitem>
-					<listitem>
-						<para>Intel Compiler ICC 14.0 or newer, <ulink url="http://software.intel.com/en-us/c-compilers">http://software.intel.com/en-us/c-compilers</ulink></para>
-					</listitem>
-				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink url="https://www.gnu.org/software/make/">https://www.gnu.org/software/make/</ulink></para>
+				<para>
+					Platform SDK 6.0a or newer
+				</para>
 			</listitem>
 			<listitem>
-				<para>boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
+				<para>
+					<filename>mc.exe</filename> may be missing in your path (for instance on VC8),
+					usually it is available as part of the Platform SDK,
+					copy it somewhere into the path
+				</para>
+			</listitem>
+			<listitem>
+				<para>Boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
 			</listitem>
 		</itemizedlist>
 
+		<para>
+			Depending on the features you want to use you also may need
+			the following software:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The OpenSSL library 0.9.7 or newer, for encryption and authentication,
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The PostgreSQL database client library, version 8.1 or newer, for storing user data
+					and authentication data in a PostgreSQL database,
+					<ulink url="http://postgresql.org">http://postgresql.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The Oracle OCI client library, version 11.2 or newer, for storing user data
+					and authentication data in an Oracle database,
+					<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The win-iconv library, version 0.0.3 or newer, needed by libxml2,
+					<ulink url="http://code.google.com/p/win-iconv/">http://code.google.com/p/win-iconv/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxml2 library, version 2.7.6 or newer, for filtering XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxslt library, version 1.1.26 or newer, for the transformation of
+					XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Python 3, version 3.3.0 or newer, for writting applications in Python,
+					<ulink url="https://www.python.org">https://www.python.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The ICU library, version 3.5 or newer, for text normalization and conversion,
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			For testing the <application>Wolframe</application> software you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Expect 5.40 or newer, for running the Expect tests,
+					<ulink url="http://expect.sourceforge.net/">http://expect.sourceforge.net/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Expect needs ActiveTcl 8.5 or newer, for running the Expect tests,
+					<ulink url="http://www.activestate.com/activetcl">http://www.activestate.com/activetcl</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A working telnet
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A PostgreSQL or Oracle database when you want to run the database tests
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			For building Windows packages you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The WIX Toolset, version 3.5 or newer,
+					<ulink url="http://wixtoolset.org/">http://wixtoolset.org/</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		<para>
+			For building the documentation and manpages you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Doxygen for developer documentation,
+					<ulink url="http://www.doxygen.org">http://www.doxygen.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Docbook 4.5 or newer and the XSL toolchain,
+					<ulink url="http://www.docbook.org">http://www.docbook.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<filename>xsltproc.exe</filename>, from libxslt
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The FOP PDF generator for documentation in PDF format,
+					<ulink url="http://xmlgraphics.apache.org/fop/">http://xmlgraphics.apache.org/fop/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 <filename>hhc.exe</filename>, help compiler from the 'HTML Help Workshop',
+					 <ulink url="http://msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		</sect2>
+
 	</sect1>
 		
+	<sect1>
+		<title>Building on Windows systems (the IDE way)</title>
+		
+		<para>
+			TO BE DEFINED..
+		</para>
+	</sect1>
+	
