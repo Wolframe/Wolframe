@@ -75,22 +75,22 @@ doc-doxygen-webpage:
 	@-mkdir doxygen/html-webpage
 	cd $(TOPDIR); doxygen docs/doxygen-webpage.conf
 
-doc-html: WolfBook.html Tutorial.html
+doc-html: WolfBook.html Tutorial.html Installation.html
 
-doc-txt: Installation.txt
+doc-txt: InstallationUnix.txt
 
-doc-html-chunked: html/index.html html-tutorial/index.html
+doc-html-chunked: html/index.html html-tutorial/index.html html-installation/index.html
 
-doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
+doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html html-installation-webpage/index.html
 
-doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html
+doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html html-installation-webpage-chunked/index.html
 
-doc-pdf: WolfBook.pdf Tutorial.pdf
+doc-pdf: WolfBook.pdf Tutorial.pdf Installation.pdf
 
 .PHONY: depend
 depend:
 
-doc-epub: WolfBook.epub Tutorial.epub
+doc-epub: WolfBook.epub Tutorial.epub Installation.epub
 
 doc-towordml: WolfBook.docx
 
@@ -120,11 +120,50 @@ INSTALLATION_FILES = \
 	InstallationDate.txt \
 	Installation/Preface.xml \
 	Installation/InstallationSource.xml \
+	Installation/InstallationSourceUnix.xml \
+	Installation/InstallationSourceWindows.xml \
 	Installation/InstallationBinary.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
+INSTALLATION_UNIX_FILES = \
+	InstallationUnix.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/InstallationSourceUnix.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
+
+INSTALLATION_WINDOWS_FILES = \
+	InstallationWindows.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/InstallationSourceWindows.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
+	
 Installation.html: $(INSTALLATION_FILES)
+Installation.pdf: $(INSTALLATION_FILES)
+
+InstallationUnix.html: $(INSTALLATION_UNIX_FILES)
+InstallationWindows.html: $(INSTALLATION_WINDOWS_FILES)
+
+html-installation/index.html: $(INSTALLATION_FILES)
+	$(XSLT_HTML_CHUNKED) $<
+
+html-installation-webpage/index.html: $(INSTALLATION_FILES)
+	$(XSLT_WEBPAGE_HTML) $<
+
+html-installation-webpage-chunked/index.html: $(INSTALLATION_FILES)
+	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
+
+Installation.epub: $(INSTALLATION_FILES)
+	mkdir -p OEBPS/images
+	cp images/draft.png images/*.svg OEBPS/images
+	echo "application/epub+zip" > mimetype
+	zip -0Xq  Installation.epub mimetype
+	zip -Xr9D Installation.epub META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
 
 # WolfBook
 
@@ -251,13 +290,16 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f Installation.html Installation.pdf Installation.txt
+	-rm -f Installation.html Installation.pdf InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
 	-rm -rf html/*.html
-	-rm -rf html-tutorial/*.html
 	-rm -rf html-webpage/*.html
+	-rm -rf html-tutorial/*.html
+	-rm -rf html-installation/*.html
 	-rm -rf html-webpage-chunked/*.html
 	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf html-tutorial-webpage-chunked/*.html
+	-rm -rf html-installation-webpage/*.html
+	-rm -rf html-installation-webpage-chunked/*.html
 	-rm -rf doxygen/html-webpage/*
 	
 local_distclean:

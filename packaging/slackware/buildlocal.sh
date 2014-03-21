@@ -80,6 +80,17 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
+	test
+check_for_errors
+
+make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
+	WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
+	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
+	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
+	CC='ccache gcc' CXX='ccache g++' \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
 	DESTDIR=$PKGBUILD/PKG install sysconfdir=/etc libdir=$LIBDIR
 check_for_errors
 

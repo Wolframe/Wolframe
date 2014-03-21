@@ -3573,19 +3573,19 @@ endif
 ifeq ($(WITH_EXPECT),1)
 
 ifeq "$(PLATFORM)" "LINUX"
-EXPECT = /usr/bin/expect
+EXPECT ?= /usr/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-EXPECT = /usr/local/bin/expect
+EXPECT ?= /usr/local/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
-EXPECT = /usr/pkg/bin/expect
+EXPECT ?= /usr/pkg/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
-EXPECT = expect
+EXPECT ?= expect
 endif
 
 endif
