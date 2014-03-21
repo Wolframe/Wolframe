@@ -38,7 +38,10 @@ CPP_OBJS = \
 	databaseLanguage.obj \
 	transactionExecStatemachine.obj \
 	baseStatement.obj \
-	substitutingStatement.obj
+	substitutingStatement.obj \
+	virtualMachine.obj \
+	virtualMachineInstance.obj \
+	virtualMachineTdlTranslatorInterface.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

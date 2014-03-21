@@ -46,7 +46,10 @@ CPP_OBJS = \
 	databaseLanguage.o \
 	transactionExecStatemachine.o \
 	baseStatement.o \
-	substitutingStatement.o
+	substitutingStatement.o \
+	virtualMachine.o \
+	virtualMachineInstance.o \
+	virtualMachineTdlTranslatorInterface.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
