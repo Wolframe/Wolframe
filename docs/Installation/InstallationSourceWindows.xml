@@ -1,0 +1,36 @@
+<!-- Windows -->
+	<sect1>
+		<title>Building on Windows systems</title>
+
+		<para>
+			For building <application>Wolframe</application> on 
+			Windows you need at least the following software:
+		</para>
+		
+		<itemizedlist>
+			<listitem>
+				<para>A recent C/C++ compiler, the following ones are known to work:
+				</para>
+				
+				<itemizedlist>
+					<listitem>
+						<para>gcc 4.1.x or newer, <ulink url="http://gcc.gnu.org">http://gcc.gnu.org</ulink></para>
+					</listitem>
+					<listitem>
+						<para>clang 3.4 or newer, <ulink url="http://clang.llvm.org">http://clang.llvm.org</ulink></para>
+					</listitem>
+					<listitem>
+						<para>Intel Compiler ICC 14.0 or newer, <ulink url="http://software.intel.com/en-us/c-compilers">http://software.intel.com/en-us/c-compilers</ulink></para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>GNU make 3.81 or newer (but preferably 3.82 or newer) from <ulink url="https://www.gnu.org/software/make/">https://www.gnu.org/software/make/</ulink></para>
+			</listitem>
+			<listitem>
+				<para>boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
+			</listitem>
+		</itemizedlist>
+
+	</sect1>
+		
