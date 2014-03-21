@@ -133,11 +133,20 @@ INSTALLATION_UNIX_FILES = \
 	Installation/InstallationSourceUnix.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
+
+INSTALLATION_WINDOWS_FILES = \
+	InstallationWindows.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/InstallationSourceWindows.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
 	
 Installation.html: $(INSTALLATION_FILES)
 Installation.pdf: $(INSTALLATION_FILES)
 
 InstallationUnix.html: $(INSTALLATION_UNIX_FILES)
+InstallationWindows.html: $(INSTALLATION_WINDOWS_FILES)
 
 html-installation/index.html: $(INSTALLATION_FILES)
 	$(XSLT_HTML_CHUNKED) $<
@@ -281,7 +290,7 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 local_clean:
 	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f Installation.html Installation.pdf InstallationUnix.txt
+	-rm -f Installation.html Installation.pdf InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
 	-rm -rf html-tutorial/*.html
