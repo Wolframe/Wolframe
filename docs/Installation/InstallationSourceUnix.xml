@@ -2,6 +2,10 @@
 	<sect1>
 		<title>Building on Unix systems</title>
 
+<!-- prerequisites -->
+		<sect2>
+			<title>Prerequisites</title>
+
 		<para>
 			For building <application>Wolframe</application> on 
 			Unix systems you need at least the following software:
@@ -32,6 +36,150 @@
 			</listitem>
 		</itemizedlist>
 		
+		<para>
+			Depending on the features you want to use you also may need
+			the following software:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The OpenSSL library 0.9.7 or newer, for encryption and authentication,
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The Sqlite database library, version 3.5.0 or newer, for storing user data
+					and authentication data in a Sqlite database,
+					<ulink url="http://sqlite.org">http://sqlite.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The PostgreSQL database client library, version 8.1 or newer, for storing user data
+					and authentication data in a PostgreSQL database,
+					<ulink url="http://postgresql.org">http://postgresql.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The Oracle OCI client library, version 11.2 or newer, for storing user data
+					and authentication data in an Oracle database,
+					<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxml2 library, version 2.7.6 or newer, for filtering XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxslt library, version 1.1.26 or newer, for the transformation of
+					XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Python 3, version 3.3.0 or newer, for writting applications in Python,
+					<ulink url="https://www.python.org">https://www.python.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libhpdf library, version 2.2.1 or newer, for PDF generation and printing,
+					<ulink url="http://libharu.org/">http://libharu.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The FreeImage package, version 3.15.4 or newer, for image manipulation,
+					<ulink url="http://freeimage.sourceforge.net">http://freeimage.sourceforge.net</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The ICU library, version 3.5 or newer, for text normalization and conversion,
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A PAM library, for instance Linux PAM, version 1.0.4 or newer, for authentication via PAM,
+					<ulink url="http://www.linux-pam.org/">http://www.linux-pam.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The Cyrus SASL library, version 2.1.22 or newer, for authentication via SASL,
+					<ulink url="http://cyrusimap.org">http://cyrusimap.org/</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		<para>
+			For testing the <application>Wolframe</application> software you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Expect 5.40 or newer, for running the Expect tests,
+					<ulink url="http://expect.sourceforge.net/">http://expect.sourceforge.net/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A working telnet
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A PostgreSQL or Oracle database when you want to run the database tests
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		<para>
+			For building the documentation and manpages you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Doxygen for developer documentation,
+					<ulink url="http://www.doxygen.org">http://www.doxygen.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Docbook 4.5 or newer and the XSL toolchain,
+					<ulink url="http://www.docbook.org">http://www.docbook.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The FOP PDF generator for documentation in PDF format,
+					<ulink url="http://xmlgraphics.apache.org/fop/">http://xmlgraphics.apache.org/fop/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Dia for conversion of SVG images,
+					<ulink url="http://live.gnome.org/Dia">http://live.gnome.org/Dia</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		</sect2>
+
+<!-- Basic build instructions -->		
+		<sect2>
+			<title>Basic build instructions</title>
+			
 		<para>
 			<application>Wolframe</application> is build and installed by simply calling:
 
@@ -87,6 +235,8 @@
 			provide the variables explicitly as mentioned above in
 			the example with 'BOOST_DIR'.
 		</para>
+		
+		</sect2>
 
 <!-- compilers -->
 		<sect2>
