@@ -91,7 +91,7 @@ public:
 
 		do	{
 			input.read( (char *)plain, m_bufferSize );
-			dataSize = input.gcount();
+			dataSize = (int)input.gcount();
 			//
 			codedSize = encodeChunk( plain, dataSize, encoded, 2 * m_bufferSize );
 			output.write( encoded, codedSize );
@@ -154,7 +154,7 @@ public:
 		do
 		{
 			input.read( encoded, m_bufferSize );
-			encodedSize = input.gcount();
+			encodedSize = (int)input.gcount();
 			dataSize = decode( encoded, encodedSize, data, m_bufferSize );
 			output.write( (const char*)data, dataSize );
 		} while ( input.good() && encodedSize > 0 );
