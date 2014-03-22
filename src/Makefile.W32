@@ -137,6 +137,7 @@ local_distclean:
 local_test:
 
 copy_prereq:
+	@-copy libwfsingleton\wfsingleton.dll" .
 !IFDEF WITH_SSL
 	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
 	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
