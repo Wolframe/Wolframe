@@ -79,7 +79,8 @@
 
 		int ch = _getch( );
 		while( ch != 13 ) {
-			pass.push_back( ch );
+			// Let's hope we get the right characters here!
+			pass.push_back( (char)ch );
 			ch = _getch( );
 		}
 		puts( "" );
