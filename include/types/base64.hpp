@@ -110,6 +110,12 @@ private:
 
 	base64_EncodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:	
+	Encoder& operator=( const Encoder &o );
+#endif
 };
 
 
@@ -161,6 +167,12 @@ public:
 private:
 	base64_DecodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:	
+	Decoder& operator=( const Decoder &o );
+#endif
 };
 
 }} // namespace _Wolframe::base64
