@@ -20,7 +20,7 @@
 # version of the boost library
 
 #BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_55_0
+BOOST_VERSION = 1_55
 
 # base dir where boost is installed
 
@@ -59,10 +59,10 @@ BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
 # ICU (icu4c)
 #############
 
-ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
+ICU_DIR = C:\develop\icu4c-52_1-Win32-msvc10\icu
 
 # the library version (how the DLLs are tagged)
-ICU_LIB_VERSION = 49
+ICU_LIB_VERSION = 52
 
 # TODO: probe!
 ICU_LIB_DIR = $(ICU_DIR)\lib
@@ -157,8 +157,8 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-#CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-#CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CC="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CXX="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe
 
 # Oracle
 ########
