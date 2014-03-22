@@ -245,8 +245,7 @@
 		WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
 		WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 		WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 \
-		CC='ccache gcc' CXX='ccache g++' \
-		CCFLAGS='-Werror' CXXFLAGS='-Werror' \
+		CC=gcc CXX=g++ CCFLAGS='-Werror' CXXFLAGS='-Werror' \
 		clean all test install
 			</programlisting>
 
@@ -372,6 +371,12 @@
 	make CC='ccache gcc' CXX='ccache g++'
 			</programlisting>
 
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: Careful with
+				non-GNU compilers and ccache. At least clang is known
+				to have issues if used together with ccache!
 			</para>
 			
 		</sect2>

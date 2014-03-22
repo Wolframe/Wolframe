@@ -252,6 +252,46 @@
 		
 		</sect2>
 
+		<sect2>
+			<title>Using ccache and distcc</title>
+			
+			<para>
+				Ccache (<ulink url="http://ccache.samba.org/">http://ccache.samba.org/</ulink>) 
+				can be used to cache the compilation of
+				<application>Wolframe</application> also on Windows.
+			</para>
+			
+			<para>
+				You need then <filename>ccache.exe</filename> binary with MSVC support from
+				<ulink url="http://cgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc">http://cgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc</ulink>.
+				You also need the Cygwin runtime from
+				<ulink url="http://cygwin.org">http://cygwin.org</ulink>.
+				Install the <filename>ccache.exe</filename> binary into
+				<filename>c:\cygwin\bin</filename>.
+			</para>
+			
+			<para>
+				Set the 'CC' and 'CXX' variables in
+				<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+				<programlisting language='shell'>
+	CC="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+	CXX="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+			</programlisting>
+			
+			</para>
+
+			<para>
+				Set the following variable in the shell you use to compile
+				<application>Wolframe</application>:
+				
+				<programlisting language='shell'>
+	Set CYGWIN=nodosfilewarning
+				</programlisting>
+			</para>
+
+		</sect2>
+
 <!-- Boost -->
 		<sect2>
 			<title>Boost</title>
@@ -273,7 +313,7 @@
 					<filename>makefiles\nmake\config.mk</filename> as follows:
 					
 					<programlisting language='shell'>
-	BOOST_DIR = C:\Boost\boost_1_55_0
+	BOOST_DIR = C:\Boost\boost_1_55
 	BOOST_INCLUDE_DIR = $(BOOST_DIR)
 	BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
 	BOOST_VC_VER = vc100
@@ -286,12 +326,119 @@
 					Rename the directory <filename>C:\Boost\boost_1_55_0\libs</filename> to
 					<filename>C:\Boost\boost_1_55_0\boost</filename>.
 				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Those pre-built packages don't
+					have support for the ICU backend in boost-locale. If you need ICU
+					support and enable it with 'WITH_ICU_1' you will have to build your
+					own version of Boost from the sources.
+				</para>
 			</sect3>
 			
 			<sect3>
 				<title>Build your own version of Boost</title>
+			
+				<para>
+					The following Boost libraries are required for building
+					<application>Wolframe</application>:
+
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time ^
+		architecture=x86 address-model=64 toolset=msvc 
+		install
+					</programlisting>
+				</para>
+
+				<para>
+					Set 'architecture', 'address-mode' and 'toolset' fitting
+					your platform.
+				</para>
+			
+				<para>
+					If you want to build the ICU normalization
+					module (WITH_ICU=1) you will have to build 'boost-locale'
+					with ICU support and you have to enable the
+					'regex' and the 'locale' boost libraries too:
+				
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time --with-locale --with-regex ^
+		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
+		architecture=x86 address-model=64 toolset=msvc 
+		install
+					</programlisting>
+
+				</para>
+
+				<para>
+					Set the "BOOST_XXX" variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	BOOST_DIR = C:\Boost\boost_1_55
+	BOOST_INCLUDE_DIR = $(BOOST_DIR)
+	BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+	BOOST_VC_VER = vc100
+	BOOST_MT = -mt
+					</programlisting>
+					
+				</para>
+						
 			</sect3>
 			
+		</sect2>
+<!--...-->
+
+<!-- ICU -->
+		<sect2>
+			<title>Support for ICU</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				the International Components for Unicode
+				(ICU, <ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>)
+				library for text normalization and conversion.
+			</para>
+			
+			<sect3>
+				<title>Use prebuild version of ICU</title>
+				
+				<para>
+					You can take the pre-build ZIP-files from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>,
+					called somthing like <filename>icu4c-52_1-Win32-msvc10.zip</filename> and
+					unpack them in for instance <filename>C:\icu4c-52_1_1-Win32-msvc10</filename>.
+				</para>
+				
+				<para>
+					You will have to set the 'ICU_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	ICU_LIB_VERSION = 52
+	ICU_DIR = C:\icu4c-52_1-Win32-msvc10\icu
+					</programlisting>
+				</para>
+				
+				<!-- TODO: build Boost with pre-built ICU -->
+				
+			</sect3>
+			
+			<sect3>
+				<title>Build you own version of ICU</title>
+				
+				<para>
+					TODO
+				</para>
+
+				<!-- TODO: build Boost with compiled version of ICU -->
+			</sect3>
+				
 		</sect2>
 	
 	</sect1>
@@ -300,7 +447,7 @@
 		<title>Building on Windows systems (the IDE way)</title>
 		
 		<para>
-			TO BE DEFINED..
+			TODO
 		</para>
 	</sect1>
 	
