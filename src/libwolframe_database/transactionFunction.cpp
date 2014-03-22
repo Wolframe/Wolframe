@@ -313,7 +313,7 @@ void TransactionFunction::Impl::handlePrintStep( const PrintStep& printstep)
 			{
 				m_resultstruct->addMark( ResultElement::SelectResultFunction, printstep.argument.namspace);
 			}
-			m_resultstruct->addMark( ResultElement::SelectResultColumn, types::touint_cast( printstep.argument.value));
+			m_resultstruct->addMark( ResultElement::SelectResultColumn, static_cast<std::size_t>( types::touint_cast( printstep.argument.value)));
 			break;
 		case Param::SymbolicResultReference:
 			if (printstep.argument.namspace>=0)
