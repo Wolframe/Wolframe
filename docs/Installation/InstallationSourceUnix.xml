@@ -190,7 +190,7 @@
 		</para>
 		
 		<para>
-			The makefiles understand the standard GNU targets like clean', 'distclean', 'test', 'install',
+			The makefiles understand the standard GNU targets like 'clean', 'distclean', 'test', 'install',
 			'uninstall', etc. Also the standard installation variables 'DESTDIR' and 'prefix' are understood.
 			The whole list of options can be seen with:
 			
@@ -234,6 +234,22 @@
 			If you get a 'NOT SUPPLIED ON THIS PLATFORM' you have to
 			provide the variables explicitly as mentioned above in
 			the example with 'BOOST_DIR'.
+		</para>
+		
+		<para>
+			A complete build may look like this:
+
+		        <programlisting language='shell'>
+	make WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
+		WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_ORACLE=1 \
+		WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+		WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
+		WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 \
+		CC='ccache gcc' CXX='ccache g++' \
+		CCFLAGS='-Werror' CXXFLAGS='-Werror' \
+		clean all test install
+			</programlisting>
+
 		</para>
 		
 		</sect2>
@@ -502,7 +518,7 @@ export PATH
 			<title>Boost</title>
 			
 				<para>
-					Boost (<ulink url="http://www.boost.or">http://www.boost.org</ulink>) is the only
+					Boost (<ulink url="http://www.boost.org">http://www.boost.org</ulink>) is the only
 					library which is absolutely required in order to build
 					<application>Wolframe</application>.
 				</para>

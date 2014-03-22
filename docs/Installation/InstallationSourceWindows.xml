@@ -1,6 +1,6 @@
 <!-- Windows -->
 	<sect1>
-		<title>Building on Windows systems (NMAKE way)</title>
+		<title>Building on Windows systems (the NMAKE way)</title>
 
 		<para>
 			This is the Unix-style compilation using the Visual
@@ -20,8 +20,7 @@
 		<itemizedlist>
 			<listitem>
 				<para>
-					Visual Studio C++ (<filename>cl.exe</filename>, <filename>rc.exe</filename>, <filename>link.exe</filename> and <filename>nmake.exe</filename>),
-					VC8 or newer
+					Visual Studio C++ 2008 or newer (<filename>cl.exe</filename>, <filename>rc.exe</filename>, <filename>link.exe</filename> and <filename>nmake.exe</filename>)
 				</para>
 			</listitem>
 			<listitem>
@@ -31,7 +30,8 @@
 			</listitem>
 			<listitem>
 				<para>
-					<filename>mc.exe</filename> may be missing in your path (for instance on VC8),
+					<filename>mc.exe</filename> may be missing in your path (for instance in Visual Studio 2008
+					it was not bundled),
 					usually it is available as part of the Platform SDK,
 					copy it somewhere into the path
 				</para>
@@ -180,7 +180,120 @@
 		</itemizedlist>
 		
 		</sect2>
+	
+<!-- Basic build instructions -->		
+		<sect2>
+			<title>Basic build instructions</title>
+			
+		<para>
+			<application>Wolframe</application> can be build in a Visual Studio command line (or better a Platform SDK command line)
+			using the following command:
 
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32
+			</programlisting>
+		</para>
+
+		<para>
+			The makefiles understand the standard GNU targets like 'clean', 'distclean', 'test',
+			etc. The whole list of options can be seen with:
+			
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 help
+			</programlisting>
+		</para>
+
+		<para>
+			Configuration is all done in a file called <filename>config.mk</filename>.
+			Examples can be found in the <filename>makefiles/nmake</filename> directory.
+		</para>
+
+		<para>
+			Optional features are enabled by using 'WITH_XXX' variables when
+			calling nmake, e. g. to enable SSL support you call make like this:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SSL=1
+			</programlisting>
+		</para>
+		
+		<para>
+			On Windows you would rather change the 'OPENSSL_DIR' variable in
+			the <filename>config.mk</filename>, for instance:
+		        <programlisting language='shell'>
+	OPENSSL_DIR = C:\OpenSSL\Win32
+			</programlisting>
+		</para>
+
+		<para>
+			A complete build may look like this:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
+		WITH_SQLITE3=1 WITH_PGSQL=1 WITH_ORACLE=1 ^
+		WITH_LIBXML2=1 WITH_LIBXSLT=1 ^
+		WITH_LIBHPDF=1 WITH_EXAMPLES=1 WITH_ICU=1 WITH_FREEIMAGE=1 ^
+		WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 ^
+		clean all test
+			</programlisting>
+
+		</para>
+		
+		<para>
+			We currently have no dependency system for the NMAKE
+			build system, so be careful when to use 'clean' to 
+			rebuild parts of the system.
+		</para>
+		
+		<para>
+			This way of building the system is mainly useful for
+			automatized systems and for packaging.
+		</para>
+		
+		</sect2>
+
+<!-- Boost -->
+		<sect2>
+			<title>Boost</title>
+			
+				<para>
+					Boost (<ulink url="http://www.boost.org">http://www.boost.org</ulink>) is the only
+					library which is absolutely required in order to build
+					<application>Wolframe</application>.
+				</para>
+
+
+			<sect3>
+				<title>Use prebuild version of Boost</title>
+				
+				<para>
+					<ulink url="http://boost.teeks99.com">http://boost.teeks99.com</ulink> provides
+					pre-compiled packages of Boost. You can install the library into for instance
+					<filename>C:\boost\boost_1_55_0</filename> and set the 'BOOST_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	BOOST_DIR = C:\Boost\boost_1_55_0
+	BOOST_INCLUDE_DIR = $(BOOST_DIR)
+	BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+	BOOST_VC_VER = vc100
+	BOOST_MT = -mt
+					</programlisting>
+
+				</para>
+				
+				<para>
+					Rename the directory <filename>C:\Boost\boost_1_55_0\libs</filename> to
+					<filename>C:\Boost\boost_1_55_0\boost</filename>.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Build your own version of Boost</title>
+			</sect3>
+			
+		</sect2>
+	
 	</sect1>
 		
 	<sect1>
