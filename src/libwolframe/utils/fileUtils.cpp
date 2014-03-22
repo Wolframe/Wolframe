@@ -216,7 +216,14 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 //	length of 128 bytes: See OFSTRUCT definition (OFS_MAXPATHNAME = 128)
 
 	unsigned char ch;
+#ifdef _WIN32
+	errno_t err;
+	FILE* fh;
+	err = fopen_s( &fh, filename.c_str(), "w");
+	if (!err)
+#else
 	FILE* fh = fopen( filename.c_str(), "w");
+#endif
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
