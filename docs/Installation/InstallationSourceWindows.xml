@@ -193,6 +193,13 @@
 	nmake /nologo /f Makefile.W32
 			</programlisting>
 		</para>
+		
+		<para>
+			You can check the compilation mode with:
+		        <programlisting language='shell'>
+	setenv
+			</programlisting>
+		</para>
 
 		<para>
 			The makefiles understand the standard GNU targets like 'clean', 'distclean', 'test',
@@ -394,6 +401,55 @@
 		</sect2>
 
 <!-- SSL -->
+		<sect2>
+			<title>Secure Socket Layer (SSL)</title>
+
+			<para>
+				The <application>Wolframe</application> protocol can
+				be secured with SSL. Currently only OpenSSL
+				(<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
+				is supported.
+			
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of OpenSSL</title>
+			
+				<para>
+					
+					You can get a prebuilt version of OpenSSL from
+					<ulink url="http://www.slproweb.com/products/Win32OpenSSL.html">http://www.slproweb.com/products/Win32OpenSSL.html</ulink>.
+					Despite the name you get also 64-bit versions there.
+				</para>
+				
+				<para>
+					Install the developer version from for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>
+					for instance to <filename>C:\OpenSSL-Win32</filename>.
+				</para>
+				
+				<para>
+					Do not copy the OpenSSL binaries to the Windows system directory, copy
+					them to the Bin subdirectory of the OpenSSL installation directory!
+				</para>
+
+				<para>
+					Set the "BOOST_XXX" variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	OPENSSL_DIR = C:\OpenSSL-Win32
+					</programlisting>
+				</para>
+			</sect3>
+
+<!-- TODO: 
+
+			<sect3>
+				<title>Build your own version of OpenSSL</title>
+			</sect3
+-->
+
+		</sect2>
 
 <!-- Sqlite3 -->		
 		<sect2>
@@ -424,7 +480,101 @@
 		</sect2>
 		
 <!-- PostgreSQL -->
+		<sect2>
+			<title>PostgreSQL database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a PostgreSQL database (<ulink url="http://postgresql.org">http://postgresql.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of PostgreSQL</title>
+			
+				<para>
+					Download the Windows installer from EnterpriseDB (you
+					reach the download link via
+					<ulink url="http://postgresql.org">http://postgresql.org</ulink>).
+				</para>
+				
+				<para>
+					You will have to set some variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
+	PGDLL_WITH_I18N = 1
+					</programlisting>
+				</para>
+
+				<para>
+					You enable the building of a loadable PostgreSQL database
+					module with:
+
+				<programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_PGSQL=1
+				</programlisting>
+							
+				</para>
+				
+			</sect3>
+
+<!-- TODO
+			<sect3>
+				<title>Build your own version of PostgreSQL</title>
+			</sect3>
+-->
+		</sect2>
+
 <!-- Oracle -->
+		<sect2>
+			<title>Oracle database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a Oracle database (<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				<emphasis role="bold">Import note</emphasis>: Make sure you
+				have all the licenses to develop with Oracle and to install an
+				Oracle database! The <application>Wolframe</application> team
+				doesn't take any responsability if licenses are violated!
+			</para>
+
+			<para>
+				You have to download the two packages
+				<filename>instantclient-basic-nt-12.1.0.1.0.zip</filename> and
+				<filename>instantclient-sdk-nt-12.1.0.1.0.zip</filename> and
+				install them to for instance
+				<filename>C:\Oracle\instantclient_12_1</filename>.
+			</para>	
+				
+			<para>
+				You will have to set the 'ORACLE_DIR' variable in
+				<filename>makefiles\nmake\config.mk</filename> as follows:
+				
+				<programlisting language='shell'>
+	ORACLE_DIR = C:\Oracle\instantclient_12_1
+				</programlisting>
+			</para>
+			
+			<para>
+				You enable the building of a loadable Oracle database
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_ORACLE=1
+			</programlisting>
+							
+			</para>
+			
+		</sect2>
+
 <!-- libxml2/libxslt -->
 
 <!-- Textwolf -->
