@@ -25,10 +25,10 @@ INCLUDE_LIBS = \
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(PYTHON_DIR)\libs\python33.lib"
+	"$(PYTHON_DIR)\libs\python$(PYTHON_VERSION).lib"
 !ELSE
 INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(PYTHON_DIR)\libs\python33_d.lib"
+	"$(PYTHON_DIR)\libs\python$(PYTHON_VERSION)_d.lib"
 !ENDIF
 
 DYNAMIC_MODULE = \

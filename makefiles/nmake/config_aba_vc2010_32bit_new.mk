@@ -117,7 +117,12 @@ LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.28-win32-debug
 # Python 3
 ##########
 
-PYTHON_DIR = C:\Python33
+PYTHON_DIR = C:\develop\Python34
+PYTHON_VERSION = 34
+PYTHON_MAJOR_VERSION = 3
+
+PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
 
 # Tcl 8.5 and Expect
 ####################
