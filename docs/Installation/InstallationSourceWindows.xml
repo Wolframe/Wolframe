@@ -663,7 +663,54 @@
 		</sect2>
 
 <!-- Python -->
+		<sect2>
+			<title>Scripting support with Python</title>
+			
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Python (<ulink url="https://www.python.org">https://www.python.org</ulink>).
+			</para>
+						
+			<para>
+				The module supports only version 3 of the Python interpreter,
+				version 2 is not supported.
+			</para>
 
+			<sect3>
+				<title>Use prebuild version of PostgreSQL</title>
+			
+				<para>
+					Download the official Python 3 Installer for Windows from
+					<ulink url="http://python.org">http://python.org</ulink>).
+				</para>
+				
+				<para>
+					You will have to set the 'PYTHON_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	PYTHON_DIR = C:\Python34
+	PYTHON_VERSION = 34
+	PYTHON_MAJOR_VERSION = 3
+	PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+	PYTHON_DLL_DIR = $(PYTHON_DIR)\DDLs	
+					</programlisting>
+				</para>
+
+				<para>
+					You enable the building of a loadable Python scripting
+					module with:
+
+				<programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_PYTHON=1
+				</programlisting>
+				
+				</para>
+				
+			</sect3>
+							
+		</sect2>
+		
 <!-- libhpdf -->
 		<sect2>
 			<title>Printing support with libhpdf</title>
