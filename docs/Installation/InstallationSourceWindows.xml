@@ -275,8 +275,8 @@
 				<filename>makefiles\nmake\config.mk</filename> as follows:
 					
 				<programlisting language='shell'>
-	CC="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-	CXX="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+	CC=C:\cygwin\bin\ccache.exe cl
+	CXX=C:\cygwin\bin\ccache.exe cl
 			</programlisting>
 			
 			</para>
@@ -330,7 +330,7 @@
 				<para>
 					<emphasis role="bold">Note</emphasis>: Those pre-built packages don't
 					have support for the ICU backend in boost-locale. If you need ICU
-					support and enable it with 'WITH_ICU_1' you will have to build your
+					support and enable it with 'WITH_ICU=1' you will have to build your
 					own version of Boost from the sources.
 				</para>
 			</sect3>
