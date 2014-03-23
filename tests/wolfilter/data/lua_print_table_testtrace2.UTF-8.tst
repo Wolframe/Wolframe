@@ -106,6 +106,7 @@
 </invoice>**config
 --input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
 **requires:TEXTWOLF
+**requires:LIBHPDF
 **file:wolframe.conf
 LoadModules
 {
