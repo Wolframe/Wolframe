@@ -71,8 +71,9 @@ ICU_LIB_DIR = $(ICU_DIR)\lib
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
+OPENSSL_DIR = C:\develop\OpenSSL-Win32
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
+#OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
@@ -81,16 +82,22 @@ OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 # (http://www.postgresql.org/)
 ##############################
 
+PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
 #PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
+#PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
-#PGDLL_WITH_I18N = 1
+PGDLL_WITH_I18N = 1
 
 # enable depending on libintl.dll and libiconv.dll (deployment only)
 PGDLL_WITHOUT_MAJOR_VERSION = 1
+
+# Oracle
+########
+
+ORACLE_DIR = C:\develop\Oracle\instantclient_12_1
 
 # win_iconv
 ###########
@@ -157,10 +164,5 @@ HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-CC="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-CXX="C:\cygwin\bin\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe
-
-# Oracle
-########
-
-ORACLE_DIR = C:\Oracle\instantclient_12_1
+CC=C:\cygwin\bin\ccache.exe cl
+CXX=C:\cygwin\bin\ccache.exe cl
