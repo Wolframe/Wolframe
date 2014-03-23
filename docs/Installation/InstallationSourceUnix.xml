@@ -2279,7 +2279,7 @@ export PATH
 			<title>zlib and libpng</title>
 			
 			<para>
-				FreeImage and libhpdf need the zlib and libpng libraries.
+				Libhpdf needs the zlib and libpng libraries.
 			</para>
 									
 			<para>

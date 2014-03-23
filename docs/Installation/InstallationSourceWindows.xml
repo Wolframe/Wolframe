@@ -392,7 +392,196 @@
 			</sect3>
 			
 		</sect2>
-<!--...-->
+
+<!-- SSL -->
+
+<!-- Sqlite3 -->		
+		<sect2>
+			<title>SQLite database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				an Sqlite3 database (<ulink url="http://sqlite.org">http://sqlite.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+
+			<para>
+				The Sqlite3 library is embedded in the subdirectory
+				<filename>3rdParty/sqlite3</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Sqlite3 database
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SQLITE3=1
+			</programlisting>
+							
+			</para>
+	
+		</sect2>
+		
+<!-- PostgreSQL -->
+<!-- Oracle -->
+<!-- libxml2/libxslt -->
+
+<!-- Textwolf -->
+		<sect2>
+			<title>XML filtering support with Textwolf</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				Textwolf (<ulink url="http://textwolf.net">http://textwolf.net</ulink>)
+				for filtering and the conversion of XML data.
+			</para>
+			
+			<para>
+				The textwolf library is embedded in the subdirectory
+				<filename>3rdParty/textwolf</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Textfolw filtering
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_TEXTWOLF=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: If you plan to
+				run tests when building the <application>Wolframe</application>
+				you should enable Textwolf as many tests rely on it's presence.
+			</para>						
+		</sect2>
+		
+<!-- cJSON -->
+		<sect2>
+			<title>JSON filtering support with cJSON</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				cJSON (<ulink url="http://sourceforge.net/projects/cjson/">http://sourceforge.net/projects/cjson/</ulink>)
+				for filtering and the conversion of JSON data.
+			</para>
+			
+			<para>
+				The cjson library is embedded in the subdirectory
+				<filename>3rdParty/libcjson</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable cJSON filtering
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_CJSON=1
+			</programlisting>
+							
+			</para>
+									
+		</sect2>
+
+<!-- Lua -->
+		<sect2>
+			<title>Scripting support with Lua</title>
+
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Lua (<ulink url="http://www.lua.org">http://www.lua.org</ulink>).
+			</para>
+
+			<para>
+				The Lua interpreter is embedded in the subdirectory
+				<filename>3rdParty/lua</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Lua scripting
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_LUA=1
+			</programlisting>
+							
+			</para>
+
+		</sect2>
+
+<!-- Python -->
+
+<!-- libhpdf -->
+		<sect2>
+			<title>Printing support with libhpdf</title>
+			
+			<para>
+				<application>Wolframe</application> can print
+				with libhpdf (<ulink url="http://libharu.org/">http://libharu.org/</ulink>,
+				also called libharu).
+			</para>
+
+			<para>
+				The libhpdf library is embedded in the subdirectory
+				<filename>3rdParty/libhpdf</filename>.
+			</para>
+									
+			<para>
+				You enable the building of a loadable libhpdf printing
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_LIBHPDF=1
+			</programlisting>
+							
+			</para>
+												
+		</sect2>
+
+<!-- FreeImage -->
+		<sect2>
+			<title>Image processing with FreeImage</title>
+			
+			<para>
+				<application>Wolframe</application> can manipulate
+				various image formats with the help of
+				the FreeImage project (<ulink url="http://freeimage.sourceforge.net">http://freeimage.sourceforge.net</ulink>).
+			</para>
+
+			<para>
+				The FreeImage package is embedded in the subdirectory
+				<filename>3rdParty/freeimage</filename>.
+			</para>
+									
+			<para>
+				You enable the building of a loadable FreeImage processing
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SYSTEM_FREEIMAGE=1
+			</programlisting>
+							
+			</para>
+			
+		</sect2>
+		
+<!-- zlib and libpng -->
+		<sect2>
+			<title>zlib and libpng</title>
+			
+			<para>
+				Libhpdf needs the zlib and libpng libraries.
+			</para>
+
+			<para>
+				The libpng and zlib libraries are embedded in the subdirectory
+				<filename>3rdParty/zlib</filename> and <filename>3rdParty/libpng</filename>.
+			</para>
+		
+		</sect2>
 
 <!-- ICU -->
 		<sect2>
@@ -425,7 +614,7 @@
 					</programlisting>
 				</para>
 				
-				<!-- TODO: build Boost with pre-built ICU -->
+<!-- TODO: build Boost with pre-built ICU -->
 				
 			</sect3>
 			
@@ -436,12 +625,46 @@
 					TODO
 				</para>
 
-				<!-- TODO: build Boost with compiled version of ICU -->
+<!-- TODO: build Boost with compiled version of ICU -->
+
 			</sect3>
 				
 		</sect2>
+
+<!-- testing -->
+		<sect2>
+			<title>Testing Wolframe</title>
+			
+			<para>
+				<application>Wolframe</application> has tests
+				written in Google gtest
+				(<ulink url="https://code.google.com/p/googletest/">https://code.google.com/p/googletest/</ulink>).
+			</para>
+			
+			<para>
+				Tests are run with:
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 test
+			</programlisting>
+			</para>
+			
+			<para>
+				Some tests run for a long time (regression and stress
+				tests). They are not run per default when calling
+				'make test', but you have to call:
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 longtest
+			</programlisting>
+			</para>
+			
+		</sect2>
+
+<!-- Expect -->
+<!-- Documentation -->
 	
 	</sect1>
+
+<!-- TODO:
 		
 	<sect1>
 		<title>Building on Windows systems (the IDE way)</title>
@@ -451,3 +674,4 @@
 		</para>
 	</sect1>
 	
+-->
