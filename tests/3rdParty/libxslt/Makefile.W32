@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 	/I. /I"$(LIBXML2_DIR)\include" \
 	/I"$(LIBXML2_DIR)\include\libxml2" \
 	/I"$(LIBXSLT_DIR)\include" \
-	/I"$(WIN_ICONV_DIR)"
+	/I"$(ICONV_DIR)\include"
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -38,7 +38,8 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" .
 	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
-	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" .
 	@-testlibxslt1 test1.xslt test1.xml > test1.RES
