@@ -591,20 +591,29 @@
 			</para>
 
 			<sect3>
-				<title>Use prebuild version of libxml2 and libxslt</title>
+				<title>Use prebuild versions of libxml2 and libxslt</title>
 			
 				<para>
-					Download the Windows ZIP files from
+					Download the Windows ZIP files <filename>libxml2-2.7.8.win32.zip</filename>,
+					<filename>iconv-1.9.2.win32.zip</filename> and
+					<filename>libxslt-1.1.26.win32.zip</filename>
+					from
 					<ulink url="http://ftp.zlatkovic.com/libxml/">http://ftp.zlatkovic.com/libxml/</ulink>).
+					Unpack them for instance to:
+					<filename>C:\libxml2-2.7.8.win32</filename>,
+					<filename>C:\iconv-1.9.2.win32</filename> and
+					<filename>C:\libxslt-1.1.26.win32</filename>.
 				</para>
 				
 				<para>
-					You will have to set some variables in
-					<filename>makefiles\nmake\config.mk</filename> as follows:
+					You will have to set the following variables in
+					<filename>makefiles\nmake\config.mk</filename>:
 					
 					<programlisting language='shell'>
-	LIBXML2_DIR = 
-	LIBXSLT_DIR = 
+	ZLIB_DIR = C:\zlib-1.2.5.win32
+	ICONV_DIR = C:\iconv-1.9.2.win32
+	LIBXML2_DIR = C:\libxml2-2.7.8.win32
+	LIBXSLT_DIR = C:\libxslt-1.1.26.win32
 					</programlisting>
 				</para>
 
