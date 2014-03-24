@@ -1011,7 +1011,7 @@ conversion of XML data.
 
 The textwolf library is embedded in the subdirectory 3rdParty/textwolf.
 
-You enable the building of a loadable Textfolw filtering module with:
+You enable the building of a loadable Textwolf filtering module with:
 
         make WITH_TEXTWOLF=1
 
