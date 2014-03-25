@@ -864,17 +864,77 @@
 	ICU_DIR = C:\icu4c-52_1-Win32-msvc10\icu
 					</programlisting>
 				</para>
+
+				<para>
+					You also have to build your own version of Boost, meaning the 'boost-locale'
+					library has to be built with ICU support enabled and you have to enable the
+					'regex' and the 'locale' boost libraries too:
 				
-<!-- TODO: build Boost with pre-built ICU -->
-				
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time --with-locale --with-regex ^
+		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
+		architecture=x86 address-model=64 toolset=msvc 
+		install
+					</programlisting>
+
+				</para>
+
+				<para>
+					<emphasis role="bold">Note</emphasis>: The packages from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>) do not
+					contain debug versions of the library. If you want to build a debugging version of 
+					<application>Wolframe</application> you have to build your own version of ICU.
+				</para>
+								
 			</sect3>
 			
 			<sect3>
 				<title>Build you own version of ICU</title>
+
+				<para>
+					You have to get the ZIP file with the Windows sources called
+					<filename>icu4c-51_1-src.zip</filename> from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>.
+					Unpack it for instance to <filename>C:\icu4c-52_1-src</filename>.
+				</para>
 				
 				<para>
-					TODO
+					Open the solution file <filename>icu\source\allinone\allinone.sln</filename>.
+					Build the desired version (Release or Debug, 32-bit or 64-bit).
 				</para>
+				
+				<para>
+					Best is to copy the resulting artifacts into a directory
+					like <filename>C:\icu4c-52_1-win32-debug</filename>. Copy in
+					there the <filename>include</filename>, <filename>bin</filename>
+					and <filename>lib</filename> directories.					
+				</para>
+				
+				<para>
+					Adapt the 'ICU_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	ICU_LIB_VERSION = 52
+	ICU_DIR = C:\icu4c-52_1-win32-debug
+					</programlisting>
+				</para>
+					
+<!-- TODO:
+ 
+In between salvage the generated artifacts:
+mkdir /cygdrive/c/<somewhere>/icu-49.1.2-win32-debug
+cp -a include /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+cp -a bin /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+cp -a lib /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+
+configure 'makefile\nmake\config.mk' and 
+set ICU_DIR to C:\<somwhere>\icu-49.1.2-win32-debug
+
+-->					
 
 <!-- TODO: build Boost with compiled version of ICU -->
 

@@ -111,7 +111,7 @@ For building the documentation and manpages you need:
 
 1.2. Basic build instructions
 
-Wolframe is build and installed by simply calling:
+Wolframe is built and installed by simply calling:
 
         make
         make install

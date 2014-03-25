@@ -181,7 +181,7 @@
 			<title>Basic build instructions</title>
 			
 		<para>
-			<application>Wolframe</application> is build and installed by simply calling:
+			<application>Wolframe</application> is built and installed by simply calling:
 
 		        <programlisting language='shell'>
 	make
