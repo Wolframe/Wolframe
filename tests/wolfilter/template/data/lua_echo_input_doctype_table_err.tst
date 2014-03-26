@@ -1,7 +1,7 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
-expecterror="try to read input twice"
+expecterror="try to use iterator for input/document twice"
 docin=employee_assignment_doctype_2			# input document name
 testcmd="-c wolframe.conf run"				# command to execute by the test
 testdata="

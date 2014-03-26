@@ -58,20 +58,27 @@ static void getDescription_( lua_State *ls, int index, std::string& rt)
 		case LUA_TUSERDATA:
 			rt.append( " userdata ");
 			lua_pushvalue( ls, index);		///...STK: udata
-			lua_getmetatable( ls, -1);		///...STK: udata mt
-			lua_pushliteral( ls, "__tostring");	///...STK: udata mt __tostring
-			lua_rawget( ls, -2);			///...STK: udata mt mt[__tostring]
-			if (lua_isnil( ls, -1))
+			if (!lua_getmetatable( ls, index))	///...STK: udata mt
 			{
-				lua_pop( ls, 3);		///... STK:
+				rt.append( "(lightuserdata)");
+				lua_pop( ls, 1);
 			}
 			else
 			{
-				rt.append( " ");
-				lua_pushvalue( ls, -3);		///... STK: udata mt mt[__tostring] udata
-				lua_call( ls, 1, 1);		///... STK: udata mt str
-				rt.append( lua_tostring( ls, -1));
-				lua_pop( ls, 3);		///... STK:
+				lua_pushliteral( ls, "__tostring");	///...STK: udata mt __tostring
+				lua_rawget( ls, -2);			///...STK: udata mt mt[__tostring]
+				if (lua_isnil( ls, -1))
+				{
+					lua_pop( ls, 3);		///... STK:
+				}
+				else
+				{
+					rt.append( " ");
+					lua_pushvalue( ls, -3);		///... STK: udata mt mt[__tostring] udata
+					lua_call( ls, 1, 1);		///... STK: udata mt str
+					rt.append( lua_tostring( ls, -1));
+					lua_pop( ls, 3);		///... STK:
+				}
 			}
 			break;
 
