@@ -58,8 +58,9 @@ public:
 	};
 
 	///\brief Constructor
-	TypedInputFilter()
+	explicit TypedInputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
+		,FilterBase(name_)
 		,m_state(InputFilter::Open)
 		,m_data(0){}
 
@@ -120,8 +121,9 @@ public:
 	typedef OutputFilter::State State;
 
 	///\brief Constructor
-	TypedOutputFilter()
+	explicit TypedOutputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
+		,FilterBase(name_)
 		,m_state(OutputFilter::Open) {}
 
 	///\brief Copy constructor

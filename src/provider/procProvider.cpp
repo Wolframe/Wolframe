@@ -221,13 +221,6 @@ cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name 
 	return rt;
 }
 
-cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::string& name ) const
-{
-	cmdbind::IOFilterCommandHandler* rt = m_impl->iofilterhandler( name );
-	if (rt) rt->setProcProvider( this);
-	return rt;
-}
-
 db::Database* ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();

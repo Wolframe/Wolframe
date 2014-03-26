@@ -94,6 +94,7 @@ struct TransactionFunction::Impl
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:utils::TypeSignature("database::TransactionFunctionInput", __LINE__)
+	,TypedOutputFilter("dbinput")
 	,m_structure( new Structure( &func_->impl().m_tagmap))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}

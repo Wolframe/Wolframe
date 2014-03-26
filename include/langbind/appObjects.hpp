@@ -124,30 +124,17 @@ public:
 
 	//\brief Copy constructor
 	//\param[in] o copied item
-	Input( const Input& o)
-		:utils::TypeSignature(o)
-		,m_used(o.m_used)
-		,m_inputfilter(o.m_inputfilter)
-		,m_docformat(o.m_docformat)
-		,m_content(o.m_content){}
+	Input( const Input& o);
 
 	//\brief Constructor by input filter
 	//\param[in] inputfilter_ input filter reference
 	//\param[in] docformat_ document format
-	Input( const InputFilterR& inputfilter_, const std::string& docformat_)
-		:utils::TypeSignature("langbind::Input", __LINE__)
-		,m_used(false)
-		,m_inputfilter(inputfilter_)
-		,m_docformat(docformat_){}
+	Input( const InputFilterR& inputfilter_, const std::string& docformat_);
 
 	//\brief Constructor by content
 	//\param[in] docformat_ document format
 	//\param[in] content_ content string
-	Input( const std::string& docformat_, const std::string& content_)
-		:utils::TypeSignature("langbind::Input", __LINE__)
-		,m_used(false)
-		,m_docformat(docformat_)
-		,m_content(new std::string(content_)){}
+	Input( const std::string& docformat_, const std::string& content_);
 
 	//\brief Destructor
 	~Input(){}
@@ -168,15 +155,27 @@ public:
 	//\return the input filter reference
 	InputFilterR& getIterator();
 
-	//\brief Get content source string is input is not from network
-	//\return the content string or empty, if not defined
-	const boost::shared_ptr<std::string>& content() const	{return m_content;}
+	//\brief Eval if this represents a document
+	//\return true, if yes
+	bool isDocument() const				{return !m_isProcessorInput;}
+	//\brief Get content source string if input is not from network
+	//\return the content string pointer or NULL, if not defined
+	const char* documentptr() const			{return m_isProcessorInput?0:m_content.get();}
+	//\brief Get size of the content source string if input is not from network
+	//\return the content string size or 0, if not defined
+	std::size_t documentsize() const		{return m_isProcessorInput?0:m_contentsize;}
+
+	//\brief Allocate a copy of the content to the input for a filter attached
+	//\return the copy (managed by the input object)
+	const void* allocContentCopy( const void* ptr, std::size_t size);
 
 private:
 	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 	std::string m_docformat;			//< document format as recognized by the document type detection as string {"xml","json",...}
-	boost::shared_ptr<std::string> m_content;	//< content source string is input is not from network
+	boost::shared_ptr<char> m_content;		//< content source string is input is not from network
+	std::size_t m_contentsize;			//< size of content in bytes
+	bool m_isProcessorInput;			//< true, if this Input object represents a document and not the processor input
 };
 
 

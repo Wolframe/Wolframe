@@ -60,7 +60,7 @@ public:
 
 	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
 		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter(attr)
+		,OutputFilter("libxslt",attr)
 		,m_xsltMapper(xsltMapper_)
 		,m_nofroot(0)
 		,m_taglevel(0)
@@ -69,7 +69,7 @@ public:
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter(attr)
+		,OutputFilter("libxml2",attr)
 		,m_nofroot(0)
 		,m_taglevel(0)
 		,m_elemitr(0)

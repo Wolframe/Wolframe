@@ -48,6 +48,7 @@ public:
 	///\brief Constructor
 	explicit ToStringFilter( const std::string indentstr_="")
 		:utils::TypeSignature("langbind::ToStringFilter", __LINE__)
+		,TypedOutputFilter("tostring")
 		,m_lasttype(FilterBase::OpenTag)
 		,m_indentstr(indentstr_) {}
 

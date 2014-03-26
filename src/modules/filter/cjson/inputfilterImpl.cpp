@@ -41,14 +41,41 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool InputFilterImpl::getValue( const char* name, std::string& val) const
+void InputFilterImpl::getRest( const void*& ptr, std::size_t& size, bool& end)
 {
-	if (std::strcmp(name,"encoding") == 0 && m_encattr_defined)
+	if (m_root.get())
+	{
+		if (m_stk.size() == 1
+			&& m_stk.back().m_node == m_firstnode
+			&& m_stk.back().m_state == StackElement::StateOpen)
+		{
+			//... initial state, no element fetched yet
+			ptr = (const void*)m_content.c_str();
+			size = m_content.size();
+		}
+		else
+		{
+			ptr = 0;
+			size = 0;
+		}
+		end = true;
+	}
+	else
+	{
+		ptr = (const void*)m_content.c_str();
+		size = m_content.size();
+		end = false;
+	}
+}
+
+bool InputFilterImpl::getValue( const char* id, std::string& val) const
+{
+	if (std::strcmp(id,"encoding") == 0 && m_encattr_defined)
 	{
 		val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
 		return true;
 	}
-	return false;
+	return Parent::getValue( id, val);
 }
 
 bool InputFilterImpl::getDocType( types::DocType& doctype)
@@ -81,9 +108,9 @@ const char* InputFilterImpl::getEncoding() const
 	return types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
 }
 
-bool InputFilterImpl::setValue( const char* name, const std::string& value)
+bool InputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	return Parent::setValue( name, value);
+	return Parent::setValue( id, value);
 }
 
 static types::String::Encoding guessCharsetEncoding( const void* content, std::size_t contentsize)
@@ -150,34 +177,34 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		m_encattr_defined = true;
 		m_root = parse( origcontent);
 
-		const cJSON* first = m_root.get();
+		m_firstnode = m_root.get();
 		int nof_docattributes = 0;
 		bool encodingParsed = false;
 
-		if (!first->string && !first->valuestring && !first->next && first->type == cJSON_Object)
+		if (!m_firstnode->string && !m_firstnode->valuestring && !m_firstnode->next && m_firstnode->type == cJSON_Object)
 		{
 			//CJSON creates a toplevel object for multiple root nodes:
-			first = first->child;
+			m_firstnode = m_firstnode->child;
 		}
 		const char* rootelem = 0;
 		const char* doctypeid = 0;
 		
 		for (;;)
 		{
-			if (first->string && first->valuestring)
+			if (m_firstnode->string && m_firstnode->valuestring)
 			{
-				if (boost::iequals("doctype",first->string))
+				if (boost::iequals("doctype",m_firstnode->string))
 				{
 					++nof_docattributes;
 					if (doctypeid) throw std::runtime_error("duplicate 'doctype' definition");
-					doctypeid = first->valuestring;
-					first = first->next;
+					doctypeid = m_firstnode->valuestring;
+					m_firstnode = m_firstnode->next;
 					continue;
 				}
-				else if (boost::iequals("encoding", first->string))
+				else if (boost::iequals("encoding", m_firstnode->string))
 				{
 					++nof_docattributes;
-					types::String::EncodingAttrib ea = types::String::getEncodingFromName( first->valuestring);
+					types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
 					if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
 					{
 						// ... encoding different than guessed. Parse again
@@ -185,21 +212,21 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 						encodingParsed = true;
 						m_encattr = ea;
 						m_root = parse( origcontent);
-						first = m_root.get();
-						while (first && nof_docattributes--) first = first->next;
+						m_firstnode = m_root.get();
+						while (m_firstnode && nof_docattributes--) m_firstnode = m_firstnode->next;
 					}
 					else
 					{
-						first = first->next;
+						m_firstnode = m_firstnode->next;
 					}
 					continue;
 				}
 			}
 			break;
 		}
-		if (first->string && !first->next)
+		if (m_firstnode->string && !m_firstnode->next)
 		{
-			rootelem = first->string;
+			rootelem = m_firstnode->string;
 		}
 		if (doctypeid)
 		{
@@ -212,7 +239,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				throw std::runtime_error( "document type defined, but no singular root element");
 			}
 		}
-		m_stk.push_back( StackElement( first));
+		m_stk.push_back( StackElement( m_firstnode));
 	}
 }
 
