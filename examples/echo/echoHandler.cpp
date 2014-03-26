@@ -41,10 +41,10 @@ echoConnection::echoConnection( const net::LocalEndpoint& local, unsigned short 
 			abort();
 	}
 
-	state_ = NEW;
-	dataStart_ = NULL;
-	dataSize_ = 0;
-	idleTimeout_ = timeout;
+	m_state = NEW;
+	m_dataStart = NULL;
+	m_dataSize = 0;
+	m_idleTimeout = timeout;
 }
 
 
@@ -95,66 +95,66 @@ void echoConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation echoConnection::nextOperation()
 {
-	switch( state_ )	{
+	switch( m_state )	{
 	case NEW:	{
-		state_ = HELLO_SENT;
+		m_state = HELLO_SENT;
 		return net::NetworkOperation( net::SendString( "Welcome to Wolframe.\n" ));
 	}
 
 	case HELLO_SENT:	{
-		state_ = READ_INPUT;
-		return net::NetworkOperation( net::ReadData( readBuf_, ReadBufSize, idleTimeout_ ));
+		m_state = READ_INPUT;
+		return net::NetworkOperation( net::ReadData( m_readBuf, ReadBufSize, m_idleTimeout ));
 	}
 
 	case READ_INPUT:
-		dataStart_ = readBuf_;
+		m_dataStart = m_readBuf;
 		// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
 
 	case OUTPUT_MSG:
-		if ( !strncmp( "quit", dataStart_, 4 ))	{
-			state_ = TERMINATING;
+		if ( !strncmp( "quit", m_dataStart, 4 ))	{
+			m_state = TERMINATING;
 			return net::NetworkOperation( net::SendString( "Thank you for using Wolframe.\n" ));
 		}
 		else	{
-			char *s = dataStart_;
-			for ( std::size_t i = 0; i < dataSize_; i++ )	{
+			char *s = m_dataStart;
+			for ( std::size_t i = 0; i < m_dataSize; i++ )	{
 				if ( *s == '\n' )	{
 					s++;
-					outMsg_ = std::string( dataStart_, s - dataStart_ );
-					dataSize_ -= s - dataStart_;
-					dataStart_ = s;
-					state_ = OUTPUT_MSG;
-					return net::NetworkOperation( net::SendString( outMsg_ ));
+					m_outMsg = std::string( m_dataStart, s - m_dataStart );
+					m_dataSize -= s - m_dataStart;
+					m_dataStart = s;
+					m_state = OUTPUT_MSG;
+					return net::NetworkOperation( net::SendString( m_outMsg ));
 				}
 				s++;
 			}
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
-			if ( dataSize_ >= ReadBufSize )	{
-				state_ = TERMINATING;
+			if ( m_dataSize >= ReadBufSize )	{
+				m_state = TERMINATING;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
-				memmove( readBuf_, dataStart_, dataSize_ );
-				state_ = READ_INPUT;
-				return net::NetworkOperation( net::ReadData( readBuf_ + dataSize_,
-									     ReadBufSize - dataSize_,
-									     idleTimeout_ ));
+				memmove( m_readBuf, m_dataStart, m_dataSize );
+				m_state = READ_INPUT;
+				return net::NetworkOperation( net::ReadData( m_readBuf + m_dataSize,
+									     ReadBufSize - m_dataSize,
+									     m_idleTimeout ));
 			}
 		}
 
 	case TIMEOUT_OCCURED:	{
-		state_ = TERMINATING;
+		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
 
 	case SIGNALLED:	{
-		state_ = TERMINATING;
+		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
 	}
 
 	case TERMINATING:	{
-		state_ = FINISHED;
+		m_state = FINISHED;
 		return net::NetworkOperation( net::CloseConnection() );
 	}
 
@@ -171,7 +171,7 @@ const net::NetworkOperation echoConnection::nextOperation()
 /// input has been consumed.
 void echoConnection::networkInput( const void*, std::size_t bytesTransferred )
 {
-	dataSize_ += bytesTransferred;
+	m_dataSize += bytesTransferred;
 }
 
 
@@ -179,38 +179,38 @@ void echoConnection::signalOccured( NetworkSignal signal )
 {
 	switch( signal )	{
 		case TIMEOUT:
-			state_ = TIMEOUT_OCCURED;
+			m_state = TIMEOUT_OCCURED;
 			LOG_TRACE << "Processor received timeout signal";
 			break;
 
 		case TERMINATE:
-			state_ = SIGNALLED;
+			m_state = SIGNALLED;
 			LOG_TRACE << "Processor received terminate signal";
 			break;
 
 		case END_OF_FILE:
 			LOG_TRACE << "Processor received EOF (read on closed connection)";
-			state_ = TERMINATING;
+			m_state = TERMINATING;
 			break;
 
 		case BROKEN_PIPE:
 			LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
-			state_ = TERMINATING;
+			m_state = TERMINATING;
 			break;
 
 		case CONNECTION_RESET:
 			LOG_TRACE << "Processor received CONNECTION RESET (connection closed by peer)";
-			state_ = TERMINATING;
+			m_state = TERMINATING;
 			break;
 
 		case OPERATION_CANCELLED:
 			LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
-			state_ = TERMINATING;
+			m_state = TERMINATING;
 			break;
 
 		case UNKNOWN_ERROR:
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
-			state_ = TERMINATING;
+			m_state = TERMINATING;
 			break;
 	}
 }

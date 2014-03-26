@@ -45,21 +45,18 @@ namespace crypto {
 class PBKDF2_HMAC_SHA1
 {
 public:
- /// Build the PBKDF2 with HMAC-SHA1
- /// \param	key	byte array
- ///
- ///
-	/// \note	All PBKDF2 constructors treat the string arguments differently.
-	///		The seed is base64 encoded while the password is plain text.
-	///		The base64 encoding can be witn padding or without
-	PBKDF2_HMAC_SHA1( const unsigned char* key, size_t keySize,
-			  const unsigned char* password, size_t pwdSize,
+ /// \note	PBKDF2 constructors treat the string arguments differently.
+ ///		The salt is base64 encoded while the password is plain text.
+ ///		The base64 encoding can be with padding or without
+
+	PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize,
+			  const unsigned char* salt, size_t saltSize,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const std::string& key, const std::string& password,
+	PBKDF2_HMAC_SHA1( const std::string& password, const std::string& salt,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const unsigned char* key, size_t keySize, const std::string& password,
+	PBKDF2_HMAC_SHA1( const std::string& password, const unsigned char* salt, size_t saltSize,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const std::string& key, const unsigned char* password, size_t pwdSize,
+	PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize, const std::string& salt,
 			  std::size_t dkLen, unsigned int rounds );
 
 	/// \note The string is a base64 representation of the hash

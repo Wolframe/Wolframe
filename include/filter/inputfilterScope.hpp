@@ -49,11 +49,13 @@ public:
 	///\brief Constructor
 	InputFilterScope()
 		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
+		,InputFilter("scope")
 		,m_taglevel(0){}
 
 	///\brief Constructor
 	explicit InputFilterScope( const InputFilterR& i)
 		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
+		,InputFilter(i->name())
 		,m_inputfilter(i)
 		,m_taglevel(1)
 	{
@@ -79,6 +81,13 @@ public:
 		return new InputFilterScope(*this);
 	}
 
+	//\brief Implement InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterScope( m_inputfilter);
+	}
+
+	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void*, std::size_t, bool)
 	{
 		throw std::logic_error( "put input to an input filter scope");

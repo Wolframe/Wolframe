@@ -61,7 +61,7 @@ struct XsltFilter :public Filter
 	{
 		XsltMapper xsltmapper( stylesheet_, arg);
 		InputFilterImpl impl( xsltmapper);
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
+		m_inputfilter.reset( new BufferingInputFilter( &impl, "libxslt"));
 		m_outputfilter.reset( new OutputFilterImpl( xsltmapper));
 	}
 };

@@ -351,10 +351,10 @@
 
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 				</para>
@@ -372,11 +372,11 @@
 				
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time --with-locale --with-regex ^
 		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 
@@ -423,7 +423,7 @@
 				</para>
 				
 				<para>
-					Install the developer version from for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>
+					Install the developer version (for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>)
 					for instance to <filename>C:\OpenSSL-Win32</filename>.
 				</para>
 				
@@ -747,7 +747,7 @@
 	PYTHON_VERSION = 34
 	PYTHON_MAJOR_VERSION = 3
 	PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
-	PYTHON_DLL_DIR = $(PYTHON_DIR)\DDLs	
+	PYTHON_DLL_DIR = $(PYTHON_DIR)\DDLs
 					</programlisting>
 				</para>
 
@@ -761,6 +761,12 @@
 				
 				</para>
 				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
+					<ulink url="http://python.org/">http://python.org</ulink>) do not
+					contain debug versions of the library. If you want to build a debugging version of 
+					<application>Wolframe</application> you have to build your own version of Python.
+				</para>
 			</sect3>
 							
 		</sect2>
@@ -872,18 +878,18 @@
 				
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time --with-locale --with-regex ^
 		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 
 				</para>
 
 				<para>
-					<emphasis role="bold">Note</emphasis>: The packages from
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
 					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>) do not
 					contain debug versions of the library. If you want to build a debugging version of 
 					<application>Wolframe</application> you have to build your own version of ICU.

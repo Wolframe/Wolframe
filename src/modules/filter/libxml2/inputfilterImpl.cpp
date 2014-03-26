@@ -37,19 +37,19 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool InputFilterImpl::getValue( const char* name, std::string& val) const
+bool InputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp( name, "empty") == 0)
+	if (std::strcmp( id, "empty") == 0)
 	{
 		val = m_withEmpty?"true":"false";
 		return true;
 	}
-	return InputFilter::getValue( name, val);
+	return InputFilter::getValue( id, val);
 }
 
-bool InputFilterImpl::setValue( const char* name, const std::string& value)
+bool InputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	if (std::strcmp( name, "empty") == 0)
+	if (std::strcmp( id, "empty") == 0)
 	{
 		if (std::strcmp( value.c_str(), "true") == 0)
 		{
@@ -65,7 +65,7 @@ bool InputFilterImpl::setValue( const char* name, const std::string& value)
 		}
 		return true;
 	}
-	return InputFilter::setValue( name, value);
+	return InputFilter::setValue( id, value);
 }
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)

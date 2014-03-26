@@ -56,7 +56,9 @@ struct InputFilterImpl :public InputFilter
 
 	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
+		,InputFilter("cjson")
 		,m_encattr_defined(false)
+		,m_firstnode(0)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -69,6 +71,7 @@ struct InputFilterImpl :public InputFilter
 		,m_encattr_defined(o.m_encattr_defined)
 		,m_doctype(o.m_doctype)
 		,m_root(o.m_root)
+		,m_firstnode(o.m_firstnode)
 		,m_stk(o.m_stk)
 		{}
 
@@ -79,6 +82,14 @@ struct InputFilterImpl :public InputFilter
 	{
 		return new InputFilterImpl(*this);
 	}
+	///\brief Implements InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl();
+	}
+
+	///\brief Implements InputFilter::getRest( const void*&,std::size_t&,bool&);
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end);
 
 	///\brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* name, std::string& val) const;
@@ -113,7 +124,8 @@ private:
 	types::String::EncodingAttrib m_encattr;	//< character set encoding attributes
 	bool m_encattr_defined;				//< true, if character set encoding is defined
 	types::DocType m_doctype;			//< document type
-	boost::shared_ptr<cJSON> m_root;
+	boost::shared_ptr<cJSON> m_root;		//< data structure holding the whole tree
+	const cJSON* m_firstnode;			//< first node (to detect if getNext has been called)
 
 	struct StackElement
 	{
@@ -128,11 +140,11 @@ private:
 			static const char* ar[] = {"StateOpen","StateAttributeValue","StateContentValue","StateChild","StateValue","StateNext","StateCheckEnd","StateReopen"};
 			return ar[i];
 		}
-		State m_state;
-		const cJSON* m_node;
-		const char* m_tag;
+		State m_state;				//< current state
+		const cJSON* m_node;			//< current node
+		const char* m_tag;			//< current tag name
 	};
-	std::vector<StackElement> m_stk;
+	std::vector<StackElement> m_stk;		//< state stack
 };
 
 }}//namespace

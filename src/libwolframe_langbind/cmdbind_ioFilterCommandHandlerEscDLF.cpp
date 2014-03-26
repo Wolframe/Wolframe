@@ -71,7 +71,7 @@ const char* IOFilterCommandHandlerEscDLF::interruptDataSessionMarker() const
 
 void IOFilterCommandHandlerEscDLF::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = protocol::InputBlock( (char*)buf, allocsize);
+	m_input.set( (char*)buf, allocsize);
 }
 
 void IOFilterCommandHandlerEscDLF::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)

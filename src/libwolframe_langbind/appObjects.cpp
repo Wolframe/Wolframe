@@ -49,6 +49,49 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
+Input::Input( const Input& o)
+	:utils::TypeSignature(o)
+	,m_used(o.m_used)
+	,m_inputfilter(o.m_inputfilter)
+	,m_docformat(o.m_docformat)
+	,m_content(o.m_content)
+	,m_contentsize(o.m_contentsize)
+	,m_isProcessorInput(o.m_isProcessorInput)
+{}
+
+Input::Input( const InputFilterR& inputfilter_, const std::string& docformat_)
+	:utils::TypeSignature("langbind::Input", __LINE__)
+	,m_used(false)
+	,m_inputfilter(inputfilter_)
+	,m_docformat(docformat_)
+	,m_contentsize(0)
+	,m_isProcessorInput(true)
+{}
+
+Input::Input( const std::string& docformat_, const std::string& content_)
+	:utils::TypeSignature("langbind::Input", __LINE__)
+	,m_used(false)
+	,m_docformat(docformat_)
+	,m_contentsize(0)
+	,m_isProcessorInput(false)
+{
+	char* mem = (char*)std::malloc( content_.size());
+	if (!mem) throw std::bad_alloc();
+	m_content = boost::shared_ptr<char>( mem, std::free);
+	m_contentsize = content_.size();
+	std::memcpy( mem, content_.c_str(), content_.size());
+}
+
+const void* Input::allocContentCopy( const void* ptr, std::size_t size)
+{
+	char* mem = (char*)std::malloc( size);
+	if (!mem) throw std::bad_alloc();
+	m_content = boost::shared_ptr<char>( mem, std::free);
+	m_contentsize = size;
+	std::memcpy( mem, ptr, size);
+	return m_content.get();
+}
+
 InputFilterR& Input::getIterator()
 {
 	if (m_used) throw std::runtime_error( "try to read input twice");

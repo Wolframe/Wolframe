@@ -42,8 +42,8 @@
 #include "crypto/HMAC.h"
 #include "crypto/PBKDF2.h"
 
-int pbkdf2_hmac_sha1( const unsigned char *salt, size_t saltLen,
-		      const unsigned char *password, size_t pwdLen,
+int pbkdf2_hmac_sha1( const unsigned char *password, size_t pwdLen,
+		      const unsigned char *salt, size_t saltLen,
 		      size_t dkLen, unsigned int rounds,
 		      unsigned char *derivedKey )
 {

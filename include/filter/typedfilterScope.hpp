@@ -48,10 +48,12 @@ public:
 	///\brief Constructor
 	TypedInputFilterScope()
 		:utils::TypeSignature("langbind::TypedInputFilterScope", __LINE__)
+		,TypedInputFilter("scope")
 		,m_taglevel(0){}
 
 	explicit TypedInputFilterScope( const TypedInputFilterR& i)
 		:utils::TypeSignature("langbind::TypedInputFilterScope", __LINE__)
+		,TypedInputFilter(i->name())
 		,m_inputfilter(i)
 		,m_taglevel(1)
 	{

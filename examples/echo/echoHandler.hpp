@@ -42,15 +42,15 @@ namespace _Wolframe {
 
 		static const std::size_t ReadBufSize = 8192;
 		/// The state of the processor FSM
-		State		state_;
+		State		m_state;
 		/// Read buffer
-		char		readBuf_[ ReadBufSize ];
-		char*		dataStart_;
-		std::size_t	dataSize_;
+		char		m_readBuf[ ReadBufSize ];
+		char*		m_dataStart;
+		std::size_t	m_dataSize;
 		/// Output buffer
-		std::string	outMsg_;
+		std::string	m_outMsg;
 		/// Idle timeout value
-		unsigned	idleTimeout_;
+		unsigned	m_idleTimeout;
 	};
 
 
