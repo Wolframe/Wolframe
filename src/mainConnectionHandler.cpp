@@ -46,9 +46,9 @@ using namespace _Wolframe::proc;
 
 enum State
 {
-	Unauthorized,
-	Authorization,
-	Authorized
+	Unauthenticated,
+	Authentication,
+	Authenticated
 };
 
 struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
@@ -56,15 +56,15 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
 	STM()
 	{
 		(*this)
-			[Unauthorized]
+			[Unauthenticated]
 				.cmd< &CommandHandler::doAuth >( "AUTH")
 				.cmd< &CommandHandler::doQuit >( "QUIT")
 				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
-			[Authorization]
+			[Authentication]
 				.cmd< &CommandHandler::doMech >( "MECH")
 				.cmd< &CommandHandler::doQuit >( "QUIT")
 				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
-			[Authorized]
+			[Authenticated]
 				.cmd< &CommandHandler::doRequest >( "REQUEST")
 				.cmd< &CommandHandler::doInterface >( "INTERFACE")
 				.cmd< &CommandHandler::doAuth >( "AUTH")
@@ -116,7 +116,7 @@ int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	else
 	{
 		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << "NONE" << endl();
-		return Authorization;
+		return Authentication;
 	}
 }
 
@@ -134,7 +134,7 @@ int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	{
 		out << "OK authorization" << endl();
 		m_authtickets.push_back( chnd->ticket());
-		return Authorized;
+		return Authenticated;
 	}
 }
 
@@ -152,14 +152,14 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	}
 	if (boost::iequals( std::string(argv[0]), "NONE"))
 	{
-		out << "OK authorization" << endl();
+		out << "OK authentication" << endl();
 		m_authtickets.push_back( "none");
-		return Authorized;
+		return Authenticated;
 	}
 	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
 	if (!authch)
 	{
-		out << "ERR no handler defined for authorization mechanism " << argv[0] << "'" << endl();
+		out << "ERR no handler defined for authentication mechanism " << argv[0] << "'" << endl();
 		return stateidx();
 	}
 	authch->setProcProvider( m_provider);

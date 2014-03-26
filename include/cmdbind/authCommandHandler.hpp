@@ -32,15 +32,17 @@
 ************************************************************************/
 ///\file authCommandHandler.hpp
 ///\brief Interface to AUTH command handler
+
 #ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
+
 #include "cmdbind/lineCommandHandler.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
 
 //\class AuthCommandHandler
-//\brief Command handler for the sub protocol for authorization
+//\brief Command handler for the sub protocol for authentication
 class AuthCommandHandler :public cmdbind::LineCommandHandlerTemplate<AuthCommandHandler>
 {
 public:
@@ -53,6 +55,7 @@ private:
 	std::string m_ticket;
 };
 
-}}//namespace
+}} //namespace
+
 #endif
 
