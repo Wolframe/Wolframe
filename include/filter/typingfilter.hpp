@@ -46,6 +46,7 @@ public:
 	///\brief Constructor
 	explicit TypingInputFilter( const InputFilterR& inp)
 		:utils::TypeSignature("langbind::TypingInputFilter", __LINE__)
+		,TypedInputFilter(inp->name())
 		,m_inputfilter(inp)
 	{
 		setFlags( inp->flags());
@@ -83,6 +84,7 @@ public:
 	///\brief Constructor
 	explicit TypingOutputFilter( const OutputFilterR& outp)
 		:utils::TypeSignature("langbind::TypingOutputFilter", __LINE__)
+		,TypedOutputFilter(outp->name())
 		,m_outputfilter(outp)
 	{
 		setFlags( outp->flags());

@@ -303,6 +303,7 @@ bool DDLStructSerializer::setFlags( Flags f)
 
 DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 	:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__)
+	,langbind::TypedInputFilter("serializer")
 	,m_st(st)
 {
 	if (!m_st) throw std::runtime_error( "empty form passed to serializer");

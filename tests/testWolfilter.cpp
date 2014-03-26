@@ -121,7 +121,7 @@ static std::string getOutputExpectedEolns( const std::string& output, const std:
 TEST_F( WolfilterTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
-	std::size_t ibar[ibarsize] = {127,2,3,5,7,11,13,17,19,23,41};
+	std::size_t ibar[ibarsize] = {4,127,5,7,11,13,17,19,23,41,43};
 	std::size_t obar[obarsize] = {127,4,5,7,11,13,17};
 	std::vector<std::string> tests;
 	std::size_t testno;

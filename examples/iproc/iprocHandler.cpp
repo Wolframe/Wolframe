@@ -224,10 +224,16 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "No processor provider set";
 								return net::CloseConnection();
 							}
-							cmdbind::IOFilterCommandHandler* hnd = m_provider->iofilterhandler( procname);
+							cmdbind::CommandHandler* chnd = m_provider->cmdhandler( procname);
+							if (!chnd)
+							{
+								LOG_ERROR << "command handler not found for '" << procname << "'";
+								return net::CloseConnection();
+							}
+							cmdbind::IOFilterCommandHandler* hnd = dynamic_cast<cmdbind::IOFilterCommandHandler*>( chnd);
 							if (!hnd)
 							{
-								LOG_ERROR << "io filter command handler not found for '" << procname << "'";
+								LOG_ERROR << "command handler for '" << procname << "' is not an iofilter command handler";
 								return net::CloseConnection();
 							}
 							langbind::Filter* flt = m_provider->filter( "char");

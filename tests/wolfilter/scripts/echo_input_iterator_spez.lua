@@ -10,7 +10,7 @@ function run()
 	for v,t in itr do
 		if t == "image" then
 			output:opentag( t)
-			process_image( scope( itr))
+			process_image( iterator.scope( itr))
 			output:closetag()
 		else
 			output:print( v, t)

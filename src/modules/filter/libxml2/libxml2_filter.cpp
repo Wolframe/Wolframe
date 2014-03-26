@@ -44,7 +44,7 @@ struct Libxml2Filter :public Filter
 	Libxml2Filter( const char* encoding=0)
 	{
 		InputFilterImpl impl;
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
+		m_inputfilter.reset( new BufferingInputFilter( &impl,"libxml2"));
 		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
 		m_outputfilter.reset( oo);
 		if (encoding)

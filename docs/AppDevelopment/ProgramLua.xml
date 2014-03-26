@@ -287,7 +287,8 @@
 		return nodes of the tree as subtree objects but only the node data in the
 		order of a pre-order traversal. You can recursively iterate on the tree
 		and build the object during traversal if you want.
-		The returned elements of the serialization iterators are tuples with the following meaning:
+		The returned elements of the serialization iterators are tuples 
+		with the following meaning:
 	</para>
 	<table frame="all" width="100%">
 		<title>Serialization Iterator Elements</title>
@@ -327,13 +328,46 @@
 	</sect2>
 
 	<sect2>
+	<title>Iterator Library</title>
+	<para><application>Wolframe</application> lets you access serialization
+		iterators through a library called <code>iterator</code> 
+		offering the following functions:
+
+		<table frame="all" width="100%">
+			<title>Method</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Parameter</entry>
+					<entry>Returns</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>scope</entry>
+					<entry>serialization iterator (*)</entry>
+					<entry>An iterator restricted on the subnodes of the last visited node (**)</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+	</para>
+	<para>
+		(*) See section "Serialization Iterator"
+	</para>
+	<para>
+		(**) If iterator.scope is called, all elements of the returned iterator has to be visited in order to continue 
+		iteration with the origin iterator on which iterator.scope was called.
+	</para>
+	</sect2>
+
+	<sect2>
 	<title>Global Objects</title>
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
-		<member>scope</member><member>function with an serialization iterator as 
-		argument returning a serialization iterator on the currently visited node 
-		and its children taking ownership on this sub scope</member>
 		<member>logger</member><member>object with methods for logging or debugging</member>
 		</simplelist>
 	</para>

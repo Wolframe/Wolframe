@@ -1488,24 +1488,37 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 	InputFilter* ff = 0;
 	if (filter->inputfilter().get())
 	{
-		ff = filter->inputfilter()->copy();
-		if (input->inputfilter().get())
+		ff = filter->inputfilter()->initcopy();
+		if (input->isDocument())
+		{
+			input->inputfilter().reset( ff);
+			const char* cstr = input->documentptr();
+			std::size_t csize = input->documentsize();
+			ff->putInput( cstr, csize, true);
+		}
+		else if (input->inputfilter().get())
 		{
 			//... old filter defined, then assign the rest of the input to the new filter attached
 			const void* chunk;
 			std::size_t chunksize;
 			bool chunkend;
 			input->inputfilter()->getRest( chunk, chunksize, chunkend);
-			ff->putInput( chunk, chunksize, chunkend);
+			try
+			{
+				chunk = input->allocContentCopy( chunk, chunksize);
+				ff->putInput( chunk, chunksize, chunkend);
+			}
+			catch (const std::runtime_error& e)
+			{
+				delete ff;
+				throw e;
+			}
+			catch (const std::bad_alloc& e)
+			{
+				delete ff;
+				throw e;
+			}
 			input->inputfilter().reset( ff);
-		}
-		else if (input->content().get())
-		{
-			//... in case of a document assign its content to the processing filter
-			input->inputfilter().reset( ff);
-			const char* cstr = input->content()->c_str();
-			std::size_t csize = input->content()->size();
-			ff->putInput( cstr, csize, true);
 		}
 		else
 		{
@@ -2496,6 +2509,12 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{0,0}
 };
 
+static const luaL_Reg iterator_methodtable[ 2] =
+{
+	{"scope",&function_scope},
+	{0,0}
+};
+
 static const luaL_Reg customvalue_methodtable[ 16] =
 {
 	{"__index", &function_customtype_index},
@@ -2728,8 +2747,11 @@ void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provid
 
 		if (provider_) setProcessorProvider( m_ls, provider_);
 		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
-		lua_pushcfunction( m_ls, &function_scope);
-		lua_setglobal( m_ls, "scope");
+
+		//Register iterator context:
+		lua_newtable( m_ls);
+		luaL_setfuncs( m_ls, iterator_methodtable, 0);
+		lua_setglobal( m_ls, "iterator");
 
 		//Register provider context:
 		lua_newtable( m_ls);

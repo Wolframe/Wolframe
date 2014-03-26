@@ -107,6 +107,7 @@
 </invoice>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
 
+**requires:LIBHPDF
 **file:wolframe.conf
 LoadModules
 {

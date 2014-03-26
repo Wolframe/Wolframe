@@ -133,6 +133,7 @@ LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
 
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+	,TypedInputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
@@ -464,6 +465,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
 	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+	,TypedOutputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_type(OpenTag)

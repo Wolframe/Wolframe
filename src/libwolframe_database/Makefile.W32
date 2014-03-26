@@ -53,6 +53,7 @@ wolframe_database.lib: $(OBJS) $(CPP_OBJS)
 local_all:
 
 local_clean:
+	-@erase transactionfunction\*.obj >NUL 2>NUL
 
 local_distclean:
 

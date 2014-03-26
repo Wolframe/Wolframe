@@ -46,6 +46,7 @@ public:
 	///\brief Constructor
 	explicit SingleElementInputFilter( const types::VariantConst& e)
 		:utils::TypeSignature("langbind::SingleElementInputFilter", __LINE__)
+		,TypedInputFilter("single")
 		,m_element(e)
 		,m_consumed(false){}
 

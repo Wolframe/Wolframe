@@ -47,9 +47,10 @@ class FilterBase
 	:public virtual utils::TypeSignature
 {
 public:
-	FilterBase()
+	explicit FilterBase( const char* name_)
 		:utils::TypeSignature("langbind::FilterBase", __LINE__)
 		,m_flags(None)
+		,m_name(name_)
 	{
 		m_errorbuf[0] = '\0';
 	}
@@ -57,6 +58,7 @@ public:
 	FilterBase( const FilterBase& o)
 		:utils::TypeSignature("langbind::FilterBase", __LINE__)
 		,m_flags(o.m_flags)
+		,m_name(o.m_name)
 	{
 		setError( o.m_errorbuf);
 	}
@@ -145,10 +147,13 @@ public:
 	///\brief Reset set all flags
 	void resetFlags()				{m_flags = None;}
 
+	const char* name() const			{return m_name;}
+
 private:
 	enum {ErrorBufSize=128};		//< maximum size of error string
 	char m_errorbuf[ ErrorBufSize];		//< error string
 	Flags m_flags;				//< flags
+	const char* m_name;			//< name of the filter
 };
 
 }}//namespace

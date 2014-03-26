@@ -80,12 +80,26 @@ public:
 		std::size_t chunksize;
 		bool chunkend;
 		m_inputfilter->getRest( chunk, chunksize, chunkend);
-		m_inputfilter.reset( in->copy());
-		m_inputfilter->putInput( chunk, chunksize, chunkend);
+		langbind::InputFilter* incopy = in->copy();
+		try
+		{
+			incopy->putInput( chunk, chunksize, chunkend);
+		}
+		catch (const std::bad_alloc& e)
+		{
+			delete incopy;
+			throw e;
+		}
+		catch (const std::runtime_error& e)
+		{
+			delete incopy;
+			throw e;
+		}
+		m_inputfilter.reset( incopy);
 		// synchronize attributes:
 		if (m_outputfilter.get())
 		{
-			m_outputfilter->setAttributes( m_inputfilter.get());
+			m_outputfilter->setAttributes( incopy);
 		}
 	}
 

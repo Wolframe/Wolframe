@@ -91,7 +91,7 @@ public:
 
 		do	{
 			input.read( (char *)plain, m_bufferSize );
-			dataSize = input.gcount();
+			dataSize = (int)input.gcount();
 			//
 			codedSize = encodeChunk( plain, dataSize, encoded, 2 * m_bufferSize );
 			output.write( encoded, codedSize );
@@ -110,6 +110,12 @@ private:
 
 	base64_EncodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:	
+	Encoder& operator=( const Encoder &o );
+#endif
 };
 
 
@@ -148,7 +154,7 @@ public:
 		do
 		{
 			input.read( encoded, m_bufferSize );
-			encodedSize = input.gcount();
+			encodedSize = (int)input.gcount();
 			dataSize = decode( encoded, encodedSize, data, m_bufferSize );
 			output.write( (const char*)data, dataSize );
 		} while ( input.good() && encodedSize > 0 );
@@ -161,6 +167,12 @@ public:
 private:
 	base64_DecodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:	
+	Decoder& operator=( const Decoder &o );
+#endif
 };
 
 }} // namespace _Wolframe::base64

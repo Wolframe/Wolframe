@@ -94,7 +94,7 @@ static types::VariantConst resolveResultReference( const TransactionOutput& outp
 		}
 		else
 		{
-			cidx = reference.touint();
+			cidx = static_cast<std::size_t>( reference.touint());
 			if (cidx == 0)
 			{
 				db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(41), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. column name must be >= 1", "internal logic error (transaction function variable reference)");
@@ -130,7 +130,7 @@ static types::VariantConst resolveResultIteratorReference( const TransactionOutp
 	}
 	else
 	{
-		cidx = reference.touint();
+		cidx = static_cast<size_t>( reference.touint());
 		if (cidx == 0)
 		{
 			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");

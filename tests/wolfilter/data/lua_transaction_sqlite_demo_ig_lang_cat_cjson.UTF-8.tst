@@ -575,7 +575,7 @@ function insert_tree( parentid, itr)
 			idcnt = idcnt + 1
 		end
 		if (t == "class") then
-			insert_tree( id, scope( itr))
+			insert_tree( id, iterator.scope( itr))
 		end
 	end
 end
@@ -736,7 +736,7 @@ function run()
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_tree( idcnt, scope( itr))
+			insert_tree( idcnt, iterator.scope( itr))
 		end
 	end
 	output:opentag( "result")

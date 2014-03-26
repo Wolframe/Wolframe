@@ -61,8 +61,9 @@ public:
 	};
 
 	///\brief Default constructor
-	explicit OutputFilter( const ContentFilterAttributes* attr_=0)
+	OutputFilter( const char* name_, const ContentFilterAttributes* attr_=0)
 		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
+		,FilterBase(name_)
 		,m_state(Open)
 		,m_buf(0)
 		,m_size(0)

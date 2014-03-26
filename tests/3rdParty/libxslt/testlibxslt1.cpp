@@ -12,11 +12,17 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
+	LIBXML_TEST_VERSION
+	
 	xsltStylesheetPtr script = xsltParseStylesheetFile( ( const xmlChar *)argv[1] );
 	xmlDocPtr doc = xmlParseFile( argv[2] );
 	const char *params[1] = { NULL };
 	xmlDocPtr res = xsltApplyStylesheet( script, doc, params );
-	xsltSaveResultToFile( stdout, res, script );
+
+	xmlChar *resTxt;
+	int resLen;
+	xsltSaveResultToString( &resTxt, &resLen, res, script );
+	std::cout << resTxt;
 
 	xmlFreeDoc( res );
 	xmlFreeDoc( doc );
