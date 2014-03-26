@@ -181,11 +181,15 @@ struct LuaObject
 		}
 	}
 
-	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
+	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance)
 	{
-		createMetatable( ls, 0, 0, mt, 0/*typename*/);
 		new (ls) LuaObject( instance);
 		luaL_getmetatable( ls, MetaTable<ObjectType>::name());
+		if (lua_type( ls, -1) == LUA_TNIL)
+		{
+			lua_pop( ls, 1);
+			luaL_error( ls, "no metatable defined to defined global object '%s'", name);
+		}
 		lua_setmetatable( ls, -2);
 		lua_setglobal( ls, name);
 	}
