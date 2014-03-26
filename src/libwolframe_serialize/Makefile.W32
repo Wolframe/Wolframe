@@ -46,6 +46,7 @@ wolframe_serialize.lib: $(OBJS) $(CPP_OBJS)
 local_all:
 
 local_clean:
+	-@erase ddl\*.obj struct\*.obj >NUL 2>NUL
 
 local_distclean:
 

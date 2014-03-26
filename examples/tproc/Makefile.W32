@@ -124,16 +124,17 @@ copy_prereq:
 	@-copy "$(ORACLE_DIR)\*.dll" tests\.
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-copy "$(WIN_ICONV_DIR)\iconv.dll" tests\.
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" tests\.
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" tests\.
 	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests\.
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" tests\.
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" tests\.
 !ENDIF
 !IFNDEF DEBUG
-	@-copy "$(PYTHON_DIR)\libs\python33.dll" tests\.
+	@-copy "$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION).dll" tests\.
 !ELSE
-	@-copy "$(PYTHON_DIR)\libs\python33_d.dll" tests\.
+	@-copy "$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION)_d.dll" tests\.
 !ENDIF
 
 local_test: $(TEST_CPP_BINS) copy_prereq

@@ -16,10 +16,10 @@ INCLUDE_LDFLAGS =
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(PYTHON_DIR)\libs\python33.lib"
+	"$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION).lib"
 !ELSE
 INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(PYTHON_DIR)\libs\python33_d.lib"
+	"$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION)_d.lib"
 !ENDIF
 
 TEST_CPP_BINS = \
@@ -42,8 +42,8 @@ local_distclean:
 # debug mode first. Later.
 local_test:
 !IFNDEF DEBUG
-	@-copy "$(PYTHON_DIR)\libs\python33.dll" .
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_MAJOR_VERSION).dll" .
 	@-embed my > test.RES
 !ELSE
-	@-copy "$(PYTHON_DIR)\libs\python33_d.dll" .
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_MAJOR_VERSION)_d.dll" .
 !ENDIF

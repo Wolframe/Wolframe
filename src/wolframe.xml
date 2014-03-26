@@ -43,7 +43,7 @@ Project Wolframe.
 		<module>modules\audit\database\mod_audit_database.dll</module>
 		<module>modules\audit\textfile\mod_audit_textfile.dll</module>
 		<module>modules\authentication\database\mod_auth_database.dll</module>
-		<module>modules\authentication\textfile\mod_auth_textfile.dll</module>
+<!--		<module>modules\authentication\textfile\mod_auth_textfile.dll</module>-->
 		<module>modules\authorization\database\mod_authz_database.dll</module>
 
 <!--		<module>modules\processor\echo\mod_proc_echo.dll</module>-->

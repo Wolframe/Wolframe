@@ -147,11 +147,12 @@ local_test:
 	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" .
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
+	@-echo copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >> test.bat
 !ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
