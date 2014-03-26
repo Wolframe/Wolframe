@@ -747,7 +747,7 @@
 	PYTHON_VERSION = 34
 	PYTHON_MAJOR_VERSION = 3
 	PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
-	PYTHON_DLL_DIR = $(PYTHON_DIR)\DDLs	
+	PYTHON_DLL_DIR = $(PYTHON_DIR)\DDLs
 					</programlisting>
 				</para>
 
@@ -761,6 +761,12 @@
 				
 				</para>
 				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
+					<ulink url="http://python.org/">http://python.org</ulink>) do not
+					contain debug versions of the library. If you want to build a debugging version of 
+					<application>Wolframe</application> you have to build your own version of Python.
+				</para>
 			</sect3>
 							
 		</sect2>
@@ -883,7 +889,7 @@
 				</para>
 
 				<para>
-					<emphasis role="bold">Note</emphasis>: The packages from
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
 					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>) do not
 					contain debug versions of the library. If you want to build a debugging version of 
 					<application>Wolframe</application> you have to build your own version of ICU.
