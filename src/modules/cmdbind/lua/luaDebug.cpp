@@ -57,8 +57,8 @@ static void getDescription_( lua_State *ls, int index, std::string& rt)
 
 		case LUA_TUSERDATA:
 			rt.append( " userdata ");
-			lua_pushvalue( ls, index);		///...STK: udata
-			if (!lua_getmetatable( ls, index))	///...STK: udata mt
+			lua_pushvalue( ls, index);			///...STK: udata
+			if (!lua_getmetatable( ls, -1))			///...STK: udata mt
 			{
 				rt.append( "(lightuserdata)");
 				lua_pop( ls, 1);
