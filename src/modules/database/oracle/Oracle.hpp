@@ -120,7 +120,7 @@ class OracleDbUnit;
 
 struct OracleLanguageDescription : public LanguageDescription
 {
-	virtual std::string stm_argument_reference( int index)
+	virtual std::string stm_argument_reference( int index) const
 	{
 		std::ostringstream rt;
 		rt << "$" << index;

@@ -13,10 +13,12 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
+	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwfsingleton \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
@@ -60,7 +62,7 @@ local_distclean:
 
 local_install:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
 
 local_test:
 ifeq ($(RUN_TESTS),1)

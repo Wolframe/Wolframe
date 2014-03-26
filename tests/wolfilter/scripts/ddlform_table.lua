@@ -49,12 +49,19 @@ function printTable( tab)
 	local iscontent = true
 	--... we do not print attributes here
 	--... iscontent=false -> print atomic values as attributes until the first non atomic value
-	--... iscontent=false -> print all values as tag content
-	for t,v in pairs(tab) do
-		local tagname = t
+	--... iscontent=true -> print all values as tag content
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
 		if type(v) == "table" then
 			iscontent = true
-			if v[#v] then
+			if v[ #v] then
 				printArray( t, v)
 			else
 				output:print( false, t)

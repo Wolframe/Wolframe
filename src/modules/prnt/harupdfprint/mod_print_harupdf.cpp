@@ -33,7 +33,7 @@
 ///\file mod_printer_harupdf.cpp
 ///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
 
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 #include "pdfPrinter.hpp"
 #include "pdfPrinterDocumentImpl.hpp"
 #include "pdfPrintProgramType.hpp"
@@ -62,5 +62,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
+}

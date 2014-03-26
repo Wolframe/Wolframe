@@ -167,7 +167,8 @@ public:
 	}
 
 private:
-	const proc::ProcessorProviderInterface* m_provider;
+// unused:
+//	const proc::ProcessorProviderInterface* m_provider;
 	db::TransactionFunctionR m_impl;
 };
 

@@ -36,7 +36,6 @@ Project Wolframe.
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
 #include "processor/procProvider.hpp"
-#include "module/filterBuilder.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>
@@ -62,7 +61,7 @@ struct XsltFilter :public Filter
 	{
 		XsltMapper xsltmapper( stylesheet_, arg);
 		InputFilterImpl impl( xsltmapper);
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
+		m_inputfilter.reset( new BufferingInputFilter( &impl, "libxslt"));
 		m_outputfilter.reset( new OutputFilterImpl( xsltmapper));
 	}
 };

@@ -31,30 +31,9 @@
 
 ************************************************************************/
 ///\file mod_filter_testtoken.cpp
-///\brief Module for token filters (one line for every xml element with one character prefix indicating the type)
-#include "module/filterBuilder.hpp"
+///\brief Module for token filter without characters set encoding (ASCII only)
+#include "appdevel/filterModuleMacros.hpp"
 #include "testtoken_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
+FILTER_MODULE( "token filter", token, _Wolframe::langbind::createTokenFilterType)
 
-namespace {
-
-struct TokenFilterObject
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder( "TokenFilter", "token", lb::createTokenFilterType);}
-};
-
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	TokenFilterObject::builder
-};
-
-ModuleEntryPoint entryPoint( 0, "token filter", 0, 0, NofObjects, objdef);

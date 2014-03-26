@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
+
+	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
+	%xinclude;
+
+	<!ENTITY % InstallationEntities	SYSTEM	"Installation/Installation.ent">
+	%InstallationEntities;
+
+	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
+	%CommonEntities;
+
+<!-- book set data -->
+	<!ENTITY BookSetVersion		SYSTEM "InstallationVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "InstallationDate.txt">
+	<!ENTITY WolframeVersion	SYSTEM "WolframeVersion.txt">
+	<!ENTITY WolfclientVersion	SYSTEM "WolfclientVersion.txt">
+
+]>
+
+<book id="book_GettingStarted" lang="en">
+	<title>Wolframe Installation</title>
+	<subtitle>Installation and Configuration Guide</subtitle>
+	<bookinfo>
+		<date>&BookSetPublicationDate;</date>
+		<issuenum>Version &BookSetVersion;</issuenum>
+		<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
+		<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
+
+		<copyright>
+			<year>2010 - 2014</year>
+			<holder>Project Wolframe</holder>
+		</copyright>
+		&WolframeLegalNotice;
+	</bookinfo>
+
+	&InstallationPreface;
+	&InstallationSource;
+	&InstallationBinary;
+</book>

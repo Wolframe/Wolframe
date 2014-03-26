@@ -167,6 +167,45 @@ endif
 
 # end of gcc section
 
+# start of clang section
+
+ifeq "$(COMPILER)" "clang"
+COMMON_COMPILE_FLAGS = \
+	-Wall -Wextra
+
+CXX_COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c++98
+
+COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c99
+endif
+
+# end of clang section
+
+# start of icc section
+
+# -Wno-unused-function would make sense for static functions, but
+# it croaks for normal API functions (which may not all be used)
+
+ifeq "$(COMPILER)" "icc"
+COMMON_COMPILE_FLAGS = \
+	-Wall
+
+#-Wno-unused-function
+
+CXX_COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c++98
+
+COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS) \
+	-std=c99
+endif
+
+# end of icc section
+
 # set flags for threading support using POSIX threads. This is completly different
 # between compiler/platforms
 ifeq "$(COMPILER)" "gcc"

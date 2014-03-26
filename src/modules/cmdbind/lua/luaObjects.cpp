@@ -57,6 +57,9 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#if LUA_VERSION_NUM < 502
+#error Wolframe needs Lua version >= 5.2.1
+#endif
 }
 
 using namespace _Wolframe;
@@ -1312,7 +1315,9 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	if (newEnter)
 	{
 		output = LuaObject<Output>::getSelf( ls, "output", "opentag");
-		check_parameters( ls, 1, 1, LUA_TSTRING);
+		if (lua_gettop( ls) != 2) throw std::runtime_error( "expected tag to open in ouput as argument");
+		int tp = lua_type( ls, 2);
+		if (tp != LUA_TSTRING && tp != LUA_TNUMBER) throw std::runtime_error( "expected string or number as first argument");
 		tag = lua_tostring( ls, 2);
 		tagsize = std::strlen( tag);
 	}
@@ -1483,24 +1488,37 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 	InputFilter* ff = 0;
 	if (filter->inputfilter().get())
 	{
-		ff = filter->inputfilter()->copy();
-		if (input->inputfilter().get())
+		ff = filter->inputfilter()->initcopy();
+		if (input->isDocument())
+		{
+			input->inputfilter().reset( ff);
+			const char* cstr = input->documentptr();
+			std::size_t csize = input->documentsize();
+			ff->putInput( cstr, csize, true);
+		}
+		else if (input->inputfilter().get())
 		{
 			//... old filter defined, then assign the rest of the input to the new filter attached
 			const void* chunk;
 			std::size_t chunksize;
 			bool chunkend;
 			input->inputfilter()->getRest( chunk, chunksize, chunkend);
-			ff->putInput( chunk, chunksize, chunkend);
+			try
+			{
+				chunk = input->allocContentCopy( chunk, chunksize);
+				ff->putInput( chunk, chunksize, chunkend);
+			}
+			catch (const std::runtime_error& e)
+			{
+				delete ff;
+				throw e;
+			}
+			catch (const std::bad_alloc& e)
+			{
+				delete ff;
+				throw e;
+			}
 			input->inputfilter().reset( ff);
-		}
-		else if (input->content().get())
-		{
-			//... in case of a document assign its content to the processing filter
-			input->inputfilter().reset( ff);
-			const char* cstr = input->content()->c_str();
-			std::size_t csize = input->content()->size();
-			ff->putInput( cstr, csize, true);
 		}
 		else
 		{
@@ -2491,6 +2509,12 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{0,0}
 };
 
+static const luaL_Reg iterator_methodtable[ 2] =
+{
+	{"scope",&function_scope},
+	{0,0}
+};
+
 static const luaL_Reg customvalue_methodtable[ 16] =
 {
 	{"__index", &function_customtype_index},
@@ -2625,7 +2649,11 @@ LuaScript::LuaScript( const std::string& path_)
 }
 
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleMap* modulemap_)
-	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_),m_modulemap(modulemap_)
+	:m_ls(0)
+	,m_thread(0)
+	,m_threadref(0)
+	,m_script(script_)
+	,m_modulemap(modulemap_)
 {}
 
 std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
@@ -2719,8 +2747,11 @@ void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provid
 
 		if (provider_) setProcessorProvider( m_ls, provider_);
 		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
-		lua_pushcfunction( m_ls, &function_scope);
-		lua_setglobal( m_ls, "scope");
+
+		//Register iterator context:
+		lua_newtable( m_ls);
+		luaL_setfuncs( m_ls, iterator_methodtable, 0);
+		lua_setglobal( m_ls, "iterator");
 
 		//Register provider context:
 		lua_newtable( m_ls);

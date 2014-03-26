@@ -183,8 +183,6 @@ public:
 
 	void pushElement( langbind::FilterBase::ElementType type, const types::VariantConst& element)
 	{
-		if (m_taglevel == -1) throw std::runtime_error( "input tags for print function call not balanced");
-
 		std::string elemstr = element.tostring();
 		textwolf::XMLScannerBase::ElementType xtype = textwolf::XMLScannerBase::None;
 		switch (type)
@@ -264,6 +262,7 @@ public:
 
 				while (m_input->getNext( elemtype, elem))
 				{
+					if (m_taglevel == 0 && elemtype == langbind::FilterBase::CloseTag) break;
 					pushElement( elemtype, elem);
 				}
 				switch (m_input->state())

@@ -109,7 +109,7 @@ private:
 struct SQLiteLanguageDescription :public LanguageDescription
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
-	virtual std::string stm_argument_reference( int index)
+	virtual std::string stm_argument_reference( int index) const
 	{
 		std::ostringstream rt;
 		rt << "$" << index;

@@ -297,7 +297,7 @@ public:
 				if (isDefined) *isDefined = true;
 				return true;
 			}
-			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element '" << name << "' (" << errorExplanation << ")";
+			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "' for configuration element '" << name << "' (" << errorExplanation << ")";
 			return false;
 		}
 		catch (bad_alloc&)

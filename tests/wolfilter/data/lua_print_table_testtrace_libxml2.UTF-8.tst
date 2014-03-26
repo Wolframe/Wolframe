@@ -107,6 +107,7 @@
 </invoice>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
 
+**requires:LIBHPDF
 **file:wolframe.conf
 LoadModules
 {
@@ -199,39 +200,40 @@ percent_1=Bigfxp( 2);
 //name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()
 //address: {R1 ?= -1; [R1] = R1 + 1} PrintText()
 **file:script.lua
-
 function run()
 	f = provider.filter( "libxml2")
 	f.empty = false
 	input:as( f)
 	output:as( provider.filter( "blob"))
-	t = input:table()
-	f = provider.formfunction( "print_invoice")
-	output:print( f( t):table())
+	local t = input:get()
+	local f = provider.formfunction( "print_invoice")
+	for val,tag in f(t):get() do
+		output:print( val)
+	end
 end
 **output
 ENTER PrintText: 1$ Text = 'invoice'
-ENTER PrintText: 2$ R1 = '0', Text = 'invoice'
-ENTER PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
-LEAVE PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
-LEAVE PrintText: 2$ R1 = '0', Text = 'invoice'
-ENTER PrintText: 4$ R1 = '1.00000', Text = 'invoice'
-ENTER PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 4$ R1 = '1.00000', Text = 'invoice'
-ENTER PrintText: 6$ R1 = '2.00000', Text = 'invoice'
-ENTER PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 6$ R1 = '2.00000', Text = 'invoice'
-ENTER PrintText: 8$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 8$ Text = 'invoice', Index = '0'
-ENTER PrintText: 9$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 9$ Text = 'invoice', Index = '0'
-ENTER PrintText: 10$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 10$ Text = 'invoice', Index = '0'
-ENTER PrintText: 11$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 11$ Text = 'invoice', Index = '0'
-ENTER PrintText: 12$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 12$ Text = 'invoice', Index = '0'
+ENTER PrintText: 2$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 2$ Text = 'invoice', Index = '0'
+ENTER PrintText: 3$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 3$ Text = 'invoice', Index = '0'
+ENTER PrintText: 4$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 4$ Text = 'invoice', Index = '0'
+ENTER PrintText: 5$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 5$ Text = 'invoice', Index = '0'
+ENTER PrintText: 6$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 6$ Text = 'invoice', Index = '0'
+ENTER PrintText: 7$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 8$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 8$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 7$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 9$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 10$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 10$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 9$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 11$ R1 = '2.00000', Text = 'invoice'
+ENTER PrintText: 12$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 12$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 11$ R1 = '2.00000', Text = 'invoice'
 LEAVE PrintText: 1$ Text = 'invoice'
 **end

@@ -26,7 +26,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@LD_LIBRARY_PATH=$(LIBHPDF_LIB_DIR):$(LIBPNG_LIB_DIR) ./testlibhpdf
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR):$(LIBPNG_LIB_DIR) ./testlibhpdf
 	@echo
 
 local_longtest:

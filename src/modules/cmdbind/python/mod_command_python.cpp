@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file mod_command_python.cpp
 ///\brief Module for command handler executing python code
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "logger-v1.hpp"
 
@@ -66,8 +66,8 @@ static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
 	pythonProgramTypeBuilder
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
 				NofConfiguredBuilder, 0, /* configuredBuilder, */
 				NofSimpleBuilder, simpleBuilder);
-
-
+}

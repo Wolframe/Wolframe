@@ -35,6 +35,7 @@
 //
 #ifndef _LANGBIND_AUTHORIZATION_HPP_INCLUDED
 #define _LANGBIND_AUTHORIZATION_HPP_INCLUDED
+
 #include <string>
 
 namespace _Wolframe {
@@ -73,6 +74,6 @@ private:
 	std::string m_resource;
 };
 
+}} //namespace
 
-}}//namespace
 #endif

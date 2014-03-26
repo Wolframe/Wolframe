@@ -344,8 +344,6 @@ private:
 
 Connection::Connection( const Connection::Configuration& cfg, ConnectionHandler* connhnd, Callback notifier_, void* clientobject_)
 	:m_impl(0)
-	,m_notifier(notifier_)
-	,m_clientobject(clientobject_)
 {
 	switch (cfg.m_transportLayerType)
 	{

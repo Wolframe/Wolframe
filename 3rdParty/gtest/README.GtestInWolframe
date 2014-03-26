@@ -1,14 +1,12 @@
 This is a down-stripped version of the Google test framework,
-version 1.7.0, svn revision trunk, r677
+version 1.7.0, svn trunk, r677
 
 To get the original go to http://code.google.com/p/googletest.
 
 Local Changes to the Code:
 
- * include/gtest/gtest.h: disable -Wsign-compare for GNU gcc
-
  * include/gtest//internal/gtest-port.h: silenced a warning
-   around a mutex initialization (pthread_t() instead of false)
+   around a mutex initialization (added a pthread_t())
 
  * autoconf/automake build system has been removed in favour of
    the Wolframe makefiles

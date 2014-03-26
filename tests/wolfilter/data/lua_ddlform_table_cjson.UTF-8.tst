@@ -146,12 +146,19 @@ function printTable( tab)
 	local iscontent = true
 	--... we do not print attributes here
 	--... iscontent=false -> print atomic values as attributes until the first non atomic value
-	--... iscontent=false -> print all values as tag content
-	for t,v in pairs(tab) do
-		local tagname = t
+	--... iscontent=true -> print all values as tag content
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
 		if type(v) == "table" then
 			iscontent = true
-			if v[#v] then
+			if v[ #v] then
 				printArray( t, v)
 			else
 				output:print( false, t)
@@ -180,12 +187,12 @@ end
 {
 	"assignmentlist":	{
 		"assignment":	[{
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"Julia",
 					"phone":	"098 765 43 21",
 					"surname":	"Tegel-Sacher"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"324",
 						"key":	"A123",
@@ -196,12 +203,12 @@ end
 						"title":	"job 2"
 					}]
 			}, {
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"Jakob",
 					"phone":	"012 345 67 89",
 					"surname":	"Stegelin"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"567",
 						"key":	"A456",

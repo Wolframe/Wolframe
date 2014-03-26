@@ -133,6 +133,7 @@ LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
 
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+	,TypedInputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
@@ -146,7 +147,7 @@ void LuaTableInputFilter::FetchState::getTagElement( types::VariantConst& elemen
 	element.init( tag, tagsize);
 }
 
-bool LuaTableInputFilter::getElementValue( int idx, types::VariantConst& element, const char*& errelemtype)
+bool LuaTableInputFilter::tryGetLuaStackValue( int idx, types::VariantConst& element, const char*& errelemtype)
 {
 	const char* lstr;
 	std::size_t lstrlen = 0;
@@ -205,10 +206,10 @@ bool LuaTableInputFilter::getElementValue( int idx, types::VariantConst& element
 	}
 }
 
-bool LuaTableInputFilter::getValue( int idx, types::VariantConst& element)
+bool LuaTableInputFilter::getLuaStackValue( int idx, types::VariantConst& element)
 {
 	const char* errelemtype = 0;
-	if (!getElementValue( idx, element, errelemtype))
+	if (!tryGetLuaStackValue( idx, element, errelemtype))
 	{
 		std::ostringstream msg;
 		msg << "element type '" << (errelemtype?errelemtype:"unknown") << "' not expected for atomic value in filter";
@@ -338,7 +339,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::Done;
 					type = FilterBase::Value;
-					return getValue( -1, element);
+					return getLuaStackValue( -1, element);
 				}
 
 			case FetchState::VectorIterValue:
@@ -352,7 +353,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::VectorIterClose;
 					type = FilterBase::Value;
-					return getValue( -1, element);
+					return getLuaStackValue( -1, element);
 				}
 
 			case FetchState::VectorIterClose:
@@ -384,7 +385,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				return true;
 
 			case FetchState::TableIterOpen:
-				if (!getValue( -2, element)) return false;
+				if (!getLuaStackValue( -2, element)) return false;
 				if (element.type() == types::Variant::String && element.charsize() == 0)
 				{
 					m_stk.back().id = FetchState::TableIterValueNoTag;
@@ -406,7 +407,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::TableIterClose;
 					type = FilterBase::Value;
-					return getValue( -1, element);
+					return getLuaStackValue( -1, element);
 				}
 
 			case FetchState::TableIterValueNoTag:
@@ -421,7 +422,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::TableIterNext;
 					type = FilterBase::Value;
-					return getValue( -1, element);
+					return getLuaStackValue( -1, element);
 				}
 
 			case FetchState::TableIterClose:
@@ -464,6 +465,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
 	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+	,TypedOutputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_type(OpenTag)

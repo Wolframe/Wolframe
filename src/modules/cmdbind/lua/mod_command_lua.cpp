@@ -32,41 +32,17 @@
 ************************************************************************/
 ///\file mod_command_lua.cpp
 ///\brief Module for command handler executing lua scripts
-#include "luaCommandHandlerBuilder.hpp"
+#include "appdevel/commandHandlerModuleMacros.hpp"
 #include "luaCommandHandler.hpp"
+#include "luaCommandHandlerConfig.hpp"
 #include "luaFunctionProgramType.hpp"
-#include "module/programTypeBuilder.hpp"
-#include "logger-v1.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-namespace {
-static ConfiguredBuilder* createLuaCommandHandler()
-{
-	static LuaCommandHandlerBuilder
-		mod( "LuaCommandHandler", "command handler for lua scripts", "cmdhandler", "lua", "LuaCommandHandler");
-	return &mod;
-}
-static SimpleBuilder* createLuaProgramType()
-{
-	return new ProgramTypeBuilder( "LuaProgramType", "luaformfunc", langbind::createLuaProgramType);
-}
-}//anonymous namespace
-
-enum {NofConfiguredBuilder=1};
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
-{
-	createLuaCommandHandler
-};
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	createLuaProgramType
-};
-
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for lua",
-				NofConfiguredBuilder, configuredBuilder,
-				NofSimpleBuilder, simpleBuilder);
-
+COMMAND_HANDLER_MODULE_WITH_PROGRAMS(
+	/*DESCRIPTION: */	"command handler and form function program interpreter for lua",
+	/*LANGNAME:*/		Lua,
+	/*CONFIG_SECTION:*/	"cmdhandler",
+	/*CONFIG_TITLE*/	"lua",
+	/*CLASSDEF:*/		_Wolframe::cmdbind::LuaCommandHandler,
+	/*CONFIGDEF:*/		_Wolframe::module::LuaCommandHandlerConfig,
+	/*CREATEPRGFUNC:*/	_Wolframe::langbind::createLuaProgramType)
 

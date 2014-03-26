@@ -113,12 +113,16 @@ private:
 
 		void getTagElement( types::VariantConst& e);
 	};
-
-	bool getValue( int idx, types::VariantConst& e);	//< fetch the element with index 'idx' as atomic value
-	bool firstTableElem( const char* tag);			//< opens a new table iterator on an array or lua table
-	bool nextTableElem();					//< fetches the next element of the currently iterated associative (non array) lua table
-	bool nextVectorElem();					//< fetches the next element of the currently iterated lua array (table with numbers as indices)
-	bool getElementValue( int idx, types::VariantConst& element, const char*& errelemtype);
+	//\brief Fetch the element with index 'idx' as atomic value from lua stack
+	bool getLuaStackValue( int idx, types::VariantConst& e);
+	//\brief Same as getLuaStackValue(int,types::VariantConst&) but does set the filter state
+	bool tryGetLuaStackValue( int idx, types::VariantConst& element, const char*& errelemtype);
+	//\brief Opens a new table iterator on an array or lua table
+	bool firstTableElem( const char* tag);
+	//\brief Fetches the next element of the currently iterated associative (non array) lua table
+	bool nextTableElem();
+	//\brief Fetches the next element of the currently iterated lua array (table with numbers as indices)
+	bool nextVectorElem();
 
 private:
 	lua_State* m_ls;			//< lua state

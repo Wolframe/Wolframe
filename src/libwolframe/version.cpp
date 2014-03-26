@@ -48,7 +48,7 @@ Version::Version( const char* version, const char* format)
 {
 	enum {NofElements=4};
 	std::size_t vi=0,ai=0,fi=0;
-	unsigned int ar[NofElements] = {0,0,0,0};
+	unsigned short ar[NofElements] = {0,0,0,0};
 	unsigned int cnt[ NofElements] = {0,0,0,0};
 	enum State {Parse,Shift};
 	State state = Shift;
@@ -136,10 +136,10 @@ Version::Version( const char* version, const char* format)
 }
 
 Version::Version( unsigned long version )
-	: m_major( version / 10000000lu ),
-	  m_minor(( version % 10000000lu ) / 100000 ),
-	  m_revision( ( version % 100000lu ) / 1000 ), m_hasRevision( true ),
-	  m_build( version % 1000 ), m_hasBuild( true )
+	: m_major((unsigned short)( version / 10000000lu )),
+	  m_minor((unsigned short)(( version % 10000000lu ) / 100000 )),
+	  m_revision( (unsigned short)(( version % 100000lu ) / 1000 )), m_hasRevision( true ),
+	  m_build( (unsigned short)( version % 1000 )), m_hasBuild( true )
 {}
 
 Version::Version( unsigned short M, unsigned short m )

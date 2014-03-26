@@ -79,8 +79,6 @@ static const int decodeTable[] = {
 		-1, -1, -1, -1, -1, -1, -1, -1,
 	};
 
-static const unsigned short decodeTableSize = sizeof( decodeTable );
-
 static int base64_decodeValue( char value )
 {
 	return decodeTable[ (int)value ];
@@ -105,7 +103,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 	dataByte = state->dataByte;
 
 	switch ( state->step )	{
-		while ( 1 )	{
+		for ( ; ; )	{
 			case STEP_A:
 				do {
 					if ( encoded == encodedEnd )	{
@@ -174,7 +172,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 	encodedEnd = encoded + encodedSize;
 	outByte = ( unsigned char* )data;
 
-	while ( 1 )	{
+	for ( ; ; )	{
 		do {
 			if ( encoded == encodedEnd )
 				return outByte - ( unsigned char* )data;
@@ -214,7 +212,4 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 		dataByte |= ( fragment & 0x03f );
 		*outByte++ = dataByte;
 	}
-
-	/* it should not reach this point */
-	return outByte - ( unsigned char* )data;
 }

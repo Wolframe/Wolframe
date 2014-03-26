@@ -98,10 +98,48 @@ FORM employee_assignment_print
 	}
 }
 **file:script.lua
+function printTable( tab)
+	-- deterministic print of a table (since lua 5.2.1 table keys order is non deterministic)
+
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
+		if type(v) == "table" then
+			if v[ #v] then
+				-- print array (keys are indices)
+				for eidx,elem in ipairs( v) do
+					output:opentag( t)
+					if type(elem) == "table" then
+						printTable( elem)
+					else
+						output:print( elem)
+					end
+					output:closetag()
+				end
+			else
+				-- print table (keys are values)
+				output:opentag( t)
+				printTable( v)
+				output:closetag()
+			end
+		else
+			output:opentag( t)
+			output:print( v)
+			output:closetag()
+		end
+	end
+end
+
 function run()
-	type = input:doctype()
-	output:as( provider.filter(), type)
-	output:print( input:table())
+	local doctype = input:doctype()
+	output:as( provider.filter(), doctype)
+	printTable( input:table())
 end
 **requires:DISABLED NETBSD
 
@@ -110,12 +148,12 @@ end
 	"doctype":	"employee_assignment_print",
 	"assignmentlist":	{
 		"assignment":	[{
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"Julia",
 					"phone":	"098 765 43 21",
 					"surname":	"Tegel-Sacher"
 				},
+				"issuedate":	"13.5.2006",
 				"task":	[{
 						"customernumber":	"324",
 						"key":	"A123",
@@ -126,17 +164,17 @@ end
 						"title":	"job 2"
 					}]
 			}, {
-				"issuedate":	"13.5.2006",
 				"employee":	{
 					"firstname":	"Jakob",
 					"phone":	"012 345 67 89",
 					"surname":	"Stegelin"
 				},
-				"task":	[{
-						"customernumber":	"890",
-						"key":	"V789",
-						"title":	"job 4"
-					}]
+				"issuedate":	"13.5.2006",
+				"task":	{
+					"customernumber":	"890",
+					"key":	"V789",
+					"title":	"job 4"
+				}
 			}]
 	}
 }

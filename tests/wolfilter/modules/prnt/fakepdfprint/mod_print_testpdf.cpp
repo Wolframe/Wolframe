@@ -34,7 +34,7 @@
 ///\brief Module for testing the printing of PDFs with a simple command interpreter logging a trace of called functions and states
 
 #include "pdfPrinterDocumentImpl.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 #include "pdfPrinter.hpp"
 #include "pdfPrintProgramType.hpp"
 #include "logger-v1.hpp"
@@ -62,5 +62,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
+extern "C" {
 ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", 0, 0, NofObjects, objdef);
-
+}

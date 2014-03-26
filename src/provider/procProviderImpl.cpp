@@ -36,21 +36,13 @@
 
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
-#include "module/ddlcompilerBuilder.hpp"
-#include "module/cppFormFunctionBuilder.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
-#include "module/customDataTypeBuilder.hpp"
-#include "module/filterBuilder.hpp"
-#include "module/runtimeEnvironmentConstructor.hpp"
-#include "types/doctype.hpp"
+#include "appDevel.hpp"			//... for inspecting different module type objects
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 #include <boost/algorithm/string.hpp>
-
 #include <ostream>
 #include <string>
 
@@ -220,9 +212,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					try
 					{
 						std::string name = ffo->objectClassName();
-						langbind::CppFormFunctionR func( ffo->object());
-						m_programs->defineCppFormFunction( name, *func);
-						LOG_TRACE << "registered '" << name << "' built-in form function ";
+
+						std::vector<std::string> funclist = ffo->functions();
+						std::vector<std::string>::const_iterator fi = funclist.begin(), fe = funclist.end();
+						for (; fi != fe; ++fi)
+						{
+							m_programs->defineCppFormFunction( *fi, ffo->function( *fi));
+							LOG_TRACE << "registered '" << *fi << "' C++ form function ";
+						}
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -445,14 +442,6 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 	cmdbind::CommandHandlerConstructor* constructor = m_cmd.at( cmd->second).constructor.get();
 	const config::NamedConfiguration* cfg = m_cmd.at( cmd->second).configuration;
 	return constructor->object( *cfg);
-}
-
-cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command ) const
-{
-	LOG_TRACE << "[provider] get iofilter command handler '" << command << "'";
-	cmdbind::CommandHandler* hnd = cmdhandler( command);
-	if (!hnd) return NULL;
-	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
 }
 
 db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase( bool suppressAlert) const

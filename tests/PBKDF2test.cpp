@@ -51,6 +51,10 @@ TEST( PBKDF2, TestVectors )
 
 	PBKDF2_HMAC_SHA1 test1( "salt", "password", 20, 1 );
 	PBKDF2_HMAC_SHA1 test1_0( test1.toString());
+	PBKDF2_HMAC_SHA1 test1_1( (const unsigned char*)"salt", 4, (const unsigned char*)"password", 8, 20, 1 );
+	PBKDF2_HMAC_SHA1 test1_2( "salt", (const unsigned char*)"password", 8, 20, 1 );
+	PBKDF2_HMAC_SHA1 test1_3( (const unsigned char*)"salt", 4, "password", 20, 1 );
+
 
 	PBKDF2_HMAC_SHA1 test2( "salt", "password", 20, 2 );
 	PBKDF2_HMAC_SHA1 test2_0( test2.toString());
@@ -70,6 +74,9 @@ TEST( PBKDF2, TestVectors )
 	EXPECT_STRCASEEQ( testVec1, test1.toBCD().c_str() );
 	EXPECT_TRUE( test1 == test1_0.toString() );
 	EXPECT_TRUE( test1 == test1_0 );
+	EXPECT_TRUE( test1 == test1_1 );
+	EXPECT_TRUE( test1 == test1_2 );
+	EXPECT_TRUE( test1 == test1_3 );
 
 	EXPECT_STRCASEEQ( testVec2, test2.toBCD().c_str() );
 	EXPECT_TRUE( test2 == test2_0.toString() );

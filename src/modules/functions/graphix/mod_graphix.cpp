@@ -32,62 +32,15 @@
 ************************************************************************/
 ///\file mod_graphix.cpp
 ///\brief Module for graphic functions with FreeImage
-#include "module/cppFormFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/cppFormFunctionModuleMacros.hpp"
 #include "graphix.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
 using namespace _Wolframe::graphix;
 
-namespace {
-
-struct graphix_info_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::CppFormFunction func( imageInfoExec, param, result );
-
-		return new CppFormFunctionBuilder( "imageInfo", func);
-	}
-};
-
-struct graphix_thumb_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::CppFormFunction func( imageThumbExec, param, result );
-
-		return new CppFormFunctionBuilder( "imageThumb", func);
-	}
-};
-
-struct graphix_rescale_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = ImageRescale::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::CppFormFunction func( imageRescaleExec, param, result );
-
-		return new CppFormFunctionBuilder( "imageRescale", func);
-	}
-};
-
-} //anonymous namespace
-
-enum { NofObjects = 3 };
-
-static createBuilderFunc objdef[NofObjects] =
-{
-	graphix_info_func::constructor,
-	graphix_thumb_func::constructor,
-	graphix_rescale_func::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
+CPP_APPLICATION_FORM_FUNCTION_MODULE("graphic functions with FreeImage")
+CPP_APPLICATION_FORM_FUNCTION("imageInfo", ImageImpl::info, ImageInfo, Image)
+CPP_APPLICATION_FORM_FUNCTION("imageThumb", ImageImpl::thumb, Image, ImageThumb)
+CPP_APPLICATION_FORM_FUNCTION("imageRescale", ImageImpl::rescale, Image, ImageRescale)
+CPP_APPLICATION_FORM_FUNCTION_MODULE_END
 

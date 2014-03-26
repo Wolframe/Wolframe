@@ -258,6 +258,11 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 					throw std::range_error( "PostgreSQL database: CONNECTION_NEEDED in synchronous connection" );
 					break;
 			}
+
+			std::stringstream statement_timeout_s;
+			statement_timeout_s << "SET statement_timeout = " << m_statementTimeout;
+			PQexec( conn, statement_timeout_s.str( ).c_str( ) );
+
 			m_connPool.add( conn );
 			m_noConnections++;
 		}

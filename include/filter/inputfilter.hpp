@@ -40,6 +40,9 @@ Project Wolframe.
 #include "filter/contentfilterAttributes.hpp"
 #include <string>
 #include <stdexcept>
+#include <cstring>
+#include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -60,8 +63,9 @@ public:
 	};
 
 	///\brief Default constructor
-	InputFilter()
+	explicit InputFilter( const char* name_)
 		:utils::TypeSignature("langbind::InputFilter", __LINE__)
+		,FilterBase(name_)
 		,m_state(Open){}
 
 	///\brief Copy constructor
@@ -77,6 +81,10 @@ public:
 	///\brief Get a self copy
 	///\return allocated pointer to copy of this
 	virtual InputFilter* copy() const=0;
+
+	///\brief Get an instance copy of this in its initial state
+	///\return allocated pointer to an instance copy in its initial state
+	virtual InputFilter* initcopy() const=0;
 
 	///\brief Declare the next input chunk to the filter
 	///\param [in] ptr the start of the input chunk
@@ -96,9 +104,9 @@ public:
 	}
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val)
+	virtual bool getValue( const char* id, std::string& val) const
 	{
-		if (std::strcmp( name, "encoding") == 0)
+		if (std::strcmp( id, "encoding") == 0)
 		{
 			const char* ee = getEncoding();
 			if (ee)
@@ -111,7 +119,7 @@ public:
 				return false;
 			}
 		}
-		return FilterBase::getValue( name, val);
+		return FilterBase::getValue( id, val);
 	}
 
 	///\brief Get next element

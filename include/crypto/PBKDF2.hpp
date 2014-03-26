@@ -45,22 +45,28 @@ namespace crypto {
 class PBKDF2_HMAC_SHA1
 {
 public:
-	PBKDF2_HMAC_SHA1( const unsigned char* key, size_t keySize,
-			  const unsigned char* password, size_t pwdSize,
+ /// \note	PBKDF2 constructors treat the string arguments differently.
+ ///		The salt is base64 encoded while the password is plain text.
+ ///		The base64 encoding can be with padding or without
+
+	PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize,
+			  const unsigned char* salt, size_t saltSize,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const std::string& key, const std::string& message,
+	PBKDF2_HMAC_SHA1( const std::string& password, const std::string& salt,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const unsigned char* key, size_t keySize, const std::string& message,
+	PBKDF2_HMAC_SHA1( const std::string& password, const unsigned char* salt, size_t saltSize,
 			  std::size_t dkLen, unsigned int rounds );
-	PBKDF2_HMAC_SHA1( const std::string& key, const unsigned char* msg, size_t msgSize,
+	PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize, const std::string& salt,
 			  std::size_t dkLen, unsigned int rounds );
 
-	/// \note The string is a base64 representation of the value
+	/// \note The string is a base64 representation of the hash
 	PBKDF2_HMAC_SHA1( const std::string& str );
 
 	~PBKDF2_HMAC_SHA1();
 
+	/// Returns the pointer to the hash
 	const unsigned char* hash() const			{ return m_hash; }
+	/// Returns the hash length in bytes
 	std::size_t size() const				{ return m_dkLen; }
 
 	/// Comparisson operators
@@ -68,7 +74,7 @@ public:
 	bool operator != ( const PBKDF2_HMAC_SHA1& rhs ) const	{ return !( *this == rhs ); }
 
 	/// Comparisson operators
-	/// \note The string is a base64 representation of the value
+	/// \note The string is a base64 representation of the hash
 	bool operator == ( const std::string& rhs ) const;
 	bool operator != ( const std::string& rhs ) const	{ return !( *this == rhs ); }
 
@@ -78,8 +84,8 @@ public:
 	/// \note The string is without the base64 end padding
 	std::string toString() const;
 private:
-	std::size_t	m_dkLen;
-	unsigned char*	m_hash;
+	std::size_t	m_dkLen;	///< hash length in bytes
+	unsigned char*	m_hash;		///< the hash
 };
 
 }} // namespace _Wolframe::crypto

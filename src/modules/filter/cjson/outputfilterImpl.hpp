@@ -58,7 +58,7 @@ public:
 
 	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
-		,OutputFilter(attr)
+		,OutputFilter("cjson",attr)
 		,m_elemitr(0)
 		,m_encattr_defined(false)
 		,m_headerPrinted(false)
@@ -95,14 +95,14 @@ public:
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val);
+	virtual bool getValue( const char* name, std::string& val) const;
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
-	void setEncoding( const std::string& name)
+	void setEncoding( const std::string& id)
 	{
-		m_encattr = types::String::getEncodingFromName( name);
+		m_encattr = types::String::getEncodingFromName( id);
 	}
 
 	void setEncoding();

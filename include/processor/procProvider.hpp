@@ -94,7 +94,6 @@ public:
 	bool loadPrograms();
 
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
-	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
 	virtual db::Database* transactionDatabase() const;
 

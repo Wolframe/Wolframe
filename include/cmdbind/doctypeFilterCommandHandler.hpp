@@ -88,6 +88,7 @@ private:
 	enum State
 	{
 		Init,
+		ParseStart,
 		ParseJSONHeaderStart,
 		ParseJSONHeaderStringKey,
 		ParseJSONHeaderSeekAssign,
@@ -109,6 +110,7 @@ private:
 	{
 		static const char* ar[] = {
 			"Init",
+			"ParseStart",
 			"ParseJSONHeaderStart",
 			"ParseJSONHeaderStringKey",
 			"ParseJSONHeaderSeekAssign",
@@ -131,19 +133,28 @@ private:
 	void throw_error( const char* msg=0) const;
 	void setState( State state_);
 
+	enum Encoding
+	{
+		UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE
+	};
+	bool getEncoding();
+	unsigned char nextChar();
+
 private:
 	enum KeyType
 	{
 		KeyNone, KeyDoctype, KeyEncoding
 	};
 	State m_state;					//< processing state machine state
+	Encoding m_encoding;				//< character set encoding
 	KeyType m_keytype;				//< type of key parsed (JSON)
 	char m_lastchar;				//< last character parsed
 	char m_endbrk;					//< end character of a parsed token (string)
 	bool m_escapestate;				//< substate for escaping (value depending on state)
-	unsigned char m_nullcnt;			//< number of null characters parsed in a row
+	unsigned int m_itr;				//< iterator position
+	unsigned int m_end;				//< end position
+	const unsigned char* m_src;			//< current source base pointer
 	protocol::InputBlock m_input;			//< input buffer
-	std::size_t m_inputidx;				//< index in input buffer
 	protocol::CharBuffer m_inputbuffer;		//< buffer for consumed input (is returned to caller because this is a preprocessing command handler)
 	std::string m_itembuf;				//< value item parsed (value depending on state)
 	std::string m_keybuf;				//< key item parsed (value depending on state)

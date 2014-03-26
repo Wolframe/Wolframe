@@ -22,13 +22,50 @@ Processor
 	}
 }
 **file:script.lua
+function printTable( tab)
+	-- deterministic print of a table (since lua 5.2.1 table keys order is non deterministic)
+
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
+		if type(v) == "table" then
+			if v[ #v] then
+				-- print array (keys are indices)
+				for eidx,elem in ipairs( v) do
+					output:opentag( t)
+					if type(elem) == "table" then
+						printTable( elem)
+					else
+						output:print( elem)
+					end
+					output:closetag()
+				end
+			else
+				-- print table (keys are values)
+				output:opentag( t)
+				printTable( v)
+				output:closetag()
+			end
+		else
+			output:opentag( t)
+			output:print( v)
+			output:closetag()
+		end
+	end
+end
 
 function run()
 	t = input:table()
 	r = provider.formfunction("employee_assignment_convert")( t)
-	output:print( r:table())
+	printTable( r:table())
 end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<assignmentlist><assignment><issuedate>8647993</issuedate><employee><firstname>juulliiaa</firstname><phone>901 234 56 78</phone><surname>teeggeell-saacchheerr</surname></employee><task><customernumber>325</customernumber><title>jjoobb 8</title><key>a876</key></task><task><customernumber>568</customernumber><title>jjoobb 7</title><key>v543</key></task></assignment><assignment><issuedate>8647993</issuedate><employee><firstname>jaakkoobb</firstname><phone>987 654 32 10</phone><surname>stteeggeelliinn</surname></employee><task><customernumber>568</customernumber><title>jjoobb 6</title><key>a543</key></task><task><customernumber>891</customernumber><title>jjoobb 5</title><key>v210</key></task></assignment></assignmentlist>
+<assignmentlist><assignment><employee><firstname>juulliiaa</firstname><phone>901 234 56 78</phone><surname>teeggeell-saacchheerr</surname></employee><issuedate>8647993</issuedate><task><customernumber>325</customernumber><key>a876</key><title>jjoobb 8</title></task><task><customernumber>568</customernumber><key>v543</key><title>jjoobb 7</title></task></assignment><assignment><employee><firstname>jaakkoobb</firstname><phone>987 654 32 10</phone><surname>stteeggeelliinn</surname></employee><issuedate>8647993</issuedate><task><customernumber>568</customernumber><key>a543</key><title>jjoobb 6</title></task><task><customernumber>891</customernumber><key>v210</key><title>jjoobb 5</title></task></assignment></assignmentlist>
 **end

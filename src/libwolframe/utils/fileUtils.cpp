@@ -54,6 +54,8 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
+#undef _Wolframe_LOWLEVEL_DEBUG
+
 std::string utils::joinPath( const std::string& path, const std::string& item)
 {
 	boost::filesystem::path rt( path);
@@ -214,7 +216,14 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 //	length of 128 bytes: See OFSTRUCT definition (OFS_MAXPATHNAME = 128)
 
 	unsigned char ch;
+#ifdef _WIN32
+	errno_t err;
+	FILE* fh;
+	err = fopen_s( &fh, filename.c_str(), "w");
+	if (!err)
+#else
 	FILE* fh = fopen( filename.c_str(), "w");
+#endif
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
@@ -494,7 +503,7 @@ FileType utils::getFileType( const std::string& filename)
 	{
 		throw e;
 	}
-	catch (std::runtime_error& e)
+	catch (std::runtime_error& )
 	{}
 	return rt;
 }
@@ -572,6 +581,9 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 				//... parse value
 				ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
 			}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+			std::cout << "PROPERTY TOKEN " << (char)(ch?ch:'?') << " '" << tok << "' (" << (id.empty()?"key":"value") << " at " << lineinfo.line << ":" << lineinfo.column << ")" << std::endl;
+#endif
 			switch (ch)
 			{
 				case '\0':

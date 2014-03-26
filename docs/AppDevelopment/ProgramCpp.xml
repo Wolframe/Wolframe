@@ -97,12 +97,25 @@
 	</para>
 		<sect3>
 		<title>Module Declaration</title>
-		<para>The module declaration needs to inlcude <code>appdevel.hpp</code> and
+		<para>The module declaration needs to include <code>appdevel.hpp</code> and
 		of course all headers with the function and data structure declarations needed.
-		The module starts with a header macro and ends with a footer macro.
-		Inbetween is the declaration of an array of functions of type <code>module::createBuilderFunc</code>.
-		The size of the array and its name you pass to the macro call that ends the
-		module declaration. The following example illustrates this:
+		The module starts with the header macro CPP_APPLICATION_FORM_FUNCTION_MODULE
+		with a short description of the module.
+		What follows are the function declarations declared with the macro
+		CPP_APPLICATION_FORM_FUNCTION. This macro has the following arguments in
+		this order:
+		</para>
+		<simplelist type="horiz" columns="2">
+		<member>Name</member><member>Description</member>
+		<member>NAME</member><member>identifier of the function</member>
+		<member>FUNCTION</member><member>implementation of the function</member>
+		<member>OUTPUT</member><member>output structure of the function</member>
+		<member>INPUT</member><member>input structure of the function</member>
+		</simplelist>
+		<para>
+		The declaration list is closed with the parameterless footer macro
+		CPP_APPLICATION_FORM_FUNCTION_MODULE_END.
+		The following example shows an example module declaration:
 		</para>
 		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customersModule.cpp" parse="text" />

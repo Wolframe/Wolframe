@@ -112,7 +112,7 @@ GreedySmallChunkAllocator::~GreedySmallChunkAllocator()
 void* GreedySmallChunkAllocator::alloc( std::size_t nn)
 {
 	void* rt;
-	if (!m_chunk || !(rt = m_chunk->alloc( nn)))
+	if (!m_chunk || (rt = m_chunk->alloc( nn)) != NULL)
 	{
 		MemChunk* chk = new MemChunk( nn);
 		rt = chk->alloc( nn);

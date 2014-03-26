@@ -37,41 +37,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
-# Lua
-!IFDEF WITH_LUA
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LUA
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\lua\src
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\3rdParty\lua\src\lua_static.lib
-!ENDIF
-
-# libxml2
-!IFDEF WITH_LIBXML2
-
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
-	/I"$(WIN_ICONV_DIR)"
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-!ENDIF
-
-# libxslt
-
-!IFDEF WITH_LIBXSLT
-INCLUDE_CXXFLAGS = $(INCLUDE_CXXFLAGS) \
-	/DWITH_LIBXSLT
-
-INCLUDE_DIRS = $(INCLUDE_DIRS) \
-	/I"$(LIBXSLT_DIR)\include"
-
-INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(LIBXSLT_DIR)\lib\libxslt.lib"
-!ENDIF
-
 # Postgresql
 !IFDEF WITH_PGSQL
 
@@ -85,19 +50,6 @@ INCLUDE_LIBS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(ORACLE_DIR)\sdk\lib\msvc\oci.lib"
-!ENDIF
-
-# libhpdf
-!IFDEF WITH_LIBHPDF
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(TOPDIR)\3rdParty\libhpdf\include"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib" \
-	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib"
 !ENDIF
 
 TEST_CPP_BINS = \
@@ -195,11 +147,12 @@ local_test:
 	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" .
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
+	@-echo copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >> test.bat
 !ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat

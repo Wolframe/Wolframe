@@ -124,9 +124,10 @@ VariantStructDescription::VariantStructDescription( const VariantStructDescripti
 		{
 			if (o.m_ar[ ii].name)
 			{
-				m_ar[ ii].name = (char*)std::malloc( std::strlen( o.m_ar[ ii].name)+1);
+				std::size_t len = std::strlen( o.m_ar[ ii].name);
+				m_ar[ ii].name = (char*)std::malloc( len+1);
 				if (!m_ar[ ii].name) goto BAD_ALLOC;
-				std::strcpy( m_ar[ ii].name, o.m_ar[ ii].name);
+				std::memcpy( m_ar[ ii].name, o.m_ar[ ii].name, len+1);
 			}
 			if (o.m_ar[ ii].substruct) try
 			{

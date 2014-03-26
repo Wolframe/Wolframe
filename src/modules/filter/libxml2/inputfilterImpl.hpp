@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file inputfilterImpl.hpp
-///\brief Input filter abstraction for the libxml2 library
+//\file inputfilterImpl.hpp
+//\brief Input filter abstraction for the libxml2 library
 
 #ifndef _Wolframe_LIBXML2_INPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_LIBXML2_INPUT_FILTER_HPP_INCLUDED
@@ -54,18 +54,22 @@ namespace langbind {
 
 struct InputFilterImpl :public InputFilter
 {
-	explicit InputFilterImpl( const XsltMapper& xsltMapper_)
+	//\brief Constructor
+	explicit InputFilterImpl( const XsltMapper& xsltMapper_, bool withEmpty_=false)
 		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		,InputFilter("libxslt")
 		,m_xsltMapper(xsltMapper_)
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
 		,m_taglevel(0)
-		,m_withEmpty(false){}
+		,m_withEmpty(withEmpty_){}
 
-	explicit InputFilterImpl()
+	//\brief Default constructor
+	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		,InputFilter("libxml2")
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
@@ -73,6 +77,7 @@ struct InputFilterImpl :public InputFilter
 		,m_taglevel(0)
 		,m_withEmpty(false){}
 
+	//\brief Copy constructor
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
 		,InputFilter(o)
@@ -88,40 +93,46 @@ struct InputFilterImpl :public InputFilter
 		,m_encoding(o.m_encoding)
 		{}
 
-	///\brief Implements InputFilter::copy()
+	//\brief Implements InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl(*this);
 	}
 
-	///\brief Implements FilterBase::getValue(const char*,std::string&)
-	virtual bool getValue( const char* name, std::string& val);
+	//\brief Implements InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl( m_xsltMapper, m_withEmpty);
+	}
 
-	///\brief Implements InputFilter::getDocType(types::DocType&&)
+	//\brief Implements FilterBase::getValue(const char*,std::string&) const
+	virtual bool getValue( const char* id, std::string& val) const;
+
+	//\brief Implements InputFilter::getDocType(types::DocType&&)
 	bool getDocType( types::DocType& doctype);
 
-	///\brief Implements FilterBase::setValue(const char*,const std::string&)
-	virtual bool setValue( const char* name, const std::string& value);
+	//\brief Implements FilterBase::setValue(const char*,const std::string&)
+	virtual bool setValue( const char* id, const std::string& value);
 
-	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
+	//\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end);
 
-	///\brief Implements InputFilter::getMetadata()
+	//\brief Implements InputFilter::getMetadata()
 	virtual bool getMetadata()
 	{
 		return (m_doc.get());
 	}
 
-	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
+	//\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
-	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
+	//\brief Implements 'ContentFilterAttributes::getEncoding() const'
 	virtual const char* getEncoding() const
 	{
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
-	///\brief Implements FilterBase::setFlags()
+	//\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
 private:

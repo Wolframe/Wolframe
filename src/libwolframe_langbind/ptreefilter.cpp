@@ -104,23 +104,10 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 
 PropertyTreeOutputFilter::PropertyTreeOutputFilter()
 	:utils::TypeSignature("langbind::PropertyTreeOutputFilter", __LINE__)
+	,TypedOutputFilter("ptree")
 {
 	m_stk.push_back( State());
 }
-
-static std::string ptree_tostring( const types::PropertyTree::Node& pt)
-{
-	std::ostringstream rt;
-	rt << "[" << pt.data().string() << "]";
-	types::PropertyTree::Node::const_iterator ii = pt.begin(), ee = pt.end();
-	for (; ii != ee; ++ii)
-	{
-		if (ii != pt.begin()) rt << ", ";
-		rt << std::string(ii->first) << " {" << ptree_tostring( ii->second) << "}";
-	}
-	return rt.str();
-}
-
 
 bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantConst& element)
 {

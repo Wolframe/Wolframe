@@ -62,6 +62,12 @@ private:
 	const time_t		m_loginTime;
 	const std::string	m_uname;
 	const std::string	m_name;
+
+#ifdef _WIN32
+// prevent C4512 on Windows, we don't want user data to be assignable
+private:	
+	User& operator=( const User &o );
+#endif
 };
 
 }} // namespace _Wolframe::AAAA

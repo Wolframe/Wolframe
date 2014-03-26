@@ -55,7 +55,6 @@
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "crypto/sha2.h"
-#include "system/globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -69,7 +68,7 @@ static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
 
 
-CRAMchallenge::CRAMchallenge()
+CRAMchallenge::CRAMchallenge( const unsigned char* data, size_t bytes )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
@@ -89,8 +88,8 @@ CRAMchallenge::CRAMchallenge()
 	sha256((const unsigned char *)&ft, sizeof( ft ), m_challenge );
 #endif
 
-	RandomGenerator& rnd = RandomGenerator::instance();
-	rnd.generate( m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+	memcpy( m_challenge + SHA256_DIGEST_SIZE, data,
+		bytes > ( CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE ) ? CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE : bytes );
 }
 
 std::string CRAMchallenge::toBCD() const

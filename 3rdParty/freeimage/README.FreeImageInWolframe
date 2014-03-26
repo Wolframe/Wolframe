@@ -1,28 +1,41 @@
-original version is 3.15.4
+This is a fixed version of the FreeImage library for various graphic formats.
 
-local changes and fixes:
-- Makefile has been renamed to 'Makefile.orig'.
-- 'GNUmakefile' and 'Makefile.w32' are added for the
-  Wolframe project.
-- Source/OpenEXR/IlmImf/ImfAutoArray.h:
-  added include for <string.h> for memset
-- Windows
-  - 'Source/librawlite/libraw/libraw_types.h': added a guard
-    against redefinition of NO_LCMS:
-    #ifndef NO_LCMS
-    #define NO_LCMS
-    #endif
-  - the Wolframe way of building libraries is to build dll
-    when BUILD_SHARED is defined, so the DLL visibility has
-    to be switched in 'Source/FreeImage.h': 
-    added BUILD_SHARED wrapper to define the macro
-    FREEIMAGE_LIB for symbol tagging (so we can build static
-    and dynamic libraries in the same directory)
-  - dito in building freeimage plus wrapper:
+It is based on version 3.15.4 of the library.
+
+To get the original go to http://freeimage.sourceforge.net.
+
+Local changes and fixes:
+
+ * Makefile has been renamed to 'Makefile.orig'.
+
+ * 'GNUmakefile' and 'Makefile.w32' are added for the
+    Wolframe project.
+
+ * Source/OpenEXR/IlmImf/ImfAutoArray.h:
+    added include for <string.h> for memset
+
+ * On Windows 'Source/librawlite/libraw/libraw_types.h': added a guard
+   against redefinition of NO_LCMS:
+
+   #ifndef NO_LCMS
+   #define NO_LCMS
+   #endif
+
+ * The Wolframe way of building libraries is to build dll
+   when BUILD_SHARED is defined, so the DLL visibility has
+   to be switched in 'Source/FreeImage.h': 
+
+   * added BUILD_SHARED wrapper to define the macro
+     FREEIMAGE_LIB for symbol tagging (so we can build static
+     and dynamic libraries in the same directory)
+
+   * dito in building freeimage plus wrapper:
     'Source/Wrapper/FreeImagePlus/FreeImagePlus.h'
-- 'Source/FreeImage/PluginHDR.cpp:76'
-  error: comma at end of enumerator list
-- tamed some errors from rpmlint (openSuse build service):
+
+ * 'Source/FreeImage/PluginHDR.cpp:76'
+    error: comma at end of enumerator list
+
+ * tamed some errors from rpmlint (openSuse build service):
     I: Program is using implicit definitions of special functions.
     these functions need to use their correct prototypes to allow
     the lightweight buffer overflow checking to work.
@@ -34,7 +47,8 @@ local changes and fixes:
      E: wolframe implicit-fortify-decl Source/ZLib/gzread.c:30
      E: wolframe implicit-fortify-decl hpdf_image_png.c:284
   => gzguts.h: added include <unistd.h> for !defined _WIN32
-- Patched Source/LibOpenJPEG/opj_malloc.h:
-  #elif ( __amd64__ ) && ( __APPLE__ ) && ( _AIX ) && ( __NetBSD__ )
-   #define HAVE_MEMALIGN
-  => avoid the error message "undefined reference to `memalign'"
+
+ * Patched Source/LibOpenJPEG/opj_malloc.h:
+   #elif ( __amd64__ ) && ( __APPLE__ ) && ( _AIX ) && ( __NetBSD__ )
+    #define HAVE_MEMALIGN
+   This eliminates the error message "undefined reference to `memalign'"

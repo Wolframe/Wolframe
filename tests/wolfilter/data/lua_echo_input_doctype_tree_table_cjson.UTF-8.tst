@@ -101,15 +101,69 @@ FORM trees
 	}
 }
 **file:script.lua
+function printTable( tab)
+	-- deterministic print of a table (since lua 5.2.1 table keys order is non deterministic)
+
+	keys = {}
+	for key,val in pairs( tab) do
+		table.insert( keys, key)
+	end
+	table.sort( keys)
+
+	for i,t in ipairs( keys) do
+		local v = tab[ t]
+
+		if type(v) == "table" then
+			if v[ #v] then
+				-- print array (keys are indices)
+				for eidx,elem in ipairs( v) do
+					output:opentag( t)
+					if type(elem) == "table" then
+						printTable( elem)
+					else
+						output:print( elem)
+					end
+					output:closetag()
+				end
+			else
+				-- print table (keys are values)
+				output:opentag( t)
+				printTable( v)
+				output:closetag()
+			end
+		else
+			output:opentag( t)
+			output:print( v)
+			output:closetag()
+		end
+	end
+end
+
 function run()
-	type = input:doctype()
-	output:as( provider.filter(), type)
-	output:print( input:table())
+	local doctype = input:doctype()
+	output:as( provider.filter(), doctype)
+	printTable( input:table())
 end
 **output
 {
 	"doctype":	"trees",
 	"root":	{
+		"btree":	{
+			"id":	"1",
+			"left":	{
+				"id":	"11",
+				"name":	"EINS EINS"
+			},
+			"name":	"EINS",
+			"right":	{
+				"id":	"12",
+				"left":	{
+					"id":	"121",
+					"name":	"EINS ZWEI EINS"
+				},
+				"name":	"EINS ZWEI"
+			}
+		},
 		"mtree":	{
 			"id":	"1",
 			"name":	"EINS",
@@ -119,30 +173,14 @@ end
 				}, {
 					"id":	"12",
 					"name":	"EINS ZWEI",
-					"node":	[{
-							"id":	"121",
-							"name":	"EINS ZWEI EINS"
-						}]
+					"node":	{
+						"id":	"121",
+						"name":	"EINS ZWEI EINS"
+					}
 				}, {
 					"id":	"13",
 					"name":	"EINS DREI"
 				}]
-		},
-		"btree":	{
-			"id":	"1",
-			"right":	{
-				"id":	"12",
-				"name":	"EINS ZWEI",
-				"left":	{
-					"id":	"121",
-					"name":	"EINS ZWEI EINS"
-				}
-			},
-			"name":	"EINS",
-			"left":	{
-				"id":	"11",
-				"name":	"EINS EINS"
-			}
 		}
 	}
 }

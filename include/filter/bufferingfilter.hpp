@@ -46,15 +46,18 @@ namespace langbind {
 class BufferingInputFilter :public InputFilter
 {
 public:
-	BufferingInputFilter( InputFilter* ref)
+	BufferingInputFilter( InputFilter* ref, const char* name_)
 		:utils::TypeSignature("langbind::BufferingInputFilter", __LINE__)
-		,m_ref(ref->copy()),m_end(false){}
+		,InputFilter(name_)
+		,m_ref(ref->copy()),m_end(false),m_fetched(false){}
 
 	BufferingInputFilter( const BufferingInputFilter& o)
 		:utils::TypeSignature(o)
 		,InputFilter(o)
 		,m_ref(o.m_ref->copy())
-		,m_end(o.m_end){}
+		,m_buf(o.m_buf)
+		,m_end(o.m_end)
+		,m_fetched(o.m_fetched){}
 
 	virtual ~BufferingInputFilter()
 	{
@@ -64,7 +67,29 @@ public:
 	///\brief Implements InputFilter::copy()const
 	virtual InputFilter* copy() const
 	{
-		return new BufferingInputFilter( m_ref);
+		return new BufferingInputFilter( *this);
+	}
+
+	///\brief Implements InputFilter::initcopy()const
+	virtual InputFilter* initcopy() const
+	{
+		return new BufferingInputFilter( m_ref, m_ref->name());
+	}
+
+	///\brief Implements InputFilter::getRest(const void*&,std::size_t&,bool)
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end_)
+	{
+		end_ = m_end;
+		if (m_fetched)
+		{
+			ptr = 0;
+			size = 0;
+		}
+		else
+		{
+			ptr = m_buf.c_str();
+			size = m_buf.size();
+		}
 	}
 
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
@@ -82,6 +107,7 @@ public:
 	{
 		if (m_end)
 		{
+			m_fetched = true;
 			bool rt = m_ref->getNext( type, element, elementsize);
 			setState( m_ref->state(), m_ref->getError());
 			return rt;
@@ -113,16 +139,16 @@ public:
 		return m_ref->getEncoding();
 	}
 
-	///\brief Implements FilterBase::getValue(const char*,std::string&)
-	virtual bool getValue( const char* name, std::string& val) const
+	///\brief Implements FilterBase::getValue(const char*,std::string&) const
+	virtual bool getValue( const char* id, std::string& val) const
 	{
-		return m_ref->getValue( name, val);
+		return m_ref->getValue( id, val);
 	}
 
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
-	virtual bool setValue( const char* name, const std::string& val)
+	virtual bool setValue( const char* id, const std::string& val)
 	{
-		return m_ref->setValue( name, val);
+		return m_ref->setValue( id, val);
 	}
 
 	InputFilter* reference() const
@@ -138,6 +164,7 @@ private:
 	InputFilter* m_ref;
 	std::string m_buf;
 	bool m_end;
+	bool m_fetched;
 };
 
 }}//namespace

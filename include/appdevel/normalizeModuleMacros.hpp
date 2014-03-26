@@ -32,8 +32,7 @@
 ************************************************************************/
 ///\file appdevel/normalizeModuleMacros.hpp
 ///\brief Macros for defining normalization and validaton function module
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/module/normalizeFunctionBuilder.hpp"
 
 //\brief Marks the start of the Wolframe C++ form function module after the includes section.
 #define NORMALIZER_MODULE(NAME,DESCRIPTION)\
@@ -92,5 +91,7 @@
 	{\
 		ModuleImpl::constructor\
 	};\
-	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
+	extern "C" { \
+		 _Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef); \
+	}
 

@@ -74,6 +74,7 @@ bool printValue_short( const signed short*, types::VariantConst& element);
 bool printValue_ushort( const unsigned short*, types::VariantConst& element);
 bool printValue_char( const signed char*, types::VariantConst& element);
 bool printValue_uchar( const unsigned char*, types::VariantConst& element);
+bool printValue_bool( const bool*, types::VariantConst& element);
 bool printValue_float( const float*, types::VariantConst& element);
 bool printValue_double( const double*, types::VariantConst& element);
 bool printValue_string( const std::string*, types::VariantConst& element);
@@ -85,41 +86,46 @@ typedef bool (*FetchElement)( Context& ctx, SerializeStateStack& stk);
 bool fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, SerializeStateStack& stk);
 
 namespace {
-template <typename TYPE>
-static bool printValue_( const void*, types::VariantConst&)
-{throw std::runtime_error( "unable to serialize atomic value of this type");}
+template <typename TYPE> struct Printer {};
 
-template <> bool printValue_<boost::int64_t>( const void* value, types::VariantConst& element)
-{return printValue_int64( (const boost::int64_t*)value, element);}
-template <> bool printValue_<boost::uint64_t>( const void* value, types::VariantConst& element)
-{return printValue_uint64( (const boost::uint64_t*)value, element);}
+template <> struct Printer<boost::int64_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_int64( (const boost::int64_t*)value, element);}};
+template <> struct Printer<boost::uint64_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_uint64( (const boost::uint64_t*)value, element);}};
 
-template <> bool printValue_<boost::int32_t>( const void* value, types::VariantConst& element)
-{return printValue_int32( (const boost::int32_t*)value, element);}
-template <> bool printValue_<boost::uint32_t>( const void* value, types::VariantConst& element)
-{return printValue_uint32( (const boost::uint32_t*)value, element);}
+template <> struct Printer<boost::int32_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_int32( (const boost::int32_t*)value, element);}};
+template <> struct Printer<boost::uint32_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_uint32( (const boost::uint32_t*)value, element);}};
 
-template <> bool printValue_<signed short>( const void* value, types::VariantConst& element)
-{return printValue_short( (const signed short*)value, element);}
-template <> bool printValue_<unsigned short>( const void* value, types::VariantConst& element)
-{return printValue_ushort( (const unsigned short*)value, element);}
+template <> struct Printer<boost::int16_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_short( (const boost::int16_t*)value, element);}};
+template <> struct Printer<boost::uint16_t>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_ushort( (const boost::uint16_t*)value, element);}};
 
-template <> bool printValue_<signed char>( const void* value, types::VariantConst& element)
-{return printValue_char( (const signed char*)value, element);}
-template <> bool printValue_<unsigned char>( const void* value, types::VariantConst& element)
-{return printValue_uchar( (const unsigned char*)value, element);}
+template <> struct Printer<signed char>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_char( (const signed char*)value, element);}};
+template <> struct Printer<unsigned char>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_uchar( (const unsigned char*)value, element);}};
 
-template <> bool printValue_<float>( const void* value, types::VariantConst& element)
-{return printValue_float( (const float*)value, element);}
-template <> bool printValue_<double>( const void* value, types::VariantConst& element)
-{return printValue_double( (const double*)value, element);}
+template <> struct Printer<bool>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_bool( (const bool*)value, element);}};
 
-template <> bool printValue_<std::string>( const void* value, types::VariantConst& element)
-{return printValue_string( (const std::string*)value, element);}
-template <> bool printValue_<types::DateTime>( const void* value, types::VariantConst& element)
-{return printValue_datetime( (const types::DateTime*)value, element);}
-template <> bool printValue_<types::BigNumber>( const void* value, types::VariantConst& element)
-{return printValue_bignumber( (const types::BigNumber*)value, element);}
+template <> struct Printer<float>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_float( (const float*)value, element);}};
+
+template <> struct Printer<double>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_double( (const double*)value, element);}};
+
+template <> struct Printer<std::string>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_string( (const std::string*)value, element);}};
+
+template <> struct Printer<types::DateTime>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_datetime( (const types::DateTime*)value, element);}};
+
+template <> struct Printer<types::BigNumber>
+{static bool printValue( const void* value, types::VariantConst& element) {return printValue_bignumber( (const types::BigNumber*)value, element);}};
+
 
 template <typename TYPE>
 static bool fetchObject_( const traits::struct_&, Context& ctx, SerializeStateStack& stk)
@@ -131,7 +137,7 @@ static bool fetchObject_( const traits::struct_&, Context& ctx, SerializeStateSt
 template <typename TYPE>
 static bool fetchObject_( const traits::atomic_&, Context& ctx, SerializeStateStack& stk)
 {
-	return fetchObjectAtomic( printValue_<TYPE>, ctx, stk);
+	return fetchObjectAtomic( Printer<TYPE>::printValue, ctx, stk);
 }
 
 template <typename TYPE>
