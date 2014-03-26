@@ -143,7 +143,10 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	langbind::InputFilterR l_inputfilter;
 	langbind::OutputFilterR l_outputfilter;
 
-	if (input_filtername == output_filtername)
+	if (input_filtername.empty() && output_filtername.empty())
+	{
+	}
+	else if (input_filtername == output_filtername)
 	{
 		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, input_filterarg));
 		if (!filter.get())
@@ -170,7 +173,6 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	if (!l_inputfilter.get())
 	{
-		throw std::runtime_error( std::string( "input filter not defined '") + input_filtername + "'");
 	}
 	if (m_inputfilter.get())
 	{
@@ -184,7 +186,6 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	if (!l_outputfilter.get())
 	{
-		throw std::runtime_error( std::string( "output filter not defined '") + output_filtername + "'");
 	}
 	if (m_outputfilter.get())
 	{

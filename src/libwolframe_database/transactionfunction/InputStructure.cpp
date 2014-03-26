@@ -527,6 +527,7 @@ public:
 	///\brief Default constructor
 	InputFilter()
 		:utils::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
+		,langbind::TypedInputFilter("dbpreprocin")
 		,m_structure(0)
 		,m_elementitr(0)
 	{
@@ -549,6 +550,7 @@ public:
 	///\brief Constructor
 	InputFilter( const TransactionFunctionInput::Structure* structure_, const std::vector<NodeAssignment>& nodelist_)
 		:utils::TypeSignature("db::TransactionFunctionInput::Structure::InputFilter", __LINE__)
+		,langbind::TypedInputFilter("dbpreprocin")
 		,m_structure(structure_)
 		,m_nodelist(nodelist_)
 		,m_elementitr(0)
@@ -775,6 +777,7 @@ public:
 	///\brief Default constructor
 	OutputFilter()
 		:utils::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		,langbind::TypedOutputFilter("dbpreprocout")
 		,m_structure(0)
 		,m_lasttype( langbind::TypedInputFilter::Value)
 		,m_taglevel(0)
@@ -794,6 +797,7 @@ public:
 	///\brief Constructor
 	OutputFilter( TransactionFunctionInput::Structure* structure_, const NodeVisitor& visitor_, const std::map<int, bool>& sourccetagmap_)
 		:utils::TypeSignature("db::TransactionFunctionInput::Structure::OutputFilter", __LINE__)
+		,langbind::TypedOutputFilter("dbpreprocout")
 		,m_structure(structure_)
 		,m_visitor(visitor_)
 		,m_lasttype( langbind::TypedInputFilter::Value)

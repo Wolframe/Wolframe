@@ -444,14 +444,6 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 	return constructor->object( *cfg);
 }
 
-cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command ) const
-{
-	LOG_TRACE << "[provider] get iofilter command handler '" << command << "'";
-	cmdbind::CommandHandler* hnd = cmdhandler( command);
-	if (!hnd) return NULL;
-	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
-}
-
 db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase( bool suppressAlert) const
 {
 	if ( ! m_db && !suppressAlert )	{

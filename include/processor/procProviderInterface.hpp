@@ -61,8 +61,6 @@ namespace cmdbind
 {
 //\brief Forward declaration
 class CommandHandler;
-//\brief Forward declaration
-class IOFilterCommandHandler;
 }
 
 namespace proc {
@@ -77,9 +75,6 @@ public:
 	//\brief Get the command handler for a specific command
 	//\param[in] command name of the command
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const=0;
-	//\brief Get the command handler for a specific command processing input/output with a filter
-	//\param[in] command name of the command
-	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const=0;
 	//\brief Get the database for transactions
 	//\return reference to database
 	virtual db::Database* transactionDatabase() const=0;

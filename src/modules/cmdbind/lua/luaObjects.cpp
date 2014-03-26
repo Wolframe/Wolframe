@@ -1488,24 +1488,37 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 	InputFilter* ff = 0;
 	if (filter->inputfilter().get())
 	{
-		ff = filter->inputfilter()->copy();
-		if (input->inputfilter().get())
+		ff = filter->inputfilter()->initcopy();
+		if (input->isDocument())
+		{
+			input->inputfilter().reset( ff);
+			const char* cstr = input->documentptr();
+			std::size_t csize = input->documentsize();
+			ff->putInput( cstr, csize, true);
+		}
+		else if (input->inputfilter().get())
 		{
 			//... old filter defined, then assign the rest of the input to the new filter attached
 			const void* chunk;
 			std::size_t chunksize;
 			bool chunkend;
 			input->inputfilter()->getRest( chunk, chunksize, chunkend);
-			ff->putInput( chunk, chunksize, chunkend);
+			try
+			{
+				chunk = input->allocContentCopy( chunk, chunksize);
+				ff->putInput( chunk, chunksize, chunkend);
+			}
+			catch (const std::runtime_error& e)
+			{
+				delete ff;
+				throw e;
+			}
+			catch (const std::bad_alloc& e)
+			{
+				delete ff;
+				throw e;
+			}
 			input->inputfilter().reset( ff);
-		}
-		else if (input->content().get())
-		{
-			//... in case of a document assign its content to the processing filter
-			input->inputfilter().reset( ff);
-			const char* cstr = input->content()->c_str();
-			std::size_t csize = input->content()->size();
-			ff->putInput( cstr, csize, true);
 		}
 		else
 		{

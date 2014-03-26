@@ -76,6 +76,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	OutputFilterImpl()
 		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
+		,OutputFilter("token")
 		,m_elemitr(0)
 		{}
 
@@ -170,6 +171,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Constructor
 	InputFilterImpl( const char* encoding_)
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
+		,InputFilter("token")
 		,m_tag(0)
 		,m_taglevel(0)
 		,m_elemtype(OpenTag)
@@ -198,14 +200,19 @@ struct InputFilterImpl :public InputFilter
 		,m_eolnread(o.m_eolnread)
 		,m_encoding(o.m_encoding){}
 
-	///\brief self copy
-	///\return copy of this
+	///\brief Implement InputFilterImpl::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member InputFilterImpl::putInput(const void*,std::size_t,bool)
+	///\brief Implement InputFilterImpl::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl(m_encoding.c_str());
+	}
+
+	///\brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
@@ -221,7 +228,7 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	///\brief implement interface member InputFilter::getNext( InputFilter::ElementType&,const void*&,std::size_t&)
+	///\brief Implement InputFilter::getNext( InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_linecomplete)

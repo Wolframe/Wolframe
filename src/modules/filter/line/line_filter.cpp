@@ -54,6 +54,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	OutputFilterImpl( const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (line)", __LINE__)
+		,OutputFilter("line")
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
@@ -148,6 +149,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief Constructor
 	InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (line)", __LINE__)
+		,InputFilter("line")
+		,m_charset(iocharset_)
 		,m_itr(iocharset_)
 		,m_output(AppCharset())
 		,m_src(0)
@@ -162,6 +165,7 @@ struct InputFilterImpl :public InputFilter
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (line)", __LINE__)
 		,InputFilter( o)
+		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
 		,m_output(o.m_output)
 		,m_elembuf(o.m_elembuf)
@@ -173,11 +177,15 @@ struct InputFilterImpl :public InputFilter
 		,m_encoding(o.m_encoding)
 		{}
 
-	///\brief self copy
-	///\return copy of this
+	//\brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
+	}
+	//\brief Implement InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl( m_encoding.c_str(), m_charset);
 	}
 
 	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
@@ -269,6 +277,7 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
+	IOCharset m_charset;		//< character set encoding
 	TextScanner m_itr;		//< iterator on source
 	AppCharset m_output;		//< output
 	std::string m_elembuf;		//< buffer for current line

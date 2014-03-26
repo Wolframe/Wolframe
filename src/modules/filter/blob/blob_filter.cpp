@@ -50,6 +50,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Constructor
 	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
+		,InputFilter("blob")
 		,m_end(false)
 		,m_done(false){}
 
@@ -62,28 +63,42 @@ struct InputFilterImpl :public InputFilter
 		,m_end(o.m_end)
 		,m_done(o.m_done){}
 
-	///\brief self copy
-	///\return copy of this
+	///\brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	///\brief Implement InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl();
+	}
+
+	///\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_elembuf.append( (const char*)ptr, size);
 		m_end = end;
 	}
 
+	///\brief Implement InputFilter::getRest( const void*&,std::size_t&,bool&)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
-		ptr = 0;
-		size = 0;
 		end = m_end;
+		if (m_done)
+		{
+			ptr = 0;
+			size = 0;
+		}
+		else
+		{
+			ptr = (const void*)m_elembuf.c_str();
+			size = m_elembuf.size();
+		}
 	}
 
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	///\brief implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_done)
@@ -133,6 +148,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	OutputFilterImpl()
 		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
+		,OutputFilter("blob")
 		,m_elemitr(0){}
 
 	///\brief Copy constructor

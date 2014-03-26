@@ -49,6 +49,7 @@ public:
 	///\brief Constructor
 	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
 		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
+		,TypedInputFilter("ptree")
 		,m_state(0)
 	{
 		State st;

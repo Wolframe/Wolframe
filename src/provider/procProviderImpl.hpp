@@ -59,7 +59,6 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
-	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command ) const;
 
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;

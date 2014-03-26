@@ -208,9 +208,9 @@ const char* OutputFilterImpl::encoding() const
 	}
 }
 
-bool OutputFilterImpl::getValue( const char* name, std::string& val) const
+bool OutputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp( name, "encoding") == 0)
+	if (std::strcmp( id, "encoding") == 0)
 	{
 		const char* ee = encoding();
 		if (ee)
@@ -220,16 +220,16 @@ bool OutputFilterImpl::getValue( const char* name, std::string& val) const
 		}
 		return false;
 	}
-	return Parent::getValue( name, val);
+	return Parent::getValue( id, val);
 }
 
-bool OutputFilterImpl::setValue( const char* name, const std::string& value)
+bool OutputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	if (std::strcmp( name, "encoding") == 0)
+	if (std::strcmp( id, "encoding") == 0)
 	{
 		m_encoding = value;
 		return true;
 	}
-	return Parent::setValue( name, value);
+	return Parent::setValue( id, value);
 }
 

@@ -80,6 +80,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	OutputFilterImpl( const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
+		,OutputFilter("token")
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
@@ -181,7 +182,9 @@ struct InputFilterImpl :public InputFilter
 	///\brief Constructor
 	InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
-		,m_itr( iocharset_)
+		,InputFilter("token")
+		,m_charset(iocharset_)
+		,m_itr(iocharset_)
 		,m_output(AppCharset())
 		,m_tag(0)
 		,m_taglevel(0)
@@ -198,6 +201,7 @@ struct InputFilterImpl :public InputFilter
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter(o)
+		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
 		,m_output(o.m_output)
 		,m_tag(o.m_tag)
@@ -211,14 +215,19 @@ struct InputFilterImpl :public InputFilter
 		,m_eolnread(o.m_eolnread)
 		,m_encoding(o.m_encoding){}
 
-	///\brief self copy
-	///\return copy of this
+	//\brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member InputFilterImpl::putInput(const void*,std::size_t,bool)
+	//\brief Implement InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		return new InputFilterImpl( m_encoding.c_str(), m_charset);
+	}
+
+	///\brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
@@ -235,7 +244,7 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	///\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_linecomplete)
@@ -357,6 +366,7 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
+	IOCharset m_charset;		//< character set encoding
 	TextScanner m_itr;		//< src iterator
 	AppCharset m_output;		//< output
 	char m_tag;			//< tag defining the currently parsed element type

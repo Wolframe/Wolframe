@@ -61,6 +61,7 @@ struct InputFilterImpl
 	///\brief Constructor
 	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
+		,InputFilter("textwolf")
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
@@ -77,19 +78,19 @@ struct InputFilterImpl
 		{}
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val) const
+	virtual bool getValue( const char* id, std::string& val) const
 	{
-		if (std::strcmp( name, "empty") == 0)
+		if (std::strcmp( id, "empty") == 0)
 		{
 			val = m_parser.withEmpty()?"true":"false";
 			return true;
 		}
-		if (std::strcmp( name, "tokenize") == 0)
+		if (std::strcmp( id, "tokenize") == 0)
 		{
 			val = m_parser.doTokenize()?"true":"false";
 			return true;
 		}
-		return Parent::getValue( name, val);
+		return Parent::getValue( id, val);
 	}
 
 	///\brief Implementation of InputFilter::getDocType(std::string&)
@@ -131,9 +132,9 @@ struct InputFilterImpl
 	}
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
-	virtual bool setValue( const char* name, const std::string& value)
+	virtual bool setValue( const char* id, const std::string& value)
 	{
-		if (std::strcmp( name, "empty") == 0)
+		if (std::strcmp( id, "empty") == 0)
 		{
 			if (std::strcmp( value.c_str(), "true") == 0)
 			{
@@ -149,7 +150,7 @@ struct InputFilterImpl
 			}
 			return true;
 		}
-		if (std::strcmp( name, "tokenize") == 0)
+		if (std::strcmp( id, "tokenize") == 0)
 		{
 			if (std::strcmp( value.c_str(), "true") == 0)
 			{
@@ -165,7 +166,7 @@ struct InputFilterImpl
 			}
 			return true;
 		}
-		return Parent::setValue( name, value);
+		return Parent::setValue( id, value);
 	}
 
 	///\brief self copy
@@ -173,6 +174,17 @@ struct InputFilterImpl
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
+	}
+
+	//\brief Implement InputFilter::initcopy()
+	virtual InputFilter* initcopy() const
+	{
+		bool withEmpty_ = m_parser.withEmpty();
+		bool doTokenize_ = m_parser.doTokenize();
+		InputFilterImpl* rt = new InputFilterImpl();
+		rt->m_parser.withEmpty( withEmpty_);
+		rt->m_parser.doTokenize( doTokenize_);
+		return rt;
 	}
 
 	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
@@ -300,7 +312,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 	OutputFilterImpl( const ContentFilterAttributes* attr=0)
 		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
-		,OutputFilter(attr)
+		,OutputFilter("textwolf",attr)
 		,m_elemitr(0)
 		,m_encodingSet(false){}
 
@@ -432,9 +444,9 @@ struct OutputFilterImpl :public OutputFilter
 	}
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val) const
+	virtual bool getValue( const char* id, std::string& val) const
 	{
-		if (std::strcmp( name, "encoding") == 0)
+		if (std::strcmp( id, "encoding") == 0)
 		{
 			const char* ee = encoding();
 			if (ee)
@@ -444,18 +456,18 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			return false;
 		}
-		return Parent::getValue( name, val);
+		return Parent::getValue( id, val);
 	}
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
-	virtual bool setValue( const char* name, const std::string& value)
+	virtual bool setValue( const char* id, const std::string& value)
 	{
-		if (std::strcmp( name, "encoding") == 0)
+		if (std::strcmp( id, "encoding") == 0)
 		{
 			m_encoding = value;
 			return true;
 		}
-		return Parent::setValue( name, value);
+		return Parent::setValue( id, value);
 	}
 
 private:
