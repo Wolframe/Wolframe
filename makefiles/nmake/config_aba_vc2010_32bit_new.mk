@@ -18,55 +18,43 @@
 ###########################################
 
 # version of the boost library
-
-#BOOST_VERSION = 1_46_1
 BOOST_VERSION = 1_55
 
 # base dir where boost is installed
-
-#BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\develop\boost_1_55_0
-#BOOST_DIR = D:\boost\boost_1_45_0
-#BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR = C:\develop\boost_1_55_0
+BOOST_DIR = C:\develop\boost_1_55_0-win32-debug
 
 # depends on the choosen boost layout
-#BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_55
-BOOST_INCLUDE_DIR = $(BOOST_DIR)
+# pre-compiled
+#BOOST_INCLUDE_DIR = $(BOOST_DIR)
+# self-compiled
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\include\boost-$(BOOST_VERSION)
 
 # visual studio version used for compiling
-
-#BOOST_VC_VER = vc80
-#BOOST_VC_VER = vc90
 BOOST_VC_VER = vc100
 
 # TODO: probe those
 BOOST_MT = -mt
 
-# preinstalled binaries
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
-
 # self-compiled
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib\Win32"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
-# precompiled libraries from http://boost.teeks99.com
-#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
-#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
-BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+# pre-compiled
+#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
 
 # ICU (icu4c)
 #############
 
-ICU_DIR = C:\develop\icu4c-52_1-Win32-msvc10\icu
+# pre-compiled
+#ICU_DIR = C:\develop\icu4c-52_1-Win32-msvc10\icu
+
+# self-compiled
+ICU_DIR = C:\develop\icu4c-52_1-win32-debug
 
 # the library version (how the DLLs are tagged)
 ICU_LIB_VERSION = 52
 
-# TODO: probe!
 ICU_LIB_DIR = $(ICU_DIR)\lib
-#ICU_LIB_DIR = $(ICU_DIR)\lib64
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
@@ -99,20 +87,25 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 
 ORACLE_DIR = C:\develop\Oracle\instantclient_12_1
 
-# win_iconv
-###########
+# zlib
+######
 
-WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+ZLIB_DIR = C:\develop\zlib-1.2.5.win32
+
+# iconv
+#######
+
+ICONV_DIR = C:\develop\iconv-1.9.2.win32
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.9.1-win32-debug
+LIBXML2_DIR = C:\develop\libxml2-2.7.8.win32
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.28-win32-debug
+LIBXSLT_DIR = C:\develop\libxslt-1.1.26.win32
 
 # Python 3
 ##########
