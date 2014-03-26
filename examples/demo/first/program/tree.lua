@@ -6,7 +6,7 @@ local function insert_tree_itr( parentid, itr)
 		if (t == "name") then
 			id = formfunction( "treeAddNode")( {name=v, parentid=parentid} ):table().ID
 		elseif (t == "class") then
-			insert_tree_itr( id, scope( itr))
+			insert_tree_itr( id, iterator.scope( itr))
 		end
 	end
 end
@@ -33,7 +33,7 @@ local function insert_tree_topnode( itr)
 				insert_topnode( name, parentid)
 				name = nil
 			end
-			insert_tree_itr( id, scope( itr))
+			insert_tree_itr( id, iterator.scope( itr))
 		end
 	end
 	if name then
@@ -89,7 +89,7 @@ function treeAddHierarchy()
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_tree_topnode( scope( itr))
+			insert_tree_topnode( iterator.scope( itr))
 		end
 	end
 end

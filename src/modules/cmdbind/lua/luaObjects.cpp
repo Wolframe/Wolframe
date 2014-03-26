@@ -2509,6 +2509,12 @@ static const luaL_Reg provider_methodtable[ 6] =
 	{0,0}
 };
 
+static const luaL_Reg iterator_methodtable[ 2] =
+{
+	{"scope",&function_scope},
+	{0,0}
+};
+
 static const luaL_Reg customvalue_methodtable[ 16] =
 {
 	{"__index", &function_customtype_index},
@@ -2741,8 +2747,11 @@ void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provid
 
 		if (provider_) setProcessorProvider( m_ls, provider_);
 		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
-		lua_pushcfunction( m_ls, &function_scope);
-		lua_setglobal( m_ls, "scope");
+
+		//Register iterator context:
+		lua_newtable( m_ls);
+		luaL_setfuncs( m_ls, iterator_methodtable, 0);
+		lua_setglobal( m_ls, "iterator");
 
 		//Register provider context:
 		lua_newtable( m_ls);

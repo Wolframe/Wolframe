@@ -13,7 +13,7 @@ function run( )
 	for c,t in i do
 		output:print( c, t)
 		if t == "content" then
-			process_content( scope( i))
+			process_content( iterator.scope( i))
 			output:print( false, false)
 		end
 	end
