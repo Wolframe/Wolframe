@@ -59,7 +59,7 @@ public:
 	vm::SymbolTable symboltab;					//< symbol table
 	std::vector<types::Variant> constants;				//< constants
 	std::vector<std::string> names;					//< names
-	std::map<SymbolTable::Index,SubroutineSignature> signatures;	//< subroutine signutures
+	std::map<vm::SymbolTable::Index,SubroutineSignature> signatures;//< subroutine signutures
 
 public:
 	VirtualMachine(){}

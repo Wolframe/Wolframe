@@ -147,7 +147,7 @@ public:
 		if (m_blockStack.empty()) throw std::runtime_error( "illegal state: end of FOREACH without begin");
 
 		Instruction& forwardJumpInstr = program[ m_blockStack.back()-1];
-		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO, Arg_AddressOffsetForward, 0))
+		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_FORWARD, 0))
 		{
 			throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
 		}
@@ -157,13 +157,13 @@ public:
 			( Co_IF_COND, Op_GOTO_BACKWARD, program.size() - m_blockStack.back())
 		;
 		// Patch forward jump (if iterator set empty):
-		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO, Arg_AddressOffsetForward, program.size() - m_blockStack.back() + 1);
+		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_FORWARD, program.size() - m_blockStack.back() + 1);
 	}
 
 	void begin_CALL( const std::string& name, const std::vector<std::string>& signature)
 	{
-		Index subroutineIdx = symboltab.getIndex( name);
-		if (subroutineIdx == SymbolTable::UnknownSymbol)
+		vm::SymbolTable::Index subroutineIdx = symboltab.getIndex( name);
+		if (subroutineIdx == vm::SymbolTable::UnknownSymbol)
 		{
 			subroutineIdx = symboltab.define( name);
 		}
@@ -176,7 +176,8 @@ public:
 
 		// Code generated:
 		program
-			( Op_OPEN_ITER, Arg_InputPath, idx)			// iterate on input path
+			( Op_OPEN_ITER_PATH, idx )			// iterate on input path
+		;
 	}
 
 private:
