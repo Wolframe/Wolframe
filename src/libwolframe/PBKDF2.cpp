@@ -47,12 +47,12 @@
 namespace _Wolframe {
 namespace crypto {
 
-PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* salt, size_t saltSize,
-				    const unsigned char* password, size_t pwdSize,
+PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize,
+				    const unsigned char* salt, size_t saltSize,
 				    std::size_t dkLen, unsigned int rounds )
 {
 	m_hash = new unsigned char[ dkLen ];
-	if ( pbkdf2_hmac_sha1( salt, saltSize, password, pwdSize, dkLen, rounds,
+	if ( pbkdf2_hmac_sha1( password, pwdSize, salt, saltSize, dkLen, rounds,
 			       m_hash ) != 0 )	{
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
@@ -60,12 +60,12 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* salt, size_t saltSize,
 	m_dkLen = dkLen;
 }
 
-PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& salt, const std::string& password,
+PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& password, const std::string& salt,
 				    std::size_t dkLen, unsigned int rounds )
 {
 	m_hash = new unsigned char[ dkLen ];
-	if ( pbkdf2_hmac_sha1( (const unsigned char*)salt.data(), salt.size(),
-			       (const unsigned char*)password.data(), password.size(),
+	if ( pbkdf2_hmac_sha1( (const unsigned char*)password.data(), password.size(),
+			       (const unsigned char*)salt.data(), salt.size(),
 			       dkLen, rounds, m_hash ) != 0 )	{
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
@@ -73,13 +73,13 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& salt, const std::string& 
 	m_dkLen = dkLen;
 }
 
-PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* salt, size_t saltSize,
-				    const std::string& password,
+PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& password,
+				    const unsigned char* salt, size_t saltSize,
 				    std::size_t dkLen, unsigned int rounds )
 {
 	m_hash = new unsigned char[ dkLen ];
-	if ( pbkdf2_hmac_sha1( salt, saltSize,
-			       (const unsigned char*)password.data(), password.size(),
+	if ( pbkdf2_hmac_sha1( (const unsigned char*)password.data(), password.size(),
+			       salt, saltSize,
 			       dkLen, rounds, m_hash ) != 0 )	{
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
@@ -88,13 +88,14 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* salt, size_t saltSize,
 	m_dkLen = dkLen;
 }
 
-PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& salt,
-				    const unsigned char* password, size_t pwdSize,
+PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSize,
+				    const std::string& salt,
 				    std::size_t dkLen, unsigned int rounds )
 {
 	m_hash = new unsigned char[ dkLen ];
-	if ( pbkdf2_hmac_sha1( (const unsigned char*)salt.data(), salt.size(),
-			       password, pwdSize, dkLen, rounds, m_hash ) != 0 )	{
+	if ( pbkdf2_hmac_sha1( password, pwdSize,
+			       (const unsigned char*)salt.data(), salt.size(),
+			       dkLen, rounds, m_hash ) != 0 )	{
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
 	}
