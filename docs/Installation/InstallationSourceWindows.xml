@@ -351,10 +351,10 @@
 
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 				</para>
@@ -372,11 +372,11 @@
 				
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time --with-locale --with-regex ^
 		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 
@@ -423,7 +423,7 @@
 				</para>
 				
 				<para>
-					Install the developer version from for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>
+					Install the developer version (for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>)
 					for instance to <filename>C:\OpenSSL-Win32</filename>.
 				</para>
 				
@@ -872,11 +872,11 @@
 				
 					<programlisting language='shell'>
 	bootstrap
-	.\b2 --prefix=C:\boost\boost_1_55
+	.\b2 --prefix=C:\boost\boost_1_55 ^
 		--with-thread --with-filesystem --with-system --with-program_options ^
 		--with-date_time --with-locale --with-regex ^
 		-sICU_PATH="C:\icu-49.1.2-win32-debug" ^
-		architecture=x86 address-model=64 toolset=msvc 
+		architecture=x86 address-model=64 toolset=msvc ^
 		install
 					</programlisting>
 
