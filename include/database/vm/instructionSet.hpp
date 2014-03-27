@@ -35,6 +35,9 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #include <stdexcept>
+#include <vector>
+#include <string>
+#include <ostream>
 #include <boost/cstdint.hpp>
 
 namespace _Wolframe {
@@ -49,10 +52,8 @@ public:
 		// Control Flow Instructions:
 		Op_EXIT,			//< exit (abort)
 		Op_RETURN,			//< return from subroutine or termination of transaction
-		Op_GOTO_FORWARD,		//< goto relative address jump forward
-		Op_GOTO_BACKWARD,		//< goto relative address jump back
 		Op_GOTO_ABSOLUTE,		//< goto absolute address
-		Op_GOTO_SYMBOLIC,		//< goto symbolic absolute address (index in names)
+		Op_GOTO_SYMBOLIC,		//< goto symbolic address (index in names)
 
 		// Print Instructions:
 		Op_PRINT_CONST,			//< print a value to output: constant
@@ -103,12 +104,168 @@ public:
 		// Others:
 		Op_NOP				//< no operation
 	};
+	static const char* opCodeName( OpCode i)
+	{
+		static const char* ar[] = {
+			"EXIT",
+			"RETURN",
+			"GOTO_ABSOLUTE",
+			"GOTO_SYMBOLIC",
+	
+			"PRINT_CONST",
+			"PRINT_SEL_IDX",
+			"PRINT_SEL_NAM",
+			"PRINT_ITR_IDX",
+			"PRINT_ITR_NAM",
+			"PRINT_OPEN",
+			"PRINT_CLOSE",
+
+			"KEEP_RESULT",
+			"SELECT_PARAMETER",
+			"SELECT_LAST_RESULT",
+			"SELECT_KEPT_RESULT",
+
+			"OPEN_ITER_LAST_RESULT",
+			"OPEN_ITER_KEPT_RESULT",
+			"OPEN_ITER_PATH",
+			"OPEN_ITER_TUPLESET",
+			"NEXT",
+
+			"SUB_FRAME_OPEN",
+			"SUB_ARG_CONST",
+			"SUB_ARG_SEL_IDX",
+			"SUB_ARG_SEL_NAM",
+			"SUB_ARG_ITR_IDX",
+			"SUB_ARG_ITR_NAM",
+			"SUB_FRAME_CLOSE",
+	
+			"STM_START",
+			"STM_BIND_CONST",
+			"STM_BIND_SEL_IDX",
+			"STM_BIND_SEL_NAM",
+			"STM_BIND_ITR_IDX",
+			"STM_BIND_ITR_NAM",
+			"STM_EXEC",
+	
+			"RESULT_INIT",
+			"RESULT_INIT_UNIQUE",
+			"RESULT_INIT_NONEMPTY",
+			"RESULT_INIT_NONEMPTY_UNIQUE",
+	
+			"NOP"
+		};
+		return ar[i];
+	}
+
+	enum ArgumentType
+	{
+		At_None,
+		At_AbsoluteAddress,
+		At_SymbolicAddress,
+		At_Path,
+		At_TupleSet,
+		At_Constant,
+		At_ColumnName,
+		At_ResultName,
+		At_SubroutineSignature,
+		At_String,
+		At_SelectedColumnIdx,
+		At_IteratorColumnIdx
+	};
+
+	static const char* argumentTypeName( ArgumentType i)
+	{
+		static const char* ar[] =
+		{
+			"",
+			"AbsoluteAddress",
+			"SymbolicAddress",
+			"Path",
+			"TupleSet",
+			"Constant",
+			"ColumnName",
+			"ResultName",
+			"SubroutineSignature",
+			"String",
+			"SelectedColumnIdx",
+			"IteratorColumnIdx"
+		};
+		return ar[i];
+	}
+
+	//\brief get the argument type of an operation
+	static ArgumentType argumentType( OpCode i)
+	{
+		static ArgumentType ar[] =
+		{
+			/*Op_EXIT*/			At_None,
+			/*Op_RETURN*/			At_None,
+			/*Op_GOTO_ABSOLUTE*/		At_AbsoluteAddress,
+			/*Op_GOTO_SYMBOLIC*/		At_SymbolicAddress,
+	
+			/*Op_PRINT_CONST*/		At_Constant,
+			/*Op_PRINT_SEL_IDX*/		At_SelectedColumnIdx,
+			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
+			/*Op_PRINT_ITR_IDX*/		At_IteratorColumnIdx,
+			/*Op_PRINT_ITR_NAM*/		At_ColumnName,
+			/*Op_PRINT_OPEN*/		At_String,
+			/*Op_PRINT_CLOSE*/		At_None,
+	
+			/*Op_KEEP_RESULT*/		At_ResultName,
+			/*Op_SELECT_PARAMETER*/		At_None,
+			/*Op_SELECT_LAST_RESULT*/	At_None,
+			/*Op_SELECT_KEPT_RESULT*/	At_ResultName,
+	
+			/*Op_OPEN_ITER_LAST_RESULT*/	At_None,
+			/*Op_OPEN_ITER_KEPT_RESULT*/	At_ResultName,
+			/*Op_OPEN_ITER_PATH*/		At_Path,
+			/*Op_OPEN_ITER_TUPLESET*/	At_TupleSet,
+			/*Op_NEXT*/			At_None,
+	
+			/*Op_SUB_FRAME_OPEN*/		At_SubroutineSignature,
+			/*Op_SUB_ARG_CONST*/		At_Constant,
+			/*Op_SUB_ARG_SEL_IDX*/		At_SelectedColumnIdx,	
+			/*Op_SUB_ARG_SEL_NAM*/		At_ColumnName,
+			/*Op_SUB_ARG_ITR_IDX*/		At_IteratorColumnIdx,
+			/*Op_SUB_ARG_ITR_NAM*/		At_ColumnName,
+			/*Op_SUB_FRAME_CLOSE*/		At_None,
+	
+			/*Op_STM_START*/		At_String,
+			/*Op_STM_BIND_CONST*/		At_Constant,
+			/*Op_STM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
+			/*Op_STM_BIND_SEL_NAM*/		At_ColumnName,
+			/*Op_STM_BIND_ITR_IDX*/		At_IteratorColumnIdx,
+			/*Op_STM_BIND_ITR_NAM*/		At_ColumnName,
+			/*Op_STM_EXEC*/			At_None,
+	
+			/*Op_RESULT_INIT*/		At_None,
+			/*Op_RESULT_INIT_UNIQUE*/	At_None,
+			/*Op_RESULT_INIT_NONEMPTY*/	At_None,
+			/*Op_RESULT_INIT_NONEMPTY_UNIQUE*/At_None,
+	
+			/*Op_NOP*/			At_None
+		};
+		return ar[i];
+	}
+
 	enum CondCode
 	{
 		Co_ALWAYS,			//< execute always
 		Co_IF_COND,			//< execute, if cond flag set to true
 		Co_NOT_IF_COND			//< execute, if cond flag set to false
 	};
+
+	static const char* condCodeName( CondCode i)
+	{
+		static const char* ar[] = 
+		{
+			"",
+			"IF_COND",
+			"NOT_IF_COND"
+		};
+		return ar[i];
+	}
+
 	typedef boost::uint32_t ArgumentIndex;
 	typedef boost::uint32_t Address;
 	typedef boost::uint32_t Instruction;
@@ -132,6 +289,25 @@ public:
 	static CondCode condCode( const Instruction& instr)		{return static_cast<CondCode>((unsigned int)(instr&Mask_CondCode) >> Shift_CondCode);}
 	static OpCode opCode( const Instruction& instr)			{return static_cast<OpCode>((unsigned int)(instr&Mask_OpCode) >> Shift_OpCode);}
 	static ArgumentIndex argumentIndex( const Instruction& instr)	{return static_cast<ArgumentIndex>((unsigned int)(instr&Mask_ArgumentIndex) >> Shift_ArgumentIndex);}
+
+	static void printProgramRaw( std::ostream& out, std::vector<Instruction>& prg)
+	{
+		std::vector<Instruction>::const_iterator pi = prg.begin(), pe = prg.end();
+		unsigned int adr = 0;
+		for (; pi != pe; ++pi,++adr)
+		{
+			CondCode cc = condCode( *pi);
+			OpCode oc = opCode( *pi);
+			ArgumentType at = argumentType( oc);
+			ArgumentIndex ai = argumentIndex( *pi);
+			out << "[" << adr << "] "<< condCodeName( cc) << " " << opCodeName( oc) << " ";
+			if (at != At_None)
+			{
+				out << argumentTypeName(at) << " " << ai;
+			}
+			out << std::endl;
+		}
+	}
 
 private:
 	enum {

@@ -115,7 +115,7 @@ public:
 		{
 			program
 				( Op_OPEN_ITER_KEPT_RESULT, ri->second )// iterate on result named
-				( Co_IF_COND, Op_GOTO_FORWARD, 0)	// goto end of block if set empty
+				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
 		}
 		else if (boost::algorithm::iequals( selector, "RESULT"))
@@ -124,7 +124,7 @@ public:
 			// Code generated:
 			program
 				( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
-				( Co_IF_COND, Op_GOTO_FORWARD, 0)	// goto end of block if set empty
+				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
 		}
 		else
@@ -136,7 +136,7 @@ public:
 			// Code generated:
 			program
 				( Op_OPEN_ITER_PATH, idx)		// iterate on input path
-				( Co_IF_COND, Op_GOTO_FORWARD, 0)	// goto end of block if set empty
+				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
 		}
 		m_blockStack.push_back( program.size());
@@ -147,17 +147,17 @@ public:
 		if (m_blockStack.empty()) throw std::runtime_error( "illegal state: end of FOREACH without begin");
 
 		Instruction& forwardJumpInstr = program[ m_blockStack.back()-1];
-		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_FORWARD, 0))
+		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
 		{
 			throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
 		}
 		// Code generated:
 		program
 			( Op_NEXT )
-			( Co_IF_COND, Op_GOTO_BACKWARD, program.size() - m_blockStack.back())
+			( Co_IF_COND, Op_GOTO_ABSOLUTE, m_blockStack.back())
 		;
 		// Patch forward jump (if iterator set empty):
-		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_FORWARD, program.size() - m_blockStack.back() + 1);
+		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, program.size());
 	}
 
 	void begin_CALL( const std::string& name, const std::vector<std::string>& signature)

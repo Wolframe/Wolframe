@@ -210,18 +210,13 @@ bool VirtualMachineInstance::execute()
 				initResult( lastResult);
 				break;
 			}
-			case Op_GOTO_FORWARD:
-				if (m_ip + argidx > m_program.size()) throw std::runtime_error( "illegal instruction argument");
-				m_ip += argidx;
-			case Op_GOTO_BACKWARD:
-				if (m_ip < argidx) throw std::runtime_error("illegal instruction argument");
-				m_ip -= argidx;
-				break;
 			case Op_GOTO_ABSOLUTE:
+				if (argidx > m_program.size()) throw std::runtime_error( "illegal goto instruction argument");
 				m_ip = argidx;
 				break;
 			case Op_GOTO_SYMBOLIC:
 				m_ip = m_vm->symboltab.getAddress( argidx);
+				if (m_ip > m_program.size()) throw std::runtime_error( "illegal goto instruction argument");
 				break;
 
 
