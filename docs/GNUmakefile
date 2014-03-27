@@ -324,8 +324,8 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(datadir)/doc/wolframe
 	@-rmdir $(DESTDIR)$(datadir)/doc
 	@-rmdir $(DESTDIR)$(datadir)
-#	@-rm $(DESTDIR)$(mandir)/man1/wolfpasswd.1.gz
-#	@-rmdir $(DESTDIR)$(mandir)/man1
+	@-rm $(DESTDIR)$(mandir)/man1/wolfpasswd.1.gz
+	@-rmdir $(DESTDIR)$(mandir)/man1
 	@-rm $(DESTDIR)$(mandir)/man8/wolframed.8.gz
 	@-rmdir $(DESTDIR)$(mandir)/man8
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5.gz

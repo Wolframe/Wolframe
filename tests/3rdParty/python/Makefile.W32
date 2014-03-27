@@ -42,10 +42,10 @@ local_distclean:
 # debug mode first. Later.
 local_test:
 !IFNDEF DEBUG
-	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_MAJOR_VERSION).dll" .
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_MAJOR_VERSION).dll" . >NUL
 	@-embed my > test.RES
 !ELSE
-	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_VERSION)_d.dll" .
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_VERSION)_d.dll" . >NUL
 !ENDIF
 	@-embed my.py > test.RES
 

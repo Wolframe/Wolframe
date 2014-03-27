@@ -18,10 +18,10 @@ doc-htmlhelp:
 	@-rmdir output >NUL 2>NUL
 	@mkdir output
 	@mkdir output\htmlhelp
-	@-copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
 	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
-	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
-	@-copy "$(LIBXSLT_DIR)\lib\libexslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libexslt.dll" .
 	@"$(XSLTPROC)" --xinclude --stringparam draft.mode yes -o output\htmlhelp\WolfBook.html "$(XSLT_HTMLHELP_STYLESHEET)" WolfBook.xml
 	@-"$(HHC_LOCATION)" output\htmlhelp\htmlhelp.hhp
 
