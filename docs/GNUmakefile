@@ -316,8 +316,8 @@ local_install:
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
 	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
-#	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(mandir)/man1
-#	gzip -f $(DESTDIR)$(mandir)/man1/wolfpasswd.1
+	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(mandir)/man1
+	gzip -f $(DESTDIR)$(mandir)/man1/wolfpasswd.1
 
 local_uninstall:
 	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
