@@ -63,6 +63,7 @@ CPP_OBJS = \
 	version.obj \
 	getPassword.obj \
 	user.obj \
+	base64.obj \
 	HMAC.obj \
 	PBKDF2.obj \
 #	password.obj \
