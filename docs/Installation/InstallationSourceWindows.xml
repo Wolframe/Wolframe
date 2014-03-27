@@ -446,7 +446,46 @@
 
 			<sect3>
 				<title>Build your own version of OpenSSL</title>
-			</sect3
+				
+If you want to compile your own version, use
+- Microsoft Compiler
+- a perl (ActivePerl)
+- optionally NASM
+
+perl Configure debug-VC-WIN32 \
+	-prefix="C:\OpenSSL\openssl-1.0.1-win32-debug"
+
+respectively
+
+perl Configure VC-WIN32 \
+	-prefix="C:\OpenSSL\openssl-1.0.1-win32-release"
+	
+Make sure there prefix has no spaces in it!
+
+ms\do_nasm
+
+nmake /f ms\ntdll.mak
+nmake /f ms\ntdll.mak install
+
+For later usage in Postgresql add the following link libraries:
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+
+respectively
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+	
+Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
+				
+			</sect3>
 -->
 
 		</sect2>
@@ -524,6 +563,92 @@
 <!-- TODO
 			<sect3>
 				<title>Build your own version of PostgreSQL</title>
+
+Compiling Postgresql
+
+
+
+This is required if you want for instance to build the debug
+version of the libpq library.
+
+You need at least ActivePerl installed.
+
+cd src\tools\msvc
+copy config_default.pl config.pl
+
+Adapt config.pl to your needs for instance for SSL support:
+
+openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
+
+You may have to touch preproc.c and preproc.h if build wants
+to start bison and you don't have bison installed.
+
+build DEBUG libpq
+
+respectively
+
+build RELEASE libpq
+
+install C:\<somewhere>
+
+or if thata fails, and usually it does (install fails happily with spaces in pathes
+source and destination, copy by hand in this case), do:
+
+mkdir C:\<somewhere>\include
+mkdir C:\<somewhere>\lib
+copy Release\libpq.dll C:\<somewhere>\lib
+copy Release\libpq.lib C:\<somewhere>\lib
+copy src\interfaces\libpq\libpq-fe.h C:\<somewhere>\include
+copy src\include\postgres_ext.h C:\<somewhere>\include
+
+
+
+Notes for Postgreslql 9.0.4
+
+If you disable OpenSSL (for instance for debugging), you have
+to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
+pgxml.sql.in.
+
+
+
+Notes for Visual Studio 2010
+
+vcbuild.exe disappeared, you need the following patch to build
+with VS2010:
+
+http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
+
+(in Wolframe, see 'contrib\Windows\Postgresql\VS2010v2.patch')
+
+The patch has some hard coded library names:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MDd.lib
+
+respectively for the release version:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MD.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MD.lib
+
+Maybe newer versions will have the patch integrated.
+
+
+
+Notes for 32-bit dependencies
+
+You can get gettext/libintl and other libraries from 
+
+http://gnuwin32.sourceforge.net/packages.html
+
+as packages.
+
+
 			</sect3>
 -->
 		</sect2>
@@ -628,6 +753,86 @@
 				</para>
 
 			</sect3>
+
+<!-- TODO
+			<sect3>
+				<title>Build your own version of LibXML2 and LibXSLT</title>
+
+LibXML2
+
+Get sources from: ftp://xmlsoft.org/libxml2/
+
+You also need either libiconv or win_iconv for character set conversion.
+In the following installation instructions we stick to win-iconv.
+
+Get win_iconv from http://code.google.com/p/win-iconv/
+
+Build win-iconv.dll with the supplied makefile from 'contrib\win-iconv\Makefile.msvc':
+
+nmake /nologo /f Makefile.msvc
+
+Adapt WIN_ICONV_DIR in 'makefiles\nmake\config.mk'.
+
+You have to fix the Makefile.msvc:
+
+There are some + where they don't belong:
+
++!if "$(WITH_ICU)" == "1"
++LIBS = $(LIBS) icu.lib
++!endif
+
+Configure libxml2, set location of win-iconv:
+
+cd win32
+cscript configure.js compiler=msvc
+	prefix="C:\cygwin\home\Andreas\libxml2-2.9.1"
+	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3"
+	include="C:\cygwin\home\Andreas\win-iconv-0.0.3"
+ 	zlib=no iconv=yes vcmanifest=yes
+
+For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
+
+When there are spaces in the installation prefix, fix it manually in 'config.msvc'
+before building the library:
+
+PREFIX="C:\Program Files\libxml2-2.7.8-win32"
+
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+nmake /nologo /f Makefile.msvc all
+nmake /nologo /f Makefile.msvc install
+
+Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
+
+
+
+LibXSLT
+
+Get sources from: ftp://xmlsoft.org/libxslt/
+
+cd win32
+cscript configure.js compiler=msvc
+	prefix="C:\cygwin\home\Andreas\libxslt-1.1.28-win32"
+	lib="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\lib;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
+	include="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\include\libxml2;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
+ 	zlib=no iconv=yes vcmanifest=yes
+
+For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
+
+When there are spaces in the installation prefix, fix it manually in 'config.msvc'
+before building the library:
+
+PREFIX="C:\Program Files\libxslt-1.1.26-win32"
+
+nmake /nologo /f Makefile.msvc all
+
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
+
+				
+			</sect3>
+-->
 			
 		</sect2>
 		
