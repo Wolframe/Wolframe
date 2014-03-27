@@ -37,21 +37,16 @@ boostLocaleTest.exe: boostLocaleTest.obj
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
 !IFNDEF DEBUG
-	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >> test.bat
-	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >> test.bat
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . . >NUL
 !ELSE
-	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >> test.bat
-	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >> test.bat
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >NUL
 !ENDIF
-	@-echo copy "$(ICU_DIR)\bin\icudt$(ICU_LIB_VERSION).dll" . >> test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo boostLocaleTest >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+	@-copy "$(ICU_DIR)\bin\icudt$(ICU_LIB_VERSION).dll" . >NUL
+	@-boostLocaleTest

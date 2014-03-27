@@ -27,12 +27,9 @@ testlibhpdf.exe: testlibhpdf.obj
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
 	@-erase *.pdf 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo testlibhpdf >> test.bat
-	@-test.bat
+	@-testlibhpdf

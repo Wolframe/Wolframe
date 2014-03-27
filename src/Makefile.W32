@@ -130,7 +130,6 @@ local_all: $(LOCAL_STATIC_LIB)
 local_clean:
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase $(CPP_OBJS) 2>NUL
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
