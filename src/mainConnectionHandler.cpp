@@ -257,6 +257,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		}
 		return stateidx();
 	}
+	LOG_DEBUG << "Got document type '" << doctype << "' format '" << docformat << "' command prefix '" << m_command << "'";
 	if (!doctype.empty())
 	{
 		m_command.append(doctype);
