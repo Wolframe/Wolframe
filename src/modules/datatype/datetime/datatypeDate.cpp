@@ -57,7 +57,15 @@ types::Variant DateDataType::toInt( const CustomDataValue& operand)
 	return types::Variant( value);
 }
 
-types::Variant DateDataType::getYear( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+types::Variant DateDataType::toUnixDate( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
+	if (!arg.empty()) throw std::runtime_error("too many arguments");
+	types::Variant::Data::Int value = op->Date::operator-( Date( 1970, 1, 1));
+	return types::Variant( value);
+}
+
+types::Variant DateDataType::getYear( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
 {
 	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
 	if (!arg.empty()) throw std::runtime_error("too many arguments");
@@ -65,7 +73,7 @@ types::Variant DateDataType::getYear( CustomDataValue& operand, const std::vecto
 	return rt;
 }
 
-types::Variant DateDataType::getMonth( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+types::Variant DateDataType::getMonth( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
 {
 	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
 	if (!arg.empty()) throw std::runtime_error("too many arguments");
@@ -73,7 +81,7 @@ types::Variant DateDataType::getMonth( CustomDataValue& operand, const std::vect
 	return rt;
 }
 
-types::Variant DateDataType::getDay( CustomDataValue& operand, const std::vector<types::Variant>& arg)
+types::Variant DateDataType::getDay( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
 {
 	const DateDataValue* op = reinterpret_cast<const DateDataValue*>(&operand);
 	if (!arg.empty()) throw std::runtime_error("too many arguments");
