@@ -175,7 +175,7 @@ public:
 		,m_headerAttrType(None)
 		,m_withEmpty(true)
 		,m_doTokenize(false)
-		,m_standalone(false)
+		,m_standalone(true)
 		,m_doctype_state(0)
 	{
 		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt, charset::UTF8());

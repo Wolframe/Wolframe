@@ -38,7 +38,7 @@
 using namespace _Wolframe::langbind;
 
 NORMALIZER_MODULE( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
-NORMALIZER_FUNCTION(	"encode",	createEncodeNormalizeFunction)
-NORMALIZER_FUNCTION(	"decode",	createDecodeNormalizeFunction)
+NORMALIZER_FUNCTION(	"base64encode",	createEncodeNormalizeFunction)
+NORMALIZER_FUNCTION(	"base64decode",	createDecodeNormalizeFunction)
 NORMALIZER_MODULE_END
 

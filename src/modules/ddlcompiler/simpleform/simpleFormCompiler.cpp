@@ -54,8 +54,10 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 	Lexem lx;
 	for (lx = lexer.next2(); lx.id() != Lexem::CloseStruct; lx=lexer.next2())
 	{
-		if (lx.id() != Lexem::Identifier) throw std::runtime_error( std::string("unexpected ") + lexer.curtoken() + ", identifier for structure element name expected");
-
+		if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String)
+		{
+			throw std::runtime_error( std::string("unexpected ") + lexer.curtoken() + ", structure element name as identifier or string expected");
+		}
 		std::string elementname( lx.value());		//< name of the element
 		bool isOptional = false;			//< element is optional (also in strict validation)
 		bool isMandatory = false;			//< element is mandatory (also in relaxed validation)

@@ -207,11 +207,7 @@ struct LuaObject
 	{
 		lua_getglobal( ls, name);
 		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, MetaTable<ObjectType>::name());
-		if (!obj)
-		{
-			luaL_error( ls, "undefined global variable '%s'", name);
-			return 0;
-		}
+		if (!obj) return 0;
 		ObjectType* rt = obj->ref();
 		lua_pop( ls, 1);
 		return rt;
