@@ -1555,7 +1555,7 @@ LUA_FUNCTION_THROWS( "input:docformat()", function_input_docformat)
 		input = (Input*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
 	}
-	if (!input->docformat().empty())
+	if (input->docformat().empty())
 	{
 		lua_pushnil( ls);
 		return 1;
