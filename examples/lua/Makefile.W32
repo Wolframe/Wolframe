@@ -65,13 +65,11 @@ local_distclean:
 local_test:
 
 run: $(CPP_BINS)
-	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" . >> test.bat
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . > NUL
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . > NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . > NUL
 !ENDIF
-	@-echo copy "$(TOPDIR)\lua\src\lua52.dll" . >> test.bat
-	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo luad.exe -c luad.conf -d DATA >> test.bat
-	@-test.bat
+	@-copy $(TOPDIR)\3rdParty\lua\src\lua52.dll . > NUL
+	@-echo Running the Wolframe server...
+	@-luad.exe -c luad.conf -d DATA

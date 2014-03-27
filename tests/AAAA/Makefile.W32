@@ -18,14 +18,13 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	wfsingleton.lib
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
 CPP_OBJS = \
 	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \
@@ -48,15 +47,10 @@ passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo authenticationTest >> test.bat
-	@-echo passwdFileTest >> test.bat
-	@-echo textFileTest >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+	@-authenticationTest
+	@-passwdFileTest
+	@-textFileTest

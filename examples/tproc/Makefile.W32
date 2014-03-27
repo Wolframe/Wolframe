@@ -101,53 +101,52 @@ local_clean:
 	@-erase tests\*.exe.manifest 2>NUL
 	@-erase tests\*.ilk 2>NUL
 	@-erase tests\*.pdb 2>NUL
+	@-erase tests\*.exp 2>NUL
+	@-erase tests\*.lib 2>NUL
 	@-erase /q tests\temp 2>NUL
 
 local_distclean:
 
 copy_prereq:
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests\. >NUL
 !IFDEF WITH_SSL
-	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests\.
-	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests\.
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests\. >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests\. >NUL
 !ENDIF
 !IFDEF WITH_LUA
-	@-copy $(TOPDIR)\lua\src\lua52.dll tests\.
+	@-copy $(TOPDIR)\lua\src\lua52.dll tests\. >NUL
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-copy "$(PGSQL_DIR)\lib\libpq.dll" tests\.
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" tests\. >NUL
 !IFDEF PGDLL_WITH_I18N
-	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" tests\.
-	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" tests\.
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" tests\. >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" tests\. >NUL
 !ENDIF
 !ENDIF
 !IFDEF WITH_ORACLE
-	@-copy "$(ORACLE_DIR)\*.dll" tests\.
+	@-copy "$(ORACLE_DIR)\*.dll" tests\. >NUL
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" tests\.
-	@-copy "$(ICONV_DIR)\bin\iconv.dll" tests\.
-	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests\.
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" tests\. >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" tests\. >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests\. >NUL
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" tests\.
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" tests\. >NUL
 !ENDIF
 !IFNDEF DEBUG
-	@-copy "$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION).dll" tests\.
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_VERSION).dll" tests\. >NUL
 !ELSE
-	@-copy "$(PYTHON_LIB_DIR)\python$(PYTHON_VERSION)_d.dll" tests\.
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_VERSION)_d.dll" tests\. >NUL
 !ENDIF
 
 local_test: $(TEST_CPP_BINS) copy_prereq
-	@-echo mkdir tests\temp > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests >> test.bat
-	@-echo cd tests >> test.bat
-	@-echo tprocHandlerTest.exe >> test.bat
-	@-test.bat
+	@-if not exist temp mkdir temp 
+	@-erase /q temp 2>NUL
+	@-cd tests & tprocHandlerTest.exe
 
 run: copy_prereq
-	@-echo @echo off > test.bat
-	@-echo copy tests\*.dll >> test.bat
-	@-echo echo Running the Wolframe tproc example... >> test.bat
-	@-echo tprocd.exe -c tproc.conf >> test.bat
-	@-test.bat
+	@-copy tests\*.dll >NUL
+	@-echo Running the Wolframe tproc example...
+	@-tprocd.exe -c tproc.conf
 

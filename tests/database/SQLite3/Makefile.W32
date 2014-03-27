@@ -54,5 +54,5 @@ garbage.db:
 	createRandom 4096 garbage.db
 
 local_test: $(TEST_CPP_BINS) test.db garbage.db
-	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" .
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll .
 	@-sqliteUnit

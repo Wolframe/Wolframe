@@ -135,75 +135,69 @@ testIntegers.exe: testIntegers.obj $(TOPDIR)\src\wolframe.lib
 local_all:
 
 local_clean:
-	@-erase test.bat logTest.log 2>NUL
+	@-erase logTest.log 2>NUL
 	@-erase /s /q temp >NUL 2>NUL
 	@-rmdir temp 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" . >> test.bat
-	@-echo mkdir temp >> test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-if not exist temp mkdir temp 
+	@-erase /q temp 2>NUL
 !IFDEF WITH_LIBXML2
-	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" .
-	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
-	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" . >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" . >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >NUL
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >> test.bat
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >NUL 
 !ENDIF
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL 
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL 
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL 
 !IFDEF PGDLL_WITH_I18N
-	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL 
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL 
 !ENDIF
 !ENDIF
 !IFDEF WITH_ORACLE
-	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
+	@-copy "$(ORACLE_DIR)\*.dll" . >NUL 
 !ENDIF
-	@-echo testNamedRetVal >> test.bat
-	@-echo testVirtualInheritance >> test.bat
-	@-echo testArrayDoublingAllocator >> test.bat
-	@-echo testFiletypeRecognition >> test.bat
-# DISABLED (only for memory corruption checks):	@-echo testTestAllocator >> test.bat
-	@-echo logTest >> test.bat
-	@-echo versionTest >> test.bat
-	@-echo counterTest >> test.bat
-	@-echo resolvePathTest >> test.bat
-	@-echo testBoostPath >> test.bat
-	@-echo testSHA >> test.bat
-	@-echo testMD5 >> test.bat
-	@-echo byte2hexTest >> test.bat
-	@-echo base64Test >> test.bat
-	@-echo testRand >> test.bat
-	@-echo testTimestamp >> test.bat
-#	@-echo CRAMtest >> test.bat
-	@-echo HMACtest >> test.bat
-	@-echo protocolArgumentParsing >> test.bat
-	@-echo testProtocolLFdotEscaping >> test.bat
-	@-echo testVariantStruct >> test.bat
-	@-echo testNumberBaseConversion >> test.bat
-	@-echo testString >> test.bat
-	@-echo testDateTime >> test.bat
-	@-echo testBigNumber >> test.bat
-	@-echo testVariantTypes >> test.bat
-	@-echo testIntegers >> test.bat
-	@-echo testWolfilter >> test.bat
-#	@-echo stringNormalizationTest >> test.bat
-#DISABLED (moved to .Attic) 	@-echo unitLibraryTest >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+	@-echo testNamedRetVal 
+	@-testVirtualInheritance 
+	@-testArrayDoublingAllocator 
+	@-testFiletypeRecognition 
+# DISABLED (only for memory corruption checks):	@-testTestAllocator 
+	@-logTest 
+	@-versionTest 
+	@-counterTest 
+	@-resolvePathTest 
+	@-testBoostPath 
+	@-testSHA 
+	@-testMD5 
+	@-byte2hexTest 
+	@-base64Test 
+	@-testRand 
+	@-testTimestamp 
+#	@-CRAMtest 
+	@-HMACtest 
+	@-protocolArgumentParsing 
+	@-testProtocolLFdotEscaping 
+	@-testVariantStruct 
+	@-testNumberBaseConversion 
+	@-testString 
+	@-testDateTime 
+	@-testBigNumber 
+	@-testVariantTypes 
+	@-testIntegers 
+	@-testWolfilter 
+#	@-stringNormalizationTest 
+#DISABLED (moved to .Attic) 	@-unitLibraryTest 
 
 local_longtest:
-	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo poolTest >> test.bat
-	@-echo PBKDF2test >> test.bat
-	@-test.bat
+	@-poolTest 
+	@-PBKDF2test 

@@ -51,15 +51,15 @@ local_clean:
 local_distclean:
 
 local_test: dbPing.exe
-	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
-	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" .
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL
 !IFDEF PGDLL_WITH_I18N
-	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
-	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL
 !ENDIF
 !IFDEF WITH_SSL
-	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
-	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
 !ENDIF
 	@-echo @echo off > test.bat
 	@-echo dbping localhost wolfusr wolfpwd wolframe >> test.bat

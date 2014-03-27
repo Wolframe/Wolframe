@@ -120,8 +120,8 @@ PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
 # Tcl 8.5 and Expect
 ####################
 
-TCL_DIR = C:\Program Files\Tcl
-#TCL_DIR = D:\Program Files\Tcl8.5.9
+TCL_DIR = C:\develop\Tcl86
+
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
 
 # Windows Installer (WIX)
@@ -147,12 +147,12 @@ WIX_ARCH = x86
 # DocBook and Stylesheets
 #########################
 
-XSLT_HTMLHELP_STYLESHEET = C:\cygwin\home\Andreas Baumann\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
+XSLT_HTMLHELP_STYLESHEET = C:\develop\docbook-xsl-ns-1.78.1\htmlhelp\htmlhelp.xsl
 
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################
 
-DOXYGEN = C:\Program Files\Doxygen\bin\doxygen.exe
+DOXYGEN = C:\develop\Doxygen\bin\doxygen.exe
 
 # Microsoft HTML Help Workshop (for documentation building and deployment)
 ##########################################################################

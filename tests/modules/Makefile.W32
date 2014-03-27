@@ -37,16 +37,11 @@ moduleTest.exe: moduleTest.obj $(TOPDIR)\src\wolframe.lib
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 # cd tests...: Temporary hotfix to avoid running the module test before having built the modules
 local_test:
 	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
-	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" >> test.bat
-	@-echo moduleTest >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-moduleTest
