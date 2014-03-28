@@ -57,15 +57,15 @@ public:
 	typedef std::vector<std::string> SubroutineSignature;
 
 public:
-	vm::Program program;						//< symbol table
-	vm::SymbolTable symboltab;					//< symbol table
-	std::vector<types::Variant> constants;				//< constants
-	vm::NameTable tagnametab;					//< tag table
-	vm::NameTable resultnametab;					//< result name table
-	vm::NameTable colnametab;					//< column name table
-	std::vector<std::string> statements;				//< database statements
-	std::map<vm::SymbolTable::Index,SubroutineSignature> signatures;//< subroutine signutures
-	vm::SelectorPathSet pathset;					//< input selector path expressions
+	vm::Program program;				//< symbol table
+	vm::SymbolTable symboltab;			//< symbol table
+	std::vector<types::Variant> constants;		//< constants
+	vm::NameTable tagnametab;			//< tag table
+	vm::NameTable resultnametab;			//< result name table
+	vm::NameTable colnametab;			//< column name table
+	std::vector<std::string> statements;		//< database statements
+	std::vector<SubroutineSignature> signatures;	//< subroutine signutures
+	vm::SelectorPathSet pathset;			//< input selector path expressions
 
 public:
 	VirtualMachine(){}

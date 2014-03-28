@@ -37,169 +37,162 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
+void VirtualMachineTdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
-	Element elem;
-	std::string::const_iterator ii = selector.begin(), ee = selector.end();
-	for (; ii != ee && (unsigned char)*ii <= 32; ++ii);
-	if (ii == ee) return;
-	if (*ii == '/')
+	vm::InstructionSet::ArgumentIndex idx;
+	if (0!=(idx=m_vm->resultnametab.getIndex( selector)))
 	{
-		elem.m_type = Element::Root;
-		m_path.push_back( elem);
+		m_vm->program
+			( Op_OPEN_ITER_KEPT_RESULT, idx )	// iterate on result named
+			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+		;
 	}
-	while (ii != ee)
+	else if (boost::algorithm::iequals( selector, "RESULT"))
 	{
-		if (*ii == '/')
+		//... selector is referencing the last result
+		// Code generated:
+		m_vm->program
+			( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
+			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+		;
+	}
+	else
+	{
+		//... selector is referencing a path expression on the input
+		idx = m_vm->pathset.add( selector);
+
+		// Code generated:
+		m_vm->program
+			( Op_OPEN_ITER_PATH, idx)		// iterate on input path
+			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+		;
+	}
+	m_stateStack.push_back( State( State::OpenForeach, m_vm->program.size()));
+}
+
+void VirtualMachineTdlTranslatorInterface::end_FOREACH()
+{
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH without begin");
+
+	Instruction& forwardJumpInstr = m_vm->program[ m_stateStack.back().value-1];
+	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
+	{
+		throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
+	}
+	// Code generated:
+	m_vm->program
+		( Op_NEXT )
+		( Co_IF_COND, Op_GOTO_ABSOLUTE, m_stateStack.back().value)
+	;
+	// Patch forward jump (if iterator set empty):
+	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, m_vm->program.size());
+	m_stateStack.pop_back();
+}
+
+void VirtualMachineTdlTranslatorInterface::begin_DO_statement( const std::string& stm)
+{
+	// Code generated:
+	m_vm->program
+		( Op_STM_START, m_vm->statements.size() )
+	;
+	m_stateStack.push_back( State( State::OpenStatementCall, m_vm->statements.size()));
+	m_vm->statements.push_back( stm);
+}
+
+void VirtualMachineTdlTranslatorInterface::end_DO_statement()
+{
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement without begin");
+	// Code generated:
+	m_vm->program
+		( Op_STM_EXEC, m_stateStack.back().value )
+	;
+	m_stateStack.pop_back();
+}
+
+static std::string mangledSubroutineName( const std::string& name, const std::vector<std::string>& templateParamValues)
+{
+	if (templateParamValues.empty())
+	{
+		return boost::to_lower_copy( name);
+	}
+	std::string rt = boost::to_lower_copy( name);
+	std::vector<std::string>::const_iterator ti = templateParamValues.begin(), te = templateParamValues.end();
+	for (;ti != te; ++ti)
+	{
+		rt.push_back( '$');
+		rt.append( boost::to_upper_copy( *ti));
+	}
+	return rt;
+}
+
+void VirtualMachineTdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
+{
+	types::keymap<vm::Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
+	if (si == se)
+	{
+		if (templateParamValues.empty())
 		{
-			++ii;
-			if (ii == ee) break;
-			if (*ii == '/')
-			{
-				elem.m_type = Element::Find;
-				++ii;
-			}
-			else
-			{
-				elem.m_type = Element::Next;
-			}
+			throw std::runtime_error( std::string("calling undefined subroutine '") + name + "'");
 		}
 		else
 		{
-			elem.m_type = Element::Next;
+			throw std::runtime_error( std::string("calling undefined subroutine template '") + name + "'");
 		}
-		std::string tagnam;
-		while (ii != ee && *ii != '/')
-		{
-			tagnam.push_back( *ii);
-			++ii;
-		}
-		if (tagnam.empty())
-		{
-			throw std::runtime_error( std::string("empty tag in path '") + selector + "'");
-		}
-		else if (tagnam == "..")
-		{
-			if (elem.m_type == Element::Find)
-			{
-				throw std::runtime_error( std::string("selection '//..' is illegal in path '") + selector + "'");
-			}
-			elem.m_type = Element::Up;
-			elem.m_tag = 0;
-		}
-		else if (tagnam == ".")
-		{
-			if (elem.m_type == Element::Find)
-			{
-				throw std::runtime_error( std::string("selection '//.' is illegal in path '") + selector + "'");
-			}
-			continue;
-		}
-		else if (tagnam == "*")
-		{
-			elem.m_tag = 0;
-		}
-		else
-		{
-			elem.m_tag = tagmap->get( tagnam);
-		}
-		m_path.push_back( elem);
 	}
-	std::string redu = tostring( tagmap);
-	if (redu != selector)
+	else
 	{
-		throw std::runtime_error( std::string("illegal selection path string '") + selector + "' (reduced to '" + redu + "')");
+		vm::InstructionSet::ArgumentIndex subroutineIdx = 0;
+		vm::InstructionSet::ArgumentIndex frameIdx = 0;
+		
+		std::string mangledName = mangledSubroutineName( name, templateParamValues);
+		std::vector<vm::Subroutine>::const_iterator ci = m_calledSubroutines.begin(), ce = m_calledSubroutines.end();
+		for (; ci != ce && mangledName != ci->name(); ++ci,++subroutineIdx){}
+		if (ci == ce)
+		{
+			subroutineIdx = m_calledSubroutines.size();
+			vm::Subroutine sr( si->second);
+			if (sr.templateParams().size() != templateParamValues.size())
+			{
+				throw std::runtime_error( std::string("calling subroutine template '") + name + "' with wrong number of template parameters");
+			}
+			sr.setName( mangledName);
+			if (templateParamValues.size())
+			{
+				sr.substituteStatementTemplates( templateParamValues);
+			}
+			m_calledSubroutines.push_back( sr);
+		}
+		frameIdx = m_vm->signatures.size();
+		m_vm->signatures.push_back( m_calledSubroutines.at(subroutineIdx).params());
+
+		// Code generated:
+		m_vm->program
+			( Op_SUB_FRAME_OPEN, frameIdx )
+		;
+		m_stateStack.push_back( State( State::OpenSubroutineCall, subroutineIdx));
 	}
 }
 
-std::string SelectorPath::tostring( const TagTable* tagmap) const
+void VirtualMachineTdlTranslatorInterface::end_DO_subroutine()
 {
-	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
-	std::ostringstream rt;
-	bool prev_root = false;
-	for (; ii != ee; ++ii)
-	{
-		switch (ii->m_type)
-		{
-			case Element::Root:
-				if (ii == m_path.begin())
-				{
-					prev_root = true;
-					rt << '/';
-				}
-				else
-				{
-					throw std::runtime_error( "illegal path");
-				}
-				break;
-
-			case Element::Next:
-				if (!prev_root)
-				{
-					rt << "/";
-				}
-				rt << tagmap->getstr(ii->m_tag);
-				prev_root = false;
-				break;
-
-			case Element::Find: 
-				if (prev_root)
-				{
-					rt << "/";
-				}
-				else
-				{
-					rt << "//";
-				}
-				rt << tagmap->getstr(ii->m_tag);
-				prev_root = false;
-				break;
-
-			case Element::Up:
-				if (prev_root) throw std::runtime_error( "illegal path");
-				rt << "/..";
-				prev_root = false;
-				break;
-		}
-	}
-	return rt.str();
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO without begin");
+	// Code generated:
+	m_vm->program
+		( Op_SUB_FRAME_CLOSE )
+		( Op_GOTO_ABSOLUTE, m_stateStack.back().value )
+	;
+	m_stateStack.pop_back();
+	m_unresolvedSubroutineCalls.push_back( m_vm->program.size() -1);
 }
 
-void SelectorPath::selectNodes( const InputStructure& st, const NodeVisitor& nv, std::vector<NodeIndex>& ar) const
+void VirtualMachineTdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 {
-	std::vector<NodeVisitor::Index> ar1,ar2;
-	ar1.push_back( nv.m_nodeidx);
+	vm::InstructionSet::ArgumentIndex idx = m_vm->pathset.add( selector);
 
-	// [B.1] Find selected nodes:
-	std::vector<Element>::const_iterator si = begin(), se = end();
-	for (; si != se; ++si)
-	{
-		ar2.clear();
-		std::vector<NodeVisitor::Index>::const_iterator ni = ar1.begin(), ne = ar1.end();
-		for (; ni != ne; ++ni)
-		{
-			switch (si->m_type)
-			{
-				case Element::Find:
-					st.find( st.node(*ni), si->m_tag, ar2);
-					break;
-
-				case Element::Root:
-					ar2.push_back( st.rootindex());
-					break;
-
-				case Element::Next:
-					st.next( st.node(*ni), si->m_tag, ar2);
-					break;
-
-				case Element::Up:
-					st.up( st.node(*ni), ar2);
-					break;
-			}
-		}
-		ar1 = ar2;
-	}
-	ar.insert( ar.end(), ar1.begin(), ar1.end());
+	// Code generated:
+	m_vm->program
+		( Op_OPEN_ITER_PATH, idx )			// iterate on input path
+	;
 }
 
 

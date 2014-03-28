@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/subroutineMap.hpp
+//\file database/vm/subroutine.hpp
 //\brief Interface for mapping names to subroutine definitions
 #ifndef _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_HPP_INCLUDED
@@ -47,16 +47,25 @@ class Subroutine
 {
 public:
 	Subroutine(){}
-	Subroutine( const std::vector<std::string>& params_, const VirtualMachineR& vm_)
-		:m_params(params_),m_vm(vm_){}
+	Subroutine( const std::string& name_, const std::vector<std::string>& templateParams_, const std::vector<std::string>& params_, const VirtualMachineR& vm_)
+		:m_name(name_),m_templateParams(templateParams_),m_params(params_),m_vm(vm_){}
+	Subroutine( const std::string& name_, const std::vector<std::string>& params_, const VirtualMachineR& vm_)
+		:m_name(name_),m_params(params_),m_vm(vm_){}
 	Subroutine( const Subroutine& o)
-		:m_params(o.m_params),m_vm(o.m_vm){}
+		:m_name(o.m_name),m_templateParams(o.m_templateParams),m_params(o.m_params),m_vm(o.m_vm){}
 
+	void setName( const std::string& name_)			{m_name = name_;}
 
+	const std::string& name() const				{return m_name;}
+	const std::vector<std::string>& templateParams() const	{return m_params;}
 	const std::vector<std::string>& params() const		{return m_params;}
 	const VirtualMachineR& vmref() const			{return m_vm;}
 
+	void substituteStatementTemplates( const std::vector<std::string>& templateParamValues);
+
 private:
+	std::string m_name;
+	std::vector<std::string> m_templateParams;
 	std::vector<std::string> m_params;
 	VirtualMachineR m_vm;
 };

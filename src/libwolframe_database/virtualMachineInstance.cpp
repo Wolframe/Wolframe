@@ -69,7 +69,7 @@ const std::string& VirtualMachineInstance::statementArgument( ArgumentIndex argi
 VirtualMachineInstance::ArgumentIndex VirtualMachineInstance::columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex argidx) const
 {
 	if (!valueset) throw std::runtime_error( "illegal instruction: no value set selected for name access");
-	return valueset->columnIndex( m_vm->colnametab.at( argidx));
+	return valueset->columnIndex( m_vm->colnametab.getName( argidx));
 }
 
 const types::Variant& VirtualMachineInstance::selectedArgument( ArgumentIndex argidx) const

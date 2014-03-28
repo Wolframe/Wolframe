@@ -35,101 +35,59 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/virtualMachine.hpp"
+#include "database/vm/subroutine.hpp"
+#include "types/keymap.hpp"
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace db {
 
 class VirtualMachineTdlTranslatorInterface
+	:public vm::InstructionSet
 {
 public:
-	explicit VirtualMachineTdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
+	explicit VirtualMachineTdlTranslatorInterface( const types::keymap<vm::Subroutine>* soubroutinemap_)
 		:m_soubroutinemap(soubroutinemap_)
 		,m_vm( new VirtualMachine())
 	{}
 	VirtualMachineTdlTranslatorInterface( const VirtualMachineTdlTranslatorInterface& o)
-		:m_blockStack(o.m_blockStack)
+		:m_stateStack(o.m_stateStack)
+		,m_unresolvedSubroutineCalls(o.m_unresolvedSubroutineCalls)
 		,m_soubroutinemap(o.m_soubroutinemap)
+		,m_calledSubroutines(o.m_calledSubroutines)
 		,m_vm(o.m_vm)
 	{}
 
-	void begin_FOREACH( const std::string& selector)
-	{
-		vm::InstructionSet::ArgumentIndex idx;
-		if (0!=(idx=m_vm->resultnametab.getIndex( selector)))
-		{
-			m_vm->program
-				( Op_OPEN_ITER_KEPT_RESULT, idx )	// iterate on result named
-				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
-			;
-		}
-		else if (boost::algorithm::iequals( selector, "RESULT"))
-		{
-			//... selector is referencing the last result
-			// Code generated:
-			m_vm->program
-				( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
-				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
-			;
-		}
-		else
-		{
-			//... selector is referencing a path expression on the input
-			idx = m_vm->pathset.add( selector);
-	
-			// Code generated:
-			program
-				( Op_OPEN_ITER_PATH, idx)		// iterate on input path
-				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
-			;
-		}
-		m_blockStack.push_back( m_vm->program.size());
-	}
+	void begin_FOREACH( const std::string& selector);
+	void end_FOREACH();
 
-	void end_FOREACH()
-	{
-		if (m_blockStack.empty()) throw std::runtime_error( "illegal state: end of FOREACH without begin");
+	void begin_DO_statement( const std::string& stm);
+	void end_DO_statement();
 
-		Instruction& forwardJumpInstr = m_vm->program[ m_blockStack.back()-1];
-		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
-		{
-			throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
-		}
-		// Code generated:
-		program
-			( Op_NEXT )
-			( Co_IF_COND, Op_GOTO_ABSOLUTE, m_blockStack.back())
-		;
-		// Patch forward jump (if iterator set empty):
-		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, program.size());
-	}
+	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
+	void end_DO_subroutine();
 
-	void begin_DO( const std::string& name)
-	{
-		types::keymap<Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
-		if (si == se)
-		{
-			!!!! STATEMENT
-		}
-		else
-		{
-			!!!! SUBROUTINE CALL
-		}
-	}
-
-	void push_ARGUMENT_PATH( const std::string& selector)
-	{
-		vm::InstructionSet::ArgumentIndex idx = m_vm->pathset.add( selector);
-
-		// Code generated:
-		program
-			( Op_OPEN_ITER_PATH, idx )			// iterate on input path
-		;
-	}
+	void push_ARGUMENT_PATH( const std::string& selector);
 
 private:
-	std::vector<Address> m_blockStack;
-	const types::keymap<Subroutine>* m_soubroutinemap;
+	struct State
+	{
+		enum Id {None,OpenForeach,OpenBlock,OpenStatementCall,OpenSubroutineCall};
+		Id id;
+		vm::InstructionSet::ArgumentIndex value;
+
+		State()
+			:id(None),value(0){}
+		State( const State& o)
+			:id(o.id),value(o.value){}
+		State( Id i, vm::InstructionSet::ArgumentIndex v)
+			:id(i),value(v){}
+	};
+
+	std::vector<State> m_stateStack;
+	std::vector<vm::InstructionSet::Address> m_unresolvedSubroutineCalls;
+	const types::keymap<vm::Subroutine>* m_soubroutinemap;
+	std::vector<vm::Subroutine> m_calledSubroutines;
 	VirtualMachineR m_vm;
 };
 

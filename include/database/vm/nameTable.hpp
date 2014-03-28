@@ -68,7 +68,7 @@ public:
 		NameMap::const_iterator si = m_namemap.find( nam);
 		if (si == m_namemap.end()) return 0;
 		if (si->second == 0) return 0; 
-		return m_namear.at( si->second);
+		return si->second;
 	}
 
 	Index define( const std::string& nam)

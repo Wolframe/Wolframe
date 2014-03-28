@@ -47,6 +47,8 @@ CPP_OBJS = \
 	transactionExecStatemachine.o \
 	baseStatement.o \
 	substitutingStatement.o \
+	vm/selectorPathSet.o \
+	vm/subroutine.o \
 	virtualMachine.o \
 	virtualMachineInstance.o \
 	virtualMachineTdlTranslatorInterface.o
