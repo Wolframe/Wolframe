@@ -1815,6 +1815,7 @@ src/libwfsingleton/logger/syslog_win32.h
 src/libwfsingleton/Makefile.W32
 src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
+src/libwolframe/base64.cpp
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
 src/libwolframe_database/baseStatement.cpp
@@ -3167,4 +3168,3 @@ wtest/Makefile.W32
 wtest/testDescription.cpp
 wtest/testModules.cpp
 wtest/wtestcheck.cpp
-src/libwolframe/base64.cpp
