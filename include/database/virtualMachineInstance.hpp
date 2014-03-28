@@ -147,7 +147,7 @@ private:
 	vm::ValueTupleSetR keptResult( ArgumentIndex idx) const;
 	vm::ValueTupleSetR tupleSet( ArgumentIndex idx) const;
 	const types::Variant& constArgument( ArgumentIndex idx) const;
-	const std::string& nameArgument( ArgumentIndex idx) const;
+	const std::string& statementArgument( ArgumentIndex argidx) const;
 	ArgumentIndex columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex nameidx) const;
 	const types::Variant& selectedArgument( ArgumentIndex idx) const;
 	const types::Variant& iteratorArgument( ArgumentIndex idx) const;

@@ -60,17 +60,16 @@ const types::Variant& VirtualMachineInstance::constArgument( ArgumentIndex argid
 	return m_vm->constants.at( argidx);
 }
 
-const std::string& VirtualMachineInstance::nameArgument( ArgumentIndex argidx) const
+const std::string& VirtualMachineInstance::statementArgument( ArgumentIndex argidx) const
 {
-	if (argidx >= m_vm->names.size()) throw std::runtime_error( "string index out of bounds");
-	return m_vm->names.at( argidx);
+	if (argidx >= m_vm->statements.size()) throw std::runtime_error( "string index out of bounds");
+	return m_vm->statements.at( argidx);
 }
 
 VirtualMachineInstance::ArgumentIndex VirtualMachineInstance::columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex argidx) const
 {
-	if (argidx >= m_vm->names.size()) throw std::runtime_error( "name index out of bounds");
 	if (!valueset) throw std::runtime_error( "illegal instruction: no value set selected for name access");
-	return valueset->columnIndex( m_vm->names.at( argidx));
+	return valueset->columnIndex( m_vm->colnametab.at( argidx));
 }
 
 const types::Variant& VirtualMachineInstance::selectedArgument( ArgumentIndex argidx) const
@@ -214,11 +213,6 @@ bool VirtualMachineInstance::execute()
 				if (argidx > m_program.size()) throw std::runtime_error( "illegal goto instruction argument");
 				m_ip = argidx;
 				break;
-			case Op_GOTO_SYMBOLIC:
-				m_ip = m_vm->symboltab.getAddress( argidx);
-				if (m_ip > m_program.size()) throw std::runtime_error( "illegal goto instruction argument");
-				break;
-
 
 			/*Print Instructions:*/
 			case Op_PRINT_CONST:
@@ -246,7 +240,7 @@ bool VirtualMachineInstance::execute()
 				++m_ip;
 				break;
 			case Op_PRINT_OPEN:
-				m_output.add( vm::Output::Element( vm::Output::Element::Open, nameArgument( argidx)));
+				m_output.add( vm::Output::Element( vm::Output::Element::Open, m_vm->tagnametab.getName( argidx)));
 				++m_ip;
 				break;
 			case Op_PRINT_CLOSE:
@@ -348,9 +342,9 @@ bool VirtualMachineInstance::execute()
 			/*Database Instructions:*/
 			case Op_STM_START:
 				top.m_bindidx = 0;
-				if (!m_db_stm->start( nameArgument( argidx)))
+				if (!m_db_stm->start( statementArgument( argidx)))
 				{
-					throw std::runtime_error( std::string("failed to start database statement '") + nameArgument( argidx) + "'");
+					throw std::runtime_error( std::string("failed to start database statement '") + statementArgument( argidx) + "'");
 				}
 				++m_ip;
 				break;

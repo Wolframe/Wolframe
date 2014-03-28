@@ -35,86 +35,31 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/virtualMachine.hpp"
-#include "transactionfunction/InputStructure.hpp"
-#include "transactionfunction/TagTable.hpp"
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace db {
 
-typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
-typedef TransactionFunctionInput::Structure::NodeVisitor::Index NodeIndex;
-typedef TransactionFunctionInput::Structure InputStructure;
-
-class SelectorPath
-{
-public:
-	struct Element
-	{
-		enum Type
-		{
-			Root,		//< starting '/'
-			Next,		//< '/element'
-			Find,		//< '//element'
-			Up		//< '..'
-		};
-	
-		static const char* typeName( Type i)
-		{
-			static const char* ar[] ={"Root","Next","Find","Up"};
-			return ar[(int)i];
-		}
-		Type m_type;
-		int m_tag;
-
-		Element()
-			:m_type(Root),m_tag(0){}
-		explicit Element( Type type_, int tag_=0)
-			:m_type(type_),m_tag(tag_){}
-		Element( const Element& o)
-			:m_type(o.m_type),m_tag(o.m_tag){}
-	};
-
-	SelectorPath(){}
-	SelectorPath( const std::string& selector, TagTable* tagmap);
-	SelectorPath( const SelectorPath& o)				:m_path(o.m_path){}
-
-	std::string tostring( const TagTable* tagmap) const;
-
-	void selectNodes( const InputStructure& st, const NodeVisitor& nv, std::vector<NodeIndex>& ar) const;
-
-	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
-	std::vector<Element>::const_iterator end() const		{return m_path.end();}
-	std::size_t size() const					{return m_path.size();}
-
-private:
-	std::vector<Element> m_path;
-};
-
-
-
 class VirtualMachineTdlTranslatorInterface
-	:public VirtualMachine
 {
 public:
-	explicit VirtualMachineTdlTranslatorInterface( bool case_sensitive_)
-		:m_tagtab(case_sensitive_)
+	explicit VirtualMachineTdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
+		:m_soubroutinemap(soubroutinemap_)
+		,m_vm( new VirtualMachine())
 	{}
 	VirtualMachineTdlTranslatorInterface( const VirtualMachineTdlTranslatorInterface& o)
-		:VirtualMachine(o)
-		,m_tagtab(o.m_tagtab)
-		,m_pathar(o.m_pathar)
-		,m_blockStack(o.m_blockStack)
-		,m_resulttab(o.m_resulttab)
+		:m_blockStack(o.m_blockStack)
+		,m_soubroutinemap(o.m_soubroutinemap)
+		,m_vm(o.m_vm)
 	{}
 
 	void begin_FOREACH( const std::string& selector)
 	{
-		types::keymap<ArgumentIndex>::const_iterator ri = m_resulttab.find( selector);
-		if (ri != m_resulttab.end())
+		vm::InstructionSet::ArgumentIndex idx;
+		if (0!=(idx=m_vm->resultnametab.getIndex( selector)))
 		{
-			program
-				( Op_OPEN_ITER_KEPT_RESULT, ri->second )// iterate on result named
+			m_vm->program
+				( Op_OPEN_ITER_KEPT_RESULT, idx )	// iterate on result named
 				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
 		}
@@ -122,7 +67,7 @@ public:
 		{
 			//... selector is referencing the last result
 			// Code generated:
-			program
+			m_vm->program
 				( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
 				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
@@ -130,8 +75,7 @@ public:
 		else
 		{
 			//... selector is referencing a path expression on the input
-			vm::InstructionSet::ArgumentIndex idx = m_pathar.size();
-			m_pathar.push_back( SelectorPath( selector, &m_tagtab));
+			idx = m_vm->pathset.add( selector);
 	
 			// Code generated:
 			program
@@ -139,14 +83,14 @@ public:
 				( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 			;
 		}
-		m_blockStack.push_back( program.size());
+		m_blockStack.push_back( m_vm->program.size());
 	}
 
 	void end_FOREACH()
 	{
 		if (m_blockStack.empty()) throw std::runtime_error( "illegal state: end of FOREACH without begin");
 
-		Instruction& forwardJumpInstr = program[ m_blockStack.back()-1];
+		Instruction& forwardJumpInstr = m_vm->program[ m_blockStack.back()-1];
 		if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
 		{
 			throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
@@ -160,19 +104,22 @@ public:
 		forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, program.size());
 	}
 
-	void begin_CALL( const std::string& name, const std::vector<std::string>& signature)
+	void begin_DO( const std::string& name)
 	{
-		vm::SymbolTable::Index subroutineIdx = symboltab.getIndex( name);
-		if (subroutineIdx == vm::SymbolTable::UnknownSymbol)
+		types::keymap<Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
+		if (si == se)
 		{
-			subroutineIdx = symboltab.define( name);
+			!!!! STATEMENT
+		}
+		else
+		{
+			!!!! SUBROUTINE CALL
 		}
 	}
 
 	void push_ARGUMENT_PATH( const std::string& selector)
 	{
-		vm::InstructionSet::ArgumentIndex idx = m_pathar.size();
-		m_pathar.push_back( SelectorPath( selector, &m_tagtab));
+		vm::InstructionSet::ArgumentIndex idx = m_vm->pathset.add( selector);
 
 		// Code generated:
 		program
@@ -181,10 +128,9 @@ public:
 	}
 
 private:
-	TagTable m_tagtab;
-	std::vector<SelectorPath> m_pathar;
 	std::vector<Address> m_blockStack;
-	types::keymap<ArgumentIndex> m_resulttab;
+	const types::keymap<Subroutine>* m_soubroutinemap;
+	VirtualMachineR m_vm;
 };
 
 }}//namespace

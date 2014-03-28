@@ -53,7 +53,6 @@ public:
 		Op_EXIT,			//< exit (abort)
 		Op_RETURN,			//< return from subroutine or termination of transaction
 		Op_GOTO_ABSOLUTE,		//< goto absolute address
-		Op_GOTO_SYMBOLIC,		//< goto symbolic address (index in names)
 
 		// Print Instructions:
 		Op_PRINT_CONST,			//< print a value to output: constant
@@ -109,8 +108,7 @@ public:
 		static const char* ar[] = {
 			"EXIT",
 			"RETURN",
-			"GOTO_ABSOLUTE",
-			"GOTO_SYMBOLIC",
+			"GOTO",
 	
 			"PRINT_CONST",
 			"PRINT_SEL_IDX",
@@ -160,8 +158,7 @@ public:
 	enum ArgumentType
 	{
 		At_None,
-		At_AbsoluteAddress,
-		At_SymbolicAddress,
+		At_Address,
 		At_Path,
 		At_TupleSet,
 		At_Constant,
@@ -169,6 +166,7 @@ public:
 		At_ResultName,
 		At_SubroutineSignature,
 		At_String,
+		At_Statement,
 		At_SelectedColumnIdx,
 		At_IteratorColumnIdx
 	};
@@ -178,8 +176,7 @@ public:
 		static const char* ar[] =
 		{
 			"",
-			"AbsoluteAddress",
-			"SymbolicAddress",
+			"Address",
 			"Path",
 			"TupleSet",
 			"Constant",
@@ -187,6 +184,7 @@ public:
 			"ResultName",
 			"SubroutineSignature",
 			"String",
+			"Statement"
 			"SelectedColumnIdx",
 			"IteratorColumnIdx"
 		};
@@ -200,9 +198,8 @@ public:
 		{
 			/*Op_EXIT*/			At_None,
 			/*Op_RETURN*/			At_None,
-			/*Op_GOTO_ABSOLUTE*/		At_AbsoluteAddress,
-			/*Op_GOTO_SYMBOLIC*/		At_SymbolicAddress,
-	
+			/*Op_GOTO*/			At_Address,
+
 			/*Op_PRINT_CONST*/		At_Constant,
 			/*Op_PRINT_SEL_IDX*/		At_SelectedColumnIdx,
 			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
@@ -230,7 +227,7 @@ public:
 			/*Op_SUB_ARG_ITR_NAM*/		At_ColumnName,
 			/*Op_SUB_FRAME_CLOSE*/		At_None,
 	
-			/*Op_STM_START*/		At_String,
+			/*Op_STM_START*/		At_Statement,
 			/*Op_STM_BIND_CONST*/		At_Constant,
 			/*Op_STM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
 			/*Op_STM_BIND_SEL_NAM*/		At_ColumnName,

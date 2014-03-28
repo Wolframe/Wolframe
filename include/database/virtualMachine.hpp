@@ -36,6 +36,8 @@
 #define _DATABASE_VIRTUAL_MACHINE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
 #include "database/vm/symbolTable.hpp"
+#include "database/vm/nameTable.hpp"
+#include "database/vm/selectorPathSet.hpp"
 #include "database/vm/program.hpp"
 #include "database/vm/subroutineFrame.hpp"
 #include "types/keymap.hpp"
@@ -58,8 +60,12 @@ public:
 	vm::Program program;						//< symbol table
 	vm::SymbolTable symboltab;					//< symbol table
 	std::vector<types::Variant> constants;				//< constants
-	std::vector<std::string> names;					//< names
+	vm::NameTable tagnametab;					//< tag table
+	vm::NameTable resultnametab;					//< result name table
+	vm::NameTable colnametab;					//< column name table
+	std::vector<std::string> statements;				//< database statements
 	std::map<vm::SymbolTable::Index,SubroutineSignature> signatures;//< subroutine signutures
+	vm::SelectorPathSet pathset;					//< input selector path expressions
 
 public:
 	VirtualMachine(){}
@@ -67,8 +73,16 @@ public:
 		:program(o.program)
 		,symboltab(o.symboltab)
 		,constants(o.constants)
-		,names(o.names){}
+		,tagnametab(o.tagnametab)
+		,resultnametab(o.resultnametab)
+		,colnametab(o.colnametab)
+		,statements(o.statements)
+		,signatures(o.signatures)
+		,pathset(o.pathset)
+	{}
 };
+
+typedef boost::shared_ptr<VirtualMachine> VirtualMachineR;
 
 }}//namespace
 #endif
