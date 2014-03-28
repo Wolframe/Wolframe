@@ -1005,7 +1005,17 @@
 					<programlisting language='shell'>
 	LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
 					</programlisting>
-				</para>				
+				</para>		
+				
+				<para>
+					The DLLs end up in the wrong directory, move them from 
+					'lib' to 'bin':
+					<programlisting language='shell'>
+	cd C:\libxslt-1.1.28-win32-debug
+	move lib\*.dll bin\.
+					</programlisting>
+				</para>		
+							
 			</sect3>
 			
 		</sect2>

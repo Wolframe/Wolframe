@@ -601,6 +601,12 @@ Adapt the 'LIBXSLT_DIR' variable in makefiles\nmake\config.mk as follows:
         LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
 
 
+The DLLs end up in the wrong directory, move them from 'lib' to 'bin':
+
+        cd C:\libxslt-1.1.28-win32-debug
+        move lib\*.dll bin\.
+
+
 1.10. XML filtering support with Textwolf
 
 Wolframe can use Textwolf (http://textwolf.net) for filtering and the
