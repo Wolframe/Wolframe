@@ -256,8 +256,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 endif
 
-local_longtest: poolTest
-ifeq ($(RUN_TESTS),0)
+local_longtest: poolTest testArrayDoublingAllocator PBKDF2test
+ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
