@@ -59,21 +59,21 @@ ICU_LIB_DIR = $(ICU_DIR)\lib
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
+# pre-built
 OPENSSL_DIR = C:\develop\OpenSSL-Win32
-#OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-#OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
-#OPENSSL_DIR = D:\Programme\OpenSSL
-#OPENSSL_DIR = D:\OpenSSL\Win32
-#OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
+
+# self-compiled
+OPENSSL_DIR = C:\develop\openssl-1.0.0l-win32-debug
 
 # Postgresql libpq
 # (http://www.postgresql.org/)
 ##############################
 
-PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
-#PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
-#PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-#PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
+# pre-built
+#PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
+
+# self-compiled
+PGSQL_DIR = C:\develop\postgresql-9.3.4-win32-debug
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
@@ -90,22 +90,38 @@ ORACLE_DIR = C:\develop\Oracle\instantclient_12_1
 # zlib
 ######
 
-ZLIB_DIR = C:\develop\zlib-1.2.5.win32
+#pre-compiled
+#ZLIB_DIR = C:\develop\zlib-1.2.5.win32
+
+#self-compiled (not needed)
+ZLIB_DIR =
 
 # iconv
 #######
 
-ICONV_DIR = C:\develop\iconv-1.9.2.win32
+#pre-compiled
+#ICONV_DIR = C:\develop\iconv-1.9.2.win32
+
+#self-compiled
+ICONV_DIR = C:\develop\win-iconv-0.0.6-win32-debug
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\develop\libxml2-2.7.8.win32
+#pre-compiled
+#LIBXML2_DIR = C:\develop\libxml2-2.7.8.win32
+
+#self-compiled
+LIBXML2_DIR = C:\develop\libxml2-2.9.1-win32-debug
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\develop\libxslt-1.1.26.win32
+#pre-compiled
+#LIBXSLT_DIR = C:\develop\libxslt-1.1.26.win32
+
+#pre-compiled
+LIBXSLT_DIR = C:\develop\libxslt-1.1.28-win32-debug
 
 # Python 3
 ##########
