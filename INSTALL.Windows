@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-March 19, 2014 version 0.0.1
+March 27, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -258,6 +258,53 @@ Set the "BOOST_XXX" variables in makefiles\nmake\config.mk as follows:
         OPENSSL_DIR = C:\OpenSSL-Win32
 
 
+Build your own version of OpenSSL
+
+You need the community edition of ActivePerl from http://www.activestate.com/
+activeperl/. Install it for instance to C:\Perl.
+
+You will also need NASM to assemble certain parts of OpenSSL. You can get a
+Windows NASM from http://www.nasm.us/. Install it for instance to C:\nasm.
+
+Make sure the Perl interpreter and the NASM assembler are part of the path in
+the shell you want to build OpenSSL:
+
+        Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+
+
+Get the source package openssl-1.0.1l.tar.gz of OpenSSL from http://
+www.openssl.org.
+
+Configure the package with:
+
+        C:\Perl\bin\perl Configure debug-VC-WIN32 \
+                --prefix="C:\openssl-1.0.1l-win32-debug"
+
+
+for a debug version, respectively with:
+
+        C:\Perl\bin\perl Configure VC-WIN32 \
+                --prefix="C:\openssl-1.0.1l-win32-release"
+
+
+for a release version.
+
+Note: Make sure there prefix you choose has no spaces in it!
+
+Prepare OpenSSL for NASM support with:
+
+        ms\do_nasm.bat
+
+
+Build and install OpenSSL now with:
+
+        nmake /f ms\ntdll.mak
+        nmake /f ms\ntdll.mak install
+
+
+More build information is available in INSTALL.W32 and INSTALL.W64 of the
+OpenSSL package itself.
+
 1.6. SQLite database support
 
 Wolframe can use an Sqlite3 database (http://sqlite.org) as backend for data
@@ -290,6 +337,94 @@ You enable the building of a loadable PostgreSQL database module with:
 
         nmake /nologo /f Makefile.W32 WITH_PGSQL=1
 
+
+Build your own version of PostgreSQL
+
+You need the community edition of ActivePerl from http://www.activestate.com/
+activeperl/. Install it for instance to C:\Perl.
+
+Make sure the Perl interpreter is part of the path in the shell you want to
+build PostgreSQL:
+
+        Set PATH=%PATH%;C:\Perl\bin
+
+
+Get the source package postgresql-9.3.4.tar.gz of PostgreSQL from http://
+www.opstgresql.org.
+
+Configure the package in the config.pl file which you create as follows:
+
+        cd src\tools\msvc
+        copy config_default.pl config.pl
+
+
+Adapt config.pl to your needs. We actually don't want to build the full server
+just the client PostgreSQL library, so specifying the location of OpenSSL is
+enough:
+
+        openssl=>"C:\\openssl-1.0.1f-win32-debug"
+
+
+Note: Those must be two backslashes!
+
+If you built your own version of OpenSSL before you will be missing some
+linking libraries in the right places. So copy them with:
+
+        mkdir C:\openssl-1.0.1-win32-debug\lib\VC
+        copy C:\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+                C:\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+        copy C:\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+                C:\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+
+
+respectively if you built the release version:
+
+        mkdir C:\openssl-1.0.1-win32-release\lib\VC
+        copy C:\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+                C:\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+        copy C:\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+                C:\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+
+
+Build the libpq library now with:
+
+        build DEBUG libpq
+
+
+respectively if you prefer a release version:
+
+        build RELEASE libpq
+
+
+Note: You may have to touch preproc.c and preproc.h if 'build' wants to start
+'bison' and you don't have 'bison' installed.
+
+Install the PostgreSQL client library for instance to C:\
+PostgreSQL-9.3.4-win32-debug with:
+
+        install C:\PostgreSQL-9.3.4-win32-debug
+
+
+Note: Unless you were able to build the whole PostgreSQL the 'install' script
+will fail. In this case copy the essential files to for instance C:\
+PostgreSQL-9.3.4-win32-debug with:
+
+        mkdir C:\PostgreSQL-9.3.4\include
+        mkdir C:\PostgreSQL-9.3.4\lib
+        copy Debug\libpq\libpq.dll C:\PostgreSQL-9.3.4\lib
+        copy Debug\libpq\libpq.lib C:\PostgreSQL-9.3.4\lib
+        copy src\interfaces\libpq\libpq-fe.h C:\PostgreSQL-9.3.4\include
+        copy src\include\postgres_ext.h C:\PostgreSQL-9.3.4\include
+        copy src\include\pg_config_ext.h C:\PostgreSQL-9.3.4\include
+
+
+Note: If you disable OpenSSL (for instance for debugging), you have to touch
+sslinfo.sql in contrib/sslinfo. The same applies for uuid-ossp.sql and
+pgxml.sql.in.
+
+Note: If you want to build PostgrSQL with gettext/libint or zlib support you
+have to build those libraries first, or get them from http://
+gnuwin32.sourceforge.net/packages.html.
 
 1.8. Oracle database support
 

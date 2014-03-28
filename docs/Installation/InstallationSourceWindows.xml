@@ -442,51 +442,83 @@
 				</para>
 			</sect3>
 
-<!-- TODO: 
-
 			<sect3>
 				<title>Build your own version of OpenSSL</title>
 				
-If you want to compile your own version, use
-- Microsoft Compiler
-- a perl (ActivePerl)
-- optionally NASM
+				<para>
+					You need the community edition of ActivePerl from
+					<ulink url="http://www.activestate.com/activeperl/">http://www.activestate.com/activeperl/</ulink>.
+					Install it for instance to <filename>C:\Perl</filename>.
+				</para>
 
-perl Configure debug-VC-WIN32 \
-	-prefix="C:\OpenSSL\openssl-1.0.1-win32-debug"
+				<para>
+					You will also need NASM to assemble certain
+					parts of OpenSSL. You can get a Windows NASM from
+					<ulink url="http://www.nasm.us/">http://www.nasm.us/</ulink>.
+					Install it for instance to <filename>C:\nasm</filename>.
+				</para>
 
-respectively
-
-perl Configure VC-WIN32 \
-	-prefix="C:\OpenSSL\openssl-1.0.1-win32-release"
-	
-Make sure there prefix has no spaces in it!
-
-ms\do_nasm
-
-nmake /f ms\ntdll.mak
-nmake /f ms\ntdll.mak install
-
-For later usage in Postgresql add the following link libraries:
-
-mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
-copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
-copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
-
-respectively
-
-mkdir C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC
-copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\libeay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
-copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
-	
-Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
+				<para>
+					Make sure the Perl interpreter and the NASM assembler are part of the path in
+					the shell you want to build OpenSSL:
+					
+					<programlisting language='shell'>
+	Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+					</programlisting>
+				</para>
+								
+				<para>
+					Get the source package <filename>openssl-1.0.1l.tar.gz</filename> of OpenSSL from
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>.
+				</para>
+				
+				<para>
+					Configure the package with:
+					
+					<programlisting language='shell'>
+	C:\Perl\bin\perl Configure debug-VC-WIN32 \
+		--prefix="C:\openssl-1.0.1l-win32-debug"
+					</programlisting>
+					
+					for a debug version, respectively with:
+					
+					<programlisting language='shell'>
+	C:\Perl\bin\perl Configure VC-WIN32 \
+		--prefix="C:\openssl-1.0.1l-win32-release"
+					</programlisting>
+					
+					for a release version.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					Make sure there prefix you choose has no spaces in it!
+				</para>
+				
+				<para>
+					Prepare OpenSSL for NASM support with:
+					
+					<programlisting language='shell'>
+	ms\do_nasm.bat
+					</programlisting>
+				</para>
+				
+				<para>
+					Build and install OpenSSL now with:
+					<programlisting language='shell'>
+	nmake /f ms\ntdll.mak
+	nmake /f ms\ntdll.mak install
+					</programlisting>
+				</para>
+				
+				<para>
+					More build information is available
+					in <filename>INSTALL.W32</filename> and
+					<filename>INSTALL.W64</filename> of the 
+					OpenSSL package itself.
+				</para>
 				
 			</sect3>
--->
 
 		</sect2>
 
@@ -560,97 +592,140 @@ Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
 				
 			</sect3>
 
-<!-- TODO
 			<sect3>
 				<title>Build your own version of PostgreSQL</title>
 
-Compiling Postgresql
+				<para>
+					You need the community edition of ActivePerl from
+					<ulink url="http://www.activestate.com/activeperl/">http://www.activestate.com/activeperl/</ulink>.
+					Install it for instance to <filename>C:\Perl</filename>.
+				</para>
 
+				<para>
+					Make sure the Perl interpreter is part of the path in
+					the shell you want to build PostgreSQL:
+					
+					<programlisting language='shell'>
+	Set PATH=%PATH%;C:\Perl\bin
+					</programlisting>
+				</para>
 
+				<para>
+					Get the source package <filename>postgresql-9.3.4.tar.gz</filename> of PostgreSQL from
+					<ulink url="http://www.postgresql.org">http://www.opstgresql.org</ulink>.
+				</para>
+				
+				<para>
+					Configure the package in the <filename>config.pl</filename>
+					file which you create as follows:
+					
+					<programlisting language='shell'>
+	cd src\tools\msvc
+	copy config_default.pl config.pl
+					</programlisting>
+				</para>
+				
+				<para>
+					Adapt <filename>config.pl</filename> to your needs. We actually don't
+					want to build the full server just the client PostgreSQL library, so
+					specifying the location of OpenSSL is enough:
+					
+					<programlisting language='shell'>
+	openssl=>"C:\\openssl-1.0.1f-win32-debug"
+					</programlisting>
+					
+					<emphasis role="bold">Note</emphasis>: Those must be two backslashes!
+				</para>
 
-This is required if you want for instance to build the debug
-version of the libpq library.
+				<para>
+					If you built your own version of OpenSSL before you will be missing
+					some linking libraries in the right places. So copy them with:
 
-You need at least ActivePerl installed.
+					<programlisting language='shell'>
+	mkdir C:\openssl-1.0.1-win32-debug\lib\VC
+	copy C:\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+		C:\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+	copy C:\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+		C:\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+					</programlisting>
+					
+					respectively if you built the release version:
 
-cd src\tools\msvc
-copy config_default.pl config.pl
+					<programlisting language='shell'>
+	mkdir C:\openssl-1.0.1-win32-release\lib\VC
+	copy C:\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+		C:\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+	copy C:\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+		C:\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+					</programlisting>
+					
+				</para>
+					
+				<para>
+					Build the <filename>libpq</filename> library now with:
+					
+					<programlisting language='shell'>
+	build DEBUG libpq
+					</programlisting>
+					
+					respectively if you prefer a release version:
+					
+					<programlisting language='shell'>
+	build RELEASE libpq
+					</programlisting>
+					
+				</para>
 
-Adapt config.pl to your needs for instance for SSL support:
-
-openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
-
-You may have to touch preproc.c and preproc.h if build wants
-to start bison and you don't have bison installed.
-
-build DEBUG libpq
-
-respectively
-
-build RELEASE libpq
-
-install C:\<somewhere>
-
-or if thata fails, and usually it does (install fails happily with spaces in pathes
-source and destination, copy by hand in this case), do:
-
-mkdir C:\<somewhere>\include
-mkdir C:\<somewhere>\lib
-copy Release\libpq.dll C:\<somewhere>\lib
-copy Release\libpq.lib C:\<somewhere>\lib
-copy src\interfaces\libpq\libpq-fe.h C:\<somewhere>\include
-copy src\include\postgres_ext.h C:\<somewhere>\include
-
-
-
-Notes for Postgreslql 9.0.4
-
-If you disable OpenSSL (for instance for debugging), you have
-to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
-pgxml.sql.in.
-
-
-
-Notes for Visual Studio 2010
-
-vcbuild.exe disappeared, you need the following patch to build
-with VS2010:
-
-http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
-
-(in Wolframe, see 'contrib\Windows\Postgresql\VS2010v2.patch')
-
-The patch has some hard coded library names:
-
-cd <openssl-dir>\lib
-mkdir VC
-cd VC
-copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
-copy ..\ssleay32.dll ssleay32MDd.lib
-
-respectively for the release version:
-
-cd <openssl-dir>\lib
-mkdir VC
-cd VC
-copy ..\libeay32.dll libeay32MD.lib (for the 32-bit debug version for example)
-copy ..\ssleay32.dll ssleay32MD.lib
-
-Maybe newer versions will have the patch integrated.
-
-
-
-Notes for 32-bit dependencies
-
-You can get gettext/libintl and other libraries from 
-
-http://gnuwin32.sourceforge.net/packages.html
-
-as packages.
-
-
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					You may have to touch <filename>preproc.c</filename> and
+					<filename>preproc.h</filename> if 'build' wants
+					to start 'bison' and you don't have 'bison' installed.
+				</para>
+				
+				<para>
+					Install the PostgreSQL client library for instance
+					to <filename>C:\PostgreSQL-9.3.4-win32-debug</filename> with:
+					
+					<programlisting language='shell'>
+	install C:\PostgreSQL-9.3.4-win32-debug
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Unless you
+					were able to build the whole PostgreSQL the 'install'
+					script will fail. In this case copy the essential files
+					to for instance <filename>C:\PostgreSQL-9.3.4-win32-debug</filename> with:
+					
+					<programlisting language='shell'>
+	mkdir C:\PostgreSQL-9.3.4\include
+	mkdir C:\PostgreSQL-9.3.4\lib
+	copy Debug\libpq\libpq.dll C:\PostgreSQL-9.3.4\lib
+	copy Debug\libpq\libpq.lib C:\PostgreSQL-9.3.4\lib
+	copy src\interfaces\libpq\libpq-fe.h C:\PostgreSQL-9.3.4\include
+	copy src\include\postgres_ext.h C:\PostgreSQL-9.3.4\include
+	copy src\include\pg_config_ext.h C:\PostgreSQL-9.3.4\include
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					If you disable OpenSSL (for instance for debugging), you have
+					to touch <filename>sslinfo.sql</filename> in <filename>contrib/sslinfo</filename>.
+					The same applies for 
+					<filename>uuid-ossp.sql</filename> and <filename>pgxml.sql.in</filename>.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					If you want to build PostgrSQL with gettext/libint or zlib support
+					you have to build those libraries first, or get
+					them from <ulink url="http://gnuwin32.sourceforge.net/packages.html">http://gnuwin32.sourceforge.net/packages.html</ulink>.
+				</para>
+					
 			</sect3>
--->
+
 		</sect2>
 
 <!-- Oracle -->
