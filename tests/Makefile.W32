@@ -169,7 +169,6 @@ local_test:
 !ENDIF
 	@-echo testNamedRetVal 
 	@-testVirtualInheritance 
-	@-testArrayDoublingAllocator 
 	@-testFiletypeRecognition 
 # DISABLED (only for memory corruption checks):	@-testTestAllocator 
 	@-logTest 
@@ -200,4 +199,5 @@ local_test:
 
 local_longtest:
 	@-poolTest 
+	@-testArrayDoublingAllocator 
 	@-PBKDF2test 
