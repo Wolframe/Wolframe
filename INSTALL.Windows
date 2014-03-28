@@ -478,6 +478,129 @@ You enable the building of a loadable libxml2/libxslt filtering module with:
         nmake /nologo /f Makefile.W32 WITH_LIBXML2=1 WITH_LIBXSLT=1
 
 
+Build your own version of LibXML2
+
+For libxml2 to support character sets you need a working iconv library. We
+currently use win-iconv-0.0.6.zip from http://code.google.com/p/win-iconv/.
+
+Build iconv.dll with the supplied makefile from packaging\patches\Windows\
+win-iconv\Makefile.msvc and install the results to for instance C:\
+win-iconv-0.0.6-win32-debug with:
+
+        nmake /nologo /f Makefile.msvc DEBUG=1
+        mkdir C:\win-iconv-0.0.6-win32-debug
+        mkdir C:\win-iconv-0.0.6-win32-debug\include
+        mkdir C:\win-iconv-0.0.6-win32-debug\lib
+        mkdir C:\win-iconv-0.0.6-win32-debug\bin
+        copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+        copy iconv.lib C:\win-iconv-0.0.6-win32-debug\lib
+        copy iconv.dll C:\win-iconv-0.0.6-win32-debug\bin
+
+
+respectively if you want to build a release version:
+
+        nmake /nologo /f Makefile.msvc
+        mkdir C:\win-iconv-0.0.6-win32-release
+        mkdir C:\win-iconv-0.0.6-win32-release\include
+        mkdir C:\win-iconv-0.0.6-win32-release\lib
+        mkdir C:\win-iconv-0.0.6-win32-release\bin
+        copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+        copy iconv.lib C:\win-iconv-0.0.6-win32-release\lib
+        copy iconv.dll C:\win-iconv-0.0.6-win32-release\bin
+
+
+Adapt the 'ICONV_DIR' variable in makefiles\nmake\config.mk as follows:
+
+        ICONV_DIR = C:\win-iconv-0.0.6-win32-debug
+
+
+Get the source package libxml2-2.9.1.tar.gz from ftp://xmlsoft.org/libxml2/.
+
+Configure libxml2, make it use the 'win-iconv' library:
+
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxml2-2.9.1-win32-release"
+                lib="C:\win-iconv-0.0.6-win32-release\lib"
+                include="C:\win-iconv-0.0.6-win32-release\include"
+                zlib=no iconv=yes vcmanifest=yes
+
+
+For a debug version you have to change 'debug' to 'release' in the paths and to
+add 'debug=yes' and 'cruntime=/MDd':
+
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxml2-2.9.1-win32-debug"
+                lib="C:\win-iconv-0.0.6-win32-debug\lib"
+                include="C:\win-iconv-0.0.6-win32-debug\include"
+                zlib=no iconv=yes vcmanifest=yes
+                debug=yes cruntime=/MDd
+
+
+Note: Try to avoid spaces in the installation prefix, if you really need some
+spaces then you will have to fix them after running the configure.js script by
+hand in the config.msvc file:
+
+        PREFIX="C:\libxml2-2.9.1 win32 debug"
+
+
+Finally build and install libxml2 with:
+
+        nmake /nologo /f Makefile.msvc all
+        nmake /nologo /f Makefile.msvc install
+
+
+Adapt the 'LIBXML2_DIR' variable in makefiles\nmake\config.mk as follows:
+
+        LIBXML2_DIR = C:\libxml2-2.9.1-win32-debug
+
+
+Build your own version of LibXSLT
+
+Get the source package libxslt-1.1.28.tar.gz from ftp://xmlsoft.org/libxslt/.
+
+Configure libxslt, make it use the 'win-iconv' and the 'libxml2' library
+compiled above:
+
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxslt-1.1.28-win32-release"
+                lib="C:\libxml2-2.9.1-win32-release\lib;C:\win-iconv-0.0.6-win32-release\lib"
+                include="C:\libxml2-2.9.1-win32-release\include\libxml2;C:\win-iconv-0.0.6-win32-release\include"
+                zlib=no iconv=yes vcmanifest=yes
+
+
+For a debug version you have to change 'debug' to 'release' in the paths and to
+add 'debug=yes' and 'cruntime=/MDd':
+
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxslt-1.1.28-win32-debug"
+                lib="C:\libxml2-2.9.1-win32-debug\lib;C:\win-iconv-0.0.6-win32-debug\lib"
+                include="C:\libxml2-2.9.1-win32-debug\include;C:\win-iconv-0.0.6-win32-debug\include"
+                zlib=no iconv=yes vcmanifest=yes
+                debug=yes cruntime=/MDd
+
+
+Note: Try to avoid spaces in the installation prefix, if you really need some
+spaces then you will have to fix them after running the configure.js script by
+hand in the config.msvc file:
+
+        PREFIX="C:\libxslt-1.1.28 win32 debug"
+
+
+Finally build and install libxslt with:
+
+        nmake /nologo /f Makefile.msvc all
+        nmake /nologo /f Makefile.msvc install
+
+
+Adapt the 'LIBXSLT_DIR' variable in makefiles\nmake\config.mk as follows:
+
+        LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
+
+
 1.10. XML filtering support with Textwolf
 
 Wolframe can use Textwolf (http://textwolf.net) for filtering and the

@@ -829,85 +829,184 @@
 
 			</sect3>
 
-<!-- TODO
 			<sect3>
-				<title>Build your own version of LibXML2 and LibXSLT</title>
-
-LibXML2
-
-Get sources from: ftp://xmlsoft.org/libxml2/
-
-You also need either libiconv or win_iconv for character set conversion.
-In the following installation instructions we stick to win-iconv.
-
-Get win_iconv from http://code.google.com/p/win-iconv/
-
-Build win-iconv.dll with the supplied makefile from 'contrib\win-iconv\Makefile.msvc':
-
-nmake /nologo /f Makefile.msvc
-
-Adapt WIN_ICONV_DIR in 'makefiles\nmake\config.mk'.
-
-You have to fix the Makefile.msvc:
-
-There are some + where they don't belong:
-
-+!if "$(WITH_ICU)" == "1"
-+LIBS = $(LIBS) icu.lib
-+!endif
-
-Configure libxml2, set location of win-iconv:
-
-cd win32
-cscript configure.js compiler=msvc
-	prefix="C:\cygwin\home\Andreas\libxml2-2.9.1"
-	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3"
-	include="C:\cygwin\home\Andreas\win-iconv-0.0.3"
- 	zlib=no iconv=yes vcmanifest=yes
-
-For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
-
-When there are spaces in the installation prefix, fix it manually in 'config.msvc'
-before building the library:
-
-PREFIX="C:\Program Files\libxml2-2.7.8-win32"
-
-For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
-
-nmake /nologo /f Makefile.msvc all
-nmake /nologo /f Makefile.msvc install
-
-Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
-
-
-
-LibXSLT
-
-Get sources from: ftp://xmlsoft.org/libxslt/
-
-cd win32
-cscript configure.js compiler=msvc
-	prefix="C:\cygwin\home\Andreas\libxslt-1.1.28-win32"
-	lib="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\lib;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
-	include="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\include\libxml2;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
- 	zlib=no iconv=yes vcmanifest=yes
-
-For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
-
-When there are spaces in the installation prefix, fix it manually in 'config.msvc'
-before building the library:
-
-PREFIX="C:\Program Files\libxslt-1.1.26-win32"
-
-nmake /nologo /f Makefile.msvc all
-
-For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
-
-Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
-
+				<title>Build your own version of LibXML2</title>
 				
+				<para>
+					For libxml2 to support character sets you need a working
+					iconv library. We currently use 
+					<filename>win-iconv-0.0.6.zip</filename> from
+					<ulink url="http://code.google.com/p/win-iconv/">http://code.google.com/p/win-iconv/</ulink>.
+				</para>
+				
+				<para>
+					Build <filename>iconv.dll</filename> with
+					the supplied makefile from 
+					<filename>packaging\patches\Windows\win-iconv\Makefile.msvc</filename>
+					and install the results to for instance
+					<filename>C:\win-iconv-0.0.6-win32-debug</filename> with:
+
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc DEBUG=1
+	mkdir C:\win-iconv-0.0.6-win32-debug
+	mkdir C:\win-iconv-0.0.6-win32-debug\include
+	mkdir C:\win-iconv-0.0.6-win32-debug\lib
+	mkdir C:\win-iconv-0.0.6-win32-debug\bin
+	copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+	copy iconv.lib C:\win-iconv-0.0.6-win32-debug\lib
+	copy iconv.dll C:\win-iconv-0.0.6-win32-debug\bin
+					</programlisting>
+					
+					respectively if you want to build a release version:
+
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc
+	mkdir C:\win-iconv-0.0.6-win32-release
+	mkdir C:\win-iconv-0.0.6-win32-release\include
+	mkdir C:\win-iconv-0.0.6-win32-release\lib
+	mkdir C:\win-iconv-0.0.6-win32-release\bin
+	copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+	copy iconv.lib C:\win-iconv-0.0.6-win32-release\lib
+	copy iconv.dll C:\win-iconv-0.0.6-win32-release\bin
+					</programlisting>
+					
+				</para>
+
+				<para>
+					Adapt the 'ICONV_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	ICONV_DIR = C:\win-iconv-0.0.6-win32-debug
+					</programlisting>
+				</para>
+					
+				<para>
+					Get the source package <filename>libxml2-2.9.1.tar.gz</filename> from
+					<ulink url="ftp://xmlsoft.org/libxml2/">ftp://xmlsoft.org/libxml2/</ulink>.
+				</para>
+					
+				<para>
+					Configure libxml2, make it use the 'win-iconv' library:
+
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxml2-2.9.1-win32-release"
+		lib="C:\win-iconv-0.0.6-win32-release\lib"
+		include="C:\win-iconv-0.0.6-win32-release\include"
+		zlib=no iconv=yes vcmanifest=yes
+					</programlisting>
+					
+					For a debug version you have to change 'debug'
+					to 'release' in the paths and to add 'debug=yes'
+					and 'cruntime=/MDd':
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxml2-2.9.1-win32-debug"
+		lib="C:\win-iconv-0.0.6-win32-debug\lib"
+		include="C:\win-iconv-0.0.6-win32-debug\include"
+		zlib=no iconv=yes vcmanifest=yes
+		debug=yes cruntime=/MDd
+					</programlisting>
+	
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Try to avoid spaces
+					in the installation prefix, if you really need some spaces then you will
+					have to fix them after running the <filename>configure.js</filename>
+					script by hand in the <filename>config.msvc</filename> file:
+
+					<programlisting language='shell'>
+	PREFIX="C:\libxml2-2.9.1 win32 debug"
+					</programlisting>
+				</para>
+				
+				<para>
+					Finally build and install libxml2 with:
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc all
+	nmake /nologo /f Makefile.msvc install
+					</programlisting>
+				</para>
+
+				<para>
+					Adapt the 'LIBXML2_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	LIBXML2_DIR = C:\libxml2-2.9.1-win32-debug
+					</programlisting>
+				</para>				
 			</sect3>
--->
+
+<!-- libXSLT self-compiled -->
+			<sect3>
+				<title>Build your own version of LibXSLT</title>
+
+				<para>
+					Get the source package <filename>libxslt-1.1.28.tar.gz</filename> from
+					<ulink url="ftp://xmlsoft.org/libxslt/">ftp://xmlsoft.org/libxslt/</ulink>.
+				</para>
+
+				<para>
+					Configure libxslt, make it use the 'win-iconv' and the 'libxml2' library
+					compiled above:
+
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxslt-1.1.28-win32-release"
+		lib="C:\libxml2-2.9.1-win32-release\lib;C:\win-iconv-0.0.6-win32-release\lib"
+		include="C:\libxml2-2.9.1-win32-release\include\libxml2;C:\win-iconv-0.0.6-win32-release\include"
+		zlib=no iconv=yes vcmanifest=yes
+					</programlisting>
+					
+					For a debug version you have to change 'debug'
+					to 'release' in the paths and to add 'debug=yes'
+					and 'cruntime=/MDd':
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxslt-1.1.28-win32-debug"
+		lib="C:\libxml2-2.9.1-win32-debug\lib;C:\win-iconv-0.0.6-win32-debug\lib"
+		include="C:\libxml2-2.9.1-win32-debug\include;C:\win-iconv-0.0.6-win32-debug\include"
+		zlib=no iconv=yes vcmanifest=yes
+		debug=yes cruntime=/MDd
+					</programlisting>
+	
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Try to avoid spaces
+					in the installation prefix, if you really need some spaces then you will
+					have to fix them after running the <filename>configure.js</filename>
+					script by hand in the <filename>config.msvc</filename> file:
+
+					<programlisting language='shell'>
+	PREFIX="C:\libxslt-1.1.28 win32 debug"
+					</programlisting>
+				</para>
+				
+				<para>
+					Finally build and install libxslt with:
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc all
+	nmake /nologo /f Makefile.msvc install
+					</programlisting>
+				</para>
+
+				<para>
+					Adapt the 'LIBXSLT_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
+					</programlisting>
+				</para>				
+			</sect3>
 			
 		</sect2>
 		
