@@ -30,14 +30,21 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/symbolTable.hpp
-//\brief Defines a map of symbols to addresses and back
-#ifndef _DATABASE_VIRTUAL_MACHINE_PROGRAM_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_PROGRAM_HPP_INCLUDED
+//\file database/program.hpp
+//\brief Interface for program executing database transactions
+#ifndef _DATABASE_VM_PROGRAM_HPP_INCLUDED
+#define _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
+#include "database/vm/symbolTable.hpp"
+#include "database/vm/nameTable.hpp"
+#include "database/vm/selectorPathSet.hpp"
+#include "database/vm/programCode.hpp"
+#include "database/vm/subroutineFrame.hpp"
+#include "types/keymap.hpp"
+#include "types/variant.hpp"
+#include <string>
 #include <vector>
-#include <cstdlib>
-#include <limits>
+#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -45,77 +52,35 @@ namespace db {
 namespace vm {
 
 class Program
+	:public InstructionSet
 {
 public:
-	typedef InstructionSet::Instruction Instruction;
-	typedef InstructionSet::CondCode CondCode;
-	typedef InstructionSet::OpCode OpCode;
-	typedef InstructionSet::Address Address;
+	typedef std::vector<std::string> SubroutineSignature;
+
+public:
+	ProgramCode program;				//< symbol table
+	SymbolTable symboltab;				//< symbol table
+	std::vector<types::Variant> constants;		//< constants
+	NameTable tagnametab;				//< tag table
+	NameTable resultnametab;			//< result name table
+	NameTable colnametab;				//< column name table
+	std::vector<std::string> statements;		//< database statements
+	std::vector<SubroutineSignature> signatures;	//< subroutine signutures
+	SelectorPathSet pathset;			//< input selector path expressions
 
 public:
 	Program(){}
 	Program( const Program& o)
-		:m_ar(o.m_ar){}
-
-	void add( const Instruction& instr)
-	{
-		m_ar.push_back( instr);
-		if (m_ar.size() >= InstructionSet::Max_ArgumentIndex)
-		{
-			throw std::runtime_error( "program size out of range");
-		}
-	}
-	Instruction& operator[]( const Address& adr)
-	{
-		if (adr >= m_ar.size()) throw std::runtime_error( "address out of bounds");
-		return m_ar[ adr];
-	}
-	const Instruction& operator[]( const Address& adr) const
-	{
-		if (adr >= m_ar.size()) throw std::runtime_error( "address out of bounds");
-		return m_ar[ adr];
-	}
-
-	Address size() const
-	{
-		return (Address)m_ar.size();
-	}
-
-	Program& operator()( CondCode cond, OpCode opcode, unsigned int arg=0)
-	{
-		add( InstructionSet::instruction( cond, opcode, arg));
-		return *this;
-	}
-	Program& operator()( OpCode opcode, unsigned int arg=0)
-	{
-		CondCode cond = InstructionSet::Co_ALWAYS;
-		add( InstructionSet::instruction( cond, opcode, arg));
-		return *this;
-	}
-
-	void append( const Program& prg)
-	{
-		m_ar.insert( m_ar.end(), prg.begin(), prg.end());
-	}
-
-	Instruction get( Address& ip) const
-	{
-		if (ip >= m_ar.size()) return InstructionSet::instruction( InstructionSet::Co_ALWAYS, InstructionSet::Op_EXIT);
-		return m_ar.at(ip);
-	}
-
-	typedef std::vector<Instruction>::const_iterator const_iterator;
-	typedef std::vector<Instruction>::iterator iterator;
-
-	const_iterator begin() const					{return m_ar.begin();}
-	const_iterator end() const					{return m_ar.end();}
-	iterator begin()						{return m_ar.begin();}
-	iterator end()							{return m_ar.end();}
-	const_iterator at( const Address& adr) const			{return m_ar.begin() + adr;}
-	iterator at( const Address& adr)				{return m_ar.begin() + adr;}
-
-private:
-	std::vector<Instruction> m_ar;
+		:program(o.program)
+		,symboltab(o.symboltab)
+		,constants(o.constants)
+		,tagnametab(o.tagnametab)
+		,resultnametab(o.resultnametab)
+		,colnametab(o.colnametab)
+		,statements(o.statements)
+		,signatures(o.signatures)
+		,pathset(o.pathset)
+	{}
 };
 
 typedef boost::shared_ptr<Program> ProgramR;

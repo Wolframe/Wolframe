@@ -41,9 +41,9 @@ CPP_OBJS = \
 	substitutingStatement.obj \
 	vm\selectorPathSet.obj \
 	vm\subroutine.obj \
-	virtualMachine.obj \
-	virtualMachineInstance.obj \
-	virtualMachineTdlTranslatorInterface.obj
+	vm\program.obj \
+	vm\programInstance.obj \
+	vm\tdlTranslatorInterface.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

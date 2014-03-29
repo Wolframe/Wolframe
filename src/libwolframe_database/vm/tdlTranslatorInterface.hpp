@@ -30,27 +30,28 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file virtualMachineTdlTranslatorInterface.hpp
+//\file vm/tdlTranslatorInterface.hpp
 //\brief Helper interface for building a virtual machine for database transactions out of TDL
-#ifndef _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
-#include "database/virtualMachine.hpp"
+#ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
+#define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
+#include "database/vm/program.hpp"
 #include "database/vm/subroutine.hpp"
 #include "types/keymap.hpp"
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace db {
+namespace vm {
 
-class VirtualMachineTdlTranslatorInterface
-	:public vm::InstructionSet
+class TdlTranslatorInterface
+	:public InstructionSet
 {
 public:
-	explicit VirtualMachineTdlTranslatorInterface( const types::keymap<vm::Subroutine>* soubroutinemap_)
+	explicit TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
 		:m_soubroutinemap(soubroutinemap_)
-		,m_vm( new VirtualMachine())
+		,m_vm( new Program())
 	{}
-	VirtualMachineTdlTranslatorInterface( const VirtualMachineTdlTranslatorInterface& o)
+	TdlTranslatorInterface( const TdlTranslatorInterface& o)
 		:m_stateStack(o.m_stateStack)
 		,m_unresolvedSubroutineCalls(o.m_unresolvedSubroutineCalls)
 		,m_soubroutinemap(o.m_soubroutinemap)
@@ -74,23 +75,23 @@ private:
 	{
 		enum Id {None,OpenForeach,OpenBlock,OpenStatementCall,OpenSubroutineCall};
 		Id id;
-		vm::InstructionSet::ArgumentIndex value;
+		InstructionSet::ArgumentIndex value;
 
 		State()
 			:id(None),value(0){}
 		State( const State& o)
 			:id(o.id),value(o.value){}
-		State( Id i, vm::InstructionSet::ArgumentIndex v)
+		State( Id i, InstructionSet::ArgumentIndex v)
 			:id(i),value(v){}
 	};
 
 	std::vector<State> m_stateStack;
-	std::vector<vm::InstructionSet::Address> m_unresolvedSubroutineCalls;
-	const types::keymap<vm::Subroutine>* m_soubroutinemap;
-	std::vector<vm::Subroutine> m_calledSubroutines;
-	VirtualMachineR m_vm;
+	std::vector<InstructionSet::Address> m_unresolvedSubroutineCalls;
+	const types::keymap<Subroutine>* m_soubroutinemap;
+	std::vector<Subroutine> m_calledSubroutines;
+	ProgramR m_vm;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

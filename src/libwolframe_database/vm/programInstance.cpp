@@ -30,14 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file virtualMachine.cpp
+//\file programInstance.cpp
 //\brief Implementation of the code executed as database input
-#include "database/virtualMachineInstance.hpp"
+#include "database/vm/programInstance.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::vm;
 
-vm::ValueTupleSetR VirtualMachineInstance::keptResult( ArgumentIndex idx) const
+vm::ValueTupleSetR ProgramInstance::keptResult( ArgumentIndex idx) const
 {
 	const StackElement& top = m_stack.back();
 	std::map<ArgumentIndex,vm::ValueTupleSetR>::const_iterator ki = top.m_resultMap.find( idx);
@@ -48,31 +49,31 @@ vm::ValueTupleSetR VirtualMachineInstance::keptResult( ArgumentIndex idx) const
 	return ki->second;
 }
 
-vm::ValueTupleSetR VirtualMachineInstance::tupleSet( ArgumentIndex argidx) const
+vm::ValueTupleSetR ProgramInstance::tupleSet( ArgumentIndex argidx) const
 {
 	if (argidx >= m_tuplesets.size()) throw std::runtime_error("tuple set reference out of bounds");
 	return m_tuplesets.at( argidx);
 }
 
-const types::Variant& VirtualMachineInstance::constArgument( ArgumentIndex argidx) const
+const types::Variant& ProgramInstance::constArgument( ArgumentIndex argidx) const
 {
 	if (argidx >= m_vm->constants.size()) throw std::runtime_error( "constant index out of bounds");
 	return m_vm->constants.at( argidx);
 }
 
-const std::string& VirtualMachineInstance::statementArgument( ArgumentIndex argidx) const
+const std::string& ProgramInstance::statementArgument( ArgumentIndex argidx) const
 {
 	if (argidx >= m_vm->statements.size()) throw std::runtime_error( "string index out of bounds");
 	return m_vm->statements.at( argidx);
 }
 
-VirtualMachineInstance::ArgumentIndex VirtualMachineInstance::columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex argidx) const
+ProgramInstance::ArgumentIndex ProgramInstance::columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex argidx) const
 {
 	if (!valueset) throw std::runtime_error( "illegal instruction: no value set selected for name access");
 	return valueset->columnIndex( m_vm->colnametab.getName( argidx));
 }
 
-const types::Variant& VirtualMachineInstance::selectedArgument( ArgumentIndex argidx) const
+const types::Variant& ProgramInstance::selectedArgument( ArgumentIndex argidx) const
 {
 	static const types::Variant null;
 	const StackElement& top = m_stack.back();
@@ -91,7 +92,7 @@ const types::Variant& VirtualMachineInstance::selectedArgument( ArgumentIndex ar
 	}
 }
 
-const types::Variant& VirtualMachineInstance::iteratorArgument( ArgumentIndex argidx) const
+const types::Variant& ProgramInstance::iteratorArgument( ArgumentIndex argidx) const
 {
 	const StackElement& top = m_stack.back();
 
@@ -99,7 +100,7 @@ const types::Variant& VirtualMachineInstance::iteratorArgument( ArgumentIndex ar
 	return top.m_valueIter->column( argidx);
 }
 
-void VirtualMachineInstance::initValueIteraror( const vm::ValueTupleSetR& valueset)
+void ProgramInstance::initValueIteraror( const vm::ValueTupleSetR& valueset)
 {
 	StackElement& top = m_stack.back();
 	if (!valueset.get()) throw std::runtime_error( "opening iterator on undefined set");
@@ -109,7 +110,7 @@ void VirtualMachineInstance::initValueIteraror( const vm::ValueTupleSetR& values
 	m_cond = (top.m_valueIter != top.m_valueEnd);
 }
 
-void VirtualMachineInstance::initResult( const vm::ValueTupleSetR& resultset)
+void ProgramInstance::initResult( const vm::ValueTupleSetR& resultset)
 {
 	StackElement& top = m_stack.back();
 
@@ -139,7 +140,7 @@ void VirtualMachineInstance::initResult( const vm::ValueTupleSetR& resultset)
 	}
 }
 
-vm::ValueTupleSetR VirtualMachineInstance::fetchDatabaseResult()
+vm::ValueTupleSetR ProgramInstance::fetchDatabaseResult()
 {
 	if (m_db_stm->hasResult()) return vm::ValueTupleSetR();
 
@@ -169,7 +170,7 @@ vm::ValueTupleSetR VirtualMachineInstance::fetchDatabaseResult()
 	return rt;
 }
 
-bool VirtualMachineInstance::execute()
+bool ProgramInstance::execute()
 {
 	if (!m_vm || !m_db_stm || m_stack.empty()) return false;
 
@@ -193,7 +194,7 @@ bool VirtualMachineInstance::execute()
 				++m_ip;
 				continue;
 		};
-		ArgumentIndex argidx = VirtualMachine::argumentIndex( instr);
+		ArgumentIndex argidx = Program::argumentIndex( instr);
 
 		switch (opCode( instr))
 		{

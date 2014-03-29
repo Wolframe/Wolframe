@@ -49,9 +49,9 @@ CPP_OBJS = \
 	substitutingStatement.o \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
-	virtualMachine.o \
-	virtualMachineInstance.o \
-	virtualMachineTdlTranslatorInterface.o
+	vm/program.o \
+	vm/programInstance.o \
+	vm/tdlTranslatorInterface.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

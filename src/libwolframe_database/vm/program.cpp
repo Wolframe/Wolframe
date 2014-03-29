@@ -30,10 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file virtualMachine.cpp
-//\brief Implementation of the code executed as database input
-#include "database/virtualMachine.hpp"
+//\file vm/program.cpp
+//\brief Implementation of the virtual machine program
+#include "database/vm/program.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::vm;
 

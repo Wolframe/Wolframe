@@ -30,15 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/virtualMachineInstance.hpp
-//\brief Interface for an instance of a virtual machine defining database transactions
-#ifndef _DATABASE_VIRTUAL_MACHINE_INSTANCE_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_INSTANCE_HPP_INCLUDED
-#include "database/virtualMachine.hpp"
+//\file database/programInstance.hpp
+//\brief Interface for state of a program executing database transactions
+#ifndef _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
+#define _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
+#include "database/vm/program.hpp"
 #include "database/vm/instructionSet.hpp"
 #include "database/vm/valueTupleSet.hpp"
 #include "database/vm/symbolTable.hpp"
-#include "database/vm/program.hpp"
+#include "database/vm/programCode.hpp"
 #include "database/vm/output.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "types/variant.hpp"
@@ -47,15 +47,16 @@
 
 namespace _Wolframe {
 namespace db {
+namespace vm {
 
-class VirtualMachineInstance
-	:public vm::InstructionSet
+class ProgramInstance
+	:public InstructionSet
 {
 public:
-	VirtualMachineInstance()
+	ProgramInstance()
 		:m_vm(0),m_db_stm(0),m_ip(0),m_cond(false)
 	{}
-	VirtualMachineInstance( const VirtualMachineInstance& o)
+	ProgramInstance( const ProgramInstance& o)
 		:m_vm(o.m_vm)
 		,m_db_stm(o.m_db_stm)
 		,m_ip(o.m_ip)
@@ -65,7 +66,7 @@ public:
 		,m_program(o.m_program)
 		,m_tuplesets(o.m_tuplesets)
 	{}
-	VirtualMachineInstance( const VirtualMachine* vm_, const std::vector<vm::ValueTupleSetR>& tuplesets_, TransactionExecStatemachine* db_stm_)
+	ProgramInstance( const Program* vm_, const std::vector<ValueTupleSetR>& tuplesets_, TransactionExecStatemachine* db_stm_)
 		:m_vm(vm_)
 		,m_db_stm(db_stm_)
 		,m_ip(0)
@@ -115,7 +116,7 @@ private:
 			:m_return_ip(0)
 			,m_bindidx(0)
 		{}
-		StackElement( Address return_ip_, const vm::ValueTupleSetR& parameter_)
+		StackElement( Address return_ip_, const ValueTupleSetR& parameter_)
 			:m_return_ip(return_ip_)
 			,m_bindidx(0)
 			,m_parameter(parameter_)
@@ -131,42 +132,42 @@ private:
 			,m_valueEnd(o.m_valueEnd)
 		{}
 
-		Address m_return_ip;						//< IP to set o RETURN
-		std::size_t m_bindidx;						//< current bind index
-		vm::ValueTupleSetR m_parameter;					//< parameter structure
-		vm::ValueTupleSetR m_lastResult;				//< last call result
-		ResultFlags m_resultFlags;					//< conditions to be meet for each element of the next result
-		std::map<ArgumentIndex,vm::ValueTupleSetR> m_resultMap;		//< KEEP result map
-		vm::ValueTupleSetR m_selectedSet;				//< selected value set
-		vm::ValueTupleSetR m_valueSet;					//< currently iterated value set
-		vm::ValueTupleSet::const_iterator m_valueIter;			//< iterator on value set
-		vm::ValueTupleSet::const_iterator m_valueEnd;			//< end of value set
+		Address m_return_ip;					//< IP to set o RETURN
+		std::size_t m_bindidx;					//< current bind index
+		ValueTupleSetR m_parameter;				//< parameter structure
+		ValueTupleSetR m_lastResult;				//< last call result
+		ResultFlags m_resultFlags;				//< conditions to be meet for each element of the next result
+		std::map<ArgumentIndex,ValueTupleSetR> m_resultMap;	//< KEEP result map
+		ValueTupleSetR m_selectedSet;				//< selected value set
+		ValueTupleSetR m_valueSet;				//< currently iterated value set
+		ValueTupleSet::const_iterator m_valueIter;		//< iterator on value set
+		ValueTupleSet::const_iterator m_valueEnd;		//< end of value set
 	};
 
 private:
-	vm::ValueTupleSetR keptResult( ArgumentIndex idx) const;
-	vm::ValueTupleSetR tupleSet( ArgumentIndex idx) const;
+	ValueTupleSetR keptResult( ArgumentIndex idx) const;
+	ValueTupleSetR tupleSet( ArgumentIndex idx) const;
 	const types::Variant& constArgument( ArgumentIndex idx) const;
 	const std::string& statementArgument( ArgumentIndex argidx) const;
-	ArgumentIndex columnIndex( const vm::ValueTupleSet* valueset, ArgumentIndex nameidx) const;
+	ArgumentIndex columnIndex( const ValueTupleSet* valueset, ArgumentIndex nameidx) const;
 	const types::Variant& selectedArgument( ArgumentIndex idx) const;
 	const types::Variant& iteratorArgument( ArgumentIndex idx) const;
-	void initValueIteraror( const vm::ValueTupleSetR& valueset);
-	void initResult( const vm::ValueTupleSetR& resultset);
-	vm::ValueTupleSetR fetchDatabaseResult();
+	void initValueIteraror( const ValueTupleSetR& valueset);
+	void initResult( const ValueTupleSetR& resultset);
+	ValueTupleSetR fetchDatabaseResult();
 
 private:
-	const VirtualMachine* m_vm;			//< virtual machine reference
+	const Program* m_vm;				//< program reference
 	TransactionExecStatemachine* m_db_stm;		//< engine to process database instructions
 	Address m_ip;					//< instruction pointer
-	vm::SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
+	SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
 	bool m_cond;					//< current condition flag for conditional execution ('InstructionSet::CondCode')
 	std::vector<StackElement> m_stack;		//< execution stack
-	vm::Output m_output;				//< output
-	vm::Program m_program;				//< program copy
-	std::vector<vm::ValueTupleSetR> m_tuplesets;	//< values from path expressions
+	Output m_output;				//< output
+	ProgramCode m_program;				//< program code copy
+	std::vector<ValueTupleSetR> m_tuplesets;	//< values from path expressions
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

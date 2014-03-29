@@ -32,9 +32,9 @@
 ************************************************************************/
 //\file database/vm/subroutine.hpp
 //\brief Interface for mapping names to subroutine definitions
-#ifndef _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_HPP_INCLUDED
-#include "database/virtualMachine.hpp"
+#ifndef _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
+#define _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
+#include "database/vm/program.hpp"
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
@@ -47,19 +47,19 @@ class Subroutine
 {
 public:
 	Subroutine(){}
-	Subroutine( const std::string& name_, const std::vector<std::string>& templateParams_, const std::vector<std::string>& params_, const VirtualMachineR& vm_)
-		:m_name(name_),m_templateParams(templateParams_),m_params(params_),m_vm(vm_){}
-	Subroutine( const std::string& name_, const std::vector<std::string>& params_, const VirtualMachineR& vm_)
-		:m_name(name_),m_params(params_),m_vm(vm_){}
+	Subroutine( const std::string& name_, const std::vector<std::string>& templateParams_, const std::vector<std::string>& params_, const ProgramR& program_)
+		:m_name(name_),m_templateParams(templateParams_),m_params(params_),m_program(program_){}
+	Subroutine( const std::string& name_, const std::vector<std::string>& params_, const ProgramR& program_)
+		:m_name(name_),m_params(params_),m_program(program_){}
 	Subroutine( const Subroutine& o)
-		:m_name(o.m_name),m_templateParams(o.m_templateParams),m_params(o.m_params),m_vm(o.m_vm){}
+		:m_name(o.m_name),m_templateParams(o.m_templateParams),m_params(o.m_params),m_program(o.m_program){}
 
 	void setName( const std::string& name_)			{m_name = name_;}
 
 	const std::string& name() const				{return m_name;}
 	const std::vector<std::string>& templateParams() const	{return m_params;}
 	const std::vector<std::string>& params() const		{return m_params;}
-	const VirtualMachineR& vmref() const			{return m_vm;}
+	const ProgramR& program() const				{return m_program;}
 
 	void substituteStatementTemplates( const std::vector<std::string>& templateParamValues);
 
@@ -67,7 +67,7 @@ private:
 	std::string m_name;
 	std::vector<std::string> m_templateParams;
 	std::vector<std::string> m_params;
-	VirtualMachineR m_vm;
+	ProgramR m_program;
 };
 
 }}}//namespace

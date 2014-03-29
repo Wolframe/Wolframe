@@ -30,14 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file virtualMachineTdlTranslatorInterface.cpp
+//\file vm/tdlTranslatorInterface.cpp
 //\brief Implementation of the helpers for building a virtual machine for database transactions out of TDL
-#include "virtualMachineTdlTranslatorInterface.hpp"
+#include "vm/tdlTranslatorInterface.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::vm;
 
-void VirtualMachineTdlTranslatorInterface::begin_FOREACH( const std::string& selector)
+void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
 	vm::InstructionSet::ArgumentIndex idx;
 	if (0!=(idx=m_vm->resultnametab.getIndex( selector)))
@@ -70,7 +71,7 @@ void VirtualMachineTdlTranslatorInterface::begin_FOREACH( const std::string& sel
 	m_stateStack.push_back( State( State::OpenForeach, m_vm->program.size()));
 }
 
-void VirtualMachineTdlTranslatorInterface::end_FOREACH()
+void TdlTranslatorInterface::end_FOREACH()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH without begin");
 
@@ -89,7 +90,7 @@ void VirtualMachineTdlTranslatorInterface::end_FOREACH()
 	m_stateStack.pop_back();
 }
 
-void VirtualMachineTdlTranslatorInterface::begin_DO_statement( const std::string& stm)
+void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
 {
 	// Code generated:
 	m_vm->program
@@ -99,7 +100,7 @@ void VirtualMachineTdlTranslatorInterface::begin_DO_statement( const std::string
 	m_vm->statements.push_back( stm);
 }
 
-void VirtualMachineTdlTranslatorInterface::end_DO_statement()
+void TdlTranslatorInterface::end_DO_statement()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement without begin");
 	// Code generated:
@@ -125,7 +126,7 @@ static std::string mangledSubroutineName( const std::string& name, const std::ve
 	return rt;
 }
 
-void VirtualMachineTdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
+void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
 {
 	types::keymap<vm::Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
 	if (si == se)
@@ -173,7 +174,7 @@ void VirtualMachineTdlTranslatorInterface::begin_DO_subroutine( const std::strin
 	}
 }
 
-void VirtualMachineTdlTranslatorInterface::end_DO_subroutine()
+void TdlTranslatorInterface::end_DO_subroutine()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO without begin");
 	// Code generated:
@@ -185,7 +186,7 @@ void VirtualMachineTdlTranslatorInterface::end_DO_subroutine()
 	m_unresolvedSubroutineCalls.push_back( m_vm->program.size() -1);
 }
 
-void VirtualMachineTdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
+void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 {
 	vm::InstructionSet::ArgumentIndex idx = m_vm->pathset.add( selector);
 

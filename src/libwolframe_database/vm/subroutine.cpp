@@ -97,8 +97,8 @@ void Subroutine::substituteStatementTemplates( const std::vector<std::string>& t
 	}
 	if (templateParamValues.size())
 	{
-		m_vm.reset( new VirtualMachine( *m_vm));
-		std::vector<std::string>::iterator si = m_vm->statements.begin(), se = m_vm->statements.end();
+		m_program.reset( new Program( *m_program));
+		std::vector<std::string>::iterator si = m_program->statements.begin(), se = m_program->statements.end();
 
 		for (; si != se; ++si)
 		{
