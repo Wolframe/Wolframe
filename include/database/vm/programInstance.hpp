@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/programInstance.hpp
+//\file database/vm/programInstance.hpp
 //\brief Interface for state of a program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
@@ -54,24 +54,24 @@ class ProgramInstance
 {
 public:
 	ProgramInstance()
-		:m_vm(0),m_db_stm(0),m_ip(0),m_cond(false)
+		:m_program(0),m_db_stm(0),m_ip(0),m_cond(false)
 	{}
 	ProgramInstance( const ProgramInstance& o)
-		:m_vm(o.m_vm)
+		:m_program(o.m_program)
 		,m_db_stm(o.m_db_stm)
 		,m_ip(o.m_ip)
 		,m_cond(o.m_cond)
 		,m_stack(o.m_stack)
 		,m_output(o.m_output)
-		,m_program(o.m_program)
+		,m_code(o.m_code)
 		,m_tuplesets(o.m_tuplesets)
 	{}
-	ProgramInstance( const Program* vm_, const std::vector<ValueTupleSetR>& tuplesets_, TransactionExecStatemachine* db_stm_)
-		:m_vm(vm_)
+	ProgramInstance( const Program* program_, const std::vector<ValueTupleSetR>& tuplesets_, TransactionExecStatemachine* db_stm_)
+		:m_program(program_)
 		,m_db_stm(db_stm_)
 		,m_ip(0)
 		,m_cond(false)
-		,m_program(m_vm->program)
+		,m_code(m_program->code)
 		,m_tuplesets(tuplesets_)
 	{
 		m_stack.push_back( StackElement());
@@ -157,14 +157,14 @@ private:
 	ValueTupleSetR fetchDatabaseResult();
 
 private:
-	const Program* m_vm;				//< program reference
+	const Program* m_program;			//< program reference
 	TransactionExecStatemachine* m_db_stm;		//< engine to process database instructions
 	Address m_ip;					//< instruction pointer
 	SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
 	bool m_cond;					//< current condition flag for conditional execution ('InstructionSet::CondCode')
 	std::vector<StackElement> m_stack;		//< execution stack
 	Output m_output;				//< output
-	ProgramCode m_program;				//< program code copy
+	ProgramCode m_code;				//< program code copy
 	std::vector<ValueTupleSetR> m_tuplesets;	//< values from path expressions
 };
 

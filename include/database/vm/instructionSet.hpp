@@ -157,18 +157,18 @@ public:
 
 	enum ArgumentType
 	{
-		At_None,
-		At_Address,
-		At_Path,
-		At_TupleSet,
-		At_Constant,
-		At_ColumnName,
-		At_ResultName,
-		At_SubroutineSignature,
-		At_String,
-		At_Statement,
-		At_SelectedColumnIdx,
-		At_IteratorColumnIdx
+		At_None,			//< no argument
+		At_Address,			//< index in ProgramCode
+		At_Path,			//< index in Program::pathset
+		At_Constant,			//< index in Program::constants
+		At_ColumnName,			//< index in Program::colnametab
+		At_TagName,			//< index in Program::tagnametab
+		At_ResultName,			//< index in Program::resultnametab
+		At_Statement,			//< index in Program::statements
+		At_SubroutineSignature,		//< index in Program::signatures
+		At_TupleSet,			//< index of tuple set
+		At_SelectedColumnIdx,		//< Index of Column in selected set
+		At_IteratorColumnIdx		//< Index of Column in tuple set iterator element
 	};
 
 	static const char* argumentTypeName( ArgumentType i)
@@ -178,13 +178,13 @@ public:
 			"",
 			"Address",
 			"Path",
-			"TupleSet",
 			"Constant",
 			"ColumnName",
+			"TagName",
 			"ResultName",
-			"SubroutineSignature",
-			"String",
 			"Statement"
+			"SubroutineSignature",
+			"TupleSet",
 			"SelectedColumnIdx",
 			"IteratorColumnIdx"
 		};
@@ -205,7 +205,7 @@ public:
 			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
 			/*Op_PRINT_ITR_IDX*/		At_IteratorColumnIdx,
 			/*Op_PRINT_ITR_NAM*/		At_ColumnName,
-			/*Op_PRINT_OPEN*/		At_String,
+			/*Op_PRINT_OPEN*/		At_TagName,
 			/*Op_PRINT_CLOSE*/		At_None,
 	
 			/*Op_KEEP_RESULT*/		At_ResultName,

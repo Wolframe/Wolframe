@@ -30,45 +30,65 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/subroutine.hpp
-//\brief Interface for mapping names to subroutine definitions
-#ifndef _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
-#define _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
-#include "database/vm/program.hpp"
-#include <string>
-#include <vector>
-#include <boost/algorithm/string.hpp>
+//\file database/vm/patchArgumentMap.hpp
+//\brief Interface for patching program code needed for joining programs
+#ifndef _DATABASE_VM_PATCH_ARGUMENT_MAP_HPP_INCLUDED
+#define _DATABASE_VM_PATCH_ARGUMENT_MAP_HPP_INCLUDED
+#include "database/vm/instructionSet.hpp"
+#include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
 namespace vm {
 
-class Subroutine
+class PatchArgumentMap
 {
 public:
-	Subroutine(){}
-	Subroutine( const std::string& name_, const std::vector<std::string>& templateParams_, const std::vector<std::string>& params_, const ProgramR& program_)
-		:m_name(name_),m_templateParams(templateParams_),m_params(params_),m_program(program_){}
-	Subroutine( const std::string& name_, const std::vector<std::string>& params_, const ProgramR& program_)
-		:m_name(name_),m_params(params_),m_program(program_){}
-	Subroutine( const Subroutine& o)
-		:m_name(o.m_name),m_templateParams(o.m_templateParams),m_params(o.m_params),m_program(o.m_program){}
+	typedef vm::InstructionSet::ArgumentIndex ArgumentIndex;
+public:
+	virtual ~PatchArgumentMap(){}
+	virtual ArgumentIndex operator[]( ArgumentIndex i) const=0;
+};
 
-	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& templateParams() const	{return m_params;}
-	const std::vector<std::string>& params() const		{return m_params;}
-	const ProgramR& program() const				{return m_program;}
+typedef boost::shared_ptr<PatchArgumentMap> PatchArgumentMapR;
 
-	void substituteStatementTemplates( const std::vector<std::string>& templateParamValues);
+
+class PatchArgumentMap_Offset
+	:public PatchArgumentMap
+{
+public:
+	PatchArgumentMap_Offset( ArgumentIndex ofs_)
+		:m_ofs(ofs_){}
+	virtual ~PatchArgumentMap_Offset(){}
+	virtual ArgumentIndex operator[]( ArgumentIndex i) const
+	{
+		return m_ofs + i;
+	}
 
 private:
-	std::string m_name;
-	std::vector<std::string> m_templateParams;
-	std::vector<std::string> m_params;
-	ProgramR m_program;
+	ArgumentIndex m_ofs;
 };
+
+class PatchArgumentMap_Table
+	:public PatchArgumentMap
+{
+public:
+	PatchArgumentMap_Table( const std::map<ArgumentIndex,ArgumentIndex>& map_)
+		:m_map(map_){}
+	virtual ~PatchArgumentMap_Table(){}
+	virtual ArgumentIndex operator[]( ArgumentIndex i) const
+	{
+		std::map<ArgumentIndex,ArgumentIndex>::const_iterator mi = m_map.find( i);
+		if (mi == m_map.end()) throw std::logic_error( "incomplete patch argument map");
+		return mi->second;
+	}
+
+private:
+	std::map<ArgumentIndex,ArgumentIndex> m_map;
+};
+
 
 }}}//namespace
 #endif
-
 

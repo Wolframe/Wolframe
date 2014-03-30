@@ -35,6 +35,7 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_SET_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
+#include "database/vm/patchArgumentMap.hpp"
 #include <map>
 #include <vector>
 #include <string>
@@ -87,6 +88,12 @@ public:
 
 	void selectNodes( const InputStructure& st, const NodeVisitor& nv, std::vector<NodeIndex>& ar) const;
 
+	typedef std::vector<Element>::const_iterator const_iterator;
+	typedef std::vector<Element>::iterator iterator;
+
+	std::vector<Element>::iterator begin()				{return m_path.begin();}
+	std::vector<Element>::iterator end()				{return m_path.end();}
+
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
@@ -121,9 +128,28 @@ public:
 		return m_pathar.size();
 	}
 
+	PatchArgumentMapR join( const SelectorPathSet& oth)
+	{
+		std::size_t ofs = m_pathar.size();
+		std::vector<SelectorPath>::const_iterator pi = oth.m_pathar.begin(), pe = oth.m_pathar.end();
+		for (; pi != pe; ++pi)
+		{
+			SelectorPath elem( *pi);
+			SelectorPath::iterator ei = elem.begin(), ee = elem.end();
+			for (; ei != ee; ++ei)
+			{
+				const char* estr = oth.m_tagtab.getstr( ei->m_tag);
+				if (!estr) throw std::logic_error( "patch argument tag name not found");
+				ei->m_tag = m_tagtab.get( estr);
+			}
+			m_pathar.push_back( elem);
+		}
+		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
+	}
+
 private:
 	TagTable m_tagtab;
-	std::vector<SelectorPath> m_pathar;
+	std::vector<SelectorPath> m_pathar;	
 };
 
 }}}//namespace

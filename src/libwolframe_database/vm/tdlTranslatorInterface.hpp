@@ -49,14 +49,17 @@ class TdlTranslatorInterface
 public:
 	explicit TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
 		:m_soubroutinemap(soubroutinemap_)
-		,m_vm( new Program())
-	{}
+	{
+		m_sub_program.code
+			( Op_GOTO_ABSOLUTE, 0 )		//... jump to start of main
+		;
+	}
 	TdlTranslatorInterface( const TdlTranslatorInterface& o)
 		:m_stateStack(o.m_stateStack)
-		,m_unresolvedSubroutineCalls(o.m_unresolvedSubroutineCalls)
 		,m_soubroutinemap(o.m_soubroutinemap)
 		,m_calledSubroutines(o.m_calledSubroutines)
-		,m_vm(o.m_vm)
+		,m_sub_program(o.m_sub_program)
+		,m_main_program(o.m_main_program)
 	{}
 
 	void begin_FOREACH( const std::string& selector);
@@ -69,6 +72,8 @@ public:
 	void end_DO_subroutine();
 
 	void push_ARGUMENT_PATH( const std::string& selector);
+
+	ProgramR createProgram() const;
 
 private:
 	struct State
@@ -84,12 +89,28 @@ private:
 		State( Id i, InstructionSet::ArgumentIndex v)
 			:id(i),value(v){}
 	};
+	struct CalledSubroutineDef
+	{
+		Address address;
+		Subroutine subroutine;
+		std::string mangledName;
+
+		CalledSubroutineDef(){}
+		CalledSubroutineDef( const CalledSubroutineDef& o)
+			:address(o.address)
+			,subroutine(o.subroutine)
+			,mangledName(o.mangledName){}
+		CalledSubroutineDef( Address a, const Subroutine& s, const std::string& m)
+			:address(a)
+			,subroutine(s)
+			,mangledName(m){}
+	};
 
 	std::vector<State> m_stateStack;
-	std::vector<InstructionSet::Address> m_unresolvedSubroutineCalls;
 	const types::keymap<Subroutine>* m_soubroutinemap;
-	std::vector<Subroutine> m_calledSubroutines;
-	ProgramR m_vm;
+	std::vector<CalledSubroutineDef> m_calledSubroutines;
+	Program m_sub_program;
+	Program m_main_program;
 };
 
 }}}//namespace

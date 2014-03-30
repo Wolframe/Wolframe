@@ -35,6 +35,7 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_PROGRAM_CODE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_PROGRAM_CODE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
+#include "database/vm/patchArgumentMap.hpp"
 #include <vector>
 #include <cstdlib>
 #include <limits>
@@ -114,6 +115,12 @@ public:
 	const_iterator at( const Address& adr) const			{return m_ar.begin() + adr;}
 	iterator at( const Address& adr)				{return m_ar.begin() + adr;}
 
+	PatchArgumentMapR join( const ProgramCode& oth)
+	{
+		std::size_t ofs = m_ar.size();
+		m_ar.insert( m_ar.end(), oth.begin(), oth.end());
+		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
+	}	
 private:
 	std::vector<Instruction> m_ar;
 };

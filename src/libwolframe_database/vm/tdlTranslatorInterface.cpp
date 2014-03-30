@@ -40,10 +40,10 @@ using namespace _Wolframe::db::vm;
 
 void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
-	vm::InstructionSet::ArgumentIndex idx;
-	if (0!=(idx=m_vm->resultnametab.getIndex( selector)))
+	InstructionSet::ArgumentIndex idx;
+	if (0!=(idx=m_main_program.resultnametab.getIndex( selector)))
 	{
-		m_vm->program
+		m_main_program.code
 			( Op_OPEN_ITER_KEPT_RESULT, idx )	// iterate on result named
 			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 		;
@@ -52,7 +52,7 @@ void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 	{
 		//... selector is referencing the last result
 		// Code generated:
-		m_vm->program
+		m_main_program.code
 			( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
 			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 		;
@@ -60,51 +60,51 @@ void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 	else
 	{
 		//... selector is referencing a path expression on the input
-		idx = m_vm->pathset.add( selector);
+		idx = m_main_program.pathset.add( selector);
 
 		// Code generated:
-		m_vm->program
+		m_main_program.code
 			( Op_OPEN_ITER_PATH, idx)		// iterate on input path
 			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 		;
 	}
-	m_stateStack.push_back( State( State::OpenForeach, m_vm->program.size()));
+	m_stateStack.push_back( State( State::OpenForeach, m_main_program.code.size()));
 }
 
 void TdlTranslatorInterface::end_FOREACH()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH without begin");
 
-	Instruction& forwardJumpInstr = m_vm->program[ m_stateStack.back().value-1];
+	Instruction& forwardJumpInstr = m_main_program.code[ m_stateStack.back().value-1];
 	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
 	{
 		throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
 	}
 	// Code generated:
-	m_vm->program
+	m_main_program.code
 		( Op_NEXT )
 		( Co_IF_COND, Op_GOTO_ABSOLUTE, m_stateStack.back().value)
 	;
 	// Patch forward jump (if iterator set empty):
-	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, m_vm->program.size());
+	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, m_main_program.code.size());
 	m_stateStack.pop_back();
 }
 
 void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
 {
 	// Code generated:
-	m_vm->program
-		( Op_STM_START, m_vm->statements.size() )
+	m_main_program.code
+		( Op_STM_START, m_main_program.statements.size() )
 	;
-	m_stateStack.push_back( State( State::OpenStatementCall, m_vm->statements.size()));
-	m_vm->statements.push_back( stm);
+	m_stateStack.push_back( State( State::OpenStatementCall, m_main_program.statements.size()));
+	m_main_program.statements.push_back( stm);
 }
 
 void TdlTranslatorInterface::end_DO_statement()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement without begin");
 	// Code generated:
-	m_vm->program
+	m_main_program.code
 		( Op_STM_EXEC, m_stateStack.back().value )
 	;
 	m_stateStack.pop_back();
@@ -128,7 +128,7 @@ static std::string mangledSubroutineName( const std::string& name, const std::ve
 
 void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
 {
-	types::keymap<vm::Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
+	types::keymap<Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
 	if (si == se)
 	{
 		if (templateParamValues.empty())
@@ -142,35 +142,35 @@ void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const
 	}
 	else
 	{
-		vm::InstructionSet::ArgumentIndex subroutineIdx = 0;
-		vm::InstructionSet::ArgumentIndex frameIdx = 0;
+		InstructionSet::ArgumentIndex subroutineIdx = 0;
+		InstructionSet::ArgumentIndex frameIdx = 0;
 		
 		std::string mangledName = mangledSubroutineName( name, templateParamValues);
-		std::vector<vm::Subroutine>::const_iterator ci = m_calledSubroutines.begin(), ce = m_calledSubroutines.end();
-		for (; ci != ce && mangledName != ci->name(); ++ci,++subroutineIdx){}
+		std::vector<CalledSubroutineDef>::const_iterator ci = m_calledSubroutines.begin(), ce = m_calledSubroutines.end();
+		for (; ci != ce && mangledName != ci->mangledName; ++ci,++subroutineIdx){}
 		if (ci == ce)
 		{
 			subroutineIdx = m_calledSubroutines.size();
-			vm::Subroutine sr( si->second);
-			if (sr.templateParams().size() != templateParamValues.size())
+			CalledSubroutineDef sr( m_sub_program.code.size(), si->second, mangledName);
+			if (sr.subroutine.templateParams().size() != templateParamValues.size())
 			{
 				throw std::runtime_error( std::string("calling subroutine template '") + name + "' with wrong number of template parameters");
 			}
-			sr.setName( mangledName);
 			if (templateParamValues.size())
 			{
-				sr.substituteStatementTemplates( templateParamValues);
+				sr.subroutine.substituteStatementTemplates( templateParamValues);
 			}
 			m_calledSubroutines.push_back( sr);
+			m_sub_program.add( *si->second.program());
 		}
-		frameIdx = m_vm->signatures.size();
-		m_vm->signatures.push_back( m_calledSubroutines.at(subroutineIdx).params());
+		frameIdx = m_main_program.signatures.size();
+		m_main_program.signatures.push_back( m_calledSubroutines.at(subroutineIdx).subroutine.params());
 
 		// Code generated:
-		m_vm->program
+		m_main_program.code
 			( Op_SUB_FRAME_OPEN, frameIdx )
 		;
-		m_stateStack.push_back( State( State::OpenSubroutineCall, subroutineIdx));
+		m_stateStack.push_back( State( State::OpenSubroutineCall, m_calledSubroutines.at(subroutineIdx).address));
 	}
 }
 
@@ -178,22 +178,53 @@ void TdlTranslatorInterface::end_DO_subroutine()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO without begin");
 	// Code generated:
-	m_vm->program
+	m_main_program.code
 		( Op_SUB_FRAME_CLOSE )
 		( Op_GOTO_ABSOLUTE, m_stateStack.back().value )
 	;
 	m_stateStack.pop_back();
-	m_unresolvedSubroutineCalls.push_back( m_vm->program.size() -1);
 }
 
 void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 {
-	vm::InstructionSet::ArgumentIndex idx = m_vm->pathset.add( selector);
+	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 
 	// Code generated:
-	m_vm->program
+	m_main_program.code
 		( Op_OPEN_ITER_PATH, idx )			// iterate on input path
 	;
 }
 
+ProgramR TdlTranslatorInterface::createProgram() const
+{
+	ProgramR rt( new Program( m_sub_program));
+
+	// Patch first instruction of the program, a GOTO that jumps to the start of main
+	std::size_t ip_start_main = m_sub_program.code.size();
+	if (rt->code.size() == 0 || *rt->code.at(0) != instruction( Op_GOTO_ABSOLUTE, 0))
+	{
+		throw std::runtime_error( "illegal state: jump to main instruction not found");
+	}
+	rt->code[ 0] = InstructionSet::instruction( Op_GOTO_ABSOLUTE, ip_start_main);
+
+	rt->add( m_main_program, false/*do not patch GOTOs*/);
+	std::size_t ip_end_main = rt->code.size();
+
+	//Patch GOTO instructions that are not subroutine calls.
+	//	Subroutine calls are already set correctly:
+	OpCode lastOpCode = Op_NOP;
+	for (std::size_t ip=ip_start_main; ip<ip_end_main; ++ip)
+	{
+		Instruction instr = *rt->code.at( ip);
+		OpCode oc = opCode( instr);
+		CondCode cc = condCode( instr);
+		ArgumentType at = argumentType( oc);
+		ArgumentIndex ai = argumentIndex( instr);
+		if (at == At_Address && lastOpCode != Op_SUB_FRAME_CLOSE)
+		{
+			rt->code[ ip] = instruction( cc, oc, ai + ip_start_main);
+		}
+	}
+	return rt;
+}
 

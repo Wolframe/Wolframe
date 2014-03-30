@@ -30,12 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/program.hpp
+//\file database/vm/program.hpp
 //\brief Interface for program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
-#include "database/vm/symbolTable.hpp"
 #include "database/vm/nameTable.hpp"
 #include "database/vm/selectorPathSet.hpp"
 #include "database/vm/programCode.hpp"
@@ -58,29 +57,30 @@ public:
 	typedef std::vector<std::string> SubroutineSignature;
 
 public:
-	ProgramCode program;				//< symbol table
-	SymbolTable symboltab;				//< symbol table
+	ProgramCode code;				//< program code
+	SelectorPathSet pathset;			//< input selector path expressions
 	std::vector<types::Variant> constants;		//< constants
+	NameTable colnametab;				//< column name table
 	NameTable tagnametab;				//< tag table
 	NameTable resultnametab;			//< result name table
-	NameTable colnametab;				//< column name table
 	std::vector<std::string> statements;		//< database statements
 	std::vector<SubroutineSignature> signatures;	//< subroutine signutures
-	SelectorPathSet pathset;			//< input selector path expressions
 
 public:
 	Program(){}
 	Program( const Program& o)
-		:program(o.program)
-		,symboltab(o.symboltab)
+		:code(o.code)
+		,pathset(o.pathset)
 		,constants(o.constants)
+		,colnametab(o.colnametab)
 		,tagnametab(o.tagnametab)
 		,resultnametab(o.resultnametab)
-		,colnametab(o.colnametab)
 		,statements(o.statements)
 		,signatures(o.signatures)
-		,pathset(o.pathset)
 	{}
+
+	//\brief Add the program to this, joining all tables and doing necessary instruction patches
+	void add( const Program& oth, bool doPatchGOTOs=true);
 };
 
 typedef boost::shared_ptr<Program> ProgramR;

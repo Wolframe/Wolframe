@@ -35,6 +35,7 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
+#include "database/vm/patchArgumentMap.hpp"
 #include "types/keymap.hpp"
 #include <map>
 #include <vector>
@@ -86,6 +87,17 @@ public:
 			return define( nam);
 		}
 		return si->second;
+	}
+
+	PatchArgumentMapR join( const NameTable& oth)
+	{
+		std::map<Index,Index> map;
+		NameMap::const_iterator oi = oth.m_namemap.begin(), oe = oth.m_namemap.end();
+		for (; oi != oe; ++oi)
+		{
+			map[ oi->second] = get( oi->first);
+		}
+		return PatchArgumentMapR( new PatchArgumentMap_Table( map));
 	}
 
 private:
