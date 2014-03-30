@@ -78,7 +78,11 @@ Project Wolframe.
 						</Component>
 						<Directory Id="BinDir" Name="bin">
 							<Component Id="EventLogDlls" Guid="{b9855bb2-d7ea-46d7-8873-96e1612212c3}">
-								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="$(var.topdir)\src\libwolframe\logger\wolframemsg.dll"/>								
+								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="$(var.topdir)\src\libwfsingleton\logger\wolframemsg.dll"/>
+							</Component>
+							
+							<Component Id="SingletonLibrary" Guid="{426a90ae-ecb4-429f-8c95-23976ef644b4}">
+								<File Id="wfsingleton.dll" Name="wfsingleton.dll" DiskId="1" Source="$(var.topdir)\src\libwfsingleton\wfsingleton.dll"/>
 							</Component>
 							
 							<Component Id="WolfilterBinary" Guid="{10d4d86a-78e3-4262-8d61-279b20ef5fc2}">
@@ -171,20 +175,20 @@ Project Wolframe.
 							<?ifdef var.with_icu?>
 							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
 								<?ifdef var.debug?>
-									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="$(var.topdir)\src\icuin49d.dll"/>
-									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="$(var.topdir)\src\icuuc49d.dll"/>
+									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version)d.dll"/>
+									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version)d.dll"/>
 								<?else?>
-									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="$(var.topdir)\src\icuin49.dll"/>
-									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="$(var.topdir)\src\icuuc49.dll"/>
+									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version).dll"/>
+									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version).dll"/>
 								<?endif?>
 							</Component>
 							<?endif?>							
 							
-							<?ifdef with_pgsql?>
+							<?ifdef var.with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
 								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="$(var.topdir)\src\libpq.dll"/>
-								<?ifdef pgdll_with_18n?>
-									<?ifdef pgdll_without_major_versions?>
+								<?ifdef var.pgdll_with_18n?>
+									<?ifdef var.pgdll_without_major_versions?>
 										<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="$(var.topdir)\src\libiconv.dll"/>
 										<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="$(var.topdir)\src\libintl.dll"/>
 									<?else?>
@@ -445,6 +449,7 @@ Project Wolframe.
 				<ComponentRef Id="WolfilterBinary"/>				
 				<ComponentRef Id="ServiceRegistryEntries"/>
 				<ComponentRef Id="EventLogDlls"/>
+				<ComponentRef Id="SingletonLibrary"/>
 				<ComponentRef Id="EventLogRegistryEntries"/>
 				<ComponentRef Id="MsvcRuntime"/>
 				<?ifdef var.with_ssl?>				
