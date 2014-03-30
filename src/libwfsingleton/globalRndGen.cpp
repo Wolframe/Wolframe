@@ -65,11 +65,11 @@ namespace _Wolframe	{
 // We don't want an implicit initialized random device
 #define	NO_IMPLICIT_RANDOM_DEVICE	1
 
-static boost::scoped_ptr< RandomGenerator >	m_t;
+static boost::scoped_ptr< GlobalRandomGenerator >	m_t;
 static boost::mutex				m_mutex;
 static bool					m_initialized = false;
 
-RandomGenerator& RandomGenerator::instance()
+GlobalRandomGenerator& GlobalRandomGenerator::instance()
 {
 	if ( !m_initialized )	{
 		boost::lock_guard< boost::mutex > lock( m_mutex );
@@ -85,19 +85,19 @@ RandomGenerator& RandomGenerator::instance()
 	return *m_t;
 }
 
-RandomGenerator& RandomGenerator::instance( const std::string &rndDev )
+GlobalRandomGenerator& GlobalRandomGenerator::instance( const std::string &rndDev )
 {
 	if ( !m_initialized )	{
 		boost::lock_guard< boost::mutex > lock( m_mutex );
 		if ( !m_initialized )	{
-			m_t.reset( new RandomGenerator( rndDev ));
+			m_t.reset( new GlobalRandomGenerator( rndDev ));
 			m_initialized = true;
 		}
 	}
 	return *m_t;
 }
 
-RandomGenerator::RandomGenerator( const std::string& rndDev )
+GlobalRandomGenerator::GlobalRandomGenerator( const std::string& rndDev )
 {
 	if ( rndDev.empty() )	{
 		LOG_INFO << "Empty random generator device. Using default device.";
@@ -108,33 +108,33 @@ RandomGenerator::RandomGenerator( const std::string& rndDev )
 	LOG_DEBUG << "Random generator initialized. Using device '" << m_device << "'";
 }
 
-RandomGenerator::RandomGenerator()
+GlobalRandomGenerator::GlobalRandomGenerator()
 {
 	m_device = DEFAULT_RANDOM_DEVICE;
 	LOG_DEBUG << "Random generator initialized with the default device (" << m_device << ")";
 }
 
-RandomGenerator::~RandomGenerator()
+GlobalRandomGenerator::~GlobalRandomGenerator()
 {}
 
-void RandomGenerator::device( const std::string &rndDev )
+void GlobalRandomGenerator::device( const std::string &rndDev )
 {
 	m_device = rndDev;
 }
 
-const std::string& RandomGenerator::device() const
+const std::string& GlobalRandomGenerator::device() const
 {
 	return m_device;
 }
 
-unsigned RandomGenerator::random() const
+unsigned GlobalRandomGenerator::random() const
 {
 	unsigned ret;
 	generate((unsigned char*)(&ret), sizeof( ret ));
 	return ret;
 }
 
-void RandomGenerator::generate( unsigned char* buffer, size_t bytes ) const
+void GlobalRandomGenerator::generate( unsigned char* buffer, size_t bytes ) const
 {
 #ifndef _WIN32
 	int hndl = open( m_device.c_str(), O_RDONLY );

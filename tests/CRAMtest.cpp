@@ -40,11 +40,9 @@
 
 TEST( DISABLED_CRAM, Challenge )
 {
-	_Wolframe::RandomGenerator& rnd = _Wolframe::RandomGenerator::instance( "" );
-	unsigned char chlng[ _Wolframe::AAAA::CRAM_CHALLENGE_SIZE ];
-	rnd.generate( chlng, _Wolframe::AAAA::CRAM_CHALLENGE_SIZE );
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance( "" );
 
-	_Wolframe::AAAA::CRAMchallenge	challenge( chlng, _Wolframe::AAAA::CRAM_CHALLENGE_SIZE );
+	_Wolframe::AAAA::CRAMchallenge	challenge( rnd );
 	std::cout << challenge.toBCD();
 	_Wolframe::AAAA::CRAMresponse	resp1( challenge.toString(), "password" );
 	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "password" );

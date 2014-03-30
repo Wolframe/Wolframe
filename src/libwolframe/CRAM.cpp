@@ -70,7 +70,7 @@ static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
 
 
-CRAMchallenge::CRAMchallenge( const unsigned char* data, size_t bytes )
+CRAMchallenge::CRAMchallenge( const crypto::RandomGenerator& rndGen )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
@@ -90,8 +90,8 @@ CRAMchallenge::CRAMchallenge( const unsigned char* data, size_t bytes )
 	sha256((const unsigned char *)&ft, sizeof( ft ), m_challenge );
 #endif
 
-	memcpy( m_challenge + SHA256_DIGEST_SIZE, data,
-		bytes > ( CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE ) ? CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE : bytes );
+	rndGen.generate( m_challenge + SHA256_DIGEST_SIZE,
+			 CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
 }
 
 std::string CRAMchallenge::toBCD() const

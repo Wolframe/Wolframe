@@ -68,6 +68,12 @@ PasswordHash::Salt::~Salt()
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
 }
 
+PasswordHash::Salt::Salt( const crypto::RandomGenerator& rndGen )
+{
+	m_size = PASSWORD_SALT_SIZE;
+	rndGen.generate( m_salt, PASSWORD_SALT_SIZE );
+}
+
 /// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
 /// and it can not be changed.
 PasswordHash::Salt::Salt( const unsigned char* data , size_t bytes )
@@ -196,6 +202,12 @@ static void hashPassword( const unsigned char* pwdSalt, size_t saltSize,
 	crypto::PBKDF2_HMAC_SHA1 key( password, pwdSalt, saltSize, PASSWORD_HASH_SIZE, PBKDF2_ROUNDS );
 	assert( key.size() == PASSWORD_HASH_SIZE );
 	memcpy( hash, key.hash(), key.size() );
+}
+
+PasswordHash::PasswordHash( const crypto::RandomGenerator& rndGen, const std::string& password )
+	: m_salt( rndGen )
+{
+	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
 }
 
 PasswordHash::PasswordHash( const unsigned char* pwdSalt, size_t bytes, const std::string& password )

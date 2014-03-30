@@ -43,6 +43,7 @@
 #define _CRAM_HPP_INCLUDED
 
 #include <string>
+#include <crypto/randomGenerator.hpp>
 #include <AAAA/password.hpp>
 
 namespace _Wolframe {
@@ -56,7 +57,7 @@ static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 class CRAMchallenge
 {
 public:
-	CRAMchallenge( const unsigned char* data, size_t bytes );
+	CRAMchallenge( const crypto::RandomGenerator& rndGen );
 
 	const unsigned char* challenge() const		{ return m_challenge; }
 	std::size_t size() const			{ return CRAM_CHALLENGE_SIZE; }

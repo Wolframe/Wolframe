@@ -128,7 +128,7 @@ int main( int argc, char* argv[] )
 	}
 	const std::vector<std::string>& args = vm["posArgs"].as< std::vector<std::string> >();
 
-	_Wolframe::RandomGenerator& rnd = _Wolframe::RandomGenerator::instance( "" );
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance( "" );
 
 	// display only
 	if ( displayOnly )	{
@@ -181,11 +181,8 @@ int main( int argc, char* argv[] )
 		}
 		// now do the job
 		WA::PasswordHash::Salt salt;
-		if ( saltStr.empty() && b64SaltStr.empty() )	{
-			unsigned char saltGen[ WA::PASSWORD_SALT_SIZE ];
-			rnd.generate( saltGen, WA::PASSWORD_SALT_SIZE );
-			salt = WA::PasswordHash::Salt( saltGen, WA::PASSWORD_SALT_SIZE );
-		}
+		if ( saltStr.empty() && b64SaltStr.empty() )
+			salt = WA::PasswordHash::Salt( rnd );
 		else	{
 			if ( !saltStr.empty() )
 				b64SaltStr = _Wolframe::base64::encode( saltStr.data(), saltStr.size(), 0 );
@@ -293,11 +290,8 @@ int main( int argc, char* argv[] )
 					user.info = args[3];
 			}
 			WA::PasswordHash::Salt salt;
-			if ( saltStr.empty() && b64SaltStr.empty() )	{
-				unsigned char saltGen[ WA::PASSWORD_SALT_SIZE ];
-				rnd.generate( saltGen, WA::PASSWORD_SALT_SIZE );
-				salt = WA::PasswordHash::Salt( saltGen, WA::PASSWORD_SALT_SIZE );
-			}
+			if ( saltStr.empty() && b64SaltStr.empty() )
+				salt = WA::PasswordHash::Salt( rnd );
 			else	{
 				if ( !saltStr.empty() )
 					b64SaltStr = _Wolframe::base64::encode( saltStr.data(), saltStr.size(), 0 );
