@@ -42,6 +42,7 @@
 #include "utils/fileUtils.hpp"
 #include "passwdFile.hpp"
 #include "AAAA/password.hpp"
+#include "types/base64.hpp"
 #include "system/globalRngGen.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -55,19 +56,21 @@ int main( int argc, char* argv[] )
 {
 	unsigned	days;
 	std::string	saltStr;
+	std::string	b64SaltStr;
 
 	PO::options_description desc( "Usage:\n"
 				      "  wolfpasswd -D passwordfile username\n"
 				      "  wolfpasswd [-c] [-d days] passwordfile username [user info]\n"
 				      "  wolfpasswd -b[c] [-d days] passwordfile username password [user info]\n"
-				      "  wolfpasswd -n [-s salt][-d days] username [user info]\n"
-				      "  wolfpasswd -nb [-s salt][-d days] username password [user info]\n"
+				      "  wolfpasswd -n [-s/-S salt] [-d days] username [user info]\n"
+				      "  wolfpasswd -nb [-s/-S salt] [-d days] username password [user info]\n"
 				      "  wolfpasswd -h\n"
 				      "Options" );
 	desc.add_options()
 			( "help,h", "Display this help message." )
 			( "create,c", "Create the file if it doesn't exist." )
-			( "salt,s", PO::value< std::string >( &saltStr ), "Use the specified salt (only valid with --display-only)." )
+			( "salt,s", PO::value< std::string >( &saltStr ), "Use the specified plain text salt (only valid with --display-only)." )
+			( "base64-salt,S", PO::value< std::string >( &b64SaltStr ), "Use the specified base64 salt (only valid with --display-only)." )
 			( "days,d", PO::value< unsigned >( &days )->default_value( 0 ), "Set the password expiration after <days>." )
 			( "display-only,n", "Don't update the password file; display results on stdout." )
 			( "batch,b", "Use the password from the command line instead of prompting for it.")
@@ -154,6 +157,10 @@ int main( int argc, char* argv[] )
 				wrong = true;
 			}
 		}
+		if ( !saltStr.empty() && !b64SaltStr.empty() )	{
+			std::cerr << "\nERROR: both --salt and --base64-salt arguments given.";
+			wrong = true;
+		}
 		if ( wrong )	{
 			std::cout << "\n\n" << desc << "\n";
 			return 2;
@@ -174,13 +181,15 @@ int main( int argc, char* argv[] )
 		}
 		// now do the job
 		WA::PasswordHash::Salt salt;
-		if ( saltStr.empty() )	{
+		if ( saltStr.empty() && b64SaltStr.empty() )	{
 			unsigned char saltGen[ WA::PASSWORD_SALT_SIZE ];
 			rnd.generate( saltGen, WA::PASSWORD_SALT_SIZE );
 			salt = WA::PasswordHash::Salt( saltGen, WA::PASSWORD_SALT_SIZE );
 		}
 		else	{
-			salt = WA::PasswordHash::Salt( saltStr );
+			if ( !saltStr.empty() )
+				b64SaltStr = _Wolframe::base64::encode( saltStr.data(), saltStr.size(), 0 );
+			salt = WA::PasswordHash::Salt( b64SaltStr );
 		}
 		WA::PasswordHash pwd( salt, passwd );
 
@@ -208,6 +217,10 @@ int main( int argc, char* argv[] )
 			std::cout << "\n\n" << desc << "\n";
 			return 2;
 		}
+		if ( ! saltStr.empty() )
+			std::cerr << "\nWarning: --salt argument ignored.";
+		if ( ! b64SaltStr.empty() )
+			std::cerr << "\nWarning: --base64-salt argument ignored.";
 
 		// All parameters are OK
 		try	{
@@ -249,6 +262,11 @@ int main( int argc, char* argv[] )
 				wrong = true;
 			}
 		}
+		if ( !saltStr.empty() && !b64SaltStr.empty() )	{
+			std::cerr << "\nERROR: both --salt and --base64-salt arguments given.";
+			wrong = true;
+		}
+
 		if ( wrong )	{
 			std::cout << "\n\n" << desc << "\n";
 			return 2;
@@ -275,13 +293,15 @@ int main( int argc, char* argv[] )
 					user.info = args[3];
 			}
 			WA::PasswordHash::Salt salt;
-			if ( saltStr.empty() )	{
+			if ( saltStr.empty() && b64SaltStr.empty() )	{
 				unsigned char saltGen[ WA::PASSWORD_SALT_SIZE ];
 				rnd.generate( saltGen, WA::PASSWORD_SALT_SIZE );
 				salt = WA::PasswordHash::Salt( saltGen, WA::PASSWORD_SALT_SIZE );
 			}
 			else	{
-				salt = WA::PasswordHash::Salt( saltStr );
+				if ( !saltStr.empty() )
+					b64SaltStr = _Wolframe::base64::encode( saltStr.data(), saltStr.size(), 0 );
+				salt = WA::PasswordHash::Salt( b64SaltStr );
 			}
 			WA::PasswordHash pwd( salt, passwd );
 			user.user = args[1];

@@ -14,14 +14,7 @@ makefiles/gmake/sub.mk
 makefiles/gmake/top.mk
 makefiles/nmake/clean.mk
 makefiles/nmake/compiler.mk
-makefiles/nmake/config_aba_vc10_32bit_debug_boost155_locale.mk
-makefiles/nmake/config_aba_vc10_32bit_debug_boost_locale.mk
-makefiles/nmake/config_aba_vc10_32bit_debug.mk
-makefiles/nmake/config_aba_vc10_32bit_release.mk
 makefiles/nmake/config_aba_vc2010_32bit_new.mk
-makefiles/nmake/config_aba_vc9_32bit_release.mk
-makefiles/nmake/config_aba_vc9_64bit_debug.mk
-makefiles/nmake/config_aba_vc9_64bit_release.mk
 makefiles/nmake/config_mba_32bit.mk
 makefiles/nmake/config_mba_64bit.mk
 makefiles/nmake/config_pfr_32bit.mk
@@ -3168,3 +3161,4 @@ wtest/Makefile.W32
 wtest/testDescription.cpp
 wtest/testModules.cpp
 wtest/wtestcheck.cpp
+include/crypto/randomGenerator.hpp

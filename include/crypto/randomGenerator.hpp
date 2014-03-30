@@ -31,29 +31,24 @@
 
 ************************************************************************/
 //
-// CRAM tests
-//
-#include "gtest/gtest.h"
-#include <stdexcept>
-#include "AAAA/CRAM.hpp"
-#include "system/globalRngGen.hpp"
+/// \file randomGenerator.hpp
+/// Random Generator interface class
 
-TEST( DISABLED_CRAM, Challenge )
+#ifndef _RANDOM_GENERATOR_HPP_INCLUDED
+#define _RANDOM_GENERATOR_HPP_INCLUDED
+
+namespace _Wolframe {
+namespace crypto {
+
+class RandomGenerator
 {
-	_Wolframe::RandomGenerator& rnd = _Wolframe::RandomGenerator::instance( "" );
-	unsigned char chlng[ _Wolframe::AAAA::CRAM_CHALLENGE_SIZE ];
-	rnd.generate( chlng, _Wolframe::AAAA::CRAM_CHALLENGE_SIZE );
+public:
+	 virtual ~RandomGenerator() {}
 
-	_Wolframe::AAAA::CRAMchallenge	challenge( chlng, _Wolframe::AAAA::CRAM_CHALLENGE_SIZE );
-	std::cout << challenge.toBCD();
-	_Wolframe::AAAA::CRAMresponse	resp1( challenge.toString(), "password" );
-	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "password" );
-	EXPECT_TRUE( resp1 == resp2 );
-}
+	virtual unsigned random() const = 0;
+	virtual void generate( unsigned char* buffer, size_t bytes ) const = 0;
+};
 
-int main( int argc, char **argv )
-{
-	::testing::InitGoogleTest( &argc, argv );
-	return RUN_ALL_TESTS();
-}
+}} // namespace _Wolframe::crypto
 
+#endif // _RANDOM_GENERATOR_HPP_INCLUDED
