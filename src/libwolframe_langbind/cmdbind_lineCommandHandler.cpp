@@ -187,7 +187,10 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				if (m_delegateHandler)
 				{
 					m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size());
-					m_delegateHandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
+					std::memmove( m_input.charptr(), m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
+					m_end = m_input.begin() + (m_end-m_itr);
+					m_itr = m_input.begin();
+					m_delegateHandler->putInput( m_input.charptr(), m_end-m_itr);
 					m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 					m_cmdstateidx = ProcessingDelegation;
 				}

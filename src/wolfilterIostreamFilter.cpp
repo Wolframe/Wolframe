@@ -647,6 +647,90 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		return;
 	}
 	{
+		if (proc[ proc.size()-1] == '~')
+		{
+			// ... command is handled by a command handler
+			//	-> detect document type with the doctype detection,
+			//	evaluate the command to execute (substitute '~' with doctype id)
+			//	and initialize the command handler with the docformat
+			//	as first parameter as the main protocol does.
+			Filter flt = getFilter( provider, ifl, ofl);
+			bool doEscapeLFdot = false;
+
+			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
+			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
+			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
+
+			// Detect document format:
+			int stateEscIn = 0;
+			int stateEscOut = 0;
+			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, doEscapeLFdot);
+
+			std::string docformat = dtfh->docformatid();
+			std::string doctype = dtfh->doctypeid();
+			std::string cmdname = std::string( proc.c_str(), proc.size()-1) + doctype;
+
+			cmdbind::CommandHandler* cmdh = provider->cmdhandler( cmdname);
+			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
+			if (cmdh)
+			{
+				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
+
+				if (ifch) 
+				{
+					LOG_DEBUG << "command handler is processing CRLFdot escaped content";
+					if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
+					if (flt.outputfilter().get())
+					{
+						ifch->setFilter( flt.outputfilter());
+						flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+					}
+					doEscapeLFdot = true;
+				}
+				const char* cmd_argv = docformat.c_str();
+				cmdh->passParameters( cmdname, 1, &cmd_argv);
+				cmdh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
+
+				// Get data (consumed and rest = not processed) from 
+				//	the doc type detection command handler 
+				//	to redirect to the executing command handler:
+				std::string databuf;
+				void* comsumed_buffer;
+				std::size_t comsumed_size;
+				dtfh->getInputBuffer( comsumed_buffer, comsumed_size);
+				const void* rest_buffer;
+				std::size_t rest_size;
+				dtfh->getDataLeft( rest_buffer, rest_size);
+				databuf.append( (const char*)comsumed_buffer, comsumed_size);
+				databuf.append( (const char*)rest_buffer, rest_size);
+	
+				// Redirect input processed and call command handler 
+				//	to process if there is still input left:
+				if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
+				{
+					processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, doEscapeLFdot);
+				}
+				// Check if there is unconsumed input left (must not happen):
+				bool end = false;
+				while (!end)
+				{
+					char ch = 0;
+					is.read( &ch, sizeof(char));
+					if ((unsigned char)ch > 32)
+					{
+						throw std::runtime_error( "unconsumed input left");
+					}
+					end = is.eof();
+				}
+				return;
+			}
+			else
+			{
+				throw std::runtime_error( std::string("cannot find command handler for '") + cmdname + "' (" + proc + ")");
+			}
+		}
+	}
+	{
 		cmdbind::CommandHandler* cmdh = provider->cmdhandler( proc);
 		if (cmdh)
 		{

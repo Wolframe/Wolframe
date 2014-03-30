@@ -69,6 +69,7 @@ CPP_OBJS = \
 	version.o \
 	getPassword.o \
 	user.o \
+	base64.o \
 	HMAC.o \
 	PBKDF2.o \
 	password.o \

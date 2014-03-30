@@ -35,6 +35,7 @@
 //
 
 #include "gtest/gtest.h"
+#include "types/base64.hpp"
 #include "crypto/PBKDF2.hpp"
 
 using namespace _Wolframe::crypto;
@@ -49,26 +50,28 @@ TEST( PBKDF2, TestVectors )
 	const char* testVec5 = "3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038";
 	const char* testVec6 = "56fa6aa75548099dcc37d7f03425e0c3";
 
-	PBKDF2_HMAC_SHA1 test1( "salt", "password", 20, 1 );
+	std::string salt = _Wolframe::base64::encode( "salt", 4, 0 );
+	PBKDF2_HMAC_SHA1 test1( "password", salt, 20, 1 );
 	PBKDF2_HMAC_SHA1 test1_0( test1.toString());
-	PBKDF2_HMAC_SHA1 test1_1( (const unsigned char*)"salt", 4, (const unsigned char*)"password", 8, 20, 1 );
-	PBKDF2_HMAC_SHA1 test1_2( "salt", (const unsigned char*)"password", 8, 20, 1 );
-	PBKDF2_HMAC_SHA1 test1_3( (const unsigned char*)"salt", 4, "password", 20, 1 );
+	PBKDF2_HMAC_SHA1 test1_1( (const unsigned char*)"password", 8, (const unsigned char*)"salt", 4, 20, 1 );
+	PBKDF2_HMAC_SHA1 test1_2( (const unsigned char*)"password", 8, salt, 20, 1 );
+	PBKDF2_HMAC_SHA1 test1_3( "password", (const unsigned char*)"salt", 4, 20, 1 );
 
 
-	PBKDF2_HMAC_SHA1 test2( "salt", "password", 20, 2 );
+	PBKDF2_HMAC_SHA1 test2( "password", salt, 20, 2 );
 	PBKDF2_HMAC_SHA1 test2_0( test2.toString());
 
-	PBKDF2_HMAC_SHA1 test3( "salt", "password", 20, 4096 );
+	PBKDF2_HMAC_SHA1 test3( "password", salt, 20, 4096 );
 	PBKDF2_HMAC_SHA1 test3_0( test3.toString());
 
-	PBKDF2_HMAC_SHA1 test4( "salt", "password", 20, 16777216 );
+	PBKDF2_HMAC_SHA1 test4( "password", salt, 20, 16777216 );
 	PBKDF2_HMAC_SHA1 test4_0( test4.toString());
 
-	PBKDF2_HMAC_SHA1 test5( "saltSALTsaltSALTsaltSALTsaltSALTsalt", "passwordPASSWORDpassword", 25, 4096 );
+	salt =_Wolframe::base64::encode( "saltSALTsaltSALTsaltSALTsaltSALTsalt", 36, 0 );
+	PBKDF2_HMAC_SHA1 test5( "passwordPASSWORDpassword", salt, 25, 4096 );
 	PBKDF2_HMAC_SHA1 test5_0( test5.toString());
 
-	PBKDF2_HMAC_SHA1 test6( (const unsigned char*)"sa\0lt", 5, (const unsigned char*)"pass\0word", 9, 16, 4096 );
+	PBKDF2_HMAC_SHA1 test6( (const unsigned char*)"pass\0word", 9, (const unsigned char*)"sa\0lt", 5, 16, 4096 );
 	PBKDF2_HMAC_SHA1 test6_0( test6.toString());
 
 	EXPECT_STRCASEEQ( testVec1, test1.toBCD().c_str() );

@@ -47,7 +47,5 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo testSimpleFormCompiler.exe >> test.bat
-	@-test.bat
+	@-testSimpleFormCompiler.exe
 

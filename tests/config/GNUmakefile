@@ -21,7 +21,8 @@ local_clean:
 local_distclean:
 
 # Aba, test hangs on FreeBSD, Windows is out of reach!
+# On Unix disabled, see issue #106
 local_test:
-ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./checkConfig.sh $(EXPECT)
-endif
+#ifeq ($(RUN_TESTS),1)
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./checkConfig.sh $(EXPECT)
+#endif

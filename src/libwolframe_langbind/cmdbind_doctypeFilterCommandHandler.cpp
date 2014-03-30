@@ -325,7 +325,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 		unsigned char ch = nextChar();
 		for (; m_state != Done; ch = nextChar())
 		{
-			if (ch == EndOfBuffer)
+			if (ch == (unsigned char)EndOfBuffer)
 			{
 				return READ;
 			}
@@ -667,11 +667,10 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
 	m_itr = 0;
-	m_end = m_input.pos();
+	m_end = bytesTransferred + ((const char*)begin - m_input.charptr());
 	m_src = (const unsigned char*)m_input.charptr();
-	if (m_end > 3 && m_src)
+	m_input.setPos( m_end);
 
 	if ((std::size_t)m_end > m_input.size())
 	{

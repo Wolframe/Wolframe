@@ -51,9 +51,9 @@ local_clean:
 local_distclean:
 
 local_test: dbPing.exe
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll >NUL
+	@-copy "$(ORACLE_DIR)\*.dll" . >NUL
 	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" >> test.bat
-	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
 	@-echo dbping andreasbaumann.dyndns.org wolfusr wolfpwd orcl >> test.bat
 	@-echo if errorlevel 1 goto skip >> test.bat
 	@-echo echo continue >> test.bat

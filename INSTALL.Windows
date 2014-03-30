@@ -1,443 +1,868 @@
-Build Instructions for Windows
-==============================
+Wolframe Installation Windows
 
-Table of Contents
------------------
+Installation and Configuration Guide for Windows
 
-  Prerequisites
-    ICU
-      Compile and install ICU (icu4c)
-    Boost
-      Compile and install boost
-      Notes for Boost 1.50, 1.51
-    OpenSSL
-      Compile and install openssl
-    Postgresql C client library
-      Compiling Postgresql
-      Notes for Postgreslql 9.0.4
-      Notes for Visual Studio 2010
-      Notes for 32-bit dependencies
-    Oracle
-    LibXML2
-    LibXSLT
-    Python 3
-    Install Tcl and Expect
-  Documentation
-  Using ccache with MSVC
+Copyright ? 2010 - 2014 Project Wolframe
 
-Prerequisites
--------------
+Commercial Usage.  Licensees holding valid Project Wolframe Commercial licenses
+may use this file in accordance with the Project Wolframe Commercial License
+Agreement provided with the Software or, alternatively, in accordance with the
+terms contained in a written agreement between the licensee and Project
+Wolframe.
 
-- Visual C++ (cl, link and nmake), VC8 or later
-- Platform SDK 6.0a or later
-- mc.exe may be missing in your path (for instance on VC8),
-  usually it is available as part of the Platform SDK,
-  copy it into the path
-- boost 1.43.0 or later, for boost-locale/ICU you need at
-  least 1.48.0, boost 1.50 and 1.51 need some patching
-- optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_LUA) lua 5.2
-  (integrated in subdir 'lua')
-- optionally (WITH_PYTHON) Python 3 scripting
-- for database support
-  - optionally (WITH_SQLITE3): using the sources in 'sqlite3'
-  - optionally (WITH_PGSQL): 
-  - optionally (WITH_ORACLE): Oracle Instant client SDK
-- for XML support
-  - optionally (WITH_LIBXML2): libxml2 (with iconv support)
-- for XSLT processing
-  - optionally (WITH_LIBXSLT): libxslt, requires also libxml2
-- optionally (WITH_CJSON): build JSON filtering module
-  implemented with cjson
-- optionally (WITH_LIBHPDF): for PDF creation,
-  using the provided version in 'libhpdf'
-- optionally (WITH_ICU): ICU (icu4c, version 49)
-  for boost-locale with ICU support
-- optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
-- optionally for packaging:
-  - Wix 3.5 or later (which needs .NET 2.0 during packaging)
-- optionally to build documentation:
-  - doxygen for building the API documentation
-  - xsltproc (from libxslt)
-  - the DocBook XSL stylesheets (for instance for HTMLHelp output)
-  - the 'hhc.exe' compiler from the 'HTML Help Workshop'
+GNU General Public License Usage.  Alternatively, you can redistribute this
+file and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-ICU
----
+Wolframe is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-Compile and install ICU (icu4c)
--------------------------------
- 
-Build your own one to get debug and release versions of the ICU library
-(the release version is available as download package, the debug one not).
- 
-open allinone.sln in Visual Studio.
- 
-Build independendly for Debug/Release 32/64-bit targets.
- 
-In between salvage the generated artifacts:
-mkdir /cygdrive/c/<somewhere>/icu-49.1.2-win32-debug
-cp -a include /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
-cp -a bin /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
-cp -a lib /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+You should have received a copy of the GNU General Public License along with
+Wolframe. If not, see http://www.gnu.org/licenses/
 
-configure 'makefile\nmake\config.mk' and 
-set ICU_DIR to C:\<somwhere>\icu-49.1.2-win32-debug
+If you have questions regarding the use of this file, please contact Project
+Wolframe.
 
-Boost
------
+March 28, 2014 version 0.0.1
 
-Get boost from http://boostpro.com or http://boost.teeks99.com.
+-------------------------------------------------------------------------------
 
-If you need boost-locale/ICU you have to compile your own version of
-boost, the default one doesn't include ICU support.
+1. Building on Windows systems (the NMAKE way)
 
-Install for instance into C:\Program Files\Boost\Boost_1_49
+This is the Unix-style compilation using the Visual Studio Command Line Window
+and NMAKE. This is the preferred way currently.
 
-configure 'makefile\nmake\config.mk' and 
-set BOOST_DIR to C:\Program Files\Boost\Boost_1_49
+1.1. Prerequisites
 
-Compile and install boost
--------------------------
+For building Wolframe on Windows you need at least the following software:
 
-If you insist to compile Boost from scratch, do the following
-in a Visual Studio C++ command line:
+  * Visual Studio C++ 2008 or newer (cl.exe, rc.exe, link.exe and nmake.exe)
 
-bootstrap
-.\b2 --prefix=C:\<myplace>\boost_1_49_0
-	--with-thread --with-filesystem --with-system --with-program_options ^
-	--with-date_time ^
-	architecture=x86 address-model=64 toolset=msvc 
-	install
+  * Platform SDK 6.0a or newer
 
-with variant, architecture, address-mode and toolset fitting your needs.
+  * mc.exe may be missing in your path (for instance in Visual Studio 2008 it
+    was not bundled), usually it is available as part of the Platform SDK, copy
+    it somewhere into the path
 
-If you want ICU support, use instead:
+  * Boost 1.48.0 or newer from http://www.boost.org
 
-.\b2 --prefix=C:\<myplace>\boost_1_49_0
-	--with-thread --with-filesystem --with-system --with-program_options ^
-	--with-date_time --with-locale --with-regex ^
-	-sICU_PATH="<sowewhere>\icu-49.1.2-win32-debug" ^
-	architecture=x86 address-model=64 toolset=msvc ^
-	install   
+Depending on the features you want to use you also may need the following
+software:
 
-Make sure that:
-Performing configuration checks
-   - icu    : yes (shows up, respectively icu64 for 64-bit compilation)
+  * The OpenSSL library 0.9.7 or newer, for encryption and authentication,
+    http://www.openssl.org
 
-Set BOOST_DIR to C:\<myplace>\boost-1_49_0
+  * The PostgreSQL database client library, version 8.1 or newer, for storing
+    user data and authentication data in a PostgreSQL database, http://
+    postgresql.org
 
-These instructions are for boost 1.49, other versions may vary.
+  * The Oracle OCI client library, version 11.2 or newer, for storing user data
+    and authentication data in an Oracle database, http://www.oracle.com
 
-Careful: Always check %LIB% and the 'setenv' environment of the SDK! You can
-end up in 64-bit code using 32-bit libraries otherwise. :-)
+  * The win-iconv library, version 0.0.3 or newer, needed by libxml2, http://
+    code.google.com/p/win-iconv/
 
-Notes for Boost 1.50, 1.51
---------------------------
+  * The libxml2 library, version 2.7.6 or newer, for filtering XML data, http:/
+    /xmlsoft.org/
 
-Boost thread depends on non-header-only libraries without including the
-auto-link-pragmas for MSBC. Apply the 'boost-7045_2.patch' from
-'packaging/patches\Windows\boost', see also:
+  * The libxslt library, version 1.1.26 or newer, for the transformation of XML
+    data, http://xmlsoft.org/
 
-https://svn.boost.org/trac/boost/ticket/7045
+  * Python 3, version 3.3.0 or newer, for writting applications in Python,
+    https://www.python.org
 
-OpenSSL
--------
+  * The ICU library, version 3.5 or newer, for text normalization and
+    conversion, http://site.icu-project.org
 
-Compile and install openssl
----------------------------
+For testing the Wolframe software you need:
 
-Easiest is to get the native Windows binary version from:
+  * Expect 5.40 or newer, for running the Expect tests, http://
+    expect.sourceforge.net/
 
-http://www.slproweb.com/products/Win32OpenSSL.html
+  * Expect needs ActiveTcl 8.5 or newer, for running the Expect tests, http://
+    www.activestate.com/activetcl
 
-Despite the name you get also 64-bit versions there.
+  * A working telnet
 
-Do not copy the OpenSSL binaries to the Windows system directory, copy
-them to the Bin subdirectory of the OpenSSL installation directory!
+  * A PostgreSQL or Oracle database when you want to run the database tests
 
-If you want to compile your own version, use
-- Microsoft Compiler
-- a perl (ActivePerl)
-- optionally NASM
+For building Windows packages you need:
 
-perl Configure debug-VC-WIN32 \
-	--prefix="C:\OpenSSL\openssl-1.0.1-win32-debug"
+  * The WIX Toolset, version 3.5 or newer, http://wixtoolset.org/
 
-respectively
+For building the documentation and manpages you need:
 
-perl Configure VC-WIN32 \
-	--prefix="C:\OpenSSL\openssl-1.0.1-win32-release"
-	
-Make sure there prefix has no spaces in it!
+  * Doxygen for developer documentation, http://www.doxygen.org
 
-ms\do_nasm
+  * Docbook 4.5 or newer and the XSL toolchain, http://www.docbook.org
 
-nmake /f ms\ntdll.mak
-nmake /f ms\ntdll.mak install
+  * xsltproc.exe, from libxslt http://xmlsoft.org/
 
-For later usage in Postgresql add the following link libraries:
+  * The FOP PDF generator for documentation in PDF format, http://
+    xmlgraphics.apache.org/fop/
 
-mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
-copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
-copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+  * hhc.exe, help compiler from the 'HTML Help Workshop', http://
+    msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx
 
-respectively
+1.2. Basic build instructions
 
-mkdir C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC
-copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\libeay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
-copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
-	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
-	
-Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
+Wolframe can be build in a Visual Studio command line (or better a Platform SDK
+command line) using the following command:
 
-Postgresql C client library
----------------------------
+        nmake /nologo /f Makefile.W32
 
-Install all in one package. You may have to install libpq64
-as an add-on using the Stack Builder.
 
-Adapt PGSQL_DIR in 'makefiles\nmake\config.mk'.
+You can check the compilation mode with:
 
-Compiling Postgresql
---------------------
+        setenv
 
-This is required if you want for instance to build the debug
-version of the libpq library.
 
-You need at least ActivePerl installed.
+The makefiles understand the standard GNU targets like 'clean', 'distclean',
+'test', etc. The whole list of options can be seen with:
 
-cd src\tools\msvc
-copy config_default.pl config.pl
+        nmake /nologo /f Makefile.W32 help
 
-Adapt config.pl to your needs for instance for SSL support:
 
-openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
+Configuration is all done in a file called config.mk. Examples can be found in
+the makefiles/nmake directory.
 
-You may have to touch preproc.c and preproc.h if build wants
-to start bison and you don't have bison installed.
+Optional features are enabled by using 'WITH_XXX' variables when calling nmake,
+e. g. to enable SSL support you call make like this:
 
-build DEBUG libpq
+        nmake /nologo /f Makefile.W32 WITH_SSL=1
 
-respectively
 
-build RELEASE libpq
+On Windows you would rather change the 'OPENSSL_DIR' variable in the config.mk,
+for instance:
 
-install C:\<somewhere>
+        OPENSSL_DIR = C:\OpenSSL\Win32
 
-or if thata fails, and usually it does (install fails happily with spaces in pathes
-source and destination, copy by hand in this case), do:
 
-mkdir C:\<somewhere>\include
-mkdir C:\<somewhere>\lib
-copy Release\libpq.dll C:\<somewhere>\lib
-copy Release\libpq.lib C:\<somewhere>\lib
-copy src\interfaces\libpq\libpq-fe.h C:\<somewhere>\include
-copy src\include\postgres_ext.h C:\<somewhere>\include
+A complete build may look like this:
 
-Notes for Postgreslql 9.0.4
----------------------------
+        nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
+                WITH_SQLITE3=1 WITH_PGSQL=1 WITH_ORACLE=1 ^
+                WITH_LIBXML2=1 WITH_LIBXSLT=1 ^
+                WITH_LIBHPDF=1 WITH_EXAMPLES=1 WITH_ICU=1 WITH_FREEIMAGE=1 ^
+                WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 ^
+                clean all test
 
-If your disable OpenSSL (for instance for debugging), you have
-to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
+
+We currently have no dependency system for the NMAKE build system, so be
+careful when to use 'clean' to rebuild parts of the system.
+
+This way of building the system is mainly useful for automatized systems and
+for packaging.
+
+1.3. Using ccache and distcc
+
+Ccache (http://ccache.samba.org/) can be used to cache the compilation of 
+Wolframe also on Windows.
+
+You need then ccache.exe binary with MSVC support from http://
+cgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc. You also
+need the Cygwin runtime from http://cygwin.org. Install the ccache.exe binary
+into c:\cygwin\bin.
+
+Set the 'CC' and 'CXX' variables in makefiles\nmake\config.mk as follows:
+
+        CC=C:\cygwin\bin\ccache.exe cl
+        CXX=C:\cygwin\bin\ccache.exe cl
+
+
+Set the following variable in the shell you use to compile Wolframe:
+
+        Set CYGWIN=nodosfilewarning
+
+
+1.4. Boost
+
+Boost (http://www.boost.org) is the only library which is absolutely required
+in order to build Wolframe.
+
+Use prebuild version of Boost
+
+http://boost.teeks99.com provides pre-compiled packages of Boost. You can
+install the library into for instance C:\boost\boost_1_55_0 and set the
+'BOOST_XXX' variables in makefiles\nmake\config.mk as follows:
+
+        BOOST_DIR = C:\Boost\boost_1_55
+        BOOST_INCLUDE_DIR = $(BOOST_DIR)
+        BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+        BOOST_VC_VER = vc100
+        BOOST_MT = -mt
+
+
+Rename the directory C:\Boost\boost_1_55_0\libs to C:\Boost\boost_1_55_0\boost.
+
+Note: Those pre-built packages don't have support for the ICU backend in
+boost-locale. If you need ICU support and enable it with 'WITH_ICU=1' you will
+have to build your own version of Boost from the sources.
+
+Build your own version of Boost
+
+The following Boost libraries are required for building Wolframe:
+
+        bootstrap
+        .\b2 --prefix=C:\boost\boost_1_55 ^
+                --with-thread --with-filesystem --with-system --with-program_options ^
+                --with-date_time ^
+                architecture=x86 address-model=64 toolset=msvc ^
+                install
+
+
+Set 'architecture', 'address-mode' and 'toolset' fitting your platform.
+
+If you want to build the ICU normalization module (WITH_ICU=1) you will have to
+build 'boost-locale' with ICU support and you have to enable the 'regex' and
+the 'locale' boost libraries too:
+
+        bootstrap
+        .\b2 --prefix=C:\boost\boost_1_55 ^
+                --with-thread --with-filesystem --with-system --with-program_options ^
+                --with-date_time --with-locale --with-regex ^
+                -sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+                architecture=x86 address-model=64 toolset=msvc ^
+                install
+
+
+Set the "BOOST_XXX" variables in makefiles\nmake\config.mk as follows:
+
+        BOOST_DIR = C:\Boost\boost_1_55
+        BOOST_INCLUDE_DIR = $(BOOST_DIR)
+        BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+        BOOST_VC_VER = vc100
+        BOOST_MT = -mt
+
+
+1.5. Secure Socket Layer (SSL)
+
+The Wolframe protocol can be secured with SSL. Currently only OpenSSL (http://
+www.openssl.org) is supported.
+
+Use prebuild version of OpenSSL
+
+You can get a prebuilt version of OpenSSL from http://www.slproweb.com/products
+/Win32OpenSSL.html. Despite the name you get also 64-bit versions there.
+
+Install the developer version (for instance Win32OpenSSL-1_0_0l.exe) for
+instance to C:\OpenSSL-Win32.
+
+Do not copy the OpenSSL binaries to the Windows system directory, copy them to
+the Bin subdirectory of the OpenSSL installation directory!
+
+Set the "BOOST_XXX" variables in makefiles\nmake\config.mk as follows:
+
+        OPENSSL_DIR = C:\OpenSSL-Win32
+
+
+Build your own version of OpenSSL
+
+You need the community edition of ActivePerl from http://www.activestate.com/
+activeperl/. Install it for instance to C:\Perl.
+
+You will also need NASM to assemble certain parts of OpenSSL. You can get a
+Windows NASM from http://www.nasm.us/. Install it for instance to C:\nasm.
+
+Make sure the Perl interpreter and the NASM assembler are part of the path in
+the shell you want to build OpenSSL:
+
+        Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+
+
+Get the source package openssl-1.0.1l.tar.gz of OpenSSL from http://
+www.openssl.org.
+
+Configure the package with:
+
+        C:\Perl\bin\perl Configure debug-VC-WIN32 \
+                --prefix="C:\openssl-1.0.1l-win32-debug"
+
+
+for a debug version, respectively with:
+
+        C:\Perl\bin\perl Configure VC-WIN32 \
+                --prefix="C:\openssl-1.0.1l-win32-release"
+
+
+for a release version.
+
+Note: Make sure there prefix you choose has no spaces in it!
+
+Prepare OpenSSL for NASM support with:
+
+        ms\do_nasm.bat
+
+
+Build and install OpenSSL now with:
+
+        nmake /f ms\ntdll.mak
+        nmake /f ms\ntdll.mak install
+
+
+More build information is available in INSTALL.W32 and INSTALL.W64 of the
+OpenSSL package itself.
+
+1.6. SQLite database support
+
+Wolframe can use an Sqlite3 database (http://sqlite.org) as backend for data
+storage and for authentication and autorization.
+
+The Sqlite3 library is embedded in the subdirectory 3rdParty/sqlite3.
+
+You enable the building of a loadable Sqlite3 database module with:
+
+        nmake /nologo /f Makefile.W32 WITH_SQLITE3=1
+
+
+1.7. PostgreSQL database support
+
+Wolframe can use a PostgreSQL database (http://postgresql.org) as backend for
+data storage and for authentication and autorization.
+
+Use prebuild version of PostgreSQL
+
+Download the Windows installer from EnterpriseDB (you reach the download link
+via http://postgresql.org).
+
+You will have to set some variables in makefiles\nmake\config.mk as follows:
+
+        PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
+        PGDLL_WITH_I18N = 1
+
+
+You enable the building of a loadable PostgreSQL database module with:
+
+        nmake /nologo /f Makefile.W32 WITH_PGSQL=1
+
+
+Build your own version of PostgreSQL
+
+You need the community edition of ActivePerl from http://www.activestate.com/
+activeperl/. Install it for instance to C:\Perl.
+
+Make sure the Perl interpreter is part of the path in the shell you want to
+build PostgreSQL:
+
+        Set PATH=%PATH%;C:\Perl\bin
+
+
+Get the source package postgresql-9.3.4.tar.gz of PostgreSQL from http://
+www.opstgresql.org.
+
+Configure the package in the config.pl file which you create as follows:
+
+        cd src\tools\msvc
+        copy config_default.pl config.pl
+
+
+Adapt config.pl to your needs. We actually don't want to build the full server
+just the client PostgreSQL library, so specifying the location of OpenSSL is
+enough:
+
+        openssl=>"C:\\openssl-1.0.1f-win32-debug"
+
+
+Note: Those must be two backslashes!
+
+If you built your own version of OpenSSL before you will be missing some
+linking libraries in the right places. So copy them with:
+
+        mkdir C:\openssl-1.0.1-win32-debug\lib\VC
+        copy C:\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+                C:\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+        copy C:\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+                C:\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+
+
+respectively if you built the release version:
+
+        mkdir C:\openssl-1.0.1-win32-release\lib\VC
+        copy C:\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+                C:\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+        copy C:\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+                C:\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+
+
+Build the libpq library now with:
+
+        build DEBUG libpq
+
+
+respectively if you prefer a release version:
+
+        build RELEASE libpq
+
+
+Note: You may have to touch preproc.c and preproc.h if 'build' wants to start
+'bison' and you don't have 'bison' installed.
+
+Install the PostgreSQL client library for instance to C:\
+PostgreSQL-9.3.4-win32-debug with:
+
+        install C:\PostgreSQL-9.3.4-win32-debug
+
+
+Note: Unless you were able to build the whole PostgreSQL the 'install' script
+will fail. In this case copy the essential files to for instance C:\
+PostgreSQL-9.3.4-win32-debug with:
+
+        mkdir C:\PostgreSQL-9.3.4\include
+        mkdir C:\PostgreSQL-9.3.4\lib
+        copy Debug\libpq\libpq.dll C:\PostgreSQL-9.3.4\lib
+        copy Debug\libpq\libpq.lib C:\PostgreSQL-9.3.4\lib
+        copy src\interfaces\libpq\libpq-fe.h C:\PostgreSQL-9.3.4\include
+        copy src\include\postgres_ext.h C:\PostgreSQL-9.3.4\include
+        copy src\include\pg_config_ext.h C:\PostgreSQL-9.3.4\include
+
+
+Note: If you disable OpenSSL (for instance for debugging), you have to touch
+sslinfo.sql in contrib/sslinfo. The same applies for uuid-ossp.sql and
 pgxml.sql.in.
 
-Notes for Visual Studio 2010
-----------------------------
+Note: If you want to build PostgrSQL with gettext/libint or zlib support you
+have to build those libraries first, or get them from http://
+gnuwin32.sourceforge.net/packages.html.
 
-vcbuild.exe disappeared, you need the following patch to build
-with VS2010:
+1.8. Oracle database support
 
-http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
+Wolframe can use a Oracle database (http://www.oracle.com) as backend for data
+storage and for authentication and autorization.
 
-(in Wolframe, see 'contrib\Windows\Postgresql\VS2010v2.patch')
+Import note: Make sure you have all the licenses to develop with Oracle and to
+install an Oracle database! The Wolframe team doesn't take any responsability
+if licenses are violated!
 
-The patch has some hard coded library names:
+You have to download the two packages instantclient-basic-nt-12.1.0.1.0.zip and
+instantclient-sdk-nt-12.1.0.1.0.zip and install them to for instance C:\Oracle\
+instantclient_12_1.
 
-cd <openssl-dir>\lib
-mkdir VC
-cd VC
-copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
-copy ..\ssleay32.dll ssleay32MDd.lib
+You will have to set the 'ORACLE_DIR' variable in makefiles\nmake\config.mk as
+follows:
 
-respectively for the release version:
+        ORACLE_DIR = C:\Oracle\instantclient_12_1
 
-cd <openssl-dir>\lib
-mkdir VC
-cd VC
-copy ..\libeay32.dll libeay32MD.lib (for the 32-bit debug version for example)
-copy ..\ssleay32.dll ssleay32MD.lib
 
-Maybe newer versions will have the patch integrated.
+You enable the building of a loadable Oracle database module with:
 
-Notes for 32-bit dependencies
------------------------------
+        nmake /nologo /f Makefile.W32 WITH_ORACLE=1
 
-You can get gettext/libintl and other libraries from 
 
-http://gnuwin32.sourceforge.net/packages.html
+1.9. XML filtering support with libxml2 and libxslt
 
-as packages.
+Wolframe can use libxml2 and libxslt (http://xmlsoft.org/) for filtering and
+the conversion of XML data.
 
-Oracle
-------
+You can build only filtering with libxml2. But if you enable libxslt filtering
+you also have to enable libxml2 filtering.
 
-Download the packages of the "Oracle Instant Client SDK",
-those are 'instantclient-basic-nt-12.1.0.1.0.zip' and
-'instantclient-sdk-nt-12.1.0.1.0.zip'.
+Use prebuild versions of libxml2 and libxslt
 
-Unpack the Zip files for example in "C:\Oracle\instantclient_12_1" 
-and adapt ORACLE_DIR in 'makefiles\nmake\config.mk'.
+Download the Windows ZIP files libxml2-2.7.8.win32.zip, iconv-1.9.2.win32.zip
+and libxslt-1.1.26.win32.zip from http://ftp.zlatkovic.com/libxml/). Unpack
+them for instance to: C:\libxml2-2.7.8.win32, C:\iconv-1.9.2.win32 and C:\
+libxslt-1.1.26.win32.
 
-LibXML2
--------
+You will have to set the following variables in makefiles\nmake\config.mk:
 
-Best is to compile your own libraries
+        ZLIB_DIR = C:\zlib-1.2.5.win32
+        ICONV_DIR = C:\iconv-1.9.2.win32
+        LIBXML2_DIR = C:\libxml2-2.7.8.win32
+        LIBXSLT_DIR = C:\libxslt-1.1.26.win32
 
-Get sources from: ftp://xmlsoft.org/libxml2/
 
-You also need either libiconv or win_iconv for character set conversion.
-In the following installation instructions we stick to win-iconv.
+You enable the building of a loadable libxml2/libxslt filtering module with:
 
-Get win_iconv from http://code.google.com/p/win-iconv/
+        nmake /nologo /f Makefile.W32 WITH_LIBXML2=1 WITH_LIBXSLT=1
 
-Build win-iconv.dll with the supplied makefile from 'contrib\win-iconv\Makefile.msvc':
 
-nmake /nologo /f Makefile.msvc
+Build your own version of LibXML2
 
-Adapt WIN_ICONV_DIR in 'makefiles\nmake\config.mk'.
+For libxml2 to support character sets you need a working iconv library. We
+currently use win-iconv-0.0.6.zip from http://code.google.com/p/win-iconv/.
 
-You have to fix the Makefile.msvc:
+Build iconv.dll with the supplied makefile from packaging\patches\Windows\
+win-iconv\Makefile.msvc and install the results to for instance C:\
+win-iconv-0.0.6-win32-debug with:
 
-There are some + where they don't belong:
+        nmake /nologo /f Makefile.msvc DEBUG=1
+        mkdir C:\win-iconv-0.0.6-win32-debug
+        mkdir C:\win-iconv-0.0.6-win32-debug\include
+        mkdir C:\win-iconv-0.0.6-win32-debug\lib
+        mkdir C:\win-iconv-0.0.6-win32-debug\bin
+        copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+        copy iconv.lib C:\win-iconv-0.0.6-win32-debug\lib
+        copy iconv.dll C:\win-iconv-0.0.6-win32-debug\bin
 
-+!if "$(WITH_ICU)" == "1"
-+LIBS = $(LIBS) icu.lib
-+!endif
 
-Configure libxml2, set location of win-iconv:
+respectively if you want to build a release version:
 
-cd win32
-cscript configure.js compiler=msvc
-	prefix="C:\cygwin\home\Andreas\libxml2-2.9.1"
-	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3"
-	include="C:\cygwin\home\Andreas\win-iconv-0.0.3"
- 	zlib=no iconv=yes vcmanifest=yes
+        nmake /nologo /f Makefile.msvc
+        mkdir C:\win-iconv-0.0.6-win32-release
+        mkdir C:\win-iconv-0.0.6-win32-release\include
+        mkdir C:\win-iconv-0.0.6-win32-release\lib
+        mkdir C:\win-iconv-0.0.6-win32-release\bin
+        copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+        copy iconv.lib C:\win-iconv-0.0.6-win32-release\lib
+        copy iconv.dll C:\win-iconv-0.0.6-win32-release\bin
 
-For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 
-When there are spaces in the installation prefix, fix it manually in 'config.msvc'
-before building the library:
+Adapt the 'ICONV_DIR' variable in makefiles\nmake\config.mk as follows:
 
-PREFIX="C:\Program Files\libxml2-2.7.8-win32"
+        ICONV_DIR = C:\win-iconv-0.0.6-win32-debug
 
-For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
 
-nmake /nologo /f Makefile.msvc all
-nmake /nologo /f Makefile.msvc install
+Get the source package libxml2-2.9.1.tar.gz from ftp://xmlsoft.org/libxml2/.
 
-Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
+Configure libxml2, make it use the 'win-iconv' library:
 
-LibXSLT
--------
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxml2-2.9.1-win32-release"
+                lib="C:\win-iconv-0.0.6-win32-release\lib"
+                include="C:\win-iconv-0.0.6-win32-release\include"
+                zlib=no iconv=yes vcmanifest=yes
 
-Best is to compile your own libraries
 
-Get sources from: ftp://xmlsoft.org/libxslt/
+For a debug version you have to change 'debug' to 'release' in the paths and to
+add 'debug=yes' and 'cruntime=/MDd':
 
-cd win32
-cscript configure.js compiler=msvc
-	prefix="C:\cygwin\home\Andreas\libxslt-1.1.28-win32"
-	lib="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\lib;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
-	include="C:\cygwin\home\Andreas\libxml2-2.9.1-win32\include\libxml2;C:\cygwin\home\Andreas\win-iconv-0.0.3-win32"
- 	zlib=no iconv=yes vcmanifest=yes
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxml2-2.9.1-win32-debug"
+                lib="C:\win-iconv-0.0.6-win32-debug\lib"
+                include="C:\win-iconv-0.0.6-win32-debug\include"
+                zlib=no iconv=yes vcmanifest=yes
+                debug=yes cruntime=/MDd
 
-For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 
-When there are spaces in the installation prefix, fix it manually in 'config.msvc'
-before building the library:
+Note: Try to avoid spaces in the installation prefix, if you really need some
+spaces then you will have to fix them after running the configure.js script by
+hand in the config.msvc file:
 
-PREFIX="C:\Program Files\libxslt-1.1.26-win32"
+        PREFIX="C:\libxml2-2.9.1 win32 debug"
 
-nmake /nologo /f Makefile.msvc all
 
-For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+Finally build and install libxml2 with:
 
-Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
+        nmake /nologo /f Makefile.msvc all
+        nmake /nologo /f Makefile.msvc install
 
-Python 3
---------
 
-Install 'python-3.3.2.msi' to C:\Python33. This is a release
-version, if you need the debugging version, compile one on
-your own:
+Adapt the 'LIBXML2_DIR' variable in makefiles\nmake\config.mk as follows:
 
-cd PCBuild
-pcbuild.sln
-build the Debug version
-(Read PCBuild/readme.txt!)
+        LIBXML2_DIR = C:\libxml2-2.9.1-win32-debug
 
-(Careful: Evil mean shortcut, build the solution till it breaks,
-copy python33_d.exp python33_d.lib and python33_d.dll to
-c:\Python33\libs of the release installation, make sure you
-take EXACTLY the same version!)
 
-Adapt PYTHON_DIR in 'makefiles\nmake\config.mk'.
+Build your own version of LibXSLT
 
-Install Tcl and Expect
-----------------------
+Get the source package libxslt-1.1.28.tar.gz from ftp://xmlsoft.org/libxslt/.
 
-Download from http://www.activestate.com/activetcl/ 
-(32-bit version, the 64-bit version had no Expect available,
-at least at the time of writting)
+Configure libxslt, make it use the 'win-iconv' and the 'libxml2' library
+compiled above:
 
-Install ActiveTcl 8.5 to C:\tcl
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxslt-1.1.28-win32-release"
+                lib="C:\libxml2-2.9.1-win32-release\lib;C:\win-iconv-0.0.6-win32-release\lib"
+                include="C:\libxml2-2.9.1-win32-release\include\libxml2;C:\win-iconv-0.0.6-win32-release\include"
+                zlib=no iconv=yes vcmanifest=yes
 
-Then adapt in 'makefiles\nmake\config.mk':
 
-TCP_DIR = C:\tcl
+For a debug version you have to change 'debug' to 'release' in the paths and to
+add 'debug=yes' and 'cruntime=/MDd':
 
-Install Expect 1.1 with:
+        cd win32
+        cscript configure.js compiler=msvc
+                prefix="C:\libxslt-1.1.28-win32-debug"
+                lib="C:\libxml2-2.9.1-win32-debug\lib;C:\win-iconv-0.0.6-win32-debug\lib"
+                include="C:\libxml2-2.9.1-win32-debug\include;C:\win-iconv-0.0.6-win32-debug\include"
+                zlib=no iconv=yes vcmanifest=yes
+                debug=yes cruntime=/MDd
 
-cd c:\Tcl\bin
-teacup install Expect
 
-Telnet is not enabled by default, enable it in "Control Panel",
-"Windows Features" or call:
+Note: Try to avoid spaces in the installation prefix, if you really need some
+spaces then you will have to fix them after running the configure.js script by
+hand in the config.msvc file:
 
-pkgmgr /iu:"TelnetClient"
+        PREFIX="C:\libxslt-1.1.28 win32 debug"
 
-Documentation
--------------
 
-Get Doxygen from http://www.stack.nl/~dimitri/doxygen/.
+Finally build and install libxslt with:
 
-Set the path of the installed binary in the variable 'DOXYGEN' 
-in 'makefiles\nmake\config.mk'.
+        nmake /nologo /f Makefile.msvc all
+        nmake /nologo /f Makefile.msvc install
 
-Get the "HTML Help Workshop and Documentation" from Microsoft.
 
-Adapt the 'HHC_LOCATION' variable in 'makefiles\nmake\config.mk' to
-match the 'hhc.exe' binary of the "MS HTML Help Workshop" to
-generate the CHM files.
+Adapt the 'LIBXSLT_DIR' variable in makefiles\nmake\config.mk as follows:
 
-Using ccache with MSVC
-----------------------
+        LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
 
-Get ccache with msvc support from:
 
-http://ccgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc
+The DLLs end up in the wrong directory, move them from 'lib' to 'bin':
 
-You also need the Cygwin runtime.
+        cd C:\libxslt-1.1.28-win32-debug
+        move lib\*.dll bin\.
 
-Set CYGWIN=nodosfilewarning
 
-to get rid of funny warnings.
+1.10. XML filtering support with Textwolf
 
-Set CC and CXX in the following way in your config.mk:
+Wolframe can use Textwolf (http://textwolf.net) for filtering and the
+conversion of XML data.
 
-CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+The textwolf library is embedded in the subdirectory 3rdParty/textwolf.
+
+You enable the building of a loadable Textwolf filtering module with:
+
+        nmake /nologo /f Makefile.W32 WITH_TEXTWOLF=1
+
+
+Note: If you plan to run tests when building the Wolframe you should enable
+Textwolf as many tests rely on it's presence.
+
+1.11. JSON filtering support with cJSON
+
+Wolframe can use cJSON (http://sourceforge.net/projects/cjson/) for filtering
+and the conversion of JSON data.
+
+The cjson library is embedded in the subdirectory 3rdParty/libcjson.
+
+You enable the building of a loadable cJSON filtering module with:
+
+        nmake /nologo /f Makefile.W32 WITH_CJSON=1
+
+
+1.12. Scripting support with Lua
+
+Wolframe can be scripted with Lua (http://www.lua.org).
+
+The Lua interpreter is embedded in the subdirectory 3rdParty/lua.
+
+You enable the building of a loadable Lua scripting module with:
+
+        nmake /nologo /f Makefile.W32 WITH_LUA=1
+
+
+1.13. Scripting support with Python
+
+Wolframe can be scripted with Python (https://www.python.org).
+
+The module supports only version 3 of the Python interpreter, version 2 is not
+supported.
+
+Use prebuild version of Python
+
+Download the official Python 3 Installer for Windows from http://python.org).
+
+You will have to set the 'PYTHON_XXX' variables in makefiles\nmake\config.mk as
+follows:
+
+        PYTHON_DIR = C:\Python34
+        PYTHON_VERSION = 34
+        PYTHON_MAJOR_VERSION = 3
+        PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+        PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
+
+
+You enable the building of a loadable Python scripting module with:
+
+        nmake /nologo /f Makefile.W32 WITH_PYTHON=1
+
+
+Note: The binary installation packages from http://python.org) do not contain
+debug versions of the library. If you want to build a debugging version of 
+Wolframe you have to build your own version of Python.
+
+Build you own version of Python
+
+You have to get the sources of Python3 called Python-3.4.0.tar from http://
+python.org. Unpack it for instance to C:\Python-3.4.0.
+
+Open the solution file PCBuild\pcbuild.sln. Build the desired version. Read
+also PCBuild\readme.txt.
+
+Copy the resulting python34_d.lib on top of the downloaded binary vesion in for
+instance C:\Python34\libs and python34_d.dll to C:\Python34\DLLs.
+
+You will have to set the 'PYTHON_XXX' variables in makefiles\nmake\config.mk as
+follows:
+
+        PYTHON_DIR = C:\Python34
+        PYTHON_VERSION = 34
+        PYTHON_MAJOR_VERSION = 3
+        PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+        PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
+
+
+1.14. Printing support with libhpdf
+
+Wolframe can print with libhpdf (http://libharu.org/, also called libharu).
+
+The libhpdf library is embedded in the subdirectory 3rdParty/libhpdf.
+
+You enable the building of a loadable libhpdf printing module with:
+
+        nmake /nologo /f Makefile.W32 WITH_LIBHPDF=1
+
+
+1.15. Image processing with FreeImage
+
+Wolframe can manipulate various image formats with the help of the FreeImage
+project (http://freeimage.sourceforge.net).
+
+The FreeImage package is embedded in the subdirectory 3rdParty/freeimage.
+
+You enable the building of a loadable FreeImage processing module with:
+
+        nmake /nologo /f Makefile.W32 WITH_SYSTEM_FREEIMAGE=1
+
+
+1.16. zlib and libpng
+
+Libhpdf needs the zlib and libpng libraries.
+
+The libpng and zlib libraries are embedded in the subdirectory 3rdParty/zlib
+and 3rdParty/libpng.
+
+1.17. Support for ICU
+
+Wolframe can use the International Components for Unicode (ICU, http://
+site.icu-project.org) library for text normalization and conversion.
+
+Use prebuild version of ICU
+
+You can take the pre-build ZIP-files from http://site.icu-project.org, called
+somthing like icu4c-52_1-Win32-msvc10.zip and unpack them in for instance C:\
+icu4c-52_1_1-Win32-msvc10.
+
+You will have to set the 'ICU_XXX' variables in makefiles\nmake\config.mk as
+follows:
+
+        ICU_LIB_VERSION = 52
+        ICU_DIR = C:\icu4c-52_1-Win32-msvc10\icu
+
+
+You also have to build your own version of Boost, meaning the 'boost-locale'
+library has to be built with ICU support enabled and you have to enable the
+'regex' and the 'locale' boost libraries too:
+
+        bootstrap
+        .\b2 --prefix=C:\boost\boost_1_55 ^
+                --with-thread --with-filesystem --with-system --with-program_options ^
+                --with-date_time --with-locale --with-regex ^
+                -sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+                architecture=x86 address-model=64 toolset=msvc ^
+                install
+
+
+Note: The binary installation packages from http://site.icu-project.org) do not
+contain debug versions of the library. If you want to build a debugging version
+of Wolframe you have to build your own version of ICU.
+
+Build you own version of ICU
+
+You have to get the ZIP file with the Windows sources called icu4c-51_1-src.zip
+from http://site.icu-project.org. Unpack it for instance to C:\icu4c-52_1-src.
+
+Open the solution file icu\source\allinone\allinone.sln. Build the desired
+version (Release or Debug, 32-bit or 64-bit).
+
+Best is to copy the resulting artifacts into a directory like C:\
+icu4c-52_1-win32-debug. Copy in there the include, bin and lib directories.
+
+Adapt the 'ICU_XXX' variables in makefiles\nmake\config.mk as follows:
+
+        ICU_LIB_VERSION = 52
+        ICU_DIR = C:\icu4c-52_1-win32-debug
+
+
+You build boost with boost-locale and ICU backend exactly the same way as with
+the pre-compiled version of ICU:
+
+        bootstrap
+        .\b2 --prefix=C:\boost\boost_1_55 ^
+                --with-thread --with-filesystem --with-system --with-program_options ^
+                --with-date_time --with-locale --with-regex ^
+                -sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+                architecture=x86 address-model=64 toolset=msvc ^
+                install
+
+
+1.18. Testing Wolframe
+
+Wolframe has tests written in Google gtest (https://code.google.com/p/
+googletest/).
+
+Tests are run with:
+
+        nmake /nologo /f Makefile.W32 test
+
+
+Some tests run for a long time (regression and stress tests). They are not run
+per default when calling 'make test', but you have to call:
+
+        nmake /nologo /f Makefile.W32 longtest
+
+
+1.19. Testing with Expect
+
+Some more complex tests are written with Expect (http://expect.sourceforge.net/
+).
+
+You enable testing with Expect with:
+
+        nmake /nologo /f Makefile.W32 WITH_EXPECT=1
+
+
+You can get a Windows version of TCL from http://www.activestate.com/activetcl/
+. Take the 32-bit community version, the the 64-bit version had no Expect
+available (at least at the time of writting).
+
+Install ActiveTcl 8.6.1 to for instance C:\Tcl86.
+
+Install Expect with:
+
+        cd C:\Tcl86
+        teacup install Expect
+
+
+Adapt the following variable in makefiles\nmake\config.mk:
+
+        TCL_DIR = C:\Tcl86
+
+
+Some tests also need 'telnet'. If telnet is not enabled as Windows feature,
+enable it in "Control Panel", "Windows Features" under "Telnet Client".
+
+1.20. Building the documentation
+
+The documentation including the man pages is written using DocBook (http://
+www.docbook.org).
+
+You need the Docbook XSLT files from http://sourceforge.net/projects/docbook/
+files/docbook-xsl-ns/. Install them and set the 'XSLT_HTMLHELP_STYLESHEET'
+variable in makefiles\nmake\config.mk:
+
+        XSLT_HTMLHELP_STYLESHEET = C:\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
+
+
+You will also need a working xsltproc.exe.
+
+For generating CHM help files you have to install the "HTML Help Workshop and
+Documentation" from Microsoft. Install it and set the 'HHC_LOCATION' variable
+in makefiles\nmake\config.mk:
+
+        HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
+
+
+Developer documentation is generated with Doxygen (http://www.doxygen.org).
+
+Get Doxygen from http://www.stack.nl/~dimitri/doxygen/, install it to for
+instance C:\Doxygen and set the 'DOXYGEN' variable in makefiles\nmake\
+config.mk:
+
+        DOXYGEN = C:\Doxygen\bin\doxygen.exe
+
+

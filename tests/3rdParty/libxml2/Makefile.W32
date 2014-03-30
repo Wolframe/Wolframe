@@ -41,6 +41,7 @@ ENCODINGS=UTF-8 UCS-2LE UCS-2BE UTF-16LE UTF-16BE
 
 local_test:
 	@-echo @echo off > test.bat
+	@-echo copy "$(ICONV_DIR)\bin\iconv.dll" . >> test.bat
 	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
 	@for %%e IN ( $(ENCODINGS) ) do \
 		@echo echo Testing libxml2 with encoding %%e >> test.bat & \

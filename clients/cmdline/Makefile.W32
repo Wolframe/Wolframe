@@ -58,23 +58,15 @@ local_distclean:
 
 local_test:
 
-run: $(CPP_BINS)
-	@-echo @echo off > test.bat
+copy_prereq:
+	@-copy $(TOPDIR)\clients\lib\wolframe_client.dll . >NUL
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
 !ENDIF
-	@-echo copy "$(TOPDIR)\clients\lib\wolframe_client.dll" . >> test.bat
-	@-echo wolframec.exe 127.0.0.1 7661 >> test.bat
-	@-test.bat
 
-runssl: $(CPP_BINS)
-	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
-	@-echo copy "$(TOPDIR)\clients\lib\wolframe_client.dll" . >> test.bat
-	@-echo wolframec.exe -S --CA-cert-file=certs\CAclient.cert.pem --client-cert-file=certs\client.crt --client-cert-key=private\client.key 127.0.0.1 7961 >> test.bat
-	@-test.bat
+run: $(CPP_BINS) copy_prereq
+	@-wolframec.exe 127.0.0.1 7661
 
+runssl: $(CPP_BINS) copy_prereq
+	@-wolframec.exe -S --CA-cert-file=certs\CAclient.cert.pem --client-cert-file=certs\client.crt --client-cert-key=private\client.key 127.0.0.1 7961

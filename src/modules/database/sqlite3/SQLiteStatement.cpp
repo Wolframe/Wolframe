@@ -73,7 +73,11 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 {
 	// does boundary checking
 	BaseStatement::bind( idx, value );
+	bindVariant( idx, value );
+}
 
+void SQLiteStatement::bindVariant( const unsigned int idx, const types::Variant &value )
+{
 	switch (value.type())
 	{
 		case types::Variant::Null:
@@ -115,11 +119,13 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 		{
 			m_data.push_back( types::DateTime( value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime));
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+			break;
 		}
 		case types::Variant::BigNumber:
 		{
 			m_data.push_back( value.tostring());
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+			break;
 		}
 		case types::Variant::Custom:
 		{
@@ -129,7 +135,7 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 				if (value.customref()->getBaseTypeValue( baseval)
 				&&  baseval.type() != types::Variant::Custom)
 				{
-					bind( idx, baseval);
+					bindVariant( idx, baseval);
 					break;
 				}
 			}
@@ -137,7 +143,8 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			bind( idx, value.tostring());
+			bindVariant( idx, value.tostring());
+			break;
 		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );
