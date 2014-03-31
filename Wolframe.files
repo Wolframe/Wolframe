@@ -1602,6 +1602,7 @@ include/crypto/HMAC.hpp
 include/crypto/md5.h
 include/crypto/PBKDF2.h
 include/crypto/PBKDF2.hpp
+include/crypto/randomGenerator.hpp
 include/crypto/sha1.h
 include/crypto/sha2.h
 include/database/baseStatement.hpp
@@ -3161,4 +3162,3 @@ wtest/Makefile.W32
 wtest/testDescription.cpp
 wtest/testModules.cpp
 wtest/wtestcheck.cpp
-include/crypto/randomGenerator.hpp
