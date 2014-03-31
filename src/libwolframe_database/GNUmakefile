@@ -47,6 +47,13 @@ CPP_OBJS = \
 	transactionExecStatemachine.o \
 	baseStatement.o \
 	substitutingStatement.o \
+	tdl/elementReference.o \
+	tdl/embeddedStatement.o \
+	tdl/parseUtils.o \
+	tdl/preprocCallStatement.o \
+	tdl/preprocElementReference.o \
+	tdl/preprocBlock.o \
+	tdl/subroutineCallStatement.o \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
 	vm/program.o \

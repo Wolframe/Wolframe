@@ -1444,7 +1444,7 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 }
 
 std::vector<std::pair<std::string,TransactionFunctionR> >
-	_Wolframe::db::loadTransactionProgramFile(
+	db::loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
 		const std::string& databaseClassName,

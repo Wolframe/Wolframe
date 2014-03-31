@@ -81,6 +81,11 @@ public:
 			return rt;
 		}
 
+		std::size_t index() const
+		{
+			return m_idx;
+		}
+
 		bool operator==( const const_iterator& o) const
 		{
 			if (!m_ref && !o.m_ref) return true;

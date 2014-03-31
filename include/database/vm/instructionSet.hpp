@@ -56,11 +56,13 @@ public:
 
 		// Print Instructions:
 		Op_PRINT_CONST,			//< print a value to output: constant
+		Op_PRINT_PATH,			//< print a value to output: unique input path selection
+		Op_PRINT_LOOPCNT,		//< print a value to output: FOREACH loop counter (first element is 0)
 		Op_PRINT_SEL_IDX,		//< print a value to output: element in selected set (unique, one element set) adressed by column index
 		Op_PRINT_SEL_NAM,		//< print a value to output: element in selected set (unique, one element set) adressed by column name
 		Op_PRINT_ITR_IDX,		//< print a value to output: element in tuple set iterated adressed by column index
 		Op_PRINT_ITR_NAM,		//< print a value to output: element in tuple set iterated adressed by column name
-		Op_PRINT_OPEN,			//< print an open tag to output (index in names)
+		Op_PRINT_OPEN,			//< print an open tag to output (index in tagnametab)
 		Op_PRINT_CLOSE,			//< print a close tag to output (no argument)
 
 		// Assignment Instructions:
@@ -79,6 +81,8 @@ public:
 		// Subroutine Call Instructions:
 		Op_SUB_FRAME_OPEN,		//< start prepare a subroutine call
 		Op_SUB_ARG_CONST,		//< push argument for subroutine call: constant value
+		Op_SUB_ARG_PATH,		//< push argument for subroutine call: path selection value
+		Op_SUB_ARG_LOOPCNT,		//< push argument for subroutine call: FOREACH loop counter (first element is 0)
 		Op_SUB_ARG_SEL_IDX,		//< push argument for subroutine call: element in selected set (unique, one element set) adressed by column index
 		Op_SUB_ARG_SEL_NAM,		//< push argument for subroutine call: element in selected set (unique, one element set) adressed by column name
 		Op_SUB_ARG_ITR_IDX,		//< push argument for subroutine call: element in tuple set iterated adressed by column index
@@ -88,6 +92,8 @@ public:
 		// Database Instructions:
 		Op_STM_START,			//< open a statement to execute
 		Op_STM_BIND_CONST,		//< bind a statement parameter: constant value
+		Op_STM_BIND_PATH,		//< bind a statement parameter: path selection value
+		Op_STM_BIND_LOOPCNT,		//< bind a statement parameter: FOREACH loop counter (first element is 0)
 		Op_STM_BIND_SEL_IDX,		//< bind a statement parameter
 		Op_STM_BIND_SEL_NAM,		//< bind a statement parameter
 		Op_STM_BIND_ITR_IDX,		//< bind a statement parameter
@@ -111,6 +117,8 @@ public:
 			"GOTO",
 	
 			"PRINT_CONST",
+			"PRINT_PATH",
+			"PRINT_LOOPCNT",
 			"PRINT_SEL_IDX",
 			"PRINT_SEL_NAM",
 			"PRINT_ITR_IDX",
@@ -131,6 +139,8 @@ public:
 
 			"SUB_FRAME_OPEN",
 			"SUB_ARG_CONST",
+			"SUB_ARG_PATH",
+			"SUB_ARG_LOOPCNT",
 			"SUB_ARG_SEL_IDX",
 			"SUB_ARG_SEL_NAM",
 			"SUB_ARG_ITR_IDX",
@@ -139,6 +149,8 @@ public:
 	
 			"STM_START",
 			"STM_BIND_CONST",
+			"STM_BIND_PATH",
+			"STM_BIND_LOOPCNT",
 			"STM_BIND_SEL_IDX",
 			"STM_BIND_SEL_NAM",
 			"STM_BIND_ITR_IDX",
@@ -201,6 +213,8 @@ public:
 			/*Op_GOTO*/			At_Address,
 
 			/*Op_PRINT_CONST*/		At_Constant,
+			/*Op_PRINT_PATH*/		At_Path,
+			/*Op_PRINT_LOOPCNT*/		At_None,
 			/*Op_PRINT_SEL_IDX*/		At_SelectedColumnIdx,
 			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
 			/*Op_PRINT_ITR_IDX*/		At_IteratorColumnIdx,
@@ -221,6 +235,8 @@ public:
 	
 			/*Op_SUB_FRAME_OPEN*/		At_SubroutineSignature,
 			/*Op_SUB_ARG_CONST*/		At_Constant,
+			/*Op_SUB_ARG_PATH*/		At_Path,
+			/*Op_SUB_ARG_LOOPCNT*/		At_None,
 			/*Op_SUB_ARG_SEL_IDX*/		At_SelectedColumnIdx,	
 			/*Op_SUB_ARG_SEL_NAM*/		At_ColumnName,
 			/*Op_SUB_ARG_ITR_IDX*/		At_IteratorColumnIdx,
@@ -229,6 +245,8 @@ public:
 	
 			/*Op_STM_START*/		At_Statement,
 			/*Op_STM_BIND_CONST*/		At_Constant,
+			/*Op_STM_BIND_PATH*/		At_Path,
+			/*Op_STM_BIND_LOOPCNT*/		At_None,
 			/*Op_STM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
 			/*Op_STM_BIND_SEL_NAM*/		At_ColumnName,
 			/*Op_STM_BIND_ITR_IDX*/		At_IteratorColumnIdx,

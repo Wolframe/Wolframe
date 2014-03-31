@@ -100,6 +100,19 @@ const types::Variant& ProgramInstance::iteratorArgument( ArgumentIndex argidx) c
 	return top.m_valueIter->column( argidx);
 }
 
+types::Variant ProgramInstance::loopcntArgument() const
+{
+	const StackElement& top = m_stack.back();
+	if (!top.m_valueSet.get())
+	{
+		throw std::runtime_error( "referencing loop count (Variable '#') outside a FOREACH context");
+	}
+	else
+	{
+		return types::Variant( top.m_valueIter->index());
+	}
+}
+
 void ProgramInstance::initValueIteraror( const ValueTupleSetR& valueset)
 {
 	StackElement& top = m_stack.back();
@@ -220,6 +233,12 @@ bool ProgramInstance::execute()
 				m_output.addValue( constArgument( argidx));
 				++m_ip;
 				break;
+			case Op_PRINT_PATH:
+				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
+			case Op_PRINT_LOOPCNT:
+				m_output.addValue( loopcntArgument());
+				++m_ip;
+				break;
 			case Op_PRINT_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
@@ -270,7 +289,6 @@ bool ProgramInstance::execute()
 				++m_ip;
 				break;
 
-
 			/*Iterator Instructions:*/
 			case Op_OPEN_ITER_LAST_RESULT:
 				initValueIteraror( top.m_lastResult);
@@ -314,6 +332,12 @@ bool ProgramInstance::execute()
 				m_subroutine_frame.push( constArgument( argidx));
 				++m_ip;
 				break;
+			case Op_SUB_ARG_PATH:
+				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
+			case Op_SUB_ARG_LOOPCNT:
+				m_subroutine_frame.push( loopcntArgument());
+				++m_ip;
+				break;
 			case Op_SUB_ARG_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
@@ -353,6 +377,15 @@ bool ProgramInstance::execute()
 				if (!m_db_stm->bind( ++top.m_bindidx, constArgument( argidx)))
 				{
 					throw std::runtime_error( std::string("failed to bind constant parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] '" + constArgument( argidx).tostring() + "'");
+				}
+				++m_ip;
+				break;
+			case Op_STM_BIND_PATH:
+				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
+			case Op_STM_BIND_LOOPCNT:
+				if (!m_db_stm->bind( ++top.m_bindidx, loopcntArgument()))
+				{
+					throw std::runtime_error( std::string("failed to bind parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] as loop counter");
 				}
 				++m_ip;
 				break;

@@ -102,6 +102,10 @@ SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 		}
 		else
 		{
+			if (std::strchr( tagnam.c_str(), '*') != 0)
+			{
+				throw std::runtime_error( "asterisk character '*' not allowed as character in a token other than the string \"*\"");
+			}
 			elem.m_tag = tagmap->get( tagnam);
 		}
 		m_path.push_back( elem);

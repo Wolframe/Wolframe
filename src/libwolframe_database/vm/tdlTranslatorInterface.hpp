@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //\file vm/tdlTranslatorInterface.hpp
-//\brief Helper interface for building a virtual machine for database transactions out of TDL
+//\brief Helper interface for building a virtual machine program for database transactions out of TDL
 #ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/vm/program.hpp"
@@ -47,47 +47,53 @@ class TdlTranslatorInterface
 	:public InstructionSet
 {
 public:
-	explicit TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
-		:m_soubroutinemap(soubroutinemap_)
-	{
-		m_sub_program.code
-			( Op_GOTO_ABSOLUTE, 0 )		//... jump to start of main
-		;
-	}
-	TdlTranslatorInterface( const TdlTranslatorInterface& o)
-		:m_stateStack(o.m_stateStack)
-		,m_soubroutinemap(o.m_soubroutinemap)
-		,m_calledSubroutines(o.m_calledSubroutines)
-		,m_sub_program(o.m_sub_program)
-		,m_main_program(o.m_main_program)
-	{}
+	explicit TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_);
+	TdlTranslatorInterface( const TdlTranslatorInterface& o);
 
 	void begin_FOREACH( const std::string& selector);
 	void end_FOREACH();
 
+	void begin_INTO_block( const std::string& tag);
+	void end_INTO_block();
+
 	void begin_DO_statement( const std::string& stm);
 	void end_DO_statement();
-
+	
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
 	void end_DO_subroutine();
 
 	void push_ARGUMENT_PATH( const std::string& selector);
+	void push_ARGUMENT_CONST( const types::Variant& value);
+	void push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
+	void push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
+
+	void print_ARGUMENT_PATH( const std::string& selector);
+	void print_ARGUMENT_CONST( const types::Variant& value);
+	void print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
+	void print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
 
 	ProgramR createProgram() const;
 
 private:
 	struct State
 	{
-		enum Id {None,OpenForeach,OpenBlock,OpenStatementCall,OpenSubroutineCall};
+		enum Id {
+			None,
+			OpenForeach,
+			OpenIntoBlock,
+			OpenStatementCall,
+			OpenSubroutineCall
+		};
 		Id id;
 		InstructionSet::ArgumentIndex value;
+		unsigned int cnt;
 
 		State()
-			:id(None),value(0){}
+			:id(None),value(0),cnt(0){}
 		State( const State& o)
-			:id(o.id),value(o.value){}
+			:id(o.id),value(o.value),cnt(o.cnt){}
 		State( Id i, InstructionSet::ArgumentIndex v)
-			:id(i),value(v){}
+			:id(i),value(v),cnt(0){}
 	};
 	struct CalledSubroutineDef
 	{

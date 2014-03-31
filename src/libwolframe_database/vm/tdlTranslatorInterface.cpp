@@ -38,6 +38,22 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
 
+TdlTranslatorInterface::TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
+	:m_soubroutinemap(soubroutinemap_)
+{
+	m_sub_program.code
+		( Op_GOTO_ABSOLUTE, 0 )		//... jump to start of main
+	;
+}
+
+TdlTranslatorInterface::TdlTranslatorInterface( const TdlTranslatorInterface& o)
+	:m_stateStack(o.m_stateStack)
+	,m_soubroutinemap(o.m_soubroutinemap)
+	,m_calledSubroutines(o.m_calledSubroutines)
+	,m_sub_program(o.m_sub_program)
+	,m_main_program(o.m_main_program)
+{}
+
 void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx;
@@ -57,6 +73,10 @@ void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
 		;
 	}
+	else if (boost::algorithm::iequals( selector, "PARAM"))
+	{
+		throw std::runtime_error("PARAM not allowed as argument of FOREACH");
+	}
 	else
 	{
 		//... selector is referencing a path expression on the input
@@ -73,7 +93,7 @@ void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 
 void TdlTranslatorInterface::end_FOREACH()
 {
-	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH without begin");
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH");
 
 	Instruction& forwardJumpInstr = m_main_program.code[ m_stateStack.back().value-1];
 	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
@@ -102,11 +122,26 @@ void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
 
 void TdlTranslatorInterface::end_DO_statement()
 {
-	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement without begin");
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement");
 	// Code generated:
 	m_main_program.code
 		( Op_STM_EXEC, m_stateStack.back().value )
 	;
+	m_stateStack.pop_back();
+}
+
+void TdlTranslatorInterface::begin_INTO_block( const std::string& tag)
+{
+	// Code generated:
+	m_main_program.code
+		( Op_PRINT_OPEN, m_main_program.tagnametab.get( tag))
+	;
+	m_stateStack.push_back( State( State::OpenStatementCall, 0));
+}
+
+void TdlTranslatorInterface::end_INTO_block()
+{
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenIntoBlock) throw std::runtime_error( "illegal state: end of INTO");
 	m_stateStack.pop_back();
 }
 
@@ -170,30 +205,326 @@ void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const
 		m_main_program.code
 			( Op_SUB_FRAME_OPEN, frameIdx )
 		;
-		m_stateStack.push_back( State( State::OpenSubroutineCall, m_calledSubroutines.at(subroutineIdx).address));
+		m_stateStack.push_back( State( State::OpenSubroutineCall, subroutineIdx));
 	}
 }
 
 void TdlTranslatorInterface::end_DO_subroutine()
 {
-	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO without begin");
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO");
+	InstructionSet::ArgumentIndex subroutineIdx = m_stateStack.back().value;
+	InstructionSet::ArgumentIndex address = m_calledSubroutines.at( subroutineIdx).address;
+	std::size_t nofParams = m_calledSubroutines.at(subroutineIdx).subroutine.params().size();
+	if (nofParams != m_stateStack.back().cnt)
+	{
+		throw std::runtime_error( "number of parameters in subroutine call does not match");
+	}
 	// Code generated:
 	m_main_program.code
 		( Op_SUB_FRAME_CLOSE )
-		( Op_GOTO_ABSOLUTE, m_stateStack.back().value )
+		( Op_GOTO_ABSOLUTE, address )
 	;
 	m_stateStack.pop_back();
 }
 
 void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 {
-	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 
+	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_SUB_ARG_PATH, idx )			// push element adressed by relative input path
+		;
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_STM_BIND_PATH, idx )			// push element adressed by relative input path
+		;
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push paramter");
+	}
+}
+
+void TdlTranslatorInterface::push_ARGUMENT_CONST( const types::Variant& value)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().cnt;
+
+	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
+	m_main_program.constants.push_back( value);
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_SUB_ARG_CONST, idx )			// push constant element
+		;
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_STM_BIND_CONST, idx )			// push constant element
+		;
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push/bind paramter");
+	}
+}
+
+void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().cnt;
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		InstructionSet::ArgumentIndex idx;
+		if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+		{
+			m_main_program.code
+				( Op_SELECT_KEPT_RESULT, idx )		// select named result
+				( Op_SUB_ARG_SEL_IDX, colidx)		// push column by index
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "RESULT"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_LAST_RESULT )		// select last result
+				( Op_SUB_ARG_SEL_IDX, colidx)		// push column by index
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "PARAM"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_PARAMETER )			// select parameter
+				( Op_SUB_ARG_SEL_IDX, colidx)		// push column by index
+			;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+		}
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		InstructionSet::ArgumentIndex idx;
+		if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+		{
+			m_main_program.code
+				( Op_SELECT_KEPT_RESULT, idx )		// select named result
+				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "RESULT"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_LAST_RESULT )		// select last result
+				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "PARAM"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_PARAMETER )			// select parameter
+				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+			;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push/bind paramter");
+	}
+}
+
+void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().cnt;
+	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
+
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		InstructionSet::ArgumentIndex idx;
+		if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+		{
+			m_main_program.code
+				( Op_SELECT_KEPT_RESULT, idx )		// select named result
+				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "RESULT"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_LAST_RESULT )		// select last result
+				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "PARAM"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_PARAMETER )			// select parameter
+				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+			;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+		}
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		InstructionSet::ArgumentIndex idx;
+		if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+		{
+			m_main_program.code
+				( Op_SELECT_KEPT_RESULT, idx )		// select named result
+				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "RESULT"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_LAST_RESULT )		// select last result
+				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+			;
+		}
+		else if (boost::algorithm::iequals( setname, "PARAM"))
+		{
+			//... selector is referencing the last result
+			// Code generated:
+			m_main_program.code
+				( Op_SELECT_PARAMETER )			// select parameter
+				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+			;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push/bind paramter");
+	}
+}
+
+void TdlTranslatorInterface::print_ARGUMENT_PATH( const std::string& selector)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+
+	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	// Code generated:
 	m_main_program.code
-		( Op_OPEN_ITER_PATH, idx )			// iterate on input path
+		( Op_PRINT_PATH, idx )				// print element adressed by relative input path
 	;
 }
+
+void TdlTranslatorInterface::print_ARGUMENT_CONST( const types::Variant& value)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+
+	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
+	m_main_program.constants.push_back( value);
+	// Code generated:
+	m_main_program.code
+		( Op_PRINT_CONST, idx )				// print element adressed by relative input path
+	;
+}
+
+void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
+{
+	InstructionSet::ArgumentIndex idx;
+	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+	{
+		m_main_program.code
+			( Op_SELECT_KEPT_RESULT, idx )		// select named result
+			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+		;
+	}
+	else if (boost::algorithm::iequals( setname, "RESULT"))
+	{
+		//... selector is referencing the last result
+		// Code generated:
+		m_main_program.code
+			( Op_SELECT_LAST_RESULT )		// select last result
+			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+		;
+	}
+	else if (boost::algorithm::iequals( setname, "PARAM"))
+	{
+		//... selector is referencing the last result
+		// Code generated:
+		m_main_program.code
+			( Op_SELECT_PARAMETER )			// select parameter
+			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+		;
+	}
+	else
+	{
+		throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+	}
+}
+
+void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
+{
+	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
+	InstructionSet::ArgumentIndex idx;
+	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
+	{
+		m_main_program.code
+			( Op_SELECT_KEPT_RESULT, idx )		// select named result
+			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+		;
+	}
+	else if (boost::algorithm::iequals( setname, "RESULT"))
+	{
+		//... selector is referencing the last result
+		// Code generated:
+		m_main_program.code
+			( Op_SELECT_LAST_RESULT )		// select last result
+			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+		;
+	}
+	else if (boost::algorithm::iequals( setname, "PARAM"))
+	{
+		//... selector is referencing the last result
+		// Code generated:
+		m_main_program.code
+			( Op_SELECT_PARAMETER )			// select parameter
+			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+		;
+	}
+	else
+	{
+		throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
+	}
+}
+
 
 ProgramR TdlTranslatorInterface::createProgram() const
 {

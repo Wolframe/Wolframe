@@ -51,10 +51,10 @@ CharTable::CharTable( const char* op, bool isInverse)
 	for (ii=33; ii<sizeof(m_ar); ++ii) m_ar[ii] = isInverse;
 	for (ii=0; op[ii]; ++ii)
 	{
-		if (op[ii] == '.' && op[ii+1] == '.' && op[ii+2] && ii > 0)
+		if (op[ii] == '.' && op[ii+1] == '.')
 		{
-			unsigned char hi = (unsigned char)op[ii+2];
-			unsigned char lo = (unsigned char)op[ii-1];
+			unsigned char hi = op[ii+2]?(unsigned char)op[ii+2]:255;
+			unsigned char lo = (ii>0)?(unsigned char)op[ii-1]:1;
 			if (hi < lo)
 			{
 				unsigned char tmp = hi;
