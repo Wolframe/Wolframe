@@ -50,7 +50,7 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
-static const unsigned int PBKDF2_ROUNDS = 505937;
+static const unsigned int PBKDF2_ROUNDS = 105937;
 
 /****  Password Salt  ************************************************/
 static const size_t PASSWORD_SALT_BCD_SIZE = PASSWORD_SALT_SIZE * 2 + 1;
