@@ -94,7 +94,7 @@ PreProcBlock PreProcBlock::parse( const LanguageDescription* langdescr, std::str
 				return rt;
 			case p_FOREACH:
 				checkUniqOccurrence( p_FOREACH, mask, g_preproc_idtab);
-				step.selector = ElementReference::parseSelectorPath( langdescr, si, se);
+				step.selector = parseSelectorPath( langdescr, si, se);
 				break;
 			case p_INTO:
 				checkUniqOccurrence( p_INTO, mask, g_preproc_idtab);

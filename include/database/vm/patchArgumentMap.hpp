@@ -36,6 +36,7 @@
 #define _DATABASE_VM_PATCH_ARGUMENT_MAP_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
 #include <map>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {

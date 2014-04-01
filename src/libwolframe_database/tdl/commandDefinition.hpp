@@ -30,12 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a subroutine call statement parsing result
-///\file tdl/subroutineCallStatement.hpp
-#ifndef _DATABASE_TDL_SUBROUTINE_CALL_STATEMENT_HPP_INCLUDED
-#define _DATABASE_TDL_SUBROUTINE_CALL_STATEMENT_HPP_INCLUDED
+///\brief Definition of a database instruction or subroutine call with FOREACH and INTO qualifier as command
+///\file tdl/commandDefinition.hpp
+#ifndef _DATABASE_TDL_COMMAND_DEFINITION_HPP_INCLUDED
+#define _DATABASE_TDL_COMMAND_DEFINITION_HPP_INCLUDED
 #include "database/databaseLanguage.hpp"
-#include "tdl/elementReference.hpp"
+#include "tdl/subroutineCallStatement.hpp"
+#include "tdl/embeddedStatement.hpp"
 #include <string>
 #include <vector>
 
@@ -43,20 +44,36 @@ namespace _Wolframe {
 namespace db {
 namespace tdl {
 
-struct SubroutineCallStatement
+struct CommandDefinition
 {
-	std::string name;				//< function name
-	std::vector<std::string> templateparams;	//< list of template arguments
-	std::vector<ElementReference> params;		//< list of call arguments
+	std::string selector;
+	EmbeddedStatement statement;
+	SubroutineCallStatement call;
+	std::vector<std::string> resultpath;
+	bool nonempty;
+	bool unique;
+	bool embedded;
 
-	SubroutineCallStatement(){}
-	SubroutineCallStatement( const SubroutineCallStatement& o)
-		:name(o.name),templateparams(o.templateparams),params(o.params){}
-	SubroutineCallStatement( const std::string& name_, const std::vector<std::string>& templateparams_, const std::vector<ElementReference>& params_)
-		:name(name_),templateparams(templateparams_),params(params_){}
+	struct Hint
+	{
+		std::string errorclass;
+		std::string message;
+		Hint(){}
+		Hint( const Hint& o)
+			:errorclass(o.errorclass),message(o.message){}
+		Hint( const std::string& e, const std::string& m)
+			:errorclass(e),message(m){}
+	};
+	std::vector<Hint> hints;
 
-	static SubroutineCallStatement parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
+	CommandDefinition()
+		:nonempty(false),unique(false),embedded(false){}
+	CommandDefinition( const CommandDefinition& o)
+		:selector(o.selector),statement(o.statement),call(o.call),resultpath(o.resultpath),nonempty(o.nonempty),unique(o.unique),embedded(o.embedded),hints(o.hints){}
+
+	static CommandDefinition parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 };
 
 }}}//namespace
 #endif
+

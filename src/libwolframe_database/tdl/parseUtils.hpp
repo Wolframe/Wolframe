@@ -39,7 +39,6 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
@@ -64,6 +63,11 @@ static inline bool isDigit( char ch)
 	return (ch >= '0' && ch <= '9');
 }
 
+static inline bool isStringQuote( char ch)
+{
+	return (ch == '\'' || ch == '\"');
+}
+
 bool isIdentifier( const std::string& str);
 std::string errorTokenString( char ch, const std::string& tok);
 char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se);
@@ -74,6 +78,7 @@ std::vector<std::string> parse_INTO_path( const LanguageDescription* langdescr, 
 std::vector<std::string> parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 
 std::string parseFunctionName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+std::string parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 
 void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab);
 

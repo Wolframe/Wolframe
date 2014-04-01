@@ -44,7 +44,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-static std::vector<std::string> SubroutineDefinition::parseResultDefinition( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+std::vector<std::string> SubroutineDefinition::parseResultDefinition( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	std::vector<std::string> rt;
 	std::string tok;
@@ -68,7 +68,7 @@ static std::vector<std::string> SubroutineDefinition::parseResultDefinition( con
 		}
 		else
 		{
-			throw throw std::runtime_error( "INTO expected after RESULT");
+			throw std::runtime_error( "INTO expected after RESULT");
 		}
 		start = si;
 	}

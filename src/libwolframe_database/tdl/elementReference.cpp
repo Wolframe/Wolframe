@@ -41,9 +41,6 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-static const utils::CharTable g_path_optab( ";,)(", false);
-static const utils::CharTable g_path_idtab( ";,)(", true);
-
 ElementReference ElementReference::parseEmbeddedReference( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	char ch = utils::gotoNextToken( si, se);
@@ -135,24 +132,9 @@ ElementReference ElementReference::parsePlainReference( const LanguageDescriptio
 	}
 	else
 	{
-		(void)utils::parseNextToken( tok, si, se, g_path_optab, g_path_idtab);
+		tok = parseSelectorPath( langdescr, si, se);
 		return ElementReference( ElementReference::SelectorPath, tok);
 	}
 }
 
-std::string ElementReference::parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	std::string rt;
-	char ch = gotoNextToken( langdescr, si, se);
-	if (!ch)
-	{
-		throw std::runtime_error( "unexpected end of file (expected selector path)");
-	}
-	if (ch == '"' || ch == '\'' || isDigit( ch) || ch == '$')
-	{
-		throw std::runtime_error( "unexpected token (expected selector path)");
-	}
-	(void)utils::parseNextToken( rt, si, se, g_path_optab, g_path_idtab);
-	return rt;
-}
 

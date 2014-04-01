@@ -38,7 +38,6 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
@@ -74,7 +73,6 @@ struct ElementReference
 
 	static ElementReference parseEmbeddedReference( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 	static ElementReference parsePlainReference( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
-	static std::string parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 };
 
 }}}//namespace

@@ -191,7 +191,7 @@ DatabaseErrorException ProgramInstance::databaseException() const
 		DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, 0, 0, 0, 0, "unknown error", "unknown error");
 		return DatabaseErrorException( dberr);
 	}
-	StackElement& top = m_stack.back();
+	const StackElement& top = m_stack.back();
 
 	if (top.m_hintidx)
 	{
@@ -204,10 +204,7 @@ DatabaseErrorException ProgramInstance::databaseException() const
 			return DatabaseErrorException( dberr);
 		}
 	}
-	else
-	{
-		return DatabaseErrorException( *err);
-	}
+	return DatabaseErrorException( *err);
 }
 
 bool ProgramInstance::execute()

@@ -70,7 +70,7 @@ ResultDefinition ResultDefinition::parse( const LanguageDescription* langdescr, 
 			{
 				throw std::runtime_error( "function name expected after RESULT FILTER");
 			}
-			rt.filter = parseFunctionName( langdescr, ci, ce);
+			rt.filter = parseFunctionName( langdescr, si, se);
 		}
 		else if (mask)
 		{

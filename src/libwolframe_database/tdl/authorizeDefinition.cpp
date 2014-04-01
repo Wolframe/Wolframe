@@ -42,7 +42,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-AuthorizeDefinition AuthorizeDefinition::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
+AuthorizeDefinition AuthorizeDefinition::parse( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
 	std::string tok;
 
@@ -50,15 +50,15 @@ AuthorizeDefinition AuthorizeDefinition::parse( const LanguageDescription* langd
 	std::string authresource;
 
 	char ch = gotoNextToken( langdescr, si, se);
-	if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
+	if (ch != '(') throw std::runtime_error( "Open bracket '(' expected after AUTHORIZE function call");
 	si++;
 	if (!parseNextToken( langdescr, authfunction, si, se))
 	{
-		throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
+		throw std::runtime_error( "unexpected end of description. function name expected after AUTHORIZE");
 	}
 	if (authfunction.empty())
 	{
-		throw ERROR( si, "AUTHORIZE function name must not be empty");
+		throw std::runtime_error( "AUTHORIZE function name must not be empty");
 	}
 	ch = gotoNextToken( langdescr, si, se);
 	if (ch == ',')
@@ -66,13 +66,13 @@ AuthorizeDefinition AuthorizeDefinition::parse( const LanguageDescription* langd
 		++si;
 		if (!parseNextToken( langdescr, authresource, si, se))
 		{
-			throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
+			throw std::runtime_error( "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
 		}
 	}
 	ch = gotoNextToken( langdescr, si, se);
 	if (ch != ')')
 	{
-		throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
+		throw std::runtime_error( "Close bracket ')' expected after AUTHORIZE function defintion");
 	}
 	++si;
 	return AuthorizeDefinition( authfunction, authresource);

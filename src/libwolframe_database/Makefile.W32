@@ -47,6 +47,7 @@ CPP_OBJS = \
 	tdl\preprocBlock.obj \
 	tdl\subroutineCallStatement.obj \
 	tdl\authorizeDefinition.obj \
+	tdl\commandDefinition.obj \
 	tdl\subroutineDefinition.obj \
 	tdl\transactionDefinition.obj \
 	vm\selectorPathSet.obj \

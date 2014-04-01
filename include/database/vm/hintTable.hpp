@@ -59,7 +59,7 @@ public:
 	const char* findHint( const Index& idx, const std::string& errorclass) const
 	{
 		if (idx > m_hintar.size() || idx == 0) throw std::runtime_error("hint table index out of bounds");
-		std::vector<Hint>::const_iterator hi = m_hintar.ar( idx-1).begin(), he = m_hintar.ar( idx-1).second.end();
+		std::vector<Hint>::const_iterator hi = m_hintar.at( idx-1).begin(), he = m_hintar.at( idx-1).end();
 		for (; hi != he; ++hi)
 		{
 			if (boost::algorithm::iequals( errorclass, hi->errorclass))
@@ -72,6 +72,7 @@ public:
 
 	Index startdef()
 	{
+		if (m_hintar.size() >= InstructionSet::Max_ArgumentIndex) throw std::runtime_error("number of defined hint sets out of bounds");
 		m_hintar.push_back( std::vector<Hint>());
 		return m_hintar.size();
 	}
@@ -80,14 +81,14 @@ public:
 	{
 		if (m_hintar.empty()) throw std::logic_error( "hint table definition without start");
 		std::vector<Hint>& top = m_hintar.back();
-		if (findHint( stmidx, errorclass)) throw std::runtime_error( std::string( "duplicate definition of hint for error class '") + errorclass + "' for same statement");
+		if (findHint( m_hintar.size(), errorclass)) throw std::runtime_error( std::string( "duplicate definition of hint for error class '") + errorclass + "' for same statement");
 		top.push_back( Hint( errorclass, message));
 	}
 
 	PatchArgumentMapR join( const HintTable& oth)
 	{
 		std::size_t ofs = m_hintar.size();
-		dst.insert( m_hintar.end(), oth.m_hintar.begin(), oth.m_hintar.end());
+		m_hintar.insert( m_hintar.end(), oth.m_hintar.begin(), oth.m_hintar.end());
 		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
 	}
 

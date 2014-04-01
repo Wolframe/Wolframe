@@ -36,9 +36,9 @@
 #define _DATABASE_TDL_TRANSACTION_DEFINITION_HPP_INCLUDED
 #include "database/databaseLanguage.hpp"
 #include "tdl/preprocBlock.hpp"
+#include "tdl/authorizeDefinition.hpp"
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
@@ -55,7 +55,6 @@ struct ResultDefinition
 	ResultDefinition( const std::vector<std::string>& path_, const std::string filter_)
 		:path(path_),filter(filter_){}
 
-	void clear();
 	static ResultDefinition parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 };
 
@@ -67,9 +66,9 @@ struct TransactionDefinition
 
 	TransactionDefinition(){}
 	TransactionDefinition( const TransactionDefinition& o)
-		:preproc(o.preproc),result(o.result),authorization(o.authorization){}
+		:result(o.result),authorization(o.authorization),preproc(o.preproc){}
 	TransactionDefinition( const ResultDefinition& r, const AuthorizeDefinition a, const PreProcBlock& p)
-		:preproc(p),result(r){}
+		:result(r),authorization(a),preproc(p){}
 };
 }}}//namespace
 #endif

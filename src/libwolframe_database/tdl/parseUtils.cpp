@@ -170,7 +170,7 @@ static const utils::CharTable g_function_idtab( "a..zA..Z0..9_.");
 std::string tdl::parseFunctionName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
 	std::string rt;
-	char ch = gotoNextToken( langdescr, ci, ce);
+	char ch = gotoNextToken( langdescr, si, se);
 	if (!ch)
 	{
 		throw std::runtime_error( "unexpected end of transaction. Preprocessing call expected");
@@ -179,7 +179,21 @@ std::string tdl::parseFunctionName( const LanguageDescription* langdescr, std::s
 	{
 		throw std::runtime_error( "unexpected token (function name expected)");
 	}
-	(void)utils::parseNextToken( rt, ci, ce, g_function_optab, g_function_idtab);
+	(void)utils::parseNextToken( rt, si, se, g_function_optab, g_function_idtab);
+	return rt;
+}
+
+
+static const utils::CharTable g_path_optab( ";,)(", false);
+static const utils::CharTable g_path_idtab( ";,)(", true);
+
+std::string tdl::parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string rt;
+	(void)gotoNextToken( langdescr, si, se);
+	char ch = utils::parseNextToken( rt, si, se, g_path_optab, g_path_idtab);
+	if (!ch) throw std::runtime_error("unexpected end of file (selector path expression expected)");
+	if (ch == '\"' || ch == '\'') throw std::runtime_error("unexpected string token (selector path expression expected)");
 	return rt;
 }
 
@@ -187,7 +201,7 @@ bool tdl::parseKeyword( const LanguageDescription* langdescr, std::string::const
 {
 	std::string::const_iterator start = si;
 	std::string tok;
-	ch = parseNextToken( langdescr, tok, si, se);
+	char ch = parseNextToken( langdescr, tok, si, se);
 	if (isAlpha(ch) && boost::algorithm::iequals( tok, keyword))
 	{
 		return true;

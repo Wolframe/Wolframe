@@ -116,16 +116,21 @@ private:
 		StackElement()
 			:m_return_ip(0)
 			,m_bindidx(0)
+			,m_hintidx(0)
 		{}
 		StackElement( Address return_ip_, const ValueTupleSetR& parameter_)
 			:m_return_ip(return_ip_)
 			,m_bindidx(0)
+			,m_hintidx(0)
 			,m_parameter(parameter_)
 		{}
 		StackElement( const StackElement& o)
 			:m_return_ip(o.m_return_ip)
 			,m_bindidx(o.m_bindidx)
+			,m_hintidx(o.m_hintidx)
+			,m_parameter(o.m_parameter)
 			,m_lastResult(o.m_lastResult)
+			,m_resultFlags(o.m_resultFlags)
 			,m_resultMap(o.m_resultMap)
 			,m_selectedSet(o.m_selectedSet)
 			,m_valueSet(o.m_valueSet)
@@ -135,6 +140,7 @@ private:
 
 		Address m_return_ip;					//< IP to set o RETURN
 		std::size_t m_bindidx;					//< current bind index
+		ArgumentIndex m_hintidx;				//< current database statement hint index
 		ValueTupleSetR m_parameter;				//< parameter structure
 		ValueTupleSetR m_lastResult;				//< last call result
 		ResultFlags m_resultFlags;				//< conditions to be meet for each element of the next result

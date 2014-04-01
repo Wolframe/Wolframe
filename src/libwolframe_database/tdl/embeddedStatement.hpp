@@ -38,7 +38,6 @@
 #include "tdl/elementReference.hpp"
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
