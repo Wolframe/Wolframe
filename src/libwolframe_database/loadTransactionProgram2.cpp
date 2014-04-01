@@ -51,7 +51,85 @@ using namespace _Wolframe::db;
 
 static void programAddCommandDefinition( TdlTranslatorInterface& prg, const CommandDefinition& cmd)
 {
-	
+	prg.init_resultset();
+	if (cmd.nonempty) prg.define_resultset_nonempty();
+	if (cmd.unique) prg.define_resultset_unique();
+
+	if (!cmd.selector.empty())
+	{
+		prg.begin_FOREACH( cmd.selector);
+	}
+	std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
+	for (; oi != oe; ++oi)
+	{
+		prg.begin_INTO_block( *oi);
+	}
+	if (cmd.embedded)
+	{
+		prg.begin_DO_statement( cmd.statement.stmstring);
+		std::vector<CommandDefinition::Hint>::const_iterator hi = cmd.hints.begin(), he = cmd.hints.end();
+		for (; hi != he; ++hi)
+		{
+			prg.statement_HINT( hi->errorclass, hi->message);
+		}
+		std::vector<ElementReference>::const_iterator pi = cmd.statement.params.begin(), pe = cmd.statement.params.end();
+		for (; pi != pe; ++pi)
+		{
+			switch (pi->type)
+			{
+				case SelectorPath:
+					prg.push_ARGUMENT_PATH( pi->selector);
+					break;
+				case LoopCounter:
+					prg.push_ARGUMENT_LOOPCNT();
+				case Constant:
+					prg.push_ARGUMENT_CONST( pi->selector);
+					break;
+				case NamedSetElement:
+					prg.push_ARGUMENT_TUPLESET( pi->name);
+					break;
+				case IndexSetElement:
+					prg.push_ARGUMENT_TUPLESET( pi->index);
+					break;
+			}
+		}
+		prg.end_DO_statement();
+	}
+	else
+	{
+		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateParamValues);
+		std::vector<ElementReference>::const_iterator pi = cmd.call.params.begin(), pe = cmd.call.params.end();
+		for (; pi != pe; ++pi)
+		{
+			switch (pi->type)
+			{
+				case SelectorPath:
+					prg.push_ARGUMENT_PATH( pi->selector);
+					break;
+				case LoopCounter:
+					prg.push_ARGUMENT_LOOPCNT();
+				case Constant:
+					prg.push_ARGUMENT_CONST( pi->selector);
+					break;
+				case NamedSetElement:
+					prg.push_ARGUMENT_TUPLESET( pi->name);
+					break;
+				case IndexSetElement:
+					prg.push_ARGUMENT_TUPLESET( pi->index);
+					break;
+			}
+		}
+		prg.end_DO_subroutine();
+	}	
+	oi = cmd.resultpath.begin();
+	for (; oi != oe; ++oi)
+	{
+		prg.end_INTO_block();
+	}
+	if (!cmd.selector.empty())
+	{
+		prg.end_FOREACH();
+	}
 }
 
 static const char* g_prgblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT",0};
@@ -129,7 +207,7 @@ static void parsePrgBlock( TdlTranslatorInterface& prg, const LanguageDescriptio
 					case IndexSetElement:
 						prg.print_ARGUMENT_TUPLESET( elem.index);
 						break;
-				};
+				}
 				std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
 				for(; pi != pe; ++pi)
 				{

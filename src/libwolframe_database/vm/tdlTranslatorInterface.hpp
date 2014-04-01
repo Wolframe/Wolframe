@@ -53,6 +53,10 @@ public:
 	void begin_FOREACH( const std::string& selector);
 	void end_FOREACH();
 
+	void init_resultset();
+	void define_resultset_unique();
+	void define_resultset_nonempty();
+
 	void begin_INTO_block( const std::string& tag);
 	void end_INTO_block();
 

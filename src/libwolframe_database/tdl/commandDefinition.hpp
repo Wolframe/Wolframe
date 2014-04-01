@@ -46,14 +46,6 @@ namespace tdl {
 
 struct CommandDefinition
 {
-	std::string selector;
-	EmbeddedStatement statement;
-	SubroutineCallStatement call;
-	std::vector<std::string> resultpath;
-	bool nonempty;
-	bool unique;
-	bool embedded;
-
 	struct Hint
 	{
 		std::string errorclass;
@@ -64,6 +56,14 @@ struct CommandDefinition
 		Hint( const std::string& e, const std::string& m)
 			:errorclass(e),message(m){}
 	};
+
+	std::string selector;
+	EmbeddedStatement statement;
+	SubroutineCallStatement call;
+	std::vector<std::string> resultpath;
+	bool nonempty;
+	bool unique;
+	bool embedded;
 	std::vector<Hint> hints;
 
 	CommandDefinition()

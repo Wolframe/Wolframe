@@ -102,10 +102,9 @@ public:
 		Op_STM_EXEC,			//< execute open statement
 
 		// Collect Results and Constraints:
-		Op_RESULT_INIT,
-		Op_RESULT_INIT_UNIQUE,
-		Op_RESULT_INIT_NONEMPTY,
-		Op_RESULT_INIT_NONEMPTY_UNIQUE,
+		Op_RESULT_SET_INIT,
+		Op_RESULT_COND_UNIQUE,
+		Op_RESULT_COND_NONEMPTY,
 
 		// Others:
 		Op_NOP				//< no operation
@@ -159,10 +158,9 @@ public:
 			"STM_HINT",
 			"STM_EXEC",
 	
-			"RESULT_INIT",
-			"RESULT_INIT_UNIQUE",
-			"RESULT_INIT_NONEMPTY",
-			"RESULT_INIT_NONEMPTY_UNIQUE",
+			"RESULT_SET_INIT",
+			"RESULT_COND_UNIQUE",
+			"RESULT_COND_NONEMPTY",
 	
 			"NOP"
 		};
@@ -257,10 +255,9 @@ public:
 			/*Op_STM_HINT*/			At_Hint,
 			/*Op_STM_EXEC*/			At_None,
 	
-			/*Op_RESULT_INIT*/		At_None,
-			/*Op_RESULT_INIT_UNIQUE*/	At_None,
-			/*Op_RESULT_INIT_NONEMPTY*/	At_None,
-			/*Op_RESULT_INIT_NONEMPTY_UNIQUE*/At_None,
+			/*Op_RESULT_SET_INIT*/		At_None,
+			/*Op_RESULT_COND_UNIQUE*/	At_None,
+			/*Op_RESULT_COND_NONEMPTY*/	At_None,
 	
 			/*Op_NOP*/			At_None
 		};

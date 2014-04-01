@@ -462,20 +462,16 @@ bool ProgramInstance::execute()
 
 
 			/*Collect Results and Constraints:*/
-			case Op_RESULT_INIT:
+			case Op_RESULT_SET_INIT:
 				top.m_resultFlags.init( false, false);
 				++m_ip;
 				break;
-			case Op_RESULT_INIT_UNIQUE:
-				top.m_resultFlags.init( true, false);
+			case Op_RESULT_COND_UNIQUE:
+				top.m_resultFlags.unique = true;
 				++m_ip;
 				break;
-			case Op_RESULT_INIT_NONEMPTY:
-				top.m_resultFlags.init( false, true);
-				++m_ip;
-				break;
-			case Op_RESULT_INIT_NONEMPTY_UNIQUE:
-				top.m_resultFlags.init( true, true);
+			case Op_RESULT_COND_NONEMPTY:
+				top.m_resultFlags.nonempty = true;
 				++m_ip;
 				break;
 

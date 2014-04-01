@@ -62,6 +62,27 @@ void TdlTranslatorInterface::result_KEEP( const std::string& name)
 	;
 }
 
+void TdlTranslatorInterface::init_resultset()
+{
+	m_main_program.code
+			( Op_RESULT_SET_INIT )
+	;
+}
+
+void TdlTranslatorInterface::define_resultset_unique()
+{
+	m_main_program.code
+			( Op_RESULT_COND_UNIQUE )
+	;
+}
+
+void TdlTranslatorInterface::define_resultset_nonempty()
+{
+	m_main_program.code
+			( Op_RESULT_COND_UNIQUE )
+	;
+}
+
 void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx;
