@@ -30,47 +30,58 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
+///\brief Definition of a transaction
+///\file tdl/transactionDefinition.hpp
+#include "database/databaseLanguage.hpp"
+#include "tdl/transactionDefinition.hpp"
 #include "tdl/parseUtils.hpp"
+#include "utils/parseUtils.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-void PreProcCallStatement::clear()
+ResultDefinition ResultDefinition::parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	name.clear();
-	params.clear();
-}
+	ResultDefinition rt;
+	std::string tok;
+	char ch;
+	unsigned int mask = 0;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
-
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
+	std::string::const_iterator start = si;
+	while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	while (ch != ')')
-	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
+		if (isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
 		{
-			++ci;
+			if ((mask & 0x2) != 0) throw std::runtime_error( "wrong order of definition in RESULT: INTO defined after FILTER");
+			if ((mask & 0x1) != 0) throw std::runtime_error( "duplicate INTO definition after RESULT");
+			mask |= 0x1;
+			rt.path = parse_INTO_path( langdescr, si, se);
 		}
-		else if (ch != ')')
+		else if (isAlpha(ch) && boost::algorithm::iequals( tok, "FILTER"))
 		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
+			if ((mask & 0x2) != 0) throw std::runtime_error( "duplicate FILTER definition after RESULT");
+			mask |= 0x2;
+			ch = gotoNextToken( langdescr, si, se);
+			if (!isAlpha(ch))
+			{
+				throw std::runtime_error( "function name expected after RESULT FILTER");
+			}
+			rt.filter = parseFunctionName( langdescr, ci, ce);
 		}
+		else if (mask)
+		{
+			si = start;
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( "INTO or FILTER expected after RESULT");
+		}
+		start = si;
 	}
 	return rt;
 }

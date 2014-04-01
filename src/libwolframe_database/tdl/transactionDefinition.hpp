@@ -30,48 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
-#include "tdl/parseUtils.hpp"
+///\brief Definition of a transaction
+///\file tdl/transactionDefinition.hpp
+#ifndef _DATABASE_TDL_TRANSACTION_DEFINITION_HPP_INCLUDED
+#define _DATABASE_TDL_TRANSACTION_DEFINITION_HPP_INCLUDED
+#include "database/databaseLanguage.hpp"
+#include "tdl/preprocBlock.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-using namespace _Wolframe;
-using namespace _Wolframe::db;
-using namespace _Wolframe::db::tdl;
+namespace _Wolframe {
+namespace db {
+namespace tdl {
 
-void PreProcCallStatement::clear()
+struct ResultDefinition
 {
-	name.clear();
-	params.clear();
-}
+	std::vector<std::string> path;
+	std::string filter;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
+	ResultDefinition(){}
+	ResultDefinition( const ResultDefinition& o)
+		:path(o.path),filter(o.filter){}
+	ResultDefinition( const std::vector<std::string>& path_, const std::string filter_)
+		:path(path_),filter(filter_){}
+
+	void clear();
+	static ResultDefinition parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
+};
+
+struct TransactionDefinition
 {
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
+	ResultDefinition result;
+	AuthorizeDefinition authorization;
+	PreProcBlock preproc;
 
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
-	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	while (ch != ')')
-	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
-		{
-			++ci;
-		}
-		else if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
-		}
-	}
-	return rt;
-}
+	TransactionDefinition(){}
+	TransactionDefinition( const TransactionDefinition& o)
+		:preproc(o.preproc),result(o.result),authorization(o.authorization){}
+	TransactionDefinition( const ResultDefinition& r, const AuthorizeDefinition a, const PreProcBlock& p)
+		:preproc(p),result(r){}
+};
+}}}//namespace
+#endif
 

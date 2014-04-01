@@ -39,6 +39,7 @@
 #include "database/vm/selectorPathSet.hpp"
 #include "database/vm/programCode.hpp"
 #include "database/vm/subroutineFrame.hpp"
+#include "database/vm/hintTable.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -64,6 +65,7 @@ public:
 	NameTable tagnametab;				//< tag table
 	NameTable resultnametab;			//< result name table
 	std::vector<std::string> statements;		//< database statements
+	HintTable hinttab;				//< hints for error classes of failing database statements
 	std::vector<SubroutineSignature> signatures;	//< subroutine signutures
 
 public:

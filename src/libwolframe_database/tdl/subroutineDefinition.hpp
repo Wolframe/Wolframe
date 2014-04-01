@@ -30,48 +30,31 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
-#include "tdl/parseUtils.hpp"
+///\brief Definition of a transaction
+///\file tdl/subroutineDefinition.hpp
+#ifndef _DATABASE_TDL_SUBROUTINE_DEFINITION_HPP_INCLUDED
+#define _DATABASE_TDL_SUBROUTINE_DEFINITION_HPP_INCLUDED
+#include "database/databaseLanguage.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-using namespace _Wolframe;
-using namespace _Wolframe::db;
-using namespace _Wolframe::db::tdl;
+namespace _Wolframe {
+namespace db {
+namespace tdl {
 
-void PreProcCallStatement::clear()
+struct SubroutineDefinition
 {
-	name.clear();
-	params.clear();
-}
+	std::vector<std::string> resultpath;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
+	SubroutineDefinition(){}
+	SubroutineDefinition( const SubroutineDefinition& o)
+		:resultpath(o.resultpath){}
+	SubroutineDefinition( const std::vector<std::string>& r)
+		:resultpath(r){}
 
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
-	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	while (ch != ')')
-	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
-		{
-			++ci;
-		}
-		else if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
-		}
-	}
-	return rt;
-}
+	static std::vector<std::string> parseResultDefinition( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
+};
+}}}//namespace
+#endif
 

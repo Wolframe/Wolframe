@@ -59,7 +59,5 @@ struct SubroutineCallStatement
 	static SubroutineCallStatement parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
 };
 
-
-
 }}}//namespace
 #endif

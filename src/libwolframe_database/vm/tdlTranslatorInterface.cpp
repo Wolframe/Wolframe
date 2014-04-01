@@ -120,6 +120,25 @@ void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
 	m_main_program.statements.push_back( stm);
 }
 
+void TdlTranslatorInterface::statement_HINT( const std::string& errorclass, const std::string& message)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: HINT without statement");
+	if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		InstructionSet::ArgumentIndex hintIdx = m_main_program.hinttab.startdef();
+		m_stateStack.push_back( State( State::StatementHint, hintIdx));
+
+		m_main_program.code
+			( Op_STM_HINT, hintIdx )
+		;
+	}
+	if (m_stateStack.back().id != State::StatementHint)
+	{
+		throw std::runtime_error( "illegal state: HINT without open statement");
+	}
+	m_main_program.hinttab.define( errorclass, message);
+}
+
 void TdlTranslatorInterface::end_DO_statement()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement");
@@ -136,7 +155,7 @@ void TdlTranslatorInterface::begin_INTO_block( const std::string& tag)
 	m_main_program.code
 		( Op_PRINT_OPEN, m_main_program.tagnametab.get( tag))
 	;
-	m_stateStack.push_back( State( State::OpenStatementCall, 0));
+	m_stateStack.push_back( State( State::OpenIntoBlock, 0));
 }
 
 void TdlTranslatorInterface::end_INTO_block()
@@ -230,6 +249,10 @@ void TdlTranslatorInterface::end_DO_subroutine()
 void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	if (m_stateStack.back().id == State::StatementHint)
+	{
+		m_stateStack.pop_back();
+	}
 
 	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
@@ -256,6 +279,10 @@ void TdlTranslatorInterface::push_ARGUMENT_CONST( const types::Variant& value)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	++m_stateStack.back().cnt;
+	if (m_stateStack.back().id == State::StatementHint)
+	{
+		m_stateStack.pop_back();
+	}
 
 	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
 	m_main_program.constants.push_back( value);
@@ -283,6 +310,10 @@ void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname,
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	++m_stateStack.back().cnt;
+	if (m_stateStack.back().id == State::StatementHint)
+	{
+		m_stateStack.pop_back();
+	}
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
 	{
 		InstructionSet::ArgumentIndex idx;

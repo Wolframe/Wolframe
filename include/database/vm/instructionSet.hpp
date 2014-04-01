@@ -98,6 +98,7 @@ public:
 		Op_STM_BIND_SEL_NAM,		//< bind a statement parameter
 		Op_STM_BIND_ITR_IDX,		//< bind a statement parameter
 		Op_STM_BIND_ITR_NAM,		//< bind a statement parameter
+		Op_STM_HINT,			//< define a list of hints for open statement
 		Op_STM_EXEC,			//< execute open statement
 
 		// Collect Results and Constraints:
@@ -155,6 +156,7 @@ public:
 			"STM_BIND_SEL_NAM",
 			"STM_BIND_ITR_IDX",
 			"STM_BIND_ITR_NAM",
+			"STM_HINT",
 			"STM_EXEC",
 	
 			"RESULT_INIT",
@@ -177,6 +179,7 @@ public:
 		At_TagName,			//< index in Program::tagnametab
 		At_ResultName,			//< index in Program::resultnametab
 		At_Statement,			//< index in Program::statements
+		At_Hint,			//< index in Program::hinttab
 		At_SubroutineSignature,		//< index in Program::signatures
 		At_TupleSet,			//< index of tuple set
 		At_SelectedColumnIdx,		//< Index of Column in selected set
@@ -251,6 +254,7 @@ public:
 			/*Op_STM_BIND_SEL_NAM*/		At_ColumnName,
 			/*Op_STM_BIND_ITR_IDX*/		At_IteratorColumnIdx,
 			/*Op_STM_BIND_ITR_NAM*/		At_ColumnName,
+			/*Op_STM_HINT*/			At_Hint,
 			/*Op_STM_EXEC*/			At_None,
 	
 			/*Op_RESULT_INIT*/		At_None,

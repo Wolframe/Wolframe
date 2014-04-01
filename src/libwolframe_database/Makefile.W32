@@ -46,6 +46,9 @@ CPP_OBJS = \
 	tdl\preprocElementReference.obj \
 	tdl\preprocBlock.obj \
 	tdl\subroutineCallStatement.obj \
+	tdl\authorizeDefinition.obj \
+	tdl\subroutineDefinition.obj \
+	tdl\transactionDefinition.obj \
 	vm\selectorPathSet.obj \
 	vm\subroutine.obj \
 	vm\program.obj \

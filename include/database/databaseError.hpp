@@ -123,7 +123,7 @@ struct DatabaseTransactionError
 		{}
 
 	DatabaseTransactionError(
-			const std::string&  transaction_,
+			const std::string& transaction_,
 			const DatabaseError& o)
 		:transaction(transaction_)
 		,severity(o.severity)

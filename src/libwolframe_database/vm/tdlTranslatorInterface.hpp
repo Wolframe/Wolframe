@@ -57,8 +57,9 @@ public:
 	void end_INTO_block();
 
 	void begin_DO_statement( const std::string& stm);
+	void statement_HINT( const std::string& errorclass, const std::string& message);
 	void end_DO_statement();
-	
+
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
 	void end_DO_subroutine();
 
@@ -82,6 +83,7 @@ private:
 			OpenForeach,
 			OpenIntoBlock,
 			OpenStatementCall,
+			StatementHint,
 			OpenSubroutineCall
 		};
 		Id id;

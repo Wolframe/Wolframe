@@ -40,7 +40,7 @@ using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
 static const utils::CharTable g_subroutine_optab( ",)(");
-static const utils::CharTable g_subroutine_idtab( "a..zA..Z0..9_.");
+static const utils::CharTable g_subroutine_idtab( "a..zA..Z0..9_");
 
 SubroutineCallStatement SubroutineCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
 {

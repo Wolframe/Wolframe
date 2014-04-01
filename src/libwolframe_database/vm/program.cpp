@@ -91,6 +91,9 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 
 	pmap = joinVectors( statements, oth.statements);
 	patchCode( code, At_Statement, startidx, *pmap);
+	
+	pmap = hinttab.join( oth.hinttab);
+	patchCode( code, At_Hint, startidx, *pmap);
 
 	pmap = joinVectors( signatures, oth.signatures);
 	patchCode( code, At_SubroutineSignature, startidx, *pmap);

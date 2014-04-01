@@ -183,6 +183,33 @@ ValueTupleSetR ProgramInstance::fetchDatabaseResult()
 	return rt;
 }
 
+DatabaseErrorException ProgramInstance::databaseException() const
+{
+	const DatabaseError* err = m_db_stm->getLastError();
+	if (!err)
+	{
+		DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, 0, 0, 0, 0, "unknown error", "unknown error");
+		return DatabaseErrorException( dberr);
+	}
+	StackElement& top = m_stack.back();
+
+	if (top.m_hintidx)
+	{
+		const char* hintstr = m_program->hinttab.findHint( top.m_hintidx, err->errorclass);
+		if (hintstr)
+		{
+			DatabaseError dberr( *err);
+			dberr.usermsg.append( " -- ");
+			dberr.usermsg.append( hintstr);
+			return DatabaseErrorException( dberr);
+		}
+	}
+	else
+	{
+		return DatabaseErrorException( *err);
+	}
+}
+
 bool ProgramInstance::execute()
 {
 	if (!m_program || !m_db_stm || m_stack.empty()) return false;
@@ -367,16 +394,17 @@ bool ProgramInstance::execute()
 			/*Database Instructions:*/
 			case Op_STM_START:
 				top.m_bindidx = 0;
+				top.m_hintidx = 0;
 				if (!m_db_stm->start( statementArgument( argidx)))
 				{
-					throw std::runtime_error( std::string("failed to start database statement '") + statementArgument( argidx) + "'");
+					throw databaseException();
 				}
 				++m_ip;
 				break;
 			case Op_STM_BIND_CONST:
 				if (!m_db_stm->bind( ++top.m_bindidx, constArgument( argidx)))
 				{
-					throw std::runtime_error( std::string("failed to bind constant parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] '" + constArgument( argidx).tostring() + "'");
+					throw databaseException();
 				}
 				++m_ip;
 				break;
@@ -385,7 +413,7 @@ bool ProgramInstance::execute()
 			case Op_STM_BIND_LOOPCNT:
 				if (!m_db_stm->bind( ++top.m_bindidx, loopcntArgument()))
 				{
-					throw std::runtime_error( std::string("failed to bind parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] as loop counter");
+					throw databaseException();
 				}
 				++m_ip;
 				break;
@@ -400,7 +428,7 @@ bool ProgramInstance::execute()
 			case Op_STM_BIND_SEL_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, selectedArgument( argidx)))
 				{
-					throw std::runtime_error( std::string("failed to bind parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] '" + selectedArgument( argidx).tostring() + "'");
+					throw databaseException();
 				}
 				++m_ip;
 				break;
@@ -413,20 +441,25 @@ bool ProgramInstance::execute()
 			case Op_STM_BIND_ITR_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, iteratorArgument( argidx)))
 				{
-					throw std::runtime_error( std::string("failed to bind parameter [") + boost::lexical_cast<std::string>(top.m_bindidx) + "] '" + iteratorArgument( argidx).tostring() + "'");
+					throw databaseException();
 				}
+				++m_ip;
+				break;
+			case Op_STM_HINT:
+				top.m_hintidx = argidx;
 				++m_ip;
 				break;
 			case Op_STM_EXEC:
 				if (!m_db_stm->execute())
 				{
-					throw std::runtime_error( "failed to execute database statement");
+					throw databaseException();
 				}
 				if (m_db_stm->hasResult())
 				{
 					initResult( fetchDatabaseResult());
 				}
 				top.m_bindidx = 0;
+				top.m_hintidx = 0;
 				++m_ip;
 				break;
 

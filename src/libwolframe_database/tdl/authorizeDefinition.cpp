@@ -30,48 +30,51 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
+///\brief Definition of autorization for a transaction function
+///\file tdl/authorizeDefinition.hpp
+#include "tdl/authorizeDefinition.hpp"
 #include "tdl/parseUtils.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-void PreProcCallStatement::clear()
+AuthorizeDefinition AuthorizeDefinition::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
 {
-	name.clear();
-	params.clear();
-}
+	std::string tok;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
+	std::string authfunction;
+	std::string authresource;
 
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
+	char ch = gotoNextToken( langdescr, si, se);
+	if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
+	si++;
+	if (!parseNextToken( langdescr, authfunction, si, se))
 	{
-		throw std::runtime_error( "'(' expected after function name");
+		throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
 	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	while (ch != ')')
+	if (authfunction.empty())
 	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
+		throw ERROR( si, "AUTHORIZE function name must not be empty");
+	}
+	ch = gotoNextToken( langdescr, si, se);
+	if (ch == ',')
+	{
+		++si;
+		if (!parseNextToken( langdescr, authresource, si, se))
 		{
-			++ci;
-		}
-		else if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
+			throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
 		}
 	}
-	return rt;
+	ch = gotoNextToken( langdescr, si, se);
+	if (ch != ')')
+	{
+		throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
+	}
+	++si;
+	return AuthorizeDefinition( authfunction, authresource);
 }
 

@@ -43,6 +43,7 @@ CPP_OBJS = \
 	transactionfunction/ResultIterator.o \
 	transactionfunction/ResultFilter.o \
 	loadTransactionProgram.o \
+	loadTransactionProgram2.o \
 	databaseLanguage.o \
 	transactionExecStatemachine.o \
 	baseStatement.o \
@@ -54,6 +55,9 @@ CPP_OBJS = \
 	tdl/preprocElementReference.o \
 	tdl/preprocBlock.o \
 	tdl/subroutineCallStatement.o \
+	tdl/authorizeDefinition.o \
+	tdl/subroutineDefinition.o \
+	tdl/transactionDefinition.o \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
 	vm/program.o \

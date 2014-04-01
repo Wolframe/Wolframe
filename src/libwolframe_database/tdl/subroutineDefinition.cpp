@@ -30,48 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
+///\brief Definition of a transaction
+///\file tdl/subroutineDefinition.hpp
+#include "database/databaseLanguage.hpp"
+#include "tdl/subroutineDefinition.hpp"
 #include "tdl/parseUtils.hpp"
+#include "utils/parseUtils.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-void PreProcCallStatement::clear()
+static std::vector<std::string> SubroutineDefinition::parseResultDefinition( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	name.clear();
-	params.clear();
-}
+	std::vector<std::string> rt;
+	std::string tok;
+	char ch;
+	unsigned int mask = 0;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
-
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
+	std::string::const_iterator start = si;
+	while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
 	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	while (ch != ')')
-	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
+		if (isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
 		{
-			++ci;
+			if ((mask & 0x2) != 0) throw std::runtime_error( "wrong order of definition in RESULT: INTO defined after FILTER");
+			if ((mask & 0x1) != 0) throw std::runtime_error( "duplicate INTO definition after RESULT");
+			mask |= 0x1;
+			rt = parse_INTO_path( langdescr, si, se);
 		}
-		else if (ch != ')')
+		else if (mask)
 		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
+			si = start;
+			break;
 		}
+		else
+		{
+			throw throw std::runtime_error( "INTO expected after RESULT");
+		}
+		start = si;
 	}
 	return rt;
 }
+
 

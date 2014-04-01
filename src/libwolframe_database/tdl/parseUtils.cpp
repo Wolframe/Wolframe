@@ -33,6 +33,7 @@
 ///\brief Implementation of utility functions for parsing
 ///\file tdl/parseUtils.cpp
 #include "tdl/parseUtils.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -162,3 +163,36 @@ void tdl::checkUniqOccurrence( int id, unsigned int& mask, const utils::Identifi
 	}
 	mask |= idshft;
 }
+
+static const utils::CharTable g_function_optab( ",)(");
+static const utils::CharTable g_function_idtab( "a..zA..Z0..9_.");
+
+std::string tdl::parseFunctionName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string rt;
+	char ch = gotoNextToken( langdescr, ci, ce);
+	if (!ch)
+	{
+		throw std::runtime_error( "unexpected end of transaction. Preprocessing call expected");
+	}
+	if (!isAlphaNumeric( ch))
+	{
+		throw std::runtime_error( "unexpected token (function name expected)");
+	}
+	(void)utils::parseNextToken( rt, ci, ce, g_function_optab, g_function_idtab);
+	return rt;
+}
+
+bool tdl::parseKeyword( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se, const char* keyword)
+{
+	std::string::const_iterator start = si;
+	std::string tok;
+	ch = parseNextToken( langdescr, tok, si, se);
+	if (isAlpha(ch) && boost::algorithm::iequals( tok, keyword))
+	{
+		return true;
+	}
+	si = start;
+	return false;
+}
+

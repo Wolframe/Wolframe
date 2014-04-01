@@ -41,6 +41,7 @@
 #include "database/vm/programCode.hpp"
 #include "database/vm/output.hpp"
 #include "database/transactionExecStatemachine.hpp"
+#include "database/databaseError.hpp"
 #include "types/variant.hpp"
 #include <string>
 #include <vector>
@@ -156,6 +157,7 @@ private:
 	void initValueIteraror( const ValueTupleSetR& valueset);
 	void initResult( const ValueTupleSetR& resultset);
 	ValueTupleSetR fetchDatabaseResult();
+	DatabaseErrorException databaseException() const;
 
 private:
 	const Program* m_program;			//< program reference

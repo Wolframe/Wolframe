@@ -30,48 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
-#include "tdl/parseUtils.hpp"
+///\brief Definition of autorization for a transaction function
+///\file tdl/authorizeDefinition.hpp
+#ifndef _DATABASE_TDL_AUTHORIZE_DEFINITION_HPP_INCLUDED
+#define _DATABASE_TDL_AUTHORIZE_DEFINITION_HPP_INCLUDED
+#include "database/databaseLanguage.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-using namespace _Wolframe;
-using namespace _Wolframe::db;
-using namespace _Wolframe::db::tdl;
+namespace _Wolframe {
+namespace db {
+namespace tdl {
 
-void PreProcCallStatement::clear()
+struct AuthorizeDefinition
 {
-	name.clear();
-	params.clear();
-}
+	std::string authfunction;
+	std::string authresource;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, si, se);
+	AuthorizeDefinition(){}
+	AuthorizeDefinition( const AuthorizeDefinition& o)
+		:authfunction(o.authfunction),authresource(o.authresource){}
+	AuthorizeDefinition( const std::string& f, const std::string& r)
+		:authfunction(f),authresource(r){}
 
-	ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
-	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
+	static AuthorizeDefinition parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
+};
 
-	// Parse parameter list:
-	while (ch != ')')
-	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
-		{
-			++ci;
-		}
-		else if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
-		}
-	}
-	return rt;
-}
-
+}}}//namespace
+#endif
