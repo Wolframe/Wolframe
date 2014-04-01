@@ -63,15 +63,19 @@ public:
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
 	void end_DO_subroutine();
 
+	void push_ARGUMENT_LOOPCNT();
 	void push_ARGUMENT_PATH( const std::string& selector);
 	void push_ARGUMENT_CONST( const types::Variant& value);
 	void push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
 	void push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
 
+	void print_ARGUMENT_LOOPCNT();
 	void print_ARGUMENT_PATH( const std::string& selector);
 	void print_ARGUMENT_CONST( const types::Variant& value);
 	void print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
 	void print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
+
+	void result_KEEP( const std::string& name);
 
 	ProgramR createProgram() const;
 

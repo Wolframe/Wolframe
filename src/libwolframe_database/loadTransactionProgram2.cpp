@@ -49,78 +49,173 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-
-static void parseErrorHint( Subroutine& subroutine, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static void programAddCommandDefinition( TdlTranslatorInterface& prg, const CommandDefinition& cmd)
 {
-	std::string tok;
-	char ch;
-
-	if (parseKeyword( langdescr, si, se, "ERROR"))
-	{
-		std::string errclass;
-		if (!parseNextToken( langdescr, errclass, si, se))
-		{
-			throw ERROR( si, "error class expected after ON ERROR");
-		}
-		if (!parseKeyword( langdescr, si, se, "HINT"))
-		{
-			throw ERROR( si, "keyword HINT expected after ON ERROR <errorclass>");
-		}
-		std::string errhint;
-		if (!parseNextToken( langdescr, errhint, si, se))
-		{
-			throw ERROR( si, "hint message string expected after ON ERROR <errorclass> HINT");
-		}
-		if (subroutine.description.steps.back().hints.find( errclass) != subroutine.description.steps.back().hints.end())
-		{
-			throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
-		}
-		subroutine.description.steps.back().hints[ errclass] = errhint;
-
-		if (';' != gotoNextToken( langdescr, si, se))
-		{
-			throw ERROR( si, "';' expected after ON ERROR declaration");
-		}
-		++si;
-	}
-	else
-	{
-		throw ERROR( si, "keyword (ERROR) expected after ON");
-	}
+	
 }
 
-static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t commandlistsize, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-	char ch;
+static const char* g_prgblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT",0};
+enum PrgBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT};
+static const utils::IdentifierTable g_prgblock_idtab( false, g_prgblock_ids);
 
-	if (0!=(ch=parseNextToken( langdescr, tok, si, se))
-	&&  isAlpha(ch) && boost::algorithm::iequals( tok, "AS"))
+static void parsePrgBlock( TdlTranslatorInterface& prg, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	std::string tok;
+	char ch = 0;
+
+	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 	{
-		ch = parseNextToken( langdescr, tok, si, se);
-		if (!isAlpha(ch))
+		std::string::const_iterator start = si;
+
+		switch ((PrgBlockKeyword)utils::parseNextIdentifier( si, se, g_prgblock_idtab))
 		{
-			throw ERROR( si, "identifier expected after KEEP AS");
+			case m_NONE:
+				ch = parseNextToken( langdescr, tok, si, se);
+				if (ch == ';')
+				{
+					throw std::runtime_error( "unexpected semicolon without statement");
+				}
+				else
+				{
+					throw std::runtime_error( std::string( "keyword (") + g_prgblock_idtab.tostring() + ") expected instead of " + errorTokenString( ch, tok));
+				}
+				break;
+			case m_ON:
+				throw std::runtime_error( "unexpected keyword ON (for error hint), only valid after database command");
+			case m_KEEP:
+				if (parseNextKeyword( langdescr, si, se, "AS"))
+				{
+					std::string resultname;
+					if (!isAlpha( parseNextToken( langdescr, resultname, si, se)))
+					{
+						throw std::runtime_error( "identifier expected after KEEP AS");
+					}
+					if (gotoNextToken( langdescr, si, se) != ';')
+					{
+						throw std::runtime_error( "semicolon ';' expected after KEEP AS <identifier>");
+					}
+					++si;
+					prg.result_KEEP( resultname);
+				}
+				break;
+			case m_END:
+				return;
+			case m_PRINT:
+			{
+				ElementReference elem = ElementReference::parse( langdescr, si, se);
+				std::vector<std::string> pt;
+				if (parseKeyword( langdescr, si, se, "INTO"))
+				{
+					pt = parse_INTO_path( langdescr, si, se);
+				}
+				std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+				for(; pi != pe; ++pi)
+				{
+					prg.begin_INTO_block( *pi);
+				}
+				switch (elem.type)
+				{
+					case SelectorPath:
+						prg.print_ARGUMENT_PATH( elem.selector);
+						break;
+					case LoopCounter:
+						prg.print_ARGUMENT_LOOPCNT();
+					case Constant:
+						prg.print_ARGUMENT_CONST( elem.selector);
+						break;
+					case NamedSetElement:
+						prg.print_ARGUMENT_TUPLESET( elem.name);
+						break;
+					case IndexSetElement:
+						prg.print_ARGUMENT_TUPLESET( elem.index);
+						break;
+				};
+				std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+				for(; pi != pe; ++pi)
+				{
+					prg.end_INTO_block();
+				}
+				ch = parseNextToken( langdescr, tok, si, se);
+				if (ch != ';')
+				{
+					throw ERROR( si, "expected ';' terminating PRINT instruction");
+				}
+				break;
+			}
+			case m_DO:
+			case m_FOREACH:
+			{
+				si = start;
+				CommandDefinition cmd = CommandDefinition::parse( langdescr, si, se);
+				programAddCommandDefinition( prg, cmd);
+				break;
+			}
+			case m_INTO:
+			{
+				std::vector<std::string> pt = parse_INTO_path( langdescr, si, se);
+				if (parseKeyword( langdescr, si, se, "PRINT"))
+				{
+					std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+					for(; pi != pe; ++pi)
+					{
+						prg.begin_INTO_block( *pi);
+					}
+					switch (elem.type)
+					{
+						case SelectorPath:
+							prg.print_ARGUMENT_PATH( elem.selector);
+							break;
+						case LoopCounter:
+							prg.print_ARGUMENT_LOOPCNT();
+						case Constant:
+							prg.print_ARGUMENT_CONST( elem.selector);
+							break;
+						case NamedSetElement:
+							prg.print_ARGUMENT_TUPLESET( elem.name);
+							break;
+						case IndexSetElement:
+							prg.print_ARGUMENT_TUPLESET( elem.index);
+							break;
+					};
+					std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+					for(; pi != pe; ++pi)
+					{
+						prg.end_INTO_block();
+					}
+					ch = parseNextToken( langdescr, tok, si, se);
+					if (ch != ';')
+					{
+						throw ERROR( si, "expected ';' terminating PRINT instruction");
+					}
+				}
+				else if (parseKeyword( langdescr, si, se, "BEGIN"))
+				{
+					std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+					for(; pi != pe; ++pi)
+					{
+						prg.begin_INTO_block( *pi);
+					}
+					parsePrgBlock( prg, langdescr, si, se);
+					std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
+					for(; pi != pe; ++pi)
+					{
+						prg.end_INTO_block();
+					}
+				}
+				else
+				{
+					si = start;
+					CommandDefinition cmd = CommandDefinition::parse( langdescr, si, se);
+					programAddCommandDefinition( prg, cmd);
+				}
+				break;
+			}
 		}
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch != ';')
-		{
-			throw ERROR( si, "semicolon ';' expected after KEEP AS <identifier>");
-		}
-		++si;
-		types::keymap<int>::const_iterator ki = keepResult_map.find( tok);
-		if (ki != keepResult_map.end())
-		{
-			throw ERROR( si, std::string("duplicate definition of result set '") + tok + "'");
-		}
-		if (commandlistsize == 0)
-		{
-			throw ERROR( si, "no result available to reference here (KEEP AS)");
-		}
-		keepResult_map.insert( tok, commandlistsize);
 	}
+	throw std::runtime_error("unexpected end of file (missing END of block)");
 }
+
+
 
 static const char* g_mainblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT","RESULT",0};
 enum MainBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT,m_RESULT};
@@ -168,14 +263,21 @@ static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessa
 				}
 				break;
 			case m_ON:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
-
-				parseErrorHint( subroutine, ERROR, langdescr, si, se);
-				break;
+				throw std::runtime_error( "unexpected keyword ON (for error hint), only valid after database command");
 			case m_KEEP:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
-
-				parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
+				if (parseNextKeyword( langdescr, si, se, "AS"))
+				{
+					std::string resultname;
+					if (!isAlpha( parseNextToken( langdescr, resultname, si, se)))
+					{
+						throw std::runtime_error( "identifier expected after KEEP AS");
+					}
+					if (gotoNextToken( langdescr, si, se) != ';')
+					{
+						throw std::runtime_error( "semicolon ';' expected after KEEP AS <identifier>");
+					}
+					++si;
+				}
 				break;
 			case m_END:
 				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");

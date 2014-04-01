@@ -54,6 +54,14 @@ TdlTranslatorInterface::TdlTranslatorInterface( const TdlTranslatorInterface& o)
 	,m_main_program(o.m_main_program)
 {}
 
+void TdlTranslatorInterface::result_KEEP( const std::string& name)
+{
+	InstructionSet::ArgumentIndex idx = m_main_program.resultnametab.get( name);
+	m_main_program.code
+		( Op_KEEP_RESULT, idx )			// assign current result to name
+	;
+}
+
 void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx;
@@ -244,6 +252,34 @@ void TdlTranslatorInterface::end_DO_subroutine()
 		( Op_GOTO_ABSOLUTE, address )
 	;
 	m_stateStack.pop_back();
+}
+
+void TdlTranslatorInterface::push_ARGUMENT_LOOPCNT()
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	if (m_stateStack.back().id == State::StatementHint)
+	{
+		m_stateStack.pop_back();
+	}
+
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_SUB_ARG_LOOPCNT )			// push loop counter
+		;
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_STM_BIND_LOOPCNT )			// push loop counter
+		;
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push paramter");
+	}
 }
 
 void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
@@ -464,10 +500,16 @@ void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname,
 	}
 }
 
+void TdlTranslatorInterface::print_ARGUMENT_LOOPCNT()
+{
+	// Code generated:
+	m_main_program.code
+		( Op_PRINT_LOOPCNT )				// print loop counter
+	;
+}
+
 void TdlTranslatorInterface::print_ARGUMENT_PATH( const std::string& selector)
 {
-	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
-
 	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	// Code generated:
 	m_main_program.code
@@ -477,8 +519,6 @@ void TdlTranslatorInterface::print_ARGUMENT_PATH( const std::string& selector)
 
 void TdlTranslatorInterface::print_ARGUMENT_CONST( const types::Variant& value)
 {
-	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
-
 	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
 	m_main_program.constants.push_back( value);
 	// Code generated:
