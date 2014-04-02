@@ -40,6 +40,7 @@ TDL_CPP_OBJS = \
 	tdl/subroutineDefinition.o
 
 VM_CPP_OBJS = \
+	vm/selectorPath.o \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
 	vm/program.o \

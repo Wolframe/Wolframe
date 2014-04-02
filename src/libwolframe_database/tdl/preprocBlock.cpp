@@ -109,3 +109,33 @@ PreProcBlock PreProcBlock::parse( const LanguageDescription* langdescr, std::str
 	throw std::runtime_error( "preprocessing block not terminated with 'ENDPROC'");
 }
 
+std::vector<TdlTransactionPreprocStep> PreProcBlock::build( vm::Program* prg) const
+{
+	std::vector<TdlTransactionPreprocStep> tdlppar;
+
+	std::vector<PreProcStep>::const_iterator ri = steps.begin(), re = steps.end();
+	for (; ri != re; ++ri)
+	{
+		TdlTransactionPreprocStep tdlpp( vm::SelectorPath( ri->selector, &prg->pathset.tagtab()), ri->statement.name, ri->resultpath);
+
+		std::vector<tdl::PreProcElementReference>::const_iterator ei = ri->statement.params.begin(), ee = ri->statement.params.end();
+		for (; ei != ee; ++ei)
+		{
+			switch (ei->type)
+			{
+				case tdl::PreProcElementReference::SelectorPath:
+					tdlpp.add_arg_selector( ei->name, vm::SelectorPath( ei->value, &prg->pathset.tagtab()));
+					break;
+				case tdl::PreProcElementReference::LoopCounter:
+					tdlpp.add_arg_loopcounter( ei->name);
+					break;
+				case tdl::PreProcElementReference::Constant:
+					tdlpp.add_arg_constant( ei->name, ei->value);
+					break;
+			}
+		}
+		tdlppar.push_back( tdlpp);
+	}
+	return tdlppar;
+}
+

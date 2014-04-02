@@ -83,6 +83,7 @@ std::string parseResourceName( const LanguageDescription* langdescr, std::string
 std::string parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::string parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::string parseSubroutineName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+std::string parseResultName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 
 void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab);
 

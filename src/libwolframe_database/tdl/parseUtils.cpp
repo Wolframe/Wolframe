@@ -240,3 +240,10 @@ std::string tdl::parseSubroutineName( const LanguageDescription* langdescr, std:
 	if (!isIdentifier( rt)) throw std::runtime_error( "identifier expected for transaction function or subroutine name");
 	return rt;
 }
+
+std::string tdl::parseResultName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	return parseSubroutineName( langdescr, si, se);
+}
+
+

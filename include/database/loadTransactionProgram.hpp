@@ -37,6 +37,7 @@
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "database/transactionFunction.hpp"
+#include "database/tdlTransactionFunction.hpp"
 #include "database/databaseLanguage.hpp"
 #include <string>
 #include <map>

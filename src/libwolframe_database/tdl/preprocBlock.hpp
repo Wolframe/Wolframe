@@ -35,6 +35,8 @@
 #ifndef _DATABASE_TDL_PREPROC_BLOCK_HPP_INCLUDED
 #define _DATABASE_TDL_PREPROC_BLOCK_HPP_INCLUDED
 #include "database/databaseLanguage.hpp"
+#include "database/tdlTransactionPreprocStep.hpp"
+#include "database/vm/program.hpp"
 #include "tdl/preprocCallStatement.hpp"
 #include <string>
 #include <vector>
@@ -69,6 +71,8 @@ struct PreProcBlock
 		:steps(steps_){}
 
 	static PreProcBlock parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
+
+	std::vector<TdlTransactionPreprocStep> build( vm::Program* prg) const;
 };
 
 }}}//namespace

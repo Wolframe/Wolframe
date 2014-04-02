@@ -35,6 +35,7 @@
 #ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/vm/program.hpp"
+#include "database/vm/instructionSet.hpp"
 #include "vm/subroutine.hpp"
 #include "types/keymap.hpp"
 #include <boost/algorithm/string.hpp>
@@ -43,10 +44,10 @@ namespace _Wolframe {
 namespace db {
 
 class Tdl2vmTranslator
-	:public InstructionSet
+	:public vm::InstructionSet
 {
 public:
-	explicit Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutinemap_);
+	explicit Tdl2vmTranslator( const types::keymap<vm::Subroutine>* soubroutinemap_);
 	Tdl2vmTranslator( const Tdl2vmTranslator& o);
 
 	void begin_FOREACH( const std::string& selector);
@@ -80,7 +81,7 @@ public:
 
 	void result_KEEP( const std::string& name);
 
-	ProgramR createProgram() const;
+	vm::ProgramR createProgram() const;
 
 private:
 	struct State
@@ -94,20 +95,20 @@ private:
 			OpenSubroutineCall
 		};
 		Id id;
-		InstructionSet::ArgumentIndex value;
+		vm::InstructionSet::ArgumentIndex value;
 		unsigned int cnt;
 
 		State()
 			:id(None),value(0),cnt(0){}
 		State( const State& o)
 			:id(o.id),value(o.value),cnt(o.cnt){}
-		State( Id i, InstructionSet::ArgumentIndex v)
+		State( Id i, vm::InstructionSet::ArgumentIndex v)
 			:id(i),value(v),cnt(0){}
 	};
 	struct CalledSubroutineDef
 	{
 		Address address;
-		Subroutine subroutine;
+		vm::Subroutine subroutine;
 		std::string mangledName;
 
 		CalledSubroutineDef(){}
@@ -115,17 +116,17 @@ private:
 			:address(o.address)
 			,subroutine(o.subroutine)
 			,mangledName(o.mangledName){}
-		CalledSubroutineDef( Address a, const Subroutine& s, const std::string& m)
+		CalledSubroutineDef( Address a, const vm::Subroutine& s, const std::string& m)
 			:address(a)
 			,subroutine(s)
 			,mangledName(m){}
 	};
 
 	std::vector<State> m_stateStack;
-	const types::keymap<Subroutine>* m_soubroutinemap;
+	const types::keymap<vm::Subroutine>* m_soubroutinemap;
 	std::vector<CalledSubroutineDef> m_calledSubroutines;
-	Program m_sub_program;
-	Program m_main_program;
+	vm::Program m_sub_program;
+	vm::Program m_main_program;
 };
 
 }}//namespace

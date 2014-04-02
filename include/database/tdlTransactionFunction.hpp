@@ -34,8 +34,8 @@
 ///\file database/tdlTransactionFunction.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
-#include "vm/program.hpp"
-#include "tdl/preprocBlock.hpp"
+#include "database/vm/program.hpp"
+#include "database/tdlTransactionPreprocStep.hpp"
 #include <string>
 #include <vector>
 
@@ -45,19 +45,18 @@ namespace db {
 class TdlTransactionFunction
 {
 public:
-
 	TdlTransactionFunction(){}
 	TdlTransactionFunction( const TdlTransactionFunction& o)
 		:m_resultfilter(o.m_resultfilter),m_authfunction(o.m_authfunction),m_authresource(o.m_authresource),m_preproc(o.m_preproc),m_program(o.m_program){}
-	TdlTransactionFunction( const std::string& rf, const std::string& af, const std::string& ar, const PreProcBlock& pb, const ProgramR& prg)
-		:m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pb),m_program(prg){}
+	TdlTransactionFunction( const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const vm::ProgramR& prg)
+		:m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pp),m_program(prg){}
 
 private:
 	std::string m_resultfilter;
 	std::string m_authfunction;
 	std::string m_authresource;
-	PreProcBlock m_preproc;
-	ProgramR m_program;
+	std::vector<TdlTransactionPreprocStep> m_preproc;
+	vm::ProgramR m_program;
 };
 
 typedef boost::shared_ptr<TdlTransactionFunction> TdlTransactionFunctionR;
