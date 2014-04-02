@@ -130,28 +130,38 @@ std::vector<std::string> tdl::parse_INTO_path( const LanguageDescription* langde
 	return rt;
 }
 
-std::vector<std::string> tdl::parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static std::vector<std::string> parseArguments( const LanguageDescription* langdescr, const char* stmname, char sb, char eb, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	std::vector<std::string> rt;
 	std::string tok;
-	if (gotoNextToken( langdescr, si, se) == '<')
+	if (gotoNextToken( langdescr, si, se) == sb)
 	{
 		++si;
 		for (;;)
 		{
 			char ch = parseNextToken( langdescr, tok, si, se);
-			if (!ch) throw std::runtime_error( "unexpected end of template argument list");
-			if (ch == ',') std::runtime_error( "expected template argument identifier before comma ','");
-			if (ch == '>') break;
-			if (!isAlpha(ch)) throw std::runtime_error( std::string( "template argument is not an identifier: '") + errorTokenString( ch, tok) + "'");
+			if (!ch) throw std::runtime_error( std::string("unexpected end of ") + stmname + " argument list");
+			if (ch == ',') std::runtime_error( std::string("expected ") + stmname + " argument identifier before comma ','");
+			if (ch == eb) break;
+			if (!isAlpha(ch)) throw std::runtime_error( std::string( "argument is not an identifier: '") + errorTokenString( ch, tok) + "'");
 			rt.push_back( tok);
 			ch = parseNextToken( langdescr, tok, si, se);
-			if (ch == '>') break;
+			if (ch == eb) break;
 			if (ch == ',') continue;
-			if (ch == ',') std::runtime_error( "expected comma ',' or end of template identifier list '>'");
+			if (ch == ',') std::runtime_error( std::string( "expected comma ',' or end of ") + stmname + " identifier list '" + eb + "'");
 		}
 	}
 	return rt;
+}
+
+std::vector<std::string> tdl::parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	return parseArguments( langdescr, "template", '<', '>', si, se);
+}
+
+std::vector<std::string> tdl::parseCallArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	return parseArguments( langdescr, "call", '(', ')', si, se);
 }
 
 void tdl::checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab)
@@ -183,6 +193,11 @@ std::string tdl::parseFunctionName( const LanguageDescription* langdescr, std::s
 	return rt;
 }
 
+std::string tdl::parseResourceName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	return parseFunctionName( langdescr, si, se);
+}
+
 
 static const utils::CharTable g_path_optab( ";,)(", false);
 static const utils::CharTable g_path_idtab( ";,)(", true);
@@ -210,3 +225,18 @@ bool tdl::parseKeyword( const LanguageDescription* langdescr, std::string::const
 	return false;
 }
 
+std::string parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string rt;
+	(void)gotoNextToken( langdescr, si, se);
+	char ch = utils::parseNextToken( rt, si, se, utils::emptyCharTable(), utils::anyCharTable());
+	if (!ch) throw std::runtime_error("unexpected end of file (filename expected)");
+	return rt;
+}
+
+std::string tdl::parseSubroutineName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string rt = parseFunctionName( langdescr, si, se);
+	if (!isIdentifier( rt)) throw std::runtime_error( "identifier expected for transaction function or subroutine name");
+	return rt;
+}

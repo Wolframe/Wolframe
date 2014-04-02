@@ -28,25 +28,7 @@ DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
-CPP_OBJS = \
-	transaction.o \
-	transactionInput.o \
-	transactionOutput.o \
-	transactionFunction.o \
-	transactionFunctionDescription.o \
-	transactionfunction/TagTable.o \
-	transactionfunction/Path.o \
-	transactionfunction/PreProcessCommand.o \
-	transactionfunction/DatabaseCommand.o \
-	transactionfunction/InputStructure.o \
-	transactionfunction/ResultStructure.o \
-	transactionfunction/ResultIterator.o \
-	transactionfunction/ResultFilter.o \
-	loadTransactionProgram.o \
-	databaseLanguage.o \
-	transactionExecStatemachine.o \
-	baseStatement.o \
-	substitutingStatement.o \
+TDL_CPP_OBJS = \
 	tdl/elementReference.o \
 	tdl/embeddedStatement.o \
 	tdl/parseUtils.o \
@@ -54,15 +36,41 @@ CPP_OBJS = \
 	tdl/preprocElementReference.o \
 	tdl/preprocBlock.o \
 	tdl/subroutineCallStatement.o \
-	tdl/authorizeDefinition.o \
 	tdl/commandDefinition.o \
-	tdl/subroutineDefinition.o \
-	tdl/transactionDefinition.o \
+	tdl/subroutineDefinition.o
+
+VM_CPP_OBJS = \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
 	vm/program.o \
-	vm/programInstance.o \
-	vm/tdlTranslatorInterface.o
+	vm/programInstance.o
+
+TF_CPP_OBJS = \
+	transactionfunction/TagTable.o \
+	transactionfunction/Path.o \
+	transactionfunction/PreProcessCommand.o \
+	transactionfunction/DatabaseCommand.o \
+	transactionfunction/InputStructure.o \
+	transactionfunction/ResultStructure.o \
+	transactionfunction/ResultIterator.o \
+	transactionfunction/ResultFilter.o
+
+CPP_OBJS = \
+	$(TDL_CPP_OBJS) \
+	$(VM_CPP_OBJS) \
+	$(TF_CPP_OBJS) \
+	transaction.o \
+	transactionInput.o \
+	transactionOutput.o \
+	transactionFunction.o \
+	transactionFunctionDescription.o \
+	tdl2vmTranslator.o \
+	loadTransactionProgram.o \
+	loadTransactionProgram2.o \
+	databaseLanguage.o \
+	transactionExecStatemachine.o \
+	baseStatement.o \
+	substitutingStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

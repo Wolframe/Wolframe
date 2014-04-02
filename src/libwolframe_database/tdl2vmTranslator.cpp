@@ -30,15 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file vm/tdlTranslatorInterface.cpp
-//\brief Implementation of the helpers for building a virtual machine for database transactions out of TDL
-#include "vm/tdlTranslatorInterface.hpp"
+//\file tdl2vmTranslator.cpp
+//\brief Implementation of the local helpers for building a virtual machine for database transactions out of TDL
+#include "tdl2vmTranslator.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
 
-TdlTranslatorInterface::TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_)
+Tdl2vmTranslator::Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutinemap_)
 	:m_soubroutinemap(soubroutinemap_)
 {
 	m_sub_program.code
@@ -46,7 +46,7 @@ TdlTranslatorInterface::TdlTranslatorInterface( const types::keymap<Subroutine>*
 	;
 }
 
-TdlTranslatorInterface::TdlTranslatorInterface( const TdlTranslatorInterface& o)
+Tdl2vmTranslator::Tdl2vmTranslator( const Tdl2vmTranslator& o)
 	:m_stateStack(o.m_stateStack)
 	,m_soubroutinemap(o.m_soubroutinemap)
 	,m_calledSubroutines(o.m_calledSubroutines)
@@ -54,7 +54,7 @@ TdlTranslatorInterface::TdlTranslatorInterface( const TdlTranslatorInterface& o)
 	,m_main_program(o.m_main_program)
 {}
 
-void TdlTranslatorInterface::result_KEEP( const std::string& name)
+void Tdl2vmTranslator::result_KEEP( const std::string& name)
 {
 	InstructionSet::ArgumentIndex idx = m_main_program.resultnametab.get( name);
 	m_main_program.code
@@ -62,28 +62,28 @@ void TdlTranslatorInterface::result_KEEP( const std::string& name)
 	;
 }
 
-void TdlTranslatorInterface::init_resultset()
+void Tdl2vmTranslator::init_resultset()
 {
 	m_main_program.code
 			( Op_RESULT_SET_INIT )
 	;
 }
 
-void TdlTranslatorInterface::define_resultset_unique()
+void Tdl2vmTranslator::define_resultset_unique()
 {
 	m_main_program.code
 			( Op_RESULT_COND_UNIQUE )
 	;
 }
 
-void TdlTranslatorInterface::define_resultset_nonempty()
+void Tdl2vmTranslator::define_resultset_nonempty()
 {
 	m_main_program.code
 			( Op_RESULT_COND_UNIQUE )
 	;
 }
 
-void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
+void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx;
 	if (0!=(idx=m_main_program.resultnametab.getIndex( selector)))
@@ -120,7 +120,7 @@ void TdlTranslatorInterface::begin_FOREACH( const std::string& selector)
 	m_stateStack.push_back( State( State::OpenForeach, m_main_program.code.size()));
 }
 
-void TdlTranslatorInterface::end_FOREACH()
+void Tdl2vmTranslator::end_FOREACH()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH");
 
@@ -139,7 +139,7 @@ void TdlTranslatorInterface::end_FOREACH()
 	m_stateStack.pop_back();
 }
 
-void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
+void Tdl2vmTranslator::begin_DO_statement( const std::string& stm)
 {
 	// Code generated:
 	m_main_program.code
@@ -149,7 +149,7 @@ void TdlTranslatorInterface::begin_DO_statement( const std::string& stm)
 	m_main_program.statements.push_back( stm);
 }
 
-void TdlTranslatorInterface::statement_HINT( const std::string& errorclass, const std::string& message)
+void Tdl2vmTranslator::statement_HINT( const std::string& errorclass, const std::string& message)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: HINT without statement");
 	if (m_stateStack.back().id == State::OpenStatementCall)
@@ -168,7 +168,7 @@ void TdlTranslatorInterface::statement_HINT( const std::string& errorclass, cons
 	m_main_program.hinttab.define( errorclass, message);
 }
 
-void TdlTranslatorInterface::end_DO_statement()
+void Tdl2vmTranslator::end_DO_statement()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement");
 	// Code generated:
@@ -178,7 +178,7 @@ void TdlTranslatorInterface::end_DO_statement()
 	m_stateStack.pop_back();
 }
 
-void TdlTranslatorInterface::begin_INTO_block( const std::string& tag)
+void Tdl2vmTranslator::begin_INTO_block( const std::string& tag)
 {
 	// Code generated:
 	m_main_program.code
@@ -187,7 +187,7 @@ void TdlTranslatorInterface::begin_INTO_block( const std::string& tag)
 	m_stateStack.push_back( State( State::OpenIntoBlock, 0));
 }
 
-void TdlTranslatorInterface::end_INTO_block()
+void Tdl2vmTranslator::end_INTO_block()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenIntoBlock) throw std::runtime_error( "illegal state: end of INTO");
 	m_stateStack.pop_back();
@@ -209,7 +209,7 @@ static std::string mangledSubroutineName( const std::string& name, const std::ve
 	return rt;
 }
 
-void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
+void Tdl2vmTranslator::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
 {
 	types::keymap<Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
 	if (si == se)
@@ -257,7 +257,7 @@ void TdlTranslatorInterface::begin_DO_subroutine( const std::string& name, const
 	}
 }
 
-void TdlTranslatorInterface::end_DO_subroutine()
+void Tdl2vmTranslator::end_DO_subroutine()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenSubroutineCall) throw std::runtime_error( "illegal state: end of DO");
 	InstructionSet::ArgumentIndex subroutineIdx = m_stateStack.back().value;
@@ -275,7 +275,7 @@ void TdlTranslatorInterface::end_DO_subroutine()
 	m_stateStack.pop_back();
 }
 
-void TdlTranslatorInterface::push_ARGUMENT_LOOPCNT()
+void Tdl2vmTranslator::push_ARGUMENT_LOOPCNT()
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	if (m_stateStack.back().id == State::StatementHint)
@@ -303,7 +303,7 @@ void TdlTranslatorInterface::push_ARGUMENT_LOOPCNT()
 	}
 }
 
-void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
+void Tdl2vmTranslator::push_ARGUMENT_PATH( const std::string& selector)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	if (m_stateStack.back().id == State::StatementHint)
@@ -332,7 +332,7 @@ void TdlTranslatorInterface::push_ARGUMENT_PATH( const std::string& selector)
 	}
 }
 
-void TdlTranslatorInterface::push_ARGUMENT_CONST( const types::Variant& value)
+void Tdl2vmTranslator::push_ARGUMENT_CONST( const types::Variant& value)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	++m_stateStack.back().cnt;
@@ -363,7 +363,7 @@ void TdlTranslatorInterface::push_ARGUMENT_CONST( const types::Variant& value)
 	}
 }
 
-void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
+void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	++m_stateStack.back().cnt;
@@ -443,7 +443,7 @@ void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname,
 	}
 }
 
-void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
+void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
 	++m_stateStack.back().cnt;
@@ -521,7 +521,7 @@ void TdlTranslatorInterface::push_ARGUMENT_TUPLESET( const std::string& setname,
 	}
 }
 
-void TdlTranslatorInterface::print_ARGUMENT_LOOPCNT()
+void Tdl2vmTranslator::print_ARGUMENT_LOOPCNT()
 {
 	// Code generated:
 	m_main_program.code
@@ -529,7 +529,7 @@ void TdlTranslatorInterface::print_ARGUMENT_LOOPCNT()
 	;
 }
 
-void TdlTranslatorInterface::print_ARGUMENT_PATH( const std::string& selector)
+void Tdl2vmTranslator::print_ARGUMENT_PATH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	// Code generated:
@@ -538,7 +538,7 @@ void TdlTranslatorInterface::print_ARGUMENT_PATH( const std::string& selector)
 	;
 }
 
-void TdlTranslatorInterface::print_ARGUMENT_CONST( const types::Variant& value)
+void Tdl2vmTranslator::print_ARGUMENT_CONST( const types::Variant& value)
 {
 	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
 	m_main_program.constants.push_back( value);
@@ -548,7 +548,7 @@ void TdlTranslatorInterface::print_ARGUMENT_CONST( const types::Variant& value)
 	;
 }
 
-void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
+void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
 {
 	InstructionSet::ArgumentIndex idx;
 	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
@@ -582,7 +582,7 @@ void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname
 	}
 }
 
-void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
+void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
 {
 	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
 	InstructionSet::ArgumentIndex idx;
@@ -618,7 +618,7 @@ void TdlTranslatorInterface::print_ARGUMENT_TUPLESET( const std::string& setname
 }
 
 
-ProgramR TdlTranslatorInterface::createProgram() const
+ProgramR Tdl2vmTranslator::createProgram() const
 {
 	ProgramR rt( new Program( m_sub_program));
 
@@ -648,6 +648,8 @@ ProgramR TdlTranslatorInterface::createProgram() const
 			rt->code[ ip] = instruction( cc, oc, ai + ip_start_main);
 		}
 	}
+	//Add final return (to main or successful termination of the program):
+	rt->code.add( Op_RETURN);
 	return rt;
 }
 

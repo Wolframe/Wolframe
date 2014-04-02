@@ -171,6 +171,10 @@ public:
 		return PositionalErrorException( err);
 	}
 
+	PositionalError getError( const std::string::const_iterator& pos_, const std::string& msgobj) const
+	{
+		return PositionalError( LineInfo( m_start, pos_), msgobj);
+	}
 private:
 	std::string::const_iterator m_start;
 };

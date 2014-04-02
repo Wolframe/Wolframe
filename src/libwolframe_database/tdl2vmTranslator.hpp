@@ -30,25 +30,24 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file vm/tdlTranslatorInterface.hpp
-//\brief Helper interface for building a virtual machine program for database transactions out of TDL
+//\file tdl2vmTranslator.hpp
+//\brief Local interface for building a virtual machine program for database transactions out of TDL
 #ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/vm/program.hpp"
-#include "database/vm/subroutine.hpp"
+#include "vm/subroutine.hpp"
 #include "types/keymap.hpp"
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace db {
-namespace vm {
 
-class TdlTranslatorInterface
+class Tdl2vmTranslator
 	:public InstructionSet
 {
 public:
-	explicit TdlTranslatorInterface( const types::keymap<Subroutine>* soubroutinemap_);
-	TdlTranslatorInterface( const TdlTranslatorInterface& o);
+	explicit Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutinemap_);
+	Tdl2vmTranslator( const Tdl2vmTranslator& o);
 
 	void begin_FOREACH( const std::string& selector);
 	void end_FOREACH();
@@ -129,6 +128,6 @@ private:
 	Program m_main_program;
 };
 
-}}}//namespace
+}}//namespace
 #endif
 

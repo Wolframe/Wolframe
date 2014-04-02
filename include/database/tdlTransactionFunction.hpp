@@ -30,36 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Loading function for transaction definition programs
-///\file database/loadTransactionProgram.hpp
-#ifndef _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
-#define _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
-#include "types/countedReference.hpp"
-#include "types/keymap.hpp"
-#include "database/transactionFunction.hpp"
-#include "database/databaseLanguage.hpp"
+///\brief Definition of a transaction function based on TDL
+///\file database/tdlTransactionFunction.hpp
+#ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
+#define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
+#include "vm/program.hpp"
+#include "tdl/preprocBlock.hpp"
 #include <string>
-#include <map>
-#include <cstdlib>
-#include <stdexcept>
+#include <vector>
 
 namespace _Wolframe {
 namespace db {
 
-std::vector<std::pair<std::string,TransactionFunctionR> >
-	loadTransactionProgramFile(
-		const std::string& filename,
-		const std::string& databaseId,
-		const std::string& databaseClassName,
-		const LanguageDescription* langdescr);
+class TdlTransactionFunction
+{
+public:
 
-std::vector<std::pair<std::string,TdlTransactionFunctionR> >
-	loadTransactionProgramFile2(
-		const std::string& filename,
-		const std::string& databaseId,
-		const std::string& databaseClassName,
-		const LanguageDescription* langdescr);
-	
+	TdlTransactionFunction(){}
+	TdlTransactionFunction( const TdlTransactionFunction& o)
+		:m_resultfilter(o.m_resultfilter),m_authfunction(o.m_authfunction),m_authresource(o.m_authresource),m_preproc(o.m_preproc),m_program(o.m_program){}
+	TdlTransactionFunction( const std::string& rf, const std::string& af, const std::string& ar, const PreProcBlock& pb, const ProgramR& prg)
+		:m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pb),m_program(prg){}
+
+private:
+	std::string m_resultfilter;
+	std::string m_authfunction;
+	std::string m_authresource;
+	PreProcBlock m_preproc;
+	ProgramR m_program;
+};
+
+typedef boost::shared_ptr<TdlTransactionFunction> TdlTransactionFunctionR;
+
 }}//namespace
 #endif
 

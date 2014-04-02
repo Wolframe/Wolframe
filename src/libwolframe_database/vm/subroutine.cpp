@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file vm/subroutine.cpp
-//\brief Implementation of subroutine definition
-#include "database/vm/subroutine.hpp"
+//\file subroutine.cpp
+//\brief Implementation of local subroutine definition
+#include "vm/subroutine.hpp"
 #include "utils/parseUtils.hpp"
 #include <string>
 #include <vector>

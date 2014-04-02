@@ -76,9 +76,13 @@ bool parseKeyword( const LanguageDescription* langdescr, std::string::const_iter
 
 std::vector<std::string> parse_INTO_path( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::vector<std::string> parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
+std::vector<std::string> parseCallArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
 
 std::string parseFunctionName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+std::string parseResourceName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::string parseSelectorPath( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+std::string parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+std::string parseSubroutineName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 
 void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab);
 
