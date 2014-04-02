@@ -388,7 +388,7 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 typedef std::vector<std::pair<std::string,TdlTransactionFunctionR> > TransactionFunctionList;
 typedef types::keymap<vm::Subroutine> SubroutineMap;
 
-static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap)
+static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::string& transactionFunctionName, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap)
 {
 	static const char* g_transaction_ids[] = {"DATABASE","AUTHORIZE","RESULT","PREPROC","BEGIN",0};
 	enum TransactionKeyword{ b_NONE, b_DATABASE,b_AUTHORIZE,b_RESULT,b_PREPROC,b_BEGIN};
@@ -481,7 +481,7 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 				if (isValidDatabase)
 				{
 					vm::ProgramR program = prg.createProgram();
-					tfunc.reset( new TdlTransactionFunction( resultfilter, authfunction, authresource, preproc.build(program.get()), program));
+					tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authfunction, authresource, preproc.build(program.get()), program));
 				}
 				return isValidDatabase;
 			}
@@ -533,7 +533,7 @@ static void load( const std::string& filename, const std::string& source, const 
 						= tdl::parseSubroutineName( langdescr, si, se);
 
 					TdlTransactionFunctionR tfunc;
-					if (parseTransactionBody( tfunc, databaseId, databaseClassName, langdescr, si, se, subroutineMap))
+					if (parseTransactionBody( tfunc, transactionName, databaseId, databaseClassName, langdescr, si, se, subroutineMap))
 					{
 						std::pair<std::string,TdlTransactionFunctionR> tfuncdef( transactionName, tfunc);
 						transactionFunctionList.push_back( tfuncdef);

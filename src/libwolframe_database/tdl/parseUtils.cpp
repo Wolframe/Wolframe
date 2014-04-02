@@ -225,7 +225,7 @@ bool tdl::parseKeyword( const LanguageDescription* langdescr, std::string::const
 	return false;
 }
 
-std::string parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
+std::string tdl::parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
 {
 	std::string rt;
 	(void)gotoNextToken( langdescr, si, se);

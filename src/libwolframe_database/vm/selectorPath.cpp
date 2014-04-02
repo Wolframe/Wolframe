@@ -207,4 +207,50 @@ void SelectorPath::selectNodes( const InputStructure& st, const NodeVisitor& nv,
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
+void SelectorPath::print( std::ostream& out, const TagTable* tagmap) const
+{
+	const char* name;
+	std::vector<Element>::const_iterator pi = m_path.begin(), pe = m_path.end();
+	if (pi != pe)
+	{
+		switch (pi->m_type)
+		{
+			case Element::Find:
+				name = tagmap->getstr( pi->m_tag);
+				out << ".//" << name;
+				break;
+			case Element::Root:
+				break;
+			case Element::Next:
+				name = tagmap->getstr( pi->m_tag);
+				out << "./" << name;
+				break;
+			case Element::Up:
+				name = tagmap->getstr( pi->m_tag);
+				out << "../" << name;
+				break;
+		}
+	}
+	for (++pi; pi != pe; ++pi)
+	{
+		switch (pi->m_type)
+		{
+			case Element::Find:
+				name = tagmap->getstr( pi->m_tag);
+				out << "//" << name;
+				break;
+			case Element::Root:
+				break;
+			case Element::Next:
+				name = tagmap->getstr( pi->m_tag);
+				out << "/" << name;
+				break;
+			case Element::Up:
+				name = tagmap->getstr( pi->m_tag);
+				out << "/../" << name;
+				break;
+		}
+	}
+}
+
 

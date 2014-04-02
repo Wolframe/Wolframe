@@ -120,7 +120,13 @@ public:
 		std::size_t ofs = m_ar.size();
 		m_ar.insert( m_ar.end(), oth.begin(), oth.end());
 		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
-	}	
+	}
+
+	void printRaw( std::ostream& out) const
+	{
+		InstructionSet::printProgramRaw( out, m_ar);
+	}
+
 private:
 	std::vector<Instruction> m_ar;
 };

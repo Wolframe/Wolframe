@@ -37,6 +37,7 @@
 #include "database/vm/selectorPath.hpp"
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace _Wolframe {
 namespace db {
@@ -79,6 +80,12 @@ public:
 		:m_selectors(o.m_selectors),m_function(o.m_function),m_arguments(o.m_arguments),m_strings(o.m_strings),m_resultpath(o.m_resultpath){}
 
 public:
+	Argument::Type arg_type( std::size_t i) const
+	{
+		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
+		return m_arguments.at(i).type;
+	}
+
 	const char* arg_constant( std::size_t i) const
 	{
 		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
@@ -142,6 +149,8 @@ public:
 	{
 		return m_arguments.size();
 	}
+
+	void print( std::ostream& out, const TagTable* tagmap) const;
 
 private:
 	std::vector<vm::SelectorPath> m_selectors;

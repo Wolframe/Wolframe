@@ -38,6 +38,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <iostream>
 #include "transactionfunction/InputStructure.hpp"
 #include "transactionfunction/TagTable.hpp"
 
@@ -95,6 +96,8 @@ public:
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
+
+	void print( std::ostream& out, const TagTable* tagmap) const;
 
 private:
 	std::vector<Element> m_path;

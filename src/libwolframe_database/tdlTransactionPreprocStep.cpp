@@ -30,41 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a transaction function based on TDL
-///\file database/tdlTransactionFunction.hpp
-#ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
-#define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
-#include "database/vm/program.hpp"
+///\brief Implementing of the methods of the transaction function preprocessing step based on TDL
+///\file tdlTransactionPreprocStep.cpp
 #include "database/tdlTransactionPreprocStep.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::db;
 
-class TdlTransactionFunction
+void TdlTransactionPreprocStep::print( std::ostream& out, const TagTable* tagmap) const
 {
-public:
-	TdlTransactionFunction(){}
-	TdlTransactionFunction( const TdlTransactionFunction& o)
-		:m_resultfilter(o.m_resultfilter),m_authfunction(o.m_authfunction),m_authresource(o.m_authresource),m_preproc(o.m_preproc),m_program(o.m_program){}
-	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const vm::ProgramR& prg)
-		:m_name(name_),m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pp),m_program(prg){}
-
-	void print( std::ostream& out) const;
-
-private:
-	std::string m_name;
-	std::string m_resultfilter;
-	std::string m_authfunction;
-	std::string m_authresource;
-	std::vector<TdlTransactionPreprocStep> m_preproc;
-	vm::ProgramR m_program;
-};
-
-typedef boost::shared_ptr<TdlTransactionFunction> TdlTransactionFunctionR;
-
-}}//namespace
-#endif
+	out << "INTO " ;
+	std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.end();
+	if (m_resultpath.empty()) out << ".";
+	for (; ri != re; ++ri)
+	{
+		if (ri != m_resultpath.begin()) out << "/";
+		out << *ri;
+	}
+	out << " FOREACH ";
+	selector().print( out, tagmap);
+	out << " DO " << function() << "(";
+	std::size_t ai = 0, ae = m_arguments.size();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != 0) out << ", ";
+		switch (arg_type( ai))
+		{
+			case Argument::SelectorPath:
+				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				arg_selector(ai).print( out, tagmap);
+				break;
+			case Argument::LoopCounter:
+				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				out << "#";
+				break;
+			case Argument::Constant:
+				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				out << "\"" << arg_constant(ai) << "\"";
+				break;
+		}
+	}
+	out << ")";
+}
 

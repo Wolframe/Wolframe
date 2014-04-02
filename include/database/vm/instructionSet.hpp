@@ -306,7 +306,7 @@ public:
 	static OpCode opCode( const Instruction& instr)			{return static_cast<OpCode>((unsigned int)(instr&Mask_OpCode) >> Shift_OpCode);}
 	static ArgumentIndex argumentIndex( const Instruction& instr)	{return static_cast<ArgumentIndex>((unsigned int)(instr&Mask_ArgumentIndex) >> Shift_ArgumentIndex);}
 
-	static void printProgramRaw( std::ostream& out, std::vector<Instruction>& prg)
+	static void printProgramRaw( std::ostream& out, const std::vector<Instruction>& prg)
 	{
 		std::vector<Instruction>::const_iterator pi = prg.begin(), pe = prg.end();
 		unsigned int adr = 0;
