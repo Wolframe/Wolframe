@@ -162,6 +162,7 @@ private:
 	const types::Variant& iteratorArgument( ArgumentIndex idx) const;
 	void initValueIteraror( const ValueTupleSetR& valueset);
 	void initResult( const ValueTupleSetR& resultset);
+	void printIteratorColumn();
 	ValueTupleSetR fetchDatabaseResult();
 	DatabaseErrorException databaseException() const;
 

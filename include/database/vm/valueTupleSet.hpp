@@ -98,7 +98,7 @@ public:
 		}
 
 		const const_iterator* operator->() const		{return this;}
-		const types::Variant& column( std::size_t i) const		{if (!m_ref || i >= m_ref->m_colnames.size() || m_idx + i >= m_ref->m_ar.size()) throw std::runtime_error("value set column index out of range"); return m_ref->m_ar.at( m_idx + i);}
+		const types::Variant& column( std::size_t i) const	{if (!m_ref || i >= m_ref->m_colnames.size() || m_idx + i >= m_ref->m_ar.size()) throw std::runtime_error("value set column index out of range"); return m_ref->m_ar.at( m_idx + i);}
 
 	private:
 		std::size_t m_idx;

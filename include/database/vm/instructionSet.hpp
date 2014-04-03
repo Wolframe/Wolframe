@@ -62,6 +62,7 @@ public:
 		Op_PRINT_SEL_NAM,		//< print a value to output: element in selected set (unique, one element set) adressed by column name
 		Op_PRINT_ITR_IDX,		//< print a value to output: element in tuple set iterated adressed by column index
 		Op_PRINT_ITR_NAM,		//< print a value to output: element in tuple set iterated adressed by column name
+		Op_PRINT_ITR_COLUMN,		//< print the whole column: for each element print OPEN [column name], result value and CLOSE
 		Op_PRINT_OPEN,			//< print an open tag to output (index in tagnametab)
 		Op_PRINT_CLOSE,			//< print a close tag to output (no argument)
 
@@ -123,6 +124,7 @@ public:
 			"PRINT_SEL_NAM",
 			"PRINT_ITR_IDX",
 			"PRINT_ITR_NAM",
+			"PRINT_ITR_COLUMN",
 			"PRINT_OPEN",
 			"PRINT_CLOSE",
 
@@ -220,6 +222,7 @@ public:
 			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
 			/*Op_PRINT_ITR_IDX*/		At_IteratorColumnIdx,
 			/*Op_PRINT_ITR_NAM*/		At_ColumnName,
+			/*Op_PRINT_ITR_COLUMN*/		At_None,
 			/*Op_PRINT_OPEN*/		At_TagName,
 			/*Op_PRINT_CLOSE*/		At_None,
 	

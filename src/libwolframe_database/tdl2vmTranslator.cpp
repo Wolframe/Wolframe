@@ -178,6 +178,40 @@ void Tdl2vmTranslator::end_DO_statement()
 	m_stateStack.pop_back();
 }
 
+void Tdl2vmTranslator::print_statement_result( const std::vector<std::string>& path)
+{
+	ArgumentIndex endofblock
+		= (ArgumentIndex)(m_main_program.code.size() + 3 + (2 * path.size()));
+	ArgumentIndex startofblock
+		= (ArgumentIndex)(m_main_program.code.size() + 2);
+
+	m_main_program.code
+		( Op_OPEN_ITER_LAST_RESULT )
+		( Co_IF_COND, Op_GOTO_ABSOLUTE, endofblock)	// goto end of block if last result empty
+	;
+	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+	for (; pi != pe; ++pi)
+	{
+		m_main_program.code
+		( Op_PRINT_OPEN, m_main_program.tagnametab.get( *pi))
+		;
+	}
+	m_main_program.code
+		( Op_PRINT_ITR_COLUMN )
+	;
+	for (; pi != pe; ++pi)
+	{
+		m_main_program.code
+		( Op_PRINT_CLOSE )
+		;
+	}
+	m_main_program.code
+		( Op_NEXT )
+		( Co_IF_COND, Op_GOTO_ABSOLUTE, startofblock )
+	;
+}
+
+
 void Tdl2vmTranslator::begin_INTO_block( const std::string& tag)
 {
 	// Code generated:

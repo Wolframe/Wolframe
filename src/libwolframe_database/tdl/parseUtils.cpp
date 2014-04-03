@@ -117,13 +117,11 @@ std::vector<std::string> tdl::parse_INTO_path( const LanguageDescription* langde
 		char ch = parseNextToken( langdescr, output, si, se);
 		if (!ch) throw std::runtime_error( "unexpected end of description. result tag path expected after INTO");
 		if (ch == '.' && output.empty()) output.push_back(ch);
-
-		if (output.empty())
-		{
-			throw std::runtime_error( "identifier or '.' expected after INTO");
-		}
+		if (output.empty()) throw std::runtime_error( "identifier or '.' expected after INTO");
+		if (!rt.empty() && rt.back() == ".") rt.pop_back();
 		rt.push_back( output);
 		ch = gotoNextToken( langdescr, si, se);
+		if (ch == '.') throw std::runtime_error( "unexpected dot '.' in INPUT PATH only single dot allowed");
 		if (ch != '/') break;
 		++si;
 	}

@@ -64,11 +64,6 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 	{
 		prg.begin_FOREACH( cmd.selector);
 	}
-	std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
-	for (; oi != oe; ++oi)
-	{
-		prg.begin_INTO_block( *oi);
-	}
 	if (cmd.embedded)
 	{
 		prg.begin_DO_statement( cmd.statement.stmstring);
@@ -99,9 +94,29 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 			}
 		}
 		prg.end_DO_statement();
+		if (cmd.resultpath.size() == 0)
+		{
+		}
+		else if (cmd.resultpath.size() == 1 && cmd.resultpath.back() == ".")
+		{
+			prg.print_statement_result( std::vector<std::string>());
+		}
+		else
+		{
+			prg.print_statement_result( cmd.resultpath);
+		}
 	}
 	else
 	{
+		bool hasIntoBlock = !(cmd.resultpath.size() == 0 || (cmd.resultpath.size() == 1 && cmd.resultpath.back() == "."));
+		if (hasIntoBlock)
+		{
+			std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
+			for (; oi != oe; ++oi)
+			{
+				prg.begin_INTO_block( *oi);
+			}
+		}
 		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateparams);
 		std::vector<tdl::ElementReference>::const_iterator pi = cmd.call.params.begin(), pe = cmd.call.params.end();
 		for (; pi != pe; ++pi)
@@ -125,12 +140,15 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 			}
 		}
 		prg.end_DO_subroutine();
+		if (hasIntoBlock)
+		{
+			std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
+			for (; oi != oe; ++oi)
+			{
+				prg.end_INTO_block();
+			}
+		}
 	}	
-	oi = cmd.resultpath.begin();
-	for (; oi != oe; ++oi)
-	{
-		prg.end_INTO_block();
-	}
 	if (!cmd.selector.empty())
 	{
 		prg.end_FOREACH();
@@ -237,10 +255,14 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				{
 					tdl::ElementReference elem = tdl::ElementReference::parsePlainReference( langdescr, si, se);
 
-					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end(); 
-					for(; pi != pe; ++pi)
+					bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+					if (hasIntoBlock)
 					{
-						prg.begin_INTO_block( *pi);
+						std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end(); 
+						for(; pi != pe; ++pi)
+						{
+							prg.begin_INTO_block( *pi);
+						}
 					}
 					switch (elem.type)
 					{
@@ -259,10 +281,13 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 							prg.print_ARGUMENT_TUPLESET( elem.selector, elem.index);
 							break;
 					};
-					pi = resultpath.begin(), pe = resultpath.end(); 
-					for(; pi != pe; ++pi)
+					if (hasIntoBlock)
 					{
-						prg.end_INTO_block();
+						std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end(); 
+						for(; pi != pe; ++pi)
+						{
+							prg.end_INTO_block();
+						}
 					}
 					ch = tdl::parseNextToken( langdescr, tok, si, se);
 					if (ch != ';')
@@ -365,17 +390,23 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 			case s_BEGIN:
 			{
 				tdl::checkUniqOccurrence( s_BEGIN, mask, g_subroutine_idtab);
-				std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-				for (; pi != pe; ++pi)
+				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+				if (hasIntoBlock)
 				{
-					prg.begin_INTO_block( *pi);
+					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
+					for (; pi != pe; ++pi)
+					{
+						prg.begin_INTO_block( *pi);
+					}
 				}
 				parsePrgBlock( prg, langdescr, si, se);
-
-				pi = resultpath.begin(), pe = resultpath.end();
-				for (; pi != pe; ++pi)
+				if (hasIntoBlock)
 				{
-					prg.end_INTO_block();
+					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
+					for (; pi != pe; ++pi)
+					{
+						prg.end_INTO_block();
+					}
 				}
 				return isValidDatabase;
 			}
@@ -466,17 +497,23 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 				tdl::checkUniqOccurrence( b_BEGIN, mask, g_transaction_idtab);
 				Tdl2vmTranslator prg( &subroutineMap);
 
-				std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-				for (; pi != pe; ++pi)
+				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+				if (hasIntoBlock)
 				{
-					prg.begin_INTO_block( *pi);
+					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
+					for (; pi != pe; ++pi)
+					{
+						prg.begin_INTO_block( *pi);
+					}
 				}
 				parsePrgBlock( prg, langdescr, si, se);
-
-				pi = resultpath.begin(), pe = resultpath.end();
-				for (; pi != pe; ++pi)
+				if (hasIntoBlock)
 				{
-					prg.end_INTO_block();
+					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
+					for (; pi != pe; ++pi)
+					{
+						prg.end_INTO_block();
+					}
 				}
 				if (isValidDatabase)
 				{

@@ -63,6 +63,7 @@ public:
 	void begin_DO_statement( const std::string& stm);
 	void statement_HINT( const std::string& errorclass, const std::string& message);
 	void end_DO_statement();
+	void print_statement_result( const std::vector<std::string>& path);
 
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
 	void end_DO_subroutine();

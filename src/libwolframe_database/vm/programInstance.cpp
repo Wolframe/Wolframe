@@ -123,6 +123,22 @@ void ProgramInstance::initValueIteraror( const ValueTupleSetR& valueset)
 	m_cond = (top.m_valueIter != top.m_valueEnd);
 }
 
+void ProgramInstance::printIteratorColumn()
+{
+	const StackElement& top = m_stack.back();
+	m_cond = (top.m_valueIter != top.m_valueEnd);
+	if (m_cond)
+	{
+		std::size_t idx=1,nofColumns = top.m_valueSet->nofColumns();
+		for (; idx<=nofColumns; ++idx)
+		{
+			m_output.add( Output::Element( Output::Element::Open, top.m_valueSet->columnName( idx)));
+			m_output.add( Output::Element( Output::Element::Value, top.m_valueIter->column( idx)));
+			m_output.add( Output::Element( Output::Element::Close));
+		}
+	}
+}
+
 void ProgramInstance::initResult( const ValueTupleSetR& resultset)
 {
 	StackElement& top = m_stack.back();
@@ -282,6 +298,9 @@ bool ProgramInstance::execute()
 			case Op_PRINT_ITR_IDX:
 				m_output.addValue( iteratorArgument( argidx));
 				++m_ip;
+				break;
+			case Op_PRINT_ITR_COLUMN:
+				printIteratorColumn();
 				break;
 			case Op_PRINT_OPEN:
 				m_output.add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
