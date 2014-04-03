@@ -66,6 +66,7 @@ TEST_F( CompileTDLTest, tests)
 {
 	std::vector<std::string> tests;
 	std::size_t testno;
+	boost::filesystem::path outputdir( g_testdir / ".." / "output");
 
 	// [1] Selecting tests to execute:
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / ".." / "data" ), dend;
@@ -82,24 +83,45 @@ TEST_F( CompileTDLTest, tests)
 		}
 	}
 	std::sort( tests.begin(), tests.end());
+	std::cerr << "Outputs of failed tests are written to '" << outputdir.string() << "'" << std::endl;
 
 	// [2] Execute tests:
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=1; itr != end; ++itr,++testno)
 	{
-		std::cerr << "processing test '" << boost::filesystem::path(*itr).stem().string() << "'" << std::endl;
-		std::cout << "TEST " << testno << ":" << std::endl;
+		std::string testname = utils::getFileStem( *itr);
+		std::string testdir = utils::getParentPath( *itr);
+		std::string inputfile = testdir + "/" + testname + ".tdl";
+		std::string expectfile = testdir + "/" + testname + ".res";
 
-		std::vector<std::pair<std::string,TdlTransactionFunctionR> >
-			tl = loadTransactionProgramFile2( *itr, "testdb", "test", &g_dblang);
-		std::vector<std::pair<std::string,TdlTransactionFunctionR> >::const_iterator ti = tl.begin(), te = tl.end();
+		// [2.1] Process test:
+		std::cerr << "processing test '" << testname << "'" << std::endl;
+
+		TdlTransactionFunctionList tl = loadTransactionProgramFile2( inputfile, "testdb", "test", &g_dblang);
+		TdlTransactionFunctionList::const_iterator ti = tl.begin(), te = tl.end();
+
+		// [2.2] Print test output to string:
+		std::ostringstream out;
 		for (; ti != te; ++ti)
 		{
-			ti->second->print( std::cout);
-			std::cout << std::endl;
+			ti->second->print( out);
+			out << std::endl;
 		}
+
+		// [2.3] Compare result and write dump to the output directory
+		//	if not equal to expected:
+		std::string expect = utils::readSourceFileContent( expectfile);
+		std::string output = out.str();
+
+		if (expect != output)
+		{
+			boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
+			utils::writeFile( outputdumpfile.string(), output);
+		}
+		EXPECT_EQ( output, expect);
 	}
 }
+
 
 int main( int argc, char **argv)
 {

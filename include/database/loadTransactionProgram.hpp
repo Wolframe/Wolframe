@@ -54,8 +54,8 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 		const std::string& databaseClassName,
 		const LanguageDescription* langdescr);
 
-std::vector<std::pair<std::string,TdlTransactionFunctionR> >
-	loadTransactionProgramFile2(
+typedef std::vector<std::pair<std::string,TdlTransactionFunctionR> > TdlTransactionFunctionList;
+TdlTransactionFunctionList loadTransactionProgramFile2(
 		const std::string& filename,
 		const std::string& databaseId,
 		const std::string& databaseClassName,

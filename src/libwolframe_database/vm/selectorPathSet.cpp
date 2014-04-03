@@ -61,9 +61,12 @@ PatchArgumentMapR SelectorPathSet::join( const SelectorPathSet& oth)
 		SelectorPath::iterator ei = elem.begin(), ee = elem.end();
 		for (; ei != ee; ++ei)
 		{
-			const char* estr = oth.m_tagtab->getstr( ei->m_tag);
-			if (!estr) throw std::logic_error( "patch argument tag name not found");
-			ei->m_tag = m_tagtab->get( estr);
+			if (ei->m_tag)
+			{
+				const char* estr = oth.m_tagtab->getstr( ei->m_tag);
+				if (!estr) throw std::logic_error( "patch argument tag name not found");
+				ei->m_tag = m_tagtab->get( estr);
+			}
 		}
 		m_pathar.push_back( elem);
 	}

@@ -52,6 +52,11 @@ SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 		elem.m_type = Element::Root;
 		m_path.push_back( elem);
 	}
+	else
+	{
+		elem.m_type = Element::Current;
+		m_path.push_back( elem);
+	}
 	while (ii != ee)
 	{
 		if (*ii == '/')
@@ -120,59 +125,6 @@ SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 	}
 }
 
-std::string SelectorPath::tostring( const TagTable* tagmap) const
-{
-	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
-	std::ostringstream rt;
-	bool prev_root = false;
-	for (; ii != ee; ++ii)
-	{
-		switch (ii->m_type)
-		{
-			case Element::Root:
-				if (ii == m_path.begin())
-				{
-					prev_root = true;
-					rt << '/';
-				}
-				else
-				{
-					throw std::runtime_error( "illegal path");
-				}
-				break;
-
-			case Element::Next:
-				if (!prev_root)
-				{
-					rt << "/";
-				}
-				rt << tagmap->getstr(ii->m_tag);
-				prev_root = false;
-				break;
-
-			case Element::Find: 
-				if (prev_root)
-				{
-					rt << "/";
-				}
-				else
-				{
-					rt << "//";
-				}
-				rt << tagmap->getstr(ii->m_tag);
-				prev_root = false;
-				break;
-
-			case Element::Up:
-				if (prev_root) throw std::runtime_error( "illegal path");
-				rt << "/..";
-				prev_root = false;
-				break;
-		}
-	}
-	return rt.str();
-}
-
 void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor& nv, std::vector<InputNodeIndex>& ar) const
 {
 	std::vector<InputNodeIndex> ar1,ar2;
@@ -192,6 +144,8 @@ void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor
 					st.find( st.node(*ni), si->m_tag, ar2);
 					break;
 
+				case Element::Current:
+					break;
 				case Element::Root:
 					ar2.push_back( st.rootindex());
 					break;
@@ -212,48 +166,74 @@ void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor
 
 void SelectorPath::print( std::ostream& out, const TagTable* tagmap) const
 {
-	const char* name;
-	std::vector<Element>::const_iterator pi = m_path.begin(), pe = m_path.end();
-	if (pi != pe)
+	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
+	Element::Type prev = Element::Next;
+	for (; ii != ee; ++ii)
 	{
-		switch (pi->m_type)
+		switch (ii->m_type)
 		{
-			case Element::Find:
-				name = tagmap->getstr( pi->m_tag);
-				out << ".//" << name;
+			case Element::Current:
 				break;
 			case Element::Root:
+				if (ii != m_path.begin())
+				{
+					throw std::runtime_error( "illegal path");
+				}
 				break;
+
 			case Element::Next:
-				name = tagmap->getstr( pi->m_tag);
-				out << "./" << name;
+				if (prev != Element::Current)
+				{
+					out << "/";
+				}
+				out << tagmap->getstr(ii->m_tag);
 				break;
+
+			case Element::Find: 
+				if (prev == Element::Current)
+				{
+					out << ".//";
+				}
+				else
+				{
+					out << "//";
+				}
+				out << tagmap->getstr(ii->m_tag);
+				break;
+
 			case Element::Up:
-				name = tagmap->getstr( pi->m_tag);
-				out << "../" << name;
+				if (prev == Element::Root)
+				{
+					throw std::runtime_error( "illegal path");
+				}
+				if (prev == Element::Current)
+				{
+					out << "..";
+				}
+				else
+				{
+					out << "/..";
+				}
 				break;
 		}
+		prev = ii->m_type;
 	}
-	for (++pi; pi != pe; ++pi)
+	if (prev == Element::Root)
 	{
-		switch (pi->m_type)
-		{
-			case Element::Find:
-				name = tagmap->getstr( pi->m_tag);
-				out << "//" << name;
-				break;
-			case Element::Root:
-				break;
-			case Element::Next:
-				name = tagmap->getstr( pi->m_tag);
-				out << "/" << name;
-				break;
-			case Element::Up:
-				name = tagmap->getstr( pi->m_tag);
-				out << "/../" << name;
-				break;
-		}
+		out << "/";
+	}
+	else if (prev == Element::Current)
+	{
+		out << ".";
 	}
 }
+
+std::string SelectorPath::tostring( const TagTable* tagmap) const
+{
+	std::ostringstream rt;
+	print( rt, tagmap);
+	return rt.str();
+}
+
 
 

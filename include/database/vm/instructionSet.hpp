@@ -195,7 +195,7 @@ public:
 			"ColumnName",
 			"TagName",
 			"ResultName",
-			"Statement"
+			"Statement",
 			"SubroutineSignature",
 			"TupleSet",
 			"SelectedColumnIdx",
@@ -333,9 +333,9 @@ private:
 	};
 public:
 	enum {
-		Max_OpCode=((1<<(BitCnt_OpCode+1))-1),
-		Max_CondCode=((1<<(BitCnt_CondCode+1))-1),
-		Max_ArgumentIndex=((1<<(BitCnt_ArgumentIndex+1))-1)
+		Max_OpCode=((1<<BitCnt_OpCode)-1),
+		Max_CondCode=((1<<BitCnt_CondCode)-1),
+		Max_ArgumentIndex=((1<<BitCnt_ArgumentIndex)-1)
 	};
 private:
 	enum {

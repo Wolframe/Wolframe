@@ -649,7 +649,10 @@ ProgramR Tdl2vmTranslator::createProgram() const
 		}
 	}
 	//Add final return (to main or successful termination of the program):
-	rt->code.add( Op_RETURN);
+	// Code generated:
+	rt->code
+		( Op_RETURN )
+	;
 	return rt;
 }
 

@@ -65,7 +65,7 @@ public:
 	const SelectorPath& getPath( const Index& idx) const
 	{
 		if (idx == 0) throw std::runtime_error( "accessing null selector path");
-		if (idx >= m_pathar.size()) throw std::runtime_error( "selector path index out of bounds");
+		if (idx > m_pathar.size()) throw std::runtime_error( "selector path index out of bounds");
 		return m_pathar.at( idx-1);
 	}
 

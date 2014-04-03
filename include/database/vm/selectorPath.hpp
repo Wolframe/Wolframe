@@ -64,6 +64,7 @@ public:
 		enum Type
 		{
 			Root,		//< starting '/'
+			Current,	//< starting './' (optional, e.g. not Root)
 			Next,		//< '/element'
 			Find,		//< '//element'
 			Up		//< '..'

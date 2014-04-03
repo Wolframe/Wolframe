@@ -109,3 +109,70 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 	patchCode( code, At_Path, startidx, *pmap);
 }
 
+void Program::print( std::ostream& out)
+{
+	std::vector<Instruction>::const_iterator pi = code.begin(), pe = code.end();
+	unsigned int adr = 0;
+	for (; pi != pe; ++pi,++adr)
+	{
+		CondCode cc = condCode( *pi);
+		const char* ccnam = condCodeName( cc);
+		OpCode oc = opCode( *pi);
+		ArgumentType at = argumentType( oc);
+		ArgumentIndex ai = argumentIndex( *pi);
+		out << "[" << adr << "] ";
+		if (ccnam[0])
+		{
+			out << ccnam << " ";
+
+		}
+		out << opCodeName( oc);
+		switch (at)
+		{
+			case At_None:
+				break;
+			case At_Address:
+				out << " @" << ai;
+				break;
+			case At_Path:
+				out << " PATH ";
+				pathset.getPath( ai).print( out, pathset.tagtab());
+				break;
+			case At_Constant:
+				if (ai >= constants.size()) throw std::runtime_error("array bound read");
+				out << " CONST \'" << constants.at(ai).tostring() << '\'';
+				break;
+			case At_ColumnName:
+				out << " COLUMN " << colnametab.getName( ai);
+				break;
+			case At_TagName:
+				out << " TAG " << tagnametab.getName( ai);
+				break;
+			case At_ResultName:
+				out << " RESULT " << tagnametab.getName( ai);
+				break;
+			case At_Statement:
+				if (ai >= statements.size()) throw std::runtime_error("array bound read");
+				out << " STM (" << statements.at( ai) << ")";
+				break;
+			case At_Hint:
+				out << " HINTS " << ai;
+				break;
+			case At_SubroutineSignature:
+				out << " SIGNATURE " << ai;
+				break;
+			case At_TupleSet:
+				out << " TUPLESET " << ai;
+				break;
+			case At_SelectedColumnIdx:
+				out << " COLIDX " << ai;
+				break;
+			case At_IteratorColumnIdx:
+				out << " COLIDX " << ai;
+				break;
+		}
+		out << std::endl;
+	}
+}
+
+

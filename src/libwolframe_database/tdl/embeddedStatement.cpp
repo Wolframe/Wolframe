@@ -59,10 +59,10 @@ EmbeddedStatement EmbeddedStatement::parse( const LanguageDescription* langdescr
 			{
 				
 				rt.stmstring.append( start, ci - 1);
-				start = ci;
 
 				rt.params.push_back( ElementReference::parseEmbeddedReference( langdescr, ci, ce));
 				rt.stmstring.append( langdescr->stm_argument_reference( rt.params.size()));
+				start = ci;
 			}
 		}
 	}

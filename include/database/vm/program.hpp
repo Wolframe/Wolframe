@@ -83,6 +83,8 @@ public:
 
 	//\brief Add the program to this, joining all tables and doing necessary instruction patches
 	void add( const Program& oth, bool doPatchGOTOs=true);
+
+	void print( std::ostream& out);
 };
 
 typedef boost::shared_ptr<Program> ProgramR;

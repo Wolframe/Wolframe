@@ -1,0 +1,6 @@
+TRANSACTION simple
+CODE
+[0] GOTO @1
+[1] RETURN
+END
+

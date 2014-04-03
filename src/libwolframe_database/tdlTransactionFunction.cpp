@@ -36,28 +36,36 @@
 #include <string>
 #include <vector>
 
+#undef LOWLEVEL_DEBUG
+
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 void TdlTransactionFunction::print( std::ostream& out) const
 {
+	// Print header:
 	out << "TRANSACTION " << m_name << std::endl;
+
+	// Print authorization constraints:
+	if (!m_authfunction.empty())
+	{
+		out << "AUTHORIZE (" << m_authfunction;
+		if (!m_authresource.empty())
+		{
+			out << ", " << m_authresource;
+		}
+		out << ")" << std::endl;
+	}
+
+	// Print result filter (result INTO got part of the generated code):
+	if (!m_resultfilter.empty())
+	{
+		out << "RESULT FILTER " << m_resultfilter << std::endl;
+	}
+
+	// Print preprocessing steps:
 	if (!m_preproc.empty())
 	{
-		if (!m_authfunction.empty())
-		{
-			out << "AUTHORIZE (" << m_authfunction;
-			if (!m_authresource.empty())
-			{
-				out << ", " << m_authresource;
-			}
-			out << ")" << std::endl;
-		}
-		if (!m_resultfilter.empty())
-		{
-			out << "RESULT FILTER " << m_resultfilter << std::endl;
-		}
-
 		out << "PREPROC" << std::endl;
 		std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_preproc.begin(), pe = m_preproc.end();
 		for (; pi != pe; ++pi)
@@ -66,11 +74,17 @@ void TdlTransactionFunction::print( std::ostream& out) const
 			out << std::endl;
 		}
 		out << "ENDPROC" << std::endl;
-
-		out << "CODE RAW" << std::endl;
-		m_program->code.printRaw( out);
-		out << "END RAW" << std::endl;
 	}
+#ifdef LOWLEVEL_DEBUG
+	// Print code without symbols:
+	out << "CODE RAW" << std::endl;
+	m_program->code.printRaw( out);
+	out << "END RAW" << std::endl;
+#endif
+	// Print code with symbolic information:
+	out << "CODE" << std::endl;
+	m_program->print( out);
+	out << "END" << std::endl;
 }
 
 
