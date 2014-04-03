@@ -1,0 +1,9 @@
+SUBROUTINE simple
+BEGIN
+END
+
+TRANSACTION main
+BEGIN
+	DO simple( );
+END
+

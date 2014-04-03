@@ -51,6 +51,7 @@ static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 static LanguageDescription g_dblang;
+static std::string selectedTestName;
 
 class CompileTDLTest
 	:public ::testing::Test
@@ -69,13 +70,29 @@ TEST_F( CompileTDLTest, tests)
 	boost::filesystem::path outputdir( g_testdir / ".." / "output");
 
 	// [1] Selecting tests to execute:
+	if (selectedTestName.size())
+	{
+		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
+	}
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / ".." / "data" ), dend;
 	for (; ditr != dend; ++ditr)
 	{
 		std::string filename = utils::resolvePath( ditr->path().string());
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".tdl"))
 		{
-			tests.push_back( filename);
+			std::string testname = utils::getFileStem( filename);
+			if (selectedTestName.size())
+			{
+				if (std::strstr( testname.c_str(), selectedTestName.c_str()))
+				{
+					std::cerr << "selected test '" << testname << "'" << std::endl;
+					tests.push_back( filename);
+				}
+			}
+			else
+			{
+				tests.push_back( filename);
+			}
 		}
 		else if (!boost::filesystem::is_directory( *ditr))
 		{
@@ -110,15 +127,24 @@ TEST_F( CompileTDLTest, tests)
 
 		// [2.3] Compare result and write dump to the output directory
 		//	if not equal to expected:
-		std::string expect = utils::readSourceFileContent( expectfile);
+		bool file_read_exception = false;
 		std::string output = out.str();
-
-		if (expect != output)
+		std::string expect;
+		try
+		{
+			expect = utils::readSourceFileContent( expectfile);
+		}
+		catch (const std::runtime_error& e)
+		{
+			file_read_exception = true;
+			std::cerr << "failed to read file with expected content: " << e.what() << std::endl;
+		}
+		if (file_read_exception || expect != output)
 		{
 			boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
 			utils::writeFile( outputdumpfile.string(), output);
 		}
-		EXPECT_EQ( output, expect);
+		EXPECT_EQ( expect, output);
 	}
 }
 
@@ -135,6 +161,10 @@ int main( int argc, char **argv)
 		{
 			std::cerr << argv[0] << " (no arguments)" << std::endl;
 			return 0;
+		}
+		else if (argc == 2)
+		{
+			selectedTestName = argv[ 1];
 		}
 		else
 		{

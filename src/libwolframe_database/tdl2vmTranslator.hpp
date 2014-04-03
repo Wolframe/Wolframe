@@ -65,7 +65,8 @@ public:
 	void end_DO_statement();
 	void print_statement_result( const std::vector<std::string>& path);
 
-	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues);
+	//\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
+	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector);
 	void end_DO_subroutine();
 
 	void push_ARGUMENT_LOOPCNT();

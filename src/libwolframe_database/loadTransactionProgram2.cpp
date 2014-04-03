@@ -60,13 +60,14 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 	if (cmd.nonempty) prg.define_resultset_nonempty();
 	if (cmd.unique) prg.define_resultset_unique();
 
-	if (!cmd.selector.empty())
-	{
-		prg.begin_FOREACH( cmd.selector);
-	}
 	if (cmd.embedded)
 	{
+		if (!cmd.selector.empty())
+		{
+			prg.begin_FOREACH( cmd.selector);
+		}
 		prg.begin_DO_statement( cmd.statement.stmstring);
+
 		std::vector<tdl::CommandDefinition::Hint>::const_iterator hi = cmd.hints.begin(), he = cmd.hints.end();
 		for (; hi != he; ++hi)
 		{
@@ -94,6 +95,13 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 			}
 		}
 		prg.end_DO_statement();
+
+		if (!cmd.selector.empty())
+		{
+			prg.end_FOREACH();
+		}
+
+		//[2] Iterate on result to print (INTO) all tuple sets produced by the FOREACH:
 		if (cmd.resultpath.size() == 0)
 		{
 		}
@@ -108,6 +116,10 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 	}
 	else
 	{
+		if (!cmd.selector.empty())
+		{
+			prg.begin_FOREACH( cmd.selector);
+		}
 		bool hasIntoBlock = !(cmd.resultpath.size() == 0 || (cmd.resultpath.size() == 1 && cmd.resultpath.back() == "."));
 		if (hasIntoBlock)
 		{
@@ -117,7 +129,7 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 				prg.begin_INTO_block( *oi);
 			}
 		}
-		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateparams);
+		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateparams, vm::SelectorPath::normalize( cmd.selector));
 		std::vector<tdl::ElementReference>::const_iterator pi = cmd.call.params.begin(), pe = cmd.call.params.end();
 		for (; pi != pe; ++pi)
 		{
@@ -148,10 +160,10 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 				prg.end_INTO_block();
 			}
 		}
-	}	
-	if (!cmd.selector.empty())
-	{
-		prg.end_FOREACH();
+		if (!cmd.selector.empty())
+		{
+			prg.end_FOREACH();
+		}
 	}
 }
 
@@ -602,6 +614,7 @@ static void load( const std::string& filename, const std::string& source, const 
 						utils::LineInfo pos = utils::getLineInfo( source.begin(), start);
 						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined at line " << pos.line << " column " << pos.column << " is ignored because of database exclusion in file " << filename;
 					}
+					break;
 				}
 				case t_TEMPLATE:
 				{

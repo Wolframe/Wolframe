@@ -1,0 +1,5 @@
+TRANSACTION main
+BEGIN
+	INTO res FOREACH /doc/element DO SELECT id FROM tab WHERE name = $(name) AND id = $(zuk) ;
+END
+

@@ -72,14 +72,14 @@ void Tdl2vmTranslator::init_resultset()
 void Tdl2vmTranslator::define_resultset_unique()
 {
 	m_main_program.code
-			( Op_RESULT_COND_UNIQUE )
+			( Op_RESULT_CONSTRAINT_UNIQUE )
 	;
 }
 
 void Tdl2vmTranslator::define_resultset_nonempty()
 {
 	m_main_program.code
-			( Op_RESULT_COND_UNIQUE )
+			( Op_RESULT_CONSTRAINT_UNIQUE )
 	;
 }
 
@@ -181,33 +181,36 @@ void Tdl2vmTranslator::end_DO_statement()
 void Tdl2vmTranslator::print_statement_result( const std::vector<std::string>& path)
 {
 	ArgumentIndex endofblock
-		= (ArgumentIndex)(m_main_program.code.size() + 3 + (2 * path.size()));
+		= (ArgumentIndex)(m_main_program.code.size()
+		+ 5			/*{A}*/
+		+ (2 * path.size()))	/*{B}*/;
 	ArgumentIndex startofblock
 		= (ArgumentIndex)(m_main_program.code.size() + 2);
+		//... + 2 ~ skipping next two operations
 
 	m_main_program.code
-		( Op_OPEN_ITER_LAST_RESULT )
-		( Co_IF_COND, Op_GOTO_ABSOLUTE, endofblock)	// goto end of block if last result empty
+		( Op_OPEN_ITER_LAST_RESULT )				/*{A}*/
+		( Co_IF_COND, Op_GOTO_ABSOLUTE, endofblock)		/*{A}*/
 	;
 	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
 	for (; pi != pe; ++pi)
 	{
 		m_main_program.code
-		( Op_PRINT_OPEN, m_main_program.tagnametab.get( *pi))
+		( Op_PRINT_OPEN, m_main_program.tagnametab.get( *pi))	/*{B}*/
 		;
 	}
 	m_main_program.code
-		( Op_PRINT_ITR_COLUMN )
+		( Op_PRINT_ITR_COLUMN )					/*{A}*/
 	;
-	for (; pi != pe; ++pi)
+	for (pi = path.begin(); pi != pe; ++pi)
 	{
 		m_main_program.code
-		( Op_PRINT_CLOSE )
+		( Op_PRINT_CLOSE )					/*{B}*/
 		;
 	}
 	m_main_program.code
-		( Op_NEXT )
-		( Co_IF_COND, Op_GOTO_ABSOLUTE, startofblock )
+		( Op_NEXT )						/*{A}*/
+		( Co_IF_COND, Op_GOTO_ABSOLUTE, startofblock )		/*{A}*/
 	;
 }
 
@@ -227,7 +230,7 @@ void Tdl2vmTranslator::end_INTO_block()
 	m_stateStack.pop_back();
 }
 
-static std::string mangledSubroutineName( const std::string& name, const std::vector<std::string>& templateParamValues)
+static std::string mangledSubroutineName( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector)
 {
 	if (templateParamValues.empty())
 	{
@@ -240,10 +243,12 @@ static std::string mangledSubroutineName( const std::string& name, const std::ve
 		rt.push_back( '$');
 		rt.append( boost::to_upper_copy( *ti));
 	}
+	rt.push_back( '%');
+	rt.append( boost::to_upper_copy( selector));
 	return rt;
 }
 
-void Tdl2vmTranslator::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues)
+void Tdl2vmTranslator::begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector)
 {
 	types::keymap<Subroutine>::const_iterator si = m_soubroutinemap->find( name), se = m_soubroutinemap->end();
 	if (si == se)
@@ -262,7 +267,7 @@ void Tdl2vmTranslator::begin_DO_subroutine( const std::string& name, const std::
 		InstructionSet::ArgumentIndex subroutineIdx = 0;
 		InstructionSet::ArgumentIndex frameIdx = 0;
 		
-		std::string mangledName = mangledSubroutineName( name, templateParamValues);
+		std::string mangledName = mangledSubroutineName( name, templateParamValues, selector);
 		std::vector<CalledSubroutineDef>::const_iterator ci = m_calledSubroutines.begin(), ce = m_calledSubroutines.end();
 		for (; ci != ce && mangledName != ci->mangledName; ++ci,++subroutineIdx){}
 		if (ci == ce)
@@ -681,6 +686,7 @@ ProgramR Tdl2vmTranslator::createProgram() const
 		{
 			rt->code[ ip] = instruction( cc, oc, ai + ip_start_main);
 		}
+		lastOpCode = oc;
 	}
 	//Add final return (to main or successful termination of the program):
 	// Code generated:

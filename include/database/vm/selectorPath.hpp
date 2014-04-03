@@ -91,6 +91,7 @@ public:
 	SelectorPath( const SelectorPath& o)				:m_path(o.m_path){}
 
 	std::string tostring( const tf::TagTable* tagmap) const;
+	static std::string normalize( const std::string& pathstr);
 
 	void selectNodes( const tf::InputStructure& st, const tf::InputNodeVisitor& nv, std::vector<tf::InputNodeIndex>& ar) const;
 

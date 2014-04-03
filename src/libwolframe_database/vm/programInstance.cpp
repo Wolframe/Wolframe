@@ -485,11 +485,11 @@ bool ProgramInstance::execute()
 				top.m_resultFlags.init( false, false);
 				++m_ip;
 				break;
-			case Op_RESULT_COND_UNIQUE:
+			case Op_RESULT_CONSTRAINT_UNIQUE:
 				top.m_resultFlags.unique = true;
 				++m_ip;
 				break;
-			case Op_RESULT_COND_NONEMPTY:
+			case Op_RESULT_CONSTRAINT_NONEMPTY:
 				top.m_resultFlags.nonempty = true;
 				++m_ip;
 				break;

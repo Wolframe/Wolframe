@@ -235,5 +235,10 @@ std::string SelectorPath::tostring( const TagTable* tagmap) const
 	return rt.str();
 }
 
+std::string SelectorPath::normalize( const std::string& pathstr)
+{
+	TagTable tm( false);
+	return SelectorPath( pathstr, &tm).tostring( &tm);
+}
 
 
