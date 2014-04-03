@@ -41,6 +41,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 class ResultElement
 {
@@ -132,6 +133,6 @@ private:
 
 typedef types::CountedReference<ResultStructure> ResultStructureR;
 
-}}//namespace
+}}}//namespace
 #endif
 

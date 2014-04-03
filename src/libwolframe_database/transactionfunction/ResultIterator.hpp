@@ -42,6 +42,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 class ResultIteratorImpl
 {
@@ -133,6 +134,6 @@ private:
 	ResultIteratorImpl m_resitr;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

@@ -116,7 +116,7 @@ std::vector<TdlTransactionPreprocStep> PreProcBlock::build( vm::Program* prg) co
 	std::vector<PreProcStep>::const_iterator ri = steps.begin(), re = steps.end();
 	for (; ri != re; ++ri)
 	{
-		TdlTransactionPreprocStep tdlpp( vm::SelectorPath( ri->selector, &prg->pathset.tagtab()), ri->statement.name, ri->resultpath);
+		TdlTransactionPreprocStep tdlpp( vm::SelectorPath( ri->selector, prg->pathset.tagtab()), ri->statement.name, ri->resultpath);
 
 		std::vector<tdl::PreProcElementReference>::const_iterator ei = ri->statement.params.begin(), ee = ri->statement.params.end();
 		for (; ei != ee; ++ei)
@@ -124,7 +124,7 @@ std::vector<TdlTransactionPreprocStep> PreProcBlock::build( vm::Program* prg) co
 			switch (ei->type)
 			{
 				case tdl::PreProcElementReference::SelectorPath:
-					tdlpp.add_arg_selector( ei->name, vm::SelectorPath( ei->value, &prg->pathset.tagtab()));
+					tdlpp.add_arg_selector( ei->name, vm::SelectorPath( ei->value, prg->pathset.tagtab()));
 					break;
 				case tdl::PreProcElementReference::LoopCounter:
 					tdlpp.add_arg_loopcounter( ei->name);

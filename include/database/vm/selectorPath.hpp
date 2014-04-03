@@ -39,16 +39,22 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
-#include "transactionfunction/InputStructure.hpp"
-#include "transactionfunction/TagTable.hpp"
 
 namespace _Wolframe {
 namespace db {
-namespace vm {
 
-typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
-typedef TransactionFunctionInput::Structure::NodeVisitor::Index NodeIndex;
-typedef TransactionFunctionInput::Structure InputStructure;
+namespace tf {
+//\brief Forward declaration
+class InputNodeVisitor;
+//\brief Forward declaration
+class InputStructure;
+//\brief Forward declaration
+typedef int InputNodeIndex;
+//\brief Forward declaration
+class TagTable;
+}//namespace
+
+namespace vm {
 
 class SelectorPath
 {
@@ -80,12 +86,12 @@ public:
 	};
 
 	SelectorPath(){}
-	SelectorPath( const std::string& selector, TagTable* tagmap);
+	SelectorPath( const std::string& selector, tf::TagTable* tagmap);
 	SelectorPath( const SelectorPath& o)				:m_path(o.m_path){}
 
-	std::string tostring( const TagTable* tagmap) const;
+	std::string tostring( const tf::TagTable* tagmap) const;
 
-	void selectNodes( const InputStructure& st, const NodeVisitor& nv, std::vector<NodeIndex>& ar) const;
+	void selectNodes( const tf::InputStructure& st, const tf::InputNodeVisitor& nv, std::vector<tf::InputNodeIndex>& ar) const;
 
 	typedef std::vector<Element>::const_iterator const_iterator;
 	typedef std::vector<Element>::iterator iterator;
@@ -97,7 +103,7 @@ public:
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
 
-	void print( std::ostream& out, const TagTable* tagmap) const;
+	void print( std::ostream& out, const tf::TagTable* tagmap) const;
 
 private:
 	std::vector<Element> m_path;

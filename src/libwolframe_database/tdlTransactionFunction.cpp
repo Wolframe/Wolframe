@@ -62,7 +62,8 @@ void TdlTransactionFunction::print( std::ostream& out) const
 		std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_preproc.begin(), pe = m_preproc.end();
 		for (; pi != pe; ++pi)
 		{
-			pi->print( out, &m_program->pathset.tagtab()) << std::endl;
+			pi->print( out, m_program->pathset.tagtab());
+			out << std::endl;
 		}
 		out << "ENDPROC" << std::endl;
 

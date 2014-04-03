@@ -43,12 +43,12 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 class Path
 {
 public:
 	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 
 	enum InternalVariableType
 	{
@@ -105,7 +105,7 @@ public:
 	InternalVariableType internalVariableType() const;
 	const char* internalVariableTypeName() const			{return internalVariableTypeName( internalVariableType());}
 	const std::string& constantReference() const;
-	void selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const;
+	void selectNodes( const InputStructure& st, const InputNodeVisitor& nv, std::vector<InputNodeIndex>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
@@ -131,5 +131,5 @@ public:
 	ConstantReferencePath( const std::string& value);
 };
 
-}}//namespace
+}}}//namespace
 #endif

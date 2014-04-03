@@ -41,11 +41,15 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include "transactionfunction/InputStructure.hpp"
-#include "transactionfunction/TagTable.hpp"
 
 namespace _Wolframe {
 namespace db {
+
+namespace tf {
+//\brief Forward declaration
+class TagTable;
+}//namespace
+
 namespace vm {
 
 class SelectorPathSet
@@ -54,11 +58,9 @@ public:
 	typedef InstructionSet::ArgumentIndex Index;
 
 public:
-	explicit SelectorPathSet()
-		:m_tagtab(false){}
-	SelectorPathSet( const SelectorPathSet& o)
-		:m_tagtab(o.m_tagtab)
-		,m_pathar(o.m_pathar){}
+	explicit SelectorPathSet();
+	SelectorPathSet( const SelectorPathSet& o);
+	~SelectorPathSet();
 
 	const SelectorPath& getPath( const Index& idx) const
 	{
@@ -69,40 +71,23 @@ public:
 
 	Index add( const std::string& selector)
 	{
-		m_pathar.push_back( SelectorPath( selector, &m_tagtab));
+		m_pathar.push_back( SelectorPath( selector, m_tagtab));
 		return m_pathar.size();
 	}
 
-	PatchArgumentMapR join( const SelectorPathSet& oth)
-	{
-		std::size_t ofs = m_pathar.size();
-		std::vector<SelectorPath>::const_iterator pi = oth.m_pathar.begin(), pe = oth.m_pathar.end();
-		for (; pi != pe; ++pi)
-		{
-			SelectorPath elem( *pi);
-			SelectorPath::iterator ei = elem.begin(), ee = elem.end();
-			for (; ei != ee; ++ei)
-			{
-				const char* estr = oth.m_tagtab.getstr( ei->m_tag);
-				if (!estr) throw std::logic_error( "patch argument tag name not found");
-				ei->m_tag = m_tagtab.get( estr);
-			}
-			m_pathar.push_back( elem);
-		}
-		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
-	}
+	PatchArgumentMapR join( const SelectorPathSet& oth);
 
-	const TagTable& tagtab() const
+	const tf::TagTable* tagtab() const
 	{
 		return m_tagtab;
 	}
-	TagTable& tagtab()
+	tf::TagTable* tagtab()
 	{
 		return m_tagtab;
 	}
 
 private:
-	TagTable m_tagtab;
+	tf::TagTable* m_tagtab;
 	std::vector<SelectorPath> m_pathar;	
 };
 

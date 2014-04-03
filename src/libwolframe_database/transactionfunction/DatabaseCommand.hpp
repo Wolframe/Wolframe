@@ -43,6 +43,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 ///\class DatabaseCommand
 ///\brief Database instruction call
@@ -103,6 +104,6 @@ private:
 	types::keymap<std::string> m_hints;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

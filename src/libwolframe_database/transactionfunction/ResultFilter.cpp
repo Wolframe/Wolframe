@@ -36,6 +36,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 ResultFilter::ResultFilter( const proc::ProcessorProviderInterface* provider_, const std::string& filtername_, const ResultStructureR& resultstruct_, const TransactionOutputR& data_)
 	:m_func(0)

@@ -38,6 +38,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 ResultIteratorImpl::ResultIteratorImpl( const ResultStructureR& resultstruct_, const db::TransactionOutputR& data_)
 	:m_resultstruct(resultstruct_)

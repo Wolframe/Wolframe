@@ -57,6 +57,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 struct TransactionFunction::Impl
 {
@@ -95,7 +96,7 @@ struct TransactionFunction::Impl
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:utils::TypeSignature("database::TransactionFunctionInput", __LINE__)
 	,TypedOutputFilter("dbinput")
-	,m_structure( new Structure( &func_->impl().m_tagmap))
+	,m_structure( new InputStructure( &func_->impl().m_tagmap))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
 
@@ -144,10 +145,8 @@ void TransactionFunctionInput::finalize( const proc::ProcessorProviderInterface*
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
-static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::NodeVisitor& selectornode, int loopcnt)
+static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, const TransactionFunctionInput* inputst, const InputNodeVisitor& selectornode, int loopcnt)
 {
-	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
-
 	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
 	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
 	{
@@ -175,7 +174,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 			case Path::Next:
 			case Path::Up:
 			{
-				std::vector<NodeVisitor::Index> param;
+				std::vector<InputNodeIndex> param;
 				pi->selectNodes( inputst->structure(), selectornode, param);
 				if (param.size() == 0)
 				{
@@ -183,7 +182,7 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 				}
 				else
 				{
-					std::vector<NodeVisitor::Index>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+					std::vector<InputNodeIndex>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
 					for (; gi != ge; ++gi)
 					{
 						if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
@@ -203,9 +202,8 @@ static void bindArguments( TransactionInput& ti, const DatabaseCommand& call, co
 	}
 }
 
-static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<TransactionFunctionInput::Structure::NodeVisitor::Index>& rootnodearray)
+static void getOperationInput( const TransactionFunctionInput* this_, TransactionInput& rt, std::size_t startfidx, std::size_t level, std::vector<DatabaseCommand>::const_iterator ci, std::vector<DatabaseCommand>::const_iterator ce, const std::vector<InputNodeIndex>& rootnodearray)
 {
-	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 	std::size_t fidx = startfidx;
 	for (; ci != ce; ++ci,++fidx)
 	{
@@ -226,8 +224,8 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		}
 
 		// Select the nodes to execute the command with:
-		std::vector<NodeVisitor::Index> nodearray;
-		std::vector<NodeVisitor::Index>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
+		std::vector<InputNodeIndex> nodearray;
+		std::vector<InputNodeIndex>::const_iterator ni = rootnodearray.begin(), ne = rootnodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			ci->selector().selectNodes( this_->structure(), *ni, nodearray);
@@ -242,12 +240,12 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 			{
 				if (ca->level() < level || (ca->level() == level && ca->statement().empty())) break;
 			}
-			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<InputNodeIndex>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->statement(), ci->resultsetidx());
 				bindArguments( rt, *ci, this_, *vi, loopcnt);
-				std::vector<NodeVisitor::Index> opnodearray;
+				std::vector<InputNodeIndex> opnodearray;
 				opnodearray.push_back( *vi);
 				getOperationInput( this_, rt, fidx+1, ci->level(), ci+1, ca, opnodearray);
 			}
@@ -258,7 +256,7 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		else
 		{
 			// Call DatabaseCommand: For each selected node do expand the function call arguments:
-			std::vector<NodeVisitor::Index>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			std::vector<InputNodeIndex>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (int loopcnt=1; vi != ve; ++vi,++loopcnt)
 			{
 				rt.startCommand( fidx, ci->level(), ci->statement(), ci->resultsetidx());
@@ -270,11 +268,10 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 
 TransactionInput TransactionFunctionInput::get() const
 {
-	typedef TransactionFunctionInput::Structure::NodeVisitor NodeVisitor;
 	TransactionInput rt;
 	std::vector<DatabaseCommand>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
 
-	std::vector<NodeVisitor::Index> nodearray;
+	std::vector<InputNodeIndex> nodearray;
 	nodearray.push_back( structure().rootindex());
 	getOperationInput( this, rt, 0, 1, ci, ce, nodearray);
 	return rt;

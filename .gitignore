@@ -68,6 +68,7 @@ tests/mtprocHandler
 tests/ptreeGenerator
 tests/configHelpersTest
 tests/configValueParser
+tests/compileTDL/src/testCompileTDL
 tests/commandCmpTest
 tests/configStructParser
 tests/database/dbTest
@@ -136,6 +137,7 @@ tests/testProtocolLFdotEscaping
 tests/testWolfilter
 tests/testWolfilter.sh
 tests/testDatabaseProcessorVM
+src/testCompileTDL
 wtest/wtestcheck
 src/modules/authentication/textfile/wolfpasswd
 examples/tproc/tests/alias.bash

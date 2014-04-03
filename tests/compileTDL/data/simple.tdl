@@ -1,0 +1,4 @@
+TRANSACTION simple
+BEGIN
+	DO INSERT INTO tab (name) VALUES ('hugo');
+END

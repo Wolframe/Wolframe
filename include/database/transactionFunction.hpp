@@ -61,15 +61,18 @@ class TransactionFunctionDescription;
 ///\brief Forward Declaration
 class TransactionFunction;
 
+namespace tf {
+	///\brief Forward Declaration
+	class InputStructure;
+	typedef boost::shared_ptr<InputStructure> InputStructureR;
+}
+
 ///\class TransactionFunctionInput
 ///\brief Input structure of transaction for language bindings
 class TransactionFunctionInput
 	:public langbind::TypedOutputFilter
 {
 public:
-	class Structure;
-	typedef boost::shared_ptr<Structure> StructureR;
-
 	explicit TransactionFunctionInput( const TransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
 	virtual ~TransactionFunctionInput();
@@ -82,7 +85,7 @@ public:
 	void finalize( const proc::ProcessorProviderInterface* provider);
 	virtual TransactionInput get() const;
 
-	const Structure& structure() const
+	const tf::InputStructure& structure() const
 	{
 		return *m_structure.get();
 	}
@@ -93,7 +96,7 @@ public:
 	}
 
 private:
-	StructureR m_structure;
+	tf::InputStructureR m_structure;
 	const TransactionFunction* m_func;
 	langbind::TypedInputFilter::ElementType m_lasttype;
 };

@@ -43,6 +43,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 class ResultFilter
 {
@@ -60,7 +61,7 @@ private:
 	langbind::TypedInputFilterR m_result;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 
 

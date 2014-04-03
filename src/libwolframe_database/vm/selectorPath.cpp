@@ -33,10 +33,13 @@
 //\file vm/selectorPath.cpp
 //\brief Implementation of an input selector path
 #include "database/vm/selectorPath.hpp"
+#include "transactionfunction/InputStructure.hpp"
+#include "transactionfunction/TagTable.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
+using namespace _Wolframe::db::tf;
 
 SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 {
@@ -170,9 +173,9 @@ std::string SelectorPath::tostring( const TagTable* tagmap) const
 	return rt.str();
 }
 
-void SelectorPath::selectNodes( const InputStructure& st, const NodeVisitor& nv, std::vector<NodeIndex>& ar) const
+void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor& nv, std::vector<InputNodeIndex>& ar) const
 {
-	std::vector<NodeVisitor::Index> ar1,ar2;
+	std::vector<InputNodeIndex> ar1,ar2;
 	ar1.push_back( nv.m_nodeidx);
 
 	// [B.1] Find selected nodes:
@@ -180,7 +183,7 @@ void SelectorPath::selectNodes( const InputStructure& st, const NodeVisitor& nv,
 	for (; si != se; ++si)
 	{
 		ar2.clear();
-		std::vector<NodeVisitor::Index>::const_iterator ni = ar1.begin(), ne = ar1.end();
+		std::vector<InputNodeIndex>::const_iterator ni = ar1.begin(), ne = ar1.end();
 		for (; ni != ne; ++ni)
 		{
 			switch (si->m_type)

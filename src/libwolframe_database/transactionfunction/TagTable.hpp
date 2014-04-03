@@ -39,6 +39,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 class TagTable
 {
@@ -77,6 +78,6 @@ private:
 	std::string m_strings;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

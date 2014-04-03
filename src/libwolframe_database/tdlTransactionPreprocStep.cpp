@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void TdlTransactionPreprocStep::print( std::ostream& out, const TagTable* tagmap) const
+void TdlTransactionPreprocStep::print( std::ostream& out, const tf::TagTable* tagmap) const
 {
 	out << "INTO " ;
 	std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.end();

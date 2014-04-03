@@ -41,6 +41,7 @@
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
 
 ///\class PreProcessCommand
 ///\brief Preprocessing function of transaction function
@@ -76,7 +77,7 @@ public:
 	const std::vector<std::string>& resultpath() const		{return m_resultpath;}
 
 	///\brief Call the command on the input 'structure'
-	void call( const proc::ProcessorProviderInterface* provider, TransactionFunctionInput::Structure& structure) const;
+	void call( const proc::ProcessorProviderInterface* provider, InputStructure& structure) const;
 	std::string tostring( const TagTable* tagmap) const;
 
 private:
@@ -86,6 +87,6 @@ private:
 	std::vector<std::string> m_resultpath;				//< path for the result in input (INTO)
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

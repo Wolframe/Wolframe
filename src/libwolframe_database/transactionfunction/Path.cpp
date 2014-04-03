@@ -37,6 +37,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 void Path::parseSelectorPath( const std::string& selector, TagTable* tagmap)
 {
@@ -287,9 +288,9 @@ std::string Path::tostring( const TagTable* tagmap) const
 	throw std::logic_error( "internal: illegal state in Path::tostring()");
 }
 
-void Path::selectNodes( const TransactionFunctionInput::Structure& st, const NodeVisitor& nv, std::vector<NodeVisitor::Index>& ar) const
+void Path::selectNodes( const InputStructure& st, const InputNodeVisitor& nv, std::vector<InputNodeIndex>& ar) const
 {
-	std::vector<NodeVisitor::Index> ar1,ar2;
+	std::vector<InputNodeIndex> ar1,ar2;
 	ar1.push_back( nv.m_nodeidx);
 
 	// [B.1] Find selected nodes:
@@ -297,7 +298,7 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Nod
 	for (; si != se; ++si)
 	{
 		ar2.clear();
-		std::vector<NodeVisitor::Index>::const_iterator ni = ar1.begin(), ne = ar1.end();
+		std::vector<InputNodeIndex>::const_iterator ni = ar1.begin(), ne = ar1.end();
 		for (; ni != ne; ++ni)
 		{
 			switch (si->m_type)

@@ -33,8 +33,40 @@
 //\file vm/selectorPathSet.cpp
 //\brief Implementation of a set of input selector pathes
 #include "database/vm/selectorPathSet.hpp"
+#include "transactionfunction/TagTable.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
+
+SelectorPathSet::SelectorPathSet()
+	:m_tagtab( new tf::TagTable(false)){}
+
+SelectorPathSet::SelectorPathSet( const SelectorPathSet& o)
+	:m_tagtab(new tf::TagTable(*o.m_tagtab))
+	,m_pathar(o.m_pathar){}
+
+SelectorPathSet::~SelectorPathSet()
+{
+	delete m_tagtab;
+}
+
+PatchArgumentMapR SelectorPathSet::join( const SelectorPathSet& oth)
+{
+	std::size_t ofs = m_pathar.size();
+	std::vector<SelectorPath>::const_iterator pi = oth.m_pathar.begin(), pe = oth.m_pathar.end();
+	for (; pi != pe; ++pi)
+	{
+		SelectorPath elem( *pi);
+		SelectorPath::iterator ei = elem.begin(), ee = elem.end();
+		for (; ei != ee; ++ei)
+		{
+			const char* estr = oth.m_tagtab->getstr( ei->m_tag);
+			if (!estr) throw std::logic_error( "patch argument tag name not found");
+			ei->m_tag = m_tagtab->get( estr);
+		}
+		m_pathar.push_back( elem);
+	}
+	return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
+}
 

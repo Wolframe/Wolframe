@@ -49,7 +49,14 @@ static PatchArgumentMapR joinVectors( std::vector<Element>& dst, const std::vect
 
 static void patchCode( ProgramCode& code, InstructionSet::ArgumentType argtype, std::size_t startidx, const PatchArgumentMap& pamap)
 {
-	if (startidx >= code.size()) throw std::logic_error("array bound access");
+	if (startidx > code.size())
+	{
+		throw std::logic_error("array bound access");
+	}
+	if (startidx == code.size())
+	{
+		return;
+	}
 	ProgramCode::iterator ci = code.begin() + startidx, ce = code.end();
 	for (; ci != ce; ++ci)
 	{

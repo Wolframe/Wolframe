@@ -37,10 +37,16 @@
 #include "database/vm/selectorPath.hpp"
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include <iostream>
 
 namespace _Wolframe {
 namespace db {
+
+namespace tf {
+//\brief Forward declaration
+class TagTable;
+}//namespace
 
 class TdlTransactionPreprocStep
 {
@@ -150,7 +156,7 @@ public:
 		return m_arguments.size();
 	}
 
-	void print( std::ostream& out, const TagTable* tagmap) const;
+	void print( std::ostream& out, const tf::TagTable* tagmap) const;
 
 private:
 	std::vector<vm::SelectorPath> m_selectors;

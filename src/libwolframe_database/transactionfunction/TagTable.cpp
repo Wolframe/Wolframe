@@ -37,6 +37,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 TagTable::TagTable( bool case_sensitive_)
 	:m_case_sensitive(case_sensitive_),m_size(0)

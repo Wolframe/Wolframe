@@ -36,6 +36,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 ResultStructure::ResultStructure()
 {

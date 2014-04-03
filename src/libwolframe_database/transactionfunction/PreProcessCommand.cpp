@@ -39,6 +39,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+using namespace _Wolframe::db::tf;
 
 static types::VariantConst
 	expectArg( langbind::TypedInputFilter* i, langbind::InputFilter::ElementType et, const char* errmsg)
@@ -119,14 +120,10 @@ std::string PreProcessCommand::tostring( const TagTable* tagmap) const
 	return rt.str();
 }
 
-void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, TransactionFunctionInput::Structure& structure) const
+void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, InputStructure& structure) const
 {
 	// Select the nodes to execute the command with:
-	typedef TransactionFunctionInput::Structure Structure;
-	typedef Structure::Node Node;
-	typedef Structure::NodeAssignment NodeAssignment;
-	typedef Structure::NodeVisitor NodeVisitor;
-	std::map<NodeVisitor::Index, int> selectmap;
+	std::map<InputNodeIndex, int> selectmap;
 	std::map<int, bool> sourccetagmap;
 
 	const types::NormalizeFunction* nf = 0;
@@ -136,7 +133,7 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 		ff = provider->formFunction( m_name);
 		if (!ff) nf = provider->normalizeFunction( m_name);
 
-		std::vector<NodeVisitor::Index> nodearray;
+		std::vector<InputNodeIndex> nodearray;
 		m_selector.selectNodes( structure, structure.rootindex(), nodearray);
 		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), utils::logPrintFormat());
 		if (nodearray.size())
@@ -147,7 +144,7 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 		{
 			LOG_DATA << "[transaction preprocess] empty selection (no execution) for function " << m_name;
 		}
-		std::vector<NodeVisitor::Index>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+		std::vector<InputNodeIndex>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			if (selectmap[*ni]++ > 0)
@@ -156,7 +153,7 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 				continue;
 			}
 			// [1A] Create the destination node for the result:
-			NodeVisitor resultnode( *ni);
+			InputNodeVisitor resultnode( *ni);
 			if (!m_resultpath.empty())
 			{
 				if (m_resultpath.size() > 1)
@@ -173,7 +170,7 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 				}
 			}
 			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
-			const Node* rn = structure.node( resultnode);
+			const InputNode* rn = structure.node( resultnode);
 			if (rn->m_firstchild)
 			{
 				rn = structure.node( rn->m_firstchild);
@@ -185,8 +182,8 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 				}
 			}
 			// [2] Build the parameter structure:
-			std::vector<NodeAssignment> parameterassign;
-			std::vector<NodeVisitor::Index> parameter;
+			std::vector<InputStructure::NodeAssignment> parameterassign;
+			std::vector<InputNodeIndex> parameter;
 			std::vector<Argument>::const_iterator ai = m_args.begin(), ae = m_args.end();
 			std::size_t aidx = 1;
 			for (; ai != ae; ++ai,++aidx)
@@ -207,7 +204,7 @@ void PreProcessCommand::call( const proc::ProcessorProviderInterface* provider, 
 				else
 				{
 					LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
-					parameterassign.push_back( NodeAssignment( ai->name, parameter.back()));
+					parameterassign.push_back( InputStructure::NodeAssignment( ai->name, parameter.back()));
 				}
 			}
 			langbind::TypedInputFilterR argfilter( structure.createInputFilter( parameterassign));
