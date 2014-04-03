@@ -1,5 +1,6 @@
 SUBROUTINE simple
 BEGIN
+	DO INSERT INTO tab (name) VALUES ('hugo');
 END
 
 TRANSACTION main
