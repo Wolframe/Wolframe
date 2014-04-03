@@ -39,12 +39,12 @@
 #define _PASSWORD_HPP_INCLUDED
 
 #include <string>
-#include <crypto/randomGenerator.hpp>
+#include <system/randomGenerator.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
 
-static const size_t PASSWORD_HASH_SIZE = 224 / 8;
+static const size_t PASSWORD_HASH_SIZE = 384 / 8;
 static const size_t PASSWORD_SALT_SIZE = 128 / 8;
 
 class PasswordHash

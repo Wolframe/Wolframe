@@ -38,7 +38,7 @@
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
-#include <crypto/randomGenerator.hpp>
+#include <system/randomGenerator.hpp>
 
 #if defined( _MSC_VER )
 	#define WOLFRAME_EXPORT __declspec( dllexport )

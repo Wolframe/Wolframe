@@ -43,7 +43,7 @@
 #define _CRAM_HPP_INCLUDED
 
 #include <string>
-#include <crypto/randomGenerator.hpp>
+#include <system/randomGenerator.hpp>
 #include <AAAA/password.hpp>
 
 namespace _Wolframe {
