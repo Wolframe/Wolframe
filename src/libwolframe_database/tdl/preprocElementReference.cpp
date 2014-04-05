@@ -44,12 +44,24 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
+static std::string extractImplicitNameFromSelector( const std::string& selector)
+{
+	std::string::const_iterator si = selector.begin(), se = selector.end();
+	std::string::const_iterator lastElemStart = si;
+	for (; si != se; ++si)
+	{
+		if (*si == '/') lastElemStart = si+1;
+	}
+	return std::string( lastElemStart, se);
+}
+
 PreProcElementReference PreProcElementReference::parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	PreProcElementReference rt;
 	std::string tok;
 	char ch;
 	std::string::const_iterator start = si;
+	bool nameDefined = false;
 
 	ch = gotoNextToken( langdescr, si, se);
 	if (isAlphaNumeric( ch) || ch == '.')
@@ -60,6 +72,7 @@ PreProcElementReference PreProcElementReference::parse( const LanguageDescriptio
 		if (ch == '=')
 		{
 			rt.name = tok;
+			nameDefined = true;
 			++si;
 			ch = gotoNextToken( langdescr, si, se);
 		}
@@ -75,6 +88,10 @@ PreProcElementReference PreProcElementReference::parse( const LanguageDescriptio
 		case ElementReference::SelectorPath:
 			rt.value = elem.selector;
 			rt.type = PreProcElementReference::SelectorPath;
+			if (!nameDefined)
+			{
+				rt.name = extractImplicitNameFromSelector( elem.selector);
+			}
 			break;
 		case ElementReference::LoopCounter:
 			rt.type = PreProcElementReference::LoopCounter;
@@ -89,6 +106,4 @@ PreProcElementReference PreProcElementReference::parse( const LanguageDescriptio
 	}
 	return rt;
 }
-
-
 

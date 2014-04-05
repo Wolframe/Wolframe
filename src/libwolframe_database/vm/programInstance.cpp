@@ -51,8 +51,8 @@ ValueTupleSetR ProgramInstance::keptResult( ArgumentIndex idx) const
 
 ValueTupleSetR ProgramInstance::tupleSet( ArgumentIndex argidx) const
 {
-	if (argidx >= m_tuplesets.size()) throw std::runtime_error("tuple set reference out of bounds");
-	return m_tuplesets.at( argidx);
+	if (argidx >= m_program->tuplesets.size()) throw std::runtime_error("tuple set reference out of bounds");
+	return m_program->tuplesets.at( argidx);
 }
 
 const types::Variant& ProgramInstance::constArgument( ArgumentIndex argidx) const

@@ -65,15 +65,13 @@ public:
 		,m_stack(o.m_stack)
 		,m_output(o.m_output)
 		,m_code(o.m_code)
-		,m_tuplesets(o.m_tuplesets)
 	{}
-	ProgramInstance( const Program* program_, const std::vector<ValueTupleSetR>& tuplesets_, TransactionExecStatemachine* db_stm_)
+	ProgramInstance( const Program* program_, TransactionExecStatemachine* db_stm_)
 		:m_program(program_)
 		,m_db_stm(db_stm_)
 		,m_ip(0)
 		,m_cond(false)
 		,m_code(m_program->code)
-		,m_tuplesets(tuplesets_)
 	{
 		m_stack.push_back( StackElement());
 	}
@@ -175,7 +173,6 @@ private:
 	std::vector<StackElement> m_stack;		//< execution stack
 	Output m_output;				//< output
 	ProgramCode m_code;				//< program code copy
-	std::vector<ValueTupleSetR> m_tuplesets;	//< values from path expressions
 };
 
 }}}//namespace

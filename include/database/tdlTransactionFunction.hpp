@@ -30,18 +30,68 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a transaction function based on TDL
-///\file database/tdlTransactionFunction.hpp
+//\brief Definition of a transaction function based on TDL
+//\file database/tdlTransactionFunction.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "database/vm/program.hpp"
+#include "database/vmTransactionInput.hpp"
+#include "database/vmTransactionOutput.hpp"
 #include "database/tdlTransactionPreprocStep.hpp"
+#include "filter/typedfilter.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
+namespace tf {
+//\brief Forward declaration
+class InputStructure;
+typedef boost::shared_ptr<InputStructure> InputStructureR;
+}
+
+//\brief Forward declaration
+class TdlTransactionFunction;
+
+//\class TdlTransactionFunctionInput
+//\brief Input structure for calling transaction functions
+class TdlTransactionFunctionInput
+	:public langbind::TypedOutputFilter
+{
+public:
+	explicit TdlTransactionFunctionInput( const TdlTransactionFunction* func_);
+	TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o);
+	virtual ~TdlTransactionFunctionInput();
+
+	//\brief Get a self copy
+	//\return allocated pointer to copy of this
+	virtual langbind::TypedOutputFilter* copy() const
+	{
+		return new TdlTransactionFunctionInput(*this);
+	}
+
+	virtual bool print( ElementType type, const types::VariantConst& element);
+	void finalize( const proc::ProcessorProviderInterface* provider);
+
+	virtual VmTransactionInput get() const;
+
+	const tf::InputStructure& structure() const
+	{
+		return *m_structure.get();
+	}
+
+	const TdlTransactionFunction* func() const
+	{
+		return m_func;
+	}
+
+private:
+	tf::InputStructureR m_structure;
+	const TdlTransactionFunction* m_func;
+	langbind::TypedInputFilter::ElementType m_lasttype;
+};
 
 class TdlTransactionFunction
 {
@@ -53,6 +103,13 @@ public:
 		:m_name(name_),m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pp),m_program(prg){}
 
 	void print( std::ostream& out) const;
+
+	const std::string& name() const					{return m_name;}
+	const std::string& resultfilter() const				{return m_resultfilter;}
+	const std::string& authfunction() const				{return m_authfunction;}
+	const std::string& authresource() const				{return m_authresource;}
+	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
+	const vm::ProgramR& program() const				{return m_program;}
 
 private:
 	std::string m_name;

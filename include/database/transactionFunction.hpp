@@ -121,7 +121,7 @@ public:
 	///\brief Build the function input
 	virtual TransactionFunctionInput* getInput() const;
 	///\brief Build the function output
-	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const db::TransactionOutputR& o) const;
+	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const TransactionOutputR& o) const;
 
 	///\brief Get the name of the function
 	const std::string& name() const			{return m_name;}

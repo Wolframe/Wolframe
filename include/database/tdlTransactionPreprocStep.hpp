@@ -41,12 +41,18 @@
 #include <iostream>
 
 namespace _Wolframe {
-namespace db {
+namespace proc {
+//\brief Forward declaration
+class ProcessorProviderInterface;
+}//namespace proc
 
+namespace db {
 namespace tf {
 //\brief Forward declaration
 class TagTable;
-}//namespace
+//\brief Forward declaration
+class InputStructure;
+}//namespace tf
 
 class TdlTransactionPreprocStep
 {
@@ -157,6 +163,8 @@ public:
 	}
 
 	void print( std::ostream& out, const tf::TagTable* tagmap) const;
+
+	void call( const proc::ProcessorProviderInterface* provider, tf::InputStructure& structure) const;
 
 private:
 	std::vector<vm::SelectorPath> m_selectors;

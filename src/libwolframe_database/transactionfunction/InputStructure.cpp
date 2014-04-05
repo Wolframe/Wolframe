@@ -607,7 +607,7 @@ public:
 				}
 				else
 				{
-					// ... empty tag = embedded content, do not open anclosing tag
+					// ... empty tag = embedded content
 					++m_nodeitr;
 				}
 				// ! The case that the parameter node is an array node (m_arrayindex) is not respected.

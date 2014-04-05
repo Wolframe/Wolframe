@@ -30,70 +30,42 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/output.hpp
-//\brief Defines the output of a virtual machine for database transactions
-#ifndef _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
-#include "types/variant.hpp"
-#include <vector>
-#include <boost/shared_ptr.hpp>
+///\brief Definition of transaction input
+///\file database/vmTransactionInput.hpp
+#ifndef _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
+#define _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
+#include "database/vm/program.hpp"
+#include "utils/printFormats.hpp"
 
 namespace _Wolframe {
 namespace db {
-namespace vm {
 
-class Output
+namespace tf {
+//\brief Forward declaration
+class InputStructure;
+}//namespace tf
+
+
+///\class TransactionInput
+///\brief Input of a transaction
+class VmTransactionInput
 {
 public:
-	Output(){}
-	Output( const Output& o)
-		:m_ar(o.m_ar){}
+	///\brief Constructor
+	VmTransactionInput(){}
+	///\brief Copy constructor
+	VmTransactionInput( const VmTransactionInput& o)
+		:m_program(o.m_program){}
+	VmTransactionInput( const vm::Program& p, const tf::InputStructure& input);
 
-	class Element
-	{
-	public:
-		enum Operation
-		{
-			Open,
-			Close,
-			Value
-		};
-		Element()
-			:m_op(Value){}
-		Element( const Element& o)
-			:m_op(o.m_op),m_arg(o.m_arg){}
-		Element( const Operation& op_, const types::Variant& arg_)
-			:m_op(op_),m_arg(arg_){}
-		explicit Element( const Operation& op_)
-			:m_op(op_){}
+	///\brief Return the input as readable serialization
+	std::string tostring() const;
 
-		Operation op() const			{return m_op;}
-		const types::Variant& arg() const	{return m_arg;}
-
-	private:
-		Operation m_op;
-		types::Variant m_arg;
-	};
-
-	void add( const Element& elem)
-	{
-		m_ar.push_back( elem);
-	}
-	void addValue( const types::Variant& value)
-	{
-		m_ar.push_back( Element( Element::Value, value));
-	}
-
-	typedef std::vector<Element>::const_iterator const_iterator;
-	const_iterator begin() const				{return m_ar.begin();}
-	const_iterator end() const				{return m_ar.end();}
-
+	void print( std::ostream& out) const;
+	
 private:
-	std::vector<Element> m_ar;
+	vm::Program m_program;
 };
 
-typedef boost::shared_ptr<Output> OutputR;
-
-}}}//namespace
+}}//namespace
 #endif
-

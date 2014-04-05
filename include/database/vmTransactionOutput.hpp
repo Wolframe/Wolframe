@@ -30,70 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/output.hpp
-//\brief Defines the output of a virtual machine for database transactions
-#ifndef _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
-#include "types/variant.hpp"
-#include <vector>
-#include <boost/shared_ptr.hpp>
+///\brief Definition of transaction output
+///\file database/vmTransactionOutput.hpp
+#ifndef _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
+#define _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
+#include "database/vm/output.hpp"
+#include <string>
+#include <iostream>
 
 namespace _Wolframe {
-namespace db {
-namespace vm {
+namespace utils {
+//\brief Forward declaration
+class PrintFormat;
+}//namespace utils
 
-class Output
+namespace db {
+
+///\class TransactionOutput
+///\brief Output of a transaction
+class VmTransactionOutput
 {
 public:
-	Output(){}
-	Output( const Output& o)
-		:m_ar(o.m_ar){}
+	///\brief Constructor
+	VmTransactionOutput(){}
+	///\brief Copy constructor
+	VmTransactionOutput( const VmTransactionOutput& o)
+		:m_impl(o.m_impl){}
 
-	class Element
+	///\brief Return the result as readable serialization
+	std::string tostring( const utils::PrintFormat* pformat=0) const;
+
+	void print( std::ostream& out, const utils::PrintFormat* pformat=0) const;
+
+	bool isCaseSensitive() const
 	{
-	public:
-		enum Operation
-		{
-			Open,
-			Close,
-			Value
-		};
-		Element()
-			:m_op(Value){}
-		Element( const Element& o)
-			:m_op(o.m_op),m_arg(o.m_arg){}
-		Element( const Operation& op_, const types::Variant& arg_)
-			:m_op(op_),m_arg(arg_){}
-		explicit Element( const Operation& op_)
-			:m_op(op_){}
-
-		Operation op() const			{return m_op;}
-		const types::Variant& arg() const	{return m_arg;}
-
-	private:
-		Operation m_op;
-		types::Variant m_arg;
-	};
-
-	void add( const Element& elem)
-	{
-		m_ar.push_back( elem);
+		return false;
 	}
-	void addValue( const types::Variant& value)
-	{
-		m_ar.push_back( Element( Element::Value, value));
-	}
-
-	typedef std::vector<Element>::const_iterator const_iterator;
-	const_iterator begin() const				{return m_ar.begin();}
-	const_iterator end() const				{return m_ar.end();}
 
 private:
-	std::vector<Element> m_ar;
+	vm::Output m_impl;
 };
 
-typedef boost::shared_ptr<Output> OutputR;
-
-}}}//namespace
+}}//namespace
 #endif
 

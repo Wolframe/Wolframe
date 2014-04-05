@@ -105,11 +105,14 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 	pmap = joinVectors( signatures, oth.signatures);
 	patchCode( code, At_SubroutineSignature, startidx, *pmap);
 
+	pmap = joinVectors( tuplesets, oth.tuplesets);
+	patchCode( code, At_TupleSet, startidx, *pmap);
+
 	pmap = pathset.join( oth.pathset);
 	patchCode( code, At_Path, startidx, *pmap);
 }
 
-void Program::print( std::ostream& out)
+void Program::print( std::ostream& out) const
 {
 	std::vector<Instruction>::const_iterator pi = code.begin(), pe = code.end();
 	unsigned int adr = 0;

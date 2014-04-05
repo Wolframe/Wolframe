@@ -241,4 +241,20 @@ std::string SelectorPath::normalize( const std::string& pathstr)
 	return SelectorPath( pathstr, &tm).tostring( &tm);
 }
 
+const char* SelectorPath::lastElementName( const tf::TagTable* tagmap) const
+{
+	if (m_path.size() == 0)
+	{
+		return 0;
+	}
+	if (m_path.back().m_tag != 0)
+	{
+		return tagmap->getstr( m_path.back().m_tag);
+	}
+	if (m_path.back().m_type == Element::Current && m_path.size() == 1)
+	{
+		return ".";
+	}
+	return 0;
+}
 

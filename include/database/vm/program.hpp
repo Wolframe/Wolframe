@@ -66,7 +66,8 @@ public:
 	NameTable resultnametab;			//< result name table
 	std::vector<std::string> statements;		//< database statements
 	HintTable hinttab;				//< hints for error classes of failing database statements
-	std::vector<SubroutineSignature> signatures;	//< subroutine signutures
+	std::vector<SubroutineSignature> signatures;	//< subroutine signatures
+	std::vector<ValueTupleSetR> tuplesets;		//< values from path expressions
 
 public:
 	Program(){}
@@ -79,12 +80,13 @@ public:
 		,resultnametab(o.resultnametab)
 		,statements(o.statements)
 		,signatures(o.signatures)
+		,tuplesets(o.tuplesets)
 	{}
 
 	//\brief Add the program to this, joining all tables and doing necessary instruction patches
 	void add( const Program& oth, bool doPatchGOTOs=true);
 
-	void print( std::ostream& out);
+	void print( std::ostream& out) const;
 };
 
 typedef boost::shared_ptr<Program> ProgramR;

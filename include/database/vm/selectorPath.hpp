@@ -106,6 +106,7 @@ public:
 	std::size_t size() const					{return m_path.size();}
 
 	void print( std::ostream& out, const tf::TagTable* tagmap) const;
+	const char* lastElementName( const tf::TagTable* tagmap) const;
 
 private:
 	std::vector<Element> m_path;

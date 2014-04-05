@@ -33,6 +33,15 @@
 ///\brief Implementing of the methods of the transaction function preprocessing step based on TDL
 ///\file tdlTransactionPreprocStep.cpp
 #include "database/tdlTransactionPreprocStep.hpp"
+#include "transactionfunction/TagTable.hpp"
+#include "transactionfunction/InputStructure.hpp"
+#include "langbind/formFunction.hpp"
+#include "filter/typedfilter.hpp"
+#include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "serialize/mapContext.hpp"
+#include "logger-v1.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -74,5 +83,245 @@ void TdlTransactionPreprocStep::print( std::ostream& out, const tf::TagTable* ta
 		}
 	}
 	out << ")";
+}
+
+static types::VariantConst
+	expectArg( langbind::TypedInputFilter* i, langbind::InputFilter::ElementType et, const char* errmsg)
+{
+	langbind::InputFilter::ElementType it;
+	types::VariantConst iv;
+
+	if (i->getNext( it, iv))
+	{
+		if (it != et) throw std::runtime_error( errmsg);
+	}
+	else
+	{
+		const char* err = i->getError();
+		throw std::runtime_error( err?err:"unexpected end of input");
+	}
+	return iv;
+}
+
+static void mapResult( langbind::TypedInputFilter* in, langbind::TypedOutputFilter* out)
+{
+	int taglevel = 0;
+	langbind::InputFilter::ElementType et;
+	types::VariantConst ev;
+
+	for (;;)
+	{
+		if (!in->getNext( et, ev))
+		{
+			const char* err = in->getError();
+			throw std::runtime_error( err?err:"unexpected end of message in result");
+		}
+		if (et == langbind::InputFilter::OpenTag)
+		{
+			++taglevel;
+		}
+		else if (et == langbind::InputFilter::CloseTag)
+		{
+			--taglevel;
+			if (taglevel < 0) return;
+		}
+		if (!out->print( et, ev))
+		{
+			const char* err = out->getError();
+			throw std::runtime_error( err?err:"unknown error in print result");
+		}
+	}
+}
+
+void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* provider, tf::InputStructure& structure) const
+{
+	// Select the nodes to execute the command with:
+	std::map<tf::InputNodeIndex, int> selectmap;
+	std::map<int, bool> sourccetagmap;
+
+	const types::NormalizeFunction* nf = 0;
+	const langbind::FormFunction* ff = 0;
+	try
+	{
+		ff = provider->formFunction( m_function);
+		if (!ff) nf = provider->normalizeFunction( m_function);
+
+		std::vector<tf::InputNodeIndex> nodearray;
+		selector().selectNodes( structure, structure.rootindex(), nodearray);
+		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), utils::logPrintFormat());
+		if (nodearray.size())
+		{
+			LOG_DATA << "[transaction preprocess] execute function " << m_function << " on " << nodearray.size() << " nodes of selection '" << structure.nodepath( *nodearray.begin()) << "'";
+		}
+		else
+		{
+			LOG_DATA << "[transaction preprocess] empty selection (no execution) for function " << m_function;
+		}
+		std::vector<tf::InputNodeIndex>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+		for (; ni != ne; ++ni)
+		{
+			if (selectmap[*ni]++ > 0)
+			{
+				LOG_WARNING << "duplicate selection of node '" << structure.nodepath( *ni) << "' (processing only first selection)";
+				continue;
+			}
+			// [1A] Create the destination node for the result:
+			tf::InputNodeVisitor resultnode( *ni);
+			if (!m_resultpath.empty())
+			{
+				if (m_resultpath.size() > 1)
+				{
+					std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.begin() + (m_resultpath.size() - 1);
+					for (; ri != re; ++ri)
+					{
+						resultnode = structure.visitTag( resultnode, *ri);
+					}
+				}
+				if (m_resultpath.back() != ".")
+				{
+					resultnode = structure.visitOrOpenUniqTag( resultnode, m_resultpath.back());
+				}
+			}
+			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
+			const tf::InputNode* rn = structure.node( resultnode);
+			if (rn->m_firstchild)
+			{
+				rn = structure.node( rn->m_firstchild);
+				for (;;)
+				{
+					sourccetagmap[ rn->m_tagstr] = true;
+					if (!rn->m_next) break;
+					rn = structure.node( rn->m_next);
+				}
+			}
+			// [2] Build the parameter structure:
+			std::vector<tf::InputStructure::NodeAssignment> parameterassign;
+			std::vector<tf::InputNodeIndex> parameter;
+			std::vector<Argument>::const_iterator ai = m_arguments.begin(), ae = m_arguments.end();
+			std::size_t aidx = 0;
+
+			for (; ai != ae; ++ai,++aidx)
+			{
+				switch (ai->type)
+				{
+					case Argument::SelectorPath:
+						m_selectors.at( m_arguments.at(aidx).value).selectNodes( structure, *ni, parameter);
+						if (parameter.size() == aidx+1)
+						{
+							LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
+							parameterassign.push_back( tf::InputStructure::NodeAssignment( ai->name, parameter.back()));
+						}
+						else
+						{
+							if (parameter.size() < aidx+1)
+							{
+								LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' = NULL";
+								parameter.push_back( 0); //... NULL node
+							}
+							else
+							{
+								throw std::runtime_error( std::string( "referenced parameter '") + ai->name + "' is not unique");
+							}
+						}
+						break;
+					case Argument::LoopCounter:
+						throw std::runtime_error("not implemented yet: Loop counter as parameter of TDL preprocessing step");
+					case Argument::Constant:
+						throw std::runtime_error("not implemented yet: Constant as parameter of TDL preprocessing step");
+				}
+			}
+			langbind::TypedInputFilterR argfilter( structure.createInputFilter( parameterassign));
+
+			// [3] Call the function:
+			if (nf)
+			{
+				// call normalize function:
+				langbind::InputFilter::ElementType et;
+				types::VariantConst ev;
+				bool haveInput = true;
+				const char* errmsg = "atomic value (pure or with single tag) expected as input of normalization function (got structure instead)";
+
+				if (argfilter->getNext( et, ev))
+				{
+					if (et == langbind::InputFilter::OpenTag)
+					{
+						// we have a structure with one tag with content value, so we run the function with the value as argument:
+						ev = expectArg( argfilter.get(), langbind::InputFilter::Value, errmsg);
+						expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
+					}
+					else if (et == langbind::InputFilter::Attribute)
+					{
+						// we have a structure with one attribute, so we run the function with the value as argument:
+						ev = expectArg( argfilter.get(), langbind::InputFilter::Value, errmsg);
+					}
+					else if (et == langbind::InputFilter::Value)
+					{
+						// we have an atomic value ....
+					}
+					else if (et == langbind::InputFilter::CloseTag)
+					{
+						// we have a NULL value, so we do not execute the function:
+						haveInput = false;
+					}
+				}
+				if (haveInput)
+				{
+					expectArg( argfilter.get(), langbind::InputFilter::CloseTag, errmsg);
+					const types::Variant res = nf->execute( ev);
+					if (m_resultpath.empty())
+					{
+						LOG_DATA << "[transaction preprocess] call validator '" << m_function << "'";
+					}
+					else
+					{
+						LOG_DATA << "[transaction preprocess] call normalizer '" << m_function << "' into '" << structure.nodepath( resultnode) << "' => " << res.typeName() << " '" << res.tostring() << "'";
+						structure.pushValue( resultnode, res);
+					}
+				}
+			}
+			else if (ff)
+			{
+				// call form function:
+				langbind::FormFunctionClosureR fc( ff->createClosure());
+				serialize::Context::Flags f = serialize::Context::None;
+
+				if (!structure.case_sensitive())
+				{
+					f = (serialize::Context::Flags)((int)f | (int)serialize::Context::CaseInsensitiveCompare);
+				}
+				fc->init( provider, argfilter, f);
+				if (!fc->call())
+				{
+					const char* err = argfilter->getError();
+					if (!err) throw std::logic_error( "internal: incomplete input");
+					throw std::runtime_error( err);
+				}
+				if (m_resultpath.empty())
+				{
+					LOG_DATA << "[transaction preprocess] call function " << m_function << " ignoring the result (no INTO declaration)";
+				}
+				else
+				{
+					// assign form function result to destination in input structure for further processing:
+					langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode, sourccetagmap));
+					langbind::TypedInputFilterR result = fc->result();
+
+					result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
+					// ... result should provide indices of arrays is possible (for further preprocessing function calls)
+
+					mapResult( result.get(), resfilter.get());
+					LOG_DATA << "[transaction preprocess] call function " << m_function << " => " << structure.tostring( resultnode, utils::logPrintFormat());
+				}
+			}
+			else
+			{
+				throw std::runtime_error( "function not defined");
+			}
+		}
+	}
+	catch (std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "failed to call TDL preprocessing function '") + m_function +"': " + e.what());
+	}
 }
 

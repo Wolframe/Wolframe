@@ -59,6 +59,8 @@ CPP_OBJS = \
 	tdlTransactionFunction.obj \
 	transactionFunction.obj \
 	transactionFunctionDescription.obj \
+	vmTransactionInput.obj \
+	vmTransactionOutput.obj \
 	tdl2vmTranslator.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \

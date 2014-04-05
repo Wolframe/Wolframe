@@ -33,6 +33,8 @@
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
 #include "database/tdlTransactionFunction.hpp"
+#include "transactionfunction/InputStructure.hpp"
+#include "logger-v1.hpp"
 #include <string>
 #include <vector>
 
@@ -87,4 +89,45 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "END" << std::endl;
 }
 
+
+bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
+{
+	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'' :" << element.typeName( element.type());
+	switch (type)
+	{
+		case langbind::TypedInputFilter::OpenTag:
+			m_structure->openTag( element);
+		break;
+		case langbind::TypedInputFilter::CloseTag:
+			m_structure->closeTag();
+		break;
+		case langbind::TypedInputFilter::Attribute:
+			m_structure->openTag( element);
+		break;
+		case langbind::TypedInputFilter::Value:
+			m_structure->pushValue( element);
+			if (m_lasttype == langbind::TypedInputFilter::Attribute)
+			{
+				m_structure->closeTag();
+			}
+		break;
+	}
+	m_lasttype = type;
+	return true;
+}
+
+void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterface* provider)
+{
+	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
+	for (; pi != pe; ++pi)
+	{
+		pi->call( provider, *m_structure);
+	}
+	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
+}
+
+VmTransactionInput TdlTransactionFunctionInput::get() const
+{
+	return VmTransactionInput( *m_func->program(), *m_structure);
+}
 

@@ -67,6 +67,8 @@ CPP_OBJS = \
 	tdlTransactionPreprocStep.o \
 	tdlTransactionFunction.o \
 	transactionFunctionDescription.o \
+	vmTransactionInput.o \
+	vmTransactionOutput.o \
 	tdl2vmTranslator.o \
 	loadTransactionProgram.o \
 	loadTransactionProgram2.o \
