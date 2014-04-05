@@ -32,11 +32,14 @@
 ************************************************************************/
 ///\file testCompileTDL.cpp
 ///\brief Test the parsing and mapping of TDL programs to its internal compiled representation
-#include "logger-v1.hpp"
 #include "database/loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
-#include "gtest/gtest.h"
+#include "database/vmTransactionInput.hpp"
+#include "transactionfunction/InputStructure.hpp"
 #include "utils/fileUtils.hpp"
+#include "types/propertyTree.hpp"
+#include "logger-v1.hpp"
+#include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -62,6 +65,21 @@ protected:
 	virtual void SetUp() {}
 	virtual void TearDown() {}
 };
+
+struct PtreeStackElem
+{
+	types::PropertyTree::Node::const_iterator itr;
+	types::PropertyTree::Node::const_iterator end;
+
+	PtreeStackElem( const types::PropertyTree::Node& ptree)
+		:itr(ptree.begin()),end(ptree.end()){}
+	PtreeStackElem( const types::PropertyTree::Node::const_iterator& itr_, const types::PropertyTree::Node::const_iterator& end_)
+		:itr(itr_),end(end_){}
+	PtreeStackElem( const PtreeStackElem& o)
+		:itr(o.itr),end(o.end){}
+	PtreeStackElem(){}
+};
+
 
 TEST_F( CompileTDLTest, tests)
 {
@@ -108,13 +126,14 @@ TEST_F( CompileTDLTest, tests)
 	{
 		std::string testname = utils::getFileStem( *itr);
 		std::string testdir = utils::getParentPath( *itr);
-		std::string inputfile = testdir + "/" + testname + ".tdl";
+		std::string tdlfile = testdir + "/" + testname + ".tdl";
 		std::string expectfile = testdir + "/" + testname + ".res";
+		std::string inputfile = testdir + "/" + testname + ".inp";
 
 		// [2.1] Process test:
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 
-		TdlTransactionFunctionList tl = loadTransactionProgramFile2( inputfile, "testdb", "test", &g_dblang);
+		TdlTransactionFunctionList tl = loadTransactionProgramFile2( tdlfile, "testdb", "test", &g_dblang);
 		TdlTransactionFunctionList::const_iterator ti = tl.begin(), te = tl.end();
 
 		// [2.2] Print test output to string:
@@ -125,7 +144,43 @@ TEST_F( CompileTDLTest, tests)
 			out << std::endl;
 		}
 
-		// [2.3] Compare result and write dump to the output directory
+		// [2.3] Create transaction function from program with input and
+		//	print it, if there is an input file defined:
+		if (utils::fileExists( inputfile))
+		{
+			types::PropertyTree ptree = utils::readPropertyTreeFile( inputfile);
+
+			for (ti = tl.begin(); ti != te; ++ti)
+			{
+				tf::InputStructure input( ti->second->program()->pathset.tagtab());
+				std::vector<PtreeStackElem> stack;
+				stack.push_back( ptree.root());
+				while (!stack.empty())
+				{
+					if (stack.back().itr == stack.back().end)
+					{
+						if (!stack.back().itr->second.data().empty())
+						{
+							input.pushValue( types::Variant( stack.back().itr->second.data().string()));
+						}
+						stack.pop_back();
+						if (!stack.empty())
+						{
+							input.closeTag();
+							stack.back().itr++;
+						}
+						continue;
+					}
+					input.openTag( types::Variant( stack.back().itr->first));
+					stack.push_back( PtreeStackElem( stack.back().itr->second));
+				}
+				VmTransactionInput trsinput( *ti->second->program(), input);
+				trsinput.print( out);
+				out << std::endl;
+			}
+		}
+
+		// [2.4] Compare result and write dump to the output directory
 		//	if not equal to expected:
 		bool file_read_exception = false;
 		std::string output = out.str();
