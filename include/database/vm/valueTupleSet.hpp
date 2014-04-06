@@ -98,7 +98,7 @@ public:
 		}
 
 		const const_iterator* operator->() const		{return this;}
-		const types::Variant& column( std::size_t i) const	{if (!m_ref || i >= m_ref->m_colnames.size() || m_idx + i >= m_ref->m_ar.size()) throw std::runtime_error("value set column index out of range"); return m_ref->m_ar.at( m_idx + i);}
+		const types::Variant& column( std::size_t i) const	{if (!m_ref || i == 0 || i > m_ref->m_colnames.size() || m_idx + i - 1 >= m_ref->m_ar.size()) throw std::runtime_error("value set column index out of range"); return m_ref->m_ar.at( m_idx + i - 1);}
 
 	private:
 		std::size_t m_idx;
@@ -120,8 +120,8 @@ public:
 	}
 	const std::string& columnName( std::size_t i) const
 	{
-		if (i > m_colnames.size()) throw std::runtime_error( "column index out of range");
-		return m_colnames.at(i);
+		if (i == 0 || i > m_colnames.size()) throw std::runtime_error( "column index out of range");
+		return m_colnames.at(i-1);
 	}
 
 	std::size_t columnIndex( const std::string& name) const
@@ -131,7 +131,7 @@ public:
 		{
 			if (boost::algorithm::iequals( name, m_colnames.at(ii)))
 			{
-				return ii;
+				return ii+1;
 			}
 		}
 		throw std::runtime_error("unknown value set column name");

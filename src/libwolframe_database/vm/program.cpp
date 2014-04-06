@@ -114,6 +114,7 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 
 void Program::print( std::ostream& out) const
 {
+	out << "Code:" << std::endl;
 	std::vector<Instruction>::const_iterator pi = code.begin(), pe = code.end();
 	unsigned int adr = 0;
 	for (; pi != pe; ++pi,++adr)
@@ -159,7 +160,7 @@ void Program::print( std::ostream& out) const
 				out << " STM (" << statements.at( ai) << ")";
 				break;
 			case At_Hint:
-				out << " HINTS " << ai;
+				out << " ERROR HINTS " << ai;
 				break;
 			case At_SubroutineSignature:
 				out << " SIGNATURE " << ai;
@@ -175,6 +176,82 @@ void Program::print( std::ostream& out) const
 				break;
 		}
 		out << std::endl;
+	}
+
+	std::vector<ValueTupleSetR>::const_iterator vi = tuplesets.begin(), ve = tuplesets.end();
+	if (vi != ve)
+	{
+		out << "Input Data:" << std::endl;
+		for (std::size_t idx=0; vi != ve; ++vi,++idx)
+		{
+			out << "SET " << idx << ": ";
+			std::size_t ii=1,nn = (*vi)->nofColumns();
+			for (; ii<=nn;++ii)
+			{
+				if (ii>1) out << ", ";
+				std::string colnam = (*vi)->columnName( ii);
+				if (colnam.empty())
+				{
+					out << "<no name>";
+				}
+				else
+				{
+					out << colnam;
+				}
+			}
+			out << std::endl;
+			ValueTupleSet::const_iterator si = (*vi)->begin(), se = (*vi)->end();
+			for (; si != se; ++si)
+			{
+				out << "  ";
+				for (std::size_t colidx=1; colidx <= nn; ++colidx)
+				{
+					if (colidx>1) out << ", ";
+					const types::Variant& colval = si->column(colidx);
+					if (colval.defined())
+					{
+						out << "'" << si->column(colidx).tostring() << "'";
+					}
+					else
+					{
+						out << "NULL";
+					}
+				}
+				out << std::endl;
+			}
+		}
+	}
+	std::vector<SubroutineSignature>::const_iterator si = signatures.begin(), se = signatures.end();
+	if (si != se)
+	{
+		out << "Subroutine Signatures:" << std::endl;
+		for (std::size_t idx=0; si != se; ++si,++idx)
+		{
+			out << "SUB " << idx << " ( ";
+			SubroutineSignature::const_iterator gi = si->begin(), ge = si->end();
+			for (std::size_t paramidx=0; gi != ge; ++gi,++paramidx)
+			{
+				if (paramidx > 0) out << ", ";
+				out << *gi;
+			}
+			out << " )" << std::endl;
+		}
+	}
+
+	std::vector<std::vector<ErrorHint> >::const_iterator hi = hinttab.begin(), he = hinttab.end();
+	if (hi != he)
+	{
+		out << "Error Hints:" << std::endl;
+		for (std::size_t idx=0; hi != he; ++hi,++idx)
+		{
+			out << "HINT " << idx << ":" << std::endl;
+			std::vector<ErrorHint>::const_iterator ei = hi->begin(), ee = hi->end();
+			for (; ei != ee; ++ei)
+			{
+				out << "  " << ei->errorclass << ": " << ei->message << std::endl;
+			}
+			out << std::endl;
+		}
 	}
 }
 

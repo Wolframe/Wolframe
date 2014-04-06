@@ -130,8 +130,10 @@ void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor
 	std::vector<InputNodeIndex> ar1,ar2;
 	ar1.push_back( nv.m_nodeidx);
 
-	// [B.1] Find selected nodes:
 	std::vector<Element>::const_iterator si = begin(), se = end();
+	for (; si != se && si->m_type == Element::Current; ++si){}
+	// ... skip current node references at start (they do not change the selection)
+
 	for (; si != se; ++si)
 	{
 		ar2.clear();
@@ -141,21 +143,23 @@ void SelectorPath::selectNodes( const InputStructure& st, const InputNodeVisitor
 			switch (si->m_type)
 			{
 				case Element::Find:
-					st.find( st.node(*ni), si->m_tag, ar2);
+					st.find( st.node( *ni), si->m_tag, ar2);
 					break;
 
 				case Element::Current:
+					ar2.push_back( *ni);
 					break;
+
 				case Element::Root:
 					ar2.push_back( st.rootindex());
 					break;
 
 				case Element::Next:
-					st.next( st.node(*ni), si->m_tag, ar2);
+					st.next( st.node( *ni), si->m_tag, ar2);
 					break;
 
 				case Element::Up:
-					st.up( st.node(*ni), ar2);
+					st.up( st.node( *ni), ar2);
 					break;
 			}
 		}

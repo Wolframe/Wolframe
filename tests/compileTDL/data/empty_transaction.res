@@ -1,5 +1,6 @@
 TRANSACTION simple
-CODE
+BEGIN
+Code:
 [0] GOTO @1
 [1] RETURN
 END

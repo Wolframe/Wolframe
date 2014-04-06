@@ -45,6 +45,17 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
+struct ErrorHint
+{
+	std::string errorclass;
+	std::string message;
+	ErrorHint(){}
+	ErrorHint( const ErrorHint& o)
+		:errorclass(o.errorclass),message(o.message){}
+	ErrorHint( const std::string& e, const std::string& m)
+		:errorclass(e),message(m){}
+};
+
 class ErrorHintTable
 {
 public:
@@ -59,7 +70,7 @@ public:
 	const char* findHint( const Index& idx, const std::string& errorclass) const
 	{
 		if (idx > m_hintar.size() || idx == 0) throw std::runtime_error("hint table index out of bounds");
-		std::vector<Hint>::const_iterator hi = m_hintar.at( idx-1).begin(), he = m_hintar.at( idx-1).end();
+		std::vector<ErrorHint>::const_iterator hi = m_hintar.at( idx-1).begin(), he = m_hintar.at( idx-1).end();
 		for (; hi != he; ++hi)
 		{
 			if (boost::algorithm::iequals( errorclass, hi->errorclass))
@@ -73,16 +84,16 @@ public:
 	Index startdef()
 	{
 		if (m_hintar.size() >= InstructionSet::Max_ArgumentIndex) throw std::runtime_error("number of defined hint sets out of bounds");
-		m_hintar.push_back( std::vector<Hint>());
+		m_hintar.push_back( std::vector<ErrorHint>());
 		return m_hintar.size();
 	}
 
 	void define( const std::string& errorclass, const std::string& message)
 	{
 		if (m_hintar.empty()) throw std::logic_error( "hint table definition without start");
-		std::vector<Hint>& top = m_hintar.back();
+		std::vector<ErrorHint>& top = m_hintar.back();
 		if (findHint( m_hintar.size(), errorclass)) throw std::runtime_error( std::string( "duplicate definition of hint for error class '") + errorclass + "' for same statement");
-		top.push_back( Hint( errorclass, message));
+		top.push_back( ErrorHint( errorclass, message));
 	}
 
 	PatchArgumentMapR join( const ErrorHintTable& oth)
@@ -92,20 +103,13 @@ public:
 		return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
 	}
 
-private:
-	struct Hint
-	{
-		std::string errorclass;
-		std::string message;
-		Hint(){}
-		Hint( const Hint& o)
-			:errorclass(o.errorclass),message(o.message){}
-		Hint( const std::string& e, const std::string& m)
-			:errorclass(e),message(m){}
-	};
+	typedef std::vector< std::vector<ErrorHint> >::const_iterator const_iterator;
+	const_iterator begin() const	{return m_hintar.begin();}
+	const_iterator end() const	{return m_hintar.end();}
 
-	typedef std::vector< std::vector<Hint> > HintAr;
-	HintAr m_hintar;
+private:
+	typedef std::vector< std::vector<ErrorHint> > ErrorHintList;
+	ErrorHintList m_hintar;
 };
 
 }}}//namespace

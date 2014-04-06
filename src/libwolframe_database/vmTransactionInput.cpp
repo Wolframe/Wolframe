@@ -11,7 +11,7 @@ using namespace _Wolframe::db;
 
 void VmTransactionInput::print( std::ostream& out) const
 {
-	out << "TRANSACTION VM PROGRAM:" << std::endl;
+	out << "TRANSACTION INPUT:" << std::endl;
 	m_program.print( out);
 }
 
@@ -239,7 +239,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 							}
 							else
 							{
-								const tf::InputNode* nd = input.node( *ni);
+								const tf::InputNode* nd = input.node( element_value_ar.at(0));
 								const types::Variant* value = input.contentvalue( nd);
 								if (value)
 								{

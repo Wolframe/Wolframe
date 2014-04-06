@@ -79,12 +79,12 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	}
 #ifdef LOWLEVEL_DEBUG
 	// Print code without symbols:
-	out << "CODE RAW" << std::endl;
+	out << "BEGIN RAW" << std::endl;
 	m_program->code.printRaw( out);
 	out << "END RAW" << std::endl;
 #endif
 	// Print code with symbolic information:
-	out << "CODE" << std::endl;
+	out << "BEGIN" << std::endl;
 	m_program->print( out);
 	out << "END" << std::endl;
 }

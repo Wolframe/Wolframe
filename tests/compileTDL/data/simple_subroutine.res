@@ -1,5 +1,6 @@
 TRANSACTION main
-CODE
+BEGIN
+Code:
 [0] GOTO @6
 [1] GOTO @2
 [2] RESULT_SET_INIT
@@ -11,5 +12,7 @@ CODE
 [8] SUB_FRAME_CLOSE
 [9] GOTO @1
 [10] RETURN
+Subroutine Signatures:
+SUB 0 (  )
 END
 

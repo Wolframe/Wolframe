@@ -1,5 +1,6 @@
 TRANSACTION main
-CODE
+BEGIN
+Code:
 [0] GOTO @1
 [1] RESULT_SET_INIT
 [2] OPEN_ITER_PATH PATH /doc/element
@@ -20,7 +21,8 @@ CODE
 [17] RETURN
 END
 
-TRANSACTION VM PROGRAM:
+TRANSACTION INPUT:
+Code:
 [0] GOTO @1
 [1] RESULT_SET_INIT
 [2] OPEN_ITER_TUPLESET TUPLESET 0
@@ -39,4 +41,9 @@ TRANSACTION VM PROGRAM:
 [15] NEXT
 [16] IF_COND GOTO @12
 [17] RETURN
+Input Data:
+SET 0: name, zuk
+  'barbara', '1'
+  'jakob', '2'
+  'sereina', '3'
 

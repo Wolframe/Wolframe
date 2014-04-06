@@ -1,5 +1,6 @@
 TRANSACTION main
-CODE
+BEGIN
+Code:
 [0] GOTO @1
 [1] RESULT_SET_INIT
 [2] OPEN_ITER_PATH PATH /doc/element
