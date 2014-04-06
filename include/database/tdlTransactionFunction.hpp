@@ -63,7 +63,7 @@ class TdlTransactionFunctionInput
 public:
 	explicit TdlTransactionFunctionInput( const TdlTransactionFunction* func_);
 	TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o);
-	virtual ~TdlTransactionFunctionInput();
+	virtual ~TdlTransactionFunctionInput(){}
 
 	//\brief Get a self copy
 	//\return allocated pointer to copy of this
@@ -110,6 +110,11 @@ public:
 	const std::string& authresource() const				{return m_authresource;}
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
 	const vm::ProgramR& program() const				{return m_program;}
+
+	///\brief Build the function input
+	virtual TdlTransactionFunctionInput* getInput() const;
+	///\brief Build the function output
+	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 private:
 	std::string m_name;

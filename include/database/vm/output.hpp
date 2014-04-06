@@ -88,6 +88,8 @@ public:
 	const_iterator begin() const				{return m_ar.begin();}
 	const_iterator end() const				{return m_ar.end();}
 
+	const std::vector<Element>& elements() const;
+
 private:
 	std::vector<Element> m_ar;
 };

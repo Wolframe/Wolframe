@@ -63,8 +63,8 @@ public:
 		,m_ip(o.m_ip)
 		,m_cond(o.m_cond)
 		,m_stack(o.m_stack)
-		,m_output(o.m_output)
 		,m_code(o.m_code)
+		,m_output(o.m_output)
 	{}
 	ProgramInstance( const Program* program_, TransactionExecStatemachine* db_stm_)
 		:m_program(program_)
@@ -72,11 +72,13 @@ public:
 		,m_ip(0)
 		,m_cond(false)
 		,m_code(m_program->code)
+		,m_output( new Output())
 	{
 		m_stack.push_back( StackElement());
 	}
 
 	bool execute();
+	const OutputR& output() const			{return m_output;}
 
 private:
 	struct ResultFlags
@@ -171,8 +173,8 @@ private:
 	SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
 	bool m_cond;					//< current condition flag for conditional execution ('InstructionSet::CondCode')
 	std::vector<StackElement> m_stack;		//< execution stack
-	Output m_output;				//< output
 	ProgramCode m_code;				//< program code copy
+	OutputR m_output;				//< output
 };
 
 }}}//namespace

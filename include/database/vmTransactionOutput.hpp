@@ -35,6 +35,7 @@
 #ifndef _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
 #define _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
 #include "database/vm/output.hpp"
+#include "filter/typedfilter.hpp"
 #include <string>
 #include <iostream>
 
@@ -56,6 +57,9 @@ public:
 	///\brief Copy constructor
 	VmTransactionOutput( const VmTransactionOutput& o)
 		:m_impl(o.m_impl){}
+	///\brief Copy constructor
+	VmTransactionOutput( const vm::OutputR& output)
+		:m_impl(output){}
 
 	///\brief Return the result as readable serialization
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
@@ -67,8 +71,10 @@ public:
 		return false;
 	}
 
+	langbind::TypedInputFilterR get() const;
+
 private:
-	vm::Output m_impl;
+	vm::OutputR m_impl;
 };
 
 }}//namespace

@@ -34,6 +34,7 @@
 ///\file tdlTransactionFunction.cpp
 #include "database/tdlTransactionFunction.hpp"
 #include "transactionfunction/InputStructure.hpp"
+#include "utils/typeSignature.hpp"
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
@@ -42,6 +43,57 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+
+TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunction* func_)
+	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
+	,langbind::TypedOutputFilter("transactionFunctionInput")
+	,m_func(func_),m_lasttype(langbind::TypedInputFilter::CloseTag){}
+
+TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o)
+	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
+	,langbind::TypedOutputFilter(o)
+	,m_structure(o.m_structure),m_func(o.m_func),m_lasttype(o.m_lasttype){}
+
+bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
+{
+	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'' :" << element.typeName( element.type());
+	switch (type)
+	{
+		case langbind::TypedInputFilter::OpenTag:
+			m_structure->openTag( element);
+		break;
+		case langbind::TypedInputFilter::CloseTag:
+			m_structure->closeTag();
+		break;
+		case langbind::TypedInputFilter::Attribute:
+			m_structure->openTag( element);
+		break;
+		case langbind::TypedInputFilter::Value:
+			m_structure->pushValue( element);
+			if (m_lasttype == langbind::TypedInputFilter::Attribute)
+			{
+				m_structure->closeTag();
+			}
+		break;
+	}
+	m_lasttype = type;
+	return true;
+}
+
+void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterface* provider)
+{
+	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
+	for (; pi != pe; ++pi)
+	{
+		pi->call( provider, *m_structure);
+	}
+	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
+}
+
+VmTransactionInput TdlTransactionFunctionInput::get() const
+{
+	return VmTransactionInput( *m_func->program(), *m_structure);
+}
 
 void TdlTransactionFunction::print( std::ostream& out) const
 {
@@ -89,45 +141,40 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "END" << std::endl;
 }
 
-
-bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
+TdlTransactionFunctionInput* TdlTransactionFunction::getInput() const
 {
-	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'' :" << element.typeName( element.type());
-	switch (type)
-	{
-		case langbind::TypedInputFilter::OpenTag:
-			m_structure->openTag( element);
-		break;
-		case langbind::TypedInputFilter::CloseTag:
-			m_structure->closeTag();
-		break;
-		case langbind::TypedInputFilter::Attribute:
-			m_structure->openTag( element);
-		break;
-		case langbind::TypedInputFilter::Value:
-			m_structure->pushValue( element);
-			if (m_lasttype == langbind::TypedInputFilter::Attribute)
-			{
-				m_structure->closeTag();
-			}
-		break;
-	}
-	m_lasttype = type;
-	return true;
+	return new TdlTransactionFunctionInput( this);
 }
 
-void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterface* provider)
+langbind::TypedInputFilterR TdlTransactionFunction::getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const
 {
-	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
-	for (; pi != pe; ++pi)
+	if (m_resultfilter.empty())
 	{
-		pi->call( provider, *m_structure);
+		// ... result filter does not exist, so return the transaction result as function result
+		return output.get();
 	}
-	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
-}
-
-VmTransactionInput TdlTransactionFunctionInput::get() const
-{
-	return VmTransactionInput( *m_func->program(), *m_structure);
+	else
+	{
+		// ... result filter exists, so we pipe the transaction result through it to get the final result
+		langbind::TypedInputFilterR unfilderedResult = output.get();
+		const langbind::FormFunction* func = provider->formFunction( m_resultfilter);
+		if (!func)
+		{
+			throw std::runtime_error( std::string( "transaction result filter function '") + m_resultfilter + "' not found (must be defined as form function)");
+		}
+		langbind::FormFunctionClosureR closure = langbind::FormFunctionClosureR( func->createClosure());
+		closure->init( provider, unfilderedResult);
+	
+		if (!closure->call())
+		{
+			throw std::runtime_error( std::string( "failed to call filter function '") + m_resultfilter + "' with result of transaction (input not complete)");
+		}
+		langbind::TypedInputFilterR filteredResult = closure->result();
+		if (unfilderedResult->flag( langbind::TypedInputFilter::PropagateNoCase))
+		{
+			filteredResult->setFlags( langbind::TypedInputFilter::PropagateNoCase);
+		}
+		return filteredResult;
+	}
 }
 

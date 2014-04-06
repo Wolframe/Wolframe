@@ -132,9 +132,9 @@ void ProgramInstance::printIteratorColumn()
 		std::size_t idx=1,nofColumns = top.m_valueSet->nofColumns();
 		for (; idx<=nofColumns; ++idx)
 		{
-			m_output.add( Output::Element( Output::Element::Open, top.m_valueSet->columnName( idx)));
-			m_output.add( Output::Element( Output::Element::Value, top.m_valueIter->column( idx)));
-			m_output.add( Output::Element( Output::Element::Close));
+			m_output->add( Output::Element( Output::Element::Open, top.m_valueSet->columnName( idx)));
+			m_output->add( Output::Element( Output::Element::Value, top.m_valueIter->column( idx)));
+			m_output->add( Output::Element( Output::Element::Close));
 		}
 	}
 }
@@ -270,13 +270,13 @@ bool ProgramInstance::execute()
 
 			/*Print Instructions:*/
 			case Op_OUTPUT_CONST:
-				m_output.addValue( constArgument( argidx));
+				m_output->addValue( constArgument( argidx));
 				++m_ip;
 				break;
 			case Op_OUTPUT_PATH:
 				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
 			case Op_OUTPUT_LOOPCNT:
-				m_output.addValue( loopcntArgument());
+				m_output->addValue( loopcntArgument());
 				++m_ip;
 				break;
 			case Op_OUTPUT_SEL_NAM:
@@ -286,7 +286,7 @@ bool ProgramInstance::execute()
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
 			case Op_OUTPUT_SEL_IDX:
-				m_output.addValue( selectedArgument( argidx));
+				m_output->addValue( selectedArgument( argidx));
 				++m_ip;
 				break;
 			case Op_OUTPUT_ITR_NAM:
@@ -296,18 +296,18 @@ bool ProgramInstance::execute()
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
 			case Op_OUTPUT_ITR_IDX:
-				m_output.addValue( iteratorArgument( argidx));
+				m_output->addValue( iteratorArgument( argidx));
 				++m_ip;
 				break;
 			case Op_OUTPUT_ITR_COLUMN:
 				printIteratorColumn();
 				break;
 			case Op_OUTPUT_OPEN:
-				m_output.add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
+				m_output->add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
 				++m_ip;
 				break;
 			case Op_OUTPUT_CLOSE:
-				m_output.add( Output::Element( Output::Element::Close));
+				m_output->add( Output::Element( Output::Element::Close));
 				++m_ip;
 				break;
 
