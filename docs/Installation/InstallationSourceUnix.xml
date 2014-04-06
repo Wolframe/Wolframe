@@ -374,9 +374,11 @@
 			</para>
 			
 			<para>
-				<emphasis role="bold">Note</emphasis>: Careful with
-				non-GNU compilers and ccache. At least clang is known
-				to have issues if used together with ccache!
+				When using 'clang' with 'ccache' set the following
+				environment variable too:
+	                        <programlisting language='shell'>
+	export CCACHE_CPP2=1
+				</programlisting>
 			</para>
 			
 		</sect2>
@@ -3123,7 +3125,7 @@ export PATH
 				<title>ArchLinux</title>
 
 				<para>
-					You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+					You need the 'libxslt', 'doxygen' and 'docbook-xsl' packages.
 				</para>				
 
 				<para>

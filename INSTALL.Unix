@@ -234,8 +234,10 @@ If you want to use ccache and distcc in parallel, use the following commands:
         make CC='ccache gcc' CXX='ccache g++'
 
 
-Note: Careful with non-GNU compilers and ccache. At least clang is known to
-have issues if used together with ccache!
+When using 'clang' with 'ccache' set the following environment variable too:
+
+        export CCACHE_CPP2=1
+
 
 1.7. Platform-specific build instructions
 
@@ -1823,7 +1825,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 
 ArchLinux
 
-You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+You need the 'libxslt', 'doxygen' and 'docbook-xsl' packages.
 
 When generating PDFs you need the 'fop' package. Newest versions run only with
 the SVN version of 'java-xmlgraphics-commons'. Install the package
