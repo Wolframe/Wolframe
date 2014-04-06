@@ -75,7 +75,7 @@ public:
 	virtual bool print( ElementType type, const types::VariantConst& element);
 	void finalize( const proc::ProcessorProviderInterface* provider);
 
-	virtual VmTransactionInput get() const;
+	virtual VmTransactionInputR get() const;
 
 	const tf::InputStructure& structure() const
 	{
@@ -112,9 +112,9 @@ public:
 	const vm::ProgramR& program() const				{return m_program;}
 
 	///\brief Build the function input
-	virtual TdlTransactionFunctionInput* getInput() const;
+	TdlTransactionFunctionInput* getInput() const;
 	///\brief Build the function output
-	virtual langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
+	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 private:
 	std::string m_name;

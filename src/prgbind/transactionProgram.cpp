@@ -35,7 +35,7 @@
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "processor/procProviderInterface.hpp"
-#include "database/transactionFunction.hpp"
+#include "database/tdlTransactionFunction.hpp"
 #include "database/databaseError.hpp"
 #include "database/database.hpp"
 #include "utils/fileUtils.hpp"
@@ -51,7 +51,7 @@ class TransactionFunctionClosure
 	,public langbind::FormFunctionClosure
 {
 public:
-	TransactionFunctionClosure( const db::TransactionFunction* f)
+	TransactionFunctionClosure( const db::TdlTransactionFunction* f)
 		:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
 		,m_provider(0)
 		,m_func(f)
@@ -84,36 +84,17 @@ public:
 			case 2:
 			{
 				m_inputstructptr->finalize( m_provider);
-				db::TransactionInput transactionInput( m_inputstructptr->get());
-				db::TransactionOutputR res;
+				db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
+				db::VmTransactionOutput res;
 				{
 					types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
 					if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
-					db::TransactionOutput* outputptr = new db::TransactionOutput();
-					try
-					{
-						trsr->begin();
-						trsr->execute( transactionInput, *outputptr);
-						trsr->commit();
-						res.reset( outputptr);
-					}
-					catch (const db::DatabaseTransactionErrorException& e)
-					{
-						delete outputptr;
-						LOG_ERROR << e.what();
-						const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
-						std::string explain;
-						if (hint) explain = explain + " -- " + hint;
-						throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
-					}
-					catch (const std::runtime_error& e)
-					{
-						delete outputptr;
-						throw e;
-					}
+					trsr->begin();
+					trsr->execute( inp, res);
+					trsr->commit();
 				}
-				m_result = m_func->getOutput( m_provider, res);
-				if (!res->isCaseSensitive())
+				m_result = res.get();
+				if (!res.isCaseSensitive())
 				{
 					//... If not case sensitive result then propagate this
 					//	to be respected in mapping to structures.
@@ -144,10 +125,10 @@ public:
 
 private:
 	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
-	const db::TransactionFunction* m_func;			//< function to execute
+	const db::TdlTransactionFunction* m_func;		//< function to execute
 	int m_state;						//< current state of call
 	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
-	db::TransactionFunctionInput* m_inputstructptr;		//< input structure implementation interface
+	db::TdlTransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
 	langbind::TypedOutputFilterR m_inputstruct;		//< input structure
 	langbind::TypedInputFilterR m_result;			//< function call result
 	serialize::Context::Flags m_flags;			//< flags for input serialization
@@ -158,7 +139,7 @@ class TransactionFunction
 	:public langbind::FormFunction
 {
 public:
-	TransactionFunction( const db::TransactionFunctionR& f)
+	TransactionFunction( const db::TdlTransactionFunctionR& f)
 		:m_impl(f){}
 
 	virtual TransactionFunctionClosure* createClosure() const
@@ -167,9 +148,7 @@ public:
 	}
 
 private:
-// unused:
-//	const proc::ProcessorProviderInterface* m_provider;
-	db::TransactionFunctionR m_impl;
+	db::TdlTransactionFunctionR m_impl;
 };
 
 
@@ -195,10 +174,10 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 			databaseID = transactionDB->ID();
 			databaseClassName = transactionDB->className();
 		}
-		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-			= db::loadTransactionProgramFile( filename, databaseID, databaseClassName, languageDescr);
+		std::vector<std::pair<std::string,db::TdlTransactionFunctionR> > funclist
+			= db::loadTransactionProgramFile2( filename, databaseID, databaseClassName, languageDescr);
 
-		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
+		std::vector<std::pair<std::string,db::TdlTransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
 		{
 			langbind::FormFunctionR func( new TransactionFunction( fi->second));

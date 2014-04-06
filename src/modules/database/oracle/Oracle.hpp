@@ -213,7 +213,7 @@ public:
 };
 
 
-class OracleTransaction : public StatemachineBasedTransaction
+class OracleTransaction : public Transaction
 {
 public:
 	OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_);

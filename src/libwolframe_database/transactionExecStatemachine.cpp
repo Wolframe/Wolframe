@@ -39,6 +39,8 @@
 #include <limits>
 #include <boost/algorithm/string.hpp>
 
+#error DEPRECATED
+
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 

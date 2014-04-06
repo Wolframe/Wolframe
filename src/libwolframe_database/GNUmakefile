@@ -73,7 +73,6 @@ CPP_OBJS = \
 	loadTransactionProgram.o \
 	loadTransactionProgram2.o \
 	databaseLanguage.o \
-	transactionExecStatemachine.o \
 	baseStatement.o \
 	substitutingStatement.o
 

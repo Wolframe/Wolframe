@@ -33,37 +33,119 @@
 //\file database/transaction.hpp
 //\brief Implementation database transaction
 #include "database/transaction.hpp"
+#include "database/vm/programInstance.hpp"
+#include "transactionfunction/InputStructure.hpp"
+#include "tdl2vmTranslator.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-Transaction::Result Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
+void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
-	Result rt;
-	TransactionInput input;
-	input.startCommand( 1, 0, stm, -1);
+	vm::ProgramInstance instance( &input.program(), m_stm.get());
+	if (!instance.execute())
+	{
+		throw std::runtime_error("unexpected transaction vm program termination");
+	}
+	output = VmTransactionOutput( instance.output());
+}
+
+static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	std::vector<std::string> resultpath;
+	resultpath.push_back( "");
+	types::keymap<vm::Subroutine> sm;
+
+	Tdl2vmTranslator prg( &sm);
+	prg.begin_DO_statement( stm);
 	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
 	for (; pi != pe; ++pi)
 	{
-		input.bindCommandArgAsValue( *pi);
+		prg.push_ARGUMENT_CONST( *pi);
 	}
-	TransactionOutput output;
-	execute( input, output);
-	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
-	if (ri == re) return rt;
-	if (ri +1 != re) throw std::logic_error("internal: more than one result (set of rows) for one command");
-	std::vector<std::string> colnames;
-	std::vector<Transaction::Result::Row> rows;
+	prg.end_DO_statement();
+	prg.output_statement_result( resultpath);
+	return prg.createProgram();
+}
 
-	std::size_t ci=0, ce = ri->nofColumns();
-	for (; ci != ce; ++ci)
+Transaction::Result Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	vm::ProgramR program = singleStatementProgram( stm, params);
+
+	VmTransactionInput input( *program, tf::InputStructure( program->pathset.tagtab()));
+	VmTransactionOutput output;
+	execute( input, output);
+
+	langbind::TypedInputFilterR of( output.get());
+
+	bool firstRow = true;
+	langbind::FilterBase::ElementType type;
+	types::VariantConst value;
+	int taglevel = 0;
+	std::vector<std::string> colnames;
+	std::vector<Result::Row> rows;
+	Result::Row row;
+	bool done = false;
+	while (of->getNext( type, value))
 	{
-		colnames.push_back( ri->columnName( ci));
-	}
-	std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
-	for (; wi != we; ++wi)
-	{
-		rows.push_back( *wi);
+		if (done)
+		{
+			throw std::runtime_error( "internal: unexpected element after final CLOSE");
+		}
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				taglevel++;
+				if (taglevel == 1)
+				{
+					if (value.type() != types::Variant::String || value.charsize() != 0)
+					{
+						throw std::runtime_error( "internal: unexpected top level tag in result");
+					}
+				}
+				else if (taglevel == 2)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					throw std::runtime_error( "internal: unexpected structure in result");
+				}
+				break;
+			case langbind::FilterBase::CloseTag:
+				--taglevel;
+				if (taglevel == -1) done = true;
+				if (taglevel == 0)
+				{
+					firstRow = false;
+					if (row.size() != colnames.size())
+					{
+						throw std::runtime_error("internal: row size does not mach to number of columns");
+					}
+					rows.push_back( row);
+					row.clear();
+				}
+				break;
+			case langbind::FilterBase::Attribute:
+				if (taglevel == 1)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					throw std::runtime_error( "internal: unexpected attribute in result");
+				}
+				break;
+			case langbind::FilterBase::Value:
+				row.push_back( value);
+				break;
+		}
 	}
 	return Result( colnames, rows);
 }

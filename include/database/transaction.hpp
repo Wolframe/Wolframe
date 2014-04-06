@@ -35,8 +35,9 @@
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
-#include "database/transactionInput.hpp"
-#include "database/transactionOutput.hpp"
+#include "database/vmTransactionInput.hpp"
+#include "database/vmTransactionOutput.hpp"
+#include "database/transactionExecStatemachine.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -49,22 +50,25 @@ namespace db {
 class Transaction
 {
 public:
+	Transaction( const std::string& name_, const TransactionExecStatemachineR& stm_)
+		:m_name(name_),m_stm(stm_){}
+
 	//\brief Destructor
 	virtual ~Transaction(){}
 	//\brief Configured ID of the underlaying database
-	virtual const std::string& databaseID() const=0;
+	const std::string& databaseID() const	{return m_stm->databaseID();}
 
 	//\brief Begin of a new transaction
-	virtual void begin()=0;
+	void begin()				{m_stm->begin();}
 	//\brief Commit of the running transaction
-	virtual void commit()=0;
+	void commit()				{m_stm->commit();}
 	//\brief Rollback of the running transaction
-	virtual void rollback()=0;
+	void rollback()				{m_stm->rollback();}
 	//\brief Close of the committed or rolled back transaction
-	virtual void close()=0;
+	void close()				{m_stm.reset();}
 
 	//\brief Execute a transaction
-	virtual void execute( const TransactionInput& input, TransactionOutput& output)=0;
+	virtual void execute( const VmTransactionInput& input, VmTransactionOutput& output);
 
 	//\class Result
 	//\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
@@ -92,6 +96,15 @@ public:
 
 	//\brief Execute a single statement
 	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+
+	TransactionExecStatemachine* execStatemachine()			{return m_stm.get();}
+
+private:
+	Transaction( const Transaction&){}	//... non copyable
+
+private:
+	std::string m_name;
+	TransactionExecStatemachineR m_stm;
 };
 
 
@@ -100,3 +113,4 @@ typedef types::CountedReference<Transaction> TransactionR;
 }} // namespace _Wolframe::db
 
 #endif // _TRANSACTION_HPP_INCLUDED
+

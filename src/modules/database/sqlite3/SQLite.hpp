@@ -188,7 +188,7 @@ public:
 
 //\class SQLiteTransaction
 class SQLiteTransaction
-	:public StatemachineBasedTransaction
+	:public Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);

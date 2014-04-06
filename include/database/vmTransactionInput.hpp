@@ -36,6 +36,7 @@
 #define _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
 #include "database/vm/program.hpp"
 #include "utils/printFormats.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
@@ -62,10 +63,14 @@ public:
 	std::string tostring() const;
 
 	void print( std::ostream& out) const;
-	
+
+	const vm::Program& program() const	{return m_program;}
+
 private:
 	vm::Program m_program;
 };
+
+typedef boost::shared_ptr<VmTransactionInput> VmTransactionInputR;
 
 }}//namespace
 #endif

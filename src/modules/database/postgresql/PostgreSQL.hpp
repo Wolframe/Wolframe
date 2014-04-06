@@ -42,7 +42,6 @@
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
-#include "database/transactionExecStatemachine.hpp"
 #include "PostgreSQLprogram.hpp"
 #include "PostgreSQLserverSettings.hpp"
 #include "config/configurationBase.hpp"
@@ -205,7 +204,7 @@ public:
 
 //\class PostgreSQLtransaction
 class PostgreSQLtransaction
-	:public StatemachineBasedTransaction
+	:public Transaction
 {
 public:
 	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);

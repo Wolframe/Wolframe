@@ -90,9 +90,9 @@ void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterfa
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
-VmTransactionInput TdlTransactionFunctionInput::get() const
+VmTransactionInputR TdlTransactionFunctionInput::get() const
 {
-	return VmTransactionInput( *m_func->program(), *m_structure);
+	return VmTransactionInputR( new VmTransactionInput( *m_func->program(), *m_structure));
 }
 
 void TdlTransactionFunction::print( std::ostream& out) const

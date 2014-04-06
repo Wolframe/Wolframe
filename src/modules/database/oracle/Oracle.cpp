@@ -390,7 +390,7 @@ void OracleDatabase::closeTransaction( Transaction *t )
 
 /*****  Oracle transaction  ***************************************/
 OracleTransaction::OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_)
-	: StatemachineBasedTransaction( name_, new TransactionExecStatemachine_oracle( env_, name_, &database.dbUnit( ) ) ) { }
+	: Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_oracle( env_, name_, &database.dbUnit( ) ) ) ) { }
 
 }} // _Wolframe::db
 
