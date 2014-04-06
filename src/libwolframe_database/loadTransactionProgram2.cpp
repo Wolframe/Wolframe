@@ -107,11 +107,11 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 		}
 		else if (cmd.resultpath.size() == 1 && cmd.resultpath.back() == ".")
 		{
-			prg.print_statement_result( std::vector<std::string>());
+			prg.output_statement_result( std::vector<std::string>());
 		}
 		else
 		{
-			prg.print_statement_result( cmd.resultpath);
+			prg.output_statement_result( cmd.resultpath);
 		}
 	}
 	else
@@ -226,18 +226,18 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				switch (elem.type)
 				{
 					case tdl::ElementReference::SelectorPath:
-						prg.print_ARGUMENT_PATH( elem.selector);
+						prg.output_ARGUMENT_PATH( elem.selector);
 						break;
 					case tdl::ElementReference::LoopCounter:
-						prg.print_ARGUMENT_LOOPCNT();
+						prg.output_ARGUMENT_LOOPCNT();
 					case tdl::ElementReference::Constant:
-						prg.print_ARGUMENT_CONST( elem.selector);
+						prg.output_ARGUMENT_CONST( elem.selector);
 						break;
 					case tdl::ElementReference::NamedSetElement:
-						prg.print_ARGUMENT_TUPLESET( elem.selector, elem.name);
+						prg.output_ARGUMENT_TUPLESET( elem.selector, elem.name);
 						break;
 					case tdl::ElementReference::IndexSetElement:
-						prg.print_ARGUMENT_TUPLESET( elem.selector, elem.index);
+						prg.output_ARGUMENT_TUPLESET( elem.selector, elem.index);
 						break;
 				}
 				pi = pt.begin(), pe = pt.end(); 
@@ -279,18 +279,18 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 					switch (elem.type)
 					{
 						case tdl::ElementReference::SelectorPath:
-							prg.print_ARGUMENT_PATH( elem.selector);
+							prg.output_ARGUMENT_PATH( elem.selector);
 							break;
 						case tdl::ElementReference::LoopCounter:
-							prg.print_ARGUMENT_LOOPCNT();
+							prg.output_ARGUMENT_LOOPCNT();
 						case tdl::ElementReference::Constant:
-							prg.print_ARGUMENT_CONST( elem.selector);
+							prg.output_ARGUMENT_CONST( elem.selector);
 							break;
 						case tdl::ElementReference::NamedSetElement:
-							prg.print_ARGUMENT_TUPLESET( elem.selector, elem.name);
+							prg.output_ARGUMENT_TUPLESET( elem.selector, elem.name);
 							break;
 						case tdl::ElementReference::IndexSetElement:
-							prg.print_ARGUMENT_TUPLESET( elem.selector, elem.index);
+							prg.output_ARGUMENT_TUPLESET( elem.selector, elem.index);
 							break;
 					};
 					if (hasIntoBlock)

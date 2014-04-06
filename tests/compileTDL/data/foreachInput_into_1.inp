@@ -1,0 +1,19 @@
+doc
+{
+	element
+	{
+		name 'barbara'
+		zuk 1
+	}
+	element
+	{
+		name 'jakob'
+		zuk 2
+	}
+	element
+	{
+		name 'sereina'
+		zuk 3
+	}
+}
+

@@ -42,7 +42,7 @@ Tdl2vmTranslator::Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutine
 	:m_soubroutinemap(soubroutinemap_)
 {
 	m_sub_program.code
-		( Op_GOTO_ABSOLUTE, 0 )		//... jump to start of main
+		( Op_GOTO, 0 )		//... jump to start of main
 	;
 }
 
@@ -89,8 +89,8 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 	if (0!=(idx=m_main_program.resultnametab.getIndex( selector)))
 	{
 		m_main_program.code
-			( Op_OPEN_ITER_KEPT_RESULT, idx )	// iterate on result named
-			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+			( Op_OPEN_ITER_KEPT_RESULT, idx )// iterate on result named
+			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	else if (boost::algorithm::iequals( selector, "RESULT"))
@@ -98,8 +98,8 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 		//... selector is referencing the last result
 		// Code generated:
 		m_main_program.code
-			( Op_OPEN_ITER_LAST_RESULT )		// iterate on last result
-			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+			( Op_OPEN_ITER_LAST_RESULT )	// iterate on last result
+			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	else if (boost::algorithm::iequals( selector, "PARAM"))
@@ -113,8 +113,8 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 
 		// Code generated:
 		m_main_program.code
-			( Op_OPEN_ITER_PATH, idx)		// iterate on input path
-			( Co_IF_COND, Op_GOTO_ABSOLUTE, 0)	// goto end of block if set empty
+			( Op_OPEN_ITER_PATH, idx)	// iterate on input path
+			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	m_stateStack.push_back( State( State::OpenForeach, m_main_program.code.size()));
@@ -124,18 +124,18 @@ void Tdl2vmTranslator::end_FOREACH()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenForeach) throw std::runtime_error( "illegal state: end of FOREACH");
 
-	Instruction& forwardJumpInstr = m_main_program.code[ m_stateStack.back().value-1];
-	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, 0))
-	{
-		throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
-	}
 	// Code generated:
 	m_main_program.code
 		( Op_NEXT )
-		( Co_IF_COND, Op_GOTO_ABSOLUTE, m_stateStack.back().value)
+		( Co_IF_COND, Op_GOTO, m_stateStack.back().value)
 	;
 	// Patch forward jump (if iterator set empty):
-	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO_ABSOLUTE, m_main_program.code.size());
+	Instruction& forwardJumpInstr = m_main_program.code[ m_stateStack.back().value-1];
+	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO, 0))
+	{
+		throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
+	}
+	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO, m_main_program.code.size());
 	m_stateStack.pop_back();
 }
 
@@ -143,7 +143,7 @@ void Tdl2vmTranslator::begin_DO_statement( const std::string& stm)
 {
 	// Code generated:
 	m_main_program.code
-		( Op_STM_START, m_main_program.statements.size() )
+		( Op_DBSTM_START, m_main_program.statements.size() )
 	;
 	m_stateStack.push_back( State( State::OpenStatementCall, m_main_program.statements.size()));
 	m_main_program.statements.push_back( stm);
@@ -158,7 +158,7 @@ void Tdl2vmTranslator::statement_HINT( const std::string& errorclass, const std:
 		m_stateStack.push_back( State( State::StatementHint, hintIdx));
 
 		m_main_program.code
-			( Op_STM_HINT, hintIdx )
+			( Op_DBSTM_HINT, hintIdx )
 		;
 	}
 	if (m_stateStack.back().id != State::StatementHint)
@@ -173,12 +173,12 @@ void Tdl2vmTranslator::end_DO_statement()
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenStatementCall) throw std::runtime_error( "illegal state: end of DO statement");
 	// Code generated:
 	m_main_program.code
-		( Op_STM_EXEC, m_stateStack.back().value )
+		( Op_DBSTM_EXEC, m_stateStack.back().value )
 	;
 	m_stateStack.pop_back();
 }
 
-void Tdl2vmTranslator::print_statement_result( const std::vector<std::string>& path)
+void Tdl2vmTranslator::output_statement_result( const std::vector<std::string>& path)
 {
 	ArgumentIndex endofblock
 		= (ArgumentIndex)(m_main_program.code.size()
@@ -190,27 +190,27 @@ void Tdl2vmTranslator::print_statement_result( const std::vector<std::string>& p
 
 	m_main_program.code
 		( Op_OPEN_ITER_LAST_RESULT )				/*{A}*/
-		( Co_IF_COND, Op_GOTO_ABSOLUTE, endofblock)		/*{A}*/
+		( Co_IF_COND, Op_GOTO, endofblock)			/*{A}*/
 	;
 	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
 	for (; pi != pe; ++pi)
 	{
 		m_main_program.code
-		( Op_PRINT_OPEN, m_main_program.tagnametab.get( *pi))	/*{B}*/
+		( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( *pi))	/*{B}*/
 		;
 	}
 	m_main_program.code
-		( Op_PRINT_ITR_COLUMN )					/*{A}*/
+		( Op_OUTPUT_ITR_COLUMN )				/*{A}*/
 	;
 	for (pi = path.begin(); pi != pe; ++pi)
 	{
 		m_main_program.code
-		( Op_PRINT_CLOSE )					/*{B}*/
+		( Op_OUTPUT_CLOSE )					/*{B}*/
 		;
 	}
 	m_main_program.code
 		( Op_NEXT )						/*{A}*/
-		( Co_IF_COND, Op_GOTO_ABSOLUTE, startofblock )		/*{A}*/
+		( Co_IF_COND, Op_GOTO, startofblock )			/*{A}*/
 	;
 }
 
@@ -219,7 +219,7 @@ void Tdl2vmTranslator::begin_INTO_block( const std::string& tag)
 {
 	// Code generated:
 	m_main_program.code
-		( Op_PRINT_OPEN, m_main_program.tagnametab.get( tag))
+		( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( tag))
 	;
 	m_stateStack.push_back( State( State::OpenIntoBlock, 0));
 }
@@ -309,7 +309,7 @@ void Tdl2vmTranslator::end_DO_subroutine()
 	// Code generated:
 	m_main_program.code
 		( Op_SUB_FRAME_CLOSE )
-		( Op_GOTO_ABSOLUTE, address )
+		( Op_GOTO, address )
 	;
 	m_stateStack.pop_back();
 }
@@ -333,7 +333,7 @@ void Tdl2vmTranslator::push_ARGUMENT_LOOPCNT()
 	{
 		// Code generated:
 		m_main_program.code
-			( Op_STM_BIND_LOOPCNT )			// push loop counter
+			( Op_DBSTM_BIND_LOOPCNT )			// push loop counter
 		;
 	}
 	else
@@ -362,7 +362,7 @@ void Tdl2vmTranslator::push_ARGUMENT_PATH( const std::string& selector)
 	{
 		// Code generated:
 		m_main_program.code
-			( Op_STM_BIND_PATH, idx )			// push element adressed by relative input path
+			( Op_DBSTM_BIND_PATH, idx )			// push element adressed by relative input path
 		;
 	}
 	else
@@ -393,7 +393,7 @@ void Tdl2vmTranslator::push_ARGUMENT_CONST( const types::Variant& value)
 	{
 		// Code generated:
 		m_main_program.code
-			( Op_STM_BIND_CONST, idx )			// push constant element
+			( Op_DBSTM_BIND_CONST, idx )			// push constant element
 		;
 	}
 	else
@@ -450,7 +450,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 		{
 			m_main_program.code
 				( Op_SELECT_KEPT_RESULT, idx )		// select named result
-				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+				( Op_DBSTM_BIND_SEL_IDX, colidx)	// bind column by index
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "RESULT"))
@@ -459,7 +459,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_LAST_RESULT )		// select last result
-				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+				( Op_DBSTM_BIND_SEL_IDX, colidx)	// bind column by index
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "PARAM"))
@@ -468,7 +468,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_PARAMETER )			// select parameter
-				( Op_STM_BIND_SEL_IDX, colidx)		// bind column by index
+				( Op_DBSTM_BIND_SEL_IDX, colidx)	// bind column by index
 			;
 		}
 		else
@@ -495,7 +495,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 		{
 			m_main_program.code
 				( Op_SELECT_KEPT_RESULT, idx )		// select named result
-				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+				( Op_SUB_ARG_SEL_NAM, colnameidx )	// push column by name
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "RESULT"))
@@ -504,7 +504,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_LAST_RESULT )		// select last result
-				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+				( Op_SUB_ARG_SEL_NAM, colnameidx )	// push column by name
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "PARAM"))
@@ -513,7 +513,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_PARAMETER )			// select parameter
-				( Op_SUB_ARG_SEL_NAM, colnameidx)	// push column by name
+				( Op_SUB_ARG_SEL_NAM, colnameidx )	// push column by name
 			;
 		}
 		else
@@ -528,7 +528,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 		{
 			m_main_program.code
 				( Op_SELECT_KEPT_RESULT, idx )		// select named result
-				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+				( Op_DBSTM_BIND_SEL_NAM, colnameidx )	// bind column by name
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "RESULT"))
@@ -537,7 +537,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_LAST_RESULT )		// select last result
-				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+				( Op_DBSTM_BIND_SEL_NAM, colnameidx )	// bind column by name
 			;
 		}
 		else if (boost::algorithm::iequals( setname, "PARAM"))
@@ -546,7 +546,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_PARAMETER )			// select parameter
-				( Op_STM_BIND_SEL_NAM, colnameidx)	// bind column by name
+				( Op_DBSTM_BIND_SEL_NAM, colnameidx )	// bind column by name
 			;
 		}
 		else
@@ -560,41 +560,41 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 	}
 }
 
-void Tdl2vmTranslator::print_ARGUMENT_LOOPCNT()
+void Tdl2vmTranslator::output_ARGUMENT_LOOPCNT()
 {
 	// Code generated:
 	m_main_program.code
-		( Op_PRINT_LOOPCNT )				// print loop counter
+		( Op_OUTPUT_LOOPCNT )				// print loop counter
 	;
 }
 
-void Tdl2vmTranslator::print_ARGUMENT_PATH( const std::string& selector)
+void Tdl2vmTranslator::output_ARGUMENT_PATH( const std::string& selector)
 {
 	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	// Code generated:
 	m_main_program.code
-		( Op_PRINT_PATH, idx )				// print element adressed by relative input path
+		( Op_OUTPUT_PATH, idx )				// print element adressed by relative input path
 	;
 }
 
-void Tdl2vmTranslator::print_ARGUMENT_CONST( const types::Variant& value)
+void Tdl2vmTranslator::output_ARGUMENT_CONST( const types::Variant& value)
 {
 	InstructionSet::ArgumentIndex idx = m_main_program.constants.size();
 	m_main_program.constants.push_back( value);
 	// Code generated:
 	m_main_program.code
-		( Op_PRINT_CONST, idx )				// print element adressed by relative input path
+		( Op_OUTPUT_CONST, idx )				// print element adressed by relative input path
 	;
 }
 
-void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
+void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
 {
 	InstructionSet::ArgumentIndex idx;
 	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
 	{
 		m_main_program.code
 			( Op_SELECT_KEPT_RESULT, idx )		// select named result
-			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+			( Op_OUTPUT_SEL_IDX, colidx)		// print column by index
 		;
 	}
 	else if (boost::algorithm::iequals( setname, "RESULT"))
@@ -603,7 +603,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, unsi
 		// Code generated:
 		m_main_program.code
 			( Op_SELECT_LAST_RESULT )		// select last result
-			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+			( Op_OUTPUT_SEL_IDX, colidx)		// print column by index
 		;
 	}
 	else if (boost::algorithm::iequals( setname, "PARAM"))
@@ -612,7 +612,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, unsi
 		// Code generated:
 		m_main_program.code
 			( Op_SELECT_PARAMETER )			// select parameter
-			( Op_PRINT_SEL_IDX, colidx)		// print column by index
+			( Op_OUTPUT_SEL_IDX, colidx)		// print column by index
 		;
 	}
 	else
@@ -621,7 +621,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, unsi
 	}
 }
 
-void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
+void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
 {
 	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
 	InstructionSet::ArgumentIndex idx;
@@ -629,7 +629,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, cons
 	{
 		m_main_program.code
 			( Op_SELECT_KEPT_RESULT, idx )		// select named result
-			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+			( Op_OUTPUT_SEL_NAM, colnameidx)		// print column by name
 		;
 	}
 	else if (boost::algorithm::iequals( setname, "RESULT"))
@@ -638,7 +638,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, cons
 		// Code generated:
 		m_main_program.code
 			( Op_SELECT_LAST_RESULT )		// select last result
-			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+			( Op_OUTPUT_SEL_NAM, colnameidx)		// print column by name
 		;
 	}
 	else if (boost::algorithm::iequals( setname, "PARAM"))
@@ -647,7 +647,7 @@ void Tdl2vmTranslator::print_ARGUMENT_TUPLESET( const std::string& setname, cons
 		// Code generated:
 		m_main_program.code
 			( Op_SELECT_PARAMETER )			// select parameter
-			( Op_PRINT_SEL_NAM, colnameidx)		// print column by name
+			( Op_OUTPUT_SEL_NAM, colnameidx)		// print column by name
 		;
 	}
 	else
@@ -663,11 +663,11 @@ ProgramR Tdl2vmTranslator::createProgram() const
 
 	// Patch first instruction of the program, a GOTO that jumps to the start of main
 	std::size_t ip_start_main = m_sub_program.code.size();
-	if (rt->code.size() == 0 || *rt->code.at(0) != instruction( Op_GOTO_ABSOLUTE, 0))
+	if (rt->code.size() == 0 || *rt->code.at(0) != instruction( Op_GOTO, 0))
 	{
 		throw std::runtime_error( "illegal state: jump to main instruction not found");
 	}
-	rt->code[ 0] = InstructionSet::instruction( Op_GOTO_ABSOLUTE, ip_start_main);
+	rt->code[ 0] = InstructionSet::instruction( Op_GOTO, ip_start_main);
 
 	rt->add( m_main_program, false/*do not patch GOTOs*/);
 	std::size_t ip_end_main = rt->code.size();

@@ -263,50 +263,50 @@ bool ProgramInstance::execute()
 				initResult( lastResult);
 				break;
 			}
-			case Op_GOTO_ABSOLUTE:
+			case Op_GOTO:
 				if (argidx > m_code.size()) throw std::runtime_error( "illegal goto instruction argument");
 				m_ip = argidx;
 				break;
 
 			/*Print Instructions:*/
-			case Op_PRINT_CONST:
+			case Op_OUTPUT_CONST:
 				m_output.addValue( constArgument( argidx));
 				++m_ip;
 				break;
-			case Op_PRINT_PATH:
+			case Op_OUTPUT_PATH:
 				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
-			case Op_PRINT_LOOPCNT:
+			case Op_OUTPUT_LOOPCNT:
 				m_output.addValue( loopcntArgument());
 				++m_ip;
 				break;
-			case Op_PRINT_SEL_NAM:
+			case Op_OUTPUT_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
-					condCode( instr), Op_PRINT_SEL_IDX, argidx);
+					condCode( instr), Op_OUTPUT_SEL_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
-			case Op_PRINT_SEL_IDX:
+			case Op_OUTPUT_SEL_IDX:
 				m_output.addValue( selectedArgument( argidx));
 				++m_ip;
 				break;
-			case Op_PRINT_ITR_NAM:
+			case Op_OUTPUT_ITR_NAM:
 				argidx = columnIndex( top.m_valueSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
-					condCode( instr), Op_PRINT_ITR_IDX, argidx);
+					condCode( instr), Op_OUTPUT_ITR_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
-			case Op_PRINT_ITR_IDX:
+			case Op_OUTPUT_ITR_IDX:
 				m_output.addValue( iteratorArgument( argidx));
 				++m_ip;
 				break;
-			case Op_PRINT_ITR_COLUMN:
+			case Op_OUTPUT_ITR_COLUMN:
 				printIteratorColumn();
 				break;
-			case Op_PRINT_OPEN:
+			case Op_OUTPUT_OPEN:
 				m_output.add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
 				++m_ip;
 				break;
-			case Op_PRINT_CLOSE:
+			case Op_OUTPUT_CLOSE:
 				m_output.add( Output::Element( Output::Element::Close));
 				++m_ip;
 				break;
@@ -407,8 +407,8 @@ bool ProgramInstance::execute()
 				break;
 
 
-			/*Database Instructions:*/
-			case Op_STM_START:
+			/*Database Statements:*/
+			case Op_DBSTM_START:
 				top.m_bindidx = 0;
 				top.m_hintidx = 0;
 				if (!m_db_stm->start( statementArgument( argidx)))
@@ -417,55 +417,55 @@ bool ProgramInstance::execute()
 				}
 				++m_ip;
 				break;
-			case Op_STM_BIND_CONST:
+			case Op_DBSTM_BIND_CONST:
 				if (!m_db_stm->bind( ++top.m_bindidx, constArgument( argidx)))
 				{
 					throw databaseException();
 				}
 				++m_ip;
 				break;
-			case Op_STM_BIND_PATH:
+			case Op_DBSTM_BIND_PATH:
 				throw std::runtime_error("illegal instruction in this state: addressing unresolved path expression");
-			case Op_STM_BIND_LOOPCNT:
+			case Op_DBSTM_BIND_LOOPCNT:
 				if (!m_db_stm->bind( ++top.m_bindidx, loopcntArgument()))
 				{
 					throw databaseException();
 				}
 				++m_ip;
 				break;
-			case Op_STM_BIND_SEL_NAM:
+			case Op_DBSTM_BIND_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
-					condCode( instr), Op_STM_BIND_SEL_IDX, argidx);
+					condCode( instr), Op_DBSTM_BIND_SEL_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
 
 				/*no break here!*/
-			case Op_STM_BIND_SEL_IDX:
+			case Op_DBSTM_BIND_SEL_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, selectedArgument( argidx)))
 				{
 					throw databaseException();
 				}
 				++m_ip;
 				break;
-			case Op_STM_BIND_ITR_NAM:
+			case Op_DBSTM_BIND_ITR_NAM:
 				argidx = columnIndex( top.m_valueSet.get(), argidx);
 				m_code[ m_ip] = InstructionSet::instruction( 
-					condCode( instr), Op_STM_BIND_ITR_IDX, argidx);
+					condCode( instr), Op_DBSTM_BIND_ITR_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
-			case Op_STM_BIND_ITR_IDX:
+			case Op_DBSTM_BIND_ITR_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, iteratorArgument( argidx)))
 				{
 					throw databaseException();
 				}
 				++m_ip;
 				break;
-			case Op_STM_HINT:
+			case Op_DBSTM_HINT:
 				top.m_hintidx = argidx;
 				++m_ip;
 				break;
-			case Op_STM_EXEC:
+			case Op_DBSTM_EXEC:
 				if (!m_db_stm->execute())
 				{
 					throw databaseException();

@@ -163,9 +163,14 @@ public:
 	PropertyTree( const Node& root_)
 		:m_root(root_){}
 
-	Node root() const			{return m_root;}
+	const Node& root() const		{return m_root;}
 	Node::const_iterator begin() const	{return m_root.begin();}
 	Node::const_iterator end() const	{return m_root.end();}
+
+	std::string tostring( const utils::PrintFormat* pformat=0) const
+	{
+		return m_root.tostring( pformat);
+	}
 
 private:
 	Node m_root;

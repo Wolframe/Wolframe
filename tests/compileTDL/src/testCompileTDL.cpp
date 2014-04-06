@@ -38,6 +38,7 @@
 #include "transactionfunction/InputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"
+#include "filter/ptreefilter.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -66,20 +67,36 @@ protected:
 	virtual void TearDown() {}
 };
 
-struct PtreeStackElem
+static void fillInputStructure( const types::PropertyTree& ptree, tf::InputStructure& input)
 {
-	types::PropertyTree::Node::const_iterator itr;
-	types::PropertyTree::Node::const_iterator end;
+	langbind::PropertyTreeInputFilter filter( ptree.root());
+	langbind::TypedInputFilter::ElementType type;
+	types::VariantConst elem;
+	int taglevel = 0;
 
-	PtreeStackElem( const types::PropertyTree::Node& ptree)
-		:itr(ptree.begin()),end(ptree.end()){}
-	PtreeStackElem( const types::PropertyTree::Node::const_iterator& itr_, const types::PropertyTree::Node::const_iterator& end_)
-		:itr(itr_),end(end_){}
-	PtreeStackElem( const PtreeStackElem& o)
-		:itr(o.itr),end(o.end){}
-	PtreeStackElem(){}
-};
-
+	while (filter.getNext( type, elem))
+	{
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				++taglevel;
+				input.openTag( elem);
+				break;
+			case langbind::FilterBase::CloseTag:
+				--taglevel;
+				if (taglevel >= 0)
+				{
+					input.closeTag();
+				}
+				break;
+			case langbind::FilterBase::Value:
+				input.pushValue( elem);
+				break;
+			case langbind::FilterBase::Attribute:
+				throw std::logic_error("unexpected attribute element returned by property filter");
+		}
+	}
+}
 
 TEST_F( CompileTDLTest, tests)
 {
@@ -148,32 +165,12 @@ TEST_F( CompileTDLTest, tests)
 		//	print it, if there is an input file defined:
 		if (utils::fileExists( inputfile))
 		{
-			types::PropertyTree ptree = utils::readPropertyTreeFile( inputfile);
-
+			types::PropertyTree input_ptree = utils::readPropertyTreeFile( inputfile);
 			for (ti = tl.begin(); ti != te; ++ti)
 			{
 				tf::InputStructure input( ti->second->program()->pathset.tagtab());
-				std::vector<PtreeStackElem> stack;
-				stack.push_back( ptree.root());
-				while (!stack.empty())
-				{
-					if (stack.back().itr == stack.back().end)
-					{
-						if (!stack.back().itr->second.data().empty())
-						{
-							input.pushValue( types::Variant( stack.back().itr->second.data().string()));
-						}
-						stack.pop_back();
-						if (!stack.empty())
-						{
-							input.closeTag();
-							stack.back().itr++;
-						}
-						continue;
-					}
-					input.openTag( types::Variant( stack.back().itr->first));
-					stack.push_back( PtreeStackElem( stack.back().itr->second));
-				}
+				fillInputStructure( input_ptree, input);
+
 				VmTransactionInput trsinput( *ti->second->program(), input);
 				trsinput.print( out);
 				out << std::endl;

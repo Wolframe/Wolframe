@@ -16,6 +16,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
@@ -23,6 +24,7 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
+	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
 

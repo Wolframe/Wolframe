@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/hintTable.hpp
-//\brief Defines the mapping of database statement ids to messages to atach on certain error classes (user hints)
-#ifndef _DATABASE_VIRTUAL_MACHINE_HINT_TABLE_HPP_INCLUDED
-#define _DATABASE_VIRTUAL_MACHINE_HINT_TABLE_HPP_INCLUDED
+//\file database/vm/errorHintTable.hpp
+//\brief Defines the mapping of database statement ids to messages to attach on certain error classes (user hints)
+#ifndef _DATABASE_VIRTUAL_MACHINE_ERROR_HINT_TABLE_HPP_INCLUDED
+#define _DATABASE_VIRTUAL_MACHINE_ERROR_HINT_TABLE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
 #include <map>
 #include <vector>
@@ -45,14 +45,14 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
-class HintTable
+class ErrorHintTable
 {
 public:
 	typedef InstructionSet::ArgumentIndex Index;
 
 public:
-	HintTable(){}
-	HintTable( const HintTable& o)
+	ErrorHintTable(){}
+	ErrorHintTable( const ErrorHintTable& o)
 		:m_hintar(o.m_hintar)
 	{}
 
@@ -85,7 +85,7 @@ public:
 		top.push_back( Hint( errorclass, message));
 	}
 
-	PatchArgumentMapR join( const HintTable& oth)
+	PatchArgumentMapR join( const ErrorHintTable& oth)
 	{
 		std::size_t ofs = m_hintar.size();
 		m_hintar.insert( m_hintar.end(), oth.m_hintar.begin(), oth.m_hintar.end());

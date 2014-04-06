@@ -86,6 +86,7 @@ std::string PropertyTree::Node::tostring( const utils::PrintFormat* pformat) con
 void PropertyTree::Node::print( std::ostringstream& out, const Node& nd, int indent, const utils::PrintFormat* pformat)
 {
 	std::string indentstr;
+	if (!pformat) pformat = utils::logPrintFormat();
 	for (int ii=0; ii<indent; ++ii) indentstr.append( pformat->indent);
 	for (Node::const_iterator ni=nd.begin(), ne=nd.end(); ni != ne; ++ni)
 	{

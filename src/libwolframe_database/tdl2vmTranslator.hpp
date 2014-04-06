@@ -63,7 +63,7 @@ public:
 	void begin_DO_statement( const std::string& stm);
 	void statement_HINT( const std::string& errorclass, const std::string& message);
 	void end_DO_statement();
-	void print_statement_result( const std::vector<std::string>& path);
+	void output_statement_result( const std::vector<std::string>& path);
 
 	//\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector);
@@ -75,11 +75,11 @@ public:
 	void push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
 	void push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
 
-	void print_ARGUMENT_LOOPCNT();
-	void print_ARGUMENT_PATH( const std::string& selector);
-	void print_ARGUMENT_CONST( const types::Variant& value);
-	void print_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
-	void print_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
+	void output_ARGUMENT_LOOPCNT();
+	void output_ARGUMENT_PATH( const std::string& selector);
+	void output_ARGUMENT_CONST( const types::Variant& value);
+	void output_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
+	void output_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
 
 	void result_KEEP( const std::string& name);
 

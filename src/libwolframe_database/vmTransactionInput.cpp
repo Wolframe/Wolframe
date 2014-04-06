@@ -86,7 +86,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 				}
 			}
 		}
-		else if (oc == Op_GOTO_ABSOLUTE)
+		else if (oc == Op_GOTO)
 		{
 			if (condCode( instr) == Co_ALWAYS)
 			{
@@ -105,13 +105,22 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 					}
 					stack.push_back( StackElem( ai, selected));
 				}
+				else
+				{
+					if (++stack.back().ip >= prg.code.size())
+					{
+						stack.pop_back();
+					}
+				}
 			}
 		}
 		else if (argumentType( oc) == At_Path)
 		{
 			if (oc == Op_OPEN_ITER_PATH)
 			{
-				// [1] Rewrite the instruction to reference the tuple set that will be created in the following scope:
+				// [1] Rewrite the instruction to reference the tuple set,
+				//	that will be created in the following scope:
+				oc = Op_OPEN_ITER_TUPLESET;
 				prg.code[ stack.back().ip] = instruction( condCode(instr), oc, prg.tuplesets.size());
 
 				// [2] Get the path referenced and create its set of selected nodes ('selected') in the input :
@@ -125,10 +134,11 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 					}
 				}
 
-				// [3] Rewite all instructions referencing path expressions in the iterator scope (till NEXT):
-				Address ip = stack.back().ip+1;			//< instruction pointer inside the loop iterated
+				// [3] Rewite all instructions referencing path expressions
+				//	in the iterator scope (till NEXT):
+				Address ip = stack.back().ip;			//< instruction pointer inside the loop iterated
 				std::vector<vm::SelectorPath> pathtuple;	//< tuple of sub path expressions referenced in the loop
-				while (ip < prg.code.size())
+				for (; ip < prg.code.size(); ++ip)
 				{
 					instr = *prg.code.at( ip);
 					oc = opCode( instr);
@@ -136,20 +146,21 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 
 					if (argumentType( oc) == At_Path)
 					{
-						// [3.1] Rewrite the path reference instruction in the FOREACH loop:
+						// [3.1] Rewrite the path reference 
+						//	instruction in the FOREACH loop:
 						ArgumentIndex ai = argumentIndex( instr);
 						pathtuple.push_back( prg.pathset.getPath( ai));
 						if (oc == Op_SUB_ARG_PATH)
 						{
 							oc = Op_SUB_ARG_ITR_IDX;
 						}
-						else if (oc == Op_PRINT_PATH)
+						else if (oc == Op_OUTPUT_PATH)
 						{
-							oc = Op_PRINT_ITR_IDX;
+							oc = Op_OUTPUT_ITR_IDX;
 						}
-						else if (oc == Op_STM_BIND_PATH)
+						else if (oc == Op_DBSTM_BIND_PATH)
 						{
-							oc = Op_STM_BIND_ITR_IDX;
+							oc = Op_DBSTM_BIND_ITR_IDX;
 						}
 						else if (oc == Op_OPEN_ITER_PATH)
 						{
@@ -286,13 +297,13 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 				{
 					oc = Op_SUB_ARG_CONST;
 				}
-				else if (oc == Op_PRINT_PATH)
+				else if (oc == Op_OUTPUT_PATH)
 				{
-					oc = Op_PRINT_CONST;
+					oc = Op_OUTPUT_CONST;
 				}
-				else if (oc == Op_STM_BIND_PATH)
+				else if (oc == Op_DBSTM_BIND_PATH)
 				{
-					oc = Op_STM_BIND_CONST;
+					oc = Op_DBSTM_BIND_CONST;
 				}
 				else
 				{
@@ -300,6 +311,10 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 				}
 				// [4] Rewrite the instruction to reference the tuple set that will be created in the following scope:
 				prg.code[ stack.back().ip] = instruction( condCode(instr), oc, constArgumentIndex);
+			}
+			if (++stack.back().ip >= prg.code.size())
+			{
+				stack.pop_back();
 			}
 		}
 		else

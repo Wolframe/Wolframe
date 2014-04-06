@@ -37,7 +37,8 @@
 #include <stdexcept>
 #include <vector>
 #include <string>
-#include <ostream>
+#include <sstream>
+#include <iostream>
 #include <boost/cstdint.hpp>
 
 namespace _Wolframe {
@@ -52,19 +53,19 @@ public:
 		// Control Flow Instructions:
 		Op_EXIT,			//< exit (abort)
 		Op_RETURN,			//< return from subroutine or termination of transaction
-		Op_GOTO_ABSOLUTE,		//< goto absolute address
+		Op_GOTO,			//< goto absolute address
 
-		// Print Instructions:
-		Op_PRINT_CONST,			//< print a value to output: constant
-		Op_PRINT_PATH,			//< print a value to output: unique input path selection
-		Op_PRINT_LOOPCNT,		//< print a value to output: FOREACH loop counter (first element is 0)
-		Op_PRINT_SEL_IDX,		//< print a value to output: element in selected set (unique, one element set) adressed by column index
-		Op_PRINT_SEL_NAM,		//< print a value to output: element in selected set (unique, one element set) adressed by column name
-		Op_PRINT_ITR_IDX,		//< print a value to output: element in tuple set iterated adressed by column index
-		Op_PRINT_ITR_NAM,		//< print a value to output: element in tuple set iterated adressed by column name
-		Op_PRINT_ITR_COLUMN,		//< print the whole column: for each element print OPEN [column name], result value and CLOSE
-		Op_PRINT_OPEN,			//< print an open tag to output (index in tagnametab)
-		Op_PRINT_CLOSE,			//< print a close tag to output (no argument)
+		// Output Instructions:
+		Op_OUTPUT_CONST,		//< print a value to output: constant
+		Op_OUTPUT_PATH,			//< print a value to output: unique input path selection
+		Op_OUTPUT_LOOPCNT,		//< print a value to output: FOREACH loop counter (first element is 0)
+		Op_OUTPUT_SEL_IDX,		//< print a value to output: element in selected set (unique, one element set) adressed by column index
+		Op_OUTPUT_SEL_NAM,		//< print a value to output: element in selected set (unique, one element set) adressed by column name
+		Op_OUTPUT_ITR_IDX,		//< print a value to output: element in tuple set iterated adressed by column index
+		Op_OUTPUT_ITR_NAM,		//< print a value to output: element in tuple set iterated adressed by column name
+		Op_OUTPUT_ITR_COLUMN,		//< print the whole column: for each element print OPEN [column name], result value and CLOSE
+		Op_OUTPUT_OPEN,			//< print an open tag to output (index in tagnametab)
+		Op_OUTPUT_CLOSE,			//< print a close tag to output (no argument)
 
 		// Assignment Instructions:
 		Op_KEEP_RESULT,			//< keep result
@@ -91,16 +92,16 @@ public:
 		Op_SUB_FRAME_CLOSE,		//< push state with parameters on stack for subroutine call. For the jump to the subroutine GOTO is used.
 
 		// Database Instructions:
-		Op_STM_START,			//< open a statement to execute
-		Op_STM_BIND_CONST,		//< bind a statement parameter: constant value
-		Op_STM_BIND_PATH,		//< bind a statement parameter: path selection value
-		Op_STM_BIND_LOOPCNT,		//< bind a statement parameter: FOREACH loop counter (first element is 0)
-		Op_STM_BIND_SEL_IDX,		//< bind a statement parameter
-		Op_STM_BIND_SEL_NAM,		//< bind a statement parameter
-		Op_STM_BIND_ITR_IDX,		//< bind a statement parameter
-		Op_STM_BIND_ITR_NAM,		//< bind a statement parameter
-		Op_STM_HINT,			//< define a list of hints for open statement
-		Op_STM_EXEC,			//< execute open statement
+		Op_DBSTM_START,			//< open a statement to execute
+		Op_DBSTM_BIND_CONST,		//< bind a statement parameter: constant value
+		Op_DBSTM_BIND_PATH,		//< bind a statement parameter: path selection value
+		Op_DBSTM_BIND_LOOPCNT,		//< bind a statement parameter: FOREACH loop counter (first element is 0)
+		Op_DBSTM_BIND_SEL_IDX,		//< bind a statement parameter
+		Op_DBSTM_BIND_SEL_NAM,		//< bind a statement parameter
+		Op_DBSTM_BIND_ITR_IDX,		//< bind a statement parameter
+		Op_DBSTM_BIND_ITR_NAM,		//< bind a statement parameter
+		Op_DBSTM_HINT,			//< define a list of hints for open statement
+		Op_DBSTM_EXEC,			//< execute open statement
 
 		// Collect Results and Constraints:
 		Op_RESULT_SET_INIT,
@@ -117,16 +118,16 @@ public:
 			"RETURN",
 			"GOTO",
 	
-			"PRINT_CONST",
-			"PRINT_PATH",
-			"PRINT_LOOPCNT",
-			"PRINT_SEL_IDX",
-			"PRINT_SEL_NAM",
-			"PRINT_ITR_IDX",
-			"PRINT_ITR_NAM",
-			"PRINT_ITR_COLUMN",
-			"PRINT_OPEN",
-			"PRINT_CLOSE",
+			"OUTPUT_CONST",
+			"OUTPUT_PATH",
+			"OUTPUT_LOOPCNT",
+			"OUTPUT_SEL_IDX",
+			"OUTPUT_SEL_NAM",
+			"OUTPUT_ITR_IDX",
+			"OUTPUT_ITR_NAM",
+			"OUTPUT_ITR_COLUMN",
+			"OUTPUT_OPEN",
+			"OUTPUT_CLOSE",
 
 			"KEEP_RESULT",
 			"SELECT_PARAMETER",
@@ -149,16 +150,16 @@ public:
 			"SUB_ARG_ITR_NAM",
 			"SUB_FRAME_CLOSE",
 	
-			"STM_START",
-			"STM_BIND_CONST",
-			"STM_BIND_PATH",
-			"STM_BIND_LOOPCNT",
-			"STM_BIND_SEL_IDX",
-			"STM_BIND_SEL_NAM",
-			"STM_BIND_ITR_IDX",
-			"STM_BIND_ITR_NAM",
-			"STM_HINT",
-			"STM_EXEC",
+			"DBSTM_START",
+			"DBSTM_BIND_CONST",
+			"DBSTM_BIND_PATH",
+			"DBSTM_BIND_LOOPCNT",
+			"DBSTM_BIND_SEL_IDX",
+			"DBSTM_BIND_SEL_NAM",
+			"DBSTM_BIND_ITR_IDX",
+			"DBSTM_BIND_ITR_NAM",
+			"DBSTM_HINT",
+			"DBSTM_EXEC",
 	
 			"RESULT_SET_INIT",
 			"RESULT_CONSTRAINT_UNIQUE",
@@ -215,16 +216,16 @@ public:
 			/*Op_RETURN*/			At_None,
 			/*Op_GOTO*/			At_Address,
 
-			/*Op_PRINT_CONST*/		At_Constant,
-			/*Op_PRINT_PATH*/		At_Path,
-			/*Op_PRINT_LOOPCNT*/		At_None,
-			/*Op_PRINT_SEL_IDX*/		At_SelectedColumnIdx,
-			/*Op_PRINT_SEL_NAM*/		At_ColumnName,
-			/*Op_PRINT_ITR_IDX*/		At_IteratorColumnIdx,
-			/*Op_PRINT_ITR_NAM*/		At_ColumnName,
-			/*Op_PRINT_ITR_COLUMN*/		At_None,
-			/*Op_PRINT_OPEN*/		At_TagName,
-			/*Op_PRINT_CLOSE*/		At_None,
+			/*Op_OUTPUT_CONST*/		At_Constant,
+			/*Op_OUTPUT_PATH*/		At_Path,
+			/*Op_OUTPUT_LOOPCNT*/		At_None,
+			/*Op_OUTPUT_SEL_IDX*/		At_SelectedColumnIdx,
+			/*Op_OUTPUT_SEL_NAM*/		At_ColumnName,
+			/*Op_OUTPUT_ITR_IDX*/		At_IteratorColumnIdx,
+			/*Op_OUTPUT_ITR_NAM*/		At_ColumnName,
+			/*Op_OUTPUT_ITR_COLUMN*/		At_None,
+			/*Op_OUTPUT_OPEN*/		At_TagName,
+			/*Op_OUTPUT_CLOSE*/		At_None,
 	
 			/*Op_KEEP_RESULT*/		At_ResultName,
 			/*Op_SELECT_PARAMETER*/		At_None,
@@ -247,16 +248,16 @@ public:
 			/*Op_SUB_ARG_ITR_NAM*/		At_ColumnName,
 			/*Op_SUB_FRAME_CLOSE*/		At_None,
 	
-			/*Op_STM_START*/		At_Statement,
-			/*Op_STM_BIND_CONST*/		At_Constant,
-			/*Op_STM_BIND_PATH*/		At_Path,
-			/*Op_STM_BIND_LOOPCNT*/		At_None,
-			/*Op_STM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
-			/*Op_STM_BIND_SEL_NAM*/		At_ColumnName,
-			/*Op_STM_BIND_ITR_IDX*/		At_IteratorColumnIdx,
-			/*Op_STM_BIND_ITR_NAM*/		At_ColumnName,
-			/*Op_STM_HINT*/			At_Hint,
-			/*Op_STM_EXEC*/			At_None,
+			/*Op_DBSTM_START*/		At_Statement,
+			/*Op_DBSTM_BIND_CONST*/		At_Constant,
+			/*Op_DBSTM_BIND_PATH*/		At_Path,
+			/*Op_DBSTM_BIND_LOOPCNT*/		At_None,
+			/*Op_DBSTM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
+			/*Op_DBSTM_BIND_SEL_NAM*/		At_ColumnName,
+			/*Op_DBSTM_BIND_ITR_IDX*/		At_IteratorColumnIdx,
+			/*Op_DBSTM_BIND_ITR_NAM*/		At_ColumnName,
+			/*Op_DBSTM_HINT*/			At_Hint,
+			/*Op_DBSTM_EXEC*/			At_None,
 	
 			/*Op_RESULT_SET_INIT*/		At_None,
 			/*Op_RESULT_CONSTRAINT_UNIQUE*/	At_None,
@@ -326,6 +327,22 @@ public:
 			}
 			out << std::endl;
 		}
+	}
+
+	static std::string instructionstr( const Instruction& instr)
+	{
+		std::ostringstream out;
+		CondCode cc = condCode( instr);
+		OpCode oc = opCode( instr);
+		ArgumentType at = argumentType( oc);
+		ArgumentIndex ai = argumentIndex( instr);
+
+		out << condCodeName( cc) << " " << opCodeName( oc) << " ";
+		if (at != At_None)
+		{
+			out << argumentTypeName(at) << " " << ai;
+		}
+		return out.str();
 	}
 
 private:
