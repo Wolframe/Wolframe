@@ -47,7 +47,7 @@ class Tdl2vmTranslator
 	:public vm::InstructionSet
 {
 public:
-	explicit Tdl2vmTranslator( const types::keymap<vm::Subroutine>* soubroutinemap_);
+	Tdl2vmTranslator( const types::keymap<vm::Subroutine>* soubroutinemap_, bool isSubroutine);
 	Tdl2vmTranslator( const Tdl2vmTranslator& o);
 
 	void begin_FOREACH( const std::string& selector);
@@ -74,12 +74,16 @@ public:
 	void push_ARGUMENT_CONST( const types::Variant& value);
 	void push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
 	void push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
+	void push_ARGUMENT_ITER( unsigned int colidx);
+	void push_ARGUMENT_ITER( const std::string& colname);
 
 	void output_ARGUMENT_LOOPCNT();
 	void output_ARGUMENT_PATH( const std::string& selector);
 	void output_ARGUMENT_CONST( const types::Variant& value);
 	void output_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx);
 	void output_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname);
+	void output_ARGUMENT_ITER( unsigned int colidx);
+	void output_ARGUMENT_ITER( const std::string& colname);
 
 	void result_KEEP( const std::string& name);
 
@@ -97,15 +101,15 @@ private:
 			OpenSubroutineCall
 		};
 		Id id;
-		vm::InstructionSet::ArgumentIndex value;
-		unsigned int cnt;
+		vm::InstructionSet::ArgumentIndex value;	//< state variable (interpretation is depending on id)
+		unsigned int paramcnt;				//< counter of parameters pushed for validity check
 
 		State()
-			:id(None),value(0),cnt(0){}
+			:id(None),value(0),paramcnt(0){}
 		State( const State& o)
-			:id(o.id),value(o.value),cnt(o.cnt){}
+			:id(o.id),value(o.value),paramcnt(o.paramcnt){}
 		State( Id i, vm::InstructionSet::ArgumentIndex v)
-			:id(i),value(v),cnt(0){}
+			:id(i),value(v),paramcnt(0){}
 	};
 	struct CalledSubroutineDef
 	{
@@ -129,6 +133,8 @@ private:
 	std::vector<CalledSubroutineDef> m_calledSubroutines;
 	vm::Program m_sub_program;
 	vm::Program m_main_program;
+	bool m_isSubroutine;
+	unsigned int m_nofCommands;
 };
 
 }}//namespace

@@ -95,7 +95,7 @@ public:
 		NameMap::const_iterator oi = oth.m_namemap.begin(), oe = oth.m_namemap.end();
 		for (; oi != oe; ++oi)
 		{
-			map[ oi->second] = get( oi->first);
+			map[ oi->second] = get( oth.m_namear.at( oi->second-1));
 		}
 		return PatchArgumentMapR( new PatchArgumentMap_Table( map));
 	}

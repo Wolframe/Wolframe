@@ -82,14 +82,7 @@ const types::Variant& ProgramInstance::selectedArgument( ArgumentIndex argidx) c
 	{
 		return null;
 	}
-	else if (argidx >= top.m_selectedSet->nofColumns())
-	{
-		throw std::runtime_error( "column index out of bounds");
-	}
-	else
-	{
-		return top.m_selectedSet->begin()->column( argidx);
-	}
+	return top.m_selectedSet->begin()->column( argidx);
 }
 
 const types::Variant& ProgramInstance::iteratorArgument( ArgumentIndex argidx) const
@@ -171,10 +164,10 @@ void ProgramInstance::initResult( const ValueTupleSetR& resultset)
 
 ValueTupleSetR ProgramInstance::fetchDatabaseResult()
 {
-	if (m_db_stm->hasResult()) return ValueTupleSetR();
+	if (!m_db_stm->hasResult()) throw std::logic_error("assertion failed: call fetchDatabaseResult() without result");
 
 	std::size_t ii,nofColumns = m_db_stm->nofColumns();
-	if (m_db_stm->nofColumns() == 0) return ValueTupleSetR();
+	if (nofColumns == 0) return ValueTupleSetR();
 
 	std::vector<std::string> colNames;
 	for (ii=0; ii<nofColumns; ++ii)
@@ -301,6 +294,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_OUTPUT_ITR_COLUMN:
 				printIteratorColumn();
+				++m_ip;
 				break;
 			case Op_OUTPUT_OPEN:
 				m_output->add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
@@ -323,6 +317,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_SELECT_LAST_RESULT:
 				top.m_selectedSet = top.m_lastResult;
+				if (!top.m_lastResult.get()) throw std::runtime_error( "selecting result set that is not defined");
 				if (top.m_selectedSet->size() > 1) throw std::runtime_error( "ambiguous value reference");
 				++m_ip;
 				break;
@@ -359,7 +354,7 @@ bool ProgramInstance::execute()
 				else
 				{
 					++top.m_valueIter;
-					m_cond = true;
+					m_cond = (top.m_valueIter != top.m_valueEnd);
 				}
 				++m_ip;
 				break;

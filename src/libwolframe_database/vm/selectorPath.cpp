@@ -190,7 +190,14 @@ void SelectorPath::print( std::ostream& out, const TagTable* tagmap) const
 				{
 					out << "/";
 				}
-				out << tagmap->getstr(ii->m_tag);
+				if (ii->m_tag)
+				{
+					out << tagmap->getstr(ii->m_tag);
+				}
+				else
+				{
+					out << "*";
+				}
 				break;
 
 			case Element::Find: 
@@ -202,7 +209,14 @@ void SelectorPath::print( std::ostream& out, const TagTable* tagmap) const
 				{
 					out << "//";
 				}
-				out << tagmap->getstr(ii->m_tag);
+				if (ii->m_tag)
+				{
+					out << tagmap->getstr(ii->m_tag);
+				}
+				else
+				{
+					out << "*";
+				}
 				break;
 
 			case Element::Up:

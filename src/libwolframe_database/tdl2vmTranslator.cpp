@@ -38,8 +38,10 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
 
-Tdl2vmTranslator::Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutinemap_)
+Tdl2vmTranslator::Tdl2vmTranslator( const types::keymap<Subroutine>* soubroutinemap_, bool isSubroutine)
 	:m_soubroutinemap(soubroutinemap_)
+	,m_isSubroutine(isSubroutine)
+	,m_nofCommands(0)
 {
 	m_sub_program.code
 		( Op_GOTO, 0 )		//... jump to start of main
@@ -52,6 +54,8 @@ Tdl2vmTranslator::Tdl2vmTranslator( const Tdl2vmTranslator& o)
 	,m_calledSubroutines(o.m_calledSubroutines)
 	,m_sub_program(o.m_sub_program)
 	,m_main_program(o.m_main_program)
+	,m_isSubroutine(o.m_isSubroutine)
+	,m_nofCommands(o.m_nofCommands)
 {}
 
 void Tdl2vmTranslator::result_KEEP( const std::string& name)
@@ -90,7 +94,7 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 	{
 		m_main_program.code
 			( Op_OPEN_ITER_KEPT_RESULT, idx )// iterate on result named
-			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
+			( Co_NOT_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	else if (boost::algorithm::iequals( selector, "RESULT"))
@@ -99,7 +103,7 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 		// Code generated:
 		m_main_program.code
 			( Op_OPEN_ITER_LAST_RESULT )	// iterate on last result
-			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
+			( Co_NOT_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	else if (boost::algorithm::iequals( selector, "PARAM"))
@@ -114,7 +118,7 @@ void Tdl2vmTranslator::begin_FOREACH( const std::string& selector)
 		// Code generated:
 		m_main_program.code
 			( Op_OPEN_ITER_PATH, idx)	// iterate on input path
-			( Co_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
+			( Co_NOT_IF_COND, Op_GOTO, 0)	// goto end of block if set empty
 		;
 	}
 	m_stateStack.push_back( State( State::OpenForeach, m_main_program.code.size()));
@@ -131,11 +135,11 @@ void Tdl2vmTranslator::end_FOREACH()
 	;
 	// Patch forward jump (if iterator set empty):
 	Instruction& forwardJumpInstr = m_main_program.code[ m_stateStack.back().value-1];
-	if (forwardJumpInstr != instruction( Co_IF_COND, Op_GOTO, 0))
+	if (forwardJumpInstr != instruction( Co_NOT_IF_COND, Op_GOTO, 0))
 	{
 		throw std::runtime_error( "illegal state: forward patch reference not pointing to instruction expected");
 	}
-	forwardJumpInstr = InstructionSet::instruction( Co_IF_COND, Op_GOTO, m_main_program.code.size());
+	forwardJumpInstr = InstructionSet::instruction( Co_NOT_IF_COND, Op_GOTO, m_main_program.code.size());
 	m_stateStack.pop_back();
 }
 
@@ -176,6 +180,7 @@ void Tdl2vmTranslator::end_DO_statement()
 		( Op_DBSTM_EXEC, m_stateStack.back().value )
 	;
 	m_stateStack.pop_back();
+	m_nofCommands += 1;
 }
 
 void Tdl2vmTranslator::output_statement_result( const std::vector<std::string>& path)
@@ -190,7 +195,7 @@ void Tdl2vmTranslator::output_statement_result( const std::vector<std::string>& 
 
 	m_main_program.code
 		( Op_OPEN_ITER_LAST_RESULT )				/*{A}*/
-		( Co_IF_COND, Op_GOTO, endofblock)			/*{A}*/
+		( Co_NOT_IF_COND, Op_GOTO, endofblock)			/*{A}*/
 	;
 	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
 	for (; pi != pe; ++pi)
@@ -227,6 +232,9 @@ void Tdl2vmTranslator::begin_INTO_block( const std::string& tag)
 void Tdl2vmTranslator::end_INTO_block()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenIntoBlock) throw std::runtime_error( "illegal state: end of INTO");
+	m_main_program.code
+		( Op_OUTPUT_CLOSE )
+	;
 	m_stateStack.pop_back();
 }
 
@@ -302,7 +310,7 @@ void Tdl2vmTranslator::end_DO_subroutine()
 	InstructionSet::ArgumentIndex subroutineIdx = m_stateStack.back().value;
 	InstructionSet::ArgumentIndex address = m_calledSubroutines.at( subroutineIdx).address;
 	std::size_t nofParams = m_calledSubroutines.at(subroutineIdx).subroutine.params().size();
-	if (nofParams != m_stateStack.back().cnt)
+	if (nofParams != m_stateStack.back().paramcnt)
 	{
 		throw std::runtime_error( "number of parameters in subroutine call does not match");
 	}
@@ -312,16 +320,17 @@ void Tdl2vmTranslator::end_DO_subroutine()
 		( Op_GOTO, address )
 	;
 	m_stateStack.pop_back();
+	m_nofCommands += 1;
 }
 
 void Tdl2vmTranslator::push_ARGUMENT_LOOPCNT()
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().paramcnt;
 	if (m_stateStack.back().id == State::StatementHint)
 	{
 		m_stateStack.pop_back();
 	}
-
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
 	{
 		// Code generated:
@@ -345,11 +354,11 @@ void Tdl2vmTranslator::push_ARGUMENT_LOOPCNT()
 void Tdl2vmTranslator::push_ARGUMENT_PATH( const std::string& selector)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().paramcnt;
 	if (m_stateStack.back().id == State::StatementHint)
 	{
 		m_stateStack.pop_back();
 	}
-
 	InstructionSet::ArgumentIndex idx = m_main_program.pathset.add( selector);
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
 	{
@@ -374,7 +383,7 @@ void Tdl2vmTranslator::push_ARGUMENT_PATH( const std::string& selector)
 void Tdl2vmTranslator::push_ARGUMENT_CONST( const types::Variant& value)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
-	++m_stateStack.back().cnt;
+	++m_stateStack.back().paramcnt;
 	if (m_stateStack.back().id == State::StatementHint)
 	{
 		m_stateStack.pop_back();
@@ -405,10 +414,23 @@ void Tdl2vmTranslator::push_ARGUMENT_CONST( const types::Variant& value)
 void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
-	++m_stateStack.back().cnt;
+	++m_stateStack.back().paramcnt;
 	if (m_stateStack.back().id == State::StatementHint)
 	{
 		m_stateStack.pop_back();
+	}
+	bool referencing_RESULT = false;
+	bool referencing_PARAM = false;
+	if (setname.empty())
+	{
+		if (m_isSubroutine && m_nofCommands == 0)
+		{
+			referencing_PARAM = true;
+		}
+		else
+		{
+			referencing_RESULT = true;
+		}
 	}
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
 	{
@@ -420,18 +442,18 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 				( Op_SUB_ARG_SEL_IDX, colidx)		// push column by index
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "RESULT"))
+		else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 		{
-			//... selector is referencing the last result
+			//... selector is referencing an column of the last result
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_LAST_RESULT )		// select last result
 				( Op_SUB_ARG_SEL_IDX, colidx)		// push column by index
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "PARAM"))
+		else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 		{
-			//... selector is referencing the last result
+			//... selector is referencing a subroutine parameter
 			// Code generated:
 			m_main_program.code
 				( Op_SELECT_PARAMETER )			// select parameter
@@ -453,7 +475,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 				( Op_DBSTM_BIND_SEL_IDX, colidx)	// bind column by index
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "RESULT"))
+		else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -462,7 +484,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 				( Op_DBSTM_BIND_SEL_IDX, colidx)	// bind column by index
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "PARAM"))
+		else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -485,9 +507,22 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, unsig
 void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const std::string& colname)
 {
 	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
-	++m_stateStack.back().cnt;
+	++m_stateStack.back().paramcnt;
 	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
 
+	bool referencing_RESULT = false;
+	bool referencing_PARAM = false;
+	if (setname.empty())
+	{
+		if (m_isSubroutine && m_nofCommands == 0)
+		{
+			referencing_PARAM = true;
+		}
+		else
+		{
+			referencing_RESULT = true;
+		}
+	}
 	if (m_stateStack.back().id == State::OpenSubroutineCall)
 	{
 		InstructionSet::ArgumentIndex idx;
@@ -498,7 +533,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 				( Op_SUB_ARG_SEL_NAM, colnameidx )	// push column by name
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "RESULT"))
+		else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -507,7 +542,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 				( Op_SUB_ARG_SEL_NAM, colnameidx )	// push column by name
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "PARAM"))
+		else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -531,7 +566,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 				( Op_DBSTM_BIND_SEL_NAM, colnameidx )	// bind column by name
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "RESULT"))
+		else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -540,7 +575,7 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 				( Op_DBSTM_BIND_SEL_NAM, colnameidx )	// bind column by name
 			;
 		}
-		else if (boost::algorithm::iequals( setname, "PARAM"))
+		else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 		{
 			//... selector is referencing the last result
 			// Code generated:
@@ -553,6 +588,53 @@ void Tdl2vmTranslator::push_ARGUMENT_TUPLESET( const std::string& setname, const
 		{
 			throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
 		}
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push/bind paramter");
+	}
+}
+
+void Tdl2vmTranslator::push_ARGUMENT_ITER( unsigned int colidx)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().paramcnt;
+
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		m_main_program.code
+			( Op_SUB_ARG_ITR_IDX, colidx )		// push column by index
+		;
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		m_main_program.code
+			( Op_DBSTM_BIND_ITR_IDX, colidx )	// bind column by index
+		;
+	}
+	else
+	{
+		throw std::runtime_error( "illegal state: expected statement or subroutine call context for push/bind paramter");
+	}
+}
+
+void Tdl2vmTranslator::push_ARGUMENT_ITER( const std::string& colname)
+{
+	if (m_stateStack.empty()) throw std::runtime_error( "illegal state: push paramter without context");
+	++m_stateStack.back().paramcnt;
+	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
+
+	if (m_stateStack.back().id == State::OpenSubroutineCall)
+	{
+		m_main_program.code
+			( Op_SUB_ARG_ITR_NAM, colnameidx )	// push column by name
+		;
+	}
+	else if (m_stateStack.back().id == State::OpenStatementCall)
+	{
+		m_main_program.code
+			( Op_DBSTM_BIND_ITR_NAM, colnameidx )	// bind column by name
+		;
 	}
 	else
 	{
@@ -590,6 +672,19 @@ void Tdl2vmTranslator::output_ARGUMENT_CONST( const types::Variant& value)
 void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, unsigned int colidx)
 {
 	InstructionSet::ArgumentIndex idx;
+	bool referencing_RESULT = false;
+	bool referencing_PARAM = false;
+	if (setname.empty())
+	{
+		if (m_isSubroutine && m_nofCommands == 0)
+		{
+			referencing_PARAM = true;
+		}
+		else
+		{
+			referencing_RESULT = true;
+		}
+	}
 	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
 	{
 		m_main_program.code
@@ -597,7 +692,7 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, uns
 			( Op_OUTPUT_SEL_IDX, colidx)		// print column by index
 		;
 	}
-	else if (boost::algorithm::iequals( setname, "RESULT"))
+	else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 	{
 		//... selector is referencing the last result
 		// Code generated:
@@ -606,7 +701,7 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, uns
 			( Op_OUTPUT_SEL_IDX, colidx)		// print column by index
 		;
 	}
-	else if (boost::algorithm::iequals( setname, "PARAM"))
+	else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 	{
 		//... selector is referencing the last result
 		// Code generated:
@@ -625,6 +720,19 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, con
 {
 	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
 	InstructionSet::ArgumentIndex idx;
+	bool referencing_RESULT = false;
+	bool referencing_PARAM = false;
+	if (setname.empty())
+	{
+		if (m_isSubroutine && m_nofCommands == 0)
+		{
+			referencing_PARAM = true;
+		}
+		else
+		{
+			referencing_RESULT = true;
+		}
+	}
 	if (0!=(idx=m_main_program.resultnametab.getIndex( setname)))
 	{
 		m_main_program.code
@@ -632,7 +740,7 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, con
 			( Op_OUTPUT_SEL_NAM, colnameidx)		// print column by name
 		;
 	}
-	else if (boost::algorithm::iequals( setname, "RESULT"))
+	else if (referencing_RESULT || boost::algorithm::iequals( setname, "RESULT"))
 	{
 		//... selector is referencing the last result
 		// Code generated:
@@ -641,7 +749,7 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, con
 			( Op_OUTPUT_SEL_NAM, colnameidx)		// print column by name
 		;
 	}
-	else if (boost::algorithm::iequals( setname, "PARAM"))
+	else if (referencing_PARAM || boost::algorithm::iequals( setname, "PARAM"))
 	{
 		//... selector is referencing the last result
 		// Code generated:
@@ -654,6 +762,22 @@ void Tdl2vmTranslator::output_ARGUMENT_TUPLESET( const std::string& setname, con
 	{
 		throw std::runtime_error( std::string( "selecting unknown name of set '") + setname + "'");
 	}
+}
+
+void Tdl2vmTranslator::output_ARGUMENT_ITER( unsigned int colidx)
+{
+	m_main_program.code
+		( Op_OUTPUT_ITR_IDX, colidx )		// push column by index
+	;
+}
+
+void Tdl2vmTranslator::output_ARGUMENT_ITER( const std::string& colname)
+{
+	InstructionSet::ArgumentIndex colnameidx = m_main_program.colnametab.get( colname);
+
+	m_main_program.code
+		( Op_OUTPUT_ITR_NAM, colnameidx )	// push column by name
+	;
 }
 
 

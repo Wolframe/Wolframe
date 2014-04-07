@@ -1,0 +1,5 @@
+TRANSACTION testcall
+BEGIN
+	DO SELECT run( $(/aa));
+	DO SELECT exec( $1);
+END

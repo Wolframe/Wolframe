@@ -26,25 +26,38 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	FOREACH //item/aa DO run ( . , ../bb, .././cc, ..//dd/.);
+	FOREACH //item/aa DO SELECT run ( $(.) , $(../bb), $(../cc), $(..//dd));
 END
 **outputfile:DBOUT
 **output
-run #1#2#3#NULL
-run #11#NULL#33#44
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] OPEN_ITER_TUPLESET TUPLESET 0
+[3] NOT_IF_COND GOTO @12
+[4] DBSTM_START STM (SELECT run ( $1 , $2, $3, $4))
+[5] DBSTM_BIND_ITR_IDX COLIDX 1
+[6] DBSTM_BIND_ITR_IDX COLIDX 2
+[7] DBSTM_BIND_ITR_IDX COLIDX 3
+[8] DBSTM_BIND_ITR_IDX COLIDX 4
+[9] DBSTM_EXEC
+[10] NEXT
+[11] IF_COND GOTO @4
+[12] RETURN
+Input Data:
+SET 0: ., bb, cc, dd
+  '1', '2', '3', NULL
+  '11', NULL, '33', '44'
+start( 'SELECT run ( $1 , $2, $3, $4)' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
 bind( 4, NULL );
 execute();
-nofColumns(); returns 0
-start( 'run' );
+start( 'SELECT run ( $1 , $2, $3, $4)' );
 bind( 1, '11' );
 bind( 2, NULL );
 bind( 3, '33' );
 bind( 4, '44' );
 execute();
-nofColumns(); returns 0
 **end

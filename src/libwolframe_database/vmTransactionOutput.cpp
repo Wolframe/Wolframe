@@ -89,12 +89,12 @@ public:
 		switch (m_itr->op())
 		{
 			case vm::Output::Element::Open:
-				type = langbind::FilterBase::Value;
+				type = langbind::FilterBase::OpenTag;
 				element = m_itr->arg();
 				break;
 
 			case vm::Output::Element::Close:
-				type = langbind::FilterBase::Value;
+				type = langbind::FilterBase::CloseTag;
 				element = m_itr->arg();
 				break;
 

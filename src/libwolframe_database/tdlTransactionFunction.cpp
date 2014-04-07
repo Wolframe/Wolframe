@@ -47,12 +47,18 @@ using namespace _Wolframe::db;
 TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunction* func_)
 	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter("transactionFunctionInput")
-	,m_func(func_),m_lasttype(langbind::TypedInputFilter::CloseTag){}
+	,m_structure(new tf::InputStructure( func_->program()->pathset.tagtab()))
+	,m_func(func_)
+	,m_lasttype(langbind::TypedInputFilter::CloseTag)
+{}
 
 TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o)
 	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter(o)
-	,m_structure(o.m_structure),m_func(o.m_func),m_lasttype(o.m_lasttype){}
+	,m_structure(o.m_structure)
+	,m_func(o.m_func)
+	,m_lasttype(o.m_lasttype)
+{}
 
 bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
 {

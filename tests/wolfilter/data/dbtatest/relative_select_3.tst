@@ -26,17 +26,23 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	DO run( wald, wiese, garten);
+	DO SELECT run( $(wald), $(wiese), $(garten));
 END
 **outputfile:DBOUT
 **output
-run #3#2#1
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2, $3))
+[3] DBSTM_BIND_CONST CONST '3'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_BIND_CONST CONST '1'
+[6] DBSTM_EXEC
+[7] RETURN
+start( 'SELECT run( $1, $2, $3)' );
 bind( 1, '3' );
 bind( 2, '2' );
 bind( 3, '1' );
 execute();
-nofColumns(); returns 0
 **end
 

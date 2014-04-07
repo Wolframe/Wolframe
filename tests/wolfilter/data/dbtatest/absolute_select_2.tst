@@ -27,15 +27,20 @@ Processor
 **file:DBIN.tdl
 TRANSACTION testcall
 BEGIN
-	DO run( /aa, /bb);
+	DO SELECT run( $(/aa), $(/bb));
 END
 **outputfile:DBOUT
 **output
-run #1#2
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_EXEC
+[6] RETURN
+start( 'SELECT run( $1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
-nofColumns(); returns 0
 **end

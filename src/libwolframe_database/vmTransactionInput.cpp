@@ -11,7 +11,6 @@ using namespace _Wolframe::db;
 
 void VmTransactionInput::print( std::ostream& out) const
 {
-	out << "TRANSACTION INPUT:" << std::endl;
 	m_program.print( out);
 }
 
@@ -233,12 +232,20 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 							{
 								valuetuple.push_back( null);
 							}
-							else if (element_value_ar.size() > 1)
-							{
-								throw std::runtime_error( std::string("ambiguus value reference in loop: '") + ti->tostring( prg.pathset.tagtab()) + "'");
-							}
 							else
 							{
+								if (element_value_ar.size() > 1)
+								{
+									std::vector<tf::InputNodeIndex>::const_iterator ei = element_value_ar.begin(), ee = element_value_ar.end();
+									tf::InputNodeIndex first = *ei;
+									for (++ei; ei != ee; ++ei)
+									{
+										if (*ei != first)
+										{
+											throw std::runtime_error( std::string("ambiguus value reference in loop: '") + ti->tostring( prg.pathset.tagtab()) + "'");
+										}
+									}
+								}
 								const tf::InputNode* nd = input.node( element_value_ar.at(0));
 								const types::Variant* value = input.contentvalue( nd);
 								if (value)

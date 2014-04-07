@@ -128,6 +128,7 @@ ElementReference ElementReference::parsePlainReference( const LanguageDescriptio
 	}
 	else if (ch == '$')
 	{
+		++si;
 		return parseEmbeddedReference( langdescr, si, se);
 	}
 	else

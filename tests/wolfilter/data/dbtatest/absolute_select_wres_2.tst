@@ -29,7 +29,7 @@ Processor
 TRANSACTION testcall
 RESULT INTO result
 BEGIN
-	INTO item DO run( /aa, /bb);
+	INTO item DO SELECT run( $(/aa), $(/bb));
 END
 **file: DBRES
 #id name#1 hugo
@@ -37,9 +37,24 @@ END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result><item><id>1</id><name>hugo</name></item></result>
-run #1#2
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] OUTPUT_OPEN TAG result
+[2] RESULT_SET_INIT
+[3] DBSTM_START STM (SELECT run( $1, $2))
+[4] DBSTM_BIND_CONST CONST '1'
+[5] DBSTM_BIND_CONST CONST '2'
+[6] DBSTM_EXEC
+[7] OPEN_ITER_LAST_RESULT
+[8] NOT_IF_COND GOTO @14
+[9] OUTPUT_OPEN TAG item
+[10] OUTPUT_ITR_COLUMN
+[11] OUTPUT_CLOSE
+[12] NEXT
+[13] IF_COND GOTO @9
+[14] OUTPUT_CLOSE
+[15] RETURN
+start( 'SELECT run( $1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();

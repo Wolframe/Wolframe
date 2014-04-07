@@ -26,17 +26,24 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	DO run( .//aa/., ./doc/main/bb/., //cc/., ./doc/main//dd);
+	DO SELECT run( $(.//aa), $(doc/main/bb), $(//cc), $(doc/main//dd));
 END
 **outputfile:DBOUT
 **output
-run #1#2#3#NULL
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2, $3, $4))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_BIND_CONST CONST '3'
+[6] DBSTM_BIND_CONST CONST ''
+[7] DBSTM_EXEC
+[8] RETURN
+start( 'SELECT run( $1, $2, $3, $4)' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
 bind( 4, NULL );
 execute();
-nofColumns(); returns 0
 **end

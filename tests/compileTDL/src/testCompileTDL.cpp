@@ -170,9 +170,9 @@ TEST_F( CompileTDLTest, tests)
 			{
 				tf::InputStructure input( ti->second->program()->pathset.tagtab());
 				fillInputStructure( input_ptree, input);
-				/*[-]*/std::cout << "++++ INPUT:" << std::endl << input.tostring() << std::endl;
 
 				VmTransactionInput trsinput( *ti->second->program(), input);
+				out << "TRANSACTION INPUT:" << std::endl;
 				trsinput.print( out);
 				out << std::endl;
 			}

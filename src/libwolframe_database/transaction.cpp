@@ -56,7 +56,7 @@ static vm::ProgramR singleStatementProgram( const std::string& stm, const std::v
 	resultpath.push_back( "");
 	types::keymap<vm::Subroutine> sm;
 
-	Tdl2vmTranslator prg( &sm);
+	Tdl2vmTranslator prg( &sm, false);
 	prg.begin_DO_statement( stm);
 	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
 	for (; pi != pe; ++pi)

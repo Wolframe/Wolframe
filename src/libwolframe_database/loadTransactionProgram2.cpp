@@ -87,10 +87,24 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 					prg.push_ARGUMENT_CONST( pi->selector);
 					break;
 				case tdl::ElementReference::NamedSetElement:
-					prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->name);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					}
 					break;
 				case tdl::ElementReference::IndexSetElement:
-					prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->index);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					}
 					break;
 			}
 		}
@@ -144,10 +158,24 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 					prg.push_ARGUMENT_CONST( pi->selector);
 					break;
 				case tdl::ElementReference::NamedSetElement:
-					prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->name);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					}
 					break;
 				case tdl::ElementReference::IndexSetElement:
-					prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->index);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					}
 					break;
 			}
 		}
@@ -477,6 +505,7 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 				{
 					throw std::runtime_error( "incomplete RESULT definition, FILTER or INTO expected");
 				}
+				break;
 			}
 			case b_AUTHORIZE:
 			{
@@ -497,6 +526,7 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 					throw std::runtime_error( "Close bracket ')' expected after AUTHORIZE function defintion");
 				}
 				++si;
+				break;
 			}
 			case b_PREPROC:
 			{
@@ -507,7 +537,7 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 			case b_BEGIN:
 			{
 				tdl::checkUniqOccurrence( b_BEGIN, mask, g_transaction_idtab);
-				Tdl2vmTranslator prg( &subroutineMap);
+				Tdl2vmTranslator prg( &subroutineMap, false);
 
 				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
 				if (hasIntoBlock)
@@ -602,7 +632,7 @@ static void load( const std::string& filename, const std::string& source, const 
 					std::vector<std::string> callArguments 
 						= tdl::parseCallArguments( langdescr, si, se);
 
-					Tdl2vmTranslator prg( &subroutineMap);
+					Tdl2vmTranslator prg( &subroutineMap, true);
 					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se))
 					{
 						subroutineMap.insert( 
@@ -633,7 +663,7 @@ static void load( const std::string& filename, const std::string& source, const 
 					std::vector<std::string> callArguments 
 						= tdl::parseCallArguments( langdescr, si, se);
 
-					Tdl2vmTranslator prg( &subroutineMap);
+					Tdl2vmTranslator prg( &subroutineMap, true);
 					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se))
 					{
 						subroutineMap.insert( 

@@ -25,26 +25,36 @@ Processor
 	program DBIN.tdl
 }
 **file:DBIN.tdl
-TRANSACTION testcall BEGIN FOREACH/doc/item/aa DO run(., ../bb);END
+TRANSACTION testcall BEGIN FOREACH/doc/item/aa DO SELECT run($(.), $(../bb));END
 **outputfile:DBOUT
 **output
-run #1#2
-run #11#22
-run #111#222
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] OPEN_ITER_TUPLESET TUPLESET 0
+[3] NOT_IF_COND GOTO @10
+[4] DBSTM_START STM (SELECT run($1, $2))
+[5] DBSTM_BIND_ITR_IDX COLIDX 1
+[6] DBSTM_BIND_ITR_IDX COLIDX 2
+[7] DBSTM_EXEC
+[8] NEXT
+[9] IF_COND GOTO @4
+[10] RETURN
+Input Data:
+SET 0: ., bb
+  '1', '2'
+  '11', '22'
+  '111', '222'
+start( 'SELECT run($1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
-nofColumns(); returns 0
-start( 'run' );
+start( 'SELECT run($1, $2)' );
 bind( 1, '11' );
 bind( 2, '22' );
 execute();
-nofColumns(); returns 0
-start( 'run' );
+start( 'SELECT run($1, $2)' );
 bind( 1, '111' );
 bind( 2, '222' );
 execute();
-nofColumns(); returns 0
 **end

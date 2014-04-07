@@ -26,13 +26,16 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	DO run();
+	DO SELECT run();
 END
 **outputfile:DBOUT
 **output
-run
-
-start( 'run' );
+Code:
+[0] GOTO @1
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run())
+[3] DBSTM_EXEC
+[4] RETURN
+start( 'SELECT run()' );
 execute();
-nofColumns(); returns 0
 **end
