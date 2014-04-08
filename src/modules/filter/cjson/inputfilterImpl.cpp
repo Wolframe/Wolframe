@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "types/string.hpp"
 #include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
@@ -152,7 +153,7 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 	if (!pp)
 	{
 		if (!ctx.errorptr) throw std::bad_alloc();
-		utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
+		utils::SourceLineInfo pos = utils::getSourceLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
 
 		std::string err( ctx.errorptr);
 		if (err.size() > 80)
@@ -160,7 +161,7 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 			err.resize( 80);
 			err.append( "...");
 		}
-		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
+		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line()) + " column " + boost::lexical_cast<std::string>(pos.column()) + " at '" + err + "'");
 	}
 	return boost::shared_ptr<cJSON>( pp, cJSON_Delete);
 }

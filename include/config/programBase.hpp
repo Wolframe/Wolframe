@@ -35,7 +35,7 @@
 //
 #ifndef _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #define _CONFIG_PROGRAM_BASE_HPP_INCLUDED
-#include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>
@@ -51,19 +51,26 @@ namespace config {
 //\class LineInfo
 //\brief Info for line/coulumn position
 struct LineInfo
-	:public utils::LineInfo
 {
+	unsigned int line;
+	unsigned int column;
+
+	LineInfo( const utils::SourceLineInfo& o)
+		:line(o.line()),column(o.column()){}
 	LineInfo( const LineInfo& o)
-		:utils::LineInfo(o){}
+		:line(o.line),column(o.column){}
 	LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-		:utils::LineInfo( utils::getLineInfo( start, pos))
-	{}
+	{
+		utils::SourceLineInfo pp( utils::getSourceLineInfo( start, pos));
+		line = pp.line();
+		column = pp.column();
+	}
 
 	static const log::LogObjectDescriptionBase* getLogObjectDescription()
 	{
-		struct Description :public log::LogObjectDescription<utils::LineInfo>
+		struct Description :public log::LogObjectDescription<LineInfo>
 		{
-			Description():log::LogObjectDescription<utils::LineInfo>( "on line $1 column $2"){(*this)(&utils::LineInfo::line)(&utils::LineInfo::column);}
+			Description():log::LogObjectDescription<LineInfo>( "on line $1 column $2"){(*this)(&LineInfo::line)(&LineInfo::column);}
 		};
 		static Description rt;
 		return &rt;

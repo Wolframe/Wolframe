@@ -356,7 +356,7 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 		}
 		else
 		{
-			throw std::runtime_error(std::string("error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lexer.position().line) + " column " + boost::lexical_cast<std::string>(lexer.position().column) + ": " + e.what());
+			throw std::runtime_error(std::string("error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lexer.position().line()) + " column " + boost::lexical_cast<std::string>(lexer.position().column()) + ": " + e.what());
 		}
 	}
 }

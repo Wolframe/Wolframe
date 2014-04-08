@@ -783,16 +783,24 @@ void Tdl2vmTranslator::output_ARGUMENT_ITER( const std::string& colname)
 
 ProgramR Tdl2vmTranslator::createProgram() const
 {
-	ProgramR rt( new Program( m_sub_program));
+	ProgramR rt;
 
 	// Patch first instruction of the program, a GOTO that jumps to the start of main
 	std::size_t ip_start_main = m_sub_program.code.size();
-	if (rt->code.size() == 0 || *rt->code.at(0) != instruction( Op_GOTO, 0))
+	if (m_sub_program.code.size() == 0 || *m_sub_program.code.at(0) != instruction( Op_GOTO, 0))
 	{
 		throw std::runtime_error( "illegal state: jump to main instruction not found");
 	}
-	rt->code[ 0] = InstructionSet::instruction( Op_GOTO, ip_start_main);
-
+	if (ip_start_main > 1)
+	{
+		rt.reset( new Program( m_sub_program));
+		rt->code[ 0] = InstructionSet::instruction( Op_GOTO, ip_start_main);
+	}
+	else
+	{
+		ip_start_main = 0;
+		rt.reset( new Program());
+	}
 	rt->add( m_main_program, false/*do not patch GOTOs*/);
 	std::size_t ip_end_main = rt->code.size();
 

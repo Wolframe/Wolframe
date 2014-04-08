@@ -113,7 +113,7 @@ end
 TRANSACTION test_transaction
 RESULT INTO doc
 BEGIN
-	INTO title FOREACH //task DO run( title);
+	INTO title FOREACH //task DO SELECT run( title);
 END
 **output
 {

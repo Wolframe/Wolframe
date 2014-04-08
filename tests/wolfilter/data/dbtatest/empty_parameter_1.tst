@@ -31,11 +31,10 @@ END
 **outputfile:DBOUT
 **output
 Code:
-[0] GOTO @1
-[1] RESULT_SET_INIT
-[2] DBSTM_START STM (SELECT run())
-[3] DBSTM_EXEC
-[4] RETURN
+[0] RESULT_SET_INIT
+[1] DBSTM_START STM (SELECT run())
+[2] DBSTM_EXEC
+[3] RETURN
 start( 'SELECT run()' );
 execute();
 **end

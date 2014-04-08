@@ -37,6 +37,7 @@ Project Wolframe.
 #include <string>
 #include "types/form.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
 
 namespace _Wolframe {
@@ -72,7 +73,7 @@ public:
 	Lexem()
 		:m_id(EndOfFile){}
 	//\brief Constructor
-	Lexem( utils::LineInfo position_, Id id_, const std::string& value_=std::string())
+	Lexem( utils::SourceLineInfo position_, Id id_, const std::string& value_=std::string())
 		:m_id(id_),m_value(value_),m_position(position_){}
 	//\brief Copy constructor
 	Lexem( const Lexem& o)
@@ -80,13 +81,13 @@ public:
 
 	Id id() const				{return m_id;}
 	std::string value() const		{return m_value;}
-	utils::LineInfo position() const	{return m_position;}
+	utils::SourceLineInfo position() const	{return m_position;}
 	std::string positionLogtext() const;
 
 private:
 	Id m_id;				//< lexem identifier
 	std::string m_value;			//< lexem value
-	utils::LineInfo m_position;		//< lexem position
+	utils::SourceLineInfo m_position;	//< lexem position
 };
 
 //\brief Structure for lexical analysis of one simple form source file
@@ -116,13 +117,13 @@ public:
 
 	//\brief Get the current position
 	//\return the position
-	utils::LineInfo position() const	{return m_position;}
+	utils::SourceLineInfo position() const	{return m_position;}
 
 private:
 	std::string::const_iterator m_start;		//< source start
 	std::string::const_iterator m_itr;		//< iterator on source
 	std::string::const_iterator m_end;		//< end of source
-	utils::LineInfo m_position;			//< current position in source
+	utils::SourceLineInfo m_position;		//< current position in source
 	std::string::const_iterator m_itr_position;	//< iterator from what m_position has been calculated the last time
 	char m_tokch;					//< token character of the current token
 };

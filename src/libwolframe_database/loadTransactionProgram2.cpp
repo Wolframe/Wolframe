@@ -46,6 +46,7 @@
 #include "tdl2vmTranslator.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/fileLineInfo.hpp"
 #include "types/conversions.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
@@ -581,6 +582,8 @@ static void load( const std::string& filename, const std::string& source, const 
 {
 	char ch;
 	std::string::const_iterator si = source.begin(), se = source.end();
+	utils::FileLineInfo pos( filename);
+	std::string::const_iterator pos_si = si;
 
 	if (!langdescr) throw std::logic_error( "no database language description defined");
 	try
@@ -619,8 +622,9 @@ static void load( const std::string& filename, const std::string& source, const 
 					}
 					else
 					{
-						utils::LineInfo pos = utils::getLineInfo( source.begin(), start);
-						LOG_DEBUG << "TDL transaction function '" << transactionName << "' defined at line " << pos.line << " column " << pos.column << " is ignored because of database exclusion in file " << filename;
+						pos.update( pos_si, start);
+						pos_si = start;
+						LOG_DEBUG << "TDL transaction function '" << transactionName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
 					}
 					break;
 				}
@@ -641,8 +645,9 @@ static void load( const std::string& filename, const std::string& source, const 
 					}
 					else
 					{
-						utils::LineInfo pos = utils::getLineInfo( source.begin(), start);
-						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined at line " << pos.line << " column " << pos.column << " is ignored because of database exclusion in file " << filename;
+						pos.update( pos_si, start);
+						pos_si = start;
+						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
 					}
 					break;
 				}
@@ -672,8 +677,9 @@ static void load( const std::string& filename, const std::string& source, const 
 					}
 					else
 					{
-						utils::LineInfo pos = utils::getLineInfo( source.begin(), start);
-						LOG_DEBUG << "TDL subroutine template '" << subroutineName << "' at line " << pos.line << " column " << pos.column << " is ignored because of database exclusion in file " << filename;
+						pos.update( pos_si, start);
+						pos_si = start;
+						LOG_DEBUG << "TDL subroutine template '" << subroutineName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
 					}
 					break;
 				}

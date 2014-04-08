@@ -35,6 +35,7 @@
 
 #ifndef _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
 #define _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
+#include "utils/fileLineInfo.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -54,39 +55,8 @@ namespace types {
 class PropertyTree
 {
 public:
-	typedef boost::shared_ptr<char> FileName;
-	static FileName getFileName( const std::string& name);
-
-	class Position
-	{
-	public:
-
-	public:
-		const char* filename() const	{return m_filename.get();}
-		unsigned int line() const	{return m_line;}
-		unsigned int column() const	{return m_column;}
-	
-		Position()
-			:m_line(0),m_column(0){}
-		Position( const Position& o)
-			:m_filename(o.m_filename),m_line(o.m_line),m_column(o.m_column){}
-		Position( FileName filename_, unsigned int line_, unsigned int column_)
-			:m_filename(filename_),m_line(line_),m_column(column_){}
-		Position( unsigned int line_, unsigned int column_)
-			:m_line(line_),m_column(column_){}
-
-		void setFileName( const FileName& filename_)
-		{
-			m_filename = filename_;
-		}
-
-		std::string logtext() const;
-
-	private:
-		FileName m_filename;
-		unsigned int m_line;
-		unsigned int m_column;
-	};
+	typedef utils::FileLineInfo Position;
+	typedef utils::FileLineInfo::FileName FileName;
 
 	class Value
 		:public std::string
@@ -157,7 +127,7 @@ public:
 	PropertyTree( const boost::property_tree::ptree& o, const std::string& filename_)
 		:m_root(o)
 	{
-		m_root.recursiveSetFileName( getFileName( filename_));
+		m_root.recursiveSetFileName( utils::FileLineInfo::getFileName( filename_));
 	}
 
 	PropertyTree( const Node& root_)

@@ -40,6 +40,7 @@
 #include "database/vm/programCode.hpp"
 #include "database/vm/subroutineFrame.hpp"
 #include "database/vm/errorHintTable.hpp"
+#include "utils/fileLineInfo.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -56,6 +57,18 @@ class Program
 {
 public:
 	typedef std::vector<std::string> SubroutineSignature;
+	struct InstructionPos
+	{
+		std::size_t ip;
+		utils::FileLineInfo pos;
+
+		InstructionPos()
+			:ip(0){}
+		InstructionPos( std::size_t ip_, const utils::FileLineInfo& pos_)
+			:ip(ip_),pos(pos_){}
+		InstructionPos( const InstructionPos& o)
+			:ip(o.ip),pos(o.pos){}
+	};
 
 public:
 	ProgramCode code;				//< program code
@@ -79,6 +92,7 @@ public:
 		,tagnametab(o.tagnametab)
 		,resultnametab(o.resultnametab)
 		,statements(o.statements)
+		,hinttab(o.hinttab)
 		,signatures(o.signatures)
 		,tuplesets(o.tuplesets)
 	{}

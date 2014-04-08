@@ -265,7 +265,7 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 	try {
 		trans->executeStatement( "SELCT 1 FROM DUAL" );
 		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( DatabaseTransactionErrorException &e ) {
+	} catch( std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1 FROM DUAL" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
@@ -302,8 +302,6 @@ TEST_F( OracleFixture, TooFewBindParameter )
 	} catch( std::runtime_error &e ) {
 // why is this another excpetion?
 		std::cout << e.what( ) << std::endl;
-//	} catch( DatabaseTransactionErrorException &e ) {
-//		std::cout << e.what( );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -336,7 +334,7 @@ TEST_F( OracleFixture, TooManyBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( DatabaseTransactionErrorException &e ) {
+	} catch( std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
@@ -369,8 +367,6 @@ TEST_F( OracleFixture, IllegalBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	//~ } catch( const DatabaseTransactionErrorException &e ) {
-		//~ std::cout << e.what( ) << std::endl;
 	} catch( std::runtime_error const &e ) {
 		std::cout << e.what( ) << std::endl;
 	} catch( ... ) {

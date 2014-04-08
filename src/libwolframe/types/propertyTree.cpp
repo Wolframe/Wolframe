@@ -39,20 +39,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-PropertyTree::FileName types::PropertyTree::getFileName( const std::string& name)
-{
-	char* cc = (char*)std::malloc( name.size()+1);
-	if (!cc) throw std::bad_alloc();
-	std::memcpy( cc, name.c_str(), name.size()+1);
-	return boost::shared_ptr<char>( cc, std::free);
-}
-
-std::string PropertyTree::Position::logtext() const
-{
-	if (!filename()) return std::string();
-	return std::string("in file '") + filename() + "' at line " + boost::lexical_cast<std::string>(m_line) + " column " + boost::lexical_cast<std::string>(m_column);
-}
-
 PropertyTree::Node::Node( const boost::property_tree::ptree& pt)
 {
 	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();

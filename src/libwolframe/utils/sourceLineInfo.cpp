@@ -30,57 +30,33 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Error class for databases
-///\file database/databaseError.hpp
-//
-#ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger-v1.hpp"
-#include "logger/logObject.hpp"
-#include <string>
-#include <cstdlib>
-#include <stdexcept>
+//\file utils/sourceLineInfo.cpp
+//\brief Implementation of positional info in source strings for error messages
+#include "utils/sourceLineInfo.hpp"
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::utils;
 
-class DatabaseError
+void SourceLineInfo::update( const std::string::const_iterator& lastpos, const std::string::const_iterator& pos)
 {
-public:
-	DatabaseError()
-		:errorcode(0),ip(0){}
+	std::string::const_iterator ii = lastpos;
+	for (; ii!=pos; ++ii)
+	{
+		if (*ii == '\n')
+		{
+			incrementLine();
+		}
+		else if (*ii != '\r')
+		{
+			incrementColumn();
+		}
+	}
+}
 
-	DatabaseError( const DatabaseError& o)
-		:dbname(o.dbname)
-		,transaction(o.transaction)
-		,errorclass(o.errorclass)
-		,errorcode(o.errorcode)
-		,errormsg(o.errormsg)
-		,errordetail(o.errordetail)
-		,errorhint(o.errorhint)
-		,ip(o.ip)
-		{}
+SourceLineInfo utils::getSourceLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
+{
+	SourceLineInfo rt;
+	rt.update( start, pos);
+	return rt;
+}
 
-	DatabaseError( const char* errorclass_,
-			int errorcode_,
-			const std::string& errormsg_,
-			const std::string& detail_=std::string())
-		:errorclass(errorclass_?errorclass_:"")
-		,errorcode(errorcode_)
-		,errormsg(errormsg_)
-		,errordetail(detail_)
-		,ip(0)
-		{}
-
-	std::string dbname;		//< error class identifier
-	std::string transaction;	//< error class identifier
-	std::string errorclass;		//< error class identifier
-	unsigned int errorcode;		//< error code
-	std::string errormsg;		//< error message string
-	std::string errordetail;	//< detailed error message string
-	std::string errorhint;		//< error message hint specified in TDL for the user
-	std::size_t ip;			//< instruction pointer in vm program
-};
-
-}}
-#endif

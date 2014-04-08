@@ -37,6 +37,7 @@ Project Wolframe.
 #include "pdfPrinterExpression.hpp"
 #include "pdfPrinterDocument.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
 #include "filter/singlefilter.hpp"
@@ -121,8 +122,8 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			utils::LineInfo pos = utils::getLineInfo( src.begin(), itr);
-			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line) + " of PDF printer layout description source (" + e.what() + ")");
+			utils::SourceLineInfo pos = utils::getSourceLineInfo( src.begin(), itr);
+			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line()) + " of PDF printer layout description source (" + e.what() + ")");
 		}
 	}
 

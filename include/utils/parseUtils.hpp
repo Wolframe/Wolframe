@@ -35,6 +35,7 @@
 
 #ifndef _WOLFRAME_PARSE_UTILS_HPP_INCLUDED
 #define _WOLFRAME_PARSE_UTILS_HPP_INCLUDED
+#include "utils/sourceLineInfo.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -138,26 +139,6 @@ std::pair<std::string,std::string> parseTokenAssignement( std::string::const_ite
 ///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the expression parsed)
 ///\param[in] end iterator marking the end of the source
 std::string parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end);
-
-///\brief Get the line/column info from a source iterator
-struct LineInfo
-{
-	unsigned int line;
-	unsigned int column;
-
-	LineInfo()
-		:line(1),column(1){}
-	LineInfo( unsigned int line_, unsigned int column_)
-		:line(line_),column(column_){}
-	LineInfo( const LineInfo& o)
-		:line(o.line),column(o.column){}
-
-	void incrementLine()	{column=1; ++line;}
-	void incrementColumn()	{++column;}
-};
-
-LineInfo getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
-LineInfo getLineInfoIncrement( const LineInfo& lineinfo, const std::string::const_iterator& lastpos, const std::string::const_iterator& pos);
 
 }} //namespace _Wolframe::utils
 

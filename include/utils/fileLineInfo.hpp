@@ -30,56 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Error class for databases
-///\file database/databaseError.hpp
-//
-#ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger-v1.hpp"
-#include "logger/logObject.hpp"
+///\file utils/fileLineInfo.hpp
+///\brief Defines a data structure to hold positional info in a source file for error messsages etc.
+
+#ifndef _WOLFRAME_FILE_LINE_INFO_HPP_INCLUDED
+#define _WOLFRAME_FILE_LINE_INFO_HPP_INCLUDED
+#include "utils/sourceLineInfo.hpp"
 #include <string>
-#include <cstdlib>
-#include <stdexcept>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace db {
+namespace utils {
 
-class DatabaseError
+class FileLineInfo
+	:public SourceLineInfo
 {
 public:
-	DatabaseError()
-		:errorcode(0),ip(0){}
+	typedef boost::shared_ptr<char> FileName;
+	static FileName getFileName( const std::string& name);
 
-	DatabaseError( const DatabaseError& o)
-		:dbname(o.dbname)
-		,transaction(o.transaction)
-		,errorclass(o.errorclass)
-		,errorcode(o.errorcode)
-		,errormsg(o.errormsg)
-		,errordetail(o.errordetail)
-		,errorhint(o.errorhint)
-		,ip(o.ip)
-		{}
+	FileLineInfo(){}
+	FileLineInfo( const std::string& filename_)
+		:m_filename( getFileName( filename_)){}
+	FileLineInfo( unsigned int line_, unsigned int column_)
+		:SourceLineInfo(line_,column_){}
+	FileLineInfo( const std::string& filename_, unsigned int line_, unsigned int column_)
+		:SourceLineInfo(line_,column_),m_filename( getFileName( filename_)){}
+	FileLineInfo( const FileLineInfo& o)
+		:SourceLineInfo(o),m_filename(o.m_filename){}
 
-	DatabaseError( const char* errorclass_,
-			int errorcode_,
-			const std::string& errormsg_,
-			const std::string& detail_=std::string())
-		:errorclass(errorclass_?errorclass_:"")
-		,errorcode(errorcode_)
-		,errormsg(errormsg_)
-		,errordetail(detail_)
-		,ip(0)
-		{}
+	const char* filename() const
+	{
+		return m_filename.get();
+	}
+	void setFileName( const FileName& filename_)
+	{
+		m_filename = filename_;
+	}
+	std::string logtext() const;
 
-	std::string dbname;		//< error class identifier
-	std::string transaction;	//< error class identifier
-	std::string errorclass;		//< error class identifier
-	unsigned int errorcode;		//< error code
-	std::string errormsg;		//< error message string
-	std::string errordetail;	//< detailed error message string
-	std::string errorhint;		//< error message hint specified in TDL for the user
-	std::size_t ip;			//< instruction pointer in vm program
+private:
+	FileName m_filename;
 };
 
 }}

@@ -30,57 +30,43 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Error class for databases
-///\file database/databaseError.hpp
-//
-#ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger-v1.hpp"
-#include "logger/logObject.hpp"
+///\file utils/sourceLineInfo.hpp
+///\brief Defines a data structure to hold positional info in a source string for error messsages etc.
+
+#ifndef _WOLFRAME_SOURCE_LINE_INFO_HPP_INCLUDED
+#define _WOLFRAME_SOURCE_LINE_INFO_HPP_INCLUDED
 #include <string>
-#include <cstdlib>
-#include <stdexcept>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace db {
+namespace utils {
 
-class DatabaseError
+class SourceLineInfo
 {
 public:
-	DatabaseError()
-		:errorcode(0),ip(0){}
+	SourceLineInfo()
+		:m_line(1),m_column(1){}
+	SourceLineInfo( unsigned int line_, unsigned int column_)
+		:m_line(line_),m_column(column_){}
+	SourceLineInfo( const SourceLineInfo& o)
+		:m_line(o.m_line),m_column(o.m_column){}
 
-	DatabaseError( const DatabaseError& o)
-		:dbname(o.dbname)
-		,transaction(o.transaction)
-		,errorclass(o.errorclass)
-		,errorcode(o.errorcode)
-		,errormsg(o.errormsg)
-		,errordetail(o.errordetail)
-		,errorhint(o.errorhint)
-		,ip(o.ip)
-		{}
+	unsigned int line() const	{return m_line;}
+	unsigned int column() const	{return m_column;}
 
-	DatabaseError( const char* errorclass_,
-			int errorcode_,
-			const std::string& errormsg_,
-			const std::string& detail_=std::string())
-		:errorclass(errorclass_?errorclass_:"")
-		,errorcode(errorcode_)
-		,errormsg(errormsg_)
-		,errordetail(detail_)
-		,ip(0)
-		{}
+	void incrementLine()	{m_column=1; ++m_line;}
+	void incrementColumn()	{++m_column;}
 
-	std::string dbname;		//< error class identifier
-	std::string transaction;	//< error class identifier
-	std::string errorclass;		//< error class identifier
-	unsigned int errorcode;		//< error code
-	std::string errormsg;		//< error message string
-	std::string errordetail;	//< detailed error message string
-	std::string errorhint;		//< error message hint specified in TDL for the user
-	std::size_t ip;			//< instruction pointer in vm program
+	void update( const std::string::const_iterator& lastpos, const std::string::const_iterator& pos);
+
+private:
+	unsigned int m_line;
+	unsigned int m_column;
 };
+
+SourceLineInfo getSourceLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
 
 }}
 #endif
+
+

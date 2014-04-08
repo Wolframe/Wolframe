@@ -31,13 +31,12 @@ END
 **outputfile:DBOUT
 **output
 Code:
-[0] GOTO @1
-[1] RESULT_SET_INIT
-[2] DBSTM_START STM (SELECT run($1, $2))
-[3] DBSTM_BIND_CONST CONST '1'
-[4] DBSTM_BIND_CONST CONST '2'
-[5] DBSTM_EXEC
-[6] RETURN
+[0] RESULT_SET_INIT
+[1] DBSTM_START STM (SELECT run($1, $2))
+[2] DBSTM_BIND_CONST CONST '1'
+[3] DBSTM_BIND_CONST CONST '2'
+[4] DBSTM_EXEC
+[5] RETURN
 start( 'SELECT run($1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );

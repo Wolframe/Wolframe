@@ -79,6 +79,7 @@ public:
 
 	bool execute();
 	const OutputR& output() const			{return m_output;}
+	const DatabaseError& lastError() const		{return m_lastError;}
 
 private:
 	struct ResultFlags
@@ -164,7 +165,7 @@ private:
 	void initResult( const ValueTupleSetR& resultset);
 	void printIteratorColumn();
 	ValueTupleSetR fetchDatabaseResult();
-	DatabaseErrorException databaseException() const;
+	void setDatabaseError();
 
 private:
 	const Program* m_program;			//< program reference
@@ -175,6 +176,7 @@ private:
 	std::vector<StackElement> m_stack;		//< execution stack
 	ProgramCode m_code;				//< program code copy
 	OutputR m_output;				//< output
+	DatabaseError m_lastError;			//< last database error reported
 };
 
 }}}//namespace

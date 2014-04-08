@@ -143,11 +143,7 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 	}
 	
 	const char *errtype = getErrorType( errcode );
-	
-	// TODO: map OCI codes to severity levels, so far everything is ERROR
-	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement->originalSQL().c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( errtype, errcode, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -220,7 +216,7 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement->originalSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( "INTERNAL", 0, message));
 		m_state = Error;
 	}
 	return false;

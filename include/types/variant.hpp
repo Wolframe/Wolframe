@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file types/variant.hpp
-//\brief Variant value type
+///\file types/variant.hpp
+///\brief Variant value type
 
 #ifndef _Wolframe_TYPES_VARIANT_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_HPP_INCLUDED
@@ -44,29 +44,29 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\class CustomDataType
-//\brief Forward declaration
+///\class CustomDataType
+///\brief Forward declaration
 class CustomDataType;
-//\class CustomDataValue
-//\brief Forward declaration
+///\class CustomDataValue
+///\brief Forward declaration
 class CustomDataValue;
-//\class CustomDataInitializer
-//\brief Forward declaration
+///\class CustomDataInitializer
+///\brief Forward declaration
 class CustomDataInitializer;
-//\class BigNumber
-//\brief Forward declaration
+///\class BigNumber
+///\brief Forward declaration
 class BigNumber;
-//\class DateTime
-//\brief Forward declaration
+///\class DateTime
+///\brief Forward declaration
 class DateTime;
 
-//\class Variant
-//\brief Variant value type
+///\class Variant
+///\brief Variant value type
 class Variant
 {
 public:
-	//\enum Type
-	//\brief Type of the variant
+	///\enum Type
+	///\brief Type of the variant
 	enum Type
 	{
 		Null,			//< value undefined (NULL)
@@ -85,23 +85,23 @@ public:
 		Constant	=0x2	//< value is a reference that is not owned and freed by this)
 	};
 
-	//\brief Get the type name as string constant for logging
-	//\param[in] i type to get the name
-	//\return name of the type
+	///\brief Get the type name as string constant for logging
+	///\param[in] i type to get the name
+	///\return name of the type
 	static const char* typeName( Type i)
 	{
 		static const char* ar[] = {"null","custom","timestamp","bignumber","double","int","uint","bool","string","array","struct","indirection","unresolved"};
 		return ar[ (int)i];
 	}
-	//\brief Get the type name of 'this' as string constant for logging
-	//\return name of the type
+	///\brief Get the type name of 'this' as string constant for logging
+	///\return name of the type
 	const char* typeName() const
 	{
 		return typeName( (Type)m_type);
 	}
 
-	//\class Data
-	//\brief Internal representation of this value
+	///\class Data
+	///\brief Internal representation of this value
 	struct Data
 	{
 		typedef _WOLFRAME_INTEGER Int;		//< signed integer type
@@ -125,7 +125,7 @@ public:
 			std::size_t size;		//< size of a string - different meaning for structures (module VariantStruct)
 		} dim;					//< dimension and metadata
 	};
-	//\brief Constructor
+	///\brief Constructor
 	Variant( Type type_)					{init(type_);}
 	Variant()						{init();}
 	Variant( bool o)					{init(Bool); m_data.value.Bool = o;}
@@ -149,10 +149,10 @@ public:
 	Variant( const types::DateTime& o)			{initDateTime( o);}
 	Variant( const types::BigNumber& o)			{initBigNumber( o);}
 
-	//\brief Destructor
+	///\brief Destructor
 	~Variant()						{release();}
 
-	//\brief Assignment operator, keeping the initialization flag of this
+	///\brief Assignment operator, keeping the initialization flag of this
 	Variant& operator=( const Variant& o)			{bool init_=initialized(); release(); initCopy( o); setInitialized(init_); return *this;}
 	Variant& operator=( bool o)				{bool init_=initialized(); release(); init(Bool); m_data.value.Bool = o; setInitialized(init_); return *this;}
 	Variant& operator=( double o)				{bool init_=initialized(); release(); init(Double); m_data.value.Double = o; setInitialized(init_); return *this;}
@@ -171,7 +171,7 @@ public:
 	Variant& operator=( const types::DateTime& o)		{bool init_=initialized(); release(); initDateTime( o); setInitialized(init_); return *this;}
 	Variant& operator=( const types::BigNumber& o)		{bool init_=initialized(); release(); initBigNumber( o); setInitialized(init_); return *this;}
 
-	//\brief Initialization as string constant (Constant flag set, data not owned by this)
+	///\brief Initialization as string constant (Constant flag set, data not owned by this)
 	void initConstant( const char* o, std::size_t l);
 	void initConstant( const std::string& o)		{initConstant( o.c_str(),o.size());}
 	void initConstant( const char* o)			{initConstant( o, std::strlen(o));}
@@ -179,7 +179,7 @@ public:
 	void initConstant( const types::BigNumber& o);
 	void initConstant( const types::DateTime& o);
 
-	//\brief Compare data with conversion (value with different types is converted first)
+	///\brief Compare data with conversion (value with different types is converted first)
 	bool operator==( const Variant& o) const		{return compare( o) == 0;}
 	bool operator!=( const Variant& o) const		{int cv = compare( o); return cv != 0 && cv != -2;}
 	bool operator>( const Variant& o) const			{int cv = compare( o); return cv > 0;}
@@ -187,25 +187,25 @@ public:
 	bool operator<=( const Variant& o) const		{int cv = compare( o); return cv <= 0 && cv != -2;}
 	bool operator<( const Variant& o) const			{int cv = compare( o); return cv == -1;}
 
-	//\brief Get the type of this
+	///\brief Get the type of this
 	Type type() const					{return (Type)m_type;}
-	//\brief Get the internal representation of the data of this
+	///\brief Get the internal representation of the data of this
 	const Data& data() const				{return m_data;}
 
-	//\brief Get the pointer to the C representation of a string (throws for non string)
+	///\brief Get the pointer to the C representation of a string (throws for non string)
 	char* charptr() const					{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.String;}
-	//\brief Get the size of a string (throws for non string)
+	///\brief Get the size of a string (throws for non string)
 	std::size_t charsize() const				{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.dim.size;}
-	//\brief Get the pointer to the custom data object (throws for non custom data type)
+	///\brief Get the pointer to the custom data object (throws for non custom data type)
 	const CustomDataValue* customref() const		{if (type() != Custom) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.Custom;}
-	//\brief Get the pointer to the custom data object (throws for non custom data type)
+	///\brief Get the pointer to the custom data object (throws for non custom data type)
 	CustomDataValue* customref()				{if (type() != Custom) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.Custom;}
-	//\brief Get the pointer to the big number object (throws for non big number data type)
+	///\brief Get the pointer to the big number object (throws for non big number data type)
 	const types::BigNumber* bignumref() const		{if (type() != BigNumber) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.BigNumberRef;}
-	//\brief Get the pointer to the big number object (throws for non big number data type)
+	///\brief Get the pointer to the big number object (throws for non big number data type)
 	types::BigNumber* bignumref()				{if (type() != BigNumber) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.BigNumberRef;}
 
-	//\brief Getter with value conversion
+	///\brief Getter with value conversion
 	std::string tostring() const;
 	std::wstring towstring() const;
 	double todouble() const;
@@ -214,42 +214,42 @@ public:
 	Data::UInt touint() const;
 	Data::Timestamp totimestamp() const;
 
-	//\brief Get the size of a string
+	///\brief Get the size of a string
 	std::size_t size() const				{return (type() == String)?m_data.dim.size:1;}
 
-	//\brief Test if this value is initialized
+	///\brief Test if this value is initialized
 	bool initialized() const				{return flags( Initialized);}
-	//\brief Set the value to be initialized
+	///\brief Set the value to be initialized
 	void setInitialized( bool v=true)			{setFlags( Initialized, v);}
 
-	//\brief Test if this value is constant (owned by this)
+	///\brief Test if this value is constant (owned by this)
 	bool constant() const					{return flags( Constant);}
 
-	//\brief Set the value to be constant
-	//\remark Setting this flag for a value owned by this can cause memory leaks
-	//\param[in] v value of constant flag set
+	///\brief Set the value to be constant
+	///\remark Setting this flag for a value owned by this can cause memory leaks
+	///\param[in] v value of constant flag set
 	void setConstant( bool v=true)				{setFlags( Constant, v);}
 
-	//\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
+	///\brief Test if this value is atomic (not VariantStruct or VariantIndirection)
 	bool atomic() const					{return m_type <= (unsigned char)String;}
 
-	//\brief Test if this value is defined (not null)
+	///\brief Test if this value is defined (not null)
 	bool defined() const					{return m_type != (unsigned char)Null;}
 
-	//\brief Reseting the content of this
+	///\brief Reseting the content of this
 	void clear()						{release(); init();}
 
-	//\brief Converting the value of this to a defined type
-	//\param[in] type_ type to convert this value to
+	///\brief Converting the value of this to a defined type
+	///\param[in] type_ type to convert this value to
 	void convert( Type type_);
 
-	//\brief Assigning o to this including a conversion to a defined type
-	//\param[in] type_ type to convert the assigned value to
-	//\param[in] o value to assign
+	///\brief Assigning o to this including a conversion to a defined type
+	///\param[in] type_ type to convert the assigned value to
+	///\param[in] o value to assign
 	void assign( Type type_, const Variant& o);
 
-	//\brief Move value from 'o' to this
-	//\param[in] o value to move
+	///\brief Move value from 'o' to this
+	///\param[in] o value to move
 	void move( Variant& o);
 
 protected:
@@ -268,8 +268,8 @@ protected:
 	void initDateTime( const types::DateTime& dt);
 	void initBigNumber( const types::BigNumber& num);
 
-	//\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
-	//\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable
+	///\brief Compares two variants (implicit type conversion to the higher priority type (order of declaration in enum Type, higher priority first))
+	///\return -1: this less than 0, 0: this equals o, 1: this bigger than o, -2: values not comparable
 	int compare( const Variant& o) const;
 
 protected:
@@ -279,12 +279,12 @@ protected:
 };
 
 
-//\class VariantConst
-//\brief Variant value type that represents a variant copy without content ownership
-//\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
+///\class VariantConst
+///\brief Variant value type that represents a variant copy without content ownership
+///\remark The livetime of the variant type this structure is initialized from must must cover the livetime of this structure
 struct VariantConst :public Variant
 {
-	//\brief Constructor
+	///\brief Constructor
 	VariantConst()					{init();}
 	VariantConst( const Variant& o)			:Variant(){initConstCopy( o);}
 	VariantConst( const VariantConst& o)		:Variant(){initConstCopy( o);}
@@ -304,10 +304,10 @@ struct VariantConst :public Variant
 	VariantConst( const char* o, std::size_t n)	:Variant(){Variant::initConstant( o, n);}
 	VariantConst( const std::string& o)		:Variant(){Variant::initConstant( o.c_str(), o.size());}
 	VariantConst( const types::DateTime& o)		:Variant(){Variant::initConstant( o);}
-	//\brief Destructor
+	///\brief Destructor
 	~VariantConst(){}
 
-	//\brief Assignment operator, keeping the initialization flag of this
+	///\brief Assignment operator, keeping the initialization flag of this
 	VariantConst& operator=( const Variant& o)		{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantConst& operator=( const VariantConst& o)		{bool init_=initialized(); initConstCopy( o); setInitialized(init_); return *this;}
 	VariantConst& operator=( bool o)			{bool init_=initialized(); Variant::init(Variant::Bool); m_data.value.Bool = o; setInitialized(init_); setConstant(); return *this;}
@@ -327,7 +327,7 @@ struct VariantConst :public Variant
 	VariantConst& operator=( const char* o)			{bool init_=initialized(); initConstant( o, std::strlen(o)); setInitialized(init_); return *this;}
 	VariantConst& operator=( const std::string& o)		{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_); return *this;}
 
-	//\brief Initialization as string constant
+	///\brief Initialization as string constant
 	void init( const char* o, std::size_t len)		{bool init_=initialized(); initConstant( o, len); setInitialized(init_);}
 	void init( const char* o)				{bool init_=initialized(); initConstant( o, o?std::strlen(o):0); setInitialized(init_);}
 	void init( const std::string& o)			{bool init_=initialized(); initConstant( o.c_str(), o.size()); setInitialized(init_);}
@@ -335,10 +335,10 @@ struct VariantConst :public Variant
 	void init( const types::BigNumber& o)			{bool init_=initialized(); initConstant( o); setInitialized(init_);}
 	void init( const types::DateTime& o)			{bool init_=initialized(); initConstant( o); setInitialized(init_);}
 
-	//\brief Empty initialization
+	///\brief Empty initialization
 	void init()						{Variant::init(); setConstant();}
 
-	//\brief Reseting the content of this
+	///\brief Reseting the content of this
 	void clear()						{Variant::init();}
 };
 
@@ -346,7 +346,7 @@ struct VariantConst :public Variant
 
 namespace std
 {
-//\brief Output stream operators for logging etc.
+///\brief Output stream operators for logging etc.
 ostream& operator << (ostream &os, const _Wolframe::types::Variant& o);
 } //namespace
 

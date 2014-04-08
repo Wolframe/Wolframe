@@ -30,57 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Error class for databases
-///\file database/databaseError.hpp
-//
-#ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger-v1.hpp"
-#include "logger/logObject.hpp"
-#include <string>
-#include <cstdlib>
-#include <stdexcept>
+//\file utils/fileLineInfo.cpp
+//\brief Implementation of positional info in files for error messages
+#include "utils/fileLineInfo.hpp"
+#include <cstring>
+#include <boost/lexical_cast.hpp>
 
-namespace _Wolframe {
-namespace db {
+using namespace _Wolframe;
+using namespace _Wolframe::utils;
 
-class DatabaseError
+FileLineInfo::FileName utils::FileLineInfo::getFileName( const std::string& name)
 {
-public:
-	DatabaseError()
-		:errorcode(0),ip(0){}
+	char* cc = (char*)std::malloc( name.size()+1);
+	if (!cc) throw std::bad_alloc();
+	std::memcpy( cc, name.c_str(), name.size()+1);
+	return boost::shared_ptr<char>( cc, std::free);
+}
 
-	DatabaseError( const DatabaseError& o)
-		:dbname(o.dbname)
-		,transaction(o.transaction)
-		,errorclass(o.errorclass)
-		,errorcode(o.errorcode)
-		,errormsg(o.errormsg)
-		,errordetail(o.errordetail)
-		,errorhint(o.errorhint)
-		,ip(o.ip)
-		{}
+std::string FileLineInfo::logtext() const
+{
+	if (!filename()) return std::string();
+	return std::string("in file '") + filename() + "' at line " + boost::lexical_cast<std::string>(line()) + " column " + boost::lexical_cast<std::string>(column());
+}
 
-	DatabaseError( const char* errorclass_,
-			int errorcode_,
-			const std::string& errormsg_,
-			const std::string& detail_=std::string())
-		:errorclass(errorclass_?errorclass_:"")
-		,errorcode(errorcode_)
-		,errormsg(errormsg_)
-		,errordetail(detail_)
-		,ip(0)
-		{}
-
-	std::string dbname;		//< error class identifier
-	std::string transaction;	//< error class identifier
-	std::string errorclass;		//< error class identifier
-	unsigned int errorcode;		//< error code
-	std::string errormsg;		//< error message string
-	std::string errordetail;	//< detailed error message string
-	std::string errorhint;		//< error message hint specified in TDL for the user
-	std::size_t ip;			//< instruction pointer in vm program
-};
-
-}}
-#endif

@@ -192,28 +192,31 @@ ValueTupleSetR ProgramInstance::fetchDatabaseResult()
 	return rt;
 }
 
-DatabaseErrorException ProgramInstance::databaseException() const
+void ProgramInstance::setDatabaseError()
 {
 	const DatabaseError* err = m_db_stm->getLastError();
 	if (!err)
 	{
-		DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, 0, 0, 0, 0, "unknown error", "unknown error");
-		return DatabaseErrorException( dberr);
+		m_lastError = DatabaseError( "UNKNOWN", 0, "unknown error");
 	}
-	const StackElement& top = m_stack.back();
-
-	if (top.m_hintidx)
+	else
 	{
-		const char* hintstr = m_program->hinttab.findHint( top.m_hintidx, err->errorclass);
-		if (hintstr)
+		const StackElement& top = m_stack.back();
+	
+		m_lastError = *err;
+		m_lastError.dbname = m_db_stm->databaseID();
+		m_lastError.transaction = m_db_stm->transactionName();
+		m_lastError.ip = m_ip;
+
+		if (top.m_hintidx)
 		{
-			DatabaseError dberr( *err);
-			dberr.usermsg.append( " -- ");
-			dberr.usermsg.append( hintstr);
-			return DatabaseErrorException( dberr);
+			const char* hintstr = m_program->hinttab.findHint( top.m_hintidx, err->errorclass);
+			if (hintstr)
+			{
+				m_lastError.errorhint = hintstr;
+			}
 		}
 	}
-	return DatabaseErrorException( *err);
 }
 
 bool ProgramInstance::execute()
@@ -246,6 +249,7 @@ bool ProgramInstance::execute()
 		{
 			/*Control Flow Instructions:*/
 			case Op_EXIT:
+				m_lastError = DatabaseError( "VM", 0, "aborted program execution");
 				return false;
 			case Op_RETURN:
 			{
@@ -408,14 +412,16 @@ bool ProgramInstance::execute()
 				top.m_hintidx = 0;
 				if (!m_db_stm->start( statementArgument( argidx)))
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				++m_ip;
 				break;
 			case Op_DBSTM_BIND_CONST:
 				if (!m_db_stm->bind( ++top.m_bindidx, constArgument( argidx)))
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				++m_ip;
 				break;
@@ -424,7 +430,8 @@ bool ProgramInstance::execute()
 			case Op_DBSTM_BIND_LOOPCNT:
 				if (!m_db_stm->bind( ++top.m_bindidx, loopcntArgument()))
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				++m_ip;
 				break;
@@ -439,7 +446,8 @@ bool ProgramInstance::execute()
 			case Op_DBSTM_BIND_SEL_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, selectedArgument( argidx)))
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				++m_ip;
 				break;
@@ -452,7 +460,8 @@ bool ProgramInstance::execute()
 			case Op_DBSTM_BIND_ITR_IDX:
 				if (!m_db_stm->bind( ++top.m_bindidx, iteratorArgument( argidx)))
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				++m_ip;
 				break;
@@ -463,7 +472,8 @@ bool ProgramInstance::execute()
 			case Op_DBSTM_EXEC:
 				if (!m_db_stm->execute())
 				{
-					throw databaseException();
+					setDatabaseError();
+					return false;
 				}
 				if (m_db_stm->hasResult())
 				{

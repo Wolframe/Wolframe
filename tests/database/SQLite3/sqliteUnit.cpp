@@ -240,7 +240,7 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 	try {
 		trans->executeStatement( "SELCT 1" );
 		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( const DatabaseTransactionErrorException &e ) {
+	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
@@ -276,9 +276,6 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 // why is this another exception?
 	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
-//	} catch( const DatabaseTransactionErrorException &e ) {
-//		std::cout << e.what( );
-//		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -310,7 +307,7 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
+	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {
@@ -343,7 +340,7 @@ TEST_F( SQLiteModuleFixture, IllegalBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
+	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.errorclass, "INTERNAL" );
 	} catch( ... ) {

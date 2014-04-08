@@ -31,6 +31,6 @@ Processor
 TRANSACTION test_transaction
 RESULT INTO doc
 BEGIN
-	INTO task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO SELECT run( title);
 END"
 . ./output_tst_all.sh

@@ -8,6 +8,7 @@
 
 #include "PostgreSQL.hpp"
 #include "types/variant.hpp"
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -257,7 +258,7 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 	try {
 		trans->executeStatement( "SELCT 1" );
 		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( const DatabaseTransactionErrorException &e ) {
+	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
 		ASSERT_EQ( e.statement, "SELCT 1" );
 		ASSERT_EQ( e.errorclass, "SYNTAX" );
@@ -294,8 +295,6 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 	} catch( const std::runtime_error &e ) {
 // why is this another excpetion?
 		std::cout << e.what( ) << std::endl;
-//	} catch( DatabaseTransactionErrorException &e ) {
-//		std::cout << e.what( );
 	} catch( ... ) {
 		FAIL( ) << "Wrong exception class seen in database error!";
 	}
@@ -328,14 +327,8 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-	} catch( const DatabaseErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-		FAIL( ) << "Wrong std::DatabaseErrorException class seen in database error!";
 	} catch( const std::runtime_error &e ) {
 		std::cout << e.what( ) << std::endl;
-//		FAIL( ) << "Wrong std::runtime_error class seen in database error!";
 	} catch( const std::exception &e ) {
 		std::cout << e.what( ) << std::endl;
 		FAIL( ) << "Wrong std::exception class seen in database error!";
@@ -373,11 +366,8 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 		trans->commit( );
 		trans->close( );
 		FAIL( ) << "Reached success state, but should fail!";
-	//~ } catch( const DatabaseTransactionErrorException &e ) {
-		//~ std::cout << e.what( ) << std::endl;
 	} catch( std::runtime_error const &e ) {
 		std::cout << e.what( ) << std::endl;
-		//~ FAIL( ) << "Wrong std::exception class seen in database error!";
 	} catch( ... ) {
 		// really?
 		trans->commit( );

@@ -86,6 +86,8 @@ public:
 	///\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()=0;
 
+	//\brief Return the name of the transaction
+	const std::string& transactionName() const	{return m_name;}
 private:
 	const std::string m_name;
 };

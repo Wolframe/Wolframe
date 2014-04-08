@@ -77,7 +77,7 @@ end
 TRANSACTION test_transaction
 RESULT INTO doc
 BEGIN
-	INTO title FOREACH //task DO run( title);
+	INTO title FOREACH //task DO SELECT run( title);
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

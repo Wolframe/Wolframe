@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of lexical analysis for the simple form DDL compiler 
 #include "simpleFormLexer.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
@@ -41,7 +42,7 @@ using namespace _Wolframe::langbind::simpleform;
 
 std::string Lexem::positionLogtext() const
 {
-	return std::string("at line ") + boost::lexical_cast<std::string>(m_position.line) + " column " + boost::lexical_cast<std::string>(m_position.column);
+	return std::string("at line ") + boost::lexical_cast<std::string>(m_position.line()) + " column " + boost::lexical_cast<std::string>(m_position.column());
 }
 
 static const utils::CharTable g_optab( "^=@!?[]{}");
@@ -103,7 +104,7 @@ Lexem Lexer::next()
 		return Lexem( m_position, Lexem::EndOfFile);
 	}
 
-	m_position = utils::getLineInfoIncrement( m_position, m_itr_position, m_itr);
+	m_position.update( m_itr_position, m_itr);
 	m_itr_position = m_itr;
 
 	switch ((Keywords)utils::parseNextIdentifier( m_itr, m_end, kwtab))
@@ -144,7 +145,7 @@ Lexem Lexer::next()
 Lexem::Id Lexer::forwardLookup()
 {
 	std::string::const_iterator itr_prev = m_itr;
-	utils::LineInfo position_prev = m_position;
+	utils::SourceLineInfo position_prev = m_position;
 	std::string::const_iterator itr_position_prev = m_itr_position;
 	char tokch_prev = m_tokch;
 

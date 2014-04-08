@@ -70,7 +70,6 @@ CPP_OBJS = \
 	vmTransactionInput.o \
 	vmTransactionOutput.o \
 	tdl2vmTranslator.o \
-	loadTransactionProgram.o \
 	loadTransactionProgram2.o \
 	databaseLanguage.o \
 	baseStatement.o \

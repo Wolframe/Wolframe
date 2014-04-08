@@ -1,7 +1,6 @@
 TRANSACTION simple
 BEGIN
 Code:
-[0] GOTO @1
-[1] RETURN
+[0] RETURN
 END
 

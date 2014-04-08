@@ -38,23 +38,22 @@ END
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <doc><address><id>1</id><name>hugo</name><street>bahnhofstrasse 15</street></address><address><id>2</id><name>miriam</name><street>zum gemsweg 3</street></address><address><id>3</id><name>sara</name><street>tannensteig 12</street></address></doc>
 Code:
-[0] GOTO @1
-[1] OUTPUT_OPEN TAG doc
-[2] RESULT_SET_INIT
-[3] DBSTM_START STM (SELECT run( $1, $2, $3))
-[4] DBSTM_BIND_CONST CONST '1'
-[5] DBSTM_BIND_CONST CONST '2'
-[6] DBSTM_BIND_CONST CONST '3'
-[7] DBSTM_EXEC
-[8] OPEN_ITER_LAST_RESULT
-[9] NOT_IF_COND GOTO @15
-[10] OUTPUT_OPEN TAG address
-[11] OUTPUT_ITR_COLUMN
-[12] OUTPUT_CLOSE
-[13] NEXT
-[14] IF_COND GOTO @10
-[15] OUTPUT_CLOSE
-[16] RETURN
+[0] OUTPUT_OPEN TAG doc
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2, $3))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_BIND_CONST CONST '3'
+[6] DBSTM_EXEC
+[7] OPEN_ITER_LAST_RESULT
+[8] NOT_IF_COND GOTO @14
+[9] OUTPUT_OPEN TAG address
+[10] OUTPUT_ITR_COLUMN
+[11] OUTPUT_CLOSE
+[12] NEXT
+[13] IF_COND GOTO @9
+[14] OUTPUT_CLOSE
+[15] RETURN
 start( 'SELECT run( $1, $2, $3)' );
 bind( 1, '1' );
 bind( 2, '2' );

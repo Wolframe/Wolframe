@@ -36,16 +36,80 @@
 #include "database/vm/programInstance.hpp"
 #include "transactionfunction/InputStructure.hpp"
 #include "tdl2vmTranslator.hpp"
+#include "logger-v1.hpp"
+#include <iostream>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+
+static std::string removeCRLF( const std::string& src)
+{
+	std::string rt;
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\r' || *si == '\n')
+		{
+			if (rt.size() && rt[ rt.size()-1] != ' ') rt.push_back(' ');
+		}
+		else
+		{
+			rt.push_back( *si);
+		}
+	}
+	return rt;
+}
 
 void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
 	vm::ProgramInstance instance( &input.program(), m_stm.get());
 	if (!instance.execute())
 	{
-		throw std::runtime_error("unexpected transaction vm program termination");
+		const DatabaseError& err = instance.lastError();
+		std::string errordetail = removeCRLF( err.errordetail);
+		std::string errormsg = removeCRLF( err.errormsg);
+		
+		std::ostringstream logmsg;
+		logmsg << "error in transaction '" << err.transaction
+			<< "' in database '" << err.dbname
+			<< "' error class '" << err.errorclass << "'";
+		if (err.errorcode)
+		{
+			logmsg << " database internal error code " << err.errorcode << "'";
+		}
+		if (err.errormsg.size())
+		{
+			logmsg << " " << errormsg;
+		}
+		if (err.errordetail.size())
+		{
+			logmsg << " " << errordetail;
+		}
+		if (err.errorhint.size())
+		{
+			logmsg << " " << err.errorhint;
+		}
+
+		std::ostringstream throwmsg;
+		//... shorter message is thrown. no internals in message as written into the logs
+		throwmsg << "error in transaction '" << err.transaction << "':";
+		if (err.errordetail.size())
+		{
+			throwmsg << " " << errordetail;
+		}
+		else if (err.errormsg.size())
+		{
+			//... error message is only thrown if errordetail is empty
+			throwmsg << " " << errormsg;
+		}
+		if (err.errorhint.size())
+		{
+			throwmsg << " " << err.errorhint;
+		}
+		rollback();
+
+		throw std::runtime_error( throwmsg.str());
 	}
 	output = VmTransactionOutput( instance.output());
 }
