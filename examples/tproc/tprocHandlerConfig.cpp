@@ -34,7 +34,6 @@
 ///\brief Implementation of the tproc connection handler configuration
 #include "types/countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
-#include "langbind/appObjects.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "config/structSerialize.hpp"

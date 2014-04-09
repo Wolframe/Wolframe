@@ -33,7 +33,9 @@
 ///\file wolfilterIostreamFilter.hpp
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "wolfilterIostreamFilter.hpp"
-#include "langbind/appObjects.hpp"
+#include "serialize/ddlFormSerializer.hpp"
+#include "serialize/ddlFormParser.hpp"
+#include "langbind/redirectFilterClosure.hpp"
 #include "langbind/formFunction.hpp"
 #include "serialize/ddl/ddlStructParser.hpp"
 #include "serialize/ddl/ddlStructSerializer.hpp"

@@ -23,7 +23,9 @@ LIBRARIES = \
 
 CPP_OBJS = \
 	protocol_ioblocks.obj \
-	appObjects.obj \
+	input.obj \
+	output.obj \
+	redirectFilterClosure.obj \
 	tostringfilter.obj \
 	ptreefilter.obj \
 	typingfilter.obj \

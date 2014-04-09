@@ -46,7 +46,7 @@
 
 namespace _Wolframe {
 namespace db {
-namespace tf {
+namespace vm {
 //\brief Forward declaration
 class InputStructure;
 typedef boost::shared_ptr<InputStructure> InputStructureR;
@@ -77,7 +77,7 @@ public:
 
 	virtual VmTransactionInputR get() const;
 
-	const tf::InputStructure& structure() const
+	const vm::InputStructure& structure() const
 	{
 		return *m_structure.get();
 	}
@@ -88,7 +88,7 @@ public:
 	}
 
 private:
-	tf::InputStructureR m_structure;
+	vm::InputStructureR m_structure;
 	const TdlTransactionFunction* m_func;
 	langbind::TypedInputFilter::ElementType m_lasttype;
 };

@@ -34,11 +34,14 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "directmapProgram.hpp"
-#include "langbind/appObjects.hpp"
 #include "langbind/formFunction.hpp"
+#include "langbind/redirectFilterClosure.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include <boost/shared_ptr.hpp>
 #include "types/keymap.hpp"
+#include "types/form.hpp"
+#include "serialize/ddl/ddlStructParser.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {

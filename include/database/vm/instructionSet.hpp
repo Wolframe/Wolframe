@@ -64,8 +64,12 @@ public:
 		Op_OUTPUT_ITR_IDX,		//< print a value to output: element in tuple set iterated adressed by column index
 		Op_OUTPUT_ITR_NAM,		//< print a value to output: element in tuple set iterated adressed by column name
 		Op_OUTPUT_ITR_COLUMN,		//< print the whole column: for each element print OPEN [column name], result value and CLOSE
-		Op_OUTPUT_OPEN,			//< print an open tag to output (index in tagnametab)
-		Op_OUTPUT_CLOSE,			//< print a close tag to output (no argument)
+		Op_OUTPUT_OPEN_ARRAY,		//< print an open tag of an array start to output (index in tagnametab)
+		Op_OUTPUT_OPEN_ELEM,		//< print an open tag of an array element to output (index in tagnametab)
+		Op_OUTPUT_OPEN,			//< print an open tag of a single element to output (index in tagnametab)
+		Op_OUTPUT_CLOSE_ARRAY,		//< print a close tag of an array start to output (no argument)
+		Op_OUTPUT_CLOSE_ELEM,		//< print a close tag of an array element to output (no argument)
+		Op_OUTPUT_CLOSE,		//< print a close tag of a single element to output (no argument)
 
 		// Assignment Instructions:
 		Op_KEEP_RESULT,			//< keep result
@@ -126,7 +130,11 @@ public:
 			"OUTPUT_ITR_IDX",
 			"OUTPUT_ITR_NAM",
 			"OUTPUT_ITR_COLUMN",
+			"OUTPUT_OPEN_ARRAY",
+			"OUTPUT_OPEN_ELEM",
 			"OUTPUT_OPEN",
+			"OUTPUT_CLOSE_ARRAY",
+			"OUTPUT_CLOSE_ELEM",
 			"OUTPUT_CLOSE",
 
 			"KEEP_RESULT",
@@ -223,8 +231,12 @@ public:
 			/*Op_OUTPUT_SEL_NAM*/		At_ColumnName,
 			/*Op_OUTPUT_ITR_IDX*/		At_IteratorColumnIdx,
 			/*Op_OUTPUT_ITR_NAM*/		At_ColumnName,
-			/*Op_OUTPUT_ITR_COLUMN*/		At_None,
+			/*Op_OUTPUT_ITR_COLUMN*/	At_None,
+			/*Op_OUTPUT_OPEN_ARRAY*/	At_TagName,
+			/*Op_OUTPUT_OPEN_ELEM*/		At_None,
 			/*Op_OUTPUT_OPEN*/		At_TagName,
+			/*Op_OUTPUT_CLOSE_ARRAY*/	At_None,
+			/*Op_OUTPUT_CLOSE_ELEM*/	At_None,
 			/*Op_OUTPUT_CLOSE*/		At_None,
 	
 			/*Op_KEEP_RESULT*/		At_ResultName,
@@ -251,13 +263,13 @@ public:
 			/*Op_DBSTM_START*/		At_Statement,
 			/*Op_DBSTM_BIND_CONST*/		At_Constant,
 			/*Op_DBSTM_BIND_PATH*/		At_Path,
-			/*Op_DBSTM_BIND_LOOPCNT*/		At_None,
-			/*Op_DBSTM_BIND_SEL_IDX*/		At_SelectedColumnIdx,
-			/*Op_DBSTM_BIND_SEL_NAM*/		At_ColumnName,
-			/*Op_DBSTM_BIND_ITR_IDX*/		At_IteratorColumnIdx,
-			/*Op_DBSTM_BIND_ITR_NAM*/		At_ColumnName,
-			/*Op_DBSTM_HINT*/			At_Hint,
-			/*Op_DBSTM_EXEC*/			At_None,
+			/*Op_DBSTM_BIND_LOOPCNT*/	At_None,
+			/*Op_DBSTM_BIND_SEL_IDX*/	At_SelectedColumnIdx,
+			/*Op_DBSTM_BIND_SEL_NAM*/	At_ColumnName,
+			/*Op_DBSTM_BIND_ITR_IDX*/	At_IteratorColumnIdx,
+			/*Op_DBSTM_BIND_ITR_NAM*/	At_ColumnName,
+			/*Op_DBSTM_HINT*/		At_Hint,
+			/*Op_DBSTM_EXEC*/		At_None,
 	
 			/*Op_RESULT_SET_INIT*/		At_None,
 			/*Op_RESULT_CONSTRAINT_UNIQUE*/	At_None,

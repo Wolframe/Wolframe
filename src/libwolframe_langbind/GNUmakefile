@@ -31,7 +31,9 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	protocol_ioblocks.o \
-	appObjects.o \
+	input.o \
+	output.o \
+	redirectFilterClosure.o \
 	null_filter.o \
 	typingfilter.o \
 	typedfilterScope.o \

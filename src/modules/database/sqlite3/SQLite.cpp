@@ -251,7 +251,7 @@ void SQLiteDatabase::closeTransaction( Transaction *t )
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::string& name_)
-	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_sqlite3( name_, &database.dbUnit()))){}
+	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_sqlite3( &database.dbUnit()))){}
 
 
 }} // _Wolframe::db

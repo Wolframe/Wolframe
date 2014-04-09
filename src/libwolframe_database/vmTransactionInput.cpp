@@ -1,6 +1,6 @@
 #include "database/vmTransactionInput.hpp"
 #include "utils/printFormats.hpp"
-#include "transactionfunction/InputStructure.hpp"
+#include "vm/inputStructure.hpp"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -28,26 +28,26 @@ struct ProgramRewriter
 	struct StackElem
 	{
 		Address ip;
-		std::vector<tf::InputNodeIndex> selected;
+		std::vector<vm::InputNodeIndex> selected;
 
 		StackElem():ip(0){}
 		StackElem( const StackElem& o)
 			:ip(o.ip),selected(o.selected){}
-		StackElem( Address ip_, const std::vector<tf::InputNodeIndex>& selected_)
+		StackElem( Address ip_, const std::vector<vm::InputNodeIndex>& selected_)
 			:ip(ip_),selected(selected_){}
 	};
-	static void rewriteInputPathReferences( vm::Program& prg, const tf::InputStructure& input);
+	static void rewriteInputPathReferences( vm::Program& prg, const vm::InputStructure& input);
 };
 
 
-void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::InputStructure& input)
+void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::InputStructure& input)
 {
 	if (prg.code.size() == 0) return;
 
 	// Initialize first element to visit:
 	std::map<ArgumentIndex,bool> visited;
 	std::vector<StackElem> stack;
-	std::vector<tf::InputNodeIndex> root;
+	std::vector<vm::InputNodeIndex> root;
 	root.push_back( input.rootindex());
 	stack.push_back( StackElem( 0, root));
 
@@ -97,7 +97,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 				if (visited.find( ai) == visited.end())
 				{
 					visited[ ai] = true;
-					std::vector<tf::InputNodeIndex> selected = stack.back().selected;
+					std::vector<vm::InputNodeIndex> selected = stack.back().selected;
 					if (++stack.back().ip >= prg.code.size())
 					{
 						stack.pop_back();
@@ -124,9 +124,9 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 
 				// [2] Get the path referenced and create its set of selected nodes ('selected') in the input :
 				const vm::SelectorPath& path = prg.pathset.getPath( argumentIndex( instr));
-				std::vector<tf::InputNodeIndex> selected;
+				std::vector<vm::InputNodeIndex> selected;
 				{
-					std::vector<tf::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
+					std::vector<vm::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
 					for (; ni != ne; ++ni)
 					{
 						path.selectNodes( input, *ni, selected);
@@ -185,7 +185,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 					std::vector<types::Variant> vecNULL;
 					vecNULL.push_back( types::Variant());
 					vm::ValueTupleSetR tupleset( new vm::ValueTupleSet( colnames));
-					std::vector<tf::InputNodeIndex>::const_iterator ni = selected.begin(), ne = selected.end();
+					std::vector<vm::InputNodeIndex>::const_iterator ni = selected.begin(), ne = selected.end();
 					for (; ni != ne; ++ni)
 					{
 						tupleset->push( vecNULL);
@@ -219,14 +219,14 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 					// [4.B.2] Create tuple set {(t1,t2,...tN),....}:
 					vm::ValueTupleSetR tupleset( new vm::ValueTupleSet( colnames));
 					types::VariantConst null;
-					std::vector<tf::InputNodeIndex>::const_iterator ni = selected.begin(), ne = selected.end();
+					std::vector<vm::InputNodeIndex>::const_iterator ni = selected.begin(), ne = selected.end();
 					for (; ni != ne; ++ni)
 					{
 						ti = pathtuple.begin(), te = pathtuple.end();
 						std::vector<types::VariantConst> valuetuple;
 						for (; ti != te; ++ti)
 						{
-							std::vector<tf::InputNodeIndex> element_value_ar;
+							std::vector<vm::InputNodeIndex> element_value_ar;
 							ti->selectNodes( input, *ni, element_value_ar);
 							if (element_value_ar.empty())
 							{
@@ -236,8 +236,8 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 							{
 								if (element_value_ar.size() > 1)
 								{
-									std::vector<tf::InputNodeIndex>::const_iterator ei = element_value_ar.begin(), ee = element_value_ar.end();
-									tf::InputNodeIndex first = *ei;
+									std::vector<vm::InputNodeIndex>::const_iterator ei = element_value_ar.begin(), ee = element_value_ar.end();
+									vm::InputNodeIndex first = *ei;
 									for (++ei; ei != ee; ++ei)
 									{
 										if (*ei != first)
@@ -246,7 +246,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 										}
 									}
 								}
-								const tf::InputNode* nd = input.node( element_value_ar.at(0));
+								const vm::InputNode* nd = input.node( element_value_ar.at(0));
 								const types::Variant* value = input.contentvalue( nd);
 								if (value)
 								{
@@ -269,8 +269,8 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 
 				// [1] Get the path referenced:
 				const vm::SelectorPath& path = prg.pathset.getPath( argumentIndex( instr));
-				std::vector<tf::InputNodeIndex> selected;
-				std::vector<tf::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
+				std::vector<vm::InputNodeIndex> selected;
+				std::vector<vm::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
 				for (; ni != ne; ++ni)
 				{
 					path.selectNodes( input, *ni, selected);
@@ -287,8 +287,8 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 				}
 				else
 				{
-					tf::InputNodeIndex valueidx = selected.back();
-					const tf::InputNode* nd = input.node( valueidx);
+					vm::InputNodeIndex valueidx = selected.back();
+					const vm::InputNode* nd = input.node( valueidx);
 					const types::Variant* value = input.contentvalue( nd);
 					if (value)
 					{
@@ -336,7 +336,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const tf::In
 }//anonymous namespace
 
 
-VmTransactionInput::VmTransactionInput( const vm::Program& p, const tf::InputStructure& input)
+VmTransactionInput::VmTransactionInput( const vm::Program& p, const vm::InputStructure& input)
 	:m_program(p)
 {
 	ProgramRewriter::rewriteInputPathReferences( m_program, input);

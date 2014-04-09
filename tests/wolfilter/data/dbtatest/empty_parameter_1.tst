@@ -37,4 +37,5 @@ Code:
 [3] RETURN
 start( 'SELECT run()' );
 execute();
+nofColumns(); returns 0
 **end

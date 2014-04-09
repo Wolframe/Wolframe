@@ -33,8 +33,8 @@
 ///\brief Implementing of the methods of the transaction function preprocessing step based on TDL
 ///\file tdlTransactionPreprocStep.cpp
 #include "database/tdlTransactionPreprocStep.hpp"
-#include "transactionfunction/TagTable.hpp"
-#include "transactionfunction/InputStructure.hpp"
+#include "vm/tagTable.hpp"
+#include "vm/inputStructure.hpp"
 #include "langbind/formFunction.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/normalizeFunction.hpp"
@@ -49,7 +49,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-void TdlTransactionPreprocStep::print( std::ostream& out, const tf::TagTable* tagmap) const
+void TdlTransactionPreprocStep::print( std::ostream& out, const vm::TagTable* tagmap) const
 {
 	out << "INTO " ;
 	std::vector<std::string>::const_iterator ri = m_resultpath.begin(), re = m_resultpath.end();
@@ -133,10 +133,10 @@ static void mapResult( langbind::TypedInputFilter* in, langbind::TypedOutputFilt
 	}
 }
 
-void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* provider, tf::InputStructure& structure) const
+void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* provider, vm::InputStructure& structure) const
 {
 	// Select the nodes to execute the command with:
-	std::map<tf::InputNodeIndex, int> selectmap;
+	std::map<vm::InputNodeIndex, int> selectmap;
 	std::map<int, bool> sourccetagmap;
 
 	const types::NormalizeFunction* nf = 0;
@@ -146,7 +146,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 		ff = provider->formFunction( m_function);
 		if (!ff) nf = provider->normalizeFunction( m_function);
 
-		std::vector<tf::InputNodeIndex> nodearray;
+		std::vector<vm::InputNodeIndex> nodearray;
 		selector().selectNodes( structure, structure.rootindex(), nodearray);
 		LOG_DATA << "[transaction preprocess] input structure: " << structure.tostring( structure.rootvisitor(), utils::logPrintFormat());
 		if (nodearray.size())
@@ -157,7 +157,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 		{
 			LOG_DATA << "[transaction preprocess] empty selection (no execution) for function " << m_function;
 		}
-		std::vector<tf::InputNodeIndex>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+		std::vector<vm::InputNodeIndex>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
 		for (; ni != ne; ++ni)
 		{
 			if (selectmap[*ni]++ > 0)
@@ -166,7 +166,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 				continue;
 			}
 			// [1A] Create the destination node for the result:
-			tf::InputNodeVisitor resultnode( *ni);
+			vm::InputNodeVisitor resultnode( *ni);
 			if (!m_resultpath.empty())
 			{
 				if (m_resultpath.size() > 1)
@@ -183,7 +183,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 				}
 			}
 			// [1B] Create the map of illegal result tags (result with tag names occurring in the input are not allowed to avoid anomalies)
-			const tf::InputNode* rn = structure.node( resultnode);
+			const vm::InputNode* rn = structure.node( resultnode);
 			if (rn->m_firstchild)
 			{
 				rn = structure.node( rn->m_firstchild);
@@ -195,8 +195,8 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 				}
 			}
 			// [2] Build the parameter structure:
-			std::vector<tf::InputStructure::NodeAssignment> parameterassign;
-			std::vector<tf::InputNodeIndex> parameter;
+			std::vector<vm::InputStructure::NodeAssignment> parameterassign;
+			std::vector<vm::InputNodeIndex> parameter;
 			std::vector<Argument>::const_iterator ai = m_arguments.begin(), ae = m_arguments.end();
 			std::size_t aidx = 0;
 
@@ -209,7 +209,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 						if (parameter.size() == aidx+1)
 						{
 							LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
-							parameterassign.push_back( tf::InputStructure::NodeAssignment( ai->name, parameter.back()));
+							parameterassign.push_back( vm::InputStructure::NodeAssignment( ai->name, parameter.back()));
 						}
 						else
 						{

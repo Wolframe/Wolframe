@@ -101,6 +101,11 @@ public:
 	void add( const Program& oth, bool doPatchGOTOs=true);
 
 	void print( std::ostream& out) const;
+	void printInstructionAt( std::ostream& out, const std::size_t& ip) const;
+	void printInstruction( std::ostream& out, const Instruction& instr) const;
+
+	std::string instructionString( const Instruction& instr) const;
+	std::string instructionStringAt( const std::size_t& ip) const;
 };
 
 typedef boost::shared_ptr<Program> ProgramR;

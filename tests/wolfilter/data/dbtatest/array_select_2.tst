@@ -50,12 +50,15 @@ start( 'SELECT run( $1, $2)' );
 bind( 1, '1' );
 bind( 2, '1' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run( $1, $2)' );
 bind( 1, '2' );
 bind( 2, NULL );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run( $1, $2)' );
 bind( 1, '3' );
 bind( 2, '3' );
 execute();
+nofColumns(); returns 0
 **end

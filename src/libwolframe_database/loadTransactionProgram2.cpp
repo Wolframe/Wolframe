@@ -41,8 +41,6 @@
 #include "tdl/preprocCallStatement.hpp"
 #include "tdl/preprocBlock.hpp"
 #include "tdl/parseUtils.hpp"
-#include "transactionFunctionDescription.hpp"
-#include "vm/subroutine.hpp"
 #include "tdl2vmTranslator.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
@@ -119,30 +117,55 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 		//[2] Iterate on result to print (INTO) all tuple sets produced by the FOREACH:
 		if (cmd.resultpath.size() == 0)
 		{
+			//... no INTO path, so we do not print the result
 		}
 		else if (cmd.resultpath.size() == 1 && cmd.resultpath.back() == ".")
 		{
-			prg.output_statement_result( std::vector<std::string>());
+			//... 'INTO .' expected always a single element as output
+			prg.begin_INTO_block( std::vector<std::string>());
+			prg.output_statement_result( false);
+			prg.end_INTO_block();
 		}
 		else
 		{
-			prg.output_statement_result( cmd.resultpath);
+			bool isLoop = !cmd.unique || !cmd.selector.empty();
+			if (isLoop)
+			{
+				prg.begin_loop_INTO_block( cmd.resultpath);
+				prg.output_statement_result( true);
+				prg.end_loop_INTO_block();
+			}
+			else
+			{
+				prg.begin_INTO_block( cmd.resultpath);
+				prg.output_statement_result( false);
+				prg.end_INTO_block();
+			}
 		}
 	}
 	else
 	{
+		bool hasIntoBlock = !(cmd.resultpath.size() == 0 || (cmd.resultpath.size() == 1 && cmd.resultpath.back() == "."));
+		bool hasIntoLoop = false;
+		if (hasIntoBlock)
+		{
+			if (cmd.selector.empty())
+			{
+				prg.begin_INTO_block( cmd.resultpath);
+			}
+			else
+			{
+				hasIntoLoop = true;
+				prg.begin_loop_INTO_block( cmd.resultpath);
+			}
+		}
 		if (!cmd.selector.empty())
 		{
 			prg.begin_FOREACH( cmd.selector);
 		}
-		bool hasIntoBlock = !(cmd.resultpath.size() == 0 || (cmd.resultpath.size() == 1 && cmd.resultpath.back() == "."));
-		if (hasIntoBlock)
+		if (hasIntoLoop)
 		{
-			std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
-			for (; oi != oe; ++oi)
-			{
-				prg.begin_INTO_block( *oi);
-			}
+			prg.begin_loop_element();
 		}
 		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateparams, vm::SelectorPath::normalize( cmd.selector));
 		std::vector<tdl::ElementReference>::const_iterator pi = cmd.call.params.begin(), pe = cmd.call.params.end();
@@ -181,17 +204,24 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 			}
 		}
 		prg.end_DO_subroutine();
-		if (hasIntoBlock)
+		if (hasIntoLoop)
 		{
-			std::vector<std::string>::const_iterator oi = cmd.resultpath.begin(), oe = cmd.resultpath.end();
-			for (; oi != oe; ++oi)
-			{
-				prg.end_INTO_block();
-			}
+			prg.end_loop_element();
 		}
 		if (!cmd.selector.empty())
 		{
 			prg.end_FOREACH();
+		}
+		if (hasIntoBlock)
+		{
+			if (cmd.selector.empty())
+			{
+				prg.end_INTO_block();
+			}
+			else
+			{
+				prg.end_loop_INTO_block();
+			}
 		}
 	}
 }
@@ -247,10 +277,10 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				{
 					pt = tdl::parse_INTO_path( langdescr, si, se);
 				}
-				std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end(); 
-				for(; pi != pe; ++pi)
+				bool hasIntoBlock = !(pt.size() == 0 || (pt.size() == 1 && pt.back() == "."));
+				if (hasIntoBlock)
 				{
-					prg.begin_INTO_block( *pi);
+					prg.begin_INTO_block( pt);
 				}
 				switch (elem.type)
 				{
@@ -269,8 +299,7 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 						prg.output_ARGUMENT_TUPLESET( elem.selector, elem.index);
 						break;
 				}
-				pi = pt.begin(), pe = pt.end(); 
-				for(; pi != pe; ++pi)
+				if (hasIntoBlock)
 				{
 					prg.end_INTO_block();
 				}
@@ -299,11 +328,7 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 					bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
 					if (hasIntoBlock)
 					{
-						std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end(); 
-						for(; pi != pe; ++pi)
-						{
-							prg.begin_INTO_block( *pi);
-						}
+						prg.begin_INTO_block( resultpath);
 					}
 					switch (elem.type)
 					{
@@ -324,11 +349,7 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 					};
 					if (hasIntoBlock)
 					{
-						std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end(); 
-						for(; pi != pe; ++pi)
-						{
-							prg.end_INTO_block();
-						}
+						prg.end_INTO_block();
 					}
 					ch = tdl::parseNextToken( langdescr, tok, si, se);
 					if (ch != ';')
@@ -434,20 +455,12 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
 				if (hasIntoBlock)
 				{
-					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-					for (; pi != pe; ++pi)
-					{
-						prg.begin_INTO_block( *pi);
-					}
+					prg.begin_INTO_block( resultpath);
 				}
 				parsePrgBlock( prg, langdescr, si, se);
 				if (hasIntoBlock)
 				{
-					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-					for (; pi != pe; ++pi)
-					{
-						prg.end_INTO_block();
-					}
+					prg.end_INTO_block();
 				}
 				return isValidDatabase;
 			}
@@ -543,20 +556,12 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
 				if (hasIntoBlock)
 				{
-					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-					for (; pi != pe; ++pi)
-					{
-						prg.begin_INTO_block( *pi);
-					}
+					prg.begin_INTO_block( resultpath);
 				}
 				parsePrgBlock( prg, langdescr, si, se);
 				if (hasIntoBlock)
 				{
-					std::vector<std::string>::const_iterator pi = resultpath.begin(), pe = resultpath.end();
-					for (; pi != pe; ++pi)
-					{
-						prg.end_INTO_block();
-					}
+					prg.end_INTO_block();
 				}
 				if (isValidDatabase)
 				{

@@ -33,8 +33,10 @@
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
 #include "database/tdlTransactionFunction.hpp"
-#include "transactionfunction/InputStructure.hpp"
+#include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
+#include "langbind/formFunction.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
@@ -47,7 +49,7 @@ using namespace _Wolframe::db;
 TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunction* func_)
 	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter("transactionFunctionInput")
-	,m_structure(new tf::InputStructure( func_->program()->pathset.tagtab()))
+	,m_structure(new vm::InputStructure( func_->program()->pathset.tagtab()))
 	,m_func(func_)
 	,m_lasttype(langbind::TypedInputFilter::CloseTag)
 {}

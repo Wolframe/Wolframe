@@ -33,17 +33,17 @@
 //\file vm/selectorPathSet.cpp
 //\brief Implementation of a set of input selector pathes
 #include "database/vm/selectorPathSet.hpp"
-#include "transactionfunction/TagTable.hpp"
+#include "vm/tagTable.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
 
 SelectorPathSet::SelectorPathSet()
-	:m_tagtab( new tf::TagTable(false)){}
+	:m_tagtab( new TagTable(false)){}
 
 SelectorPathSet::SelectorPathSet( const SelectorPathSet& o)
-	:m_tagtab(new tf::TagTable(*o.m_tagtab))
+	:m_tagtab(new TagTable(*o.m_tagtab))
 	,m_pathar(o.m_pathar){}
 
 SelectorPathSet::~SelectorPathSet()

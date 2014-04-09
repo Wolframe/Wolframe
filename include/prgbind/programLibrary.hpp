@@ -37,7 +37,7 @@
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "database/database.hpp"
-#include "langbind/cppFormFunction.hpp"
+#include "serialize/cppFormFunction.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/runtimeEnvironment.hpp"
@@ -61,7 +61,7 @@ public:
 	ProgramLibrary( const ProgramLibrary& o);
 
 	virtual ~ProgramLibrary();
-	virtual void defineCppFormFunction( const std::string& name, const langbind::CppFormFunction& f);
+	virtual void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f);
 	virtual void defineFormFunction( const std::string& name, const langbind::FormFunctionR f);
 	virtual void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env);
 	virtual void definePrivateForm( const types::FormDescriptionR& f);

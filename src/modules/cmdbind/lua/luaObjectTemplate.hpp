@@ -41,10 +41,16 @@ Project Wolframe.
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"
+#include "types/form.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
+#include "langbind/redirectFilterClosure.hpp"
+#include "serialize/ddlFormParser.hpp"
+#include "serialize/ddlFormSerializer.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/struct/structSerializer.hpp"
 #include "utils/fileUtils.hpp"
 #include <limits>
 #include <stdexcept>
@@ -61,7 +67,6 @@ namespace langbind {
 
 template <class ObjectType>
 struct MetaTable {static const char* name()						{return 0;}};
-template <> struct MetaTable<Logger> {static const char* name()				{return "wolframe.Logger";}};
 template <> struct MetaTable<Input> {static const char* name()				{return "wolframe.Input";}};
 template <> struct MetaTable<Output> {static const char* name()				{return "wolframe.Output";}};
 template <> struct MetaTable<Filter> {static const char* name()				{return "wolframe.Filter";}};
@@ -71,8 +76,8 @@ template <> struct MetaTable<types::CustomDataValueR> {static const char* name()
 template <> struct MetaTable<types::CustomDataInitializerR> {static const char* name()	{return "wolframe.CustomInitializer";}};
 template <> struct MetaTable<types::DateTime> {static const char* name()		{return "wolframe.DateTime";}};
 template <> struct MetaTable<types::BigNumber> {static const char* name()		{return "wolframe.BigNumber";}};
-template <> struct MetaTable<DDLFormParser> {static const char* name()			{return "wolframe.DDLFormParser";}};
-template <> struct MetaTable<DDLFormSerializer> {static const char* name()		{return "wolframe.DDLFormSerializer";}};
+template <> struct MetaTable<serialize::DDLFormParser> {static const char* name()	{return "wolframe.DDLFormParser";}};
+template <> struct MetaTable<serialize::DDLFormSerializer> {static const char* name()	{return "wolframe.DDLFormSerializer";}};
 template <> struct MetaTable<InputFilterClosure> {static const char* name()		{return "wolframe.InputFilterClosure";}};
 template <> struct MetaTable<TypedInputFilterR> {static const char* name()		{return "wolframe.TypedInputFilterR";}};
 template <> struct MetaTable<TypedInputFilterClosure> {static const char* name()	{return "wolframe.TypedInputFilterClosure";}};

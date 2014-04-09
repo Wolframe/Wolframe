@@ -55,9 +55,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( const std::string& name_, PostgreSQLdbUnit* dbunit_)
-	:TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_)
+	:m_state(Init)
 	,m_lastresult(0)
 	,m_statement( new STATEMENT_CLASS( ) )
 	,m_nof_rows(0)

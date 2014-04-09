@@ -36,6 +36,7 @@
 #define _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
 #include "database/vm/output.hpp"
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
 #include <string>
 #include <iostream>
 

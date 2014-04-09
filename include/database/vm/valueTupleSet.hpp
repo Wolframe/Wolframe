@@ -57,8 +57,14 @@ public:
 	class const_iterator
 	{
 	public:
-		const_iterator( const ValueTupleSet* ref_=0)
-			:m_idx(0),m_ref(ref_){}
+		const_iterator()
+			:m_idx(0)
+		{
+			static const ValueTupleSet v; 
+			m_ref = &v;
+		}
+		explicit const_iterator( const ValueTupleSet* ref_, std::size_t idx_=0)
+			:m_idx(idx_),m_ref(ref_){}
 		const_iterator( const const_iterator& o)
 			:m_idx(o.m_idx),m_ref(o.m_ref){}
 		const_iterator& operator++()
@@ -66,11 +72,6 @@ public:
 			if (m_ref)
 			{
 				m_idx += m_ref->m_colnames.size();
-				if (m_idx >= m_ref->m_ar.size())
-				{
-					m_idx=0;
-					m_ref=0;
-				}
 			}
 			return *this;
 		}
@@ -88,17 +89,22 @@ public:
 
 		bool operator==( const const_iterator& o) const
 		{
-			if (!m_ref && !o.m_ref) return true;
 			return (m_ref == o.m_ref && m_idx == o.m_idx);
 		}
 		bool operator!=( const const_iterator& o) const
 		{
-			if (!m_ref && !o.m_ref) return false;
 			return (m_ref != o.m_ref || m_idx != o.m_idx);
 		}
 
 		const const_iterator* operator->() const		{return this;}
-		const types::Variant& column( std::size_t i) const	{if (!m_ref || i == 0 || i > m_ref->m_colnames.size() || m_idx + i - 1 >= m_ref->m_ar.size()) throw std::runtime_error("value tuple set column index out of range"); return m_ref->m_ar.at( m_idx + i - 1);}
+		const types::Variant& column( std::size_t i) const
+		{
+			if (!m_ref || i == 0 || i > m_ref->m_colnames.size() || m_idx + i - 1 >= m_ref->m_ar.size())
+			{
+				throw std::runtime_error("value tuple set column index out of range");
+			}
+			return m_ref->m_ar.at( m_idx + i - 1);
+		}
 
 	private:
 		std::size_t m_idx;
@@ -107,11 +113,11 @@ public:
 
 	const_iterator begin() const
 	{
-		return const_iterator(this);
+		return const_iterator( this);
 	}
 	const_iterator end() const
 	{
-		return const_iterator();
+		return const_iterator( this, m_ar.size());
 	}
 
 	std::size_t nofColumns() const

@@ -39,4 +39,5 @@ Code:
 start( 'SELECT run( $1)' );
 bind( 1, 'ein parameter text' );
 execute();
+nofColumns(); returns 0
 **end

@@ -33,6 +33,7 @@ CPP_OBJS = \
 	ddl/ddlStructSerializer.o \
 	mapContext.o \
 	serializationErrorException.o \
+	cppFormFunction.o \
 	struct/intrusiveParser.o \
 	struct/intrusiveSerializer.o \
 	struct/parseStack.o \

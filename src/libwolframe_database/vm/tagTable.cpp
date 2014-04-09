@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of a tag map for database transaction functions
-///\file transactionfunction/TagTable.cpp
-#include "transactionfunction/TagTable.hpp"
+///\brief Implementation of the table type representing tag names as integers
+///\file vm/tagTable.cpp
+#include "vm/tagTable.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
-using namespace _Wolframe::db::tf;
+using namespace _Wolframe::db::vm;
 
 TagTable::TagTable( bool case_sensitive_)
 	:m_case_sensitive(case_sensitive_),m_size(0)

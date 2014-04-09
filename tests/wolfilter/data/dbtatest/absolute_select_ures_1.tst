@@ -56,4 +56,5 @@ next(); returns 0
 start( 'SELECT exec( $1)' );
 bind( 1, '2' );
 execute();
+nofColumns(); returns 0
 **end

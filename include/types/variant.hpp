@@ -191,6 +191,7 @@ public:
 	Type type() const					{return (Type)m_type;}
 	///\brief Get the internal representation of the data of this
 	const Data& data() const				{return m_data;}
+	Data& data()						{return m_data;}
 
 	///\brief Get the pointer to the C representation of a string (throws for non string)
 	char* charptr() const					{if (type() != String) throw std::logic_error("illegal access (type mismatch)"); return m_data.value.String;}

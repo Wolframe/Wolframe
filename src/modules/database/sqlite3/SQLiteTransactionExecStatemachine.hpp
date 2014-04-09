@@ -55,7 +55,7 @@ struct TransactionExecStatemachine_sqlite3
 	:public TransactionExecStatemachine
 {
 	//\brief Constructor
-	TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_);
+	explicit TransactionExecStatemachine_sqlite3( SQLiteDBunit* dbunit_);
 
 	//\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
@@ -78,7 +78,8 @@ struct TransactionExecStatemachine_sqlite3
 	virtual bool execute();
 	//\brief Return true is the last command has at least one result row returned
 	virtual bool hasResult();
-	//\brief Get the number of columns of the last result
+	//\brief Get the number of columns of the last result.
+	//\remark This function should be used to check if the last command had a result (that can also be empty)
 	virtual std::size_t nofColumns();
 	//\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);

@@ -44,12 +44,6 @@
 
 namespace _Wolframe {
 namespace db {
-
-namespace tf {
-//\brief Forward declaration
-class TagTable;
-}//namespace
-
 namespace vm {
 
 class SelectorPathSet
@@ -77,17 +71,17 @@ public:
 
 	PatchArgumentMapR join( const SelectorPathSet& oth);
 
-	const tf::TagTable* tagtab() const
+	const TagTable* tagtab() const
 	{
 		return m_tagtab;
 	}
-	tf::TagTable* tagtab()
+	TagTable* tagtab()
 	{
 		return m_tagtab;
 	}
 
 private:
-	tf::TagTable* m_tagtab;
+	TagTable* m_tagtab;
 	std::vector<SelectorPath> m_pathar;	
 };
 

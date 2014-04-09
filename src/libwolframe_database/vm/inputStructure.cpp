@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of input data structure for the transaction function
-///\file transactionfunction/InputStructure.cpp
-#include "transactionfunction/InputStructure.hpp"
+///\brief Implementation of the input data structure for transaction functions
+///\file vm/inputStructure.cpp
+#include "vm/inputStructure.hpp"
 #include "filter/typedfilter.hpp"
 #include "utils/printFormats.hpp"
 #include "logger-v1.hpp"
@@ -40,7 +40,7 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
-using namespace _Wolframe::db::tf;
+using namespace _Wolframe::db::vm;
 
 InputStructure::InputStructure( const InputStructure& o)
 	:m_nodemem(o.m_nodemem)

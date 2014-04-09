@@ -50,16 +50,21 @@ SET 0: .
 start( 'SELECT run($1)' );
 bind( 1, '1' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1)' );
 bind( 1, '2' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1)' );
 bind( 1, '1' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1)' );
 bind( 1, '2' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1)' );
 bind( 1, '3' );
 execute();
+nofColumns(); returns 0
 **end

@@ -57,14 +57,16 @@ Code:
 [13] DBSTM_EXEC
 [14] NEXT
 [15] IF_COND GOTO @9
-[16] OPEN_ITER_LAST_RESULT
-[17] NOT_IF_COND GOTO @23
-[18] OUTPUT_OPEN TAG doc
-[19] OUTPUT_ITR_COLUMN
-[20] OUTPUT_CLOSE
-[21] NEXT
-[22] IF_COND GOTO @18
-[23] RETURN
+[16] OUTPUT_OPEN_ARRAY TAG doc
+[17] OPEN_ITER_LAST_RESULT
+[18] NOT_IF_COND GOTO @24
+[19] OUTPUT_OPEN_ELEM
+[20] OUTPUT_ITR_COLUMN
+[21] OUTPUT_CLOSE_ELEM
+[22] NEXT
+[23] IF_COND GOTO @19
+[24] OUTPUT_CLOSE_ARRAY
+[25] RETURN
 start( 'SELECT run( $1 ,$2,$3 )' );
 bind( 1, '1' );
 bind( 2, '2' );
@@ -109,4 +111,5 @@ bind( 1, '3' );
 bind( 2, 'sara' );
 bind( 3, 'tannen steig 12' );
 execute();
+nofColumns(); returns 0
 **end

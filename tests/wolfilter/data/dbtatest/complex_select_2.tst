@@ -48,12 +48,15 @@ start( 'SELECT run($1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1, $2)' );
 bind( 1, '11' );
 bind( 2, '22' );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1, $2)' );
 bind( 1, '111' );
 bind( 2, '222' );
 execute();
+nofColumns(); returns 0
 **end

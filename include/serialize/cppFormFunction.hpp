@@ -29,16 +29,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/cppFormFunction.hpp
-///\brief Interface to the built-in function for processor language bindings
-#ifndef _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
-#define _Wolframe_langbind_CPP_FORM_FUNCTION_HPP_INCLUDED
+///\file serialize/cppFormFunction.hpp
+///\brief Interface to form functions written in C++
+#ifndef _Wolframe_serialize_CPP_FORM_FUNCTION_HPP_INCLUDED
+#define _Wolframe_serialize_CPP_FORM_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
+#include "serialize/struct/structSerializer.hpp"
+#include "serialize/struct/structParser.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "filter/typedfilter.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace langbind {
+namespace serialize {
 
 ///\class CppFormFunction
 ///\brief Function of language bindings implemented in C++ with a form as argument and as result. The forms are defined by a serialization description.
@@ -93,6 +96,57 @@ private:
 };
 
 typedef boost::shared_ptr<CppFormFunction> CppFormFunctionR;
+
+//\class ApiFormData
+class ApiFormData
+	:public virtual utils::TypeSignature
+{
+public:
+	ApiFormData( const serialize::StructDescriptionBase* descr);
+	~ApiFormData();
+
+	void* get() const					{return m_data.get();}
+	const serialize::StructDescriptionBase* descr() const	{return m_descr;}
+	const boost::shared_ptr<void>& data() const		{return m_data;}
+private:
+	const serialize::StructDescriptionBase* m_descr;
+	boost::shared_ptr<void> m_data;
+};
+
+//\class CppFormFunctionClosure
+//\brief Closure with calling state of called CppFormFunction
+class CppFormFunctionClosure
+	:public virtual utils::TypeSignature
+{
+public:
+	//\brief Constructor
+	//\param[in] f function called
+	CppFormFunctionClosure( const CppFormFunction& f);
+
+	//\brief Copy constructor
+	//\param[in] o copied item
+	CppFormFunctionClosure( const CppFormFunctionClosure& o);
+
+	//\brief Calls the form function with the input from the input filter specified
+	//\return true when completed
+	bool call();
+
+	//\brief Initialization of call context for a new call
+	//\param[in] i call input
+	//\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
+	void init( const proc::ProcessorProviderInterface* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags);
+
+	const serialize::StructSerializer& result() const	{return m_result;}
+
+private:
+	CppFormFunction m_func;
+	int m_state;
+	ApiFormData m_param_data;
+	ApiFormData m_result_data;
+	serialize::StructSerializer m_result;
+	serialize::StructParser m_parser;
+	const proc::ProcessorProviderInterface* m_provider;
+};
 
 }}//namespace
 #endif

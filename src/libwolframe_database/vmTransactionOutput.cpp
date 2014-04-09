@@ -13,18 +13,36 @@ void VmTransactionOutput::print( std::ostream& out, const utils::PrintFormat* pf
 	std::size_t indent = 0;
 	std::size_t indentsize = (pformat->indent?std::strlen(pformat->indent):0);
 	std::string indentstr;
+	std::vector<types::Variant> stack;
 
 	vm::Output::const_iterator oi = m_impl->begin(), oe = m_impl->end();
 	for (; oi != oe; ++oi)
 	{
 		switch (oi->op())
 		{
+			case vm::Output::Element::OpenArray:
+				stack.push_back( oi->arg());
+				break;
+
+			case vm::Output::Element::OpenArrayElement:
+				if (stack.empty()) throw std::runtime_error( "tags in transaction output not balanced");
+				out << pformat->newitem << indentstr << stack.back().tostring() << pformat->openstruct;
+				indent += 1;
+				indentstr.append( pformat->indent);
+				break;
+
 			case vm::Output::Element::Open:
 				out << pformat->newitem << indentstr << oi->arg().tostring() << pformat->openstruct;
 				indent += 1;
 				indentstr.append( pformat->indent);
 				break;
 
+			case vm::Output::Element::CloseArray:
+				if (stack.empty()) throw std::runtime_error( "tags in transaction output not balanced");
+				stack.pop_back();
+				break;
+
+			case vm::Output::Element::CloseArrayElement:
 			case vm::Output::Element::Close:
 				if (indent == 0)
 				{
@@ -78,6 +96,7 @@ public:
 
 	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
+	AGAIN:
 		if (m_itr == m_end)
 		{
 			if (m_done) return false;
@@ -88,11 +107,54 @@ public:
 		}
 		switch (m_itr->op())
 		{
+			case vm::Output::Element::OpenArray:
+				if (langbind::FilterBase::flag(SerializeWithIndices))
+				{
+					m_stack.push_back( 0L);
+					type = langbind::FilterBase::OpenTag;
+					element = m_itr->arg();
+				}
+				else
+				{
+					m_stack.push_back( m_itr->arg());
+					++m_itr;
+					goto AGAIN;
+				}
+				break;
+
+			case vm::Output::Element::OpenArrayElement:
+				if (m_stack.empty()) throw std::runtime_error("tags in output not balanced");
+				if (langbind::FilterBase::flag(SerializeWithIndices))
+				{
+					++m_stack.back().data().value.Int;
+				}
+				type = langbind::FilterBase::OpenTag;
+				element = m_stack.back();
+				break;
+
 			case vm::Output::Element::Open:
 				type = langbind::FilterBase::OpenTag;
 				element = m_itr->arg();
 				break;
 
+			case vm::Output::Element::CloseArray:
+				if (m_stack.empty()) throw std::runtime_error("tags in output not balanced");
+				if (langbind::FilterBase::flag(SerializeWithIndices))
+				{
+					type = langbind::FilterBase::CloseTag;
+					element = m_itr->arg();
+					m_stack.pop_back();
+					break;
+				}
+				else
+				{
+					m_stack.pop_back();
+					++m_itr;
+					goto AGAIN;
+				}
+				break;
+
+			case vm::Output::Element::CloseArrayElement:
 			case vm::Output::Element::Close:
 				type = langbind::FilterBase::CloseTag;
 				element = m_itr->arg();
@@ -112,6 +174,7 @@ private:
 	vm::OutputR m_output;
 	vm::Output::const_iterator m_itr;
 	vm::Output::const_iterator m_end;
+	std::vector<types::Variant> m_stack;
 };
 
 langbind::TypedInputFilterR VmTransactionOutput::get() const

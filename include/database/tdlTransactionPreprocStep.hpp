@@ -47,12 +47,12 @@ class ProcessorProviderInterface;
 }//namespace proc
 
 namespace db {
-namespace tf {
+namespace vm {
 //\brief Forward declaration
 class TagTable;
 //\brief Forward declaration
 class InputStructure;
-}//namespace tf
+}//namespace vm
 
 class TdlTransactionPreprocStep
 {
@@ -162,9 +162,9 @@ public:
 		return m_arguments.size();
 	}
 
-	void print( std::ostream& out, const tf::TagTable* tagmap) const;
+	void print( std::ostream& out, const vm::TagTable* tagmap) const;
 
-	void call( const proc::ProcessorProviderInterface* provider, tf::InputStructure& structure) const;
+	void call( const proc::ProcessorProviderInterface* provider, vm::InputStructure& structure) const;
 
 private:
 	std::vector<vm::SelectorPath> m_selectors;

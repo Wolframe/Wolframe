@@ -35,7 +35,8 @@ Project Wolframe.
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #include "luaDump.hpp"
 #include "filter/filter.hpp"
-#include "langbind/appObjects.hpp"
+#include "langbind/input.hpp"
+#include "langbind/output.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <map>
 #include <list>

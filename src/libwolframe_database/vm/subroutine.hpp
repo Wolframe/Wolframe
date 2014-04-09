@@ -55,7 +55,7 @@ public:
 		:m_name(o.m_name),m_templateParams(o.m_templateParams),m_params(o.m_params),m_program(o.m_program){}
 
 	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& templateParams() const	{return m_params;}
+	const std::vector<std::string>& templateParams() const	{return m_templateParams;}
 	const std::vector<std::string>& params() const		{return m_params;}
 	const ProgramR& program() const				{return m_program;}
 

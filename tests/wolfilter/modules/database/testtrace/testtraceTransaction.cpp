@@ -144,8 +144,7 @@ public:
 
 	///\brief Constructor
 	TransactionHandler( const std::string& outfilename, const std::vector<std::string>& res)
-		:TransactionExecStatemachine("TEST")
-		,m_res(res)
+		:m_res(res)
 		,m_out(outfilename.c_str())
 	{
 		m_resitr = m_res.begin();

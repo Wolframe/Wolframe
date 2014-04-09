@@ -34,6 +34,7 @@
 ///\file prgbind_transactionProgram.cpp
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/programLibrary.hpp"
+#include "langbind/redirectFilterClosure.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "database/tdlTransactionFunction.hpp"
 #include "database/databaseError.hpp"
@@ -41,7 +42,6 @@
 #include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
 #include "config/programBase.hpp"
-#include "langbind/appObjects.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;

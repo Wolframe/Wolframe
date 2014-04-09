@@ -102,14 +102,17 @@ types::Variant ProgramInstance::loopcntArgument() const
 	}
 	else
 	{
-		return types::Variant( top.m_valueIter->index());
+		return types::Variant( top.m_valueIter->index()+1);
 	}
 }
 
 void ProgramInstance::initValueIteraror( const ValueTupleSetR& valueset)
 {
 	StackElement& top = m_stack.back();
-	if (!valueset.get()) throw std::runtime_error( "opening iterator on undefined set");
+	if (!valueset.get())
+	{
+		throw std::runtime_error( "opening iterator on undefined set");
+	}
 	top.m_valueSet = valueset;
 	top.m_valueIter = top.m_valueSet->begin();
 	top.m_valueEnd = top.m_valueSet->end();
@@ -162,12 +165,9 @@ void ProgramInstance::initResult( const ValueTupleSetR& resultset)
 	}
 }
 
-ValueTupleSetR ProgramInstance::fetchDatabaseResult()
+ValueTupleSetR ProgramInstance::fetchDatabaseResult( std::size_t nofColumns)
 {
-	if (!m_db_stm->hasResult()) throw std::logic_error("assertion failed: call fetchDatabaseResult() without result");
-
-	std::size_t ii,nofColumns = m_db_stm->nofColumns();
-	if (nofColumns == 0) return ValueTupleSetR();
+	std::size_t ii;
 
 	std::vector<std::string> colNames;
 	for (ii=0; ii<nofColumns; ++ii)
@@ -205,7 +205,6 @@ void ProgramInstance::setDatabaseError()
 	
 		m_lastError = *err;
 		m_lastError.dbname = m_db_stm->databaseID();
-		m_lastError.transaction = m_db_stm->transactionName();
 		m_lastError.ip = m_ip;
 
 		if (top.m_hintidx)
@@ -227,6 +226,8 @@ bool ProgramInstance::execute()
 	{
 		// Define abbreviation for the current state:
 		StackElement& top = m_stack.back();
+
+		LOG_TRACE << "[transaction vm] execute [" << m_ip << "]" << m_program->instructionStringAt( m_ip);
 
 		// Evaluate conditional:
 		Instruction instr = m_code.get( m_ip);
@@ -300,8 +301,24 @@ bool ProgramInstance::execute()
 				printIteratorColumn();
 				++m_ip;
 				break;
+			case Op_OUTPUT_OPEN_ARRAY:
+				m_output->add( Output::Element( Output::Element::OpenArray, m_program->tagnametab.getName( argidx)));
+				++m_ip;
+				break;
+			case Op_OUTPUT_OPEN_ELEM:
+				m_output->add( Output::Element( Output::Element::OpenArrayElement, 0));
+				++m_ip;
+				break;
 			case Op_OUTPUT_OPEN:
 				m_output->add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
+				++m_ip;
+				break;
+			case Op_OUTPUT_CLOSE_ARRAY:
+				m_output->add( Output::Element( Output::Element::CloseArray));
+				++m_ip;
+				break;
+			case Op_OUTPUT_CLOSE_ELEM:
+				m_output->add( Output::Element( Output::Element::CloseArrayElement));
 				++m_ip;
 				break;
 			case Op_OUTPUT_CLOSE:
@@ -470,20 +487,22 @@ bool ProgramInstance::execute()
 				++m_ip;
 				break;
 			case Op_DBSTM_EXEC:
+			{
 				if (!m_db_stm->execute())
 				{
 					setDatabaseError();
 					return false;
 				}
-				if (m_db_stm->hasResult())
+				std::size_t nofColumns = m_db_stm->nofColumns();
+				if (nofColumns)
 				{
-					initResult( fetchDatabaseResult());
+					initResult( fetchDatabaseResult( nofColumns));
 				}
 				top.m_bindidx = 0;
 				top.m_hintidx = 0;
 				++m_ip;
 				break;
-
+			}
 
 			/*Collect Results and Constraints:*/
 			case Op_RESULT_SET_INIT:

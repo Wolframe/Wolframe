@@ -57,13 +57,20 @@ public:
 	void define_resultset_unique();
 	void define_resultset_nonempty();
 
-	void begin_INTO_block( const std::string& tag);
+	void begin_INTO_block( const std::vector<std::string>& path);
 	void end_INTO_block();
+
+	void begin_loop_INTO_block( const std::vector<std::string>& path);
+	void end_loop_INTO_block();
+
+	void begin_loop_element();
+	void end_loop_element();
 
 	void begin_DO_statement( const std::string& stm);
 	void statement_HINT( const std::string& errorclass, const std::string& message);
 	void end_DO_statement();
-	void output_statement_result( const std::vector<std::string>& path);
+
+	void output_statement_result( bool isLoop);
 
 	//\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector);
@@ -96,9 +103,11 @@ private:
 			None,
 			OpenForeach,
 			OpenIntoBlock,
+			OpenIntoBlockArray,
 			OpenStatementCall,
 			StatementHint,
-			OpenSubroutineCall
+			OpenSubroutineCall,
+			OpenLoopElement
 		};
 		Id id;
 		vm::InstructionSet::ArgumentIndex value;	//< state variable (interpretation is depending on id)

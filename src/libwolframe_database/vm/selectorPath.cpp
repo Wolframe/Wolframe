@@ -33,13 +33,14 @@
 //\file vm/selectorPath.cpp
 //\brief Implementation of an input selector path
 #include "database/vm/selectorPath.hpp"
-#include "transactionfunction/InputStructure.hpp"
-#include "transactionfunction/TagTable.hpp"
+#include "vm/inputStructure.hpp"
+#include "vm/tagTable.hpp"
+#include <iostream>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
-using namespace _Wolframe::db::tf;
 
 SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 {
@@ -259,7 +260,7 @@ std::string SelectorPath::normalize( const std::string& pathstr)
 	return SelectorPath( pathstr, &tm).tostring( &tm);
 }
 
-const char* SelectorPath::lastElementName( const tf::TagTable* tagmap) const
+const char* SelectorPath::lastElementName( const TagTable* tagmap) const
 {
 	if (m_path.size() == 0)
 	{

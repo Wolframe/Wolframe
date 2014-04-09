@@ -183,59 +183,128 @@ void Tdl2vmTranslator::end_DO_statement()
 	m_nofCommands += 1;
 }
 
-void Tdl2vmTranslator::output_statement_result( const std::vector<std::string>& path)
+void Tdl2vmTranslator::output_statement_result( bool isLoop)
 {
 	ArgumentIndex endofblock
-		= (ArgumentIndex)(m_main_program.code.size()
-		+ 5			/*{A}*/
-		+ (2 * path.size()))	/*{B}*/;
+		= (ArgumentIndex)(m_main_program.code.size() + 5);			/*{A}*/
+	if (isLoop) endofblock += 2							/*{B}*/;
+
 	ArgumentIndex startofblock
 		= (ArgumentIndex)(m_main_program.code.size() + 2);
 		//... + 2 ~ skipping next two operations
 
 	m_main_program.code
-		( Op_OPEN_ITER_LAST_RESULT )				/*{A}*/
-		( Co_NOT_IF_COND, Op_GOTO, endofblock)			/*{A}*/
+		( Op_OPEN_ITER_LAST_RESULT )						/*{A}*/
+		( Co_NOT_IF_COND, Op_GOTO, endofblock)					/*{A}*/
 	;
-	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
-	for (; pi != pe; ++pi)
+	if (isLoop)
 	{
 		m_main_program.code
-		( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( *pi))	/*{B}*/
+			( Op_OUTPUT_OPEN_ELEM )						/*{B}*/
 		;
+		//... element gets indexed if required
 	}
 	m_main_program.code
-		( Op_OUTPUT_ITR_COLUMN )				/*{A}*/
+		( Op_OUTPUT_ITR_COLUMN )						/*{A}*/
 	;
-	for (pi = path.begin(); pi != pe; ++pi)
+	if (isLoop)
 	{
 		m_main_program.code
-		( Op_OUTPUT_CLOSE )					/*{B}*/
+			( Op_OUTPUT_CLOSE_ELEM )					/*{B}*/
 		;
+		//... element gets indexed if required
 	}
 	m_main_program.code
-		( Op_NEXT )						/*{A}*/
-		( Co_IF_COND, Op_GOTO, startofblock )			/*{A}*/
+		( Op_NEXT )								/*{A}*/
+		( Co_IF_COND, Op_GOTO, startofblock )					/*{A}*/
 	;
 }
 
 
-void Tdl2vmTranslator::begin_INTO_block( const std::string& tag)
+void Tdl2vmTranslator::begin_INTO_block( const std::vector<std::string>& path)
 {
-	// Code generated:
-	m_main_program.code
-		( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( tag))
-	;
-	m_stateStack.push_back( State( State::OpenIntoBlock, 0));
+	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+	for (; pi != pe; ++pi)
+	{
+		// Code generated:
+		m_main_program.code
+			( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( *pi))
+		;
+	}
+	m_stateStack.push_back( State( State::OpenIntoBlock, path.size()));
 }
 
 void Tdl2vmTranslator::end_INTO_block()
 {
 	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenIntoBlock) throw std::runtime_error( "illegal state: end of INTO");
-	m_main_program.code
-		( Op_OUTPUT_CLOSE )
-	;
+	std::size_t cnt = m_stateStack.back().value;
+	while (cnt-- > 0)
+	{
+		m_main_program.code
+			( Op_OUTPUT_CLOSE )
+		;
+	}
 	m_stateStack.pop_back();
+}
+
+void Tdl2vmTranslator::begin_loop_INTO_block( const std::vector<std::string>& path)
+{
+	if (path.size() > 0)
+	{
+		std::vector<std::string>::const_iterator pi = path.begin(), pe = path.begin() + path.size() -1;
+		for (; pi != pe; ++pi)
+		{
+			m_main_program.code
+			( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( *pi))		/*{B}*/
+			;
+		}
+		m_main_program.code
+			( Op_OUTPUT_OPEN_ARRAY, m_main_program.tagnametab.get( *pi))	/*{B}*/
+		;
+		//... inner most element gets array iterator
+	}
+	else
+	{
+		throw std::runtime_error("loop INTO statement with empty path");
+	}
+	m_stateStack.push_back( State( State::OpenIntoBlockArray, path.size()));
+}
+
+void Tdl2vmTranslator::end_loop_INTO_block()
+{
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenIntoBlockArray) throw std::runtime_error( "illegal state: end of INTO (array)");
+	std::size_t cnt = m_stateStack.back().value;
+	if (cnt-- > 0)
+	{
+		m_main_program.code
+			( Op_OUTPUT_CLOSE_ARRAY )
+		;
+		//... inner most element gets array iterator
+
+		while (cnt-- > 0)
+		{
+			m_main_program.code
+				( Op_OUTPUT_CLOSE )
+			;
+		}
+	}
+	m_stateStack.pop_back();
+}
+
+void Tdl2vmTranslator::begin_loop_element()
+{
+	m_main_program.code
+		( Op_OUTPUT_OPEN_ELEM )
+	;
+	m_stateStack.push_back( State( State::OpenLoopElement, 0));
+}
+
+void Tdl2vmTranslator::end_loop_element()
+{
+	if (m_stateStack.empty() || m_stateStack.back().id != State::OpenLoopElement) throw std::runtime_error( "illegal state: end of loop element");
+	m_main_program.code
+		( Op_OUTPUT_CLOSE_ELEM )
+	;
 }
 
 static std::string mangledSubroutineName( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector)

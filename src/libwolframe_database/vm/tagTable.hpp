@@ -30,16 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Internal interface for input data structure of transaction function
-///\file transactionfunction/TagTable.hpp
-#ifndef _DATABASE_TRANSACTION_FUNCTION_TAG_TABLE_HPP_INCLUDED
-#define _DATABASE_TRANSACTION_FUNCTION_TAG_TABLE_HPP_INCLUDED
+///\brief Internal interface for representing tag names as integers
+///\file vm/tagTable.hpp
+#ifndef _DATABASE_VM_TAG_TABLE_HPP_INCLUDED
+#define _DATABASE_VM_TAG_TABLE_HPP_INCLUDED
 #include <map>
 #include <string>
 
 namespace _Wolframe {
 namespace db {
-namespace tf {
+namespace vm {
 
 class TagTable
 {

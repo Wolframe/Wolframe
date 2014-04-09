@@ -48,4 +48,5 @@ start( 'SELECT run($1, $2)' );
 bind( 1, '1' );
 bind( 2, '1' );
 execute();
+nofColumns(); returns 0
 **end

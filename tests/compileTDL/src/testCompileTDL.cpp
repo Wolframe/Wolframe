@@ -35,7 +35,7 @@
 #include "database/loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
 #include "database/vmTransactionInput.hpp"
-#include "transactionfunction/InputStructure.hpp"
+#include "vm/inputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"
 #include "filter/ptreefilter.hpp"
@@ -67,7 +67,7 @@ protected:
 	virtual void TearDown() {}
 };
 
-static void fillInputStructure( const types::PropertyTree& ptree, tf::InputStructure& input)
+static void fillInputStructure( const types::PropertyTree& ptree, vm::InputStructure& input)
 {
 	langbind::PropertyTreeInputFilter filter( ptree.root());
 	langbind::TypedInputFilter::ElementType type;
@@ -168,7 +168,7 @@ TEST_F( CompileTDLTest, tests)
 			types::PropertyTree input_ptree = utils::readPropertyTreeFile( inputfile);
 			for (ti = tl.begin(); ti != te; ++ti)
 			{
-				tf::InputStructure input( ti->second->program()->pathset.tagtab());
+				vm::InputStructure input( ti->second->program()->pathset.tagtab());
 				fillInputStructure( input_ptree, input);
 
 				VmTransactionInput trsinput( *ti->second->program(), input);

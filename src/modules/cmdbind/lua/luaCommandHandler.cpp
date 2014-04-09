@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Implementation of the lua command handler
 #include "luaCommandHandler.hpp"
 #include "luaDebug.hpp"
-#include "langbind/appObjects.hpp"
 #include "luaObjects.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>

@@ -28,37 +28,23 @@ TDL_CPP_OBJS = \
 	tdl\preprocElementReference.obj \
 	tdl\preprocBlock.obj \
 	tdl\subroutineCallStatement.obj \
-	tdl\commandDefinition.obj \
-	tdl\subroutineDefinition.obj
+	tdl\commandDefinition.obj
 
 VM_CPP_OBJS = \
+	vm\tagTable.obj \
+	vm\inputStructure.obj \
 	vm\selectorPath.obj \
 	vm\selectorPathSet.obj \
 	vm\subroutine.obj \
 	vm\program.obj \
 	vm\programInstance.obj
 
-TF_CPP_OBJS = \
-	transactionfunction\TagTable.obj \
-	transactionfunction\Path.obj \
-	transactionfunction\PreProcessCommand.obj \
-	transactionfunction\DatabaseCommand.obj \
-	transactionfunction\InputStructure.obj \
-	transactionfunction\ResultStructure.obj \
-	transactionfunction\ResultIterator.obj \
-	transactionfunction\ResultFilter.obj
-
 CPP_OBJS = \
 	$(TDL_CPP_OBJS) \
 	$(VM_CPP_OBJS) \
-	$(TF_CPP_OBJS) \
 	transaction.obj \
-	transactionInput.obj \
-	transactionOutput.obj \
 	tdlTransactionPreprocStep.obj \
 	tdlTransactionFunction.obj \
-	transactionFunction.obj \
-	transactionFunctionDescription.obj \
 	vmTransactionInput.obj \
 	vmTransactionOutput.obj \
 	tdl2vmTranslator.obj \

@@ -43,4 +43,5 @@ bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
 execute();
+nofColumns(); returns 0
 **end

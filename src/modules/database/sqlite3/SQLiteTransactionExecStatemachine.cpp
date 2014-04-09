@@ -55,9 +55,8 @@ static int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_st
 	return sqlite3_prepare_v2( c, s, n, stm, t);
 }
 
-TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_)
-	:TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( SQLiteDBunit* dbunit_)
+	:m_state(Init)
 	,m_hasResult(false)
 	,m_hasRow(false)
 	,m_stm(0)

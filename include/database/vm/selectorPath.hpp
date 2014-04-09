@@ -42,8 +42,8 @@
 
 namespace _Wolframe {
 namespace db {
+namespace vm {
 
-namespace tf {
 //\brief Forward declaration
 class InputNodeVisitor;
 //\brief Forward declaration
@@ -52,9 +52,6 @@ class InputStructure;
 typedef int InputNodeIndex;
 //\brief Forward declaration
 class TagTable;
-}//namespace
-
-namespace vm {
 
 class SelectorPath
 {
@@ -87,13 +84,13 @@ public:
 	};
 
 	SelectorPath(){}
-	SelectorPath( const std::string& selector, tf::TagTable* tagmap);
+	SelectorPath( const std::string& selector, TagTable* tagmap);
 	SelectorPath( const SelectorPath& o)				:m_path(o.m_path){}
 
-	std::string tostring( const tf::TagTable* tagmap) const;
+	std::string tostring( const TagTable* tagmap) const;
 	static std::string normalize( const std::string& pathstr);
 
-	void selectNodes( const tf::InputStructure& st, const tf::InputNodeVisitor& nv, std::vector<tf::InputNodeIndex>& ar) const;
+	void selectNodes( const InputStructure& st, const InputNodeVisitor& nv, std::vector<InputNodeIndex>& ar) const;
 
 	typedef std::vector<Element>::const_iterator const_iterator;
 	typedef std::vector<Element>::iterator iterator;
@@ -105,8 +102,8 @@ public:
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
 
-	void print( std::ostream& out, const tf::TagTable* tagmap) const;
-	const char* lastElementName( const tf::TagTable* tagmap) const;
+	void print( std::ostream& out, const TagTable* tagmap) const;
+	const char* lastElementName( const TagTable* tagmap) const;
 
 private:
 	std::vector<Element> m_path;

@@ -41,11 +41,10 @@
 namespace _Wolframe {
 namespace db {
 
-namespace tf {
+namespace vm {
 //\brief Forward declaration
 class InputStructure;
-}//namespace tf
-
+}//namespace vm
 
 ///\class TransactionInput
 ///\brief Input of a transaction
@@ -57,7 +56,7 @@ public:
 	///\brief Copy constructor
 	VmTransactionInput( const VmTransactionInput& o)
 		:m_program(o.m_program){}
-	VmTransactionInput( const vm::Program& p, const tf::InputStructure& input);
+	VmTransactionInput( const vm::Program& p, const vm::InputStructure& input);
 
 	///\brief Return the input as readable serialization
 	std::string tostring() const;

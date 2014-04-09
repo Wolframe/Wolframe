@@ -50,9 +50,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_)
-	: TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_)
+	:m_state(Init)
 	,m_env(env_)
 	,m_lastresult(0)
 	,m_nof_cols(0)

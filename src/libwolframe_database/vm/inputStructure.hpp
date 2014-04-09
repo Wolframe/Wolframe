@@ -30,12 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Internal interface for input data structure of transaction function
-///\file transactionfunction/InputStructure.hpp
-#ifndef _DATABASE_TRANSACTION_FUNCTION_INPUT_STRUCTURE_HPP_INCLUDED
-#define _DATABASE_TRANSACTION_FUNCTION_INPUT_STRUCTURE_HPP_INCLUDED
-#include "database/transactionFunction.hpp"
-#include "transactionfunction/TagTable.hpp"
+///\brief Internal interface for the input data structure of transaction functions
+///\file vm/inputStructure.hpp
+#ifndef _DATABASE_VM_INPUT_STRUCTURE_HPP_INCLUDED
+#define _DATABASE_VM_INPUT_STRUCTURE_HPP_INCLUDED
+#include "vm/tagTable.hpp"
 #include "filter/typedfilter.hpp"
 #include "utils/allocators.hpp"
 #include "utils/printFormats.hpp"
@@ -45,7 +44,7 @@
 
 namespace _Wolframe {
 namespace db {
-namespace tf {
+namespace vm {
 
 ///\class Node
 ///\brief Node of the structure

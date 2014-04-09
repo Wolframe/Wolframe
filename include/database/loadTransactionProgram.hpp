@@ -34,25 +34,15 @@
 ///\file database/loadTransactionProgram.hpp
 #ifndef _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
 #define _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
-#include "types/countedReference.hpp"
-#include "types/keymap.hpp"
-#include "database/transactionFunction.hpp"
 #include "database/tdlTransactionFunction.hpp"
 #include "database/databaseLanguage.hpp"
 #include <string>
-#include <map>
+#include <vector>
 #include <cstdlib>
 #include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
-
-std::vector<std::pair<std::string,TransactionFunctionR> >
-	loadTransactionProgramFile(
-		const std::string& filename,
-		const std::string& databaseId,
-		const std::string& databaseClassName,
-		const LanguageDescription* langdescr);
 
 typedef std::vector<std::pair<std::string,TdlTransactionFunctionR> > TdlTransactionFunctionList;
 TdlTransactionFunctionList loadTransactionProgramFile2(

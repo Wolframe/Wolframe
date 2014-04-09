@@ -54,10 +54,12 @@ bind( 2, '2' );
 bind( 3, '3' );
 bind( 4, NULL );
 execute();
+nofColumns(); returns 0
 start( 'SELECT run($1, $2, $3, $4 ) ' );
 bind( 1, '11' );
 bind( 2, NULL );
 bind( 3, '33' );
 bind( 4, '44' );
 execute();
+nofColumns(); returns 0
 **end

@@ -54,9 +54,13 @@ public:
 	public:
 		enum Operation
 		{
-			Open,
-			Close,
-			Value
+			Open,			//< open of a single element
+			OpenArray,		//< open of an array 
+			OpenArrayElement,	//< open of an array element
+			Close,			//< close of a single element
+			CloseArray,		//< close of an array
+			CloseArrayElement,	//< close of an array element
+			Value			//< content value
 		};
 		Element()
 			:m_op(Value){}

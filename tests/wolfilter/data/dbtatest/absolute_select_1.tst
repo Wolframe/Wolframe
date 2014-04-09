@@ -40,4 +40,5 @@ Code:
 start( 'SELECT run( $1)' );
 bind( 1, '1' );
 execute();
+nofColumns(); returns 0
 **end

@@ -33,7 +33,6 @@
 ///\file wolfilterCommandLine.cpp
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
-#include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -43,6 +42,7 @@
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/doctype.hpp"
+#include "langbind/redirectFilterClosure.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>

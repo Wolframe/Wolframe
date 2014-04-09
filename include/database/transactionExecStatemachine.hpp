@@ -49,8 +49,8 @@ class TransactionExecStatemachine
 {
 public:
 	///\brief Constructor
-	explicit TransactionExecStatemachine( const std::string& name_)
-		:m_name(name_){}
+	TransactionExecStatemachine(){}
+
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine(){}
 
@@ -85,11 +85,6 @@ public:
 	virtual const db::DatabaseError* getLastError()=0;
 	///\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()=0;
-
-	//\brief Return the name of the transaction
-	const std::string& transactionName() const	{return m_name;}
-private:
-	const std::string m_name;
 };
 
 typedef boost::shared_ptr<TransactionExecStatemachine> TransactionExecStatemachineR;

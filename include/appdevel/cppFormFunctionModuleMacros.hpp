@@ -50,7 +50,7 @@
 
 //\brief Marks the end if the Wolframe C++ form function module.
 #define CPP_APPLICATION_FORM_FUNCTION_MODULE_END\
-	{0,langbind::CppFormFunction()}\
+	{0,serialize::CppFormFunction()}\
 	};\
 	namespace {\
 	struct ModuleImpl\

@@ -41,4 +41,5 @@ start( 'SELECT run( $1, $2)' );
 bind( 1, 'hier ist ein haus text' );
 bind( 2, 'hier ist ein baum text' );
 execute();
+nofColumns(); returns 0
 **end

@@ -34,7 +34,7 @@
 //\brief Implementation database transaction
 #include "database/transaction.hpp"
 #include "database/vm/programInstance.hpp"
-#include "transactionfunction/InputStructure.hpp"
+#include "vm/inputStructure.hpp"
 #include "tdl2vmTranslator.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
@@ -64,16 +64,28 @@ static std::string removeCRLF( const std::string& src)
 void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
 	vm::ProgramInstance instance( &input.program(), m_stm.get());
-	if (!instance.execute())
+	bool result;
+	try
+	{
+		result = instance.execute();
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_ERROR << "exception thrown in transaction '" << m_name
+				<< "' at VM IP " << instance.ip()
+				<< " instruction " << input.program().instructionStringAt( instance.ip());
+		throw e;
+	}
+	if (!result)
 	{
 		const DatabaseError& err = instance.lastError();
 		std::string errordetail = removeCRLF( err.errordetail);
 		std::string errormsg = removeCRLF( err.errormsg);
 		
 		std::ostringstream logmsg;
-		logmsg << "error in transaction '" << err.transaction
-			<< "' in database '" << err.dbname
-			<< "' error class '" << err.errorclass << "'";
+		logmsg << "error in transaction '" << m_name << "' [IP " << err.ip << "]"
+			<< " for database '" << err.dbname << "'"
+			<< " error class '" << err.errorclass << "'";
 		if (err.errorcode)
 		{
 			logmsg << " database internal error code " << err.errorcode << "'";
@@ -93,7 +105,7 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 
 		std::ostringstream throwmsg;
 		//... shorter message is thrown. no internals in message as written into the logs
-		throwmsg << "error in transaction '" << err.transaction << "':";
+		throwmsg << "error in transaction '" << m_name << "':";
 		if (err.errordetail.size())
 		{
 			throwmsg << " " << errordetail;
@@ -112,6 +124,23 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 		throw std::runtime_error( throwmsg.str());
 	}
 	output = VmTransactionOutput( instance.output());
+	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_DATA)
+	{
+		langbind::TypedInputFilterR resultfilter = output.get();
+		langbind::FilterBase::ElementType elemtype;
+		types::VariantConst elemvalue;
+		while (resultfilter->getNext( elemtype, elemvalue))
+		{
+			if (elemvalue.defined())
+			{
+				LOG_DATA << "[transaction output] element " << langbind::FilterBase::elementTypeName( elemtype) << " '" << elemvalue.tostring() << "' :" << elemvalue.typeName();
+			}
+			else
+			{
+				LOG_DATA << "[transaction output] element " << langbind::FilterBase::elementTypeName( elemtype);
+			}
+		}
+	}
 }
 
 static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
@@ -128,7 +157,9 @@ static vm::ProgramR singleStatementProgram( const std::string& stm, const std::v
 		prg.push_ARGUMENT_CONST( *pi);
 	}
 	prg.end_DO_statement();
-	prg.output_statement_result( resultpath);
+	prg.begin_loop_INTO_block( resultpath);
+	prg.output_statement_result( true);
+	prg.end_loop_INTO_block();
 	return prg.createProgram();
 }
 
@@ -136,7 +167,7 @@ Transaction::Result Transaction::executeStatement( const std::string& stm, const
 {
 	vm::ProgramR program = singleStatementProgram( stm, params);
 
-	VmTransactionInput input( *program, tf::InputStructure( program->pathset.tagtab()));
+	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
 	VmTransactionOutput output;
 	execute( input, output);
 

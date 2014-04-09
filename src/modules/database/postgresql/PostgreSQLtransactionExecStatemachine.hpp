@@ -55,7 +55,7 @@ class PostgreSQLdbUnit;
 struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
 	//\brief Constructor
-	explicit TransactionExecStatemachine_postgres( const std::string& name_, PostgreSQLdbUnit* dbunit_);
+	explicit TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_);
 
 	//\brief Destructor
 	virtual ~TransactionExecStatemachine_postgres();

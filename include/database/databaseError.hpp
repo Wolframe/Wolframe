@@ -52,7 +52,6 @@ public:
 
 	DatabaseError( const DatabaseError& o)
 		:dbname(o.dbname)
-		,transaction(o.transaction)
 		,errorclass(o.errorclass)
 		,errorcode(o.errorcode)
 		,errormsg(o.errormsg)
@@ -73,7 +72,6 @@ public:
 		{}
 
 	std::string dbname;		//< error class identifier
-	std::string transaction;	//< error class identifier
 	std::string errorclass;		//< error class identifier
 	unsigned int errorcode;		//< error code
 	std::string errormsg;		//< error message string

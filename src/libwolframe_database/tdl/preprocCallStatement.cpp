@@ -59,19 +59,29 @@ PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* lan
 	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
 
 	// Parse parameter list:
-	while (ch != ')')
+	if (')' != utils::gotoNextToken( ci, ce))
 	{
-		rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-		ch = utils::gotoNextToken( ci, ce);
-		if (ch == ',')
+		for (;;)
 		{
-			++ci;
-		}
-		else if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
+			rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
+			ch = utils::gotoNextToken( ci, ce);
+			if (ch == ',')
+			{
+				++ci;
+				ch = utils::gotoNextToken( ci, ce);
+				if (ch == ')') throw std::runtime_error( "unexpected token ')' immediately after comma ',' in parameter list");
+			}
+			else if (ch == ')')
+			{
+				break;
+			}
+			else
+			{
+				throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
+			}
 		}
 	}
+	++ci;	
 	return rt;
 }
 

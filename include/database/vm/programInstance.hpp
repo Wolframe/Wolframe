@@ -80,6 +80,7 @@ public:
 	bool execute();
 	const OutputR& output() const			{return m_output;}
 	const DatabaseError& lastError() const		{return m_lastError;}
+	unsigned int ip() const				{return m_ip;}
 
 private:
 	struct ResultFlags
@@ -164,7 +165,7 @@ private:
 	void initValueIteraror( const ValueTupleSetR& valueset);
 	void initResult( const ValueTupleSetR& resultset);
 	void printIteratorColumn();
-	ValueTupleSetR fetchDatabaseResult();
+	ValueTupleSetR fetchDatabaseResult( std::size_t nofColumns);
 	void setDatabaseError();
 
 private:
