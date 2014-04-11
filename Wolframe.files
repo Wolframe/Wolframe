@@ -1110,6 +1110,7 @@ makefiles/nmake/top.mk
 .Attic/dotnet/recordinfo.cpp
 .Attic/dotnet/recordinfo.hpp
 .Attic/ErrorCode.hpp
+.Attic/exceptionBase.hpp
 .Attic/expression_filter.hpp
 .Attic/filter/filter_expression_filter.cpp
 .Attic/filter/luaGeneratorInputFilter.cpp
@@ -1534,6 +1535,12 @@ examples/tproc/appProperties.cpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
+examples/tproc/tests/temp/echo.lua
+examples/tproc/tests/temp/example_1.lua
+examples/tproc/tests/temp/example_2.lua
+examples/tproc/tests/temp/example_3.lua
+examples/tproc/tests/temp/example_4.lua
+examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/template/expand.sh
 examples/tproc/tests/template/output_provider_cfg.sh
@@ -1775,7 +1782,6 @@ src/appProperties.cpp
 src/connectionBase.hpp
 src/connection.cpp
 src/connection.hpp
-src/exceptionBase.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
 src/interfaceCommandHandler.cpp
