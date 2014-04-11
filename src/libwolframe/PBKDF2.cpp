@@ -66,7 +66,7 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& password, const std::stri
 	int saltSize;
 	int saltMaxSize = (( salt.length() + 3 ) / 4 ) * 3;
 	unsigned char* saltData = new unsigned char[ saltMaxSize ];
-	if (( saltSize = base64_decode( salt.data(), salt.size(), saltData, saltMaxSize )) < 0 )	{
+	if (( saltSize = base64::decode( salt, saltData, saltMaxSize )) < 0 )	{
 		delete[] saltData;
 		throw std::runtime_error( "error decoding PBKDF2 salt" );
 	}

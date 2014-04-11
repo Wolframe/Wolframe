@@ -103,6 +103,12 @@ inline int decode( const char* encoded, size_t encodedSize, void* data, size_t d
 	return base64_decode( encoded, encodedSize, data, dataMaxSize );
 }
 
+inline int decode( const std::string encoded, void* data, size_t dataMaxSize )
+{
+	return base64_decode( encoded.data(), encoded.length(), data, dataMaxSize );
+}
+
+
 class Decoder
 {
 	static const size_t BUFFERSIZE = 512;

@@ -78,15 +78,15 @@ private:
 	void handleStop();
 
 	/// object variables
-	boost::asio::io_service&		m_IOservice;	// The io_service used to perform asynchronous operations.
-	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
-	connection_ptr				m_newConnection;// The next connection to be accepted.
-	SocketConnectionList< connection_ptr >	m_connList;	// List of active connections
+	boost::asio::io_service&		m_IOservice;	///< The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		m_strand;	///< Strand to ensure the acceptor's handlers are not called concurrently.
+	boost::asio::ip::tcp::acceptor		m_acceptor;	///< Acceptor(s) used to listen for incoming connections.
+	connection_ptr				m_newConnection;///< The next connection to be accepted.
+	SocketConnectionList< connection_ptr >	m_connList;	///< List of active connections
 
 	std::string				m_identifier;
 
-	_Wolframe::ServerHandler&		m_srvHandler;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };
 
 
@@ -123,16 +123,16 @@ private:
 	void handleStop();
 
 	/// object variables
-	boost::asio::io_service&		m_IOservice;	// The io_service used to perform asynchronous operations.
-	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
-	boost::asio::ssl::context		m_SSLcontext;	// SSL acceptor server context
-	SSLconnection_ptr			m_newConnection;// The next connection to be accepted.
-	SocketConnectionList< SSLconnection_ptr > m_connList;	// List of active connections
+	boost::asio::io_service&		m_IOservice;	///< The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		m_strand;	///< Strand to ensure the acceptor's handlers are not called concurrently.
+	boost::asio::ip::tcp::acceptor		m_acceptor;	///< Acceptor(s) used to listen for incoming connections.
+	boost::asio::ssl::context		m_SSLcontext;	///< SSL acceptor server context
+	SSLconnection_ptr			m_newConnection;///< The next connection to be accepted.
+	SocketConnectionList< SSLconnection_ptr > m_connList;	///< List of active connections
 
 	std::string				m_identifier;
 
-	_Wolframe::ServerHandler&		m_srvHandler;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };
 
 #endif // WITH_SSL

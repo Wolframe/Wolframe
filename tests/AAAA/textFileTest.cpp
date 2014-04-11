@@ -58,7 +58,7 @@ protected:
 		logBack( LogBackend::instance( ) )
 	{
 		// Initialize the global random number generator
-		_Wolframe::RandomGenerator::instance( "" );
+		_Wolframe::GlobalRandomGenerator::instance( "" );
 
 //		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
 		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );

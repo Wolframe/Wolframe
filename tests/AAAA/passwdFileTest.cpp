@@ -51,7 +51,7 @@ class PasswdFileFixture : public ::testing::Test
 protected:
 	PasswdFileFixture( )
 	{
-		_Wolframe::RandomGenerator::instance( "" );
+		_Wolframe::GlobalRandomGenerator::instance( "" );
 	}
 };
 
@@ -121,7 +121,7 @@ TEST_F( PasswdFileFixture, getHMACuser )
 	PwdFileUser		user;
 	bool			result;
 
-	_Wolframe::RandomGenerator& rnd = _Wolframe::RandomGenerator::instance();
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
 	unsigned char saltData[ PASSWORD_SALT_SIZE ];
 	rnd.generate( saltData, PASSWORD_SALT_SIZE );
 	PasswordHash::Salt	salt( saltData, PASSWORD_SALT_SIZE );

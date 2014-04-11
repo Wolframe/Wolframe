@@ -33,7 +33,7 @@ class FreeImageFixture : public ::testing::Test
 #endif // FREEIMAGE_LIB
 			FreeImage_SetOutputMessage( FreeImageErrorHandler );
 		}
-		
+
 		~FreeImageFixture( )
 		{
 // call this ONLY when linking with FreeImage as a static library
@@ -51,6 +51,7 @@ TEST_F( FreeImageFixture, VersionInfo )
 	const char *version = FreeImage_GetVersion( );
 	std::ostringstream ss;
 	ss << FREEIMAGE_MAJOR_VERSION << "." << FREEIMAGE_MINOR_VERSION << "." << FREEIMAGE_RELEASE_SERIAL;
+	(void)ss.str( ).c_str( );
 	ASSERT_STREQ( version, ss.str( ).c_str( ) );
 }
 
@@ -70,9 +71,9 @@ TEST_F( FreeImageFixture, ImageInfo )
 // try to guess the file format from the file extension
 		format = FreeImage_GetFIFFromFilename( TESTFILE );
 	}
-	
+
 	FIBITMAP *image = 0;
-	
+
 // check that the plugin has reading capabilities ...
 	if( ( format != FIF_UNKNOWN ) && FreeImage_FIFSupportsReading( format ) ) {
 // ok, let's load the file
@@ -80,7 +81,7 @@ TEST_F( FreeImageFixture, ImageInfo )
 	}
 	assert( image != 0 );
 
-// get info about the image	
+// get info about the image
 	unsigned int width = FreeImage_GetWidth( image );
 	unsigned int height = FreeImage_GetHeight( image );
 	//std::cout << "size is " << width << " x " << height << std::endl;
@@ -96,10 +97,10 @@ TEST_F( FreeImageFixture, ImageInfo )
 	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
 	ASSERT_EQ( widthThumb, 50u );
 	ASSERT_EQ( heightThumb, 50u );
-	
+
 // save image (for debugging mainly)
 	FreeImage_Save( FIF_PNG, thumb, THUMB, 0 );
-	
+
 // Unload the bitmap
 	FreeImage_Unload( image );
 }

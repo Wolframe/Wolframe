@@ -40,9 +40,9 @@ TEST( Random, Randomness )
 {
 	unsigned char buf[39];
 
-	_Wolframe::RandomGenerator::instance( "" );
+	_Wolframe::GlobalRandomGenerator::instance( "" );
 
-	_Wolframe::RandomGenerator& rng = _Wolframe::RandomGenerator::instance();
+	_Wolframe::GlobalRandomGenerator& rng = _Wolframe::GlobalRandomGenerator::instance();
 
 	rng.generate( buf, 39 );
 

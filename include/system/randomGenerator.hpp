@@ -31,49 +31,24 @@
 
 ************************************************************************/
 //
-// Sort of a pseudo-singleton
-//
+/// \file randomGenerator.hpp
+/// Random Generator interface class
 
-#ifndef _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
-#define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
+#ifndef _RANDOM_GENERATOR_HPP_INCLUDED
+#define _RANDOM_GENERATOR_HPP_INCLUDED
 
-#include <string>
-#include <system/randomGenerator.hpp>
+namespace _Wolframe {
+namespace crypto {
 
-#if defined( _MSC_VER )
-	#define WOLFRAME_EXPORT __declspec( dllexport )
-#else
-	#define WOLFRAME_EXPORT
-#endif
-
-namespace _Wolframe	{
-
-class GlobalRandomGenerator : public crypto::RandomGenerator
+class RandomGenerator
 {
 public:
-	~GlobalRandomGenerator();
+	 virtual ~RandomGenerator() {}
 
-	WOLFRAME_EXPORT static GlobalRandomGenerator& instance();
-	WOLFRAME_EXPORT static GlobalRandomGenerator& instance( const std::string &rndDev );
-
-	WOLFRAME_EXPORT void device( const std::string &rndDev );
-	WOLFRAME_EXPORT const std::string& device() const;
-	WOLFRAME_EXPORT unsigned random() const;
-	WOLFRAME_EXPORT void generate( unsigned char* buffer, size_t bytes ) const;
-
-protected:
-	GlobalRandomGenerator();
-	GlobalRandomGenerator( const std::string &rndDev );
-
-private:
-	// make it noncopyable
-	GlobalRandomGenerator( const GlobalRandomGenerator& );
-	const GlobalRandomGenerator& operator= ( const GlobalRandomGenerator& );
-
-	// Real object data
-	std::string	m_device;		///< random generator device
+	virtual unsigned random() const = 0;
+	virtual void generate( unsigned char* buffer, size_t bytes ) const = 0;
 };
 
-} // namespace _Wolframe
+}} // namespace _Wolframe::crypto
 
-#endif // _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
+#endif // _RANDOM_GENERATOR_HPP_INCLUDED
