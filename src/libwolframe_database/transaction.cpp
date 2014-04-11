@@ -121,6 +121,7 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 				<< "' at VM IP " << instance.ip()
 				<< " instruction " << input.program().instructionStringAt( instance.ip())
 				<< locationstr;
+		m_stm->rollback();
 		throw e;
 	}
 	if (!result)
@@ -155,6 +156,7 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 		{
 			logmsg << " TDL source location " << posinfo.logtext();
 		}
+		LOG_ERROR << logmsg.str();
 
 		std::ostringstream throwmsg;
 		//... shorter message is thrown. no internals in message as written into the logs
@@ -172,7 +174,7 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 		{
 			throwmsg << " " << err.errorhint;
 		}
-		rollback();
+		m_stm->rollback();
 
 		throw std::runtime_error( throwmsg.str());
 	}
@@ -297,5 +299,57 @@ Transaction::Result Transaction::executeStatement( const std::string& stm, const
 	}
 	return Result( colnames, rows);
 }
+
+static std::string errorMessageString( const DatabaseError& err)
+{
+	std::string errordetail = removeCRLF( err.errordetail);
+	std::string errormsg = removeCRLF( err.errormsg);
+	
+	std::ostringstream logmsg;
+	logmsg << "error in database '" << err.dbname << "'"
+		<< " error class '" << err.errorclass << "'";
+
+	if (err.errorcode)
+	{
+		logmsg << " database internal error code " << err.errorcode << "'";
+	}
+	if (errormsg.size())
+	{
+		logmsg << " " << errormsg;
+	}
+	if (errordetail.size())
+	{
+		logmsg << " " << errordetail;
+	}
+	return logmsg.str();
+}
+
+void Transaction::begin()
+{
+	if (!m_stm->begin())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
+void Transaction::commit()
+{
+	if (!m_stm->commit())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
+void Transaction::rollback()
+{
+	if (!m_stm->rollback())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
 
 

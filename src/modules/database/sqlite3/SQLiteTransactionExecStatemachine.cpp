@@ -69,6 +69,7 @@ TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
 	clear();
 	delete m_statement;
+	if (m_conn) delete m_conn;
 }
 
 void TransactionExecStatemachine_sqlite3::clear()
@@ -183,14 +184,26 @@ bool TransactionExecStatemachine_sqlite3::commit()
 bool TransactionExecStatemachine_sqlite3::rollback()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL rollback()";
-	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
-	clear();
-	if (rt)
+	if (m_state == Transaction)
 	{
-		delete m_conn;
-		m_conn = 0;
 	}
-	return rt;
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
+	if (m_conn)
+	{
+		bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
+		clear();
+		if (rt)
+		{
+			delete m_conn;
+			m_conn = 0;
+		}
+		return rt;
+	}
+	m_state = Init;
+	return true;
 }
 
 bool TransactionExecStatemachine_sqlite3::status( int rc, State newstate)

@@ -354,7 +354,14 @@ bool ProgramInstance::execute()
 
 			/*Iterator Instructions:*/
 			case Op_OPEN_ITER_LAST_RESULT:
-				initValueIteraror( top.m_lastResult);
+				if (top.m_lastResult.get())
+				{
+					initValueIteraror( top.m_lastResult);
+				}
+				else
+				{
+					initValueIteraror( ValueTupleSetR( new ValueTupleSet()));
+				}
 				++m_ip;
 				break;
 

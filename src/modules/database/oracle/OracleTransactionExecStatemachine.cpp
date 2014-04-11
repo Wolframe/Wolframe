@@ -198,9 +198,17 @@ bool TransactionExecStatemachine_oracle::commit()
 bool TransactionExecStatemachine_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
+	if (m_state == Transaction)
+	{
+	}
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
 	if (m_conn)
 	{
 		bool rt = status( OCITransRollback( (*m_conn)->svchp, (*m_conn)->errhp, OCI_DEFAULT ), Init );
+		clear();
 		if (rt)
 		{
 			delete m_conn;
@@ -208,6 +216,7 @@ bool TransactionExecStatemachine_oracle::rollback()
 		}
 		return rt;
 	}
+	m_state = Init;
 	return true;
 }
 

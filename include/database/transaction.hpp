@@ -59,11 +59,11 @@ public:
 	const std::string& databaseID() const	{return m_stm->databaseID();}
 
 	///\brief Begin of a new transaction
-	void begin()				{m_stm->begin();}
+	void begin();
 	///\brief Commit of the running transaction
-	void commit()				{m_stm->commit();}
+	void commit();
 	///\brief Rollback of the running transaction
-	void rollback()				{m_stm->rollback();}
+	void rollback();
 	///\brief Close of the committed or rolled back transaction
 	void close()				{m_stm.reset();}
 

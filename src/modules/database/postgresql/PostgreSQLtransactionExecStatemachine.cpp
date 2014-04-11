@@ -239,6 +239,7 @@ bool TransactionExecStatemachine_postgres::commit()
 	{
 		delete m_conn;
 		m_conn = 0;
+		m_state = Init;
 	}
 	return rt;
 }
@@ -246,6 +247,13 @@ bool TransactionExecStatemachine_postgres::commit()
 bool TransactionExecStatemachine_postgres::rollback()
 {
 	LOG_TRACE << "[postgresql statement] CALL rollback()";
+	if (m_state == Transaction)
+	{
+	}
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
 	if (m_conn)
 	{
 		bool rt = status( PQexec( **m_conn, "ROLLBACK;"), Init);
@@ -253,9 +261,11 @@ bool TransactionExecStatemachine_postgres::rollback()
 		{
 			delete m_conn;
 			m_conn = 0;
+			m_state = Init;
 		}
 		return rt;
 	}
+	m_state = Init;
 	return true;
 }
 
