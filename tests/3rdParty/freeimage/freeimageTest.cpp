@@ -43,7 +43,7 @@ class FreeImageFixture : public ::testing::Test
 		}
 };
 
-TEST_F( FreeImageFixture, DISABLED_VersionInfo )
+TEST_F( FreeImageFixture, VersionInfo )
 {
 	//std::cout << "FreeImage " << FreeImage_GetVersion( ) << "\n";
 	//std::cout << FreeImage_GetCopyrightMessage( ) << "\n\n";
