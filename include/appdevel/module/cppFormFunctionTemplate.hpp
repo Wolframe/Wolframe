@@ -42,8 +42,8 @@
 namespace _Wolframe {
 namespace appdevel {
 
-//\class CppFormFunction
-//\brief Application development template for form functions written in C++
+///\class CppFormFunction
+///\brief Application development template for form functions written in C++
 template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
 struct CppFormFunction
 {

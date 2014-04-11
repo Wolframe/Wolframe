@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file subroutine.hpp
-//\brief Local interface for mapping names to subroutine definitions
+///\file subroutine.hpp
+///\brief Local interface for mapping names to subroutine definitions
 #ifndef _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
 #define _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
 #include "database/vm/program.hpp"

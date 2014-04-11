@@ -42,15 +42,15 @@
 
 namespace _Wolframe {
 namespace proc {
-//\brief Forward declaration
+///\brief Forward declaration
 class ProcessorProviderInterface;
 }//namespace proc
 
 namespace db {
 namespace vm {
-//\brief Forward declaration
+///\brief Forward declaration
 class TagTable;
-//\brief Forward declaration
+///\brief Forward declaration
 class InputStructure;
 }//namespace vm
 
@@ -67,29 +67,35 @@ public:
 		};
 
 		Type type;
-		std::string name;
+		std::size_t name;
 		std::size_t value;
 
 		Argument()
-			:type(LoopCounter),value(0){}
+			:type(LoopCounter),name(0),value(0){}
 		Argument( const Argument& o)
 			:type(o.type),name(o.name),value(o.value){}
-		Argument( Type t, const std::string& n, int v)
+		Argument( Type t, const std::size_t n, std::size_t v)
 			:type(t),name(n),value(v){}
 	};
 
 public:
+	TdlTransactionPreprocStep()
+	{
+		m_strings.push_back('\0');
+		m_selectors.push_back( vm::SelectorPath());
+	}
 	TdlTransactionPreprocStep( const vm::SelectorPath& selector_, const std::string& function_, const std::vector<std::string>& resultpath_=std::vector<std::string>())
 		:m_function(function_),m_resultpath(resultpath_)
 	{
+		m_strings.push_back('\0');
 		m_selectors.push_back( selector_);
 	}
-	TdlTransactionPreprocStep()
-	{
-		m_selectors.push_back( vm::SelectorPath());
-	}
 	TdlTransactionPreprocStep( const TdlTransactionPreprocStep& o)
-		:m_selectors(o.m_selectors),m_function(o.m_function),m_arguments(o.m_arguments),m_strings(o.m_strings),m_resultpath(o.m_resultpath){}
+		:m_selectors(o.m_selectors)
+		,m_function(o.m_function)
+		,m_arguments(o.m_arguments)
+		,m_strings(o.m_strings)
+		,m_resultpath(o.m_resultpath){}
 
 public:
 	Argument::Type arg_type( std::size_t i) const
@@ -98,23 +104,32 @@ public:
 		return m_arguments.at(i).type;
 	}
 
+	const char* arg_name( std::size_t i) const
+	{
+		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
+		if (!m_arguments.at(i).name) return 0;
+		return m_strings.c_str() + m_arguments.at(i).name;
+	}
+
 	const char* arg_constant( std::size_t i) const
 	{
 		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
-		if (m_arguments.at(i).type != Argument::Constant) return 0;
+		if (m_arguments.at(i).type != Argument::Constant) throw std::logic_error("illegal access");
 		return m_strings.c_str() + m_arguments.at(i).value;
-	}
-
-	const std::string& arg_name( std::size_t i) const
-	{
-		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
-		return m_arguments.at(i).name;
 	}
 
 	bool arg_loopcounter( std::size_t i) const
 	{
 		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
+		if (m_arguments.at(i).type != Argument::LoopCounter) throw std::logic_error("illegal access");
 		return (m_arguments.at(i).type == Argument::LoopCounter);
+	}
+
+	const vm::SelectorPath& arg_selector( std::size_t i) const
+	{
+		if (m_arguments.size() <= i) throw std::logic_error("array bounds read");
+		if (m_arguments.at(i).type != Argument::SelectorPath) throw std::logic_error("illegal access");
+		return m_selectors.at( m_arguments.at(i).value);
 	}
 
 	const vm::SelectorPath& selector() const
@@ -122,28 +137,19 @@ public:
 		return m_selectors.at( 0);
 	}
 
-	const vm::SelectorPath& arg_selector( std::size_t i) const
-	{
-		if (m_arguments.size() <= i+1 || i == 0) throw std::logic_error("array bounds read");
-		if (m_arguments.at(i-1).type != Argument::SelectorPath) throw std::logic_error("illegal access");
-		return m_selectors.at( m_arguments.at(i-1).value);
-	}
-
 	void add_arg_constant( const std::string& name, const std::string& value)
 	{
-		m_arguments.push_back( Argument( Argument::Constant, name, m_strings.size()));
-		m_strings.append( value);
-		m_strings.push_back( '\0');
+		m_arguments.push_back( Argument( Argument::Constant, getStringIdx( name), getStringIdx( value)));
 	}
 
 	void add_arg_loopcounter( const std::string& name)
 	{
-		m_arguments.push_back( Argument( Argument::LoopCounter, name, 0));
+		m_arguments.push_back( Argument( Argument::LoopCounter, getStringIdx( name), 0));
 	}
 
 	void add_arg_selector( const std::string& name, const vm::SelectorPath& value)
 	{
-		m_arguments.push_back( Argument( Argument::SelectorPath, name, m_selectors.size()));
+		m_arguments.push_back( Argument( Argument::SelectorPath, getStringIdx( name), m_selectors.size()));
 		m_selectors.push_back( value);
 	}
 
@@ -163,8 +169,22 @@ public:
 	}
 
 	void print( std::ostream& out, const vm::TagTable* tagmap) const;
+	std::string tostring( const vm::TagTable* tagmap) const;
 
 	void call( const proc::ProcessorProviderInterface* provider, vm::InputStructure& structure) const;
+
+private:
+	std::size_t getStringIdx( const std::string& value)
+	{
+		std::size_t stringidx = 0;
+		if (!value.empty())
+		{
+			stringidx = m_strings.size();
+			m_strings.append( value);
+			m_strings.push_back( '\0');
+		}
+		return stringidx;
+	}
 
 private:
 	std::vector<vm::SelectorPath> m_selectors;

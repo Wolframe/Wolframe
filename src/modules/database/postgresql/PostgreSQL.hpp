@@ -202,7 +202,7 @@ public:
 };
 
 
-//\class PostgreSQLtransaction
+///\class PostgreSQLtransaction
 class PostgreSQLtransaction
 	:public Transaction
 {

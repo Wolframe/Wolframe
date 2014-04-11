@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file langbind/output.hpp
-//\brief Interface to network output for processor language bindings
+///\file langbind/output.hpp
+///\brief Interface to network output for processor language bindings
 #ifndef _Wolframe_langbind_OUTPUT_HPP_INCLUDED
 #define _Wolframe_langbind_OUTPUT_HPP_INCLUDED
 #include "filter/filter.hpp"
@@ -39,40 +39,40 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-//\class Output
-//\brief Output as seen from scripting language binding
+///\class Output
+///\brief Output as seen from scripting language binding
 class Output
 	:public virtual utils::TypeSignature
 {
 public:
-	//\brief Constructor
+	///\brief Constructor
 	Output()
 		:utils::TypeSignature("langbind::Output", __LINE__)
 		,m_state(0)
 		,m_called(false){}
-	//\brief Copy constructor
-	//\param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	Output( const Output& o)
 		:utils::TypeSignature(o)
 		,m_outputfilter(o.m_outputfilter)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
-	//\brief Constructor by output filter
-	//\param[in] flt output filter reference
+	///\brief Constructor by output filter
+	///\param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
 		:utils::TypeSignature("langbind::Output", __LINE__)
 		,m_outputfilter(flt)
 		,m_state(0)
 		,m_called(false){}
-	//\brief Destructor
+	///\brief Destructor
 	~Output(){}
 
-	//\brief Print the next element
-	//\param[in] e1 first element
-	//\param[in] e1size first element size
-	//\param[in] e2 second element
-	//\param[in] e2size second element size
-	//\return true, on success, false if we have to yield processing
+	///\brief Print the next element
+	///\param[in] e1 first element
+	///\param[in] e1size first element size
+	///\param[in] e2 second element
+	///\param[in] e2size second element size
+	///\return true, on success, false if we have to yield processing
 	bool print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 	const OutputFilterR& outputfilter() const		{return m_outputfilter;}

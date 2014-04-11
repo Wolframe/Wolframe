@@ -44,10 +44,10 @@ namespace db {
 
 ///\class SubstitutingStatement
 ///\brief An abstract statement class which allows derived classes to
-///       provide a simple escaping function which encodes the data
-///       which is stored directly in the SQL statement
+//       provide a simple escaping function which encodes the data
+//       which is stored directly in the SQL statement
 ///\file database/substitutingStatement.hpp
-//\remark A generic statement class which takes the string and replaces
+///\remark A generic statement class which takes the string and replaces
 //        the placeholders direcly with the data (more as prove of concept).
 //        To be useful a derived class has at least to implement the 'convert'
 //        method
@@ -65,16 +65,16 @@ class SubstitutingStatement : public BaseStatement
 	
 	protected:
 		///\brief Function to convert and escape a variant, if single
-		///       quotes are need, the function should also return those,
-		///       care must be taken to use the database escape functions
-		///       to escape the values here (beware of SQL code injection!)
+		//       quotes are need, the function should also return those,
+		//       care must be taken to use the database escape functions
+		//       to escape the values here (beware of SQL code injection!)
 		virtual const std::string convert( const types::Variant &value ) const = 0;
 
 		virtual const std::string replace( const unsigned int idx ) const;
 	
 	private:
 		///\brief Stores the placeholders in calls of bind till they are used
-		///       to create the substituted SQL statement with the embedded data.
+		//       to create the substituted SQL statement with the embedded data.
 		std::map< unsigned int, std::string > m_bind;
 };
 

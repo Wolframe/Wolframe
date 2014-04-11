@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file comauto/procProviderDispatch.hpp
-//\brief Dispatch Interface for calls of processor provider function from .NET via interop callback
+///\file comauto/procProviderDispatch.hpp
+///\brief Dispatch Interface for calls of processor provider function from .NET via interop callback
 #ifndef _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -45,7 +45,7 @@ class TypeLib;
 class ProcessorProviderDispatch :public IDispatch
 {
 public:
-	//\brief DispId declarations in the ProcProviderInterface
+	///\brief DispId declarations in the ProcProviderInterface
 	enum DispID {DispID_CALL=1, DispID_CALL_NORES=2};
 
 public:

@@ -42,13 +42,13 @@
 
 namespace _Wolframe {
 namespace utils {
-//\brief Forward declaration
+///\brief Forward declaration
 class PrintFormat;
 }//namespace utils
 
 namespace db {
 
-///\class TransactionOutput
+////\class TransactionOutput
 ///\brief Output of a transaction
 class VmTransactionOutput
 {

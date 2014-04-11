@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file types/numberBaseConversion.hpp
-//\brief Private interface for big number conversions from decimal to binary represention and back
+///\file types/numberBaseConversion.hpp
+///\brief Private interface for big number conversions from decimal to binary represention and back
 
 #ifndef _Wolframe_TYPES_NUMBER_BASE_CONVERSION_HPP_INCLUDED
 #define _Wolframe_TYPES_NUMBER_BASE_CONVERSION_HPP_INCLUDED
@@ -40,40 +40,40 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\brief Convert a large but limited size big endian integer value to a BCD number
-//\param[in] uintptr pointer to integer number (big endian) 
-//\param[in] uintsize size of 'uintptr' in bytes
-//\param[out] digitsbuf buffer for digits to fill with the result (integers from 0..9 and NOT ascii '0'..'9')
-//\param[in] digitsbufsize allocation size of 'digitsbuf' in bytes
-//\return number of digits in the result (might be 0 for "0")
+///\brief Convert a large but limited size big endian integer value to a BCD number
+///\param[in] uintptr pointer to integer number (big endian) 
+///\param[in] uintsize size of 'uintptr' in bytes
+///\param[out] digitsbuf buffer for digits to fill with the result (integers from 0..9 and NOT ascii '0'..'9')
+///\param[in] digitsbufsize allocation size of 'digitsbuf' in bytes
+///\return number of digits in the result (might be 0 for "0")
 unsigned int convertBinaryToBCD( const unsigned char* uintptr, unsigned int uintsize, unsigned char* digitsbuf, unsigned int digitsbufsize);
 
-//\brief Convert a large but limited size BCD number to a big endian integer value
-//\param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
-//\param[in] digitsbufsize size of 'digitsbuf' in bytes
-//\param[out] buf integer number (big endian) = conversion result
-//\param[in] bufsize size of 'buf' in bytes
-//\return number of digits in the result (might be 0 for "0")
+///\brief Convert a large but limited size BCD number to a big endian integer value
+///\param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
+///\param[in] digitsbufsize size of 'digitsbuf' in bytes
+///\param[out] buf integer number (big endian) = conversion result
+///\param[in] bufsize size of 'buf' in bytes
+///\return number of digits in the result (might be 0 for "0")
 void convertBCDtoBinary( const unsigned char* digits, unsigned int nofdigits, unsigned char* buf, unsigned int bufsize);
 
-//\brief Convert a large but limited size big endian integer value to a BCD number
-//\tparam UINTTYPE big endian integer type
-//\param[in] val big integer number
-//\param[out] digitsbuf buffer for digits to fill with the result (integers from 0..9 and NOT ascii '0'..'9')
-//\param[in] digitsbufsize allocation size of 'digitsbuf' in bytes
-//\return number of digits in the result (might be 0 for "0")
+///\brief Convert a large but limited size big endian integer value to a BCD number
+///\tparam UINTTYPE big endian integer type
+///\param[in] val big integer number
+///\param[out] digitsbuf buffer for digits to fill with the result (integers from 0..9 and NOT ascii '0'..'9')
+///\param[in] digitsbufsize allocation size of 'digitsbuf' in bytes
+///\return number of digits in the result (might be 0 for "0")
 template <typename UINTTYPE>
 unsigned int convertBigEndianUintToBCD( const UINTTYPE& val, unsigned char* digitsbuf, unsigned int digitsbufsize)
 {
 	return convertBinaryToBCD( (const unsigned char*)&val, sizeof(val), digitsbuf, digitsbufsize);
 }
 
-//\brief Convert a large but limited size BCD number to a big endian integer value
-//\tparam UINTTYPE big endian integer type
-//\param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
-//\param[in] digitsbufsize size of 'digitsbuf' in bytes
-//\param[out] val big integer number
-//\return number of digits in the result (might be 0 for "0")
+///\brief Convert a large but limited size BCD number to a big endian integer value
+///\tparam UINTTYPE big endian integer type
+///\param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
+///\param[in] digitsbufsize size of 'digitsbuf' in bytes
+///\param[out] val big integer number
+///\return number of digits in the result (might be 0 for "0")
 template <typename UINTTYPE>
 void convertBCDtoBigEndianUint( const unsigned char* digits, unsigned int nofdigits, UINTTYPE& val)
 {

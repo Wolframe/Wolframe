@@ -73,6 +73,8 @@ static void patchCode( ProgramCode& code, InstructionSet::ArgumentType argtype, 
 void Program::add( const Program& oth, bool doPatchGOTOs)
 {
 	std::size_t startidx = code.size();
+
+	// Patch GOT0 addresses if required (doPatchGOTOs == true):
 	PatchArgumentMapR pmap;
 	if (doPatchGOTOs)
 	{
@@ -84,34 +86,65 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 		code.append( oth.code);
 	}
 
+	// Update variant constant references:
 	pmap = joinVectors( constants, oth.constants);
 	patchCode( code, At_Constant, startidx, *pmap);
 
+	// Update tag name references:
 	pmap = tagnametab.join( oth.tagnametab);
 	patchCode( code, At_TagName, startidx, *pmap);
 
+	// Update result name references:
 	pmap = resultnametab.join( oth.resultnametab);
 	patchCode( code, At_ResultName, startidx, *pmap);
 
+	// Update column name references:
 	pmap = colnametab.join( oth.colnametab);
 	patchCode( code, At_ColumnName, startidx, *pmap);
 
+	// Update statement references:
 	pmap = joinVectors( statements, oth.statements);
 	patchCode( code, At_Statement, startidx, *pmap);
 	
+	// Update error hint references:
 	pmap = hinttab.join( oth.hinttab);
 	patchCode( code, At_Hint, startidx, *pmap);
 
+	// Update signature references:
 	pmap = joinVectors( signatures, oth.signatures);
 	patchCode( code, At_SubroutineSignature, startidx, *pmap);
 
+	// Update tuple set references:
 	pmap = joinVectors( tuplesets, oth.tuplesets);
 	patchCode( code, At_TupleSet, startidx, *pmap);
 
+	// Update path references:
 	pmap = pathset.join( oth.pathset);
 	patchCode( code, At_Path, startidx, *pmap);
+
+	// Update TDL position references:
+	std::size_t startidx_tdlpos = tdlpositions.size();
+	tdlpositions.insert( tdlpositions.end(), oth.tdlpositions.begin(), oth.tdlpositions.end());
+	std::vector<InstructionPos>::iterator di = tdlpositions.begin() + startidx_tdlpos, de = tdlpositions.end();
+	for (; di != de; ++di)
+	{
+		di->ip += startidx;
+	}
 }
 
+void Program::setCurrentSourceReference( const utils::FileLineInfo& posinfo)
+{
+	tdlpositions.push_back( InstructionPos( code.size(), posinfo));
+}
+
+bool Program::getSourceReference( std::size_t ip, utils::FileLineInfo& posinfo) const
+{
+	std::vector<InstructionPos>::const_iterator prev = tdlpositions.begin(), di = tdlpositions.begin(), de = tdlpositions.end();
+	for (; di != de && ip >= di->ip; prev=di++) {}
+	if (di == tdlpositions.begin()) return false;
+	posinfo = prev->pos;
+	return true;
+}
 
 std::string Program::instructionString( const Instruction& instr) const
 {

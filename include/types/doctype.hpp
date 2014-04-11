@@ -40,13 +40,13 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\class DocType
-//\brief Document type representation.
-//\remark Inspired by XML but acting as superset of all document type descriptions.
+///\class DocType
+///\brief Document type representation.
+///\remark Inspired by XML but acting as superset of all document type descriptions.
 struct DocType
 {
-	//\class SchemaPath
-	//\brief Elements needed besides document type id to build the URI of the document schema description
+	///\class SchemaPath
+	///\brief Elements needed besides document type id to build the URI of the document schema description
 	struct SchemaPath
 	{
 		std::string dir;	//< location directory of the schema descriptions

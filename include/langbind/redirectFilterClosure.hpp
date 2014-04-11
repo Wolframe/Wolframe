@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file langbind/redirectFilterClosure.hpp
-//\brief Interface to redirect streaming from an input filter to an output filter interface
+///\file langbind/redirectFilterClosure.hpp
+///\brief Interface to redirect streaming from an input filter to an output filter interface
 #ifndef _Wolframe_langbind_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #define _Wolframe_langbind_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -41,7 +41,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-//\class RedirectFilterClosure
+///\class RedirectFilterClosure
 class RedirectFilterClosure
 	:public virtual utils::TypeSignature
 {
@@ -51,13 +51,13 @@ public:
 	RedirectFilterClosure( const RedirectFilterClosure& o);
 	~RedirectFilterClosure(){}
 
-	//\brief Calls the fetching of input and printing it to output until end or interruption
-	//\return true when completed
+	///\brief Calls the fetching of input and printing it to output until end or interruption
+	///\return true when completed
 	bool call();
 
-	//\brief Initialization of call context for a new call
-	//\param[in] i call input
-	//\param[in] o call output
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	///\param[in] o call output
 	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o);
 
 	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}

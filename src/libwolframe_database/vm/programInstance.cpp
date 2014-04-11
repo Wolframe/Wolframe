@@ -227,7 +227,11 @@ bool ProgramInstance::execute()
 		// Define abbreviation for the current state:
 		StackElement& top = m_stack.back();
 
-		LOG_TRACE << "[transaction vm] execute [" << m_ip << "]" << m_program->instructionStringAt( m_ip);
+		// Log execution trace via callback procedure:
+		if (m_logTraceCallBack)
+		{
+			m_logTraceCallBack( m_logTraceContext, m_ip);
+		}
 
 		// Evaluate conditional:
 		Instruction instr = m_code.get( m_ip);

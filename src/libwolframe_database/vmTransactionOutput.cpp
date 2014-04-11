@@ -9,7 +9,11 @@ using namespace _Wolframe::db;
 
 void VmTransactionOutput::print( std::ostream& out, const utils::PrintFormat* pformat) const
 {
-	if (!pformat) print( out, utils::logPrintFormat());
+	if (!pformat)
+	{
+		print( out, utils::logPrintFormat());
+		return;
+	}
 	std::size_t indent = 0;
 	std::size_t indentsize = (pformat->indent?std::strlen(pformat->indent):0);
 	std::string indentstr;

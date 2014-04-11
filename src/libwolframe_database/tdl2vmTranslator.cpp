@@ -305,6 +305,7 @@ void Tdl2vmTranslator::end_loop_element()
 	m_main_program.code
 		( Op_OUTPUT_CLOSE_ELEM )
 	;
+	m_stateStack.pop_back();
 }
 
 static std::string mangledSubroutineName( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector)
@@ -847,6 +848,11 @@ void Tdl2vmTranslator::output_ARGUMENT_ITER( const std::string& colname)
 	m_main_program.code
 		( Op_OUTPUT_ITR_NAM, colnameidx )	// push column by name
 	;
+}
+
+void Tdl2vmTranslator::setCurrentSourceReference( const utils::FileLineInfo& posinfo)
+{
+	m_main_program.setCurrentSourceReference( posinfo);
 }
 
 

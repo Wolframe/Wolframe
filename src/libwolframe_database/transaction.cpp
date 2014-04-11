@@ -61,9 +61,49 @@ static std::string removeCRLF( const std::string& src)
 	return rt;
 }
 
+struct vm::ProgramInstance::LogTraceContext
+{
+	const vm::Program* program;
+};
+
+static void programInstance_logTraceCallBack_TRACE( const vm::ProgramInstance::LogTraceContext* ctx, unsigned int ip)
+{
+	utils::FileLineInfo posinfo;
+	if (ctx->program->getSourceReference( ip, posinfo))
+	{
+		LOG_TRACE << "[transaction vm] execute [" << ip << "]" << ctx->program->instructionStringAt( ip) << " " << posinfo.logtext_short();
+	}
+}
+
+static void programInstance_logTraceCallBack_DEBUG( const vm::ProgramInstance::LogTraceContext* ctx, unsigned int ip)
+{
+	utils::FileLineInfo posinfo;
+	if (ctx->program->getSourceReference( ip, posinfo))
+	{
+		LOG_DEBUG << "[transaction vm] execute [" << ip << "]" << ctx->program->instructionStringAt( ip);
+	}
+}
+
+
 void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
-	vm::ProgramInstance instance( &input.program(), m_stm.get());
+	vm::ProgramInstance::LogTraceContext context;
+	context.program = &input.program();
+
+	vm::ProgramInstance::LogTraceCallBack logtrace = 0;
+	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_DEBUG)
+	{
+		if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_TRACE)
+		{
+			logtrace = &programInstance_logTraceCallBack_TRACE;
+		}
+		else
+		{
+			logtrace = &programInstance_logTraceCallBack_DEBUG;
+		}
+	}
+	vm::ProgramInstance instance( context.program, m_stm.get(), logtrace, &context);
+
 	bool result;
 	try
 	{
@@ -71,9 +111,16 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 	}
 	catch (const std::runtime_error& e)
 	{
+		std::string locationstr;
+		utils::FileLineInfo posinfo;
+		if (input.program().getSourceReference( instance.ip(), posinfo))
+		{
+			locationstr = std::string(" TDL source location ") + posinfo.logtext();
+		}
 		LOG_ERROR << "exception thrown in transaction '" << m_name
 				<< "' at VM IP " << instance.ip()
-				<< " instruction " << input.program().instructionStringAt( instance.ip());
+				<< " instruction " << input.program().instructionStringAt( instance.ip())
+				<< locationstr;
 		throw e;
 	}
 	if (!result)
@@ -101,6 +148,12 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 		if (err.errorhint.size())
 		{
 			logmsg << " " << err.errorhint;
+		}
+		std::string locationstr;
+		utils::FileLineInfo posinfo;
+		if (input.program().getSourceReference( instance.ip(), posinfo))
+		{
+			logmsg << " TDL source location " << posinfo.logtext();
 		}
 
 		std::ostringstream throwmsg;

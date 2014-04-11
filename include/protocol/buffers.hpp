@@ -34,12 +34,11 @@ Project Wolframe.
 ///
 ///\file protocol/buffers.hpp
 ///\brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
-///
-/// All buffers defined in this module are preallocated fixed size and implement a subset of STL back insertion sequence interface for appending data.
-/// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
-/// The protocol uses fixed size buffers because protocol messages are not considered to have a size defined by the client for security reasons.
-/// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in protocol/ioblocks.hpp
-/// to the application processors.
+// All buffers defined in this module are preallocated fixed size and implement a subset of STL back insertion sequence interface for appending data.
+// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
+// The protocol uses fixed size buffers because protocol messages are not considered to have a size defined by the client for security reasons.
+// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in protocol/ioblocks.hpp
+// to the application processors.
 ///
 #include <cstddef>
 #include <stdexcept>

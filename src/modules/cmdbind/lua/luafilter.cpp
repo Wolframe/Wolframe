@@ -314,6 +314,23 @@ static const char* getTagName( lua_State* ls, int idx)
 	}
 }
 
+std::string LuaTableInputFilter::stackDump( const std::vector<FetchState>& stk)
+{
+	std::ostringstream out;
+	std::vector<LuaTableInputFilter::FetchState>::const_iterator si = stk.begin(), se = stk.end();
+	for (; si != se; ++si)
+	{
+		if (si != stk.begin()) out << ",";
+		out << FetchState::idShortName( si->id);
+		if (si->tag) out << "(" << si->tag << ")";
+		if (si->id == LuaTableInputFilter::FetchState::VectorIterValue || si->id == LuaTableInputFilter::FetchState::VectorIterClose || si->id == LuaTableInputFilter::FetchState::VectorIterReopen)
+		{
+			out << ":" << si->idx;
+		}
+	}
+	return out.str();
+}
+
 bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	if (!lua_checkstack( m_ls, 10))
@@ -328,6 +345,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 		switch (m_stk.back().id)
 		{
 			case FetchState::Init:
+				m_stk.back().id = FetchState::TopLevel;
 			case FetchState::TopLevel:
 				if (lua_istable( m_ls, -1))
 				{
@@ -339,7 +357,11 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::Done;
 					type = FilterBase::Value;
-					return getLuaStackValue( -1, element);
+					if (getLuaStackValue( -1, element))
+					{
+						return true;
+					}
+					return false;
 				}
 
 			case FetchState::VectorIterValue:
@@ -353,7 +375,11 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::VectorIterClose;
 					type = FilterBase::Value;
-					return getLuaStackValue( -1, element);
+					if (getLuaStackValue( -1, element))
+					{
+						return true;
+					}
+					return false;
 				}
 
 			case FetchState::VectorIterClose:
@@ -407,7 +433,14 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::TableIterClose;
 					type = FilterBase::Value;
-					return getLuaStackValue( -1, element);
+					if (getLuaStackValue( -1, element))
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 
 			case FetchState::TableIterValueNoTag:
@@ -422,7 +455,11 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 				{
 					m_stk.back().id = FetchState::TableIterNext;
 					type = FilterBase::Value;
-					return getLuaStackValue( -1, element);
+					if (getLuaStackValue( -1, element))
+					{
+						return true;
+					}
+					return false;
 				}
 
 			case FetchState::TableIterClose:

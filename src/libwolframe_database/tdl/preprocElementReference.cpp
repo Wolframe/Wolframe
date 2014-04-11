@@ -46,6 +46,10 @@ using namespace _Wolframe::db::tdl;
 
 static std::string extractImplicitNameFromSelector( const std::string& selector)
 {
+	if (selector == ".")
+	{
+		return std::string();
+	}
 	std::string::const_iterator si = selector.begin(), se = selector.end();
 	std::string::const_iterator lastElemStart = si;
 	for (; si != se; ++si)
@@ -71,7 +75,10 @@ PreProcElementReference PreProcElementReference::parse( const LanguageDescriptio
 		ch = gotoNextToken( langdescr, si, se);
 		if (ch == '=')
 		{
-			rt.name = tok;
+			if (tok != ".")
+			{
+				rt.name = tok;
+			}
 			nameDefined = true;
 			++si;
 			ch = gotoNextToken( langdescr, si, se);

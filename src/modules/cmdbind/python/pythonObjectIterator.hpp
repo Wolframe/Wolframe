@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file pythonObjectIterator.hpp
-//\brief Interface to C++ (STL like) iterator on a python object
+///\file pythonObjectIterator.hpp
+///\brief Interface to C++ (STL like) iterator on a python object
 #ifndef _Wolframe_python_OBJECT_ITERATOR_HPP_INCLUDED
 #define _Wolframe_python_OBJECT_ITERATOR_HPP_INCLUDED
 #include "pythonObject.hpp"
@@ -40,24 +40,24 @@ namespace _Wolframe {
 namespace langbind {
 namespace python {
 
-//\brief Iterator on structure or array elements
+///\brief Iterator on structure or array elements
 class ObjectIterator
 {
 public:
-	//\brief Default constructor
+	///\brief Default constructor
 	ObjectIterator();
-	//\brief Constructor
+	///\brief Constructor
 	explicit ObjectIterator( const Object& obj_);
-	//\brief Copy constructor
+	///\brief Copy constructor
 	ObjectIterator( const ObjectIterator& o);
-	//\brief Destructor
+	///\brief Destructor
 	~ObjectIterator();
 
-	//\brief Compare objects
-	//\return -1 if 'this' is smaller than 'o', +1 if 'this' is bigger than 'o', 0 if 'this' and 'o' are equal
+	///\brief Compare objects
+	///\return -1 if 'this' is smaller than 'o', +1 if 'this' is bigger than 'o', 0 if 'this' and 'o' are equal
 	int compare( const ObjectIterator& o) const			{return (int)m_pos - (int)o.m_pos;}
 
-	//\brief Compare operators
+	///\brief Compare operators
 	bool operator==( const ObjectIterator& o) const			{return compare(o) == 0;}
 	bool operator!=( const ObjectIterator& o) const			{return compare(o) != 0;}
 	bool operator<( const ObjectIterator& o) const			{return compare(o) < 0;}
@@ -65,7 +65,7 @@ public:
 	bool operator>( const ObjectIterator& o) const			{return compare(o) > 0;}
 	bool operator>=( const ObjectIterator& o) const			{return compare(o) >= 0;}
 
-	//\brief Increment
+	///\brief Increment
 	ObjectIterator& operator++()					{fetch_next(); return *this;}
 	ObjectIterator operator++(int)					{ObjectIterator rt(*this); fetch_next(); return rt;}
 
@@ -78,7 +78,7 @@ public:
 		bool array() const;
 		types::Variant getValue() const;
 	};
-	//\brief Accessor
+	///\brief Accessor
 	const Element* operator->() const				{return &m_elem;}
 	const Element& operator*() const				{return m_elem;}
 

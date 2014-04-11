@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/transaction.hpp
-//\brief Interface of a database transaction
+///\file database/transaction.hpp
+///\brief Interface of a database transaction
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
@@ -46,32 +46,37 @@
 namespace _Wolframe {
 namespace db {
 
-//\brief Transaction interface
+///\brief Transaction interface
 class Transaction
 {
 public:
 	Transaction( const std::string& name_, const TransactionExecStatemachineR& stm_)
 		:m_name(name_),m_stm(stm_){}
 
-	//\brief Destructor
+	///\brief Destructor
 	virtual ~Transaction(){}
-	//\brief Configured ID of the underlaying database
+	///\brief Configured ID of the underlaying database
 	const std::string& databaseID() const	{return m_stm->databaseID();}
 
-	//\brief Begin of a new transaction
+	///\brief Begin of a new transaction
 	void begin()				{m_stm->begin();}
-	//\brief Commit of the running transaction
+	///\brief Commit of the running transaction
 	void commit()				{m_stm->commit();}
-	//\brief Rollback of the running transaction
+	///\brief Rollback of the running transaction
 	void rollback()				{m_stm->rollback();}
-	//\brief Close of the committed or rolled back transaction
+	///\brief Close of the committed or rolled back transaction
 	void close()				{m_stm.reset();}
 
-	//\brief Execute a transaction
+	///\brief Execute a transaction
 	virtual void execute( const VmTransactionInput& input, VmTransactionOutput& output);
 
-	//\class Result
-	//\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
+	const std::string& name() const
+	{
+		return m_name;
+	}
+
+	///\class Result
+	///\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
 	class Result
 	{
 	public:
@@ -94,7 +99,7 @@ public:
 		std::vector<Row> m_rows;
 	};
 
-	//\brief Execute a single statement
+	///\brief Execute a single statement
 	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
 
 	TransactionExecStatemachine* execStatemachine()			{return m_stm.get();}

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/nameTable.hpp
-//\brief Defines a set of names assigned to ascending indices
+///\file database/vm/nameTable.hpp
+///\brief Defines a set of names assigned to ascending indices
 #ifndef _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"

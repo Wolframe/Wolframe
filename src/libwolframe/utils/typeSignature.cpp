@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file utils/typeSignature.hpp
-//\brief Implementation of signature for structures to detect memory problems
+///\file utils/typeSignature.hpp
+///\brief Implementation of signature for structures to detect memory problems
 #include "utils/typeSignature.hpp"
 #include <boost/lexical_cast.hpp>
 

@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file Interface for assignment of Input Filter to MSDN Variant Type
+///\file Interface for assignment of Input Filter to MSDN Variant Type
 #ifndef _Wolframe_COM_AUTOMATION_VARIANT_ASSIGNMENT_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_VARIANT_ASSIGNMENT_HPP_INCLUDED
 #include "filter/typedfilter.hpp"

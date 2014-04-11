@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief Configuration tree for the configuration parser
-//\file config/configurationTree.hpp
+///\brief Configuration tree for the configuration parser
+///\file config/configurationTree.hpp
 
 #ifndef _CONFIGURATION_TREE_HPP_INCLUDED
 #define _CONFIGURATION_TREE_HPP_INCLUDED

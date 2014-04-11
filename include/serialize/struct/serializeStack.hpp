@@ -43,8 +43,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class SerializeState
-//\brief State stack element for an iterator on a structure (serializer)
+///\class SerializeState
+///\brief State stack element for an iterator on a structure (serializer)
 class SerializeState
 {
 public:
@@ -68,7 +68,7 @@ private:
 	std::size_t m_stateidx;
 };
 
-//\brief State stack for an iterator on a structure (serializer)
+///\brief State stack for an iterator on a structure (serializer)
 typedef std::vector<SerializeState> SerializeStateStack;
 
 }}//namespace

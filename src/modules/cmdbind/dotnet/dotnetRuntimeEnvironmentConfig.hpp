@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file dotnetRuntimeEnvironmentConfig.hpp
-//\brief Interface .NET runtime environment configuration
+///\file dotnetRuntimeEnvironmentConfig.hpp
+///\brief Interface .NET runtime environment configuration
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include "config/configurationTree.hpp"
@@ -42,7 +42,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-//\brief Named configuration definition
+///\brief Named configuration definition
 class DotnetRuntimeEnvironmentConfig
 	:public config::NamedConfiguration
 {
@@ -65,13 +65,13 @@ public:
 		,m_className(className_){}
 	virtual ~DotnetRuntimeEnvironmentConfig(){}
 
-	//\brief Parse the configuration
-	//\param[in] pt configuration tree
-	//\param[in] modules module directory
+	///\brief Parse the configuration
+	///\param[in] pt configuration tree
+	///\param[in] modules module directory
 	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory* modules);
 
-	//\brief Set canonical path for files referenced as relative path in configuration
-	//\param[in] referencePath reference path
+	///\brief Set canonical path for files referenced as relative path in configuration
+	///\param[in] referencePath reference path
 	virtual void setCanonicalPathes( const std::string& referencePath);
 
 	virtual bool check() const;

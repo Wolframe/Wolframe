@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/errorHintTable.hpp
-//\brief Defines the mapping of database statement ids to messages to attach on certain error classes (user hints)
+///\file database/vm/errorHintTable.hpp
+///\brief Defines the mapping of database statement ids to messages to attach on certain error classes (user hints)
 #ifndef _DATABASE_VIRTUAL_MACHINE_ERROR_HINT_TABLE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_ERROR_HINT_TABLE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"

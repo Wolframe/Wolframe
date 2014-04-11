@@ -45,13 +45,13 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace utils {
-	//\brief Forward declaration
+	///\brief Forward declaration
 	struct PrintFormat;
 }
 namespace types {
 
-//\class FormDescription
-//\brief Description of a form structure
+///\class FormDescription
+///\brief Description of a form structure
 class FormDescription
 	:public types::VariantStructDescription
 {
@@ -108,8 +108,8 @@ private:
 typedef boost::shared_ptr<FormDescription> FormDescriptionR;
 
 
-//\class Form
-//\brief Form data structure
+///\class Form
+///\brief Form data structure
 class Form
 	:public types::VariantStruct
 {
@@ -152,7 +152,7 @@ private:
 	const FormDescription* m_description;
 };
 
-//\brief shared ownership reference to form data structure
+///\brief shared ownership reference to form data structure
 typedef boost::shared_ptr<Form> FormR;
 
 }}//namespace

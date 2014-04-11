@@ -31,8 +31,8 @@
 
 ************************************************************************/
 
-//\brief Interface to substitute parameters in embedded SQL statements
-//\file database/statement.hpp
+///\brief Interface to substitute parameters in embedded SQL statements
+///\file database/statement.hpp
 
 #ifndef _DATABASE_BASE_STATEMENT_HPP_INCLUDED
 #define _DATABASE_BASE_STATEMENT_HPP_INCLUDED
@@ -45,8 +45,8 @@
 namespace _Wolframe {
 namespace db {
 
-//\class BaseStatement
-//\brief Implements basic parsing of the Wolframe SQL statement with
+///\class BaseStatement
+///\brief Implements basic parsing of the Wolframe SQL statement with
 //       placeholders, derived classes can steer how the SQL string is
 //       converted to native format
 class BaseStatement : public Statement

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/selectorPath.hpp
-//\brief Defines an input selector path
+///\file database/vm/selectorPath.hpp
+///\brief Defines an input selector path
 #ifndef _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_HPP_INCLUDED
 #include <map>
@@ -44,13 +44,13 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
-//\brief Forward declaration
+///\brief Forward declaration
 class InputNodeVisitor;
-//\brief Forward declaration
+///\brief Forward declaration
 class InputStructure;
-//\brief Forward declaration
+///\brief Forward declaration
 typedef int InputNodeIndex;
-//\brief Forward declaration
+///\brief Forward declaration
 class TagTable;
 
 class SelectorPath

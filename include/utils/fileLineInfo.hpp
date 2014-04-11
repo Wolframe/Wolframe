@@ -68,6 +68,7 @@ public:
 		m_filename = filename_;
 	}
 	std::string logtext() const;
+	std::string logtext_short() const;
 
 private:
 	FileName m_filename;

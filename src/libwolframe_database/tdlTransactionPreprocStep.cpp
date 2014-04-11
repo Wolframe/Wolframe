@@ -45,9 +45,17 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
+
+std::string TdlTransactionPreprocStep::tostring( const vm::TagTable* tagmap) const
+{
+	std::ostringstream out;
+	print( out, tagmap);
+	return out.str();
+}
 
 void TdlTransactionPreprocStep::print( std::ostream& out, const vm::TagTable* tagmap) const
 {
@@ -69,15 +77,15 @@ void TdlTransactionPreprocStep::print( std::ostream& out, const vm::TagTable* ta
 		switch (arg_type( ai))
 		{
 			case Argument::SelectorPath:
-				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				if (arg_name(ai)) out << arg_name(ai) << "=";
 				arg_selector(ai).print( out, tagmap);
 				break;
 			case Argument::LoopCounter:
-				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				if (arg_name(ai)) out << arg_name(ai) << "=";
 				out << "#";
 				break;
 			case Argument::Constant:
-				if (arg_name(ai).size()) out << arg_name(ai) << "=";
+				if (arg_name(ai)) out << arg_name(ai) << "=";
 				out << "\"" << arg_constant(ai) << "\"";
 				break;
 		}
@@ -208,8 +216,8 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 						m_selectors.at( m_arguments.at(aidx).value).selectNodes( structure, *ni, parameter);
 						if (parameter.size() == aidx+1)
 						{
-							LOG_DATA << "[transaction preprocess] argument '" << ai->name << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
-							parameterassign.push_back( vm::InputStructure::NodeAssignment( ai->name, parameter.back()));
+							LOG_DATA << "[transaction preprocess] argument '" << (m_strings.c_str()+ai->name) << "' in '" << structure.nodepath( parameter.back()) << "' = " << structure.tostring( parameter.back(), utils::logPrintFormat());
+							parameterassign.push_back( vm::InputStructure::NodeAssignment( (m_strings.c_str()+ai->name), parameter.back()));
 						}
 						else
 						{
@@ -220,7 +228,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 							}
 							else
 							{
-								throw std::runtime_error( std::string( "referenced parameter '") + ai->name + "' is not unique");
+								throw std::runtime_error( std::string( "referenced parameter '") + (m_strings.c_str()+ai->name) + "' is not unique");
 							}
 						}
 						break;

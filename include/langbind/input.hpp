@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file langbind/input.hpp
-//\brief Interface to network output for processor language bindings
+///\file langbind/input.hpp
+///\brief Interface to network output for processor language bindings
 #ifndef _Wolframe_langbind_INPUT_HPP_INCLUDED
 #define _Wolframe_langbind_INPUT_HPP_INCLUDED
 #include "filter/filter.hpp"
@@ -42,62 +42,62 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-//\class Input
-//\brief Input as seen from the application processor program
+///\class Input
+///\brief Input as seen from the application processor program
 class Input
 	:public virtual utils::TypeSignature
 {
 public:
-	//\brief Constructor
+	///\brief Constructor
 	Input()
 		:utils::TypeSignature("langbind::Input", __LINE__)
 		,m_used(false){}
 
-	//\brief Copy constructor
-	//\param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	Input( const Input& o);
 
-	//\brief Constructor by input filter
-	//\param[in] inputfilter_ input filter reference
-	//\param[in] docformat_ document format
+	///\brief Constructor by input filter
+	///\param[in] inputfilter_ input filter reference
+	///\param[in] docformat_ document format
 	Input( const InputFilterR& inputfilter_, const std::string& docformat_);
 
-	//\brief Constructor by content
-	//\param[in] docformat_ document format
-	//\param[in] content_ content string
+	///\brief Constructor by content
+	///\param[in] docformat_ document format
+	///\param[in] content_ content string
 	Input( const std::string& docformat_, const std::string& content_);
 
-	//\brief Destructor
+	///\brief Destructor
 	~Input(){}
 
-	//\brief Get the input filter attached to input
-	//\return the input filter reference
+	///\brief Get the input filter attached to input
+	///\return the input filter reference
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
 
-	//\brief Get the input filter attached to input
-	//\return the input filter reference
+	///\brief Get the input filter attached to input
+	///\return the input filter reference
 	InputFilterR& inputfilter()			{return m_inputfilter;}
 
-	//\brief Get the document format as recognized by the document type detection as string {"xml","json",...}
-	//\return the document format as string
+	///\brief Get the document format as recognized by the document type detection as string {"xml","json",...}
+	///\return the document format as string
 	const std::string& docformat() const		{return m_docformat;}
 
-	//\brief Get the input filter attached to input and check for duplicate access
-	//\return the input filter reference
+	///\brief Get the input filter attached to input and check for duplicate access
+	///\return the input filter reference
 	InputFilterR& getIterator();
 
-	//\brief Eval if this represents a document
-	//\return true, if yes
+	///\brief Eval if this represents a document
+	///\return true, if yes
 	bool isDocument() const				{return !m_isProcessorInput;}
-	//\brief Get content source string if input is not from network
-	//\return the content string pointer or NULL, if not defined
+	///\brief Get content source string if input is not from network
+	///\return the content string pointer or NULL, if not defined
 	const char* documentptr() const			{return m_isProcessorInput?0:m_content.get();}
-	//\brief Get size of the content source string if input is not from network
-	//\return the content string size or 0, if not defined
+	///\brief Get size of the content source string if input is not from network
+	///\return the content string size or 0, if not defined
 	std::size_t documentsize() const		{return m_isProcessorInput?0:m_contentsize;}
 
-	//\brief Allocate a copy of the content to the input for a filter attached
-	//\return the copy (managed by the input object)
+	///\brief Allocate a copy of the content to the input for a filter attached
+	///\return the copy (managed by the input object)
 	const void* allocContentCopy( const void* ptr, std::size_t size);
 
 private:

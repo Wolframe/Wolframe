@@ -1,5 +1,5 @@
-//\file configValueParser.cpp
-//\brief configuration lexem parser unit tests using google test framework (gTest)
+///\file configValueParser.cpp
+///\brief configuration lexem parser unit tests using google test framework (gTest)
 
 #include "config/valueParser.hpp"
 #include "gtest/gtest.h"

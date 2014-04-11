@@ -602,14 +602,13 @@
 		<sect3>
 			<title>Substructures in the Result</title>
 			<para>We already learned how to define substructures of the 
-			transaction function result with
-			the <code>RESULT INTO</code> directive of an OPERATION or 
-			TRANSACTION. But <code>RESULT INTO</code> blocks can also be
-			defined locally as sub blocks in the main processing block.
-			A sub-block in the result is declared with 
+			transaction function result with the <code>RESULT INTO</code>
+			directive of a TRANSACTION. 
+			But we can also define a scope in the result structure
+			for sub blocks. A sub-block in the result is declared with 
 			<programlisting language='sql'>
 
-				RESULT INTO &lt;resulttag&gt;
+				INTO &lt;resulttag&gt;
 				BEGIN
 					...&lt;instruction list&gt;...
 				END

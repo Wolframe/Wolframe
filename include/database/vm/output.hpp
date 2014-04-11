@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/output.hpp
-//\brief Defines the output of a virtual machine for database transactions
+///\file database/vm/output.hpp
+///\brief Defines the output of a virtual machine for database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
 #include "types/variant.hpp"

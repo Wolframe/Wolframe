@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/subroutineFrame.hpp
-//\brief Defines the instruction set of the virtual machine defining database transactions
+///\file database/vm/subroutineFrame.hpp
+///\brief Defines the instruction set of the virtual machine defining database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_FRAME_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_FRAME_HPP_INCLUDED
 #include "database/vm/valueTupleSet.hpp"

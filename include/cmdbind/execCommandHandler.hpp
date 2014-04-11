@@ -46,8 +46,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-//\class ExecCommandHandler
-//\brief Command handler for a list of predefined protocol commands. Represents one state in the protocol statemachine.
+///\class ExecCommandHandler
+///\brief Command handler for a list of predefined protocol commands. Represents one state in the protocol statemachine.
 class ExecCommandHandler :public CommandHandler
 {
 public:

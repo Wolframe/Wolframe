@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/programCode.hpp
-//\brief Defines a map of symbols to addresses and back
+///\file database/vm/programCode.hpp
+///\brief Defines a map of symbols to addresses and back
 #ifndef _DATABASE_VIRTUAL_MACHINE_PROGRAM_CODE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_PROGRAM_CODE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"

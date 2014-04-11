@@ -93,6 +93,7 @@ void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterfa
 	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
 	for (; pi != pe; ++pi)
 	{
+		LOG_TRACE << "[transaction input] execute preprocessing function " << pi->tostring( m_func->program()->pathset.tagtab());
 		pi->call( provider, *m_structure);
 	}
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();

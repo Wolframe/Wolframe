@@ -97,7 +97,7 @@ private:
 
 typedef boost::shared_ptr<CppFormFunction> CppFormFunctionR;
 
-//\class ApiFormData
+///\class ApiFormData
 class ApiFormData
 	:public virtual utils::TypeSignature
 {
@@ -113,27 +113,27 @@ private:
 	boost::shared_ptr<void> m_data;
 };
 
-//\class CppFormFunctionClosure
-//\brief Closure with calling state of called CppFormFunction
+///\class CppFormFunctionClosure
+///\brief Closure with calling state of called CppFormFunction
 class CppFormFunctionClosure
 	:public virtual utils::TypeSignature
 {
 public:
-	//\brief Constructor
-	//\param[in] f function called
+	///\brief Constructor
+	///\param[in] f function called
 	CppFormFunctionClosure( const CppFormFunction& f);
 
-	//\brief Copy constructor
-	//\param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	CppFormFunctionClosure( const CppFormFunctionClosure& o);
 
-	//\brief Calls the form function with the input from the input filter specified
-	//\return true when completed
+	///\brief Calls the form function with the input from the input filter specified
+	///\return true when completed
 	bool call();
 
-	//\brief Initialization of call context for a new call
-	//\param[in] i call input
-	//\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	///\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
 	void init( const proc::ProcessorProviderInterface* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags);
 
 	const serialize::StructSerializer& result() const	{return m_result;}

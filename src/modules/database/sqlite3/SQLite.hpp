@@ -57,7 +57,7 @@ namespace db {
 
 static const char* SQLite_DB_CLASS_NAME = "SQLite";
 
-//\brief SQLite database configuration
+///\brief SQLite database configuration
 class SQLiteConfig : public config::NamedConfiguration
 {
 public:
@@ -174,8 +174,8 @@ private:
 };
 
 
-//\class SQLiteConstructor
-//\brief SQLite database constructor
+///\class SQLiteConstructor
+///\brief SQLite database constructor
 class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
@@ -186,7 +186,7 @@ public:
 };
 
 
-//\class SQLiteTransaction
+///\class SQLiteTransaction
 class SQLiteTransaction
 	:public Transaction
 {

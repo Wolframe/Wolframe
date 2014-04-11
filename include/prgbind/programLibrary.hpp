@@ -52,8 +52,8 @@
 namespace _Wolframe {
 namespace prgbind {
 
-//\class ProgramLibrary
-//\brief Class representing the program library with all programs loaded
+///\class ProgramLibrary
+///\brief Class representing the program library with all programs loaded
 class ProgramLibrary
 {
 public:

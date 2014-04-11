@@ -92,7 +92,7 @@ struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
 
-	//\brief Get the database identifier
+	///\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
 	///\brief Begin transaction

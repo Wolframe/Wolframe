@@ -227,7 +227,9 @@ function run( inp )
 	getDataFiltered = provider.formfunction("getDataFiltered")
 	resfiltered = getDataFiltered( it)
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	for k,v in ipairs(  resfilteredtab['person']) do
+		table.insert( rt.person, v)
+	end
 	return rt
 end
 
@@ -324,7 +326,6 @@ BEGIN
 END
 
 SUBROUTINE getPerson( id)
-RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
 		WHERE PersonCompanyRel.companyid = Company.ID
@@ -349,7 +350,7 @@ END
 TRANSACTION getData
 BEGIN
 	DO SELECT ID FROM Person;
-	FOREACH RESULT INTO . DO getPerson( $1);
+	FOREACH RESULT INTO person DO getPerson( $1);
 END
 
 TRANSACTION getDataFiltered

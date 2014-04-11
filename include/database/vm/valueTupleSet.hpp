@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/valueTupleSet.hpp
-//\brief Defines the instruction set of the virtual machine defining database transactions
+///\file database/vm/valueTupleSet.hpp
+///\brief Defines the instruction set of the virtual machine defining database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_VALUE_TYPLE_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_VALUE_TYPLE_SET_HPP_INCLUDED
 #include "types/variant.hpp"

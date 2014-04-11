@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
 #define _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
-//\file utils/typeSignature.hpp
-//\brief Interface for signature for structures to detect memory problems
+///\file utils/typeSignature.hpp
+///\brief Interface for signature for structures to detect memory problems
 
 #include <cstddef>
 #include <cstring>

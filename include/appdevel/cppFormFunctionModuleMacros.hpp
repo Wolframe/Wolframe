@@ -36,7 +36,7 @@
 #include "appdevel/module/cppFormFunctionTemplate.hpp"
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
 
-//\brief Marks the start if the Wolframe C++ form function module after the includes section.
+///\brief Marks the start if the Wolframe C++ form function module after the includes section.
 #define CPP_APPLICATION_FORM_FUNCTION_MODULE(NAME)\
 	static const char* _Wolframe__moduleName()\
 	{\
@@ -45,10 +45,11 @@
 	static _Wolframe::module::CppFormFunctionDef _Wolframe__cppFormFunctions[] =\
 	{
 
+///\brief Defines a Wolframe C++ form function
 #define CPP_APPLICATION_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
 	{NAME,appdevel::CppFormFunction<INPUT,OUTPUT,FUNCTION>::declaration()},
 
-//\brief Marks the end if the Wolframe C++ form function module.
+///\brief Marks the end if the Wolframe C++ form function module.
 #define CPP_APPLICATION_FORM_FUNCTION_MODULE_END\
 	{0,serialize::CppFormFunction()}\
 	};\

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/program.hpp
-//\brief Interface for program executing database transactions
+///\file database/vm/program.hpp
+///\brief Interface for program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
@@ -81,6 +81,7 @@ public:
 	ErrorHintTable hinttab;				//< hints for error classes of failing database statements
 	std::vector<SubroutineSignature> signatures;	//< subroutine signatures
 	std::vector<ValueTupleSetR> tuplesets;		//< values from path expressions
+	std::vector<InstructionPos> tdlpositions;	//< map of positions in tdl
 
 public:
 	Program(){}
@@ -95,10 +96,14 @@ public:
 		,hinttab(o.hinttab)
 		,signatures(o.signatures)
 		,tuplesets(o.tuplesets)
+		,tdlpositions(o.tdlpositions)
 	{}
 
-	//\brief Add the program to this, joining all tables and doing necessary instruction patches
+	///\brief Add the program to this, joining all tables and doing necessary instruction patches
 	void add( const Program& oth, bool doPatchGOTOs=true);
+
+	void setCurrentSourceReference( const utils::FileLineInfo& posinfo);
+	bool getSourceReference( std::size_t ip, utils::FileLineInfo& posinfo) const;
 
 	void print( std::ostream& out) const;
 	void printInstructionAt( std::ostream& out, const std::size_t& ip) const;

@@ -252,7 +252,9 @@ function run( inp )
 	getDataFiltered = provider.formfunction("getDataFiltered")
 	resfiltered = getDataFiltered( it)
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	for k,v in ipairs(  resfilteredtab['person']) do
+		table.insert( rt.person, v)
+	end
 	return rt
 end
 

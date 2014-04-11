@@ -51,7 +51,7 @@ private:
 	unsigned	m_build;		///< Build number.
 	bool		m_hasBuild;		///< Is build number present ?
 public:
-	//\brief Empty Version constructor.
+	///\brief Empty Version constructor.
 	// This will contruct a Version object having major and minor versions set to 0,
 	// no revision number and no build number.
 	Version()

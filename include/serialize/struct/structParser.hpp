@@ -38,8 +38,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class StructParser
-//\brief Initializer of a structure based on a structure description feeded with a serialization
+///\class StructParser
+///\brief Initializer of a structure based on a structure description feeded with a serialization
 class StructParser
 {
 public:

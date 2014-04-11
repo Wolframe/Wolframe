@@ -52,8 +52,8 @@ typedef boost::uint32_t BCDElement;
 typedef boost::uint32_t FactorType;
 #endif
 
-//\class BigBCD
-//\brief Arbitrary size BCD number type with basic arithmetic operations
+///\class BigBCD
+///\brief Arbitrary size BCD number type with basic arithmetic operations
 class BigBCD
 {
 public:
@@ -174,8 +174,8 @@ private:
 };
 
 
-//\class BigFxpBCD
-//\brief Arbitrary size fixed point number represented as BCD plus comma position with basic arithmetic operations.
+///\class BigFxpBCD
+///\brief Arbitrary size fixed point number represented as BCD plus comma position with basic arithmetic operations.
 class BigFxpBCD :public BigBCD
 {
 public:

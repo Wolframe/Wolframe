@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/patchArgumentMap.hpp
-//\brief Interface for patching program code needed for joining programs
+///\file database/vm/patchArgumentMap.hpp
+///\brief Interface for patching program code needed for joining programs
 #ifndef _DATABASE_VM_PATCH_ARGUMENT_MAP_HPP_INCLUDED
 #define _DATABASE_VM_PATCH_ARGUMENT_MAP_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"

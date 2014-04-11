@@ -161,8 +161,8 @@ void InputStructure::print( std::ostream& out, const utils::PrintFormat* pformat
 		}
 		else
 		{
-			if (!stk.empty()) out << pformat->closestruct;
 			stk.pop_back();
+			if (!stk.empty()) out << pformat->closestruct;
 		}
 	}
 }

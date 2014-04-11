@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief Interface for higher data type transformations for libpq
-//\file PostgreSQLserverSettings.hpp
+///\brief Interface for postgreSQL server settings (protocol to store and retrieve data in the internal binary format instead of string)
+///\file PostgreSQLserverSettings.hpp
 #ifndef _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
 #define _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
 #include <libpq-fe.h>

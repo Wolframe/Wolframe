@@ -35,7 +35,7 @@
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
 
-//\brief Defines a Wolframe command handler module after the includes section.
+///\brief Defines a Wolframe command handler module after the includes section.
 #define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
 	static _Wolframe::module::SimpleBuilder* createProgramType()\
 	{\

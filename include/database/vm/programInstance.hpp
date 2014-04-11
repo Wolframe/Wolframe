@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/programInstance.hpp
-//\brief Interface for state of a program executing database transactions
+///\file database/vm/programInstance.hpp
+///\brief Interface for state of a program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #include "database/vm/program.hpp"
@@ -54,8 +54,17 @@ class ProgramInstance
 	:public InstructionSet
 {
 public:
+	struct LogTraceContext;
+	typedef void (*LogTraceCallBack)( const LogTraceContext* prgcontext, unsigned int ip_);
+
+public:
 	ProgramInstance()
-		:m_program(0),m_db_stm(0),m_ip(0),m_cond(false)
+		:m_program(0)
+		,m_db_stm(0)
+		,m_ip(0)
+		,m_cond(false)
+		,m_logTraceCallBack(0)
+		,m_logTraceContext(0)
 	{}
 	ProgramInstance( const ProgramInstance& o)
 		:m_program(o.m_program)
@@ -65,14 +74,18 @@ public:
 		,m_stack(o.m_stack)
 		,m_code(o.m_code)
 		,m_output(o.m_output)
+		,m_logTraceCallBack(o.m_logTraceCallBack)
+		,m_logTraceContext(o.m_logTraceContext)
 	{}
-	ProgramInstance( const Program* program_, TransactionExecStatemachine* db_stm_)
+	ProgramInstance( const Program* program_, TransactionExecStatemachine* db_stm_, LogTraceCallBack logTraceCallBack_=0, const LogTraceContext* logTraceContext_=0)
 		:m_program(program_)
 		,m_db_stm(db_stm_)
 		,m_ip(0)
 		,m_cond(false)
 		,m_code(m_program->code)
 		,m_output( new Output())
+		,m_logTraceCallBack(logTraceCallBack_)
+		,m_logTraceContext(logTraceContext_)
 	{
 		m_stack.push_back( StackElement());
 	}
@@ -178,6 +191,8 @@ private:
 	ProgramCode m_code;				//< program code copy
 	OutputR m_output;				//< output
 	DatabaseError m_lastError;			//< last database error reported
+	LogTraceCallBack m_logTraceCallBack;		//< NULL or callback procedure for logging execution that is be called after every instruction executed
+	const LogTraceContext* m_logTraceContext;	//< Context for 'm_logTraceCallBack'
 };
 
 }}}//namespace

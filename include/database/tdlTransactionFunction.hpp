@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief Definition of a transaction function based on TDL
-//\file database/tdlTransactionFunction.hpp
+///\brief Definition of a transaction function based on TDL
+///\file database/tdlTransactionFunction.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "database/vm/program.hpp"
@@ -47,16 +47,16 @@
 namespace _Wolframe {
 namespace db {
 namespace vm {
-//\brief Forward declaration
+///\brief Forward declaration
 class InputStructure;
 typedef boost::shared_ptr<InputStructure> InputStructureR;
 }
 
-//\brief Forward declaration
+///\brief Forward declaration
 class TdlTransactionFunction;
 
-//\class TdlTransactionFunctionInput
-//\brief Input structure for calling transaction functions
+///\class TdlTransactionFunctionInput
+///\brief Input structure for calling transaction functions
 class TdlTransactionFunctionInput
 	:public langbind::TypedOutputFilter
 {
@@ -65,8 +65,8 @@ public:
 	TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o);
 	virtual ~TdlTransactionFunctionInput(){}
 
-	//\brief Get a self copy
-	//\return allocated pointer to copy of this
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
 	virtual langbind::TypedOutputFilter* copy() const
 	{
 		return new TdlTransactionFunctionInput(*this);
@@ -111,9 +111,9 @@ public:
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
 	const vm::ProgramR& program() const				{return m_program;}
 
-	///\brief Build the function input
+	////\brief Build the function input
 	TdlTransactionFunctionInput* getInput() const;
-	///\brief Build the function output
+	////\brief Build the function output
 	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 private:

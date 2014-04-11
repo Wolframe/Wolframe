@@ -79,6 +79,8 @@ public:
 			case 0:
 				throw std::runtime_error( "input not initialized");
 			case 1:
+				LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
+
 				if (!m_input.call()) return false;
 				m_state = 2;
 			case 2:
@@ -93,7 +95,7 @@ public:
 					trsr->execute( inp, res);
 					trsr->commit();
 				}
-				m_result = res.get();
+				m_result = m_func->getOutput( m_provider, res);
 				if (!res.isCaseSensitive())
 				{
 					//... If not case sensitive result then propagate this

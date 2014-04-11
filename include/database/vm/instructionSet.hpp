@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/instructionSet.hpp
-//\brief Defines the instruction set of the virtual machine defining database transactions
+///\file database/vm/instructionSet.hpp
+///\brief Defines the instruction set of the virtual machine defining database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #include <stdexcept>
@@ -215,7 +215,7 @@ public:
 		return ar[i];
 	}
 
-	//\brief get the argument type of an operation
+	///\brief get the argument type of an operation
 	static ArgumentType argumentType( OpCode i)
 	{
 		static ArgumentType ar[] =

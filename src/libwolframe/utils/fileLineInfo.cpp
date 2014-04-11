@@ -53,3 +53,9 @@ std::string FileLineInfo::logtext() const
 	return std::string("in file '") + filename() + "' at line " + boost::lexical_cast<std::string>(line()) + " column " + boost::lexical_cast<std::string>(column());
 }
 
+std::string FileLineInfo::logtext_short() const
+{
+	if (!filename()) return std::string();
+	return std::string("at ") + filename() + " " + boost::lexical_cast<std::string>(line()) + ":" + boost::lexical_cast<std::string>(column());
+}
+

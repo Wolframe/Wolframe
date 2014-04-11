@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file serialize/ddlFormSerializer.hpp
-//\brief Interface to DDL form serialization
+///\file serialize/ddlFormSerializer.hpp
+///\brief Interface to DDL form serialization
 #ifndef _Wolframe_serialize_DDL_FORM_SERIALIZER_HPP_INCLUDED
 #define _Wolframe_serialize_DDL_FORM_SERIALIZER_HPP_INCLUDED
 #include "utils/typeSignature.hpp"

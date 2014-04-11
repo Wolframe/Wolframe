@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file tdl2vmTranslator.hpp
-//\brief Local interface for building a virtual machine program for database transactions out of TDL
+///\file tdl2vmTranslator.hpp
+///\brief Local interface for building a virtual machine program for database transactions out of TDL
 #ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #include "database/vm/program.hpp"
@@ -49,6 +49,8 @@ class Tdl2vmTranslator
 public:
 	Tdl2vmTranslator( const types::keymap<vm::Subroutine>* soubroutinemap_, bool isSubroutine);
 	Tdl2vmTranslator( const Tdl2vmTranslator& o);
+
+	void setCurrentSourceReference( const utils::FileLineInfo& posinfo);
 
 	void begin_FOREACH( const std::string& selector);
 	void end_FOREACH();
@@ -72,7 +74,7 @@ public:
 
 	void output_statement_result( bool isLoop);
 
-	//\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
+	///\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector);
 	void end_DO_subroutine();
 

@@ -78,8 +78,8 @@ private:
 };
 
 
-//\class ProcessorProvider
-//\brief Processor provider
+///\class ProcessorProvider
+///\brief Processor provider
 class ProcessorProvider
 	:public ProcessorProviderInterface
 	,private boost::noncopyable

@@ -38,8 +38,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class StructSerializer
-//\brief Iterator on elements of structures based on a structure description
+///\class StructSerializer
+///\brief Iterator on elements of structures based on a structure description
 class StructSerializer :public langbind::TypedInputFilter
 {
 public:

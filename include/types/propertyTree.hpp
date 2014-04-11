@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file types/propertyTree.hpp
-//\brief Interface to a key value tree based on boost::property_tree::ptree with position info for better error reporting
+///\file types/propertyTree.hpp
+///\brief Interface to a key value tree based on boost::property_tree::ptree with position info for better error reporting
 
 #ifndef _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED
 #define _WOLFRAME_PROPERTY_TREE_HPP_INCLUDED

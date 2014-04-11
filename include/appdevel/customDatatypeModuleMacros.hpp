@@ -34,7 +34,7 @@
 ///\brief Macros for defining a custom datatype module
 #include "appdevel/module/customDataTypeBuilder.hpp"
 
-//\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
+///\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
 #define CUSTOM_DATATYPE_MODULE(NAME,DESCRIPTION)\
 	static const char* _Wolframe__moduleName()\
 	{\
@@ -47,11 +47,11 @@
 	static _Wolframe::module::CustomDataTypeDef _Wolframe__customDataTypes[] =\
 	{
 
-//\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
+///\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
 #define CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
-//\brief Defines the end of the CUSTOM_DATATYPE_MODULE section
+///\brief Defines the end of the CUSTOM_DATATYPE_MODULE section
 #define CUSTOM_DATATYPE_MODULE_END\
 		{0,0}\
 	};\

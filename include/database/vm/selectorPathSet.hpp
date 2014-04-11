@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/vm/selectorPathSet.hpp
-//\brief Defines a set selector pathes
+///\file database/vm/selectorPathSet.hpp
+///\brief Defines a set selector pathes
 #ifndef _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SELECTOR_PATH_SET_HPP_INCLUDED
 #include "database/vm/selectorPath.hpp"

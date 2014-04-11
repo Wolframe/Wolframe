@@ -34,7 +34,7 @@
 ///\brief Macros for defining normalization and validaton function module
 #include "appdevel/module/normalizeFunctionBuilder.hpp"
 
-//\brief Marks the start of the Wolframe C++ form function module after the includes section.
+///\brief Marks the start of the Wolframe C++ form function module after the includes section.
 #define NORMALIZER_MODULE(NAME,DESCRIPTION)\
 	static const char* _Wolframe__moduleName()\
 	{\
@@ -51,7 +51,7 @@
 	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
 	{
 
-//\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
+///\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
 #define NORMALIZER_MODULE_WITH_RESOURCE(NAME,DESCRIPTION,RESOURCECLASS)\
 	static const char* _Wolframe__moduleName()\
 	{\
@@ -69,11 +69,11 @@
 	{
 
 
-//\brief Defines normalization function in the NORMALIZER_MODULE section
+///\brief Defines normalization function in the NORMALIZER_MODULE section
 #define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
 		{NAME,&CONSTRUCTOR},\
 
-//\brief Defines the end of the NORMALIZER_MODULE section
+///\brief Defines the end of the NORMALIZER_MODULE section
 #define NORMALIZER_MODULE_END\
 		{0,0}\
 	};\

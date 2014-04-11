@@ -50,7 +50,7 @@ class PostgreSQLsubstitutingStatement : public SubstitutingStatement
 
 		void setConnection( PGconn *conn );
 		
-		//\brief Executes the statement with substituted parameters
+		///\brief Executes the statement with substituted parameters
 		PGresult* execute( ) const;
 
 	protected:

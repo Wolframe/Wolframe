@@ -35,7 +35,7 @@
 #ifndef _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 
-//\brief PF:HACK: Questionable here. Version should be in version.hpp
+///\remark PF:HACK: Questionable here. Version should be in version.hpp
 #define _WOLFRAME_SDK_VERSION_NUM 000005
 
 #include "appdevel/cppFormFunctionModuleMacros.hpp"	//< modules implementing a set of form functions written in C++

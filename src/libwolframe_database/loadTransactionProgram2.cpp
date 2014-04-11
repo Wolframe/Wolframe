@@ -227,12 +227,13 @@ static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::Comma
 }
 
 
-static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, utils::FileLineInfo& posinfo)
 {
 	static const char* g_prgblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT",0};
 	enum PrgBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT};
 	static const utils::IdentifierTable g_prgblock_idtab( false, g_prgblock_ids);
 
+	std::string::const_iterator posinfo_si = si;
 	std::string tok;
 	char ch = 0;
 
@@ -256,6 +257,10 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 			case m_ON:
 				throw std::runtime_error( "unexpected keyword ON (for error hint), only valid after database command");
 			case m_KEEP:
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
 				if (tdl::parseKeyword( langdescr, si, se, "AS"))
 				{
 					std::string resultname = tdl::parseResultName( langdescr, si, se);
@@ -268,9 +273,16 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				}
 				break;
 			case m_END:
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
 				return;
 			case m_PRINT:
 			{
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
 				tdl::ElementReference elem = tdl::ElementReference::parsePlainReference( langdescr, si, se);
 				std::vector<std::string> pt;
 				if (tdl::parseKeyword( langdescr, si, se, "INTO"))
@@ -314,6 +326,10 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 			case m_FOREACH:
 			{
 				si = start;
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
 				tdl::CommandDefinition cmd = tdl::CommandDefinition::parse( langdescr, si, se);
 				programAddCommandDefinition( prg, cmd);
 				break;
@@ -359,11 +375,18 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				}
 				else if (tdl::parseKeyword( langdescr, si, se, "BEGIN"))
 				{
-					parsePrgBlock( prg, langdescr, si, se);
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+					parsePrgBlock( prg, langdescr, si, se, posinfo);
+					posinfo_si = si;
 				}
 				else
 				{
 					si = start;
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+					prg.setCurrentSourceReference( posinfo);
+
 					tdl::CommandDefinition cmd = tdl::CommandDefinition::parse( langdescr, si, se);
 					programAddCommandDefinition( prg, cmd);
 				}
@@ -414,15 +437,16 @@ static bool checkDatabaseList( const std::string& databaseID, const std::string&
 }
 
 
-static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, utils::FileLineInfo& posinfo)
 {
-	static const char* g_subroutine_ids[] = {"DATABASE","RESULT","BEGIN",0};
-	enum SubroutineKeyword{ s_NONE, s_DATABASE,s_RESULT,s_BEGIN};
+	static const char* g_subroutine_ids[] = {"DATABASE","BEGIN",0};
+	enum SubroutineKeyword{ s_NONE, s_DATABASE, s_BEGIN};
 	static const utils::IdentifierTable g_subroutine_idtab( false, g_subroutine_ids);
 
 	bool isValidDatabase = true;
 	unsigned int mask = 0;
 	std::vector<std::string> resultpath;
+	std::string::const_iterator posinfo_si = si;
 
 	while (tdl::gotoNextToken( langdescr, si, se))
 	{
@@ -435,33 +459,31 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 				throw std::runtime_error( std::string("unexpected token in TDL subroutine header. keyword (") + g_subroutine_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
 			}
 			case s_DATABASE:
+			{
 				tdl::checkUniqOccurrence( s_DATABASE, mask, g_subroutine_idtab);
 				isValidDatabase = checkDatabaseList( databaseId, databaseClassName, langdescr, si, se);
 				break;
-			case s_RESULT:
-				tdl::checkUniqOccurrence( s_RESULT, mask, g_subroutine_idtab);
-				if (tdl::parseKeyword( langdescr, si, se, "INTO"))
-				{
-					resultpath = tdl::parse_INTO_path( langdescr, si, se);
-				}
-				else
-				{
-					throw std::runtime_error( "expected INTO after RESULT directive in SUBROUTINE declaration");
-				}
-				break;
+			}
 			case s_BEGIN:
 			{
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
 				tdl::checkUniqOccurrence( s_BEGIN, mask, g_subroutine_idtab);
 				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
 				if (hasIntoBlock)
 				{
 					prg.begin_INTO_block( resultpath);
 				}
-				parsePrgBlock( prg, langdescr, si, se);
+				parsePrgBlock( prg, langdescr, si, se, posinfo);
+				posinfo_si = si;
 				if (hasIntoBlock)
 				{
 					prg.end_INTO_block();
 				}
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
 				return isValidDatabase;
 			}
 		}
@@ -473,7 +495,7 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 typedef std::vector<std::pair<std::string,TdlTransactionFunctionR> > TransactionFunctionList;
 typedef types::keymap<vm::Subroutine> SubroutineMap;
 
-static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::string& transactionFunctionName, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap)
+static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::string& transactionFunctionName, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap, utils::FileLineInfo& posinfo)
 {
 	static const char* g_transaction_ids[] = {"DATABASE","AUTHORIZE","RESULT","PREPROC","BEGIN",0};
 	enum TransactionKeyword{ b_NONE, b_DATABASE,b_AUTHORIZE,b_RESULT,b_PREPROC,b_BEGIN};
@@ -486,6 +508,8 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 	std::string authfunction;
 	std::string authresource;
 	tdl::PreProcBlock preproc;
+
+	std::string::const_iterator posinfo_si = si;
 
 	while (tdl::gotoNextToken( langdescr, si, se))
 	{
@@ -558,7 +582,12 @@ static bool parseTransactionBody( TdlTransactionFunctionR& tfunc, const std::str
 				{
 					prg.begin_INTO_block( resultpath);
 				}
-				parsePrgBlock( prg, langdescr, si, se);
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+
+				parsePrgBlock( prg, langdescr, si, se, posinfo);
+				posinfo_si = si;
+
 				if (hasIntoBlock)
 				{
 					prg.end_INTO_block();
@@ -587,8 +616,9 @@ static void load( const std::string& filename, const std::string& source, const 
 {
 	char ch;
 	std::string::const_iterator si = source.begin(), se = source.end();
-	utils::FileLineInfo pos( filename);
-	std::string::const_iterator pos_si = si;
+
+	utils::FileLineInfo posinfo( utils::getFileStem( filename) + utils::getFileExtension( filename));
+	std::string::const_iterator posinfo_si = si;
 
 	if (!langdescr) throw std::logic_error( "no database language description defined");
 	try
@@ -616,33 +646,46 @@ static void load( const std::string& filename, const std::string& source, const 
 
 				case t_TRANSACTION:
 				{
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
+
 					std::string transactionName
 						= tdl::parseSubroutineName( langdescr, si, se);
 
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
 					TdlTransactionFunctionR tfunc;
-					if (parseTransactionBody( tfunc, transactionName, databaseId, databaseClassName, langdescr, si, se, subroutineMap))
+					if (parseTransactionBody( tfunc, transactionName, databaseId, databaseClassName, langdescr, si, se, subroutineMap, posinfo))
 					{
 						std::pair<std::string,TdlTransactionFunctionR> tfuncdef( transactionName, tfunc);
 						transactionFunctionList.push_back( tfuncdef);
 					}
 					else
 					{
-						pos.update( pos_si, start);
-						pos_si = start;
-						LOG_DEBUG << "TDL transaction function '" << transactionName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
+						LOG_DEBUG << "TDL transaction function '" << transactionName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
 					}
+					posinfo_si = si;
 					break;
 				}
 				case t_SUBROUTINE:
 				{
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
+
 					std::string subroutineName
 						= tdl::parseSubroutineName( langdescr, si, se);
 					std::vector<std::string> templateArguments;
 					std::vector<std::string> callArguments 
 						= tdl::parseCallArguments( langdescr, si, se);
 
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
 					Tdl2vmTranslator prg( &subroutineMap, true);
-					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se))
+					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se, posinfo))
 					{
 						subroutineMap.insert( 
 							subroutineName, 
@@ -650,14 +693,17 @@ static void load( const std::string& filename, const std::string& source, const 
 					}
 					else
 					{
-						pos.update( pos_si, start);
-						pos_si = start;
-						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
+						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
 					}
+					posinfo_si = si;
 					break;
 				}
 				case t_TEMPLATE:
 				{
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
+
 					(void)tdl::gotoNextToken( langdescr, si, se);
 
 					std::vector<std::string> templateArguments
@@ -673,8 +719,11 @@ static void load( const std::string& filename, const std::string& source, const 
 					std::vector<std::string> callArguments 
 						= tdl::parseCallArguments( langdescr, si, se);
 
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
 					Tdl2vmTranslator prg( &subroutineMap, true);
-					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se))
+					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se, posinfo))
 					{
 						subroutineMap.insert( 
 							subroutineName, 
@@ -682,10 +731,9 @@ static void load( const std::string& filename, const std::string& source, const 
 					}
 					else
 					{
-						pos.update( pos_si, start);
-						pos_si = start;
-						LOG_DEBUG << "TDL subroutine template '" << subroutineName << "' defined " << pos.logtext() << " is ignored because of database exclusion";
+						LOG_DEBUG << "TDL subroutine template '" << subroutineName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
 					}
+					posinfo_si = si;
 					break;
 				}
 				case t_INCLUDE:

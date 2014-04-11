@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file types/normalizeFunction.hpp
-//\brief Normalize function definition
+///\file types/normalizeFunction.hpp
+///\brief Normalize function definition
 
 #ifndef _Wolframe_TYPES_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _Wolframe_TYPES_NORMALIZE_FUNCTION_HPP_INCLUDED
@@ -43,12 +43,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\class Variant
-//\brief Forward declaration
+///\class Variant
+///\brief Forward declaration
 class Variant;
 
-//\class NormalizeFunction
-//\brief Basic normalization function for atomic values (variant type)
+///\class NormalizeFunction
+///\brief Basic normalization function for atomic values (variant type)
 class NormalizeFunction
 {
 public:
@@ -58,7 +58,7 @@ public:
 	virtual NormalizeFunction* copy() const=0;
 };
 
-//\brief Shared ownership reference to normalization function for atomic values (variant type)
+///\brief Shared ownership reference to normalization function for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunction> NormalizeFunctionR;
 
 
@@ -75,8 +75,8 @@ typedef boost::shared_ptr<NormalizeResourceHandle> NormalizeResourceHandleR;
 typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandle)();
 typedef NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
-//\class NormalizeFunctionType
-//\brief Class of basic normalization functions instantiated by arguments
+///\class NormalizeFunctionType
+///\brief Class of basic normalization functions instantiated by arguments
 class NormalizeFunctionType
 {
 public:
@@ -108,15 +108,15 @@ private:
 
 
 
-//\class NormalizeFunctionMap
-//\brief Map of basic normalization functions for atomic values (variant type)
+///\class NormalizeFunctionMap
+///\brief Map of basic normalization functions for atomic values (variant type)
 struct NormalizeFunctionMap
 {
 	virtual ~NormalizeFunctionMap(){}
 	virtual const NormalizeFunction* get( const std::string& name) const=0;
 };
 
-//\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
+///\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunctionMap> NormalizeFunctionMapR;
 
 }}//namespace

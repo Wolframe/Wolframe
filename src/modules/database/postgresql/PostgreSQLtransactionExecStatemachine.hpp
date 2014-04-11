@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief PostgreSQL interface to the standard database transaction execution statemechine
-//\file PostgreSQLtransactionExecStatemachine.hpp
+///\brief PostgreSQL interface to the standard database transaction execution statemechine
+///\file PostgreSQLtransactionExecStatemachine.hpp
 #ifndef _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
@@ -49,46 +49,46 @@ namespace db {
 
 class PostgreSQLdbUnit;
 
-//\class TransactionExecStatemachine_postgres
-//\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
-//\remark The postgres connection is opened, closed, created and disposed by the caller
+///\class TransactionExecStatemachine_postgres
+///\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
+///\remark The postgres connection is opened, closed, created and disposed by the caller
 struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
-	//\brief Constructor
+	///\brief Constructor
 	explicit TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_);
 
-	//\brief Destructor
+	///\brief Destructor
 	virtual ~TransactionExecStatemachine_postgres();
 
-	//\brief Get the database identifier
+	///\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
-	//\brief Begin transaction
+	///\brief Begin transaction
 	virtual bool begin();
-	//\brief Commit current transaction
+	///\brief Commit current transaction
 	virtual bool commit();
-	//\brief Rollback current transaction
+	///\brief Rollback current transaction
 	virtual bool rollback();
 
-	//\brief Start new command statement
+	///\brief Start new command statement
 	virtual bool start( const std::string& statement);
-	//\brief Bind parameter value on current command statement
+	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value);
-	//\brief Execute instance of current statement
+	///\brief Execute instance of current statement
 	virtual bool execute();
-	//\brief Return true is the last command has at least one result row returned
+	///\brief Return true is the last command has at least one result row returned
 	virtual bool hasResult();
-	//\brief Get the number of columns of the last result
+	///\brief Get the number of columns of the last result
 	virtual std::size_t nofColumns();
-	//\brief Get a column title of the last result
+	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
-	//\brief Get the last database error as string
+	///\brief Get the last database error as string
 	virtual const db::DatabaseError* getLastError();
-	//\brief Get a column of the last result
+	///\brief Get a column of the last result
 	virtual types::VariantConst get( std::size_t idx);
-	//\brief Skip to the next row of the last result
+	///\brief Skip to the next row of the last result
 	virtual bool next();
-	//\brief Find out if the database is case sensitive or not
+	///\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()	{return false;}
 
 private:
