@@ -32,6 +32,7 @@ Project Wolframe.
 
 #include "pythonException.hpp"
 #include <stdexcept>
+#include <new>
 
 #include <Python.h>
 

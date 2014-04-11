@@ -375,7 +375,9 @@
 			
 			<para>
 				When using 'clang' with 'ccache' set the following
-				environment variable too:
+				environment variable too (on Linux only, on FreeBSD 10
+				the ccache with clang combination runs out of the
+				box):
 	                        <programlisting language='shell'>
 	export CCACHE_CPP2=1
 				</programlisting>
@@ -395,7 +397,20 @@
 				</para>
 				
 				<para>
-					Both FreeBSD 8 and FreeBSD 9 are supported.
+					FreeBSD 8, 9 and 10 are supported.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					As of FreeBSD 10 it's recommended to use
+					the 'pkgng' package management tool to
+					install binary prerequsites.
+				</para>
+
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					Since FreeBSD 10 clang is the default
+					compiler and no longer gcc.
 				</para>
 			</sect3>
 
@@ -747,16 +762,24 @@ export PATH
 					boost-locale and the ICU backend.
 				</para>
 			</sect3>
-			
+
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+
+				<para>
+					You need the 'boost-libs' package.
+				</para>
+			</sect3>
+				
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 
 				<para>
 					You need the 'boost-libs' package.
 				</para>
 
 				<para>
-					Some boost header files are broken, for patches
+					Some boost header files are broken when compiling with gcc, for patches
 					see <filename>packaging/patches/FreeBSD</filename>.
 					They can be applied to the ports directory before
 					rebuilding Boost or directly to the installed header files in
@@ -1279,7 +1302,18 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+				<para>
+					You need the 'postgresql93-client' package.
+				</para>
+
+				<para>
+					For testing you also need the 'postgresql93-server' package.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 				<para>
 					You need the 'postgresql92-client' package.
 				</para>
@@ -1875,7 +1909,15 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+				
+				<para>
+					You need the 'python33' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 				<para>
 					Build the BSD ports package for 'python33'.
 					There is no binary Python 3 package.
@@ -2045,12 +2087,20 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+				
+				<para>
+					You need the 'libharu' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 				<para>
 					Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
 				</para>
 				<para>
-					You need the 'png'  package for this.
+					You need the 'png' package for this.
 				</para>
 			</sect3>
 
@@ -2222,7 +2272,15 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+				
+				<para>
+					You need the 'freeimage' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 				<para>
 					Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
 				</para>
@@ -2480,7 +2538,16 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>FreeBSD</title>
+				<title>FreeBSD 10</title>
+				<para>
+					The official Boost packages have a boost-locale
+					library which has support
+					for the ICU backend per default.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>FreeBSD 8 and 9</title>
 				<para>
 					The official Boost packages don't contain a
 					boost-locale with ICU backend.
