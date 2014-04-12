@@ -226,7 +226,7 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 #endif
 	if (!fh)
 	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
+		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for writing");
 	}
 	boost::shared_ptr<FILE> fhr( fh, fclose);
 	std::string::const_iterator fi = content.begin(), fe = content.end();

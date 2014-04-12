@@ -38,6 +38,7 @@
 #include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testDescription.hpp"
+#include "wtest/testReport.hpp"
 #include "module/moduleInterface.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
@@ -67,56 +68,6 @@ protected:
 };
 
 static std::string selectedTestName;
-
-#if defined(_WIN32)
-static std::string getOutputExpectedEolns( const std::string& output, const std::string& expected)
-{
-	std::string::const_iterator ei = expected.begin(), ee = expected.end();
-	std::string::const_iterator oi = output.begin(), oe = output.end();
-	std::string resultstr;
-
-	for (; ei != ee && oi != oe; ++oi,++ei)
-	{
-		if (*ei == *oi)
-		{
-			resultstr.push_back( *ei);
-		}
-		else if (*ei == '\r' && *oi == '\n')
-		{
-			++ei;
-			if (*ei == '\n')
-			{
-				resultstr.push_back( '\r');
-				resultstr.push_back( '\n');
-			}
-			else
-			{
-				break;
-			}
-		}
-		else if (*ei == '\n' && *oi == '\r')
-		{
-			++oi;
-			if (*oi == '\n')
-			{
-				resultstr.push_back( '\n');
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-	if (oi == oe && ei == ee)
-	{
-		return resultstr;
-	}
-	else
-	{
-		return output;
-	}
-}
-#endif
 
 TEST_F( WolfilterTest, tests)
 {
@@ -398,6 +349,11 @@ int main( int argc, char **argv)
 	{
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
 	}
+#define _WOLFRAME_USE_GTEST_REPORT
+#ifdef _WOLFRAME_USE_GTEST_REPORT
+	boost::filesystem::path refpath( g_testdir / "gtestReport.txt");
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+#endif
 	return RUN_ALL_TESTS();
 }
 
