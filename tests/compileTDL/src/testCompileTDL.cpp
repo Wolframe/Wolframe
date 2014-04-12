@@ -35,7 +35,6 @@
 #include "database/loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
 #include "database/vmTransactionInput.hpp"
-#include "wtest/testDescription.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"
@@ -96,6 +95,54 @@ static void fillInputStructure( const types::PropertyTree& ptree, vm::InputStruc
 			case langbind::FilterBase::Attribute:
 				throw std::logic_error("unexpected attribute element returned by property filter");
 		}
+	}
+}
+
+static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected_)
+{
+	std::string::const_iterator ei = expected_.begin(), ee = expected_.end();
+	std::string::const_iterator oi = output.begin(), oe = output.end();
+	std::string resultstr;
+
+	for (; ei != ee && oi != oe; ++oi,++ei)
+	{
+		if (*ei == *oi)
+		{
+			resultstr.push_back( *ei);
+		}
+		else if (*ei == '\r' && *oi == '\n')
+		{
+			++ei;
+			if (*ei == '\n')
+			{
+				resultstr.push_back( '\r');
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (*ei == '\n' && *oi == '\r')
+		{
+			++oi;
+			if (*oi == '\n')
+			{
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (oi == oe && ei == ee)
+	{
+		return resultstr;
+	}
+	else
+	{
+		return output;
 	}
 }
 
@@ -192,7 +239,7 @@ TEST_F( CompileTDLTest, tests)
 			file_read_exception = true;
 			std::cerr << "failed to read file with expected content: " << e.what() << std::endl;
 		}
-		std::string output = wtest::TestDescription::normalizeOutputCRLF( out.str(), expect);
+		std::string output = normalizeOutputCRLF( out.str(), expect);
 
 		if (file_read_exception || expect != output)
 		{

@@ -8,6 +8,7 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
+	-I$(TOPDIR)/wtest/include \
 	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/src/libwolframe_database \
 	-I$(BOOST_INCLUDE_DIR)
@@ -17,6 +18,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
+	-L$(TOPDIR)/wtest \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
@@ -37,7 +39,7 @@ TEST_CPP_BINS = \
 
 testCompileTDL$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a $(TOPDIR)/src/libwolframe_database/libwolframe_database.a
 
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/wtest"
 
 local_all:
 
