@@ -82,19 +82,19 @@ public:
 
 private:
 	// Called before any test activity starts.
-	virtual void OnTestProgramStart(const ::testing::UnitTest& /* unit_test */)
+	virtual void OnTestProgramStart(const ::testing::UnitTest& /*unit_test*/)
 	{
 		m_state = Init;
 	}
 
 	// Called after all test activities have ended.
-	virtual void OnTestProgramEnd(const ::testing::UnitTest& /* unit_test */)
+	virtual void OnTestProgramEnd(const ::testing::UnitTest& /*unit_test*/)
 	{
 		m_state = Terminated;
 	}
 
 	// Called before a test starts.
-	virtual void OnTestStart(const ::testing::TestInfo& test_info)
+	virtual void OnTestStart( const ::testing::TestInfo& /*test_info*/)
 	{
 		m_state = Start;
 	}
@@ -113,7 +113,7 @@ private:
 	}
 
 	// Called after a test ends.
-	virtual void OnTestEnd( const ::testing::TestInfo& test_info)
+	virtual void OnTestEnd( const ::testing::TestInfo& /*test_info*/)
 	{
 		m_state = End;
 	}
