@@ -37,6 +37,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <errno.h>
 #include "gtest/gtest.h"
 
 namespace _Wolframe {
