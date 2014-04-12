@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace utils {
 ///\brief Forward declaration
-class PrintFormat;
+struct PrintFormat;
 }//namespace utils
 
 namespace db {
