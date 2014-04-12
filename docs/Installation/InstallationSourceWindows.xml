@@ -411,6 +411,13 @@
 				is supported.
 			
 			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: No matter whether you
+				use the precompiled version or if you build OpenSSL on your own
+				use the 0.9.8, 1.0.0 or 1.0.1g versions, but not  the version
+				1.0.1 through 1.0.1f (Heartbleed bug)!
+			</para>
 
 			<sect3>
 				<title>Use prebuild version of OpenSSL</title>
@@ -423,7 +430,7 @@
 				</para>
 				
 				<para>
-					Install the developer version (for instance <filename>Win32OpenSSL-1_0_0l.exe</filename>)
+					Install the developer version (for instance <filename>Win32OpenSSL-1_0_1g.exe</filename>)
 					for instance to <filename>C:\OpenSSL-Win32</filename>.
 				</para>
 				
@@ -468,7 +475,7 @@
 				</para>
 								
 				<para>
-					Get the source package <filename>openssl-1.0.1l.tar.gz</filename> of OpenSSL from
+					Get the source package <filename>openssl-1.0.1g.tar.gz</filename> of OpenSSL from
 					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>.
 				</para>
 				
@@ -476,15 +483,15 @@
 					Configure the package with:
 					
 					<programlisting language='shell'>
-	C:\Perl\bin\perl Configure debug-VC-WIN32 \
-		--prefix="C:\openssl-1.0.1l-win32-debug"
+	perl Configure debug-VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-debug"
 					</programlisting>
 					
 					for a debug version, respectively with:
 					
 					<programlisting language='shell'>
-	C:\Perl\bin\perl Configure VC-WIN32 \
-		--prefix="C:\openssl-1.0.1l-win32-release"
+	perl Configure VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-release"
 					</programlisting>
 					
 					for a release version.
@@ -631,7 +638,7 @@
 					specifying the location of OpenSSL is enough:
 					
 					<programlisting language='shell'>
-	openssl=>"C:\\openssl-1.0.1f-win32-debug"
+	openssl=>"C:\\openssl-1.0.1g-win32-debug"
 					</programlisting>
 					
 					<emphasis role="bold">Note</emphasis>: Those must be two backslashes!
@@ -642,21 +649,21 @@
 					some linking libraries in the right places. So copy them with:
 
 					<programlisting language='shell'>
-	mkdir C:\openssl-1.0.1-win32-debug\lib\VC
-	copy C:\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
-		C:\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
-	copy C:\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
-		C:\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+	mkdir C:\openssl-1.0.1g-win32-debug\lib\VC
+	copy C:\openssl-1.0.1g-win32-debug\lib\libeay32.lib ^
+		C:\openssl-1.0.1g-win32-debug\lib\VC\libeay32MDd.lib
+	copy C:\openssl-1.0.1g-win32-debug\lib\ssleay32.lib ^
+		C:\openssl-1.0.1g-win32-debug\lib\VC\ssleay32MDd.lib
 					</programlisting>
 					
 					respectively if you built the release version:
 
 					<programlisting language='shell'>
-	mkdir C:\openssl-1.0.1-win32-release\lib\VC
-	copy C:\openssl-1.0.1-win32-release\lib\libeay32.lib ^
-		C:\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
-	copy C:\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
-		C:\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+	mkdir C:\openssl-1.0.1g-win32-release\lib\VC
+	copy C:\openssl-1.0.1g-win32-release\lib\libeay32.lib ^
+		C:\openssl-1.0.1g-win32-release\lib\VC\libeay32MD.lib
+	copy C:\openssl-1.0.1g-win32-release\lib\ssleay32.lib ^
+		C:\openssl-1.0.1g-win32-release\lib\VC\ssleay32MD.lib
 					</programlisting>
 					
 				</para>

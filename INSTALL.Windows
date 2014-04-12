@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-March 28, 2014 version 0.0.1
+April 12, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -242,12 +242,16 @@ Set the "BOOST_XXX" variables in makefiles\nmake\config.mk as follows:
 The Wolframe protocol can be secured with SSL. Currently only OpenSSL (http://
 www.openssl.org) is supported.
 
+Note: No matter whether you use the precompiled version or if you build OpenSSL
+on your own use the 0.9.8, 1.0.0 or 1.0.1g versions, but not the version 1.0.1
+through 1.0.1f (Heartbleed bug)!
+
 Use prebuild version of OpenSSL
 
 You can get a prebuilt version of OpenSSL from http://www.slproweb.com/products
 /Win32OpenSSL.html. Despite the name you get also 64-bit versions there.
 
-Install the developer version (for instance Win32OpenSSL-1_0_0l.exe) for
+Install the developer version (for instance Win32OpenSSL-1_0_1g.exe) for
 instance to C:\OpenSSL-Win32.
 
 Do not copy the OpenSSL binaries to the Windows system directory, copy them to
@@ -272,19 +276,19 @@ the shell you want to build OpenSSL:
         Set PATH=%PATH%;C:\Perl\bin;C:\nasm
 
 
-Get the source package openssl-1.0.1l.tar.gz of OpenSSL from http://
+Get the source package openssl-1.0.1g.tar.gz of OpenSSL from http://
 www.openssl.org.
 
 Configure the package with:
 
-        C:\Perl\bin\perl Configure debug-VC-WIN32 \
-                --prefix="C:\openssl-1.0.1l-win32-debug"
+        perl Configure debug-VC-WIN32 \
+                --prefix="C:\openssl-1.0.1g-win32-debug"
 
 
 for a debug version, respectively with:
 
-        C:\Perl\bin\perl Configure VC-WIN32 \
-                --prefix="C:\openssl-1.0.1l-win32-release"
+        perl Configure VC-WIN32 \
+                --prefix="C:\openssl-1.0.1g-win32-release"
 
 
 for a release version.
@@ -362,7 +366,7 @@ Adapt config.pl to your needs. We actually don't want to build the full server
 just the client PostgreSQL library, so specifying the location of OpenSSL is
 enough:
 
-        openssl=>"C:\\openssl-1.0.1f-win32-debug"
+        openssl=>"C:\\openssl-1.0.1g-win32-debug"
 
 
 Note: Those must be two backslashes!
@@ -370,20 +374,20 @@ Note: Those must be two backslashes!
 If you built your own version of OpenSSL before you will be missing some
 linking libraries in the right places. So copy them with:
 
-        mkdir C:\openssl-1.0.1-win32-debug\lib\VC
-        copy C:\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
-                C:\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
-        copy C:\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
-                C:\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+        mkdir C:\openssl-1.0.1g-win32-debug\lib\VC
+        copy C:\openssl-1.0.1g-win32-debug\lib\libeay32.lib ^
+                C:\openssl-1.0.1g-win32-debug\lib\VC\libeay32MDd.lib
+        copy C:\openssl-1.0.1g-win32-debug\lib\ssleay32.lib ^
+                C:\openssl-1.0.1g-win32-debug\lib\VC\ssleay32MDd.lib
 
 
 respectively if you built the release version:
 
-        mkdir C:\openssl-1.0.1-win32-release\lib\VC
-        copy C:\openssl-1.0.1-win32-release\lib\libeay32.lib ^
-                C:\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
-        copy C:\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
-                C:\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+        mkdir C:\openssl-1.0.1g-win32-release\lib\VC
+        copy C:\openssl-1.0.1g-win32-release\lib\libeay32.lib ^
+                C:\openssl-1.0.1g-win32-release\lib\VC\libeay32MD.lib
+        copy C:\openssl-1.0.1g-win32-release\lib\ssleay32.lib ^
+                C:\openssl-1.0.1g-win32-release\lib\VC\ssleay32MD.lib
 
 
 Build the libpq library now with:

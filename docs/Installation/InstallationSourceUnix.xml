@@ -918,13 +918,19 @@ export PATH
 				Currently only OpenSSL (<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
 				is supported. The location of the library can be overloaded with:
 		        <programlisting language='shell'>
-	make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
+	make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1g
 			</programlisting>				
 			</para>				
 			
 			<para>
 				Use the most recent version of the OpenSSL library available
 				for you platform.
+			</para>
+
+			<para>
+				<emphasis role="bold">Note</emphasis>:
+				Be carefull to use the 0.9.8, 1.0.0 or 1.0.1g or newer versions, but not the versions
+				1.0.1 through 1.0.1f (Heartbleed bug)!
 			</para>
 
 			<sect3>

@@ -182,7 +182,7 @@ CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pas
 			std::string errMsg = "'" + s + "' is not a valid challenge string (random data error)";
 			throw std::runtime_error( errMsg );
 		}
-		if ( chlngSize != CRAM_CHALLENGE_SIZE )	{
+		if ( (size_t)chlngSize != CRAM_CHALLENGE_SIZE )	{
 			std::string errMsg = "'" + s + "' is not a valid challenge string (expected "
 					     + boost::lexical_cast<std::string>( CRAM_CHALLENGE_SIZE )
 					     + " random bytes, got "
