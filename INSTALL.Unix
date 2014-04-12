@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-March 28, 2014 version 0.0.1
+April 12, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -550,10 +550,13 @@ following when building:
 Currently only OpenSSL (http://www.openssl.org) is supported. The location of
 the library can be overloaded with:
 
-        make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
+        make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1g
 
 
 Use the most recent version of the OpenSSL library available for you platform.
+
+Note: Be carefull to use the 0.9.8, 1.0.0 or 1.0.1g or newer versions, but not
+the versions 1.0.1 through 1.0.1f (Heartbleed bug)!
 
 RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions
 
