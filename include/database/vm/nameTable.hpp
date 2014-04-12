@@ -59,8 +59,8 @@ public:
 
 	const std::string& getName( const Index& idx) const
 	{
-		if (idx > m_namear.size()) throw std::runtime_error("name reference out of range");
-		if (idx == 0) throw std::runtime_error( "name reference is NULL");
+		if (idx > m_namear.size()) throw std::runtime_error("reference out of range");
+		if (idx == 0) throw std::runtime_error( "reference is NULL");
 		return m_namear.at(idx-1);
 	}
 
