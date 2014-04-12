@@ -35,6 +35,7 @@
 #include "database/loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
 #include "database/vmTransactionInput.hpp"
+#include "wtest/testDescription.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"
@@ -181,7 +182,6 @@ TEST_F( CompileTDLTest, tests)
 		// [2.4] Compare result and write dump to the output directory
 		//	if not equal to expected:
 		bool file_read_exception = false;
-		std::string output = out.str();
 		std::string expect;
 		try
 		{
@@ -192,6 +192,8 @@ TEST_F( CompileTDLTest, tests)
 			file_read_exception = true;
 			std::cerr << "failed to read file with expected content: " << e.what() << std::endl;
 		}
+		std::string output = wtest::TestDescription::normalizeOutputCRLF( out.str(), expect);
+
 		if (file_read_exception || expect != output)
 		{
 			boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));

@@ -277,10 +277,8 @@ TEST_F( WolfilterTest, tests)
 			std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
 			outstr.append( utils::readSourceFileContent( outfile));
 		}
-#if defined(_WIN32)
 		//... On Windows std::endl used in stream output differs from Unix
-		outstr = getOutputExpectedEolns( outstr, td.expected);
-#endif
+		outstr = td.normalizeOutputCRLF( outstr);
 		if (td.expected != outstr)
 		{
 			// [2.6] Dump test contents to files in case of error

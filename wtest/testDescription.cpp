@@ -58,7 +58,14 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs);
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+{
+	res.clear();
+	std::vector<std::string> imm;
+	boost::split( imm, inp, boost::is_any_of(splitchrs));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+}
 
 using namespace _Wolframe;
 using namespace wtest;
@@ -577,14 +584,59 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 	}
 }
 
-static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+std::string TestDescription::normalizeOutputCRLF( const std::string& output, const std::string& expected_)
 {
-	res.clear();
-	std::vector<std::string> imm;
-	boost::split( imm, inp, boost::is_any_of(splitchrs));
-	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
-	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+	std::string::const_iterator ei = expected_.begin(), ee = expected_.end();
+	std::string::const_iterator oi = output.begin(), oe = output.end();
+	std::string resultstr;
+
+	for (; ei != ee && oi != oe; ++oi,++ei)
+	{
+		if (*ei == *oi)
+		{
+			resultstr.push_back( *ei);
+		}
+		else if (*ei == '\r' && *oi == '\n')
+		{
+			++ei;
+			if (*ei == '\n')
+			{
+				resultstr.push_back( '\r');
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (*ei == '\n' && *oi == '\r')
+		{
+			++oi;
+			if (*oi == '\n')
+			{
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	if (oi == oe && ei == ee)
+	{
+		return resultstr;
+	}
+	else
+	{
+		return output;
+	}
 }
+
+std::string TestDescription::normalizeOutputCRLF( const std::string& output)
+{
+	return normalizeOutputCRLF( output, expected);
+}
+
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
