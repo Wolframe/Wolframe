@@ -355,7 +355,6 @@ BEGIN
 END
 
 SUBROUTINE getPerson( id)
-RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name AS "name" FROM Company,PersonCompanyRel
 		WHERE PersonCompanyRel.companyid = Company.ID
@@ -380,7 +379,7 @@ END
 TRANSACTION getData
 BEGIN
 	DO SELECT ID AS "id" FROM Person;
-	FOREACH RESULT INTO . DO getPerson( $1);
+	FOREACH RESULT INTO person DO getPerson( $1);
 END
 
 TRANSACTION getDataFiltered
