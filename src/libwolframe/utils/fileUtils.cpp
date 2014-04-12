@@ -188,7 +188,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 	}
 #else
 	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), "r");
+	FILE* fh = fopen( filename.c_str(), "rb");
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
