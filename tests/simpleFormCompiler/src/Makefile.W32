@@ -33,7 +33,7 @@ OBJS = \
 TEST_CPP_BINS = \
 	testSimpleFormCompiler.exe
 
-all: $(TEST_OBJS) $(TEST_CPP_BINS)
+all: $(OBJS) $(TEST_CPP_BINS)
 
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

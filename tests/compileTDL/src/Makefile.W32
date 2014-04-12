@@ -28,8 +28,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
-OBJS = \
-	testCompileTDL.obj
+OBJS =
 
 TEST_CPP_BINS = \
 	testCompileTDL.exe
