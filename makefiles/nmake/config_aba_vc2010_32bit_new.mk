@@ -60,10 +60,10 @@ ICU_LIB_DIR = $(ICU_DIR)\lib
 ##############################################################
 
 # pre-built
-OPENSSL_DIR = C:\develop\OpenSSL-Win32
+#OPENSSL_DIR = C:\develop\OpenSSL-Win32
 
 # self-compiled
-OPENSSL_DIR = C:\develop\openssl-1.0.0l-win32-debug
+OPENSSL_DIR = C:\develop\openssl-1.0.1g-win32-debug
 
 # Postgresql libpq
 # (http://www.postgresql.org/)
@@ -77,7 +77,7 @@ PGSQL_DIR = C:\develop\postgresql-9.3.4-win32-debug
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
-PGDLL_WITH_I18N = 1
+#PGDLL_WITH_I18N = 1
 
 # enable depending on libintl.dll and libiconv.dll (deployment only)
 PGDLL_WITHOUT_MAJOR_VERSION = 1
@@ -144,10 +144,10 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 # used for deployment only!
 #########################
 
-WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+WIX_DIR = C:\Program Files\WiX Toolset v3.8
 
-#WIX_LIBS = dutil_2008.lib wcautil_2008.lib
-WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
+WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+#WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
 WIX_ARCH = x86

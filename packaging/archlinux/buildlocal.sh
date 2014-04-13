@@ -3,16 +3,7 @@
 VERSION=0.0.1
 PKGBUILD=$HOME/archbuild
 ARCH=`uname -m`
-if test "x$ARCH" = "xx86_64"; then
-	LIBDIR="/usr/lib"
-else
-if test "x$ARCH" = "xi686"; then
-	LIBDIR="/usr/lib"
-else
-	echo "ERROR: Unknown slackware architecture '$ARCH'"
-	exit 1
-fi
-fi
+LIBDIR="/usr/lib"
 rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG
 
 check_for_errors( )
