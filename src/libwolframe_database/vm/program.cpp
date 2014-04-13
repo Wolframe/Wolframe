@@ -32,8 +32,8 @@
 ************************************************************************/
 //\file vm/program.cpp
 //\brief Implementation of the virtual machine program
-#include "database/vm/program.hpp"
-#include "database/vm/patchArgumentMap.hpp"
+#include "vm/program.hpp"
+#include "vm/patchArgumentMap.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

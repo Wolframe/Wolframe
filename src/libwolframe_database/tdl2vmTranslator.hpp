@@ -34,8 +34,8 @@
 ///\brief Local interface for building a virtual machine program for database transactions out of TDL
 #ifndef _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSLATOR_INTERFACE_HPP_INCLUDED
-#include "database/vm/program.hpp"
 #include "database/vm/instructionSet.hpp"
+#include "vm/program.hpp"
 #include "vm/subroutine.hpp"
 #include "types/keymap.hpp"
 #include <boost/algorithm/string.hpp>

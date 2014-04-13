@@ -31,10 +31,10 @@
 
 ************************************************************************/
 ///\brief Definition of a transaction function preprocessing step based on TDL
-///\file database/tdlTransactionPreprocStep.hpp
+///\file tdlTransactionPreprocStep.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_PREPROC_STEP_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_PREPROC_STEP_HPP_INCLUDED
-#include "database/vm/selectorPath.hpp"
+#include "vm/selectorPath.hpp"
 #include <string>
 #include <vector>
 #include <stdexcept>

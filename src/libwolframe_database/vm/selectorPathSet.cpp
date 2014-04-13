@@ -32,7 +32,7 @@
 ************************************************************************/
 //\file vm/selectorPathSet.cpp
 //\brief Implementation of a set of input selector pathes
-#include "database/vm/selectorPathSet.hpp"
+#include "vm/selectorPathSet.hpp"
 #include "vm/tagTable.hpp"
 
 using namespace _Wolframe;

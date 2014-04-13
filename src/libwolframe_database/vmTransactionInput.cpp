@@ -1,6 +1,6 @@
 #include "database/vmTransactionInput.hpp"
-#include "database/vm/selectorPathSet.hpp"
-#include "database/vm/program.hpp"
+#include "vm/program.hpp"
+#include "vm/selectorPathSet.hpp"
 #include "utils/printFormats.hpp"
 #include "vm/inputStructure.hpp"
 #include <iostream>

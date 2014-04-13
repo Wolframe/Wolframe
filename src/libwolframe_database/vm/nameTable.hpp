@@ -35,7 +35,7 @@
 #ifndef _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_NAME_TABLE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
-#include "database/vm/patchArgumentMap.hpp"
+#include "vm/patchArgumentMap.hpp"
 #include "types/keymap.hpp"
 #include <map>
 #include <vector>

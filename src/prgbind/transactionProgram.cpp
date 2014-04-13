@@ -35,13 +35,10 @@
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "filter/redirectFilterClosure.hpp"
-#include "processor/procProviderInterface.hpp"
-#include "database/tdlTransactionFunction.hpp"
 #include "database/databaseError.hpp"
 #include "database/database.hpp"
-#include "database/vm/program.hpp"
-#include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
+#include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;

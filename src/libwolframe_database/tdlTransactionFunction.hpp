@@ -31,16 +31,16 @@
 
 ************************************************************************/
 ///\brief Definition of a transaction function based on TDL
-///\file database/tdlTransactionFunction.hpp
+///\file tdlTransactionFunction.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
-#include "database/vm/program.hpp"
 #include "database/vmTransactionInput.hpp"
 #include "database/vmTransactionOutput.hpp"
-#include "database/tdlTransactionPreprocStep.hpp"
 #include "langbind/formFunction.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "filter/typedfilter.hpp"
+#include "vm/program.hpp"
+#include "tdlTransactionPreprocStep.hpp"
 #include <string>
 #include <vector>
 #include <iostream>

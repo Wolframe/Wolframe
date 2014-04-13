@@ -35,6 +35,7 @@
 #include "database/loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
 #include "database/vmTransactionInput.hpp"
+#include "tdlTransactionFunction.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"

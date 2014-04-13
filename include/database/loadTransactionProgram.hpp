@@ -34,7 +34,6 @@
 ///\file database/loadTransactionProgram.hpp
 #ifndef _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
 #define _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
-#include "database/tdlTransactionFunction.hpp"
 #include "database/databaseLanguage.hpp"
 #include "langbind/formFunction.hpp"
 #include <string>

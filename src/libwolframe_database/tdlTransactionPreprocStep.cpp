@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\brief Implementing of the methods of the transaction function preprocessing step based on TDL
 ///\file tdlTransactionPreprocStep.cpp
-#include "database/tdlTransactionPreprocStep.hpp"
+#include "tdlTransactionPreprocStep.hpp"
 #include "vm/tagTable.hpp"
 #include "vm/inputStructure.hpp"
 #include "langbind/formFunction.hpp"

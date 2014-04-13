@@ -35,9 +35,9 @@
 #ifndef _DATABASE_TDL_PREPROC_BLOCK_HPP_INCLUDED
 #define _DATABASE_TDL_PREPROC_BLOCK_HPP_INCLUDED
 #include "database/databaseLanguage.hpp"
-#include "database/tdlTransactionPreprocStep.hpp"
-#include "database/vm/program.hpp"
+#include "vm/program.hpp"
 #include "tdl/preprocCallStatement.hpp"
+#include "tdlTransactionPreprocStep.hpp"
 #include <string>
 #include <vector>
 

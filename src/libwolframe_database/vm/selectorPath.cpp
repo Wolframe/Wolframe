@@ -32,7 +32,7 @@
 ************************************************************************/
 //\file vm/selectorPath.cpp
 //\brief Implementation of an input selector path
-#include "database/vm/selectorPath.hpp"
+#include "vm/selectorPath.hpp"
 #include "vm/inputStructure.hpp"
 #include "vm/tagTable.hpp"
 #include <iostream>

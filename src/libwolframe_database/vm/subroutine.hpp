@@ -34,7 +34,7 @@
 ///\brief Local interface for mapping names to subroutine definitions
 #ifndef _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
 #define _DATABASE_VM_SUBROUTINE_HPP_INCLUDED
-#include "database/vm/program.hpp"
+#include "vm/program.hpp"
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>

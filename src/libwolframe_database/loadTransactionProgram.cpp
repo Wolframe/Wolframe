@@ -42,6 +42,7 @@
 #include "tdl/preprocBlock.hpp"
 #include "tdl/parseUtils.hpp"
 #include "tdl2vmTranslator.hpp"
+#include "tdlTransactionFunction.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/fileLineInfo.hpp"

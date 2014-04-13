@@ -33,7 +33,7 @@
 ///\file vm/programImage.cpp
 ///\brief Implementation of methods of the program executing database transactions
 #include "database/vm/programImage.hpp"
-#include "database/vm/program.hpp"
+#include "vm/program.hpp"
 #include <sstream>
 #include <iostream>
 

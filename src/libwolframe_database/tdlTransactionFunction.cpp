@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
-#include "database/tdlTransactionFunction.hpp"
+#include "tdlTransactionFunction.hpp"
 #include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
