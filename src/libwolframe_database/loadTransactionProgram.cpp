@@ -378,8 +378,17 @@ static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* lan
 				{
 					posinfo.update( posinfo_si, si);
 					posinfo_si = si;
+					bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+					if (hasIntoBlock)
+					{
+						prg.begin_INTO_block( resultpath);
+					}
 					parsePrgBlock( prg, langdescr, si, se, posinfo);
 					posinfo_si = si;
+					if (hasIntoBlock)
+					{
+						prg.end_INTO_block();
+					}
 				}
 				else
 				{
@@ -504,7 +513,6 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 	bool isValidDatabase = true;
 	unsigned int mask = 0;
 	std::string resultfilter;
-	std::vector<std::string> resultpath;
 	std::string authfunction;
 	std::string authresource;
 	tdl::PreProcBlock preproc;
@@ -528,20 +536,13 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 			case b_RESULT:
 			{
 				tdl::checkUniqOccurrence( b_RESULT, mask, g_transaction_idtab);
-				bool complete = false;
-				if (tdl::parseKeyword( langdescr, si, se, "INTO"))
-				{
-					resultpath = tdl::parse_INTO_path( langdescr, si, se);
-					complete = true;
-				}
 				if (tdl::parseKeyword( langdescr, si, se, "FILTER"))
 				{
 					resultfilter = tdl::parseFunctionName( langdescr, si, se);
-					complete = true;
 				}
-				if (!complete)
+				else
 				{
-					throw std::runtime_error( "incomplete RESULT definition, FILTER or INTO expected");
+					throw std::runtime_error( "FILTER expected after RESULT");
 				}
 				break;
 			}
@@ -577,21 +578,12 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 				tdl::checkUniqOccurrence( b_BEGIN, mask, g_transaction_idtab);
 				Tdl2vmTranslator prg( &subroutineMap, false);
 
-				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
-				if (hasIntoBlock)
-				{
-					prg.begin_INTO_block( resultpath);
-				}
 				posinfo.update( posinfo_si, si);
 				posinfo_si = si;
 
 				parsePrgBlock( prg, langdescr, si, se, posinfo);
 				posinfo_si = si;
 
-				if (hasIntoBlock)
-				{
-					prg.end_INTO_block();
-				}
 				if (isValidDatabase)
 				{
 					vm::ProgramR program = prg.createProgram();

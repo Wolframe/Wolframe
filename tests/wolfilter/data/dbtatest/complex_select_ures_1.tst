@@ -26,11 +26,12 @@ Processor
 	program DBIN.tdl
 }
 **file:DBIN.tdl
-TRANSACTION testcall RESULT INTO result BEGIN
+TRANSACTION testcall
+BEGIN INTO result BEGIN
 	FOREACH //aa DO SELECT run($(.));
 	FOREACH RESULT INTO person DO SELECT call( $(//aa) , $1 ) ;
 	FOREACH RESULT INTO age DO SELECT get ( $(//aa),$1 ,$2 ,$3);
-END
+END END
 **file: DBRES
 #res#1#2
 #vorname name beruf#karin fischer beamte

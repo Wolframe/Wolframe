@@ -39,9 +39,11 @@ end
 #name#job1#job2#job3#job4
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
 BEGIN
-	INTO title FOREACH //task DO SELECT run( title);
+	INTO doc
+	BEGIN
+		INTO title FOREACH //task DO SELECT run( title);
+	END
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

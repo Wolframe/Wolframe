@@ -27,9 +27,11 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-RESULT INTO result
+BEGIN
+INTO result
 BEGIN
 	INTO item DO SELECT run( $(/aa), $(/bb));
+END
 END
 **file: DBRES
 #id name#1 hugo

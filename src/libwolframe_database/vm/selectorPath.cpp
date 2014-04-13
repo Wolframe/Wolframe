@@ -37,6 +37,7 @@
 #include "vm/tagTable.hpp"
 #include <iostream>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -120,7 +121,7 @@ SelectorPath::SelectorPath( const std::string& selector, TagTable* tagmap)
 		m_path.push_back( elem);
 	}
 	std::string redu = tostring( tagmap);
-	if (redu != selector)
+	if (!boost::algorithm::iequals(redu,selector) && !boost::algorithm::iequals(std::string("./") + redu,selector))
 	{
 		throw std::runtime_error( std::string("illegal selection path string '") + selector + "' (reduced to '" + redu + "')");
 	}

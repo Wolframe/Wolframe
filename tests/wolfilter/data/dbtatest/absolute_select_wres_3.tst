@@ -27,9 +27,11 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-RESULT INTO doc
+BEGIN
+INTO doc
 BEGIN
 	INTO address DO SELECT run( $(/aa), $(/bb), $(/cc));
+END
 END
 **file: DBRES
 #id name street#1 hugo "bahnhofstrasse 15"#2 miriam "zum gemsweg 3"#3 sara "tannensteig 12"
