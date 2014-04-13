@@ -49,7 +49,7 @@ CPP_OBJS = \
 	vmTransactionInput.obj \
 	vmTransactionOutput.obj \
 	tdl2vmTranslator.obj \
-	loadTransactionProgram2.obj \
+	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	baseStatement.obj \
 	substitutingStatement.obj

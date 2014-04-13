@@ -198,14 +198,15 @@ TEST_F( CompileTDLTest, tests)
 		// [2.1] Process test:
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 
-		TdlTransactionFunctionList tl = loadTransactionProgramFile2( tdlfile, "testdb", "test", &g_dblang);
+		TdlTransactionFunctionList tl = loadTransactionProgramFile( tdlfile, "testdb", "test", &g_dblang);
 		TdlTransactionFunctionList::const_iterator ti = tl.begin(), te = tl.end();
 
 		// [2.2] Print test output to string:
 		std::ostringstream out;
 		for (; ti != te; ++ti)
 		{
-			ti->second->print( out);
+			const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
+			tfunc->print( out);
 			out << std::endl;
 		}
 
@@ -216,10 +217,11 @@ TEST_F( CompileTDLTest, tests)
 			types::PropertyTree input_ptree = utils::readPropertyTreeFile( inputfile);
 			for (ti = tl.begin(); ti != te; ++ti)
 			{
-				vm::InputStructure input( ti->second->program()->pathset.tagtab());
+				const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
+				vm::InputStructure input( tfunc->program()->pathset.tagtab());
 				fillInputStructure( input_ptree, input);
 
-				VmTransactionInput trsinput( *ti->second->program(), input);
+				VmTransactionInput trsinput( *tfunc->program(), input);
 				out << "TRANSACTION INPUT:" << std::endl;
 				trsinput.print( out);
 				out << std::endl;

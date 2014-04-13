@@ -33,6 +33,7 @@
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
 #include "database/tdlTransactionFunction.hpp"
+#include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
 #include "langbind/formFunction.hpp"
@@ -43,10 +44,45 @@
 
 #undef LOWLEVEL_DEBUG
 
+
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunction* func_)
+///\class TdlTransactionFunctionInput
+///\brief Input structure for calling transaction functions
+class TdlTransactionFunctionClosure::InputStructure
+
+	:public langbind::TypedOutputFilter
+{
+public:
+	explicit InputStructure( const TdlTransactionFunction* func_);
+
+	InputStructure( const InputStructure& o);
+
+	virtual ~InputStructure(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual langbind::TypedOutputFilter* copy() const;
+
+	virtual bool print( ElementType type, const types::VariantConst& element);
+
+	void finalize( const proc::ProcessorProviderInterface* provider);
+
+	virtual VmTransactionInputR get() const;
+
+	const vm::InputStructure& structure() const;
+
+	const TdlTransactionFunction* func() const;
+
+private:
+	vm::InputStructureR m_structure;
+	const TdlTransactionFunction* m_func;
+	langbind::TypedInputFilter::ElementType m_lasttype;
+};
+
+
+TdlTransactionFunctionClosure::InputStructure::InputStructure( const TdlTransactionFunction* func_)
 	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter("transactionFunctionInput")
 	,m_structure(new vm::InputStructure( func_->program()->pathset.tagtab()))
@@ -54,7 +90,7 @@ TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFu
 	,m_lasttype(langbind::TypedInputFilter::CloseTag)
 {}
 
-TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o)
+TdlTransactionFunctionClosure::InputStructure::InputStructure( const InputStructure& o)
 	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
 	,langbind::TypedOutputFilter(o)
 	,m_structure(o.m_structure)
@@ -62,7 +98,12 @@ TdlTransactionFunctionInput::TdlTransactionFunctionInput( const TdlTransactionFu
 	,m_lasttype(o.m_lasttype)
 {}
 
-bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantConst& element)
+langbind::TypedOutputFilter* TdlTransactionFunctionClosure::InputStructure::copy() const
+{
+	return new InputStructure(*this);
+}
+
+bool TdlTransactionFunctionClosure::InputStructure::print( ElementType type, const types::VariantConst& element)
 {
 	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << utils::getLogString( element) << "'' :" << element.typeName( element.type());
 	switch (type)
@@ -88,7 +129,7 @@ bool TdlTransactionFunctionInput::print( ElementType type, const types::VariantC
 	return true;
 }
 
-void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterface* provider)
+void TdlTransactionFunctionClosure::InputStructure::finalize( const proc::ProcessorProviderInterface* provider)
 {
 	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
 	for (; pi != pe; ++pi)
@@ -99,10 +140,113 @@ void TdlTransactionFunctionInput::finalize( const proc::ProcessorProviderInterfa
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
 
-VmTransactionInputR TdlTransactionFunctionInput::get() const
+VmTransactionInputR TdlTransactionFunctionClosure::InputStructure::get() const
 {
 	return VmTransactionInputR( new VmTransactionInput( *m_func->program(), *m_structure));
 }
+
+const vm::InputStructure& TdlTransactionFunctionClosure::InputStructure::structure() const
+{
+	return *m_structure.get();
+}
+
+const TdlTransactionFunction* TdlTransactionFunctionClosure::InputStructure::func() const
+{
+	return m_func;
+}
+
+static std::string removeCRLF( const std::string& src)
+{
+	std::string rt;
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\r' || *si == '\n')
+		{
+			if (rt.size() && rt[ rt.size()-1] != ' ') rt.push_back(' ');
+		}
+		else
+		{
+			rt.push_back( *si);
+		}
+	}
+	return rt;
+}
+
+static std::string databaseError_logtext( const db::DatabaseError& err, const std::string& name, const db::vm::Program& program)
+{
+	std::ostringstream logmsg;
+	logmsg << "error in transaction '" << name << "' [IP " << err.ip << "]"
+		<< " for database '" << err.dbname << "'"
+		<< " error class '" << err.errorclass << "'";
+	if (err.errorcode)
+	{
+		logmsg << " database internal error code " << err.errorcode << "'";
+	}
+	if (err.errormsg.size())
+	{
+		logmsg << " " << removeCRLF( err.errormsg);
+	}
+	if (err.errordetail.size())
+	{
+		logmsg << " " << removeCRLF( err.errordetail);
+	}
+	if (err.errorhint.size())
+	{
+		logmsg << " " << err.errorhint;
+	}
+	std::string locationstr;
+	utils::FileLineInfo posinfo;
+
+	if (program.getSourceReference( err.ip, posinfo))
+	{
+		logmsg << " TDL source location " << posinfo.logtext();
+	}
+	return logmsg.str();
+}
+
+static std::string databaseError_throwtext( const db::DatabaseError& err, const std::string& name)
+{
+	std::ostringstream throwmsg;
+	//... shorter message is thrown. no internals in message as written into the logs
+	throwmsg << "error in transaction '" << name << "':";
+	if (err.errordetail.size())
+	{
+		throwmsg << " " << removeCRLF( err.errordetail);
+	}
+	else if (err.errormsg.size())
+	{
+		//... error message is only thrown if errordetail is empty
+		throwmsg << " " << removeCRLF( err.errormsg);
+	}
+	if (err.errorhint.size())
+	{
+		throwmsg << " " << err.errorhint;
+	}
+	return throwmsg.str();
+}
+
+void TdlTransactionFunctionClosure::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+{
+	m_provider = p;
+	m_inputstructptr = new TdlTransactionFunctionClosure::InputStructure( m_func);
+	m_inputstruct.reset( m_inputstructptr);
+	i->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
+	m_input.init( i, m_inputstruct);
+	m_state = 1;
+	m_flags = f;
+}
+
+langbind::TypedInputFilterR TdlTransactionFunctionClosure::result() const
+{
+	return m_result;
+}
+
+TdlTransactionFunctionClosure* TdlTransactionFunction::createClosure() const
+{
+	return new TdlTransactionFunctionClosure( this);
+}
+
 
 void TdlTransactionFunction::print( std::ostream& out) const
 {
@@ -150,40 +294,113 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "END" << std::endl;
 }
 
-TdlTransactionFunctionInput* TdlTransactionFunction::getInput() const
-{
-	return new TdlTransactionFunctionInput( this);
-}
 
-langbind::TypedInputFilterR TdlTransactionFunction::getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const
+TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunction* f)
+	:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
+	,m_provider(0)
+	,m_func(f)
+	,m_state(0)
+	,m_inputstructptr(0)
+	,m_flags(serialize::Context::None)
+	{}
+
+TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o)
+	:utils::TypeSignature(o)
+	,m_provider(o.m_provider)
+	,m_func(o.m_func)
+	,m_state(o.m_state)
+	,m_input(o.m_input)
+	,m_inputstructptr(o.m_inputstructptr)
+	,m_inputstruct(o.m_inputstruct)
+	,m_result(o.m_result)
+	,m_flags(o.m_flags)
+	{}
+
+bool TdlTransactionFunctionClosure::call()
 {
-	if (m_resultfilter.empty())
+	switch (m_state)
 	{
-		// ... result filter does not exist, so return the transaction result as function result
-		return output.get();
-	}
-	else
-	{
-		// ... result filter exists, so we pipe the transaction result through it to get the final result
-		langbind::TypedInputFilterR unfilderedResult = output.get();
-		const langbind::FormFunction* func = provider->formFunction( m_resultfilter);
-		if (!func)
+		case 0:
+			throw std::runtime_error( "input not initialized");
+		case 1:
+			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
+
+			if (!m_input.call()) return false;
+			m_state = 2;
+		case 2:
 		{
-			throw std::runtime_error( std::string( "transaction result filter function '") + m_resultfilter + "' not found (must be defined as form function)");
+			// Execute function:
+			m_inputstructptr->finalize( m_provider);
+			db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
+			db::VmTransactionOutput res;
+			{
+				types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
+				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
+				trsr->begin();
+
+				if (trsr->execute( inp, res))
+				{
+					trsr->commit();
+				}
+				else
+				{
+					const db::DatabaseError* err = trsr->getLastError();
+					if (err)
+					{
+						LOG_ERROR << databaseError_logtext( *err, m_func->name(), *m_func->program());
+						std::string msg( databaseError_throwtext( *err, m_func->name()));
+						throw std::runtime_error( msg);
+					}
+					else
+					{
+						db::DatabaseError ue( "UNKNOWN", 0, "unknown error (transaction program)");
+						LOG_ERROR << databaseError_logtext( ue, m_func->name(), *m_func->program());
+						throw std::runtime_error( databaseError_throwtext( ue, m_func->name()));
+					}
+				}
+			}
+			// Build output:
+			if (m_func->resultfilter().empty())
+			{
+				// ... result filter does not exist, so return the transaction result as function result
+				m_result = res.get();
+			}
+			else
+			{
+				// ... result filter exists, so we pipe the transaction result through it to get the final result
+				langbind::TypedInputFilterR unfilderedResult = res.get();
+				const langbind::FormFunction* func = m_provider->formFunction( m_func->resultfilter());
+				if (!func)
+				{
+					throw std::runtime_error( std::string( "transaction result filter function '") + m_func->resultfilter() + "' not found (must be defined as form function)");
+				}
+				langbind::FormFunctionClosureR filterclosure = langbind::FormFunctionClosureR( func->createClosure());
+				filterclosure->init( m_provider, unfilderedResult);
+			
+				if (!filterclosure->call())
+				{
+					throw std::runtime_error( std::string( "failed to call filter function '") + m_func->resultfilter() + "' with result of transaction (input not complete)");
+				}
+				langbind::TypedInputFilterR filteredResult = filterclosure->result();
+				if (unfilderedResult->flag( langbind::TypedInputFilter::PropagateNoCase))
+				{
+					filteredResult->setFlags( langbind::TypedInputFilter::PropagateNoCase);
+				}
+				m_result = filteredResult;
+			}
+
+			// Propagate flags for output:
+			if (!res.isCaseSensitive())
+			{
+				//... If not case sensitive result then propagate this
+				//	to be respected in mapping to structures.
+				m_result->setFlags( langbind::TypedInputFilter::PropagateNoCase);
+			}
+			m_state = 3;
+			return true;
 		}
-		langbind::FormFunctionClosureR closure = langbind::FormFunctionClosureR( func->createClosure());
-		closure->init( provider, unfilderedResult);
-	
-		if (!closure->call())
-		{
-			throw std::runtime_error( std::string( "failed to call filter function '") + m_resultfilter + "' with result of transaction (input not complete)");
-		}
-		langbind::TypedInputFilterR filteredResult = closure->result();
-		if (unfilderedResult->flag( langbind::TypedInputFilter::PropagateNoCase))
-		{
-			filteredResult->setFlags( langbind::TypedInputFilter::PropagateNoCase);
-		}
-		return filteredResult;
+		default:
+			return true;
 	}
 }
 

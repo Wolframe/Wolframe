@@ -33,7 +33,6 @@ CPP_OBJS = \
 	protocol_ioblocks.o \
 	input.o \
 	output.o \
-	redirectFilterClosure.o \
 	null_filter.o \
 	typingfilter.o \
 	typedfilterScope.o \

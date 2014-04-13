@@ -36,6 +36,7 @@
 #define _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
 #include "database/tdlTransactionFunction.hpp"
 #include "database/databaseLanguage.hpp"
+#include "langbind/formFunction.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -44,8 +45,8 @@
 namespace _Wolframe {
 namespace db {
 
-typedef std::vector<std::pair<std::string,TdlTransactionFunctionR> > TdlTransactionFunctionList;
-TdlTransactionFunctionList loadTransactionProgramFile2(
+typedef std::vector<std::pair<std::string,langbind::FormFunctionR> > TdlTransactionFunctionList;
+TdlTransactionFunctionList loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
 		const std::string& databaseClassName,

@@ -42,7 +42,7 @@
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/doctype.hpp"
-#include "langbind/redirectFilterClosure.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>

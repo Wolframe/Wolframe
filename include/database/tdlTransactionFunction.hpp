@@ -38,6 +38,8 @@
 #include "database/vmTransactionInput.hpp"
 #include "database/vmTransactionOutput.hpp"
 #include "database/tdlTransactionPreprocStep.hpp"
+#include "langbind/formFunction.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "filter/typedfilter.hpp"
 #include <string>
 #include <vector>
@@ -55,45 +57,37 @@ typedef boost::shared_ptr<InputStructure> InputStructureR;
 ///\brief Forward declaration
 class TdlTransactionFunction;
 
-///\class TdlTransactionFunctionInput
-///\brief Input structure for calling transaction functions
-class TdlTransactionFunctionInput
-	:public langbind::TypedOutputFilter
+///\///\brief 
+///\brief Closure (execution context) of a transaction function based on TDL
+class TdlTransactionFunctionClosure
+	:public utils::TypeSignature
+	,public langbind::FormFunctionClosure
 {
 public:
-	explicit TdlTransactionFunctionInput( const TdlTransactionFunction* func_);
-	TdlTransactionFunctionInput( const TdlTransactionFunctionInput& o);
-	virtual ~TdlTransactionFunctionInput(){}
+	TdlTransactionFunctionClosure( const db::TdlTransactionFunction* f);
+	TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o);
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
-	virtual langbind::TypedOutputFilter* copy() const
-	{
-		return new TdlTransactionFunctionInput(*this);
-	}
+	virtual bool call();
 
-	virtual bool print( ElementType type, const types::VariantConst& element);
-	void finalize( const proc::ProcessorProviderInterface* provider);
+	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
 
-	virtual VmTransactionInputR get() const;
-
-	const vm::InputStructure& structure() const
-	{
-		return *m_structure.get();
-	}
-
-	const TdlTransactionFunction* func() const
-	{
-		return m_func;
-	}
+	virtual langbind::TypedInputFilterR result() const;
 
 private:
-	vm::InputStructureR m_structure;
-	const TdlTransactionFunction* m_func;
-	langbind::TypedInputFilter::ElementType m_lasttype;
+	class InputStructure;
+	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
+	const TdlTransactionFunction* m_func;			//< function to execute
+	int m_state;						//< current state of call
+	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
+	InputStructure* m_inputstructptr;			//< input structure implementation interface
+	langbind::TypedOutputFilterR m_inputstruct;		//< input structure
+	langbind::TypedInputFilterR m_result;			//< function call result
+	serialize::Context::Flags m_flags;			//< flags for input serialization
 };
 
+
 class TdlTransactionFunction
+	:public langbind::FormFunction
 {
 public:
 	TdlTransactionFunction(){}
@@ -111,18 +105,18 @@ public:
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
 	const vm::ProgramR& program() const				{return m_program;}
 
-	////\brief Build the function input
-	TdlTransactionFunctionInput* getInput() const;
 	////\brief Build the function output
 	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
+	virtual TdlTransactionFunctionClosure* createClosure() const;
+
 private:
-	std::string m_name;
-	std::string m_resultfilter;
-	std::string m_authfunction;
-	std::string m_authresource;
-	std::vector<TdlTransactionPreprocStep> m_preproc;
-	vm::ProgramR m_program;
+	std::string m_name;		 			//< function name
+	std::string m_resultfilter;				//< name of result filter function to call with the transaction result
+	std::string m_authfunction;				//< authorization function name
+	std::string m_authresource;				//< authorization resource name
+	std::vector<TdlTransactionPreprocStep> m_preproc;	//< preprocessing steps to perform on input before transaction execution
+	vm::ProgramR m_program;					//< program to execute
 };
 
 typedef boost::shared_ptr<TdlTransactionFunction> TdlTransactionFunctionR;

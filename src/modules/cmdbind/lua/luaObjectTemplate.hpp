@@ -46,7 +46,7 @@ Project Wolframe.
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
-#include "langbind/redirectFilterClosure.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "serialize/ddlFormParser.hpp"
 #include "serialize/ddlFormSerializer.hpp"
 #include "serialize/struct/structParser.hpp"
@@ -85,7 +85,7 @@ template <> struct MetaTable<FormFunctionClosureR> {static const char* name()		{
 template <> struct MetaTable<types::NormalizeFunctionR> {static const char* name()	{return "wolframe.NormalizeFunctionR";}};
 template <> struct MetaTable<serialize::StructSerializer> {static const char* name()	{return "wolframe.StructSerializer";}};
 template <> struct MetaTable<proc::ProcessorProviderInterface> {static const char* name(){return "wolframe.ProcessorProvider";}};
-template <> struct MetaTable<langbind::LuaModuleMap> {static const char* name()		{return "wolframe.LuaModuleMap";}};
+template <> struct MetaTable<LuaModuleMap> {static const char* name()			{return "wolframe.LuaModuleMap";}};
 
 template <class ObjectType>
 struct LuaObject

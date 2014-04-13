@@ -35,7 +35,7 @@ Project Wolframe.
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "directmapProgram.hpp"
 #include "langbind/formFunction.hpp"
-#include "langbind/redirectFilterClosure.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include <boost/shared_ptr.hpp>
 #include "types/keymap.hpp"

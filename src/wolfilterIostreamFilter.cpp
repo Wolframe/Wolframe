@@ -35,7 +35,6 @@
 #include "wolfilterIostreamFilter.hpp"
 #include "serialize/ddlFormSerializer.hpp"
 #include "serialize/ddlFormParser.hpp"
-#include "langbind/redirectFilterClosure.hpp"
 #include "langbind/formFunction.hpp"
 #include "serialize/ddl/ddlStructParser.hpp"
 #include "serialize/ddl/ddlStructSerializer.hpp"
@@ -43,6 +42,7 @@
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "utils/stringUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
