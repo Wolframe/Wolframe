@@ -45,6 +45,7 @@ VM_CPP_OBJS = \
 	vm/selectorPathSet.o \
 	vm/subroutine.o \
 	vm/program.o \
+	vm/programImage.o \
 	vm/programInstance.o
 
 CPP_OBJS = \

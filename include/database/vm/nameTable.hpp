@@ -100,6 +100,11 @@ public:
 		return PatchArgumentMapR( new PatchArgumentMap_Table( map));
 	}
 
+	const std::vector<std::string>& array() const
+	{
+		return m_namear;
+	}
+
 private:
 	typedef types::keymap<Index> NameMap;
 	NameMap m_namemap;

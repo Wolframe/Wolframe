@@ -63,120 +63,55 @@ static std::string removeCRLF( const std::string& src)
 
 struct vm::ProgramInstance::LogTraceContext
 {
-	const vm::Program* program;
+	const vm::ProgramImage* program;
 };
 
 static void programInstance_logTraceCallBack_TRACE( const vm::ProgramInstance::LogTraceContext* ctx, unsigned int ip)
 {
-	utils::FileLineInfo posinfo;
-	if (ctx->program->getSourceReference( ip, posinfo))
-	{
-		LOG_TRACE << "[transaction vm] execute [" << ip << "]" << ctx->program->instructionStringAt( ip) << " " << posinfo.logtext_short();
-	}
+	std::ostringstream str;
+	ctx->program->printInstruction( str, ctx->program->code[ ip]);
+	LOG_TRACE << "[transaction vm] execute [" << ip << "] " << str.str();
 }
 
-static void programInstance_logTraceCallBack_DEBUG( const vm::ProgramInstance::LogTraceContext* ctx, unsigned int ip)
-{
-	utils::FileLineInfo posinfo;
-	if (ctx->program->getSourceReference( ip, posinfo))
-	{
-		LOG_DEBUG << "[transaction vm] execute [" << ip << "]" << ctx->program->instructionStringAt( ip);
-	}
-}
-
-
-void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
+bool Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
 	vm::ProgramInstance::LogTraceContext context;
 	context.program = &input.program();
 
 	vm::ProgramInstance::LogTraceCallBack logtrace = 0;
-	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_DEBUG)
+	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_TRACE)
 	{
-		if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_TRACE)
-		{
-			logtrace = &programInstance_logTraceCallBack_TRACE;
-		}
-		else
-		{
-			logtrace = &programInstance_logTraceCallBack_DEBUG;
-		}
+		logtrace = &programInstance_logTraceCallBack_TRACE;
 	}
-	vm::ProgramInstance instance( context.program, m_stm.get(), logtrace, &context);
-
-	bool result;
+	vm::ProgramInstance instance( *context.program, m_stm.get(), logtrace, &context);
 	try
 	{
-		result = instance.execute();
+		if (!instance.execute())
+		{
+			const DatabaseError* err = instance.lastError();
+			if (err)
+			{
+				m_lastError = *err;
+			}
+			else
+			{
+				m_lastError = DatabaseError( "UNKNOWN", 0, "unknown error");
+			}
+			m_stm->rollback();
+			return false;
+		}
 	}
 	catch (const std::runtime_error& e)
 	{
-		std::string locationstr;
-		utils::FileLineInfo posinfo;
-		if (input.program().getSourceReference( instance.ip(), posinfo))
-		{
-			locationstr = std::string(" TDL source location ") + posinfo.logtext();
-		}
-		LOG_ERROR << "exception thrown in transaction '" << m_name
-				<< "' at VM IP " << instance.ip()
-				<< " instruction " << input.program().instructionStringAt( instance.ip())
-				<< locationstr;
+		m_lastError = DatabaseError( "EXCEPTION", 0, e.what());
+		m_lastError.ip = instance.ip();
+		m_stm->rollback();
+		return false;
+	}
+	catch (const std::exception& e)
+	{
 		m_stm->rollback();
 		throw e;
-	}
-	if (!result)
-	{
-		const DatabaseError& err = instance.lastError();
-		std::string errordetail = removeCRLF( err.errordetail);
-		std::string errormsg = removeCRLF( err.errormsg);
-		
-		std::ostringstream logmsg;
-		logmsg << "error in transaction '" << m_name << "' [IP " << err.ip << "]"
-			<< " for database '" << err.dbname << "'"
-			<< " error class '" << err.errorclass << "'";
-		if (err.errorcode)
-		{
-			logmsg << " database internal error code " << err.errorcode << "'";
-		}
-		if (err.errormsg.size())
-		{
-			logmsg << " " << errormsg;
-		}
-		if (err.errordetail.size())
-		{
-			logmsg << " " << errordetail;
-		}
-		if (err.errorhint.size())
-		{
-			logmsg << " " << err.errorhint;
-		}
-		std::string locationstr;
-		utils::FileLineInfo posinfo;
-		if (input.program().getSourceReference( instance.ip(), posinfo))
-		{
-			logmsg << " TDL source location " << posinfo.logtext();
-		}
-		LOG_ERROR << logmsg.str();
-
-		std::ostringstream throwmsg;
-		//... shorter message is thrown. no internals in message as written into the logs
-		throwmsg << "error in transaction '" << m_name << "':";
-		if (err.errordetail.size())
-		{
-			throwmsg << " " << errordetail;
-		}
-		else if (err.errormsg.size())
-		{
-			//... error message is only thrown if errordetail is empty
-			throwmsg << " " << errormsg;
-		}
-		if (err.errorhint.size())
-		{
-			throwmsg << " " << err.errorhint;
-		}
-		m_stm->rollback();
-
-		throw std::runtime_error( throwmsg.str());
 	}
 	output = VmTransactionOutput( instance.output());
 	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_DATA)
@@ -196,108 +131,7 @@ void Transaction::execute( const VmTransactionInput& input, VmTransactionOutput&
 			}
 		}
 	}
-}
-
-static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
-{
-	std::vector<std::string> resultpath;
-	resultpath.push_back( "");
-	types::keymap<vm::Subroutine> sm;
-
-	Tdl2vmTranslator prg( &sm, false);
-	prg.begin_DO_statement( stm);
-	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
-	for (; pi != pe; ++pi)
-	{
-		prg.push_ARGUMENT_CONST( *pi);
-	}
-	prg.end_DO_statement();
-	prg.begin_loop_INTO_block( resultpath);
-	prg.output_statement_result( true);
-	prg.end_loop_INTO_block();
-	return prg.createProgram();
-}
-
-Transaction::Result Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
-{
-	vm::ProgramR program = singleStatementProgram( stm, params);
-
-	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
-	VmTransactionOutput output;
-	execute( input, output);
-
-	langbind::TypedInputFilterR of( output.get());
-
-	bool firstRow = true;
-	langbind::FilterBase::ElementType type;
-	types::VariantConst value;
-	int taglevel = 0;
-	std::vector<std::string> colnames;
-	std::vector<Result::Row> rows;
-	Result::Row row;
-	bool done = false;
-	while (of->getNext( type, value))
-	{
-		if (done)
-		{
-			throw std::runtime_error( "internal: unexpected element after final CLOSE");
-		}
-		switch (type)
-		{
-			case langbind::FilterBase::OpenTag:
-				taglevel++;
-				if (taglevel == 1)
-				{
-					if (value.type() != types::Variant::String || value.charsize() != 0)
-					{
-						throw std::runtime_error( "internal: unexpected top level tag in result");
-					}
-				}
-				else if (taglevel == 2)
-				{
-					if (firstRow)
-					{
-						colnames.push_back( value.tostring());
-					}
-				}
-				else
-				{
-					throw std::runtime_error( "internal: unexpected structure in result");
-				}
-				break;
-			case langbind::FilterBase::CloseTag:
-				--taglevel;
-				if (taglevel == -1) done = true;
-				if (taglevel == 0)
-				{
-					firstRow = false;
-					if (row.size() != colnames.size())
-					{
-						throw std::runtime_error("internal: row size does not mach to number of columns");
-					}
-					rows.push_back( row);
-					row.clear();
-				}
-				break;
-			case langbind::FilterBase::Attribute:
-				if (taglevel == 1)
-				{
-					if (firstRow)
-					{
-						colnames.push_back( value.tostring());
-					}
-				}
-				else
-				{
-					throw std::runtime_error( "internal: unexpected attribute in result");
-				}
-				break;
-			case langbind::FilterBase::Value:
-				row.push_back( value);
-				break;
-		}
-	}
-	return Result( colnames, rows);
+	return true;
 }
 
 static std::string errorMessageString( const DatabaseError& err)
@@ -322,6 +156,128 @@ static std::string errorMessageString( const DatabaseError& err)
 		logmsg << " " << errordetail;
 	}
 	return logmsg.str();
+}
+
+static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	std::vector<std::string> resultpath;
+	resultpath.push_back( "");
+	types::keymap<vm::Subroutine> sm;
+
+	Tdl2vmTranslator prg( &sm, false);
+	prg.begin_DO_statement( stm);
+	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
+	for (; pi != pe; ++pi)
+	{
+		prg.push_ARGUMENT_CONST( *pi);
+	}
+	prg.end_DO_statement();
+	prg.begin_loop_INTO_block( resultpath);
+	prg.output_statement_result( true);
+	prg.end_loop_INTO_block();
+	return prg.createProgram();
+}
+
+bool Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	vm::ProgramR program = singleStatementProgram( stm, params);
+
+	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionOutput output;
+
+	return execute( input, output);
+}
+
+bool Transaction::executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params)
+{
+	vm::ProgramR program = singleStatementProgram( stm, params);
+
+	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionOutput output;
+
+	if (!execute( input, output))
+	{
+		return false;
+	}
+	langbind::TypedInputFilterR of( output.get());
+
+	bool firstRow = true;
+	langbind::FilterBase::ElementType type;
+	types::VariantConst value;
+	int taglevel = 0;
+	std::vector<std::string> colnames;
+	std::vector<Result::Row> rows;
+	Result::Row row;
+	bool done = false;
+
+	while (of->getNext( type, value))
+	{
+		if (done)
+		{
+			m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected element after final CLOSE");
+			return false;
+		}
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				taglevel++;
+				if (taglevel == 1)
+				{
+					if (value.type() != types::Variant::String || value.charsize() != 0)
+					{
+						m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected top level tag in result");
+						return false;
+					}
+				}
+				else if (taglevel == 2)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected structure in result");
+					return false;
+				}
+				break;
+			case langbind::FilterBase::CloseTag:
+				--taglevel;
+				if (taglevel == -1) done = true;
+				if (taglevel == 0)
+				{
+					firstRow = false;
+					if (row.size() != colnames.size())
+					{
+						m_lastError = DatabaseError( "EXCEPTION", 0, "row size does not mach to number of columns");
+						return false;
+					}
+					rows.push_back( row);
+					row.clear();
+				}
+				break;
+			case langbind::FilterBase::Attribute:
+				if (taglevel == 1)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected attribute in result");
+					return false;
+				}
+				break;
+			case langbind::FilterBase::Value:
+				row.push_back( value);
+				break;
+		}
+	}
+	result = Result( colnames, rows);
+	return true;
 }
 
 void Transaction::begin()

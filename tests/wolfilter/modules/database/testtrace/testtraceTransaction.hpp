@@ -51,7 +51,7 @@ public:
 	TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_);
 	virtual ~TesttraceTransaction(){}
 
-	virtual void execute( const VmTransactionInput& input, VmTransactionOutput& output);
+	virtual bool execute( const VmTransactionInput& input, VmTransactionOutput& output);
 
 private:
 	

@@ -39,6 +39,7 @@
 #include <vector>
 #include <errno.h>
 #include "gtest/gtest.h"
+#include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
 namespace wtest {

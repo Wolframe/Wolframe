@@ -34,7 +34,7 @@
 ///\file database/vmTransactionInput.hpp
 #ifndef _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
 #define _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
-#include "database/vm/program.hpp"
+#include "database/vm/programImage.hpp"
 #include "utils/printFormats.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -44,6 +44,8 @@ namespace db {
 namespace vm {
 //\brief Forward declaration
 class InputStructure;
+//\brief Forward declaration
+class Program;
 }//namespace vm
 
 ///\class TransactionInput
@@ -63,10 +65,10 @@ public:
 
 	void print( std::ostream& out) const;
 
-	const vm::Program& program() const	{return m_program;}
+	const vm::ProgramImage& program() const		{return m_program;}
 
 private:
-	vm::Program m_program;
+	vm::ProgramImage m_program;
 };
 
 typedef boost::shared_ptr<VmTransactionInput> VmTransactionInputR;

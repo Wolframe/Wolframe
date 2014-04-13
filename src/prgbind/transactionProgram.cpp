@@ -39,12 +39,85 @@
 #include "database/tdlTransactionFunction.hpp"
 #include "database/databaseError.hpp"
 #include "database/database.hpp"
+#include "database/vm/program.hpp"
 #include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
-#include "config/programBase.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
+
+static std::string removeCRLF( const std::string& src)
+{
+	std::string rt;
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\r' || *si == '\n')
+		{
+			if (rt.size() && rt[ rt.size()-1] != ' ') rt.push_back(' ');
+		}
+		else
+		{
+			rt.push_back( *si);
+		}
+	}
+	return rt;
+}
+
+static std::string databaseError_logtext( const db::DatabaseError& err, const std::string& name, const db::vm::Program& program)
+{
+	std::ostringstream logmsg;
+	logmsg << "error in transaction '" << name << "' [IP " << err.ip << "]"
+		<< " for database '" << err.dbname << "'"
+		<< " error class '" << err.errorclass << "'";
+	if (err.errorcode)
+	{
+		logmsg << " database internal error code " << err.errorcode << "'";
+	}
+	if (err.errormsg.size())
+	{
+		logmsg << " " << removeCRLF( err.errormsg);
+	}
+	if (err.errordetail.size())
+	{
+		logmsg << " " << removeCRLF( err.errordetail);
+	}
+	if (err.errorhint.size())
+	{
+		logmsg << " " << err.errorhint;
+	}
+	std::string locationstr;
+	utils::FileLineInfo posinfo;
+
+	if (program.getSourceReference( err.ip, posinfo))
+	{
+		logmsg << " TDL source location " << posinfo.logtext();
+	}
+	return logmsg.str();
+}
+
+static std::string databaseError_throwtext( const db::DatabaseError& err, const std::string& name)
+{
+	std::ostringstream throwmsg;
+	//... shorter message is thrown. no internals in message as written into the logs
+	throwmsg << "error in transaction '" << name << "':";
+	if (err.errordetail.size())
+	{
+		throwmsg << " " << removeCRLF( err.errordetail);
+	}
+	else if (err.errormsg.size())
+	{
+		//... error message is only thrown if errordetail is empty
+		throwmsg << " " << removeCRLF( err.errormsg);
+	}
+	if (err.errorhint.size())
+	{
+		throwmsg << " " << err.errorhint;
+	}
+	return throwmsg.str();
+}
+
 
 class TransactionFunctionClosure
 	:public utils::TypeSignature
@@ -92,8 +165,27 @@ public:
 					types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
 					if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 					trsr->begin();
-					trsr->execute( inp, res);
-					trsr->commit();
+
+					if (trsr->execute( inp, res))
+					{
+						trsr->commit();
+					}
+					else
+					{
+						const db::DatabaseError* err = trsr->getLastError();
+						if (err)
+						{
+							LOG_ERROR << databaseError_logtext( *err, m_func->name(), *m_func->program());
+							std::string msg( databaseError_throwtext( *err, m_func->name()));
+							throw std::runtime_error( msg);
+						}
+						else
+						{
+							db::DatabaseError ue( "UNKNOWN", 0, "unknown error (transaction program)");
+							LOG_ERROR << databaseError_logtext( ue, m_func->name(), *m_func->program());
+							throw std::runtime_error( databaseError_throwtext( ue, m_func->name()));
+						}
+					}
 				}
 				m_result = m_func->getOutput( m_provider, res);
 				if (!res.isCaseSensitive())
@@ -186,10 +278,6 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 			library.defineFormFunction( fi->first, func);
 			LOG_DEBUG << "Loaded transaction function '" << fi->first << "'";
 		}
-	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw config::PositionalFileErrorException( config::PositionalFileError( e, filename));
 	}
 	catch (const std::runtime_error& e)
 	{

@@ -34,21 +34,23 @@
 ///\brief Interface for state of a program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
-#include "database/vm/program.hpp"
+#include "database/vm/programImage.hpp"
 #include "database/vm/instructionSet.hpp"
 #include "database/vm/valueTupleSet.hpp"
-#include "database/vm/symbolTable.hpp"
-#include "database/vm/programCode.hpp"
 #include "database/vm/output.hpp"
+#include "database/vm/subroutineFrame.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "database/databaseError.hpp"
 #include "types/variant.hpp"
 #include <string>
 #include <vector>
+#include <map>
 
 namespace _Wolframe {
 namespace db {
 namespace vm {
+///\brief Forward Declaration
+class Program;
 
 class ProgramInstance
 	:public InstructionSet
@@ -59,8 +61,7 @@ public:
 
 public:
 	ProgramInstance()
-		:m_program(0)
-		,m_db_stm(0)
+		:m_db_stm(0)
 		,m_ip(0)
 		,m_cond(false)
 		,m_logTraceCallBack(0)
@@ -72,27 +73,16 @@ public:
 		,m_ip(o.m_ip)
 		,m_cond(o.m_cond)
 		,m_stack(o.m_stack)
-		,m_code(o.m_code)
 		,m_output(o.m_output)
 		,m_logTraceCallBack(o.m_logTraceCallBack)
 		,m_logTraceContext(o.m_logTraceContext)
 	{}
-	ProgramInstance( const Program* program_, TransactionExecStatemachine* db_stm_, LogTraceCallBack logTraceCallBack_=0, const LogTraceContext* logTraceContext_=0)
-		:m_program(program_)
-		,m_db_stm(db_stm_)
-		,m_ip(0)
-		,m_cond(false)
-		,m_code(m_program->code)
-		,m_output( new Output())
-		,m_logTraceCallBack(logTraceCallBack_)
-		,m_logTraceContext(logTraceContext_)
-	{
-		m_stack.push_back( StackElement());
-	}
+
+	ProgramInstance( const ProgramImage& program_, TransactionExecStatemachine* db_stm_, LogTraceCallBack logTraceCallBack_=0, const LogTraceContext* logTraceContext_=0);
 
 	bool execute();
 	const OutputR& output() const			{return m_output;}
-	const DatabaseError& lastError() const		{return m_lastError;}
+	const DatabaseError* lastError() const		{return &m_lastError;}
 	unsigned int ip() const				{return m_ip;}
 
 private:
@@ -171,6 +161,7 @@ private:
 	ValueTupleSetR tupleSet( ArgumentIndex idx) const;
 	const types::Variant& constArgument( ArgumentIndex idx) const;
 	const std::string& statementArgument( ArgumentIndex argidx) const;
+	const std::string& tagnameArgument( ArgumentIndex argidx) const;
 	types::Variant loopcntArgument() const;
 	ArgumentIndex columnIndex( const ValueTupleSet* valueset, ArgumentIndex nameidx) const;
 	const types::Variant& selectedArgument( ArgumentIndex idx) const;
@@ -182,13 +173,12 @@ private:
 	void setDatabaseError();
 
 private:
-	const Program* m_program;			//< program reference
+	ProgramImage m_program;				//< image of program to execute
 	TransactionExecStatemachine* m_db_stm;		//< engine to process database instructions
 	Address m_ip;					//< instruction pointer
 	SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
 	bool m_cond;					//< current condition flag for conditional execution ('InstructionSet::CondCode')
 	std::vector<StackElement> m_stack;		//< execution stack
-	ProgramCode m_code;				//< program code copy
 	OutputR m_output;				//< output
 	DatabaseError m_lastError;			//< last database error reported
 	LogTraceCallBack m_logTraceCallBack;		//< NULL or callback procedure for logging execution that is be called after every instruction executed

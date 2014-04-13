@@ -33,6 +33,7 @@
 //\file vm/programInstance.cpp
 //\brief Implementation of the code executed as database input
 #include "database/vm/programInstance.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -51,26 +52,35 @@ ValueTupleSetR ProgramInstance::keptResult( ArgumentIndex idx) const
 
 ValueTupleSetR ProgramInstance::tupleSet( ArgumentIndex argidx) const
 {
-	if (argidx >= m_program->tuplesets.size()) throw std::runtime_error("tuple set reference out of bounds");
-	return m_program->tuplesets.at( argidx);
+	if (argidx >= m_program.tuplesets.size()) throw std::runtime_error("tuple set reference out of bounds");
+	return m_program.tuplesets.at( argidx);
 }
 
 const types::Variant& ProgramInstance::constArgument( ArgumentIndex argidx) const
 {
-	if (argidx >= m_program->constants.size()) throw std::runtime_error( "constant index out of bounds");
-	return m_program->constants.at( argidx);
+	if (argidx >= m_program.constants.size()) throw std::runtime_error( "constant index out of bounds");
+	return m_program.constants.at( argidx);
 }
 
 const std::string& ProgramInstance::statementArgument( ArgumentIndex argidx) const
 {
-	if (argidx >= m_program->statements.size()) throw std::runtime_error( "string index out of bounds");
-	return m_program->statements.at( argidx);
+	if (argidx >= m_program.statements.size()) throw std::runtime_error( "string index out of bounds");
+	return m_program.statements.at( argidx);
+}
+
+const std::string& ProgramInstance::tagnameArgument( ArgumentIndex argidx) const
+{
+	if (argidx > m_program.tagnames.size()) throw std::runtime_error( "tag name index out of bounds");
+	if (argidx == 0) throw std::runtime_error( "tag name index referencing NULL");
+	return m_program.tagnames.at( argidx-1);
 }
 
 ProgramInstance::ArgumentIndex ProgramInstance::columnIndex( const ValueTupleSet* valueset, ArgumentIndex argidx) const
 {
 	if (!valueset) throw std::runtime_error( "illegal instruction: no value set selected for name access");
-	return valueset->columnIndex( m_program->colnametab.getName( argidx));
+	if (argidx == 0) throw std::runtime_error( "referencing column index NULL");
+	if (argidx > m_program.colnames.size()) throw std::runtime_error( "referencing column index out of bounds");
+	return valueset->columnIndex( m_program.colnames[ argidx-1]);
 }
 
 const types::Variant& ProgramInstance::selectedArgument( ArgumentIndex argidx) const
@@ -209,10 +219,15 @@ void ProgramInstance::setDatabaseError()
 
 		if (top.m_hintidx)
 		{
-			const char* hintstr = m_program->hinttab.findHint( top.m_hintidx, err->errorclass);
-			if (hintstr)
+			if (top.m_hintidx > m_program.errorhints.size()) throw std::runtime_error("referencing hint out of bounds");
+			std::vector<ProgramImage::ErrorHint>::const_iterator hi = m_program.errorhints.at(top.m_hintidx-1).begin(), he = m_program.errorhints.at(top.m_hintidx-1).end();
+			for (; hi != he; ++hi)
 			{
-				m_lastError.errorhint = hintstr;
+				if (err->errorclass == hi->errorclass)
+				{
+					m_lastError.errorhint = hi->message;
+					break;
+				}
 			}
 		}
 	}
@@ -220,7 +235,7 @@ void ProgramInstance::setDatabaseError()
 
 bool ProgramInstance::execute()
 {
-	if (!m_program || !m_db_stm || m_stack.empty()) return false;
+	if (!m_db_stm || m_stack.empty()) return false;
 
 	for(;;)
 	{
@@ -234,7 +249,7 @@ bool ProgramInstance::execute()
 		}
 
 		// Evaluate conditional:
-		Instruction instr = m_code.get( m_ip);
+		Instruction instr = m_program.code.get( m_ip);
 		switch (condCode( instr))
 		{
 			case Co_ALWAYS:
@@ -248,7 +263,7 @@ bool ProgramInstance::execute()
 				++m_ip;
 				continue;
 		};
-		ArgumentIndex argidx = Program::argumentIndex( instr);
+		ArgumentIndex argidx = InstructionSet::argumentIndex( instr);
 
 		switch (opCode( instr))
 		{
@@ -266,7 +281,7 @@ bool ProgramInstance::execute()
 				break;
 			}
 			case Op_GOTO:
-				if (argidx > m_code.size()) throw std::runtime_error( "illegal goto instruction argument");
+				if (argidx > m_program.code.size()) throw std::runtime_error( "illegal goto instruction argument");
 				m_ip = argidx;
 				break;
 
@@ -283,7 +298,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_OUTPUT_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_OUTPUT_SEL_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -293,7 +308,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_OUTPUT_ITR_NAM:
 				argidx = columnIndex( top.m_valueSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_OUTPUT_ITR_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -306,7 +321,7 @@ bool ProgramInstance::execute()
 				++m_ip;
 				break;
 			case Op_OUTPUT_OPEN_ARRAY:
-				m_output->add( Output::Element( Output::Element::OpenArray, m_program->tagnametab.getName( argidx)));
+				m_output->add( Output::Element( Output::Element::OpenArray, tagnameArgument( argidx)));
 				++m_ip;
 				break;
 			case Op_OUTPUT_OPEN_ELEM:
@@ -314,7 +329,7 @@ bool ProgramInstance::execute()
 				++m_ip;
 				break;
 			case Op_OUTPUT_OPEN:
-				m_output->add( Output::Element( Output::Element::Open, m_program->tagnametab.getName( argidx)));
+				m_output->add( Output::Element( Output::Element::Open, tagnameArgument( argidx)));
 				++m_ip;
 				break;
 			case Op_OUTPUT_CLOSE_ARRAY:
@@ -394,8 +409,8 @@ bool ProgramInstance::execute()
 
 			/*Subroutine Call Instructions:*/
 			case Op_SUB_FRAME_OPEN:
-				if (argidx >= m_program->signatures.size()) throw std::runtime_error( "suroutine signatiure reference out of bounds");
-				m_subroutine_frame.init( m_program->signatures.at( argidx));
+				if (argidx >= m_program.signatures.size()) throw std::runtime_error( "suroutine signatiure reference out of bounds");
+				m_subroutine_frame.init( m_program.signatures.at( argidx));
 				++m_ip;
 				break;
 			case Op_SUB_ARG_CONST:
@@ -410,7 +425,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_SUB_ARG_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_SUB_ARG_SEL_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -420,7 +435,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_SUB_ARG_ITR_NAM:
 				argidx = columnIndex( top.m_valueSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_SUB_ARG_ITR_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -465,7 +480,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_DBSTM_BIND_SEL_NAM:
 				argidx = columnIndex( top.m_selectedSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_DBSTM_BIND_SEL_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -481,7 +496,7 @@ bool ProgramInstance::execute()
 				break;
 			case Op_DBSTM_BIND_ITR_NAM:
 				argidx = columnIndex( top.m_valueSet.get(), argidx);
-				m_code[ m_ip] = InstructionSet::instruction( 
+				m_program.code[ m_ip] = InstructionSet::instruction( 
 					condCode( instr), Op_DBSTM_BIND_ITR_IDX, argidx);
 				//... rewrite program instruction in local copy to use column index instead of column name in the next iteration
 				/*no break here!*/
@@ -537,3 +552,17 @@ bool ProgramInstance::execute()
 		}
 	}
 }
+
+ProgramInstance::ProgramInstance( const ProgramImage& program_, TransactionExecStatemachine* db_stm_, LogTraceCallBack logTraceCallBack_, const LogTraceContext* logTraceContext_)
+	:m_program(program_)
+	,m_db_stm(db_stm_)
+	,m_ip(0)
+	,m_cond(false)
+	,m_output( new Output())
+	,m_logTraceCallBack(logTraceCallBack_)
+	,m_logTraceContext(logTraceContext_)
+{
+	// Initalize top level context:
+	m_stack.push_back( StackElement());
+}
+

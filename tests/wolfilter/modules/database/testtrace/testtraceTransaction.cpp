@@ -259,11 +259,11 @@ TesttraceTransaction::TesttraceTransaction( const TesttraceDatabase* dbref_, con
 	,m_result(result_)
 {}
 
-void TesttraceTransaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
+bool TesttraceTransaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
 {
 	TransactionHandler* handler = dynamic_cast<TransactionHandler*>( execStatemachine());
 	input.print( handler->out());
-	Transaction::execute( input, output);
+	return Transaction::execute( input, output);
 }
 
 

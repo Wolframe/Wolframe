@@ -39,6 +39,7 @@
 #include <vector>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace db {

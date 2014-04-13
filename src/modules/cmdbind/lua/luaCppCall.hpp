@@ -100,7 +100,7 @@ struct LuaFunctionCppCall
 		{
 			return Functor::call( ls);
 		}
-		catch (std::exception& e)
+		catch (const std::exception& e)
 		{
 			luaerr.init( name, e.what());
 		}

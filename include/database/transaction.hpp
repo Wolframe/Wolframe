@@ -38,6 +38,7 @@
 #include "database/vmTransactionInput.hpp"
 #include "database/vmTransactionOutput.hpp"
 #include "database/transactionExecStatemachine.hpp"
+#include "database/databaseError.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -54,7 +55,7 @@ public:
 		:m_name(name_),m_stm(stm_){}
 
 	///\brief Destructor
-	virtual ~Transaction(){}
+	virtual ~Transaction()			{close();}
 	///\brief Configured ID of the underlaying database
 	const std::string& databaseID() const	{return m_stm->databaseID();}
 
@@ -68,7 +69,8 @@ public:
 	void close()				{m_stm.reset();}
 
 	///\brief Execute a transaction
-	virtual void execute( const VmTransactionInput& input, VmTransactionOutput& output);
+	///\return true if successful, otherwise false (use getLastError to get details)
+	virtual bool execute( const VmTransactionInput& input, VmTransactionOutput& output);
 
 	const std::string& name() const
 	{
@@ -99,10 +101,15 @@ public:
 		std::vector<Row> m_rows;
 	};
 
-	///\brief Execute a single statement
-	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+	///\brief Execute a single statement with result
+	///\return true if successful, otherwise false (use getLastError to get details)
+	bool executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+	///\brief Execute a single statement without result
+	///\return true if successful, otherwise false (use getLastError to get details)
+	bool executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
 
 	TransactionExecStatemachine* execStatemachine()			{return m_stm.get();}
+	const DatabaseError* getLastError() const			{return &m_lastError;}
 
 private:
 	Transaction( const Transaction&){}	//... non copyable
@@ -110,6 +117,7 @@ private:
 private:
 	std::string m_name;
 	TransactionExecStatemachineR m_stm;
+	DatabaseError m_lastError;
 };
 
 

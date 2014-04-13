@@ -38,6 +38,7 @@
 #include "types/variant.hpp"
 #include <string>
 #include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {

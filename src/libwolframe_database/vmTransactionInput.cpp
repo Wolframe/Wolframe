@@ -1,4 +1,6 @@
 #include "database/vmTransactionInput.hpp"
+#include "database/vm/selectorPathSet.hpp"
+#include "database/vm/program.hpp"
 #include "utils/printFormats.hpp"
 #include "vm/inputStructure.hpp"
 #include <iostream>
@@ -36,11 +38,12 @@ struct ProgramRewriter
 		StackElem( Address ip_, const std::vector<vm::InputNodeIndex>& selected_)
 			:ip(ip_),selected(selected_){}
 	};
-	static void rewriteInputPathReferences( vm::Program& prg, const vm::InputStructure& input);
+
+	static void rewriteInputPathReferences( vm::ProgramImage& prg, const vm::SelectorPathSet& pathset, const vm::InputStructure& input);
 };
 
 
-void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::InputStructure& input)
+void ProgramRewriter::rewriteInputPathReferences( vm::ProgramImage& prg, const vm::SelectorPathSet& pathset, const vm::InputStructure& input)
 {
 	if (prg.code.size() == 0) return;
 
@@ -123,7 +126,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 				prg.code[ stack.back().ip] = instruction( condCode(instr), oc, prg.tuplesets.size());
 
 				// [2] Get the path referenced and create its set of selected nodes ('selected') in the input :
-				const vm::SelectorPath& path = prg.pathset.getPath( argumentIndex( instr));
+				const vm::SelectorPath& path = pathset.getPath( argumentIndex( instr));
 				std::vector<vm::InputNodeIndex> selected;
 				{
 					std::vector<vm::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
@@ -148,7 +151,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 						// [3.1] Rewrite the path reference 
 						//	instruction in the FOREACH loop:
 						ArgumentIndex ai = argumentIndex( instr);
-						pathtuple.push_back( prg.pathset.getPath( ai));
+						pathtuple.push_back( pathset.getPath( ai));
 						if (oc == Op_SUB_ARG_PATH)
 						{
 							oc = Op_SUB_ARG_ITR_IDX;
@@ -202,10 +205,10 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 					const char* elemname;
 					for (; ti != te; ++ti)
 					{
-						elemname = ti->lastElementName( prg.pathset.tagtab());
+						elemname = ti->lastElementName( pathset.tagtab());
 						if (!elemname && elemname[0] == '.' && !elemname[1])
 						{
-							elemname = path.lastElementName( prg.pathset.tagtab());
+							elemname = path.lastElementName( pathset.tagtab());
 						}
 						if (elemname)
 						{
@@ -242,7 +245,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 									{
 										if (*ei != first)
 										{
-											throw std::runtime_error( std::string("ambiguus value reference in loop: '") + ti->tostring( prg.pathset.tagtab()) + "'");
+											throw std::runtime_error( std::string("ambiguus value reference in loop: '") + ti->tostring( pathset.tagtab()) + "'");
 										}
 									}
 								}
@@ -268,7 +271,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 				//... single instruction (outside FOREACH context) with path reference 
 
 				// [1] Get the path referenced:
-				const vm::SelectorPath& path = prg.pathset.getPath( argumentIndex( instr));
+				const vm::SelectorPath& path = pathset.getPath( argumentIndex( instr));
 				std::vector<vm::InputNodeIndex> selected;
 				std::vector<vm::InputNodeIndex>::const_iterator ni = stack.back().selected.begin(), ne = stack.back().selected.end();
 				for (; ni != ne; ++ni)
@@ -283,7 +286,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 				}
 				else if (selected.size() > 1)
 				{
-					throw std::runtime_error( std::string("ambiguus single value reference: '") + path.tostring( prg.pathset.tagtab()) + "'");
+					throw std::runtime_error( std::string("ambiguus single value reference: '") + path.tostring( pathset.tagtab()) + "'");
 				}
 				else
 				{
@@ -339,7 +342,7 @@ void ProgramRewriter::rewriteInputPathReferences( vm::Program& prg, const vm::In
 VmTransactionInput::VmTransactionInput( const vm::Program& p, const vm::InputStructure& input)
 	:m_program(p)
 {
-	ProgramRewriter::rewriteInputPathReferences( m_program, input);
+	ProgramRewriter::rewriteInputPathReferences( m_program, p.pathset, input);
 }
 
 

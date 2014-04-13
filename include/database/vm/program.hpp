@@ -31,15 +31,15 @@
 
 ************************************************************************/
 ///\file database/vm/program.hpp
-///\brief Interface for program executing database transactions
+///\brief Interface for constructing and inspecting programs executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
 #include "database/vm/nameTable.hpp"
 #include "database/vm/selectorPathSet.hpp"
 #include "database/vm/programCode.hpp"
-#include "database/vm/subroutineFrame.hpp"
 #include "database/vm/errorHintTable.hpp"
+#include "database/vm/valueTupleSet.hpp"
 #include "utils/fileLineInfo.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"

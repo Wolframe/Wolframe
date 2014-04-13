@@ -35,11 +35,8 @@
 //
 #ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
 #define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
-#include "logger-v1.hpp"
-#include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>
-#include <stdexcept>
 
 namespace _Wolframe {
 namespace db {
@@ -71,6 +68,7 @@ public:
 		,ip(0)
 		{}
 
+public:
 	std::string dbname;		//< error class identifier
 	std::string errorclass;		//< error class identifier
 	unsigned int errorcode;		//< error code

@@ -47,6 +47,13 @@ static PatchArgumentMapR joinVectors( std::vector<Element>& dst, const std::vect
 	return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
 }
 
+static PatchArgumentMapR joinProgramCode( ProgramCode& ths, const ProgramCode& oth)
+{
+	std::size_t ofs = ths.size();
+	ths.append( oth);
+	return PatchArgumentMapR( new PatchArgumentMap_Offset( ofs));
+}
+
 static void patchCode( ProgramCode& code, InstructionSet::ArgumentType argtype, std::size_t startidx, const PatchArgumentMap& pamap)
 {
 	if (startidx > code.size())
@@ -78,7 +85,7 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 	PatchArgumentMapR pmap;
 	if (doPatchGOTOs)
 	{
-		pmap = code.join( oth.code);
+		pmap = joinProgramCode( code, oth.code);
 		patchCode( code, At_Address, startidx, *pmap);
 	}
 	else
@@ -200,7 +207,7 @@ void Program::printInstruction( std::ostream& out, const Instruction& instr) con
 			out << " TAG " << tagnametab.getName( ai);
 			break;
 		case At_ResultName:
-			out << " RESULT " << tagnametab.getName( ai);
+			out << " RESULT " << resultnametab.getName( ai);
 			break;
 		case At_Statement:
 			if (ai >= statements.size()) throw std::runtime_error("array bound read");
@@ -296,14 +303,14 @@ void Program::print( std::ostream& out) const
 		}
 	}
 
-	std::vector<std::vector<ErrorHint> >::const_iterator hi = hinttab.begin(), he = hinttab.end();
+	std::vector<ErrorHintTable::HintList>::const_iterator hi = hinttab.begin(), he = hinttab.end();
 	if (hi != he)
 	{
 		out << "Error Hints:" << std::endl;
 		for (std::size_t idx=0; hi != he; ++hi,++idx)
 		{
 			out << "HINT " << idx << ":" << std::endl;
-			std::vector<ErrorHint>::const_iterator ei = hi->begin(), ee = hi->end();
+			ErrorHintTable::HintList::const_iterator ei = hi->begin(), ee = hi->end();
 			for (; ei != ee; ++ei)
 			{
 				out << "  " << ei->errorclass << ": " << ei->message << std::endl;
