@@ -38,7 +38,7 @@
 #include <boost/lexical_cast.hpp>
 
 //\brief Defines a Wolframe module for programs with a runtime environment (e.g. programs with shared resources) after the includes section.
-#define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION)\
+#define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
 	static const char* _Wolframe__moduleName()\
 	{\
 		return #NAME;\
@@ -53,11 +53,9 @@
 	public:\
 		NAME ##Constructor(){}\
 		virtual ~NAME ##Constructor(){}\
-		virtual DotnetRuntimeEnvironment* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		virtual CLASSDEF* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
-			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");\
-			DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);\
+			CLASSDEF* rt = new CLASSDEF( cfgi);\
 			return rt;\
 		}\
 		virtual const char* objectClassName() const\
@@ -70,16 +68,17 @@
 		}\
 	};\
 	class NAME ##Builder\
-		:public ConfiguredBuilder\
+		:public _Wolframe::module::ConfiguredBuilder\
 	{\
 	public:\
 		NAME ##Builder()\
-			:ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #NAME)\
+			:_Wolframe::module::ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #NAME)\
 		{\
 			int err;\
-			if (0!=(err=INITFUNCTION())) throw std::runtime_error(std::string("failed to initialize runtime environment (error code ") + boost::lexical_cast<std::string>(err) + ")");\
 		}\
-		virtual ~NAME ## Builder(){}\
+		virtual ~NAME ## Builder()\
+		{\
+		}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\
 			return _Wolframe::ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\

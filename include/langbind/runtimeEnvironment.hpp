@@ -58,6 +58,8 @@ public:
 	//\return the function names
 	virtual std::vector<std::string> functions() const=0;
 
+	//\brief Get the global name of the runtime environment
+	//\return the runtime envoronment name
 	virtual const char* name() const=0;
 };
 

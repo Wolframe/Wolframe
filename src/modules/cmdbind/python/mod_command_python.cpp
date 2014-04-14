@@ -31,43 +31,15 @@
 
 ************************************************************************/
 ///\file mod_command_python.cpp
-///\brief Module for command handler executing python code
-#include "appdevel/module/programTypeBuilder.hpp"
-#include "pythonFunctionProgramType.hpp"
-#include "logger-v1.hpp"
+///\brief Module for runtime environment executing python code
+#include "appdevel/runtimeEnvironmentModuleMacros.hpp"
+#include "pythonRuntimeEnvironment.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+RUNTIME_ENVIRONMENT_MODULE(
+	PythonCommandHandler,
+	"command handler for Python scripts",
+	"runtimeenv", "python",
+	_Wolframe::module::PythonRuntimeEnvironment,
+	_Wolframe::module::PythonRuntimeEnvironmentConfig);
 
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
-{
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
-	return &mod;
-}
-*/
 
-static SimpleBuilder* pythonProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
-
-enum {NofConfiguredBuilder=0};
-/* LATER
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
-{
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
-}

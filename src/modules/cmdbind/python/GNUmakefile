@@ -35,6 +35,8 @@ CPP_OBJS = \
 	pythonInterpreterInstance.o \
 	pythonStructure.o \
 	pythonStructureBuilder.o \
+	pythonRuntimeEnvironmentConfig.o \
+	pythonRuntimeEnvironment.o \
 	pythonFunctionProgramType.o \
 	mod_command_python.o
 

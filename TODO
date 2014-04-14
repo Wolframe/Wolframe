@@ -5,6 +5,8 @@ Core:
 	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
+Filters:
+	- Implement serialize with indices in cJSON filter
 Processors:
 	- Rewrite TDL VM
 	- Python (ABa, with support PF)

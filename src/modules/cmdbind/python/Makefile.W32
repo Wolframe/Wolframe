@@ -42,6 +42,8 @@ CPP_OBJS = \
 	pythonInterpreterInstance.obj \
 	pythonStructure.obj \
 	pythonStructureBuilder.obj \
+	pythonRuntimeEnvironmentConfig.obj \
+	pythonRuntimeEnvironment.obj \
 	pythonFunctionProgramType.obj \
 	mod_command_python.obj
 

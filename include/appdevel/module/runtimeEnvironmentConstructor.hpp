@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace proc {
 	//\brief Forward declaration
-	class ProcessorProvider;
+	class ProcessorProviderInterface;
 }
 namespace module {
 
