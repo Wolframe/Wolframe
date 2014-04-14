@@ -234,8 +234,16 @@ struct InputFilterImpl
 				if (st < 0)
 				{
 					if (st == -1) continue;
-					setState( Error, "textwolf: syntax error in XML");
-					return false;
+					if (st == -2)
+					{
+						setState( Error, ee);
+						return false;
+					}
+					else
+					{
+						setState( Error, "syntax error in XML");
+						return false;
+					}
 				}
 				else
 				{

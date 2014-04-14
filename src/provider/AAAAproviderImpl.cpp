@@ -83,7 +83,7 @@ AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* con
 	  m_auditor( conf->m_auditConfig, modules )
 {
 	// initialize the global rnd generator
-	RandomGenerator::instance( conf->m_randomDevice );
+	GlobalRandomGenerator::instance( conf->m_randomDevice );
 }
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )

@@ -98,10 +98,23 @@ public:
 	{
 		m_steps.push_back(f);
 	}
+
+	bool hasMethod( const std::string& methodname)
+	{
+		if (m_steps.empty()) return false;
+		const types::NormalizeFunction* nf = m_steps.back().get();
+		const types::CustomDataNormalizer* cf = dynamic_cast<const types::CustomDataNormalizer*>( nf);
+		if (!cf) return false;
+		const types::CustomDataType* tp = cf->type();
+		if (!tp) return false;
+		return tp->getMethod( methodname);
+	}
+
 	virtual const char* name() const
 	{
 		return m_name.c_str();
 	}
+
 	virtual types::Variant execute( const types::Variant& i) const
 	{
 		if (m_steps.empty()) return i;
@@ -141,7 +154,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 	std::vector<std::pair<std::string,types::NormalizeFunctionR> > rt;
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
-	static const utils::CharTable optab( "=;)(,");
+	static const utils::CharTable optab( "#=;)(,");
 	std::string prgname,tok,funcname;
 	std::string::const_iterator argstart;
 	std::string::const_iterator si = source.begin(), se = source.end();
@@ -183,7 +196,14 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::vector<types::Variant>(), prglibrary)));
+						if (funcdef.hasMethod( funcname))
+						{
+							funcdef.define( types::NormalizeFunctionR( new types::CustomDataMethodCallNormalizer( funcname, std::vector<types::Variant>())));
+						}
+						else
+						{
+							funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, std::vector<types::Variant>(), prglibrary)));
+						}
 						++si;
 						continue;
 					case '(':
@@ -208,7 +228,14 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 						while ((ch=utils::parseNextToken( tok, si, se, optab)) == ',');
 						if (ch != ')') throw ERROR( si, "expected ')' or argument separator ','");
 						
-						funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, arg, prglibrary)));
+						if (funcdef.hasMethod( funcname))
+						{
+							funcdef.define( types::NormalizeFunctionR( new types::CustomDataMethodCallNormalizer( funcname, arg)));
+						}
+						else
+						{
+							funcdef.define( types::NormalizeFunctionR( createBaseFunction( funcname, arg, prglibrary)));
+						}
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{

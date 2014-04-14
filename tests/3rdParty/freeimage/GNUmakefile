@@ -38,9 +38,11 @@ local_clean:
 
 local_distclean:
 
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(FREEIMAGE_LIB_DIR):$(FREEIMAGEPLUS_LIB_DIR)"
+
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(FREEIMAGE_LIB_DIR):$(FREEIMAGEPLUS_LIB_DIR) ./freeimageTest
-	@LD_LIBRARY_PATH=$(FREEIMAGE_LIB_DIR):$(FREEIMAGEPLUS_LIB_DIR) ./freeimageTestCpp
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./freeimageTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./freeimageTestCpp
 	@echo
 endif

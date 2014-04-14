@@ -8,7 +8,7 @@ Windows WIX Packaging Instructions
 Requirements
 ------------
 
-* Wix 3.5 (which requires .NET 2.0)
+* Wix 3.8 (which requires .NET 2.0)
 
 Prepare the build
 -----------------

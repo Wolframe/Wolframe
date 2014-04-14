@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-March 19, 2014 version 0.0.1
+April 12, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -234,8 +234,12 @@ If you want to use ccache and distcc in parallel, use the following commands:
         make CC='ccache gcc' CXX='ccache g++'
 
 
-Note: Careful with non-GNU compilers and ccache. At least clang is known to
-have issues if used together with ccache!
+When using 'clang' with 'ccache' set the following environment variable too (on
+Linux only, on FreeBSD 10 the ccache with clang combination runs out of the
+box):
+
+        export CCACHE_CPP2=1
+
 
 1.7. Platform-specific build instructions
 
@@ -244,7 +248,12 @@ FreeBSD
 You need GNU make, BSD make doesn't work. You have to install the 'gmake'
 package.
 
-Both FreeBSD 8 and FreeBSD 9 are supported.
+FreeBSD 8, 9 and 10 are supported.
+
+Note: As of FreeBSD 10 it's recommended to use the 'pkgng' package management
+tool to install binary prerequsites.
+
+Note: Since FreeBSD 10 clang is the default compiler and no longer gcc.
 
 NetBSD
 
@@ -448,13 +457,18 @@ You need the 'boost' package. This package is part of the 'l' package series.
 The official Boost package contains support for boost-locale and the ICU
 backend.
 
-FreeBSD
+FreeBSD 10
 
 You need the 'boost-libs' package.
 
-Some boost header files are broken, for patches see packaging/patches/FreeBSD.
-They can be applied to the ports directory before rebuilding Boost or directly
-to the installed header files in /usr/local/include/boost.
+FreeBSD 8 and 9
+
+You need the 'boost-libs' package.
+
+Some boost header files are broken when compiling with gcc, for patches see
+packaging/patches/FreeBSD. They can be applied to the ports directory before
+rebuilding Boost or directly to the installed header files in /usr/local/
+include/boost.
 
 NetBSD
 
@@ -536,10 +550,13 @@ following when building:
 Currently only OpenSSL (http://www.openssl.org) is supported. The location of
 the library can be overloaded with:
 
-        make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1.f
+        make WITH_SSL=1 OPENSSL_DIR=/usr/local/openssl-1.0.1g
 
 
 Use the most recent version of the OpenSSL library available for you platform.
+
+Note: Be carefull to use the 0.9.8, 1.0.0 or 1.0.1g or newer versions, but not
+the versions 1.0.1 through 1.0.1f (Heartbleed bug)!
 
 RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions
 
@@ -763,7 +780,13 @@ Compile Wolframe now with:
 Alternatively you can of course also build the 'postgresql' package with the
 help of SlackBuilds.
 
-FreeBSD
+FreeBSD 10
+
+You need the 'postgresql93-client' package.
+
+For testing you also need the 'postgresql93-server' package.
+
+FreeBSD 8 and 9
 
 You need the 'postgresql92-client' package.
 
@@ -1105,7 +1128,11 @@ On Slackware you have to build your own version of Python with:
 Alternatively you can of course also build the 'python3' package with the help
 of SlackBuilds.
 
-FreeBSD
+FreeBSD 10
+
+You need the 'python33' package.
+
+FreeBSD 8 and 9
 
 Build the BSD ports package for 'python33'. There is no binary Python 3
 package.
@@ -1201,7 +1228,11 @@ and 'libpng' packages.
 
 Both packages are part of the 'l' package series.
 
-FreeBSD
+FreeBSD 10
+
+You need the 'libharu' package.
+
+FreeBSD 8 and 9
 
 Build the embedded version of libhpdf with 'WITH_LOCAL_LIBHPDF=1'.
 
@@ -1302,7 +1333,11 @@ On Slackware you have to build your own version of FreeImage. You need the
 Alternatively you can of course also build the 'FreeImage' package with the
 help of SlackBuilds.
 
-FreeBSD
+FreeBSD 10
+
+You need the 'freeimage' package.
+
+FreeBSD 8 and 9
 
 Build the embedded version of FreeImage with 'WITH_LOCAL_FREEIMAGE=1'.
 
@@ -1448,7 +1483,12 @@ Slackware
 The official Boost package contains support for boost-locale and the ICU
 backend. This package is part of the 'l' package series.
 
-FreeBSD
+FreeBSD 10
+
+The official Boost packages have a boost-locale library which has support for
+the ICU backend per default.
+
+FreeBSD 8 and 9
 
 The official Boost packages don't contain a boost-locale with ICU backend.
 
@@ -1823,7 +1863,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 
 ArchLinux
 
-You need the 'xsltproc', 'doxygen' and 'docbook-xsl' packages.
+You need the 'libxslt', 'doxygen' and 'docbook-xsl' packages.
 
 When generating PDFs you need the 'fop' package. Newest versions run only with
 the SVN version of 'java-xmlgraphics-commons'. Install the package

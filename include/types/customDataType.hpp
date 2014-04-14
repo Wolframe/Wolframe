@@ -103,7 +103,7 @@ typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
 typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::vector<types::Variant>& arg);
 typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
-typedef types::Variant (*CustomDataValueMethod)( CustomDataValue& val, const std::vector<types::Variant>& arg);
+typedef types::Variant (*CustomDataValueMethod)( const CustomDataValue& val, const std::vector<types::Variant>& arg);
 
 //\class CustomDataType
 //\brief Custom Data Type Definition

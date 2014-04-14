@@ -37,16 +37,12 @@ freeimageTestCpp.exe: freeimageTestCpp.obj
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
 	@-erase thumb.png thumbcpp.png testmem.png 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo copy "$(TOPDIR)\3rdParty\freeimage\freeimage3.dll" . >> test.bat
-	@-echo copy "$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.dll" . >> test.bat
-	@-echo freeimageTest >> test.bat
-	@-echo freeimageTestCpp >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+	@-copy $(TOPDIR)\3rdParty\freeimage\freeimage3.dll . >NUL
+	@-copy $(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.dll . >NUL
+	@-freeimageTest
+	@-freeimageTestCpp

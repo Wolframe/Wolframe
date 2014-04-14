@@ -40,15 +40,17 @@
 #include <cassert>
 
 #include "AAAA/password.hpp"
+#include "crypto/PBKDF2.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
-#include "crypto/sha2.h"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
+
+static const unsigned int PBKDF2_ROUNDS = 10589;
 
 /****  Password Salt  ************************************************/
 static const size_t PASSWORD_SALT_BCD_SIZE = PASSWORD_SALT_SIZE * 2 + 1;
@@ -66,6 +68,12 @@ PasswordHash::Salt::~Salt()
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
 }
 
+PasswordHash::Salt::Salt( const crypto::RandomGenerator& rndGen )
+{
+	m_size = PASSWORD_SALT_SIZE;
+	rndGen.generate( m_salt, PASSWORD_SALT_SIZE );
+}
+
 /// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
 /// and it can not be changed.
 PasswordHash::Salt::Salt( const unsigned char* data , size_t bytes )
@@ -79,8 +87,7 @@ PasswordHash::Salt::Salt( const std::string& str )
 {
 	int ret;
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
-	if (( ret = base64_decode( str.data(), str.size(),
-				   m_salt, PASSWORD_SALT_SIZE )) < 0 )	{
+	if (( ret = base64::decode( str, m_salt, PASSWORD_SALT_SIZE )) < 0 )	{
 		std::string errMsg = "Cannot convert '" + str + "' to a password salt";
 		throw std::runtime_error( errMsg );
 	}
@@ -145,17 +152,16 @@ PasswordHash::Hash::Hash( const std::string& str )
 {
 	int	ret;
 	memset( m_hash, 0, PASSWORD_HASH_SIZE );
-	if (( ret = base64_decode( str.data(), str.size(),
-				   m_hash, PASSWORD_HASH_SIZE )) < 0 )	{
+	if (( ret = base64::decode( str, m_hash, PASSWORD_HASH_SIZE )) < 0 )	{
 		std::string errMsg = "Cannot convert '" + str + "' to a password hash";
 		throw std::runtime_error( errMsg );
 	}
-//	if ( ret != PASSWORD_HASH_SIZE )	{
-//		std::string errMsg = "Password hash has wrong size, expected "
-//				     + boost::lexical_cast<std::string>( PASSWORD_HASH_SIZE ) + ", got "
-//				     + boost::lexical_cast<std::string>( ret );
-//		throw std::runtime_error( errMsg );
-//	}
+	if ( (size_t)ret != PASSWORD_HASH_SIZE )	{
+		std::string errMsg = "Password hash has wrong size, expected "
+				     + boost::lexical_cast<std::string>( PASSWORD_HASH_SIZE ) + ", got "
+				     + boost::lexical_cast<std::string>( ret );
+		throw std::runtime_error( errMsg );
+	}
 }
 
 
@@ -190,10 +196,18 @@ std::string PasswordHash::Hash::toString() const
 }
 
 /****  PasswordHash  *************************************************/
-static void hashPassword( const unsigned char* /*pwdSalt*/, size_t /*saltSize*/, const std::string& password,
-			  unsigned char* hash )
+static void hashPassword( const unsigned char* pwdSalt, size_t saltSize,
+			  const std::string& password, unsigned char* hash )
 {
-	sha224((const unsigned char*)password.c_str(), password.length(), hash );
+	crypto::PBKDF2_HMAC_SHA1 key( password, pwdSalt, saltSize, PASSWORD_HASH_SIZE, PBKDF2_ROUNDS );
+	assert( key.size() == PASSWORD_HASH_SIZE );
+	memcpy( hash, key.hash(), key.size() );
+}
+
+PasswordHash::PasswordHash( const crypto::RandomGenerator& rndGen, const std::string& password )
+	: m_salt( rndGen )
+{
+	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
 }
 
 PasswordHash::PasswordHash( const unsigned char* pwdSalt, size_t bytes, const std::string& password )

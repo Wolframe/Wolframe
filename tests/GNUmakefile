@@ -114,6 +114,7 @@ TEST_CPP_BINS = \
 	testMD5$(EXE) \
 	HMACtest$(EXE) \
 	PBKDF2test$(EXE) \
+	CRAMtest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
@@ -130,7 +131,6 @@ TEST_CPP_BINS = \
 	testString$(EXE) \
 	testDateTime$(EXE) \
 	testBigNumber$(EXE) \
-#	CRAMtest$(EXE) \
 # DISABLED (moved to .Attic) unitLibraryTest$(EXE)
 #	stringNormalizationTest$(EXE) \
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
@@ -141,7 +141,7 @@ logTest$(EXE): $(TOPDIR)/src/libwolframed.a
 testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-# CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -221,8 +221,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
 	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
-#	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
+	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
@@ -256,8 +256,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 endif
 
-local_longtest: poolTest
-ifeq ($(RUN_TESTS),0)
+local_longtest: poolTest testArrayDoublingAllocator PBKDF2test
+ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator

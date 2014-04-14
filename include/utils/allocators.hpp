@@ -36,6 +36,7 @@
 #define _UTILS_ALLOCATORS_HPP_INCLUDED
 #include <cstddef>
 #include <stdexcept>
+#include <new>
 
 namespace _Wolframe {
 namespace utils {

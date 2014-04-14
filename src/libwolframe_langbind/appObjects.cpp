@@ -94,7 +94,7 @@ const void* Input::allocContentCopy( const void* ptr, std::size_t size)
 
 InputFilterR& Input::getIterator()
 {
-	if (m_used) throw std::runtime_error( "try to read input twice");
+	if (m_used) throw std::runtime_error( "try to use iterator for input/document twice");
 	m_used = true;
 	return m_inputfilter;
 }

@@ -63,13 +63,24 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSiz
 PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const std::string& password, const std::string& salt,
 				    std::size_t dkLen, unsigned int rounds )
 {
+	int saltSize;
+	int saltMaxSize = (( salt.length() + 3 ) / 4 ) * 3;
+	unsigned char* saltData = new unsigned char[ saltMaxSize ];
+	if (( saltSize = base64::decode( salt, saltData, saltMaxSize )) < 0 )	{
+		delete[] saltData;
+		throw std::runtime_error( "error decoding PBKDF2 salt" );
+	}
+
 	m_hash = new unsigned char[ dkLen ];
+
 	if ( pbkdf2_hmac_sha1( (const unsigned char*)password.data(), password.size(),
-			       (const unsigned char*)salt.data(), salt.size(),
+			       saltData, (size_t)saltSize,
 			       dkLen, rounds, m_hash ) != 0 )	{
+		delete[] saltData;
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
 	}
+	delete[] saltData;
 	m_dkLen = dkLen;
 }
 
@@ -92,13 +103,23 @@ PBKDF2_HMAC_SHA1::PBKDF2_HMAC_SHA1( const unsigned char* password, size_t pwdSiz
 				    const std::string& salt,
 				    std::size_t dkLen, unsigned int rounds )
 {
+	int saltSize;
+	int saltMaxSize = (( salt.length() + 3 ) / 4 ) * 3;
+	unsigned char* saltData = new unsigned char[ saltMaxSize ];
+	if (( saltSize = base64_decode( salt.data(), salt.size(), saltData, saltMaxSize )) < 0 )	{
+		delete[] saltData;
+		throw std::runtime_error( "error decoding PBKDF2 salt" );
+	}
+
 	m_hash = new unsigned char[ dkLen ];
-	if ( pbkdf2_hmac_sha1( password, pwdSize,
-			       (const unsigned char*)salt.data(), salt.size(),
+	if ( pbkdf2_hmac_sha1( password, pwdSize, saltData, saltSize,
 			       dkLen, rounds, m_hash ) != 0 )	{
+		delete[] saltData;
 		delete[] m_hash; m_hash = NULL; m_dkLen = 0;
 		throw std::runtime_error( "error building PBKDF2-HMAC-SHA1 derived key" );
 	}
+
+	delete[] saltData;
 	m_dkLen = dkLen;
 }
 

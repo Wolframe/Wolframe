@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-/// \file user.hpp
+///\file user.hpp
 /// Basic user information
 //
 
@@ -51,21 +51,26 @@ public:
 		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
 		  m_uname( uName ), m_name( Name )	{}
 
+	/// Destructor
 	~User();
 
 	const std::string& authenticator() const	{ return m_authenticator; }
+	/// Return the login moment
 	time_t loginTime() const			{ return m_loginTime; }
+	/// Return the username
 	const std::string& uname() const		{ return m_uname; }
+	/// Return the real name of the user
 	const std::string& name() const			{ return m_name; }
+
 private:
-	const std::string	m_authenticator;
-	const time_t		m_loginTime;
-	const std::string	m_uname;
-	const std::string	m_name;
+	std::string	m_authenticator;
+	time_t		m_loginTime;
+	std::string	m_uname;
+	std::string	m_name;
 
 #ifdef _WIN32
 // prevent C4512 on Windows, we don't want user data to be assignable
-private:	
+private:
 	User& operator=( const User &o );
 #endif
 };

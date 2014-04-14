@@ -30,44 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/SQLiteStatement.hpp
-#ifndef _SQLITE_STATEMENT_HPP_INCLUDED
-#define _SQLITE_STATEMENT_HPP_INCLUDED
-#include <string>
-#include <vector>
-#include "database/baseStatement.hpp"
-#include "sqlite3.h"
+//
+/// \file randomGenerator.hpp
+/// Random Generator interface class
+
+#ifndef _RANDOM_GENERATOR_HPP_INCLUDED
+#define _RANDOM_GENERATOR_HPP_INCLUDED
 
 namespace _Wolframe {
-namespace db {
+namespace crypto {
 
-class SQLiteStatement : public BaseStatement
+class RandomGenerator
 {
-	public:
-		SQLiteStatement( );
-		SQLiteStatement( const SQLiteStatement &o );
+public:
+	 virtual ~RandomGenerator() {}
 
-		virtual void clear( );
-
-		virtual void bind( const unsigned int idx, const types::Variant &arg );
-
-		virtual const std::string replace( const unsigned int idx ) const;
-
-		void setStatement( sqlite3_stmt *stm );
-		
-		int getLastStatus( );
-	
-	private:
-		//\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
-		void bindVariant( unsigned int idx, const types::Variant &value);
-
-	private:
-		sqlite3_stmt *m_stm;
-		int m_rc;
-		std::vector<std::string> m_data;
+	virtual unsigned random() const = 0;
+	virtual void generate( unsigned char* buffer, size_t bytes ) const = 0;
 };
 
-}}//namespace
-#endif
+}} // namespace _Wolframe::crypto
 
+#endif // _RANDOM_GENERATOR_HPP_INCLUDED

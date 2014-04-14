@@ -56,7 +56,12 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 {
 	// does boundary checking
 	BaseStatement::bind( idx, value );
-	
+
+	bindVariant( idx, value);
+}
+
+void PostgreSQLstatement::bindVariant( unsigned int idx, const types::Variant& value)
+{
 	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
 
 	switch (value.type())
@@ -112,11 +117,13 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 		{
 			std::string strval = types::DateTime( value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime);
 			bindString( strval.c_str(), strval.size());
+			break;
 		}
 		case types::Variant::BigNumber:
 		{
 			std::string strval = value.tostring();
 			bindString( strval.c_str(), strval.size());
+			break;
 		}
 		case types::Variant::Custom:
 		{
@@ -126,7 +133,7 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 				if (value.customref()->getBaseTypeValue( baseval)
 				&&  baseval.type() != types::Variant::Custom)
 				{
-					bind( idx, baseval);
+					bindVariant( idx, baseval);
 					break;
 				}
 			}
@@ -134,7 +141,8 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			bind( idx, value.tostring());
+			bindVariant( idx, value.tostring());
+			break;
 		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );

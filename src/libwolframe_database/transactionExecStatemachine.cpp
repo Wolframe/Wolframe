@@ -109,7 +109,7 @@ static types::VariantConst resolveResultReference( const TransactionOutput& outp
 		}
 		if (fi->nofRows() > 1)
 		{
-			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "unbound result reference to set of results", "internal logic error (transaction function variable reference)");
+			db::DatabaseError dberr( _Wolframe::log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(43), 0/*dbname*/, cmditr->statement().c_str(), "INTERNAL", "unbound result reference to set of results", "unbound result reference to set of results");
 			throw db::DatabaseErrorException( dberr);
 		}
 		if (fi->nofRows() > 0)
@@ -528,6 +528,11 @@ void TransactionExecStatemachine::doTransaction( const TransactionInput& input, 
 	{
 		rollback();
 		throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
+	}
+	catch (const std::logic_error& e)
+	{
+		rollback();
+		throw e;
 	}
 }
 

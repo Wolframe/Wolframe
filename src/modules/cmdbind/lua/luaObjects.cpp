@@ -1555,7 +1555,7 @@ LUA_FUNCTION_THROWS( "input:docformat()", function_input_docformat)
 		input = (Input*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
 	}
-	if (!input->docformat().empty())
+	if (input->docformat().empty())
 	{
 		lua_pushnil( ls);
 		return 1;
@@ -2708,7 +2708,8 @@ void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provid
 
 		// register objects already here that may be used in the initilization part:
 		Logger logger_;
-		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
+		LuaObject<Logger>::createMetatable( m_ls, 0, 0, logger_methodtable, 0/*typename*/);
+		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_);
 		if (m_modulemap)
 		{
 			setGlobalModuleMap( m_ls, m_modulemap);
@@ -2744,6 +2745,8 @@ void LuaScriptInstance::initbase( const proc::ProcessorProviderInterface* provid
 		LuaObject<TypedInputFilterClosure>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
 		LuaObject<FormFunctionClosureR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
 		LuaObject<types::NormalizeFunctionR>::createMetatable( m_ls, 0, 0, 0/*mt*/, 0/*typename*/);
+		LuaObject<Input>::createMetatable( m_ls, 0, 0, input_methodtable, 0/*typename*/);
+		LuaObject<Output>::createMetatable( m_ls, 0, 0, output_methodtable, 0/*typename*/);
 
 		if (provider_) setProcessorProvider( m_ls, provider_);
 		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0/*mt*/, "filter");
@@ -2765,8 +2768,8 @@ void LuaScriptInstance::init( const Input& input_, const Output& output_, const 
 	initbase( provider_, true);
 	LuaExceptionHandlerScope luaThrows(m_ls);
 	{
-		LuaObject<Input>::createGlobal( m_ls, "input", input_, input_methodtable);
-		LuaObject<Output>::createGlobal( m_ls, "output", output_, output_methodtable);
+		LuaObject<Input>::createGlobal( m_ls, "input", input_);
+		LuaObject<Output>::createGlobal( m_ls, "output", output_);
 	}
 }
 

@@ -130,55 +130,54 @@ local_all: $(LOCAL_STATIC_LIB)
 local_clean:
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase $(CPP_OBJS) 2>NUL
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
 
 copy_prereq:
-	@-copy libwfsingleton\wfsingleton.dll" .
+	@-copy libwfsingleton\wfsingleton.dll . >NUL
 !IFDEF WITH_SSL
-	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
-	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
 !ENDIF
 !IFDEF WITH_LUA
-	@-copy ..\3rdParty\lua\src\lua52.dll .
+	@-copy ..\3rdParty\lua\src\lua52.dll . >NUL
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL
 !IFDEF PGDLL_WITH_I18N
-	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
-	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL
 !ENDIF
+!ENDIF
+!IFDEF WITH_ORACLE
+	@-copy "$(ORACLE_DIR)\*.dll" .  >NUL
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" .
-	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
-	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" . >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" . >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >NUL
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >NUL
 !ENDIF
 !IFDEF WITH_ICU
 !IFNDEF DEBUG
-	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" .
-	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" .
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >NUL
 !ELSE
-	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" .
-	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" .
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >NUL
 !ENDIF
 !ENDIF
 
 run: copy_prereq
-	@-echo echo Running the Wolframe server... > test.bat
-	@-echo wolframed.exe -c wolframe.xml >> test.bat
-	@-test.bat
+	@-echo Running the Wolframe server...
+	@-wolframed.exe -c wolframe.xml
 
 check: copy_prereq
-	@-echo wolframed.exe -c wolframe.xml -t > test.bat
-	@-test.bat
+	@-wolframed.exe -c wolframe.xml -t
 
 print: copy_prereq
-	@-echo wolframed.exe -c wolframe.xml -p > test.bat
-	@-test.bat
+	@-wolframed.exe -c wolframe.xml -p

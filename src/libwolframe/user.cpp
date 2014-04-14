@@ -37,7 +37,8 @@
 #include <string>
 #include <AAAA/user.hpp>
 
-using namespace _Wolframe::AAAA;
+namespace _Wolframe	{
+namespace AAAA	{
 
 
 /// User object destructor.
@@ -60,3 +61,5 @@ User::~User()
 	      i < m_name.length(); i++, cptr++ )
 		*cptr = 'x';
 }
+
+}} // namespace _Wolframe::AAAA

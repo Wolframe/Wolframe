@@ -38,20 +38,14 @@
 #include "AAAA/CRAM.hpp"
 #include "system/globalRngGen.hpp"
 
-TEST( CRAM, UninitializedRandomGenerator )
+TEST( DISABLED_CRAM, Challenge )
 {
-	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge, std::logic_error );
-}
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance( "" );
 
-TEST( CRAM, Challenge )
-{
-	_Wolframe::RandomGenerator::instance( "" );
-
-	const unsigned char* pwdHash = (const unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
-	_Wolframe::AAAA::CRAMchallenge	challenge;
+	_Wolframe::AAAA::CRAMchallenge	challenge( rnd );
 	std::cout << challenge.toBCD();
-	_Wolframe::AAAA::CRAMresponse	resp1( challenge, pwdHash, 224 / 8 );
-	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), pwdHash, 224 / 8 );
+	_Wolframe::AAAA::CRAMresponse	resp1( challenge.toString(), "password" );
+	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "password" );
 	EXPECT_TRUE( resp1 == resp2 );
 }
 

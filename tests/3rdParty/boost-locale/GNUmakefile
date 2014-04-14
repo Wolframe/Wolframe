@@ -34,8 +34,10 @@ local_clean:
 
 local_distclean:
 
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(ICU_LIB_DIR)"
+
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(ICU_LIB_DIR) LANG=en_US.UTF8 ./boostLocaleTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) LANG=en_US.UTF8 ./boostLocaleTest
 	@echo
 endif

@@ -3,7 +3,7 @@
 **requires:CJSON
 **requires:TEXTWOLF
 **exception
-try to read input twice
+try to use iterator for input/document twice
 **input
 {
   "doctype" : "employee_assignment_print",

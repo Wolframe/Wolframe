@@ -74,6 +74,9 @@ class OracleStatement : public BaseStatement
 		sword getLastStatus( );
 
 	private:
+		//\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
+		void bindVariant( unsigned int idx, const types::Variant &value);
+
 		void bindUInt( const unsigned int idx, unsigned int &value );
 		void bindInt( const unsigned int idx, signed int &value );
 #if OCI_MAJOR_VERSION >= 12 || ( OCI_MAJOR_VERSION == 11 && OCI_MAJOR_VERSION >= 2 )

@@ -1,4 +1,4 @@
-LIBRARY mod_normalize_example1
+LIBRARY mod_example_normalize1
 
 EXPORTS
 entryPoint	@1

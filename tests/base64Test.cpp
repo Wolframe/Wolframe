@@ -115,30 +115,37 @@ TEST( Base64, encoding )
 	codeLength = strEncode( emptyData, encoded, bufSize );
 	EXPECT_EQ( 0, codeLength );
 	EXPECT_STREQ( "", encoded );
+	EXPECT_STREQ( "", _Wolframe::base64::encode( emptyData, 0, 0 ).c_str() );
 
 	codeLength = strEncode( vector1, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result1, encoded );
+	EXPECT_STREQ( result1, _Wolframe::base64::encode( vector1, strlen( vector1 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector2, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result2, encoded );
+	EXPECT_STREQ( result2, _Wolframe::base64::encode( vector2, strlen( vector2 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector3, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result3, encoded );
+	EXPECT_STREQ( result3, _Wolframe::base64::encode( vector3, strlen( vector3 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector4, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result4, encoded );
+	EXPECT_STREQ( result4, _Wolframe::base64::encode( vector4, strlen( vector4 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector5, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result5, encoded );
+	EXPECT_STREQ( result5, _Wolframe::base64::encode( vector5, strlen( vector5 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector6, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result6, encoded );
+	EXPECT_STREQ( result6, _Wolframe::base64::encode( vector6, strlen( vector6 ), 0 ).c_str() );
 }
 
 TEST( Base64, decoding )
