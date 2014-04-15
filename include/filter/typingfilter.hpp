@@ -34,6 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #define _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/variant.hpp"
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
@@ -57,7 +59,8 @@ public:
 	TypingInputFilter( const TypingInputFilter& o)
 		:utils::TypeSignature(o)
 		,TypedInputFilter(o)
-		,m_inputfilter(o.m_inputfilter){}
+		,m_inputfilter(o.m_inputfilter)
+		,m_stack(o.m_stack){}
 
 	///\brief Destructor
 	virtual ~TypingInputFilter(){}
@@ -72,8 +75,22 @@ public:
 	///\brief Implementation of TypedInputFilter::setFlags(Flags)
 	virtual bool setFlags( Flags f);
 
+	///\brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const;
+
 private:
 	InputFilterR m_inputfilter;
+	struct StackElement
+	{
+		bool isArrayElem;
+		unsigned int cnt;
+
+		StackElement( const StackElement& o)
+			:isArrayElem(o.isArrayElem),cnt(o.cnt){}
+		StackElement()
+			:isArrayElem(false),cnt(0){}
+	};
+	std::vector<StackElement> m_stack;
 };
 
 ///\class TypingOutputFilter

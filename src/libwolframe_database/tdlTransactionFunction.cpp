@@ -231,7 +231,6 @@ void TdlTransactionFunctionClosure::init( const proc::ProcessorProviderInterface
 	m_provider = p;
 	m_inputstructptr = new TdlTransactionFunctionClosure::InputStructure( m_func);
 	m_inputstruct.reset( m_inputstructptr);
-	i->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
 	m_input.init( i, m_inputstruct);
 	m_state = 1;
 	m_flags = f;

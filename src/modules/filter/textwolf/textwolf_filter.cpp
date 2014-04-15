@@ -302,6 +302,12 @@ private:
 		return InputFilter::setFlags( f);
 	}
 
+	///\brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const
+	{
+		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+	}
+
 private:
 	typedef textwolf::XMLParser<std::string> XMLParser;
 	XMLParser m_parser;			//< XML parser

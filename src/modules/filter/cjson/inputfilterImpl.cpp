@@ -290,7 +290,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 	while (!m_stk.empty())
 	{
 		const cJSON* nd = m_stk.back().m_node;
-		if (!nd && m_stk.back().m_state != StackElement::StateCheckEnd)
+		if (!nd && m_stk.back().m_state != StackElement::StateCloseNode && m_stk.back().m_state != StackElement::StateCheckEnd)
 		{
 			setState( Error, "internal: invalid node in JSON structure");
 			return false;
@@ -354,6 +354,14 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						{
 							m_stk.push_back( StackElement( nd->child, nd->string));
 							nd = m_stk.back().m_node;
+
+							if (flag( FilterBase::SerializeWithIndices))
+							{
+								type = InputFilter::OpenTag;
+								element = "";
+								elementsize = 0;
+								return true;
+							}
 						}
 						else
 						{
@@ -436,26 +444,48 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						{
 							m_stk.back().m_state = StackElement::StateOpen;
 						}
+						continue;
 					}
 					else
 					{
-						m_stk.pop_back();
-						if (m_stk.empty())
+						if (m_stk.back().m_tag && flag( FilterBase::SerializeWithIndices))
 						{
-							// final close:
 							type = InputFilter::CloseTag;
 							element = 0;
 							elementsize = 0;
+							m_stk.back().m_state = StackElement::StateCloseNode;
 							return true;
 						}
-						nd = m_stk.back().m_node;
+						m_stk.back().m_state = StackElement::StateCloseNode;
+						continue;
 					}
+
+				case StackElement::StateCloseNode:
+					m_stk.pop_back();
+					if (m_stk.empty())
+					{
+						// final close:
+						type = InputFilter::CloseTag;
+						element = 0;
+						elementsize = 0;
+						return true;
+					}
+					nd = m_stk.back().m_node;
 					continue;
 
 				case StackElement::StateReopen:
-					type = InputFilter::OpenTag;
-					element = m_stk.back().m_tag;
-					elementsize = std::strlen( m_stk.back().m_tag);
+					if (flag( FilterBase::SerializeWithIndices))
+					{
+						type = InputFilter::OpenTag;
+						element = 0;
+						elementsize = 0;
+					}
+					else
+					{
+						type = InputFilter::OpenTag;
+						element = m_stk.back().m_tag;
+						elementsize = std::strlen( m_stk.back().m_tag);
+					}
 					m_stk.back().m_state = StackElement::StateOpen;
 					return true;
 			}
@@ -463,14 +493,4 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 	}
 	return false;
 }
-
-bool InputFilterImpl::setFlags( Flags f)
-{
-	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
-	{
-		return false;
-	}
-	return InputFilter::setFlags( f);
-}
-
 

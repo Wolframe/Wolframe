@@ -275,6 +275,11 @@ void InputFilterImpl::getElement( const void*& element, std::size_t& elementsize
 	}
 }
 
+bool InputFilterImpl::checkSetFlags( Flags f) const
+{
+	return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+}
+
 bool InputFilterImpl::setFlags( Flags f)
 {
 	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))

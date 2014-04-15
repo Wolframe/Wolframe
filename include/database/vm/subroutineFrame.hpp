@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file database/vm/subroutineFrame.hpp
-///\brief Defines the instruction set of the virtual machine defining database transactions
+///\brief Defines a structure for addressing the parameters passed to a subroutine by name
 #ifndef _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_FRAME_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_SUBROUTINE_FRAME_HPP_INCLUDED
 #include "database/vm/valueTupleSet.hpp"
@@ -45,28 +45,36 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
+///\class SubroutineFrame
+///\brief Structure for addressing the parameters passed to a subroutine by name
 class SubroutineFrame
 {
 public:
+	///\brief Default constructor
 	SubroutineFrame(){}
+	///\brief Constructor
 	explicit SubroutineFrame( const std::vector<std::string>& paramnames_)
 		:m_paramnames(paramnames_){}
+	///\brief Copy constructor
 	SubroutineFrame( const SubroutineFrame& o)
 		:m_paramnames(o.m_paramnames)
 		,m_paramvalues(o.m_paramvalues){}
 
+	///\brief Clear current subroutine frame (start initialization)
 	void clear()
 	{
 		m_paramnames.clear();
 		m_paramvalues.clear();
 	}
 
+	///\brief Initialize parameter names by the parameters defined for a subroutine
 	void init( const std::vector<std::string>& paramnames_)
 	{
 		clear();
 		m_paramnames = paramnames_;
 	}
 
+	///\brief Push a parameter value (in the order of the parameter names)
 	void push( const types::Variant& p)
 	{
 		if (m_paramvalues.size() >= m_paramnames.size())
@@ -75,6 +83,8 @@ public:
 		}
 		m_paramvalues.push_back( p);
 	}
+	///\brief Get the parameters of a called subroutine as value tuple set
+	///\return the value tuple set of the parameters
 	ValueTupleSetR getParameters() const
 	{
 		if (m_paramvalues.size() < m_paramnames.size())
@@ -87,8 +97,8 @@ public:
 	}
 
 private:
-	std::vector<std::string> m_paramnames;
-	std::vector<types::Variant> m_paramvalues;
+	std::vector<std::string> m_paramnames;		//< parameter names
+	std::vector<types::Variant> m_paramvalues;	//< parameter values (parallel array to m_paramnames)
 };
 
 }}}//namespace

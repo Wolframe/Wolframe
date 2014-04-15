@@ -42,16 +42,23 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
+///\class Output
+///\brief Output structure of the VM for transactions
 class Output
 {
 public:
+	///\brief Default constructor
 	Output(){}
+	///\brief Copy constructor
 	Output( const Output& o)
 		:m_ar(o.m_ar){}
 
+	///\class Element
+	///\brief Element of output
 	class Element
 	{
 	public:
+		///\brief Operation of output
 		enum Operation
 		{
 			Open,			//< open of a single element
@@ -62,40 +69,53 @@ public:
 			CloseArrayElement,	//< close of an array element
 			Value			//< content value
 		};
+		///\brief Default constructor
 		Element()
 			:m_op(Value){}
+		///\brief Copy constructor
 		Element( const Element& o)
 			:m_op(o.m_op),m_arg(o.m_arg){}
+		///\brief Constructor
 		Element( const Operation& op_, const types::Variant& arg_)
 			:m_op(op_),m_arg(arg_){}
+		///\brief Constructor
 		explicit Element( const Operation& op_)
 			:m_op(op_){}
 
+		///\brief Get the operation of output
 		Operation op() const			{return m_op;}
+		///\brief Get the argument of output
 		const types::Variant& arg() const	{return m_arg;}
 
 	private:
-		Operation m_op;
-		types::Variant m_arg;
+		Operation m_op;				//< operation of output
+		types::Variant m_arg;			//< argument of output
 	};
 
+	///\brief Add element to output
+	///\param[in] element to add
 	void add( const Element& elem)
 	{
 		m_ar.push_back( elem);
 	}
+	///\brief Add a value element to output
+	///\param[in] value value of element to add
 	void addValue( const types::Variant& value)
 	{
 		m_ar.push_back( Element( Element::Value, value));
 	}
 
 	typedef std::vector<Element>::const_iterator const_iterator;
+	///\brief Get the start iterator on this output
 	const_iterator begin() const				{return m_ar.begin();}
+	///\brief Get the end iterator on this output
 	const_iterator end() const				{return m_ar.end();}
 
+	///\brief Get the array of output elements
 	const std::vector<Element>& elements() const;
 
 private:
-	std::vector<Element> m_ar;
+	std::vector<Element> m_ar;		//< array of output elements
 };
 
 typedef boost::shared_ptr<Output> OutputR;

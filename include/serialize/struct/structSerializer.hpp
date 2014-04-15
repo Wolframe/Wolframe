@@ -64,6 +64,8 @@ public:
 
 	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
+
+	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
 private:

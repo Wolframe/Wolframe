@@ -135,6 +135,9 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
+	///\brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const;
+
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);

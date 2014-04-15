@@ -144,6 +144,11 @@ struct InputFilterImpl :public InputFilter
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	virtual bool checkSetFlags( Flags f) const
+	{
+		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+	}
+
 	virtual bool setFlags( Flags f)
 	{
 		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))

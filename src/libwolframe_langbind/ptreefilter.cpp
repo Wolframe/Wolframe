@@ -39,6 +39,11 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+bool PropertyTreeInputFilter::checkSetFlags( Flags f) const
+{
+	return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+}
+
 bool PropertyTreeInputFilter::setFlags( Flags f)
 {
 	langbind::TypedInputFilter::setFlags( f);

@@ -45,9 +45,13 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
+///\class InstructionSet
+///\brief Enumeration of instructions for the transaction VM with some static functions on them
 struct InstructionSet
 {
 public:
+	///\enum OpCode
+	///\brief Implemented operation codes of the VM
 	enum OpCode
 	{
 		// Control Flow Instructions:
@@ -178,6 +182,8 @@ public:
 		return ar[i];
 	}
 
+	///\enum ArgumentType
+	///\brief Enumeration of argument types
 	enum ArgumentType
 	{
 		At_None,			//< no argument
@@ -195,6 +201,7 @@ public:
 		At_IteratorColumnIdx		//< Index of Column in tuple set iterator element
 	};
 
+	///\brief Get the name of an argument type
 	static const char* argumentTypeName( ArgumentType i)
 	{
 		static const char* ar[] =
@@ -280,6 +287,8 @@ public:
 		return ar[i];
 	}
 
+	///\enum CondCode
+	///\brief Enumeration of conditional codes
 	enum CondCode
 	{
 		Co_ALWAYS,			//< execute always
@@ -287,6 +296,7 @@ public:
 		Co_NOT_IF_COND			//< execute, if cond flag set to false
 	};
 
+	///\brief Get the name of a conditional code
 	static const char* condCodeName( CondCode i)
 	{
 		static const char* ar[] = 
@@ -297,11 +307,18 @@ public:
 		};
 		return ar[i];
 	}
-
+	///\brief Index of an argument
 	typedef boost::uint32_t ArgumentIndex;
+	///\brief Address in program code
 	typedef boost::uint32_t Address;
+	///\brief Instruction
 	typedef boost::uint32_t Instruction;
 
+	///\brief Build an instruction from its parts
+	///\brief param[in] cond conditional code (condition for execution)
+	///\brief param[in] opcode instruction operation code
+	///\brief param[in] arg operation argument
+	///\return the instruction
 	static Instruction instruction( CondCode cond, OpCode opcode, unsigned int arg=0)
 	{
 		Instruction rt = 0;
@@ -313,15 +330,28 @@ public:
 		rt |= (arg << Shift_ArgumentIndex);
 		return rt;
 	}
+	///\brief Build an instruction from its parts (no condition -> always executed)
+	///\brief param[in] opcode instruction operation code
+	///\brief param[in] arg operation argument
+	///\return the instruction
 	static Instruction instruction( OpCode opcode, unsigned int arg=0)
 	{
 		return instruction( Co_ALWAYS, opcode, arg);
 	}
 
+	///\brief Get the condition code of an instruction (defining on which condition the instruction is executed)
+	///\brief param[in] instr the instruction to extract the condition code from
 	static CondCode condCode( const Instruction& instr)		{return static_cast<CondCode>((unsigned int)(instr&Mask_CondCode) >> Shift_CondCode);}
+	///\brief Get the operation code of an instruction (defining what is done on execution)
+	///\brief param[in] instr the instruction to extract the operation code from
 	static OpCode opCode( const Instruction& instr)			{return static_cast<OpCode>((unsigned int)(instr&Mask_OpCode) >> Shift_OpCode);}
+	///\brief Get the argument index of the instruction (addressing the argument depending on the argument type of the instruction)
+	///\brief param[in] instr the instruction to extract the argument index from
 	static ArgumentIndex argumentIndex( const Instruction& instr)	{return static_cast<ArgumentIndex>((unsigned int)(instr&Mask_ArgumentIndex) >> Shift_ArgumentIndex);}
 
+	///\brief Print the program code without any symbolic information that is not available here
+	///\brief param[out] out output stream to print to
+	///\brief param[out] prg vector of instructions to print
 	static void printProgramRaw( std::ostream& out, const std::vector<Instruction>& prg)
 	{
 		std::vector<Instruction>::const_iterator pi = prg.begin(), pe = prg.end();
@@ -341,6 +371,8 @@ public:
 		}
 	}
 
+	///\brief Get the instruction as string
+	///\return the instruction as string
 	static std::string instructionstr( const Instruction& instr)
 	{
 		std::ostringstream out;
@@ -359,21 +391,21 @@ public:
 
 private:
 	enum {
-		BitCnt_OpCode=6,	Shift_OpCode=26,
-		BitCnt_CondCode=2,	Shift_CondCode=24,
-		BitCnt_ArgumentIndex=20,Shift_ArgumentIndex=0
+		BitCnt_OpCode=6,	Shift_OpCode=26,			//< location and size of the operation code in the instruction
+		BitCnt_CondCode=2,	Shift_CondCode=24,			//< location and size of the condition code in the instruction
+		BitCnt_ArgumentIndex=20,Shift_ArgumentIndex=0			//< location and size of the argument index in the instruction
 	};
 public:
 	enum {
-		Max_OpCode=((1<<BitCnt_OpCode)-1),
-		Max_CondCode=((1<<BitCnt_CondCode)-1),
-		Max_ArgumentIndex=((1<<BitCnt_ArgumentIndex)-1)
+		Max_OpCode=((1<<BitCnt_OpCode)-1),				//< maximum value of the operation code in the instruction
+		Max_CondCode=((1<<BitCnt_CondCode)-1),				//< maximum value of the condition code in the instruction
+		Max_ArgumentIndex=((1<<BitCnt_ArgumentIndex)-1)			//< maximum value of the argument index in the instruction
 	};
 private:
 	enum {
-		Mask_OpCode=(Max_OpCode << Shift_OpCode),
-		Mask_CondCode=(Max_CondCode << Shift_CondCode),
-		Mask_ArgumentIndex=(Max_ArgumentIndex << Shift_ArgumentIndex)
+		Mask_OpCode=(Max_OpCode << Shift_OpCode),			//< separation bit mask of the operation code in the instruction
+		Mask_CondCode=(Max_CondCode << Shift_CondCode),			//< separation bit mask of the condition code in the instruction
+		Mask_ArgumentIndex=(Max_ArgumentIndex << Shift_ArgumentIndex)	//< separation bit mask of the argument index in the instruction
 	};
 };
 
