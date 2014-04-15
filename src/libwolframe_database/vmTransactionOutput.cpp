@@ -146,7 +146,7 @@ public:
 			case vm::Output::Element::OpenArray:
 				if (langbind::FilterBase::flag(SerializeWithIndices))
 				{
-					m_stack.push_back( 0L);
+					m_stack.push_back( (types::Variant::Data::Int)0L);
 					type = langbind::FilterBase::OpenTag;
 					element = m_itr->arg();
 				}
