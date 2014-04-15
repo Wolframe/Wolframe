@@ -15,12 +15,10 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
-	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_database \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwfsingleton -lwolframe -lwolframe_serialize -lwolframe_database
+	-lwfsingleton -lwolframe
 
 STATIC_LIB = libwolframe_langbind.a
 
