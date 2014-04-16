@@ -621,6 +621,10 @@ std::string TestDescription::normalizeOutputCRLF( const std::string& output, con
 				break;
 			}
 		}
+		else
+		{
+			break;
+		}
 	}
 	if (oi == oe && ei == ee)
 	{

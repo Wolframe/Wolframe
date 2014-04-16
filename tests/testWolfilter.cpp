@@ -72,7 +72,7 @@ static std::string selectedTestName;
 TEST_F( WolfilterTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
-	std::size_t ibar[ibarsize] = {4,127,5,7,11,13,17,19,23,41,43};
+	std::size_t ibar[ibarsize] = {127,4,5,7,11,13,17,19,23,41,43};
 	std::size_t obar[obarsize] = {127,4,5,7,11,13,17};
 	std::vector<std::string> tests;
 	std::size_t testno;
@@ -228,6 +228,7 @@ TEST_F( WolfilterTest, tests)
 			std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
 			outstr.append( utils::readSourceFileContent( outfile));
 		}
+
 		//... On Windows std::endl used in stream output differs from Unix
 		outstr = td.normalizeOutputCRLF( outstr);
 		if (td.expected != outstr)

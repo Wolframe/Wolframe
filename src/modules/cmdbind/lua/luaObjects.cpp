@@ -1930,7 +1930,81 @@ static int function_input_table_nil( lua_State* ls)
 	return 1;
 }
 
-static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool outputIsTable)
+static lua_CFunction get_input_struct_table_closure( lua_State* ls, Input* input)
+{
+	if (input->inputfilter().get())
+	{
+		//... the filter provides no structure info. try to get the 'form' from the document type for it
+		types::DocType doctype;
+		if (input->inputfilter()->getDocType( doctype))
+		{
+			if (doctype.defined())
+			{
+				//... document with !DOCTYPE declaration -> lookup for form
+				const proc::ProcessorProviderInterface* gtc = getProcessorProvider( ls);
+				const types::FormDescription* st = gtc->formDescription( doctype.id);
+				if (!st)
+				{
+					LOG_DEBUG << "no form defined for document type '" << doctype.id << "'";
+
+					//... no form defined -> map it without structure info but issue a warning
+					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
+					if (!inp->setFlags( TypedInputFilter::SerializeWithIndices))
+					{
+						LOG_WARNING << "calling :table() on document type '" << doctype.id << "' without form defined for filter without input structure info";
+					}
+					TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+					RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
+					lua_pushlightuserdata( ls, obj);
+					return &function_input_table_RedirectFilterClosure;
+				}
+				else
+				{
+					//... form defined. pass filter input through form to get the structure info
+					types::FormR form( new types::Form( st));
+	
+					serialize::DDLFormParser* closure;
+					serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
+					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
+					LuaObject<serialize::DDLFormParser>::push_luastack( ls, serialize::DDLFormParser( form));
+					closure = LuaObject<serialize::DDLFormParser>::get( ls, -1);
+					closure->init( inp, flags);
+					lua_pushlightuserdata( ls, closure);
+					return &function_input_table_DDLFormParser;
+				}
+			}
+			else
+			{
+				//... document is standalone -> map it without structure info but issue a warning
+				TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
+				if (!inp->setFlags( TypedInputFilter::SerializeWithIndices))
+				{
+					LOG_WARNING << "calling table() on standalone document for filter without input structure info";
+				}
+				TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+				RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
+				lua_pushlightuserdata( ls, obj);
+				return &function_input_table_RedirectFilterClosure;
+			}
+		}
+		else if (input->inputfilter()->state() == InputFilter::Error)
+		{
+			std::string msg( "error parsing DOCTYPE: ");
+			const char* err = input->inputfilter()->getError();
+			msg.append( err?err:"unknown");
+			throw std::runtime_error(msg);
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "undefined input filter");
+	}
+	return 0;
+}
+
+static lua_CFunction get_input_struct_form_closure( lua_State* ls, Input* input)
 {
 	if (input->inputfilter().get())
 	{
@@ -1944,24 +2018,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 				const types::FormDescription* st = gtc->formDescription( doctype.id);
 				if (!st)
 				{
-					if (!outputIsTable)
-					{
-						if (!input->inputfilter()->checkSetFlags( TypedInputFilter::SerializeWithIndices))
-						{
-							LOG_WARNING << "calling :table() on document document type '" << doctype.id << "' without form defined for filter without input structure info";
-						}
-						TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
-						inp->setFlags( TypedInputFilter::SerializeWithIndices);
-						TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-						RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
-						lua_pushlightuserdata( ls, obj);
-						return &function_input_table_RedirectFilterClosure;
-					}
-					else
-					{
-						return &function_input_table_nil;
-					}
+					return &function_input_table_nil;
 				}
 				else
 				{
@@ -1974,29 +2031,8 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 					closure = LuaObject<serialize::DDLFormParser>::get( ls, -1);
 					closure->init( inp, flags);
 					lua_pushlightuserdata( ls, closure);
-					if (outputIsTable)
-					{
-						return &function_input_table_DDLFormParser;
-					}
-					else
-					{
-						return &function_input_form_DDLFormParser;
-					}
+					return &function_input_form_DDLFormParser;
 				}
-			}
-			else if (outputIsTable)
-			{
-				// document is standalone
-				TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
-				if (!inp->setFlags( TypedInputFilter::SerializeWithIndices))
-				{
-					LOG_WARNING << "calling table() on standalone document for filter without input structure info";
-				}
-				TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-				RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
-				lua_pushlightuserdata( ls, obj);
-				return &function_input_table_RedirectFilterClosure;
 			}
 			else
 			{
@@ -2032,7 +2068,7 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table)
 		input = (Input*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
 	}
-	lua_CFunction func = get_input_struct_closure( ls, input, true);
+	lua_CFunction func = get_input_struct_table_closure( ls, input);
 	if (!func)
 	{
 		lua_pushlightuserdata( ls, input);
@@ -2056,7 +2092,7 @@ LUA_FUNCTION_THROWS( "input:form()", function_input_form)
 		input = (Input*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
 	}
-	lua_CFunction func = get_input_struct_closure( ls, input, false);
+	lua_CFunction func = get_input_struct_form_closure( ls, input);
 	if (!func)
 	{
 		lua_pushlightuserdata( ls, input);

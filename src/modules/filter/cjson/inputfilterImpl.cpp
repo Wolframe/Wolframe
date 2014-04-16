@@ -338,6 +338,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							elementsize = std::strlen( nd->string);
 							m_stk.back().m_state = StackElement::StateChild;
 						}
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -360,6 +361,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 								type = InputFilter::OpenTag;
 								element = "";
 								elementsize = 0;
+								LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 								return true;
 							}
 						}
@@ -382,6 +384,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -399,6 +402,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 					{
 						m_stk.back().m_state = StackElement::StateNext;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -420,6 +424,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						elementsize = 0;
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -438,6 +443,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							element = 0;
 							elementsize = 0;
 							m_stk.back().m_state = StackElement::StateReopen;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
 						else
@@ -454,6 +460,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							element = 0;
 							elementsize = 0;
 							m_stk.back().m_state = StackElement::StateCloseNode;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
 						m_stk.back().m_state = StackElement::StateCloseNode;
@@ -468,6 +475,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						type = InputFilter::CloseTag;
 						element = 0;
 						elementsize = 0;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					nd = m_stk.back().m_node;
@@ -487,6 +495,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						elementsize = std::strlen( m_stk.back().m_tag);
 					}
 					m_stk.back().m_state = StackElement::StateOpen;
+					LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 					return true;
 			}
 		}

@@ -312,6 +312,8 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	{
 		setState( Error, "cjson filter illegal operation: printing after final close");
 	}
+	LOG_DATA << "[json output filter] print " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+
 	switch (type)
 	{
 		case OutputFilter::OpenTag:
