@@ -31,7 +31,7 @@ cd $OLDPWD
 mv /tmp/wolframe-$VERSION.tar.Z .
 rm -rf /tmp/wolframe-$VERSION
 
-cp wolframe-$VERSION.tar.Z $PKGBUILD/BUILD/.
+cp -f wolframe-$VERSION.tar.Z $PKGBUILD/BUILD/.
 cd $PKGBUILD/BUILD
 uncompress -c wolframe-$VERSION.tar.Z | tar xvf -
 cd wolframe-$VERSION
