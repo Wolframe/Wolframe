@@ -41,19 +41,16 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::SimpleBuilder* createCompiler()\
+	static _Wolframe::module::BaseBuilder* createCompiler()\
 	{\
 		return new _Wolframe::module::DDLCompilerBuilder( #LANGUAGE "Compiler", #LANGUAGE, CREATE_COMPILER);\
 	}\
-	enum {NofSimpleBuilder=1};\
-	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
-		createCompiler\
+		createCompiler, NULL\
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(),\
-				0, 0,\
-				NofSimpleBuilder, simpleBuilder);\
+		entryPoint( 0, _Wolframe__moduleDescription(), builder );\
 	}
 

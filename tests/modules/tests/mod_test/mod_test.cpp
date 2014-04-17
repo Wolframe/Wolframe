@@ -102,7 +102,7 @@ bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static ConfiguredBuilder* createModule( void )
+static BaseBuilder* createModule( void )
 {
 	static module::ConfiguredBuilderDescription< test::TestModuleConstructor,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
@@ -110,13 +110,10 @@ static ConfiguredBuilder* createModule( void )
 }
 
 
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
+static BaseBuilder* (*containers[])() = {
+	createModule, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "Test Module",
-			     nrContainers, containers,
-			     0, NULL );
+ModuleEntryPoint entryPoint( 0, "Test Module", containers );
 
 }}} // namespace _Wolframe::module:test

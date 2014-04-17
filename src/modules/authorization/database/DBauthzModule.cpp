@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace module {
 
-static ConfiguredBuilder* createModule( void )
+static BaseBuilder* createModule( void )
 {
 	static module::ConfiguredBuilderDescription< AAAA::DBauthzConstructor,
 			AAAA::DatabaseAuthzConfig > mod( "Authorization database", "authorization",
@@ -49,13 +49,10 @@ static ConfiguredBuilder* createModule( void )
 	return &mod;
 }
 
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
+static BaseBuilder* (*containers[])() = {
+	createModule, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "Database authorization",
-			     nrContainers, containers,
-			     0, NULL );
+ModuleEntryPoint entryPoint( 0, "Database authorization", containers);
 
 }} // namespace _Wolframe::module

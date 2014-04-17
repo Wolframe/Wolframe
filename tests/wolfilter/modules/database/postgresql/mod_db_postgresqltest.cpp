@@ -43,20 +43,19 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static ConfiguredBuilder* createDatabase()
+static BaseBuilder* createDatabase()
 {
 	static module::ConfiguredBuilderDescription< db::PostgreSQLTestConstructor,
 		db::PostgreSQLTestConfig > mod( "test PostgreSQL database", "database", "PostgreSQLTest", db::POSTGRESQL_DB_CLASS_NAME);
 	return &mod;
 }
 
-enum { NofObjects = 1 };
-static CreateBuilderFunc containers[ NofObjects] =
+static createBuilderFunc containers[] =
 {
-	createDatabase
+	createDatabase, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", containers );
 
 }} // namespace _Wolframe::module
 

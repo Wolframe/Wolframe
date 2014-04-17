@@ -171,11 +171,22 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
 			break;
 		}
 
-		for ( unsigned short i = 0; i < entry->cfgdContainers; i++ )	{
-			modDir.addBuilder( entry->createCfgdBuilder[ i ]() );
-		}
-		for ( unsigned short i = 0; i < entry->containers; i++ )	{
-			modDir.addBuilder( entry->createBuilder[ i ]() );
+		for ( unsigned short i = 0; entry->createBuilder[ i ]; i++ )	{
+			BaseBuilder* builder = entry->createBuilder[ i ]();
+			SimpleBuilder* simpleBuilder = dynamic_cast<SimpleBuilder*>(builder);
+			ConfiguredBuilder* configuredBuilder = dynamic_cast<ConfiguredBuilder*>(builder);
+			if (configuredBuilder)
+			{
+				modDir.addBuilder( configuredBuilder);
+			}
+			else if (simpleBuilder)
+			{
+				modDir.addBuilder( simpleBuilder);
+			}
+			else
+			{
+				LOG_ERROR << "Unknown type of builder in module '" << entry->name << "'";
+			}
 		}
 		handleList.addHandle( hndl );
 		LOG_DEBUG << "Module '" << entry->name << "' loaded";

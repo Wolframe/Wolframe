@@ -42,20 +42,17 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::SimpleBuilder* createFilterType()\
+	static _Wolframe::module::BaseBuilder* createFilterType()\
 	{\
 		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
 	}\
-	enum {NofSimpleBuilder=1};\
-	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
-		createFilterType\
+		createFilterType, NULL\
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(),\
-				0, 0,\
-				NofSimpleBuilder, simpleBuilder);\
+		entryPoint( 0, _Wolframe__moduleDescription(), builder);\
 	}
 
 
@@ -65,25 +62,23 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::SimpleBuilder* createFilterType()\
+	static _Wolframe::module::BaseBuilder* createFilterType()\
 	{\
 		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
 	}\
-	static _Wolframe::module::SimpleBuilder* createProgramType()\
+	static _Wolframe::module::BaseBuilder* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME, CREATE_PRG_FUNC);\
 	}\
-	enum {NofSimpleBuilder=2};\
-	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
 		createFilterType,\
-		createProgramType\
+		createProgramType,\
+		NULL\
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(),\
-				0, 0,\
-				NofSimpleBuilder, simpleBuilder);\
+		entryPoint( 0, _Wolframe__moduleDescription(), builder);\
 	}
 
 

@@ -37,18 +37,15 @@
 
 ///\brief Defines a Wolframe command handler module after the includes section.
 #define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
-	static _Wolframe::module::SimpleBuilder* createProgramType()\
+	static _Wolframe::module::BaseBuilder* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
 	}\
-	enum {NofSimpleBuilder=1};\
-	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
-		createProgramType\
+		createProgramType, NULL\
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "form function program type for " #LANGNAME,\
-				0, 0,\
-				NofSimpleBuilder, simpleBuilder);\
+		entryPoint( 0, "form function program type for " #LANGNAME, builder );\
 	}

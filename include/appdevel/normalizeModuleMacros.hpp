@@ -80,18 +80,17 @@
 	namespace {\
 	struct ModuleImpl\
 	{\
-		static _Wolframe::module::SimpleBuilder* constructor()\
+		static _Wolframe::module::BaseBuilder* constructor()\
 		{\
 			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
 		}\
 	};\
 	}\
-	enum {NofObjects=1};\
-	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[ NofObjects] =\
+	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[] =\
 	{\
-		ModuleImpl::constructor\
+		ModuleImpl::constructor, NULL\
 	};\
 	extern "C" { \
-		 _Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef); \
+		 _Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__objdef); \
 	}
 

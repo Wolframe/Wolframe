@@ -47,8 +47,19 @@
 namespace _Wolframe {
 namespace module {
 
+class BaseBuilder
+{
+public:
+	virtual ~BaseBuilder(){};
+
+	virtual const char* objectClassName() const = 0;
+	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
+	virtual ObjectConstructorBase* constructor() = 0;
+};
+
 ///
 class SimpleBuilder
+	:public BaseBuilder
 {
 	friend class ModulesDirectory;
 public:
@@ -57,7 +68,7 @@ public:
 
 	virtual ~SimpleBuilder()			{}
 
-	const char* objectClassName() const		{ return m_className; }
+	virtual const char* objectClassName() const	{ return m_className; }
 
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
@@ -67,6 +78,7 @@ protected:
 
 ///
 class ConfiguredBuilder
+	:public BaseBuilder
 {
 	friend class ModulesDirectory;
 public:
@@ -83,7 +95,7 @@ public:
 
 	virtual ~ConfiguredBuilder()			{}
 
-	const char* objectClassName() const		{ return m_className; }
+	virtual const char* objectClassName() const	{ return m_className; }
 
 	/// The type of the object: filter, audit, command handler etc.
 	/// This is not the same as the objectName
@@ -133,13 +145,9 @@ private:
 
 //*********** Module interface *********
 
-/// Function that constructs a configured builder.
-/// This function is specific for each of the configured builders in the module.
-typedef ConfiguredBuilder* (*createCfgdBuilderFunc)();
-
-/// Function that constructs a simple (non-configured) builder.
-/// This function is specific for each of the simple builders in the module.
-typedef SimpleBuilder* (*createBuilderFunc)();
+///\brief Function that constructs a builder.
+//	This function is specific for each of the configured builders in the module.
+typedef BaseBuilder* (*createBuilderFunc)();
 
 
 /// The module entry point structure. Only one entry point per module.
@@ -149,25 +157,16 @@ struct ModuleEntryPoint
 		MODULE_SIGN_SIZE = 16
 	};
 
-	char signature[MODULE_SIGN_SIZE];		///< module entry point signature
+	char signature[ MODULE_SIGN_SIZE];		///< module entry point signature
 	unsigned short ifaceVersion;			///< version of the module loader interface
 	const char* name;				///< name of the module
-	unsigned short		cfgdContainers;		///< number of configured builders
-	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
-	unsigned short		containers;		///< number of simple (unconfigured) builders
-	createBuilderFunc	*createBuilder;		///< the array of functions that create the simple builders
+	createBuilderFunc* createBuilder;		///< NULL terminated array of functions that create the builders
 public:
-	ModuleEntryPoint( unsigned short iVer, const char* modName,
-			  unsigned short nrContainers, createCfgdBuilderFunc* containerFunc,
-			  unsigned short nrObjects, createBuilderFunc* objectFunc
-			  )
-		: ifaceVersion( iVer ), name( modName ),
-		  cfgdContainers( nrContainers ), createCfgdBuilder( containerFunc ),
-		  containers( nrObjects ), createBuilder( objectFunc )
+	ModuleEntryPoint( unsigned short iVer, const char* modName, createBuilderFunc* createBuilder_)
+		: ifaceVersion( iVer ), name( modName ), createBuilder( createBuilder_ )
 	{
-		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
-		if ( createCfgdBuilder == NULL ) cfgdContainers = 0;
-		if ( createBuilder == NULL ) containers = 0;
+		std::memset ( signature, 0, MODULE_SIGN_SIZE);
+		std::memcpy ( signature, "Wolframe Module", std::strlen("Wolframe Module"));
 	}
 };
 

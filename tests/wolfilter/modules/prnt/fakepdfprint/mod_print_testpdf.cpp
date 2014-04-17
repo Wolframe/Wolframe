@@ -49,19 +49,18 @@ struct PdfPrinter
 	{
 		return new prnt::SimplePdfPrintProgram( prnt::createTestTraceDocument);
 	}
-	static SimpleBuilder* constructor()
+	static BaseBuilder* constructor()
 	{
 		return new ProgramTypeBuilder( "TestPdfPrintFunction", "simplepdf", &PdfPrinter::createProgram);
 	}
 };
 }//anonymous namespace
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[] =
 {
-	PdfPrinter::constructor
+	PdfPrinter::constructor, NULL
 };
 
 extern "C" {
-ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", objdef );
 }

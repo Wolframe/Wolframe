@@ -39,35 +39,16 @@
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
-{
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
-	return &mod;
-}
-*/
-
-static SimpleBuilder* pythonProgramTypeBuilder()
+static BaseBuilder* pythonProgramTypeBuilder()
 {
 	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
 }
 
-enum {NofConfiguredBuilder=0};
-/* LATER
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
+static BaseBuilder* (*builder[])() =
 {
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
+	pythonProgramTypeBuilder, NULL
 };
 
 extern "C" {
-	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
+	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python", builder );
 }

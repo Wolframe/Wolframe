@@ -43,20 +43,19 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static ConfiguredBuilder* createDatabase()
+static BaseBuilder* createDatabase()
 {
 	static module::ConfiguredBuilderDescription< db::OracleTestConstructor,
 		db::OracleTestConfig > mod( "test Oracle database", "database", "OracleTest", db::ORACLE_DB_CLASS_NAME);
 	return &mod;
 }
 
-enum { NofObjects = 1 };
-static CreateBuilderFunc containers[ NofObjects] =
+static createBuilderFunc containers[] =
 {
-	createDatabase
+	createDatabase, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "Oracle test database", NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "Oracle test database", containers );
 
 }} // namespace _Wolframe::module
 

@@ -56,18 +56,17 @@
 	namespace {\
 	struct ModuleImpl\
 	{\
-	static _Wolframe::module::SimpleBuilder* constructor()\
+	static _Wolframe::module::BaseBuilder* constructor()\
 	{\
 		return new _Wolframe::module::CppFormFunctionBuilder( _Wolframe__moduleName(), _Wolframe__cppFormFunctions);\
 	}\
 	};\
 	}\
-	enum {NofObjects=1};\
-	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[ NofObjects] =\
+	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[] =\
 	{\
-		ModuleImpl::constructor\
+		ModuleImpl::constructor, NULL\
 	};\
 	extern "C" { \
-		 module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, _Wolframe__objdef); \
+		 module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), _Wolframe__objdef); \
 	}
 

@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace module {
 
-static ConfiguredBuilder* createSQLiteModule( void )
+static BaseBuilder* createSQLiteModule( void )
 {
 	static module::ConfiguredBuilderDescription< db::SQLiteConstructor,
 			db::SQLiteConfig > mod( "SQLite database", "database",
@@ -49,13 +49,10 @@ static ConfiguredBuilder* createSQLiteModule( void )
 	return &mod;
 }
 
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createSQLiteModule
+static BaseBuilder* (*containers[])() = {
+	createSQLiteModule, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "SQLite database",
-			     nrContainers, containers,
-			     0, NULL );
+ModuleEntryPoint entryPoint( 0, "SQLite database", containers);
 
 }} // namespace _Wolframe::module

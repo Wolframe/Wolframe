@@ -86,21 +86,18 @@
 			return new LANGNAME ##CommandHandlerConstructor();\
 		}\
 	};\
-	static _Wolframe::module::ConfiguredBuilder* createCommandHandler()\
+	static _Wolframe::module::BaseBuilder* createCommandHandler()\
 	{\
 		static LANGNAME ##CommandHandlerBuilder rt;\
 		return &rt;\
 	}\
-	enum {NofConfiguredBuilder=1};\
-	static _Wolframe::module::ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
-		createCommandHandler\
+		createCommandHandler, NULL\
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "command handler and form function handler for " #LANGNAME,\
-				NofConfiguredBuilder, configuredBuilder,\
-				0, 0);\
+		entryPoint( 0, "command handler and form function handler for " #LANGNAME, builder );\
 	}
 
 
@@ -152,28 +149,20 @@
 			return new LANGNAME ##CommandHandlerConstructor();\
 		}\
 	};\
-	static _Wolframe::module::ConfiguredBuilder* createCommandHandler()\
+	static _Wolframe::module::BaseBuilder* createCommandHandler()\
 	{\
 		static LANGNAME ##CommandHandlerBuilder rt;\
 		return &rt;\
 	}\
-	static _Wolframe::module::SimpleBuilder* createProgramType()\
+	static _Wolframe::module::BaseBuilder* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
 	}\
-	enum {NofConfiguredBuilder=1};\
-	static _Wolframe::module::ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =\
+	static _Wolframe::module::BaseBuilder* (*builder[])() =\
 	{\
-		createCommandHandler\
-	};\
-	enum {NofSimpleBuilder=1};\
-	static _Wolframe::module::SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =\
-	{\
-		createProgramType\
+		createCommandHandler, createProgramType, NULL \
 	};\
 	extern "C" {\
 		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "command handler and form function program type for " #LANGNAME,\
-				NofConfiguredBuilder, configuredBuilder,\
-				NofSimpleBuilder, simpleBuilder);\
+		entryPoint( 0, "command handler and form function program type for " #LANGNAME, builder);\
 	}
