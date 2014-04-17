@@ -112,8 +112,11 @@ struct InputFilterImpl :public InputFilter
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
-	///\remark FilterBase::setFlags() inherited		(always successful)
-	///\remark FilterBase::checkSetFlags()const inherited	(true)
+	///\brief Implements FilterBase::setFlags()
+	virtual bool setFlags( Flags f);
+
+	///\brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const;
 
 private:
 	boost::shared_ptr<cJSON> parse( const std::string& content);

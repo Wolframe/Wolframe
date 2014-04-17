@@ -503,3 +503,13 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 	return false;
 }
 
+bool InputFilterImpl::checkSetFlags( Flags f) const
+{
+	return true;
+}
+
+bool InputFilterImpl::setFlags( Flags f)
+{
+	return FilterBase::setFlags( f);
+}
+
